@@ -1,6 +1,6 @@
 /**
- * File:   logging.h
- * Author: Sebastian Junges
+ * @file:   logging.h
+ * @author: Sebastian Junges
  *
  * A small wrapper which sends messages to LOG4CPLUS if LOG4CPLUS is available,
  * otherwise the messages are just printed to std::cout.
@@ -155,7 +155,6 @@ inline void configureLogging() {
     fileAppender->setLayout(layout);
     logger.addAppender(fileAppender);
     logger.setLogLevel(log4cplus::TRACE_LOG_LEVEL);
-
 #endif
 }
 
