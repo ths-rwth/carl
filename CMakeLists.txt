@@ -21,7 +21,7 @@ set( arithlib_MAJORVERSION 0)
 set( arithlib_MINORVERSION 1)
 set( arithlib_MAINTENANCEVERSION 0)
 set( arithlib_VERSION "${arithlib_MAJORVERSION}.${arithlib_MINORVERSION}.${arithlib_MAINTENANCEVERSION}")
-set( PROJECT_VERSION ${arithlib_VERSION})
+set( PROJECT_VERSION "${arithlib_VERSION}")
 set( smtrat_NAME "SMT-RAT" )
 set( smtrat_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
