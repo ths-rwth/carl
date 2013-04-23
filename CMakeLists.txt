@@ -33,6 +33,8 @@ set( smtrat_DESCRIPTION ${PROJECT_DESCRIPTION} )
 # options
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 
+option( ARITHMETIC_LOGGING "Compile with the logging facility of the arithmetic library" ON )
+
 # path to put in the executables
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -59,9 +61,6 @@ set( libraries ${GINACRA_LIBRARY} ${GINAC_LIBRARY} ${CLN_LIBRARY} ${GMP_LIBRARY}
 # C.2. optional libraries
 # # # # # # # # # # # # # # # # # # # # # #
 
-# GiNaC and GiNaCRA should be included for migration.
-#find_package(GiNaC REQUIRED)
-#find_package(GiNaCRA REQUIRED)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.3. Development and debug libraries.
@@ -77,6 +76,8 @@ if(DOXYGEN)
 else()
   message(WARNING, "Doxygen not found")
 endif()
+
+# find log4cplus
 
 
 # # # # # # # # # # # # # # # # # # # # # #

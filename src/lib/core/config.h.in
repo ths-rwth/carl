@@ -1,3 +1,6 @@
 /**
  * Auto generated file config.h from config.h.in.
  */ 
+
+#define LOGi2_USE_LOG4CPLUS
+#cmakedefine ARITHMETIC_LOGGING

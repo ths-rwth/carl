@@ -1,3 +1,6 @@
+# Start compiling resources (if necessary)
+add_subdirectory(resources)
+
 add_subdirectory(lib)
 
 # For unit tests.

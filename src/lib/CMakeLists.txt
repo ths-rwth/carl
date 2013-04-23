@@ -1,6 +1,12 @@
+# include directories.
+include_directories( ${LOG4CPLUS_INCLUDE_DIR}
+
+)
+
+# include core in library. 
 add_subdirectory(core)
 
-# All the sources for the aritmetic library.
+# Compose all the sources for the aritmetic library.
 set(arithmetic_lib_sources 
 	${arithmetic_lib_core_sources}
 )
