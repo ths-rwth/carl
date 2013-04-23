@@ -24,7 +24,7 @@
 //#define LOGi2_DISABLE_INFO_MSG
 //#define LOGi2_DISABLE_DEBUG_MSG
 //#define LOGi2_DISABLE_TRACE_MSG
-
+#define LOGi2_TOFILE
 
 #ifndef LOGi2_DISABLE
 #ifdef LOGi2_USE_LOG4CPLUS
@@ -40,9 +40,9 @@
 #endif
 
 
-#ifndef GINACRA_LOGGING
+#ifndef ARITHMETIC_LOGGING
 #define LOGi2_DISABLE
-#undef GINACRA_USE_LOG4CPLUS
+#undef LOGi2_USE_LOG4CPLUS
 #endif
 
 #ifdef LOGi2_DISABLE
@@ -87,7 +87,7 @@
 
 namespace arithmetic {
 #ifndef LOGi2_DISABLE
-#ifdef GINACRA_USE_LOG4CPLUS
+#ifdef LOGi2_USE_LOG4CPLUS
 // use LOG4CPLUS types
 typedef log4cplus::Logger Log;
 #define getLog(name) log4cplus::Logger::getInstance((name));
@@ -147,10 +147,13 @@ typedef void* Log;
 
 
 inline void configureLogging() {
-#ifdef GINACRA_USE_LOG4CPLUS
-    log4cplus::Logger logger = log4cplus::Logger::getInstance("ginacra");
-    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::FileAppender("ginacra.log"));
-    //log4cplus::SharedAppenderPtr fileAppender(new log4cplus::ConsoleAppender());
+#ifdef LOGi2_USE_LOG4CPLUS
+    log4cplus::Logger logger = log4cplus::Logger::getInstance("arithmetic");
+    #ifdef LOGi2_TOFILE
+    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::FileAppender("arithmetic.log"));
+    #else
+    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::ConsoleAppender());
+    #endif
     std::auto_ptr<log4cplus::Layout> layout(new log4cplus::PatternLayout("%r [%T] %-5p %c |%b:%L| - %m%n"));
     fileAppender->setLayout(layout);
     logger.addAppender(fileAppender);

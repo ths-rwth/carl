@@ -1,8 +1,9 @@
 /*
- * File:   initialize.h
+ * @file:   initialize.h
+ * @author Sebastian Junges
+ 
  * This file should be the first included header from the GiNaCRA library 
  * in order to make sure some initilization is done right.
- * @author Sebastian Junges
  * Created: 20/11/2012
  * Version: 23/11/2012
  */
