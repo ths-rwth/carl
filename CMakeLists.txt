@@ -10,6 +10,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
 # # # # # # # # # # # # # # # # # # # # # #
@@ -25,6 +26,9 @@ set( PROJECT_VERSION "${arithlib_VERSION}")
 set( smtrat_NAME "SMT-RAT" )
 set( smtrat_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
+
+# path to find own modules
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options
