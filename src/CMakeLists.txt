@@ -4,6 +4,7 @@ add_subdirectory(resources)
 # Libraries..
 set( libraries ${LOG4CPLUS_LIB} )
 
+message( ${libraries})
 add_subdirectory(lib)
 
 # For unit tests.

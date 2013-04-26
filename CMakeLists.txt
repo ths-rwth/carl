@@ -41,6 +41,8 @@ option( ARITHMETIC_LOGGING "Compile with the logging facility of the arithmetic 
 
 # path to put in the executables
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+# compiler flags.
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++0x")
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C. Find system tools and libraries.

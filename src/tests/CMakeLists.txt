@@ -27,7 +27,7 @@ add_custom_target( check
 # link the libraries
 target_link_libraries( check_arithmetic
                        ${CPPUNIT_LIBRARIES}
-                       lib_arithmetic
+                       #lib_arithmetic
                        ${libraries}
 )
 
