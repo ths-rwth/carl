@@ -200,10 +200,10 @@ get_locale_by_name (tstring const & locale_name) try
     else
         return std::locale (LOG4CPLUS_TSTRING_TO_STRING (locale_name).c_str ());
 }
-catch (std::runtime_error const &)
+catch (std::runtime_error const & e)
 {
     helpers::getLogLog ().error (
-        LOG4CPLUS_TEXT ("Failed to create locale " + locale_name));
+        LOG4CPLUS_TEXT ("Failed to create locale " + locale_name + e.what()));
     return std::locale ();
 }
 
@@ -220,7 +220,7 @@ FileAppender::FileAppender(const tstring& filename_,
     , reopenDelay(1)
     , bufferSize (0)
     , buffer (0)
-    , localeName (LOG4CPLUS_TEXT ("DEFAULT"))
+    , localeName (LOG4CPLUS_TEXT(""))
 {
     init(filename_, mode_, internal::empty_str);
 }

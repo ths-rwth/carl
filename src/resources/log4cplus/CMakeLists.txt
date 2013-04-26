@@ -46,11 +46,9 @@ include_directories (${log4cplus_SOURCE_DIR}/include
                      ${log4cplus_BINARY_DIR}/include
                     )
 
-if (LOG4CPLUS_BUILD_TESTING)
-  enable_testing()
-endif (LOG4CPLUS_BUILD_TESTING)
 
 add_subdirectory (src)
+#add_subdirectory (tests)
 #add_subdirectory (loggingserver)
 
 include(Log4CPlusCPack.cmake)
