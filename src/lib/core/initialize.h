@@ -14,7 +14,6 @@
 
 #include "config.h"
 #include "logging.h"
-#include "settings.h"
 
 namespace arithmetic
 {
@@ -27,7 +26,6 @@ namespace arithmetic
     {
         // initializing the logging library.
         configureLogging();
-        LOGMSG_DEBUG( getLog( "arithmetic" ), "Logging up and running" );
         // initialize anything else here!
 
         return 0;

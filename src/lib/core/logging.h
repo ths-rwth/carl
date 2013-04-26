@@ -36,6 +36,7 @@
 #include <log4cplus/layout.h>
 #include <log4cplus/consoleappender.h>
 #include <log4cplus/loglevel.h>
+#include "log4cplus/helpers/loglog.h"
 #endif
 #endif
 
@@ -90,7 +91,7 @@ namespace arithmetic {
 #ifdef LOGi2_USE_LOG4CPLUS
 // use LOG4CPLUS types
 typedef log4cplus::Logger Log;
-#define getLog(name) log4cplus::Logger::getInstance((name));
+#define getLog(name) log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(name))
 // use LOG4CPLUS macros
 #ifndef LOGi2_DISABLE_FATAL_MSG
 #define LOGMSG_FATAL(log, msg) LOG4CPLUS_FATAL((log), msg)
@@ -148,15 +149,19 @@ typedef void* Log;
 
 inline void configureLogging() {
 #ifdef LOGi2_USE_LOG4CPLUS
-    log4cplus::Logger logger = log4cplus::Logger::getInstance("arithmetic");
+    log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("arithmetic"));
     #ifdef LOGi2_TOFILE
-    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::FileAppender("arithmetic.log"));
+    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::FileAppender(LOG4CPLUS_TEXT("arithmetic.log")));
     #else
     log4cplus::SharedAppenderPtr fileAppender(new log4cplus::ConsoleAppender());
     #endif
+    // Set layout. 
+    // Notice that the current version of log4cplus uses the deprecated auto_ptr
     std::auto_ptr<log4cplus::Layout> layout(new log4cplus::PatternLayout("%r [%T] %-5p %c |%b:%L| - %m%n"));
     fileAppender->setLayout(layout);
+    // Set output.
     logger.addAppender(fileAppender);
+    // Set minimal loglovel
     logger.setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 #endif
 }
