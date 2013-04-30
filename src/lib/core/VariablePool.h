@@ -32,8 +32,11 @@ class VariablePool
 private:
     
     /// Counter for the number of used variables.
-    unsigned nrVariablesUsed;
+    unsigned mNextVarId;
     
+    /**
+     * The (only) instance of VariablePool.
+     */
     static std::shared_ptr< VariablePool >  instance;
     /**
      * Making sure that creating a new instance is called only once.
@@ -50,8 +53,6 @@ private:
     VariablePool();
     VariablePool(const VariablePool& rs);
     VariablePool& operator = (const VariablePool& rs);
-    
- 
 public:
     static VariablePool& getInstance(  );
     

@@ -9,13 +9,18 @@
 
 #include "logging.h"
 #include <iostream>
+#include <cln/intparam.h>
 
 namespace arithmetic
 {
 
+std::shared_ptr< VariablePool > VariablePool::instance;
+std::once_flag VariablePool::only_one;
+
+
 VariablePool::VariablePool()
 {
-    std::cout << "output" << std::endl;
+    mNextVarId = 0;
     LOGMSG_INFO("arithmetic.varpool", "Constructor called");
 }
 VariablePool::VariablePool(const VariablePool& rs) {
@@ -27,7 +32,6 @@ VariablePool& VariablePool::operator = (const VariablePool& rs)
     if (this != &rs) {
         instance  = rs.instance;
     }
- 
     return *this;
 }   
 
@@ -39,20 +43,14 @@ VariablePool& VariablePool::getInstance(  )
             VariablePool::instance.reset( new VariablePool() );
             LOGMSG_INFO("arithmetic","VariablePool created.");
         });
-
     return *VariablePool::instance;
 }
 
-std::shared_ptr< VariablePool > VariablePool::instance;
-    /**
-     * Making sure that creating a new instance is called only once.
-     * Note: According to the new C++11 standard this is not strictly necessary.
-     * However, this is currently only supported in gcc 4.8.1 and newer. Therefore,
-     * we decided to make explicit use of this flag, thereby supporting gcc 4.7 
-     * and some other compilers.
-     */
-std::once_flag VariablePool::only_one;
-    
+variable VariablePool::getFreshVariable(VariableType type)
+{
+    size_t t(type);
+    return (t << ((sizeof(variable) * char_bitsize) - VARIABLE_BITS_RESERVED_FOR_TYPE) | mNextVarId++);
+}
 
 }
 
