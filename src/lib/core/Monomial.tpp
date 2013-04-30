@@ -10,6 +10,7 @@
 
 namespace arithmetic
 {
+
 template <typename Coefficient>
 Monomial<Coefficient>::Monomial() :
     mCoefficient(), 
@@ -33,5 +34,6 @@ Monomial<Coefficient>::Monomial(const Coefficient& coeff, variable v, exponent e
 {
     
 }
+
 
 }

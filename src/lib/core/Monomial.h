@@ -5,22 +5,10 @@
 
 #pragma once
 #include "Variable.h"
+#include "VarExpPair.h"
 
 namespace arithmetic
 {   
-
-    typedef unsigned exponent;
-    
-    struct VarExpPair
-    {
-        VarExpPair(variable v, exponent e) :
-            var(v),
-            exp(e)
-        {}
-        
-        variable var;
-        exponent exp;
-    };
     /**
      *  The general-purpose multivariate polynomial class.
      */
@@ -48,7 +36,10 @@ namespace arithmetic
              * @param e The exponent of this variable
              */
             Monomial(const Coefficient& c, variable v, exponent e=1);
-                    
+            
+            Monomial(const Coefficient& c, const VarExpPair& varexp);
+
+            
     };
 }
 

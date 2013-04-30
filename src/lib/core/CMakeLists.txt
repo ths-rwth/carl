@@ -4,6 +4,7 @@ set(arithmetic_lib_core_headers
 	Monomial.h Monomial.tpp
 	Polynomial.h
 	PolynomialPolicy.h
+	VarExpPair.h
 	Variable.h
 	VariablePool.h
 	initialize.h
@@ -12,6 +13,7 @@ set(arithmetic_lib_core_headers
 ) 
 # Source files in here
 set(arithmetic_lib_core_sources 
+	core/VarExpPair.cpp
 	core/Variable.cpp
 	core/VariablePool.cpp
 PARENT_SCOPE)
