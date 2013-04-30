@@ -1,6 +1,6 @@
 /* 
  * File:   UnitTest_Monomial.cpp
- * Author: square
+ * Author: Sebastian Junges
  * 
  * Created on April 23, 2013, 4:20 PM
  */

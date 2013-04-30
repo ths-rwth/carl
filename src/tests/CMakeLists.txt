@@ -17,6 +17,7 @@ link_directories( ${PROJECT_BINARY_DIR} )
 
 add_executable( check_arithmetic test.cpp 
 	UnitTest_Monomial.cpp	
+	UnitTest_VariablePool.cpp
 )
 
 # executable target
