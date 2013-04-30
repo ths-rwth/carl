@@ -157,7 +157,7 @@ inline void configureLogging() {
     #endif
     // Set layout. 
     // Notice that the current version of log4cplus uses the deprecated auto_ptr
-    std::auto_ptr<log4cplus::Layout> layout(new log4cplus::PatternLayout("%r [%T] %-5p %c |%b:%L| - %m%n"));
+    std::auto_ptr<log4cplus::Layout> layout(new log4cplus::PatternLayout("%r [%T] %-5p %-25c |%-25b:%4L| -\t %m%n"));
     fileAppender->setLayout(layout);
     // Set output.
     logger.addAppender(fileAppender);
