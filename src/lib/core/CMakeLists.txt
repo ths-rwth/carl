@@ -1,6 +1,7 @@
 # Header files in here (only headers from this directory!)
 set(arithmetic_lib_core_headers 
 	AbstractPolynomial.h
+	Monomial.h Monomial.tpp
 	Polynomial.h
 	PolynomialPolicy.h
 	Variable.h
