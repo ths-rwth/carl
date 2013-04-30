@@ -1,5 +1,6 @@
 #pragma once
 #include <cppunit/extensions/HelperMacros.h>
+#include "../lib/core/Monomial.h"
 
 class UnitTest_Monomial : public CPPUNIT_NS::TestFixture
 {

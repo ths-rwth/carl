@@ -15,7 +15,9 @@ include_directories( ${PROJECT_SOURCE_DIR}/src/lib )
 link_directories( ${PROJECT_BINARY_DIR} )
 
 
-add_executable( check_arithmetic test.cpp )
+add_executable( check_arithmetic test.cpp 
+	UnitTest_Monomial.cpp	
+)
 
 # executable target
 add_custom_target( check
@@ -27,7 +29,7 @@ add_custom_target( check
 # link the libraries
 target_link_libraries( check_arithmetic
                        ${CPPUNIT_LIBRARIES}
-                       #lib_arithmetic
+                       lib_arithmetic
                        ${libraries}
 )
 
