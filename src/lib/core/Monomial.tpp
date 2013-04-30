@@ -7,6 +7,7 @@
 
 // Include for code assistance.
 #include "Monomial.h"
+#include <iterator>
 
 namespace arithmetic
 {
@@ -35,5 +36,12 @@ Monomial<Coefficient>::Monomial(const Coefficient& coeff, variable v, exponent e
     
 }
 
+template<typename C>
+std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs )
+{
+    os << rhs.mCoefficient;
+    std::copy(rhs.mExponents.begin(), rhs.mExponents.end(),std::ostream_iterator<std::string>(os));
+    return os;
+}
 
 }

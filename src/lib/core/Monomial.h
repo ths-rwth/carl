@@ -38,8 +38,9 @@ namespace arithmetic
             Monomial(const Coefficient& c, variable v, exponent e=1);
             
             Monomial(const Coefficient& c, const VarExpPair& varexp);
-
             
+            template <typename C>
+            friend std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs );
     };
 }
 
