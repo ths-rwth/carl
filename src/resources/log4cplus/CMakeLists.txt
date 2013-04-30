@@ -11,9 +11,7 @@ set (log4cplus_postfix "")
 find_package (Threads)
 message (STATUS "Threads: ${CMAKE_THREAD_LIBS_INIT}")
 
-# we always build a static library in order to easy the linking in other projects
-# set(BUILD_SHARED_LIBS NOT ${STATICLIB_SWITCH})
-set(BUILD_SHARED_LIBS OFF)
+set(BUILD_SHARED_LIBS NOT ${STATICLIB_SWITCH})
 
 set (LOG4CPLUS_WORKING_LOCALE_DEFAULT OFF)
 
