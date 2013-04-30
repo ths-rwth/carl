@@ -44,33 +44,16 @@ private:
      */
     static std::once_flag                   only_one;
     
-    
+    /* 
+     * Constructors are all private, as we have a singleton.
+     */
     VariablePool();
-    VariablePool(const VariablePool& rs) {
-        instance  = rs.instance;
-    }
-    
-    VariablePool& operator = (const VariablePool& rs) 
-    {
-        if (this != &rs) {
-            instance  = rs.instance;
-        }
- 
-        return *this;
-    }   
+    VariablePool(const VariablePool& rs);
+    VariablePool& operator = (const VariablePool& rs);
     
  
 public:
-    static VariablePool& getInstance(  )
-    {
-        std::call_once( VariablePool::only_one, [] ()
-            {
-                VariablePool::instance.reset( new VariablePool() );
-                LOGMSG_INFO("arithmetic","VariablePool created.");
-            });
- 
-        return *VariablePool::instance;
-    }
+    static VariablePool& getInstance(  );
     
     /**
      * Get a variable which was not used before.
