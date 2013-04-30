@@ -11,6 +11,7 @@ set(arithmetic_lib_core_headers
 ) 
 # Source files in here
 set(arithmetic_lib_core_sources 
+	core/Variable.cpp
 	core/VariablePool.cpp
 PARENT_SCOPE)
 

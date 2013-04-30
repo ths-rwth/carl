@@ -6,10 +6,9 @@
 #include "VariablePool.h"
 
 #include <mutex>
+#include <climits>
 
 #include "logging.h"
-#include <iostream>
-#include <cln/intparam.h>
 
 namespace arithmetic
 {
@@ -49,7 +48,7 @@ VariablePool& VariablePool::getInstance(  )
 variable VariablePool::getFreshVariable(VariableType type)
 {
     size_t t(type);
-    return (t << ((sizeof(variable) * char_bitsize) - VARIABLE_BITS_RESERVED_FOR_TYPE) | mNextVarId++);
+    return (t << ((sizeof(variable) * CHAR_BIT) - VARIABLE_BITS_RESERVED_FOR_TYPE) | mNextVarId++);
 }
 
 }
