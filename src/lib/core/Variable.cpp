@@ -22,4 +22,10 @@ unsigned getVarId(variable v)
     return mask >> VARIABLE_BITS_RESERVED_FOR_TYPE & v;
 }
 
+std::string variableToString(variable v)
+{
+    return "x_" + v;
+}
+
+
 }

@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <string>
 
 namespace arithmetic
 {
 typedef unsigned variable;
+/// Number of bytes reserved for type encoding.
 static const unsigned VARIABLE_BITS_RESERVED_FOR_TYPE = 4;
 
 
@@ -23,15 +25,18 @@ enum VariableType { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3 };
 
 /**
  * For a variable, determine the type.
+ * @param v The variable.
+ * @return The variable type in its enum. 
  */
 VariableType getVarType(variable v);
 /**
  * Get the id of the variable, that is without the bits encoding extra information.
- * @param v
- * @return 
+ * @param v The variable
+ * @return its id.
  */
 unsigned getVarId(variable v);
 
+std::string variableToString(variable v);
 }
 
 
