@@ -84,6 +84,7 @@ else()
 endif()
 
 # find log4cplus
+find_package(Log4cplus)
 
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
