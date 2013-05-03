@@ -51,7 +51,7 @@ private:
      * Constructors are all private, as we have a singleton.
      */
     VariablePool();
-    VariablePool(const VariablePool& rs);
+    VariablePool(const VariablePool& rs) = delete;
     VariablePool& operator = (const VariablePool& rs);
 public:
     static VariablePool& getInstance(  );
@@ -61,20 +61,20 @@ public:
      * @param type
      * @return A variable of type type.
      */
-    variable getFreshVariable(VariableType type = VT_REAL);
+    Variable getFreshVariable(VariableType type = VT_REAL);
     /**
      * Get the name recorded for this variable. If no special name was set,
      * we use "x_id".
      * @param v
      * @return 
      */
-    std::string getVariableName(variable v);
+    std::string getVariableName(Variable v);
     /**
      * Add a name for a given variable.
      * @param v
      * @param name
      */
-    void setVariableName(variable v, const std::string& name);
+    void setVariableName(Variable v, const std::string& name);
    
     /**
      * The number of variables initialized by the pool.

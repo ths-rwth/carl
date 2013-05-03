@@ -2,7 +2,7 @@
 set(arithmetic_lib_core_headers 
 	AbstractPolynomial.h
 	Monomial.h Monomial.tpp
-	Polynomial.h
+	Polynomial.h Polynomial.tpp
 	PolynomialPolicy.h
 	VarExpPair.h
 	Variable.h
@@ -13,8 +13,6 @@ set(arithmetic_lib_core_headers
 ) 
 # Source files in here
 set(arithmetic_lib_core_sources 
-	core/VarExpPair.cpp
-	core/Variable.cpp
 	core/VariablePool.cpp
 PARENT_SCOPE)
 

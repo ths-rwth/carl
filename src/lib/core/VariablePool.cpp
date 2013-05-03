@@ -1,5 +1,5 @@
 /**
- * @file VariablePool.h 
+ * @file VariablePool.cpp
  * @author Sebastian Junges
  */
 
@@ -17,27 +17,23 @@ std::shared_ptr< VariablePool > VariablePool::instance;
 std::once_flag VariablePool::only_one;
 
 
-VariablePool::VariablePool()
+VariablePool::VariablePool():
+mNextVarId (1 << Variable::VARIABLE_BITS_RESERVED_FOR_TYPE)
 {
-    mNextVarId = 0;
     LOGMSG_INFO("arithmetic.varpool", "Constructor called");
 }
-VariablePool::VariablePool(const VariablePool& rs) {
-    instance  = rs.instance;
-}
     
-VariablePool& VariablePool::operator = (const VariablePool& rs) 
+VariablePool& VariablePool::operator= (const VariablePool& rs) 
 {
     if (this != &rs) {
         instance  = rs.instance;
     }
     return *this;
 }   
-
-
 VariablePool& VariablePool::getInstance(  )
 {
-    std::call_once( VariablePool::only_one, [] ()
+    std::call_once( VariablePool::only_one, 
+        [] ()
         {
             VariablePool::instance.reset( new VariablePool() );
             LOGMSG_INFO("arithmetic","VariablePool created.");
@@ -45,11 +41,10 @@ VariablePool& VariablePool::getInstance(  )
     return *VariablePool::instance;
 }
 
-variable VariablePool::getFreshVariable(VariableType type)
+Variable VariablePool::getFreshVariable(VariableType type)
 {
     LOGMSG_TRACE("arithmetic.varpool", "New variable..");
-    unsigned t(type);
-    return (t | mNextVarId++ << VARIABLE_BITS_RESERVED_FOR_TYPE );
+    return Variable(mNextVarId++, type);
 }
 
 }

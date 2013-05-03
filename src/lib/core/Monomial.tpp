@@ -14,8 +14,9 @@ namespace arithmetic
 
 template <typename Coefficient>
 Monomial<Coefficient>::Monomial() :
-    mCoefficient(), 
-    mExponents()
+    mCoefficient(0), 
+    mExponents(),
+    mTotalDegree(0)
 {
     
 }
@@ -23,15 +24,17 @@ Monomial<Coefficient>::Monomial() :
 template <typename Coefficient>
 Monomial<Coefficient>::Monomial(const Coefficient& coeff) :
     mCoefficient(coeff), 
-    mExponents()
+    mExponents(),
+    mTotalDegree(0)
 {
     
 }
 
 template <typename Coefficient>
-Monomial<Coefficient>::Monomial(const Coefficient& coeff, variable v, exponent e) :
+Monomial<Coefficient>::Monomial(const Coefficient& coeff, Variable v, exponent e) :
     mCoefficient(coeff), 
-    mExponents(1, VarExpPair(v,e))
+    mExponents(1, VarExpPair(v,e)),
+    mTotalDegree(e)
 {
     
 }

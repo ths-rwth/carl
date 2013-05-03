@@ -5,9 +5,11 @@
 
 #pragma once
 
-#include "AbstractPolynomial.h"
+#include <vector>
 #include "PolynomialPolicy.h"
 #include "Monomial.h"
+
+
 
 namespace arithmetic
 {
@@ -15,8 +17,19 @@ namespace arithmetic
      *  The general-purpose multivariate polynomial class.
      */
     template<typename Coeff, typename Policy = StdPolynomialPolicy>
-    class Polynomial : public AbstractPolynomial
+    class Polynomial
     {
+    protected:
+        /// A vector of all monomials
+        std::vector<Monomial<Coeff>> mTerms;
+    public:
+        Polynomial() = default;
+        Polynomial(const Monomial& m);
+        ~Polynomial() = default;
         
+        template <typename C,P>
+        friend std::ostream& operator <<( std::ostream& os, const Polynomial<C,P>& rhs );
     };
 }
+
+#include "Polynomial.tpp"
