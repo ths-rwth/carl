@@ -86,7 +86,13 @@ endif()
 # find log4cplus
 find_package(Log4cplus)
 
+find_package(GTest REQUIRED)
+
+
 add_subdirectory(resources EXCLUDE_FROM_ALL)
+
+enable_testing()
+
 
 set(libraries ${LOG4CPLUS_LIB} pthread rt)
 

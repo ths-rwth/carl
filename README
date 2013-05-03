@@ -9,7 +9,7 @@ OPTIONAL:
 cln
 gmp
 log4cplus *
-googletest *
+googletest 
 doxygen
 
 Libraries marked with a asterix * are included in the resources directory.
@@ -24,7 +24,7 @@ $ mkdir build && cd build
 
 To compile dependencies (1) not found in the system AND (2) which are included in the resources:
 
-$ make dependencies
+$ make resources
 
 To compile the arithmetic library:
 
