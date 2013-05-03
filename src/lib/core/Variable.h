@@ -9,9 +9,11 @@
 
 namespace arithmetic
 {
+/// Variables are bitvectors with  [ ordering | id | type]
 typedef unsigned variable;
 /// Number of bytes reserved for type encoding.
 static const unsigned VARIABLE_BITS_RESERVED_FOR_TYPE = 4;
+static const unsigned VARIABLE_BITS_RESERVED_FOR_ORDERING = 8;
 
 
 /**

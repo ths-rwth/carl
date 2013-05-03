@@ -77,6 +77,15 @@ public:
     void setVariableName(variable v, const std::string& name);
    
     /**
+     * The number of variables initialized by the pool.
+     * @return 
+     */
+    unsigned nrVariables()
+    {
+        return mNextVarId;
+    }
+    
+    /**
      * Remove all information.
      */
     void clear();

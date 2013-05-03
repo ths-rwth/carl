@@ -13,13 +13,12 @@ namespace arithmetic
 
 VariableType getVarType(variable v)
 {
-    return (VariableType)(v >> ((sizeof(variable) * CHAR_BIT) - VARIABLE_BITS_RESERVED_FOR_TYPE));
+    return (VariableType)(v % (1 << VARIABLE_BITS_RESERVED_FOR_TYPE));
 }
 
 unsigned getVarId(variable v)
 {
-    unsigned mask = -1;
-    return mask >> VARIABLE_BITS_RESERVED_FOR_TYPE & v;
+    return (v >> VARIABLE_BITS_RESERVED_FOR_TYPE);
 }
 
 std::string variableToString(variable v)

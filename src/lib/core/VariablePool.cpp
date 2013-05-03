@@ -47,8 +47,9 @@ VariablePool& VariablePool::getInstance(  )
 
 variable VariablePool::getFreshVariable(VariableType type)
 {
-    size_t t(type);
-    return (t << ((sizeof(variable) * CHAR_BIT) - VARIABLE_BITS_RESERVED_FOR_TYPE) | mNextVarId++);
+    LOGMSG_TRACE("arithmetic.varpool", "New variable..");
+    unsigned t(type);
+    return (t | mNextVarId++ << VARIABLE_BITS_RESERVED_FOR_TYPE );
 }
 
 }
