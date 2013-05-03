@@ -38,6 +38,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 
 option( ARITHMETIC_LOGGING "Compile with the logging facility of the arithmetic library" ON )
+option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 
 # path to put in the executables
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -72,8 +73,6 @@ set( libraries  ${CLN_LIBRARY} ${GMP_LIBRARY} pthread )
 # C.3. Development and debug libraries.
 # # # # # # # # # # # # # # # # # # # # # #
 
-# CPP Unit is used for testing.
-find_package(CPPUnit)
 
 # if doxygen is installed, create the make doc target
 include(FindDoxygen)
@@ -83,10 +82,13 @@ else()
   message(WARNING, "Doxygen not found")
 endif()
 
-# find log4cplus
-find_package(Log4cplus)
-
-find_package(GTest REQUIRED)
+# we only search for this libraries in the system, if we do not force using the shipped resources.
+if(NOT FORCE_SHIPPED_RESOURCES)
+	# find log4cplus
+	find_package(Log4cplus)
+	# find googletest
+	find_package(GTest)
+endif()
 
 
 add_subdirectory(resources EXCLUDE_FROM_ALL)
