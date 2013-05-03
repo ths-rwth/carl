@@ -17,8 +17,8 @@ set(arithmetic_lib_core_sources
 PARENT_SCOPE)
 
 # Write config.h 
-configure_file( ${CMAKE_SOURCE_DIR}/src/lib/core/config.h.in 
-				${CMAKE_SOURCE_DIR}/src/lib/core/config.h
+configure_file( ${CMAKE_SOURCE_DIR}/src/arithmetic/core/config.h.in 
+				${CMAKE_SOURCE_DIR}/src/arithmetic/core/config.h
 )  
 
 # Installation of header files
