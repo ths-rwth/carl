@@ -1,2 +1,55 @@
-For information see:
+----------------------------------------------
+1. Dependencies
+----------------------------------------------
+This library has the following dependencies:
+
+REQUIRED:
+
+OPTIONAL:
+cln
+gmp
+log4cplus *
+googletest *
+doxygen
+
+Libraries marked with a asterix * are included in the resources directory.
+
+More information on the libraries is to be included
+---------------------------------------------
+2. Installation
+---------------------------------------------
+Start with:
+
+$ mkdir build && cd build
+
+To compile dependencies (1) not found in the system AND (2) which are included in the resources:
+
+$ make dependencies
+
+To compile the arithmetic library:
+
+$ make
+
+To run some unittests:
+
+$ make test
+
+To compile examples:
+
+$ make examples
+
+To install:
+
+$ make install
+
+
+--------------------------------------------
+3. Supported platforms
+--------------------------------------------
+
+We have tested on the following platforms:
+
+Arch Linux (Kernel 3.8) with GCC 4.8
+
+For more information see:
 https://sselab.de/lab9/private/intwiki/smtrat/index.php?title=Arithmetic_Lib
