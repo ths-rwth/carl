@@ -1,11 +1,5 @@
-# Start compiling resources (if necessary)
-add_subdirectory(resources)
-
 # Libraries..
-set( libraries ${LOG4CPLUS_LIB} )
-
-message( ${libraries})
-add_subdirectory(lib)
+add_subdirectory(arithmetic)
 
 # For unit tests.
 if(CppUnit_FOUND)

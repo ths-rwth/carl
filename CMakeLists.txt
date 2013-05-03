@@ -8,7 +8,7 @@
 # F. CPack
 # # # # # # # # # # # # # # # # # # # # # #
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -61,7 +61,7 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++0x")
 # find gmp (which is necessary for CLN, at least when linking statically)
 # include( FindGMP )
 
-set( libraries ${GINACRA_LIBRARY} ${GINAC_LIBRARY} ${CLN_LIBRARY} ${GMP_LIBRARY} pthread )
+set( libraries  ${CLN_LIBRARY} ${GMP_LIBRARY} pthread )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
@@ -85,6 +85,9 @@ endif()
 
 # find log4cplus
 
+add_subdirectory(resources EXCLUDE_FROM_ALL)
+
+set(libraries ${LOG4CPLUS_LIB} pthread rt)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files

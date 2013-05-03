@@ -1,14 +1,13 @@
-# Enable ExternalProject CMake module
+add_custom_target(dependencies)
 
+# Enable ExternalProject CMake module
 INCLUDE(ExternalProject)
 
 # Set default ExternalProject root directory
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
 if(NOT LOG4CPLUS_FOUND)	
-
-message("${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1" )
-# Add gtest
+# Add log4cplus
 ExternalProject_Add(
     log4cplus
 	DOWNLOAD_COMMAND ""
@@ -34,4 +33,7 @@ ExternalProject_Get_Property(log4cplus binary_dir)
 	
 	set( LOG4CPLUS_INCLUDE_DIR "${source_dir}/include" PARENT_SCOPE )
 	set( LOG4CPLUS_LIB "${binary_dir}/src/liblog4cplus.so.7" PARENT_SCOPE )
+	add_dependencies(dependencies log4cplus)
 endif()
+
+
