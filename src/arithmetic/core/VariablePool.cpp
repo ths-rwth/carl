@@ -6,7 +6,6 @@
 #include "VariablePool.h"
 
 #include <mutex>
-#include <climits>
 
 #include "logging.h"
 
@@ -43,7 +42,7 @@ VariablePool& VariablePool::getInstance(  )
 
 Variable VariablePool::getFreshVariable(VariableType type)
 {
-    LOGMSG_TRACE("arithmetic.varpool", "New variable..");
+    LOGMSG_TRACE("arithmetic.varpool", "New variable of type" << type);
     return Variable(mNextVarId++, type);
 }
 
