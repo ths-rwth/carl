@@ -28,11 +28,11 @@ namespace arithmetic
 
     protected:
         /// The coefficient of the monomial..
-        Coefficient mCoefficient;
+        Coefficient mCoefficient = 0;
         /// A vector of variable-exponent vars (v_i^e_i) with nonzero exponents. 
         std::vector<VarExpPair> mExponents;
         /// Some applications performance depends on getting the degree of monomials very fast
-        exponent mTotalDegree;
+        exponent mTotalDegree = 0;
         
         typedef std::vector<VarExpPair>::iterator exponents_it;
         typedef std::vector<VarExpPair>::const_iterator exponents_cIt;
@@ -42,7 +42,7 @@ namespace arithmetic
         //
         /**
          */
-        Monomial();
+        Monomial() = default;
         /**
          * Generate a constant
          * @param c The value of the constant.

@@ -13,19 +13,17 @@ namespace arithmetic
 {
 
 template <typename Coefficient>
-Monomial<Coefficient>::Monomial() :
-    mCoefficient(0), 
-    mExponents(),
-    mTotalDegree(0)
+Monomial<Coefficient>::Monomial(const Coefficient& coeff) :
+    mCoefficient(coeff)
 {
     
 }
 
+
 template <typename Coefficient>
-Monomial<Coefficient>::Monomial(const Coefficient& coeff) :
-    mCoefficient(coeff), 
-    mExponents(),
-    mTotalDegree(0)
+Monomial<Coefficient>::Monomial(Variable v, exponent e) :
+    mExponents(1, VarExpPair(v,e)),
+    mTotalDegree(e)
 {
     
 }
@@ -55,6 +53,7 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator*=(Variable::Arg v)
     {
         return *this;
     }
+    ++mTotalDegree;
     // Linear, as we expect small monomials.
     for(exponents_it it = mExponents.begin(); it != mExponents.end(); ++it)
     {
@@ -67,11 +66,11 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator*=(Variable::Arg v)
         // Variable is not present, we have to insert v.
         if(*it > v)
         {
-            mExponents.emplace(it,v);
+            mExponents.emplace(it,v,1);
         }
     }
     // Variable was not inserted, insert at end.
-    mExponents.emplace_back(v);
+    mExponents.emplace_back(v,1);
     return *this;
 }
 
