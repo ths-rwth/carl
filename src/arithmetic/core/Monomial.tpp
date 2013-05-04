@@ -18,8 +18,6 @@ Monomial<Coefficient>::Monomial(const Coefficient& coeff) :
 {
     
 }
-
-
 template <typename Coefficient>
 Monomial<Coefficient>::Monomial(Variable v, exponent e) :
     mCoefficient(1),
@@ -37,13 +35,69 @@ Monomial<Coefficient>::Monomial(const Coefficient& coeff, Variable v, exponent e
 {
     
 }
-
-
-
 template <typename Coefficient>
 CompareResult Monomial<Coefficient>::compareGradedLexical()
 {
     
+}
+
+template<typename C1, typename C2>
+bool operator==(const Monomial<C1>& lhs, const Monomial<C2>& rhs)
+{
+    if(lhs.mTotalDegree != rhs.mTotalDegree || lhs.mCoefficient != rhs.mCoefficient) return false;
+    else return lhs.mExponents == rhs.mExponents;
+}
+template<typename C>
+bool operator==(const Monomial<C>& lhs, const C& rhs)
+{
+    // Degree is just a machine word, so it is the fastest check.
+    if(lhs.mTotalDegree == 0 && lhs.mCoefficient == rhs) return true;
+    else return false;
+}
+template<typename C>
+bool operator==(const Monomial<C>& lhs, Variable::Arg rhs)
+{
+    // TODO think about reordering based on what is most probable.
+    if(lhs.mCoefficient != 1 || lhs.mTotalDegree != 1) return false;
+    if(lhs.mExponents[0].var == rhs) return true;
+    else return false;
+}
+
+template<typename C>
+bool operator==(const C& lhs, const Monomial<C>& rhs)
+{
+    return rhs == lhs;
+}
+template<typename C>
+bool operator==(const Variable& lhs, const Monomial<C>& rhs)
+{
+    return rhs == lhs;
+}
+
+template<typename C1, typename C2>
+bool operator!=(const Monomial<C1>& lhs, const Monomial<C2>& rhs)
+{
+    return !(lhs == rhs);
+}
+template<typename C>
+bool operator!=(const Monomial<C>& lhs, const C& rhs)
+{
+    return !(lhs == rhs);
+}
+template<typename C>
+bool operator!=(const C& lhs, const Monomial<C>& rhs)
+{
+    return !(lhs == rhs);
+}
+template<typename C>
+bool operator!=(const Monomial<C>& lhs, const Variable& rhs)
+{
+    return !(lhs == rhs);
+}
+template<typename C>
+bool operator!=(const Variable& lhs, const Monomial<C>& rhs)
+{
+    return !(lhs == rhs);
 }
 
 template <typename Coefficient>

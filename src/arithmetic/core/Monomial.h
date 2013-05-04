@@ -147,23 +147,22 @@ namespace arithmetic
         template<typename C>
         friend bool operator==(const Monomial<C>& lhs, const C& rhs);
         template<typename C>
-        friend bool operator==(const C& lhs, const Monomial& rhs);
+        friend bool operator==(const C& lhs, const Monomial<C>& rhs);
         template<typename C>
         friend bool operator==(const Monomial<C>& lhs, const Variable& rhs);
         template<typename C>
-        friend bool operator==(const Variable& lhs, const Monomial& rhs);
+        friend bool operator==(const Variable& lhs, const Monomial<C>& rhs);
 
         template<typename C1, typename C2>
         friend bool operator!=(const Monomial<C1>& lhs, const Monomial<C2>& rhs);
         template<typename C>
         friend bool operator!=(const Monomial<C>& lhs, const C& rhs);
         template<typename C>
-        friend bool operator!=(const C& lhs, const Monomial& rhs);
+        friend bool operator!=(const C& lhs, const Monomial<C>& rhs);
         template<typename C>
         friend bool operator!=(const Monomial<C>& lhs, const Variable& rhs);
         template<typename C>
-        friend bool operator!=(const Variable& lhs, const Monomial& rhs);
-
+        friend bool operator!=(const Variable& lhs, const Monomial<C>& rhs);
 
         // Addition and substraction make only very limited sense, we do not support that.            
         // Multiplication and dividing
