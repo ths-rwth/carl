@@ -57,7 +57,7 @@ public:
      * @param id The identifier of the variable
      * @param type The type (domain)
      */
-    explicit Variable(unsigned id, VariableType type) :
+    explicit Variable(unsigned id, VariableType type = VT_REAL) :
     mVariable((unsigned)type | id << VARIABLE_BITS_RESERVED_FOR_TYPE )
     {
         assert(id < sizeof(mVariable) * CHAR_BIT - BITS_RESERVED);
