@@ -21,10 +21,36 @@ namespace arithmetic
         Variable var;
         exponent exp;
         
-        VarExpPair(Variable v, exponent e) :
+        explicit VarExpPair(Variable v, exponent e=1) :
             var(v),
             exp(e)
         {}
+        
+        // Operators checking only the variable.
+        friend bool operator==(const VarExpPair& lhs, Variable::Arg rhs)
+        {
+            return lhs.var == rhs;
+        }
+        friend bool operator!=(const VarExpPair& lhs, Variable::Arg rhs)
+        {
+            return lhs.var != rhs;
+        }
+        friend bool operator<=(const VarExpPair& lhs, Variable::Arg rhs)
+        {
+            return lhs.var <= rhs;
+        }
+        friend bool operator>=(const VarExpPair& lsh, Variable::Arg rhs)
+        {
+            return lsh.var >= rhs;
+        }
+        friend bool operator<(const VarExpPair& lhs, Variable::Arg rhs)
+        {
+            return lhs.var < rhs;
+        }
+        friend bool operator>(const VarExpPair& lsh, Variable::Arg rhs)
+        {
+            return lsh.var > rhs;
+        }
         
         friend std::ostream& operator <<( std::ostream& os, const VarExpPair& rhs )
         {
@@ -32,6 +58,8 @@ namespace arithmetic
             if(rhs.exp > 1) os << "^" << rhs.exp;
             return os;
         }
+        
+        
     };
 }
 
