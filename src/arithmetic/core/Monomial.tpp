@@ -22,6 +22,7 @@ Monomial<Coefficient>::Monomial(const Coefficient& coeff) :
 
 template <typename Coefficient>
 Monomial<Coefficient>::Monomial(Variable v, exponent e) :
+    mCoefficient(1),
     mExponents(1, VarExpPair(v,e)),
     mTotalDegree(e)
 {
@@ -66,11 +67,11 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator*=(Variable::Arg v)
         // Variable is not present, we have to insert v.
         if(*it > v)
         {
-            mExponents.emplace(it,v,1);
+            mExponents.emplace(it,v);
         }
     }
     // Variable was not inserted, insert at end.
-    mExponents.emplace_back(v,1);
+    mExponents.emplace_back(v);
     return *this;
 }
 
