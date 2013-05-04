@@ -30,7 +30,7 @@ if(NOT LOG4CPLUS_FOUND)
 	ExternalProject_Get_Property(log4cplus binary_dir)
 
 	set( LOG4CPLUS_INCLUDE_DIR "${source_dir}/include" PARENT_SCOPE )
-	set( LOG4CPLUS_LIB "${binary_dir}/src/liblog4cplus.so.7" PARENT_SCOPE )
+	set( LOG4CPLUS_LIBRARY "${binary_dir}/src/liblog4cplus.so.7" PARENT_SCOPE )
 	add_dependencies(resources log4cplus)
 endif()
 

@@ -89,14 +89,11 @@ if(NOT FORCE_SHIPPED_RESOURCES)
 	# find googletest
 	find_package(GTest)
 endif()
-
-
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-
-
-set(libraries ${LOG4CPLUS_LIB} pthread rt)
+set(libraries ${LOG4CPLUS_LIBRARY} pthread)
+set(include_dirs ${LOG4CPLUS_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files

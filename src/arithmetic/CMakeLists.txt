@@ -1,6 +1,6 @@
 # include directories.
-include_directories( ${LOG4CPLUS_INCLUDE_DIR}
-
+include_directories( 
+${include_dirs}
 )
 
 # include core in library. 
