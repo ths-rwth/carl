@@ -170,13 +170,20 @@ namespace arithmetic
         Monomial& operator*=(const Coefficient& rhs);
         Monomial& operator*=(const Monomial& rhs);
         
-        const Monomial operator*(const Coefficient& lhs, Variable::Arg rhs);
-        const Monomial operator*(Variable::Arg lhs, const Coefficient& rhs);
-        const Monomial operator*(const Monomial& lhs, Variable::Arg rhs );
-        const Monomial operator*(Variable::Arg rhs  lhs, const Monomial& rhs );
-        const Monomial operator*(const Monomial& lhs, const Coefficient& rhs );
-        const Monomial operator*(const Coefficient& lhs, const Monomial& rhs);
-        const Monomial operator*(const Monomial& lhs, const Monomial& rhs );
+        template<typename C>
+        friend const Monomial<C> operator*(const C& lhs, Variable::Arg rhs);
+        template<typename C>
+        friend const Monomial<C> operator*(Variable::Arg lhs, const C& rhs);
+        template<typename C>
+        friend const Monomial<C> operator*(const Monomial<C>& lhs, Variable::Arg rhs );
+        template<typename C>
+        friend const Monomial<C> operator*(Variable::Arg lhs, const Monomial& rhs );
+        template<typename C>
+        friend const Monomial<C> operator*(const Monomial<C>& lhs, const C& rhs );
+        template<typename C>
+        friend const Monomial<C> operator*(const C& lhs, const Monomial<C>& rhs);
+        template<typename C>
+        friend const Monomial<C> operator*(const Monomial<C>& lhs, const Monomial<C>& rhs );
         
         // Output
         template <typename C>
