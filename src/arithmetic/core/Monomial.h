@@ -149,9 +149,9 @@ namespace arithmetic
         template<typename C>
         friend bool operator==(const C& lhs, const Monomial<C>& rhs);
         template<typename C>
-        friend bool operator==(const Monomial<C>& lhs, const Variable& rhs);
+        friend bool operator==(const Monomial<C>& lhs, Variable::Arg rhs);
         template<typename C>
-        friend bool operator==(const Variable& lhs, const Monomial<C>& rhs);
+        friend bool operator==(Variable::Arg lhs, const Monomial<C>& rhs);
 
         template<typename C1, typename C2>
         friend bool operator!=(const Monomial<C1>& lhs, const Monomial<C2>& rhs);
@@ -160,14 +160,24 @@ namespace arithmetic
         template<typename C>
         friend bool operator!=(const C& lhs, const Monomial<C>& rhs);
         template<typename C>
-        friend bool operator!=(const Monomial<C>& lhs, const Variable& rhs);
+        friend bool operator!=(const Monomial<C>& lhs, Variable::Arg rhs);
         template<typename C>
-        friend bool operator!=(const Variable& lhs, const Monomial<C>& rhs);
+        friend bool operator!=(Variable::Arg lhs, const Monomial<C>& rhs);
 
         // Addition and substraction make only very limited sense, we do not support that.            
         // Multiplication and dividing
-        Monomial& operator*=(const Variable& rhs);
+        Monomial& operator*=(Variable::Arg rhs);
         Monomial& operator*=(const Coefficient& rhs);
+        Monomial& operator*=(const Monomial& rhs);
+        
+        const Monomial operator*(const Coefficient& lhs, Variable::Arg rhs);
+        const Monomial operator*(Variable::Arg lhs, const Coefficient& rhs);
+        const Monomial operator*(const Monomial& lhs, Variable::Arg rhs );
+        const Monomial operator*(Variable::Arg rhs  lhs, const Monomial& rhs );
+        const Monomial operator*(const Monomial& lhs, const Coefficient& rhs );
+        const Monomial operator*(const Coefficient& lhs, const Monomial& rhs);
+        const Monomial operator*(const Monomial& lhs, const Monomial& rhs );
+        
         // Output
         template <typename C>
         friend std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs );
