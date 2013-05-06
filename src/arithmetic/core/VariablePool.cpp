@@ -11,10 +11,8 @@
 
 namespace arithmetic
 {
-
 std::shared_ptr< VariablePool > VariablePool::instance;
 std::once_flag VariablePool::only_one;
-
 
 VariablePool::VariablePool():
 mNextVarId (1 << Variable::VARIABLE_BITS_RESERVED_FOR_TYPE)

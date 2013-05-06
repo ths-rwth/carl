@@ -1,6 +1,6 @@
 # include directories.
 include_directories( 
-${include_dirs}
+	${include_dirs}
 )
 
 # include core in library. 

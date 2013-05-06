@@ -145,6 +145,28 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator*=(const Coefficient& rhs)
     return *this;
 }
 
+template<typename Coefficient>
+Monomial<Coefficient>& Monomial<Coefficient>::operator*=(const Monomial<Coefficient>& rhs)
+{
+    
+}
+        
+template<typename C>
+const Monomial<C> operator*(const C& lhs, Variable::Arg rhs);
+template<typename C>
+const Monomial<C> operator*(Variable::Arg lhs, const C& rhs);
+template<typename C>
+const Monomial<C> operator*(const Monomial<C>& lhs, Variable::Arg rhs );
+template<typename C>
+const Monomial<C> operator*(Variable::Arg lhs, const Monomial<C>& rhs );
+template<typename C>
+const Monomial<C> operator*(const Monomial<C>& lhs, const C& rhs );
+template<typename C>
+const Monomial<C> operator*(const C& lhs, const Monomial<C>& rhs);
+template<typename C>
+const Monomial<C> operator*(const Monomial<C>& lhs, const Monomial<C>& rhs );
+        
+
 template <typename C>
 std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs )
 {
