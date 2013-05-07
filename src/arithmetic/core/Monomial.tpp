@@ -202,19 +202,50 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator*=(const Monomial<Coeffici
 }
         
 template<typename C>
-const Monomial<C> operator*(const C& lhs, Variable::Arg rhs);
+const Monomial<C> operator*(const C& lhs, Variable::Arg rhs)
+{
+    // Note that this implementation is not optimized yet!
+    return Monomial<C>(lhs, rhs);
+}
 template<typename C>
-const Monomial<C> operator*(Variable::Arg lhs, const C& rhs);
+const Monomial<C> operator*(Variable::Arg lhs, const C& rhs)
+{
+    return rhs * lhs;
+}
 template<typename C>
-const Monomial<C> operator*(const Monomial<C>& lhs, Variable::Arg rhs );
+const Monomial<C> operator*(const Monomial<C>& lhs, Variable::Arg rhs )
+{
+    // Note that this implementation is not optimized yet!
+    Monomial<C> result(lhs);
+    result *= rhs;
+    return result;
+}
 template<typename C>
-const Monomial<C> operator*(Variable::Arg lhs, const Monomial<C>& rhs );
+const Monomial<C> operator*(Variable::Arg lhs, const Monomial<C>& rhs )
+{
+    return rhs * lhs;
+}
 template<typename C>
-const Monomial<C> operator*(const Monomial<C>& lhs, const C& rhs );
+const Monomial<C> operator*(const Monomial<C>& lhs, const C& rhs )
+{
+    // Note that this implementation is not optimized yet!
+    Monomial<C> result(lhs);
+    result *= rhs;
+    return result;
+}
 template<typename C>
-const Monomial<C> operator*(const C& lhs, const Monomial<C>& rhs);
+const Monomial<C> operator*(const C& lhs, const Monomial<C>& rhs)
+{
+    return lhs * rhs;
+}
 template<typename C>
-const Monomial<C> operator*(const Monomial<C>& lhs, const Monomial<C>& rhs );
+const Monomial<C> operator*(const Monomial<C>& lhs, const Monomial<C>& rhs )
+{
+    // Note that this implementation is not optimized yet!
+    Monomial<C> result(lhs);
+    result *= rhs;
+    return result;
+}
         
 
 template <typename C>
