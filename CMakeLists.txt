@@ -41,7 +41,7 @@ option( ARITHMETIC_LOGGING "Compile with the logging facility of the arithmetic 
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 
 # path to put in the executables
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 # compiler flags.
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++0x")
 

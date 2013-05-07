@@ -33,6 +33,7 @@ if(${STATICLIB_SWITCH} STREQUAL "ON")
   set_target_properties( lib_arithmetic PROPERTIES LINK_SEARCH_END_STATIC TRUE )
   set_target_properties( lib_arithmetic PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 endif()
+
 target_link_libraries( lib_arithmetic ${libraries} ) # libraries definied in top-level CMakeLists.txt
 
 

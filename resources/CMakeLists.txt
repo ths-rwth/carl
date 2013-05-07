@@ -9,7 +9,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
 # Adding log4cplus.
 if(NOT LOG4CPLUS_FOUND)	
-# Add log4cplus
+# Add log4cplus (local build)
 	ExternalProject_Add(
 		log4cplus
 		DOWNLOAD_COMMAND ""
@@ -18,24 +18,21 @@ if(NOT LOG4CPLUS_FOUND)
 		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
 		# CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
 		#           -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-		# Disable installing..
-		INSTALL_COMMAND ""
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build
+				   -DBUILD_SHARED_LIBS:BOOL=0
+		INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build
 		# Wrap download, configure and build steps in a script to log output
 		LOG_CONFIGURE ON
 		LOG_BUILD ON)
 
-	ExternalProject_Get_Property(log4cplus source_dir)
 
-	# Specify MainTest's link libraries
-	ExternalProject_Get_Property(log4cplus binary_dir)
-
-	set( LOG4CPLUS_INCLUDE_DIR "${source_dir}/include" PARENT_SCOPE )
-	set( LOG4CPLUS_LIBRARY "${binary_dir}/src/liblog4cplus.so.7" PARENT_SCOPE )
+	set( LOG4CPLUS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build/include" PARENT_SCOPE )
+	set( LOG4CPLUS_LIBRARY "${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build/lib/liblog4cplusS.a" PARENT_SCOPE )
 	add_dependencies(resources log4cplus)
 endif()
 
 if(NOT GTEST_FOUND)
-	# Add gtest
+	# Add gtest (local build)
 	ExternalProject_Add(
 		googletest
 		#For downloads (may be useful later!)

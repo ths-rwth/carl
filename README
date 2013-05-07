@@ -9,10 +9,11 @@ OPTIONAL:
 cln
 gmp
 log4cplus *
-googletest 
+googletest *
 doxygen
 
-Libraries marked with a asterix * are included in the resources directory.
+Libraries marked with a asterix (*) are included in the resources directory.
+More information on them is found in the README in that directory.
 
 More information on the libraries is to be included
 ---------------------------------------------
