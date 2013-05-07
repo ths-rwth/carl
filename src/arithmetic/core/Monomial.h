@@ -5,6 +5,7 @@
 
 #pragma once
 #include <algorithm>
+#include <list>
 
 #include "Variable.h"
 #include "CompareResult.h"
@@ -134,9 +135,9 @@ namespace arithmetic
         // Orderings
         ///////////////////////////
 
-        static CompareResult compareLexical();
-        static CompareResult compareGradedLexical();
-        static CompareResult compareGradedReverseLexical();
+        static CompareResult compareLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
+        static CompareResult compareGradedLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
+        static CompareResult compareGradedReverseLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
 
         ///////////////////////////
         // Operators
@@ -189,6 +190,15 @@ namespace arithmetic
         // Output
         template <typename C>
         friend std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs );
+        
+    private:
+        // Ordering helpers.
+        /**
+         * @param lhs 
+         * @param rhs
+         * @return true if lhs < rhs.
+         */
+        static CompareResult lexicalCompare(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
     };
 }
 

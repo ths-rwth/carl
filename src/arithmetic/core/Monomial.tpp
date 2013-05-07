@@ -12,6 +12,9 @@
 namespace arithmetic
 {
 
+// 
+// public
+// 
 template <typename Coefficient>
 Monomial<Coefficient>::Monomial(const Coefficient& coeff) :
     mCoefficient(coeff)
@@ -47,10 +50,20 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator =(const Monomial& rhs)
     return *this;
 }
 
+
 template <typename Coefficient>
-CompareResult Monomial<Coefficient>::compareGradedLexical()
+CompareResult Monomial<Coefficient>::compareLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs)
 {
-    
+    return lexicalCompare(lhs,rhs);
+}
+
+
+template <typename Coefficient>
+CompareResult Monomial<Coefficient>::compareGradedLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs)
+{
+    if(lhs.mTotalDegree < rhs.mTotalDegree) return CompareResult::LESS;
+    if(lhs.mTotalDegree > rhs.mTotalDegree) return CompareResult::GREATER;
+    return lexicalCompare(lhs, rhs);
 }
 
 template<typename C1, typename C2>
@@ -258,5 +271,42 @@ std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs )
     }
     return os;
 }
+
+// 
+// private:
+// 
+template <typename Coefficient>
+CompareResult Monomial<Coefficient>::lexicalCompare(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs)
+{
+    exponents_cIt lhsit = lhs.mExponents.begin( );
+    exponents_cIt rhsit = rhs.mExponents.begin( );
+    exponents_cIt lhsend = lhs.mExponents.end( );
+    exponents_cIt rhsend = rhs.mExponents.end( );
+
+    while( lhsit != lhsend )
+    {
+        if( rhsit == rhsend )
+            return CompareResult::GREATER;
+        //which variable occurs first
+        if( lhsit->var == rhsit->var )
+        {
+            //equal variables
+            if( lhsit->exp < rhsit->exp )
+                return CompareResult::LESS;
+            if( lhsit->exp > rhsit->exp )
+                return CompareResult::GREATER;
+        }
+        else
+        {
+            return (lhsit->var < rhsit->var ) ? CompareResult::GREATER : CompareResult::LESS;
+        }
+        ++lhsit;
+        ++rhsit;
+    }
+    if( rhsit == rhsend )
+        return CompareResult::EQUAL;
+    return CompareResult::LESS;
+}
+
 
 }
