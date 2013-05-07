@@ -68,6 +68,7 @@ namespace arithmetic
          */
         Monomial(const Coefficient& c, const VarExpPair& varexp);
 
+        Monomial& operator=(const Monomial& rhs);
         /**
          * Gives the coefficient, i.e. the constant factor.
          * @return 

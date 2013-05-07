@@ -26,6 +26,14 @@ namespace arithmetic
             exp(e)
         {}
         
+        friend bool operator==(const VarExpPair& lhs, const VarExpPair& rhs)
+        {
+            return lhs.var == rhs.var && lhs.exp  == rhs.exp;
+        }
+        friend bool operator!=(const VarExpPair& lhs, const VarExpPair& rhs)
+        {
+            return lhs.var != rhs.var || lhs.exp  != rhs.exp;
+        }
         // Operators checking only the variable.
         friend bool operator==(const VarExpPair& lhs, Variable::Arg rhs)
         {

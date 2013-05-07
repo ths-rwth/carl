@@ -35,6 +35,18 @@ Monomial<Coefficient>::Monomial(const Coefficient& coeff, Variable v, exponent e
 {
     
 }
+
+template <typename Coefficient>
+Monomial<Coefficient>& Monomial<Coefficient>::operator =(const Monomial& rhs)
+{
+    // Check for self-assignment.
+    if(this == &rhs) return *this;
+    mCoefficient = rhs.mCoefficient;
+    mExponents = rhs.mExponents;
+    mTotalDegree = rhs.mTotalDegree;
+    return *this;
+}
+
 template <typename Coefficient>
 CompareResult Monomial<Coefficient>::compareGradedLexical()
 {
@@ -148,7 +160,45 @@ Monomial<Coefficient>& Monomial<Coefficient>::operator*=(const Coefficient& rhs)
 template<typename Coefficient>
 Monomial<Coefficient>& Monomial<Coefficient>::operator*=(const Monomial<Coefficient>& rhs)
 {
+    // Multiplying 0 with something does not change anything.
+    if(mCoefficient == 0) return *this;
+    // Multiplying with 0 makes zero.
+    if(rhs.mCoefficient == 0)
+    {
+        mCoefficient = 0;
+        mExponents.clear();
+        mTotalDegree = 0;
+        return *this;
+    }
+    mCoefficient *= rhs.mCoefficient;
+    if(rhs.mTotalDegree == 0) return *this;
+    mTotalDegree += rhs.mTotalDegree;
     
+    // Linear, as we expect small monomials.
+    exponents_cIt itright = rhs.mExponents.begin();
+    for(exponents_it itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+    {
+        // Everything is inserted.
+        if(itright == rhs.mExponents.end())
+        {
+            return *this;
+        }
+        // Variable is present in both monomials.
+        if(itleft->var == itright->var)
+        {
+            itleft->exp += itright->exp;
+            ++itright;
+        }
+        // Variable is not present in lhs, we have to insert var-exp pair from rhs.
+        else if(itleft->var > itright->var) 
+        {
+            mExponents.insert(itleft,*itright);
+            ++itright;
+        }        
+    }
+    // Insert remainder of rhs.
+    mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
+    return *this;
 }
         
 template<typename C>
@@ -171,7 +221,10 @@ template <typename C>
 std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs )
 {
     os << rhs.mCoefficient;
-    std::copy(rhs.mExponents.begin(), rhs.mExponents.end(),std::ostream_iterator<std::string>(os));
+    for( VarExpPair vp : rhs.mExponents )
+    {
+        os << vp;
+    }
     return os;
 }
 
