@@ -31,7 +31,9 @@ if(NOT LOG4CPLUS_FOUND)
 	add_dependencies(resources log4cplus)
 endif()
 
-if(NOT GTEST_FOUND)
+if(GTEST_FOUND)
+	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
+else()
 	# Add gtest (local build)
 	ExternalProject_Add(
 		googletest
@@ -51,11 +53,11 @@ if(NOT GTEST_FOUND)
 
 	# Specify include dir
 	ExternalProject_Get_Property(googletest source_dir)
-	set(GTEST_INCLUDE_DIR ${source_dir}/include)
+	set(GTEST_INCLUDE_DIR ${source_dir}/include PARENT_SCOPE)
 	
 	# Specify MainTest's link libraries
 	ExternalProject_Get_Property(googletest binary_dir)
-	set(GTEST_LIBRARY ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest${CMAKE_FIND_LIBRARY_SUFFIXES})
+	set(GTEST_LIBRARIES ${binary_dir}/libgtest.a ${binary_dir}/libgtest_main.a PARENT_SCOPE)
 
 	add_dependencies(resources googletest)
 endif()

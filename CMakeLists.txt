@@ -94,7 +94,7 @@ add_subdirectory(resources EXCLUDE_FROM_ALL)
 enable_testing()
 set(libraries ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${LOG4CPLUS_INCLUDE_DIR} )
-message(${include_dirs})
+
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files
