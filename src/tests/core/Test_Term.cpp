@@ -29,7 +29,15 @@ TEST(Term, Operators)
 
 TEST(Term, Multiplication)
 {
- 
+    Term<int> t(1);
+    Variable v0(0);
+    t *= v0;
+    Term<int> t0(v0);
+    EXPECT_EQ(t0,t);
+    t *= v0;
+    Term<int> t1(Monomial(v0,2));
+    EXPECT_EQ(t1,t);
+    
 }
 
 

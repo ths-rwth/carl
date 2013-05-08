@@ -77,6 +77,15 @@ class Term
             return mMonomial->nrVariables();
         }
         
+        /**
+         * Set the term to zero with the canonical representation.
+         */
+        void clear()
+        {
+            mCoeff = 0;
+            mMonomial.reset();
+        }
+        
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
@@ -132,6 +141,7 @@ class Term
         
         template<typename Coeff>
         friend std::ostream& operator<<(std::ostream& lhs, const Term<Coeff>& rhs);
+        
         
 };
 

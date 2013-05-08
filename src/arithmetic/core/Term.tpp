@@ -30,7 +30,7 @@ bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
 {
     return (lhs.mCoeff == rhs.mCoeff) &&
             ((!lhs.mMonomial && !rhs.mMonomial) || 
-             (lhs.mMonomial && rhs.mMonomial && *lhs.mMonomial == rhs.mMonomial));
+             (lhs.mMonomial && rhs.mMonomial && *lhs.mMonomial == *rhs.mMonomial));
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Coeff& rhs)
@@ -60,54 +60,75 @@ bool operator==(const Term<Coeff>& lhs, const Monomial& rhs)
 template<typename Coeff>
 bool operator==(const Monomial& lhs, const Term<Coeff>& rhs)
 {
-    return rhs == lhs;
+    return (rhs == lhs);
 }
 template<typename Coeff>
 bool operator!=(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 template<typename Coeff>
 bool operator!=(const Term<Coeff>& lhs, const Coeff& rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 template<typename Coeff>
 bool operator!=(const Coeff& lhs, const Term<Coeff>& rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 template<typename Coeff>
 bool operator!=(const Term<Coeff>& lhs, Variable::Arg rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 template<typename Coeff>
 bool operator!=(Variable::Arg lhs, const Term<Coeff>& rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 template<typename Coeff>
 bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 template<typename Coeff>
 bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs)
 {
-    return !lhs == rhs;
+    return !(lhs == rhs);
 }
 
 template<typename Coefficient>
-Term& Term<Coefficient>::operator*=(const Coefficient& rhs)
+Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 {
-    
+    if(rhs == 0) 
+    {
+        clear();
+        return *this;
+    }
+    assert(mCoeff == 0 || mCoeff * rhs != 0);
+    mCoeff *= rhs;
+    return *this;
 }
-Term& Term<Coefficient>::operator*=(Variable::Arg rhs)
+template<typename Coefficient>
+Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 {
-    
+    if(mCoeff == 0)
+    {
+        return *this;
+    }
+    if(mMonomial)
+    {
+        mMonomial = std::make_shared<const Monomial>(*mMonomial * rhs);
+    }
+    else
+    {
+        mMonomial = std::make_shared<const Monomial>(rhs);
+    }
+    return *this;
 }
-Term& Term<Coefficient>::operator*=(const Term& rhs)
+template<typename Coefficient>
+Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 {
     
 }
@@ -132,7 +153,10 @@ template<typename Coeff>
 const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs);
 
 template<typename Coeff>
-std::ostream& operator<<(std::ostream& lhs, const Term<Coeff>& rhs);
+std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
+{
+    return os << rhs.mCoeff << rhs.mMonomial;
+}
 
 
 }
