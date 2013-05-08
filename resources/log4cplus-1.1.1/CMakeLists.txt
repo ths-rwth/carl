@@ -9,6 +9,9 @@ endif ()
 project (log4cplus)
 cmake_minimum_required (VERSION 2.8.0)
 
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fPIC")
+
+
 include (Log4CPlusUtils.cmake)
 log4cplus_get_version ("${PROJECT_SOURCE_DIR}/include"
   log4cplus_version_major log4cplus_version_minor log4cplus_version_patch)
