@@ -21,10 +21,10 @@ namespace arithmetic
     {
     protected:
         /// A vector of all monomials
-        std::vector<Monomial<Coeff>> mTerms;
+        std::vector<shared_ptr<Monomial<Coeff>>> mTerms;
     public:
         Polynomial() = default;
-        Polynomial(const Monomial& m);
+        explicit Polynomial(const Monomial& m);
         ~Polynomial() = default;
         
         template <typename C,P>

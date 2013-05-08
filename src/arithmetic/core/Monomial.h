@@ -113,6 +113,10 @@ namespace arithmetic
             }
         }
 
+        exponent highestExponent(Variable::Arg v) const
+        {
+            assert("NOT IMPLEMENTED");
+        }
 
         ///////////////////////////
         // Orderings
@@ -289,5 +293,3 @@ namespace arithmetic
 
     };
 }
-
-#include "Monomial.hpp"
