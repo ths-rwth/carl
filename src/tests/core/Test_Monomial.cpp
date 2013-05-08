@@ -6,8 +6,8 @@ using namespace arithmetic;
 
 TEST(Monomial, Constructor)
 {
-    Monomial<int> m1(1);
-    Monomial<unsigned> m2(3);
+    Monomial m1();
+    Monomial m2();
     SUCCEED();
 }
 
@@ -17,7 +17,7 @@ TEST(Monomial, Operators)
     Variable v1 = Variable((unsigned)1);
     Variable v2 = Variable((unsigned)2);
     
-    Monomial<int> m0(v0);
+    Monomial m0(v0);
     m0 *= v1;
     EXPECT_EQ(1,m0.exponentOfVariable(v1));
     m0 *= v1;
@@ -27,10 +27,35 @@ TEST(Monomial, Operators)
     m0 *= v2;
     EXPECT_EQ(4,m0.tdeg());
     EXPECT_EQ(3,m0.nrVariables());
-    Monomial<int> m1(m0);
-    m1 *= 0;
+    Monomial m1;
     EXPECT_EQ(0,m1.tdeg());
     EXPECT_EQ(0,m1.exponentOfVariable(v1));
     EXPECT_EQ(0,m1.nrVariables());
+    
+    Monomial m2;
+    Monomial m3;
+    m2 *= v1;
+    m3 *= v1;
+    EXPECT_EQ(m2, m3);
+}
+
+TEST(Monomial, multiplication)
+{
+    Variable v0 = Variable((unsigned)0);
+    Variable v1 = Variable((unsigned)1);
+    Variable v2 = Variable((unsigned)2);
+    
+    Monomial m0(v0);
+    Monomial m1(v1);
+    Monomial m01(v0);
+    m01 *= v1;
+    m0 *= m1;
+    EXPECT_EQ(m01, m0);
+    m01 *= m01;
+    m0 *= v0;
+    m0 *= v1;
+    //m0 *= m0;
+    EXPECT_EQ(m01, m0);
+    
 }
 
