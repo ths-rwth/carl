@@ -7,7 +7,7 @@
 
 #include <vector>
 #include "PolynomialPolicy.h"
-#include "Monomial.h"
+#include "Term.h"
 
 
 
@@ -17,18 +17,17 @@ namespace arithmetic
      *  The general-purpose multivariate polynomial class.
      */
     template<typename Coeff, typename Policy = StdPolynomialPolicy>
-    class Polynomial
+    class MultivariatePolynomial
     {
     protected:
         /// A vector of all monomials
-        std::vector<shared_ptr<Monomial<Coeff>>> mTerms;
+        std::vector<shared_ptr<Term<Coeff>>> mTerms;
     public:
-        Polynomial() = default;
-        explicit Polynomial(const Monomial& m);
-        ~Polynomial() = default;
+        MultivariatePolynomial() = default;
+        explicit MultivariatePolynomial(const Monomial& m);
         
         template <typename C,P>
-        friend std::ostream& operator <<( std::ostream& os, const Polynomial<C,P>& rhs );
+        friend std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,P>& rhs );
     };
 }
 
