@@ -18,7 +18,6 @@ namespace arithmetic
      * while also limiting the use of expensive language features such as RTTI, exceptions and even 
      * polymorphism.
      */
-    template<typename Coefficient>
     class Monomial
     {
     private:
@@ -28,8 +27,6 @@ namespace arithmetic
         static const bool PREFERBINARYSEARCH = false;
 
     protected:
-        /// The coefficient of the monomial..
-        Coefficient mCoefficient = 0;
         /// A vector of variable-exponent vars (v_i^e_i) with nonzero exponents. 
         std::vector<VarExpPair> mExponents;
         /// Some applications performance depends on getting the degree of monomials very fast
@@ -45,39 +42,13 @@ namespace arithmetic
          */
         Monomial() = default;
         /**
-         * Generate a constant
-         * @param c The value of the constant.
-         */
-        explicit Monomial(const Coefficient& c);
-        /**
          * Generate a monomial from a variable, with constant 1 (one).
          * @param v The variable.
          * @param e The exponent.
          */
         explicit Monomial(Variable v, exponent e=1);
-        /**
-         * A monomial over one variable.
-         * @param c The coefficient for the monomial.
-         * @param v The variable
-         * @param e The exponent of this variable
-         */
-        Monomial(const Coefficient& c, Variable v, exponent e=1);
-        /**
-         * 
-         * @param c
-         * @param varexp
-         */
-        Monomial(const Coefficient& c, const VarExpPair& varexp);
-
+        
         Monomial& operator=(const Monomial& rhs);
-        /**
-         * Gives the coefficient, i.e. the constant factor.
-         * @return 
-         */
-        const Coefficient& coeff() const
-        {
-            return mCoefficient;
-        }
         /**
          * Gives the total degree, i.e. the sum of all exponents.
          * @return 
@@ -135,61 +106,34 @@ namespace arithmetic
         // Orderings
         ///////////////////////////
 
-        static CompareResult compareLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
-        static CompareResult compareGradedLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
-        static CompareResult compareGradedReverseLexical(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
+        static CompareResult compareLexical(const Monomial& lhs, const Monomial& rhs);
+        static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs);
+        static CompareResult compareGradedReverseLexical(const Monomial& lhs, const Monomial& rhs);
 
         ///////////////////////////
         // Operators
         ///////////////////////////
 
         // Compare operators
-        template<typename C1, typename C2>
-        friend bool operator==(const Monomial<C1>& lhs, const Monomial<C2>& rhs);
-        template<typename C>
-        friend bool operator==(const Monomial<C>& lhs, const C& rhs);
-        template<typename C>
-        friend bool operator==(const C& lhs, const Monomial<C>& rhs);
-        template<typename C>
-        friend bool operator==(const Monomial<C>& lhs, Variable::Arg rhs);
-        template<typename C>
-        friend bool operator==(Variable::Arg lhs, const Monomial<C>& rhs);
+        friend bool operator==(const Monomial& lhs, const Monomial& rhs);
+        friend bool operator==(const Monomial& lhs, Variable::Arg rhs);
+        friend bool operator==(Variable::Arg lhs, const Monomial& rhs);
 
-        template<typename C1, typename C2>
-        friend bool operator!=(const Monomial<C1>& lhs, const Monomial<C2>& rhs);
-        template<typename C>
-        friend bool operator!=(const Monomial<C>& lhs, const C& rhs);
-        template<typename C>
-        friend bool operator!=(const C& lhs, const Monomial<C>& rhs);
-        template<typename C>
-        friend bool operator!=(const Monomial<C>& lhs, Variable::Arg rhs);
-        template<typename C>
-        friend bool operator!=(Variable::Arg lhs, const Monomial<C>& rhs);
+        friend bool operator!=(const Monomial& lhs, const Monomial& rhs);
+        friend bool operator!=(const Monomial& lhs, Variable::Arg rhs);
+        friend bool operator!=(Variable::Arg lhs, const Monomial& rhs);
 
         // Addition and substraction make only very limited sense, we do not support that.            
         // Multiplication and dividing
         Monomial& operator*=(Variable::Arg rhs);
-        Monomial& operator*=(const Coefficient& rhs);
         Monomial& operator*=(const Monomial& rhs);
         
-        template<typename C>
-        friend const Monomial<C> operator*(const C& lhs, Variable::Arg rhs);
-        template<typename C>
-        friend const Monomial<C> operator*(Variable::Arg lhs, const C& rhs);
-        template<typename C>
-        friend const Monomial<C> operator*(const Monomial<C>& lhs, Variable::Arg rhs );
-        template<typename C>
-        friend const Monomial<C> operator*(Variable::Arg lhs, const Monomial& rhs );
-        template<typename C>
-        friend const Monomial<C> operator*(const Monomial<C>& lhs, const C& rhs );
-        template<typename C>
-        friend const Monomial<C> operator*(const C& lhs, const Monomial<C>& rhs);
-        template<typename C>
-        friend const Monomial<C> operator*(const Monomial<C>& lhs, const Monomial<C>& rhs );
+        friend const Monomial operator*(const Monomial& lhs, Variable::Arg rhs );
+        friend const Monomial operator*(Variable::Arg lhs, const Monomial& rhs );
+        friend const Monomial operator*(const Monomial& lhs, const Monomial& rhs );
         
         // Output
-        template <typename C>
-        friend std::ostream& operator <<( std::ostream& os, const Monomial<C>& rhs );
+        friend std::ostream& operator <<( std::ostream& os, const Monomial& rhs );
         
     private:
         // Ordering helpers.
@@ -198,8 +142,8 @@ namespace arithmetic
          * @param rhs
          * @return true if lhs < rhs.
          */
-        static CompareResult lexicalCompare(const Monomial<Coefficient>& lhs, const Monomial<Coefficient>& rhs);
+        static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs);
     };
 }
 
-#include "Monomial.tpp"
+#include "Monomial.hpp"
