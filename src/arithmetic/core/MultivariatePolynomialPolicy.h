@@ -10,7 +10,7 @@ namespace arithmetic
     /**
      * The default policy for polynomials. 
      */
-    struct StdPolynomialPolicy
+    struct StdMultivariatePolynomialPolicy
     {
         
     };
