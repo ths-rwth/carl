@@ -91,6 +91,7 @@ namespace arithmetic {
 #ifdef LOGi2_USE_LOG4CPLUS
 // use LOG4CPLUS types
 typedef log4cplus::Logger Log;
+#define ROOTLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("arithmetic"))
 #define getLog(name) log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(name))
 // use LOG4CPLUS macros
 #ifndef LOGi2_DISABLE_FATAL_MSG
@@ -142,8 +143,10 @@ typedef void* Log;
 
 #ifdef LOGi2_USE_LOG4CPLUS
 #define LOG_ASSERT(condition, log, message) log.assertion((condition), (message))
+#define LOG_NOTIMPLEMENTED() ROOTLOGGER.assertion(false, "Not implemented.")
 #else
 #define LOG_ASSERT(condition, log, message) assert(condition);
+#define LOG_NOTIMPLEMENTED() assert(false);
 #endif
 
 
