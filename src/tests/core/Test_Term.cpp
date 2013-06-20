@@ -21,10 +21,8 @@ TEST(Term, Operators)
     Monomial m0(v0);
     Term<int> t0(m0);
     EXPECT_TRUE(t0.isLinear());
-    EXPECT_FALSE(t.isLinear());
-    EXPECT_TRUE(t0.isAtMostLinear());
-    EXPECT_TRUE(t.isAtMostLinear());
-    EXPECT_EQ(0, t.nrVariables());
+    EXPECT_TRUE(t.isLinear());
+    EXPECT_EQ(0, t.getNrVariables());
 }
 
 TEST(Term, Multiplication)
