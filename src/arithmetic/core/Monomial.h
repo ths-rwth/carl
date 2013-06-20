@@ -126,6 +126,14 @@ namespace arithmetic
         {
             return lexicalCompare(lhs,rhs);
         }
+        
+        static CompareResult compareLexical(const Monomial& lhs, Variable::Arg rhs)
+        {
+            if(lhs.mExponents.front().var < rhs) return CompareResult::LESS;
+            if(lhs.mExponents.front().var > rhs) return CompareResult::GREATER;
+            if(lhs.mExponents.front().exp > 1) return CompareResult::GREATER;
+            else return CompareResult::LESS;
+        }
 
 
         static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs)
@@ -133,6 +141,16 @@ namespace arithmetic
             if(lhs.mTotalDegree < rhs.mTotalDegree) return CompareResult::LESS;
             if(lhs.mTotalDegree > rhs.mTotalDegree) return CompareResult::GREATER;
             return lexicalCompare(lhs, rhs);
+        }
+        
+        static CompareResult compareGradedLexical(const Monomial& lhs, Variable::Arg rhs)
+        {
+            if(lhs.mTotalDegree < 1) return CompareResult::LESS;
+            if(lhs.mTotalDegree > 1) return CompareResult::GREATER;
+            if(lhs.mExponents.front().var < rhs) return CompareResult::GREATER;
+            if(lhs.mExponents.front().var > rhs) return CompareResult::LESS;
+            else return CompareResult::EQUAL;
+            
         }
 
         // 
@@ -290,6 +308,7 @@ namespace arithmetic
                 return CompareResult::EQUAL;
             return CompareResult::LESS;
         }
-
     };
+    
+    
 }

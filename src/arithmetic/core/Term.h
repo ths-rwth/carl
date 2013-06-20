@@ -23,9 +23,9 @@ class Term
         explicit Term(const Coefficient& c);
         explicit Term(Variable::Arg v);
         explicit Term(const Monomial& m);
-        explicit Term(std::shared_ptr<const Monomial> m);
+        explicit Term(const std::shared_ptr<const Monomial>& m);
         Term(const Coefficient& c, const Monomial& m);
-        Term(const Coefficient& c, std::shared_ptr<const Monomial> m);
+        Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
         
         /**
          * Get the coefficient.
@@ -63,15 +63,10 @@ class Term
          */
         bool isLinear() const
         {
-            if(!mMonomial) return false;
+            if(!mMonomial) return true;
             return mMonomial->isLinear();
         }
-        bool isAtMostLinear() const
-        {
-            if(!mMonomial) return true;
-            return mMonomial->isAtMostLinear();
-        }
-        size_t nrVariables() const
+        size_t getNrVariables() const
         {
             if(!mMonomial) return 0;
             return mMonomial->nrVariables();

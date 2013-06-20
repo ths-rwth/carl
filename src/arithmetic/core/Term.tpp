@@ -26,10 +26,17 @@ Term<Coefficient>::Term(const Monomial& m) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, std::shared_ptr<const Monomial> m)
+Term<Coefficient>::Term(const Coefficient& c, const Monomial& m)
 : mCoeff(c)
 {
-    if(c != 0) mMonomial(m);
+    if (c != 0) mMonomial = std::make_shared<const Monomial>(m);
+}
+
+template<typename Coefficient>
+Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m)
+: mCoeff(c)
+{
+    if(c != 0) mMonomial = m;
 }
 
 template<typename Coeff>
@@ -211,7 +218,14 @@ const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs)
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 {
-    return os << rhs.mCoeff << rhs.mMonomial;
+    if(rhs.mMonomial)
+    {
+        return os << rhs.mCoeff << *rhs.mMonomial;
+    }
+    else 
+    {
+        os << rhs.mCoeff;
+    }
 }
 
 

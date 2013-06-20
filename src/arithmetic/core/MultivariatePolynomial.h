@@ -25,10 +25,12 @@ namespace arithmetic
     class MultivariatePolynomial
     {
     protected:
+        typedef std::vector<std::shared_ptr<const Term<Coeff>>> TermsType;
         /// A vector of all monomials
-        std::vector<std::shared_ptr<const Term<Coeff>>> mTerms;
+        TermsType mTerms;
     public:
         MultivariatePolynomial() = default;
+        explicit MultivariatePolynomial(Variable::Arg v);
         explicit MultivariatePolynomial(const Monomial& m);
         explicit MultivariatePolynomial(const Term<Coeff>& t);
         explicit MultivariatePolynomial(std::shared_ptr<const Monomial> m);
@@ -61,6 +63,8 @@ namespace arithmetic
         bool isZero() const;
         bool isConstant() const;
         bool isLinear() const;
+        
+        size_t nrTerms() const { return mTerms.size(); }
         std::shared_ptr<const Term<Coeff>> constantPart() const;
         
         /**
@@ -72,16 +76,22 @@ namespace arithmetic
         MultivariatePolynomial derivative(Variable::Arg v) const;
         UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>> coeffRepresentation(Variable::Arg v) const;
         
+        /**
+         * Multiplies the polynomial with minus one.
+         * @return reference to the object.
+         */
+        MultivariatePolynomial& negate();
+        
         template<typename C, typename P>
         friend bool operator==( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
         template<typename C, typename P>
-        friend bool operator==(const UnivariatePolynomial<C>& lhs, const Term<C>& rhs);
+        friend bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,P>& rhs);
         template<typename C, typename P>
-        friend bool operator==(const Term<C>& lhs, const UnivariatePolynomial<C>& rhs);
+        friend bool operator==(const MultivariatePolynomial<C,P>& lhs, const UnivariatePolynomial<C>& rhs);
         template<typename C, typename P>
-        friend bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const Term<C>& rhs);
+        friend bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,P>& rhs);
         template<typename C, typename P>
-        friend bool operator==(const Term<C>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs);
+        friend bool operator==(const MultivariatePolynomial<C,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs);
         template<typename C, typename P>
         friend bool operator==(const MultivariatePolynomial<C,P>& lhs, const Term<C>& rhs);
         template<typename C, typename P>
@@ -126,6 +136,12 @@ namespace arithmetic
         template<typename C, typename P>
         friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs);
         
+        MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
+        MultivariatePolynomial& operator+=(const Term<Coeff>& rhs);
+        MultivariatePolynomial& operator+=(const Monomial& rhs);
+        MultivariatePolynomial& operator+=(const Variable::Arg);
+        MultivariatePolynomial& operator+=(const Coeff& c);
+        
         template<typename C, typename P>
         friend const MultivariatePolynomial<C,P> operator+( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
         template<typename C, typename P>
@@ -152,6 +168,18 @@ namespace arithmetic
         friend const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, Variable::Arg rhs);
         template<typename C, typename P>
         friend const MultivariatePolynomial<C,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs);
+        
+        MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
+        MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
+        MultivariatePolynomial& operator-=(const Monomial& rhs);
+        MultivariatePolynomial& operator-=(const Variable::Arg);
+        MultivariatePolynomial& operator-=(const Coeff& c);
+        
+        /**
+         * Consider using negate instead, which does not copy the current polynomial.
+         * @return 
+         */
+        const MultivariatePolynomial operator-() const;
         
         template<typename C, typename P>
         friend const MultivariatePolynomial<C,P> operator-( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
@@ -180,6 +208,11 @@ namespace arithmetic
         template<typename C, typename P>
         friend const MultivariatePolynomial<C,P> operator-(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs);
         
+        MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
+        MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
+        MultivariatePolynomial& operator*=(const Monomial& rhs);
+        MultivariatePolynomial& operator*=(const Variable::Arg);
+        MultivariatePolynomial& operator*=(const Coeff& c);
         
         template<typename C, typename P>
         friend const MultivariatePolynomial<C,P> operator*( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
