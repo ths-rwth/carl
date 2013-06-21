@@ -136,11 +136,17 @@ namespace arithmetic
         template<typename C, typename P>
         friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs);
         
+        /**
+         * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 
+         * @param rhs
+         * @return 
+         */
         MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
         MultivariatePolynomial& operator+=(const Term<Coeff>& rhs);
         MultivariatePolynomial& operator+=(const Monomial& rhs);
         MultivariatePolynomial& operator+=(const Variable::Arg);
         MultivariatePolynomial& operator+=(const Coeff& c);
+        
         
         template<typename C, typename P>
         friend const MultivariatePolynomial<C,P> operator+( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);

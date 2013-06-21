@@ -138,6 +138,7 @@ namespace arithmetic
 
         static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs)
         {
+            
             if(lhs.mTotalDegree < rhs.mTotalDegree) return CompareResult::LESS;
             if(lhs.mTotalDegree > rhs.mTotalDegree) return CompareResult::GREATER;
             return lexicalCompare(lhs, rhs);

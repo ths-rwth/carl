@@ -113,6 +113,12 @@ bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs)
 }
 
 template<typename Coefficient>
+const Term<Coefficient> Term<Coefficient>::operator-() const
+{
+    return Term<Coefficient>(-mCoeff,mMonomial);
+}
+
+template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 {
     if(rhs == 0) 

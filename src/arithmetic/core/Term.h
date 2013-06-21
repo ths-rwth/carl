@@ -81,6 +81,7 @@ class Term
             mMonomial.reset();
         }
         
+        
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
@@ -110,6 +111,8 @@ class Term
         friend bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs);
         template<typename Coeff>
         friend bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs);
+        
+        const Term<Coefficient> operator-() const;
         
         Term& operator *=(const Coefficient& rhs);
         Term& operator *=(Variable::Arg rhs);

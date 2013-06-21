@@ -32,6 +32,7 @@ struct MonomialComparator
     template<typename Coeff>
     static CompareResult compare(const Term<Coeff>& t1, const Term<Coeff>& t2)
     {
+        if(t1.monomial() == t2.monomial()) return CompareResult::EQUAL;
         return f(*t1.monomial(), *t2.monomial());
     }
     
