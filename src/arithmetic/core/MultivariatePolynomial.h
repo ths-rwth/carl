@@ -26,8 +26,12 @@ namespace arithmetic
     {
     protected:
         typedef std::vector<std::shared_ptr<const Term<Coeff>>> TermsType;
+        typedef typename Policy::Ordering Ordering;
+        
         /// A vector of all monomials
         TermsType mTerms;
+        
+        
     public:
         MultivariatePolynomial() = default;
         explicit MultivariatePolynomial(Variable::Arg v);
@@ -75,6 +79,8 @@ namespace arithmetic
         
         MultivariatePolynomial derivative(Variable::Arg v) const;
         UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>> coeffRepresentation(Variable::Arg v) const;
+        
+        unsigned hash() const;
         
         /**
          * Multiplies the polynomial with minus one.
@@ -135,6 +141,12 @@ namespace arithmetic
         friend bool operator!=(const MultivariatePolynomial<C,P>& lhs, Variable::Arg rhs);
         template<typename C, typename P>
         friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs);
+        
+        
+        template<typename C, typename P>
+        friend bool operator<( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
+        template<typename C, typename P>
+        friend bool operator<=( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
         
         /**
          * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 
@@ -249,7 +261,13 @@ namespace arithmetic
         
         template <typename C, typename P>
         friend std::ostream& operator<<( std::ostream& os, const MultivariatePolynomial<C,P>& rhs );
+    
+    private:
+        void sortTerms();
+    
     };
+    
+        
 }
 
 #include "MultivariatePolynomial.tpp"

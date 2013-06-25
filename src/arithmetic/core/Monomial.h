@@ -46,14 +46,16 @@ namespace arithmetic
          * @param v The variable.
          * @param e The exponent.
          */
-        Monomial(Variable v, exponent e=1) :
+        Monomial(Variable::Arg v, exponent e=1) :
             mExponents(1, VarExpPair(v,e)),
             mTotalDegree(e)
         {
 
         }
+        
+        Monomial(const Monomial& rhs) = default;
 
-        Monomial& operator =(const Monomial& rhs)
+        Monomial& operator=(const Monomial& rhs)
         {
             // Check for self-assignment.
             if(this == &rhs) return *this;

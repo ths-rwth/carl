@@ -26,6 +26,13 @@ Term<Coefficient>::Term(const Monomial& m) :
 }
 
 template<typename Coefficient>
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned exponent) :
+mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, exponent)))
+{
+    
+}
+
+template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const Monomial& m)
 : mCoeff(c)
 {
@@ -161,12 +168,12 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
     {
         if(rhs.mMonomial)
         {
-            mMonomial = std::make_shared<const Monomial>(*mMonomial * *(rhs.mMonomial));
+            mMonomial = std::make_shared<const Monomial>((*mMonomial) * (*rhs.mMonomial));
         }
     }
     else
     {
-        mMonomial = std::make_shared<const Monomial>(rhs.mMonomial);
+        mMonomial = rhs.mMonomial;
     }
     return *this;   
 }
@@ -230,7 +237,7 @@ std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
     }
     else 
     {
-        os << rhs.mCoeff;
+        return os << rhs.mCoeff;
     }
 }
 

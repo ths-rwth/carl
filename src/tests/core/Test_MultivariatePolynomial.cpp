@@ -79,6 +79,19 @@ TEST(MultivariatePolynomial, Substraction)
 
 TEST(MultivariatePolynomial, Multiplication)
 {
+    Variable v0(0);
+    Variable v1(1);
+    MultivariatePolynomial<int> p0(v0);
+    
+    p0 *= v0;
+    EXPECT_EQ(Term<int>(1,v0,2), *(p0.lterm()));
+    
+    p0 += v1;
+    p0 += 1;
+    std::cout << p0 << std::endl;
+    p0 *= p0;
+    std::cout << p0 << std::endl;
+    
     
 }
 

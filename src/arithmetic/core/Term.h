@@ -26,6 +26,7 @@ class Term
         explicit Term(const std::shared_ptr<const Monomial>& m);
         Term(const Coefficient& c, const Monomial& m);
         Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
+        Term(const Coefficient& c, Variable::Arg v, unsigned exponent);
         
         /**
          * Get the coefficient.

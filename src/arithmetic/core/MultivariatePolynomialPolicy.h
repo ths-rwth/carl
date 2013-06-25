@@ -15,6 +15,7 @@ namespace arithmetic
     struct StdMultivariatePolynomialPolicy
     {
         typedef GrLexOrdering Ordering;
+        static const Ordering order;
         /**
          * Linear searching means that we search linearly for a term instead of applying e.g. binary search.
          * Although the worst-case complexity is worse, for polynomials with a small nr of terms, this should be better.
