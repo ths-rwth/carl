@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "arithmetic/core/MultivariatePolynomial.h"
+#include "carl/core/MultivariatePolynomial.h"
 
 
-using namespace arithmetic;
+using namespace carl;
 
 TEST(MultivariatePolynomial, Constructor)
 {

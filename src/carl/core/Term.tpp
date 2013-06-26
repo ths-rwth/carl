@@ -3,7 +3,7 @@
 // for code assistance
 #include "Term.h"
 
-namespace arithmetic
+namespace carl
 {
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :

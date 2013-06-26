@@ -13,7 +13,7 @@
 
 
 
-namespace arithmetic
+namespace carl
 {
     // forward declaration of UnivariatePolynomials
     template<typename Coeff>
@@ -81,12 +81,6 @@ namespace arithmetic
         UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>> coeffRepresentation(Variable::Arg v) const;
         
         unsigned hash() const;
-        
-        /**
-         * Multiplies the polynomial with minus one.
-         * @return reference to the object.
-         */
-        MultivariatePolynomial& negate();
         
         template<typename C, typename P>
         friend bool operator==( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs);
@@ -193,10 +187,7 @@ namespace arithmetic
         MultivariatePolynomial& operator-=(const Variable::Arg);
         MultivariatePolynomial& operator-=(const Coeff& c);
         
-        /**
-         * Consider using negate instead, which does not copy the current polynomial.
-         * @return 
-         */
+        
         const MultivariatePolynomial operator-() const;
         
         template<typename C, typename P>

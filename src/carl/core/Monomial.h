@@ -11,7 +11,7 @@
 #include "CompareResult.h"
 #include "VarExpPair.h"
 
-namespace arithmetic
+namespace carl
 {   
     /**
      *  The general-purpose monomials. Notice that we aim to keep this object as small as possbible, 

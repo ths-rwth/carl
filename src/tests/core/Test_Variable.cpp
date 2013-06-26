@@ -1,8 +1,8 @@
 
 #include "gtest/gtest.h"
-#include "arithmetic/core/Variable.h"
+#include "carl/core/Variable.h"
 
-using namespace arithmetic;
+using namespace carl;
 
 TEST(Variable, Constructor)
 {

@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace arithmetic
+namespace carl
 {
 template<typename Coefficient>
 class UnivariatePolynomial

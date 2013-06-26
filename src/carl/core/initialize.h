@@ -15,10 +15,10 @@
 #include "config.h"
 #include "logging.h"
 
-namespace arithmetic
+namespace carl
 {
     /**
-     * The routine for initializing the arithmetic library.
+     * The routine for initializing the carl library.
      * Which is called automatically by including this header.
      * TODO prevent outside access.
      */

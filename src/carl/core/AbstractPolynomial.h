@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace arithmetic
+namespace carl
 {
     /**
      *  Abstract base class for general-purpose polynomials.

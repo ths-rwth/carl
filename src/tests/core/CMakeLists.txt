@@ -9,6 +9,6 @@ add_executable( runCoreTests
 				Test_Term.cpp
 				Test_Variable.cpp 
 				Test_VariablePool.cpp  )
-target_link_libraries(runCoreTests lib_arithmetic ${libraries} ${GTEST_LIBRARIES})
+target_link_libraries(runCoreTests lib_carl ${libraries} ${GTEST_LIBRARIES})
 
 add_test( NAME core COMMAND runCoreTests )

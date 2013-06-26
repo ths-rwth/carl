@@ -8,7 +8,7 @@
 #include <memory>
 #include "Monomial.h"
 
-namespace arithmetic
+namespace carl
 {
 
 template<typename Coefficient>

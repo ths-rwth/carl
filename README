@@ -51,6 +51,8 @@ $ make install
 We have tested on the following platforms:
 
 Arch Linux (Kernel 3.8) with GCC 4.8
+Ubuntu 12.04 with GCC 4.7.3
+Gentoo    
 
 For more information see:
 https://sselab.de/lab9/private/intwiki/smtrat/index.php?title=Arithmetic_Lib

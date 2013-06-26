@@ -41,7 +41,7 @@
 #endif
 
 
-#ifndef ARITHMETIC_LOGGING
+#ifndef CARL_LOGGING
 #define LOGi2_DISABLE
 #undef LOGi2_USE_LOG4CPLUS
 #endif
@@ -86,13 +86,13 @@
 #endif
 
 
-namespace arithmetic {
+namespace carl {
 #ifndef LOGi2_DISABLE
 #ifdef LOGi2_USE_LOG4CPLUS
 // use LOG4CPLUS types
 typedef log4cplus::Logger Log;
-#define ROOTLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("arithmetic"))
-#define ASSERTIONLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("arithmetic.assert"))
+#define ROOTLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl"))
+#define ASSERTIONLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.assert"))
 #define getLog(name) log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(name))
 // use LOG4CPLUS macros
 #ifndef LOGi2_DISABLE_FATAL_MSG
@@ -147,16 +147,15 @@ typedef void* Log;
 #define LOG_NOTIMPLEMENTED() ROOTLOGGER.assertion(false, "Not implemented.")
 #else
 #define LOG_ASSERT(condition, message) assert(condition)
-#define LOG_ASSERT(condition, log, message) assert(condition)
 #define LOG_NOTIMPLEMENTED() assert(false);
 #endif
 
 
 inline void configureLogging() {
 #ifdef LOGi2_USE_LOG4CPLUS
-    log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("arithmetic"));
+    log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl"));
     #ifdef LOGi2_TOFILE
-    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::FileAppender(LOG4CPLUS_TEXT("arithmetic.log")));
+    log4cplus::SharedAppenderPtr fileAppender(new log4cplus::FileAppender(LOG4CPLUS_TEXT("carl.log")));
     #else
     log4cplus::SharedAppenderPtr fileAppender(new log4cplus::ConsoleAppender());
     #endif

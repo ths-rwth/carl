@@ -12,7 +12,7 @@
 #include "config.h"
 
 
-namespace arithmetic
+namespace carl
 {
 /**
  * Several types of variables are supported.

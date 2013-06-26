@@ -3,5 +3,5 @@
  */ 
 
 #define LOGi2_USE_LOG4CPLUS
-#cmakedefine ARITHMETIC_LOGGING
+#cmakedefine CARL_LOGGING
 #cmakedefine VARIABLE_PASS_BY_VALUE

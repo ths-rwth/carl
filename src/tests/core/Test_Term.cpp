@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
-#include "arithmetic/core/Term.h"
-#include "arithmetic/core/Variable.h"
-#include "arithmetic/core/Monomial.h"
+#include "carl/core/Term.h"
+#include "carl/core/Variable.h"
+#include "carl/core/Monomial.h"
 
 
-using namespace arithmetic;
+using namespace carl;
 
 TEST(Term, Constructor)
 {

@@ -4,7 +4,7 @@
 #include "MultivariatePolynomial.h"
 #include "logging.h"
 
-namespace arithmetic
+namespace carl
 {
 
 
@@ -123,8 +123,8 @@ std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::constan
     {
         LOG_NOTIMPLEMENTED();
     }
-    
 }
+
 
 template<typename Coeff, typename Policy>
 bool MultivariatePolynomial<Coeff,Policy>::isTsos() const
@@ -535,6 +535,19 @@ const MultivariatePolynomial<C,P> operator+(Variable::Arg lhs, const Multivariat
 
 
 template<typename Coeff, typename Policy>
+const MultivariatePolynomial<Coeff, Policy> MultivariatePolynomial<Coeff,Policy>::operator -() const
+{
+    MultivariatePolynomial<Coeff, Policy> negation;
+    negation.mTerms.reserve(mTerms.size());
+    for(auto term : mTerms)
+    {
+        negation.mTerms.push_back(std::make_shared<const Term<Coeff>>(-term));
+    }
+    return negation;
+}
+
+
+template<typename Coeff, typename Policy>
 MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::operator-=(const MultivariatePolynomial& rhs)
 {
     if(mTerms.size() == 0) mTerms = rhs.mTerms;
@@ -811,14 +824,12 @@ MultivariatePolynomial<Coeff,Policy>& MultivariatePolynomial<Coeff,Policy>::oper
     mTerms.clear();
     // Sort the entries from newterms.
     // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
-    std::cout << "start sorting" << std::endl;
     std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
-    std::cout << "done sorting" << std::endl;
     // remove duplicates by adding their coefficients.
     // list.unique() fails because it does not handle coefficient updates.
     std::shared_ptr<const Term<Coeff>> frontTerm = newTerms.front();
     Coeff frontCoeff(frontTerm->coeff());
-    std::cout << "begin iterate " << std::endl;
+    
     for(auto it = ++newTerms.begin(); it != newTerms.end(); ++it)
     {
         if(Policy::Ordering::compare(*frontTerm, **it) == CompareResult::EQUAL)
@@ -840,7 +851,7 @@ MultivariatePolynomial<Coeff,Policy>& MultivariatePolynomial<Coeff,Policy>::oper
             frontCoeff = (*it)->coeff();
         }
     }
-    std::cout << "end iterate " << std::endl;
+    
     if(frontCoeff == frontTerm->coeff())
     {
         mTerms.push_back(frontTerm);

@@ -12,7 +12,7 @@
 #include "Variable.h"
 
 
-namespace arithmetic 
+namespace carl 
 {
 
 /**

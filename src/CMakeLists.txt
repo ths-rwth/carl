@@ -1,5 +1,5 @@
 # Libraries..
-add_subdirectory(arithmetic)
+add_subdirectory(carl)
 
 # For unit tests.
 # We decided to always compile them, if gtest is present,

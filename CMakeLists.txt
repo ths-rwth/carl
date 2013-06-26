@@ -14,17 +14,17 @@ cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
 # # # # # # # # # # # # # # # # # # # # # #
-project(arithlib CXX)
+project(carl CXX)
 
-set( PROJECT_FULLNAME "Arithmetic Lib")
+set( PROJECT_FULLNAME "carl")
 set( PROJECT_DESCRIPTION "Something fancy")
-set( arithlib_MAJORVERSION 0)
-set( arithlib_MINORVERSION 1)
-set( arithlib_MAINTENANCEVERSION 0)
-set( arithlib_VERSION "${arithlib_MAJORVERSION}.${arithlib_MINORVERSION}.${arithlib_MAINTENANCEVERSION}")
+set( carl_MAJORVERSION 0)
+set( carl_MINORVERSION 1)
+set( carl_MAINTENANCEVERSION 0)
+set( carl_VERSION "${arithlib_MAJORVERSION}.${arithlib_MINORVERSION}.${arithlib_MAINTENANCEVERSION}")
 set( PROJECT_VERSION "${arithlib_VERSION}")
-set( smtrat_NAME "SMT-RAT" )
-set( smtrat_DESCRIPTION ${PROJECT_DESCRIPTION} )
+set( carl_NAME "CArL" )
+set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
 
 # path to find own modules
@@ -37,7 +37,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # options
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 
-option( ARITHMETIC_LOGGING "Compile with the logging facility of the arithmetic library" ON )
+option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 
 # path to put in the executables
@@ -59,10 +59,10 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++0x")
 
 # We start by using CLN as numeric library. 
 # include( FindCLN )
-# find gmp (which is necessary for CLN, at least when linking statically)
-# include( FindGMP )
+# Default numeric library is GMP. 
+include( FindGMP )
 
-set( libraries  ${CLN_LIBRARY} ${GMP_LIBRARY} pthread )
+set( libraries  ${GMP_LIBRARY} pthread )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries

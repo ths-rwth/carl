@@ -10,7 +10,7 @@
 #include "Variable.h"
 #include <iostream>
 
-namespace arithmetic
+namespace carl
 {
     typedef unsigned exponent;
     /**

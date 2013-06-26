@@ -4,7 +4,7 @@
 #include "Monomial.h"
 #include "Term.h"
 
-namespace arithmetic 
+namespace carl 
 {
 
 typedef CompareResult( *MonomialOrderingFc )(const Monomial&, const Monomial&);

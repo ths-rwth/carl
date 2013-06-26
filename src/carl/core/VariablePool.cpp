@@ -9,7 +9,7 @@
 
 #include "logging.h"
 
-namespace arithmetic
+namespace carl
 {
 std::shared_ptr< VariablePool > VariablePool::instance;
 std::once_flag VariablePool::only_one;
@@ -17,7 +17,7 @@ std::once_flag VariablePool::only_one;
 VariablePool::VariablePool():
 mNextVarId (1 << Variable::VARIABLE_BITS_RESERVED_FOR_TYPE)
 {
-    LOGMSG_INFO("arithmetic.varpool", "Constructor called");
+    LOGMSG_INFO("carl.varpool", "Constructor called");
 }
     
 VariablePool& VariablePool::operator= (const VariablePool& rs) 
@@ -33,14 +33,14 @@ VariablePool& VariablePool::getInstance(  )
         [] ()
         {
             VariablePool::instance.reset( new VariablePool() );
-            LOGMSG_INFO("arithmetic","VariablePool created.");
+            LOGMSG_INFO("carl","VariablePool created.");
         });
     return *VariablePool::instance;
 }
 
 Variable VariablePool::getFreshVariable(VariableType type)
 {
-    LOGMSG_TRACE("arithmetic.varpool", "New variable of type" << type);
+    LOGMSG_TRACE("carl.varpool", "New variable of type" << type);
     return Variable(mNextVarId++, type);
 }
 

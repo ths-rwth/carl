@@ -7,7 +7,7 @@
 
 #include "MonomialOrdering.h"
 
-namespace arithmetic
+namespace carl
 {
     /**
      * The default policy for polynomials. 

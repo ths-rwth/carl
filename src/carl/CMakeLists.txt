@@ -6,9 +6,14 @@ include_directories(
 # include core in library. 
 add_subdirectory(core)
 
+#include groebner and cad modules in library.
+add_subdirectory(groebner)
+add_subdirectory(cad)
+
+
 # Compose all the sources for the aritmetic library.
-set(arithmetic_lib_sources 
-	${arithmetic_lib_core_sources}
+set(carl_lib_sources 
+	${carl_lib_core_sources}
 )
 
 # set linking flags
@@ -17,8 +22,8 @@ if(${STATICLIB_SWITCH} STREQUAL "ON")
 	set(STATICLIB "STATIC")
 endif()
 
-add_library(lib_arithmetic ${STATICLIB} ${arithmetic_lib_sources} )
-set_target_properties( lib_arithmetic PROPERTIES
+add_library(lib_carl ${STATICLIB} ${carl_lib_sources} )
+set_target_properties( lib_carl PROPERTIES
 		# create *nix style library versions + symbolic links
 		VERSION "${PROJECT_VERSION}"
 		SOVERSION "${PROJECT_VERSION}"
@@ -30,17 +35,17 @@ set_target_properties( lib_arithmetic PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 if(${STATICLIB_SWITCH} STREQUAL "ON")
-  set_target_properties( lib_arithmetic PROPERTIES LINK_SEARCH_END_STATIC TRUE )
-  set_target_properties( lib_arithmetic PROPERTIES LINK_SEARCH_START_STATIC TRUE )
+  set_target_properties( lib_carl PROPERTIES LINK_SEARCH_END_STATIC TRUE )
+  set_target_properties( lib_carl PROPERTIES LINK_SEARCH_START_STATIC TRUE )
 endif()
 
-target_link_libraries( lib_arithmetic ${libraries} ) # libraries definied in top-level CMakeLists.txt
+target_link_libraries( lib_carl ${libraries} ) # libraries definied in top-level CMakeLists.txt
 
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-install( TARGETS lib_arithmetic DESTINATION lib PERMISSIONS
+install( TARGETS lib_carl DESTINATION lib PERMISSIONS
     OWNER_READ OWNER_WRITE OWNER_EXECUTE
     GROUP_READ GROUP_EXECUTE
     WORLD_READ WORLD_EXECUTE
