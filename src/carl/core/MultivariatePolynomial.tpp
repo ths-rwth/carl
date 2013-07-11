@@ -125,6 +125,22 @@ std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::constan
     }
 }
 
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::tail() const
+{
+    MultivariatePolynomial tail;
+    tail.mTerms.reserve(mTerms.size()-1);
+    tail.mTerms.insert(tail.mTerms.begin(), mTerms.begin(), --mTerms.end());
+    assert(!isZero());
+}
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy>& MultivariatePolynomial<Coeff,Policy>::stripLT()
+{
+    assert(!isZero());
+    mTerms.pop_back();
+    return *this;
+}
 
 template<typename Coeff, typename Policy>
 bool MultivariatePolynomial<Coeff,Policy>::isTsos() const

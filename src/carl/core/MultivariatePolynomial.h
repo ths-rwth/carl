@@ -43,12 +43,12 @@ namespace carl
         explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
         
         /**
-         * 
+         * The leading monomial
          * @return 
          */
         std::shared_ptr<const Monomial> lmon() const;
         /**
-         * 
+         * The leading term
          * @return 
          */
         std::shared_ptr<const Term<Coeff>> lterm() const;
@@ -59,7 +59,7 @@ namespace carl
          */
         Coeff lcoeff() const;
         /**
-         * 
+         * Calculates the max. degree over all monomials occurring in the polynomial.
          * @return 
          */
         exponent highestDegree() const;
@@ -68,8 +68,25 @@ namespace carl
         bool isConstant() const;
         bool isLinear() const;
         
+        /**
+         * Calculates the number of terms.
+         * @return the number of terms
+         */
         size_t nrTerms() const { return mTerms.size(); }
         std::shared_ptr<const Term<Coeff>> constantPart() const;
+        
+        /**
+         * For the polynomial p, the function calculates a polynomial p - lt(p).
+         * The function assumes the polynomial to be nonzero, otherwise, lt(p) is not defined.
+         * @return A new polynomial p - lt(p).
+         */
+        MultivariatePolynomial tail() const;
+        /**
+         * Drops the leading term.
+         * The function assumes the polynomial to be nonzero, otherwise the leading term is not defined.
+         * @return  A reference to this.
+         */
+        MultivariatePolynomial& stripLT();
         
         /**
          * Checks whether the polynomial is a trivial sum of squares.
