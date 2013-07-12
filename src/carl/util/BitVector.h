@@ -5,18 +5,183 @@
  *
  * 
  */
+#pragma once
 
-#ifndef BITVECTOR_H
-#define	BITVECTOR_H
+#include <vector>
+#include <stdlib.h>
+#include <iostream>
+#include <assert.h>
 
-class BitVector
+namespace carl
 {
-public:
-    BitVector( );
-    virtual ~BitVector( );
-private:
 
-};
+    const unsigned sizeOfUnsigned = sizeof(unsigned);
+	
+    class BitVector {
+	public:
+		BitVector() {}
+		
+		BitVector(unsigned pos) {
+			setBit(pos);
+		}
+		
+		size_t size() const {
+			return mBits.size() * sizeOfUnsigned * 8;
+		}
+		
+		void reserve(size_t capacity) {
+			mBits.resize(capacity);
+		}
+		
+        bool empty() const
+        {
+            for( auto it = mBits.begin(); it != mBits.end(); ++it )
+            {
+                if(*it != 0) return false;
+            }
+            return true;
+        }
+        
+        size_t findFirstSetBit() const
+        {
+            size_t pos;
+            for( auto it = mBits.begin();  it != mBits.end(); ++it )
+            {
+                if(*it != 0) {
+                    unsigned elem = *it;
+                    while( (elem & (unsigned)1) == 0 )
+                    {
+                        elem >>= 1;
+                        ++pos;
+                    }
+                    return pos;
+                }
+                pos += sizeOfUnsigned * 8;
+            }
+            return size();
+        }
+                
+		void setBit(unsigned pos, bool val = true) {
+			static_assert(sizeof(unsigned) == 4, "Currently bitvectors are only supported on these platforms.");
+			unsigned vecElem = pos >> 5;
+			unsigned mask = (unsigned)1;
+			mask <<= (pos & (unsigned)31);
+			if(vecElem >=  mBits.size()) {
+				mBits.resize(vecElem + 1, 0);
+			} 
+			if(!val) {
+				mask = ~mask;
+				mBits[vecElem] &= mask;
+			} else {
+				mBits[vecElem] |= mask;
+			}
+			assert(getBit(pos) == val);
+		}
+		
+		bool getBit(unsigned pos) const {
+			assert(sizeof(unsigned) == 4);
+			unsigned vecElem =  pos >> 5;
+			if(vecElem < mBits.size()) {
+				unsigned bitNr = pos & (unsigned)31;
+				return (mBits[vecElem] >> bitNr) & (unsigned)1;
+			} 
+			else 
+			{
+				return false;
+			}
+		}
+        
+        bool subsetOf(const BitVector& superset);
+		
+		friend bool operator== (const BitVector& lhs, const BitVector& rhs);
+        
+        
+		friend BitVector operator| (const BitVector& lhs, const BitVector& rhs);
+		
+		BitVector& operator|= (const BitVector& rhs) {
+			std::vector<unsigned>::iterator lhsIt = mBits.begin();
+			std::vector<unsigned>::const_iterator rhsIt = rhs.mBits.begin();
+			
+			std::vector<unsigned>::const_iterator lhsEnd = mBits.end();
+			std::vector<unsigned>::const_iterator rhsEnd = rhs.mBits.end();
+			
+			while(true) {
+				if(lhsIt == lhsEnd) {
+					mBits.insert(lhsIt,rhsIt,rhsEnd);
+					break;
+				}
+				
+				if(rhsIt == rhsEnd) {
+					break;
+				}
+				
+				*lhsIt |= *rhsIt;
+				++rhsIt;
+				++lhsIt;
+			}
+				
+			return *this;
+		}
+		
+		
+		class forward_iterator {
+		public:
+			forward_iterator(const std::vector<unsigned>::const_iterator it, const std::vector<unsigned>::const_iterator vectorEnd) :
+			posInVec(0), vecIter(it), vecEnd(vectorEnd)
+			{
+				curVecElem = (vecIter) == vecEnd ? 0 : *vecIter ;
+			}
+		protected:
+			unsigned posInVec;
+			std::vector<unsigned>::const_iterator vecIter;
+			const std::vector<unsigned>::const_iterator vecEnd;
+			unsigned curVecElem;
+			
+		public:
+			bool get() {
+				return (bool)(curVecElem & (unsigned)1);
+			}
+			
+			void next() {
+				if(++posInVec == 32) { 
+					posInVec = 0;
+					curVecElem = (++vecIter) == vecEnd ? 0 : *vecIter ;
+				} else {
+					curVecElem >>= 1;
+				}
+			}
+			
+			friend bool operator==(const forward_iterator& fi1, const forward_iterator& fi2);
+			
+			void operator++(int i = 1) {
+				if(i == 0) {
+					next();
+				}
+			}
+			
+			bool isEnd() {
+				return vecIter == vecEnd;
+			}
+		};
+		typedef forward_iterator const_iterator;
+		
+		forward_iterator begin() const {
+			return forward_iterator(mBits.begin(), mBits.end());
+		}
+		
+		forward_iterator end() const {
+			return forward_iterator(mBits.end(), mBits.end());
+		}
+		
+		void print(std::ostream& os = std::cout) const {
+			//std::cout << "Size of vector entries: " << sizeOfUnsigned << " .. " << std::endl;
+			for(const_iterator it = begin(); !it.isEnd(); it++) {
+				os << it.get();
+			}
+		}
+		
+		protected:
+			std::vector<unsigned> mBits;
+	};
 
-#endif	/* BITVECTOR_H */
-
+}
