@@ -1,0 +1,203 @@
+/** 
+ * @file   Ideal.h
+ * @author Sebastian Junges
+ *
+ * @since July 12, 2013
+ */
+
+#pragma once
+
+#include <unordered_set>
+#include "ideal-ds/IdealDSVector.h"
+#include "ideal-ds/PolynomialSorts.h"
+
+#include "../core/Term.h"
+
+namespace carl
+{
+
+
+template <class Polynomial, template<class> class Datastructure = IdealDatastructureVector, int CacheSize = 0>
+class MultivariateIdeal
+{
+
+    
+private:
+    std::vector<Polynomial> mGenerators;
+
+    sortByLeadingTerm<Polynomial> mTermOrder;
+
+    std::unordered_set<size_t> mEliminated;
+    Datastructure<Polynomial> mDivisorLookup;
+public:
+
+    MultivariateIdeal() : 
+        mGenerators(), 
+        mTermOrder(mGenerators), 
+        mEliminated(), 
+        mDivisorLookup(mGenerators, mEliminated, mTermOrder)
+    {
+
+    }
+
+    MultivariateIdeal(const Polynomial& p1, const Polynomial& p2) : 
+        mGenerators(), 
+        mTermOrder(mGenerators), 
+        mEliminated(), 
+        mDivisorLookup(mGenerators, mEliminated, mTermOrder)
+    {
+        addGenerator(p1);
+        addGenerator(p2);
+    }
+
+    virtual ~MultivariateIdeal()
+    {
+
+    }
+
+    MultivariateIdeal& operator=(const MultivariateIdeal& rhs)
+    {
+        if(this == &rhs) return *this;
+        this->mGenerators.assign(rhs.mGenerators.begin(), rhs.mGenerators.end());
+        this->mEliminated = rhs.mEliminated;
+        removeEliminated();
+        mDivisorLookup.reset();
+        return *this;
+    }
+
+    size_t addGenerator(const Polynomial& f)
+    {
+        size_t lastIndex = mGenerators.size();
+        mGenerators.push_back(f);
+        mDivisorLookup.addGenerator(lastIndex);
+        return lastIndex;
+    }
+
+    DivisionLookupResult<Polynomial> getDivisor(const Polynomial& f) const
+    {
+        return mDivisorLookup.getDivisor(f);
+    }
+
+    bool isDividable(const Term<typename Polynomial::Coeff>& m)
+    {
+        return mDivisorLookup.isDividable();
+    }
+
+    std::vector<Polynomial>& getGenerators()
+    {
+        return mGenerators;
+    }
+
+    const std::vector<Polynomial>& getGenerators() const
+    {
+        return mGenerators;
+    }
+
+
+    const Polynomial& getGenerator(size_t index) const
+    {
+        return mGenerators[index];
+    }
+
+    std::vector<size_t> getOrderedIndices()
+    {
+        std::vector<size_t> orderedIndices;
+        for(size_t i = 0; i < mGenerators.size(); ++i)
+        {
+            orderedIndices.push_back(i);
+        }
+
+        std::sort(orderedIndices.begin(), orderedIndices.end(), mTermOrder);
+        return orderedIndices;
+
+    }
+
+    void eliminateGenerator(size_t index)
+    {
+        mEliminated.insert(index);
+    }
+
+    /**
+     * Invalidates indices
+     * @return a vector with the new indices
+     */
+    void removeEliminated()
+    {
+        std::vector<Polynomial> tempGen;
+        for(size_t it = 0; it != mGenerators.size(); ++it)
+        {
+            if(mEliminated.count(it) == 0)
+            {
+                tempGen.push_back(mGenerators[it]);
+            }
+        }
+        tempGen.swap(mGenerators);
+        mEliminated.clear();
+
+    }
+
+
+    bool isConstant() const
+    {
+        return mGenerators.size() == 1 && mGenerators.front().isConstant();
+    }
+
+    /**
+     * Checks whether all polynomials occurring in this ideal are linear.
+     * @return 
+     */
+    bool isLinear() const
+    {
+        for(auto it = mGenerators.begin(); it != mGenerators.end(); ++it)
+        {
+            if(!it->isLinear()) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Gather all variables occurring in this ideal.
+     * @return 
+     */
+    std::set<unsigned> gatherVariables() const
+    {
+        std::set<unsigned> vars;
+        for(auto it = mGenerators.begin(); it != mGenerators.end(); ++it)
+        {
+            it->gatherVariables(vars);
+        }
+        return vars;
+    }
+
+//    std::set<unsigned> getSuperfluousVariables() const
+//    {
+//        std::set<unsigned> superfluous;
+//        for(auto it = mGenerators.begin(); it != mGenerators.end(); ++it)
+//        {
+//            //Variables occurring in polynomials x + y. 
+//            if(it->nrOfTerms() == 2 && it->lterm().tdeg() == 1)
+//            {
+//                superfluous.insert(it->lterm().getSingleVariableNr());
+//            }
+//        }
+//        return superfluous;
+//    }
+
+    void print(bool printOrigins=true, std::ostream& os = std::cout) const
+    {
+        for(typename std::vector<Polynomial>::const_iterator it = mGenerators.begin(); it != mGenerators.end(); ++it)
+        {
+            os << *it;
+            if(printOrigins)
+            {
+                os << " [";
+                it->getOrigins().print();
+                os << "]";
+            }
+            os << ";\n";
+        }
+    }
+};
+
+
+}

@@ -91,8 +91,4 @@ TEST(MultivariatePolynomial, Multiplication)
     std::cout << p0 << std::endl;
     p0 *= p0;
     std::cout << p0 << std::endl;
-    
-    
 }
-
-

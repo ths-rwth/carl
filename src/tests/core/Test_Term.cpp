@@ -1,8 +1,7 @@
 #include "gtest/gtest.h"
-#include "carl/core/Term.h"
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
-
+#include "carl/core/Term.h"
 
 using namespace carl;
 
@@ -38,4 +37,13 @@ TEST(Term, Multiplication)
     
 }
 
-
+TEST(Term, Derivative)
+{
+    Variable v0(0);
+    Variable v1(1);
+    Term<int> t(3);
+    t *= v0 * v0 * v0 * v1;
+    Term<int>* tprime = t.derivative(v0);
+    EXPECT_EQ(9,tprime->coeff());
+    
+}

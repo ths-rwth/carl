@@ -24,9 +24,12 @@ namespace carl
     template<typename Coeff, typename Policy = StdMultivariatePolynomialPolicy>
     class MultivariatePolynomial
     {
+    public:
+        typedef typename Policy::Ordering Ordering;
+        typedef Term<Coeff> TermType;
     protected:
         typedef std::vector<std::shared_ptr<const Term<Coeff>>> TermsType;
-        typedef typename Policy::Ordering Ordering;
+        
         
         /// A vector of all monomials
         TermsType mTerms;

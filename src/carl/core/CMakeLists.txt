@@ -1,7 +1,7 @@
 # Header files in here (only headers from this directory!)
 set(carl_lib_core_headers 
 	AbstractPolynomial.h
-	Monomial.h Monomial.tpp
+	Monomial.h
 	Polynomial.h Polynomial.tpp
 	PolynomialPolicy.h
 	VarExpPair.h
@@ -14,6 +14,7 @@ set(carl_lib_core_headers
 # Source files in here
 set(carl_lib_core_sources 
 	core/VariablePool.cpp
+	core/Monomial.cpp
 	
 PARENT_SCOPE)
 

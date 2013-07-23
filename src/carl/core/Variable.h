@@ -34,6 +34,8 @@ enum VariableType { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3 };
  * Moreover, notice that for small classes like this, pass-by-value could be faster than pass-by-ref.
  * However, this depends much on the capabilities of the compiler. 
  */
+class Monomial;
+
 class Variable
 {    
 private:
@@ -72,6 +74,9 @@ public:
     {
         return (VariableType)(mVariable % (1 << VARIABLE_BITS_RESERVED_FOR_TYPE));
     }
+    
+    
+    friend const Monomial operator*(const Variable& lhs, const Variable& rhs);
     
     friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs)
     {

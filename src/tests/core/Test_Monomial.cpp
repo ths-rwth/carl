@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
+#include "carl/core/Monomial_derivative.h"
 
 using namespace carl;
 
@@ -41,9 +42,9 @@ TEST(Monomial, Operators)
 
 TEST(Monomial, multiplication)
 {
-    Variable v0 = Variable((unsigned)0);
-    Variable v1 = Variable((unsigned)1);
-    Variable v2 = Variable((unsigned)2);
+    Variable v0((unsigned)0);
+    Variable v1((unsigned)1);
+    Variable v2((unsigned)2);
     
     Monomial m0(v0);
     Monomial m1(v1);
@@ -56,6 +57,39 @@ TEST(Monomial, multiplication)
     m0 *= v1;
     //m0 *= m0;
     EXPECT_EQ(m01, m0);
+    Monomial m = v0 * v0;
     
 }
+
+TEST(Monomial, derivative)
+{
+    Variable v0((unsigned)0);
+    Variable v1((unsigned)1);
+    Monomial m0 = v0 * v1;
+    Term<int>* t = m0.derivative<int>(v0);
+    EXPECT_EQ(1, t->getNrVariables());
+    
+}
+
+TEST(Monomial, division)
+{
+    Variable v0((unsigned)0);
+    Variable v1((unsigned)1);
+    Variable v2((unsigned)2);
+    
+    Monomial m0 = v0 * v0 * v1 * v1 * v2;
+    Monomial m1 = v0 * v0 * v0;
+    Monomial m2 = v0 * v0 * v1 * v2;
+    Monomial m0x = v0 * v0 * v1 * v2;
+    Monomial m0y = v0 * v0 * v1 * v1;
+    EXPECT_EQ(nullptr, m0.dividedBy(m1));
+    EXPECT_EQ(nullptr, m1.dividedBy(m0));
+    EXPECT_EQ(m0x, *m0.dividedBy(v1));
+    EXPECT_EQ(m0y, *m0.dividedBy(v2));
+    std::cout << "----------" << std::endl;
+    EXPECT_EQ(Monomial(v1), *m0.dividedBy(m2));
+    
+    
+}
+
 

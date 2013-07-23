@@ -80,9 +80,14 @@ public:
      * The number of variables initialized by the pool.
      * @return 
      */
-    unsigned nrVariables()
+    unsigned nrVariables() const
     {
         return mNextVarId;
+    }
+    
+    static unsigned NrVariables() 
+    {
+        return instance->nrVariables();
     }
     
     /**

@@ -25,6 +25,7 @@ class Term
         explicit Term(const Monomial& m);
         explicit Term(const std::shared_ptr<const Monomial>& m);
         Term(const Coefficient& c, const Monomial& m);
+        Term(const Coefficient& c, const Monomial* m);
         Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
         Term(const Coefficient& c, Variable::Arg v, unsigned exponent);
         
@@ -37,6 +38,10 @@ class Term
             return mCoeff;
         }
         
+        /**
+         * 
+         * @return 
+         */
         std::shared_ptr<const Monomial> monomial() const
         {
             return mMonomial;
@@ -82,6 +87,28 @@ class Term
             mMonomial.reset();
         }
         
+        /**
+         * 
+         * @param a non-zero coefficient.
+         * @return 
+         */
+        Term* dividedBy(const Coefficient&) const;
+        /**
+         * 
+         * @param 
+         * @return 
+         */
+        Term* dividedBy(Variable::Arg) const;
+        /**
+         * 
+         * @param 
+         * @return 
+         */
+        Term* dividedBy(const Monomial&) const;
+        
+        Term* dividedBy(const Term&) const;
+        
+        Term* derivative(Variable::Arg) const;
         
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
@@ -117,6 +144,7 @@ class Term
         
         Term& operator *=(const Coefficient& rhs);
         Term& operator *=(Variable::Arg rhs);
+        Term& operator *=(const Monomial& rhs);
         Term& operator *=(const Term& rhs);
         
         template<typename Coeff>

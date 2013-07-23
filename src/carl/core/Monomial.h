@@ -13,6 +13,9 @@
 
 namespace carl
 {   
+    
+    template<typename Coefficient> 
+    class Term;
     /**
      *  The general-purpose monomials. Notice that we aim to keep this object as small as possbible, 
      * while also limiting the use of expensive language features such as RTTI, exceptions and even 
@@ -120,6 +123,94 @@ namespace carl
             assert("NOT IMPLEMENTED");
         }
 
+        Monomial* dividedBy(Variable::Arg v) const
+        {
+             // Linear implementation, as we expect very small monomials.
+            exponents_cIt it;
+            if((it = std::find(mExponents.cbegin(), mExponents.cend(), v)) == mExponents.cend())
+            {
+                return nullptr;
+            }
+            else
+            {
+                Monomial* m = new Monomial();
+                // If the exponent is one, the variable does not occur in the new monomial.
+                if(it->exp == 1)
+                {
+                    if(it != mExponents.begin())
+                    {
+                        m->mExponents.assign(mExponents.begin(), it);
+                    }
+                    m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
+                }
+                // We have to decrease the exponent of the variable by one.
+                else
+                {
+                    m->mExponents.assign(mExponents.begin(), mExponents.end());
+                    m->mExponents[it - mExponents.begin()].exp -= 1;
+                }
+                m->mTotalDegree = mTotalDegree - 1;
+                return m;
+            }
+        }
+
+        /**
+         * 
+         * @param m Recommended to be non-constant as this yields unnecessary copying.
+         * @return 
+         */
+        Monomial* dividedBy(const Monomial& m) const
+        {
+            Monomial* result = new Monomial();
+            if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
+            {
+                // Division will fail.
+                return nullptr;
+            }
+            
+            result->mTotalDegree =  mTotalDegree - m.mTotalDegree;
+
+            // Linear, as we expect small monomials.
+            exponents_cIt itright = m.mExponents.begin();
+            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+            {
+                // Done with division
+                if(itright == m.mExponents.end())
+                {
+                    // Insert remaining part
+                    result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
+                    return result;
+                }
+                // Variable is present in both monomials.
+                if(itleft->var == itright->var)
+                {
+                    exponent newExp = itleft->exp - itright->exp;
+                    if(newExp > itleft->exp)
+                    {
+                        // Underflow, itright->exp was larger than itleft->exp.
+                        return nullptr;
+                    }
+                    else if(newExp > 0)
+                    {
+                        result->mExponents.push_back(VarExpPair(itleft->var, newExp));
+                    }
+                    itright++;
+                }
+                // Variable is not present in lhs, division fails.
+                else if(itleft->var > itright->var) 
+                {
+                    return nullptr;
+                }        
+            }
+            // If there remain variables in the m, it fails.
+            if(itright != m.mExponents.end()) return nullptr;
+            return result;
+            
+        }        
+        
+        template<typename Coefficient>
+        Term<Coefficient>* derivative(Variable::Arg v) const;
+        
         ///////////////////////////
         // Orderings
         ///////////////////////////
@@ -256,9 +347,17 @@ namespace carl
             return result;
         }
 
-        friend const Monomial operator*(Variable::Arg lhs, const Monomial& rhs )
+        friend const Monomial operator*(Variable::Arg lhs, const Monomial& rhs)
         {
             return rhs * lhs;
+        }
+        
+        friend const Monomial operator*(const Variable& lhs, const Variable& rhs)
+        {
+            // Note that this implementation is not optimized yet!
+            Monomial result(lhs);
+            result *= rhs;
+            return result;
         }
 
         friend const Monomial operator*(const Monomial& lhs, const Monomial& rhs )

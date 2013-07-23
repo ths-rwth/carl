@@ -5,10 +5,13 @@
  * Created on June 25, 2013, 6:29 PM
  */
 
-#ifndef POLYNOMIALWITHREASONSET_H
-#define	POLYNOMIALWITHREASONSET_H
+#pragma once
 
-
-
-#endif	/* POLYNOMIALWITHREASONSET_H */
-
+namespace carl
+{
+template<Coeff, Policy>
+PolynomialWithReasonSet : public Polynomial<Coeff, Policy>
+{
+    BitVector reasonSet;
+};
+}

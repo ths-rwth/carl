@@ -2,6 +2,7 @@
 
 // for code assistance
 #include "Term.h"
+#include "Monomial_derivative.h"
 
 namespace carl
 {
@@ -26,6 +27,13 @@ Term<Coefficient>::Term(const Monomial& m) :
 }
 
 template<typename Coefficient>
+Term<Coefficient>::Term(const Coefficient& c, const Monomial* m) :
+    mCoeff(c), mMonomial(std::shared_ptr<const Monomial>(m))
+{
+    
+}
+
+template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned exponent) :
 mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, exponent)))
 {
@@ -45,6 +53,76 @@ Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomi
 {
     if(c != 0) mMonomial = m;
 }
+
+
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::dividedBy(const Coefficient& c) const
+{
+    assert(c != 0);
+    return new Term(mCoeff / c, mMonomial);
+}
+
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::dividedBy(Variable::Arg v) const
+{
+    if(mMonomial)
+    {
+        Monomial* div = mMonomial->dividedBy(v);
+        if(div != nullptr)
+        {
+            return new Term<Coefficient>(mCoeff, div);
+        }   
+    }
+    return nullptr;    
+}
+
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::dividedBy(const Monomial& m) const
+{
+    if(mMonomial)
+    {
+        Monomial* div = mMonomial->dividedBy(m);
+        if(div != nullptr)
+        {
+            return new Term<Coefficient>(mCoeff, div);
+        }   
+    }
+    return nullptr;  
+}
+
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::dividedBy(const Term& t) const
+{
+    assert(t.mCoeff != 0);
+    if(mMonomial)
+    {
+        if(!t.mMonomial)
+        {
+            // Term is just a constant.
+            return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
+        }
+        Monomial* div = mMonomial->dividedBy(*(t->mMonomial));
+        if(div != nullptr)
+        {
+            return new Term<Coefficient>(mCoeff / t.mCoeff, div);
+        }   
+    } 
+    else if(!t.mMonomial)
+    {
+       // Division of constants.
+        return new Term<Coefficient>(mCoeff / t.mCoeff);
+    }
+    return nullptr;  
+}
+
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
+{
+    Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
+    *t *= mCoeff;
+    return t;
+}
+
 
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
@@ -154,6 +232,25 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
     }
     return *this;
 }
+
+template<typename Coefficient>
+Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial& rhs)
+{
+    if(mCoeff == 0) return *this;
+    
+    if(mMonomial)
+    {
+        mMonomial = std::make_shared<const Monomial>((*mMonomial) * (rhs));
+        
+    }
+    else
+    {
+        mMonomial = std::make_shared<const Monomial>(rhs);
+    }
+    return *this;   
+}
+
+
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 {
