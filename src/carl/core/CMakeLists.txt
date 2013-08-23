@@ -14,7 +14,6 @@ set(carl_lib_core_headers
 # Source files in here
 set(carl_lib_core_sources 
 	core/VariablePool.cpp
-	core/Monomial.cpp
 	
 PARENT_SCOPE)
 
@@ -25,6 +24,6 @@ configure_file( ${CMAKE_SOURCE_DIR}/src/carl/core/config.h.in
 
 # Installation of header files
 install(FILES			${carl_lib_core_headers}
-		DESTINATION		include/carl/lib/core
+		DESTINATION		include/carl/core
 )
 

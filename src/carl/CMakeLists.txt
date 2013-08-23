@@ -1,4 +1,5 @@
 # include directories.
+message(${include_dirs})
 include_directories( 
 	${include_dirs}
 )
@@ -10,12 +11,14 @@ add_subdirectory(util)
 #include groebner and cad modules in library.
 add_subdirectory(groebner)
 add_subdirectory(cad)
+add_subdirectory(interval)
 
 
 # Compose all the sources for the aritmetic library.
 set(carl_lib_sources 
 	${carl_lib_core_sources}
 	${carl_lib_util_sources}
+	${carl_lib_interval_sources}
 )
 
 # set linking flags

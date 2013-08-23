@@ -17,7 +17,7 @@ cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
 project(carl CXX)
 
 set( PROJECT_FULLNAME "carl")
-set( PROJECT_DESCRIPTION "Something fancy")
+set( PROJECT_DESCRIPTION "Computer ARithmetic Library")
 set( carl_MAJORVERSION 0)
 set( carl_MINORVERSION 1)
 set( carl_MAINTENANCEVERSION 0)
@@ -58,21 +58,38 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++0x")
 # # # # # # # # # # # # # # # # # # # # # #
 
 # We start by using CLN as numeric library. 
-# include( FindCLN )
+include( FindCLN )
 # Default numeric library is GMP. 
 include( FindGMP )
 
-set( libraries  ${GMP_LIBRARY} pthread )
+set( libraries  ${GMP_LIBRARY} ${CLN_LIBRARY} pthread )
+set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
 # # # # # # # # # # # # # # # # # # # # # #
 
+# We use boost intervals for the interval arithmetic
+
+OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
+# If Boost was found, the Boost include directory will be saved in the variable
+# Boost_INCLUDE_DIR.
+if(BOOST_LOCAL)
+SET(BOOST_NO_BOOST_CMAKE ON)
+
+SET(BOOST_NO_SYSTEM_PATHS ON)
+message(ERROR "No local version of boost exists")
+#SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
+#SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
+endif()
+FIND_PACKAGE(Boost COMPONENTS REQUIRED)
+
+set( libraries  ${libraries} )
+set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.3. Development and debug libraries.
 # # # # # # # # # # # # # # # # # # # # # #
-
 
 # if doxygen is installed, create the make doc target
 include(FindDoxygen)
@@ -92,8 +109,8 @@ endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-set(libraries ${LOG4CPLUS_LIBRARY} pthread)
-set(include_dirs ${LOG4CPLUS_INCLUDE_DIR} )
+set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
+set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
 
 # # # # # # # # # # # # # # # # # # # # # #

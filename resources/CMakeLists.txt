@@ -35,6 +35,7 @@ if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
 else()
 	# Add gtest (local build)
+	message("-- Use shipped version of GTest")
 	ExternalProject_Add(
 		googletest
 		#For downloads (may be useful later!)
