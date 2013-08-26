@@ -18,28 +18,437 @@ TEST(DoubleInterval, Getters)
 
 TEST(DoubleInterval, Addition)
 {
+    DoubleInterval a0 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval a1 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval a2 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    DoubleInterval a3 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND);
     
+    DoubleInterval b0 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval b1 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval b2 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    DoubleInterval b3 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    
+    DoubleInterval result;
+    
+    result = a0.add(b0);
+    EXPECT_EQ( DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 4, DoubleInterval::WEAK_BOUND), result);
+    result = a0.add(b1);
+    EXPECT_EQ( DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 4, DoubleInterval::WEAK_BOUND), result);
+    result = a0.add(b2);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a0.add(b3);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    
+    result = a1.add(b0);
+    EXPECT_EQ( DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 4, DoubleInterval::WEAK_BOUND), result);
+    result = a1.add(b1);
+    EXPECT_EQ( DoubleInterval(-2, DoubleInterval::WEAK_BOUND, 4, DoubleInterval::WEAK_BOUND), result);
+    result = a1.add(b2);
+    EXPECT_EQ( DoubleInterval(-2, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND), result);
+    result = a1.add(b3);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    
+    result = a2.add(b0);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a2.add(b1);
+    EXPECT_EQ( DoubleInterval(-2, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND), result);
+    result = a2.add(b2);
+    EXPECT_EQ( DoubleInterval(-2, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND), result);
+    result = a2.add(b3);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    
+    result = a3.add(b0);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a3.add(b1);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a3.add(b2);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a3.add(b3);
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
 }
 
 
-TEST(DoubleInterval, Substraction)
+TEST(DoubleInterval, Subtraction)
 {
+    DoubleInterval a0 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval a1 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval a2 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    DoubleInterval a3 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND);
     
+    DoubleInterval b0 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval b1 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND);
+    DoubleInterval b2 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    DoubleInterval b3 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    
+    DoubleInterval result;
+    
+    result = a0.add(b0.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a0.add(b1.minus());
+    EXPECT_EQ( DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 3, DoubleInterval::WEAK_BOUND), result);
+    result = a0.add(b2.minus());
+    EXPECT_EQ( DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 3, DoubleInterval::WEAK_BOUND), result);
+    result = a0.add(b3.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    
+    result = a1.add(b0.minus());
+    EXPECT_EQ( DoubleInterval(-3, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND), result);
+    result = a1.add(b1.minus());
+    EXPECT_EQ( DoubleInterval(-3, DoubleInterval::WEAK_BOUND, 3, DoubleInterval::WEAK_BOUND), result);
+    result = a1.add(b2.minus());
+    EXPECT_EQ( DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 3, DoubleInterval::WEAK_BOUND), result);
+    result = a1.add(b3.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    
+    result = a2.add(b0.minus());
+    EXPECT_EQ( DoubleInterval(-3, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND), result);
+    result = a2.add(b1.minus());
+    EXPECT_EQ( DoubleInterval(-3, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND), result);
+    result = a2.add(b2.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a2.add(b3.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    
+    result = a3.add(b0.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a3.add(b1.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a3.add(b2.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
+    result = a3.add(b3.minus());
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
 }
 
 
 TEST(DoubleInterval, Multiplication)
 {
-    
+    DoubleInterval c0  = DoubleInterval( -2, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval c1  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval c2  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND );
+    DoubleInterval c3  = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND );
+    DoubleInterval c4  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, -1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval c5  = DoubleInterval( -2, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval c6  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+    DoubleInterval c7  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+    DoubleInterval c8  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+
+    DoubleInterval d0  = DoubleInterval( -2, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d1  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d2  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, -1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d3  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+
+    DoubleInterval d4  = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d5  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d6  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d7  = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d8  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 0, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d9  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::WEAK_BOUND );
+    DoubleInterval d10 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+    DoubleInterval d11 = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+    DoubleInterval d12 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND );
+    DoubleInterval result;
+
+    result = c0.mul( d0 );
+    EXPECT_EQ( DoubleInterval( c0.right() * d0.right(), DoubleInterval::WEAK_BOUND, c0.left() * d0.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c0.mul( d5 );
+    EXPECT_EQ( DoubleInterval( c0.right() * d5.right(), DoubleInterval::WEAK_BOUND, c0.left() * d5.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c1.mul( d0 );
+    EXPECT_EQ( DoubleInterval( c1.right() * d0.left(), DoubleInterval::WEAK_BOUND, c1.left() * d0.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c1.mul( d5 );
+    EXPECT_EQ( DoubleInterval( c1.right() * d5.left(), DoubleInterval::WEAK_BOUND, c1.left() * d5.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c2.mul( d0 );
+    EXPECT_EQ( DoubleInterval( c2.right() * d0.left(), DoubleInterval::WEAK_BOUND, c2.left() * d0.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c2.mul( d5 );
+    EXPECT_EQ( DoubleInterval( c2.right() * d5.left(), DoubleInterval::WEAK_BOUND, c2.left() * d5.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c3.mul( d0 );
+    EXPECT_EQ( DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND ), result );
+    result = c3.mul( d5 );
+    EXPECT_EQ( DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND ), result );
+    result = c4.mul( d0 );
+    EXPECT_EQ( DoubleInterval( c4.right() * d0.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c4.mul( d5 );
+    EXPECT_EQ( DoubleInterval( c4.right() * d5.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c5.mul( d0 );
+    EXPECT_EQ( DoubleInterval( c5.right() * d0.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c5.mul( d5 );
+    EXPECT_EQ( DoubleInterval( c5.right() * d5.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c6.mul( d0 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c6.left() * d0.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c6.mul( d5 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c6.left() * d5.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c7.mul( d0 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c7.left() * d0.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c7.mul( d5 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c7.left() * d5.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c8.mul( d0 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d5 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d6 );
+    EXPECT_EQ( DoubleInterval( c0.left() * d6.right(), DoubleInterval::WEAK_BOUND, c0.left() * d6.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c1.mul( d6 );
+    EXPECT_EQ( DoubleInterval( ( c1.left() * d6.right() < c1.right() * d6.left() ? c1.left() * d6.right() : c1.right() * d6.left()),
+                                         DoubleInterval::WEAK_BOUND,
+                                         c1.left() * d6.left() > c1.right() * d6.right() ? c1.left() * d6.left() : c1.right() * d6.right(),
+                                         DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c2.mul( d6 );
+    EXPECT_EQ( DoubleInterval( c2.right() * d6.left(), DoubleInterval::WEAK_BOUND, c2.right() * d6.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c3.mul( d6 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d6 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d6 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d6 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d6 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d6 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d1 );
+    EXPECT_EQ( DoubleInterval( c0.left() * d1.right(), DoubleInterval::WEAK_BOUND, c0.right() * d1.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c0.mul( d7 );
+    EXPECT_EQ( DoubleInterval( c0.left() * d7.right(), DoubleInterval::WEAK_BOUND, c0.right() * d7.left(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c1.mul( d1 );
+    EXPECT_EQ( DoubleInterval( c1.left() * d1.right(), DoubleInterval::WEAK_BOUND, c1.right() * d1.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c1.mul( d7 );
+    EXPECT_EQ( DoubleInterval( c1.left() * d7.right(), DoubleInterval::WEAK_BOUND, c1.right() * d7.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c2.mul( d1 );
+    EXPECT_EQ( DoubleInterval( c2.left() * d1.left(), DoubleInterval::WEAK_BOUND, c2.right() * d1.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c2.mul( d7 );
+    EXPECT_EQ( DoubleInterval( c2.left() * d7.left(), DoubleInterval::WEAK_BOUND, c2.right() * d7.right(), DoubleInterval::WEAK_BOUND ),
+                          result );
+    result = c3.mul( d1 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c3.mul( d7 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d1 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c4.right() * d1.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c4.mul( d7 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c4.right() * d7.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c5.mul( d1 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c5.right() * d1.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c5.mul( d7 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c5.right() * d7.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c6.mul( d1 );
+    EXPECT_EQ( DoubleInterval( c6.left() * d1.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c6.mul( d7 );
+    EXPECT_EQ( DoubleInterval( c6.left() * d7.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c7.mul( d1 );
+    EXPECT_EQ( DoubleInterval( c7.left() * d1.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c7.mul( d7 );
+    EXPECT_EQ( DoubleInterval( c7.left() * d7.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c8.mul( d1 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d7 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c1.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c2.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c3.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );;
+    result = c5.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c6.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c7.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c8.mul( d4 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+
+    result = c0.mul( d2 );
+    EXPECT_EQ( DoubleInterval( c0.right() * d2.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c0.mul( d8 );
+    EXPECT_EQ( DoubleInterval( c0.right() * d8.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c1.mul( d2 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c1.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c2.mul( d2 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c2.left() * d2.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c2.mul( d8 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c2.left() * d8.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c3.mul( d2 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c3.mul( d8 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d2 );
+    EXPECT_EQ( DoubleInterval( c4.right() * d2.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c4.mul( d8 );
+    EXPECT_EQ( DoubleInterval( c4.right() * d8.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c5.mul( d2 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d2 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d2 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c7.left() * d2.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c7.mul( d8 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c7.left() * d8.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c8.mul( d2 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d9 );
+    EXPECT_EQ( DoubleInterval( c0.left() * d9.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c0.mul( d8 );
+    EXPECT_EQ( DoubleInterval( c0.left() * d8.right(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c1.mul( d9 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c1.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c2.mul( d9 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c2.right() * d9.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c2.mul( d8 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c2.right() * d8.right(), DoubleInterval::WEAK_BOUND ), result );
+    result = c3.mul( d9 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c3.mul( d8 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d9 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c4.mul( d8 );
+    EXPECT_EQ( DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c5.mul( d9 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d9 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d9 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d8 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 0, DoubleInterval::WEAK_BOUND ), result );
+    result = c8.mul( d9 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d8 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d11 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c0.left() * d11.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c0.mul( d10 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c0.left() * d10.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c1.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c1.mul( d10 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c2.mul( d11 );
+    EXPECT_EQ( DoubleInterval( c2.right() * d11.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c2.mul( d10 );
+    EXPECT_EQ( DoubleInterval( c2.right() * d10.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c3.mul( d11 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c3.mul( d10 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d11 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 0, DoubleInterval::WEAK_BOUND ), result );
+    result = c4.mul( d10 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d10 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d10 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d11 );
+    EXPECT_EQ( DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c7.mul( d10 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d10 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d11 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c0.right() * d11.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c0.mul( d3 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c0.right() * d3.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c1.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c1.mul( d3 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c2.mul( d11 );
+    EXPECT_EQ( DoubleInterval( c2.left() * d11.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c2.mul( d3 );
+    EXPECT_EQ( DoubleInterval( c2.left() * d3.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c3.mul( d11 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c3.mul( d3 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d11 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c4.right() * d11.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c4.mul( d3 );
+    EXPECT_EQ( DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, c4.right() * d3.left(), DoubleInterval::WEAK_BOUND ), result );
+    result = c5.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d3 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d3 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d11 );
+    EXPECT_EQ( DoubleInterval( c7.left() * d11.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c7.mul( d3 );
+    EXPECT_EQ( DoubleInterval( c7.left() * d3.left(), DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND ), result );
+    result = c8.mul( d11 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d3 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+
+    result = c0.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c1.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c2.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c3.mul( d12 );
+    EXPECT_EQ( DoubleInterval( 0 ), result );
+    result = c4.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c5.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c6.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c7.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    result = c8.mul( d12 );
+    EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
 }
 
 
 TEST(DoubleInterval, Division)
 {
-    DoubleInterval i0  = DoubleInterval( 0.0, DoubleInterval::STRICT_BOUND, 0.0, DoubleInterval::STRICT_BOUND );
-    DoubleInterval i1  = DoubleInterval();
-    DoubleInterval i2  = DoubleInterval( 0.0, DoubleInterval::INFINITY_BOUND, 0.0, DoubleInterval::INFINITY_BOUND );
-    DoubleInterval i3  = DoubleInterval( 0.0, DoubleInterval::INFINITY_BOUND, 10.0, DoubleInterval::WEAK_BOUND );
 
     DoubleInterval a0  = DoubleInterval( -2, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND );
     DoubleInterval a1  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
@@ -65,59 +474,6 @@ TEST(DoubleInterval, Division)
     DoubleInterval b10 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
     DoubleInterval b11 = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
     DoubleInterval b12 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-
-    DoubleInterval ia = DoubleInterval( 1, 4 );
-    DoubleInterval ib = DoubleInterval( 2, 5 );
-    DoubleInterval ic = DoubleInterval( -2, 3 );
-    DoubleInterval id = DoubleInterval( 0, 2 );
-
-    VariablePool& varPool = VariablePool::getInstance();
-    Variable a = varPool.getFreshVariable();
-    varPool.setVariableName(a, "a");
-    Variable b = varPool.getFreshVariable();
-    varPool.setVariableName(b, "b");
-    Variable c = varPool.getFreshVariable();
-    varPool.setVariableName(c, "c");
-    Variable d = varPool.getFreshVariable();
-    varPool.setVariableName(c, "d");
-    
-    
-    DoubleInterval::evaldoubleintervalmap mapt;
-    mapt[a] = ia;
-    mapt[b] = ib;
-    mapt[c] = ic;
-    mapt[d] = id;
-    
-    MultivariatePolynomial<cln::cl_RA> e1;
-    e1 += a;
-    e1 += b;
-    e1 += c;
-    e1 += d;
-    MultivariatePolynomial<cln::cl_RA> e2;
-    e2 += a*b;
-    e2 += c*d;
-    MultivariatePolynomial<cln::cl_RA> e3;
-    e3 += a*b*c;
-    e3 += d;
-    MultivariatePolynomial<cln::cl_RA> e4;
-    e4 += a;
-    e4 += b;
-    e4 -= c;
-    e4 -= d;
-    MultivariatePolynomial<cln::cl_RA> e5;
-    e5 += a;
-    e5 += b;
-    e5 += 3;
-    e5 += 4;
-    MultivariatePolynomial<cln::cl_RA> e6;
-    e6 += (cln::cl_RA)12*a;
-    e6 += (cln::cl_RA)3*b;
-    e6 += Monomial(c, 2);
-    e6 -= Monomial(d,3);
-    MultivariatePolynomial<cln::cl_RA> e7;
-    e7 += a;
-//    e7 += b*(c+a)*(c+a)*d;
-    e7 += b;
     DoubleInterval result1, result2;
     // Table 7 Tests: Division without containing 0
     a0.div_ext( result1, result2, b0 );
