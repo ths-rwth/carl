@@ -8,7 +8,8 @@
 
 #include "IntervalEvaluation.h"
 
-IntervalEvaluation::IntervalEvaluation( )
-{
-}
 
+namespace carl
+{
+    
+}

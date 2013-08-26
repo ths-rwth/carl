@@ -9,16 +9,52 @@
 
 #pragma once
 
+#include "DoubleInterval.h"
+
+#include "../core/Monomial.h"
+#include "../core/Term.h"
+#include "../core/MultivariatePolynomial.h"
+
 namespace carl
 {
 class IntervalEvaluation
 {
 public:
     static DoubleInterval evaluate(const Monomial& m, const std::map<Variable, DoubleInterval>&);
+	template<typename Coeff>
+	static DoubleInterval evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>&);
     
 private:
 
 };
+
+inline DoubleInterval IntervalEvaluation::evaluate(const Monomial& m, const std::map<Variable, DoubleInterval>& map)
+{
+	DoubleInterval result(1);
+	// TODO use iterator.
+	for(size_t i = 0; i < m.nrVariables(); ++i)
+	{
+		// We expect every variable to be in the map.
+		assert(map.count(m[i].var) > 0);
+		result *= map.at(m[i].var).power(m[i].exp);
+	}
+	return result;
+}
+
+template<typename Coeff>
+inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>& map)
+{
+	DoubleInterval result(t->coeff());
+	Monomial& m = *t->monomial();
+	// TODO use iterator.
+	for(size_t i = 0; i < m.nrVariables(); ++i)
+	{
+		// We expect every variable to be in the map.
+		assert(map.count(m[i].var) > 0);
+		result *= map.at(m[i].var).power(m[i].exp);
+	}
+	return result;
+}
 }
 
 

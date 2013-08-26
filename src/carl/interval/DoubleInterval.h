@@ -451,60 +451,60 @@ namespace carl
     
 }    // namespace carl
 
-const carl::DoubleInterval operator +( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline const carl::DoubleInterval operator +( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return lh.add( rh );
 }
 
-const carl::DoubleInterval operator +( const carl::DoubleInterval& lh, const double& rh )
+inline const carl::DoubleInterval operator +( const carl::DoubleInterval& lh, const double& rh )
 {
     // TODO optimization potential
     return lh.add( carl::DoubleInterval( rh ) );
 }
 
-const carl::DoubleInterval operator +( const double& lh, const carl::DoubleInterval& rh )
+inline const carl::DoubleInterval operator +( const double& lh, const carl::DoubleInterval& rh )
 {
     // TODO optimization potential
     return rh.add( carl::DoubleInterval( lh ) );
 }
 
-const carl::DoubleInterval operator -( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline const carl::DoubleInterval operator -( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return lh.add( rh.minus() );
 }
 
 
-const carl::DoubleInterval operator -( const carl::DoubleInterval& lh, const double& rh )
+inline const carl::DoubleInterval operator -( const carl::DoubleInterval& lh, const double& rh )
 {
     return lh + (-rh);
 }
 
-const carl::DoubleInterval operator -( const double& lh, const carl::DoubleInterval& rh )
+inline const carl::DoubleInterval operator -( const double& lh, const carl::DoubleInterval& rh )
 {
     return (-lh) + rh;
 }
 
-const carl::DoubleInterval operator *( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline const carl::DoubleInterval operator *( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return lh.mul( rh );
 }
     
-const carl::DoubleInterval operator *( const carl::DoubleInterval& lh, const double& rh )
+inline const carl::DoubleInterval operator *( const carl::DoubleInterval& lh, const double& rh )
 {
     return carl::DoubleInterval( lh.mul( carl::DoubleInterval( rh ) ) );
 }
 
-const carl::DoubleInterval operator *( const double& lh, const carl::DoubleInterval& rh )
+inline const carl::DoubleInterval operator *( const double& lh, const carl::DoubleInterval& rh )
 {
     return rh * lh;
 }
 
-const carl::DoubleInterval operator /( const carl::DoubleInterval& lh, const double& rh ) throw ( std::overflow_error )
+inline const carl::DoubleInterval operator /( const carl::DoubleInterval& lh, const double& rh ) throw ( std::overflow_error )
 {
     return lh.div( carl::DoubleInterval( rh ) );
 }
 
-const carl::DoubleInterval operator /( const double& lh, const carl::DoubleInterval& rh ) throw ( std::overflow_error )
+inline const carl::DoubleInterval operator /( const double& lh, const carl::DoubleInterval& rh ) throw ( std::overflow_error )
 {
     carl::DoubleInterval result = carl::DoubleInterval( lh );
     result.div( rh );
@@ -513,22 +513,22 @@ const carl::DoubleInterval operator /( const double& lh, const carl::DoubleInter
 
 // relational operators
 
-bool operator ==( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator ==( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return lh.isEqual( rh );
 }
 
-bool operator !=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator !=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return !lh.isEqual( rh );
 }
 
-bool operator <=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator <=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return lh.isLessOrEqual( rh );
 }
 
-bool operator >=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator >=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
 {
     return lh.isGreaterOrEqual( rh );
 }
