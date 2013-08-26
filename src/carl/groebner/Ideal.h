@@ -18,10 +18,8 @@ namespace carl
 
 
 template <class Polynomial, template<class> class Datastructure = IdealDatastructureVector, int CacheSize = 0>
-class MultivariateIdeal
+class Ideal
 {
-
-    
 private:
     std::vector<Polynomial> mGenerators;
 
@@ -31,7 +29,7 @@ private:
     Datastructure<Polynomial> mDivisorLookup;
 public:
 
-    MultivariateIdeal() : 
+    Ideal() : 
         mGenerators(), 
         mTermOrder(mGenerators), 
         mEliminated(), 
@@ -40,7 +38,7 @@ public:
 
     }
 
-    MultivariateIdeal(const Polynomial& p1, const Polynomial& p2) : 
+    Ideal(const Polynomial& p1, const Polynomial& p2) : 
         mGenerators(), 
         mTermOrder(mGenerators), 
         mEliminated(), 
@@ -50,12 +48,12 @@ public:
         addGenerator(p2);
     }
 
-    virtual ~MultivariateIdeal()
+    virtual ~Ideal()
     {
 
     }
 
-    MultivariateIdeal& operator=(const MultivariateIdeal& rhs)
+    Ideal& operator=(const Ideal& rhs)
     {
         if(this == &rhs) return *this;
         this->mGenerators.assign(rhs.mGenerators.begin(), rhs.mGenerators.end());
@@ -72,13 +70,15 @@ public:
         mDivisorLookup.addGenerator(lastIndex);
         return lastIndex;
     }
+	
+	DivisionLookupResult<Polynomial> getDivisor(const Term<typename Polynomial::CoeffType>& t) const
+	{
+		return mDivisorLookup.getDivisor(t);
+	}
 
-    DivisionLookupResult<Polynomial> getDivisor(const Polynomial& f) const
-    {
-        return mDivisorLookup.getDivisor(f);
-    }
+    
 
-    bool isDividable(const Term<typename Polynomial::Coeff>& m)
+    bool isDividable(const Term<typename Polynomial::CoeffType>& m)
     {
         return mDivisorLookup.isDividable();
     }
@@ -183,7 +183,7 @@ public:
 //        return superfluous;
 //    }
 
-    void print(bool printOrigins=true, std::ostream& os = std::cout) const
+    void print(bool printOrigins=false, std::ostream& os = std::cout) const
     {
         for(typename std::vector<Polynomial>::const_iterator it = mGenerators.begin(); it != mGenerators.end(); ++it)
         {

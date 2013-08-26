@@ -101,7 +101,7 @@ Term<Coefficient>* Term<Coefficient>::dividedBy(const Term& t) const
             // Term is just a constant.
             return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
         }
-        Monomial* div = mMonomial->dividedBy(*(t->mMonomial));
+        Monomial* div = mMonomial->dividedBy(*(t.mMonomial));
         if(div != nullptr)
         {
             return new Term<Coefficient>(mCoeff / t.mCoeff, div);

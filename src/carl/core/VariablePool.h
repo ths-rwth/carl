@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <map>
 
 #include "Variable.h"
 
@@ -47,6 +48,7 @@ private:
      */
     static std::once_flag                   only_one;
     
+    std::map<Variable, std::string> mFriendlyNames;
     /* 
      * Constructors are all private, as we have a singleton.
      */
@@ -68,13 +70,13 @@ public:
      * @param v
      * @return 
      */
-    std::string getVariableName(Variable v);
+    const std::string getVariableName(Variable::Arg v) const;
     /**
      * Add a name for a given variable.
      * @param v
      * @param name
      */
-    void setVariableName(Variable v, const std::string& name);
+    void setVariableName(Variable::Arg v, const std::string& name);
    
     /**
      * The number of variables initialized by the pool.
@@ -87,9 +89,21 @@ public:
     
     static unsigned NrVariables() 
     {
-        return instance->nrVariables();
+        return getInstance().nrVariables();
     }
     
+    static std::string getFriendlyName(Variable::Arg v)
+    {
+        if(!instance) 
+        {
+            return getInstance().getVariableName(v);
+        }
+        else
+        {
+            return instance->getVariableName(v);
+        }
+        
+    }
     /**
      * Remove all information.
      */

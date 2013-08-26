@@ -47,7 +47,14 @@ MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(const UnivariatePol
 {
     LOG_NOTIMPLEMENTED();
 }
-        
+
+template<typename Coeff, typename Policy>
+template<typename InputIterator>
+MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(InputIterator begin, InputIterator end)
+{
+    mTerms.assign(begin, end);
+    sortTerms();
+}
     
 template<typename Coeff, typename Policy>
 std::shared_ptr<const Monomial> MultivariatePolynomial<Coeff,Policy>::lmon() const
@@ -58,14 +65,8 @@ template<typename Coeff, typename Policy>
 std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::lterm() const
 {
     LOG_ASSERT(!isZero(), "Leading term undefined on zero polynomials.");
-    if(Policy::Ordering::degreeOrder)
-    {
-        return mTerms.back();
-    }
-    else 
-    {
-        LOG_NOTIMPLEMENTED();
-    }
+	return mTerms.back();
+    
 }
 template<typename Coeff, typename Policy>
 Coeff MultivariatePolynomial<Coeff,Policy>::lcoeff() const
@@ -128,10 +129,12 @@ std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::constan
 template<typename Coeff, typename Policy>
 MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::tail() const
 {
+	assert(mTerms.size() != 0);
+	if (mTerms.size() == 1) return MultivariatePolynomial();
     MultivariatePolynomial tail;
-    tail.mTerms.reserve(mTerms.size()-1);
+	tail.mTerms.reserve(mTerms.size()-1);
     tail.mTerms.insert(tail.mTerms.begin(), mTerms.begin(), --mTerms.end());
-    assert(!isZero());
+    return tail;
 }
 
 template<typename Coeff, typename Policy>
@@ -222,7 +225,7 @@ template<typename C, typename P>
 bool operator==(const MultivariatePolynomial<C,P>& lhs, Variable::Arg rhs)
 {
     if(lhs.mTerms.size() != 1) return false;
-    return *(lhs.mTerms.front()->monomial) == rhs;
+    return *(lhs.mTerms.front()->monomial()) == rhs;
 }
 template<typename C, typename P>
 bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs)
@@ -309,12 +312,12 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
     while(true)
     {
         CompareResult cmpres(Policy::Ordering::compare(**lhsIt, **rhsIt));
-        if(cmpres == CompareResult::GREATER)
+        if(cmpres == CompareResult::LESS)
         {
             newTerms.push_back(*lhsIt);
             if(++lhsIt != mTerms.end()) break;
         }
-        else if(cmpres == CompareResult::LESS)
+        else if(cmpres == CompareResult::GREATER)
         {
             newTerms.push_back(*rhsIt);
             if(++rhsIt != rhs.mTerms.end()) break;
@@ -349,7 +352,7 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
             // TODO consider comparing the shared pointers.
             if( (**it).isConstant() ) break;
             CompareResult cmpres(Policy::Ordering::compare((**it), rhs));
-            if( cmpres == CompareResult::LESS ) break;
+            if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
@@ -387,7 +390,7 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         {
             if( (**it).isConstant() ) break;
             CompareResult cmpres(Policy::Ordering::compare(*(**it).monomial(), rhs));
-            if( cmpres == CompareResult::LESS ) break;
+            if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
@@ -423,7 +426,7 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         while(it != mTerms.end())
         {
             CompareResult cmpres(Policy::Ordering::compare(*(**it).monomial(), rhs));
-            if( cmpres == CompareResult::LESS ) break;
+            if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
@@ -486,32 +489,32 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,P>& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, const UnivariatePolynomial<C>& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,P>& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
 {
-    
+	LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, const Term<C>& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const Term<C>& lhs, const MultivariatePolynomial<C,P>& rhs)
@@ -521,7 +524,7 @@ const MultivariatePolynomial<C,P> operator+(const Term<C>& lhs, const Multivaria
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, const Monomial& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const Monomial& lhs, const MultivariatePolynomial<C,P>& rhs)
@@ -531,7 +534,7 @@ const MultivariatePolynomial<C,P> operator+(const Monomial& lhs, const Multivari
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, const C& rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const C& lhs, const MultivariatePolynomial<C,P>& rhs)
@@ -541,7 +544,7 @@ const MultivariatePolynomial<C,P> operator+(const C& lhs, const MultivariatePoly
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(const MultivariatePolynomial<C,P>& lhs, Variable::Arg rhs)
 {
-    
+    LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,P>& rhs)
@@ -576,12 +579,12 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
     while(true)
     {
         CompareResult cmpres(Policy::Ordering::compare(**lhsIt, **rhsIt));
-        if(cmpres == CompareResult::GREATER)
+        if(cmpres == CompareResult::LESS)
         {
             newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**lhsIt)));
             if(++lhsIt != mTerms.end()) break;
         }
-        else if(cmpres == CompareResult::LESS)
+        else if(cmpres == CompareResult::GREATER)
         {
             newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**rhsIt)));
             if(++rhsIt != rhs.mTerms.end()) break;
@@ -625,7 +628,7 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
             // TODO consider comparing the shared pointers.
             if( (**it).isConstant() ) break;
             CompareResult cmpres(Policy::Ordering::compare((**it), rhs));
-            if( cmpres == CompareResult::LESS ) break;
+            if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
@@ -663,7 +666,7 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         {
             if( (**it).isConstant() ) break;
             CompareResult cmpres(Policy::Ordering::compare(*(**it).monomial(), rhs));
-            if( cmpres == CompareResult::LESS ) break;
+            if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
@@ -699,7 +702,7 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         while(it != mTerms.end())
         {
             CompareResult cmpres(Policy::Ordering::compare(*(**it).monomial(), rhs));
-            if( cmpres == CompareResult::LESS ) break;
+            if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
@@ -1020,7 +1023,7 @@ std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,P>& 
 template<typename Coeff, typename Policy>
 void MultivariatePolynomial<Coeff, Policy>::sortTerms()
 {
-    std::sort(mTerms.begin(), mTerms.end(), Policy::Ordering::less);
+    std::sort(mTerms.begin(), mTerms.end(), (bool (*)(const std::shared_ptr<const Term<Coeff>>&, const std::shared_ptr<const Term<Coeff>>& ))Ordering::less);
 }
 
 }

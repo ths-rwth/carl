@@ -20,20 +20,26 @@ namespace carl
 template<typename Polynomial>
 struct DivisionLookupResult
 {
-    DivisionLookupResult(const Polynomial& divisor, const Term<typename Polynomial::Coeff>* factor) :
-    mDivisor(divisor), mFactor(factor)
+	DivisionLookupResult() :
+    mDivisor(nullptr), mFactor(nullptr)
     {
         
+    }
+	
+    DivisionLookupResult(const Polynomial* divisor, const Term<typename Polynomial::CoeffType>* factor) :
+    mDivisor(divisor), mFactor(factor)
+    {
+        std::cout << *mDivisor << std::endl;
     }
     
     bool success()
     {
-        return mFactor != nullptr;
+        return mDivisor != nullptr;
     }
     
     
     const Polynomial* const mDivisor;
-    Term<typename Polynomial::Coeff>* mFactor;
+    const Term<typename Polynomial::CoeffType>* mFactor;
 };
 
 }

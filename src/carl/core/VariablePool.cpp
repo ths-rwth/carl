@@ -7,6 +7,8 @@
 
 #include <mutex>
 
+#include "initialize.h"
+#include "config.h"
 #include "logging.h"
 
 namespace carl
@@ -40,9 +42,33 @@ VariablePool& VariablePool::getInstance(  )
 
 Variable VariablePool::getFreshVariable(VariableType type)
 {
-    LOGMSG_TRACE("carl.varpool", "New variable of type" << type);
+    LOGMSG_DEBUG("carl.varpool", "New variable of type " << type << " with id " << mNextVarId + 1);
     return Variable(mNextVarId++, type);
 }
+
+const std::string VariablePool::getVariableName(Variable::Arg v) const
+{
+    std::map<Variable, std::string>::const_iterator it = mFriendlyNames.find(v);
+    if(it == mFriendlyNames.end())
+    {
+        return "x_" + std::to_string(v.getId());
+    }
+    else
+    {
+        return it->second;
+    }
+}
+
+void VariablePool::setVariableName(Variable::Arg v, const std::string& name) 
+{
+    #ifdef CARL_USE_FRIENDLY_VARNAMES
+    mFriendlyNames[v] = name;
+    #endif
+}
+
+
+
+
 
 }
 

@@ -368,7 +368,7 @@ namespace carl
             return result;
         }
 
-        friend std::ostream& operator <<( std::ostream& os, const Monomial& rhs )
+        friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
         {
             for( VarExpPair vp : rhs.mExponents )
             {

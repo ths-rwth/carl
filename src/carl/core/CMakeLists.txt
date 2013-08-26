@@ -14,6 +14,7 @@ set(carl_lib_core_headers
 # Source files in here
 set(carl_lib_core_sources 
 	core/VariablePool.cpp
+	core/Variable.cpp
 	
 PARENT_SCOPE)
 

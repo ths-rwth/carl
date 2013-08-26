@@ -55,6 +55,11 @@ class Term
             if(!mMonomial) return 0;
             return mMonomial->tdeg();
         }
+		
+		bool isZero() const
+		{
+			return mCoeff == 0;
+		}
         /**
          * Checks whether the monomial is a constant.
          * @return 

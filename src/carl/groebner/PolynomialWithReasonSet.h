@@ -7,11 +7,29 @@
 
 #pragma once
 
+#include "../core/MultivariatePolynomial.h"
+#include "../core/MultivariatePolynomialPolicy.h"
+#include "../util/BitVector.h"
+
 namespace carl
 {
-template<Coeff, Policy>
-PolynomialWithReasonSet : public Polynomial<Coeff, Policy>
+template<typename Coeff, typename Policy=StdMultivariatePolynomialPolicy>
+class PolynomialWithReasonSet : public MultivariatePolynomial<Coeff, Policy>
 {
     BitVector reasonSet;
+    public:
+	
+	PolynomialWithReasonSet() : MultivariatePolynomial<Coeff, Policy>()
+	{}
+	PolynomialWithReasonSet(const MultivariatePolynomial<Coeff, Policy>& p) : MultivariatePolynomial<Coeff, Policy>(p)
+	{}
+	
+	template<typename InputIterator>
+	PolynomialWithReasonSet(InputIterator begin, InputIterator end) : MultivariatePolynomial<Coeff, Policy>(begin, end)
+	{}
+		
+		
+    const BitVector& getOrigins() const { return reasonSet; }
+    void setOrigins(const BitVector& origins) { reasonSet = origins; }
 };
 }

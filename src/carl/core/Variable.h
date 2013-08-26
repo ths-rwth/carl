@@ -16,7 +16,7 @@ namespace carl
 {
 /**
  * Several types of variables are supported.
- * TODO: consider making this strongly typedefed (new in C++11). 
+ * TODO: consider making this VariablePool vp& = Vstrongly typedefed (new in C++11). 
  * REAL: the reals RR
  * RATIONAL: rational numbers QQ
  * INT: the integers ZZ
@@ -62,7 +62,7 @@ public:
     explicit Variable(unsigned id, VariableType type = VT_REAL) :
     mVariable((unsigned)type | id << VARIABLE_BITS_RESERVED_FOR_TYPE )
     {
-        assert(id < sizeof(mVariable) * CHAR_BIT - BITS_RESERVED);
+        assert(id <  (1 << (sizeof(mVariable) * CHAR_BIT - BITS_RESERVED)));
     }    
     
     unsigned getId() const
@@ -78,10 +78,7 @@ public:
     
     friend const Monomial operator*(const Variable& lhs, const Variable& rhs);
     
-    friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs)
-    {
-        return os << "x_" << rhs.getId();
-    }
+    friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs);
     
     /**
      * Notice that for performance reasons, we consider the whole variable and not just the id.

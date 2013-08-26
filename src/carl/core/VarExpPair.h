@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Variable.h"
+#include "VariablePool.h"
 #include <iostream>
 
 namespace carl
@@ -62,7 +63,7 @@ namespace carl
         
         friend std::ostream& operator <<( std::ostream& os, const VarExpPair& rhs )
         {
-            os << (rhs.var);
+            os << rhs.var;
             if(rhs.exp > 1) os << "^" << rhs.exp;
             return os;
         }

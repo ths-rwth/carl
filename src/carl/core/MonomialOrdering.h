@@ -29,7 +29,19 @@ struct MonomialComparator
     {
         return (compare(*(t1->monomial()), *(t2->monomial())) == CompareResult::LESS );
     }
+	
+	
+    bool operator()(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
+    {
+        return (compare(*m1, *m2) == CompareResult::LESS );
+    }
 
+	template<typename Coeff>
+    static CompareResult compare( const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2 )
+    {
+        return compare(*(t1->monomial()), *(t2->monomial()));
+    }
+	
     static CompareResult compare( const Monomial& m1, const Monomial& m2 )
     {
         return f( m1, m2 );
@@ -87,6 +99,13 @@ struct MonomialComparator
     static bool greater(const Monomial& m1, const Monomial& m2)
     {
         return (compare( m1, m2 ) == CompareResult::GREATER );
+    }
+    
+    template<typename Coeff>
+    static bool equal(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
+    {
+        if(t1 == t2) return true;
+        return (compare(*t1, *t2) == CompareResult::EQUAL );
     }
 
     static const bool degreeOrder = degreeOrdered;

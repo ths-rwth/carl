@@ -24,7 +24,7 @@ template <class Polynomial>
 class ReductorEntry
 {
 protected:
-    typedef typename Polynomial::Coeff   Coeff;
+    typedef typename Polynomial::CoeffType   Coeff;
     Polynomial                         mTail;
     std::shared_ptr<const Term<Coeff>>          mLead;
     const Term<Coeff>*    mMultiple;
@@ -36,8 +36,8 @@ public:
      * @param pol
      * Resulting polynomial = multiple * pol.
      */
-    ReductorEntry(const Term<Coeff>& multiple, const Polynomial& pol) :
-    mTail(pol.tail()), mLead(*multiple * pol.lterm()), mMultiple(multiple)
+    ReductorEntry(const Term<Coeff>* multiple, const Polynomial& pol) :
+    mTail(pol.tail()), mLead(std::make_shared<const Term<Coeff>>(*multiple * *pol.lterm())), mMultiple(multiple)
     {
     }
 
@@ -81,8 +81,8 @@ public:
      */
     void removeLeadingTerm()
     {
-        assert(mTail.nrOfTerms() != 0);
-        *mLead =(*mMultiple * mTail.lterm());
+        assert(mTail.nrTerms() != 0);
+		mLead = std::make_shared<const Term<Coeff>>(*mMultiple * *mTail.lterm());
         mTail.stripLT();
     }
 
@@ -94,11 +94,14 @@ public:
     bool addCoefficient(const Coeff& coeffToBeAdded)
     {
         assert(!empty());
-        if((*mLead) += coeffToBeAdded != 0)
+		Coeff newCoeff = mLead->coeff() + coeffToBeAdded;
+		
+        if(newCoeff != 0)
         {
+			mLead = std::make_shared<const Term<Coeff>>(newCoeff, mLead->monomial());
             return false;
         }
-        if(mTail.nrOfTerms() != 0)
+        else if(mTail.nrTerms() != 0)
         {
             removeLeadingTerm();
         }
