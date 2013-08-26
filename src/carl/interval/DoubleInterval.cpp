@@ -427,7 +427,7 @@ namespace carl
         {
             if( mLeftType == INFINITY_BOUND && right() != 0 )
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), mRightType, WEAK_BOUND );
+                a = DoubleInterval(  1 / right() , mRightType, 0,  WEAK_BOUND );
             }
             else if( mLeftType == INFINITY_BOUND && right() == 0 )
             {
@@ -435,7 +435,7 @@ namespace carl
             }
             else if( mRightType == INFINITY_BOUND && left() != 0 )
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), WEAK_BOUND, mLeftType );
+                a = DoubleInterval(  0 , WEAK_BOUND, 1  /  left(), mLeftType );
             }
             else if( mRightType == INFINITY_BOUND && left() == 0 )
             {
