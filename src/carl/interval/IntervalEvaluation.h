@@ -23,6 +23,9 @@ public:
     static DoubleInterval evaluate(const Monomial& m, const std::map<Variable, DoubleInterval>&);
 	template<typename Coeff>
 	static DoubleInterval evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>&);
+	template<typename Coeff, typename Policy>
+	static DoubleInterval evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>&);
+	
     
 private:
 
@@ -55,6 +58,19 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const s
 	}
 	return result;
 }
+
+template<typename Coeff, typename Policy>
+inline DoubleInterval IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>& map)
+{
+	DoubleInterval result(0);
+	for(size_t i = 0; i < p.nrTerms(); ++i)
+	{
+		result += evaluate(*p[i], map);
+	}	
+	return result;
+}
+
+
 }
 
 

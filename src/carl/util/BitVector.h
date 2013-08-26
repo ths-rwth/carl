@@ -95,7 +95,11 @@ namespace carl
 		
 		friend bool operator== (const BitVector& lhs, const BitVector& rhs);
         
-        
+        BitVector& calculateUnion(const BitVector& rhs)
+		{
+			return *this |= rhs;
+		}
+		
 		friend BitVector operator| (const BitVector& lhs, const BitVector& rhs);
 		
 		BitVector& operator|= (const BitVector& rhs) {
