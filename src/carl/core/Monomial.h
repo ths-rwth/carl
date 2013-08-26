@@ -99,6 +99,11 @@ namespace carl
             return mExponents.size();
         }
 
+		const VarExpPair& operator[](int index) const
+		{
+			assert(index < (int)mExponents.size());
+			return mExponents[index];
+		}
         /**
          * TODO: write code if binary search is preferred.
          * @param v
