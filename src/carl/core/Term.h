@@ -114,6 +114,8 @@ class Term
         Term* dividedBy(const Term&) const;
         
         Term* derivative(Variable::Arg) const;
+		
+		Term* substitute(const std::map<Variable, Coefficient>& substitutions) const;
         
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
@@ -156,7 +158,7 @@ class Term
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs);
-        template<typename Coeff>
+		template<typename Coeff>
         friend const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs);

@@ -35,6 +35,7 @@ protected:
 	TermsType mTerms;
 public:
 	MultivariatePolynomial() = default;
+	explicit MultivariatePolynomial(const Coeff& c);
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Monomial& m);
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
@@ -104,6 +105,30 @@ public:
 
 	MultivariatePolynomial derivative(Variable::Arg v) const;
 	UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>> coeffRepresentation(Variable::Arg v) const;
+	
+	/**
+	 * For a polynomial p, returns p/gcd(all coefficients in p)
+     * @return 
+     */
+	MultivariatePolynomial coprimeCoefficients() const;
+	
+	/**
+	 * For a polynomial p, returns p/lc(p)
+     * @return 
+     */
+	MultivariatePolynomial normalize() const;
+	
+	/**
+	 * 
+     * @return 
+     */
+	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions);
+	
+	/**
+	 * Like substitute, but expects substitutions for all variables.
+     * @return 
+     */
+	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
 
 	unsigned hash() const;
 

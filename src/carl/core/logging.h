@@ -145,7 +145,7 @@ typedef void* Log;
 #ifdef LOGi2_USE_LOG4CPLUS
 #define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (message))
 #define LOG_NOTIMPLEMENTED() ROOTLOGGER.assertion(false, "Not implemented.")
-#define LOG_INEFFICIENT() ROOTLOGGER.forcedLog(log4cplus::WARN_LOG_LEVEL, "Inefficient method called: " +  __PRETTY_FUNCTION__)
+#define LOG_INEFFICIENT() ROOTLOGGER.forcedLog(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
 #else
 #define LOG_ASSERT(condition, message) assert(condition)
 #define LOG_NOTIMPLEMENTED() assert(false);

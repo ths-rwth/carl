@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include <cln/cln.h>
+#include <gmpxx.h>
 
 
 using namespace carl;
@@ -9,6 +11,10 @@ TEST(MultivariatePolynomial, Constructor)
     Variable v0(0);
     Term<int> t0(v0);
     MultivariatePolynomial<int> p0(t0);
+    
+    MultivariatePolynomial<int> p1(3);
+    EXPECT_EQ(1, p1.nrTerms());
+    EXPECT_TRUE(p1.isLinear());
 }
 
 TEST(MultivariatePolynomial, Operators)
@@ -100,4 +106,78 @@ TEST(MultivariatePolynomial, Multiplication)
     std::cout << p0 << std::endl;
     p0 *= p0;
     std::cout << p0 << std::endl;
+    
+}
+
+TEST(MultivariatePolynomial, Normalize)
+{
+    Variable v0(0);
+    Variable v1(1);
+    Variable v2(2);
+    MultivariatePolynomial<cln::cl_RA> mp;
+    mp += v0;
+    MultivariatePolynomial<cln::cl_RA> mp2 = mp * (cln::cl_RA)2;
+    EXPECT_EQ(mp, mp.normalize());
+    EXPECT_EQ(mp, mp2.normalize());
+    
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
+    mp += (cln::cl_RA)2 * v1;
+    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
+    mp2 += v1;
+    EXPECT_EQ(mp2, mp.normalize());
+    
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
+    mp += (cln::cl_RA)4 * v1;
+    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
+    mp2 += (cln::cl_RA)2 * v1;
+    EXPECT_EQ(mp2, mp.normalize());
+}
+
+TEST(MultivariatePolynomial, Coprime)
+{
+    Variable v0(0);
+    Variable v1(1);
+    MultivariatePolynomial<cln::cl_RA> mp;
+    mp += v0;
+    MultivariatePolynomial<cln::cl_RA> mp2 = mp * (cln::cl_RA)2;
+    EXPECT_EQ(mp, mp.coprimeCoefficients());
+    
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
+    mp += (cln::cl_RA)4 * v1;
+    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
+    mp2 += (cln::cl_RA)2 * v1;
+    EXPECT_EQ(mp2, mp.coprimeCoefficients());
+    
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1/6 * v0);
+    mp += (cln::cl_RA)4 * v1;
+    mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1 * v0);
+    mp2 += (cln::cl_RA)24 * v1;
+    EXPECT_EQ(mp2, mp.coprimeCoefficients());
+    
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1/6 * v0);
+    mp += (cln::cl_RA)1/4 * v1;
+    mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
+    mp2 += (cln::cl_RA)3 * v1;
+    EXPECT_EQ(mp2, mp.coprimeCoefficients());
+    
+    MultivariatePolynomial<mpq_class> mpG = MultivariatePolynomial<mpq_class>(mpq_class(1,6) * v0);
+    mpG += mpq_class(1,4) * v1;
+    MultivariatePolynomial<mpq_class> mp2G = MultivariatePolynomial<mpq_class>(mpq_class(2) * v0);
+    mp2G += mpq_class(3) * v1;
+    EXPECT_EQ(mp2G, mpG.coprimeCoefficients());
+}
+        
+TEST(MultivariatePolynomial, Substitute)
+{
+    Variable v0(0);
+    Variable v1(1);
+    MultivariatePolynomial<cln::cl_RA> mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1/6 * v0);
+    mp += (cln::cl_RA)4 * v1;
+    MultivariatePolynomial<cln::cl_RA> mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2);
+    mp2 += (cln::cl_RA)4 * v1;
+    std::map<Variable, cln::cl_RA> substitutions;
+    substitutions[v0] = (cln::cl_RA)12;
+    EXPECT_EQ(mp2, mp.substitute(substitutions));
+    substitutions[v0] = (cln::cl_RA)0;
+    EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)4 * v1), mp.substitute(substitutions));
 }

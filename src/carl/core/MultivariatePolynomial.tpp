@@ -3,11 +3,18 @@
 #include <list>
 #include "MultivariatePolynomial.h"
 #include "logging.h"
+#include "numbers.h"
 
 namespace carl
 {
 
 
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(const Coeff& c) :
+mTerms(1,std::make_shared<const Term<Coeff>>(c))
+{
+    
+}
 
 template<typename Coeff, typename Policy>
 MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(Variable::Arg v) :
@@ -96,12 +103,12 @@ bool MultivariatePolynomial<Coeff,Policy>::isZero() const
 template<typename Coeff, typename Policy>
 bool MultivariatePolynomial<Coeff,Policy>::isConstant() const
 {
-    return (mTerms.size == 0) || (mTerms.size == 1 && mTerms.front()->isConstant());
+    return (mTerms.size() == 0) || (mTerms.size() == 1 && mTerms.front()->isConstant());
 }
 template<typename Coeff, typename Policy>
 bool MultivariatePolynomial<Coeff,Policy>::isLinear() const
 {
-    if(mTerms.size == 0) return true;
+    if(mTerms.size() == 0) return true;
     if(Policy::Ordering::degreeOrder)
     {
         return mTerms.back()->isLinear();
@@ -118,6 +125,8 @@ const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Policy>::
 	assert(index < nrTerms());
 	return mTerms.at(index);
 }
+
+
 
 template<typename Coeff, typename Policy>
 std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::constantPart() const
@@ -157,6 +166,71 @@ bool MultivariatePolynomial<Coeff,Policy>::isTsos() const
 {
     LOG_NOTIMPLEMENTED();
     return false;
+}
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::substitute(const std::map<Variable,Coeff>& substitutions)
+{
+	MultivariatePolynomial result;
+	for(auto term : mTerms)
+	{
+		Term<Coeff>* t = term->substitute(substitutions);
+		if(t->coeff() != 0)
+		{
+			result.mTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
+		}
+	}
+	//result.sortTerms();
+	return result;
+}
+
+template<typename Coeff, typename Policy>
+Coeff MultivariatePolynomial<Coeff,Policy>::evaluate(const std::map<Variable,Coeff>& substitutions)
+{
+	// We do not have to construct polynomials all the time.
+	LOG_INEFFICIENT();
+	MultivariatePolynomial result = substitute(substitutions);
+	assert(result.isConstant());
+	return result.constantPart();
+}
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::coprimeCoefficients() const
+{
+	assert(nrTerms() != 0);
+	if(nrTerms() == 1) return *this;
+	typename TermsType::const_iterator it = mTerms.begin();
+	typename IntegralT<Coeff>::type num = getNum((*it)->coeff());
+	typename IntegralT<Coeff>::type den = getDenom((*it)->coeff());
+	for(++it; it != mTerms.end(); ++it)
+	{
+		num = gcd(num, getNum((*it)->coeff()));
+		den = lcm(den, getDenom((*it)->coeff()));
+	}
+	Coeff factor = den/num;
+	// Notice that even if factor is 1, we create a new polynomial
+	MultivariatePolynomial<Coeff, Policy> result;
+	result.mTerms.reserve(mTerms.size());
+	for(const typename std::shared_ptr<const TermType> term : mTerms)
+	{
+		result.mTerms.push_back(std::make_shared<const TermType>(*term * factor));
+	}
+	return result;
+	
+	
+}
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::normalize() const
+{
+	MultivariatePolynomial result;
+	result.mTerms.reserve(mTerms.size());
+	for(typename TermsType::const_iterator it = mTerms.begin(); it != mTerms.end(); ++it)
+	{
+		result.mTerms.emplace_back((*it)->dividedBy(lcoeff()));
+	}
+	return result;
+	
 }
 
 template<typename C, typename P>
@@ -1058,6 +1132,8 @@ const MultivariatePolynomial<C,P> operator*(const C& lhs, const MultivariatePoly
 {
 	return rhs * lhs;
 }
+
+
 template<typename C, typename P>
 const MultivariatePolynomial<C,P> operator*(const MultivariatePolynomial<C,P>& lhs, Variable::Arg rhs)
 {
