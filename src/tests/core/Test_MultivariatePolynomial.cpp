@@ -47,6 +47,15 @@ TEST(MultivariatePolynomial, Addition)
     p1 += v1;
     p0 += p1;
     EXPECT_EQ(2,p0.nrTerms());   
+    
+    MultivariatePolynomial<int> p10a;
+    p10a += v0*v0;
+    p10a += v1;
+    EXPECT_EQ(v0*v0, *p10a.lterm());
+    MultivariatePolynomial<int> p10b;
+    p10b += v1;
+    p10b += v0*v0;
+    EXPECT_EQ(v0*v0, *p10b.lterm());
 }
 
 TEST(MultivariatePolynomial, Substraction)
