@@ -69,11 +69,12 @@ public:
                 continue;
             }
             Term<typename Polynomial::CoeffType>* divres = t.dividedBy(*mGenerators[*it].lterm());
+			
             //Division succeeded, so we have found a divisor;
             //To eliminate, we have to negate the factor.
             if(divres != nullptr)
             {
-				std::cout << t << " div by " << mGenerators[*it];
+				divres->negate();
                 return DivisionLookupResult<Polynomial>(&mGenerators[*it], divres);
             }
             ++it;

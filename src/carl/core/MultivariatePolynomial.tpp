@@ -180,7 +180,7 @@ MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::subst
 			result.mTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
 	}
-	//result.sortTerms();
+	result.sortTerms();
 	return result;
 }
 
@@ -231,6 +231,12 @@ MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::norma
 	}
 	return result;
 	
+}
+
+template<typename Coeff, typename Policy>
+unsigned MultivariatePolynomial<Coeff,Policy>::hash() const
+{
+    return mTerms.size << 16 || (lcoeff() ^ lterm()->getNrVariables());
 }
 
 template<typename C, typename P>
@@ -1168,7 +1174,7 @@ std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,P>& 
 template<typename Coeff, typename Policy>
 void MultivariatePolynomial<Coeff, Policy>::sortTerms()
 {
-    std::sort(mTerms.begin(), mTerms.end(), (bool (*)(const std::shared_ptr<const Term<Coeff>>&, const std::shared_ptr<const Term<Coeff>>& ))Ordering::less);
+    std::sort(mTerms.begin(), mTerms.end(), (bool (*)(const std::shared_ptr<const Term<Coeff>>&, const std::shared_ptr<const Term<Coeff>>& ))Ordering::greater);
 }
 
 }

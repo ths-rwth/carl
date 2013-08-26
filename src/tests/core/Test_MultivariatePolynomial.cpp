@@ -62,6 +62,10 @@ TEST(MultivariatePolynomial, Addition)
     p10b += v1;
     p10b += v0*v0;
     EXPECT_EQ(v0*v0, *p10b.lterm());
+    
+    MultivariatePolynomial<cln::cl_RA> mp2(v0);
+    mp2 += (cln::cl_RA)2 * v1;
+    EXPECT_EQ(v0, *mp2.lterm());
 }
 
 TEST(MultivariatePolynomial, Substraction)

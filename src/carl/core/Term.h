@@ -91,6 +91,11 @@ class Term
             mCoeff = 0;
             mMonomial.reset();
         }
+		
+		void negate()
+		{
+			mCoeff = -mCoeff;
+		}
         
         /**
          * 

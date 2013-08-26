@@ -95,6 +95,13 @@ struct MonomialComparator
         if(t1 == t2) return false;
         return (compare(*t1, *t2) == CompareResult::LESS );
     }
+	
+	template<typename Coeff>
+    static bool greater(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
+    {
+        if(t1 == t2) return false;
+        return (compare(*t1, *t2) == CompareResult::GREATER );
+    }
 
     static bool greater(const Monomial& m1, const Monomial& m2)
     {
