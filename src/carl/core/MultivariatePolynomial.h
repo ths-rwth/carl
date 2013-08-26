@@ -54,7 +54,7 @@ public:
 	 * The leading term
 	 * @return 
 	 */
-	std::shared_ptr<const Term<Coeff >> lterm() const;
+	std::shared_ptr<const Term<Coeff>> lterm() const;
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
@@ -79,7 +79,7 @@ public:
 	{
 		return mTerms.size();
 	}
-	std::shared_ptr<const Term<Coeff >> constantPart() const;
+	std::shared_ptr<const Term<Coeff>> constantPart() const;
 
 	/**
 	 * For the polynomial p, the function calculates a polynomial p - lt(p).
@@ -93,6 +93,8 @@ public:
 	 * @return  A reference to this.
 	 */
 	MultivariatePolynomial& stripLT();
+	
+	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
@@ -101,7 +103,7 @@ public:
 	bool isTsos() const;
 
 	MultivariatePolynomial derivative(Variable::Arg v) const;
-	UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy >> coeffRepresentation(Variable::Arg v) const;
+	UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>> coeffRepresentation(Variable::Arg v) const;
 
 	unsigned hash() const;
 
@@ -203,6 +205,8 @@ public:
 	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, Variable::Arg rhs);
 	template<typename C, typename P>
 	friend const MultivariatePolynomial<C, P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C, P>& rhs);
+	template<typename C, typename P>
+	friend const MultivariatePolynomial<C, P> operator+(Variable::Arg lhs, Variable::Arg rhs);
 
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
