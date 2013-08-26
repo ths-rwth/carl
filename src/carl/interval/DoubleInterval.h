@@ -44,6 +44,8 @@ namespace carl
             typedef boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> > Checking;
 
             typedef boost::numeric::interval< double, boost::numeric::interval_lib::policies< Rounding, Checking > > BoostDoubleInterval;
+            
+            typedef std::map<Variable, DoubleInterval> evaldoubleintervalmap;
 
             /// Standard assertion for checking the input to constructors and setters: the interval bounds might define an empty interval but can never cross (left > right).
 #define DOUBLE_BOUNDS_OK( left, leftType, right, rightType )\
@@ -449,88 +451,89 @@ namespace carl
     };    // class DoubleInterval
 
     
-}    // namespace carl
+ // namespace carl
 
-inline const carl::DoubleInterval operator +( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline const DoubleInterval operator +( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return lh.add( rh );
 }
 
-inline const carl::DoubleInterval operator +( const carl::DoubleInterval& lh, const double& rh )
+inline const DoubleInterval operator +( const DoubleInterval& lh, const double& rh )
 {
     // TODO optimization potential
-    return lh.add( carl::DoubleInterval( rh ) );
+    return lh.add( DoubleInterval( rh ) );
 }
 
-inline const carl::DoubleInterval operator +( const double& lh, const carl::DoubleInterval& rh )
+inline const DoubleInterval operator +( const double& lh, const DoubleInterval& rh )
 {
     // TODO optimization potential
-    return rh.add( carl::DoubleInterval( lh ) );
+    return rh.add( DoubleInterval( lh ) );
 }
 
-inline const carl::DoubleInterval operator -( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline const DoubleInterval operator -( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return lh.add( rh.minus() );
 }
 
 
-inline const carl::DoubleInterval operator -( const carl::DoubleInterval& lh, const double& rh )
+inline const DoubleInterval operator -( const DoubleInterval& lh, const double& rh )
 {
     return lh + (-rh);
 }
 
-inline const carl::DoubleInterval operator -( const double& lh, const carl::DoubleInterval& rh )
+inline const DoubleInterval operator -( const double& lh, const DoubleInterval& rh )
 {
     return (-lh) + rh;
 }
 
-inline const carl::DoubleInterval operator *( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline const DoubleInterval operator *( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return lh.mul( rh );
 }
     
-inline const carl::DoubleInterval operator *( const carl::DoubleInterval& lh, const double& rh )
+inline const DoubleInterval operator *( const DoubleInterval& lh, const double& rh )
 {
-    return carl::DoubleInterval( lh.mul( carl::DoubleInterval( rh ) ) );
+    return DoubleInterval( lh.mul( DoubleInterval( rh ) ) );
 }
 
-inline const carl::DoubleInterval operator *( const double& lh, const carl::DoubleInterval& rh )
+inline const DoubleInterval operator *( const double& lh, const DoubleInterval& rh )
 {
     return rh * lh;
 }
 
-inline const carl::DoubleInterval operator /( const carl::DoubleInterval& lh, const double& rh ) throw ( std::overflow_error )
+inline const DoubleInterval operator /( const DoubleInterval& lh, const double& rh ) throw ( std::overflow_error )
 {
-    return lh.div( carl::DoubleInterval( rh ) );
+    return lh.div( DoubleInterval( rh ) );
 }
 
-inline const carl::DoubleInterval operator /( const double& lh, const carl::DoubleInterval& rh ) throw ( std::overflow_error )
+inline const DoubleInterval operator /( const double& lh, const DoubleInterval& rh ) throw ( std::overflow_error )
 {
-    carl::DoubleInterval result = carl::DoubleInterval( lh );
+    DoubleInterval result = DoubleInterval( lh );
     result.div( rh );
     return result;
 }
 
 // relational operators
 
-inline bool operator ==( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator ==( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return lh.isEqual( rh );
 }
 
-inline bool operator !=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator !=( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return !lh.isEqual( rh );
 }
 
-inline bool operator <=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator <=( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return lh.isLessOrEqual( rh );
 }
 
-inline bool operator >=( const carl::DoubleInterval& lh, const carl::DoubleInterval& rh )
+inline bool operator >=( const DoubleInterval& lh, const DoubleInterval& rh )
 {
     return lh.isGreaterOrEqual( rh );
 }
 
+}
 
