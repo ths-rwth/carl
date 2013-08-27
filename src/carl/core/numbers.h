@@ -28,6 +28,8 @@ namespace carl
 	{
 		typedef mpz_class type;
 	};
+        
+        
 
 	inline cln::cl_I getNum(const cln::cl_RA& rat)
 	{
@@ -43,6 +45,24 @@ namespace carl
 	{
 		return cln::expt(base, exp);
 	}
+        
+        inline double getDouble( const cln::cl_RA& rational )
+        {
+            return cln::double_approx(rational);
+        }
+        
+        
+        template<typename Rational>
+        inline Rational rationalize( double d )
+        {
+            assert(false);
+        }
+        
+        template<>
+        inline cln::cl_RA rationalize<cln::cl_RA>( double d )
+        {
+            return cln::rationalize( cln::cl_R(d) );
+        }
 	
 	
 	inline const mpz_class& getNum(const mpq_class& rat)
@@ -54,7 +74,23 @@ namespace carl
 	{
 		return rat.get_den();
 	}
+        
+        inline double getDouble( const mpq_class& rational )
+        {
+            return rational.get_d();
+        }
+        
+        template<>
+        inline mpq_class rationalize<mpq_class>( double d )
+        {
+            return mpq_class(d);
+        }
 	
+        inline double getDouble( const int& rational )
+        {
+            return double(rational);
+        }
+        
 	inline mpz_class gcd(const mpz_class& v1, const mpz_class& v2)
 	{
 		mpz_class res;

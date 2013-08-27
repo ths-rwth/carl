@@ -3,6 +3,7 @@
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include <cln/cln.h>
+#include <gmpxx.h>
 
 using namespace carl;
 
@@ -14,6 +15,7 @@ TEST(DoubleInterval, Constructor)
     EXPECT_EQ(DoubleInterval(1, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND), DoubleInterval::emptyInterval());
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
+    DoubleInterval test7 = DoubleInterval((mpz_class)-1, DoubleInterval::WEAK_BOUND, (mpz_class)1, DoubleInterval::WEAK_BOUND);
     SUCCEED();
 }
 

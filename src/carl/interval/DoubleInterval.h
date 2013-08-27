@@ -7,6 +7,7 @@
 #include <map>
 #include <cassert>
 #include <cmath>
+#include <cfloat>
 
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
@@ -15,6 +16,7 @@
 
 #include "../core/Variable.h"
 #include "../core/Sign.h"
+#include "../core/numbers.h"
 
 using namespace boost::numeric::interval_lib;
 
@@ -82,6 +84,9 @@ namespace carl
              * @param bool overapproximate
              */
             DoubleInterval( const cln::cl_RA& n, bool overapproximate = false );
+            
+            template<typename Rational>
+            DoubleInterval( const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft=false, bool overapproxright=false);
 
             /** Creates closed DoubleInterval
              * @param _content
@@ -414,14 +419,16 @@ namespace carl
              * @param bool overapproximate
              * @return double representation of o (underapprox) Note, that it can return the double INFINITY.
              */
-            static double roundDown( const cln::cl_RA& o, bool overapproximate = false );
+            template<typename Rational>
+            static double roundDown( const Rational& o, bool overapproximate = false );
 
             /** Returns a up-rounded representation of the given numeric
              * @param numeric o
              * @param bool overapproximate
              * @return double representation of o (overapprox) Note, that it can return the double INFINITY.
              */
-            static double roundUp( const cln::cl_RA& o, bool overapproximate = false );
+            template<typename Rational>
+            static double roundUp( const Rational& o, bool overapproximate = false );
 
             void operator +=( const DoubleInterval& );
             void operator -=( const DoubleInterval& );
@@ -451,6 +458,72 @@ namespace carl
     };    // class DoubleInterval
 
     
+    template<typename Rational>
+    DoubleInterval::DoubleInterval( const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft, bool overapproxright)
+    {
+        double dLeft = roundDown( lower, overapproxleft );
+        double dRight = roundUp( upper, overapproxright );
+        if( dLeft == -INFINITY ) mLeftType = INFINITY_BOUND;
+        if( dRight == INFINITY ) mRightType = INFINITY_BOUND;
+        if( mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND )
+        {
+            mInterval =  BoostDoubleInterval( 0 );
+        }
+        else if( mLeftType == INFINITY_BOUND )
+        {
+            mInterval =  BoostDoubleInterval( dRight );
+        }
+        else if( mRightType == INFINITY_BOUND )
+        {
+            mInterval =  BoostDoubleInterval( dLeft );
+        }
+        else if( (lower == upper && lowerType != upperType) || lower > upper )
+        {
+            mLeftType = STRICT_BOUND;
+            mRightType = STRICT_BOUND;
+            mInterval = BoostDoubleInterval( 0 );
+        }
+        else
+        {
+            mInterval =  BoostDoubleInterval( dLeft, dRight );
+        }
+    }
+    
+    template<typename Rational>
+    double DoubleInterval::roundDown( const Rational& o, bool overapproximate )
+    {
+        double result = getDouble(o);
+        if( result == -INFINITY ) return result;
+        if( result == INFINITY ) return DBL_MAX;
+        // If the cln::cl_RA cannot be represented exactly by a double, round.
+        if( overapproximate || rationalize<Rational>( result )  != o )
+        {
+            if( result == -DBL_MAX ) return -INFINITY;
+            return std::nextafter( result, -INFINITY );
+        }
+        else
+        {
+            return result;
+        }
+    }
+
+    template<typename Rational>
+    double DoubleInterval::roundUp( const Rational& o, bool overapproximate )
+    {
+        double result = getDouble(o);
+        if( result == INFINITY ) return result;
+        if( result == -INFINITY ) return -DBL_MAX;
+        // If the cln::cl_RA cannot be represented exactly by a double, round.
+        if( overapproximate || rationalize<Rational>( result ) != o )
+        {
+            if( result == DBL_MAX ) return INFINITY;
+            return std::nextafter( result, INFINITY );
+        }
+        else
+        {
+            return result;
+        }
+    }
  // namespace carl
 
 inline const DoubleInterval operator +( const DoubleInterval& lh, const DoubleInterval& rh )

@@ -57,6 +57,8 @@ namespace carl
     DoubleInterval::DoubleInterval( const cln::cl_RA& n, bool overapproximate ):
         DoubleInterval( n, WEAK_BOUND, n, WEAK_BOUND, overapproximate, overapproximate )
     {}
+    
+    
 
     DoubleInterval::DoubleInterval( const BoostDoubleInterval& _interval ):
         DoubleInterval( _interval, ( _interval.lower() == INFINITY ? INFINITY_BOUND : WEAK_BOUND), ( _interval.upper() == INFINITY ? INFINITY_BOUND : WEAK_BOUND) )
@@ -809,39 +811,39 @@ namespace carl
     //  Auxiliary Functions:  //
     ////////////////////////////
 
-    double DoubleInterval::roundDown( const cln::cl_RA& o, bool overapproximate )
-    {
-        double result = cln::double_approx(o);
-        if( result == -INFINITY ) return result;
-        if( result == INFINITY ) return DBL_MAX;
-        // If the cln::cl_RA cannot be represented exactly by a double, round.
-        if( overapproximate || cln::rationalize( cln::cl_R( result ) ) != o )
-        {
-            if( result == -DBL_MAX ) return -INFINITY;
-            return std::nextafter( result, -INFINITY );
-        }
-        else
-        {
-            return result;
-        }
-    }
-
-    double DoubleInterval::roundUp( const cln::cl_RA& o, bool overapproximate )
-    {
-        double result = cln::double_approx(o);
-        if( result == INFINITY ) return result;
-        if( result == -INFINITY ) return -DBL_MAX;
-        // If the cln::cl_RA cannot be represented exactly by a double, round.
-        if( overapproximate || cln::rationalize( cln::cl_R( result ) ) != o )
-        {
-            if( result == DBL_MAX ) return INFINITY;
-            return std::nextafter( result, INFINITY );
-        }
-        else
-        {
-            return result;
-        }
-    }
+//    double DoubleInterval::roundDown( const cln::cl_RA& o, bool overapproximate )
+//    {
+//        double result = cln::double_approx(o);
+//        if( result == -INFINITY ) return result;
+//        if( result == INFINITY ) return DBL_MAX;
+//        // If the cln::cl_RA cannot be represented exactly by a double, round.
+//        if( overapproximate || cln::rationalize( cln::cl_R( result ) ) != o )
+//        {
+//            if( result == -DBL_MAX ) return -INFINITY;
+//            return std::nextafter( result, -INFINITY );
+//        }
+//        else
+//        {
+//            return result;
+//        }
+//    }
+//
+//    double DoubleInterval::roundUp( const cln::cl_RA& o, bool overapproximate )
+//    {
+//        double result = cln::double_approx(o);
+//        if( result == INFINITY ) return result;
+//        if( result == -INFINITY ) return -DBL_MAX;
+//        // If the cln::cl_RA cannot be represented exactly by a double, round.
+//        if( overapproximate || cln::rationalize( cln::cl_R( result ) ) != o )
+//        {
+//            if( result == DBL_MAX ) return INFINITY;
+//            return std::nextafter( result, INFINITY );
+//        }
+//        else
+//        {
+//            return result;
+//        }
+//    }
 
     // unary arithmetic operators of DoubleInterval
     const DoubleInterval DoubleInterval::operator -( const DoubleInterval& lh ) const
