@@ -62,6 +62,16 @@ MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(InputIterator begin
     mTerms.assign(begin, end);
     sortTerms();
 }
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff, Policy>::MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms)
+{
+	for(Term<Coeff> term : terms)
+	{
+		mTerms.push_back(std::make_shared<const Term<Coeff>>(term));
+	}
+	sortTerms();
+}
     
 template<typename Coeff, typename Policy>
 std::shared_ptr<const Monomial> MultivariatePolynomial<Coeff,Policy>::lmon() const
@@ -230,6 +240,33 @@ MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::norma
 		result.mTerms.emplace_back((*it)->dividedBy(lcoeff()));
 	}
 	return result;
+	
+}
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::SPolynomial(
+																const MultivariatePolynomial<Coeff, Policy>& p,
+																const MultivariatePolynomial<Coeff, Policy>& q)
+{
+	assert(p.nrTerms() != 0);
+	assert(q.nrTerms() != 0);
+
+	
+	if( p.nrTerms() == 1 && q.nrTerms() == 1 )
+	{
+		return MultivariatePolynomial();
+	}
+	else if( p.nrTerms() == 1 )
+	{
+		return -(q.lterm()->calcLcmAndDivBy( *p.lmon() ) * q.tail());
+	}
+	else if( q.nrTerms() == 1 )
+	{
+		return (p.lterm()->calcLcmAndDivBy( *q.lmon() ) * p.tail());
+	}
+	else
+	{
+		return (p.tail() * p.lterm()->calcLcmAndDivBy(*q.lmon())) - (q.tail() * q.lterm()->calcLcmAndDivBy( *p.lmon() ));
+	}
 	
 }
 
@@ -437,7 +474,6 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         while(it != mTerms.end())
         {
             // TODO consider comparing the shared pointers.
-            if( (**it).isConstant() ) break;
             CompareResult cmpres(Policy::Ordering::compare((**it), rhs));
             if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
@@ -475,7 +511,6 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         typename TermsType::iterator it(mTerms.begin());
         while(it != mTerms.end())
         {
-            if( (**it).isConstant() ) break;
             CompareResult cmpres(Policy::Ordering::compare(*(**it).monomial(), rhs));
             if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
@@ -1174,7 +1209,7 @@ std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,P>& 
 template<typename Coeff, typename Policy>
 void MultivariatePolynomial<Coeff, Policy>::sortTerms()
 {
-    std::sort(mTerms.begin(), mTerms.end(), (bool (*)(const std::shared_ptr<const Term<Coeff>>&, const std::shared_ptr<const Term<Coeff>>& ))Ordering::greater);
+    std::sort(mTerms.begin(), mTerms.end(), (bool (*)(const std::shared_ptr<const Term<Coeff>>&, const std::shared_ptr<const Term<Coeff>>& ))Ordering::less);
 }
 
 }

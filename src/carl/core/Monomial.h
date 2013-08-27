@@ -205,13 +205,58 @@ namespace carl
                 else if(itleft->var > itright->var) 
                 {
                     return nullptr;
-                }        
+                }
+				else
+				{
+					assert(itright->var > itleft->var);
+					result->mExponents.push_back(*itleft);
+				}
             }
             // If there remain variables in the m, it fails.
             if(itright != m.mExponents.end()) return nullptr;
             return result;
             
-        }        
+        }
+		
+		Monomial* calcLcmAndDivideBy(const Monomial& m) const
+		{
+			Monomial* result = new Monomial();
+            
+            // Linear, as we expect small monomials.
+            exponents_cIt itright = m.mExponents.begin();
+            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+            {
+                // Done with division
+                if(itright == m.mExponents.end())
+                {
+                    // Insert remaining part
+                    result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
+                    return result;
+                }
+                // Variable is present in both monomials.
+                if(itleft->var == itright->var)
+                {
+                    exponent newExp = std::max(itleft->exp, itright->exp) - itright->exp;
+                    if(newExp != 0)
+                    {
+                        result->mExponents.push_back(VarExpPair(itleft->var, newExp));
+                    }
+                    itright++;
+                }
+                // Variable is not present in lhs, dividing lcm yields variable will not occur in result
+                
+				else if(itleft->var > itright->var) 
+                {
+					itright++;
+                }
+				else
+				{
+					assert(itright->var > itleft->var);
+					result->mExponents.push_back(*itleft);
+				}
+            }
+			return result;
+		}
         
         template<typename Coefficient>
         Term<Coefficient>* derivative(Variable::Arg v) const;

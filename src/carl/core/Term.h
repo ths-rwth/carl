@@ -117,6 +117,8 @@ class Term
         Term* dividedBy(const Monomial&) const;
         
         Term* dividedBy(const Term&) const;
+		
+		Term* calcLcmAndDivideBy( const Monomial&) const;
         
         Term* derivative(Variable::Arg) const;
 		

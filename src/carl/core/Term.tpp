@@ -131,6 +131,13 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coeffic
 }
 
 
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
+{
+	return new Term(coeff(), monomial()->calcLcmAndDivideBy(m));
+}
+
+
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
 {

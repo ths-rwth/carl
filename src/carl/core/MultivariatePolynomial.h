@@ -45,7 +45,7 @@ public:
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<typename InputIterator>
 	MultivariatePolynomial(InputIterator begin, InputIterator end);
-
+	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	/**
 	 * The leading monomial
 	 * @return 
@@ -129,6 +129,8 @@ public:
      * @return 
      */
 	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
+	
+	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	unsigned hash() const;
 
