@@ -52,10 +52,11 @@ namespace carl
         }
         
         
-        template<typename Rational>
-        inline Rational rationalize( double d )
+        
+        template<>
+        inline int rationalize<int>( double d )
         {
-            assert(false);
+            return (int)d;
         }
         
         template<>
