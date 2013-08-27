@@ -61,9 +61,10 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++0x")
 include( FindCLN )
 # Default numeric library is GMP. 
 include( FindGMP )
+include( FindGMPXX )
 
-set( libraries  ${GMP_LIBRARY} ${CLN_LIBRARY} pthread )
-set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} )
+set( libraries ${GMP_LIBRARY}  ${GMPXX_LIBRARIES} ${CLN_LIBRARY} pthread )
+set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries

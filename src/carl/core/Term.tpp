@@ -3,12 +3,13 @@
 // for code assistance
 #include "Term.h"
 #include "Monomial_derivative.h"
+#include "Monomial_substitute.h"
 
 namespace carl
 {
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :
-    mCoeff(c)
+    mCoeff(c), mMonomial()
 {
     
 }
@@ -121,6 +122,12 @@ Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
     Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
     *t *= mCoeff;
     return t;
+}
+
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coefficient>& substitutions) const
+{
+	return mMonomial->substitute<Coefficient>(substitutions, coeff());
 }
 
 
@@ -284,6 +291,11 @@ const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
 }
 template<typename Coeff>
 const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs)
+{
+    return Term<Coeff>(lhs.mCoeff * rhs, lhs.mMonomial);
+}
+template<typename Coeff>
+const Term<Coeff> operator*(const Term<Coeff>& lhs, int rhs)
 {
     return Term<Coeff>(lhs.mCoeff * rhs, lhs.mMonomial);
 }

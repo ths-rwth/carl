@@ -1,4 +1,5 @@
 # Add test cpp file
+message(${libraries})
 add_executable( runCoreTests
 				Test_Monomial.cpp
 				Test_MultivariatePolynomial.cpp
