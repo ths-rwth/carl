@@ -54,12 +54,6 @@ namespace carl
         DoubleInterval( n, WEAK_BOUND, n, WEAK_BOUND )
     {}
 
-    DoubleInterval::DoubleInterval( const cln::cl_RA& n, bool overapproximate ):
-        DoubleInterval( n, WEAK_BOUND, n, WEAK_BOUND, overapproximate, overapproximate )
-    {}
-    
-    
-
     DoubleInterval::DoubleInterval( const BoostDoubleInterval& _interval ):
         DoubleInterval( _interval, ( _interval.lower() == INFINITY ? INFINITY_BOUND : WEAK_BOUND), ( _interval.upper() == INFINITY ? INFINITY_BOUND : WEAK_BOUND) )
     {}
@@ -129,37 +123,6 @@ namespace carl
         }
     }
 
-    DoubleInterval::DoubleInterval( const cln::cl_RA& left, BoundType leftType, const cln::cl_RA& right, BoundType rightType, bool overapproxleft, bool overapproxright ):
-        mLeftType( leftType ),
-        mRightType( rightType )
-    {
-        double dLeft = roundDown( left, overapproxleft );
-        double dRight = roundUp( right, overapproxright );
-        if( dLeft == -INFINITY ) mLeftType = INFINITY_BOUND;
-        if( dRight == INFINITY ) mRightType = INFINITY_BOUND;
-        if( mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND )
-        {
-            mInterval =  BoostDoubleInterval( 0 );
-        }
-        else if( mLeftType == INFINITY_BOUND )
-        {
-            mInterval =  BoostDoubleInterval( dRight );
-        }
-        else if( mRightType == INFINITY_BOUND )
-        {
-            mInterval =  BoostDoubleInterval( dLeft );
-        }
-        else if( (left == right && leftType != rightType) || left > right )
-        {
-            mLeftType = STRICT_BOUND;
-            mRightType = STRICT_BOUND;
-            mInterval = BoostDoubleInterval( 0 );
-        }
-        else
-        {
-            mInterval =  BoostDoubleInterval( dLeft, dRight );
-        }
-    }
 
     DoubleInterval::~DoubleInterval(){}
 

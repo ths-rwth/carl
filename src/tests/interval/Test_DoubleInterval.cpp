@@ -15,17 +15,32 @@ TEST(DoubleInterval, Constructor)
     EXPECT_EQ(DoubleInterval(1, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND), DoubleInterval::emptyInterval());
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
-    DoubleInterval test7 = DoubleInterval((mpz_class)-1, DoubleInterval::WEAK_BOUND, (mpz_class)1, DoubleInterval::WEAK_BOUND);
+    DoubleInterval test7 = DoubleInterval((mpq_class)-1, DoubleInterval::WEAK_BOUND, (mpq_class)1, DoubleInterval::WEAK_BOUND);
     SUCCEED();
 }
 
 TEST(DoubleInterval, Getters)
 {
-    DoubleInterval test1 = DoubleInterval(-1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::STRICT_BOUND);
-    EXPECT_EQ(test1.left(), -1);
-    EXPECT_EQ(test1.right(), 1);
-    EXPECT_EQ(test1.leftType(), DoubleInterval::WEAK_BOUND);
-    EXPECT_EQ(test1.rightType(), DoubleInterval::STRICT_BOUND);
+    DoubleInterval test1 = DoubleInterval(-1.0, DoubleInterval::WEAK_BOUND, 1.0, DoubleInterval::STRICT_BOUND);
+    EXPECT_EQ(-1, test1.left());
+    EXPECT_EQ(1, test1.right());
+    EXPECT_EQ(DoubleInterval::WEAK_BOUND, test1.leftType());
+    EXPECT_EQ(DoubleInterval::STRICT_BOUND, test1.rightType());
+    DoubleInterval test2 = DoubleInterval(-1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::STRICT_BOUND);
+    EXPECT_EQ(-1, test2.left());
+    EXPECT_EQ(1, test2.right());
+    EXPECT_EQ(DoubleInterval::WEAK_BOUND, test2.leftType());
+    EXPECT_EQ(DoubleInterval::STRICT_BOUND, test2.rightType());
+    DoubleInterval test3 = DoubleInterval((mpq_class)-1, DoubleInterval::WEAK_BOUND, (mpq_class)1, DoubleInterval::STRICT_BOUND);
+    EXPECT_EQ(-1, test3.left());
+    EXPECT_EQ(1, test3.right());
+    EXPECT_EQ(DoubleInterval::WEAK_BOUND, test3.leftType());
+    EXPECT_EQ(DoubleInterval::STRICT_BOUND, test3.rightType());
+    DoubleInterval test4 = DoubleInterval((cln::cl_RA)-1, DoubleInterval::WEAK_BOUND, (cln::cl_RA)1, DoubleInterval::STRICT_BOUND);
+    EXPECT_EQ(-1, test4.left());
+    EXPECT_EQ(1, test4.right());
+    EXPECT_EQ(DoubleInterval::WEAK_BOUND, test4.leftType());
+    EXPECT_EQ(DoubleInterval::STRICT_BOUND, test4.rightType());
 }
 
 TEST(DoubleInterval, Addition)

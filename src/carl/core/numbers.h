@@ -51,14 +51,13 @@ namespace carl
             return cln::double_approx(rational);
         }
         
-        
-        
-        template<>
-        inline int rationalize<int>( double d )
+		template<typename t>
+        inline t rationalize( double d )
         {
-            return (int)d;
+            return cln::rationalize( cln::cl_R(d) );
         }
         
+		
         template<>
         inline cln::cl_RA rationalize<cln::cl_RA>( double d )
         {
