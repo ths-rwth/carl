@@ -56,7 +56,12 @@ namespace carl
 
         }
         
-        Monomial(const Monomial& rhs) = default;
+        Monomial(const Monomial& rhs) :
+			mExponents(rhs.mExponents),
+			mTotalDegree(rhs.mTotalDegree)
+		{
+			
+		}
 
         Monomial& operator=(const Monomial& rhs)
         {
@@ -221,7 +226,7 @@ namespace carl
 		Monomial* calcLcmAndDivideBy(const Monomial& m) const
 		{
 			Monomial* result = new Monomial();
-            
+            result->mTotalDegree = mTotalDegree - m.mTotalDegree;
             // Linear, as we expect small monomials.
             exponents_cIt itright = m.mExponents.begin();
             for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
@@ -240,6 +245,7 @@ namespace carl
                     if(newExp != 0)
                     {
                         result->mExponents.push_back(VarExpPair(itleft->var, newExp));
+						result->mTotalDegree += newExp;
                     }
                     itright++;
                 }
@@ -371,6 +377,7 @@ namespace carl
                 // Everything is inserted.
                 if(itright == rhs.mExponents.end())
                 {
+					std::cout << *this << std::endl;
                     return *this;
                 }
                 // Variable is present in both monomials.
