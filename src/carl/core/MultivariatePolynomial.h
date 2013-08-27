@@ -133,6 +133,8 @@ public:
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	unsigned hash() const;
+	
+	MultivariatePolynomial pow(unsigned exp) const;
 
 	template<typename C, typename P>
 	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);

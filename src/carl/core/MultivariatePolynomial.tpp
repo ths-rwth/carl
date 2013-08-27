@@ -257,17 +257,35 @@ MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::SPoly
 	}
 	else if( p.nrTerms() == 1 )
 	{
-		return -(q.lterm()->calcLcmAndDivBy( *p.lmon() ) * q.tail());
+		return -(q.lterm()->calcLcmAndDivideBy( *p.lmon() ) * q.tail());
 	}
 	else if( q.nrTerms() == 1 )
 	{
-		return (p.lterm()->calcLcmAndDivBy( *q.lmon() ) * p.tail());
+		return (p.lterm()->calcLcmAndDivideBy( *q.lmon() ) * p.tail());
 	}
 	else
 	{
-		return (p.tail() * p.lterm()->calcLcmAndDivBy(*q.lmon())) - (q.tail() * q.lterm()->calcLcmAndDivBy( *p.lmon() ));
+		return (p.tail() * q.lterm()->calcLcmAndDivideBy(*p.lmon())) - (q.tail() * p.lterm()->calcLcmAndDivideBy( *q.lmon() ));
 	}
 	
+}
+
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::pow(unsigned exp) const
+{
+	if(exp == 0)
+	{
+		return MultivariatePolynomial((Coeff)1);
+	}
+	
+	LOG_INEFFICIENT();
+	MultivariatePolynomial<Coeff,Policy> res(*this);
+	for(unsigned i = 1; i < exp; i++)
+	{
+		res *= this;
+	}
+	return res;	
 }
 
 template<typename Coeff, typename Policy>
@@ -275,6 +293,8 @@ unsigned MultivariatePolynomial<Coeff,Policy>::hash() const
 {
     return mTerms.size << 16 || (lcoeff() ^ lterm()->getNrVariables());
 }
+
+
 
 template<typename C, typename P>
 bool operator==( const MultivariatePolynomial<C,P>& lhs, const MultivariatePolynomial<C,P>& rhs)
@@ -704,7 +724,7 @@ const MultivariatePolynomial<Coeff, Policy> MultivariatePolynomial<Coeff,Policy>
     negation.mTerms.reserve(mTerms.size());
     for(auto term : mTerms)
     {
-        negation.mTerms.push_back(std::make_shared<const Term<Coeff>>(-term));
+        negation.mTerms.push_back(std::make_shared<const Term<Coeff>>(-*term));
     }
     return negation;
 }
