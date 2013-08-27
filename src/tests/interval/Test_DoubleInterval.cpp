@@ -8,12 +8,22 @@ using namespace carl;
 
 TEST(DoubleInterval, Constructor)
 {
-    
+    DoubleInterval test1 = DoubleInterval(-1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND);
+    DoubleInterval test2 = DoubleInterval(-1, DoubleInterval::STRICT_BOUND, 1, DoubleInterval::STRICT_BOUND);
+    DoubleInterval test3 = DoubleInterval(-1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND);
+    EXPECT_EQ(DoubleInterval(1, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND), DoubleInterval::emptyInterval());
+    DoubleInterval test5 = DoubleInterval::unboundedInterval();
+    DoubleInterval test6 = DoubleInterval::emptyInterval();
+    SUCCEED();
 }
 
 TEST(DoubleInterval, Getters)
 {
-    
+    DoubleInterval test1 = DoubleInterval(-1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::STRICT_BOUND);
+    EXPECT_EQ(test1.left(), -1);
+    EXPECT_EQ(test1.right(), 1);
+    EXPECT_EQ(test1.leftType(), DoubleInterval::WEAK_BOUND);
+    EXPECT_EQ(test1.rightType(), DoubleInterval::STRICT_BOUND);
 }
 
 TEST(DoubleInterval, Addition)
