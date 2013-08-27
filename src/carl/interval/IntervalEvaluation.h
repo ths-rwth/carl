@@ -48,13 +48,16 @@ template<typename Coeff>
 inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>& map)
 {
 	DoubleInterval result(t->coeff());
-	Monomial& m = *t->monomial();
-	// TODO use iterator.
-	for(size_t i = 0; i < m.nrVariables(); ++i)
+	if(t->monomial())
 	{
-		// We expect every variable to be in the map.
-		assert(map.count(m[i].var) > 0);
-		result *= map.at(m[i].var).power(m[i].exp);
+		Monomial& m = *t->monomial();
+		// TODO use iterator.
+		for(size_t i = 0; i < m.nrVariables(); ++i)
+		{
+			// We expect every variable to be in the map.
+			assert(map.count(m[i].var) > 0);
+			result *= map.at(m[i].var).power(m[i].exp);
+		}
 	}
 	return result;
 }
