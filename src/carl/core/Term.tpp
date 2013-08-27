@@ -132,9 +132,9 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coeffic
 
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
+Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 {
-	return new Term(coeff(), monomial()->calcLcmAndDivideBy(m));
+	return Term(1, monomial()->calcLcmAndDivideBy(m));
 }
 
 
