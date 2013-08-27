@@ -84,7 +84,7 @@ namespace carl
         {
             mInterval = BoostDoubleInterval( _interval.lower() );
         }
-        else if( _interval.lower() == _interval.upper() && leftType != rightType )
+        else if( (_interval.lower() == _interval.upper() && leftType != rightType) )
         {
             mLeftType = STRICT_BOUND;
             mRightType = STRICT_BOUND;
@@ -115,7 +115,7 @@ namespace carl
         {
             mInterval = BoostDoubleInterval( left );
         }
-        else if( left == right && (leftType == STRICT_BOUND || rightType == STRICT_BOUND) )
+        else if( (left == right && (leftType == STRICT_BOUND || rightType == STRICT_BOUND)) || left > right )
         {
             mLeftType = STRICT_BOUND;
             mRightType = STRICT_BOUND;
@@ -147,7 +147,7 @@ namespace carl
         {
             mInterval =  BoostDoubleInterval( dLeft );
         }
-        else if( left == right && leftType != rightType )
+        else if( (left == right && leftType != rightType) || left > right )
         {
             mLeftType = STRICT_BOUND;
             mRightType = STRICT_BOUND;
