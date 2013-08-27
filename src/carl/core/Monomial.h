@@ -223,6 +223,11 @@ namespace carl
             
         }
 		
+		/**
+		 * 
+         * @param m
+         * @return 
+         */
 		Monomial* calcLcmAndDivideBy(const Monomial& m) const
 		{
 			Monomial* result = new Monomial();
@@ -262,6 +267,22 @@ namespace carl
 				}
             }
 			return result;
+		}
+		
+		/**
+		 * For a monomial \prod_i x_i^e_i with e_i != 0, returns \prod_i x_i^1.
+         * @return 
+         */
+		Monomial* seperablePart() const
+		{
+			Monomial* m = new Monomial();
+			m->mExponents.reserve(mExponents.size());
+			m->mTotalDegree = mExponents.size();
+			for(const VarExpPair& ve : mExponents)
+			{
+				m->mExponents.emplace_back(ve.var, ve.exp);
+			}
+			return m;
 		}
         
         template<typename Coefficient>

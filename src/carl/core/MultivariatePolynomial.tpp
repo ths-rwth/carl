@@ -72,6 +72,17 @@ MultivariatePolynomial<Coeff, Policy>::MultivariatePolynomial(const std::initial
 	}
 	sortTerms();
 }
+
+
+template<typename Coeff, typename Policy>
+MultivariatePolynomial<Coeff, Policy>::MultivariatePolynomial(const std::initializer_list<Variable>& terms)
+{
+	for(Variable term : terms)
+	{
+		mTerms.push_back(std::make_shared<const Term<Coeff>>(term));
+	}
+	sortTerms();
+}
     
 template<typename Coeff, typename Policy>
 std::shared_ptr<const Monomial> MultivariatePolynomial<Coeff,Policy>::lmon() const
@@ -283,7 +294,7 @@ MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::pow(u
 	MultivariatePolynomial<Coeff,Policy> res(*this);
 	for(unsigned i = 1; i < exp; i++)
 	{
-		res *= this;
+		res *= *this;
 	}
 	return res;	
 }

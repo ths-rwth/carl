@@ -46,6 +46,7 @@ public:
 	template<typename InputIterator>
 	MultivariatePolynomial(InputIterator begin, InputIterator end);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
+	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	/**
 	 * The leading monomial
 	 * @return 
