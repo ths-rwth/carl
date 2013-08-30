@@ -38,7 +38,7 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Monomial& m, const std:
 	for(size_t i = 0; i < m.nrVariables(); ++i)
 	{
 		// We expect every variable to be in the map.
-		assert(map.count(m[i].var) > 0);
+		LOG_ASSERT(map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
 		result *= map.at(m[i].var).power(m[i].exp);
 	}
 	return result;
