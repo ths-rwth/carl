@@ -215,3 +215,13 @@ TEST(MultivariatePolynomial, SPolynomial)
     
     
 }
+
+TEST(MultivariatePolynomial, GatherVariables)
+{
+    EXPECT_TRUE(false);
+}
+
+TEST(MultivariatePolynomial, Derive)
+{
+    EXPECT_TRUE(false);
+}

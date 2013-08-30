@@ -455,6 +455,14 @@ private:
 
 }; // class DoubleInterval
 
+
+template<typename Rational>
+DoubleInterval::DoubleInterval(const Rational& rat, bool overapprox) : 
+DoubleInterval(rat, WEAK_BOUND,rat, WEAK_BOUND, overapprox, overapprox)
+{
+    // TODO overapprox in both directions?
+}
+
 template<typename Rational>
 DoubleInterval::DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft, bool overapproxright)
 {

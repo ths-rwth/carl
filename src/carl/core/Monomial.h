@@ -440,6 +440,7 @@ namespace carl
                 if(*it > v)
                 {
                     mExponents.emplace(it,v);
+                    return *this;
                 }
             }
             // Variable was not inserted, insert at end.
