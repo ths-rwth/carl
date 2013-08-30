@@ -29,7 +29,7 @@ struct DivisionLookupResult
     DivisionLookupResult(const Polynomial* divisor, const Term<typename Polynomial::CoeffType>* factor) :
     mDivisor(divisor), mFactor(factor)
     {
-        std::cout << *mDivisor << std::endl;
+        
     }
     
     bool success()
