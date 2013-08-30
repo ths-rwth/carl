@@ -39,7 +39,7 @@ struct MonomialComparator
 	template<typename Coeff>
     static CompareResult compare( const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2 )
     {
-        return compare(*(t1->monomial()), *(t2->monomial()));
+        return compare(*t1, *t2);
     }
 	
     static CompareResult compare( const Monomial& m1, const Monomial& m2 )

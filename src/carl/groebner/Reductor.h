@@ -21,23 +21,23 @@ template<class Polynomial>
 class ReductorConfiguration
 {
 public:
-	
+
 	typedef ReductorEntry<Polynomial> EntryType;
 	typedef EntryType* Entry;
 	typedef carl::CompareResult CompareResult;
-	
-	static const CompareResult compare(Entry e1, Entry e2)
+
+	static CompareResult compare(Entry e1, Entry e2)
 	{
 		return Polynomial::Ordering::compare(e1->getLead(), e2->getLead());
 	}
 
-	static const bool cmpLessThan(CompareResult res)
+	static bool cmpLessThan(CompareResult res)
 	{
 		return res == CompareResult::LESS;
 	}
 	static const bool supportDeduplicationWhileOrdering = false;
 
-	static const bool cmpEqual(CompareResult res)
+	static bool cmpEqual(CompareResult res)
 	{
 		return res == CompareResult::EQUAL;
 	}
@@ -49,7 +49,7 @@ public:
 	 * @param e2 lower entry
 	 * @return true if e1->lt is cancelled
 	 */
-	static const bool deduplicate(Entry e1, Entry e2)
+	static bool deduplicate(Entry e1, Entry e2)
 	{
 		assert(Polynomial::Ordering::compare(e1->getLead(), e2->getLead()) == CompareResult::EQUAL);
 		return e1->addCoefficient(e2->getLead().getCoeff());
@@ -73,8 +73,8 @@ struct hasOrigins<void*>
 template<typename InputPolynomial, typename PolynomialInIdeal, typename Origins, template <class> class Datastructure = carl::Heap, template <typename Polynomial> class Configuration = ReductorConfiguration>
 class Reductor
 {
-    static_assert(std::is_base_of<InputPolynomial, PolynomialInIdeal>::value,
-                  "Ideal and polynomial to be reduced are incompatible");
+	static_assert(std::is_base_of<InputPolynomial, PolynomialInIdeal>::value,
+				  "Ideal and polynomial to be reduced are incompatible");
 protected:
 	typedef typename InputPolynomial::Ordering Order;
 	typedef typename Configuration<InputPolynomial>::EntryType EntryType;
@@ -101,7 +101,7 @@ public:
 	 * The basic reduce routine on a priority queue.
 	 * @return 
 	 */
-	const bool reduce()
+	bool reduce()
 	{
 		while(!mDatastruct.empty())
 		{
@@ -113,7 +113,7 @@ public:
 				// get actual leading term
 				entry = mDatastruct.top();
 				leadingTerm = entry->getLead();
-
+				LOGMSG_TRACE("carl.gb.reductor", "Intermediate leading term: " << *leadingTerm);
 				assert(!leadingTerm->isZero());
 				// update the data structure.
 				// only insert non-emty polynomials.
@@ -121,7 +121,6 @@ public:
 				typename Configuration<InputPolynomial>::Entry newentry = mDatastruct.top();
 				while(entry != newentry && Order::equal(leadingTerm, newentry->getLead()))
 				{
-					//                    std::cout << newentry->getLead() << std::endl;
 					entry->addCoefficient(newentry->getLead()->coeff());
 					if(!updateDatastruct(newentry)) break;
 
@@ -131,13 +130,11 @@ public:
 			}
 			while(leadingTerm->isZero() && !mDatastruct.empty());
 			// Done finding leading term.
-			
+			LOGMSG_DEBUG("carl.gb.reductor", "Leading term: " << *leadingTerm);
 			// We have found the leading term..
 			if(leadingTerm->isZero())
 			{
 				assert(mDatastruct.empty());
-
-				
 				//then the datastructure is empty, we are done.
 				return true;
 			}
@@ -147,19 +144,20 @@ public:
 			// check if the reduction succeeded.
 			if(divres.success())
 			{
-				
+
 				mReductionOccured = true;
 				if(hasOrigins<Origins>::valid)
 				{
 					//mOrigins.calculateUnion(divres.mDivisor->getOrigins());
 				}
-				if(divres.mDivisor->nrTerms() > 1) 
+				if(divres.mDivisor->nrTerms() > 1)
 				{
 					insert(divres.mDivisor->tail(), divres.mFactor);
 				}
 			}
 			else
 			{
+				LOGMSG_DEBUG("carl.gb.reductor", "Not reducible: " << *leadingTerm);
 				mRemainder.push_back(leadingTerm);
 				return false;
 			}
@@ -185,16 +183,12 @@ public:
 	{
 		// TODO:
 		// Do simple reductions first.
-		//Log logger = getLog( "ginacra.mr.reduction" );
-		//LOGMSG_DEBUG( logger, "Begin full reduction" );
 		while(!reduce())
 		{
-
+			// no operation.
 		}
 		// TODO check whether this is sorted.
-		InputPolynomial res(mRemainder.begin(), mRemainder.end());
-
-		return res;
+		return InputPolynomial(mRemainder.begin(), mRemainder.end());
 	}
 private:
 
@@ -213,10 +207,7 @@ private:
 		}
 		else
 		{
-			//mDatastruct.print();
-			//std::cout << "replace lt" << std::endl;
 			entry->removeLeadingTerm();
-
 			mDatastruct.decreaseTop(entry);
 		}
 		return true;
@@ -226,7 +217,7 @@ private:
 	{
 		if(!g.isZero())
 		{
-			std::cout << g << std::endl;
+			LOGMSG_TRACE("carl.gb.reductor", "Insert polynomial: " << g << " * " << *fact);
 			mDatastruct.push(new EntryType(fact, g));
 		}
 	}
@@ -243,7 +234,7 @@ private:
 	Datastructure<Configuration<InputPolynomial> > mDatastruct;
 	std::vector<std::shared_ptr<const Term<Coeff >> > mRemainder;
 	bool mReductionOccured;
-	Origins mOrigins;
+	//Origins mOrigins;
 };
 
 

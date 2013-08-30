@@ -116,7 +116,7 @@ public:
      * 
      * @return true iff the polynomial equals zero
      */
-    bool empty()
+    bool empty() const
     {
         return !mLead;
     }
@@ -127,7 +127,7 @@ public:
      */
     void print(std::ostream& os = std::cout)
     {
-        if(empty()) return os << " ";
+        if(empty()) os << " ";
         os << *mLead << " +(" << *mMultiple << " * " << mTail << ")";
     }
 

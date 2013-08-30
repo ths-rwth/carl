@@ -112,9 +112,9 @@ TEST(MultivariatePolynomial, Multiplication)
     
     p0 += v1;
     p0 += 1;
-    std::cout << p0 << std::endl;
+    //std::cout << p0 << std::endl;
     p0 *= p0;
-    std::cout << p0 << std::endl;
+    //std::cout << p0 << std::endl;
     
 }
 
@@ -202,7 +202,15 @@ TEST(MultivariatePolynomial, SPolynomial)
     vpool.setVariableName(z, "z");
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
     MultivariatePolynomial<cln::cl_RA> g1({(cln::cl_RA)3*x*x*x*x*y, (cln::cl_RA)1*y*y});
-    std::cout << MultivariatePolynomial<cln::cl_RA>::SPolynomial(f1.normalize(),g1.normalize()) << std::endl;
+    EXPECT_EQ(3,MultivariatePolynomial<cln::cl_RA>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
+    //MultivariatePolynomial<cln::cl_RA> s1({(cln::cl_RA)-1*x*x});
+    //EXPECT_EQ(s1, MultivariatePolynomial::SPolynomial(f1.normalize(), g1.normalize()));
+    
+    
+    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)1*x*x*x, (cln::cl_RA)-2*x*y} );
+    MultivariatePolynomial<cln::cl_RA> g2({(cln::cl_RA)1*x*x*y, (cln::cl_RA)-2*y*y, (cln::cl_RA)1*x});
+    MultivariatePolynomial<cln::cl_RA> s2({(cln::cl_RA)-1*x*x});
+    EXPECT_EQ(s2, MultivariatePolynomial<cln::cl_RA>::SPolynomial(f2, g2));
     
     
     

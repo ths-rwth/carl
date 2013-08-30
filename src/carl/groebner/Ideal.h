@@ -83,6 +83,11 @@ public:
         return mDivisorLookup.isDividable();
     }
 
+	size_t nrGenerators() const
+	{
+		return mGenerators.size();
+	}
+	
     std::vector<Polynomial>& getGenerators()
     {
         return mGenerators;
@@ -135,6 +140,13 @@ public:
         mEliminated.clear();
 
     }
+	
+	void clear()
+	{
+		mGenerators.clear();
+		mEliminated.clear();
+		mDivisorLookup.reset();
+	}
 
 
     bool isConstant() const
@@ -183,6 +195,16 @@ public:
 //        return superfluous;
 //    }
 
+	friend std::ostream& operator<<(std::ostream& os, const Ideal& rhs )
+	{
+		os << "{";
+		for(Polynomial p : rhs.mGenerators)
+		{
+			os << p << std::endl;
+		}
+		return os << "}";
+	}
+	
     void print(bool printOrigins=false, std::ostream& os = std::cout) const
     {
         for(typename std::vector<Polynomial>::const_iterator it = mGenerators.begin(); it != mGenerators.end(); ++it)
@@ -191,7 +213,7 @@ public:
             if(printOrigins)
             {
                 os << " [";
-                it->getOrigins().print();
+//                it->getOrigins().print();
                 os << "]";
             }
             os << ";\n";

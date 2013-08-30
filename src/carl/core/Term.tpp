@@ -28,6 +28,13 @@ Term<Coefficient>::Term(const Monomial& m) :
 }
 
 template<typename Coefficient>
+Term<Coefficient>::Term(const std::shared_ptr<const Monomial>& m) :
+    mCoeff(1), mMonomial(m)
+{
+    
+}
+
+template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const Monomial* m) :
     mCoeff(c), mMonomial(std::shared_ptr<const Monomial>(m))
 {
@@ -286,6 +293,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
     {
         mMonomial = rhs.mMonomial;
     }
+	mCoeff *= rhs.mCoeff;
     return *this;   
 }
 

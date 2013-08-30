@@ -10,6 +10,7 @@
 #include "Variable.h"
 #include "CompareResult.h"
 #include "VarExpPair.h"
+#include "logging.h"
 
 namespace carl
 {   
@@ -128,9 +129,10 @@ namespace carl
             }
         }
 
-        exponent highestExponent(Variable::Arg v) const
+        exponent highestExponent(Variable::Arg) const
         {
-            assert("NOT IMPLEMENTED");
+            LOG_NOTIMPLEMENTED();
+			return 0;
         }
 
         Monomial* dividedBy(Variable::Arg v) const
@@ -164,6 +166,50 @@ namespace carl
             }
         }
 
+		
+		bool dividableBy(const Monomial& m) const
+		{
+			assert(validate());
+			if(m.mTotalDegree > mTotalDegree) return false;
+			if(m.nrVariables() > nrVariables()) return false;
+			// Linear, as we expect small monomials.
+            exponents_cIt itright = m.mExponents.begin();
+            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+            {
+                // Done with division
+                if(itright == m.mExponents.end())
+                {
+			        return true;
+                }
+                // Variable is present in both monomials.
+                if(itleft->var == itright->var)
+                {
+                    if(itright->exp > itleft->exp)
+                    {
+                        // Underflow, itright->exp was larger than itleft->exp.
+			            return false;
+                    }
+                    itright++;
+                }
+                // Variable is not present in lhs, division fails.
+                else if(itleft->var > itright->var) 
+                {
+			        return false;
+                }
+				else
+				{
+					assert(itright->var > itleft->var);
+				}
+            }
+            // If there remain variables in the m, it fails.
+            if(itright != m.mExponents.end()) 
+			{
+				return false;
+			}
+			return true;
+            
+			
+		}
         /**
          * 
          * @param m Recommended to be non-constant as this yields unnecessary copying.
@@ -171,13 +217,13 @@ namespace carl
          */
         Monomial* dividedBy(const Monomial& m) const
         {
-            Monomial* result = new Monomial();
             if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
             {
                 // Division will fail.
+				
                 return nullptr;
             }
-            
+            Monomial* result = new Monomial();
             result->mTotalDegree =  mTotalDegree - m.mTotalDegree;
 
             // Linear, as we expect small monomials.
@@ -189,6 +235,7 @@ namespace carl
                 {
                     // Insert remaining part
                     result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
+					assert(result->validate());
                     return result;
                 }
                 // Variable is present in both monomials.
@@ -198,6 +245,7 @@ namespace carl
                     if(newExp > itleft->exp)
                     {
                         // Underflow, itright->exp was larger than itleft->exp.
+						delete result;
                         return nullptr;
                     }
                     else if(newExp > 0)
@@ -209,6 +257,7 @@ namespace carl
                 // Variable is not present in lhs, division fails.
                 else if(itleft->var > itright->var) 
                 {
+					delete result;
                     return nullptr;
                 }
 				else
@@ -218,7 +267,12 @@ namespace carl
 				}
             }
             // If there remain variables in the m, it fails.
-            if(itright != m.mExponents.end()) return nullptr;
+            if(itright != m.mExponents.end())
+			{
+				delete result;
+				return nullptr;
+			}
+			assert(result->validate());
             return result;
             
         }
@@ -231,10 +285,10 @@ namespace carl
 		Monomial* calcLcmAndDivideBy(const Monomial& m) const
 		{
 			Monomial* result = new Monomial();
-            result->mTotalDegree = mTotalDegree - m.mTotalDegree;
+            result->mTotalDegree = mTotalDegree;
             // Linear, as we expect small monomials.
             exponents_cIt itright = m.mExponents.begin();
-            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end();)
             {
                 // Done with division
                 if(itright == m.mExponents.end())
@@ -250,22 +304,29 @@ namespace carl
                     if(newExp != 0)
                     {
                         result->mExponents.push_back(VarExpPair(itleft->var, newExp));
-						result->mTotalDegree += newExp;
+						result->mTotalDegree -= itright->exp;
                     }
-                    itright++;
+					else
+					{
+						result->mTotalDegree -= itleft->exp;
+					}
+                    ++itright;
+					++itleft;
                 }
                 // Variable is not present in lhs, dividing lcm yields variable will not occur in result
                 
 				else if(itleft->var > itright->var) 
                 {
-					itright++;
+					++itright;
                 }
 				else
 				{
 					assert(itright->var > itleft->var);
 					result->mExponents.push_back(*itleft);
+					++itleft;
 				}
             }
+			assert(result->validate());
 			return result;
 		}
 		
@@ -277,10 +338,10 @@ namespace carl
 		{
 			Monomial* m = new Monomial();
 			m->mExponents.reserve(mExponents.size());
-			m->mTotalDegree = mExponents.size();
+			m->mTotalDegree = (unsigned)mExponents.size();
 			for(const VarExpPair& ve : mExponents)
 			{
-				m->mExponents.emplace_back(ve.var, ve.exp);
+				m->mExponents.emplace_back(ve.var, 1);
 			}
 			return m;
 		}
@@ -393,12 +454,12 @@ namespace carl
 
             // Linear, as we expect small monomials.
             exponents_cIt itright = rhs.mExponents.begin();
+			assert(itright != rhs.mExponents.end());
             for(exponents_it itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
             {
                 // Everything is inserted.
                 if(itright == rhs.mExponents.end())
                 {
-					std::cout << *this << std::endl;
                     return *this;
                 }
                 // Variable is present in both monomials.
@@ -410,12 +471,20 @@ namespace carl
                 // Variable is not present in lhs, we have to insert var-exp pair from rhs.
                 else if(itleft->var > itright->var) 
                 {
-                    mExponents.insert(itleft,*itright);
+					assert(itright != rhs.mExponents.end());
+                    itleft = mExponents.insert(itleft,*itright);
                     ++itright;
+				
                 }        
+				else 
+				{
+					assert(itleft->var < itright->var);
+				}
+
             }
             // Insert remainder of rhs.
             mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
+			assert(validate());
             return *this;
         }
 
@@ -454,11 +523,84 @@ namespace carl
             {
                 os << vp;
             }
+			os << "[" << rhs.mTotalDegree << "]";
             return os;
         }
+		
+		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
+		{
+			Monomial result;
+			assert(lhs.validate());
+			assert(rhs.validate());
+			result.mTotalDegree = lhs.tdeg() + rhs.tdeg();
+            // Linear, as we expect small monomials.
+            exponents_cIt itright = rhs.mExponents.begin();
+            for(exponents_cIt itleft = lhs.mExponents.begin(); itleft != lhs.mExponents.end();)
+            {
+                // Done on right
+                if(itright == rhs.mExponents.end())
+                {
+                    // Insert remaining part
+                    result.mExponents.insert(result.mExponents.end(), itleft, lhs.mExponents.end());
+                    return result;
+                }
+                // Variable is present in both monomials.
+                if(itleft->var == itright->var)
+                {
+                    exponent newExp = std::max(itleft->exp, itright->exp);
+					result.mExponents.push_back(VarExpPair(itleft->var, newExp));
+					result.mTotalDegree -= std::min(itleft->exp, itright->exp);
+                    ++itright;
+					++itleft;
+                }
+                // Variable is not present in lhs, dividing lcm yields variable will not occur in result
+                
+				else if(itleft->var > itright->var) 
+                {
+					result.mExponents.push_back(*itright);
+					++itright;
+                }
+				else
+				{
+					assert(itright->var > itleft->var);
+					result.mExponents.push_back(*itleft);
+					++itleft;
+				}
+            }
+			 // Insert remaining part
+			result.mExponents.insert(result.mExponents.end(), itright, rhs.mExponents.end());
+			LOG_ASSERT(result.validate(), "lcm of " + lhs.toString() + ", " + rhs.toString() + " yields invalid " + result.toString());
+			return result;
+			
+		}
 
+		std::string toString() const
+		{
+			std::stringstream stream;
+			stream << *this;
+			return stream.str();
+		}
     private:
         
+		/**
+		 * Checks whether the data is valid.
+         * @return 
+         */
+		bool validate() const
+		{
+			unsigned tdeg = 0;
+			int lastVarIndex = -1;
+			for(VarExpPair ve : mExponents)
+			{
+				if(ve.exp == 0) return false;
+				if((int)ve.var.getId() <= lastVarIndex) return false;
+				tdeg += ve.exp;
+				lastVarIndex = ve.var.getId();
+			}
+			if(tdeg != mTotalDegree) return false;
+			return true;
+		}
+		
         static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
         {
             exponents_cIt lhsit = lhs.mExponents.begin( );

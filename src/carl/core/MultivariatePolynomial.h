@@ -81,7 +81,8 @@ public:
 	{
 		return mTerms.size();
 	}
-	std::shared_ptr<const Term<Coeff>> constantPart() const;
+	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
+	bool hasConstantTerm() const;
 
 	/**
 	 * For the polynomial p, the function calculates a polynomial p - lt(p).
@@ -136,6 +137,8 @@ public:
 	unsigned hash() const;
 	
 	MultivariatePolynomial pow(unsigned exp) const;
+	
+	bool isReducibleIdentity() const;
 
 	template<typename C, typename P>
 	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);

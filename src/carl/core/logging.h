@@ -93,6 +93,7 @@ namespace carl {
 typedef log4cplus::Logger Log;
 #define ROOTLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl"))
 #define ASSERTIONLOGGER log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.assert"))
+#define DEVLOGGER (log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.dev")))
 #define getLog(name) log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(name))
 // use LOG4CPLUS macros
 #ifndef LOGi2_DISABLE_FATAL_MSG
@@ -144,13 +145,14 @@ typedef void* Log;
 
 #ifdef LOGi2_USE_LOG4CPLUS
 #define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (message))
-#define LOG_NOTIMPLEMENTED() ROOTLOGGER.assertion(false, "Not implemented.")
-#define LOG_INEFFICIENT() ROOTLOGGER.forcedLog(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
+#define LOG_NOTIMPLEMENTED() DEVLOGGER.assertion(false, (std::string)"Not implemented method-stub called: " +  (std::string)__PRETTY_FUNCTION__)
+#define LOG_INEFFICIENT() DEVLOGGER.log(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
 #else
 #define LOG_ASSERT(condition, message) assert(condition)
 #define LOG_NOTIMPLEMENTED() assert(false);
 #define LOG_INEFFICIENT() std::cout <<  "Inefficient method called:" << __PRETTY_FUNCTION__ << std::endl;
 #endif
+
 
 
 inline void configureLogging() {
@@ -168,7 +170,9 @@ inline void configureLogging() {
     // Set output.
     logger.addAppender(fileAppender);
     // Set minimal loglovel
-    logger.setLogLevel(log4cplus::TRACE_LOG_LEVEL);
+    logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
+	DEVLOGGER.setLogLevel(log4cplus::ERROR_LOG_LEVEL);
+	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.gb")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 #endif
 }
 

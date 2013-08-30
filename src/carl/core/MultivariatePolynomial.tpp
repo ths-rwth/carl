@@ -35,14 +35,16 @@ mTerms(1,std::make_shared<const Term<Coeff>>(t))
     
 }
 template<typename Coeff, typename Policy>
-MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(std::shared_ptr<const Monomial> m)
+MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(std::shared_ptr<const Monomial> m) :
+mTerms(1,std::make_shared<const Term<Coeff>>(m))
 {
-    LOG_NOTIMPLEMENTED();
+
 }
 template<typename Coeff, typename Policy>
-MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(std::shared_ptr<const Term<Coeff>> t)
+MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(std::shared_ptr<const Term<Coeff>> t) :
+mTerms(1,t)
 {
-    LOG_NOTIMPLEMENTED();
+    
 }
 template<typename Coeff, typename Policy>
 MultivariatePolynomial<Coeff,Policy>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>>& pol)
@@ -94,8 +96,15 @@ std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::lterm()
 {
     LOG_ASSERT(!isZero(), "Leading term undefined on zero polynomials.");
 	return mTerms.back();
-    
 }
+
+template<typename Coeff, typename Policy>
+std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::trailingTerm() const
+{
+    LOG_ASSERT(!isZero(), "Trailing term undefined on zero polynomials.");
+	return mTerms.front();
+}
+
 template<typename Coeff, typename Policy>
 Coeff MultivariatePolynomial<Coeff,Policy>::lcoeff() const
 {
@@ -141,6 +150,16 @@ bool MultivariatePolynomial<Coeff,Policy>::isLinear() const
 }
 
 template<typename Coeff, typename Policy>
+bool MultivariatePolynomial<Coeff,Policy>::hasConstantTerm() const
+{
+    if(nrTerms() == 0) return false;
+	else
+	{
+		return trailingTerm()->isConstant();
+	}
+}
+
+template<typename Coeff, typename Policy>
 const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Policy>::operator[](int index) const
 {
 	assert(index < nrTerms());
@@ -149,19 +168,6 @@ const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Policy>::
 
 
 
-template<typename Coeff, typename Policy>
-std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Policy>::constantPart() const
-{
-    if(mTerms.size == 0) return true;
-    if(Policy::Ordering::degreeOrder)
-    {
-        if(mTerms.front()->isConstant()) return mTerms.back();
-    }
-    else 
-    {
-        LOG_NOTIMPLEMENTED();
-    }
-}
 
 template<typename Coeff, typename Policy>
 MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::tail() const
@@ -185,7 +191,14 @@ MultivariatePolynomial<Coeff,Policy>& MultivariatePolynomial<Coeff,Policy>::stri
 template<typename Coeff, typename Policy>
 bool MultivariatePolynomial<Coeff,Policy>::isTsos() const
 {
-    LOG_NOTIMPLEMENTED();
+    //LOG_NOTIMPLEMENTED();
+    return false;
+}
+
+template<typename Coeff, typename Policy>
+bool MultivariatePolynomial<Coeff,Policy>::isReducibleIdentity() const
+{
+    //LOG_NOTIMPLEMENTED();
     return false;
 }
 
@@ -268,11 +281,11 @@ MultivariatePolynomial<Coeff,Policy> MultivariatePolynomial<Coeff,Policy>::SPoly
 	}
 	else if( p.nrTerms() == 1 )
 	{
-		return -(q.lterm()->calcLcmAndDivideBy( *p.lmon() ) * q.tail());
+		return -(p.lterm()->calcLcmAndDivideBy( *q.lmon() ) * q.tail());
 	}
 	else if( q.nrTerms() == 1 )
 	{
-		return (p.lterm()->calcLcmAndDivideBy( *q.lmon() ) * p.tail());
+		return (q.lterm()->calcLcmAndDivideBy( *p.lmon() ) * p.tail());
 	}
 	else
 	{
@@ -757,15 +770,16 @@ MultivariatePolynomial<Coeff, Policy>& MultivariatePolynomial<Coeff, Policy>::op
         if(cmpres == CompareResult::LESS)
         {
             newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**lhsIt)));
-            if(++lhsIt != mTerms.end()) break;
+            if(++lhsIt == mTerms.end()) break;
         }
         else if(cmpres == CompareResult::GREATER)
         {
             newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**rhsIt)));
-            if(++rhsIt != rhs.mTerms.end()) break;
+            if(++rhsIt == rhs.mTerms.end()) break;
         }
         else 
         {
+			assert(cmpres == CompareResult::EQUAL);
             if( (**lhsIt).coeff() != (**rhsIt).coeff() )
             {
                 newTerms.push_back(std::make_shared<const Term<Coeff>>( (**lhsIt).coeff() - (**rhsIt).coeff(), (**lhsIt).monomial() ));
@@ -1226,7 +1240,7 @@ std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,P>& 
 {
     const typename MultivariatePolynomial<C,P>::TermsType& terms(rhs.mTerms);
     typename MultivariatePolynomial<C,P>::TermsType::const_reverse_iterator term = terms.rbegin();
-    if(terms.size() == 0) return os;
+    if(terms.size() == 0) return os << "0";
     if(terms.size() == 1) return os << **term;
     os << **term;
     
