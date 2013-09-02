@@ -20,11 +20,11 @@ class UnivariatePolynomial;
 /**
  *  The general-purpose multivariate polynomial class.
  */
-template<typename Coeff, typename Policy = StdMultivariatePolynomialPolicy>
+template<typename Coeff, typename Ordering = GrLexOrdering, typename Policy = StdMultivariatePolynomialPolicy>
 class MultivariatePolynomial
 {
 public:
-	typedef typename Policy::Ordering Ordering;
+	typedef Ordering OrderedBy;
 	typedef Term<Coeff> TermType;
 	typedef Coeff CoeffType;
 protected:
@@ -41,7 +41,7 @@ public:
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
 	explicit MultivariatePolynomial(std::shared_ptr<const Monomial> m);
 	explicit MultivariatePolynomial(std::shared_ptr<const Term<Coeff >> t);
-	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy >> &pol);
+	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<typename InputIterator>
 	MultivariatePolynomial(InputIterator begin, InputIterator end);
@@ -104,9 +104,17 @@ public:
 	 * @return true if polynomial is of the form \sum a_im_i^2 with a_i > 0 for all i.
 	 */
 	bool isTsos() const;
+	
+	/**
+	 * Iterates through all terms to find variables occuring in this polynomial.
+     * @param vars Holds the variables occuring in the polynomial at return.
+     */
+	void gatherVariables(std::set<Variable>& vars) const;
+	
+	bool isReducibleIdentity() const;
 
 	MultivariatePolynomial derivative(Variable::Arg v) const;
-	UnivariatePolynomial<MultivariatePolynomial<Coeff, Policy>> coeffRepresentation(Variable::Arg v) const;
+	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
 	 * For a polynomial p, returns p/gcd(all coefficients in p)
@@ -125,6 +133,7 @@ public:
      * @return 
      */
 	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions);
+	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions);
 	
 	/**
 	 * Like substitute, but expects substitutions for all variables.
@@ -132,73 +141,74 @@ public:
      */
 	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
 	
+	
+	
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	unsigned hash() const;
 	
 	MultivariatePolynomial pow(unsigned exp) const;
 	
-	bool isReducibleIdentity() const;
 
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const Term<C>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const Monomial& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const Monomial& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, const C& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const C& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator==(const MultivariatePolynomial<C, P>& lhs, Variable::Arg rhs);
-	template<typename C, typename P>
-	friend bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C, P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, const Term<C>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const Term<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, const Monomial& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const Monomial& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, const C& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const C& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator!=(const MultivariatePolynomial<C, P>& lhs, Variable::Arg rhs);
-	template<typename C, typename P>
-	friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C, P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 
-	template<typename C, typename P>
-	friend bool operator<(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend bool operator<=(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 	/**
 	 * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 
@@ -212,34 +222,34 @@ public:
 	MultivariatePolynomial& operator+=(const Coeff& c);
 
 
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, const Term<C>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const Term<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, const Monomial& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const Monomial& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, const C& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const C& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(const MultivariatePolynomial<C, P>& lhs, Variable::Arg rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator+(Variable::Arg lhs, Variable::Arg rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, Variable::Arg rhs);
 
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
@@ -250,32 +260,32 @@ public:
 
 	const MultivariatePolynomial operator-() const;
 
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, const Term<C>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const Term<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, const Monomial& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const Monomial& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, const C& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const C& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(const MultivariatePolynomial<C, P>& lhs, Variable::Arg rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator-(Variable::Arg lhs, const MultivariatePolynomial<C, P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
@@ -283,44 +293,44 @@ public:
 	MultivariatePolynomial& operator*=(const Variable::Arg);
 	MultivariatePolynomial& operator*=(const Coeff& c);
 
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, const Term<C>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const Term<C>& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, const Monomial& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const Monomial& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, const C& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const C& lhs, const MultivariatePolynomial<C, P>& rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(const MultivariatePolynomial<C, P>& lhs, Variable::Arg rhs);
-	template<typename C, typename P>
-	friend const MultivariatePolynomial<C, P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C, P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
-	template <typename C, typename P>
-	friend std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C, P>& rhs);
+	template <typename C, typename O, typename P>
+	friend std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs);
 
-	template<typename C, typename P>
-	static bool compareByLeadingTerm(const MultivariatePolynomial<C, P>& p1, const MultivariatePolynomial<C, P>& p2)
+	template<typename C, typename O, typename P>
+	static bool compareByLeadingTerm(const MultivariatePolynomial<C,O,P>& p1, const MultivariatePolynomial<C,O,P>& p2)
 	{
 		return Ordering::less(p1.lterm(), p2.lterm());
 	}
 
-	template<typename C, typename P>
-	static bool compareByNrTerms(const MultivariatePolynomial<C, P>& p1, const MultivariatePolynomial<C, P>& p2)
+	template<typename C, typename O, typename P>
+	static bool compareByNrTerms(const MultivariatePolynomial<C,O,P>& p1, const MultivariatePolynomial<C,O,P>& p2)
 	{
 		return (p1.nrOfTerms() < p2.nrOfTerms());
 	}
