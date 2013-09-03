@@ -248,8 +248,12 @@ MultivariatePolynomial<Coeff,Ordering,Policy>& MultivariatePolynomial<Coeff,Orde
 template<typename Coeff, typename Ordering, typename Policy>
 bool MultivariatePolynomial<Coeff,Ordering,Policy>::isTsos() const
 {
-    //LOG_NOTIMPLEMENTED();
-    return false;
+	// A polynomial is a tsos if it is the sum of squares in its standard representation.
+    for(const std::shared_ptr<const TermType>& term : mTerms)
+	{
+		if(!term->isSquare()) return false;
+	}
+	return true;
 }
 
 template<typename Coeff, typename Ordering, typename Policy>

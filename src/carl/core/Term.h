@@ -82,6 +82,15 @@ class Term
             if(!mMonomial) return 0;
             return mMonomial->nrVariables();
         }
+		
+		/**
+		 * Is square.
+         * @return 
+         */
+		bool isSquare() const
+		{
+			return (mCoeff >= (Coefficient)0) && ((!mMonomial) || mMonomial->isSquare());
+		}
         
         /**
          * Set the term to zero with the canonical representation.
@@ -123,6 +132,7 @@ class Term
         Term* derivative(Variable::Arg) const;
 		
 		Term* substitute(const std::map<Variable, Coefficient>& substitutions) const;
+		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
 		
 		void gatherVariables(std::set<Variable>& variables) const
 		{

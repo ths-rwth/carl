@@ -100,6 +100,16 @@ namespace carl
         {
             return mTotalDegree <= 1;
         }
+		
+		bool isSquare() const
+		{
+			if(mTotalDegree % 2 == 1) return false;
+			for(const VarExpPair& ve : mExponents)
+			{
+				if(ve.exp % 2 == 1) return false;
+			}
+			return true;
+		}
         size_t nrVariables() const
         {
             return mExponents.size();
