@@ -18,9 +18,15 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
     }
     else
     {
-        // If the exponent is one, the variable does not occur in the new monomial.
+		// If the exponent is one, the variable does not occur in the new monomial.
         if(it->exp == 1)
         {
+			// If it was the only variable, we get the one-term.
+			if(mExponents.size() == 1) 
+			{
+				return new Term<Coefficient>((Coefficient)1);
+			}
+
             Monomial* m = new Monomial();
             if(it != mExponents.begin())
             {

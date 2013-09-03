@@ -191,7 +191,11 @@ class Term
         template<typename Coeff>
         friend std::ostream& operator<<(std::ostream& lhs, const Term<Coeff>& rhs);
         
-        
+        static bool EqualMonomial(const Term& lhs, const Term& rhs)
+		{
+			return	(!lhs.mMonomial && !rhs.mMonomial) || // both no monomial 
+					(lhs.mMonomial && rhs.mMonomial && *lhs.mMonomial == *rhs.mMonomial);
+		}
 };
 
 }

@@ -76,7 +76,7 @@ MultivariatePolynomial<Coeff,Ordering,Policy>::MultivariatePolynomial(InputItera
 			Coeff c = (*it)->coeff();
 			for(++jt; jt != mTerms.end(); ++jt)
 			{
-				if( *((**jt).monomial()) == *((**it).monomial()) ) 
+				if(Term<Coeff>::EqualMonomial(**jt, **it)) 
 				{
 					c += (*jt)->coeff();
 					// We do not yet remove the term as this would cause multiple movements
@@ -1339,6 +1339,21 @@ std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,O,P>
         os << " + " << **term;
     }
     return os;
+}
+
+template<typename Coeff, typename Ordering, typename Policy>
+std::string MultivariatePolynomial<Coeff, Ordering, Policy>::toString(bool infix) const
+{
+	if(infix)
+	{
+		std::stringstream strstr;
+		strstr << *this;
+		return strstr.str();
+	}
+	else
+	{
+		return "NOT IMPLEMENTED";
+	}
 }
 
 template<typename Coeff, typename Ordering, typename Policy>

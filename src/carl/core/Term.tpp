@@ -134,6 +134,11 @@ Term<Coefficient>* Term<Coefficient>::dividedBy(const Term& t) const
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 {
+	if(!mMonomial)
+	{
+		// Derivatives of constants are zero.
+		return new Term<Coefficient>((Coefficient)0);
+	}
     Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
     *t *= mCoeff;
     return t;
@@ -156,9 +161,8 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
 {
-    return (lhs.mCoeff == rhs.mCoeff) &&
-            ((!lhs.mMonomial && !rhs.mMonomial) || 
-             (lhs.mMonomial && rhs.mMonomial && *lhs.mMonomial == *rhs.mMonomial));
+    return (lhs.mCoeff == rhs.mCoeff) && // same coefficients
+            Term<Coeff>::EqualMonomial(lhs, rhs); // same monomials
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Coeff& rhs)
