@@ -19,7 +19,7 @@ class Term
         std::shared_ptr<const Monomial> mMonomial;
     
     public:
-        Term() = default;
+        Term();
         explicit Term(const Coefficient& c);
         explicit Term(Variable::Arg v);
         explicit Term(const Monomial& m);
@@ -29,7 +29,7 @@ class Term
         Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
         Term(const Coefficient& c, Variable::Arg v, unsigned exponent);
         
-        /**
+		/**
          * Get the coefficient.
          * @return 
          */
@@ -123,6 +123,14 @@ class Term
         Term* derivative(Variable::Arg) const;
 		
 		Term* substitute(const std::map<Variable, Coefficient>& substitutions) const;
+		
+		void gatherVariables(std::set<Variable>& variables) const
+		{
+			if(mMonomial)
+			{
+				mMonomial->gatherVariables(variables);
+			}
+		}
         
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);

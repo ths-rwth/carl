@@ -24,7 +24,7 @@ TEST(MultivariatePolynomial, Operators)
     MultivariatePolynomial<int> p0a(t0);
     MultivariatePolynomial<int> p0b(v0);
     EXPECT_EQ(p0a, p0b);
-    
+    //TODO isUnivariate
 }
 
 TEST(MultivariatePolynomial, Addition)
@@ -115,7 +115,11 @@ TEST(MultivariatePolynomial, Multiplication)
     //std::cout << p0 << std::endl;
     p0 *= p0;
     //std::cout << p0 << std::endl;
-    
+}
+
+TEST(MultivariatePolynomial, toString)
+{
+    EXPECT_TRUE(false);
 }
 
 TEST(MultivariatePolynomial, Normalize)
@@ -211,17 +215,74 @@ TEST(MultivariatePolynomial, SPolynomial)
     MultivariatePolynomial<cln::cl_RA> g2({(cln::cl_RA)1*x*x*y, (cln::cl_RA)-2*y*y, (cln::cl_RA)1*x});
     MultivariatePolynomial<cln::cl_RA> s2({(cln::cl_RA)-1*x*x});
     EXPECT_EQ(s2, MultivariatePolynomial<cln::cl_RA>::SPolynomial(f2, g2));
-    
-    
-    
 }
 
 TEST(MultivariatePolynomial, GatherVariables)
 {
-    EXPECT_TRUE(false);
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    vpool.setVariableName(y, "y");
+    Variable z = vpool.getFreshVariable();
+    vpool.setVariableName(z, "z");
+    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
+    std::set<Variable> vars;
+    f1.gatherVariables(vars);
+    EXPECT_EQ(x, *vars.begin());
+    EXPECT_EQ(2, vars.size());
 }
 
-TEST(MultivariatePolynomial, Derive)
+TEST(MultivariatePolynomial, Derivative)
+{
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    vpool.setVariableName(y, "y");
+    Variable z = vpool.getFreshVariable();
+    vpool.setVariableName(z, "z");
+    MultivariatePolynomial<cln::cl_RA> fx({x});
+    ASSERT_EQ((cln::cl_RA)1, fx.derivative(x));
+    ASSERT_EQ((cln::cl_RA)0, fx.derivative(y));
+    MultivariatePolynomial<cln::cl_RA> f2x({(cln::cl_RA)2*x});
+    ASSERT_EQ((cln::cl_RA)2, f2x.derivative(x));
+    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
+    MultivariatePolynomial<cln::cl_RA> f1dx({(cln::cl_RA)3*x*x*y*y, (cln::cl_RA)-2*x*y*y*y, Term<cln::cl_RA>((cln::cl_RA)1)});
+    MultivariatePolynomial<cln::cl_RA> f1dy({(cln::cl_RA)2*x*x*x*y, (cln::cl_RA)-3*x*x*y*y});
+    ASSERT_EQ(f1dx, f1.derivative(x));
+    ASSERT_EQ(f1dy, f1.derivative(y));
+    ASSERT_EQ(f1.derivative(x).derivative(y), f1.derivative(y).derivative(x));
+}
+
+
+TEST(MultivariatePolynomial, hasVar)
 {
     EXPECT_TRUE(false);
 }
+
+
+TEST(MultivariatePolynomial, maxExponent)
+{
+    // p.maxExponent()
+    
+    // p.maxExponent(v) -> finds all occurences of variable v and returns the highest exponent.
+    EXPECT_TRUE(false);
+}
+
+TEST(MultivariatePolynomial, getCoefficient )
+{
+    // find polynomial which sums all terms with v^e and returns them without v.
+    EXPECT_TRUE(false);
+}
+
+TEST(MultivariatePolynomial, cauchyBounds)
+{
+    EXPECT_TRUE(false);
+}
+
+TEST(MultivariatePolyonomial, factorization)
+{
+    EXPECT_TRUE(false);
+}
+

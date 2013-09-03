@@ -7,6 +7,14 @@
 
 namespace carl
 {
+
+template<typename Coefficient>
+Term<Coefficient>::Term() :
+    mCoeff((Coefficient)0), mMonomial()
+{
+    
+}
+
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :
     mCoeff(c), mMonomial()

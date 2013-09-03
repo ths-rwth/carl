@@ -44,7 +44,7 @@ public:
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<typename InputIterator>
-	MultivariatePolynomial(InputIterator begin, InputIterator end);
+	MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	/**
@@ -83,6 +83,16 @@ public:
 	}
 	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
 	bool hasConstantTerm() const;
+	
+	typename TermsType::const_iterator begin() const
+	{
+		return mTerms.begin();
+	}
+	
+	typename TermsType::const_iterator end() const
+	{
+		return mTerms.end();
+	}
 
 	/**
 	 * For the polynomial p, the function calculates a polynomial p - lt(p).
@@ -97,7 +107,7 @@ public:
 	 */
 	MultivariatePolynomial& stripLT();
 	
-	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
+	
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
@@ -110,10 +120,11 @@ public:
      * @param vars Holds the variables occuring in the polynomial at return.
      */
 	void gatherVariables(std::set<Variable>& vars) const;
+	std::set<Variable> gatherVariables() const;
 	
 	bool isReducibleIdentity() const;
 
-	MultivariatePolynomial derivative(Variable::Arg v) const;
+	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
 	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
@@ -129,15 +140,15 @@ public:
 	MultivariatePolynomial normalize() const;
 	
 	/**
-	 * 
-     * @return 
+	 * Replace all variables by a value given in their map.
+     * @return A new polynomial without the variables in map.
      */
 	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions);
 	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions);
 	
 	/**
 	 * Like substitute, but expects substitutions for all variables.
-     * @return 
+     * @return For a polynomial p, the function value p(x_1,...,x_n).
      */
 	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
 	
@@ -149,6 +160,9 @@ public:
 	
 	MultivariatePolynomial pow(unsigned exp) const;
 	
+	std::string toString(bool infix=true) const;
+	
+	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
 
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
@@ -335,6 +349,7 @@ public:
 		return (p1.nrOfTerms() < p2.nrOfTerms());
 	}
 
+	
 private:
 	void sortTerms();
 

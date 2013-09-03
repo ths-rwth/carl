@@ -59,10 +59,67 @@ MultivariatePolynomial<Coeff,Ordering,Policy>::MultivariatePolynomial(const Univ
 
 template<typename Coeff, typename Ordering, typename Policy>
 template<typename InputIterator>
-MultivariatePolynomial<Coeff,Ordering,Policy>::MultivariatePolynomial(InputIterator begin, InputIterator end)
+MultivariatePolynomial<Coeff,Ordering,Policy>::MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted)
 {
-    mTerms.assign(begin, end);
-    sortTerms();
+	mTerms.assign(begin, end);
+	if(!sorted)
+	{
+		sortTerms();
+	}
+	if(duplicates)
+	{
+		// We now iterate over the terms to find equal monomials.
+		for(typename TermsType::iterator it=mTerms.begin(); it != mTerms.end(); )
+		{
+			// look ahead for equal monomials
+			typename TermsType::iterator jt=it;
+			Coeff c = (*it)->coeff();
+			for(++jt; jt != mTerms.end(); ++jt)
+			{
+				if( *((**jt).monomial()) == *((**it).monomial()) ) 
+				{
+					c += (*jt)->coeff();
+					// We do not yet remove the term as this would cause multiple movements
+					// over the whole operation. Instead, we write a zero and clear these zeros later on.
+					// TODO make a global shared ptr for zero terms.
+					*jt = std::make_shared<const Term<Coeff>>((Coeff)0);
+				}
+				else
+				{
+					break;
+				}
+			}
+			if(c != (*it)->coeff())
+			{
+				if(c == (Coeff)0)
+				{
+					*it = std::make_shared<const Term<Coeff>>((Coeff)0);
+				}
+				else
+				{
+					*it = std::make_shared<const Term<Coeff>>(c, (**it).monomial());
+				}
+				// We need to update this iterator.
+			}
+			
+			// Go on where the look ahead stopped.
+			it = jt;
+		}
+		// Now we have to remove zeros.
+		for(typename TermsType::iterator it=mTerms.begin(); it != mTerms.end(); )
+		{
+			if(**it == (Coeff)0)
+			{
+				it = mTerms.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+		
+	}
+	
 }
 
 template<typename Coeff, typename Ordering, typename Policy>
@@ -266,6 +323,22 @@ MultivariatePolynomial<Coeff,Ordering,Policy> MultivariatePolynomial<Coeff,Order
 	return result;
 	
 }
+
+template<typename Coeff, typename Ordering, typename Policy>
+MultivariatePolynomial<Coeff,Ordering,Policy> MultivariatePolynomial<Coeff,Ordering,Policy>::derivative(Variable::Arg v, unsigned nth) const
+{
+	assert(!isZero());
+	// TODO n > 1 not yet implemented!
+	assert(nth == 1);
+	TermsType tmpTerms;
+	for(std::shared_ptr<const Term<Coeff>> t : mTerms)
+	{
+		tmpTerms.emplace_back(t->derivative(v));
+	}
+	return MultivariatePolynomial(tmpTerms.begin(), tmpTerms.end(), true, false);
+}
+
+
 template<typename Coeff, typename Ordering, typename Policy>
 MultivariatePolynomial<Coeff,Ordering,Policy> MultivariatePolynomial<Coeff,Ordering,Policy>::SPolynomial(
 																const MultivariatePolynomial<Coeff, Ordering, Policy>& p,
@@ -294,7 +367,6 @@ MultivariatePolynomial<Coeff,Ordering,Policy> MultivariatePolynomial<Coeff,Order
 	
 }
 
-
 template<typename Coeff, typename Ordering, typename Policy>
 MultivariatePolynomial<Coeff,Ordering,Policy> MultivariatePolynomial<Coeff,Ordering,Policy>::pow(unsigned exp) const
 {
@@ -310,6 +382,24 @@ MultivariatePolynomial<Coeff,Ordering,Policy> MultivariatePolynomial<Coeff,Order
 		res *= *this;
 	}
 	return res;	
+}
+
+
+template<typename Coeff, typename Ordering, typename Policy>
+void MultivariatePolynomial<Coeff,Ordering,Policy>::gatherVariables(std::set<Variable>& vars) const
+{
+	for(std::shared_ptr<const Term<Coeff>> t : mTerms)
+	{
+		t->gatherVariables(vars);
+	}
+}
+
+template<typename Coeff, typename Ordering, typename Policy>
+std::set<Variable> MultivariatePolynomial<Coeff,Ordering,Policy>::gatherVariables() const
+{
+	std::set<Variable> vars;
+	gatherVariables(vars);
+	return vars;
 }
 
 template<typename Coeff, typename Ordering, typename Policy>
@@ -382,7 +472,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
     if(lhs.mTerms.empty() && rhs == 0) return true;
     if(lhs.mTerms.size() > 1) return false;
-    return *(lhs.mTerms.front()->coeff()) == rhs;
+    return (lhs.mTerms.front()->coeff()) == rhs;
 }
 template<typename C, typename O, typename P>
 bool operator==(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)

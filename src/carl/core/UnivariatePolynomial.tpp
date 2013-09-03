@@ -27,6 +27,5 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	}
 	os << rhs.mCoefficients[0];
 	return os;
-	
 }
 }

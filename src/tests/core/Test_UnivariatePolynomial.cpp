@@ -19,3 +19,9 @@ TEST(UnivariatePolynomial, Constructor)
     std::cout << pol << std::endl;
 }
 
+
+
+TEST(UnivariatePolynomial, cauchyBounds)
+{
+    EXPECT_TRUE(false);
+}

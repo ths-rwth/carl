@@ -346,6 +346,18 @@ namespace carl
 			return m;
 		}
         
+		/**
+		 * Fill the set of variables with the variables from this monomial.
+         * @param variables
+         */
+		void gatherVariables(std::set<Variable>& variables) const
+		{
+			for(const VarExpPair& ve : mExponents)
+			{
+				variables.insert(ve.var);
+			}
+		}
+		
         template<typename Coefficient>
         Term<Coefficient>* derivative(Variable::Arg v) const;
         
