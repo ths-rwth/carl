@@ -35,10 +35,13 @@ set_target_properties( lib_carl PROPERTIES
 		# allow creating static and shared libs without conflicts
 		# CLEAN_DIRECT_OUTPUT 1
 		# avoid conflicts between library and binary target names
-		OUTPUT_NAME arithmetic
+		OUTPUT_NAME carl
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		# we currently do not use public header option, as it doesnt support multi-directory headers
 )
+
+
 if(${STATICLIB_SWITCH} STREQUAL "ON")
   set_target_properties( lib_carl PROPERTIES LINK_SEARCH_END_STATIC TRUE )
   set_target_properties( lib_carl PROPERTIES LINK_SEARCH_START_STATIC TRUE )
@@ -49,10 +52,15 @@ target_link_libraries( lib_carl ${libraries} ) # libraries definied in top-level
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
+ 
 
-install( TARGETS lib_carl DESTINATION lib PERMISSIONS
-    OWNER_READ OWNER_WRITE OWNER_EXECUTE
-    GROUP_READ GROUP_EXECUTE
-    WORLD_READ WORLD_EXECUTE
+install( TARGETS lib_carl 
+	EXPORT carlTargets
+	LIBRARY DESTINATION "${LIB_INSTALL_DIR}" COMPONENT shlib
+	PERMISSIONS
+		OWNER_READ OWNER_WRITE OWNER_EXECUTE
+		GROUP_READ GROUP_EXECUTE
+		WORLD_READ WORLD_EXECUTE
 )
+
 
