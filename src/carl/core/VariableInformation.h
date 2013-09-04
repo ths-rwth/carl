@@ -8,15 +8,13 @@
 #pragma once
 #include <map>
 
+#include "VarExpPair.h"
+
 namespace carl
 {
 	template<bool collectCoeff, typename CoeffType>
 	struct VariableInformation
 	{
-		VariableInformation() 
-		{
-			std::cout << "MG" << std::endl;
-		}
 		
 	};
 
@@ -37,9 +35,11 @@ namespace carl
 		/// Number of terms a variable occurs in.
 		unsigned occurence;
 		
-		void updateCoeff()
+		template<typename Term>
+		void updateCoeff(unsigned, const Term&)
 		{
 			// Empty function, we do not save the coefficient here.
+			// TODO there might be a better solution to this.
 		}
 	};
 	
@@ -51,11 +51,20 @@ namespace carl
 		}
 		
 	
-		std::map<unsigned, CoeffType> coeff;
+		std::map<unsigned, CoeffType> coeffs;
 		
-		void updateCoeff()
+		template<typename Term>
+		void updateCoeff(unsigned exponent, const Term& t)
 		{
-			
+			typename std::map<unsigned, CoeffType>::iterator it = coeffs.find(exponent);
+			if(it == coeffs.end())
+			{
+				coeffs.emplace(exponent, CoeffType(t));
+			}
+			else
+			{
+				it->second += t;
+			}
 		}
 	};
 

@@ -145,6 +145,35 @@ namespace carl
             LOG_NOTIMPLEMENTED();
 			return 0;
         }
+		
+		/**
+		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
+         * @return nullptr if result is 1, otherwise m/v^e.
+         */
+		Monomial* dropVariable(Variable::Arg v) const
+		{
+			Monomial* m = new Monomial();
+			m->mExponents.reserve(mExponents.size()-1);
+			m->mTotalDegree = mTotalDegree;
+			
+			for(const VarExpPair& ve : mExponents)
+			{
+				if(ve.var == v)
+				{
+					m->mTotalDegree -= ve.exp;
+				}
+				else
+				{
+					m->mExponents.emplace_back(ve);
+				}
+			}
+			if(m->mTotalDegree == 0) 
+			{
+				delete m;
+				return nullptr;
+			}
+			return m;
+		}
 
         Monomial* dividedBy(Variable::Arg v) const
         {

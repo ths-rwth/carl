@@ -27,6 +27,7 @@ class MultivariatePolynomial
 public:
 	typedef Ordering OrderedBy;
 	typedef Term<Coeff> TermType;
+	typedef Monomial MonomType;
 	typedef Coeff CoeffType;
 protected:
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;

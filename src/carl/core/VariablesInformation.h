@@ -11,6 +11,7 @@
 #include "VarExpPair.h"
 #include "VariableInformation.h"
 
+
 namespace carl
 {
 
@@ -28,7 +29,7 @@ class VariablesInformation
 	 * @param monomial The monomial part of t.
      */
 	template<typename TermCoeff>
-	void variableInTerm(const VarExpPair& ve, const TermCoeff& termCoeff, const Monomial& monomial)
+	void variableInTerm(const VarExpPair& ve, const TermCoeff& termCoeff, const typename CoeffType::MonomType& monomial)
 	{
 		auto it = mVariableInfo.find(ve.var);
 		// Variable did not occur before.
@@ -52,11 +53,35 @@ class VariablesInformation
 		}
 		if(collectCoeff)
 		{
-			it->second.updateCoeff();
+			typename CoeffType::MonomType* m = monomial.dropVariable(ve.var);
+			if(m == nullptr)
+			{
+				it->second.updateCoeff(ve.exp, typename CoeffType::TermType(termCoeff));
+			}
+			else
+			{
+				it->second.updateCoeff(ve.exp, typename CoeffType::TermType(termCoeff, m));
+			}
 		}
 	}
 	
+	const VariableInformation<collectCoeff, CoeffType>* getVarInfo(Variable::Arg v) const
+	{
+		auto it = mVariableInfo.find(v);
+		// Variable did not occur before.
+		if(it == mVariableInfo.end())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return &(it->second);
+		}
+	}
 	
-
+	bool occurs(Variable::Arg v) const
+	{
+		return mVariableInfo.count(v) > 0;
+	}
 };
 }

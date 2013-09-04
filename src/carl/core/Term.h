@@ -7,7 +7,7 @@
 
 #include <memory>
 #include "Monomial.h"
-#include "VariableInformation.h"
+#include "VariablesInformation.h"
 
 namespace carl
 {
