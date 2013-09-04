@@ -7,6 +7,7 @@
 
 #include <memory>
 #include "Monomial.h"
+#include "VariableInformation.h"
 
 namespace carl
 {
@@ -133,6 +134,9 @@ class Term
 		
 		Term* substitute(const std::map<Variable, Coefficient>& substitutions) const;
 		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
+		
+		template<bool gatherCoeff, typename CoeffType>
+		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
 		
 		void gatherVariables(std::set<Variable>& variables) const
 		{

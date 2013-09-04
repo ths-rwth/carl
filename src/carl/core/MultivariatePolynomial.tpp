@@ -413,6 +413,22 @@ unsigned MultivariatePolynomial<Coeff,Ordering,Policy>::hash() const
 }
 
 
+template<typename Coeff, typename Ordering, typename Policy>
+template<bool gatherCoeff>
+VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policy>> MultivariatePolynomial<Coeff,Ordering,Policy>::getVarInfo() const
+{
+	VariablesInformation<gatherCoeff, MultivariatePolynomial> varinfomap;
+	// We iterate over all terms.
+	for(std::shared_ptr<const TermType> term : mTerms)
+	{
+		// And gather information from the terms and meanwhile up
+		term->gatherVarInfo(varinfomap);
+	}
+	return varinfomap;
+	
+}
+
+
 
 template<typename C, typename O, typename P>
 bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)

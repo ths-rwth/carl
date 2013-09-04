@@ -8,8 +8,9 @@
 #include <memory>
 #include <vector>
 
-#include "MultivariatePolynomialPolicy.h"
 #include "Term.h"
+#include "MultivariatePolynomialPolicy.h"
+#include "VariableInformation.h"
 
 namespace carl
 {
@@ -29,7 +30,8 @@ public:
 	typedef Coeff CoeffType;
 protected:
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
-
+	template <bool gatherCoeff>
+	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
 	/// A vector of all monomials
 	TermsType mTerms;
@@ -163,7 +165,14 @@ public:
 	std::string toString(bool infix=true) const;
 	
 	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
+	
+	template<bool gatherCoeff>
+	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(Variable::Arg v) const;
 
+	template<bool gatherCoeff>
+	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
+
+	
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>

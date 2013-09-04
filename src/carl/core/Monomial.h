@@ -10,6 +10,7 @@
 #include "Variable.h"
 #include "CompareResult.h"
 #include "VarExpPair.h"
+#include "VariablesInformation.h"
 #include "logging.h"
 
 namespace carl
@@ -338,6 +339,16 @@ namespace carl
             }
 			assert(result->validate());
 			return result;
+		}
+		
+		
+		template<typename Coeff, bool gatherCoeff, typename CoeffType>
+		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
+		{
+			for( const VarExpPair& ve : mExponents )
+			{
+				varinfo.variableInTerm(ve, coeffFromTerm, *this);
+			}
 		}
 		
 		/**

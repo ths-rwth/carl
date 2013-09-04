@@ -255,6 +255,21 @@ TEST(MultivariatePolynomial, Derivative)
     ASSERT_EQ(f1.derivative(x).derivative(y), f1.derivative(y).derivative(x));
 }
 
+TEST(MultivariatePolynomial, varInfo)
+{
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    vpool.setVariableName(y, "y");
+    Variable z = vpool.getFreshVariable();
+    vpool.setVariableName(z, "z");
+    
+    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
+    
+    f1.getVarInfo<false>();
+}
+
 
 TEST(MultivariatePolynomial, hasVar)
 {

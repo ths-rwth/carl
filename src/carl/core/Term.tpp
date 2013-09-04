@@ -150,11 +150,31 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coeffic
 	return mMonomial->substitute<Coefficient>(substitutions, coeff());
 }
 
+template<typename Coefficient>
+Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Term<Coefficient>>& substitutions) const
+{
+	//return mMonomial->substitute<Coefficient>(substitutions, coeff());
+}
+
 
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 {
 	return Term(1, monomial()->calcLcmAndDivideBy(m));
+}
+
+template<typename Coefficient>
+template<bool gatherCoeff, typename CoeffType>
+void Term<Coefficient>::gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const
+{
+	if(mMonomial)
+	{
+		mMonomial->gatherVarInfo(varinfo, coeff());
+	}
+	else
+	{
+		// No change in varinfo.
+	}
 }
 
 

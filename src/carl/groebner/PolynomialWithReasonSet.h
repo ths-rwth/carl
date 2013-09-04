@@ -13,19 +13,19 @@
 
 namespace carl
 {
-template<typename Coeff, typename Policy=StdMultivariatePolynomialPolicy>
-class PolynomialWithReasonSet : public MultivariatePolynomial<Coeff, Policy>
+template<typename Coeff, typename Ordering = GrLexOrdering, typename Policy=StdMultivariatePolynomialPolicy>
+class PolynomialWithReasonSet : public MultivariatePolynomial<Coeff, Ordering, Policy>
 {
     BitVector reasonSet;
     public:
 	
-	PolynomialWithReasonSet() : MultivariatePolynomial<Coeff, Policy>()
+	PolynomialWithReasonSet() : MultivariatePolynomial<Coeff,Ordering,Policy>()
 	{}
-	PolynomialWithReasonSet(const MultivariatePolynomial<Coeff, Policy>& p) : MultivariatePolynomial<Coeff, Policy>(p)
+	PolynomialWithReasonSet(const MultivariatePolynomial<Coeff,Ordering,Policy>& p) : MultivariatePolynomial<Coeff,Ordering,Policy>(p)
 	{}
 	
 	template<typename InputIterator>
-	PolynomialWithReasonSet(InputIterator begin, InputIterator end) : MultivariatePolynomial<Coeff, Policy>(begin, end)
+	PolynomialWithReasonSet(InputIterator begin, InputIterator end) : MultivariatePolynomial<Coeff,Ordering, Policy>(begin, end)
 	{}
 		
 		

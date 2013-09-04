@@ -28,7 +28,7 @@ public:
 
 	static CompareResult compare(Entry e1, Entry e2)
 	{
-		return Polynomial::Ordering::compare(e1->getLead(), e2->getLead());
+		return Polynomial::OrderedBy::compare(e1->getLead(), e2->getLead());
 	}
 
 	static bool cmpLessThan(CompareResult res)
@@ -76,7 +76,7 @@ class Reductor
 	static_assert(std::is_base_of<InputPolynomial, PolynomialInIdeal>::value,
 				  "Ideal and polynomial to be reduced are incompatible");
 protected:
-	typedef typename InputPolynomial::Ordering Order;
+	typedef typename InputPolynomial::OrderedBy Order;
 	typedef typename Configuration<InputPolynomial>::EntryType EntryType;
 	typedef typename InputPolynomial::CoeffType Coeff;
 public:
@@ -188,7 +188,7 @@ public:
 			// no operation.
 		}
 		// TODO check whether this is sorted.
-		return InputPolynomial(mRemainder.begin(), mRemainder.end());
+		return InputPolynomial(mRemainder.begin(), mRemainder.end(), false, false);
 	}
 private:
 
