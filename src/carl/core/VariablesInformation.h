@@ -35,7 +35,9 @@ class VariablesInformation
 		// Variable did not occur before.
 		if(it == mVariableInfo.end())
 		{
-			it = mVariableInfo.emplace(ve.var, VariableInformation<collectCoeff, CoeffType>(ve.exp)).first;
+			// TODO GCC 4.7 does not support the (faster) emplace on maps
+			//it = mVariableInfo.emplace(ve.var, VariableInformation<collectCoeff, CoeffType>(ve.exp)).first;
+			it = mVariableInfo.insert(std::make_pair(ve.var, VariableInformation<collectCoeff, CoeffType>(ve.exp))).first;
 		}
 		else
 		{
