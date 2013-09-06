@@ -30,6 +30,8 @@ set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+# for cmake 2.8.7 
+include(FindPackageHandleStandardArgs) 
 
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options
