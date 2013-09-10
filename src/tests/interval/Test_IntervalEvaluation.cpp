@@ -9,36 +9,6 @@ using namespace carl;
 
 TEST(IntervalEvaluation, Monomial)
 {
-    DoubleInterval i0  = DoubleInterval( 0.0, DoubleInterval::STRICT_BOUND, 0.0, DoubleInterval::STRICT_BOUND );
-    DoubleInterval i1  = DoubleInterval();
-    DoubleInterval i2  = DoubleInterval( 0.0, DoubleInterval::INFINITY_BOUND, 0.0, DoubleInterval::INFINITY_BOUND );
-    DoubleInterval i3  = DoubleInterval( 0.0, DoubleInterval::INFINITY_BOUND, 10.0, DoubleInterval::WEAK_BOUND );
-
-    DoubleInterval a0  = DoubleInterval( -2, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval a1  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval a2  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND );
-    DoubleInterval a3  = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND );
-    DoubleInterval a4  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, -1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval a5  = DoubleInterval( -2, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval a6  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-    DoubleInterval a7  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-    DoubleInterval a8  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-
-    DoubleInterval b0  = DoubleInterval( -2, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b1  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 2, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b2  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, -1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b3  = DoubleInterval( 1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-
-    DoubleInterval b4  = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b5  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 0, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b6  = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b7  = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b8  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 0, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b9  = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::WEAK_BOUND );
-    DoubleInterval b10 = DoubleInterval( -1, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-    DoubleInterval b11 = DoubleInterval( 0, DoubleInterval::WEAK_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-    DoubleInterval b12 = DoubleInterval( -1, DoubleInterval::INFINITY_BOUND, 1, DoubleInterval::INFINITY_BOUND );
-
     DoubleInterval ia = DoubleInterval( 1, 4 );
     DoubleInterval ib = DoubleInterval( 2, 5 );
     DoubleInterval ic = DoubleInterval( -2, 3 );
