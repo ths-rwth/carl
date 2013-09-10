@@ -347,14 +347,12 @@ public:
 	template <typename C, typename O, typename P>
 	friend std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs);
 
-	template<typename C, typename O, typename P>
-	static bool compareByLeadingTerm(const MultivariatePolynomial<C,O,P>& p1, const MultivariatePolynomial<C,O,P>& p2)
+	static bool compareByLeadingTerm(const MultivariatePolynomial& p1, const MultivariatePolynomial& p2)
 	{
 		return Ordering::less(p1.lterm(), p2.lterm());
 	}
 
-	template<typename C, typename O, typename P>
-	static bool compareByNrTerms(const MultivariatePolynomial<C,O,P>& p1, const MultivariatePolynomial<C,O,P>& p2)
+	static bool compareByNrTerms(const MultivariatePolynomial& p1, const MultivariatePolynomial& p2)
 	{
 		return (p1.nrOfTerms() < p2.nrOfTerms());
 	}
