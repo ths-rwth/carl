@@ -33,7 +33,7 @@
 
 #include "../Ideal.h"
 #include "../Reductor.h"
-#include "../RealRadicalAwareAdding.h"
+#include "../GBUpdateProcedures.h"
 #include "CriticalPairs.h"
 
 //#include "BuchbergerStats.h"
@@ -112,8 +112,6 @@ protected:
 	void removeBuchbergerTriples(std::unordered_map<size_t, SPolPair>& spairs, std::vector<size_t>& primelist);
 
 	void reduce();
-
-
 };
 
 }

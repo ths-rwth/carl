@@ -26,88 +26,6 @@
 namespace carl
 {
 //
-//template< typename Order, typename BuchbergerSettings>
-//Buchberger<Order, BuchbergerSettings>::Buchberger( const MultivariateIdeal<Order>& i ) :
-//    mOrigGenerators( i.getGenerators( ) ) 
-//#ifdef BUCHBERGER_STATISTICS
-//    , mStats( BuchbergerStats::getInstance( ) )
-//#endif
-//{
-//    for( size_t k = 0; k < mOrigGenerators.size( ); ++k )
-//    {
-//        mOrigGenerators[k].setOrigins( k );
-//    }
-//    for( auto it = mOrigGenerators.begin( ); it != mOrigGenerators.end( ); ++it )
-//    {
-//        mInputScheduled.push_back( *it );
-//    }
-//}
-//
-///**
-// * Add a polynomial to the set of generators.
-// * @param pol
-// */
-//template< typename Order, typename BuchbergerSettings>
-//void Buchberger<Order, BuchbergerSettings>::addPolynomial( const Polynomial& pol, bool setOrigins )
-//{
-//    mInputScheduled.push_back( pol );
-//    if( setOrigins )
-//    {
-//        mOrigGenerators.push_back( pol );
-//        mOrigGenerators.back( ).setOrigins( mOrigGenerators.size( ) - 1 );
-//        mInputScheduled.back( ).setOrigins( mOrigGenerators.size( ) - 1 );
-//    }
-//}
-//
-///**
-// * Add a polynomial to the set of generators.
-// * @param pol
-// */
-//template< typename Order, typename BuchbergerSettings>
-//void Buchberger<Order, BuchbergerSettings>::addPolynomial( const Polynomial& pol, size_t originIndex )
-//{
-//    mInputScheduled.push_back( pol );
-//    mInputScheduled.back( ).setOrigins(originIndex);
-//}
-//
-///**
-// * Use the input to reduce other scheduled polynomials.
-// */
-//template< typename Order, typename BuchbergerSettings>
-//std::list<std::pair<BitVector, BitVector> > Buchberger<Order, BuchbergerSettings>::reduceInput( )
-//{
-//    std::vector<Polynomial> toBeReduced;
-//    //We only schedule "new" input for reduction
-//    for( typename std::list<Polynomial>::const_iterator it = mInputScheduled.begin( ); it != mInputScheduled.end( ); ++it )
-//    {
-//        toBeReduced.push_back( *it );
-//    }
-//    sort( toBeReduced.begin( ), toBeReduced.end( ), Polynomial::sortByLeadingTerm );
-//
-//    // We reduce with the whole ideal
-//    Ideal reduced;
-//    reduced = mGb;
-//
-//    std::list<std::pair<BitVector, BitVector> > result;
-//    // We want to return deductions, that is done by return the bitvector together with the bitvector which represents the original.
-//    for( typename std::vector<Polynomial>::const_iterator index = toBeReduced.begin( ); index != toBeReduced.end( ); ++index )
-//    {
-//        Reductor reduct( reduced, *index );
-//        Polynomial res = reduct.fullReduce( );
-//        if( res.isZero( ) )
-//        {
-//            result.push_back( std::pair<BitVector, BitVector>(index->getOrigins().getBitVector(), res.getOrigins( ).getBitVector( ) ) );
-//        }
-//        else // ( !res.isZero( ) )
-//        {
-//            reduced.addGenerator( res.normalized( ) );
-//        }
-//    }
-//
-//    mInputScheduled.assign( reduced.getGenerators( ).begin( ), reduced.getGenerators( ).end( ) );
-//    return result;
-//}
-//
 ///**
 // * Calculate the Groebner basis
 // * @return An ideal object with generators which equal the Groebner basis.
@@ -321,9 +239,4 @@ void Buchberger<Polynomial, AddingPolicy>::removeBuchbergerTriples(std::unordere
 		}
 	}
 }
-//
-
-//
-//
-//
 }

@@ -68,6 +68,7 @@ public:
                 mDivList.erase(it);
                 continue;
             }
+			
             Term<typename Polynomial::CoeffType>* divres = t.dividedBy(*mGenerators[*it].lterm());
 			
             //Division succeeded, so we have found a divisor;

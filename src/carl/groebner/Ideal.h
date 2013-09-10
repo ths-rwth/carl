@@ -47,11 +47,23 @@ public:
         addGenerator(p1);
         addGenerator(p2);
     }
+	
+	
 
     virtual ~Ideal()
     {
 
     }
+	
+	Ideal(const Ideal& rhs) : 
+	mGenerators(rhs.mGenerators.begin(), rhs.mGenerators.end()), 
+    mTermOrder(mGenerators), 
+    mEliminated(rhs.mEliminated), 
+    mDivisorLookup(mGenerators, mEliminated, mTermOrder)
+	{
+		removeEliminated();
+		mDivisorLookup.reset();
+	}
 
     Ideal& operator=(const Ideal& rhs)
     {
