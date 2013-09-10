@@ -354,7 +354,7 @@ public:
 
 	static bool compareByNrTerms(const MultivariatePolynomial& p1, const MultivariatePolynomial& p2)
 	{
-		return (p1.nrOfTerms() < p2.nrOfTerms());
+		return (p1.nrTerms() < p2.nrTerms());
 	}
 
 	
