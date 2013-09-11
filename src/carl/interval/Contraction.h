@@ -29,9 +29,9 @@ namespace carl {
             typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
             if( it == mDerivatives.end() )
             {
-                it = mDerivatives.emplace(variable, mConstraint.derivative(variable));
+                it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
             }
-            return contract(intervals, variable, mConstraint, (*it).second, resA, resB);
+            return Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB);
         }
     };
 
@@ -48,8 +48,8 @@ namespace carl {
             substitutedIntervalMap[variable] = centerInterval;
 
             // Create Newton Operator
-            DoubleInterval numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap, true);
-            DoubleInterval denominator = IntervalEvaluation::evaluate(derivative, intervals, true);
+            DoubleInterval numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
+            DoubleInterval denominator = IntervalEvaluation::evaluate(derivative, intervals);
             DoubleInterval result1, result2;
 
             bool split = numerator.div_ext(result1, result2, denominator);

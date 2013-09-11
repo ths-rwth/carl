@@ -65,12 +65,19 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const s
 template<typename Coeff, typename Policy>
 inline DoubleInterval IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>& map)
 {
-	DoubleInterval result(0);
-	for(size_t i = 0; i < p.nrTerms(); ++i)
+    if(p.isZero())
+    {
+        return DoubleInterval(0);
+    }
+    else
+    {
+	DoubleInterval result(evaluate(*p[0], map)); 
+	for(size_t i = 1; i < p.nrTerms(); ++i)
 	{
 		result += evaluate(*p[i], map);
-	}	
-	return result;
+	}
+        return result;
+    }
 }
 
 

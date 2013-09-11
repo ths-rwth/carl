@@ -434,7 +434,7 @@ public:
 
 	// unary arithmetic operators of DoubleInterval
 	const DoubleInterval operator -(const DoubleInterval& lh) const;
-	friend std::ostream& operator <<(std::ostream& str, const DoubleInterval&);
+	friend std::ostream& operator<<(std::ostream& str, const DoubleInterval&);
 
 
 private:
@@ -503,8 +503,8 @@ double DoubleInterval::roundDown(const Rational& o, bool overapproximate)
 	if(result == -INFINITY) return result;
 	if(result == INFINITY) return DBL_MAX;
 	// If the cln::cl_RA cannot be represented exactly by a double, round.
-	Rational r = rationalize<Rational>(result);
-	if(overapproximate || r != o)
+//	Rational r = rationalize<Rational>(result);
+	if(overapproximate || rationalize<Rational>(result) != o)
 	{
 		if(result == -DBL_MAX) return -INFINITY;
 		return std::nextafter(result, -INFINITY);
@@ -522,8 +522,8 @@ double DoubleInterval::roundUp(const Rational& o, bool overapproximate)
 	if(result == INFINITY) return result;
 	if(result == -INFINITY) return -DBL_MAX;
 	// If the cln::cl_RA cannot be represented exactly by a double, round.
-	Rational r = rationalize<Rational>(result);
-	if(overapproximate || r != o)
+//	Rational r = rationalize<Rational>(result);
+	if(overapproximate || rationalize<Rational>(result) != o)
 	{
 		if(result == DBL_MAX) return INFINITY;
 		return std::nextafter(result, INFINITY);

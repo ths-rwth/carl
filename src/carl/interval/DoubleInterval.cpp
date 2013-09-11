@@ -726,7 +726,7 @@ namespace carl
         switch( mLeftType )
         {
             case INFINITY_BOUND:
-                return o.mLeftType != INFINITY_BOUND;
+                return o.mLeftType == INFINITY_BOUND;
             default:
                 return (left() <= o.left() );
         }
@@ -741,10 +741,10 @@ namespace carl
          *  -------------]----[------------ holds.
          */
         // only compare right bounds
-        switch( mLeftType )
+        switch( mRightType )
         {
             case INFINITY_BOUND:
-                return o.mLeftType != INFINITY_BOUND;
+                return o.mRightType == INFINITY_BOUND;
             default:
                 return (right() >= o.right() );
         }
