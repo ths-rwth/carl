@@ -1,7 +1,9 @@
 set(carl_lib_interval_headers 
-	DoubleInterval.h
+        Contraction.h	
+        DoubleInterval.h
 	IntervalEvaluation.h
-        Contraction.h
+        PointIntervalFactory.h
+        
 ) 
 # Source files in here
 set(carl_lib_interval_sources 
