@@ -29,7 +29,7 @@ template<typename Rational> class PointIntervalFactory
         ~PointIntervalFactory();
         
         
-        DoubleInterval* getPointInterval(const Rational& _rat)
+        const DoubleInterval& getPointInterval(const Rational& _rat)
         {
             if(mIntervals.count(_rat) > 0)
             {
@@ -38,14 +38,14 @@ template<typename Rational> class PointIntervalFactory
             else
             {
                 // create PointInterval without overapproximation
-                return *mIntervals.emplace(_rat,DoubleInterval(_rat,false)).first;
+                return mIntervals.emplace(_rat,DoubleInterval(_rat,false)).first;
             }
         }
         
     private:
         void init()
         {
-            mIntervals.emplace(Rational(1), DoubleInterval(Rational(1), false));
+            mIntervals.emplace((Rational) 1, DoubleInterval((Rational) 1, false));
         }
 };
 
