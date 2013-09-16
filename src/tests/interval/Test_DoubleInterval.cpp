@@ -474,7 +474,7 @@ TEST(DoubleInterval, Multiplication)
 }
 
 
-TEST(DoubleInterval, Division)
+TEST(DoubleInterval, ExtendedDivision)
 {
 
     DoubleInterval a0  = DoubleInterval( -2, DoubleInterval::WEAK_BOUND, -1, DoubleInterval::WEAK_BOUND );
@@ -761,4 +761,63 @@ TEST(DoubleInterval, Division)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a8.div_ext( result1, result2, b12 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
+}
+
+
+TEST(DoubleInterval, Intersection)
+{
+    DoubleInterval a1(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND);
+    
+    DoubleInterval b01(2,DoubleInterval::WEAK_BOUND,3,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b02(1,DoubleInterval::WEAK_BOUND,3,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b03(0,DoubleInterval::WEAK_BOUND,3,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b04(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b05(-2,DoubleInterval::WEAK_BOUND,0,DoubleInterval::WEAK_BOUND);
+    
+    DoubleInterval b06(-2,DoubleInterval::WEAK_BOUND,-1,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b07(-3,DoubleInterval::WEAK_BOUND,-2,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b08(-1,DoubleInterval::WEAK_BOUND,-1,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b09(1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b10(0,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND);
+    
+    DoubleInterval b11(-1,DoubleInterval::WEAK_BOUND,0,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b12(-0.5,DoubleInterval::WEAK_BOUND,0.5,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b13(-2,DoubleInterval::WEAK_BOUND,2,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b14(0,DoubleInterval::STRICT_BOUND,0,DoubleInterval::STRICT_BOUND);
+    DoubleInterval b15(-1,DoubleInterval::INFINITY_BOUND,1,DoubleInterval::INFINITY_BOUND);
+    
+    DoubleInterval b16(-1,DoubleInterval::INFINITY_BOUND,-1,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b17(-1,DoubleInterval::INFINITY_BOUND,0,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b18(-1,DoubleInterval::INFINITY_BOUND,1,DoubleInterval::WEAK_BOUND);
+    DoubleInterval b19(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::INFINITY_BOUND);
+    DoubleInterval b20(0,DoubleInterval::WEAK_BOUND,1,DoubleInterval::INFINITY_BOUND);
+    
+    DoubleInterval b21(1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::INFINITY_BOUND);
+    
+    
+    EXPECT_EQ(DoubleInterval::emptyInterval(), a1.intersect(b01));
+    EXPECT_EQ(DoubleInterval(1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b02));
+    EXPECT_EQ(DoubleInterval(0,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b03));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b04));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,0,DoubleInterval::WEAK_BOUND), a1.intersect(b05));
+    
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,-1,DoubleInterval::WEAK_BOUND), a1.intersect(b06));
+    EXPECT_EQ(DoubleInterval::emptyInterval(), a1.intersect(b07));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,-1,DoubleInterval::WEAK_BOUND), a1.intersect(b08));
+    EXPECT_EQ(DoubleInterval(1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b09));
+    EXPECT_EQ(DoubleInterval(0,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b10));
+    
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,0,DoubleInterval::WEAK_BOUND), a1.intersect(b11));
+    EXPECT_EQ(DoubleInterval(-0.5,DoubleInterval::WEAK_BOUND,0.5,DoubleInterval::WEAK_BOUND), a1.intersect(b12));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b13));
+    EXPECT_EQ(DoubleInterval::emptyInterval(), a1.intersect(b14));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b15));
+    
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,-1,DoubleInterval::WEAK_BOUND), a1.intersect(b16));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,0,DoubleInterval::WEAK_BOUND), a1.intersect(b17));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b18));
+    EXPECT_EQ(DoubleInterval(-1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b19));
+    EXPECT_EQ(DoubleInterval(0,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b20));
+    
+    EXPECT_EQ(DoubleInterval(1,DoubleInterval::WEAK_BOUND,1,DoubleInterval::WEAK_BOUND), a1.intersect(b21));
 }
