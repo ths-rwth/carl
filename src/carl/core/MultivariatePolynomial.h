@@ -21,16 +21,19 @@ class UnivariatePolynomial;
 /**
  *  The general-purpose multivariate polynomial class.
  */
-template<typename Coeff, typename Ordering = GrLexOrdering, typename Policy = StdMultivariatePolynomialPolicy>
-class MultivariatePolynomial
+template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
+class MultivariatePolynomial : public Policies
 {
 public:
+	/// The ordering of the terms.
 	typedef Ordering OrderedBy;
 	typedef Term<Coeff> TermType;
 	typedef Monomial MonomType;
 	typedef Coeff CoeffType;
+	typedef Policies Policy;
 protected:
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
+	
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
@@ -46,6 +49,8 @@ public:
 	explicit MultivariatePolynomial(std::shared_ptr<const Term<Coeff >> t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
+	template<class OtherPolicy>
+	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicy>&);
 	template<typename InputIterator>
 	MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);

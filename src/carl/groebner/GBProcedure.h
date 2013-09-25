@@ -95,7 +95,7 @@ public:
 
 		for(typename std::vector<Polynomial>::const_iterator index = toBeReduced.begin(); index != toBeReduced.end(); ++index)
 		{
-			Reductor<Polynomial, Polynomial, void> reduct(reduced, *index);
+			Reductor<Polynomial, Polynomial> reduct(reduced, *index);
 			Polynomial res = reduct.fullReduce();
 			if(res.isZero())
 			{
@@ -145,7 +145,7 @@ private:
 		Ideal<Polynomial>* reduced = new Ideal<Polynomial>();
 		for(std::vector<size_t>::const_iterator index = toBeReduced.begin(); index != toBeReduced.end(); ++index)
 		{
-			Reductor<Polynomial, Polynomial, void> reduct(*reduced, mGb->getGenerator(*index));
+			Reductor<Polynomial, Polynomial> reduct(*reduced, mGb->getGenerator(*index));
 			Polynomial res = reduct.fullReduce().normalize();
 			LOGMSG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);
 			reduced->addGenerator(res);
