@@ -6,6 +6,7 @@
 #pragma once
 #include <algorithm>
 #include <list>
+#include <set>
 
 #include "Variable.h"
 #include "CompareResult.h"
