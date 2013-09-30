@@ -15,13 +15,21 @@
 namespace carl
 {
 
+class VariablesInformationInterface
+{
+	virtual bool hasCoeff() const = 0;
+};
+
 template<bool collectCoeff, typename CoeffType>
-class VariablesInformation
+class VariablesInformation : public VariablesInformationInterface
 {
 	std::map<Variable, VariableInformation<collectCoeff, CoeffType>> mVariableInfo;
 	
-	public:
-	
+public:
+	bool hasCoeff() const override
+	{
+		return collectCoeff;
+	}
 	/**
 	 * Updates the Variable informations based on the assumption that this method is called with according parameters
      * @param ve A variable-exponent pair occuring in a term t.
