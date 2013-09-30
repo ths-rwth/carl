@@ -45,6 +45,17 @@ class UnivariatePolynomial
 	
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	
+	//friend bool operator==(const UnivariatePolynomial& lhs, const UnivariatePolynomial& rhs);
+	
+	UnivariatePolynomial& operator+=(const Coefficient& rhs);
+	/**
+	 * 
+     * @param rhs A univariate polynomial over the same variable.
+     * @return 
+     */
+	UnivariatePolynomial& operator+=(const UnivariatePolynomial& rhs);
+	
+	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
 

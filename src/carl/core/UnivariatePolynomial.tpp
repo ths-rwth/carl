@@ -43,6 +43,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 	}
 }
 
+
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth ) const
 {
@@ -133,9 +134,51 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePol
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
-	std::cout << "a: " << a << ", b: " << b << std::endl;
 	if(b.isZero()) return a;
 	else return gcd_recursive(b, a.reduce(b));
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
+{
+	if(rhs == (Coeff)0) return *this;
+	if(mCoefficients.empty())
+	{
+		// Adding non-zero rhs to zero.
+		mCoefficients.resize(1, rhs);
+	}
+	else
+	{
+		mCoefficients.front() += rhs;
+		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coeff)0) 
+		{
+			// Result is zero.
+			mCoefficients.clear();
+		}
+	}
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
+{
+	assert(mMainVar == rhs.mMainVar);
+	if(degree() < rhs.degree())
+	{
+		for(unsigned i = 0; i < degree(); ++i)
+		{
+			mCoefficients[i] += rhs.mCoefficients[i];
+		}
+		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - (rhs.degree() - degree()), rhs.mCoefficients.end());
+	}
+	else
+	{
+		for(unsigned i = 0; i < rhs.degree(); ++i)
+		{
+			mCoefficients[i] += rhs.mCoefficients[i];
+		}
+	}
+	return *this;
 }
 
 
@@ -144,7 +187,7 @@ template<typename C>
 std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 {
 	if(rhs.isZero()) return os << "0";
-	for(size_t i = 0; i < rhs.mCoefficients.size()-1; i++ )
+	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		os << "(" << rhs.mCoefficients[rhs.mCoefficients.size()-i-1] << ")*" << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
 	}
