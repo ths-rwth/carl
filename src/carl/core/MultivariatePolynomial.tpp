@@ -264,6 +264,33 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const
+{
+	// A constant polynomial is obviously univariate.
+	if(isConstant()) return true;
+	
+	Variable v(0);
+	// If the leading term is nonlinear, than there are several variables involved.
+	if(lterm()->isLinear())
+	{
+		//As the monomials are ordered, a leading term is non-constant in a non-constant polynomial,
+		//and thus, we can be sure that the variable actually exists.
+		v = lterm()->getSingleVariable();
+	}
+	else
+	{
+		return false;
+	}
+	
+	for(const std::shared_ptr<const Term<Coeff>>& term : mTerms)
+	{
+		if(!term->hasNoOtherVariable(v)) return false;
+	}
+	return true;
+}
+
+
+template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
 {
 	// A polynomial is a tsos if it is the sum of squares in its standard representation.
@@ -277,7 +304,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() const
 {
-    //LOG_NOTIMPLEMENTED();
+    LOG_NOTIMPLEMENTED();
     return false;
 }
 

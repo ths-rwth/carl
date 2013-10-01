@@ -78,11 +78,36 @@ class Term
             if(!mMonomial) return true;
             return mMonomial->isLinear();
         }
+		/**
+		 * 
+         * @return 
+         */
         size_t getNrVariables() const
         {
             if(!mMonomial) return 0;
             return mMonomial->nrVariables();
         }
+		
+		/**
+		 * Checks if the monomial is either a constant or the only variable occuring is the variable v.
+         * @param v The variable which may occur.
+         * @return true if no variable occurs, or just v occurs. 
+         */
+		bool hasNoOtherVariable(Variable::Arg v) const
+		{
+			if(!mMonomial) return true;
+			return mMonomial->hasNoOtherVariable(v);
+		}
+		
+		/**
+		 * For terms with exactly one variable, get this variable.
+         * @return The only variable occuring in the term.
+         */
+		Variable::Arg getSingleVariable() const
+		{
+			assert(getNrVariables() == 1);
+			return mMonomial->getSingleVariable();
+		}
 		
 		/**
 		 * Is square.

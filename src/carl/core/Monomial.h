@@ -117,6 +117,29 @@ namespace carl
             return mExponents.size();
         }
 
+		Variable::Arg getSingleVariable() const
+		{
+			assert(mExponents.size() == 1);
+			return mExponents.front().var;
+		}
+		
+		bool hasNoOtherVariable(Variable::Arg v) const
+		{
+			if(mExponents.size() == 1)
+			{
+				if(mExponents.front().var == v) return true;
+				return false;
+			}
+			else if(mExponents.size() == 0) 
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
 		const VarExpPair& operator[](int index) const
 		{
 			assert(index < (int)mExponents.size());

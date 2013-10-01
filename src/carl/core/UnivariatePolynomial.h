@@ -7,27 +7,57 @@
 #include <map>
 
 #include "Variable.h"
+#include "VariableInformation.h"
+#include "Polynomial.h"
 
 namespace carl
 {
 template<typename Coefficient>
-class UnivariatePolynomial
+class UnivariatePolynomial : public Polynomial
 {
 	public:
 	UnivariatePolynomial(Variable::Arg mainVar);	
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
+	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
+	
+	//Polynomial interface implementations.
+	/**
+	 * @see class Polynomial
+     * @return 
+     */
+	virtual bool isUnivariateRepresented() const override
+	{
+		return true;
+	}
+	/**
+	 * @see class Polynomial
+     * @return 
+     */
+	virtual bool isMultivariateRepresented() const override
+	{
+		return false;
+	}
+	
 	
 	bool isZero() const
 	{
 		return mCoefficients.size() == 0;
 	}
 	
+	/**
+	 * Checks whether the polynomial is constant with respect to the main variable.
+     * @return 
+     */
 	bool isConstant() const
 	{
 		return mCoefficients.size() <= 1;
 	}
 	
+	/**
+	 * Get the maximal exponent of the main variable.
+     * @return 
+     */
 	unsigned degree() const 
 	{
 		// todo add assertion that this is valid.

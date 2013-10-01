@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "Polynomial.h"
 #include "Term.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
@@ -22,7 +23,7 @@ class UnivariatePolynomial;
  *  The general-purpose multivariate polynomial class.
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
-class MultivariatePolynomial : public Policies
+class MultivariatePolynomial : public Polynomial, Policies
 {
 public:
 	/// The ordering of the terms.
@@ -55,6 +56,25 @@ public:
 	MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
+	
+	//Polynomial interface implementations.
+	/**
+	 * @see class Polynomial
+     * @return 
+     */
+	virtual bool isUnivariateRepresented() const override
+	{
+		return false;
+	}
+	/**
+	 * @see class Polynomial
+     * @return 
+     */
+	virtual bool isMultivariateRepresented() const override
+	{
+		return true;
+	}
+	
 	/**
 	 * The leading monomial
 	 * @return 
@@ -115,7 +135,12 @@ public:
 	 */
 	MultivariatePolynomial& stripLT();
 	
-	
+	/**
+	 * Checks whether only one variable occurs.
+     * @return 
+	 * Notice that it might be better to use the variable information if several pieces of information are requested.
+     */
+	bool isUnivariate() const;
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
