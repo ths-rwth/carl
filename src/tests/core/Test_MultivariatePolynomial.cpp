@@ -24,7 +24,8 @@ TEST(MultivariatePolynomial, Operators)
     MultivariatePolynomial<int> p0a(t0);
     MultivariatePolynomial<int> p0b(v0);
     EXPECT_EQ(p0a, p0b);
-    //TODO isUnivariate
+    
+    EXPECT_TRUE(p0a.isUnivariate());
 }
 
 TEST(MultivariatePolynomial, Addition)
@@ -268,32 +269,32 @@ TEST(MultivariatePolynomial, varInfo)
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
     
     VariablesInformation<false, MultivariatePolynomial<cln::cl_RA>> vi = f1.getVarInfo<false>();
-    EXPECT_EQ(3, vi.getVarInfo(x)->maxDegree);
-    EXPECT_EQ(1, vi.getVarInfo(x)->minDegree);
-    EXPECT_EQ(3, vi.getVarInfo(x)->occurence);
-    EXPECT_EQ(3, vi.getVarInfo(y)->maxDegree);
-    EXPECT_EQ(2, vi.getVarInfo(y)->minDegree);
-    EXPECT_EQ(2, vi.getVarInfo(y)->occurence);
+    EXPECT_EQ(3, vi.getVarInfo(x)->maxDegree());
+    EXPECT_EQ(1, vi.getVarInfo(x)->minDegree());
+    EXPECT_EQ(3, vi.getVarInfo(x)->occurence());
+    EXPECT_EQ(3, vi.getVarInfo(y)->maxDegree());
+    EXPECT_EQ(2, vi.getVarInfo(y)->minDegree());
+    EXPECT_EQ(2, vi.getVarInfo(y)->occurence());
     EXPECT_EQ(nullptr, vi.getVarInfo(z));
     
     MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)1*x*x*x*x*y*y, (cln::cl_RA)1*x*x*x*x*z*z ,(cln::cl_RA)-1*x*y, (cln::cl_RA)1*z});
     VariablesInformation<true, MultivariatePolynomial<cln::cl_RA>> vi2 = f2.getVarInfo<true>();
-    EXPECT_EQ(4, vi2.getVarInfo(x)->maxDegree);
-    EXPECT_EQ(1, vi2.getVarInfo(x)->minDegree);
-    EXPECT_EQ(3, vi2.getVarInfo(x)->occurence);
-    EXPECT_EQ(0, vi2.getVarInfo(x)->coeffs.count(0));
-    EXPECT_EQ(0, vi2.getVarInfo(x)->coeffs.count(2));
-    EXPECT_EQ(0, vi2.getVarInfo(x)->coeffs.count(3));
-    EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>({(cln::cl_RA)1*y*y, (cln::cl_RA)1*z*z}), vi2.getVarInfo(x)->coeffs.at(4)); 
-    EXPECT_EQ(2, vi2.getVarInfo(y)->maxDegree);
-    EXPECT_EQ(1, vi2.getVarInfo(y)->minDegree);
-    EXPECT_EQ(2, vi2.getVarInfo(y)->occurence);
-    EXPECT_EQ((cln::cl_RA)-1*x, vi2.getVarInfo(y)->coeffs.at(1)); 
-    EXPECT_EQ((cln::cl_RA)1*x*x*x*x, vi2.getVarInfo(y)->coeffs.at(2)); 
-    EXPECT_EQ(2, vi2.getVarInfo(z)->maxDegree);
-    EXPECT_EQ(1, vi2.getVarInfo(z)->minDegree);
-    EXPECT_EQ(2, vi2.getVarInfo(z)->occurence);
-    EXPECT_EQ((cln::cl_RA)1, vi2.getVarInfo(z)->coeffs.at(1));
+    EXPECT_EQ(4, vi2.getVarInfo(x)->maxDegree());
+    EXPECT_EQ(1, vi2.getVarInfo(x)->minDegree());
+    EXPECT_EQ(3, vi2.getVarInfo(x)->occurence());
+    EXPECT_EQ(0, vi2.getVarInfo(x)->coeffs().count(0));
+    EXPECT_EQ(0, vi2.getVarInfo(x)->coeffs().count(2));
+    EXPECT_EQ(0, vi2.getVarInfo(x)->coeffs().count(3));
+    EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>({(cln::cl_RA)1*y*y, (cln::cl_RA)1*z*z}), vi2.getVarInfo(x)->coeffs().at(4)); 
+    EXPECT_EQ(2, vi2.getVarInfo(y)->maxDegree());
+    EXPECT_EQ(1, vi2.getVarInfo(y)->minDegree());
+    EXPECT_EQ(2, vi2.getVarInfo(y)->occurence());
+    EXPECT_EQ((cln::cl_RA)-1*x, vi2.getVarInfo(y)->coeffs().at(1)); 
+    EXPECT_EQ((cln::cl_RA)1*x*x*x*x, vi2.getVarInfo(y)->coeffs().at(2)); 
+    EXPECT_EQ(2, vi2.getVarInfo(z)->maxDegree());
+    EXPECT_EQ(1, vi2.getVarInfo(z)->minDegree());
+    EXPECT_EQ(2, vi2.getVarInfo(z)->occurence());
+    EXPECT_EQ((cln::cl_RA)1, vi2.getVarInfo(z)->coeffs().at(1));
 }
 
 TEST(MultivariatePolynomial, cauchyBounds)

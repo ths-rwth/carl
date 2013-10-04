@@ -11,6 +11,36 @@
 
 namespace carl
 {
+	//
+	// Type traits.
+	// For type traits, we use the notation conventions of std, being lower cases with underscores.
+	//
+
+	/**
+	 * Type trait  is_field. 
+	 * Default is false, but certain types which encode algebraic fields should be set to true. 
+	 * @see UnivariatePolynomial - CauchyBound for example.
+	 */
+	template<typename type>
+	struct is_field
+	{
+		static const bool value = false;
+	};
+	
+	template<>
+	struct is_field<cln::cl_RA>
+	{
+		static const bool value = true;
+	};
+	
+	template<>
+	struct is_field<mpq_class>
+	{
+		static const bool value = true;
+	};
+	
+	
+	
 	template<typename RationalType>
 	struct IntegralT
 	{
