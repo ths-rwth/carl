@@ -6,9 +6,11 @@
 #pragma once
 #include <map>
 
+#include "numbers.h"
 #include "Variable.h"
 #include "VariableInformation.h"
 #include "Polynomial.h"
+
 
 namespace carl
 {
@@ -74,6 +76,19 @@ class UnivariatePolynomial : public Polynomial
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
+	
+	/**
+	 * Notice, Cauchy bounds are only defined for polynomials over fields.
+	 * 
+	 * This is 
+     * @return 
+     */
+	 Coefficient cauchyBound() const;
+	 Coefficient modifiedCauchyBound() const;
+	 
+	
+	
+	
 	
 	//friend bool operator==(const UnivariatePolynomial& lhs, const UnivariatePolynomial& rhs);
 	

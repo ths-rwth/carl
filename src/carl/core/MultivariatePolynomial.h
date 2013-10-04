@@ -109,7 +109,15 @@ public:
 	{
 		return mTerms.size();
 	}
+	/**
+	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
+     * @return 
+     */
 	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
+	/**
+	 * 
+     * @return 
+     */
 	bool hasConstantTerm() const;
 	
 	typename TermsType::const_iterator begin() const
@@ -177,6 +185,11 @@ public:
      * @return A new polynomial without the variables in map.
      */
 	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions);
+	/**
+	 * Replace all variables by a Term in which the variable does not occur.
+     * @param substitutions
+     * @return 
+     */
 	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions);
 	
 	/**
@@ -186,7 +199,12 @@ public:
 	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
 	
 	
-	
+	/**
+	 * Calculates the S-Polynomial.
+     * @param p
+     * @param q
+     * @return 
+     */
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	unsigned hash() const;

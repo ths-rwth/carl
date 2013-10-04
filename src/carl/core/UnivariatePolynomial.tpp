@@ -139,6 +139,30 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 }
 
 template<typename Coeff>
+Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
+{
+	// We could also use SFINAE, but this gives clearer error messages.
+	// Just in case, if we want to use SFINAE, the right statement would be
+	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
+	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
+	
+	
+}
+
+
+template<typename Coeff>
+Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
+{
+	// We could also use SFINAE, but this gives clearer error messages.
+	// Just in case, if we want to use SFINAE, the right statement would be
+	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
+	static_assert(is_field<Coeff>::value, "Modified Cauchy bounds are only defined for field-coefficients");
+	
+	
+}
+
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
 {
 	if(rhs == (Coeff)0) return *this;
