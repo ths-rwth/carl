@@ -77,6 +77,8 @@ class UnivariatePolynomial : public Polynomial
 	
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	
+	
+	
 	/**
 	 * Notice, Cauchy bounds are only defined for polynomials over fields.
 	 * 
@@ -86,20 +88,34 @@ class UnivariatePolynomial : public Polynomial
 	 Coefficient cauchyBound() const;
 	 Coefficient modifiedCauchyBound() const;
 	 
+	friend bool operator==(const UnivariatePolynomial& lhs, const UnivariatePolynomial& rhs);
+	friend bool operator!=(const UnivariatePolynomial& lhs, const UnivariatePolynomial& rhs);
 	
-	
-	
-	
-	//friend bool operator==(const UnivariatePolynomial& lhs, const UnivariatePolynomial& rhs);
 	
 	UnivariatePolynomial& operator+=(const Coefficient& rhs);
 	/**
-	 * 
-     * @param rhs A univariate polynomial over the same variable.
+	 * @param rhs A univariate polynomial over the same variable.
      * @return 
      */
 	UnivariatePolynomial& operator+=(const UnivariatePolynomial& rhs);
-	
+	UnivariatePolynomial& operator-=(const Coefficient& rhs);
+	/**
+	 * @param rhs A univariate polynomial over the same variable.
+     * @return 
+     */
+	UnivariatePolynomial& operator-=(const UnivariatePolynomial& rhs);
+	UnivariatePolynomial& operator*=(const Coefficient& rhs);
+	/**
+	 * @param rhs A univariate polynomial over the same variable.
+     * @return 
+     */
+	UnivariatePolynomial& operator*=(const UnivariatePolynomial& rhs);
+	/**
+	 * Only defined for field-coefficients.
+     * @param rhs
+     * @return 
+     */
+	UnivariatePolynomial& operator/=(const Coefficient& rhs);
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);

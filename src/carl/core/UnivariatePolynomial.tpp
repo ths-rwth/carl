@@ -8,6 +8,7 @@
 #pragma once
 
 #include "UnivariatePolynomial.h"
+#include "logging.h"
 #include <algorithm>
 
 namespace carl
@@ -145,8 +146,20 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	// Just in case, if we want to use SFINAE, the right statement would be
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
+	Coeff maxCoeff = mCoefficients.front() > 0 ? mCoefficients.front() : -mCoefficients.front();
+	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
+	{
+		if(*it > maxCoeff ) 
+		{
+			maxCoeff = *it;
+		}
+		else if( -(*it) > maxCoeff )
+		{
+			maxCoeff = -*it;
+		}
+	}
 	
-	
+	return 1 + maxCoeff/lcoeff();
 }
 
 
@@ -157,10 +170,8 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 	// Just in case, if we want to use SFINAE, the right statement would be
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Modified Cauchy bounds are only defined for field-coefficients");
-	
-	
+	LOG_NOTIMPLEMENTED();
 }
-
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
@@ -206,6 +217,24 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 }
 
 
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff& rhs)
+{
+	
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const UnivariatePolynomial& rhs)
+{
+	assert(mMainVar == rhs.mMainVar);
+}
+
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
+{
+	static_assert(is_field<Coeff>::value, "Division by coefficients is only defined for field-coefficients");
+}
 
 template<typename C>
 std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
