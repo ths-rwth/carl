@@ -50,15 +50,12 @@ public:
 		else
 		{
 			// One more term in which the variable occurs.
-			(it->second.occurence)++;
-			// Update minimal/maximal occurence.
-			if(it->second.maxDegree < ve.exp)
+			it->second.increaseOccurence();
+			// Update minimal/maximal degree.
+			if(!it->second.raiseMaxDegree(ve.exp))
 			{
-				it->second.maxDegree = ve.exp;
-			}
-			else if(it->second.minDegree > ve.exp) 
-			{
-				it->second.minDegree = ve.exp;
+				// Only if raising failed, lowering can be successful.
+				it->second.lowerMinDegree(ve.exp);
 			}
 		}
 		if(collectCoeff)
