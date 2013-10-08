@@ -70,7 +70,7 @@ public:
      * @param v
      * @return 
      */
-    const std::string getVariableName(Variable::Arg v) const;
+    const std::string getVariableName(Variable::Arg v, bool friendlyVarName = true) const;
     /**
      * Add a name for a given variable.
      * @param v
@@ -92,15 +92,15 @@ public:
         return getInstance().nrVariables();
     }
     
-    static std::string getFriendlyName(Variable::Arg v)
+    static std::string getName(Variable::Arg v, bool friendlyVarName = true)
     {
         if(!instance) 
         {
-            return getInstance().getVariableName(v);
+            return getInstance().getVariableName(v, friendlyVarName);
         }
         else
         {
-            return instance->getVariableName(v);
+            return instance->getVariableName(v, friendlyVarName);
         }
         
     }

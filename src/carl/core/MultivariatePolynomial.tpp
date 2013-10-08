@@ -189,7 +189,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 template<typename Coeff, typename Ordering, typename Policies>
 exponent MultivariatePolynomial<Coeff,Ordering,Policies>::highestDegree() const
 {
-    if(mTerms.size == 0) return 0;
+    if(mTerms.size() == 0) return 0;
     if(Ordering::degreeOrder)
     {
         return mTerms.back()->tdeg();
@@ -309,7 +309,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,Coeff>& substitutions)
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,Coeff>& substitutions) const
 {
 	MultivariatePolynomial result;
 	for(auto term : mTerms)
@@ -325,7 +325,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,Coeff>& substitutions)
+Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,Coeff>& substitutions) const
 {
 	// We do not have to construct polynomials all the time.
 	LOG_INEFFICIENT();
@@ -1391,34 +1391,25 @@ const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const Multivari
 }
 
 template<typename C, typename O, typename P>
-std::ostream& operator <<( std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs )
+std::ostream& operator<<( std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs )
 {
-    const typename MultivariatePolynomial<C,O,P>::TermsType& terms(rhs.mTerms);
-    typename MultivariatePolynomial<C,O,P>::TermsType::const_reverse_iterator term = terms.rbegin();
-    if(terms.size() == 0) return os << "0";
-    if(terms.size() == 1) return os << **term;
-    os << **term;
-    
-    for(++term; term != terms.rend(); ++term)
-    {
-        os << " + " << **term;
-    }
-    return os;
+    return (os << rhs.toString(true, true));
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool infix) const
+std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool infix, bool friendlyVarNames) const
 {
-	if(infix)
-	{
-		std::stringstream strstr;
-		strstr << *this;
-		return strstr.str();
-	}
-	else
-	{
-		return "NOT IMPLEMENTED";
-	}
+    if(mTerms.size() == 0) return "0";
+    auto term = mTerms.rbegin();
+    if(mTerms.size() == 1) return (*term)->toString(infix, friendlyVarNames);
+    std::string result = "";
+    if( !infix ) result += "(+";
+    for( ; term != mTerms.rend(); ++term)
+    {
+        result += (infix ? "+" : " ") + (*term)->toString(infix, friendlyVarNames);
+    }
+    if( !infix ) result += ")";
+    return result;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
