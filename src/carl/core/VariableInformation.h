@@ -107,7 +107,7 @@ namespace carl
 		}
 		
 	
-		const std::map<unsigned, CoeffType> coeffs() const
+		const std::map<unsigned, CoeffType>& coeffs() const
 		{
 			return mCoeffs;
 		}
