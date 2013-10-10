@@ -455,7 +455,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 unsigned MultivariatePolynomial<Coeff,Ordering,Policies>::hash() const
 {
     // TODO: make this compilable 
-    return 0;//mTerms.size() << 16 || (lcoeff() ^ lterm()->getNrVariables());
+    return mTerms.size() << 16 || (std::hash<Coeff>()(lcoeff()) ^ lterm()->getNrVariables());
 }
 
 
