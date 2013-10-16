@@ -603,15 +603,51 @@ namespace carl
             result *= rhs;
             return result;
         }
+        
+        std::string toString(bool infix = true, bool friendlyVarNames = true) const
+        {
+            if(mExponents.empty()) return "1";
+            if(infix)
+            {
+                std::string result = "";
+                for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
+                {
+                    std::stringstream s;
+                    s << vp->exp;
+                    if(vp != mExponents.begin())
+                        result += "*";
+                    result += varToString(vp->var, friendlyVarNames) + (vp->exp > 1 ? ("^" + s.str()) : "");
+                }
+                return result;
+            }
+            else
+            {
+                std::string result = (mExponents.size() > 1 ? "(*" : "");
+                for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
+                {
+                    std::stringstream s;
+                    s << vp->exp;
+                    std::string varName = varToString(vp->var, friendlyVarNames);
+                    if(vp->exp == 1)
+                    {
+                        result += varName;
+                    }
+                    else if(vp->exp > 1) //necessary?
+                    {
+                        result += "(*";
+                        for(unsigned i = 0; i<vp->exp; ++i)
+                            result += " " + varName;
+                        result += ")";
+                    }
+                }
+                result += (mExponents.size() > 1 ? ")" : "");
+                return result;
+            }
+        }
 
         friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
         {
-            for( VarExpPair vp : rhs.mExponents )
-            {
-                os << vp;
-            }
-			os << "[" << rhs.mTotalDegree << "]";
-            return os;
+            return (os << rhs.toString());
         }
 		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
@@ -661,12 +697,6 @@ namespace carl
 			
 		}
 
-		std::string toString() const
-		{
-			std::stringstream stream;
-			stream << *this;
-			return stream.str();
-		}
     private:
         
 		/**

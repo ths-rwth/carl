@@ -184,19 +184,19 @@ public:
 	 * Replace all variables by a value given in their map.
      * @return A new polynomial without the variables in map.
      */
-	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions);
+	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions) const;
 	/**
 	 * Replace all variables by a Term in which the variable does not occur.
      * @param substitutions
      * @return 
      */
-	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions);
+	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions) const;
 	
 	/**
 	 * Like substitute, but expects substitutions for all variables.
      * @return For a polynomial p, the function value p(x_1,...,x_n).
      */
-	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
+	Coeff evaluate(const std::map<Variable, Coeff>& substitutions) const;
 	
 	
 	/**
@@ -211,7 +211,7 @@ public:
 	
 	MultivariatePolynomial pow(unsigned exp) const;
 	
-	std::string toString(bool infix=true) const;
+	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
 	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
 	

@@ -8,6 +8,7 @@
 #pragma once
 #include <cln/cln.h>
 #include <gmpxx.h>
+#include <functional>
 
 namespace carl
 {
@@ -185,5 +186,26 @@ namespace carl
 		mpz_lcm(res.get_mpz_t(), v1.get_mpz_t(), v2.get_mpz_t());
 		return res;
 	}
-	
-}
+
+} // namespace carl    
+
+namespace std
+{
+    template<>
+    class hash<cln::cl_RA> {
+    public:
+        size_t operator()(const cln::cl_RA& cln_rational) const 
+        {
+            return cln::equal_hashcode( cln_rational );
+        }
+    };
+    
+    template<>
+    class hash<mpq_t> {
+    public:
+        size_t operator()(const mpq_t& gmp_rational) const 
+        {
+            return mpz_get_ui( mpq_numref(gmp_rational) ) ^ mpz_get_ui( mpq_denref(gmp_rational));
+        }
+    };
+} // namespace std

@@ -387,15 +387,30 @@ const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs)
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 {
-    if(rhs.mMonomial)
+    return (os << rhs.toString());
+}
+
+template<typename Coefficient>
+std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
+{ 
+    if(mMonomial)
     {
-        return os << rhs.mCoeff << *rhs.mMonomial;
+        std::stringstream s;
+        s << mCoeff;
+        // TODO: If the coefficient is 1, omit it.
+        if( infix ) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+        else
+        {
+            // TODO: If the coefficient is a rational a/b, display it as (/ a b)
+            return "(* " + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+        }
     }
     else 
     {
-        return os << rhs.mCoeff;
+        std::stringstream s;
+        s << mCoeff;
+        return s.str();
     }
 }
-
 
 }
