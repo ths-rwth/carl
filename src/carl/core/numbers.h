@@ -39,6 +39,44 @@ namespace carl
 		static const bool value = true;
 	};
 	
+	/**
+	 * Type trait is_number
+	 */
+	template<typename type>
+	struct is_number
+	{
+		static const bool value = false;
+	};
+	
+	template<>
+	struct is_number<int>
+	{
+		static const bool value = true;
+	};
+	
+	template<>
+	struct is_number<cln::cl_RA>
+	{
+		static const bool value = true;
+	};
+	
+	template<>
+	struct is_number<cln::cl_I>
+	{
+		static const bool value = true;
+	};
+	
+	template<>
+	struct is_number<mpq_class>
+	{
+		static const bool value = true;
+	};
+	
+	template<>
+	struct is_number<mpz_class>
+	{
+		static const bool value = true;
+	};
 	
 	
 	template<typename RationalType>
@@ -54,13 +92,26 @@ namespace carl
 	};
 	
 	template<>
+	struct IntegralT<cln::cl_I>
+	{
+		typedef cln::cl_I type;
+	};
+
+	
+	template<>
 	struct IntegralT<mpq_class>
 	{
 		typedef mpz_class type;
 	};
+	
+	template<>
+	struct IntegralT<mpz_class>
+	{
+		typedef mpz_class type;
+	};
+	
         
         
-
 	inline cln::cl_I getNum(const cln::cl_RA& rat)
 	{
 		return cln::numerator(rat);
