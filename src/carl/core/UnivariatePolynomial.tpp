@@ -174,6 +174,16 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
+{
+	UnivariatePolynomial result(mMainVar);
+	result.mCoefficients.reserve(mCoefficients.size());
+	std::transform(mCoefficients.begin(), mCoefficients.end(), result.mCoefficients.begin(), 
+				 [](const Coeff& c) -> Coeff {return -c;});
+	return result;		 
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
 {
 	if(rhs == (Coeff)0) return *this;
@@ -216,17 +226,60 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 	return *this;
 }
 
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const Coeff& rhs)
+{
+	LOG_INEFFICIENT();
+	return *this += -rhs;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const UnivariatePolynomial& rhs)
+{
+	LOG_INEFFICIENT();
+	return *this += -rhs;
+}
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff& rhs)
 {
-	
+	if(rhs == (Coeff)0)
+	{
+		mCoefficients.clear();
+		return *this;
+	}
+	for(Coeff& c : mCoefficients)
+	{
+		c *= rhs;
+	}
+	return *this;		
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const UnivariatePolynomial& rhs)
 {
 	assert(mMainVar == rhs.mMainVar);
+	if(rhs.isZero())
+	{
+		mCoefficients.clear();
+		return *this;
+	}
+	
+	std::vector<Coeff> newCoeffs; 
+	newCoeffs.reserve(mCoefficients.size() + rhs.mCoefficients.size());
+	for(unsigned e = 0; e < mCoefficients.size() + rhs.mCoefficients.size(); ++e)
+	{
+		newCoeffs.push_back((Coeff)0);
+		for(unsigned i = 0; i < mCoefficients.size() && i <= e; ++i)
+		{
+			if(e - i < rhs.mCoefficients.size())
+			{
+				newCoeffs.back() += mCoefficients[i] * rhs.mCoefficients[e-i];
+			}
+		}
+	}
+	mCoefficients.swap(newCoeffs);
+	return *this;
 }
 
 
@@ -234,6 +287,34 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
 {
 	static_assert(is_field<Coeff>::value, "Division by coefficients is only defined for field-coefficients");
+	assert(rhs != (Coeff)0);
+	for(Coeff& c : mCoefficients)
+	{
+		c /= rhs;
+	}
+	return *this;		
+}
+
+template<typename C>
+bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	if(lhs.mMainVar == rhs.mMainVar)
+	{
+		return lhs.mCoefficients == rhs.mCoefficients;
+	}
+	else
+	{
+		// in different variables, polynomials can still be equal if constant.
+		if(lhs.isZero() && rhs.isZero()) return true;
+		if(lhs.isConstant() && rhs.isConstant() && lhs.lcoeff() == rhs.lcoeff()) return true;
+		return false;
+	}
+}
+
+template<typename C>
+bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return !(lhs == rhs);
 }
 
 template<typename C>

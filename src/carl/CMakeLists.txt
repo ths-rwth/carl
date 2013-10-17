@@ -22,9 +22,10 @@ set(carl_lib_sources
 	${carl_lib_core_sources}
 	${carl_lib_util_sources}
 	${carl_lib_number_sources}
-
 	${carl_lib_interval_sources}
 )
+
+message(${carl_lib_sources})
 
 # set linking flags
 set(STATICLIB "SHARED")
