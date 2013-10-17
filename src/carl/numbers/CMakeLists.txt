@@ -4,7 +4,7 @@ set(carl_lib_number_headers
 ) 
 # Source files in here
 set(carl_lib_number_sources 
-	numbers/GF.cpp
+	
 	
 PARENT_SCOPE)
 

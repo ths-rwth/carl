@@ -180,6 +180,13 @@ namespace carl
 		return res;
 	}	
 		
+	inline mpz_class mod(const mpz_class& n, const mpz_class& m)
+	{
+		mpz_class res;
+		mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
+		return res;
+	}
+	
 	inline mpz_class gcd(const mpz_class& v1, const mpz_class& v2)
 	{
 		mpz_class res;
