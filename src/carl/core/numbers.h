@@ -77,23 +77,23 @@ namespace carl
 		return cln::expt(base, exp);
 	}
         
-        inline double getDouble( const cln::cl_RA& rational )
-        {
-            return cln::double_approx(rational);
-        }
-        
-		template<typename t>
-        inline t rationalize( double d )
-        {
-            return cln::rationalize( cln::cl_R(d) );
-        }
-        
-		
-        template<>
-        inline cln::cl_RA rationalize<cln::cl_RA>( double d )
-        {
-            return cln::rationalize( cln::cl_R(d) );
-        }
+    inline double getDouble( const cln::cl_RA& rational )
+    {
+        return cln::double_approx(rational);
+    }
+
+    template<typename t>
+    inline t rationalize( double d )
+    {
+        return cln::rationalize( cln::cl_R(d) );
+    }
+
+
+    template<>
+    inline cln::cl_RA rationalize<cln::cl_RA>( double d )
+    {
+        return cln::rationalize( cln::cl_R(d) );
+    }
 	
 	
 	inline const mpz_class& getNum(const mpq_class& rat)
@@ -106,21 +106,21 @@ namespace carl
 		return rat.get_den();
 	}
         
-        inline double getDouble( const mpq_class& rational )
-        {
-            return rational.get_d();
-        }
-        
-        template<>
-        inline mpq_class rationalize<mpq_class>( double d )
-        {
-            return mpq_class(d);
-        }
-	
-        inline double getDouble( const int& rational )
-        {
-            return double(rational);
-        }
+    inline double getDouble( const mpq_class& rational )
+    {
+        return rational.get_d();
+    }
+
+    template<>
+    inline mpq_class rationalize<mpq_class>( double d )
+    {
+        return mpq_class(d);
+    }
+
+    inline double getDouble( const int& rational )
+    {
+        return double(rational);
+    }
         
 	inline mpz_class gcd(const mpz_class& v1, const mpz_class& v2)
 	{
@@ -135,13 +135,50 @@ namespace carl
 		mpz_lcm(res.get_mpz_t(), v1.get_mpz_t(), v2.get_mpz_t());
 		return res;
 	}
+    
+    template<typename t>
+    inline t abs( const t& _arg )
+    {
+        return _arg < 0 ? t( -1 )*_arg : _arg;
+    }
+    
+    template<>
+    inline cln::cl_RA abs<cln::cl_RA>(const cln::cl_RA& cln_rational) 
+    {
+        return cln::abs( cln_rational );
+    }
+    
+    template<typename t>
+    inline t num( const t& _arg )
+    {
+        return _arg;
+    }
+    
+    template<typename t>
+    inline t denom( const t& )
+    {
+        return t(1);
+    }
+    
+    template<>
+    inline cln::cl_RA num<cln::cl_RA>(const cln::cl_RA& cln_rational) 
+    {
+        return cln::numerator( cln_rational );
+    }
+    
+    template<>
+    inline cln::cl_RA denom<cln::cl_RA>(const cln::cl_RA& cln_rational) 
+    {
+        return cln::denominator( cln_rational );
+    }
 
 } // namespace carl    
 
 namespace std
 {
     template<>
-    class hash<cln::cl_RA> {
+    class hash<cln::cl_RA>
+    {
     public:
         size_t operator()(const cln::cl_RA& cln_rational) const 
         {
@@ -150,7 +187,8 @@ namespace std
     };
     
     template<>
-    class hash<mpq_t> {
+    class hash<mpq_t>
+    {
     public:
         size_t operator()(const mpq_t& gmp_rational) const 
         {

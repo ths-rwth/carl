@@ -121,7 +121,19 @@ public:
     static_assert(BITS_RESERVED < 
             CHAR_BIT * sizeof(mVariable), "Too many bits reserved for special use.");
 };
-}
+} // namespace carl
+
+namespace std
+{
+    template<>
+    class hash<carl::Variable> {
+    public:
+        size_t operator()(const carl::Variable& variable) const 
+        {
+            return variable.getId();
+        }
+    };
+} // namespace std
 
 
 

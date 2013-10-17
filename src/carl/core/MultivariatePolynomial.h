@@ -57,6 +57,8 @@ public:
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	
+    virtual ~MultivariatePolynomial() {};
+    
 	//Polynomial interface implementations.
 	/**
 	 * @see class Polynomial
@@ -280,7 +282,11 @@ public:
 	template<typename C, typename O, typename P>
 	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
+	friend bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
 	friend bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 	/**
 	 * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 

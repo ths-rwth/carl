@@ -622,17 +622,15 @@ namespace carl
             }
             else
             {
-                std::string result = (mExponents.size() > 1 ? "(*" : "");
+                std::string result = (mExponents.size() > 1 ? "(* " : "");
                 for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
                 {
+                    if(vp != mExponents.begin()) result += " ";
                     std::stringstream s;
                     s << vp->exp;
                     std::string varName = varToString(vp->var, friendlyVarNames);
-                    if(vp->exp == 1)
-                    {
-                        result += varName;
-                    }
-                    else if(vp->exp > 1) //necessary?
+                    if(vp->exp == 1) result += varName;
+                    else if(vp->exp > 1) // Is it necessary to check vp->exp > 1?
                     {
                         result += "(*";
                         for(unsigned i = 0; i<vp->exp; ++i)

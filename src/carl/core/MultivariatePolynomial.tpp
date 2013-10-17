@@ -639,12 +639,12 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         if(cmpres == CompareResult::LESS)
         {
             newTerms.push_back(*lhsIt);
-            if(++lhsIt != mTerms.end()) break;
+            if(++lhsIt == mTerms.end()) break;
         }
         else if(cmpres == CompareResult::GREATER)
         {
             newTerms.push_back(*rhsIt);
-            if(++rhsIt != rhs.mTerms.end()) break;
+            if(++rhsIt == rhs.mTerms.end()) break;
         }
         else 
         {
@@ -1407,7 +1407,12 @@ std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool inf
     if( !infix ) result += "(+";
     for( ; term != mTerms.rend(); ++term)
     {
-        result += (infix ? "+" : " ") + (*term)->toString(infix, friendlyVarNames);
+        if(infix)
+        {
+            if(term != mTerms.rbegin()) result += "+";
+        }
+        else result += " ";
+        result += (*term)->toString(infix, friendlyVarNames);
     }
     if( !infix ) result += ")";
     return result;
