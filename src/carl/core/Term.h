@@ -239,6 +239,19 @@ class Term
 		}
 };
 
-}
+} // namespace carl
+
+namespace std
+{
+    template<typename Coefficient>
+    class hash<carl::Term<Coefficient>>
+    {
+    public:
+        size_t operator()(const carl::Term<Coefficient>& term) const 
+        {
+            return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
+        }
+    };
+} // namespace std
 
 #include "Term.tpp"

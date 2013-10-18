@@ -654,7 +654,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
             }
             ++lhsIt;
             ++rhsIt;
-            if(lhsIt == mTerms.end() || rhsIt == rhs.mTerms.end() ) break;
+            if(lhsIt == mTerms.end() || rhsIt == rhs.mTerms.end()) break;
         }
     }
     newTerms.insert(newTerms.end(), lhsIt, mTerms.cend());

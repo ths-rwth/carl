@@ -126,7 +126,8 @@ public:
 namespace std
 {
     template<>
-    class hash<carl::Variable> {
+    class hash<carl::Variable>
+    {
     public:
         size_t operator()(const carl::Variable& variable) const 
         {

@@ -395,9 +395,9 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
     if(mMonomial)
     {
-        std::stringstream s;
         if(mCoeff != Coefficient(1))
         {
+            std::stringstream s;
             if(!infix) s << " ";
             bool negative = (mCoeff < 0);
             if(negative) s << "(-" << (infix ? "" : " ");
@@ -410,9 +410,14 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
             }
             if(negative) 
                 s << ")";
+            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
         }
-        if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
-        else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+        else
+        {
+            if(infix) return mMonomial->toString(true, friendlyVarNames);
+            else return mMonomial->toString(infix, friendlyVarNames);
+        }
     }
     else 
     {

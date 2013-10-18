@@ -417,7 +417,22 @@ private:
 
 };
 
+} // namespace carl
 
-}
+namespace std
+{
+    template<typename C, typename O, typename P>
+    class hash<carl::MultivariatePolynomial<C,O,P>>
+    {
+    public:
+        size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
+        {
+            size_t result = 0;
+            for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
+                result ^= hash<carl::Term<C>>()(**iter);
+            return result;
+        }
+    };
+} // namespace std
 
 #include "MultivariatePolynomial.tpp"
