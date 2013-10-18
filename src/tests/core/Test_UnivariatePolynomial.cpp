@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
+#include "carl/core/MultivariatePolynomial.h"
 
 #include <cln/cln.h>
 using namespace carl;
@@ -46,5 +47,14 @@ TEST(UnivariatePolynomial, GCD)
 
 TEST(UnivariatePolynomial, cauchyBounds)
 {
-    EXPECT_TRUE(false);
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    
+    UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
+    p.cauchyBound();
+    p.modifiedCauchyBound();
+    
+    
 }

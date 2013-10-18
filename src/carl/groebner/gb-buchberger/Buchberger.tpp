@@ -64,7 +64,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 			Polynomial spol = Polynomial::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
 			LOGMSG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
 			// Schedules the S-polynomial for reduction
-			Reductor<Polynomial, Polynomial, void> reductor(*pGb, spol);
+			Reductor<Polynomial, Polynomial> reductor(*pGb, spol);
 			// Does a full reduction on this
 			Polynomial remainder = reductor.fullReduce();
 			LOGMSG_DEBUG("carl.gb.buchberger", "Remainder of SPol: " << remainder);

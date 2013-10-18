@@ -78,6 +78,8 @@ public:
     
     friend const Monomial operator*(const Variable& lhs, const Variable& rhs);
     
+    friend std::string varToString(carl::Variable::Arg rhs, bool friendlyVarName = true);
+    
     friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs);
     
     /**
@@ -119,7 +121,20 @@ public:
     static_assert(BITS_RESERVED < 
             CHAR_BIT * sizeof(mVariable), "Too many bits reserved for special use.");
 };
-}
+} // namespace carl
+
+namespace std
+{
+    template<>
+    class hash<carl::Variable>
+    {
+    public:
+        size_t operator()(const carl::Variable& variable) const 
+        {
+            return variable.getId();
+        }
+    };
+} // namespace std
 
 
 

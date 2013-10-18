@@ -8,6 +8,7 @@
 #pragma once
 
 #include "UnivariatePolynomial.h"
+#include "logging.h"
 #include <algorithm>
 
 namespace carl
@@ -42,6 +43,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 		mCoefficients.push_back(expAndCoeff.second);
 	}
 }
+
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth ) const
@@ -133,18 +135,193 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePol
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
-	std::cout << "a: " << a << ", b: " << b << std::endl;
 	if(b.isZero()) return a;
 	else return gcd_recursive(b, a.reduce(b));
 }
 
+template<typename Coeff>
+Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
+{
+	// We could also use SFINAE, but this gives clearer error messages.
+	// Just in case, if we want to use SFINAE, the right statement would be
+	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
+	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
+	Coeff maxCoeff = mCoefficients.front() > 0 ? mCoefficients.front() : -mCoefficients.front();
+	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
+	{
+		if(*it > maxCoeff ) 
+		{
+			maxCoeff = *it;
+		}
+		else if( -(*it) > maxCoeff )
+		{
+			maxCoeff = -*it;
+		}
+	}
+	
+	return 1 + maxCoeff/lcoeff();
+}
 
+
+template<typename Coeff>
+Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
+{
+	// We could also use SFINAE, but this gives clearer error messages.
+	// Just in case, if we want to use SFINAE, the right statement would be
+	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
+	static_assert(is_field<Coeff>::value, "Modified Cauchy bounds are only defined for field-coefficients");
+	LOG_NOTIMPLEMENTED();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
+{
+	UnivariatePolynomial result(mMainVar);
+	result.mCoefficients.reserve(mCoefficients.size());
+	std::transform(mCoefficients.begin(), mCoefficients.end(), result.mCoefficients.begin(), 
+				 [](const Coeff& c) -> Coeff {return -c;});
+	return result;		 
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
+{
+	if(rhs == (Coeff)0) return *this;
+	if(mCoefficients.empty())
+	{
+		// Adding non-zero rhs to zero.
+		mCoefficients.resize(1, rhs);
+	}
+	else
+	{
+		mCoefficients.front() += rhs;
+		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coeff)0) 
+		{
+			// Result is zero.
+			mCoefficients.clear();
+		}
+	}
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
+{
+	assert(mMainVar == rhs.mMainVar);
+	if(degree() < rhs.degree())
+	{
+		for(unsigned i = 0; i < degree(); ++i)
+		{
+			mCoefficients[i] += rhs.mCoefficients[i];
+		}
+		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - (rhs.degree() - degree()), rhs.mCoefficients.end());
+	}
+	else
+	{
+		for(unsigned i = 0; i < rhs.degree(); ++i)
+		{
+			mCoefficients[i] += rhs.mCoefficients[i];
+		}
+	}
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const Coeff& rhs)
+{
+	LOG_INEFFICIENT();
+	return *this += -rhs;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const UnivariatePolynomial& rhs)
+{
+	LOG_INEFFICIENT();
+	return *this += -rhs;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff& rhs)
+{
+	if(rhs == (Coeff)0)
+	{
+		mCoefficients.clear();
+		return *this;
+	}
+	for(Coeff& c : mCoefficients)
+	{
+		c *= rhs;
+	}
+	return *this;		
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const UnivariatePolynomial& rhs)
+{
+	assert(mMainVar == rhs.mMainVar);
+	if(rhs.isZero())
+	{
+		mCoefficients.clear();
+		return *this;
+	}
+	
+	std::vector<Coeff> newCoeffs; 
+	newCoeffs.reserve(mCoefficients.size() + rhs.mCoefficients.size());
+	for(unsigned e = 0; e < mCoefficients.size() + rhs.mCoefficients.size(); ++e)
+	{
+		newCoeffs.push_back((Coeff)0);
+		for(unsigned i = 0; i < mCoefficients.size() && i <= e; ++i)
+		{
+			if(e - i < rhs.mCoefficients.size())
+			{
+				newCoeffs.back() += mCoefficients[i] * rhs.mCoefficients[e-i];
+			}
+		}
+	}
+	mCoefficients.swap(newCoeffs);
+	return *this;
+}
+
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
+{
+	static_assert(is_field<Coeff>::value, "Division by coefficients is only defined for field-coefficients");
+	assert(rhs != (Coeff)0);
+	for(Coeff& c : mCoefficients)
+	{
+		c /= rhs;
+	}
+	return *this;		
+}
+
+template<typename C>
+bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	if(lhs.mMainVar == rhs.mMainVar)
+	{
+		return lhs.mCoefficients == rhs.mCoefficients;
+	}
+	else
+	{
+		// in different variables, polynomials can still be equal if constant.
+		if(lhs.isZero() && rhs.isZero()) return true;
+		if(lhs.isConstant() && rhs.isConstant() && lhs.lcoeff() == rhs.lcoeff()) return true;
+		return false;
+	}
+}
+
+template<typename C>
+bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return !(lhs == rhs);
+}
 
 template<typename C>
 std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 {
 	if(rhs.isZero()) return os << "0";
-	for(size_t i = 0; i < rhs.mCoefficients.size()-1; i++ )
+	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		os << "(" << rhs.mCoefficients[rhs.mCoefficients.size()-i-1] << ")*" << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
 	}

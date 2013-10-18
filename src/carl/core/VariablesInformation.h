@@ -15,13 +15,21 @@
 namespace carl
 {
 
+class VariablesInformationInterface
+{
+	virtual bool hasCoeff() const = 0;
+};
+
 template<bool collectCoeff, typename CoeffType>
-class VariablesInformation
+class VariablesInformation : public VariablesInformationInterface
 {
 	std::map<Variable, VariableInformation<collectCoeff, CoeffType>> mVariableInfo;
 	
-	public:
-	
+public:
+	bool hasCoeff() const override
+	{
+		return collectCoeff;
+	}
 	/**
 	 * Updates the Variable informations based on the assumption that this method is called with according parameters
      * @param ve A variable-exponent pair occuring in a term t.
@@ -42,15 +50,12 @@ class VariablesInformation
 		else
 		{
 			// One more term in which the variable occurs.
-			(it->second.occurence)++;
-			// Update minimal/maximal occurence.
-			if(it->second.maxDegree < ve.exp)
+			it->second.increaseOccurence();
+			// Update minimal/maximal degree.
+			if(!it->second.raiseMaxDegree(ve.exp))
 			{
-				it->second.maxDegree = ve.exp;
-			}
-			else if(it->second.minDegree > ve.exp) 
-			{
-				it->second.minDegree = ve.exp;
+				// Only if raising failed, lowering can be successful.
+				it->second.lowerMinDegree(ve.exp);
 			}
 		}
 		if(collectCoeff)

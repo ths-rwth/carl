@@ -10,6 +10,7 @@
 #include "Ideal.h"
 #include "ReductorEntry.h"
 #include "../util/Heap.h"
+#include "../util/BitVector.h"
 
 namespace carl
 {
@@ -58,29 +59,20 @@ public:
 	static const bool fastIndex = true;
 };
 
-template<typename T>
-struct hasOrigins
-{
-	static const bool valid = true;
-};
-
-template<>
-struct hasOrigins<void*>
-{
-	static const bool valid = false;
-};
-
-template<typename InputPolynomial, typename PolynomialInIdeal, typename Origins, template <class> class Datastructure = carl::Heap, template <typename Polynomial> class Configuration = ReductorConfiguration>
+template<typename InputPolynomial, typename PolynomialInIdeal, template <class> class Datastructure = carl::Heap, template <typename Polynomial> class Configuration = ReductorConfiguration>
 class Reductor
 {
-	static_assert(std::is_base_of<InputPolynomial, PolynomialInIdeal>::value,
-				  "Ideal and polynomial to be reduced are incompatible");
+	
 protected:
 	typedef typename InputPolynomial::OrderedBy Order;
 	typedef typename Configuration<InputPolynomial>::EntryType EntryType;
 	typedef typename InputPolynomial::CoeffType Coeff;
+private:
+	const Ideal<PolynomialInIdeal>& mIdeal;
+	Datastructure<Configuration<InputPolynomial>> mDatastruct;
+	std::vector<std::shared_ptr<const Term<Coeff>>> mRemainder;
+	bool mReductionOccured;
 public:
-
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const InputPolynomial& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
 	{
@@ -93,9 +85,7 @@ public:
 		insert(f);
 	}
 
-	virtual ~Reductor()
-	{
-	}
+	virtual ~Reductor()	{}
 
 	/**
 	 * The basic reduce routine on a priority queue.
@@ -144,9 +134,8 @@ public:
 			// check if the reduction succeeded.
 			if(divres.success())
 			{
-
 				mReductionOccured = true;
-				if(hasOrigins<Origins>::valid)
+				if(InputPolynomial::Policy::has_reasons)
 				{
 					//mOrigins.calculateUnion(divres.mDivisor->getOrigins());
 				}
@@ -161,7 +150,6 @@ public:
 				mRemainder.push_back(leadingTerm);
 				return false;
 			}
-
 		}
 		return true;
 	}
@@ -190,8 +178,18 @@ public:
 		// TODO check whether this is sorted.
 		return InputPolynomial(mRemainder.begin(), mRemainder.end(), false, false);
 	}
+	
+	
 private:
 
+    
+	void setOrigins(const BitVector& update, const BitVector& with)
+	{
+		
+	}
+	
+	
+	
 	/**
 	 * A small routine which updates the underlying data structure for the polynomial which is reduced.
 	 * @param entry
@@ -229,11 +227,6 @@ private:
 	}
 
 
-
-	const Ideal<PolynomialInIdeal>& mIdeal;
-	Datastructure<Configuration<InputPolynomial> > mDatastruct;
-	std::vector<std::shared_ptr<const Term<Coeff >> > mRemainder;
-	bool mReductionOccured;
 	//Origins mOrigins;
 };
 

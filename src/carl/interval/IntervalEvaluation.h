@@ -63,7 +63,7 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const s
 		{
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].var) > 0);
-			result *= map.at(m[i].var).power(m[i].exp);
+			result *= map.at(m[i].var).power((int)m[i].exp);
 		}
 	}
 	return result;
@@ -78,11 +78,11 @@ inline DoubleInterval IntervalEvaluation::evaluate(const MultivariatePolynomial<
     }
     else
     {
-	DoubleInterval result(evaluate(*p[0], map)); 
-	for(size_t i = 1; i < p.nrTerms(); ++i)
-	{
-		result += evaluate(*p[i], map);
-	}
+		DoubleInterval result(evaluate(*p[0], map)); 
+		for(size_t i = 1; i < p.nrTerms(); ++i)
+		{
+			result += evaluate(*p[i], map);
+		}
         return result;
     }
 }

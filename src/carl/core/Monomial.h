@@ -117,6 +117,29 @@ namespace carl
             return mExponents.size();
         }
 
+		Variable::Arg getSingleVariable() const
+		{
+			assert(mExponents.size() == 1);
+			return mExponents.front().var;
+		}
+		
+		bool hasNoOtherVariable(Variable::Arg v) const
+		{
+			if(mExponents.size() == 1)
+			{
+				if(mExponents.front().var == v) return true;
+				return false;
+			}
+			else if(mExponents.size() == 0) 
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
 		const VarExpPair& operator[](int index) const
 		{
 			assert(index < (int)mExponents.size());
@@ -580,15 +603,49 @@ namespace carl
             result *= rhs;
             return result;
         }
+        
+        std::string toString(bool infix = true, bool friendlyVarNames = true) const
+        {
+            if(mExponents.empty()) return "1";
+            if(infix)
+            {
+                std::string result = "";
+                for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
+                {
+                    std::stringstream s;
+                    s << vp->exp;
+                    if(vp != mExponents.begin())
+                        result += "*";
+                    result += varToString(vp->var, friendlyVarNames) + (vp->exp > 1 ? ("^" + s.str()) : "");
+                }
+                return result;
+            }
+            else
+            {
+                std::string result = (mExponents.size() > 1 ? "(* " : "");
+                for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
+                {
+                    if(vp != mExponents.begin()) result += " ";
+                    std::stringstream s;
+                    s << vp->exp;
+                    std::string varName = varToString(vp->var, friendlyVarNames);
+                    if(vp->exp == 1) result += varName;
+                    else if(vp->exp > 1) // Is it necessary to check vp->exp > 1?
+                    {
+                        result += "(*";
+                        for(unsigned i = 0; i<vp->exp; ++i)
+                            result += " " + varName;
+                        result += ")";
+                    }
+                }
+                result += (mExponents.size() > 1 ? ")" : "");
+                return result;
+            }
+        }
 
         friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
         {
-            for( VarExpPair vp : rhs.mExponents )
-            {
-                os << vp;
-            }
-			os << "[" << rhs.mTotalDegree << "]";
-            return os;
+            return (os << rhs.toString());
         }
 		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
@@ -638,12 +695,6 @@ namespace carl
 			
 		}
 
-		std::string toString() const
-		{
-			std::stringstream stream;
-			stream << *this;
-			return stream.str();
-		}
     private:
         
 		/**
@@ -697,6 +748,26 @@ namespace carl
             return CompareResult::LESS;
         }
     };
-    
-    
-}
+} // namespace carl
+
+namespace std
+{
+    template<>
+    class hash<carl::Monomial>
+    {
+    public:
+        size_t operator()(const carl::Monomial& monomial) const 
+        {
+            size_t result = 0;
+            for(unsigned i = 0; i < monomial.nrVariables(); ++i)
+            {
+                result <<= 5;
+                result ^= hash<carl::Variable>()( monomial[i].var );
+                result <<= 5;
+                result ^= monomial[i].exp;
+            }
+            return result;
+        }
+    };
+} // namespace std
+

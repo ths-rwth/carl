@@ -387,15 +387,44 @@ const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs)
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 {
-    if(rhs.mMonomial)
+    return (os << rhs.toString());
+}
+
+template<typename Coefficient>
+std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
+{ 
+    if(mMonomial)
     {
-        return os << rhs.mCoeff << *rhs.mMonomial;
+        if(mCoeff != Coefficient(1))
+        {
+            std::stringstream s;
+            if(!infix) s << " ";
+            bool negative = (mCoeff < 0);
+            if(negative) s << "(-" << (infix ? "" : " ");
+            if(infix) s << abs<Coefficient>(mCoeff);
+            else
+            {
+                Coefficient d = denom<Coefficient>(mCoeff);
+                if(d != Coefficient(1)) s << "(/ " << abs<Coefficient>(num<Coefficient>(mCoeff)) << " " << abs<Coefficient>(d) << ")";
+                else s << abs<Coefficient>(mCoeff);
+            }
+            if(negative) 
+                s << ")";
+            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+        }
+        else
+        {
+            if(infix) return mMonomial->toString(true, friendlyVarNames);
+            else return mMonomial->toString(infix, friendlyVarNames);
+        }
     }
     else 
     {
-        return os << rhs.mCoeff;
+        std::stringstream s;
+        s << mCoeff;
+        return s.str();
     }
 }
-
 
 }

@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "Polynomial.h"
 #include "Term.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
@@ -21,16 +22,19 @@ class UnivariatePolynomial;
 /**
  *  The general-purpose multivariate polynomial class.
  */
-template<typename Coeff, typename Ordering = GrLexOrdering, typename Policy = StdMultivariatePolynomialPolicy>
-class MultivariatePolynomial
+template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
+class MultivariatePolynomial : public Polynomial, Policies
 {
 public:
+	/// The ordering of the terms.
 	typedef Ordering OrderedBy;
 	typedef Term<Coeff> TermType;
 	typedef Monomial MonomType;
 	typedef Coeff CoeffType;
+	typedef Policies Policy;
 protected:
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
+	
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
@@ -46,10 +50,33 @@ public:
 	explicit MultivariatePolynomial(std::shared_ptr<const Term<Coeff >> t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
+	template<class OtherPolicy>
+	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicy>&);
 	template<typename InputIterator>
 	MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
+	
+    virtual ~MultivariatePolynomial() {};
+    
+	//Polynomial interface implementations.
+	/**
+	 * @see class Polynomial
+     * @return 
+     */
+	virtual bool isUnivariateRepresented() const override
+	{
+		return false;
+	}
+	/**
+	 * @see class Polynomial
+     * @return 
+     */
+	virtual bool isMultivariateRepresented() const override
+	{
+		return true;
+	}
+	
 	/**
 	 * The leading monomial
 	 * @return 
@@ -84,7 +111,15 @@ public:
 	{
 		return mTerms.size();
 	}
+	/**
+	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
+     * @return 
+     */
 	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
+	/**
+	 * 
+     * @return 
+     */
 	bool hasConstantTerm() const;
 	
 	typename TermsType::const_iterator begin() const
@@ -110,7 +145,12 @@ public:
 	 */
 	MultivariatePolynomial& stripLT();
 	
-	
+	/**
+	 * Checks whether only one variable occurs.
+     * @return 
+	 * Notice that it might be better to use the variable information if several pieces of information are requested.
+     */
+	bool isUnivariate() const;
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
@@ -146,24 +186,34 @@ public:
 	 * Replace all variables by a value given in their map.
      * @return A new polynomial without the variables in map.
      */
-	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions);
-	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions);
+	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions) const;
+	/**
+	 * Replace all variables by a Term in which the variable does not occur.
+     * @param substitutions
+     * @return 
+     */
+	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions) const;
 	
 	/**
 	 * Like substitute, but expects substitutions for all variables.
      * @return For a polynomial p, the function value p(x_1,...,x_n).
      */
-	Coeff evaluate(const std::map<Variable, Coeff>& substitutions);
+	Coeff evaluate(const std::map<Variable, Coeff>& substitutions) const;
 	
 	
-	
+	/**
+	 * Calculates the S-Polynomial.
+     * @param p
+     * @param q
+     * @return 
+     */
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	unsigned hash() const;
 	
 	MultivariatePolynomial pow(unsigned exp) const;
 	
-	std::string toString(bool infix=true) const;
+	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
 	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
 	
@@ -232,7 +282,11 @@ public:
 	template<typename C, typename O, typename P>
 	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
+	friend bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
 	friend bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 	/**
 	 * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 
@@ -363,7 +417,22 @@ private:
 
 };
 
+} // namespace carl
 
-}
+namespace std
+{
+    template<typename C, typename O, typename P>
+    class hash<carl::MultivariatePolynomial<C,O,P>>
+    {
+    public:
+        size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
+        {
+            size_t result = 0;
+            for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
+                result ^= hash<carl::Term<C>>()(**iter);
+            return result;
+        }
+    };
+} // namespace std
 
 #include "MultivariatePolynomial.tpp"

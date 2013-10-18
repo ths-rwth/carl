@@ -532,8 +532,7 @@ double DoubleInterval::roundUp(const Rational& o, bool overapproximate)
 	{
 		return result;
 	}
-}
-// namespace carl
+} 
 
 inline const DoubleInterval operator +(const DoubleInterval& lh, const DoubleInterval& rh)
 {
@@ -616,5 +615,17 @@ inline bool operator >=(const DoubleInterval& lh, const DoubleInterval& rh)
 	return lh.isGreaterOrEqual(rh);
 }
 
-}
+} // namespace carl
 
+namespace std
+{
+    template<>
+    class hash<carl::DoubleInterval> {
+    public:
+        size_t operator()(const carl::DoubleInterval& double_interval) const 
+        {
+            return (  ((size_t) double_interval.left() ^ (size_t) double_interval.leftType())
+                    ^ ((size_t) double_interval.right() ^ (size_t) double_interval.rightType()));
+        }
+    };
+} // namespace std

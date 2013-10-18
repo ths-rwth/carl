@@ -46,16 +46,23 @@ Variable VariablePool::getFreshVariable(VariableType type)
     return Variable(mNextVarId++, type);
 }
 
-const std::string VariablePool::getVariableName(Variable::Arg v) const
+const std::string VariablePool::getVariableName(Variable::Arg v, bool friendly) const
 {
-    std::map<Variable, std::string>::const_iterator it = mFriendlyNames.find(v);
-    if(it == mFriendlyNames.end())
+    if( friendly )
     {
-        return "x_" + std::to_string(v.getId());
+        std::map<Variable, std::string>::const_iterator it = mFriendlyNames.find(v);
+        if(it == mFriendlyNames.end())
+        {
+            return "x_" + std::to_string(v.getId());
+        }
+        else
+        {
+            return it->second;
+        }
     }
     else
     {
-        return it->second;
+        return "x_" + std::to_string(v.getId());
     }
 }
 

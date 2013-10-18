@@ -12,6 +12,7 @@
 
 namespace carl
 {
+
 	template<bool collectCoeff, typename CoeffType>
 	struct VariableInformation
 	{
@@ -19,21 +20,74 @@ namespace carl
 	};
 
 	template<typename CoeffType>
-	struct VariableInformation<false, CoeffType>
+	class VariableInformation<false, CoeffType>
 	{
+		
+		/// Maximal degree variable occurs with.
+		unsigned mMaxDegree;
+		/// Minimal non-zero degree variable occurs with.
+		unsigned mMinDegree;
+		/// Number of terms a variable occurs in.
+		unsigned mOccurence;
+	public:
 		VariableInformation(unsigned degreeOfOccurence)
-		:	maxDegree(degreeOfOccurence), 
-			minDegree(degreeOfOccurence), 
-			occurence(1)
+		:	mMaxDegree(degreeOfOccurence), 
+			mMinDegree(degreeOfOccurence), 
+			mOccurence(1)
 		{
 			
 		}
-		/// Maximal degree variable occurs with.
-		unsigned maxDegree;
-		/// Minimal non-zero degree variable occurs with.
-		unsigned minDegree;
-		/// Number of terms a variable occurs in.
-		unsigned occurence;
+		
+		unsigned maxDegree() const
+		{
+			return mMaxDegree;
+		}
+		
+		unsigned minDegree() const
+		{
+			return mMinDegree;
+		}
+		
+		unsigned occurence() const
+		{
+			return mOccurence;
+		}
+		
+		/**
+		 * If degree is larger than maxDegree, we set the maxDegree to degree.
+         * @param degree
+		 * @return true if degree was larger.
+         */
+		bool raiseMaxDegree(unsigned degree)
+		{
+			if(mMaxDegree < degree)
+			{
+				mMaxDegree = degree;
+				return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * If degree is smaller than minDegree, we set the minDegree to degree.
+         * @param degree
+		 * @return true if degree was smaller.
+         */
+		bool lowerMinDegree(unsigned degree)
+		{
+			if(mMinDegree > degree)
+			{
+				mMinDegree = degree;
+				return true;
+			}
+			return false;
+		}
+		
+		
+		void increaseOccurence()
+		{
+			++mOccurence;
+		}
 		
 		template<typename Term>
 		void updateCoeff(unsigned, const Term&)
@@ -44,24 +98,30 @@ namespace carl
 	};
 	
 	template<typename CoeffType>
-	struct VariableInformation<true, CoeffType> : public VariableInformation<false, CoeffType>
+	class VariableInformation<true, CoeffType> : public VariableInformation<false, CoeffType>
 	{
+		std::map<unsigned, CoeffType> mCoeffs;
+	public:
 		VariableInformation(unsigned degreeOfOccurence) :  VariableInformation<false, CoeffType>(degreeOfOccurence)
 		{
 		}
 		
 	
-		std::map<unsigned, CoeffType> coeffs;
+		const std::map<unsigned, CoeffType>& coeffs() const
+		{
+			return mCoeffs;
+		}
+		
 		
 		template<typename Term>
 		void updateCoeff(unsigned exponent, const Term& t)
 		{
-			typename std::map<unsigned, CoeffType>::iterator it = coeffs.find(exponent);
-			if(it == coeffs.end())
+			typename std::map<unsigned, CoeffType>::iterator it = mCoeffs.find(exponent);
+			if(it == mCoeffs.end())
 			{
 				// TODO no support for map emplace in GCC 4.7. 
 				// coeffs.emplace(exponent, CoeffType(t));
-				coeffs.insert(std::make_pair(exponent, CoeffType(t)));
+				mCoeffs.insert(std::make_pair(exponent, CoeffType(t)));
 				
 			}
 			else
