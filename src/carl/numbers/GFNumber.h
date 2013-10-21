@@ -60,12 +60,18 @@ class GFNumber
 	template<typename IntegerT>
 	friend bool operator!=(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
 	
+	const GFNumber operator-() const;
+	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator+(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator+(const GFNumber<IntegerT>& lhs, const IntegerT& rhs);
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator+(const IntegerT& lhs, const GFNumber<IntegerT>& rhs);
+	
+	GFNumber& operator++();
+	GFNumber& operator+=(const GFNumber& rhs);
+	GFNumber& operator+=(const IntegerType& rhs);
 	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator-(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
@@ -74,12 +80,19 @@ class GFNumber
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator-(const IntegerT& lhs, const GFNumber<IntegerT>& rhs);
 	
+	GFNumber& operator--();
+	GFNumber& operator-=(const GFNumber& rhs);
+	GFNumber& operator-=(const IntegerType& rhs);
+	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator*(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator*(const GFNumber<IntegerT>& lhs, const IntegerT& rhs);
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator*(const IntegerT& lhs, const GFNumber<IntegerT>& rhs);
+	
+	GFNumber& operator*=(const GFNumber& rhs);
+	GFNumber& operator*=(const IntegerType& rhs);
 	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
