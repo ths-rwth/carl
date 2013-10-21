@@ -119,6 +119,7 @@ inline cln::cl_I getDenom(const cln::cl_RA& rat)
 	return cln::denominator(rat);
 }
 
+
 inline cln::cl_RA pow(const cln::cl_RA& base, unsigned exp)
 {
 	return cln::expt(base, exp);
@@ -140,6 +141,22 @@ inline cln::cl_RA rationalize<cln::cl_RA>(double d)
 {
 	return cln::rationalize(cln::cl_R(d));
 }
+
+inline mpz_class abs(const mpz_class& i)
+{
+	mpz_class res;
+	mpz_abs(res.get_mpz_t(), i.get_mpz_t());
+	return res;
+}
+
+
+inline mpq_class abs(const mpq_class& r)
+{
+	mpq_class res;
+	mpq_abs(res.get_mpq_t(), r.get_mpq_t());
+	return res;
+}
+
 
 inline const mpz_class& getNum(const mpq_class& rat)
 {
@@ -199,19 +216,6 @@ inline mpz_class lcm(const mpz_class& v1, const mpz_class& v2)
 	mpz_lcm(res.get_mpz_t(), v1.get_mpz_t(), v2.get_mpz_t());
 	return res;
 }
-
-template<typename t>
-inline t abs(const t& _arg)
-{
-	return _arg < 0 ? t(-1) * _arg : _arg;
-}
-
-template<>
-inline cln::cl_RA abs<cln::cl_RA>(const cln::cl_RA& cln_rational)
-{
-	return cln::abs(cln_rational);
-}
-
 
 
 } // namespace carl    
