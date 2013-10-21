@@ -31,6 +31,11 @@ bool operator!=(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 	return !(lhs == rhs);
 }
 	
+template<typename IntegerT>
+const GFNumber<IntegerT> GFNumber<IntegerT>::operator-() const
+{
+	return GFNumber<IntegerT>(-mN, mGf);
+}
 
 template<typename IntegerT>
 GFNumber<IntegerT> operator+(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
@@ -50,6 +55,29 @@ GFNumber<IntegerT> operator+(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 }
 
 template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator ++()
+{
+	mN++;
+	return *this;
+}
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator +=(const GFNumber& rhs)
+{
+	assert(*mGf == *(rhs.mGf));
+	mN += rhs.mN;
+	return *this;
+}
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator +=(const IntegerT& rhs)
+{
+	mN += rhs;
+	return *this;
+}
+
+
+template<typename IntegerT>
 GFNumber<IntegerT> operator-(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
 	assert(*(lhs.mGf) == *(rhs.mGf));
@@ -64,6 +92,28 @@ template<typename IntegerT>
 GFNumber<IntegerT> operator-(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 {
 	return GFNumber<IntegerT>(lhs - rhs.mN, rhs.mGf);
+}
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator --()
+{
+	mN--;
+	return *this;
+}
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator -=(const GFNumber& rhs)
+{
+	assert(*mGf == *(rhs.mGf));
+	mN -= rhs.mN;
+	return *this;
+}
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator -=(const IntegerT& rhs)
+{
+	mN -= rhs;
+	return *this;
 }
 
 template<typename IntegerT>
@@ -82,6 +132,23 @@ GFNumber<IntegerT> operator*(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 {
 	return rhs * lhs;
 }
+
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const GFNumber& rhs)
+{
+	assert(*mGf == *(rhs.mGf));
+	mN *= rhs.mN;
+	return *this;
+}
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const IntegerT& rhs)
+{
+	mN *= rhs;
+	return *this;
+}
+
 
 template<typename IntegerT>
 GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
