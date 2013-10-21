@@ -10,6 +10,7 @@
 #pragma once
 
 #include "DoubleInterval.h"
+#include "ExactInterval.h"
 
 #include "../core/Monomial.h"
 #include "../core/Term.h"
@@ -25,7 +26,13 @@ public:
 	static DoubleInterval evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>&);
 	template<typename Coeff, typename Policy>
 	static DoubleInterval evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>&);
-	
+        
+        template<typename Numeric>
+        static ExactInterval<Numeric> evaluate(const Monomial& m, const std::map<Variable, ExactInterval<Numeric> >&);
+        template<typename Numeric>
+	static ExactInterval<Numeric> evaluate(const Term<Numeric>& t, const std::map<Variable, ExactInterval<Numeric> >&);
+	template<typename Numeric, typename Policy>
+	static ExactInterval<Numeric> evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, ExactInterval<Numeric> >&);
     
 private:
 
@@ -80,6 +87,55 @@ inline DoubleInterval IntervalEvaluation::evaluate(const MultivariatePolynomial<
     }
 }
 
+template<typename Numeric>
+inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const std::map<Variable, ExactInterval<Numeric> >& map)
+{
+	ExactInterval<Numeric> result(1);
+	// TODO use iterator.
+	for(size_t i = 0; i < m.nrVariables(); ++i)
+	{
+		// We expect every variable to be in the map.
+		LOG_ASSERT(map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
+		result *= map.at(m[i].var).power(m[i].exp);
+	}
+	return result;
+}
+
+template<typename Numeric>
+inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Term<Numeric>& t, const std::map<Variable, ExactInterval<Numeric> >& map)
+{
+	ExactInterval<Numeric> result(t.coeff());
+	if(t.monomial())
+	{
+		const Monomial& m = *t.monomial();
+		// TODO use iterator.
+		for(size_t i = 0; i < m.nrVariables(); ++i)
+		{
+			// We expect every variable to be in the map.
+			assert(map.count(m[i].var) > 0);
+			result *= map.at(m[i].var).power(m[i].exp);
+		}
+	}
+	return result;
+}
+
+template<typename Numeric, typename Policy>
+inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, ExactInterval<Numeric> >& map)
+{
+    if(p.isZero())
+    {
+        return ExactInterval<Numeric>(0);
+    }
+    else
+    {
+	ExactInterval<Numeric> result(evaluate(*p[0], map)); 
+	for(size_t i = 1; i < p.nrTerms(); ++i)
+	{
+		result += evaluate(*p[i], map);
+	}
+        return result;
+    }
+}
 
 }
 
