@@ -249,7 +249,10 @@ namespace std
     public:
         size_t operator()(const carl::Term<Coefficient>& term) const 
         {
-            return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
+            if(term.isConstant())
+                return hash<Coefficient>()(term.coeff());
+            else
+                return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
         }
     };
 } // namespace std
