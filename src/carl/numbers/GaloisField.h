@@ -69,6 +69,11 @@ class GaloisField
 		return n > (mPK-1)/2 ?  mod(n-(mPK+1)/2, mPK) - (mPK-1)/2 : mod(n, mPK);
 	}
 	
+	friend bool operator==(const GaloisField& lhs, const GaloisField& rhs)
+	{
+		return lhs.mPK == rhs.mPK;
+	}
+	
 	friend std::ostream& operator<<(std::ostream& os, const GaloisField& rhs)
 	{
 		return os << "GF(" << rhs.mP << "^" << rhs.mK << ")";

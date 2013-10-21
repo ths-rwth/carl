@@ -179,6 +179,11 @@ namespace carl
 		mpz_pow_ui (res.get_mpz_t(), b.get_mpz_t(), e);
 		return res;
 	}	
+	
+	inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder)
+	{
+		mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
+	}
 		
 	inline mpz_class mod(const mpz_class& n, const mpz_class& m)
 	{

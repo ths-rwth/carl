@@ -2,7 +2,7 @@
 
 #include "Monomial.h"
 #include "Term.h"
-#include "numbers.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {
