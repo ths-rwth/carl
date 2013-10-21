@@ -44,6 +44,17 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 	}
 }
 
+template<typename Coeff>
+Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const 
+{
+	Coeff result(0);
+	Coeff var = 1;
+	for(const Coeff& coeff : mCoefficients)
+	{
+		result += (coeff * var);
+		var *= value;
+	}
+}
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth ) const
@@ -162,6 +173,67 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	return 1 + maxCoeff/lcoeff();
 }
 
+
+template<typename Coeff>
+template<typename Integer>
+UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+{
+	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
+	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
+	typename IntegralT<Coeff>::type num = getNum(*it);
+	typename IntegralT<Coeff>::type den = getDenom(*it);
+	for(++it; it != mCoefficients.end(); ++it)
+	{
+		num = gcd(num, getNum(*it));
+		den = lcm(den, getDenom(*it));
+	}
+	Coeff factor = den/num;
+	// Notice that even if factor is 1, we create a new polynomial
+	UnivariatePolynomial<Integer> result;
+	result.mCoefficients.reserve(mCoefficients.size());
+	for(const Coeff& coeff : mCoefficients)
+	{
+		result.mCoefficients.push_back(coeff * factor);
+	}
+	return result;
+}	
+
+template<typename Coeff>
+DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
+{
+/*	assert(degree() >= divisor.degree());
+	assert(!divisor.isZero());
+	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	
+	do
+	{
+		unsigned degdiff = degree() - divisor.degree();
+		Coeff factor = lcoeff()/divisor.lcoeff();
+
+		result.remainder.mCoefficients.reserve(mCoefficients.size()-1);
+		unsigned lastNonZero = 0;
+		if(degdiff > 0)
+		{
+			result.remainder.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
+			lastNonZero = (unsigned)(std::find(result.mCoefficients.rbegin(), result.mCoefficients.rend(), (Coeff)0) - result.mCoefficients.rend()) + 1;
+		}
+
+		// By construction, the leading coefficient will be zero.
+		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		{
+			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
+			if(result.mCoefficients.back() != 0) 
+			{
+				lastNonZero = i+degdiff+1;
+			}
+		}
+		// strip zeros from the end as we might have pushed zeros.
+		result.mCoefficients.resize(lastNonZero, (Coeff)0);
+	}
+	while(divisor.degree() < result.degree())
+	return result;*/
+	
+}
 
 template<typename Coeff>
 Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const

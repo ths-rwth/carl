@@ -16,7 +16,7 @@
 
 #include "../core/Variable.h"
 #include "../core/Sign.h"
-#include "../core/numbers.h"
+#include "../numbers/numbers.h"
 
 using namespace boost::numeric::interval_lib;
 

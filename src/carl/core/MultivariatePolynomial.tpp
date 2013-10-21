@@ -3,7 +3,7 @@
 #include <list>
 #include "MultivariatePolynomial.h"
 #include "logging.h"
-#include "numbers.h"
+#include "carl/numbers/numbers.h"
 
 namespace carl
 {

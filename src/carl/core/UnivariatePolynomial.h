@@ -6,10 +6,11 @@
 #pragma once
 #include <map>
 
-#include "numbers.h"
+#include "../numbers/numbers.h"
 #include "Variable.h"
 #include "VariableInformation.h"
 #include "Polynomial.h"
+#include "DivisionResult.h"
 
 
 namespace carl
@@ -78,13 +79,28 @@ public:
 		return mCoefficients.back();
 	}
 
+	/**
+	 * 
+     * @return copr
+     */
+	template<typename Integer>
+	UnivariatePolynomial<Integer> coprimeCoefficients() const;
+	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
-
+	
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	
+	UnivariatePolynomial& mod(const Coefficient& modulus);
+	UnivariatePolynomial mod(const Coefficient& modulus) const;
+	static UnivariatePolynomial& mod(UnivariatePolynomial&, const Coefficient& modulus);
+	static UnivariatePolynomial mod(const UnivariatePolynomial&, const Coefficient& modulus);
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 
-
+	UnivariatePolynomial squareFreePart() const;
+	
+	Coefficient evaluate(const Coefficient& value) const;
 
 	/**
 	 * Notice, Cauchy bounds are only defined for polynomials over fields.

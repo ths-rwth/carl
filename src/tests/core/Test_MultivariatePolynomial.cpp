@@ -179,6 +179,8 @@ TEST(MultivariatePolynomial, Coprime)
     MultivariatePolynomial<mpq_class> mp2G = MultivariatePolynomial<mpq_class>(mpq_class(2) * v0);
     mp2G += mpq_class(3) * v1;
     EXPECT_EQ(mp2G, mpG.coprimeCoefficients());
+    
+    
 }
         
 TEST(MultivariatePolynomial, Substitute)
