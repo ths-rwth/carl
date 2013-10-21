@@ -9,10 +9,10 @@ using namespace carl;
 TEST(MultivariatePolynomial, Constructor)
 {
     Variable v0(0);
-    Term<int> t0(v0);
-    MultivariatePolynomial<int> p0(t0);
+    Term<mpz_class> t0(v0);
+    MultivariatePolynomial<mpz_class> p0(t0);
     
-    MultivariatePolynomial<int> p1(3);
+    MultivariatePolynomial<mpz_class> p1(3);
     EXPECT_EQ(1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
 }
@@ -20,9 +20,9 @@ TEST(MultivariatePolynomial, Constructor)
 TEST(MultivariatePolynomial, Operators)
 {
     Variable v0(0);
-    Term<int> t0(v0);
-    MultivariatePolynomial<int> p0a(t0);
-    MultivariatePolynomial<int> p0b(v0);
+    Term<mpz_class> t0(v0);
+    MultivariatePolynomial<mpz_class> p0a(t0);
+    MultivariatePolynomial<mpz_class> p0b(v0);
     EXPECT_EQ(p0a, p0b);
     
     EXPECT_TRUE(p0a.isUnivariate());
@@ -31,8 +31,8 @@ TEST(MultivariatePolynomial, Operators)
 TEST(MultivariatePolynomial, Addition)
 {
     Variable v0(0);
-    Term<int> t0(v0);
-    MultivariatePolynomial<int> p0(v0);
+    Term<mpz_class> t0(v0);
+    MultivariatePolynomial<mpz_class> p0(v0);
     p0 += 3;
     EXPECT_EQ(2, p0.nrTerms());
     p0 += 3;
@@ -47,19 +47,19 @@ TEST(MultivariatePolynomial, Addition)
     EXPECT_EQ(3,p0.nrTerms());
     p0 += Monomial(v2);
     EXPECT_EQ(3,p0.nrTerms());
-    p0 += Term<int>(-2,v2);
+    p0 += Term<mpz_class>(-2,v2);
     EXPECT_EQ(2,p0.nrTerms());
     
-    MultivariatePolynomial<int> p1(v0);
+    MultivariatePolynomial<mpz_class> p1(v0);
     p1 += v1;
     p0 += p1;
     EXPECT_EQ(2,p0.nrTerms());   
     
-    MultivariatePolynomial<int> p10a;
+    MultivariatePolynomial<mpz_class> p10a;
     p10a += v0*v0;
     p10a += v1;
     EXPECT_EQ(v0*v0, *p10a.lterm());
-    MultivariatePolynomial<int> p10b;
+    MultivariatePolynomial<mpz_class> p10b;
     p10b += v1;
     p10b += v0*v0;
     EXPECT_EQ(v0*v0, *p10b.lterm());
@@ -72,7 +72,7 @@ TEST(MultivariatePolynomial, Addition)
 TEST(MultivariatePolynomial, Substraction)
 {
     Variable v0(0);
-    MultivariatePolynomial<int> p0(v0);
+    MultivariatePolynomial<mpz_class> p0(v0);
     p0 -= 3;
     EXPECT_EQ(2, p0.nrTerms());
     p0 -= 3;
@@ -88,10 +88,10 @@ TEST(MultivariatePolynomial, Substraction)
     p0 -= Monomial(v2);
     
     EXPECT_EQ(3,p0.nrTerms());
-    p0 -= Term<int>(-2,v2);
+    p0 -= Term<mpz_class>(-2,v2);
     EXPECT_EQ(2,p0.nrTerms());
     
-    MultivariatePolynomial<int> p1(v0);
+    MultivariatePolynomial<mpz_class> p1(v0);
     p1 -= v1;
     p0 -= p1;
     EXPECT_EQ(0,p0.nrTerms());
@@ -101,15 +101,15 @@ TEST(MultivariatePolynomial, Multiplication)
 {
     Variable v0(0);
     Variable v1(1);
-    MultivariatePolynomial<int> p0(v0);
+    MultivariatePolynomial<mpz_class> p0(v0);
     
     p0 *= v0;
-    EXPECT_EQ(Term<int>(1,v0,2), *(p0.lterm()));
+    EXPECT_EQ(Term<mpz_class>(1,v0,2), *(p0.lterm()));
     
-    MultivariatePolynomial<int> q({2*v0*v0, 1*v0*v1});
-    Term<int> t(1, v0,2);
-    MultivariatePolynomial<int> res = q * t;
-    EXPECT_EQ(MultivariatePolynomial<int>({2*v0*v0*v0*v0, 1*v0*v0*v0*v1}), res);
+    MultivariatePolynomial<mpz_class> q({mpz_class(2)*v0*v0, mpz_class(1)*v0*v1});
+    Term<mpz_class> t(1, v0,2);
+    MultivariatePolynomial<mpz_class> res = q * t;
+    EXPECT_EQ(MultivariatePolynomial<mpz_class>({mpz_class(2)*v0*v0*v0*v0, mpz_class(1)*v0*v0*v0*v1}), res);
     
     p0 += v1;
     p0 += 1;
