@@ -401,12 +401,12 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
             if(!infix) s << " ";
             bool negative = (mCoeff < 0);
             if(negative) s << "(-" << (infix ? "" : " ");
-            if(infix) s << abs<Coefficient>(mCoeff);
+            if(infix) s << abs(mCoeff);
             else
             {
-                Coefficient d = denom<Coefficient>(mCoeff);
-                if(d != Coefficient(1)) s << "(/ " << abs<Coefficient>(num<Coefficient>(mCoeff)) << " " << abs<Coefficient>(d) << ")";
-                else s << abs<Coefficient>(mCoeff);
+                typename IntegralT<Coefficient>::type d = getDenom(mCoeff);
+                if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << abs(getNum(mCoeff)) << " " << abs(d) << ")";
+                else s << abs(mCoeff);
             }
             if(negative) 
                 s << ")";
