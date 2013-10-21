@@ -623,6 +623,36 @@ bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
     return lhs != rhs;
 }
 
+//template<typename C, typename O, typename P>
+//bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+//{
+//    // Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
+//    return std::equal(lhs.mTerms.begin(), lhs.mTerms.end(), rhs.mTerms.begin(),
+//                    [](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
+//                    -> bool 
+//                    {
+//                        return lterm != rterm && *lterm < *rterm;
+//                    });
+//}
+//
+//template<typename C, typename O, typename P>
+//bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+//{
+//    return rhs<lhs;
+//}
+//
+//template<typename C, typename O, typename P>
+//bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+//{
+//    return !(rhs<lhs);
+//}
+//
+//template<typename C, typename O, typename P>
+//bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+//{
+//    return !(rhs>lhs);
+//}
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
@@ -639,12 +669,12 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         if(cmpres == CompareResult::LESS)
         {
             newTerms.push_back(*lhsIt);
-            if(++lhsIt != mTerms.end()) break;
+            if(++lhsIt == mTerms.end()) break;
         }
         else if(cmpres == CompareResult::GREATER)
         {
             newTerms.push_back(*rhsIt);
-            if(++rhsIt != rhs.mTerms.end()) break;
+            if(++rhsIt == rhs.mTerms.end()) break;
         }
         else 
         {
@@ -654,7 +684,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
             }
             ++lhsIt;
             ++rhsIt;
-            if(lhsIt == mTerms.end() || rhsIt == rhs.mTerms.end() ) break;
+            if(lhsIt == mTerms.end() || rhsIt == rhs.mTerms.end()) break;
         }
     }
     newTerms.insert(newTerms.end(), lhsIt, mTerms.cend());
@@ -1407,7 +1437,12 @@ std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool inf
     if( !infix ) result += "(+";
     for( ; term != mTerms.rend(); ++term)
     {
-        result += (infix ? "+" : " ") + (*term)->toString(infix, friendlyVarNames);
+        if(infix)
+        {
+            if(term != mTerms.rbegin()) result += "+";
+        }
+        else result += " ";
+        result += (*term)->toString(infix, friendlyVarNames);
     }
     if( !infix ) result += ")";
     return result;

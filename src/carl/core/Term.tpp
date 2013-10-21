@@ -395,14 +395,28 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
     if(mMonomial)
     {
-        std::stringstream s;
-        s << mCoeff;
-        // TODO: If the coefficient is 1, omit it.
-        if( infix ) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+        if(mCoeff != Coefficient(1))
+        {
+            std::stringstream s;
+            if(!infix) s << " ";
+            bool negative = (mCoeff < 0);
+            if(negative) s << "(-" << (infix ? "" : " ");
+            if(infix) s << abs<Coefficient>(mCoeff);
+            else
+            {
+                Coefficient d = denom<Coefficient>(mCoeff);
+                if(d != Coefficient(1)) s << "(/ " << abs<Coefficient>(num<Coefficient>(mCoeff)) << " " << abs<Coefficient>(d) << ")";
+                else s << abs<Coefficient>(mCoeff);
+            }
+            if(negative) 
+                s << ")";
+            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+        }
         else
         {
-            // TODO: If the coefficient is a rational a/b, display it as (/ a b)
-            return "(* " + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+            if(infix) return mMonomial->toString(true, friendlyVarNames);
+            else return mMonomial->toString(infix, friendlyVarNames);
         }
     }
     else 

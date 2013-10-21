@@ -57,6 +57,8 @@ public:
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	
+    virtual ~MultivariatePolynomial() {};
+    
 	//Polynomial interface implementations.
 	/**
 	 * @see class Polynomial
@@ -128,6 +130,16 @@ public:
 	typename TermsType::const_iterator end() const
 	{
 		return mTerms.end();
+	}
+    
+	typename TermsType::const_reverse_iterator rbegin() const
+	{
+		return mTerms.rbegin();
+	}
+	
+	typename TermsType::const_reverse_iterator rend() const
+	{
+		return mTerms.rend();
 	}
 
 	/**
@@ -277,10 +289,14 @@ public:
 	friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 
-	template<typename C, typename O, typename P>
-	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+//	template<typename C, typename O, typename P>
+//	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+//	template<typename C, typename O, typename P>
+//	friend bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+//	template<typename C, typename O, typename P>
+//	friend bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+//	template<typename C, typename O, typename P>
+//	friend bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
 	/**
 	 * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 
@@ -411,7 +427,22 @@ private:
 
 };
 
+} // namespace carl
 
-}
+namespace std
+{
+    template<typename C, typename O, typename P>
+    class hash<carl::MultivariatePolynomial<C,O,P>>
+    {
+    public:
+        size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
+        {
+            size_t result = 0;
+            for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
+                result ^= hash<carl::Term<C>>()(**iter);
+            return result;
+        }
+    };
+} // namespace std
 
 #include "MultivariatePolynomial.tpp"
