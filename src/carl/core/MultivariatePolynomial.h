@@ -1,6 +1,7 @@
 /**
  * @file MultivariatePolynomial.h 
  * @author Sebastian Junges
+ * @author Florian Corzilius
  */
 
 #pragma once

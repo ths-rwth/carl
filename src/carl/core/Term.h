@@ -1,6 +1,7 @@
 /**
  * @file Term.h 
  * @author Sebastian Junges
+ * @author Florian Corzilius
  */
 
 #pragma once
