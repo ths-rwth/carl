@@ -217,6 +217,16 @@ inline mpz_class lcm(const mpz_class& v1, const mpz_class& v2)
 	return res;
 }
 
+inline bool isInteger(const mpq_class& r)
+{
+	 return 0 != mpz_divisible_p(r.get_num_mpz_t(), r.get_den_mpz_t());
+}
+
+inline bool isInteger(const mpz_class&)
+{
+	return true;
+}
+
 
 } // namespace carl    
 

@@ -26,11 +26,54 @@ bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 	return  (lhs.mGf == rhs.mGf || *(lhs.mGf) == *(rhs.mGf)) && (lhs.mGf->modulo(lhs.mN - rhs.mN) == 0);
 }
 template<typename IntegerT>
+bool operator==(const GFNumber<IntegerT>& lhs, const IntegerT& rhs)
+{
+	return lhs.mGf->modulo(lhs.mN) == rhs;
+}
+template<typename IntegerT>
+bool operator==(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
+{
+	return rhs == lhs;
+}
+template<typename IntegerT>
+bool operator==(const GFNumber<IntegerT>& lhs, int rhs)
+{
+	return lhs.mGf->modulo(lhs.mN) == rhs;
+}
+template<typename IntegerT>
+bool operator==(int lhs, const GFNumber<IntegerT>& rhs)
+{
+	return rhs == lhs;
+}
+
+
+template<typename IntegerT>
 bool operator!=(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
 	return !(lhs == rhs);
 }
-	
+template<typename IntegerT>
+bool operator!=(const GFNumber<IntegerT>& lhs, const IntegerT& rhs)
+{
+		return !(lhs == rhs);
+}
+template<typename IntegerT>
+bool operator!=(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
+{
+	return !(lhs == rhs);
+}
+
+template<typename IntegerT>
+bool operator!=(const GFNumber<IntegerT>& lhs, int rhs)
+{
+		return !(lhs == rhs);
+}
+template<typename IntegerT>
+bool operator!=(int lhs, const GFNumber<IntegerT>& rhs)
+{
+	return !(lhs == rhs);
+}
+
 template<typename IntegerT>
 const GFNumber<IntegerT> GFNumber<IntegerT>::operator-() const
 {

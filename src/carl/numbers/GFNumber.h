@@ -57,8 +57,43 @@ class GFNumber
 	
 	template<typename IntegerT>
 	friend bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
+	/**
+	 * lhs == rhs, if rhs \in [lhs].
+     * @return 
+     */
+	template<typename IntegerT>
+	friend bool operator==(const GFNumber<IntegerT>& lhs, const IntegerT& rhs);
+	/**
+	 * lhs == rhs, if lhs \in [rhs].
+     * @return 
+     */
+	template<typename IntegerT>
+	friend bool operator==(const IntegerT& lhs, const GFNumber<IntegerT>& rhs);
+	template<typename IntegerT>
+	friend bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
+	/**
+	 * lhs == rhs, if rhs \in [lhs].
+     * @return 
+     */
+	template<typename IntegerT>
+	friend bool operator==(const GFNumber<IntegerT>& lhs, int rhs);
+	/**
+	 * lhs == rhs, if lhs \in [rhs].
+     * @return 
+     */
+	template<typename IntegerT>
+	friend bool operator==(int lhs, const GFNumber<IntegerT>& rhs);
 	template<typename IntegerT>
 	friend bool operator!=(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
+	template<typename IntegerT>
+	friend bool operator!=(const GFNumber<IntegerT>& lhs, const IntegerT& rhs);
+	template<typename IntegerT>
+	friend bool operator!=(const IntegerT& lhs, const GFNumber<IntegerT>& rhs);
+	template<typename IntegerT>
+	friend bool operator!=(const GFNumber<IntegerT>& lhs, int rhs);
+	template<typename IntegerT>
+	friend bool operator!=(int lhs, const GFNumber<IntegerT>& rhs);
+	
 	
 	const GFNumber operator-() const;
 	

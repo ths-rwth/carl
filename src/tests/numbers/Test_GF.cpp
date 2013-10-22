@@ -13,7 +13,6 @@ TEST(GaloisField, integers)
     GaloisFieldManager<mpz_class>& gfm = GaloisFieldManager<mpz_class>::getInstance();
     
     const GaloisField<mpz_class>* gf5 = gfm.getField(5,1);
-    std::cout << *gf5 << std::endl;
     GFNumber<mpz_class> a0(0,gf5);
     GFNumber<mpz_class> a1(1,gf5);
     GFNumber<mpz_class> a2(2,gf5);
