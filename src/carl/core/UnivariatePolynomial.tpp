@@ -76,6 +76,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 		result += (coeff * var);
 		var *= value;
 	}
+    return result;
 }
 
 template<typename Coeff>
