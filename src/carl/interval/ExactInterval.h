@@ -10,10 +10,6 @@ namespace carl
     //////////////
     // Typedefs //
     //////////////
-
-//    template<typename Numeric>
-//    class ExactInterval<Numeric>;
-//    typedef std::map<Variable, ExactInterval<Numeric> > evalintervalmap;
     
     template<typename Numeric>
     class ExactInterval
@@ -344,6 +340,9 @@ namespace carl
             }
 
     };    // class ExactInterval
+    
+    template<typename T>
+    using evalintervalmap = std::map<Variable, ExactInterval<T> >;
 
 }
 
