@@ -1,7 +1,9 @@
 #pragma once
+#include "MultivariatePolynomial.h"
 #include <memory>
 #include <list>
-#include "MultivariatePolynomial.h"
+
+#include "UnivariatePolynomial.h"
 #include "logging.h"
 #include "carl/numbers/numbers.h"
 
@@ -472,6 +474,25 @@ VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies
 	}
 	return varinfomap;
 	
+}
+
+template<typename C, typename O, typename P>
+UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() const
+{
+	// Only correct when it is already only in one variable.
+	assert(gatherVariables().size() == 1);
+	// For constant polynomials, we would have to use some random variable.
+	// We could introduce a fixed one, but I am unsure about the consequences.
+	// TODO we could implement a method isUnivariate()
+	
+	Variable::Arg x = lmon()->getSingleVariable();
+	std::vector<C> coeffs(highestDegree()+1,0);
+	// TODO we do not use the fact that it is already sorted..
+	for(std::shared_ptr<const Term<C>> t : mTerms)
+	{
+		coeffs[t->tdeg()] = t->coeff();
+	}
+	return UnivariatePolynomial<C>(x, coeffs);
 }
 
 

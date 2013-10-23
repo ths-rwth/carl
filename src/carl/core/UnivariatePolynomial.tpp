@@ -45,6 +45,13 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coeff>& coefficients)
+: mMainVar(mainVar), mCoefficients(coefficients)
+{
+	
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coeff>& coefficients)
 : mMainVar(mainVar)
 {
@@ -284,6 +291,21 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 	LOG_NOTIMPLEMENTED();
 }
 
+
+
+template<typename Coeff>
+UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
+{
+	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
+	res.mCoefficients.reserve(mCoefficients.size());
+	for(const Coeff& c : mCoefficients)
+	{
+		assert(isInteger(c));
+		res.mCoefficients.push_back(typename IntegralT<Coeff>::type(c));
+	}
+	res.stripLeadingZeroes();
+}
+
 template<typename Coeff>
 UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolynomial<Coeff>::toFiniteDomain(const GaloisField<typename IntegralT<Coeff>::type>* galoisField) const
 {
@@ -518,7 +540,11 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	if(rhs.isZero()) return os << "0";
 	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
-		os << "(" << rhs.mCoefficients[rhs.mCoefficients.size()-i-1] << ")*" << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
+		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
+		if(c != 0)
+		{
+			os << "(" << c << ")*" << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
+		}
 	}
 	os << rhs.mCoefficients[0];
 	return os;

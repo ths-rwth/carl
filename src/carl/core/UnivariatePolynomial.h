@@ -30,6 +30,7 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
+	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
 
@@ -87,6 +88,10 @@ public:
 		return mCoefficients.back();
 	}
 
+	const Variable& mainVar() const
+	{
+		return mMainVar;
+	}
 	/**
 	 * 
      * @return copr
@@ -112,6 +117,13 @@ public:
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	
+	UnivariatePolynomial normalize();
+	/**
+	 * Works only from rationals, if the numbers are already integers.
+     * @return 
+     */
+	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
 
 	/**

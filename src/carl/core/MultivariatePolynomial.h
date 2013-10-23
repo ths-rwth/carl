@@ -226,7 +226,10 @@ public:
 	
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
+	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
+	
 	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
+	
 	
 	template<bool gatherCoeff>
 	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(Variable::Arg v) const;
