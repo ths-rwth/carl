@@ -5,13 +5,14 @@
 
 #pragma once
 #include <map>
+#include <vector>
 
-#include "../numbers/numbers.h"
 #include "Variable.h"
 #include "VariableInformation.h"
 #include "Polynomial.h"
 #include "DivisionResult.h"
-
+#include "../numbers/numbers.h"
+#include "../numbers/GFNumber.h"
 
 namespace carl
 {
@@ -19,8 +20,15 @@ namespace carl
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
+	
+	template<class T> friend class UnivariatePolynomial; // 't' is a template
+private:
+	Variable mMainVar;
+	std::vector<Coefficient> mCoefficients;
+
 public:
 	UnivariatePolynomial(Variable::Arg mainVar);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
@@ -96,11 +104,15 @@ public:
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
 	static UnivariatePolynomial& mod(UnivariatePolynomial&, const Coefficient& modulus);
 	static UnivariatePolynomial mod(const UnivariatePolynomial&, const Coefficient& modulus);
-	static UnivariatePolynomial gcd(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
+	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
+	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
+											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
 	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
+	
+	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
 
 	/**
 	 * Notice, Cauchy bounds are only defined for polynomials over fields.
@@ -123,18 +135,41 @@ public:
 	 * @return 
 	 */
 	UnivariatePolynomial& operator+=(const UnivariatePolynomial& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	
 	UnivariatePolynomial& operator-=(const Coefficient& rhs);
 	/**
 	 * @param rhs A univariate polynomial over the same variable.
 	 * @return 
 	 */
 	UnivariatePolynomial& operator-=(const UnivariatePolynomial& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	
+	
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
 	/**
 	 * @param rhs A univariate polynomial over the same variable.
 	 * @return 
 	 */
 	UnivariatePolynomial& operator*=(const UnivariatePolynomial& rhs);
+	
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	
 	/**
 	 * Only defined for field-coefficients.
 	 * @param rhs
@@ -144,12 +179,17 @@ public:
 
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
-
-private:
-	Variable mMainVar;
-	std::vector<Coefficient> mCoefficients;
-
+	
+	
+	private:
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
+	void stripLeadingZeroes() 
+	{
+		while(!isZero() && lcoeff() == 0)
+		{
+			mCoefficients.pop_back();
+		}
+	}
 };
 }
 

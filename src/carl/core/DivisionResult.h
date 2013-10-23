@@ -10,6 +10,17 @@
 template<typename Type>
 struct DivisionResult
 {
+	DivisionResult()
+	{
+		
+	}
+	
+	DivisionResult(const Type& q, const Type& r) :
+	quotient(q), remainder(r)
+	{
+		
+	}
+	
 	Type quotient;
 	Type remainder;
 };

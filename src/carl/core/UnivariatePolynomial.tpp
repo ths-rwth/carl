@@ -20,6 +20,21 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
 {
 	
 }
+template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, exponent e) :
+mMainVar(mainVar),
+mCoefficients(e+1,(Coeff)0)
+{
+	if(c != 0)
+	{
+		mCoefficients[e] = c;
+	}
+	else
+	{
+		mCoefficients.clear();
+	}
+}
+
 
 
 template<typename Coeff>
@@ -134,6 +149,47 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 }
 
+/**
+ * See Algorithm 2.2 in GZL92.
+ * @param a
+ * @param b
+ * @param s
+ * @param t
+ * @return 
+ */
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b, UnivariatePolynomial& s, UnivariatePolynomial& t)
+{
+	assert(a.mMainVar == b.mMainVar);
+	assert(a.mMainVar == s.mMainVar);
+	assert(a.mMainVar == t.mMainVar);
+	
+	const Variable& x = a.mMainVar;
+	//TODO Normalize!
+	UnivariatePolynomial<Coeff> c = a;
+	//TODO Normalize!
+	UnivariatePolynomial<Coeff> d = b;
+	UnivariatePolynomial<Coeff> c2(x);
+	UnivariatePolynomial<Coeff> c1 = c2 + (Coeff)1;
+	UnivariatePolynomial<Coeff> d1(x);
+	UnivariatePolynomial<Coeff> d2 = d1 + (Coeff)1;
+	while(!d.isZero())
+	{
+		DivisionResult<UnivariatePolynomial<Coeff>> divres = c.divide(d);
+		UnivariatePolynomial r1 = c1 - divres.quotient*d1;
+		UnivariatePolynomial r2 = c2 - divres.quotient*d2;
+		c = d;
+		c1 = d1;
+		c2 = d2;
+		d = divres.remainder;
+		d1 = r1;
+		d2 = r2;
+	}
+	s = c1;
+	t = c2;
+	return c;
+}
+
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
@@ -201,37 +257,20 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
-/*	assert(degree() >= divisor.degree());
+	
 	assert(!divisor.isZero());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	result.quotient.mCoefficients.resize(1 + degree()-divisor.degree());
 	
 	do
 	{
-		unsigned degdiff = degree() - divisor.degree();
-		Coeff factor = lcoeff()/divisor.lcoeff();
-
-		result.remainder.mCoefficients.reserve(mCoefficients.size()-1);
-		unsigned lastNonZero = 0;
-		if(degdiff > 0)
-		{
-			result.remainder.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
-			lastNonZero = (unsigned)(std::find(result.mCoefficients.rbegin(), result.mCoefficients.rend(), (Coeff)0) - result.mCoefficients.rend()) + 1;
-		}
-
-		// By construction, the leading coefficient will be zero.
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
-			if(result.mCoefficients.back() != 0) 
-			{
-				lastNonZero = i+degdiff+1;
-			}
-		}
-		// strip zeros from the end as we might have pushed zeros.
-		result.mCoefficients.resize(lastNonZero, (Coeff)0);
+		Coeff factor = result.remainder.lcoeff()/divisor.lcoeff();
+		unsigned degdiff = result.remainder.degree() - divisor.degree();
+		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff) * divisor;
+		result.quotient.mCoefficients[degdiff] += factor;
 	}
-	while(divisor.degree() < result.degree())
-	return result;*/
+	while(divisor.degree() <= result.remainder.degree());
+	return result;
 	
 }
 
@@ -246,10 +285,25 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 }
 
 template<typename Coeff>
+UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolynomial<Coeff>::toFiniteDomain(const GaloisField<typename IntegralT<Coeff>::type>* galoisField) const
+{
+	UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> res(mMainVar);
+	res.mCoefficients.reserve(mCoefficients.size());
+	for(const Coeff& c : mCoefficients)
+	{
+		assert(isInteger(c));
+		res.mCoefficients.push_back(GFNumber<typename IntegralT<Coeff>::type>(c,galoisField));
+	}
+	res.stripLeadingZeroes();
+	return res;
+	
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
-	result.mCoefficients.reserve(mCoefficients.size());
+	result.mCoefficients.resize(mCoefficients.size());
 	std::transform(mCoefficients.begin(), mCoefficients.end(), result.mCoefficients.begin(), 
 				 [](const Coeff& c) -> Coeff {return -c;});
 	return result;		 
@@ -282,7 +336,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 	assert(mMainVar == rhs.mMainVar);
 	if(degree() < rhs.degree())
 	{
-		for(unsigned i = 0; i < degree(); ++i)
+		for(unsigned i = 0; i < mCoefficients.size(); ++i)
 		{
 			mCoefficients[i] += rhs.mCoefficients[i];
 		}
@@ -290,13 +344,37 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 	}
 	else
 	{
-		for(unsigned i = 0; i < rhs.degree(); ++i)
+		for(unsigned i = 0; i < rhs.mCoefficients.size(); ++i)
 		{
-			mCoefficients[i] += rhs.mCoefficients[i];
+			mCoefficients[i] += rhs.mCoefficients[i]; 
 		}
 	}
+	stripLeadingZeroes();
 	return *this;
 }
+
+template<typename C>
+UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res += rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const C& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res += rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return rhs + lhs;
+}
+	
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const Coeff& rhs)
@@ -310,6 +388,29 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const Univa
 {
 	LOG_INEFFICIENT();
 	return *this += -rhs;
+}
+
+
+template<typename C>
+UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res -= rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const C& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res -= rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return rhs - lhs;
 }
 
 template<typename Coeff>
@@ -354,6 +455,28 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Univa
 	return *this;
 }
 
+
+template<typename C>
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res *= rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res *= rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return rhs * lhs;
+}
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
