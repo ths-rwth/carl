@@ -54,7 +54,9 @@ TEST(MultivariatePolynomial, Addition)
     p1 += v1;
     p0 += p1;
     EXPECT_EQ(2,p0.nrTerms());   
-    
+    MultivariatePolynomial<mpz_class> mp2(v0);
+    mp2 += (mpz_class)2 * v1;
+    EXPECT_EQ(v0, *mp2.lterm());
     MultivariatePolynomial<mpz_class> p10a;
     p10a += v0*v0;
     p10a += v1;
@@ -63,10 +65,21 @@ TEST(MultivariatePolynomial, Addition)
     p10b += v1;
     p10b += v0*v0;
     EXPECT_EQ(v0*v0, *p10b.lterm());
+	EXPECT_EQ(p10a, p10b);
+    p10a += p10b;
+	p10a += mp2;
+	p10a += p0;
+	p10b += mp2;
+	p10b += p0;
+	p10b += v0 * v0;
+	p10b += v1;
+	EXPECT_EQ(p10a, p10b);
+	
+	
+	
     
-    MultivariatePolynomial<cln::cl_RA> mp2(v0);
-    mp2 += (cln::cl_RA)2 * v1;
-    EXPECT_EQ(v0, *mp2.lterm());
+	
+	
 }
 
 TEST(MultivariatePolynomial, Substraction)
