@@ -103,6 +103,8 @@ public:
 	bool isZero() const;
 	bool isConstant() const;
 	bool isLinear() const;
+    
+    Definiteness definiteness() const;
 
 	/**
 	 * Calculates the number of terms.

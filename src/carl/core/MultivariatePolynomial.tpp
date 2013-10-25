@@ -207,11 +207,13 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isZero() const
 {
     return mTerms.empty();
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
 {
     return (mTerms.size() == 0) || (mTerms.size() == 1 && mTerms.front()->isConstant());
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 {
@@ -224,6 +226,40 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
     {
         LOG_NOTIMPLEMENTED();
     }
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() const
+{
+    auto term = mTerms.rbegin();
+    Definiteness result = (*term)->definiteness();
+    ++term;
+    if( term == mTerms.rend() ) return result;
+    if( result > Definiteness::NON )
+    {
+        for( ; term != mTerms.rend(); ++term )
+        {
+            Definiteness termDefin = (*term)->definiteness();
+            if( termDefin > Definiteness::NON )
+            {
+                if( termDefin > result ) result = termDefin;
+            }
+            else return Definiteness::NON;
+        }
+    }
+    else if( result < Definiteness::NON )
+    {
+        for( ; term != mTerms.rend(); ++term )
+        {
+            Definiteness termDefin = (*term)->definiteness();
+            if( termDefin < Definiteness::NON )
+            {
+                if( termDefin > result ) result = termDefin;
+            }
+            else return Definiteness::NON;
+        }
+    }
+    return result;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -980,7 +1016,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         CompareResult cmpres(Ordering::compare(**lhsIt, **rhsIt));
         if(cmpres == CompareResult::LESS)
         {
-            newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**lhsIt)));
+            newTerms.push_back(std::make_shared<const Term<Coeff>>((**lhsIt)));
             if(++lhsIt == mTerms.end()) break;
         }
         else if(cmpres == CompareResult::GREATER)

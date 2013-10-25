@@ -145,6 +145,17 @@ Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 }
 
 template<typename Coefficient>
+Definiteness Term<Coefficient>::definiteness() const
+{
+    if(mMonomial)
+        if(mMonomial->isSquare())
+            return (mCoeff < (Coefficient)0 ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
+    else if(mCoeff != (Coefficient)0)
+        return (mCoeff < (Coefficient)0 ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
+    return Definiteness::NON;
+}
+
+template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coefficient>& substitutions) const
 {
 	return mMonomial->substitute<Coefficient>(substitutions, coeff());

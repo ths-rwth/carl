@@ -12,6 +12,7 @@
 
 namespace carl
 {
+    enum class Definiteness : int { NEGATIVE = -2, NEGATIVE_SEMI = -1, NON = 0, POSITIVE_SEMI = 1, POSITIVE = 2 };
 
 template<typename Coefficient>
 class Term
@@ -157,6 +158,8 @@ class Term
 		Term calcLcmAndDivideBy( const Monomial&) const;
         
         Term* derivative(Variable::Arg) const;
+        
+        Definiteness definiteness() const;
 		
 		Term* substitute(const std::map<Variable, Coefficient>& substitutions) const;
 		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
