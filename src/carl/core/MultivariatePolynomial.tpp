@@ -677,7 +677,11 @@ bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
-    if(mTerms.size() == 0) mTerms = rhs.mTerms;
+    if(mTerms.size() == 0) 
+	{
+		mTerms = rhs.mTerms;
+		return *this;
+	}
     if(rhs.mTerms.size() == 0) return *this;
     
     TermsType newTerms;
