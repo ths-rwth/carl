@@ -4,11 +4,13 @@
  *
  * @since September 10, 2013
  * 
- * Obtained from: http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence/264088#264088
  */
 
 #pragma once
 
+/*
+ * Obtained from: http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence/264088#264088
+ */
 #define HAS_MEM_FUNC(func, name)                                        \
     template<typename T, typename Sign>                                 \
     struct name {                                                       \
@@ -19,3 +21,19 @@
         template <typename   > static no  &chk(...);                    \
         static bool const value = sizeof(chk<T>(0)) == sizeof(yes);     \
     }
+
+
+/*
+ * The enable-if idiom.
+ */
+template <bool, class T = void> 
+struct enable_if 
+{};
+ 
+template <class T> 
+struct enable_if<true, T> 
+{ 
+  typedef T type; 
+};
+
+
