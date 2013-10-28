@@ -816,21 +816,21 @@ namespace carl
     
     std::ostream& operator << (std::ostream& str, const DoubleInterval& d)
     {
-        if( d.leftType() == DoubleInterval::INFINITY_BOUND )
+        if( d.leftType() == INFINITY_BOUND )
             str << "]-infinity";
         else
         {
             str.precision( 30 );
-            str << (d.leftType() == DoubleInterval::STRICT_BOUND ? "]" : "[") << d.left();
+            str << (d.leftType() == STRICT_BOUND ? "]" : "[") << d.left();
             str.precision( 0 );
         }
         str << ", ";
-        if( d.rightType() == DoubleInterval::INFINITY_BOUND )
+        if( d.rightType() == INFINITY_BOUND )
             str << "infinity[";
         else
         {
             str.precision( 30 );
-            str << d.right() << (d.rightType() == DoubleInterval::WEAK_BOUND ? "]" : "[");
+            str << d.right() << (d.rightType() == WEAK_BOUND ? "]" : "[");
             str.precision( 0 );
         }
         return str;

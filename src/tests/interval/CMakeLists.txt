@@ -1,5 +1,6 @@
 add_executable( runIntervalTests
 				Test_DoubleInterval.cpp
+                                Test_ExactInterval.cpp
                                 Test_IntervalEvaluation.cpp
                                 Test_Contraction.cpp
 			  )
