@@ -165,6 +165,9 @@ class Term
 		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
 		
 		template<bool gatherCoeff, typename CoeffType>
+		void gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
+		
+		template<bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
 		
 		void gatherVariables(std::set<Variable>& variables) const

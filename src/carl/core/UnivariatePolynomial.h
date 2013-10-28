@@ -32,7 +32,7 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
-	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
+//	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
 
 	//Polynomial interface implementations.
 

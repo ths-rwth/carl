@@ -35,8 +35,6 @@ mCoefficients(e+1,(Coeff)0)
 	}
 }
 
-
-
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coeff> coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)

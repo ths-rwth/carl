@@ -7,6 +7,8 @@
 
 #pragma once
 #include <map>
+#include <algorithm>
+
 
 #include "VarExpPair.h"
 
@@ -30,6 +32,14 @@ namespace carl
 		/// Number of terms a variable occurs in.
 		unsigned mOccurence;
 	public:
+		VariableInformation()
+		:	mMaxDegree(0), 
+			mMinDegree(0), 
+			mOccurence(0)
+		{
+			
+		}
+        
 		VariableInformation(unsigned degreeOfOccurence)
 		:	mMaxDegree(degreeOfOccurence), 
 			mMinDegree(degreeOfOccurence), 
@@ -37,7 +47,20 @@ namespace carl
 		{
 			
 		}
-		
+        
+		VariableInformation(const VariableInformation<false, CoeffType>& varInfo)
+		:	mMaxDegree(varInfo.mMaxDegree), 
+			mMinDegree(varInfo.mMinDegree), 
+			mOccurence(varInfo.mOccurence)
+		{
+			
+		}
+        
+        bool hasCoeff() const
+        {
+            return false;
+        }
+    
 		unsigned maxDegree() const
 		{
 			return mMaxDegree;
@@ -95,6 +118,22 @@ namespace carl
 			// Empty function, we do not save the coefficient here.
 			// TODO there might be a better solution to this.
 		}
+        
+        void collect(const Variable& var, const typename CoeffType::CoeffType& termCoeff, const typename CoeffType::MonomType& monomial)
+        {
+            exponent e = monomial.exponentOfVariable(var);
+            if(e > 0)
+            {
+                // One more term in which the variable occurs.
+                increaseOccurence();
+                // Update minimal/maximal degree.
+                if(!raiseMaxDegree(e))
+                {
+                    // Only if raising failed, lowering can be successful.
+                    lowerMinDegree(e);
+                }
+            }
+        }
 	};
 	
 	template<typename CoeffType>
@@ -102,16 +141,27 @@ namespace carl
 	{
 		std::map<unsigned, CoeffType> mCoeffs;
 	public:
+		VariableInformation() :  VariableInformation<false, CoeffType>()
+		{
+		}
+        
 		VariableInformation(unsigned degreeOfOccurence) :  VariableInformation<false, CoeffType>(degreeOfOccurence)
 		{
 		}
-		
+        
+		VariableInformation(const VariableInformation<false, CoeffType>& varInfo) :  VariableInformation<false, CoeffType>(varInfo)
+        {
+        }
+        
+        bool hasCoeff() const
+        {
+            return true;
+        }
 	
 		const std::map<unsigned, CoeffType>& coeffs() const
 		{
 			return mCoeffs;
 		}
-		
 		
 		template<typename Term>
 		void updateCoeff(unsigned exponent, const Term& t)
@@ -129,6 +179,46 @@ namespace carl
 				it->second += t;
 			}
 		}
+        
+        void collect(const Variable& v, const typename CoeffType::CoeffType& termCoeff, const typename CoeffType::MonomType& monomial)
+        {
+            exponent e = 0;
+            std::vector<VarExpPair> exps = std::vector<VarExpPair>();
+            exps.reserve(monomial.nrVariables()-1);
+            exponent totalDegree = monomial.tdeg();
+            for(unsigned i = 0; i<monomial.nrVariables(); ++i)
+            {
+                if(monomial[i].var == v)
+                {
+                    totalDegree -= monomial[i].exp;
+                    e = monomial[i].exp;
+                }
+                else
+                {
+                    exps.push_back(monomial[i]);
+                }
+            }
+            if(totalDegree != 0) 
+            { 
+                typename CoeffType::MonomType* m = new typename CoeffType::MonomType(std::move(exps), totalDegree);
+                updateCoeff(e, typename CoeffType::TermType(termCoeff, m));
+            }
+            else
+            {
+                updateCoeff(e, typename CoeffType::TermType(termCoeff));
+            }
+            if(e > 0)
+            {
+                // One more term in which the variable occurs.
+                this->increaseOccurence();
+                // Update minimal/maximal degree.
+                if(!this->raiseMaxDegree(e))
+                {
+                    // Only if raising failed, lowering can be successful.
+                    this->lowerMinDegree(e);
+                }
+            }
+        }
 	};
 
 }

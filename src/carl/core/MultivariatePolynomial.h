@@ -234,7 +234,7 @@ public:
 	
 	
 	template<bool gatherCoeff>
-	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(Variable::Arg v) const;
+	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(const Variable& v) const;
 
 	template<bool gatherCoeff>
 	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;

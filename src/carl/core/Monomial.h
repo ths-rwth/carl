@@ -66,6 +66,18 @@ namespace carl
 		{
 			
 		}
+        
+        /**
+         * Generate a monomial from a vector of variable-exponent pairs and a total degree.
+         * @param exponents The variables and their exponents.
+         * @param totalDegree The total degree of the monomial to generate.
+         */
+        Monomial(std::vector<VarExpPair>&& exponents, exponent totalDegree) :
+            mExponents(exponents),
+            mTotalDegree(totalDegree)
+        {
+            assert( validate() );
+        }
 
         Monomial& operator=(const Monomial& rhs)
         {
@@ -395,6 +407,11 @@ namespace carl
 			return result;
 		}
 		
+		template<typename Coeff, bool gatherCoeff, typename CoeffType>
+		void gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
+		{
+            varinfo.collect(var, coeffFromTerm, *this);
+		}
 		
 		template<typename Coeff, bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const

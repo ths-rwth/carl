@@ -30,6 +30,27 @@ public:
 	{
 		return collectCoeff;
 	}
+    
+    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::const_iterator cbegin()
+    {
+        return mVariableInfo.begin();
+    }
+    
+    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::const_iterator cend()
+    {
+        return mVariableInfo.end();
+    }
+    
+    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::iterator begin()
+    {
+        return mVariableInfo.begin();
+    }
+    
+    typename std::map<Variable, VariableInformation<collectCoeff, CoeffType>>::iterator end()
+    {
+        return mVariableInfo.end();
+    }
+    
 	/**
 	 * Updates the Variable informations based on the assumption that this method is called with according parameters
      * @param ve A variable-exponent pair occuring in a term t.

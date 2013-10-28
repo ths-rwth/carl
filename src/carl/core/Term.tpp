@@ -160,13 +160,20 @@ Definiteness Term<Coefficient>::definiteness() const
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coefficient>& substitutions) const
 {
-	return mMonomial->substitute<Coefficient>(substitutions, coeff());
+    if(mMonomial)
+    {
+        return mMonomial->substitute<Coefficient>(substitutions, coeff());
+    }
+    else
+    {
+        return new Term<Coefficient>( mCoeff );
+    }
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Term<Coefficient>>& substitutions) const
 {
-	//return mMonomial->substitute<Coefficient>(substitutions, coeff());
+    LOG_NOTIMPLEMENTED();
 }
 
 
@@ -174,6 +181,17 @@ template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 {
 	return Term(1, monomial()->calcLcmAndDivideBy(m));
+
+}
+
+template<typename Coefficient>
+template<bool gatherCoeff, typename CoeffType>
+void Term<Coefficient>::gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
+{
+	if(mMonomial)
+	{
+		mMonomial->gatherVarInfo(var, varinfo, coeff());
+	}
 }
 
 template<typename Coefficient>
@@ -435,7 +453,18 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
     else 
     {
         std::stringstream s;
-        s << mCoeff;
+        bool negative = (mCoeff < 0);
+        if(negative)
+            s << "(-" << (infix ? "" : " ");
+        if(infix) s << abs(mCoeff);
+        else
+        {
+            typename IntegralT<Coefficient>::type d = getDenom(mCoeff);
+            if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << abs(getNum(mCoeff)) << " " << abs(d) << ")";
+            else s << abs(mCoeff);
+        }
+        if(negative)
+            s << ")";
         return s.str();
     }
 }

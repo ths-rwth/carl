@@ -67,8 +67,6 @@ namespace carl
             if(rhs.exp > 1) os << "^" << rhs.exp;
             return os;
         }
-        
-        
     };
 }
 
