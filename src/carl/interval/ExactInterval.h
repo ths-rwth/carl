@@ -3,9 +3,16 @@
  */
 
 #pragma once
+#include "../core/Sign.h"
+#include "../numbers/numbers.h"
+#include "BoundType.h"
 
 namespace carl
 {
+    template<typename Numeric> class ExactInterval;
+    
+    template<typename Numeric>
+    std::ostream& operator<<(std::ostream& str, const ExactInterval<Numeric>&);
 
     //////////////
     // Typedefs //
@@ -16,17 +23,6 @@ namespace carl
     {
         public:
 
-            /// Determines whether the bound is strict or weak.
-            enum BoundType
-            {
-                /// the given bound is compared by a strict ordering relation
-                STRICT_BOUND,
-                /// the given bound is compared by a weak ordering relation
-                WEAK_BOUND,
-                /// the given bound is interpreted as minus or plus infinity depending on whether it is the left or the right bound
-                INFINITY_BOUND
-            };
-
             /// Standard assertion for checking the input to constructors and setters: the interval bounds might define an empty interval but can never cross (left > right).
             #define BOUNDS_OK( left, leftType, right, rightType )\
                 ( leftType == INFINITY_BOUND || rightType == INFINITY_BOUND || left <= right )
@@ -34,6 +30,8 @@ namespace carl
             //////////////////////////
             // Con- and destructors //
             //////////////////////////
+            
+            ExactInterval();
             
             /**
              * Constructs the point interval [n, n].
@@ -152,7 +150,8 @@ namespace carl
              */
             bool empty() const
             {
-                return !( BOUNDS_OK( mLeft, mLeftType, mRight, mRightType ) || ( mLeftType != STRICT_BOUND && mRightType != STRICT_BOUND && mLeft == mRight ) );
+                return !(mLeftType == INFINITY_BOUND || mRightType == INFINITY_BOUND || left() < right() || ( left() == right() && mLeftType != STRICT_BOUND && mRightType != STRICT_BOUND ));
+//                return !( BOUNDS_OK( mLeft, mLeftType, mRight, mRightType ) || ( mLeftType != STRICT_BOUND && mRightType != STRICT_BOUND && mLeft == mRight ) );
             }
 
             /**
@@ -306,11 +305,13 @@ namespace carl
              * Creates the unbounded interval denoted by ]-infty,infty[
              * @return empty interval
              */
-            static ExactInterval<Numeric> unboundedInterval()
+            static ExactInterval<Numeric> unboundedExactInterval()
             {
                 return ExactInterval( Numeric(-1), INFINITY_BOUND, Numeric(1), INFINITY_BOUND );
             }
 
+            friend std::ostream& operator<< <>(std::ostream& str, const ExactInterval<Numeric>&);
+            
         protected:
             ////////////////
             // Attributes //
@@ -341,8 +342,32 @@ namespace carl
 
     };    // class ExactInterval
     
-    template<typename T>
-    using evalintervalmap = std::map<Variable, ExactInterval<T> >;
+
+// relational operators
+
+    template<typename Numeric>
+inline bool operator ==(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.isEqual(rh);
+}
+
+    template<typename Numeric>
+inline bool operator !=(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return !lh.isEqual(rh);
+}
+
+    template<typename Numeric>
+inline bool operator <=(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.isLessOrEqual(rh);
+}
+
+    template<typename Numeric>
+inline bool operator >=(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.isGreaterOrEqual(rh);
+}
 
 }
 

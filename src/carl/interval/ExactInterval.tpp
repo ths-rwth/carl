@@ -23,6 +23,14 @@ namespace carl
     //////////////////////////
 
     template<typename Numeric>
+    ExactInterval<Numeric>::ExactInterval():
+        mLeft( 0 ),
+        mLeftType( INFINITY_BOUND ),
+        mRight( 0 ),
+        mRightType( INFINITY_BOUND )
+    {}
+    
+    template<typename Numeric>
     ExactInterval<Numeric>::ExactInterval( const Numeric& l, BoundType lType, const Numeric& r, BoundType rType ):
         mLeft( l ),
         mLeftType( lType ),
@@ -414,7 +422,7 @@ namespace carl
         {
             if( o.unbounded() )
             {
-                a = unboundedInterval();
+                a = unboundedExactInterval();
                 return false;
             }    // o.unbounded
             else
@@ -597,6 +605,29 @@ namespace carl
             default:
                 return (mRight >= o.mRight);
         }
+    }
+    
+    template<typename Numeric>
+    std::ostream& operator << (std::ostream& str, const ExactInterval<Numeric>& d)
+    {
+        if( d.leftType() == INFINITY_BOUND )
+            str << "]-infinity";
+        else
+        {
+            str.precision( 30 );
+            str << (d.leftType() == STRICT_BOUND ? "]" : "[") << d.left();
+            str.precision( 0 );
+        }
+        str << ", ";
+        if( d.rightType() == INFINITY_BOUND )
+            str << "infinity[";
+        else
+        {
+            str.precision( 30 );
+            str << d.right() << (d.rightType() == WEAK_BOUND ? "]" : "[");
+            str.precision( 0 );
+        }
+        return str;
     }
 
 }

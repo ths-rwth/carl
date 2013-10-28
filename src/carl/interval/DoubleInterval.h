@@ -1,6 +1,7 @@
 /**
  * @author Florian Corzilius
  * @author Sebastian Junges
+ * @author Stefan Schupp
  */
 #pragma once
 
@@ -17,6 +18,7 @@
 #include "../core/Variable.h"
 #include "../core/Sign.h"
 #include "../numbers/numbers.h"
+#include "BoundType.h"
 
 using namespace boost::numeric::interval_lib;
 
@@ -29,18 +31,6 @@ public:
 	///////////////
 	//  Typedef  //
 	///////////////
-
-	/// Determines whether the bound is strict or weak.
-
-	enum BoundType
-	{
-		/// the given bound is compared by a strict ordering relation
-		STRICT_BOUND,
-		/// the given bound is compared by a weak ordering relation
-		WEAK_BOUND,
-		/// the given bound is interpreted as minus or plus infinity depending on whether it is the left or the right bound
-		INFINITY_BOUND
-	};
 
 	typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_arith_opp<double> > Rounding;
 
