@@ -11,7 +11,7 @@
 #pragma once
 
 #include <iomanip>
-
+#include <iostream>
 #include "config.h"
 #include "logging.h"
 

@@ -62,7 +62,9 @@ target_link_libraries( lib_carl ${libraries} ) # libraries definied in top-level
 
 install( TARGETS lib_carl 
 	EXPORT carlTargets
-	LIBRARY DESTINATION "${LIB_INSTALL_DIR}" COMPONENT shlib
+	LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    COMPONENT shlib
 	PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE
 		GROUP_READ GROUP_EXECUTE

@@ -93,7 +93,7 @@ include( FindCLN )
 include( FindGMP )
 include( FindGMPXX )
 
-set( libraries ${GMP_LIBRARY}  ${GMPXX_LIBRARIES} ${CLN_LIBRARY} pthread )
+set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} pthread )
 set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -140,7 +140,7 @@ endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
+set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
 
@@ -170,7 +170,7 @@ export(TARGETS lib_carl  FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 export(PACKAGE carl)
  
 include(CMakePackageConfigHelpers)
-# Create the FooBarConfig.cmake and FooBarConfigVersion files
+# Create the carlConfig.cmake and carlConfigVersion files
 file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")

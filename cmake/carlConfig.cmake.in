@@ -11,5 +11,5 @@ endif()
    
 set(carl_INCLUDE_DIR "@CONF_INCLUDE_DIRS@")
 
-set(FOOBAR_LIBRARIES lib_carl)
+set(carl_LIBRARIES lib_carl)
 check_required_components(carl)
