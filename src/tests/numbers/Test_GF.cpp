@@ -2,14 +2,15 @@
 #include "gtest/gtest.h"
 #include "carl/numbers/GFNumber.h"
 
+#include <type_traits>
 
 using namespace carl;
 
 TEST(GaloisField, integers)
 {
-    mpz_class p(3);
-    
-    GaloisField<mpz_class> gf3(p,1);
+	
+
+    GaloisField<mpz_class> gf3(3,1);
     GaloisFieldManager<mpz_class>& gfm = GaloisFieldManager<mpz_class>::getInstance();
     
     const GaloisField<mpz_class>* gf5 = gfm.getField(5,1);

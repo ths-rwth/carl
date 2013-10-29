@@ -1,5 +1,6 @@
 # Add test cpp file
 add_executable( runNumbersTests
+				Test_numbers.cpp
 				Test_EEA.cpp
 				Test_PrimeFactory.cpp 
 				Test_GF.cpp
