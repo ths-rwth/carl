@@ -25,7 +25,6 @@ set(carl_lib_sources
 	${carl_lib_interval_sources}
 )
 
-message(${carl_lib_sources})
 
 # set linking flags
 set(STATICLIB "SHARED")
