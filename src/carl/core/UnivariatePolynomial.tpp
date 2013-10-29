@@ -6,10 +6,10 @@
  */
 
 #pragma once
-
 #include "UnivariatePolynomial.h"
-#include "logging.h"
 #include <algorithm>
+#include "../util/SFINAE.h"
+#include "logging.h"
 
 namespace carl
 {
@@ -23,7 +23,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, exponent e) :
 mMainVar(mainVar),
-mCoefficients(e+1,(Coeff)0)
+mCoefficients(e+1,(Coeff)c-c) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
 {
 	if(c != 0)
 	{
@@ -260,6 +260,11 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 	return result;
 }	
 
+
+
+
+
+
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
@@ -306,6 +311,7 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 }
 
 template<typename Coeff>
+//template<typename T = Coeff, EnableIf<!std::is_same<IntegralT<Coeff>, bool>::value>>
 UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolynomial<Coeff>::toFiniteDomain(const GaloisField<typename IntegralT<Coeff>::type>* galoisField) const
 {
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> res(mMainVar);
