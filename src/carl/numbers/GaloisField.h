@@ -19,7 +19,7 @@ namespace carl
 template<typename IntegerType>
 class GaloisField
 {
-	const IntegerType mP;
+	const unsigned mP;
 	const unsigned mK;
 	const IntegerType mPK;
 	const IntegerType symmetricModuloOperationOffset;
@@ -31,8 +31,8 @@ class GaloisField
      * @param k A exponent
 	 * @see GaloisFieldManager where the overhead of creating several GFs is prevented by storing them.
      */
-	GaloisField(IntegerType p, unsigned k=1)
-	: mP(p), mK(k), mPK(pow(p,k)), symmetricModuloOperationOffset( (mPK-1)/2 )
+	GaloisField(unsigned p, unsigned k=1)
+	: mP(p), mK(k), mPK(pow(IntegerType(p),k)), symmetricModuloOperationOffset( (mPK-1)/2 )
 	{ 
 	}
 	
@@ -40,7 +40,7 @@ class GaloisField
 	 * Returns the p from Z_{p^k}
      * @return a prime
      */
-	const IntegerType& p() const
+	unsigned p() const
 	{
 		return mP;
 	}
@@ -88,7 +88,7 @@ class GaloisFieldManager
 	 * Notice that for fully c++11 compliant compilers, this is redundant.
 	 */
 	static std::once_flag mOnceFlag;
-	std::map<std::pair<IntegerType, IntegerType>, const GaloisField<IntegerType>*, IntegerPairCompare<IntegerType>> mGaloisFields;
+	std::map<std::pair<unsigned, unsigned>, const GaloisField<IntegerType>*, IntegerPairCompare<unsigned>> mGaloisFields;
 	
 	GaloisFieldManager()
 	{
@@ -98,7 +98,7 @@ class GaloisFieldManager
 	public:
 	static GaloisFieldManager& getInstance();
 	
-	const GaloisField<IntegerType>* getField(const IntegerType& p, unsigned k)
+	const GaloisField<IntegerType>* getField(unsigned p, unsigned k=1)
 	{
 		auto it = mGaloisFields.find(std::make_pair(p,k));
 		if(it == mGaloisFields.end())

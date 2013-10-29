@@ -18,6 +18,7 @@ template<typename IntegerType>
 class GFNumber;
 
 
+
 /**
  * Galois Field numbers, i.e. numbers from fields with a finite characteristic.
  */
@@ -32,6 +33,11 @@ class GFNumber
 	: mN(gf->symmetricModulo(n)), mGf(gf)
 	{
 		
+	}
+	
+	GFNumber<IntegerType> toGF(const GaloisField<IntegerType>* newfield)
+	{
+		return GFNumber(mN, newfield);
 	}
 	
 	void normalize()
@@ -131,6 +137,7 @@ class GFNumber
 	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
+	
 	
 	friend std::ostream& operator<<(std::ostream& os, const GFNumber& rhs)
 	{

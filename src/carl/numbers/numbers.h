@@ -12,6 +12,13 @@
 
 namespace carl
 {
+
+// 
+// Forward declaration
+//
+template <typename IntegerT>
+class GFNumber;
+	
 //
 // Type traits.
 // For type traits, we use the notation conventions of std, being lower cases with underscores.
@@ -85,6 +92,7 @@ struct IntegralT
 	typedef int type;
 };
 
+
 template<>
 struct IntegralT<cln::cl_RA>
 {
@@ -107,6 +115,13 @@ template<>
 struct IntegralT<mpz_class>
 {
 	typedef mpz_class type;
+};
+
+template<>
+template<typename C>
+struct IntegralT<GFNumber<C>>
+{
+	typedef C type;
 };
 
 inline cln::cl_I getNum(const cln::cl_RA& rat)
