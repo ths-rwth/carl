@@ -42,14 +42,14 @@ public:
 
 	/// Standard assertion for checking the input to constructors and setters: the interval bounds might define an empty interval but can never cross (left > right).
 #define DOUBLE_BOUNDS_OK( left, leftType, right, rightType )\
-            (leftType == INFINITY_BOUND || rightType == INFINITY_BOUND || left < right)
+            (leftType == BoundType::INFTY || rightType == BoundType::INFTY || left < right)
 
 protected:
 
 	///////////////
 	//  Members  //
 	///////////////
-
+    
 	BoostDoubleInterval mInterval;
 	BoundType mLeftType;
 	BoundType mRightType;
@@ -305,7 +305,7 @@ public:
 	 */
 	bool unbounded() const
 	{
-		return mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND;
+		return mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY;
 	}
 
 	/**
@@ -389,7 +389,7 @@ public:
 	 */
 	static DoubleInterval emptyInterval()
 	{
-		return DoubleInterval(BoostDoubleInterval(0), STRICT_BOUND, STRICT_BOUND);
+		return DoubleInterval(BoostDoubleInterval(0), BoundType::STRICT, BoundType::STRICT);
 	}
 
 	/**
@@ -435,12 +435,12 @@ private:
 	/** Return the bound type which corresponds to the weakest-possible type when combining all elements in two intervals.
 	 * @param type1
 	 * @param type2
-	 * @return INFINITY_BOUND if one of the given types is INIFNITY_BOUND, STRICT_BOUND if one of the given types is STRICT_BOUND
+	 * @return BoundType::INFTY if one of the given types is INIFNITY_BOUND, BoundType::STRICT if one of the given types is BoundType::STRICT
 	 */
 	inline static BoundType getWeakestBoundType(BoundType type1, BoundType type2)
 	{
-		return (type1 == INFINITY_BOUND || type2 == INFINITY_BOUND)
-				? INFINITY_BOUND : (type1 == STRICT_BOUND || type2 == STRICT_BOUND) ? STRICT_BOUND : WEAK_BOUND;
+		return (type1 == BoundType::INFTY || type2 == BoundType::INFTY)
+				? BoundType::INFTY : (type1 == BoundType::STRICT || type2 == BoundType::STRICT) ? BoundType::STRICT : BoundType::WEAK;
 	}
 
 }; // class DoubleInterval
@@ -448,7 +448,7 @@ private:
 
 template<typename Rational>
 DoubleInterval::DoubleInterval(const Rational& rat, bool overapprox) : 
-DoubleInterval(rat, WEAK_BOUND,rat, WEAK_BOUND, overapprox, overapprox)
+DoubleInterval(rat, BoundType::WEAK,rat, BoundType::WEAK, overapprox, overapprox)
 {
     // TODO overapprox in both directions?
 }
@@ -458,24 +458,24 @@ DoubleInterval::DoubleInterval(const Rational& lower, BoundType lowerType, const
 {
 	double dLeft = roundDown(lower, overapproxleft);
 	double dRight = roundUp(upper, overapproxright);
-	if(dLeft == -INFINITY) mLeftType = INFINITY_BOUND;
-	if(dRight == INFINITY) mRightType = INFINITY_BOUND;
-	if(mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND)
+	if(dLeft == -INFINITY) mLeftType = BoundType::INFTY;
+	if(dRight == INFINITY) mRightType = BoundType::INFTY;
+	if(mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY)
 	{
 		mInterval = BoostDoubleInterval(0);
 	}
-	else if(mLeftType == INFINITY_BOUND)
+	else if(mLeftType == BoundType::INFTY)
 	{
 		mInterval = BoostDoubleInterval(dRight);
 	}
-	else if(mRightType == INFINITY_BOUND)
+	else if(mRightType == BoundType::INFTY)
 	{
 		mInterval = BoostDoubleInterval(dLeft);
 	}
 	else if((lower == upper && lowerType != upperType) || lower > upper)
 	{
-		mLeftType = STRICT_BOUND;
-		mRightType = STRICT_BOUND;
+		mLeftType = BoundType::STRICT;
+		mRightType = BoundType::STRICT;
 		mInterval = BoostDoubleInterval(0);
 	}
 	else
