@@ -1052,7 +1052,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
     }
     while(lhsIt != mTerms.end())
     {
-        newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**lhsIt)));
+        newTerms.push_back(std::make_shared<const Term<Coeff>>((**lhsIt)));
         ++lhsIt;
     }
     
