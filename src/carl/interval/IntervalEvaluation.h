@@ -2,7 +2,7 @@
  * @file   IntervalEvaluation.h
  *         Created on August 23, 2013, 1:12 PM
  * @author: Sebastian Junges
- *
+ * @author: Stefan Schupp
  * 
  */
 
@@ -42,7 +42,7 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Monomial& m, const std:
 {
 	DoubleInterval result(1);
 	// TODO use iterator.
-	for(size_t i = 0; i < m.nrVariables(); ++i)
+	for(unsigned i = 0; i < m.nrVariables(); ++i)
 	{
 		// We expect every variable to be in the map.
 		LOG_ASSERT(map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
@@ -59,7 +59,7 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const s
 	{
 		const Monomial& m = *t.monomial();
 		// TODO use iterator.
-		for(size_t i = 0; i < m.nrVariables(); ++i)
+		for(unsigned i = 0; i < m.nrVariables(); ++i)
 		{
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].var) > 0);
@@ -79,7 +79,7 @@ inline DoubleInterval IntervalEvaluation::evaluate(const MultivariatePolynomial<
     else
     {
 		DoubleInterval result(evaluate(*p[0], map)); 
-		for(size_t i = 1; i < p.nrTerms(); ++i)
+		for(unsigned i = 1; i < p.nrTerms(); ++i)
 		{
 			result += evaluate(*p[i], map);
 		}
@@ -92,7 +92,7 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, co
 {
 	ExactInterval<Numeric> result(1);
 	// TODO use iterator.
-	for(size_t i = 0; i < m.nrVariables(); ++i)
+	for(unsigned i = 0; i < m.nrVariables(); ++i)
 	{
 		// We expect every variable to be in the map.
 		LOG_ASSERT(map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
@@ -109,7 +109,7 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Term<Numeric>& 
 	{
 		const Monomial& m = *t.monomial();
 		// TODO use iterator.
-		for(size_t i = 0; i < m.nrVariables(); ++i)
+		for(unsigned i = 0; i < m.nrVariables(); ++i)
 		{
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].var) > 0);
