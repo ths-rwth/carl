@@ -25,7 +25,7 @@ namespace carl
 
             /// Standard assertion for checking the input to constructors and setters: the interval bounds might define an empty interval but can never cross (left > right).
             #define BOUNDS_OK( left, leftType, right, rightType )\
-                ( leftType == INFINITY_BOUND || rightType == INFINITY_BOUND || left <= right )
+                ( leftType == BoundType::INFTY || rightType == BoundType::INFTY || left <= right )
 
             //////////////////////////
             // Con- and destructors //
@@ -39,9 +39,9 @@ namespace carl
              */
             ExactInterval( const Numeric& n ):
                 mLeft( n ),
-                mLeftType( WEAK_BOUND ),
+                mLeftType( BoundType::WEAK ),
                 mRight( n ),
-                mRightType( WEAK_BOUND )
+                mRightType( BoundType::WEAK )
             {}
 
             /**
@@ -150,8 +150,8 @@ namespace carl
              */
             bool empty() const
             {
-                return !(mLeftType == INFINITY_BOUND || mRightType == INFINITY_BOUND || left() < right() || ( left() == right() && mLeftType != STRICT_BOUND && mRightType != STRICT_BOUND ));
-//                return !( BOUNDS_OK( mLeft, mLeftType, mRight, mRightType ) || ( mLeftType != STRICT_BOUND && mRightType != STRICT_BOUND && mLeft == mRight ) );
+                return !(mLeftType == BoundType::INFTY || mRightType == BoundType::INFTY || left() < right() || ( left() == right() && mLeftType != BoundType::STRICT && mRightType != BoundType::STRICT ));
+//                return !( BOUNDS_OK( mLeft, mLeftType, mRight, mRightType ) || ( mLeftType != BoundType::STRICT && mRightType != BoundType::STRICT && mLeft == mRight ) );
             }
 
             /**
@@ -159,7 +159,7 @@ namespace carl
              */
             bool unbounded() const
             {
-                return mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND;
+                return mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY;
             }
 
             /**
@@ -167,7 +167,7 @@ namespace carl
              */
             bool halfunbounded() const
             {
-                return mLeftType == INFINITY_BOUND || mRightType == INFINITY_BOUND;
+                return mLeftType == BoundType::INFTY || mRightType == BoundType::INFTY;
             }
 
             ////////////////
@@ -298,7 +298,7 @@ namespace carl
              */
             static ExactInterval<Numeric> emptyExactInterval()
             {
-                return ExactInterval( Numeric(0), STRICT_BOUND, Numeric(0), STRICT_BOUND );
+                return ExactInterval( Numeric(0), BoundType::STRICT, Numeric(0), BoundType::STRICT );
             }
 
             /**
@@ -307,7 +307,7 @@ namespace carl
              */
             static ExactInterval<Numeric> unboundedExactInterval()
             {
-                return ExactInterval( Numeric(-1), INFINITY_BOUND, Numeric(1), INFINITY_BOUND );
+                return ExactInterval( Numeric(-1), BoundType::INFTY, Numeric(1), BoundType::INFTY );
             }
 
             friend std::ostream& operator<< <>(std::ostream& str, const ExactInterval<Numeric>&);
@@ -318,9 +318,9 @@ namespace carl
             ////////////////
 
             Numeric   mLeft;    // left bound of the interval
-            BoundType mLeftType;    // type of the left bound (STRICT_BOUND or WEAK_BOUND)
+            BoundType mLeftType;    // type of the left bound (BoundType::STRICT or BoundType::WEAK)
             Numeric   mRight;    // right bound of the interval
-            BoundType mRightType;    // type of the right bound (STRICT_BOUND or WEAK_BOUND)
+            BoundType mRightType;    // type of the right bound (BoundType::STRICT or BoundType::WEAK)
 
         private:
 
@@ -332,12 +332,12 @@ namespace carl
              * Return the bound type which corresponds to the weakest-possible type when combining all elements in two intervals.
              * @param type1
              * @param type2
-             * @return INFINITY_BOUND if one of the given types is INIFNITY_BOUND, STRICT_BOUND if one of the given types is STRICT_BOUND
+             * @return BoundType::INFTY if one of the given types is INIFNITY_BOUND, BoundType::STRICT if one of the given types is BoundType::STRICT
              */
             inline static BoundType getWeakestBoundType( BoundType type1, BoundType type2 )
             {
-                return (type1 == INFINITY_BOUND || type2 == INFINITY_BOUND)
-                       ? INFINITY_BOUND : (type1 == STRICT_BOUND || type2 == STRICT_BOUND) ? STRICT_BOUND : WEAK_BOUND;
+                return (type1 == BoundType::INFTY || type2 == BoundType::INFTY)
+                       ? BoundType::INFTY : (type1 == BoundType::STRICT || type2 == BoundType::STRICT) ? BoundType::STRICT : BoundType::WEAK;
             }
 
     };    // class ExactInterval

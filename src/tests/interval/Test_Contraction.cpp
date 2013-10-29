@@ -56,39 +56,39 @@ TEST(Contraction, SimpleNewton)
     
     split = e1_contractor(map,a,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(DoubleInterval(-10,WEAK_BOUND, 0, WEAK_BOUND), resultA);
+    EXPECT_EQ(DoubleInterval(-10,BoundType::WEAK, 0, BoundType::WEAK), resultA);
     
     split = e1_contractor(map,b,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(DoubleInterval(-9,WEAK_BOUND, 1,WEAK_BOUND), resultA);
+    EXPECT_EQ(DoubleInterval(-9,BoundType::WEAK, 1,BoundType::WEAK), resultA);
     
     split = e1_contractor(map,c,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(DoubleInterval(-11,WEAK_BOUND, -3, WEAK_BOUND), resultA);
+    EXPECT_EQ(DoubleInterval(-11,BoundType::WEAK, -3, BoundType::WEAK), resultA);
     
     split = e1_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(DoubleInterval(-12,WEAK_BOUND, -1, WEAK_BOUND), resultA);
+    EXPECT_EQ(DoubleInterval(-12,BoundType::WEAK, -1, BoundType::WEAK), resultA);
     
     split = e6_contractor(map,a,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = DoubleInterval(-2.00000000000000177635683940025, WEAK_BOUND, 0.166666666666667406815349750104, WEAK_BOUND);
+    overapprox = DoubleInterval(-2.00000000000000177635683940025, BoundType::WEAK, 0.166666666666667406815349750104, BoundType::WEAK);
     EXPECT_EQ(overapprox.isLessOrEqual(resultA) && overapprox.isGreaterOrEqual(resultA), true);
     
     split = e6_contractor(map,b,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = DoubleInterval(-19.000000000000007105427357601, WEAK_BOUND, -1.33333333333333214909544039983, WEAK_BOUND);
+    overapprox = DoubleInterval(-19.000000000000007105427357601, BoundType::WEAK, -1.33333333333333214909544039983, BoundType::WEAK);
     EXPECT_EQ(overapprox.isLessOrEqual(resultA) && overapprox.isGreaterOrEqual(resultA), true);
     
     split = e6_contractor(map,c,resultA,resultB);
     EXPECT_EQ(split, true);
-    overapprox = DoubleInterval(-1, INFINITY_BOUND, -1.2, WEAK_BOUND);
+    overapprox = DoubleInterval(-1, BoundType::INFTY, -1.2, BoundType::WEAK);
     EXPECT_EQ(overapprox.isLessOrEqual(resultA) && overapprox.isGreaterOrEqual(resultA), true);
-    overapprox = DoubleInterval(3.0625, WEAK_BOUND, 1, INFINITY_BOUND);
+    overapprox = DoubleInterval(3.0625, BoundType::WEAK, 1, BoundType::INFTY);
     EXPECT_EQ(overapprox.isLessOrEqual(resultB) && overapprox.isGreaterOrEqual(resultB), true);
     
     split = e6_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = DoubleInterval(2.41666666666666651863693004998, WEAK_BOUND, 1, INFINITY_BOUND);
+    overapprox = DoubleInterval(2.41666666666666651863693004998, BoundType::WEAK, 1, BoundType::INFTY);
     EXPECT_EQ(overapprox.isLessOrEqual(resultA) && overapprox.isGreaterOrEqual(resultA), true);
 }

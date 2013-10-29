@@ -25,9 +25,9 @@ namespace carl
     template<typename Numeric>
     ExactInterval<Numeric>::ExactInterval():
         mLeft( 0 ),
-        mLeftType( INFINITY_BOUND ),
+        mLeftType( BoundType::INFTY ),
         mRight( 0 ),
-        mRightType( INFINITY_BOUND )
+        mRightType( BoundType::INFTY )
     {}
     
     template<typename Numeric>
@@ -65,14 +65,14 @@ namespace carl
          * or
          *  ----------]0------------|--------
          */
-        if( (mLeftType == STRICT_BOUND && mLeft >= 0) || (mLeftType == WEAK_BOUND && mLeft > 0) )
+        if( (mLeftType == BoundType::STRICT && mLeft >= 0) || (mLeftType == BoundType::WEAK && mLeft > 0) )
             return Sign::POSITIVE;
 
         /** -----------|------------0[-------
          * or
          *  ----------|------------]-0-------
          */
-        if( (mRightType == STRICT_BOUND && mRight <= 0) || (mRightType == WEAK_BOUND && mRight < 0) )
+        if( (mRightType == BoundType::STRICT && mRight <= 0) || (mRightType == BoundType::WEAK && mRight < 0) )
             return Sign::NEGATIVE;
 
         /** ----------[0------------|-------
@@ -92,26 +92,26 @@ namespace carl
     {
         switch( mLeftType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
-            case STRICT_BOUND:
+            case BoundType::STRICT:
                 if( mLeft >= n )
                     return false;
                 break;
-            case WEAK_BOUND:
+            case BoundType::WEAK:
                 if( mLeft > n )
                     return false;
         }
         // Invariant: n is not conflicting with left bound
         switch( mRightType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
-            case STRICT_BOUND:
+            case BoundType::STRICT:
                 if( mRight <= n )
                     return false;
                 break;
-            case WEAK_BOUND:
+            case BoundType::WEAK:
                 if( mRight < n )
                     return false;
                 break;
@@ -124,27 +124,27 @@ namespace carl
     {
         switch( mLeftType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
-            case STRICT_BOUND:
-                if( o.mLeftType == INFINITY_BOUND || mLeft > o.mLeft || ( mLeft == o.mLeft && o.mLeftType == WEAK_BOUND ) )
+            case BoundType::STRICT:
+                if( o.mLeftType == BoundType::INFTY || mLeft > o.mLeft || ( mLeft == o.mLeft && o.mLeftType == BoundType::WEAK ) )
                     return false;
                 break;
-            case WEAK_BOUND:
-                if( o.mLeftType == INFINITY_BOUND || mLeft >= o.mLeft )
+            case BoundType::WEAK:
+                if( o.mLeftType == BoundType::INFTY || mLeft >= o.mLeft )
                     return false;
         }
         // Invariant: left bound of o is not conflicting with left bound
         switch( mRightType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
-            case STRICT_BOUND:
-                if( o.mRightType == INFINITY_BOUND || mRight < o.mRight || ( mRight == o.mRight && o.mRightType == WEAK_BOUND ) )
+            case BoundType::STRICT:
+                if( o.mRightType == BoundType::INFTY || mRight < o.mRight || ( mRight == o.mRight && o.mRightType == BoundType::WEAK ) )
                     return false;
                 break;
-            case WEAK_BOUND:
-                if( o.mRightType == INFINITY_BOUND || mRight <= o.mRight )
+            case BoundType::WEAK:
+                if( o.mRightType == BoundType::INFTY || mRight <= o.mRight )
                     return false;
         }
         return true;    // for open intervals: mLeft <= o.mLeft && mRight >= o.mRight
@@ -153,57 +153,57 @@ namespace carl
     template<typename Numeric>
     bool ExactInterval<Numeric>::meets( const Numeric& n ) const
     {
-        return ( mLeft <= n || mLeftType == INFINITY_BOUND ) && ( mRight >= n || mRightType == INFINITY_BOUND );
+        return ( mLeft <= n || mLeftType == BoundType::INFTY ) && ( mRight >= n || mRightType == BoundType::INFTY );
     }
 
     template<typename Numeric>
     ExactInterval<Numeric> ExactInterval<Numeric>::intersect( const ExactInterval<Numeric>& o ) const
     {
-        if( (mRight < o.mLeft && mRightType != INFINITY_BOUND && o.mLeftType != INFINITY_BOUND)
-                || (o.mRight < mLeft && mLeftType != INFINITY_BOUND && o.mRightType != INFINITY_BOUND) )    // intersection empty
-            return ExactInterval( 0, STRICT_BOUND, 0, STRICT_BOUND );
-        // Invariant: ( mRight >= o.mLeft || mRightType == INFINITY_BOUND && o.mLeftType == INFINITY_BOUND ) && ( o.mRight >= mLeft || mLeftType == INFINITY_BOUND && o.mRightType == INFINITY_BOUND )
-        BoundType leftBoundType  = mLeftType == INFINITY_BOUND && o.mLeftType == INFINITY_BOUND ? INFINITY_BOUND : WEAK_BOUND;
-        BoundType rightBoundType = mRightType == INFINITY_BOUND && o.mRightType == INFINITY_BOUND ? INFINITY_BOUND : WEAK_BOUND;
-        if( o.mLeftType == INFINITY_BOUND || mLeft > o.mLeft || (mLeft == o.mLeft && mLeftType != STRICT_BOUND && o.mLeftType != STRICT_BOUND) )
+        if( (mRight < o.mLeft && mRightType != BoundType::INFTY && o.mLeftType != BoundType::INFTY)
+                || (o.mRight < mLeft && mLeftType != BoundType::INFTY && o.mRightType != BoundType::INFTY) || this->empty() || o.empty() )    // intersection empty
+            return ExactInterval( 0, BoundType::STRICT, 0, BoundType::STRICT );
+        // Invariant: ( mRight >= o.mLeft || mRightType == BoundType::INFTY && o.mLeftType == BoundType::INFTY ) && ( o.mRight >= mLeft || mLeftType == BoundType::INFTY && o.mRightType == BoundType::INFTY )
+        BoundType leftBoundType  = mLeftType == BoundType::INFTY && o.mLeftType == BoundType::INFTY ? BoundType::INFTY : BoundType::WEAK;
+        BoundType rightBoundType = mRightType == BoundType::INFTY && o.mRightType == BoundType::INFTY ? BoundType::INFTY : BoundType::WEAK;
+        if( o.mLeftType == BoundType::INFTY || mLeft > o.mLeft || (mLeft == o.mLeft && mLeftType != BoundType::STRICT && o.mLeftType != BoundType::STRICT) )
         {    // mLeft can be safely taken as weak bound of the intersection or is infinity
-            if( o.mRightType == INFINITY_BOUND || (mRightType != INFINITY_BOUND && mRight < o.mRight) )
+            if( o.mRightType == BoundType::INFTY || (mRightType != BoundType::INFTY && mRight < o.mRight) )
                 return ExactInterval( mLeft, leftBoundType, mRight, rightBoundType );    // mRight can be safely taken as weak bound of the intersection
-            else if( mRightType == INFINITY_BOUND || mRight > o.mRight )
+            else if( mRightType == BoundType::INFTY || mRight > o.mRight )
                 return ExactInterval( mLeft, leftBoundType, o.mRight, rightBoundType );    // o.mRight can be safely taken as weak bound of the intersection
             // Invariant: mRight == o.mRight
-            if( mRightType == STRICT_BOUND || o.mRightType == STRICT_BOUND )
-                return ExactInterval( mLeft, leftBoundType, mRight, STRICT_BOUND );    // the new right type has to be strict
+            if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
+                return ExactInterval( mLeft, leftBoundType, mRight, BoundType::STRICT );    // the new right type has to be strict
             return ExactInterval( mLeft, leftBoundType, mRight, rightBoundType );
         }
-        if( mLeftType == INFINITY_BOUND || mLeft < o.mLeft )
+        if( mLeftType == BoundType::INFTY || mLeft < o.mLeft )
         {    // o.mLeft can be safely taken as weak bound of the intersection
-            if( o.mRightType == INFINITY_BOUND || (mRightType != INFINITY_BOUND && mRight < o.mRight) )
+            if( o.mRightType == BoundType::INFTY || (mRightType != BoundType::INFTY && mRight < o.mRight) )
                 return ExactInterval( o.mLeft, leftBoundType, mRight, rightBoundType );    // mRight can be safely taken as weak bound of the intersection
-            else if( mRightType == INFINITY_BOUND || mRight > o.mRight )
+            else if( mRightType == BoundType::INFTY || mRight > o.mRight )
                 return ExactInterval( o.mLeft, leftBoundType, o.mRight, rightBoundType );    // o.mRight can be safely taken as weak bound of the intersection
             // Invariant: mRight == o.mRight
-            if( mRightType == STRICT_BOUND || o.mRightType == STRICT_BOUND )
-                return ExactInterval( o.mLeft, leftBoundType, mRight, STRICT_BOUND );    // the new right type has to be strict
+            if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
+                return ExactInterval( o.mLeft, leftBoundType, mRight, BoundType::STRICT );    // the new right type has to be strict
             return ExactInterval( o.mLeft, leftBoundType, mRight, rightBoundType );
         }
-        // Invariant: mLeft == o.mLeft && ( mLeftType == STRICT_BOUND || o.mLeftType == STRICT_BOUND )
-        assert( mLeftType == STRICT_BOUND || o.mLeftType == STRICT_BOUND );
+        // Invariant: mLeft == o.mLeft && ( mLeftType == BoundType::STRICT || o.mLeftType == BoundType::STRICT )
+        assert( mLeftType == BoundType::STRICT || o.mLeftType == BoundType::STRICT );
         // the new left type has to be strict
-        if( o.mRightType == INFINITY_BOUND || mRight < o.mRight )
-            return ExactInterval( mLeft, STRICT_BOUND, mRight, rightBoundType );    // mRight can be safely taken as weak bound of the intersection
-        else if( mRightType == INFINITY_BOUND || mRight > o.mRight )
-            return ExactInterval( mLeft, STRICT_BOUND, o.mRight, rightBoundType );    // o.mRight can be safely taken as weak bound of the intersection
+        if( o.mRightType == BoundType::INFTY || mRight < o.mRight )
+            return ExactInterval( mLeft, BoundType::STRICT, mRight, rightBoundType );    // mRight can be safely taken as weak bound of the intersection
+        else if( mRightType == BoundType::INFTY || mRight > o.mRight )
+            return ExactInterval( mLeft, BoundType::STRICT, o.mRight, rightBoundType );    // o.mRight can be safely taken as weak bound of the intersection
         // Invariant: mRight == o.mRight
-        if( mRightType == STRICT_BOUND || o.mRightType == STRICT_BOUND )
-            return ExactInterval( mLeft, STRICT_BOUND, mRight, STRICT_BOUND );    // the new right type has to be strict
-        return ExactInterval( mLeft, STRICT_BOUND, mRight, rightBoundType );
+        if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
+            return ExactInterval( mLeft, BoundType::STRICT, mRight, BoundType::STRICT );    // the new right type has to be strict
+        return ExactInterval( mLeft, BoundType::STRICT, mRight, rightBoundType );
     }
 
     template<typename Numeric>
     Numeric ExactInterval<Numeric>::midpoint() const
     {
-        return getWeakestBoundType(mLeftType,mRightType) == INFINITY_BOUND ? Numeric(0) : (mLeft + mRight) / Numeric( 2 );
+        return getWeakestBoundType(mLeftType,mRightType) == BoundType::INFTY ? Numeric(0) : (mLeft + mRight) / Numeric( 2 );
     }
 
     template<typename Numeric>
@@ -219,9 +219,9 @@ namespace carl
                 return ExactInterval( r, mRightType, l, mLeftType );
         }
         if( l >= r )
-            return ExactInterval( 0, WEAK_BOUND, l, mLeftType );
+            return ExactInterval( 0, BoundType::WEAK, l, mLeftType );
         else
-            return ExactInterval( 0, WEAK_BOUND, r, mRightType );
+            return ExactInterval( 0, BoundType::WEAK, r, mRightType );
     }
 
     ///////////////////////////
@@ -273,28 +273,28 @@ namespace carl
         bool    mininfty, maxinfty, isSet;
         Numeric min, max;
 
-        mininfty = (mLeftType == INFINITY_BOUND && (o.mRight > 0 || o.mRightType == INFINITY_BOUND))
-                   || (mRightType == INFINITY_BOUND && (o.mLeft < 0 || o.mLeftType == INFINITY_BOUND))
-                   || (o.mLeftType == INFINITY_BOUND && (mRight > 0 || mRightType == INFINITY_BOUND))
-                   || (o.mRightType == INFINITY_BOUND && (mRight < 0 || (mLeft < 0 || mLeftType == INFINITY_BOUND)));
+        mininfty = (mLeftType == BoundType::INFTY && (o.mRight > 0 || o.mRightType == BoundType::INFTY))
+                   || (mRightType == BoundType::INFTY && (o.mLeft < 0 || o.mLeftType == BoundType::INFTY))
+                   || (o.mLeftType == BoundType::INFTY && (mRight > 0 || mRightType == BoundType::INFTY))
+                   || (o.mRightType == BoundType::INFTY && (mRight < 0 || (mLeft < 0 || mLeftType == BoundType::INFTY)));
 
-        maxinfty = (mLeftType == INFINITY_BOUND && (o.mRight < 0 || (o.mLeft < 0 || o.mLeftType == INFINITY_BOUND)))
-                   || (mRightType == INFINITY_BOUND && (o.mLeft > 0 || (o.mRight > 0 || o.mRightType == INFINITY_BOUND)))
-                   || (o.mLeftType == INFINITY_BOUND && (mRight < 0 || (mLeft < 0 || mLeftType == INFINITY_BOUND)))
-                   || (o.mRightType == INFINITY_BOUND && (mLeft > 0 || (mRight > 0 || mRightType == INFINITY_BOUND)));
+        maxinfty = (mLeftType == BoundType::INFTY && (o.mRight < 0 || (o.mLeft < 0 || o.mLeftType == BoundType::INFTY)))
+                   || (mRightType == BoundType::INFTY && (o.mLeft > 0 || (o.mRight > 0 || o.mRightType == BoundType::INFTY)))
+                   || (o.mLeftType == BoundType::INFTY && (mRight < 0 || (mLeft < 0 || mLeftType == BoundType::INFTY)))
+                   || (o.mRightType == BoundType::INFTY && (mLeft > 0 || (mRight > 0 || mRightType == BoundType::INFTY)));
 
         // min calculation
         if( !mininfty )
         {
             isSet = false;
-            if( mLeftType != INFINITY_BOUND )
+            if( mLeftType != BoundType::INFTY )
             {
-                if( o.mLeftType != INFINITY_BOUND )
+                if( o.mLeftType != BoundType::INFTY )
                 {
                     isSet = true;
                     min   = mLeft * o.mLeft;
                 }
-                if( o.mRightType != INFINITY_BOUND )
+                if( o.mRightType != BoundType::INFTY )
                 {
                     if( min > mLeft * o.mRight ||!isSet )
                     {
@@ -303,9 +303,9 @@ namespace carl
                     }
                 }
             }
-            if( mRightType != INFINITY_BOUND )
+            if( mRightType != BoundType::INFTY )
             {
-                if( o.mLeftType != INFINITY_BOUND )
+                if( o.mLeftType != BoundType::INFTY )
                 {
                     if( min > mRight * o.mLeft ||!isSet )
                     {
@@ -313,7 +313,7 @@ namespace carl
                         isSet = true;
                     }
                 }
-                if( o.mRightType != INFINITY_BOUND )
+                if( o.mRightType != BoundType::INFTY )
                 {
                     if( min > mRight * o.mRight ||!isSet )
                     {
@@ -333,14 +333,14 @@ namespace carl
         if( !maxinfty )
         {
             isSet = false;
-            if( mLeftType != INFINITY_BOUND )
+            if( mLeftType != BoundType::INFTY )
             {
-                if( o.mLeftType != INFINITY_BOUND )
+                if( o.mLeftType != BoundType::INFTY )
                 {
                     isSet = true;
                     max   = mLeft * o.mLeft;
                 }
-                if( o.mRightType != INFINITY_BOUND )
+                if( o.mRightType != BoundType::INFTY )
                 {
                     if( max < mLeft * o.mRight ||!isSet )
                     {
@@ -349,9 +349,9 @@ namespace carl
                     }
                 }
             }
-            if( mRightType != INFINITY_BOUND )
+            if( mRightType != BoundType::INFTY )
             {
-                if( o.mLeftType != INFINITY_BOUND )
+                if( o.mLeftType != BoundType::INFTY )
                 {
                     if( max < mRight * o.mLeft ||!isSet )
                     {
@@ -359,7 +359,7 @@ namespace carl
                         isSet = true;
                     }
                 }
-                if( o.mRightType != INFINITY_BOUND )
+                if( o.mRightType != BoundType::INFTY )
                 {
                     if( max < mRight * o.mRight ||!isSet )
                     {
@@ -374,7 +374,7 @@ namespace carl
             max = 1;
         }
 
-        return ExactInterval( min, mininfty ? INFINITY_BOUND : WEAK_BOUND, max, maxinfty ? INFINITY_BOUND : WEAK_BOUND );
+        return ExactInterval( min, mininfty ? BoundType::INFTY : BoundType::WEAK, max, maxinfty ? BoundType::INFTY : BoundType::WEAK );
 
     }
 
@@ -413,7 +413,7 @@ namespace carl
         {
             splitOccured = false;
             if( this->contains( 0 ))
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 ), BoundType::INFTY );
             else
                 a = emptyExactInterval();
             return false;
@@ -464,8 +464,8 @@ namespace carl
         Numeric lPower = pow( mLeft, e );
         Numeric rPower = pow( mRight, e );
         if( lPower <= rPower )
-            return ExactInterval( Numeric(0), WEAK_BOUND, rPower, mRightType );
-        return ExactInterval( Numeric(0), WEAK_BOUND, lPower, mLeftType );
+            return ExactInterval( Numeric(0), BoundType::WEAK, rPower, mRightType );
+        return ExactInterval( Numeric(0), BoundType::WEAK, lPower, mLeftType );
     }
 
     template<typename Numeric>
@@ -473,60 +473,60 @@ namespace carl
     {
         if( this->unbounded() )
         {
-            a = ExactInterval(Numeric(0), STRICT_BOUND, Numeric(0), STRICT_BOUND);
+            a = ExactInterval(Numeric(0), BoundType::STRICT, Numeric(0), BoundType::STRICT);
             return false;
         }
         else if( this->contains( 0 ) && mLeft != 0 && mRight != 0 )
         {
-            if( mLeftType == INFINITY_BOUND )
+            if( mLeftType == BoundType::INFTY )
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 0 ), WEAK_BOUND );
-                b = ExactInterval( Numeric( 1 / mRight ), WEAK_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 0 ), BoundType::WEAK );
+                b = ExactInterval( Numeric( 1 / mRight ), BoundType::WEAK, Numeric( 1 ), BoundType::INFTY );
             }
-            else if( mRightType == INFINITY_BOUND )
+            else if( mRightType == BoundType::INFTY )
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 / mLeft ), WEAK_BOUND );
-                b = ExactInterval( Numeric( 0 ), WEAK_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 / mLeft ), BoundType::WEAK );
+                b = ExactInterval( Numeric( 0 ), BoundType::WEAK, Numeric( 1 ), BoundType::INFTY );
             }
             else if( mLeft == 0 && mRight != 0 )
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 ), INFINITY_BOUND );
-                b = ExactInterval( Numeric( 1 / mRight ), WEAK_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 ), BoundType::INFTY );
+                b = ExactInterval( Numeric( 1 / mRight ), BoundType::WEAK, Numeric( 1 ), BoundType::INFTY );
             }
             else if( mLeft != 0 && mRight == 0 )
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 / mLeft ), WEAK_BOUND );
-                b = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 / mLeft ), BoundType::WEAK );
+                b = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 ), BoundType::INFTY );
             }
             else if( mLeft == 0 && mRight == 0 )
             {
-                a = ExactInterval(Numeric(-1), INFINITY_BOUND, Numeric(1), INFINITY_BOUND);
+                a = ExactInterval(Numeric(-1), BoundType::INFTY, Numeric(1), BoundType::INFTY);
                 return false;
             }
             else
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 / mLeft ), WEAK_BOUND );
-                b = ExactInterval( Numeric( 1 / mRight ), WEAK_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 / mLeft ), BoundType::WEAK );
+                b = ExactInterval( Numeric( 1 / mRight ), BoundType::WEAK, Numeric( 1 ), BoundType::INFTY );
             }
             return true;
         }
         else
         {
-            if( mLeftType == INFINITY_BOUND && mRight != 0 )
+            if( mLeftType == BoundType::INFTY && mRight != 0 )
             {
-                a = ExactInterval( Numeric( 1 / mRight ), mRightType, Numeric( 0 ), WEAK_BOUND );
+                a = ExactInterval( Numeric( 1 / mRight ), mRightType, Numeric( 0 ), BoundType::WEAK );
             }
-            else if( mLeftType == INFINITY_BOUND && mRight == 0 )
+            else if( mLeftType == BoundType::INFTY && mRight == 0 )
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 0 ), WEAK_BOUND );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 0 ), BoundType::WEAK );
             }
-            else if( mRightType == INFINITY_BOUND && mLeft != 0 )
+            else if( mRightType == BoundType::INFTY && mLeft != 0 )
             {
-                a = ExactInterval( Numeric( 0 ), WEAK_BOUND, Numeric( 1 / mLeft ), mLeftType );
+                a = ExactInterval( Numeric( 0 ), BoundType::WEAK, Numeric( 1 / mLeft ), mLeftType );
             }
-            else if( mRightType == INFINITY_BOUND && mLeft == 0 )
+            else if( mRightType == BoundType::INFTY && mLeft == 0 )
             {
-                a = ExactInterval( Numeric( 0 ), WEAK_BOUND, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( 0 ), BoundType::WEAK, Numeric( 1 ), BoundType::INFTY );
             }
             else if( mLeft != 0 && mRight != 0 )
             {
@@ -534,11 +534,11 @@ namespace carl
             }
             else if( mLeft == 0 && mRight != 0 )
             {
-                a = ExactInterval( Numeric( 1 / mRight ), mRightType, Numeric( 1 ), INFINITY_BOUND );
+                a = ExactInterval( Numeric( 1 / mRight ), mRightType, Numeric( 1 ), BoundType::INFTY );
             }
             else if( mLeft != 0 && mRight == 0 )
             {
-                a = ExactInterval( Numeric( -1 ), INFINITY_BOUND, Numeric( 1 / mLeft ), mLeftType );
+                a = ExactInterval( Numeric( -1 ), BoundType::INFTY, Numeric( 1 / mLeft ), mLeftType );
             }
             return false;
         }
@@ -554,7 +554,7 @@ namespace carl
         if( this == &o )
             return true;
         return ( mLeftType == o.mLeftType && mRightType == o.mRightType &&
-                ( ( mLeftType == INFINITY_BOUND && mRight == o.mRight ) || ( mRightType == INFINITY_BOUND && mLeft == o.mLeft ) || ( mLeft == o.mLeft && mRight == o.mRight ) ) );
+                ( ( mLeftType == BoundType::INFTY && mRight == o.mRight ) || ( mRightType == BoundType::INFTY && mLeft == o.mLeft ) || ( mLeft == o.mLeft && mRight == o.mRight ) ) );
     }
 
     template<typename Numeric>
@@ -569,8 +569,8 @@ namespace carl
         // only compare left bounds
         switch( mLeftType )
         {
-            case INFINITY_BOUND:
-                return o.mLeftType == INFINITY_BOUND;
+            case BoundType::INFTY:
+                return o.mLeftType == BoundType::INFTY;
             default:
                 return (mLeft <= o.mLeft);
         }
@@ -600,8 +600,8 @@ namespace carl
         // only compare right bounds
         switch( mRightType )
         {
-            case INFINITY_BOUND:
-                return o.mRightType == INFINITY_BOUND;
+            case BoundType::INFTY:
+                return o.mRightType == BoundType::INFTY;
             default:
                 return (mRight >= o.mRight);
         }
@@ -610,21 +610,21 @@ namespace carl
     template<typename Numeric>
     std::ostream& operator << (std::ostream& str, const ExactInterval<Numeric>& d)
     {
-        if( d.leftType() == INFINITY_BOUND )
+        if( d.leftType() == BoundType::INFTY )
             str << "]-infinity";
         else
         {
             str.precision( 30 );
-            str << (d.leftType() == STRICT_BOUND ? "]" : "[") << d.left();
+            str << (d.leftType() == BoundType::STRICT ? "]" : "[") << d.left();
             str.precision( 0 );
         }
         str << ", ";
-        if( d.rightType() == INFINITY_BOUND )
+        if( d.rightType() == BoundType::INFTY )
             str << "infinity[";
         else
         {
             str.precision( 30 );
-            str << d.right() << (d.rightType() == WEAK_BOUND ? "]" : "[");
+            str << d.right() << (d.rightType() == BoundType::WEAK ? "]" : "[");
             str.precision( 0 );
         }
         return str;

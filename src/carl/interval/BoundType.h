@@ -7,12 +7,16 @@
 
 #pragma once
 
-enum BoundType {
+namespace carl
+{
+    enum class BoundType {
                 /// the given bound is compared by a strict ordering relation
-                STRICT_BOUND,
+                STRICT,
                 /// the given bound is compared by a weak ordering relation
-                WEAK_BOUND,
+                WEAK,
                 /// the given bound is interpreted as minus or plus infinity depending on whether it is the left or the right bound
-                INFINITY_BOUND
+                INFTY
             };
+            
+}
 

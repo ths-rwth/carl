@@ -14,7 +14,7 @@ namespace carl
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Coeff& c) :
 Policies(),
-mTerms(1,std::make_shared<const Term<Coeff>>(c))
+mTerms(c == 0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
 {
     
 }

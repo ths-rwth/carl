@@ -46,20 +46,20 @@ namespace carl
     DoubleInterval::DoubleInterval()
     {
         mInterval = BoostDoubleInterval( 0 );
-        mLeftType  = INFINITY_BOUND;
-        mRightType = INFINITY_BOUND;
+        mLeftType  = BoundType::INFTY;
+        mRightType = BoundType::INFTY;
     }
 
     DoubleInterval::DoubleInterval( const double& n ):
-        DoubleInterval( n, WEAK_BOUND, n, WEAK_BOUND )
+        DoubleInterval( n, BoundType::WEAK, n, BoundType::WEAK )
     {}
 
     DoubleInterval::DoubleInterval( const BoostDoubleInterval& _interval ):
-        DoubleInterval( _interval, ( _interval.lower() == INFINITY ? INFINITY_BOUND : WEAK_BOUND), ( _interval.upper() == INFINITY ? INFINITY_BOUND : WEAK_BOUND) )
+        DoubleInterval( _interval, ( _interval.lower() == INFINITY ? BoundType::INFTY : BoundType::WEAK), ( _interval.upper() == INFINITY ? BoundType::INFTY : BoundType::WEAK) )
     {}
 
     DoubleInterval::DoubleInterval( const double& left, const double& right ):
-        DoubleInterval( left, ( left == INFINITY ? INFINITY_BOUND : WEAK_BOUND), right, ( right == INFINITY ? INFINITY_BOUND : WEAK_BOUND) )
+        DoubleInterval( left, ( left == INFINITY ? BoundType::INFTY : BoundType::WEAK), right, ( right == INFINITY ? BoundType::INFTY : BoundType::WEAK) )
     {}
 
     DoubleInterval::DoubleInterval( const BoostDoubleInterval& _interval, BoundType leftType, BoundType rightType ):
@@ -68,22 +68,22 @@ namespace carl
         mRightType( rightType )
     {
         assert( _interval.lower() != NAN && _interval.lower() != -INFINITY && _interval.upper() != NAN && _interval.upper() != INFINITY );
-        if( mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND )
+        if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( 0 );
         }
-        else if( mLeftType == INFINITY_BOUND )
+        else if( mLeftType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( _interval.upper() );
         }
-        else if( mRightType == INFINITY_BOUND )
+        else if( mRightType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( _interval.lower() );
         }
         else if( (_interval.lower() == _interval.upper() && leftType != rightType) )
         {
-            mLeftType = STRICT_BOUND;
-            mRightType = STRICT_BOUND;
+            mLeftType = BoundType::STRICT;
+            mRightType = BoundType::STRICT;
             mInterval = BoostDoubleInterval( 0 );
         }
         else
@@ -97,24 +97,24 @@ namespace carl
         mRightType( rightType )
     {
         assert( left != NAN && left != INFINITY && right != NAN && right != -INFINITY );
-        if( left == -INFINITY ) mLeftType = INFINITY_BOUND;
-        if( right == INFINITY ) mRightType = INFINITY_BOUND;
-        if( mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND )
+        if( left == -INFINITY ) mLeftType = BoundType::INFTY;
+        if( right == INFINITY ) mRightType = BoundType::INFTY;
+        if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( 0 );
         }
-        else if( mLeftType == INFINITY_BOUND )
+        else if( mLeftType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( right );
         }
-        else if( mRightType == INFINITY_BOUND )
+        else if( mRightType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( left );
         }
-        else if( (left == right && (leftType == STRICT_BOUND || rightType == STRICT_BOUND)) || left > right )
+        else if( (left == right && (leftType == BoundType::STRICT || rightType == BoundType::STRICT)) || left > right )
         {
-            mLeftType = STRICT_BOUND;
-            mRightType = STRICT_BOUND;
+            mLeftType = BoundType::STRICT;
+            mRightType = BoundType::STRICT;
             mInterval = BoostDoubleInterval( 0 );
         }
         else
@@ -135,12 +135,12 @@ namespace carl
         if( _left > left() && _left <= right() )
         {
             setLeft( _left );
-            mLeftType = WEAK_BOUND;
+            mLeftType = BoundType::WEAK;
         }
         else if( _left > left() )
         {
-            mLeftType   = STRICT_BOUND;
-            mRightType  = STRICT_BOUND;
+            mLeftType   = BoundType::STRICT;
+            mRightType  = BoundType::STRICT;
             mInterval = BoostDoubleInterval( 0 );
         }
     }
@@ -150,12 +150,12 @@ namespace carl
         if( _right >= left() && _right < right() )
         {
             setRight( _right );
-            mRightType = WEAK_BOUND;
+            mRightType = BoundType::WEAK;
         }
         else if( _right < left() )
         {
-            mLeftType   = STRICT_BOUND;
-            mRightType  = STRICT_BOUND;
+            mLeftType   = BoundType::STRICT;
+            mRightType  = BoundType::STRICT;
             mInterval = BoostDoubleInterval( 0 );
         }
     }
@@ -178,40 +178,40 @@ namespace carl
 
     DoubleInterval DoubleInterval::sqrt() const
     {
-        if( mRightType != INFINITY_BOUND && right() < 0 )
+        if( mRightType != BoundType::INFTY && right() < 0 )
         {
             return emptyInterval();
         }
-        double lvalue = (mLeftType == INFINITY_BOUND || left() < 0) ? 0 : left();
-        double rvalue = (mRightType == INFINITY_BOUND || right() < 0) ? 0 : right();
-        if( lvalue > rvalue && mRightType == INFINITY_BOUND ) rvalue = lvalue;
+        double lvalue = (mLeftType == BoundType::INFTY || left() < 0) ? 0 : left();
+        double rvalue = (mRightType == BoundType::INFTY || right() < 0) ? 0 : right();
+        if( lvalue > rvalue && mRightType == BoundType::INFTY ) rvalue = lvalue;
         BoostDoubleInterval content = boost::numeric::sqrt( BoostDoubleInterval( lvalue, rvalue ) );
         BoundType leftType = mLeftType;
         BoundType rightType = mRightType;
-        if( mLeftType == INFINITY_BOUND || left() < 0 )
+        if( mLeftType == BoundType::INFTY || left() < 0 )
         {
-            leftType = WEAK_BOUND;
+            leftType = BoundType::WEAK;
         }
         return DoubleInterval( content, leftType, rightType );
     }
 
     DoubleInterval DoubleInterval::mul( const DoubleInterval& _interval ) const
     {
-        BoundType leftType = WEAK_BOUND;
-        BoundType rightType = WEAK_BOUND;
-        if( (mLeftType == INFINITY_BOUND && (_interval.right() > 0 || _interval.mRightType == INFINITY_BOUND))
-            || (mRightType == INFINITY_BOUND && (_interval.left() < 0 || _interval.mLeftType == INFINITY_BOUND))
-            || (_interval.mLeftType == INFINITY_BOUND && (right() > 0 || mRightType == INFINITY_BOUND))
-            || (_interval.mRightType == INFINITY_BOUND && (right() < 0 || (left() < 0 || mLeftType == INFINITY_BOUND))) )
+        BoundType leftType = BoundType::WEAK;
+        BoundType rightType = BoundType::WEAK;
+        if( (mLeftType == BoundType::INFTY && (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY))
+            || (mRightType == BoundType::INFTY && (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY))
+            || (_interval.mLeftType == BoundType::INFTY && (right() > 0 || mRightType == BoundType::INFTY))
+            || (_interval.mRightType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY))) )
         {
-            leftType = INFINITY_BOUND;
+            leftType = BoundType::INFTY;
         }
-        if( (mLeftType == INFINITY_BOUND && (_interval.right() < 0 || (_interval.left() < 0 || _interval.mLeftType == INFINITY_BOUND)))
-            || (mRightType == INFINITY_BOUND && (_interval.left() > 0 || (_interval.right() > 0 || _interval.mRightType == INFINITY_BOUND)))
-            || (_interval.mLeftType == INFINITY_BOUND && (right() < 0 || (left() < 0 || mLeftType == INFINITY_BOUND)))
-            || (_interval.mRightType == INFINITY_BOUND && (left() > 0 || (right() > 0 || mRightType == INFINITY_BOUND))) )
+        if( (mLeftType == BoundType::INFTY && (_interval.right() < 0 || (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY)))
+            || (mRightType == BoundType::INFTY && (_interval.left() > 0 || (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY)))
+            || (_interval.mLeftType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY)))
+            || (_interval.mRightType == BoundType::INFTY && (left() > 0 || (right() > 0 || mRightType == BoundType::INFTY))) )
         {
-            rightType = INFINITY_BOUND;
+            rightType = BoundType::INFTY;
         }
         return DoubleInterval( BoostDoubleInterval( mInterval*_interval.content() ), leftType, rightType );
     }
@@ -219,21 +219,21 @@ namespace carl
     DoubleInterval DoubleInterval::div( const DoubleInterval& _interval ) const throw ( std::invalid_argument )
     {
         if( _interval.contains( 0 ) ) throw ( std::invalid_argument( "Division by interval containing zero not allowed." ) );
-        BoundType leftType = WEAK_BOUND;
-        BoundType rightType = WEAK_BOUND;
-        if( (mLeftType == INFINITY_BOUND && (_interval.right() > 0 || _interval.mRightType == INFINITY_BOUND))
-            || (mRightType == INFINITY_BOUND && (_interval.left() < 0 || _interval.mLeftType == INFINITY_BOUND))
-            || (_interval.mLeftType == INFINITY_BOUND && (right() > 0 || mRightType == INFINITY_BOUND))
-            || (_interval.mRightType == INFINITY_BOUND && (right() < 0 || (left() < 0 || mLeftType == INFINITY_BOUND))) )
+        BoundType leftType = BoundType::WEAK;
+        BoundType rightType = BoundType::WEAK;
+        if( (mLeftType == BoundType::INFTY && (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY))
+            || (mRightType == BoundType::INFTY && (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY))
+            || (_interval.mLeftType == BoundType::INFTY && (right() > 0 || mRightType == BoundType::INFTY))
+            || (_interval.mRightType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY))) )
         {
-            leftType = INFINITY_BOUND;
+            leftType = BoundType::INFTY;
         }
-        if( (mLeftType == INFINITY_BOUND && (_interval.right() < 0 || (_interval.left() < 0 || _interval.mLeftType == INFINITY_BOUND)))
-            || (mRightType == INFINITY_BOUND && (_interval.left() > 0 || (_interval.right() > 0 || _interval.mRightType == INFINITY_BOUND)))
-            || (_interval.mLeftType == INFINITY_BOUND && (right() < 0 || (left() < 0 || mLeftType == INFINITY_BOUND)))
-            || (_interval.mRightType == INFINITY_BOUND && (left() > 0 || (right() > 0 || mRightType == INFINITY_BOUND))) )
+        if( (mLeftType == BoundType::INFTY && (_interval.right() < 0 || (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY)))
+            || (mRightType == BoundType::INFTY && (_interval.left() > 0 || (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY)))
+            || (_interval.mLeftType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY)))
+            || (_interval.mRightType == BoundType::INFTY && (left() > 0 || (right() > 0 || mRightType == BoundType::INFTY))) )
         {
-            rightType = INFINITY_BOUND;
+            rightType = BoundType::INFTY;
         }
         return DoubleInterval( BoostDoubleInterval( mInterval/_interval.content() ), leftType, rightType );
     }
@@ -243,7 +243,7 @@ namespace carl
         DoubleInterval inverseA, inverseB;
         bool          splitOccured;
 
-        if( o.leftType() != INFINITY_BOUND && o.left() == 0 && o.rightType() != INFINITY_BOUND && o.right() == 0 )    // point interval 0
+        if( o.leftType() != BoundType::INFTY && o.left() == 0 && o.rightType() != BoundType::INFTY && o.right() == 0 )    // point interval 0
         {
             splitOccured = false;
             if( this->contains( 0 ))
@@ -296,30 +296,30 @@ namespace carl
     {
         if( _exp % 2 == 0 )
         {
-            if( mLeftType == INFINITY_BOUND && mRightType == INFINITY_BOUND )
+            if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
             {
                 return DoubleInterval();
             }
-            else if( mLeftType == INFINITY_BOUND )
+            else if( mLeftType == BoundType::INFTY )
             {
                 if( contains( 0 ) )
                 {
-                    return DoubleInterval( 0, WEAK_BOUND, 0, INFINITY_BOUND );
+                    return DoubleInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
                 }
                 else
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mRightType, INFINITY_BOUND );
+                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mRightType, BoundType::INFTY );
                 }
             }
-            else if( mRightType == INFINITY_BOUND )
+            else if( mRightType == BoundType::INFTY )
             {
                 if( contains( 0 ) )
                 {
-                    return DoubleInterval( 0, WEAK_BOUND, 0, INFINITY_BOUND );
+                    return DoubleInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
                 }
                 else
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mLeftType, INFINITY_BOUND );
+                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mLeftType, BoundType::INFTY );
                 }
             }
             else
@@ -333,7 +333,7 @@ namespace carl
                 }
                 if( contains( 0 ) )
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), WEAK_BOUND, rType );
+                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), BoundType::WEAK, rType );
                 }
                 else
                 {
@@ -356,24 +356,24 @@ namespace carl
         }
         else if( this->contains( 0 ) && left() != 0 && right() != 0 )
         {
-            if( mLeftType == INFINITY_BOUND )
+            if( mLeftType == BoundType::INFTY )
             {
-                a = DoubleInterval( 0, INFINITY_BOUND, 0, WEAK_BOUND );
-                b = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), WEAK_BOUND, INFINITY_BOUND );
+                a = DoubleInterval( 0, BoundType::INFTY, 0, BoundType::WEAK );
+                b = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), BoundType::WEAK, BoundType::INFTY );
             }
-            else if( mRightType == INFINITY_BOUND )
+            else if( mRightType == BoundType::INFTY )
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), INFINITY_BOUND, WEAK_BOUND );
-                b = DoubleInterval( 0, WEAK_BOUND, 0, INFINITY_BOUND );
+                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), BoundType::INFTY, BoundType::WEAK );
+                b = DoubleInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
             }
             else if( left() == 0 && right() != 0 )
             {
-                a = DoubleInterval( 0, INFINITY_BOUND, 0, INFINITY_BOUND );
-                b = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), WEAK_BOUND, INFINITY_BOUND );
+                a = DoubleInterval( 0, BoundType::INFTY, 0, BoundType::INFTY );
+                b = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), BoundType::WEAK, BoundType::INFTY );
             }
             else if( left() != 0 && right() == 0 )
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), INFINITY_BOUND, WEAK_BOUND );
+                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), BoundType::INFTY, BoundType::WEAK );
                 b = unboundedInterval(); // todo: really the whole interval here?
             }
             else if( left() == 0 && right() == 0 )
@@ -383,28 +383,28 @@ namespace carl
             }
             else
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), INFINITY_BOUND, WEAK_BOUND );
-                b = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), WEAK_BOUND, INFINITY_BOUND );
+                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), BoundType::INFTY, BoundType::WEAK );
+                b = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), BoundType::WEAK, BoundType::INFTY );
             }
             return true;
         }
         else
         {
-            if( mLeftType == INFINITY_BOUND && right() != 0 )
+            if( mLeftType == BoundType::INFTY && right() != 0 )
             {
-                a = DoubleInterval(  1 / right() , mRightType, 0,  WEAK_BOUND );
+                a = DoubleInterval(  1 / right() , mRightType, 0,  BoundType::WEAK );
             }
-            else if( mLeftType == INFINITY_BOUND && right() == 0 )
+            else if( mLeftType == BoundType::INFTY && right() == 0 )
             {
-                a = DoubleInterval( 0, INFINITY_BOUND, 0, WEAK_BOUND );
+                a = DoubleInterval( 0, BoundType::INFTY, 0, BoundType::WEAK );
             }
-            else if( mRightType == INFINITY_BOUND && left() != 0 )
+            else if( mRightType == BoundType::INFTY && left() != 0 )
             {
-                a = DoubleInterval(  0 , WEAK_BOUND, 1  /  left(), mLeftType );
+                a = DoubleInterval(  0 , BoundType::WEAK, 1  /  left(), mLeftType );
             }
-            else if( mRightType == INFINITY_BOUND && left() == 0 )
+            else if( mRightType == BoundType::INFTY && left() == 0 )
             {
-                a = DoubleInterval( 0, WEAK_BOUND, 0, INFINITY_BOUND );
+                a = DoubleInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
             }
             else if( left() != 0 && right() != 0 )
             {
@@ -412,11 +412,11 @@ namespace carl
             }
             else if( left() == 0 && right() != 0 )
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), mRightType, INFINITY_BOUND );
+                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( right() ), mRightType, BoundType::INFTY );
             }
             else if( left() != 0 && right() == 0 )
             {
-                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), INFINITY_BOUND, mLeftType );
+                a = DoubleInterval( BoostDoubleInterval( 1 ) / BoostDoubleInterval( left() ), BoundType::INFTY, mLeftType );
             }
 
             return false;
@@ -427,7 +427,7 @@ namespace carl
     double DoubleInterval::diameter() const
     {
         assert( DOUBLE_BOUNDS_OK( left(), mLeftType, right(), mRightType ));
-        if( mLeftType == INFINITY_BOUND || mRightType == INFINITY_BOUND )
+        if( mLeftType == BoundType::INFTY || mRightType == BoundType::INFTY )
         {
             return -1;
         }
@@ -436,7 +436,7 @@ namespace carl
     
     bool DoubleInterval::empty() const
     {
-        return !(mLeftType == INFINITY_BOUND || mRightType == INFINITY_BOUND || left() < right() || ( left() == right() && mLeftType != STRICT_BOUND && mRightType != STRICT_BOUND ));
+        return !(mLeftType == BoundType::INFTY || mRightType == BoundType::INFTY || left() < right() || ( left() == right() && mLeftType != BoundType::STRICT && mRightType != BoundType::STRICT ));
     }
 
     //////////////////
@@ -449,11 +449,11 @@ namespace carl
         {
             return Sign::ZERO;
         }
-        else if( (mLeftType == STRICT_BOUND && left() >= 0) || (mLeftType == WEAK_BOUND && left() > 0) )
+        else if( (mLeftType == BoundType::STRICT && left() >= 0) || (mLeftType == BoundType::WEAK && left() > 0) )
         {
             return Sign::POSITIVE;
         }
-        else if( (mRightType == STRICT_BOUND && right() <= 0) || (mRightType == WEAK_BOUND && right() < 0) )
+        else if( (mRightType == BoundType::STRICT && right() <= 0) || (mRightType == BoundType::WEAK && right() < 0) )
         {
             return Sign::NEGATIVE;
         }
@@ -467,26 +467,26 @@ namespace carl
     {
         switch( mLeftType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
-            case STRICT_BOUND:
+            case BoundType::STRICT:
                 if( left() >= n )
                     return false;
                 break;
-            case WEAK_BOUND:
+            case BoundType::WEAK:
                 if( left() > n )
                     return false;
         }
         // Invariant: n is not conflicting with left bound
         switch( mRightType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
-            case STRICT_BOUND:
+            case BoundType::STRICT:
                 if( right() <= n )
                     return false;
                 break;
-            case WEAK_BOUND:
+            case BoundType::WEAK:
                 if( right() < n )
                     return false;
                 break;
@@ -498,26 +498,26 @@ namespace carl
     {
         switch( mLeftType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
             default:
                 if( left() > o.left() )
                     return false;
-            case STRICT_BOUND:
-                if( left() == o.left() && o.mLeftType != STRICT_BOUND )
+            case BoundType::STRICT:
+                if( left() == o.left() && o.mLeftType != BoundType::STRICT )
                     return false;
                 break;
         }
         // Invariant: left bound of o is not conflicting with left bound
         switch( mRightType )
         {
-            case INFINITY_BOUND:
+            case BoundType::INFTY:
                 break;
             default:
                 if( right() < o.right() )
                     return false;
-            case STRICT_BOUND:
-                if( right() == o.right() && o.mRightType != STRICT_BOUND )
+            case BoundType::STRICT:
+                if( right() == o.right() && o.mRightType != BoundType::STRICT )
                     return false;
                 break;
         }
@@ -536,7 +536,7 @@ namespace carl
         BoundType maxLowest;
         BoundType minUppest;
         // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
-        if ( mLeftType != INFINITY_BOUND && o.leftType() != INFINITY_BOUND )
+        if ( mLeftType != BoundType::INFTY && o.leftType() != BoundType::INFTY )
         {
             if ( left() < o.left() )
             {
@@ -554,12 +554,12 @@ namespace carl
                 maxLowest = getWeakestBoundType(mLeftType, o.leftType());
             }
         }
-        else if ( mLeftType == INFINITY_BOUND && o.leftType() != INFINITY_BOUND )
+        else if ( mLeftType == BoundType::INFTY && o.leftType() != BoundType::INFTY )
         {
             lowerValue = o.left();
             maxLowest = o.leftType();
         }
-        else if ( mLeftType != INFINITY_BOUND && o.leftType() == INFINITY_BOUND )
+        else if ( mLeftType != BoundType::INFTY && o.leftType() == BoundType::INFTY )
         {
             lowerValue = left();
             maxLowest = mLeftType;
@@ -567,11 +567,11 @@ namespace carl
         else
         {
             lowerValue = 0;
-            maxLowest = INFINITY_BOUND;
+            maxLowest = BoundType::INFTY;
         }
         
         // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
-        if ( mRightType != INFINITY_BOUND && o.rightType() != INFINITY_BOUND )
+        if ( mRightType != BoundType::INFTY && o.rightType() != BoundType::INFTY )
         {
             if ( right() > o.right() )
             {
@@ -588,25 +588,25 @@ namespace carl
                 upperValue = right();
                 minUppest = getWeakestBoundType(mRightType, o.rightType());
             }
-            if( maxLowest == INFINITY_BOUND )
+            if( maxLowest == BoundType::INFTY )
             {
                 lowerValue = upperValue;
             }
         }
-        else if ( mRightType == INFINITY_BOUND && o.rightType() != INFINITY_BOUND )
+        else if ( mRightType == BoundType::INFTY && o.rightType() != BoundType::INFTY )
         {
             upperValue = o.right();
             minUppest = o.rightType();
-            if( maxLowest == INFINITY_BOUND )
+            if( maxLowest == BoundType::INFTY )
             {
                 lowerValue = upperValue;
             }
         }
-        else if ( mRightType != INFINITY_BOUND && o.rightType() == INFINITY_BOUND )
+        else if ( mRightType != BoundType::INFTY && o.rightType() == BoundType::INFTY )
         {
             upperValue = right();
             minUppest = mRightType;
-            if( maxLowest == INFINITY_BOUND )
+            if( maxLowest == BoundType::INFTY )
             {
                 lowerValue = upperValue;
             }
@@ -614,56 +614,56 @@ namespace carl
         else
         {
             upperValue = lowerValue;
-            minUppest = INFINITY_BOUND;
+            minUppest = BoundType::INFTY;
         }
         if ( lowerValue > upperValue )
             return emptyInterval();
         return DoubleInterval(lowerValue, maxLowest, upperValue, minUppest );
         
-//        if( (right() < o.left() && mRightType != INFINITY_BOUND && o.mLeftType != INFINITY_BOUND)
-//                || (o.right() < left() && mLeftType != INFINITY_BOUND && o.mRightType != INFINITY_BOUND) )    // intersection empty
-//            return DoubleInterval( 0, STRICT_BOUND, 0, STRICT_BOUND );
-//        // Invariant: ( right() >= o.left() || mRightType == INFINITY_BOUND && o.mLeftType == INFINITY_BOUND ) && ( o.right() >= left() || mLeftType == INFINITY_BOUND && o.mRightType == INFINITY_BOUND )
-//        BoundType leftBoundType  = (mLeftType == INFINITY_BOUND && o.mLeftType == INFINITY_BOUND) ? INFINITY_BOUND : WEAK_BOUND;
-//        BoundType rightBoundType = (mRightType == INFINITY_BOUND && o.mRightType == INFINITY_BOUND) ? INFINITY_BOUND : WEAK_BOUND;
-//        if( o.mLeftType == INFINITY_BOUND || (left() > o.left() && mLeftType != INFINITY_BOUND && o.mLeftType != INFINITY_BOUND ) || (left() == o.left() && mLeftType != STRICT_BOUND && o.mLeftType != STRICT_BOUND) )
+//        if( (right() < o.left() && mRightType != BoundType::INFTY && o.mLeftType != BoundType::INFTY)
+//                || (o.right() < left() && mLeftType != BoundType::INFTY && o.mRightType != BoundType::INFTY) )    // intersection empty
+//            return DoubleInterval( 0, BoundType::STRICT, 0, BoundType::STRICT );
+//        // Invariant: ( right() >= o.left() || mRightType == BoundType::INFTY && o.mLeftType == BoundType::INFTY ) && ( o.right() >= left() || mLeftType == BoundType::INFTY && o.mRightType == BoundType::INFTY )
+//        BoundType leftBoundType  = (mLeftType == BoundType::INFTY && o.mLeftType == BoundType::INFTY) ? BoundType::INFTY : BoundType::WEAK;
+//        BoundType rightBoundType = (mRightType == BoundType::INFTY && o.mRightType == BoundType::INFTY) ? BoundType::INFTY : BoundType::WEAK;
+//        if( o.mLeftType == BoundType::INFTY || (left() > o.left() && mLeftType != BoundType::INFTY && o.mLeftType != BoundType::INFTY ) || (left() == o.left() && mLeftType != BoundType::STRICT && o.mLeftType != BoundType::STRICT) )
 //        {    // left() can be safely taken as weak bound of the intersection or is infinity
-//            if( o.mRightType == INFINITY_BOUND || (mRightType != INFINITY_BOUND && right() < o.right() ) )
+//            if( o.mRightType == BoundType::INFTY || (mRightType != BoundType::INFTY && right() < o.right() ) )
 //                return DoubleInterval( left(), leftBoundType, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
-//            else if( mRightType == INFINITY_BOUND || right() > o.right() )
+//            else if( mRightType == BoundType::INFTY || right() > o.right() )
 //                return DoubleInterval( left(), leftBoundType, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
 //            // Invariant: right() == o.mRight
-//            if( mRightType == STRICT_BOUND || o.mRightType == STRICT_BOUND )
-//                return DoubleInterval( left(), leftBoundType, right(), STRICT_BOUND );    // the new right type has to be strict
+//            if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
+//                return DoubleInterval( left(), leftBoundType, right(), BoundType::STRICT );    // the new right type has to be strict
 //            return DoubleInterval( left(), leftBoundType, right(), rightBoundType );
 //        }
-//        if( mLeftType == INFINITY_BOUND || left() < o.left() )
+//        if( mLeftType == BoundType::INFTY || left() < o.left() )
 //        {    // o.left() can be safely taken as weak bound of the intersection
-//            if( o.mRightType == INFINITY_BOUND || (mRightType != INFINITY_BOUND && right() < o.right() ) )
+//            if( o.mRightType == BoundType::INFTY || (mRightType != BoundType::INFTY && right() < o.right() ) )
 //                return DoubleInterval( o.left(), leftBoundType, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
-//            else if( mRightType == INFINITY_BOUND || right() > o.right() )
+//            else if( mRightType == BoundType::INFTY || right() > o.right() )
 //                return DoubleInterval( o.left(), leftBoundType, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
 //            // Invariant: right() == o.mRight
-//            if( mRightType == STRICT_BOUND || o.mRightType == STRICT_BOUND )
-//                return DoubleInterval( o.left(), leftBoundType, right(), STRICT_BOUND );    // the new right type has to be strict
+//            if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
+//                return DoubleInterval( o.left(), leftBoundType, right(), BoundType::STRICT );    // the new right type has to be strict
 //            return DoubleInterval( o.left(), leftBoundType, right(), rightBoundType );
 //        }
-//        // Invariant: left() == o.left() && ( mLeftType == STRICT_BOUND || o.mLeftType == STRICT_BOUND )
-//        assert( mLeftType == STRICT_BOUND || o.mLeftType == STRICT_BOUND );
+//        // Invariant: left() == o.left() && ( mLeftType == BoundType::STRICT || o.mLeftType == BoundType::STRICT )
+//        assert( mLeftType == BoundType::STRICT || o.mLeftType == BoundType::STRICT );
 //        // the new left type has to be strict
-//        if( o.mRightType == INFINITY_BOUND || right() < o.right() )
-//            return DoubleInterval( left(), STRICT_BOUND, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
-//        else if( mRightType == INFINITY_BOUND || right() > o.right() )
-//            return DoubleInterval( left(), STRICT_BOUND, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
+//        if( o.mRightType == BoundType::INFTY || right() < o.right() )
+//            return DoubleInterval( left(), BoundType::STRICT, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
+//        else if( mRightType == BoundType::INFTY || right() > o.right() )
+//            return DoubleInterval( left(), BoundType::STRICT, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
 //        // Invariant: right() == o.mRight
-//        if( mRightType == STRICT_BOUND || o.mRightType == STRICT_BOUND )
-//            return DoubleInterval( left(), STRICT_BOUND, right(), STRICT_BOUND );    // the new right type has to be strict
-//        return DoubleInterval( left(), STRICT_BOUND, right(), rightBoundType );
+//        if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
+//            return DoubleInterval( left(), BoundType::STRICT, right(), BoundType::STRICT );    // the new right type has to be strict
+//        return DoubleInterval( left(), BoundType::STRICT, right(), rightBoundType );
     }
 
     double DoubleInterval::midpoint() const
     {
-        double midpoint = getWeakestBoundType( mLeftType, mRightType ) == INFINITY_BOUND ? 0.0 : (left() + right() ) / 2.0;
+        double midpoint = getWeakestBoundType( mLeftType, mRightType ) == BoundType::INFTY ? 0.0 : (left() + right() ) / 2.0;
         if( midpoint < left() ) return left();
         if( midpoint > right() ) return right();
         return midpoint;
@@ -671,8 +671,8 @@ namespace carl
 
     DoubleInterval DoubleInterval::abs() const
     {
-        BoundType rbt = ( mLeftType != INFINITY_BOUND && mRightType != INFINITY_BOUND ) ? (std::abs( left() ) <= std::abs( right() ) ? mRightType : mLeftType ) : INFINITY_BOUND;
-        BoundType lbt = ( mLeftType == STRICT_BOUND && left() >= 0 ) ? STRICT_BOUND : WEAK_BOUND;
+        BoundType rbt = ( mLeftType != BoundType::INFTY && mRightType != BoundType::INFTY ) ? (std::abs( left() ) <= std::abs( right() ) ? mRightType : mLeftType ) : BoundType::INFTY;
+        BoundType lbt = ( mLeftType == BoundType::STRICT && left() >= 0 ) ? BoundType::STRICT : BoundType::WEAK;
         return DoubleInterval( boost::numeric::abs( mInterval ), lbt, rbt );
     }
 
@@ -693,8 +693,8 @@ namespace carl
 	void DoubleInterval::operator*=( const DoubleInterval& _interval )
 	{
 		mInterval *= _interval.content();
-        mLeftType = mInterval.lower() == Checking::neg_inf() ? INFINITY_BOUND : WEAK_BOUND;
-        mLeftType = mInterval.upper() == Checking::pos_inf() ? INFINITY_BOUND : WEAK_BOUND;
+        mLeftType = mInterval.lower() == Checking::neg_inf() ? BoundType::INFTY : BoundType::WEAK;
+        mLeftType = mInterval.upper() == Checking::pos_inf() ? BoundType::INFTY : BoundType::WEAK;
 	}
 
     ///////////////////////////
@@ -725,8 +725,8 @@ namespace carl
         // only compare left bounds
         switch( mLeftType )
         {
-            case INFINITY_BOUND:
-                return o.mLeftType == INFINITY_BOUND;
+            case BoundType::INFTY:
+                return o.mLeftType == BoundType::INFTY;
             default:
                 return (left() <= o.left() );
         }
@@ -743,8 +743,8 @@ namespace carl
         // only compare right bounds
         switch( mRightType )
         {
-            case INFINITY_BOUND:
-                return o.mRightType == INFINITY_BOUND;
+            case BoundType::INFTY:
+                return o.mRightType == BoundType::INFTY;
             default:
                 return (right() >= o.right() );
         }
@@ -753,15 +753,15 @@ namespace carl
     void DoubleInterval::dbgprint() const
     {
         std::cout.precision( 30 );
-        if( mLeftType == INFINITY_BOUND )
+        if( mLeftType == BoundType::INFTY )
             std::cout << "]-infinity";
         else
-            std::cout << (mLeftType == STRICT_BOUND ? "]" : "[") << left();
+            std::cout << (mLeftType == BoundType::STRICT ? "]" : "[") << left();
         std::cout << ", ";
-        if( mRightType == INFINITY_BOUND )
+        if( mRightType == BoundType::INFTY )
             std::cout << "infinity[";
         else
-            std::cout << right() << (mRightType == WEAK_BOUND ? "]" : "[") << std::endl;
+            std::cout << right() << (mRightType == BoundType::WEAK ? "]" : "[") << std::endl;
         std::cout.precision( 0 );
     }
 
@@ -816,21 +816,21 @@ namespace carl
     
     std::ostream& operator << (std::ostream& str, const DoubleInterval& d)
     {
-        if( d.leftType() == INFINITY_BOUND )
+        if( d.leftType() == BoundType::INFTY )
             str << "]-infinity";
         else
         {
             str.precision( 30 );
-            str << (d.leftType() == STRICT_BOUND ? "]" : "[") << d.left();
+            str << (d.leftType() == BoundType::STRICT ? "]" : "[") << d.left();
             str.precision( 0 );
         }
         str << ", ";
-        if( d.rightType() == INFINITY_BOUND )
+        if( d.rightType() == BoundType::INFTY )
             str << "infinity[";
         else
         {
             str.precision( 30 );
-            str << d.right() << (d.rightType() == WEAK_BOUND ? "]" : "[");
+            str << d.right() << (d.rightType() == BoundType::WEAK ? "]" : "[");
             str.precision( 0 );
         }
         return str;
