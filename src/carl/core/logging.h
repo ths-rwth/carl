@@ -10,7 +10,7 @@
  * LOGi2_DISABLE (disable logging)
  *
  * Created: 21/11/2012
- * @version: 2012-12-21
+ * @version: 2013-10-28
  */
 
 #pragma once
@@ -26,6 +26,12 @@
 //#define LOGi2_DISABLE_TRACE_MSG
 #define LOGi2_TOFILE
 
+
+#ifndef CARL_LOGGING
+#define LOGi2_DISABLE
+#undef LOGi2_USE_LOG4CPLUS
+#endif
+
 #ifndef LOGi2_DISABLE
 #ifdef LOGi2_USE_LOG4CPLUS
 // include the appropriate headers.
@@ -40,11 +46,6 @@
 #endif
 #endif
 
-
-#ifndef CARL_LOGGING
-#define LOGi2_DISABLE
-#undef LOGi2_USE_LOG4CPLUS
-#endif
 
 #ifdef LOGi2_DISABLE
 // If we do not use logging, we do not have to do anything with the messages
