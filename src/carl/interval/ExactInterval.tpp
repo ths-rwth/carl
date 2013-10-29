@@ -160,7 +160,7 @@ namespace carl
     ExactInterval<Numeric> ExactInterval<Numeric>::intersect( const ExactInterval<Numeric>& o ) const
     {
         if( (mRight < o.mLeft && mRightType != BoundType::INFTY && o.mLeftType != BoundType::INFTY)
-                || (o.mRight < mLeft && mLeftType != BoundType::INFTY && o.mRightType != BoundType::INFTY) )    // intersection empty
+                || (o.mRight < mLeft && mLeftType != BoundType::INFTY && o.mRightType != BoundType::INFTY) || this->empty() || o.empty() )    // intersection empty
             return ExactInterval( 0, BoundType::STRICT, 0, BoundType::STRICT );
         // Invariant: ( mRight >= o.mLeft || mRightType == BoundType::INFTY && o.mLeftType == BoundType::INFTY ) && ( o.mRight >= mLeft || mLeftType == BoundType::INFTY && o.mRightType == BoundType::INFTY )
         BoundType leftBoundType  = mLeftType == BoundType::INFTY && o.mLeftType == BoundType::INFTY ? BoundType::INFTY : BoundType::WEAK;

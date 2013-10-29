@@ -811,7 +811,6 @@ TEST(ExactInterval, Intersection)
     EXPECT_EQ(ExactInterval<cln::cl_RA>( (cln::cl_RA)-1/2,BoundType::WEAK,(cln::cl_RA)1/2,BoundType::WEAK), a1.intersect(b12));
     EXPECT_EQ(ExactInterval<cln::cl_RA>( (cln::cl_RA)-1,BoundType::WEAK,(cln::cl_RA)1,BoundType::WEAK), a1.intersect(b13));
     EXPECT_EQ(true, a1.intersect(b14).empty());
-    std::cout << a1.intersect(b14)<<  std::endl;
     EXPECT_EQ(ExactInterval<cln::cl_RA>( (cln::cl_RA)-1,BoundType::WEAK,(cln::cl_RA)1,BoundType::WEAK), a1.intersect(b15));
     
     EXPECT_EQ(ExactInterval<cln::cl_RA>( (cln::cl_RA)-1,BoundType::WEAK,(cln::cl_RA)-1,BoundType::WEAK), a1.intersect(b16));
