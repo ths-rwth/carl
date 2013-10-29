@@ -14,6 +14,9 @@
 #include "../numbers/numbers.h"
 #include "../numbers/GFNumber.h"
 
+#include "logging.h"
+#include "../util/SFINAE.h"
+
 namespace carl
 {
 
@@ -118,7 +121,23 @@ public:
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	
-	UnivariatePolynomial normalize();
+	template<typename T = Coefficient, EnableIf<has_normalize<T>>...>
+	UnivariatePolynomial& normalizeCoefficients()
+	{
+		static_assert(std::is_same<T,Coefficient>::value, "No template parameters should be given");
+		for(Coefficient& c : mCoefficients)
+		{
+			c.normalize();
+		}
+		return *this;
+	}
+	template<typename T = Coefficient, DisableIf<has_normalize<T>>...>
+	UnivariatePolynomial& normalizeCoefficients()
+	{
+		static_assert(std::is_same<T,Coefficient>::value, "No template parameters should be given");
+		LOGMSG_WARN("carl.core", "normalize not possible");
+		return *this;
+	}
 	/**
 	 * Works only from rationals, if the numbers are already integers.
      * @return 
@@ -181,6 +200,11 @@ public:
 	friend UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	template<typename C, typename I>
+	friend UnivariatePolynomial<C> operator*(const I& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C, typename I>
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const I& rhs);
+	
 	
 	/**
 	 * Only defined for field-coefficients.
@@ -188,7 +212,10 @@ public:
 	 * @return 
 	 */
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
-
+	
+	template<typename Integral>
+	UnivariatePolynomial& operator/=(const Integral& rhs);
+	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
 	

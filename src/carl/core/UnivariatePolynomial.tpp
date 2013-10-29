@@ -130,7 +130,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	if(degdiff > 0)
 	{
 		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
-		lastNonZero = (unsigned)(std::find(result.mCoefficients.rbegin(), result.mCoefficients.rend(), (Coeff)0) - result.mCoefficients.rend()) + 1;
+		lastNonZero = (unsigned)(std::find(result.mCoefficients.rbegin(), result.mCoefficients.rend(), 0) - result.mCoefficients.rend()) + 1;
 	}
 	
 	// By construction, the leading coefficient will be zero.
@@ -143,7 +143,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 		}
 	}
 	// strip zeros from the end as we might have pushed zeros.
-	result.mCoefficients.resize(lastNonZero, (Coeff)0);
+	result.mCoefficients.resize(lastNonZero, Coeff(0));
 	
 	if(result.degree() < divisor.degree())
 	{
@@ -271,7 +271,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 	
 	assert(!divisor.isZero());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
-	result.quotient.mCoefficients.resize(1 + degree()-divisor.degree());
+	result.quotient.mCoefficients.resize(1 + degree()-divisor.degree(),(Coeff)0);
 	
 	do
 	{
@@ -330,7 +330,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
-	result.mCoefficients.resize(mCoefficients.size());
+	result.mCoefficients.resize(mCoefficients.size(), (Coeff)0);
 	std::transform(mCoefficients.begin(), mCoefficients.end(), result.mCoefficients.begin(), 
 				 [](const Coeff& c) -> Coeff {return -c;});
 	return result;		 
@@ -516,6 +516,9 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 	}
 	return *this;		
 }
+
+
+
 
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)

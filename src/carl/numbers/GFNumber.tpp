@@ -16,6 +16,7 @@ namespace carl
 template<typename IntegerT>
 GFNumber<IntegerT> GFNumber<IntegerT>::inverse() const
 {
+	assert(mGf != nullptr);
 	return GFNumber<IntegerT>(EEA<IntegerT>::calculate(mGf->size(), mN).second, mGf);
 }
 
@@ -23,11 +24,14 @@ template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
 	// same field AND same number after normalization.
+	assert(lhs.mGf != nullptr);
+	assert(rhs.mGf != nullptr);
 	return  (lhs.mGf == rhs.mGf || *(lhs.mGf) == *(rhs.mGf)) && (lhs.mGf->modulo(lhs.mN - rhs.mN) == 0);
 }
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const IntegerT& rhs)
 {
+	assert(lhs.mGf != nullptr);
 	return lhs.mGf->modulo(lhs.mN) == rhs;
 }
 template<typename IntegerT>
@@ -38,6 +42,7 @@ bool operator==(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, int rhs)
 {
+	assert(lhs.mGf != nullptr);
 	return lhs.mGf->modulo(lhs.mN) == rhs;
 }
 template<typename IntegerT>
@@ -83,8 +88,9 @@ const GFNumber<IntegerT> GFNumber<IntegerT>::operator-() const
 template<typename IntegerT>
 GFNumber<IntegerT> operator+(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
-	assert(*(lhs.mGf) == *(rhs.mGf));
-	return GFNumber<IntegerT>(lhs.mN + rhs.mN, lhs.mGf);
+	assert(lhs.mGf != nullptr || rhs.mGf != nullptr);
+	assert(lhs.mGf == nullptr || rhs.mGf == nullptr || *(lhs.mGf) == *(rhs.mGf));
+	return GFNumber<IntegerT>(lhs.mN + rhs.mN, lhs.mGf == nullptr ? rhs.mGf : lhs.mGf);
 }
 template<typename IntegerT>
 GFNumber<IntegerT> operator+(const GFNumber<IntegerT>& lhs, const IntegerT& rhs)
@@ -107,7 +113,7 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator ++()
 template<typename IntegerT>
 GFNumber<IntegerT>& GFNumber<IntegerT>::operator +=(const GFNumber& rhs)
 {
-	assert(*mGf == *(rhs.mGf));
+	assert(rhs.mGf == nullptr || *mGf == *(rhs.mGf));
 	mN += rhs.mN;
 	return *this;
 }
@@ -124,7 +130,7 @@ template<typename IntegerT>
 GFNumber<IntegerT> operator-(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
 	assert(*(lhs.mGf) == *(rhs.mGf));
-	return GFNumber<IntegerT>(lhs.mN - rhs.mN, lhs.mGf);
+	return GFNumber<IntegerT>(lhs.mN - rhs.mN, lhs.mGf == nullptr ? rhs.mGf : lhs.mGf);
 }
 template<typename IntegerT>
 GFNumber<IntegerT> operator-(const GFNumber<IntegerT>& lhs, const IntegerT& rhs)
@@ -147,7 +153,7 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator --()
 template<typename IntegerT>
 GFNumber<IntegerT>& GFNumber<IntegerT>::operator -=(const GFNumber& rhs)
 {
-	assert(*mGf == *(rhs.mGf));
+	assert(rhs.mGf == nullptr || *mGf == *(rhs.mGf));
 	mN -= rhs.mN;
 	return *this;
 }
@@ -163,7 +169,7 @@ template<typename IntegerT>
 GFNumber<IntegerT> operator*(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
 	assert(*(lhs.mGf) == *(rhs.mGf));
-	return GFNumber<IntegerT>(lhs.mN * rhs.mN, lhs.mGf);
+	return GFNumber<IntegerT>(lhs.mN * rhs.mN, lhs.mGf == nullptr ? rhs.mGf : lhs.mGf);
 }
 template<typename IntegerT>
 GFNumber<IntegerT> operator*(const GFNumber<IntegerT>& lhs, const IntegerT& rhs)
@@ -180,7 +186,7 @@ GFNumber<IntegerT> operator*(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 template<typename IntegerT>
 GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const GFNumber& rhs)
 {
-	assert(*mGf == *(rhs.mGf));
+	assert(rhs.mGf == nullptr || *mGf == *(rhs.mGf));
 	mN *= rhs.mN;
 	return *this;
 }
@@ -196,8 +202,9 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const IntegerT& rhs)
 template<typename IntegerT>
 GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
+	assert(!rhs.isZero());
 	assert(*(lhs.mGf) == *(rhs.mGf));	
-	return GFNumber<IntegerT>(lhs.mN * rhs.inverse().mN, lhs.mGf);
+	return GFNumber<IntegerT>(lhs.mN * rhs.inverse().mN, lhs.mGf == nullptr ? rhs.mGf : lhs.mGf);
 }
 
 }

@@ -29,27 +29,36 @@ class GFNumber
 	const GaloisField<IntegerType>* mGf;
 	
 	public:
-	GFNumber(IntegerType n, const GaloisField<IntegerType>* gf)
+	GFNumber(IntegerType n, const GaloisField<IntegerType>* gf= nullptr)
 	: mN(gf->symmetricModulo(n)), mGf(gf)
 	{
 		
 	}
 	
-	GFNumber<IntegerType> toGF(const GaloisField<IntegerType>* newfield)
+	GFNumber(const GFNumber& n, const GaloisField<IntegerType>* gf) :
+	mN(n.mN),
+	mGf(gf)
+	{
+		
+	}
+	
+	GFNumber<IntegerType> toGF(const GaloisField<IntegerType>* newfield) const
 	{
 		return GFNumber(mN, newfield);
 	}
 	
 	void normalize()
 	{
+		if(isZero() || isUnit()) return;
+		assert(mGf != nullptr);
 		mGf->modulo(mN);
 	}
 	
-	bool isZero()
+	bool isZero() const
 	{
 		return mN == 0;
 	}
-	bool isUnit()
+	bool isUnit() const
 	{
 		return mN == 1;
 	}
