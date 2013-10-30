@@ -27,7 +27,7 @@ namespace carl
         // initializing the logging library.
         configureLogging();
         // initialize anything else here!
-
+		
         return 0;
     }
 
@@ -44,4 +44,5 @@ namespace carl
 
     /// Call to initialize.
     static int initvariable = initialize();
+	// TODO Suppress unused variable.
 }
