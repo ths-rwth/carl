@@ -25,8 +25,6 @@
 //#define LOGi2_DISABLE_DEBUG_MSG
 //#define LOGi2_DISABLE_TRACE_MSG
 
-namespace carl
-{
 #define LOGi2_TOFILE
 
 
@@ -49,6 +47,8 @@ namespace carl
 	#endif
 #endif
 
+namespace carl
+{
 
 #ifdef LOGi2_DISABLE
 	// If we do not use logging, we do not have to do anything with the messages
@@ -88,7 +88,6 @@ namespace carl
 #ifdef LOGi2_DISABLE_TRACE_MSG
 	#define LOGMSG_TRACE(log, msg) ;
 #endif
-
 
 
 #ifndef LOGi2_DISABLE

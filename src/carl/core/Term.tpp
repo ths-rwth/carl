@@ -171,7 +171,7 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coeffic
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Term<Coefficient>>& substitutions) const
+Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Term<Coefficient>>&) const
 {
     LOG_NOTIMPLEMENTED();
 }

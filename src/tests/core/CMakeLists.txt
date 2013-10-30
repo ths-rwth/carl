@@ -1,5 +1,4 @@
 # Add test cpp file
-message(${libraries})
 add_executable( runCoreTests
 				Test_Variable.cpp 
 				Test_VariablePool.cpp 
@@ -7,6 +6,7 @@ add_executable( runCoreTests
 				Test_Term.cpp
 				Test_MultivariatePolynomial.cpp
 				Test_UnivariatePolynomial.cpp
+				Test_MultivariateHensel.cpp
 				
 				 )
 target_link_libraries(runCoreTests lib_carl ${libraries} ${GTEST_LIBRARIES})

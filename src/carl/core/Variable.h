@@ -126,9 +126,8 @@ public:
 namespace std
 {
     template<>
-    class hash<carl::Variable>
+    struct hash<carl::Variable>
     {
-    public:
         size_t operator()(const carl::Variable& variable) const 
         {
             return variable.getId();

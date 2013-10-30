@@ -154,9 +154,9 @@ namespace carl
 			}
 		}
 		
-		const VarExpPair& operator[](int index) const
+		const VarExpPair& operator[](unsigned index) const
 		{
-			assert(index < (int)mExponents.size());
+			assert(index < mExponents.size());
 			return mExponents[index];
 		}
         /**
@@ -237,7 +237,7 @@ namespace carl
                 else
                 {
                     m->mExponents.assign(mExponents.begin(), mExponents.end());
-                    m->mExponents[it - mExponents.begin()].exp -= 1;
+                    m->mExponents[(size_t)(it - mExponents.begin())].exp -= (size_t)1;
                 }
                 m->mTotalDegree = mTotalDegree - 1;
                 return m;
@@ -723,11 +723,11 @@ namespace carl
 		bool validate() const
 		{
 			unsigned tdeg = 0;
-			int lastVarIndex = -1;
+			unsigned lastVarIndex = 0;
 			for(VarExpPair ve : mExponents)
 			{
 				if(ve.exp == 0) return false;
-				if((int)ve.var.getId() <= lastVarIndex) return false;
+				if(ve.var.getId() < lastVarIndex) return false;
 				tdeg += ve.exp;
 				lastVarIndex = ve.var.getId();
 			}
@@ -772,9 +772,8 @@ namespace carl
 namespace std
 {
     template<>
-    class hash<carl::Monomial>
+    struct hash<carl::Monomial>
     {
-    public:
         size_t operator()(const carl::Monomial& monomial) const 
         {
             size_t result = 0;

@@ -292,7 +292,7 @@ namespace carl
         }    // !pointinterval 0
     }
 
-    DoubleInterval DoubleInterval::power( int _exp ) const
+    DoubleInterval DoubleInterval::power( unsigned _exp ) const
     {
         if( _exp % 2 == 0 )
         {

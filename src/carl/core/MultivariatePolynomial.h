@@ -230,7 +230,7 @@ public:
 	
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	
-	const std::shared_ptr<const Term<Coeff>>& operator[](int) const;
+	const std::shared_ptr<const Term<Coeff>>& operator[](unsigned) const;
 	
 	
 	template<bool gatherCoeff>
@@ -438,9 +438,8 @@ private:
 namespace std
 {
     template<typename C, typename O, typename P>
-    class hash<carl::MultivariatePolynomial<C,O,P>>
+    struct hash<carl::MultivariatePolynomial<C,O,P>>
     {
-    public:
         size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
         {
             size_t result = 0;

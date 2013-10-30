@@ -18,11 +18,12 @@ GFNumber<IntegerT> GFNumber<IntegerT>::inverse() const
 {
 	assert(mGf != nullptr);
 	return GFNumber<IntegerT>(EEA<IntegerT>::calculate(mGf->size(), mN).second, mGf);
+	
 }
 
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
-{
+{	
 	// same field AND same number after normalization.
 	assert(lhs.mGf != nullptr);
 	assert(rhs.mGf != nullptr);

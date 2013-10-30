@@ -251,9 +251,8 @@ class Term
 namespace std
 {
     template<typename Coefficient>
-    class hash<carl::Term<Coefficient>>
+    struct hash<carl::Term<Coefficient>>
     {
-    public:
         size_t operator()(const carl::Term<Coefficient>& term) const 
         {
             if(term.isConstant())

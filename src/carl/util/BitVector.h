@@ -44,7 +44,7 @@ namespace carl
         
         size_t findFirstSetBit() const
         {
-            size_t pos;
+            size_t pos = 0;
             for( auto it = mBits.begin();  it != mBits.end(); ++it )
             {
                 if(*it != 0) {
@@ -157,7 +157,7 @@ namespace carl
 			
 			friend bool operator==(const forward_iterator& fi1, const forward_iterator& fi2);
 			
-			void operator++(int i = 1) {
+			void operator++(int i) {
 				if(i == 0) {
 					next();
 				}

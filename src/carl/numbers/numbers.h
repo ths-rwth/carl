@@ -117,7 +117,6 @@ struct IntegralT<mpz_class>
 	typedef mpz_class type;
 };
 
-template<>
 template<typename C>
 struct IntegralT<GFNumber<C>>
 {
@@ -137,7 +136,7 @@ inline cln::cl_I getDenom(const cln::cl_RA& rat)
 
 inline cln::cl_RA pow(const cln::cl_RA& base, unsigned exp)
 {
-	return cln::expt(base, exp);
+	return cln::expt(base, (int)exp);
 }
 
 inline double getDouble(const cln::cl_RA& rational)
@@ -248,7 +247,18 @@ constexpr bool isInteger(const mpz_class&)
 {
 	return true;
 }
-
+//
+//template<typename T>
+//bool isZero(const T& t)
+//{
+//	return t == (T)0;
+//}
+//
+//template<typename C>
+//bool isZero(const GFNumber<C>& c)
+//{
+//	return c.isZero();
+//}
 
 } // namespace carl    
 
@@ -256,10 +266,8 @@ namespace std
 {
 
 template<>
-class hash<cln::cl_RA>
+struct hash<cln::cl_RA>
 {
-public:
-
 	size_t operator()(const cln::cl_RA& cln_rational) const
 	{
 		return cln::equal_hashcode(cln_rational);
@@ -267,10 +275,8 @@ public:
 };
 
 template<>
-class hash<mpq_t>
+struct hash<mpq_t>
 {
-public:
-
 	size_t operator()(const mpq_t& gmp_rational) const
 	{
 		return mpz_get_ui(mpq_numref(gmp_rational)) ^ mpz_get_ui(mpq_denref(gmp_rational));

@@ -260,11 +260,6 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 	return result;
 }	
 
-
-
-
-
-
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
@@ -296,7 +291,7 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_instantiation_of<GFNumber, C>>...>
+template<typename C, EnableIf<is_instantiation_of<GFNumber, C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
 {
 	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
@@ -310,8 +305,7 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 }
 
 template<typename Coeff>
-//template<typename C, DisableIf<std::false_type>...>
-template<typename C, DisableIf<is_instantiation_of<GFNumber, C>>...>
+template<typename C, DisableIf<is_instantiation_of<GFNumber, C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
 {
 	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
@@ -353,7 +347,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
 {
-	if(rhs == (Coeff)0) return *this;
+	if(rhs == 0) return *this;
 	if(mCoefficients.empty())
 	{
 		// Adding non-zero rhs to zero.

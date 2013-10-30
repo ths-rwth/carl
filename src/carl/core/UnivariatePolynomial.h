@@ -121,7 +121,7 @@ public:
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	
-	template<typename T = Coefficient, EnableIf<has_normalize<T>>...>
+	template<typename T = Coefficient, EnableIf<has_normalize<T>> = dummy>
 	UnivariatePolynomial& normalizeCoefficients()
 	{
 		static_assert(std::is_same<T,Coefficient>::value, "No template parameters should be given");
@@ -131,7 +131,7 @@ public:
 		}
 		return *this;
 	}
-	template<typename T = Coefficient, DisableIf<has_normalize<T>>...>
+	template<typename T = Coefficient, DisableIf<has_normalize<T>> = dummy>
 	UnivariatePolynomial& normalizeCoefficients()
 	{
 		static_assert(std::is_same<T,Coefficient>::value, "No template parameters should be given");
@@ -142,9 +142,9 @@ public:
 	 * Works only from rationals, if the numbers are already integers.
      * @return 
      */
-	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>>...>
+	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
-	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>>...>
+	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
 	
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;

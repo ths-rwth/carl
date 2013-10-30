@@ -7,8 +7,8 @@ using namespace carl;
 
 TEST(Monomial, Constructor)
 {
-    Monomial m1();
-    Monomial m2();
+    Monomial m1;
+    Monomial m2;
     SUCCEED();
 }
 
@@ -20,18 +20,18 @@ TEST(Monomial, Operators)
     
     Monomial m0(v0);
     m0 *= v1;
-    EXPECT_EQ(1,m0.exponentOfVariable(v1));
+    EXPECT_EQ((unsigned)1,m0.exponentOfVariable(v1));
     m0 *= v1;
-    EXPECT_EQ(2,m0.exponentOfVariable(v1));
-    EXPECT_EQ(3,m0.tdeg());
-    EXPECT_EQ(0,m0.exponentOfVariable(v2));
+    EXPECT_EQ((unsigned)2,m0.exponentOfVariable(v1));
+    EXPECT_EQ((unsigned)3,m0.tdeg());
+    EXPECT_EQ((unsigned)0,m0.exponentOfVariable(v2));
     m0 *= v2;
-    EXPECT_EQ(4,m0.tdeg());
-    EXPECT_EQ(3,m0.nrVariables());
+    EXPECT_EQ((unsigned)4,m0.tdeg());
+    EXPECT_EQ((unsigned)3,m0.nrVariables());
     Monomial m1;
-    EXPECT_EQ(0,m1.tdeg());
-    EXPECT_EQ(0,m1.exponentOfVariable(v1));
-    EXPECT_EQ(0,m1.nrVariables());
+    EXPECT_EQ((unsigned)0,m1.tdeg());
+    EXPECT_EQ((unsigned)0,m1.exponentOfVariable(v1));
+    EXPECT_EQ((unsigned)0,m1.nrVariables());
     
     Monomial m2;
     Monomial m3;
@@ -67,7 +67,7 @@ TEST(Monomial, derivative)
     Variable v1((unsigned)1);
     Monomial m0 = v0 * v1;
     Term<int>* t = m0.derivative<int>(v0);
-    EXPECT_EQ(1, t->getNrVariables());
+    EXPECT_EQ((unsigned)1, t->getNrVariables());
     
 }
 
@@ -86,10 +86,7 @@ TEST(Monomial, division)
     EXPECT_EQ(nullptr, m1.dividedBy(m0));
     EXPECT_EQ(m0x, *m0.dividedBy(v1));
     EXPECT_EQ(m0y, *m0.dividedBy(v2));
-    std::cout << "----------" << std::endl;
     EXPECT_EQ(Monomial(v1), *m0.dividedBy(m2));
-    
-    
 }
 
 

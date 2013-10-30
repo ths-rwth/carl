@@ -275,7 +275,7 @@ public:
 	 * @param e exponent
 	 * @return power to <code>e</code> of this interval
 	 */
-	DoubleInterval power(int e) const;
+	DoubleInterval power(unsigned e) const;
 
 	/** Computes the inverse to the interval with respect to division by zero and infinity
 	 * @param a first result reference
@@ -610,8 +610,7 @@ inline bool operator >=(const DoubleInterval& lh, const DoubleInterval& rh)
 namespace std
 {
     template<>
-    class hash<carl::DoubleInterval> {
-    public:
+    struct hash<carl::DoubleInterval> {    
         size_t operator()(const carl::DoubleInterval& double_interval) const 
         {
             return (  ((size_t) double_interval.left() ^ (size_t) double_interval.leftType())

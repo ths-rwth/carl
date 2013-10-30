@@ -119,7 +119,7 @@ namespace carl
 			// TODO there might be a better solution to this.
 		}
         
-        void collect(const Variable& var, const typename CoeffType::CoeffType& termCoeff, const typename CoeffType::MonomType& monomial)
+        void collect(const Variable& var, const typename CoeffType::CoeffType&, const typename CoeffType::MonomType& monomial)
         {
             exponent e = monomial.exponentOfVariable(var);
             if(e > 0)

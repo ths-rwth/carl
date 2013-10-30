@@ -55,13 +55,13 @@ mTerms(1,t)
     
 }
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& pol) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>&) :
 Policies()
 {
     LOG_NOTIMPLEMENTED();
 }
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>&) :
 Policies()
 {
     LOG_NOTIMPLEMENTED();
@@ -273,7 +273,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](int index) const
+const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](unsigned index) const
 {
 	assert(index < nrTerms());
 	return mTerms.at(index);
@@ -560,7 +560,7 @@ bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePol
                     });
 }
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+bool operator==(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
     return false;
@@ -571,7 +571,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
     return rhs == lhs;
 }
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
     return false;
@@ -923,22 +923,22 @@ const MultivariatePolynomial<C,O,P> operator+( const MultivariatePolynomial<C,O,
 	return result;
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
+const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<C>&)
 {
     LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
+const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<MultivariatePolynomial<C>>&)
 {
 	LOG_NOTIMPLEMENTED();
 }
@@ -1222,7 +1222,7 @@ const MultivariatePolynomial<C,O,P> operator-( const MultivariatePolynomial<C,O,
 	return result;
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
@@ -1232,7 +1232,7 @@ const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P
 	return rhs - lhs;
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
@@ -1418,7 +1418,7 @@ const MultivariatePolynomial<C,O,P> operator*( const MultivariatePolynomial<C,O,
 	return result;
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
@@ -1428,7 +1428,7 @@ const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P
     return rhs * lhs;
 }
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }

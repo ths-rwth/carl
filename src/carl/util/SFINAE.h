@@ -26,7 +26,10 @@ namespace dtl
 {
 	enum class enabled {};
 }
-	
+
+// Support for Clang 3.1.
+constexpr dtl::enabled dummy = {};
+
 template <typename Condition>
 using EnableIf = typename std::enable_if<Condition::value, dtl::enabled>::type;	
 template <typename Condition>

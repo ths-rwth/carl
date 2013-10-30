@@ -57,14 +57,14 @@ namespace carl {
                 result1 = result1.minus();
                 result2 = result2.minus();
 
-                switch (result1.isLessOrEqual(result2)) {
-                    case true:
-                        resA = centerInterval.add(result1);
-                        resB = centerInterval.add(result2);
-                        break;
-                    case false:
-                        resA = centerInterval.add(result2);
-                        resB = centerInterval.add(result1);
+                if(result1.isLessOrEqual(result2)) {
+					resA = centerInterval.add(result1);
+					resB = centerInterval.add(result2);
+				}
+				else
+				{
+					resA = centerInterval.add(result2);
+					resB = centerInterval.add(result1);
                 }
                 return true;
             } else {
