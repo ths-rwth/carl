@@ -72,7 +72,7 @@ TEST(UnivariatePolynomial, cauchyBounds)
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
-    Variable y = vpool.getFreshVariable();
+
     
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
     //p.cauchyBound();

@@ -237,7 +237,7 @@ namespace carl
                 else
                 {
                     m->mExponents.assign(mExponents.begin(), mExponents.end());
-                    m->mExponents[(size_t)(it - mExponents.begin())].exp -= (size_t)1;
+                    m->mExponents[(unsigned)(it - mExponents.begin())].exp -= 1;
                 }
                 m->mTotalDegree = mTotalDegree - 1;
                 return m;
