@@ -142,7 +142,11 @@ public:
 	 * Works only from rationals, if the numbers are already integers.
      * @return 
      */
+	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>>...>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
+	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>>...>
+	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
+	
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
 
 	/**
@@ -188,6 +192,8 @@ public:
 	
 	
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
+	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
+	UnivariatePolynomial& operator*=(const typename IntegralT<Coefficient>::type& rhs);
 	/**
 	 * @param rhs A univariate polynomial over the same variable.
 	 * @return 
@@ -200,10 +206,10 @@ public:
 	friend UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs);
-	template<typename C, typename I>
-	friend UnivariatePolynomial<C> operator*(const I& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename I>
-	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const I& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs);
 	
 	
 	/**
@@ -212,9 +218,6 @@ public:
 	 * @return 
 	 */
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
-	
-	template<typename Integral>
-	UnivariatePolynomial& operator/=(const Integral& rhs);
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);

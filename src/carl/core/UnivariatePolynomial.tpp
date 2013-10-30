@@ -295,9 +295,8 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 	LOG_NOTIMPLEMENTED();
 }
 
-
-
 template<typename Coeff>
+template<typename C, EnableIf<is_instantiation_of<GFNumber, C>>...>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
 {
 	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
@@ -305,7 +304,22 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 	for(const Coeff& c : mCoefficients)
 	{
 		assert(isInteger(c));
-		res.mCoefficients.push_back(typename IntegralT<Coeff>::type(c));
+		res.mCoefficients.push_back(c.representingInteger());
+	}
+	res.stripLeadingZeroes();
+}
+
+template<typename Coeff>
+//template<typename C, DisableIf<std::false_type>...>
+template<typename C, DisableIf<is_instantiation_of<GFNumber, C>>...>
+UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
+{
+	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
+	res.mCoefficients.reserve(mCoefficients.size());
+	for(const Coeff& c : mCoefficients)
+	{
+		assert(isInteger(c));
+		res.mCoefficients.push_back((typename IntegralT<Coeff>::type)c);
 	}
 	res.stripLeadingZeroes();
 }
@@ -455,6 +469,24 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff
 	return *this;		
 }
 
+
+template<typename Coeff>
+template<typename I, DisableIf<std::is_same<Coeff, I>>...>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const typename IntegralT<Coeff>::type& rhs)
+{
+	static_assert(std::is_same<Coeff, I>::value, "Do not provide template parameters");
+	if(rhs == (I)0)
+	{
+		mCoefficients.clear();
+		return *this;
+	}
+	for(Coeff& c : mCoefficients)
+	{
+		c *= rhs;
+	}
+	return *this;		
+}
+
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const UnivariatePolynomial& rhs)
 {
@@ -505,10 +537,28 @@ UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& r
 	return rhs * lhs;
 }
 
+template<typename C>
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs)
+{
+	UnivariatePolynomial<C> res(lhs);
+	res *= rhs;
+	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return rhs * lhs;
+}
+
+
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
 {
-	static_assert(is_field<Coeff>::value, "Division by coefficients is only defined for field-coefficients");
+	if(!is_field<Coeff>::value)
+	{
+		LOGMSG_WARN("carl.core", "Division by coefficients is only defined for field-coefficients");
+	}
 	assert(rhs != (Coeff)0);
 	for(Coeff& c : mCoefficients)
 	{
@@ -516,8 +566,6 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 	}
 	return *this;		
 }
-
-
 
 
 template<typename C>
