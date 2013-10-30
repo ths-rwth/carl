@@ -24,6 +24,9 @@
 //#define LOGi2_DISABLE_INFO_MSG
 //#define LOGi2_DISABLE_DEBUG_MSG
 //#define LOGi2_DISABLE_TRACE_MSG
+
+namespace carl
+{
 #define LOGi2_TOFILE
 
 
@@ -87,7 +90,7 @@
 #endif
 
 
-namespace carl {
+
 #ifndef LOGi2_DISABLE
 	#ifdef LOGi2_USE_LOG4CPLUS
 	// use LOG4CPLUS types
@@ -144,16 +147,21 @@ namespace carl {
 	#define getLog(name) NULL;
 #endif
 
-#ifdef LOGi2_USE_LOG4CPLUS
-	#define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (message))
-	#define LOG_NOTIMPLEMENTED() DEVLOGGER.assertion(false, (std::string)"Not implemented method-stub called: " +  (std::string)__PRETTY_FUNCTION__)
-	#define LOG_INEFFICIENT() DEVLOGGER.log(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
+#ifndef LOGi2_DISABLE	
+	#ifdef LOGi2_USE_LOG4CPLUS
+		#define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (message))
+		#define LOG_NOTIMPLEMENTED() DEVLOGGER.assertion(false, (std::string)"Not implemented method-stub called: " +  (std::string)__PRETTY_FUNCTION__)
+		#define LOG_INEFFICIENT() DEVLOGGER.log(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
+	#else
+		#define LOG_ASSERT(condition, message) assert(condition)
+		#define LOG_NOTIMPLEMENTED() assert(false);
+		#define LOG_INEFFICIENT() std::cout <<  "Inefficient method called:" << __PRETTY_FUNCTION__ << std::endl;
+	#endif
 #else
 	#define LOG_ASSERT(condition, message) assert(condition)
-	#define LOG_NOTIMPLEMENTED() assert(false);
-	#define LOG_INEFFICIENT() std::cout <<  "Inefficient method called:" << __PRETTY_FUNCTION__ << std::endl;
+	#define LOG_NOTIMPLEMENTED() assert(false)
+	#define LOG_INEFFICIENT() ;
 #endif
-
 
 
 inline void configureLogging() {
@@ -178,4 +186,3 @@ inline void configureLogging() {
 }
 
 }
-
