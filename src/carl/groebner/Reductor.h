@@ -182,12 +182,7 @@ public:
 	
 private:
 
-    
-	void setOrigins(const BitVector& update, const BitVector& with)
-	{
-		
-	}
-	
+ 	
 	
 	
 	/**

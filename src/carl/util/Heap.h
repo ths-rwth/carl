@@ -273,7 +273,7 @@ namespace carl
     template<class C>
     void Heap<C>::moveValueUp( Node pos, Entry value )
     {
-        const Node origPos = pos;
+        //const Node origPos = pos;
         while( !pos.isRoot() )
         {
             const Node                up  = pos.parent();

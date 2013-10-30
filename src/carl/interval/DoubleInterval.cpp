@@ -294,6 +294,7 @@ namespace carl
 
     DoubleInterval DoubleInterval::power( unsigned _exp ) const
     {
+		assert(_exp <= INT_MAX );
         if( _exp % 2 == 0 )
         {
             if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
@@ -308,7 +309,7 @@ namespace carl
                 }
                 else
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mRightType, BoundType::INFTY );
+                    return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), mRightType, BoundType::INFTY );
                 }
             }
             else if( mRightType == BoundType::INFTY )
@@ -319,7 +320,7 @@ namespace carl
                 }
                 else
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mLeftType, BoundType::INFTY );
+                    return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), mLeftType, BoundType::INFTY );
                 }
             }
             else
@@ -333,17 +334,17 @@ namespace carl
                 }
                 if( contains( 0 ) )
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), BoundType::WEAK, rType );
+                    return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), BoundType::WEAK, rType );
                 }
                 else
                 {
-                    return DoubleInterval( boost::numeric::pow( mInterval, _exp ), lType, rType );
+                    return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), lType, rType );
                 }
             }
         }
         else
         {
-            return DoubleInterval( boost::numeric::pow( mInterval, _exp ), mLeftType, mRightType );
+            return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), mLeftType, mRightType );
         }
     }
 

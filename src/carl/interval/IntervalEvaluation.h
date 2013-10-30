@@ -63,7 +63,7 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const s
 		{
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].var) > 0);
-			result *= map.at(m[i].var).power((int)m[i].exp);
+			result *= map.at(m[i].var).power(m[i].exp);
 		}
 	}
 	return result;

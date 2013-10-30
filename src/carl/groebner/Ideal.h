@@ -92,7 +92,7 @@ public:
 
     bool isDividable(const Term<typename Polynomial::CoeffType>& m)
     {
-        return mDivisorLookup.isDividable();
+        return mDivisorLookup.isDividable(m);
     }
 
 	size_t nrGenerators() const

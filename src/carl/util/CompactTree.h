@@ -77,8 +77,9 @@ namespace carl
             void increaseCapacity();
             void swap( CompactTree& tree );
 
-            struct Node
+            class Node
             {
+			public:
                 Node():
                     _index( fi ? S : 1 )
                 {}    // the root node is the default
@@ -169,7 +170,7 @@ namespace carl
 
             std::vector<Entry> getCopy() const
             {
-                Node it();
+                Node it;
                 std::vector<Entry> ret;
                 while( it <= _lastLeaf )
                 {
