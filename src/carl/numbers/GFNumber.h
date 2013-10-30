@@ -30,7 +30,7 @@ class GFNumber
 	
 	public:
 	GFNumber(IntegerType n, const GaloisField<IntegerType>* gf= nullptr)
-	: mN(gf->symmetricModulo(n)), mGf(gf)
+	: mN(gf == nullptr ? n : gf->symmetricModulo(n)), mGf(gf)
 	{
 		
 	}
