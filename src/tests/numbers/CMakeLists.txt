@@ -5,6 +5,6 @@ add_executable( runNumbersTests
 				Test_PrimeFactory.cpp 
 				Test_GF.cpp
 				 )
-target_link_libraries(runNumbersTests lib_carl ${libraries} ${GTEST_LIBRARIES})
+target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libraries})
 
 add_test( NAME numbers COMMAND runNumbersTests )

@@ -4,6 +4,6 @@ add_executable( runGroebnerTests
 				Test_Reductor.cpp
 				Test_GB_Buchberger.cpp
 			  )
-target_link_libraries(runGroebnerTests lib_carl ${libraries} ${GTEST_LIBRARIES})
+target_link_libraries(runGroebnerTests ${GTEST_LIBRARIES} lib_carl ${libraries})
 
 add_test( NAME groebner COMMAND runGroebnerTests )
