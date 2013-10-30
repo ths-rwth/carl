@@ -9,6 +9,6 @@ add_executable( runCoreTests
 				Test_MultivariateHensel.cpp
 				
 				 )
-target_link_libraries(runCoreTests lib_carl ${libraries} ${GTEST_LIBRARIES})
+target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
 
 add_test( NAME core COMMAND runCoreTests )
