@@ -626,7 +626,7 @@ inline const char* SkipComma(const char* str) {
 // the entire string if it contains no comma.
 inline String GetPrefixUntilComma(const char* str) {
   const char* comma = strchr(str, ',');
-  return comma == NULL ? String(str) : String(str, comma - str);
+  return comma == NULL ? String(str) : String(str,(unsigned)(comma - str));
 }
 
 // TypeParameterizedTest<Fixture, TestSel, Types>::Register()
