@@ -230,7 +230,7 @@ inline mpz_class lcm(const mpz_class& v1, const mpz_class& v2)
 	mpz_class res;
 	mpz_lcm(res.get_mpz_t(), v1.get_mpz_t(), v2.get_mpz_t());
 	return res;
-}
+} 
 
 template<typename C>
 constexpr bool isInteger(const GFNumber<C>&)
@@ -244,7 +244,7 @@ inline bool isInteger(const mpq_class& r)
 	 return 0 != mpz_divisible_p(r.get_num_mpz_t(), r.get_den_mpz_t());
 }
 
-inline bool isInteger(const mpz_class&)
+constexpr bool isInteger(const mpz_class&)
 {
 	return true;
 }

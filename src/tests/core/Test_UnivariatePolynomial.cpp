@@ -97,3 +97,21 @@ TEST(UnivariatePolynomial, toFiniteDomain)
     UnivariatePolynomial<GFNumber<mpz_class>> pol5F = pol5.toFiniteDomain(gf5);
     std::cout << pol5F << std::endl;
 }
+
+TEST(UnivariatePolynomial, normalizeCoefficients)
+{
+	VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    vpool.setVariableName(y, "y");
+    Variable z = vpool.getFreshVariable();
+    vpool.setVariableName(z, "z");
+    
+	UnivariatePolynomial<mpz_class> pol(x, {(mpz_class)1, (mpz_class)2});
+    const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
+    UnivariatePolynomial<GFNumber<mpz_class>> polF = pol.toFiniteDomain(gf5);
+    
+	pol.normalizeCoefficients();
+	polF.normalizeCoefficients();
+}

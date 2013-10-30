@@ -63,7 +63,7 @@ class GFNumber
 		return mN == 1;
 	}
 	
-	IntegerType getRepresentingInteger() const
+	const IntegerType& representingInteger() const
 	{
 		return mN;
 	}

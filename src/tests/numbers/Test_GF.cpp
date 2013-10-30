@@ -20,11 +20,11 @@ TEST(GaloisField, integers)
     GFNumber<mpz_class> a3(3,gf5);
     GFNumber<mpz_class> a4(4,gf5);
     
-    EXPECT_EQ(mpz_class(0),a0.getRepresentingInteger());
-    EXPECT_EQ(mpz_class(1),a1.getRepresentingInteger());
-    EXPECT_EQ(mpz_class(2),a2.getRepresentingInteger());
-    EXPECT_EQ(mpz_class(-2),a3.getRepresentingInteger());
-    EXPECT_EQ(mpz_class(-1),a4.getRepresentingInteger());
+    EXPECT_EQ(mpz_class(0),a0.representingInteger());
+    EXPECT_EQ(mpz_class(1),a1.representingInteger());
+    EXPECT_EQ(mpz_class(2),a2.representingInteger());
+    EXPECT_EQ(mpz_class(-2),a3.representingInteger());
+    EXPECT_EQ(mpz_class(-1),a4.representingInteger());
     
     EXPECT_TRUE(a0.isZero());
     EXPECT_FALSE(a2.isZero());
