@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <list>
 #include <set>
+#include <sstream>
 
 #include "Variable.h"
 #include "CompareResult.h"
