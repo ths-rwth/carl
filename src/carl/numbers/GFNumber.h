@@ -150,7 +150,16 @@ class GFNumber
 	
 	friend std::ostream& operator<<(std::ostream& os, const GFNumber& rhs)
 	{
-		return os << "(" << rhs.mN << ") mod " << rhs.mGf->size();
+		os << "(" << rhs.mN << ") mod ";
+		if(rhs.mGf != nullptr)
+		{
+			os << rhs.mGf->size();
+		}
+		else
+		{
+			os << "?";
+		}
+		return os;
 	}
 	
 };
