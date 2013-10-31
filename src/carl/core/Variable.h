@@ -51,6 +51,12 @@ public:
 private:
     unsigned mVariable;
     
+    /**
+     * Default constructor, constructing a variable, which is considered as not an actual variable.
+     * The resulting variable is store in NO_VARIABLE, so use this if you need a default value for a variable.
+     */
+    explicit Variable() : mVariable(0) {} 
+    
 public:
     /**
      * Although we recommend access through the VariablePool, we allow public construction of variables
@@ -62,6 +68,7 @@ public:
     explicit Variable(unsigned id, VariableType type = VT_REAL) :
     mVariable((unsigned)type | id << VARIABLE_BITS_RESERVED_FOR_TYPE )
     {
+        assert( id > 0 );
         assert(id <  (1 << (sizeof(mVariable) * CHAR_BIT - BITS_RESERVED)));
     }    
     
@@ -120,6 +127,7 @@ public:
     static constexpr unsigned BITS_RESERVED = VARIABLE_BITS_RESERVED_FOR_ORDERING + VARIABLE_BITS_RESERVED_FOR_TYPE;
     static_assert(BITS_RESERVED < 
             CHAR_BIT * sizeof(mVariable), "Too many bits reserved for special use.");
+    static const Variable NO_VARIABLE;
 };
 } // namespace carl
 

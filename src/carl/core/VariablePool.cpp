@@ -48,6 +48,7 @@ Variable VariablePool::getFreshVariable(VariableType type)
 
 const std::string VariablePool::getVariableName(Variable::Arg v, bool friendly) const
 {
+    if( v == Variable::NO_VARIABLE ) return "NO_VARIABLE";
     if( friendly )
     {
         std::map<Variable, std::string>::const_iterator it = mFriendlyNames.find(v);

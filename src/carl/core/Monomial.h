@@ -177,6 +177,16 @@ namespace carl
                 return it->exp;
             }
         }
+        
+        /**
+         * TODO: write code if binary search is preferred.
+         * @param v The variable to check for its occurrence.
+         * @return true, if the variable occurs in this term.
+         */
+        bool has(Variable::Arg v) const
+        {
+            return (std::find(mExponents.cbegin(), mExponents.cend(), v) != mExponents.cend());
+        }
 
         exponent highestExponent(Variable::Arg) const
         {

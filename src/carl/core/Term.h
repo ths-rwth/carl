@@ -89,6 +89,16 @@ class Term
             if(!mMonomial) return 0;
             return mMonomial->nrVariables();
         }
+        
+        /**
+         * @param v The variable to check for its occurrence.
+         * @return true, if the variable occurs in this term.
+         */
+        bool has(Variable::Arg v) const
+        {
+            if(mMonomial) return mMonomial->has(v);
+            return false;
+        }
 		
 		/**
 		 * Checks if the monomial is either a constant or the only variable occuring is the variable v.

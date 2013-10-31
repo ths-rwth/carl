@@ -3,6 +3,8 @@
 
 namespace carl
 {
+    const Variable Variable::NO_VARIABLE = Variable();
+    
     std::string varToString(carl::Variable::Arg rhs, bool friendlyVarName)
     {
         return carl::VariablePool::getName(rhs, friendlyVarName);

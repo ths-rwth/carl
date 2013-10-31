@@ -307,7 +307,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const
 	// A constant polynomial is obviously univariate.
 	if(isConstant()) return true;
 	
-	Variable v(0);
+	Variable v = Variable::NO_VARIABLE;
 	// If the leading term is nonlinear, than there are several variables involved.
 	if(lterm()->isLinear())
 	{
@@ -337,6 +337,14 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
 		if(!term->isSquare()) return false;
 	}
 	return true;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::has(Variable::Arg v) const
+{
+    for(const std::shared_ptr<const TermType>& term : mTerms)
+        if( term->has(v) ) return true;
+    return false;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

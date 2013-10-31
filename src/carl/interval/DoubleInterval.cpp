@@ -694,8 +694,10 @@ namespace carl
 	void DoubleInterval::operator*=( const DoubleInterval& _interval )
 	{
 		mInterval *= _interval.content();
-        mLeftType = mInterval.lower() == Checking::neg_inf() ? BoundType::INFTY : BoundType::WEAK;
-        mLeftType = mInterval.upper() == Checking::pos_inf() ? BoundType::INFTY : BoundType::WEAK;
+//        mLeftType = mInterval.lower() == Checking::neg_inf() ? BoundType::INFTY : BoundType::WEAK;
+//        mLeftType = mInterval.upper() == Checking::pos_inf() ? BoundType::INFTY : BoundType::WEAK;
+        mLeftType = getWeakestBoundType( mLeftType, _interval.leftType() );
+        mRightType = getWeakestBoundType( mRightType, _interval.rightType() );
 	}
 
     ///////////////////////////

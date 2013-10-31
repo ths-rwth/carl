@@ -177,6 +177,12 @@ public:
      */
 	void gatherVariables(std::set<Variable>& vars) const;
 	std::set<Variable> gatherVariables() const;
+    
+    /**
+     * @param v The variable to check for its occurrence.
+     * @return true, if the variable occurs in this term.
+     */
+    bool has(Variable::Arg v) const;
 	
 	bool isReducibleIdentity() const;
 
