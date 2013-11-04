@@ -696,8 +696,8 @@ namespace carl
 		mInterval *= _interval.content();
 //        mLeftType = mInterval.lower() == Checking::neg_inf() ? BoundType::INFTY : BoundType::WEAK;
 //        mLeftType = mInterval.upper() == Checking::pos_inf() ? BoundType::INFTY : BoundType::WEAK;
-        mLeftType = getWeakestBoundType( mLeftType, _interval.leftType() );
-        mRightType = getWeakestBoundType( mRightType, _interval.rightType() );
+        mLeftType = getWeakestBoundType( (mLeftType == BoundType::STRICT ? BoundType::WEAK : mLeftType), (_interval.leftType() == BoundType::STRICT ? BoundType::WEAK : _interval.leftType() ));
+        mLeftType = getWeakestBoundType( (mRightType == BoundType::STRICT ? BoundType::WEAK : mRightType), (_interval.rightType() == BoundType::STRICT ? BoundType::WEAK : _interval.rightType() ));
 	}
 
     ///////////////////////////

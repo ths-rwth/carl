@@ -222,17 +222,14 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	Coeff maxCoeff = mCoefficients.front() > 0 ? mCoefficients.front() : -mCoefficients.front();
 	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
 	{
-		if(*it > maxCoeff ) 
+        Coeff absOfCoeff = abs( *it );
+		if( absOfCoeff > maxCoeff ) 
 		{
-			maxCoeff = *it;
-		}
-		else if( -(*it) > maxCoeff )
-		{
-			maxCoeff = -*it;
+			maxCoeff = absOfCoeff;
 		}
 	}
 	
-	return 1 + maxCoeff/lcoeff();
+	return 1 + maxCoeff/abs( lcoeff() );
 }
 
 
