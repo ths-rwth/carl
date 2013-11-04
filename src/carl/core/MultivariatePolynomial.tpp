@@ -639,7 +639,7 @@ bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename C, typename O, typename P>
 bool operator!=( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs); // TODO: != could be much cheaper than ==
 }
 template<typename C, typename O, typename P>
 bool operator!=(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
@@ -1309,6 +1309,11 @@ const MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const Multivari
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const MultivariatePolynomial<Coeff,Ordering,Policies>& rhs)
 {
+    if( mTerms.size() == 0 || rhs.mTerms.size() == 0 )
+    {
+        mTerms.clear();
+        return *this;
+    }
     TermsType newTerms;
     newTerms.reserve(mTerms.size() * rhs.mTerms.size());
     for(auto termLhs : mTerms)

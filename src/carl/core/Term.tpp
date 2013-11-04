@@ -192,6 +192,10 @@ void Term<Coefficient>::gatherVarInfo(const Variable& var, VariableInformation<g
 	{
 		mMonomial->gatherVarInfo(var, varinfo, coeff());
 	}
+    else
+    {
+        varinfo.updateCoeff( 0, *this );
+    }
 }
 
 template<typename Coefficient>
