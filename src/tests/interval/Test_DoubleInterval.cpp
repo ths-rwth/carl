@@ -16,6 +16,7 @@ TEST(DoubleInterval, Constructor)
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
     DoubleInterval test7 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
+    DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
     SUCCEED();
 }
 

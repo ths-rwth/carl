@@ -454,7 +454,9 @@ DoubleInterval(rat, BoundType::WEAK,rat, BoundType::WEAK, overapprox, overapprox
 }
 
 template<typename Rational>
-DoubleInterval::DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft, bool overapproxright)
+DoubleInterval::DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft, bool overapproxright) : 
+    mLeftType( lowerType ),
+    mRightType( upperType )
 {
 	double dLeft = roundDown(lower, overapproxleft);
 	double dRight = roundUp(upper, overapproxright);
@@ -480,8 +482,6 @@ DoubleInterval::DoubleInterval(const Rational& lower, BoundType lowerType, const
 	}
 	else
 	{
-		mLeftType = lowerType;
-		mRightType = upperType;
 		mInterval = BoostDoubleInterval(dLeft, dRight);
 	}
 }
