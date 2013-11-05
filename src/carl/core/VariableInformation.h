@@ -155,7 +155,7 @@ namespace carl
         
         bool hasCoeff() const
         {
-            return true;
+            return !mCoeffs.empty();
         }
 	
 		const std::map<unsigned, CoeffType>& coeffs() const

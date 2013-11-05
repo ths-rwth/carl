@@ -679,25 +679,83 @@ namespace carl
 
 	void DoubleInterval::operator+=( const DoubleInterval& _interval )
 	{
-		mInterval += _interval.content();
         mLeftType = getWeakestBoundType( mLeftType, _interval.leftType() );
         mRightType = getWeakestBoundType( mRightType, _interval.rightType() );
+        if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
+        {
+            mInterval = BoostDoubleInterval( 0 );
+        }
+        else
+        {
+            mInterval += _interval.content();
+            if( mLeftType == BoundType::INFTY )
+            {
+                mInterval = BoostDoubleInterval( mInterval.upper() );
+            }
+            else if( mRightType == BoundType::INFTY )
+            {
+                mInterval = BoostDoubleInterval( mInterval.lower() );
+            }
+            else if( (mInterval.lower() == mInterval.upper() && mLeftType != mRightType) )
+            {
+                mLeftType = BoundType::STRICT;
+                mRightType = BoundType::STRICT;
+                mInterval = BoostDoubleInterval( 0 );
+            }
+        }
 	}
 
 	void DoubleInterval::operator-=( const DoubleInterval& _interval )
 	{
-		mInterval -= _interval.content();
         mLeftType = getWeakestBoundType( mLeftType, _interval.rightType() );
         mRightType = getWeakestBoundType( mRightType, _interval.leftType() );
+        if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
+        {
+            mInterval = BoostDoubleInterval( 0 );
+        }
+        else
+        {
+            mInterval -= _interval.content();
+            if( mLeftType == BoundType::INFTY )
+            {
+                mInterval = BoostDoubleInterval( mInterval.upper() );
+            }
+            else if( mRightType == BoundType::INFTY )
+            {
+                mInterval = BoostDoubleInterval( mInterval.lower() );
+            }
+            else if( (mInterval.lower() == mInterval.upper() && mLeftType != mRightType) )
+            {
+                mLeftType = BoundType::STRICT;
+                mRightType = BoundType::STRICT;
+                mInterval = BoostDoubleInterval( 0 );
+            }
+        }
 	}
 
 	void DoubleInterval::operator*=( const DoubleInterval& _interval )
 	{
+        BoundType leftType = BoundType::WEAK;
+        BoundType rightType = BoundType::WEAK;
+        if( (mLeftType == BoundType::INFTY && (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY))
+            || (mRightType == BoundType::INFTY && (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY))
+            || (_interval.mLeftType == BoundType::INFTY && (right() > 0 || mRightType == BoundType::INFTY))
+            || (_interval.mRightType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY))) )
+        {
+            leftType = BoundType::INFTY;
+        }
+        if( (mLeftType == BoundType::INFTY && (_interval.right() < 0 || (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY)))
+            || (mRightType == BoundType::INFTY && (_interval.left() > 0 || (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY)))
+            || (_interval.mLeftType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY)))
+            || (_interval.mRightType == BoundType::INFTY && (left() > 0 || (right() > 0 || mRightType == BoundType::INFTY))) )
+        {
+            rightType = BoundType::INFTY;
+        }
+        mLeftType = leftType;
+        mRightType = rightType;
 		mInterval *= _interval.content();
 //        mLeftType = mInterval.lower() == Checking::neg_inf() ? BoundType::INFTY : BoundType::WEAK;
 //        mLeftType = mInterval.upper() == Checking::pos_inf() ? BoundType::INFTY : BoundType::WEAK;
-        mLeftType = getWeakestBoundType( (mLeftType == BoundType::STRICT ? BoundType::WEAK : mLeftType), (_interval.leftType() == BoundType::STRICT ? BoundType::WEAK : _interval.leftType() ));
-        mLeftType = getWeakestBoundType( (mRightType == BoundType::STRICT ? BoundType::WEAK : mRightType), (_interval.rightType() == BoundType::STRICT ? BoundType::WEAK : _interval.rightType() ));
 	}
 
     ///////////////////////////

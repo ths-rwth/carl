@@ -1343,9 +1343,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
         {
             if(frontCoeff == frontTerm->coeff())
             {
+                assert(frontCoeff!=0);
                 mTerms.push_back(frontTerm);
             }
-            else
+            else if(frontCoeff != 0)
             {
                 mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
             }
