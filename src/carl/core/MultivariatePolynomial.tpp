@@ -1026,42 +1026,44 @@ const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<C
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const MultivariatePolynomial& rhs)
 {
-    if(mTerms.size() == 0) mTerms = rhs.mTerms;
     if(rhs.mTerms.size() == 0) return *this;
     
     TermsType newTerms;
     newTerms.reserve(mTerms.size() + rhs.mTerms.size());
     typename TermsType::const_iterator lhsIt(mTerms.begin());
     typename TermsType::const_iterator rhsIt(rhs.mTerms.begin());
-    while(true)
+    if(mTerms.size() > 0)
     {
-        CompareResult cmpres(Ordering::compare(**lhsIt, **rhsIt));
-        if(cmpres == CompareResult::LESS)
+        while(true)
+        {
+            CompareResult cmpres(Ordering::compare(**lhsIt, **rhsIt));
+            if(cmpres == CompareResult::LESS)
+            {
+                newTerms.push_back(std::make_shared<const Term<Coeff>>((**lhsIt)));
+                if(++lhsIt == mTerms.end()) break;
+            }
+            else if(cmpres == CompareResult::GREATER)
+            {
+                newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**rhsIt)));
+                if(++rhsIt == rhs.mTerms.end()) break;
+            }
+            else 
+            {
+                assert(cmpres == CompareResult::EQUAL);
+                if( (**lhsIt).coeff() != (**rhsIt).coeff() )
+                {
+                    newTerms.push_back(std::make_shared<const Term<Coeff>>( (**lhsIt).coeff() - (**rhsIt).coeff(), (**lhsIt).monomial() ));
+                }
+                ++lhsIt;
+                ++rhsIt;
+                if(lhsIt == mTerms.end() || rhsIt == rhs.mTerms.end() ) break;
+            }
+        }
+        while(lhsIt != mTerms.end())
         {
             newTerms.push_back(std::make_shared<const Term<Coeff>>((**lhsIt)));
-            if(++lhsIt == mTerms.end()) break;
-        }
-        else if(cmpres == CompareResult::GREATER)
-        {
-            newTerms.push_back(std::make_shared<const Term<Coeff>>(-(**rhsIt)));
-            if(++rhsIt == rhs.mTerms.end()) break;
-        }
-        else 
-        {
-			assert(cmpres == CompareResult::EQUAL);
-            if( (**lhsIt).coeff() != (**rhsIt).coeff() )
-            {
-                newTerms.push_back(std::make_shared<const Term<Coeff>>( (**lhsIt).coeff() - (**rhsIt).coeff(), (**lhsIt).monomial() ));
-            }
             ++lhsIt;
-            ++rhsIt;
-            if(lhsIt == mTerms.end() || rhsIt == rhs.mTerms.end() ) break;
         }
-    }
-    while(lhsIt != mTerms.end())
-    {
-        newTerms.push_back(std::make_shared<const Term<Coeff>>((**lhsIt)));
-        ++lhsIt;
     }
     
     while(rhsIt != rhs.mTerms.end())
