@@ -171,10 +171,12 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	assert(a.mMainVar == t.mMainVar);
 	
 	const Variable& x = a.mMainVar;
-	//TODO Normalize!
 	UnivariatePolynomial<Coeff> c = a;
-	//TODO Normalize!
 	UnivariatePolynomial<Coeff> d = b;
+	c.normalizeCoefficients();
+	d.normalizeCoefficients();
+	c.normalize();
+	d.normalize();
 	UnivariatePolynomial<Coeff> c2(x);
 	UnivariatePolynomial<Coeff> c1 = c2 + (Coeff)1;
 	UnivariatePolynomial<Coeff> d1(x);
@@ -190,9 +192,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 		d = divres.remainder;
 		d1 = r1;
 		d2 = r2;
+		c.normalizeCoefficients();
+		d.normalizeCoefficients();
 	}
 	s = c1;
 	t = c2;
+	s.normalizeCoefficients();
+	t.normalizeCoefficients();
 	return c;
 }
 
@@ -229,7 +235,13 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 		}
 	}
 	
-	return 1 + maxCoeff/abs( lcoeff() );
+	return 1 + maxCoeff/lcoeff();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalize() const
+{
+	
 }
 
 
@@ -274,7 +286,6 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 	}
 	while(divisor.degree() <= result.remainder.degree());
 	return result;
-	
 }
 
 template<typename Coeff>

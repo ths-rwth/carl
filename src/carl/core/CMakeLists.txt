@@ -15,7 +15,7 @@ set(carl_lib_core_headers
 set(carl_lib_core_sources 
 	core/VariablePool.cpp
 	core/Variable.cpp
-	
+	core/logging.cpp
 PARENT_SCOPE)
 
 # Write config.h 

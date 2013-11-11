@@ -102,9 +102,14 @@ public:
 	template<typename Integer>
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
+	UnivariatePolynomial normalize() const;
+	
+	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
+	
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
+	
 	
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
 	

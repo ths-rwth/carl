@@ -58,7 +58,7 @@ which simplifies finding carl to a simple find_package(carl), no matter if carl 
 
 We have tested on the following platforms:
 
-Arch Linux (Kernel 3.10) with GCC 4.8
+Arch Linux (Kernel 3.10) with GCC 4.8.1
 Ubuntu 12.04 LTS with GCC 4.7.3
 
 

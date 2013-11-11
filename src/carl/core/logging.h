@@ -148,7 +148,7 @@ namespace carl
 
 #ifndef LOGi2_DISABLE	
 	#ifdef LOGi2_USE_LOG4CPLUS
-		#define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (message))
+		#define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (std::string)" " + std::string(message))
 		#define LOG_NOTIMPLEMENTED() DEVLOGGER.assertion(false, (std::string)"Not implemented method-stub called: " +  (std::string)__PRETTY_FUNCTION__)
 		#define LOG_INEFFICIENT() DEVLOGGER.log(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
 	#else
@@ -162,6 +162,7 @@ namespace carl
 	#define LOG_INEFFICIENT() ;
 #endif
 
+void setInitialLogLevel();
 
 inline void configureLogging() {
 #ifdef LOGi2_USE_LOG4CPLUS
@@ -176,10 +177,7 @@ inline void configureLogging() {
     fileAppender->setLayout(std::auto_ptr<log4cplus::Layout>( new log4cplus::PatternLayout("%r [%T] %-5p %-25c |%-25b:%4L| -\t %m%n")));
     // Set output.
     logger.addAppender(fileAppender);
-    // Set minimal loglovel
-    logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
-	DEVLOGGER.setLogLevel(log4cplus::ERROR_LOG_LEVEL);
-	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.gb")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
+	setInitialLogLevel();
 #endif
 }
 

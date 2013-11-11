@@ -8,6 +8,7 @@
 #pragma once
 #include "../numbers/GFNumber.h"
 #include "UnivariatePolynomial.h"
+#include "logging.h"
 
 /**
  * Includes the algorithms 6.2 and 6.3 from the book 
@@ -113,6 +114,7 @@ class DiophantineEquations
 	std::vector<Polynomial> EEAlift(Polynomial a, Polynomial b) const
 	{
 		assert(a.mainVar() == b.mainVar());
+		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: a=" << a << ", b=" << b );
 		const Variable& x = a.mainVar();
 		Polynomial amodp = a.toFiniteDomain(mGf_p);
 		Polynomial bmodp = b.toFiniteDomain(mGf_p);
@@ -120,7 +122,8 @@ class DiophantineEquations
 		Polynomial t(x);
 		Polynomial g(x);
 		g = Polynomial::extended_gcd(amodp,bmodp,s,t);
-		assert(g.isOne());
+		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: g=" << g << ", s=" << s << ", t=" << t );
+		LOG_ASSERT(g.isOne(), "g expected to be one");
 		Polynomial smodp = s;
 		Polynomial tmodp = t;
 		assert( mGf_p->p() == mGf_pk->p());

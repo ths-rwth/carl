@@ -61,6 +61,18 @@ TEST(UnivariatePolynomial, GCD)
     std::cout << g << std::endl;
     std::cout << s << std::endl;
     std::cout << t << std::endl;
+	
+    UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)0, (mpz_class)2});
+	const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
+    UnivariatePolynomial<GFNumber<mpz_class>> a1 = A1.toFiniteDomain(gf5);
+	UnivariatePolynomial<mpz_class> A2(x, 1, 5);
+	UnivariatePolynomial<GFNumber<mpz_class>> a2 = A2.toFiniteDomain(gf5);
+	UnivariatePolynomial<GFNumber<mpz_class>> s1(x);
+	UnivariatePolynomial<GFNumber<mpz_class>> t1(x);
+    UnivariatePolynomial<GFNumber<mpz_class>> gp = UnivariatePolynomial<GFNumber<mpz_class>>::extended_gcd(a1,a2,s1,t1);
+	std::cout << t1 << std::endl;
+	std::cout << s1 << std::endl;
+	std::cout << gp << std::endl;
     
     
 }
