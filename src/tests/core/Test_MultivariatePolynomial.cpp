@@ -8,7 +8,7 @@ using namespace carl;
 
 TEST(MultivariatePolynomial, Constructor)
 {
-    Variable v0(0);
+    Variable v0(1);
     Term<mpz_class> t0(v0);
     MultivariatePolynomial<mpz_class> p0(t0);
     
@@ -19,7 +19,7 @@ TEST(MultivariatePolynomial, Constructor)
 
 TEST(MultivariatePolynomial, Operators)
 {
-    Variable v0(0);
+    Variable v0(1);
     Term<mpz_class> t0(v0);
     MultivariatePolynomial<mpz_class> p0a(t0);
     MultivariatePolynomial<mpz_class> p0b(v0);
@@ -30,7 +30,7 @@ TEST(MultivariatePolynomial, Operators)
 
 TEST(MultivariatePolynomial, Addition)
 {
-    Variable v0(0);
+    Variable v0(1);
     Term<mpz_class> t0(v0);
     MultivariatePolynomial<mpz_class> p0(v0);
     p0 += 3;
@@ -78,7 +78,7 @@ TEST(MultivariatePolynomial, Addition)
 
 TEST(MultivariatePolynomial, Substraction)
 {
-    Variable v0((unsigned)0);
+    Variable v0((unsigned)1);
     MultivariatePolynomial<mpz_class> p0(v0);
     p0 -= 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
@@ -106,8 +106,8 @@ TEST(MultivariatePolynomial, Substraction)
 
 TEST(MultivariatePolynomial, Multiplication)
 {
-    Variable v0(0);
-    Variable v1(1);
+    Variable v0(1);
+    Variable v1(2);
     MultivariatePolynomial<mpz_class> p0(v0);
     
     p0 *= v0;
@@ -132,9 +132,9 @@ TEST(MultivariatePolynomial, toString)
 
 TEST(MultivariatePolynomial, Normalize)
 {
-    Variable v0(0);
-    Variable v1(1);
-    Variable v2(2);
+    Variable v0(1);
+    Variable v1(2);
+    Variable v2(3);
     MultivariatePolynomial<cln::cl_RA> mp;
     mp += v0;
     MultivariatePolynomial<cln::cl_RA> mp2 = mp * (cln::cl_RA)2;
@@ -156,8 +156,8 @@ TEST(MultivariatePolynomial, Normalize)
 
 TEST(MultivariatePolynomial, Coprime)
 {
-    Variable v0(0);
-    Variable v1(1);
+    Variable v0(1);
+    Variable v1(2);
     MultivariatePolynomial<cln::cl_RA> mp;
     mp += v0;
     MultivariatePolynomial<cln::cl_RA> mp2 = mp * (cln::cl_RA)2;
@@ -192,8 +192,8 @@ TEST(MultivariatePolynomial, Coprime)
         
 TEST(MultivariatePolynomial, Substitute)
 {
-    Variable v0(0);
-    Variable v1(1);
+    Variable v0(1);
+    Variable v1(2);
     MultivariatePolynomial<cln::cl_RA> mp((cln::cl_RA)1/6 * v0);
     mp += (cln::cl_RA)4 * v1;
     MultivariatePolynomial<cln::cl_RA> mp2((cln::cl_RA)2);
