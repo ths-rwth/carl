@@ -47,6 +47,13 @@ struct is_field<mpq_class>
 	static const bool value = true;
 };
 
+template<typename C>
+struct is_field<GFNumber<C>>
+{
+	static const bool value = true;
+};
+
+
 /**
  * Type trait is_number
  */

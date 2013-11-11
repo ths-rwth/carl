@@ -239,10 +239,20 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_field<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalize() const
 {
-	
+	return *this/lcoeff();
 }
+
+
+template<typename Coeff>
+template<typename C, DisableIf<is_field<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalize() const
+{
+	// TODO implement
+}
+	
 
 
 template<typename Coeff>
@@ -569,7 +579,14 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 	return *this;		
 }
 
-
+template<typename C>
+UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs)
+{
+	static_assert(is_field<C>::value, "Division by coefficients is only defined for field-coefficients");
+	assert(rhs != (C)0);
+	UnivariatePolynomial<C> res(lhs);
+	return res /= rhs;
+}
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {

@@ -221,4 +221,13 @@ GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<Integ
 	return GFNumber<IntegerT>(lhs.mN * rhs.inverse().mN, lhs.mGf == nullptr ? rhs.mGf : lhs.mGf);
 }
 
+
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator /=(const GFNumber<IntegerT>& rhs)
+{
+	assert(!rhs.isZero());
+	mN * rhs.inverse().mN;
+	return *this;
+}
+
 }

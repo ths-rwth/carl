@@ -146,7 +146,8 @@ class GFNumber
 	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
-	
+
+	GFNumber& operator/=(const GFNumber& rhs);
 	
 	friend std::ostream& operator<<(std::ostream& os, const GFNumber& rhs)
 	{

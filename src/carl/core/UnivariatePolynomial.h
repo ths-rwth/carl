@@ -102,6 +102,9 @@ public:
 	template<typename Integer>
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
+	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
+	UnivariatePolynomial normalize() const;
+	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 	UnivariatePolynomial normalize() const;
 	
 	
@@ -223,6 +226,9 @@ public:
 	 * @return 
 	 */
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
+	
+	template<typename C>
+	friend UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
