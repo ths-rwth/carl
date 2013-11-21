@@ -45,7 +45,6 @@ bool operator==(const IntegerT& lhs, const GFNumber<IntegerT>& rhs)
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, int rhs)
 {
-	std::cout << lhs.mN << std::endl;
 	if(lhs.isZero() && rhs == 0) return true;
 	if(lhs.isUnit() && rhs == 1) return true;
 	if(lhs.isZero() && rhs != 0) return false;
@@ -217,8 +216,8 @@ template<typename IntegerT>
 GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {
 	assert(!rhs.isZero());
-	assert(*(lhs.mGf) == *(rhs.mGf));	
-	return GFNumber<IntegerT>(lhs.mN * rhs.inverse().mN, lhs.mGf == nullptr ? rhs.mGf : lhs.mGf);
+	assert(rhs.mGf != nullptr);
+	return GFNumber<IntegerT>(lhs.mN * rhs.inverse().mN, rhs.mGf);
 }
 
 

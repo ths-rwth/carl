@@ -16,7 +16,7 @@ namespace carl
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
-: mMainVar(mainVar)
+: mMainVar(mainVar), mCoefficients()
 {
 	
 }
@@ -155,6 +155,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 }
 
+
+
 /**
  * See Algorithm 2.2 in GZL92.
  * @param a
@@ -170,22 +172,30 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	assert(a.mMainVar == s.mMainVar);
 	assert(a.mMainVar == t.mMainVar);
 	
+	LOGMSG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
 	const Variable& x = a.mMainVar;
 	UnivariatePolynomial<Coeff> c = a;
 	UnivariatePolynomial<Coeff> d = b;
 	c.normalizeCoefficients();
 	d.normalizeCoefficients();
-	c.normalize();
-	d.normalize();
+	c = c.normalized();
+	d = d.normalized();
+	
+	UnivariatePolynomial<Coeff> c1 = a.one();
 	UnivariatePolynomial<Coeff> c2(x);
-	UnivariatePolynomial<Coeff> c1 = c2 + (Coeff)1;
+	
 	UnivariatePolynomial<Coeff> d1(x);
-	UnivariatePolynomial<Coeff> d2 = d1 + (Coeff)1;
+	UnivariatePolynomial<Coeff> d2 = a.one();
+	
 	while(!d.isZero())
 	{
 		DivisionResult<UnivariatePolynomial<Coeff>> divres = c.divide(d);
+		assert(divres.remainder == c - divres.quotient * d);
 		UnivariatePolynomial r1 = c1 - divres.quotient*d1;
 		UnivariatePolynomial r2 = c2 - divres.quotient*d2;
+		LOGMSG_TRACE("carl.core", "UnivEEA: q=" << divres.quotient << ", r=" << divres.remainder);
+		LOGMSG_TRACE("carl.core", "UnivEEA: r1=" << c1 << "-" << divres.quotient << "*" << d1 << "==" << c1 - divres.quotient * d1 );
+		LOGMSG_TRACE("carl.core", "UnivEEA: r2=" << c2 << "-" << divres.quotient << "*" << d2 << "==" << c2 - divres.quotient * d2 );
 		c = d;
 		c1 = d1;
 		c2 = d2;
@@ -194,11 +204,21 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 		d2 = r2;
 		c.normalizeCoefficients();
 		d.normalizeCoefficients();
+		
+		LOGMSG_TRACE("carl.core", "UnivEEA: c=" << c << ", d=" << d );
+		LOGMSG_TRACE("carl.core", "UnivEEA: c1=" << c1 << ", c2=" << c2 );
+		LOGMSG_TRACE("carl.core", "UnivEEA: d1=" << d1 << ", d2=" << d2 );
 	}
-	s = c1;
-	t = c2;
+	s = c1 / (a.lcoeff() * c.lcoeff());
+	t = c2 / (b.lcoeff() * c.lcoeff());
+	c = c.normalized();
+	c.normalizeCoefficients();
 	s.normalizeCoefficients();
 	t.normalizeCoefficients();
+	LOGMSG_DEBUG("carl.core", "UnivEEA: g=" << c << ", s=" << s << ", t=" << t );
+	LOGMSG_TRACE("carl.core", "UnivEEA: " << c << "==" << s*a + t*b << "==" << s*a << " + " << t*b );
+	assert(c == s*a + t*b);
+	
 	return c;
 }
 
@@ -240,15 +260,20 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 
 template<typename Coeff>
 template<typename C, EnableIf<is_field<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalize() const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 {
-	return *this/lcoeff();
+	if(isZero())
+	{
+		return *this;
+	}
+	Coeff tmp(lcoeff());
+	return *this/tmp;
 }
 
 
 template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalize() const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 {
 	// TODO implement
 }
@@ -282,10 +307,14 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 template<typename Coeff>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	
 	assert(!divisor.isZero());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
-	result.quotient.mCoefficients.resize(1 + degree()-divisor.degree(),(Coeff)0);
+	assert(*this == divisor * result.quotient + result.remainder);
+	if(divisor.degree() > degree())
+	{
+		return result;
+	}
+	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
 	
 	do
 	{
@@ -294,7 +323,8 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff) * divisor;
 		result.quotient.mCoefficients[degdiff] += factor;
 	}
-	while(divisor.degree() <= result.remainder.degree());
+	while(divisor.degree() <= result.remainder.degree() && !result.remainder.isZero());
+	assert(*this == divisor * result.quotient + result.remainder);
 	return result;
 }
 
@@ -387,13 +417,19 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
 {
 	assert(mMainVar == rhs.mMainVar);
-	if(degree() < rhs.degree())
+	
+	if(rhs.isZero())
+	{
+		return *this;
+	}
+	
+	if(mCoefficients.size() < rhs.mCoefficients.size())
 	{
 		for(unsigned i = 0; i < mCoefficients.size(); ++i)
 		{
 			mCoefficients[i] += rhs.mCoefficients[i];
 		}
-		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - (rhs.degree() - degree()), rhs.mCoefficients.end());
+		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - (rhs.mCoefficients.size() - mCoefficients.size()), rhs.mCoefficients.end());
 	}
 	else
 	{
@@ -478,6 +514,12 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff
 	{
 		c *= rhs;
 	}
+	
+	if(is_finite_domain<Coeff>::value)
+	{
+		stripLeadingZeroes();
+	}
+	
 	return *this;		
 }
 
@@ -511,7 +553,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Univa
 	
 	std::vector<Coeff> newCoeffs; 
 	newCoeffs.reserve(mCoefficients.size() + rhs.mCoefficients.size());
-	for(unsigned e = 0; e < mCoefficients.size() + rhs.mCoefficients.size(); ++e)
+	for(unsigned e = 0; e < mCoefficients.size() + rhs.degree(); ++e)
 	{
 		newCoeffs.push_back((Coeff)0);
 		for(unsigned i = 0; i < mCoefficients.size() && i <= e; ++i)
@@ -523,6 +565,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Univa
 		}
 	}
 	mCoefficients.swap(newCoeffs);
+	stripLeadingZeroes();
 	return *this;
 }
 
@@ -571,7 +614,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 	{
 		LOGMSG_WARN("carl.core", "Division by coefficients is only defined for field-coefficients");
 	}
-	assert(rhs != (Coeff)0);
+	assert(rhs != 0);
 	for(Coeff& c : mCoefficients)
 	{
 		c /= rhs;
@@ -583,7 +626,7 @@ template<typename C>
 UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {
 	static_assert(is_field<C>::value, "Division by coefficients is only defined for field-coefficients");
-	assert(rhs != (C)0);
+	assert(rhs != 0);
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
 }

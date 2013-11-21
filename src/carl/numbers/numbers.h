@@ -54,6 +54,18 @@ struct is_field<GFNumber<C>>
 };
 
 
+template<typename C>
+struct is_finite_domain
+{
+	static constexpr bool value = false;
+};
+
+template<typename C>
+struct is_finite_domain<GFNumber<C>>
+{
+	static constexpr bool value = true;
+};
+
 /**
  * Type trait is_number
  */

@@ -24,14 +24,14 @@ template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
 	
-	template<class T> friend class UnivariatePolynomial; // 't' is a template
+	template<class T> friend class UnivariatePolynomial; 
 private:
 	Variable mMainVar;
 	std::vector<Coefficient> mCoefficients;
 
 public:
 	UnivariatePolynomial(Variable::Arg mainVar);
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
@@ -66,6 +66,18 @@ public:
 	{
 		return mCoefficients.size() == 1 && mCoefficients.back() == (Coefficient)1;
 	}
+	
+	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
+	UnivariatePolynomial one() const
+	{
+		return UnivariatePolynomial(mMainVar, C(1, lcoeff().gf()));
+	}
+	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
+	UnivariatePolynomial one() const
+	{
+		return UnivariatePolynomial(mMainVar, (C)1);
+	}
+	
 
 	/**
 	 * Checks whether the polynomial is constant with respect to the main variable.
@@ -103,9 +115,9 @@ public:
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
-	UnivariatePolynomial normalize() const;
+	UnivariatePolynomial normalized() const;
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
-	UnivariatePolynomial normalize() const;
+	UnivariatePolynomial normalized() const;
 	
 	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;

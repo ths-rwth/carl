@@ -41,6 +41,11 @@ class GFNumber
 	{
 		
 	}
+
+	const GaloisField<IntegerType>* gf() const
+	{
+		return mGf;
+	}
 	
 	GFNumber<IntegerType> toGF(const GaloisField<IntegerType>* newfield) const
 	{

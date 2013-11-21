@@ -47,8 +47,8 @@ has_method_struct(normalize);
 
 //http://stackoverflow.com/questions/11251376/how-can-i-check-if-a-type-is-an-instantiation-of-a-given-class-template
 template < template <typename...> class Template, typename T >
-struct is_instantiation_of : std::false_type {};
+struct is_instantiation_of : std::false_type { static constexpr bool value = false; };
 template < template <typename...> class Template, typename... Args >
-struct is_instantiation_of< Template, Template<Args...> > : std::true_type {};
+struct is_instantiation_of< Template, Template<Args...> > : std::true_type { static constexpr bool value = true; };
 
 }

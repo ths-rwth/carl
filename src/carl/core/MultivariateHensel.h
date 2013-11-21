@@ -39,6 +39,18 @@ class DiophantineEquations
 														 unsigned d) const
 	{
 		assert(a.size() > (unsigned)1);
+		size_t r = a.size();
+		size_t v = I.size() + 1;
+		Variable x_v = I.rend()->first;
+		Integer a_v = I.rend()->second;
+		if(v > 1)
+		{
+			LOG_NOTIMPLEMENTED();
+		}
+		else
+		{
+			
+		}
 		
 	}
 	
@@ -118,6 +130,7 @@ class DiophantineEquations
 		const Variable& x = a.mainVar();
 		Polynomial amodp = a.toFiniteDomain(mGf_p);
 		Polynomial bmodp = b.toFiniteDomain(mGf_p);
+		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: a mod p=" << amodp << ", b mod p=" << bmodp );
 		Polynomial s(x);
 		Polynomial t(x);
 		Polynomial g(x);
@@ -149,6 +162,7 @@ class DiophantineEquations
 			t += tau*modulus;
 			modulus *= p;
 		}
+		assert((s.toFiniteDomain(mGf_pk)*a + t.toFiniteDomain(mGf_pk)*b).isOne());
 		return {s,t};
 		
 	}

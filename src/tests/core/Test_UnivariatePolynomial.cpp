@@ -52,12 +52,24 @@ TEST(UnivariatePolynomial, GCD)
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
+	UnivariatePolynomial<cln::cl_RA> s(x);
+    UnivariatePolynomial<cln::cl_RA> t(x);
+    
+	UnivariatePolynomial<cln::cl_RA> v(x, {(cln::cl_RA)1, (cln::cl_RA)1});
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
+	UnivariatePolynomial<cln::cl_RA> g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,v,s,t);
+	std::cout << g << std::endl;
+    std::cout << s << std::endl;
+    std::cout << t << std::endl;
+	g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(v,p,s,t);
+	std::cout << g << std::endl;
+    std::cout << s << std::endl;
+    std::cout << t << std::endl;
+	
+	
     UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)-6, (cln::cl_RA)-5,(cln::cl_RA)1});
     //std::cout << "gcd" << UnivariatePolynomial<cln::cl_RA>::gcd(p,q) << std::endl;
-    UnivariatePolynomial<cln::cl_RA> s(x);
-    UnivariatePolynomial<cln::cl_RA> t(x);
-    UnivariatePolynomial<cln::cl_RA> g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,q,s,t);
+    g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,q,s,t);
     std::cout << g << std::endl;
     std::cout << s << std::endl;
     std::cout << t << std::endl;
