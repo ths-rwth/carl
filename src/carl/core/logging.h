@@ -100,22 +100,22 @@ namespace carl
 		#define getLog(name) log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(name))
 		// use LOG4CPLUS macros
 		#ifndef LOGi2_DISABLE_FATAL_MSG
-			#define LOGMSG_FATAL(log, msg) LOG4CPLUS_FATAL((log), msg)
+			#define LOGMSG_FATAL(log, msg) LOG4CPLUS_FATAL(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_ERROR_MSG
-			#define LOGMSG_ERROR(log, msg) LOG4CPLUS_ERROR((log), msg)
+			#define LOGMSG_ERROR(log, msg) LOG4CPLUS_ERROR(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_WARN_MSG
-			#define LOGMSG_WARN(log, msg) LOG4CPLUS_WARN((log), msg)
+			#define LOGMSG_WARN(log, msg) LOG4CPLUS_WARN(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_INFO_MSG
-			#define LOGMSG_INFO(log, msg) LOG4CPLUS_INFO((log), msg)
+			#define LOGMSG_INFO(log, msg) LOG4CPLUS_INFO(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_DEBUG_MSG
-			#define LOGMSG_DEBUG(log, msg) LOG4CPLUS_DEBUG((log), msg)
+			#define LOGMSG_DEBUG(log, msg) LOG4CPLUS_DEBUG(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_TRACE_MSG
-			#define LOGMSG_TRACE(log, msg) LOG4CPLUS_TRACE((log), msg)
+			#define LOGMSG_TRACE(log, msg) LOG4CPLUS_TRACE(log, msg)
 		#endif
 	#else
 		typedef void* Log;
