@@ -9,11 +9,12 @@ TEST(Diophantine, Constructor)
 	VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
+	Variable y = vpool.getFreshVariable();
 	
 	MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
     MultivariatePolynomial<cln::cl_RA> g1({(cln::cl_RA)3*x*x*x*x*y, (cln::cl_RA)1*y*y});
     
-	MultivariateGCD gcd(f1,g1);
+	MultivariateGCD<cln::cl_RA> gcd(f1,g1);
 	gcd.calculate();
 //    UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)1, (mpz_class)1, (mpz_class)0, (mpz_class)1});
 //	const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);

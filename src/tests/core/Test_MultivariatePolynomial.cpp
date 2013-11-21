@@ -30,7 +30,7 @@ TEST(MultivariatePolynomial, Operators)
 
 TEST(MultivariatePolynomial, Addition)
 {
-    Variable v0(1);
+    Variable v0((unsigned)1);
     Term<mpz_class> t0(v0);
     MultivariatePolynomial<mpz_class> p0(v0);
     p0 += 3;
@@ -40,8 +40,8 @@ TEST(MultivariatePolynomial, Addition)
     p0 += -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
     
-    Variable v1((unsigned)1);
-    Variable v2((unsigned)2);
+    Variable v1((unsigned)2);
+    Variable v2((unsigned)3);
     p0 += v1;
     p0 += Monomial(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
@@ -86,8 +86,8 @@ TEST(MultivariatePolynomial, Substraction)
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 -= -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
-    Variable v1(1);
-    Variable v2(2);
+    Variable v1((unsigned)2);
+    Variable v2((unsigned)3);
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     p0 -= Monomial(v2);
