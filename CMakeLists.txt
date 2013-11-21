@@ -68,12 +68,21 @@ endforeach()
 # path to put in the executables after building.
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for builed executables")
 
-
 # compiler flags.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")
-if(DEVELOPER)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion ")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	message("using clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	message("using gcc")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
+else()
+	message("possibly unsupported compiler")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
 endif()
+if(DEVELOPER)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion ")
+endif()
+
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C. Find system tools and libraries.
