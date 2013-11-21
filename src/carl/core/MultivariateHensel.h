@@ -34,24 +34,24 @@ class DiophantineEquations
 	}
 	
 	std::vector<Polynomial> solveMultivariateDiophantine(const std::vector<Polynomial>& a,
-														 const Polynomial& c,
+														 const Polynomial&, //c
 														 const std::map<Variable, Integer>& I,
-														 unsigned d) const
+														 unsigned /*d*/) const
 	{
 		assert(a.size() > (unsigned)1);
-		size_t r = a.size();
+		//size_t r = a.size();
 		size_t v = I.size() + 1;
-		Variable x_v = I.rend()->first;
-		Integer a_v = I.rend()->second;
+		//Variable x_v = I.rend()->first;
+		//Integer a_v = I.rend()->second;
 		if(v > 1)
 		{
 			LOG_NOTIMPLEMENTED();
 		}
 		else
 		{
-			
 		}
-		
+		//Prvent warning
+		return {};
 	}
 	
 	/**
@@ -142,7 +142,7 @@ class DiophantineEquations
 		assert( mGf_p->p() == mGf_pk->p());
 		Integer p = mGf_p->p();
 		Integer modulus = p;
-		Polynomial e(x),c(x);
+		Polynomial c(x);
 		for(unsigned j=1; j<mGf_pk->k(); ++j)
 		{
 			// TODO check moduli.

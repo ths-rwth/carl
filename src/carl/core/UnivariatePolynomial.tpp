@@ -143,7 +143,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 		}
 	}
 	// strip zeros from the end as we might have pushed zeros.
-	result.mCoefficients.resize(lastNonZero, Coeff(0));
+	result.stripLeadingZeroes();
 	
 	if(result.degree() < divisor.degree())
 	{
@@ -350,6 +350,7 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 		res.mCoefficients.push_back(c.representingInteger());
 	}
 	res.stripLeadingZeroes();
+	return res;
 }
 
 template<typename Coeff>
@@ -386,9 +387,12 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
-	result.mCoefficients.resize(mCoefficients.size(), (Coeff)0);
-	std::transform(mCoefficients.begin(), mCoefficients.end(), result.mCoefficients.begin(), 
-				 [](const Coeff& c) -> Coeff {return -c;});
+	result.mCoefficients.reserve(mCoefficients.size());
+	for(auto c : mCoefficients)
+	{
+		result.mCoefficients.push_back(-c);
+	}
+	
 	return result;		 
 }
 

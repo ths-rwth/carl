@@ -20,6 +20,9 @@
 namespace carl
 {
 
+template<typename C, typename O, typename P>
+class MultivariatePolynomial;
+	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
@@ -127,6 +130,7 @@ public:
 	
 	
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	bool divides(const UnivariatePolynomial&) const;
 	
 	UnivariatePolynomial& mod(const Coefficient& modulus);
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
@@ -230,6 +234,10 @@ public:
 	friend UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs);
+	template<typename C, typename O, typename P>
+	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const C& lhs, const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& rhs);
 	
 	
 	/**
