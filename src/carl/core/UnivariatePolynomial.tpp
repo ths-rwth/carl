@@ -429,7 +429,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 		{
 			mCoefficients[i] += rhs.mCoefficients[i];
 		}
-		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - (rhs.mCoefficients.size() - mCoefficients.size()), rhs.mCoefficients.end());
+		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - ((unsigned)(rhs.mCoefficients.size() - mCoefficients.size())), rhs.mCoefficients.end());
 	}
 	else
 	{
