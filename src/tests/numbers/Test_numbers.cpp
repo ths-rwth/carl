@@ -17,18 +17,15 @@ TEST(Numbers, IntegralT)
 	
 }
 
-TEST(Numbers, PrimeFactorizations)
+TEST(Numbers, AllFactors)
 {
-    for(unsigned num = 0; num<=100; ++num)
+    for(int num = 0; num<=100; ++num)
     {
-        std::vector<unsigned> pf = calculateFactorization(num);
-        unsigned prod = (num == 0 ? 0 : 1);
+        std::vector<int> pf = calculateAllFactors(num);
         for(auto fac = pf.begin(); fac != pf.end(); ++fac)
         {
-            prod *= *fac;
-            EXPECT_EQ((unsigned)0,num%(*fac));
+            EXPECT_EQ(0,num%(*fac));
         }
-        EXPECT_EQ(prod,num);
     }
 }
 	

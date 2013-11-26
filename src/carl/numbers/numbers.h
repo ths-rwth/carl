@@ -295,65 +295,26 @@ inline bool isInteger(const cln::cl_I&)
 	return true;
 }
 
-
-
-
-//
-//template<typename T>
-//bool isZero(const T& t)
-//{
-//	return t == (T)0;
-//}
-//
-//template<typename C>
-//bool isZero(const GFNumber<C>& c)
-//{
-//	return c.isZero();
-//}
-
-//static const unsigned NUM_OF_PRECALCULATED_FACTORIZATIONS = 100;
-
-static std::vector<unsigned> calculateFactorization(unsigned n)
+static std::vector<int> calculateAllFactors(int num)
 {
-    if(n==0) return std::vector<unsigned>();
-    if(n<4) return std::vector<unsigned>(1, n);
-    std::vector<unsigned> result;
-    unsigned f = 2;
-    while(f * f <= n)
+    if(num == 0) return std::vector<int>();
+    std::vector<int> result = std::vector<int>(1, 1);
+    int abs_num = std::abs(num);
+    if(abs_num > 1 && abs_num < 4) result.push_back(abs_num);
+    if(abs_num < 4) return result;
+    int fac = 2;
+    int max_fac = abs_num / 2;
+    while(fac <= max_fac)
     {
-        if(n % f == 0)
+        if(abs_num % fac == 0)
         {
-            result.push_back(f);
-            n /= f;
+            result.push_back(fac);
         }
-        else
-        {
-            ++f;
-        }
+        ++fac;
     }
-    if(n>1) result.push_back(n);
+    if(abs_num > 1) result.push_back(abs_num);
     return result;
 }
-
-//static constexpr std::array<std::array<unsigned, NUM_OF_PRECALCULATED_FACTORIZATIONS>, NUM_OF_PRECALCULATED_FACTORIZATIONS> getFactorizationsUntil(unsigned n)
-//{
-//    return (n==0 ? std::array<std::array<unsigned, NUM_OF_PRECALCULATED_FACTORIZATIONS>, NUM_OF_PRECALCULATED_FACTORIZATIONS>{} : getFactorizationsUntil(n-1));
-////    for(unsigned i = 0; i<=n; ++i)
-////    {
-////        result[i] = &calculateFactorization(i);
-////    }
-////    return result;
-//}
-
-//constexpr std::array<std::array<unsigned, NUM_OF_PRECALCULATED_FACTORIZATIONS>, NUM_OF_PRECALCULATED_FACTORIZATIONS> factorizations = getFactorizationsUntil(NUM_OF_PRECALCULATED_FACTORIZATIONS);
-//
-//static std::vector<unsigned> getFactorization(unsigned n)
-//{
-//    if(n<=NUM_OF_PRECALCULATED_FACTORIZATIONS)
-//        return factorizations.at(n);
-//    else
-//        return calculateFactorization(n);
-//}
 
 } // namespace carl    
 

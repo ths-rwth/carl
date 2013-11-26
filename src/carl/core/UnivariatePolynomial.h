@@ -147,12 +147,6 @@ public:
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
 	UnivariatePolynomial squareFreePart() const;
-    
-    std::map<UnivariatePolynomial, unsigned> factorization() const;
-    
-    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors);
-    
-	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
@@ -193,11 +187,18 @@ public:
 	 */
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
+    
+    std::map<UnivariatePolynomial, unsigned> factorization() const;
+    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors);
+    Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
+	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 
 	UnivariatePolynomial operator-() const;
 	UnivariatePolynomial& operator+=(const Coefficient& rhs);

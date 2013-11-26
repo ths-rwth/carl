@@ -139,3 +139,35 @@ TEST(UnivariatePolynomial, normalizeCoefficients)
 	pol.normalizeCoefficients();
 	polF.normalizeCoefficients();
 }
+
+TEST(UnivariatePolynomial, factorization)
+{
+	VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    
+	UnivariatePolynomial<cln::cl_RA> pol(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
+    
+    std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
+    UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
+//    std::cout << "Factorization of  " << pol << "  is  ";
+    for(auto factor = factors.begin(); factor != factors.end(); ++factor)
+    {
+//        if(factor != factors.begin())
+//            std::cout << "*";
+//        std::cout << "(" << factor->first << ")^" << factor->second;
+        EXPECT_NE(0, factor->second);
+        for(unsigned i=0; i < factor->second; ++i)
+        {
+            productOfFactors *= factor->first;
+        }
+    }
+    std::cout << std::endl;
+    EXPECT_EQ(pol, productOfFactors);
+    
+    UnivariatePolynomial<cln::cl_RA> pol2(x, {(cln::cl_RA)-1, (cln::cl_RA)2, (cln::cl_RA)-6, (cln::cl_RA)2});
+    EXPECT_EQ(5, pol2.syntheticDivision((cln::cl_RA)3) );
+    
+    UnivariatePolynomial<cln::cl_RA> pol3(x, {(cln::cl_RA)-42, (cln::cl_RA)0, (cln::cl_RA)-12, (cln::cl_RA)1});
+    EXPECT_EQ(-123, pol3.syntheticDivision((cln::cl_RA)3) );
+}
