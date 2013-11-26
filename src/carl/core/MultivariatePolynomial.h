@@ -43,7 +43,7 @@ protected:
 	TermsType mTerms;
 public:
 	MultivariatePolynomial() = default;
-	//explicit MultivariatePolynomial(int c);
+	explicit MultivariatePolynomial(int c);
 	explicit MultivariatePolynomial(const Coeff& c);
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Monomial& m);
@@ -239,6 +239,8 @@ public:
 	MultivariatePolynomial pow(unsigned exp) const;
 	
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
+	
+	MultivariatePolynomial<typename IntegralT<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
 	
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;

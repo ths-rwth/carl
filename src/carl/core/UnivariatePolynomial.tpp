@@ -132,21 +132,15 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	Coeff factor = lcoeff()/divisor.lcoeff();
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-1);
-	unsigned lastNonZero = 0;
 	if(degdiff > 0)
 	{
 		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
-		lastNonZero = (unsigned)(std::find(result.mCoefficients.rbegin(), result.mCoefficients.rend(), 0) - result.mCoefficients.rend()) + 1;
 	}
 	
 	// By construction, the leading coefficient will be zero.
 	for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
 	{
 		result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
-		if(result.mCoefficients.back() != 0) 
-		{
-			lastNonZero = i+degdiff+1;
-		}
 	}
 	// strip zeros from the end as we might have pushed zeros.
 	result.stripLeadingZeroes();
@@ -224,7 +218,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	LOGMSG_DEBUG("carl.core", "UnivEEA: g=" << c << ", s=" << s << ", t=" << t );
 	LOGMSG_TRACE("carl.core", "UnivEEA: " << c << "==" << s*a + t*b << "==" << s*a << " + " << t*b );
 	assert(c == s*a + t*b);
-	
 	return c;
 }
 
@@ -242,6 +235,29 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 {
 	if(b.isZero()) return a;
 	else return gcd_recursive(b, a.reduce(b));
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modulus)
+{
+	for(Coeff& coeff : mCoefficients)
+	{
+		coeff = carl::mod(coeff, modulus);
+	}
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::mod(const Coeff& modulus) const
+{
+	UnivariatePolynomial<Coeff> result;
+	result.mCoefficients.reserve(mCoefficients.size());
+	for(auto coeff : mCoefficients)
+	{
+		result.mCoefficients.push_back(mod(coeff, modulus));
+	}
+	result.stripLeadingZeroes();
+	return result;
 }
 
 template<typename Coeff>
@@ -332,6 +348,12 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 	while(divisor.degree() <= result.remainder.degree() && !result.remainder.isZero());
 	assert(*this == divisor * result.quotient + result.remainder);
 	return result;
+}
+
+template<typename Coeff>
+bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& dividant) const
+{
+	return dividant.divide(*this).remainder.isZero();
 }
 
 template<typename Coeff>
@@ -762,7 +784,7 @@ UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& r
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff& rhs)
 {
-	if(rhs == (Coeff)0)
+	if(rhs == 0)
 	{
 		mCoefficients.clear();
 		return *this;
@@ -902,6 +924,24 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 		return false;
 	}
 }
+
+template<typename C>
+bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs)
+{	
+	if(lhs.isZero())
+	{
+		return rhs == 0;
+	}
+	if(lhs.isConstant() && lhs.lcoeff() == rhs) return true;
+	return false;
+}
+
+template<typename C>
+bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return rhs == lhs;
+}
+
 
 template<typename C>
 bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)

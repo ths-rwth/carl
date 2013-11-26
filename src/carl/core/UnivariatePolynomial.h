@@ -140,8 +140,6 @@ public:
 	
 	UnivariatePolynomial& mod(const Coefficient& modulus);
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
-	static UnivariatePolynomial& mod(UnivariatePolynomial&, const Coefficient& modulus);
-	static UnivariatePolynomial mod(const UnivariatePolynomial&, const Coefficient& modulus);
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
@@ -150,6 +148,17 @@ public:
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
+	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
+	{
+		
+	}
+	template<typename SubstitutionType, typename C = Coefficient, DisableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
+	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
+	{
+		// TODO check behaviour here. 
+		return *this;
+	}
 	
 	template<typename T = Coefficient, EnableIf<has_normalize<T>> = dummy>
 	UnivariatePolynomial& normalizeCoefficients()
@@ -195,6 +204,10 @@ public:
 
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>

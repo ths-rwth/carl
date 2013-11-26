@@ -30,7 +30,8 @@ class MultivariateGCD
 	typedef GCDResult<Coeff,Ordering,Policies> Result;
 	typedef	typename Polynomial::TermType Term; 
 	typedef typename IntegralT<Coeff>::type Integer;
-	typedef UnivariatePolynomial<Polynomial> UnivPol;
+	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
+	typedef UnivariatePolynomial<Coeff> UnivPol;
 	
 	const Polynomial& mp1;
 	const Polynomial& mp2;
@@ -69,8 +70,8 @@ class MultivariateGCD
 		// gcd(p, ay + b) is either ay + b or 1.
 		
 		Variable x = getMainVar(mp1, mp2);
-		UnivPol A = mp1.toUnivariatePolynomial(x);
-		UnivPol B = mp2.toUnivariatePolynomial(x);
+		UnivReprPol A = mp1.toUnivariatePolynomial(x);
+		UnivReprPol B = mp2.toUnivariatePolynomial(x);
 		Polynomial a;// = A.cont();
 		Polynomial b;// = B.cont();
 		A /= a;
@@ -81,8 +82,8 @@ class MultivariateGCD
 		
 		Integer p = getPrime(A,B);
 		std::map<Variable, Integer> eval_b = findEval(A,B,p); // bold b in book.
-		UnivPol A_I(x);// = A.evaluateCoefficient(eval_b).mod(p);
-		UnivPol B_I(x);// = B.evaluateCoefficient(eval_b).mod(p);
+		UnivPol A_I = A.evaluateCoefficient(eval_b).mod(p);
+		UnivPol B_I = B.evaluateCoefficient(eval_b).mod(p);
 		UnivPol C_I = UnivPol::gcd(A_I, B_I);
 		unsigned d =  C_I.degree();
 		if(d == 0)
@@ -132,7 +133,8 @@ class MultivariateGCD
 				}
 			}
 			// Check for relatively prime cofactors
-			UnivPol U_I(x), H_I(x);
+			UnivReprPol U_I(x);
+			UnivPol H_I(x);
 			Polynomial c;
 			if(UnivPol::gcd(B_I, C_I).isOne())
 			{
@@ -201,7 +203,7 @@ class MultivariateGCD
 		
 	}	
 		
-	Integer getPrime(const UnivPol& A, const UnivPol& B)
+	Integer getPrime(const UnivReprPol& A, const UnivReprPol& B)
 	{
 		Integer p;
 		do 
@@ -220,7 +222,7 @@ class MultivariateGCD
      * @param p Prime number
      * @return the evaluation point.
      */
-	std::map<Variable, Integer> findEval( const UnivPol& A, const UnivPol& B, Integer p ) const
+	std::map<Variable, Integer> findEval( const UnivReprPol& A, const UnivReprPol& B, Integer p ) const
 	{
 		std::map<Variable, Integer> result;
 		

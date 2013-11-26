@@ -10,6 +10,12 @@
 namespace carl
 {
 
+	
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(int c) : MultivariatePolynomial((Coeff)c)
+{
+    
+}
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Coeff& c) :
@@ -212,6 +218,16 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
 {
     return (mTerms.size() == 0) || (mTerms.size() == 1 && mTerms.front()->isConstant());
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
+{
+	if(isZero()) return 0;
+	if(trailingTerm()->isConstant())
+	{
+		return trailingTerm()->coeff();
+	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -556,6 +572,12 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 	return UnivariatePolynomial<C>(x, coeffs);
 }
 
+template<typename C, typename O, typename P>
+UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg mainVar) const
+{
+	
+	LOG_NOTIMPLEMENTED();
+}
 
 
 template<typename C, typename O, typename P>
@@ -640,6 +662,21 @@ bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 }
 
 template<typename C, typename O, typename P>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
+{
+    if(lhs.mTerms.empty() && rhs == 0) return true;
+    if(lhs.mTerms.size() > 1) return false;
+    return (lhs.mTerms.front()->coeff()) == rhs;
+}
+
+template<typename C, typename O, typename P>
+bool operator==(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
+{
+	return rhs == lhs;
+}
+
+
+template<typename C, typename O, typename P>
 bool operator!=( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs); // TODO: != could be much cheaper than ==
@@ -647,63 +684,75 @@ bool operator!=( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePol
 template<typename C, typename O, typename P>
 bool operator!=(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
 template<typename C, typename O, typename P>
 bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    return lhs != rhs;
+    return !(lhs == rhs);
 }
+
+template<typename C, typename O, typename P>
+bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
+{
+    return !(lhs == rhs);
+}
+template<typename C, typename O, typename P>
+bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
+{
+    return !(lhs == rhs);
+}
+
 
 //template<typename C, typename O, typename P>
 //bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)

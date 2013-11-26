@@ -17,10 +17,16 @@ namespace carl
 {
 
 // 
-// Forward declaration
+// Forward declarations
 //
-template <typename IntegerT>
+template<typename IntegerT>
 class GFNumber;
+
+template<typename C>
+class UnivariatePolynomial;
+
+template<typename C, typename O, typename P>
+class MultivariatePolynomial;
 	
 //
 // Type traits.
@@ -152,6 +158,29 @@ struct IntegralT<mpz_class>
 
 template<typename C>
 struct IntegralT<GFNumber<C>>
+{
+	typedef C type;
+};
+
+
+
+/**
+ * Coefficient ring of numbers is just the type of the number. (TODO limit this to numbers)
+ */
+template<typename C>
+struct CoefficientRing
+{
+	typedef C type;
+};
+
+template<typename C>
+struct CoefficientRing<UnivariatePolynomial<C>>
+{
+	typedef C type;
+};
+
+template<typename C, typename O, typename P>
+struct CoefficientRing<MultivariatePolynomial<C, O, P>>
 {
 	typedef C type;
 };
