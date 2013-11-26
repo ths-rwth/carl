@@ -20,18 +20,21 @@
 namespace carl
 {
 
+template<typename C, typename O, typename P>
+class MultivariatePolynomial;
+	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
 	
-	template<class T> friend class UnivariatePolynomial; // 't' is a template
+	template<class T> friend class UnivariatePolynomial; 
 private:
 	Variable mMainVar;
 	std::vector<Coefficient> mCoefficients;
 
 public:
 	UnivariatePolynomial(Variable::Arg mainVar);
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
@@ -67,6 +70,18 @@ public:
 	{
 		return mCoefficients.size() == 1 && mCoefficients.back() == (Coefficient)1;
 	}
+	
+	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
+	UnivariatePolynomial one() const
+	{
+		return UnivariatePolynomial(mMainVar, C(1, lcoeff().gf()));
+	}
+	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
+	UnivariatePolynomial one() const
+	{
+		return UnivariatePolynomial(mMainVar, (C)1);
+	}
+	
 
 	/**
 	 * Checks whether the polynomial is constant with respect to the main variable.
@@ -108,11 +123,20 @@ public:
 	template<typename Integer>
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
+	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
+	UnivariatePolynomial normalized() const;
+	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	UnivariatePolynomial normalized() const;
+	
+	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
+	
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	
+	
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	bool divides(const UnivariatePolynomial&) const;
 	
 	UnivariatePolynomial& mod(const Coefficient& modulus);
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
@@ -222,6 +246,10 @@ public:
 	friend UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs);
+	template<typename C, typename O, typename P>
+	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const C& lhs, const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& rhs);
 	
 	
 	/**
@@ -230,6 +258,9 @@ public:
 	 * @return 
 	 */
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
+	
+	template<typename C>
+	friend UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);

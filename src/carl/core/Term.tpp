@@ -158,7 +158,8 @@ Definiteness Term<Coefficient>::definiteness() const
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Coefficient>& substitutions) const
+template<typename SubstitutionType>
+Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
     if(mMonomial)
     {

@@ -41,6 +41,11 @@ class GFNumber
 	{
 		
 	}
+
+	const GaloisField<IntegerType>* gf() const
+	{
+		return mGf;
+	}
 	
 	GFNumber<IntegerType> toGF(const GaloisField<IntegerType>* newfield) const
 	{
@@ -146,7 +151,8 @@ class GFNumber
 	
 	template<typename IntegerT>
 	friend GFNumber<IntegerT> operator/(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
-	
+
+	GFNumber& operator/=(const GFNumber& rhs);
 	
 	friend std::ostream& operator<<(std::ostream& os, const GFNumber& rhs)
 	{

@@ -61,6 +61,25 @@ struct characteristic
 	static const unsigned value = 0;
 };
 
+template<typename C>
+struct is_field<GFNumber<C>>
+{
+	static const bool value = true;
+};
+
+
+template<typename C>
+struct is_finite_domain
+{
+	static constexpr bool value = false;
+};
+
+template<typename C>
+struct is_finite_domain<GFNumber<C>>
+{
+	static constexpr bool value = true;
+};
+
 /**
  * Type trait is_number
  */

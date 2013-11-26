@@ -8,6 +8,7 @@
 #pragma once
 #include "../numbers/GFNumber.h"
 #include "UnivariatePolynomial.h"
+#include "logging.h"
 
 /**
  * Includes the algorithms 6.2 and 6.3 from the book 
@@ -33,12 +34,24 @@ class DiophantineEquations
 	}
 	
 	std::vector<Polynomial> solveMultivariateDiophantine(const std::vector<Polynomial>& a,
-														 const Polynomial& c,
+														 const Polynomial&, //c
 														 const std::map<Variable, Integer>& I,
-														 unsigned d) const
+														 unsigned /*d*/) const
 	{
 		assert(a.size() > (unsigned)1);
-		
+		//size_t r = a.size();
+		size_t v = I.size() + 1;
+		//Variable x_v = I.rend()->first;
+		//Integer a_v = I.rend()->second;
+		if(v > 1)
+		{
+			LOG_NOTIMPLEMENTED();
+		}
+		else
+		{
+		}
+		//Prvent warning
+		return {};
 	}
 	
 	/**
@@ -113,20 +126,23 @@ class DiophantineEquations
 	std::vector<Polynomial> EEAlift(Polynomial a, Polynomial b) const
 	{
 		assert(a.mainVar() == b.mainVar());
+		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: a=" << a << ", b=" << b );
 		const Variable& x = a.mainVar();
 		Polynomial amodp = a.toFiniteDomain(mGf_p);
 		Polynomial bmodp = b.toFiniteDomain(mGf_p);
+		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: a mod p=" << amodp << ", b mod p=" << bmodp );
 		Polynomial s(x);
 		Polynomial t(x);
 		Polynomial g(x);
 		g = Polynomial::extended_gcd(amodp,bmodp,s,t);
-		assert(g.isOne());
+		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: g=" << g << ", s=" << s << ", t=" << t );
+		LOG_ASSERT(g.isOne(), "g expected to be one");
 		Polynomial smodp = s;
 		Polynomial tmodp = t;
 		assert( mGf_p->p() == mGf_pk->p());
 		Integer p = mGf_p->p();
 		Integer modulus = p;
-		Polynomial e(x),c(x);
+		Polynomial c(x);
 		for(unsigned j=1; j<mGf_pk->k(); ++j)
 		{
 			// TODO check moduli.
@@ -146,6 +162,7 @@ class DiophantineEquations
 			t += tau*modulus;
 			modulus *= p;
 		}
+		assert((s.toFiniteDomain(mGf_pk)*a + t.toFiniteDomain(mGf_pk)*b).isOne());
 		return {s,t};
 		
 	}

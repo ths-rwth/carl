@@ -43,6 +43,7 @@ protected:
 	TermsType mTerms;
 public:
 	MultivariatePolynomial() = default;
+	//explicit MultivariatePolynomial(int c);
 	explicit MultivariatePolynomial(const Coeff& c);
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Monomial& m);
@@ -124,6 +125,7 @@ public:
      * @return 
      */
 	bool hasConstantTerm() const;
+	Coeff constantPart() const;
 	
 	typename TermsType::const_iterator begin() const
 	{
@@ -186,6 +188,8 @@ public:
 	
 	bool isReducibleIdentity() const;
 
+	MultivariatePolynomial divideBy(const MultivariatePolynomial& divisor) const;
+	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
 	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
@@ -205,7 +209,8 @@ public:
 	 * Replace all variables by a value given in their map.
      * @return A new polynomial without the variables in map.
      */
-	MultivariatePolynomial substitute(const std::map<Variable, Coeff>& substitutions) const;
+	template<typename SubstitutionType = Coeff>
+	MultivariatePolynomial substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
 	/**
 	 * Replace all variables by a Term in which the variable does not occur.
      * @param substitutions
@@ -217,9 +222,10 @@ public:
 	 * Like substitute, but expects substitutions for all variables.
      * @return For a polynomial p, the function value p(x_1,...,x_n).
      */
-	Coeff evaluate(const std::map<Variable, Coeff>& substitutions) const;
+    template<typename SubstitutionType = Coeff>
+	Coeff evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
 	
-	
+	bool divides(const MultivariatePolynomial& b) const;
 	/**
 	 * Calculates the S-Polynomial.
      * @param p
@@ -235,9 +241,11 @@ public:
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
+	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
 	const std::shared_ptr<const Term<Coeff>>& operator[](unsigned) const;
-	
+
+	MultivariatePolynomial mod(const typename IntegralT<Coeff>::type& modulo) const;
 	
 	template<bool gatherCoeff>
 	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(const Variable& v) const;
@@ -272,6 +280,11 @@ public:
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
 	friend bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator==(int lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	
 
 	template<typename C, typename O, typename P>
 	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
@@ -299,7 +312,12 @@ public:
 	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
 	friend bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
-
+	template<typename C, typename O, typename P>
+	friend bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, int rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	
+ 
 
 //	template<typename C, typename O, typename P>
 //	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
@@ -395,14 +413,11 @@ public:
 
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	//We need sfinae to prevent C=MultivariatePolynomial
+	//template<typename C, typename O, typename P>
+	//friend const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	//template<typename C, typename O, typename P>
+	//friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
@@ -420,6 +435,17 @@ public:
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 
+	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
+	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
+	MultivariatePolynomial& operator/=(const Monomial& rhs);
+	MultivariatePolynomial& operator/=(const Variable::Arg);
+	MultivariatePolynomial& operator/=(const Coeff& c);
+
+	
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	
+	
 	template <typename C, typename O, typename P>
 	friend std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs);
 

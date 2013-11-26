@@ -355,7 +355,8 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,Coeff>& substitutions) const
+template<typename SubstitutionType>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	MultivariatePolynomial result;
 	for(auto term : mTerms)
@@ -371,7 +372,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,Coeff>& substitutions) const
+template<typename SubstitutionType>
+Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	// We do not have to construct polynomials all the time.
 	LOG_INEFFICIENT();
@@ -533,6 +535,7 @@ VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies
 	return varinfomap;
 	
 }
+
 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() const
@@ -1440,16 +1443,6 @@ const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>&, co
 }
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
-{
-    return rhs * lhs;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
-{
-    LOG_NOTIMPLEMENTED();
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
 {
     return rhs * lhs;
 }

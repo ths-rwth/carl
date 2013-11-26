@@ -100,22 +100,22 @@ namespace carl
 		#define getLog(name) log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(name))
 		// use LOG4CPLUS macros
 		#ifndef LOGi2_DISABLE_FATAL_MSG
-			#define LOGMSG_FATAL(log, msg) LOG4CPLUS_FATAL((log), msg)
+			#define LOGMSG_FATAL(log, msg) LOG4CPLUS_FATAL(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_ERROR_MSG
-			#define LOGMSG_ERROR(log, msg) LOG4CPLUS_ERROR((log), msg)
+			#define LOGMSG_ERROR(log, msg) LOG4CPLUS_ERROR(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_WARN_MSG
-			#define LOGMSG_WARN(log, msg) LOG4CPLUS_WARN((log), msg)
+			#define LOGMSG_WARN(log, msg) LOG4CPLUS_WARN(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_INFO_MSG
-			#define LOGMSG_INFO(log, msg) LOG4CPLUS_INFO((log), msg)
+			#define LOGMSG_INFO(log, msg) LOG4CPLUS_INFO(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_DEBUG_MSG
-			#define LOGMSG_DEBUG(log, msg) LOG4CPLUS_DEBUG((log), msg)
+			#define LOGMSG_DEBUG(log, msg) LOG4CPLUS_DEBUG(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_TRACE_MSG
-			#define LOGMSG_TRACE(log, msg) LOG4CPLUS_TRACE((log), msg)
+			#define LOGMSG_TRACE(log, msg) LOG4CPLUS_TRACE(log, msg)
 		#endif
 	#else
 		typedef void* Log;
@@ -148,7 +148,7 @@ namespace carl
 
 #ifndef LOGi2_DISABLE	
 	#ifdef LOGi2_USE_LOG4CPLUS
-		#define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (message))
+		#define LOG_ASSERT(condition, message) ASSERTIONLOGGER.assertion((condition), (std::string)" " + std::string(message))
 		#define LOG_NOTIMPLEMENTED() DEVLOGGER.assertion(false, (std::string)"Not implemented method-stub called: " +  (std::string)__PRETTY_FUNCTION__)
 		#define LOG_INEFFICIENT() DEVLOGGER.log(log4cplus::WARN_LOG_LEVEL, (std::string)"Inefficient method called: " +  (std::string)__PRETTY_FUNCTION__)
 	#else
@@ -162,6 +162,7 @@ namespace carl
 	#define LOG_INEFFICIENT() ;
 #endif
 
+void setInitialLogLevel();
 
 inline void configureLogging() {
 #ifdef LOGi2_USE_LOG4CPLUS
@@ -176,10 +177,7 @@ inline void configureLogging() {
     fileAppender->setLayout(std::auto_ptr<log4cplus::Layout>( new log4cplus::PatternLayout("%r [%T] %-5p %-25c |%-25b:%4L| -\t %m%n")));
     // Set output.
     logger.addAppender(fileAppender);
-    // Set minimal loglovel
-    logger.setLogLevel(log4cplus::INFO_LOG_LEVEL);
-	DEVLOGGER.setLogLevel(log4cplus::ERROR_LOG_LEVEL);
-	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.gb")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
+	setInitialLogLevel();
 #endif
 }
 
