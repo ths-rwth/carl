@@ -509,7 +509,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
         for(; shiftedTc != shiftedTcs.end(); ++shiftedTc)
         {
             int divisor = tcFactors.back() - (*lcFactor) * shiftedTc->first;
-            if(shiftedTc->second % divisor != 0)
+            if(shiftedTc->second % divisor != 0) // maybe cheaper
             {
                 break;
             }
