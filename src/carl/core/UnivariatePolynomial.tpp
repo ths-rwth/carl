@@ -121,6 +121,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 {
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
+	if(is_field<Coeff>::value && divisor.isConstant())
+	{
+		return UnivariatePolynomial<Coeff>(mMainVar);
+	}
 	//std::cout << *this << " / " << divisor << std::endl;
 	unsigned degdiff = degree() - divisor.degree();
 	Coeff factor = lcoeff()/divisor.lcoeff();
@@ -219,15 +223,22 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
 	// We want degree(b) <= degree(a).
-	if(a.degree() < b.degree()) return gcd_recursive(b,a);
-	else return gcd_recursive(a,b);
+	if(a.degree() < b.degree()) return gcd_recursive(b.normalized(),a.normalized()).normalized();
+	else return gcd_recursive(a.normalized(),b.normalized()).normalized();
 }
 
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
+	assert(b.degree() <= a.degree());
+	std::cout << "a: " << a << std::endl;
+	std::cout << "b: " << b << std::endl;
 	if(b.isZero()) return a;
+//	if(is_field<Coeff>::value)
+//	{
+//		if(b.isConstant()) return b;
+//	}
 	else return gcd_recursive(b, a.reduce(b));
 }
 
@@ -306,12 +317,12 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 	typename IntegralT<Coeff>::type den = getDenom(*it);
 	for(++it; it != mCoefficients.end(); ++it)
 	{
-		num = gcd(num, getNum(*it));
-		den = lcm(den, getDenom(*it));
+		num = carl::gcd(num, getNum(*it));
+		den = carl::lcm(den, getDenom(*it));
 	}
 	Coeff factor = den/num;
 	// Notice that even if factor is 1, we create a new polynomial
-	UnivariatePolynomial<Integer> result;
+	UnivariatePolynomial<Integer> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& coeff : mCoefficients)
 	{

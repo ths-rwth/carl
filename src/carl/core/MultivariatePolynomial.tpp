@@ -408,8 +408,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	typename IntegralT<Coeff>::type den = getDenom((*it)->coeff());
 	for(++it; it != mTerms.end(); ++it)
 	{
-		num = gcd(num, getNum((*it)->coeff()));
-		den = lcm(den, getDenom((*it)->coeff()));
+		num = carl::gcd(num, getNum((*it)->coeff()));
+		den = carl::lcm(den, getDenom((*it)->coeff()));
 	}
 	Coeff factor = den/num;
 	// Notice that even if factor is 1, we create a new polynomial

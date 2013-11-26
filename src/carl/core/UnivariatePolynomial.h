@@ -114,7 +114,7 @@ public:
 	 * 
      * @return copr
      */
-	template<typename Integer>
+	template<typename Integer=Coefficient>
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>

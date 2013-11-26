@@ -181,6 +181,16 @@ inline cln::cl_I getDenom(const cln::cl_RA& rat)
 	return cln::denominator(rat);
 }
 
+inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return cln::gcd(a,b);
+}
+
+inline cln::cl_I lcm(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return cln::lcm(a,b);
+}
+
 
 inline cln::cl_RA pow(const cln::cl_RA& base, unsigned exp)
 {
