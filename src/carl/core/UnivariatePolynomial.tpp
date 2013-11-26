@@ -50,6 +50,12 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coeff>&& coefficients)
+: mMainVar(mainVar), mCoefficients(coefficients)
+{
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coeff>& coefficients)
 : mMainVar(mainVar)
 {
@@ -62,6 +68,129 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 		}
 		mCoefficients.push_back(expAndCoeff.second);
 	}
+}
+
+template<typename Coeff>
+std::map<UnivariatePolynomial<Coeff>, unsigned> UnivariatePolynomial<Coeff>::factorization() const
+{
+    std::map<UnivariatePolynomial, unsigned> result;
+    if( mCoefficients.size() == 1 )
+    {
+        result.insert(std::pair<UnivariatePolynomial, unsigned>(*this, 1));
+    }
+    else if( mCoefficients.size() > 1 )
+    {
+        UnivariatePolynomial<Coeff> remainingPoly;
+        // Exclude the factors  (x-r)^i  with  r rational.
+        remainingPoly = excludeLinearFactors( *remainingPoly, result );
+        // Calculate the square free factorization.
+        std::map<unsigned, UnivariatePolynomial<Coeff>> sff = remainingPoly->squareFreeFactorization();
+        for(auto expFactorPair = sff.begin(); expFactorPair != sff.end(); ++expFactorPair)
+        {
+            auto retVal = result.insert(std::pair<UnivariatePolynomial, unsigned>(expFactorPair->second, expFactorPair->first));
+            if(!retVal->second)
+            {
+                retVal->first->second += expFactorPair->first;
+            }
+        }
+    }
+    return result;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(const UnivariatePolynomial<Coeff>& _poly, std::map<UnivariatePolynomial<Coeff>, unsigned>& _linearFactors)
+{
+    UnivariatePolynomial<Coeff> result;
+    // Exclude the factor x^i.
+    auto cf = _poly.coefficients().begin();
+    if(*cf == 0) // Polynomial is of the form a_n * x^n + ... + a_k * x^k (a>k, k>0)
+    {
+        unsigned k = 0;
+        while(*cf == 0)
+        {
+            assert(cf != _poly.coefficients().end());
+            ++cf;
+            ++k;
+        }
+        // Take x^k as a factor
+        _linearFactors.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(k, _poly.mainVar()));
+        // Construct the remainder  a_n * x^{n-k} + ... + a_{k-1} * x + a_k
+        std::vector<Coeff> cfs;
+        cfs.reserve(_poly.coefficients().size()-k);
+        cfs = std::vector<Coeff>(cf, _poly.coefficients().end());
+        result = UnivariatePolynomial<Coeff>(_poly.mainVar(), std::move(cfs));
+    }
+    else
+    {
+        result = _poly;
+    }
+    // Exclude the factor (x-r)^i  with  r rational and r!=0.
+    std::set<Coeff> possibleRationalRoots;
+    do
+    {
+        if(result->degree() <= 1)
+        {
+            auto retVal = _linearFactors.insert(std::pair<UnivariatePolynomial, unsigned>(result, 1));
+            if(!retVal->second)
+            {
+                ++retVal->first->second;
+            }
+        }
+        int lcAsInt = toInt(getNum(result.lcoeff()));
+        std::vector<unsigned> lcFactorization;
+        if( lcAsInt <= INT_MAX )
+        {
+            lcFactorization = calculateFactorization((unsigned)std::abs(lcAsInt));
+        }
+        assert(result.coefficients().size() > 1);
+        assert(result.coefficients().front() != 0);
+        int tcAsInt = toInt(getNum(result.coefficients().front()));
+        std::vector<unsigned> tcFactorization;
+        if( tcAsInt <= INT_MAX )
+        {
+            tcFactorization = calculateFactorization((unsigned)std::abs(tcAsInt));
+        }
+    }
+    while( !possibleRationalRoots.empty() );
+    return result;
+}
+
+template<typename Coeff>
+std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squareFreeFactorization() const
+{
+    std::map<unsigned,UnivariatePolynomial> result;
+	if(characteristic<Coeff>::value != 0 && degree() >= characteristic<Coeff>::value)
+    {
+        result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(1, *this));
+    }
+    else
+    {
+        UnivariatePolynomial<Coeff> b = this->derivative();
+        UnivariatePolynomial<Coeff> c = gcd(*this, b);
+        if(c.isZero())
+        {
+            result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(1, *this));
+        }
+        else
+        {
+            UnivariatePolynomial<Coeff> w = (*this).divide(c);
+            UnivariatePolynomial<Coeff> y = b.divide(c);
+            UnivariatePolynomial<Coeff> z = y-w.derivative();
+            unsigned i = 1;
+            while(!z.isZero())
+            {
+                UnivariatePolynomial<Coeff> g = gcd(w, z);
+                assert(result.find(i) == result.end());
+                result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(i, g));
+                ++i;
+                w = w.divide(g);
+                y = z.divide(g);
+                z = y - w.derivative();
+            }
+            result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(i, w));
+        }
+    }
+    return result;
 }
 
 template<typename Coeff>
@@ -114,7 +243,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 		return result;
 	}
 }
-
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial& divisor) const

@@ -16,5 +16,20 @@ TEST(Numbers, IntegralT)
 	static_assert(is_instantiation_of<GFNumber,GFNumber<mpz_class>>::value, "Check whether the is_instantiaton works correctly");
 	
 }
+
+TEST(Numbers, PrimeFactorizations)
+{
+    for(unsigned num = 0; num<=100; ++num)
+    {
+        std::vector<unsigned> pf = calculateFactorization(num);
+        unsigned prod = (num == 0 ? 0 : 1);
+        for(auto fac = pf.begin(); fac != pf.end(); ++fac)
+        {
+            prod *= *fac;
+            EXPECT_EQ((unsigned)0,num%(*fac));
+        }
+        EXPECT_EQ(prod,num);
+    }
+}
 	
  

@@ -34,6 +34,7 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
+	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 //	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
 
@@ -91,6 +92,11 @@ public:
 		return mCoefficients.back();
 	}
 
+	const std::vector<Coefficient>& coefficients() const
+	{
+		return mCoefficients;
+	}
+
 	const Variable& mainVar() const
 	{
 		return mMainVar;
@@ -117,6 +123,12 @@ public:
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
 	UnivariatePolynomial squareFreePart() const;
+    
+    std::map<UnivariatePolynomial, unsigned> factorization() const;
+    
+    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors);
+    
+	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	

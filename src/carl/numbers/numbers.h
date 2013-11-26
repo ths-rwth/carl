@@ -6,9 +6,12 @@
  */
 
 #pragma once
+#include <climits>
 #include <cln/cln.h>
 #include <gmpxx.h>
 #include <functional>
+#include <array>
+#include <map>
 
 namespace carl
 {
@@ -45,6 +48,17 @@ template<>
 struct is_field<mpq_class>
 {
 	static const bool value = true;
+};
+
+/**
+ * Type trait for the characteristic of the given field (template argument).
+ * Default is 0, but certain types which encode algebraic fields should be set to true. 
+ * @see UnivariatePolynomial - squareFreeFactorization for example.
+ */
+template<typename type>
+struct characteristic
+{
+	static const unsigned value = 0;
 };
 
 /**
@@ -163,7 +177,6 @@ inline mpz_class abs(const mpz_class& i)
 	return res;
 }
 
-
 inline mpq_class abs(const mpq_class& r)
 {
 	mpq_class res;
@@ -171,6 +184,11 @@ inline mpq_class abs(const mpq_class& r)
 	return res;
 }
 
+inline int toInt(const cln::cl_I& i)
+{
+    assert(i <= INT_MAX);
+    return cln::cl_I_to_int(i);
+}
 
 inline const mpz_class& getNum(const mpq_class& rat)
 {
@@ -232,7 +250,7 @@ inline mpz_class lcm(const mpz_class& v1, const mpz_class& v2)
 } 
 
 template<typename C>
-constexpr bool isInteger(const GFNumber<C>&)
+inline bool isInteger(const GFNumber<C>&)
 {
 	return true;
 }
@@ -243,10 +261,24 @@ inline bool isInteger(const mpq_class& r)
 	 return 0 != mpz_divisible_p(r.get_num_mpz_t(), r.get_den_mpz_t());
 }
 
-constexpr bool isInteger(const mpz_class&)
+inline bool isInteger(const mpz_class&)
 {
 	return true;
 }
+
+inline bool isInteger(const cln::cl_RA& rat)
+{
+	return cln::denominator(rat) == cln::cl_I(1);
+}
+
+inline bool isInteger(const cln::cl_I&)
+{
+	return true;
+}
+
+
+
+
 //
 //template<typename T>
 //bool isZero(const T& t)
@@ -258,6 +290,50 @@ constexpr bool isInteger(const mpz_class&)
 //bool isZero(const GFNumber<C>& c)
 //{
 //	return c.isZero();
+//}
+
+//static const unsigned NUM_OF_PRECALCULATED_FACTORIZATIONS = 100;
+
+static std::vector<unsigned> calculateFactorization(unsigned n)
+{
+    if(n==0) return std::vector<unsigned>();
+    if(n<4) return std::vector<unsigned>(1, n);
+    std::vector<unsigned> result;
+    unsigned f = 2;
+    while(f * f <= n)
+    {
+        if(n % f == 0)
+        {
+            result.push_back(f);
+            n /= f;
+        }
+        else
+        {
+            ++f;
+        }
+    }
+    if(n>1) result.push_back(n);
+    return result;
+}
+
+//static constexpr std::array<std::array<unsigned, NUM_OF_PRECALCULATED_FACTORIZATIONS>, NUM_OF_PRECALCULATED_FACTORIZATIONS> getFactorizationsUntil(unsigned n)
+//{
+//    return (n==0 ? std::array<std::array<unsigned, NUM_OF_PRECALCULATED_FACTORIZATIONS>, NUM_OF_PRECALCULATED_FACTORIZATIONS>{} : getFactorizationsUntil(n-1));
+////    for(unsigned i = 0; i<=n; ++i)
+////    {
+////        result[i] = &calculateFactorization(i);
+////    }
+////    return result;
+//}
+
+//constexpr std::array<std::array<unsigned, NUM_OF_PRECALCULATED_FACTORIZATIONS>, NUM_OF_PRECALCULATED_FACTORIZATIONS> factorizations = getFactorizationsUntil(NUM_OF_PRECALCULATED_FACTORIZATIONS);
+//
+//static std::vector<unsigned> getFactorization(unsigned n)
+//{
+//    if(n<=NUM_OF_PRECALCULATED_FACTORIZATIONS)
+//        return factorizations.at(n);
+//    else
+//        return calculateFactorization(n);
 //}
 
 } // namespace carl    
