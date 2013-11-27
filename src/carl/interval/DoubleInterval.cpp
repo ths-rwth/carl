@@ -469,7 +469,17 @@ namespace carl
             return false;
         }
     }
-
+    
+    DoubleInterval DoubleInterval::exp() const
+    {
+        return DoubleInterval(std::exp(mInterval.lower()), mLeftType, std::exp(mInterval.upper()), mRightType);
+    }
+    
+    DoubleInterval DoubleInterval::log() const
+    {
+        assert( left() > 0 );
+        return DoubleInterval(std::log(mInterval.lower()), mLeftType, std::log(mInterval.upper()), mRightType);
+    }
 
     double DoubleInterval::diameter() const
     {

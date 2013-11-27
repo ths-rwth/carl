@@ -333,6 +333,17 @@ public:
 	 */
 	bool reciprocal(DoubleInterval& a, DoubleInterval& b) const;
 
+        /**
+         * Computes the exp of the interval.
+         * @return 
+         */
+        DoubleInterval exp() const;
+        
+        /**
+         * Computes the logarithm of the interval.
+         * @return 
+         */
+        DoubleInterval log() const;
 
 	/**
 	 * Calculates the diameter of the interval

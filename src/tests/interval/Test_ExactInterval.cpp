@@ -109,40 +109,40 @@ TEST(ExactInterval, Subtraction)
     
     ExactInterval<cln::cl_RA> result;
     
-    result = a0.add(b0.minus());
+    result = a0.add(b0.inverse());
     EXPECT_EQ( true, result.unbounded());
-    result = a0.add(b1.minus());
+    result = a0.add(b1.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-1, BoundType::INFTY, (cln::cl_RA)3, BoundType::WEAK), result);
-    result = a0.add(b2.minus());
+    result = a0.add(b2.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-1, BoundType::INFTY, (cln::cl_RA)3, BoundType::WEAK), result);
-    result = a0.add(b3.minus());
+    result = a0.add(b3.inverse());
     EXPECT_EQ( true, result.unbounded());
     
-    result = a1.add(b0.minus());
+    result = a1.add(b0.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-3, BoundType::WEAK, (cln::cl_RA)1, BoundType::INFTY), result);
-    result = a1.add(b1.minus());
+    result = a1.add(b1.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-3, BoundType::WEAK, (cln::cl_RA)3, BoundType::WEAK), result);
-    result = a1.add(b2.minus());
+    result = a1.add(b2.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-1, BoundType::INFTY, (cln::cl_RA)3, BoundType::WEAK), result);
-    result = a1.add(b3.minus());
+    result = a1.add(b3.inverse());
     EXPECT_EQ( true, result.unbounded());
     
-    result = a2.add(b0.minus());
+    result = a2.add(b0.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-3, BoundType::WEAK, (cln::cl_RA)1, BoundType::INFTY), result);
-    result = a2.add(b1.minus());
+    result = a2.add(b1.inverse());
     EXPECT_EQ( ExactInterval<cln::cl_RA>((cln::cl_RA)-3, BoundType::WEAK, (cln::cl_RA)1, BoundType::INFTY), result);
-    result = a2.add(b2.minus());
+    result = a2.add(b2.inverse());
     EXPECT_EQ( true, result.unbounded());
-    result = a2.add(b3.minus());
+    result = a2.add(b3.inverse());
     EXPECT_EQ( true, result.unbounded());
     
-    result = a3.add(b0.minus());
+    result = a3.add(b0.inverse());
     EXPECT_EQ( true, result.unbounded());
-    result = a3.add(b1.minus());
+    result = a3.add(b1.inverse());
     EXPECT_EQ( true, result.unbounded());
-    result = a3.add(b2.minus());
+    result = a3.add(b2.inverse());
     EXPECT_EQ( true, result.unbounded());
-    result = a3.add(b3.minus());
+    result = a3.add(b3.inverse());
     EXPECT_EQ( true, result.unbounded());
 }
 
