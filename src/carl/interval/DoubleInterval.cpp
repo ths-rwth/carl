@@ -159,6 +159,52 @@ namespace carl
             mInterval = BoostDoubleInterval( 0 );
         }
     }
+    
+    void DoubleInterval::split(DoubleInterval& _left, DoubleInterval& _right) const
+    {
+        if(left() != right() || (leftType() == BoundType::INFTY && rightType() == BoundType::INFTY))
+        {
+            _left.mInterval.set(left(),midpoint());
+            _left.setLeftType(leftType());
+            _left.setRightType(BoundType::STRICT);
+
+            _right.mInterval.set(midpoint(),right());
+            _right.setLeftType(BoundType::WEAK);
+            _right.setRightType(rightType());
+        }
+        else
+        {
+            _left = *this;
+            _right = *this;
+        }
+    }
+    
+    void DoubleInterval::split(std::vector<DoubleInterval>& _result, const unsigned n) const
+    {
+        double diameter = this->diameter();
+        diameter /= n;
+
+        DoubleInterval tmp;
+        tmp.set(left(), left()+diameter);
+        tmp.setLeftType(leftType());
+        tmp.setRightType(BoundType::STRICT);
+        _result.insert(_result.end(), tmp);
+
+        for( unsigned i = 1; i < (n-1); ++i )
+        {
+            tmp.set(diameter*i, diameter*(i+1));
+            _result.insert(_result.end(), tmp);
+        }
+
+        tmp.set(diameter*(n-1),diameter*n);
+        tmp.setRightType(rightType());
+        _result.insert(_result.end(), tmp);
+    }
+    
+    void DoubleInterval::bloat(const double& _width)
+    {
+        mInterval.set(mInterval.lower()-_width, mInterval.upper()+_width);
+    }
 
     //////////////////
     //  Arithmetic  //
@@ -171,7 +217,7 @@ namespace carl
                               getWeakestBoundType( mRightType, o.mRightType ) );
     }
 
-    DoubleInterval DoubleInterval::minus() const
+    DoubleInterval DoubleInterval::inverse() const
     {
         return DoubleInterval( -right(), mRightType, -left(), mLeftType );
     }
@@ -240,7 +286,7 @@ namespace carl
 
     bool DoubleInterval::div_ext( DoubleInterval& a, DoubleInterval& b, const DoubleInterval& o )
     {
-        DoubleInterval inverseA, inverseB;
+        DoubleInterval reciprocalA, reciprocalB;
         bool          splitOccured;
 
         if( o.leftType() != BoundType::INFTY && o.left() == 0 && o.rightType() != BoundType::INFTY && o.right() == 0 )    // point interval 0
@@ -266,16 +312,16 @@ namespace carl
             else
             {
                 //default case
-                splitOccured = o.inverse( inverseA, inverseB );
+                splitOccured = o.reciprocal( reciprocalA, reciprocalB );
                 if( !splitOccured )
                 {
-                    a = this->mul( inverseA );
+                    a = this->mul( reciprocalA );
                     return false;
                 }
                 else
                 {
-                    a = this->mul( inverseA );
-                    b = this->mul( inverseB );
+                    a = this->mul( reciprocalA );
+                    b = this->mul( reciprocalB );
 
                     if( a == b )
                     {
@@ -348,7 +394,7 @@ namespace carl
         }
     }
 
-    bool DoubleInterval::inverse( DoubleInterval& a, DoubleInterval& b ) const
+    bool DoubleInterval::reciprocal( DoubleInterval& a, DoubleInterval& b ) const
     {
         if( this->unbounded() )
         {
@@ -433,6 +479,19 @@ namespace carl
             return -1;
         }
         return right() - left();
+    }
+    
+    double DoubleInterval::diameterRatio( const DoubleInterval& _interval) const
+    {
+        return diameter()/_interval.diameter();
+    }
+    
+    double DoubleInterval::magnitude() const
+    {
+        assert( DOUBLE_BOUNDS_OK( left(), mLeftType, right(), mRightType));
+        double inf = fabs(mInterval.lower());
+        double sup = fabs(mInterval.upper());
+        return inf < sup ? sup : inf;
     }
     
     bool DoubleInterval::empty() const
@@ -620,46 +679,6 @@ namespace carl
         if ( lowerValue > upperValue )
             return emptyInterval();
         return DoubleInterval(lowerValue, maxLowest, upperValue, minUppest );
-        
-//        if( (right() < o.left() && mRightType != BoundType::INFTY && o.mLeftType != BoundType::INFTY)
-//                || (o.right() < left() && mLeftType != BoundType::INFTY && o.mRightType != BoundType::INFTY) )    // intersection empty
-//            return DoubleInterval( 0, BoundType::STRICT, 0, BoundType::STRICT );
-//        // Invariant: ( right() >= o.left() || mRightType == BoundType::INFTY && o.mLeftType == BoundType::INFTY ) && ( o.right() >= left() || mLeftType == BoundType::INFTY && o.mRightType == BoundType::INFTY )
-//        BoundType leftBoundType  = (mLeftType == BoundType::INFTY && o.mLeftType == BoundType::INFTY) ? BoundType::INFTY : BoundType::WEAK;
-//        BoundType rightBoundType = (mRightType == BoundType::INFTY && o.mRightType == BoundType::INFTY) ? BoundType::INFTY : BoundType::WEAK;
-//        if( o.mLeftType == BoundType::INFTY || (left() > o.left() && mLeftType != BoundType::INFTY && o.mLeftType != BoundType::INFTY ) || (left() == o.left() && mLeftType != BoundType::STRICT && o.mLeftType != BoundType::STRICT) )
-//        {    // left() can be safely taken as weak bound of the intersection or is infinity
-//            if( o.mRightType == BoundType::INFTY || (mRightType != BoundType::INFTY && right() < o.right() ) )
-//                return DoubleInterval( left(), leftBoundType, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
-//            else if( mRightType == BoundType::INFTY || right() > o.right() )
-//                return DoubleInterval( left(), leftBoundType, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
-//            // Invariant: right() == o.mRight
-//            if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
-//                return DoubleInterval( left(), leftBoundType, right(), BoundType::STRICT );    // the new right type has to be strict
-//            return DoubleInterval( left(), leftBoundType, right(), rightBoundType );
-//        }
-//        if( mLeftType == BoundType::INFTY || left() < o.left() )
-//        {    // o.left() can be safely taken as weak bound of the intersection
-//            if( o.mRightType == BoundType::INFTY || (mRightType != BoundType::INFTY && right() < o.right() ) )
-//                return DoubleInterval( o.left(), leftBoundType, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
-//            else if( mRightType == BoundType::INFTY || right() > o.right() )
-//                return DoubleInterval( o.left(), leftBoundType, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
-//            // Invariant: right() == o.mRight
-//            if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
-//                return DoubleInterval( o.left(), leftBoundType, right(), BoundType::STRICT );    // the new right type has to be strict
-//            return DoubleInterval( o.left(), leftBoundType, right(), rightBoundType );
-//        }
-//        // Invariant: left() == o.left() && ( mLeftType == BoundType::STRICT || o.mLeftType == BoundType::STRICT )
-//        assert( mLeftType == BoundType::STRICT || o.mLeftType == BoundType::STRICT );
-//        // the new left type has to be strict
-//        if( o.mRightType == BoundType::INFTY || right() < o.right() )
-//            return DoubleInterval( left(), BoundType::STRICT, right(), rightBoundType );    // right() can be safely taken as weak bound of the intersection
-//        else if( mRightType == BoundType::INFTY || right() > o.right() )
-//            return DoubleInterval( left(), BoundType::STRICT, o.right(), rightBoundType );    // o.right() can be safely taken as weak bound of the intersection
-//        // Invariant: right() == o.mRight
-//        if( mRightType == BoundType::STRICT || o.mRightType == BoundType::STRICT )
-//            return DoubleInterval( left(), BoundType::STRICT, right(), BoundType::STRICT );    // the new right type has to be strict
-//        return DoubleInterval( left(), BoundType::STRICT, right(), rightBoundType );
     }
 
     double DoubleInterval::midpoint() const
@@ -677,8 +696,8 @@ namespace carl
         return DoubleInterval( boost::numeric::abs( mInterval ), lbt, rbt );
     }
 
-	void DoubleInterval::operator+=( const DoubleInterval& _interval )
-	{
+    void DoubleInterval::operator+=( const DoubleInterval& _interval )
+    {
         mLeftType = getWeakestBoundType( mLeftType, _interval.leftType() );
         mRightType = getWeakestBoundType( mRightType, _interval.rightType() );
         if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
@@ -703,10 +722,10 @@ namespace carl
                 mInterval = BoostDoubleInterval( 0 );
             }
         }
-	}
+    }
 
-	void DoubleInterval::operator-=( const DoubleInterval& _interval )
-	{
+    void DoubleInterval::operator-=( const DoubleInterval& _interval )
+    {
         mLeftType = getWeakestBoundType( mLeftType, _interval.rightType() );
         mRightType = getWeakestBoundType( mRightType, _interval.leftType() );
         if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
@@ -731,10 +750,10 @@ namespace carl
                 mInterval = BoostDoubleInterval( 0 );
             }
         }
-	}
+    }
 
-	void DoubleInterval::operator*=( const DoubleInterval& _interval )
-	{
+    void DoubleInterval::operator*=( const DoubleInterval& _interval )
+    {
         BoundType leftType = BoundType::WEAK;
         BoundType rightType = BoundType::WEAK;
         if( (mLeftType == BoundType::INFTY && (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY))
@@ -753,10 +772,10 @@ namespace carl
         }
         mLeftType = leftType;
         mRightType = rightType;
-		mInterval *= _interval.content();
+        mInterval *= _interval.content();
 //        mLeftType = mInterval.lower() == Checking::neg_inf() ? BoundType::INFTY : BoundType::WEAK;
 //        mLeftType = mInterval.upper() == Checking::pos_inf() ? BoundType::INFTY : BoundType::WEAK;
-	}
+    }
 
     ///////////////////////////
     // Relational Operations //
@@ -872,7 +891,7 @@ namespace carl
     // unary arithmetic operators of DoubleInterval
     const DoubleInterval DoubleInterval::operator -( const DoubleInterval& lh ) const
     {
-        return lh.minus();
+        return lh.inverse();
     }
     
     std::ostream& operator << (std::ostream& str, const DoubleInterval& d)
