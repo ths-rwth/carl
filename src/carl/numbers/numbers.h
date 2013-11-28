@@ -232,10 +232,44 @@ inline mpq_class abs(const mpq_class& r)
 	return res;
 }
 
+template<typename i>
+inline i toInt(const mpz_class&)
+{
+	return (i) 0;
+}
+
+template<>
+inline signed long int toInt(const mpz_class& i)
+{
+    assert(i <= INT_MAX);
+    return mpz_get_si(i.get_mpz_t());
+}
+
+template<>
+inline unsigned long int toInt(const mpz_class& i)
+{
+    assert(i <= UINT_MAX);
+    return mpz_get_ui(i.get_mpz_t());
+}
+
+template<typename i>
+inline i toInt(const cln::cl_I&)
+{
+	return (i) 0;
+}
+
+template<>
 inline int toInt(const cln::cl_I& i)
 {
     assert(i <= INT_MAX);
     return cln::cl_I_to_int(i);
+}
+
+template<>
+inline unsigned toInt(const cln::cl_I& i)
+{
+    assert(i <= UINT_MAX);
+    return cln::cl_I_to_uint(i);
 }
 
 inline const mpz_class& getNum(const mpq_class& rat)
@@ -297,6 +331,41 @@ inline mpz_class lcm(const mpz_class& v1, const mpz_class& v2)
 	return res;
 } 
 
+inline long mod(const long& n, const long& m)
+{
+	return n % m;
+}
+
+inline unsigned long mod(const unsigned long& n, const unsigned long& m)
+{
+	return n % m;
+}
+
+inline unsigned mod(const unsigned& n, const unsigned& m)
+{
+	return n % m;
+}
+
+inline int mod(const int& n, const int& m)
+{
+	return n % m;
+}
+
+inline cln::cl_I mod(const cln::cl_I& n, const cln::cl_I& m)
+{
+	return cln::mod(n, m);
+}
+
+inline cln::cl_I gcd(const cln::cl_I& v1, const cln::cl_I& v2)
+{
+	return cln::gcd(v1, v2);
+}
+
+inline cln::cl_I lcm(const cln::cl_I& v1, const cln::cl_I& v2)
+{
+	return cln::lcm(v1, v2);
+} 
+
 template<typename C>
 inline bool isInteger(const GFNumber<C>&)
 {
@@ -322,27 +391,6 @@ inline bool isInteger(const cln::cl_RA& rat)
 inline bool isInteger(const cln::cl_I&)
 {
 	return true;
-}
-
-static std::vector<int> calculateAllFactors(int num)
-{
-    if(num == 0) return std::vector<int>();
-    std::vector<int> result = std::vector<int>(1, 1);
-    int abs_num = std::abs(num);
-    if(abs_num > 1 && abs_num < 4) result.push_back(abs_num);
-    if(abs_num < 4) return result;
-    int fac = 2;
-    int max_fac = abs_num / 2;
-    while(fac <= max_fac)
-    {
-        if(abs_num % fac == 0)
-        {
-            result.push_back(fac);
-        }
-        ++fac;
-    }
-    if(abs_num > 1) result.push_back(abs_num);
-    return result;
 }
 
 } // namespace carl    

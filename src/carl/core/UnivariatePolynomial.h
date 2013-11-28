@@ -120,6 +120,8 @@ public:
 	 * 
      * @return copr
      */
+    Coefficient coprimeFactor() const;
+    
 	template<typename Integer>
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
@@ -198,7 +200,10 @@ public:
 	Coefficient modifiedCauchyBound() const;
     
     std::map<UnivariatePolynomial, unsigned> factorization() const;
-    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors);
+    
+    template<typename Integer>
+    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum );
+    
     Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 

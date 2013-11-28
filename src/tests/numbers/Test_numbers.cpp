@@ -16,17 +16,5 @@ TEST(Numbers, IntegralT)
 	static_assert(is_instantiation_of<GFNumber,GFNumber<mpz_class>>::value, "Check whether the is_instantiaton works correctly");
 	
 }
-
-TEST(Numbers, AllFactors)
-{
-    for(int num = 0; num<=100; ++num)
-    {
-        std::vector<int> pf = calculateAllFactors(num);
-        for(auto fac = pf.begin(); fac != pf.end(); ++fac)
-        {
-            EXPECT_EQ(0,num%(*fac));
-        }
-    }
-}
 	
  

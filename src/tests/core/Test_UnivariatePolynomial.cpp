@@ -146,24 +146,45 @@ TEST(UnivariatePolynomial, factorization)
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
     
-	UnivariatePolynomial<cln::cl_RA> pol(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
+	UnivariatePolynomial<cln::cl_RA> linA(x, {(cln::cl_RA)-2, (cln::cl_RA)5});
+	UnivariatePolynomial<cln::cl_RA> linB(x, {(cln::cl_RA)1, (cln::cl_RA)3});
+	UnivariatePolynomial<cln::cl_RA> linC(x, {(cln::cl_RA)2014, (cln::cl_RA)68});
+	UnivariatePolynomial<cln::cl_RA> linD(x, {(cln::cl_RA)-13, (cln::cl_RA)4});
+	UnivariatePolynomial<cln::cl_RA> linE(x, {(cln::cl_RA)-20, (cln::cl_RA)5});
+	UnivariatePolynomial<cln::cl_RA> quaA(x, {(cln::cl_RA)-2, (cln::cl_RA)0, (cln::cl_RA)1});
+	UnivariatePolynomial<cln::cl_RA> quaB(x, {(cln::cl_RA)3, (cln::cl_RA)6, (cln::cl_RA)9});
     
-    std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
-    UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
-//    std::cout << "Factorization of  " << pol << "  is  ";
-    for(auto factor = factors.begin(); factor != factors.end(); ++factor)
+	UnivariatePolynomial<cln::cl_RA> polA(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
+    UnivariatePolynomial<cln::cl_RA> polB = linA*linA;
+    UnivariatePolynomial<cln::cl_RA> polC = linA*linA*linA;
+    UnivariatePolynomial<cln::cl_RA> polD = linA*linB*linC*linD*linE;
+    UnivariatePolynomial<cln::cl_RA> polE = quaA*linC*linD*linE;
+    UnivariatePolynomial<cln::cl_RA> polF = linA*quaB*linE;
+    UnivariatePolynomial<cln::cl_RA> polG = quaA*quaB*linD*linE;
+    UnivariatePolynomial<cln::cl_RA> polH = polA*quaB*linD;
+    UnivariatePolynomial<cln::cl_RA> polI = linA*linA*quaA*quaA*quaB*quaB*quaB*quaB;
+    
+    std::vector<UnivariatePolynomial<cln::cl_RA>> polys = {linA, linC, linE, quaA, quaB, polA, polB, polC, polD, polE, polF, polG, polH, polI};
+    
+    for(UnivariatePolynomial<cln::cl_RA> pol : polys)
     {
-//        if(factor != factors.begin())
-//            std::cout << "*";
-//        std::cout << "(" << factor->first << ")^" << factor->second;
-        EXPECT_NE(0, factor->second);
-        for(unsigned i=0; i < factor->second; ++i)
+        std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
+        UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
+        std::cout << "Factorization of  " << pol << "  is  ";
+        for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {
-            productOfFactors *= factor->first;
+            if(factor != factors.begin())
+                std::cout << " * ";
+            std::cout << "(" << factor->first << ")^" << factor->second;
+            EXPECT_NE(0, factor->second);
+            for(unsigned i=0; i < factor->second; ++i)
+            {
+                productOfFactors *= factor->first;
+            }
         }
+        std::cout << std::endl;
+        EXPECT_EQ(pol, productOfFactors);
     }
-    std::cout << std::endl;
-    EXPECT_EQ(pol, productOfFactors);
     
     UnivariatePolynomial<cln::cl_RA> pol2(x, {(cln::cl_RA)-1, (cln::cl_RA)2, (cln::cl_RA)-6, (cln::cl_RA)2});
     EXPECT_EQ(5, pol2.syntheticDivision((cln::cl_RA)3) );

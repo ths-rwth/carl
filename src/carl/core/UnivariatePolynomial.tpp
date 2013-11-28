@@ -292,7 +292,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 	return *this/tmp;
 }
 
-
 template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
@@ -300,11 +299,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 	// TODO implement
 }
 	
-
-
 template<typename Coeff>
-template<typename Integer>
-UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
@@ -312,10 +308,18 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 	typename IntegralT<Coeff>::type den = getDenom(*it);
 	for(++it; it != mCoefficients.end(); ++it)
 	{
-		num = gcd(num, getNum(*it));
-		den = lcm(den, getDenom(*it));
+		num = carl::gcd(num, getNum(*it));
+		den = carl::lcm(den, getDenom(*it));
 	}
-	Coeff factor = den/num;
+	return den/num;
+}
+
+template<typename Coeff>
+template<typename Integer>
+UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+{
+	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
+	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<Integer> result;
 	result.mCoefficients.reserve(mCoefficients.size());
@@ -416,30 +420,75 @@ std::map<UnivariatePolynomial<Coeff>, unsigned> UnivariatePolynomial<Coeff>::fac
 {
     LOGMSG_TRACE("carl.core", "UnivFactor: " << *this );
     std::map<UnivariatePolynomial<Coeff>, unsigned> result;
-    if( mCoefficients.size() == 1 )
+    if(isConstant()) // Constant.
     {
-        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(*this), 1));
+        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << *this << ")^" << 1 );
+        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(*this, 1));
+        return result;
     }
-    else if( mCoefficients.size() > 1 )
+    // Make the polynomial's coefficients coprime (integral and with gcd 1).
+    UnivariatePolynomial<Coeff> remainingPoly(mainVar());
+    Coeff factor = coprimeFactor();
+    if(factor == 1)
     {
-        // Exclude the factors  (x-r)^i  with  r rational.
-        UnivariatePolynomial<Coeff> remainingPoly = excludeLinearFactors( *this, result );
+        remainingPoly = *this;
+    }
+    else
+    {
+        // Store the rational factor and make the polynomial's coefficients coprime.
+        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), {(Coeff)1 / factor}), 1));
+        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), {(Coeff)1 / factor}) << ")^" << 1 );
+        remainingPoly.mCoefficients.reserve(mCoefficients.size());
+        for(const Coeff& coeff : mCoefficients)
+        {
+            remainingPoly.mCoefficients.push_back(coeff * factor);
+        }
+    }
+    assert(mCoefficients.size() > 1);
+    // Exclude the factors  (x-r)^i  with  r rational.
+    remainingPoly = excludeLinearFactors<int>(remainingPoly, result, INT_MAX);
+    assert(!remainingPoly.isConstant() || remainingPoly.lcoeff() == (Coeff)1);
+    if(!remainingPoly.isConstant())
+    {
         // Calculate the square free factorization.
         std::map<unsigned, UnivariatePolynomial<Coeff>> sff = remainingPoly.squareFreeFactorization();
+//        factor = (Coeff) 1;
         for(auto expFactorPair = sff.begin(); expFactorPair != sff.end(); ++expFactorPair)
         {
-            auto retVal = result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(expFactorPair->second, expFactorPair->first));
-            if(!retVal.second)
+//            Coeff cpf = expFactorPair->second.coprimeFactor();
+//            if(cpf != (Coeff) 1)
+//            {
+//                factor *= pow(expFactorPair->second.coprimeFactor(), expFactorPair->first);
+//                expFactorPair->second /= cpf;
+//            }
+            if(!expFactorPair->second.isConstant() || expFactorPair->second.lcoeff() != (Coeff) 1)
             {
-                retVal.first->second += expFactorPair->first;
+                auto retVal = result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(expFactorPair->second, expFactorPair->first));
+                LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << expFactorPair->second << ")^" << expFactorPair->first );
+                if(!retVal.second)
+                {
+                    retVal.first->second += expFactorPair->first;
+                }
             }
         }
+//        if(factor != (Coeff) 1)
+//        {
+//            LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), {factor}) << ")^" << 1 );
+//            // Add the constant factor to the factors.
+//            if( result.begin()->first.isConstant() )
+//            {
+//                factor *= result.begin()->first.lcoeff();
+//                result.erase( result.begin() );
+//            }
+//            result.insert(result.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), {factor}), 1));
+//        }
     }
     return result;
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(const UnivariatePolynomial<Coeff>& poly, std::map<UnivariatePolynomial<Coeff>, unsigned>& linearFactors)
+template<typename Integer>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(const UnivariatePolynomial<Coeff>& poly, std::map<UnivariatePolynomial<Coeff>, unsigned>& linearFactors, const Integer& maxInt)
 {
     LOGMSG_TRACE("carl.core", "UnivELF: " << poly );
     UnivariatePolynomial<Coeff> result(poly.mainVar());
@@ -455,8 +504,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
             ++k;
         }
         // Take x^k as a factor.
-        auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(poly.mainVar(), (Coeff)1, 1), k));
-        LOGMSG_TRACE("carl.core", "UnivELF: add linear factor (" << retVal.first->first << ")^" << k );
+        auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(poly.mainVar(), {(Coeff)0, (Coeff)1}), k));
+        LOGMSG_TRACE("carl.core", "UnivELF: add the factor (" << retVal.first->first << ")^" << k );
         if(!retVal.second)
         {
             retVal.first->second += k;
@@ -473,101 +522,151 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
         result = poly;
     }
     // Check whether the polynomial is already a linear factor.
-    if(result.degree() <= 1)
+    if(result.degree() > 1)
     {
-        auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(result, 1));
-        LOGMSG_TRACE("carl.core", "UnivELF: add linear factor (" << result << ")^" << 1 );
-        if(!retVal.second)
+        // Exclude the factor (x-r)^i, with r rational and r!=0, from result.
+        assert(result.coefficients().size() > 1);
+        typename IntegralT<Coeff>::type lc = abs(getNum(result.lcoeff()));
+        typename IntegralT<Coeff>::type tc = abs(getNum(result.coefficients().front()));
+        if( maxInt != 0 && (tc > maxInt || lc > maxInt) )
         {
-            ++retVal.first->second;
+            return result;
         }
-        return result;
-    }
-    // Exclude the factor (x-r)^i, with r rational and r!=0, from result.
-    assert(result.coefficients().size() > 1);
-    int lcAsInt = toInt(getNum(result.lcoeff()));
-    std::vector<int> lcFactors;
-    if( lcAsInt <= INT_MAX )
-    {
-        lcFactors = calculateAllFactors(lcAsInt);
-    }
-    int tcAsInt = toInt(getNum(result.coefficients().front()));
-    std::vector<int> tcFactors;
-    if( tcAsInt <= INT_MAX )
-    {
-        tcFactors = calculateAllFactors(tcAsInt);
-    }
-    std::vector<std::pair<int, int>> shiftedTcs;
-    bool positive = true;
-    auto lcFactor = lcFactors.begin();
-    while(true)
-    {
-        LOGMSG_TRACE("carl.core", "UnivELF: try rational  " << (positive ? "-" : "") << tcFactors.back() << "/" << (*lcFactor));
-        // Check whether the numerator of the rational to consider divides the trailing coefficient of all
-        // zero-preserving shifts {result(x+x_0) | for some found x_0 with result(x_0)!=0 and x_0 integer}
-        auto shiftedTc = shiftedTcs.begin();
-        for(; shiftedTc != shiftedTcs.end(); ++shiftedTc)
+        Integer lcAsInt = toInt<Integer>(lc);
+        Integer tcAsInt = toInt<Integer>(tc);
+        Integer halfOfLcAsInt = lcAsInt/2;
+        Integer halfOfTcAsInt = tcAsInt/2;
+        std::vector<std::pair<Integer, Integer>> shiftedTcs;
+        bool positive = true;
+        Integer tcFactor = 1;
+        Integer lcFactor = 1;
+        while(true)
         {
-            int divisor = tcFactors.back() - (*lcFactor) * shiftedTc->first;
-            if(shiftedTc->second % divisor != 0) // maybe cheaper
+            LOGMSG_TRACE("carl.core", "UnivELF: try rational  " << (positive ? "-" : "") << tcFactor << "/" << lcFactor);
+            // Check whether the numerator of the rational to consider divides the trailing coefficient of all
+            // zero-preserving shifts {result(x+x_0) | for some found x_0 with result(x_0)!=0 and x_0 integer}
+            auto shiftedTc = shiftedTcs.begin();
+            for(; shiftedTc != shiftedTcs.end(); ++shiftedTc)
             {
-                break;
-            }
-        }
-        if(shiftedTc == shiftedTcs.end())
-        {
-            Coeff posRatZero = positive ? (Coeff(tcFactors.back()) / Coeff(*lcFactor)) : -(Coeff(tcFactors.back()) / Coeff(*lcFactor));
-            LOGMSG_TRACE("carl.core", "UnivELF: consider possible non zero rational factor  " << posRatZero);
-            Coeff image = result.syntheticDivision(posRatZero);
-            if(image == 0)
-            {
-                UnivariatePolynomial<Coeff> linearFactor(result.mainVar(), {-posRatZero, (Coeff)1});
-                auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(linearFactor, 1));
-                LOGMSG_TRACE("carl.core", "UnivELF: add linear factor (" << linearFactor << ")^" << 1 );
-                if(!retVal.second)
+                Integer divisor = tcFactor - lcFactor * shiftedTc->first;
+                if(divisor != 0 && carl::mod(shiftedTc->second, divisor) != 0) // TODO: achieve this maybe cheaper
                 {
-                    ++retVal.first->second;
+                    break;
                 }
-                // Check whether the polynomial is a linear factor now.
-                if(result.degree() <= 1)
+            }
+            if(shiftedTc == shiftedTcs.end())
+            {
+                Coeff posRatZero = positive ? (Coeff(tcFactor) / Coeff(lcFactor)) : -(Coeff(tcFactor) / Coeff(lcFactor));
+                LOGMSG_TRACE("carl.core", "UnivELF: consider possible non zero rational factor  " << posRatZero);
+                Coeff image = result.syntheticDivision(posRatZero);
+                if(image == 0)
                 {
-                    retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(result, 1));
-                    LOGMSG_TRACE("carl.core", "UnivELF: add linear factor (" << result << ")^" << 1 );
-                    if(!retVal.second)
+                    // Remove all linear factor with the found zero from result.
+                    UnivariatePolynomial<Coeff> linearFactor(result.mainVar(), {-posRatZero, (Coeff)1});
+                    while(image == 0)
                     {
-                        ++retVal.first->second;
+                        auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(linearFactor, 1));
+                        LOGMSG_TRACE("carl.core", "UnivELF: add the factor (" << linearFactor << ")^" << 1 );
+                        if(!retVal.second)
+                        {
+                            ++retVal.first->second;
+                        }
+                        // Check whether result is a linear factor now.
+                        if(result.degree() <= 1)
+                        {
+                            goto LinearFactorRemains;
+                        }
+                        image = result.syntheticDivision(posRatZero);
                     }
-                    return result;
                 }
-            }
-            else if(isInteger(posRatZero))
-            {
-                assert(isInteger(image));
-                LOGMSG_TRACE("carl.core", "UnivELF: new shift with " << toInt(getNum(posRatZero)) << " to " << std::abs(toInt(getNum(image))));
-                shiftedTcs.push_back(std::pair<int, int>(toInt(getNum(posRatZero)), std::abs(toInt(getNum(image)))));
-            }
-        }
-        if(shiftedTc == shiftedTcs.end() && positive)
-        {
-            positive = false;
-        }
-        else
-        {
-            positive = true;
-            ++lcFactor;
-            if(lcFactor == lcFactors.end())
-            {
-                tcFactors.pop_back();
-                if(tcFactors.empty())
+                else if(isInteger(posRatZero))
                 {
-                    return result;
+                    // Add a zero-preserving shift.
+                    assert(isInteger(image));
+                    typename IntegralT<Coeff>::type imageInt = getNum(image);
+                    if( imageInt <= maxInt )
+                    {
+                        LOGMSG_TRACE("carl.core", "UnivELF: new shift with " << getNum(posRatZero) << " to " << abs(getNum(image)));
+                        shiftedTcs.push_back(std::pair<Integer, Integer>(toInt<Integer>(getNum(posRatZero)), toInt<Integer>(abs(getNum(image)))));
+                    }
                 }
-                lcFactor = lcFactors.begin();
+            }
+            // Find the next numerator-denominator combination.
+            if(shiftedTc == shiftedTcs.end() && positive)
+            {
+                positive = false;
+            }
+            else
+            {
+                positive = true;
+                ++lcFactor;
+                while(lcFactor <= halfOfLcAsInt)
+                {
+                    if(carl::mod(lcAsInt, lcFactor) == 0)
+                    {
+                        break;
+                    }
+                    ++lcFactor;
+                }
+                if(lcFactor > halfOfLcAsInt)
+                {
+                    ++tcFactor;
+                    while(tcFactor <= halfOfTcAsInt)
+                    {
+                        if(carl::mod(tcAsInt, tcFactor) == 0)
+                        {
+                            break;
+                        }
+                        ++tcFactor;
+                    }
+                    if(tcFactor > halfOfTcAsInt)
+                    {
+                        Coeff factor = result.coprimeFactor();
+                        if(factor != (Coeff) 1)
+                        {
+                            std::cout << "result:  " << result << std::endl;
+                            std::cout << "factor:  " << factor << std::endl;
+                            result *= factor;
+                            std::cout << "result:  " << result << std::endl;
+                            LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), {(Coeff)1/factor}) << ")^" << 1 );
+                            // Add the constant factor to the factors.
+                            if( linearFactors.begin()->first.isConstant() )
+                            {
+                                factor = (Coeff)1 / factor;
+                                factor *= linearFactors.begin()->first.lcoeff();
+                                linearFactors.erase(linearFactors.begin());
+                            }
+                            linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), {factor}), 1));
+                        }
+                        return result;
+                    }
+                    lcFactor = 1;
+                }
             }
         }
+        assert(false);
     }
-    assert(false);
-    return result;
+LinearFactorRemains:
+    Coeff factor = result.lcoeff();
+    if(factor != (Coeff) 1)
+    {
+        result /= factor;
+        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), {factor}) << ")^" << 1 );
+        // Add the constant factor to the factors.
+        if( linearFactors.begin()->first.isConstant() )
+        {
+            factor *= linearFactors.begin()->first.lcoeff();
+            linearFactors.erase(linearFactors.begin());
+        }
+        linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), {factor}), 1));
+    }
+    auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(result, 1));
+    LOGMSG_TRACE("carl.core", "UnivELF: add the factor (" << result << ")^" << 1 );
+    if(!retVal.second)
+    {
+        ++retVal.first->second;
+    }
+    return UnivariatePolynomial<Coeff>(result.mainVar(),{(Coeff) 1});
 }
 
 template<typename Coeff>
@@ -583,7 +682,7 @@ Coeff UnivariatePolynomial<Coeff>::syntheticDivision(const Coeff& zeroOfDivisor)
     auto coeff = coefficients().rbegin();
     thirdRow[posThirdRow] = (*coeff) + secondRow.front();
     ++coeff;
-    while( coeff != coefficients().rend() )
+    while(coeff != coefficients().rend())
     {
         secondRow.push_back(zeroOfDivisor*thirdRow[posThirdRow]);
         --posThirdRow;
@@ -591,12 +690,12 @@ Coeff UnivariatePolynomial<Coeff>::syntheticDivision(const Coeff& zeroOfDivisor)
         ++coeff;
     }
     assert(posThirdRow == 0);
-    LOGMSG_TRACE("carl.core", "UnivSynDiv: (" << *this << ")[x -> " << zeroOfDivisor << "]  =  " << thirdRow.front() );
+    LOGMSG_TRACE("carl.core", "UnivSynDiv: (" << *this << ")[x -> " << zeroOfDivisor << "]  =  " << thirdRow.front());
     if(thirdRow.front() == 0)
     {
         thirdRow.erase(thirdRow.begin());
         this->mCoefficients.swap(thirdRow);
-        LOGMSG_TRACE("carl.core", "UnivSynDiv: reduced by ((" << abs(getDenom(thirdRow.front())) << ")*" << mainVar() << " + (" << (thirdRow.front()<0 ? "-" : "") << abs(getNum(thirdRow.front())) << "))  ->  " << *this );
+        LOGMSG_TRACE("carl.core", "UnivSynDiv: reduced by ((" << abs(getDenom(thirdRow.front())) << ")*" << mainVar() << " + (" << (thirdRow.front()<0 ? "-" : "") << abs(getNum(thirdRow.front())) << "))  ->  " << *this);
         return Coeff(0);
     }
     return thirdRow.front();
@@ -909,6 +1008,7 @@ UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& r
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
 }
+
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
@@ -984,10 +1084,10 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
-//		if(c != 0)
-//		{
+		if(c != 0)
+		{
 			os << "(" << c << ")*" << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
-//		}
+		}
 	}
 	os << rhs.mCoefficients[0];
 	return os;
