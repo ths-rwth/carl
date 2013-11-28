@@ -718,7 +718,12 @@ std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squ
         LOGMSG_TRACE("carl.core", "UnivSSF: b = " << b);
         UnivariatePolynomial<Coeff> s(mainVar());
         UnivariatePolynomial<Coeff> t(mainVar());
-        UnivariatePolynomial<Coeff> c = extended_gcd(*this, b, s, t); // TODO: use gcd instead
+        UnivariatePolynomial<Coeff> c = extended_gcd((*this), b, s, t); // TODO: use gcd instead
+        typename IntegralT<Coeff>::type numOfCpf = getNum(c.coprimeFactor());
+        if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
+        {
+            c *= (Coeff) numOfCpf;
+        }
         LOGMSG_TRACE("carl.core", "UnivSSF: c = " << c);
         if(c.isZero())
         {
@@ -738,6 +743,11 @@ std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squ
             {
                 LOGMSG_TRACE("carl.core", "UnivSSF: next iteration");
                 UnivariatePolynomial<Coeff> g = extended_gcd(w, z, s, t); // TODO: use gcd instead
+                numOfCpf = getNum(g.coprimeFactor());
+                if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
+                {
+                    g *= (Coeff) numOfCpf;
+                }
                 LOGMSG_TRACE("carl.core", "UnivSSF: g = " << g);
                 assert(result.find(i) == result.end());
                 result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(i, g));

@@ -191,4 +191,24 @@ TEST(UnivariatePolynomial, factorization)
     
     UnivariatePolynomial<cln::cl_RA> pol3(x, {(cln::cl_RA)-42, (cln::cl_RA)0, (cln::cl_RA)-12, (cln::cl_RA)1});
     EXPECT_EQ(-123, pol3.syntheticDivision((cln::cl_RA)3) );
+    
+    UnivariatePolynomial<cln::cl_RA> pol4(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)1});
+    UnivariatePolynomial<cln::cl_RA> pol5(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)-1});
+    UnivariatePolynomial<cln::cl_RA> pol6 = pol4*pol5*pol5*pol5;
+    std::map<unsigned, UnivariatePolynomial<cln::cl_RA>> sffactors = pol6.squareFreeFactorization();
+    std::cout << "Square free factorization of  " << pol6 << "  is  ";
+    UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
+    for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)
+    {
+        if(factor != sffactors.begin())
+            std::cout << " * ";
+        std::cout << "(" << factor->second << ")^" << factor->first;
+        EXPECT_NE(0, factor->first);
+        for(unsigned i=0; i < factor->first; ++i)
+        {
+            productOfFactors *= factor->second;
+        }
+    }
+    std::cout << std::endl;
+    EXPECT_EQ(pol6, productOfFactors);
 }
