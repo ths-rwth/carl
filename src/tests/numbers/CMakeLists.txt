@@ -4,6 +4,8 @@ add_executable( runNumbersTests
 				Test_EEA.cpp
 				Test_PrimeFactory.cpp 
 				Test_GF.cpp
+                                Test_DoubleFloat.cpp
+                                Test_MpfrFloat.cpp
 				 )
 target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libraries})
 
