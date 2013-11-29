@@ -77,11 +77,6 @@ namespace carl
             {
                 mLeft = l;
             }
-            
-            void setLeft( const ExactInterval& _interval )
-            {
-                mLeft = _interval.left();
-            }
 
             /**
              * Set new left bound type for the interval.
@@ -99,11 +94,6 @@ namespace carl
             void setRight( const Numeric& r )
             {
                 mRight = r;
-            }
-            
-            void setRight( const ExactInterval& _interval )
-            {
-                mRight = _interval.right();
             }
 
             /**
