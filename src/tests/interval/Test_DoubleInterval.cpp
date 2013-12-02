@@ -110,40 +110,40 @@ TEST(DoubleInterval, Subtraction)
     
     DoubleInterval result;
     
-    result = a0.add(b0.minus());
+    result = a0.add(b0.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
-    result = a0.add(b1.minus());
+    result = a0.add(b1.inverse());
     EXPECT_EQ( DoubleInterval(-1, BoundType::INFTY, 3, BoundType::WEAK), result);
-    result = a0.add(b2.minus());
+    result = a0.add(b2.inverse());
     EXPECT_EQ( DoubleInterval(-1, BoundType::INFTY, 3, BoundType::WEAK), result);
-    result = a0.add(b3.minus());
+    result = a0.add(b3.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
     
-    result = a1.add(b0.minus());
+    result = a1.add(b0.inverse());
     EXPECT_EQ( DoubleInterval(-3, BoundType::WEAK, 1, BoundType::INFTY), result);
-    result = a1.add(b1.minus());
+    result = a1.add(b1.inverse());
     EXPECT_EQ( DoubleInterval(-3, BoundType::WEAK, 3, BoundType::WEAK), result);
-    result = a1.add(b2.minus());
+    result = a1.add(b2.inverse());
     EXPECT_EQ( DoubleInterval(-1, BoundType::INFTY, 3, BoundType::WEAK), result);
-    result = a1.add(b3.minus());
+    result = a1.add(b3.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
     
-    result = a2.add(b0.minus());
+    result = a2.add(b0.inverse());
     EXPECT_EQ( DoubleInterval(-3, BoundType::WEAK, 1, BoundType::INFTY), result);
-    result = a2.add(b1.minus());
+    result = a2.add(b1.inverse());
     EXPECT_EQ( DoubleInterval(-3, BoundType::WEAK, 1, BoundType::INFTY), result);
-    result = a2.add(b2.minus());
+    result = a2.add(b2.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
-    result = a2.add(b3.minus());
+    result = a2.add(b3.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
     
-    result = a3.add(b0.minus());
+    result = a3.add(b0.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
-    result = a3.add(b1.minus());
+    result = a3.add(b1.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
-    result = a3.add(b2.minus());
+    result = a3.add(b2.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
-    result = a3.add(b3.minus());
+    result = a3.add(b3.inverse());
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result);
 }
 
@@ -795,7 +795,6 @@ TEST(DoubleInterval, Intersection)
     
     DoubleInterval b21(1,BoundType::WEAK,1,BoundType::INFTY);
     
-    
     EXPECT_EQ(DoubleInterval::emptyInterval(), a1.intersect(b01));
     EXPECT_EQ(DoubleInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b02));
     EXPECT_EQ(DoubleInterval(0,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b03));
@@ -821,4 +820,43 @@ TEST(DoubleInterval, Intersection)
     EXPECT_EQ(DoubleInterval(0,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b20));
     
     EXPECT_EQ(DoubleInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
+}
+
+TEST(DoubleInterval, Split)
+{
+    DoubleInterval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);
+    DoubleInterval i2(-1, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval i3(-1, BoundType::WEAK, 1, BoundType::WEAK);
+    DoubleInterval i4(0, BoundType::STRICT, 0, BoundType::STRICT);
+    
+    DoubleInterval resA;
+    DoubleInterval resB;
+    
+    i1.split(resA, resB);
+    EXPECT_EQ(DoubleInterval(-1, BoundType::INFTY, 0, BoundType::STRICT), resA);
+    EXPECT_EQ(DoubleInterval(0, BoundType::WEAK, 1, BoundType::INFTY), resB);
+    
+    i2.split(resA, resB);
+    EXPECT_EQ(DoubleInterval(-1, BoundType::STRICT, 0, BoundType::STRICT), resA);
+    EXPECT_EQ(DoubleInterval(0, BoundType::WEAK, 1, BoundType::STRICT), resB);
+    
+    i3.split(resA, resB);
+    EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 0, BoundType::STRICT), resA);
+    EXPECT_EQ(DoubleInterval(0, BoundType::WEAK, 1, BoundType::WEAK), resB);
+    
+    i4.split(resA, resB);
+    EXPECT_EQ(DoubleInterval(0, BoundType::STRICT, 0, BoundType::STRICT), resA);
+    EXPECT_EQ(DoubleInterval(0, BoundType::STRICT, 0, BoundType::STRICT), resB);
+    
+    // uniform multi-split
+    DoubleInterval i5(0,BoundType::WEAK, 5, BoundType::STRICT);
+    
+    std::vector<DoubleInterval> results;
+    i5.split(results,5);
+    EXPECT_EQ(5, results.size());
+    EXPECT_EQ(DoubleInterval(0, BoundType::WEAK, 1, BoundType::STRICT), results.at(0));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 2, BoundType::STRICT), results.at(1));
+    EXPECT_EQ(DoubleInterval(2, BoundType::WEAK, 3, BoundType::STRICT), results.at(2));
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 4, BoundType::STRICT), results.at(3));
+    EXPECT_EQ(DoubleInterval(4, BoundType::WEAK, 5, BoundType::STRICT), results.at(4));
 }

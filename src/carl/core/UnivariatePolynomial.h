@@ -26,6 +26,9 @@ template<typename Coefficient> class UnivariatePolynomial;
 template<typename Coefficient>
 using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
+template<typename C, typename O, typename P>
+class MultivariatePolynomial;
+	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
@@ -40,6 +43,7 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
+	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 //	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
 
@@ -109,6 +113,11 @@ public:
 		return mCoefficients.back();
 	}
 
+	const std::vector<Coefficient>& coefficients() const
+	{
+		return mCoefficients;
+	}
+
 	const Variable& mainVar() const
 	{
 		return mMainVar;
@@ -117,6 +126,8 @@ public:
 	 * 
      * @return copr
      */
+    Coefficient coprimeFactor() const;
+    
 	template<typename Integer>
 	UnivariatePolynomial<Integer> coprimeCoefficients() const;
 	
@@ -133,11 +144,10 @@ public:
 	
 	
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	bool divides(const UnivariatePolynomial&) const;
 	
 	UnivariatePolynomial& mod(const Coefficient& modulus);
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
-	static UnivariatePolynomial& mod(UnivariatePolynomial&, const Coefficient& modulus);
-	static UnivariatePolynomial mod(const UnivariatePolynomial&, const Coefficient& modulus);
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
@@ -146,6 +156,17 @@ public:
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
+	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
+	{
+		
+	}
+	template<typename SubstitutionType, typename C = Coefficient, DisableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
+	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
+	{
+		// TODO check behaviour here. 
+		return *this;
+	}
 	
 	template<typename T = Coefficient, EnableIf<has_normalize<T>> = dummy>
 	UnivariatePolynomial& normalizeCoefficients()
@@ -183,7 +204,19 @@ public:
 	 */
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
+    
+    std::map<UnivariatePolynomial, unsigned> factorization() const;
+    
+    template<typename Integer>
+    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum = 0 );
+    
+    Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
+	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 
+	template<typename C>
+	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -201,6 +234,8 @@ public:
 	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, ComparisonOrder order = Default);
 	template<typename C>
 	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, ComparisonOrder order = Default);
+	template<typename C>
+	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 
 	UnivariatePolynomial operator-() const;
 	UnivariatePolynomial& operator+=(const Coefficient& rhs);
@@ -249,6 +284,10 @@ public:
 	friend UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs);
+	template<typename C, typename O, typename P>
+	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
+	template<typename C, typename O, typename P>
+	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const C& lhs, const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& rhs);
 	
 	
 	/**

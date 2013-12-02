@@ -21,7 +21,7 @@ TEST(Term, Operators)
     Term<mpz_class> t0(m0);
     EXPECT_TRUE(t0.isLinear());
     EXPECT_TRUE(t.isLinear());
-    EXPECT_EQ(0, t.getNrVariables());
+    EXPECT_EQ((unsigned)0, t.getNrVariables());
 }
 
 TEST(Term, Multiplication)

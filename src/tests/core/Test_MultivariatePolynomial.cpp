@@ -30,7 +30,7 @@ TEST(MultivariatePolynomial, Operators)
 
 TEST(MultivariatePolynomial, Addition)
 {
-    Variable v0(1);
+    Variable v0((unsigned)1);
     Term<mpz_class> t0(v0);
     MultivariatePolynomial<mpz_class> p0(v0);
     p0 += 3;
@@ -40,8 +40,8 @@ TEST(MultivariatePolynomial, Addition)
     p0 += -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
     
-    Variable v1((unsigned)1);
-    Variable v2((unsigned)2);
+    Variable v1((unsigned)2);
+    Variable v2((unsigned)3);
     p0 += v1;
     p0 += Monomial(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
@@ -53,7 +53,7 @@ TEST(MultivariatePolynomial, Addition)
     MultivariatePolynomial<mpz_class> p1(v0);
     p1 += v1;
     p0 += p1;
-    EXPECT_EQ(2,p0.nrTerms());   
+    EXPECT_EQ((unsigned)2,p0.nrTerms());   
     MultivariatePolynomial<mpz_class> mp2(v0);
     mp2 += (mpz_class)2 * v1;
     EXPECT_EQ(v0, *mp2.lterm());
@@ -86,8 +86,8 @@ TEST(MultivariatePolynomial, Substraction)
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 -= -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
-    Variable v1(1);
-    Variable v2(2);
+    Variable v1((unsigned)2);
+    Variable v2((unsigned)3);
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     p0 -= Monomial(v2);
@@ -216,7 +216,7 @@ TEST(MultivariatePolynomial, SPolynomial)
     vpool.setVariableName(z, "z");
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
     MultivariatePolynomial<cln::cl_RA> g1({(cln::cl_RA)3*x*x*x*x*y, (cln::cl_RA)1*y*y});
-    EXPECT_EQ(3,MultivariatePolynomial<cln::cl_RA>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
+    EXPECT_EQ((unsigned)3,MultivariatePolynomial<cln::cl_RA>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
     //MultivariatePolynomial<cln::cl_RA> s1({(cln::cl_RA)-1*x*x});
     //EXPECT_EQ(s1, MultivariatePolynomial::SPolynomial(f1.normalize(), g1.normalize()));
     
@@ -240,7 +240,7 @@ TEST(MultivariatePolynomial, GatherVariables)
     std::set<Variable> vars;
     f1.gatherVariables(vars);
     EXPECT_EQ(x, *vars.begin());
-    EXPECT_EQ(2, vars.size());
+    EXPECT_EQ((unsigned)2, vars.size());
 }
 
 TEST(MultivariatePolynomial, Derivative)

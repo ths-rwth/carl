@@ -6,14 +6,14 @@
 
 namespace carl
 {
-template<typename Coefficient>
-Term<Coefficient>* Monomial::substitute(const std::map<Variable,Coefficient>& substitutions, Coefficient factor) const
+template<typename Coefficient, typename SubstitutionType>
+Term<Coefficient>* Monomial::substitute(const std::map<Variable,SubstitutionType>& substitutions, Coefficient factor) const
 {
 	Monomial* m = new Monomial();
 	m->mTotalDegree = mTotalDegree;
 	for(const VarExpPair& ve : mExponents) 
 	{
-		typename std::map<Variable,Coefficient>::const_iterator it = substitutions.find(ve.var);
+		typename std::map<Variable,SubstitutionType>::const_iterator it = substitutions.find(ve.var);
 		if(it == substitutions.end())
 		{
 			m->mExponents.push_back(ve);

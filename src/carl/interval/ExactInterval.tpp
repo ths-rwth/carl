@@ -238,7 +238,7 @@ namespace carl
     }
 
     template<typename Numeric>
-    ExactInterval<Numeric> ExactInterval<Numeric>::minus() const
+    ExactInterval<Numeric> ExactInterval<Numeric>::inverse() const
     {
         return ExactInterval( -mRight, mRightType, -mLeft, mLeftType );
     }
@@ -406,7 +406,7 @@ namespace carl
     template<typename Numeric>
     bool ExactInterval<Numeric>::div_ext( ExactInterval<Numeric>& a, ExactInterval<Numeric>& b, const ExactInterval<Numeric>& o )
     {
-        ExactInterval<Numeric> inverseA, inverseB;
+        ExactInterval<Numeric> reciprocalA, reciprocalB;
         bool     splitOccured;
 
         if( o.mLeft == 0 && o.mRight == 0 )    // point interval 0
@@ -428,16 +428,16 @@ namespace carl
             else
             {
                 //default case
-                splitOccured = o.inverse( inverseA, inverseB );
+                splitOccured = o.reciprocal( reciprocalA, reciprocalB );
                 if( !splitOccured )
                 {
-                    a = this->mul( inverseA );
+                    a = this->mul( reciprocalA );
                     return false;
                 }
                 else
                 {
-                    a = this->mul( inverseA );
-                    b = this->mul( inverseB );
+                    a = this->mul( reciprocalA );
+                    b = this->mul( reciprocalB );
 
                     if( a == b )
                     {
@@ -469,7 +469,7 @@ namespace carl
     }
 
     template<typename Numeric>
-    bool ExactInterval<Numeric>::inverse( ExactInterval<Numeric>& a, ExactInterval<Numeric>& b ) const
+    bool ExactInterval<Numeric>::reciprocal( ExactInterval<Numeric>& a, ExactInterval<Numeric>& b ) const
     {
         if( this->unbounded() )
         {
@@ -542,6 +542,91 @@ namespace carl
             }
             return false;
         }
+    }
+    
+    template<typename Numeric>
+    ExactInterval<Numeric> ExactInterval<Numeric>::exp() const
+    {
+        return ExactInterval<Numeric>(exp(mLeft), mLeftType, exp(mRight), mRightType);
+    }
+
+    template<typename Numeric>
+    ExactInterval<Numeric> ExactInterval<Numeric>::log() const
+    {
+        return ExactInterval<Numeric>(log(mLeft), mLeftType, log(mRight), mRightType);
+    }
+    
+    template<typename Numeric>
+    void ExactInterval<Numeric>::split(ExactInterval<Numeric>& _left, ExactInterval<Numeric>& _right) const
+    {
+        if(left() != right() || (leftType() == BoundType::INFTY && rightType() == BoundType::INFTY))
+        {
+            _left.set(left(),midpoint());
+            _left.setLeftType(leftType());
+            _left.setRightType(BoundType::STRICT);
+
+            _right.set(midpoint(),right());
+            _right.setLeftType(BoundType::WEAK);
+            _right.setRightType(rightType());
+        }
+        else
+        {
+            _left = *this;
+            _right = *this;
+        }
+    }
+    
+    template<typename Numeric>
+    void ExactInterval<Numeric>::split(std::vector<ExactInterval<Numeric> >& _result, const unsigned n) const
+    {
+        Numeric diameter = this->diameter();
+        diameter /= n;
+
+        ExactInterval<Numeric> tmp;
+        tmp.set(left(), left()+diameter);
+        tmp.setLeftType(leftType());
+        tmp.setRightType(BoundType::STRICT);
+        _result.insert(_result.end(), tmp);
+
+        for( unsigned i = 1; i < (n-1); ++i )
+        {
+            tmp.set(diameter*i, diameter*(i+1));
+            _result.insert(_result.end(), tmp);
+        }
+
+        tmp.set(diameter*(n-1),diameter*n);
+        tmp.setRightType(rightType());
+        _result.insert(_result.end(), tmp);
+    }
+    
+    template<typename Numeric>
+    void ExactInterval<Numeric>::bloat(const Numeric& _width)
+    {
+        set(left()-_width, right()+_width);
+    }
+    
+    template<typename Numeric>
+    Numeric ExactInterval<Numeric>::diameter() const
+    {
+        if( mLeftType == BoundType::INFTY || mRightType == BoundType::INFTY )
+        {
+            return -1;
+        }
+        return right() - left();
+    }
+    
+    template<typename Numeric>
+    Numeric ExactInterval<Numeric>::diameterRatio( const ExactInterval<Numeric>& _interval) const
+    {
+        return diameter()/_interval.diameter();
+    }
+    
+    template<typename Numeric>
+    Numeric ExactInterval<Numeric>::magnitude() const
+    {
+        Numeric inf = abs(left());
+        Numeric sup = abs(right());
+        return inf < sup ? sup : inf;
     }
 
     ///////////////////////////
