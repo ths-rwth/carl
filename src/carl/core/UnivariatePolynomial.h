@@ -6,6 +6,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <memory>
 
 #include "Variable.h"
 #include "VariableInformation.h"
@@ -19,6 +20,11 @@
 
 namespace carl
 {
+
+template<typename Coefficient> class UnivariatePolynomial;
+	
+template<typename Coefficient>
+using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
@@ -181,7 +187,20 @@ public:
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
+	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	
+	enum ComparisonOrder {
+		CauchyBound, LowDegree, Memory, Default = Memory
+	};
+	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default);
+	template<typename C>
+	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, ComparisonOrder order = Default);
+	template<typename C>
+	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, ComparisonOrder order = Default);
 
 	UnivariatePolynomial operator-() const;
 	UnivariatePolynomial& operator+=(const Coefficient& rhs);

@@ -645,11 +645,55 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 		return false;
 	}
 }
+template<typename C>
+bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs)
+{
+	if (lhs == nullptr && rhs == nullptr) return true;
+	if (lhs == nullptr || rhs == nullptr) return false;
+	return *lhs == *rhs;
+}
 
 template<typename C>
 bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
 	return !(lhs == rhs);
+}
+template<typename C>
+bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs)
+{
+	if (lhs == nullptr && rhs == nullptr) return false;
+	if (lhs == nullptr || rhs == nullptr) return true;
+	return *lhs != *rhs;
+}
+
+template<typename C>
+bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, ComparisonOrder order) {
+	switch (order) {
+		case CauchyBound: {
+			C a = this->cauchyBound();
+			C b = rhs.cauchyBound();
+			if (a < b) return true;
+			return (a == b) && this->less(rhs);
+		}
+		case LowDegree:
+			if (this->degree() < rhs.degree()) return true;
+			return (this->degree() == rhs.degree()) && this->less(rhs);
+		case Default:
+		case Memory:
+			return this < &rhs;
+	}
+}
+template<typename C>
+bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
+{
+	return lhs.less(rhs);
+}
+template<typename C>
+bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs)
+{
+	if (lhs == nullptr) return rhs != nullptr;
+	if (rhs == nullptr) return true;
+	return lhs->less(*rhs);
 }
 
 template<typename C>
