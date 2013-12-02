@@ -129,6 +129,11 @@ public:
 	
 	std::list<UnivariatePolynomialPtr<Coefficient>&> getParentsOf(const UnivariatePolynomialPtr<Coefficient>& p) const;
 
+	/**
+	 * Checks if the given elimination polynomial has non-trivial parents, i.e. if it has more than a single parent.
+     * @param p Univariate polynomial
+     * @return true, if the given polynomial has non-trivial parents.
+     */
 	bool hasParents(const UnivariatePolynomialPtr<Coefficient>& p) const;
 	
 	/*
@@ -144,7 +149,7 @@ public:
 	
 	/**
 	 * Inserts an elimination polynomial with the specified parent into the set.
-	 * @param r
+	 * @param r elimination polynomial
 	 * @param parents parents of the elimination (optional, standard is (0) ), if more than 1 parent is given, the list is interpreted as concatenation of parent pairs, e.g. (a, 0, b, c) defines  the parents (a) and (b,c).
 	 * @param avoidSingle If true, the polynomial added is not added to the single-elimination queue (default: false).
 	 * @return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element that already had its same key in the map. The pair::second element in the pair is set to true if a new element was inserted or false if an element with the same key existed.
@@ -156,6 +161,54 @@ public:
 			const std::list<UnivariatePolynomialPtr<Coefficient>>& parents = std::list<UnivariatePolynomialPtr<Coefficient>>( 1, UnivariatePolynomialPtr<Coefficient>() ),
 			bool avoidSingle = false
 			);
+	
+	/**
+	 * Insert all polynomials from first to last (excl. last), while all have the same parent.
+	 * @param first
+	 * @param last
+	 * @param parents parents of the elimination (optional, standard is one 0 parent)
+	 * @param avoidSingle If true, all polynomials added are not added to the single-elimination queue (default: false).
+	 * @return the list of polynomials actually added to the set, which might be smaller than the input set
+	 */
+	template<class InputIterator>
+	std::list<UnivariatePolynomialPtr<Coefficient>> insert(
+			InputIterator first,
+			InputIterator last,
+			const std::list<UnivariatePolynomialPtr<Coefficient>>& parents = std::list<UnivariatePolynomialPtr<Coefficient>>( 1, UnivariatePolynomialPtr<Coefficient>() ),
+			bool avoidSingle = false
+			);
+	
+	/**
+	 * Insert an object which is allocated newly and stored as its new pointer value.
+	 * @param r
+	 * @param parents parents of the elimination (optional, standard is one 0 parent)
+	 * @param avoidSingle If true, all polynomials added are not added to the single-elimination queue (default: false).
+	 * @return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element that already had its same key in the map. The pair::second element in the pair is set to true if a new element was inserted or false if an element with the same key existed.
+	 * @complexity logarithmic in the number of polynomials stored
+	 * @see insert
+	 */
+	std::pair<typename PolynomialSet::iterator, bool> insert(
+			const UnivariatePolynomial<Coefficient>& r,
+			const std::list<UnivariatePolynomialPtr<Coefficient>>& parents = std::list<UnivariatePolynomialPtr<Coefficient>>( 1, UnivariatePolynomialPtr<Coefficient>()),
+			bool avoidSingle = false
+			);
+	
+	/**
+	 * Insert the contents of the set s into this set.
+	 * @param s
+	 * @param avoidSingle If true, all polynomials added are not added to the single-elimination queue (default: false).
+	 * @return the list of polynomials actually added, which might be smaller than the input set
+	 */
+	std::list<UnivariatePolynomialPtr<Coefficient>> insert(
+			const EliminationSet<Coefficient>& s,
+			bool avoidSingle = false
+			);
+	/**
+	 * Pretend to insert the contents of the set s into this set, but in fact, remove all polynomials <b>existing</b> in this set from s.
+	 * @param s
+	 * @return true if a change to s was committed
+	 */
+	bool insertAmend(EliminationSet<Coefficient>& s);
 };
 
 }
