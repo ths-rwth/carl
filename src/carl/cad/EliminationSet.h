@@ -15,6 +15,8 @@
 #include "../core/UnivariatePolynomial.h"
 #include "../core/logging.h"
 
+#include "CADSettings.h"
+
 namespace carl {
 namespace CAD {
 	
@@ -128,6 +130,10 @@ public:
 	
 	//TODO: constructor
 	
+	///////////////
+	// SELECTORS //
+	///////////////
+	
 	std::list<UnivariatePolynomialPtr<Coefficient>&> getParentsOf(const UnivariatePolynomialPtr<Coefficient>& p) const;
 
 	/**
@@ -147,6 +153,10 @@ public:
 	 * @param order New order function.
 	 */
 	void setLiftingOrder( PolynomialComparator order );
+	
+	////////////////////
+	// ACCESS METHODS //
+	////////////////////
 	
 	/**
 	 * Inserts an elimination polynomial with the specified parent into the set.
@@ -246,6 +256,117 @@ public:
 	 * Remove every data from this set.
 	 */
 	void clear();
+	
+	/////////////////////////////////
+	// LIFTING POSITION MANAGEMENT //
+	/////////////////////////////////
+	
+	/**
+	 * Retrieve the next position for lifting.
+	 * The lifting positions are stored in the order of the set of elimination polynomials, but can lack polynomials which were already popped.
+	 *
+	 * If the lifting queue is empty the behavior of this method is undefined.
+	 * @return the smallest (w.r.t. set order) elimination polynomial not yet considered for lifting
+	 * @complexity constant
+	 */
+	const UnivariatePolynomialPtr<Coefficient>& nextLiftingPosition() {
+		return this->mLiftingQueue.front();
+	}
+
+	/**
+	 * Pop the polynomial returned by nextLiftingPosition() from the lifting position queue.
+	 * The lifting positions are stored in the order of the set of elimination polynomials, but can lack polynomials which were already popped.
+	 *
+	 * If the lifting queue is empty the behavior of this method is undefined.
+	 * @complexity constant
+	 */
+	void popLiftingPosition() {
+		this->mLiftingQueue.pop_front();
+	}
+
+	/**
+	 * Gives true if all were popped already, false if a lifting position exists.
+	 * @return true if all were popped already, false if a lifting position exists
+	 */
+	bool emptyLiftingQueue() const {
+		return this->mLiftingQueue.empty();
+	}
+
+	/**
+	 * Gives true if the lifting position queue contains all elimination polynomials, false otherwise.
+	 * @return true if the lifting position queue contains all elimination polynomials, false otherwise
+	 */
+	bool fullLiftingQueue() const {
+		return this->mLiftingQueue.size() == this->polynomials.size();
+	}
+
+	/**
+	 * Re-build the lifting position queue from scratch using all polynomials in the set. The reset state is <b>not</b> changed.
+	 * @complexity linear in the number of polynomials stored
+	 */
+	void resetLiftingPositionsFully();
+	
+	/**
+	 * Re-build the lifting position queue just with the polynomials stored as reset state.
+	 * @complexity linear in the number of polynomials stored
+	 */
+	void resetLiftingPositions() {
+		this->mLiftingQueue = this->mLiftingQueueReset;
+	}
+
+	/**
+	 * Defines the reset state for lifting positions as the current lifting positions queue and all polynomials inserted in the future.
+	 */
+	void setLiftingPositionsReset() {
+		this->mLiftingQueueReset = this->mLiftingQueue;
+	}
+	
+	/////////////////////////////////////
+	// ELIMINATION POSITION MANAGEMENT //
+	/////////////////////////////////////
+	
+	/**
+	 * Return the next position in the single-elimination queue and remove it from the queue.
+	 *
+	 * If the single-elimination queue is empty the behavior of this method is undefined.
+	 * @return the next position in the single-elimination queue
+	 */
+	const UnivariatePolynomialPtr<Coefficient>& popNextSingleEliminationPosition();
+
+	/**
+	 * Gives true if all single eliminations are done.
+	 * @return true if all single eliminations are done
+	 */
+	bool emptySingleEliminationQueue() const {
+	   return mSingleEliminationQueue.empty();
+	}
+
+	/**
+	 * Gives true if all paired eliminations are done, false otherwise.
+	 * @return true if all eliminations are done, false otherwise.
+	 */
+	bool emptyPairedEliminationQueue() const {
+	   return mPairedEliminationQueue.empty();
+	}
+	
+	/**
+	 * Does the elimination of the polynomial p and stores the resulting polynomials into the specified
+	 * destination set.
+	 *
+	 * The polynomial is erased from all queues.
+	 * @param p
+	 * @param destination
+	 * @param variable the main variable of the destination elimination set
+	 * @param setting
+	 * @return list of polynomials added to destination
+	 */
+	std::list<UnivariatePolynomialPtr<Coefficient>> eliminateInto(
+			const UnivariatePolynomialPtr<Coefficient>& p,
+			EliminationSet<Coefficient>& destination,
+			const Variable& variable,
+			const CADSettings& setting
+			);
+
 };
 
 }
