@@ -436,8 +436,8 @@ std::map<UnivariatePolynomial<Coeff>, unsigned> UnivariatePolynomial<Coeff>::fac
     else
     {
         // Store the rational factor and make the polynomial's coefficients coprime.
-        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), {(Coeff)1 / factor}), 1));
-        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), {(Coeff)1 / factor}) << ")^" << 1 );
+        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), (Coeff) 1 / factor) << ")^" << 1 );
+        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), (Coeff) 1 / factor), 1));
         remainingPoly.mCoefficients.reserve(mCoefficients.size());
         for(const Coeff& coeff : mCoefficients)
         {
@@ -680,7 +680,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
                         if(factor != (Coeff) 1)
                         {
                             result *= factor;
-                            LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), {(Coeff)1/factor}) << ")^" << 1 );
+                            LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({(Coeff)1/factor})) << ")^" << 1 );
                             // Add the constant factor to the factors.
                             if( linearFactors.begin()->first.isConstant() )
                             {
@@ -688,7 +688,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
                                 factor *= linearFactors.begin()->first.lcoeff();
                                 linearFactors.erase(linearFactors.begin());
                             }
-                            linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), {factor}), 1));
+                            linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({factor})), 1));
                         }
                         return result;
                     }
@@ -703,14 +703,14 @@ LinearFactorRemains:
     if(factor != (Coeff) 1)
     {
         result /= factor;
-        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), {factor}) << ")^" << 1 );
+        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), factor) << ")^" << 1 );
         // Add the constant factor to the factors.
         if( linearFactors.begin()->first.isConstant() )
         {
             factor *= linearFactors.begin()->first.lcoeff();
             linearFactors.erase(linearFactors.begin());
         }
-        linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), {factor}), 1));
+        linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), factor), 1));
     }
     auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(result, 1));
     LOGMSG_TRACE("carl.core", "UnivELF: add the factor (" << result << ")^" << 1 );
@@ -718,7 +718,7 @@ LinearFactorRemains:
     {
         ++retVal.first->second;
     }
-    return UnivariatePolynomial<Coeff>(result.mainVar(),{(Coeff) 1});
+    return UnivariatePolynomial<Coeff>(result.mainVar(), (Coeff)1);
 }
 
 template<typename Coeff>
