@@ -2,8 +2,7 @@
 set(carl_lib_core_headers 
 	AbstractPolynomial.h
 	Monomial.h
-	Polynomial.h Polynomial.tpp
-	PolynomialPolicy.h
+	Polynomial.h
 	VarExpPair.h
 	Variable.h
 	VariablePool.h
@@ -27,4 +26,3 @@ configure_file( ${CMAKE_SOURCE_DIR}/src/carl/core/config.h.in
 install(FILES			${carl_lib_core_headers}
 		DESTINATION		include/carl/core
 )
-

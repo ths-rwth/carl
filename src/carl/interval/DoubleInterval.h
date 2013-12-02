@@ -19,6 +19,7 @@
 #include "../core/Sign.h"
 #include "../numbers/numbers.h"
 #include "BoundType.h"
+#include "../numbers/FLOAT_T.h"
 
 using namespace boost::numeric::interval_lib;
 
