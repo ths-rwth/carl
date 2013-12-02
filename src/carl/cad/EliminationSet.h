@@ -49,6 +49,7 @@ private:
 			if (l2 < l1) return false;
 			if (less(a.first, b.first)) return true;
 			if (a.first == b.first) return less(a.second, b.second);
+			return false;
 		}
 	};
 	
@@ -126,7 +127,9 @@ public:
 	
 	//TODO: constructor
 	
-	std::list<UnivariatePolynomialPtr<Coefficient>&> getParentsOf( const UnivariatePolynomialPtr<Coefficient>& p ) const;
+	std::list<UnivariatePolynomialPtr<Coefficient>&> getParentsOf(const UnivariatePolynomialPtr<Coefficient>& p) const;
+
+	bool hasParents(const UnivariatePolynomialPtr<Coefficient>& p) const;
 	
 	/*
 	 * Set a new order for the elimination queue.
