@@ -231,9 +231,9 @@ public:
 	};
 	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default);
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, ComparisonOrder order = Default);
+	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomialPtr<C>::ComparisonOrder order);
 	template<typename C>
-	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, ComparisonOrder order = Default);
+	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomialPtr<C>::ComparisonOrder order);
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 
