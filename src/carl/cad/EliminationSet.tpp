@@ -1,8 +1,6 @@
 
 #include "EliminationSet.h"
 
-#include <forward_list>
-
 namespace carl {
 namespace CAD {
 
@@ -161,6 +159,112 @@ bool EliminationSet<Coefficient>::insertAmend(EliminationSet<Coefficient>& s) {
 		s.erase(*i); // remove polynomial from s
 	}
 	return !toDelete.empty();
+}
+
+template<typename Coefficient>
+size_t EliminationSet<Coefficient>::erase( const UnivariatePolynomialPtr<Coefficient>& p ) {
+	if (p == 0) return 0;
+	
+	// remove the child for each parent from the children mapping
+	for (typename parentbucket::iterator i:  this->parentsPerChild[p]) {
+		if (i->first != 0) this->childrenPerParent[i->first].erase( p );
+		if (i->second != 0) this->childrenPerParent[i->second].erase( p );
+	}
+	// remove the child from the parents mapping
+	this->parentsPerChild.erase(p);
+	// remove from lifting and elimination queues
+	std::list<typename PolynomialSet::iterator> queuePosition = std::lower_bound(this->mLiftingQueue.begin(), this->mLiftingQueue.end(), p, this->liftingOrder);
+	
+	if (queuePosition != this->mLiftingQueue.end() && *queuePosition == p ) {
+		this->mLiftingQueue.erase(queuePosition);
+	}
+	queuePosition = std::lower_bound(mLiftingQueueReset.begin(), mLiftingQueueReset.end(), p, this->liftingOrder);
+	if( queuePosition != mLiftingQueueReset.end() && *queuePosition == p )
+		mLiftingQueueReset.erase( queuePosition );
+	queuePosition = std::lower_bound(mSingleEliminationQueue.begin(), mSingleEliminationQueue.end(), p, this->eliminationOrder);
+	if( queuePosition != mSingleEliminationQueue.end() && *queuePosition == p )
+		mSingleEliminationQueue.erase(queuePosition);
+	queuePosition = std::lower_bound(mPairedEliminationQueue.begin(), mPairedEliminationQueue.end(), p, this->eliminationOrder);
+	if( queuePosition != mPairedEliminationQueue.end() && *queuePosition == p )
+		mPairedEliminationQueue.erase(queuePosition);
+	// remove from main structure
+	return this->polynomials.erase(p);
+}
+
+template<typename Coefficient>
+std::forward_list<UnivariatePolynomialPtr<Coefficient>> EliminationSet<Coefficient>::removeByParent(const UnivariatePolynomialPtr<Coefficient>& parent) {
+	std::forward_list<UnivariatePolynomialPtr<Coefficient>> deleted;
+	if (parent == nullptr) // zero parent is reserved for "no parent"
+		return deleted;
+	// remove all lone children of parent
+	auto position = this->childrenPerParent.find( parent );
+	if (position == this->childrenPerParent.end())
+		return deleted;    // parent not found
+	for (typename PolynomialSet::const_iterator child: position->second)	{
+		// for all children of parent check their parents
+		auto parents = this->parentsPerChild.find(*child);
+		if (parents == this->parentsPerChild.end() || parents->second.empty())
+			continue;    // nothing to be done for this child
+		typename parentbucket::const_iterator p = std::find_if( parents->second.begin(), parents->second.end(), EliminationParentsContain( parent ) );
+		while (p != parents->second.end()) {
+			// search matching parents
+			parents->second.erase(p); // remove either single matching parent or parents which got divorced by the removed parent
+			p = std::find_if( parents->second.begin(), parents->second.end(), EliminationParentsContain( parent ) );
+		}
+
+		if (parents->second.empty()) {
+			// no parent was left for the child, so delete it
+			this->parentsPerChild.erase( parents );
+			auto queuePosition = std::lower_bound( mLiftingQueue.begin(), mLiftingQueue.end(),
+																						   *child, this->liftingOrder );
+			if( queuePosition != mLiftingQueue.end() )
+				mLiftingQueue.erase( queuePosition );
+			queuePosition = std::lower_bound( mLiftingQueueReset.begin(), mLiftingQueueReset.end(), *child, this->liftingOrder );
+			if( queuePosition != mLiftingQueueReset.end() )
+				mLiftingQueueReset.erase( queuePosition );
+			queuePosition = std::lower_bound( mSingleEliminationQueue.begin(), mSingleEliminationQueue.end(), *child, this->eliminationOrder );
+			if( queuePosition != mSingleEliminationQueue.end() )
+				mSingleEliminationQueue.erase( queuePosition );
+			queuePosition = std::lower_bound( mPairedEliminationQueue.begin(), mPairedEliminationQueue.end(), *child, this->eliminationOrder );
+			if( queuePosition != mPairedEliminationQueue.end() )
+				mPairedEliminationQueue.erase( queuePosition );
+			deleted.push_front( *child );
+			this->polynomials.erase(*child);
+		}
+	}
+	// remove the information of parent itself
+	this->childrenPerParent.erase( position );
+	return deleted;
+}
+
+template<typename Coefficient>
+UnivariatePolynomialPtr<Coefficient> EliminationSet<Coefficient>::find(const UnivariatePolynomial<Coefficient>& p) {
+	auto position = this->polynomials.find(std::make_shared<UnivariatePolynomial<Coefficient>>(p));
+	return (position == this->polynomials.end() ? nullptr : *position);
+}
+
+template<typename Coefficient>
+void swap(EliminationSet<Coefficient>& lhs, EliminationSet<Coefficient>& rhs) {
+	std::swap(lhs.polynomials, rhs.polynomials);
+	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
+	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
+	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
+	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
+	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
+	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
+	std::swap(lhs.liftingOrder, rhs.liftingOrder);
+	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
+}
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::clear() {
+	this->polynomials.clear();
+	this->mLiftingQueue.clear();
+	this->mLiftingQueueReset.clear();
+	this->mSingleEliminationQueue.clear();
+	this->mPairedEliminationQueue.clear();
+	this->childrenPerParent.clear();
+	this->parentsPerChild.clear();
 }
 
 }

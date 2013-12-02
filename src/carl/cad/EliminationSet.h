@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <forward_list>
 #include <list>
 #include <set>
 #include <utility>
@@ -209,6 +210,42 @@ public:
 	 * @return true if a change to s was committed
 	 */
 	bool insertAmend(EliminationSet<Coefficient>& s);
+	
+	/**
+	 * Removes a polynomial p completely from the set (and all internal auxiliary structures).
+	 * @param p polynomial to be removed from the set
+	 * @return 1 if p exited in the set, 0 otherwise
+	 * @complexity linear in the number of elimination polynomials one level above the level represented by this elimination set, i.e. the parents
+	 */
+	size_t erase(const UnivariatePolynomialPtr<Coefficient>& p);
+	
+	/** Asserts that parent is removed.
+	 * Removes all elimination polynomials from the set which have parent as only parent (lone polynomials) or as only other parent (divorce-suffering polynomials).
+	 * A list of those deleted is returned.
+	 * Elimination polynomials which have several parents among which parent is are not deleted, but their auxiliary data structures are updated.
+	 * @param parent of the lone elimination polynomials to be removed
+	 * @return list of elimination polynomials removed
+	 * @complexity linear in the number of elimination polynomials which do belong to the given parent
+	 */
+	std::forward_list<UnivariatePolynomialPtr<Coefficient>> removeByParent(const UnivariatePolynomialPtr<Coefficient>& parent);
+
+	/**
+	 * Searches the set entry for the given polynomial p if exists, otherwise nullptr.
+	 * @param p
+	 * @return set entry for the given polynomial p if exists, otherwise nullptr
+	 */
+	UnivariatePolynomialPtr<Coefficient> find(const UnivariatePolynomial<Coefficient>& p);
+	
+	/**
+	 * Swaps the contents (all attributes) of the two EliminationSets.
+	 * @see std::set::swap
+	 */
+	friend void swap(EliminationSet<Coefficient>& lhs, EliminationSet<Coefficient>& rhs);
+
+	/**
+	 * Remove every data from this set.
+	 */
+	void clear();
 };
 
 }
