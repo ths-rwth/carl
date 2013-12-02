@@ -10,6 +10,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 # Adding log4cplus.
 if(NOT LOG4CPLUS_FOUND)	
 # Add log4cplus (local build)
+	message("-- Use shipped version of Log4CPlus")
 	ExternalProject_Add(
 		log4cplus
 		DOWNLOAD_COMMAND ""
