@@ -35,6 +35,12 @@ endif()
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
 else()
+	# Create configure command dependend on compiler
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			set (cfg_command <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> CXX=/usr/bin/clang++ "CXXFLAGS=-stdlib=libc++ -std=c++11 -DGTEST_USE_OWN_TR1_TUPLE=1 --verbose")
+	else()
+			set(cfg_command <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>)
+	endif()
 	# Add gtest (local build)
 	message("-- Use shipped version of GTest")
 	ExternalProject_Add(
@@ -45,8 +51,8 @@ else()
 		DOWNLOAD_COMMAND ""
 		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/gtest-1.6.0"
 		# Force separate output paths for debug and release builds to allow easy
-		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-		CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> CXX=/usr/bin/clang++ "CXXFLAGS=-stdlib=libc++ -std=c++11 -DGTEST_USE_OWN_TR1_TUPLE=1 --verbose"
+		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES 
+		CONFIGURE_COMMAND ${cfg_command}
 		CMAKE_ARGS -Dgtest_force_shared_crt=ON
 		# Disable install step
 		INSTALL_COMMAND ""
