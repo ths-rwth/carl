@@ -46,6 +46,7 @@ else()
 		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/gtest-1.6.0"
 		# Force separate output paths for debug and release builds to allow easy
 		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
+		CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> CXX=/usr/bin/clang++ "CXXFLAGS=-stdlib=libc++ -std=c++11 -DGTEST_USE_OWN_TR1_TUPLE=1 --verbose"
 		CMAKE_ARGS -Dgtest_force_shared_crt=ON
 		# Disable install step
 		INSTALL_COMMAND ""
@@ -59,6 +60,7 @@ else()
 	
 	# Specify MainTest's link libraries
 	ExternalProject_Get_Property(googletest binary_dir)
+	
 	set(GTEST_LIBRARIES ${binary_dir}/libgtest.a ${binary_dir}/libgtest_main.a PARENT_SCOPE)
 
 	add_dependencies(resources googletest)
