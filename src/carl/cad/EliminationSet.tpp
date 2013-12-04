@@ -550,19 +550,10 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::factorize() {
 	EliminationSet<Coefficient> factorizedSet(this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
-		ex factorizedI = GiNaC::factor( GiNaC::mdenom( *p ) * *p );
-		if( GiNaC::is_exactly_a<GiNaC::mul>( factorizedI ) )
-		{    // only proper products are considered, the others can stay as they are
-			#ifdef GINACRA_CAD_DEBUG
-			cout << "Replacing " << **i << " with " << factorizedI << " using " << GiNaC::mdenom( **i ) * **i << endl;
-			#endif
-			// insert the factors and omit the original
-			std::list<UnivariatePolynomialPtr<Coefficient>> parents = this->getParentsOf(p);
-			for (auto f: factorizedI)
-				factorizedSet.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(UnivariatePolynomial<Coefficient>(f, p->variable())), parents);
+		// insert the factors and omit the original
+		for (auto factor: p->factorization()) {
+			factorizedSet.insert(std::make_shared(factor.first), this->getParentsOf(p));
 		}
-		else
-			factorizedSet.insert(p, this->getParentsOf(p));
 	}
 	std::swap(*this, factorizedSet);
 }
