@@ -1185,6 +1185,26 @@ bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C
 }
 
 template<typename C>
+class UnivariatePolynomialComparator
+{
+private:
+	typename UnivariatePolynomial<C>::ComparisonOrder order;
+public:
+	UnivariatePolynomialComparator(typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+				: order(order)
+	{}
+
+	bool operator()(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs) const
+	{
+		return less(lhs, rhs, order);
+	}
+	bool operator()(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs) const
+	{
+		return less(lhs, rhs, order);
+	}
+};
+
+template<typename C>
 bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
 	if(lhs.mMainVar == rhs.mMainVar)
