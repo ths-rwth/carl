@@ -39,6 +39,10 @@ private:
 	std::vector<Coefficient> mCoefficients;
 
 public:
+
+	typedef typename UnderlyingNumberType<Coefficient>::type NumberType;
+	typedef typename IntegralT<NumberType>::type IntNumberType;
+
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
