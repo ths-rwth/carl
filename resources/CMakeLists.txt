@@ -37,7 +37,7 @@ if(GTEST_FOUND)
 else()
 	# Create configure command dependend on compiler
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			set (cmake_command -Dgtest_force_shared_crt=ON -DCXX=/usr/bin/clang++ "-DCMAKE_CXX_FLAGS=-stdlib=libc++ -std=c++11 -DGTEST_USE_OWN_TR1_TUPLE=1" )
+			set (cmake_command -Dgtest_force_shared_crt=ON -DCXX=/usr/bin/clang++ -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_CXX_FLAGS=-DGTEST_USE_OWN_TR1_TUPLE=1 )
 	else()
 			set(cmake_command -Dgtest_force_shared_crt=ON)
 	endif()
