@@ -271,7 +271,7 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
 	{
         Coeff absOfCoeff = abs( *it );
-		if( absOfCoeff > maxCoeff ) 
+		if(absOfCoeff > maxCoeff) 
 		{
 			maxCoeff = absOfCoeff;
 		}
@@ -413,6 +413,36 @@ UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolyno
 	res.stripLeadingZeroes();
 	return res;
 	
+}
+
+template<typename Coeff>
+template<typename N, EnableIf<is_fraction<N>>>
+typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::numericContent() const
+{
+	if (this->isZero()) return 0;
+	// Obtain main denominator for all coefficients.
+	IntNumberType mainDenom = this->mainDenom();
+	
+	// now, some coefficient times mainDenom is always integral.
+	// we convert such a product to an integral data type by getNum()
+	assert(getDenom(this->numericContent(0) * mainDenom) == 1);
+	IntNumberType res = getNum(this->numericContent(0) * mainDenom);
+	for (unsigned i = 1; i < this->mCoefficients.size(); i++) {
+		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
+		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
+	}
+	return res / mainDenom;
+}
+
+template<typename Coeff>
+template<typename C, EnableIf<is_number<C>>>
+typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::mainDenom() const
+{
+	IntNumberType denom = 1;
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		denom = carl::lcm(denom, getDenom(this->mCoefficients[i]));
+	}
+	return denom;
 }
 
 template<typename Coeff>
@@ -1147,7 +1177,6 @@ bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs
 	return lhs.less(rhs, order);
 }
 template<typename C>
-//bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, ComparisonOrder order = Default);
 bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
 {
 	if (lhs == nullptr) return rhs != nullptr;

@@ -237,7 +237,68 @@ public:
 	 */
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
-    
+
+	/**
+	 * Returns the numeric content part of the i'th coefficient.
+	 *
+	 * If the coefficients are numbers, this is simply the i'th coefficient.
+	 * If the coefficients are polynomials, this is the numeric content part of the i'th coefficient.
+     * @param i number of the coefficient
+     * @return numeric content part of i'th coefficient.
+     */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	typename UnderlyingNumberType<Coefficient>::type numericContent(unsigned int i) const
+	{
+		return this->mCoefficients[i];
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	typename UnderlyingNumberType<Coefficient>::type numericContent(unsigned int i) const
+	{
+		return this->mCoefficients[i].numericContent();
+	}
+
+	/**
+	 * Returns the numeric unit part of the polynomial.
+	 *
+	 * If the coefficients are numbers, this is the sign of the leading coefficient.
+	 * If the coefficients are polynomials, this is the unit part of the leading coefficient.s
+     * @return unit part of the polynomial.
+     */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	NumberType numericUnit() const
+	{
+		return (this->lcoeff() >= 0 ? 1 : -1);
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	NumberType numericUnit() const
+	{
+		return this->lcoeff().numericUnit();
+	}
+
+	/**
+	 * Obtains the numeric content part of this polynomial.
+	 *
+	 * The numeric content part of a polynomial is defined as the gcd() of the numeric content parts of all coefficients.
+	 * This is only possible if the underlying number type is either integral or fractional.
+	 *
+	 * As for fractional numbers, we consider the following definition:
+	 *		gcd( a/b, c/d ) = gcd( a/b*l, c/d*l ) / l
+	 * where l = lcm(b,d).
+     * @return numeric content part of the polynomial.
+	 * @see UnivariatePolynomials::numericContent(unsigned int)
+     */
+	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
+	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
+
+	/**
+     * Compute the main denominator of all numeric coefficients of this polynomial.
+	 * This method only applies if the Coefficient type is a number.
+     * @return the main denominator of all coefficients of this polynomial.
+     */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	IntNumberType mainDenom() const;
+
+
     std::map<UnivariatePolynomial, unsigned> factorization() const;
     
     template<typename Integer>

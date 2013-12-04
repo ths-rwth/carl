@@ -579,6 +579,30 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 	LOG_NOTIMPLEMENTED();
 }
 
+template<typename Coeff, typename O, typename P>
+template<typename C, EnableIf<is_number<C>>>
+typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numericContent() const
+{
+	if (this->isZero()) return 0;
+	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
+	for (unsigned i = 0; i < this->mTerms; i++) {
+		res = gcd(res, this->mTerms[i]->coeff());
+	}
+	return res;
+}
+
+template<typename Coeff, typename O, typename P>
+template<typename C, DisableIf<is_number<C>>>
+typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numericContent() const
+{
+	if (this->isZero()) return 0;
+	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff().numericContent();
+	for (unsigned i = 0; i < this->mTerms; i++) {
+		res = gcd(res, this->mTerms[i]->coeff().numericContent());
+	}
+	return res;
+}
+
 
 template<typename C, typename O, typename P>
 bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
