@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cmath>
 #include <cfloat>
+#include <vector>
 
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>

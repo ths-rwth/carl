@@ -35,6 +35,12 @@ endif()
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
 else()
+	# Create configure command dependend on compiler
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			set (cmake_command -Dgtest_force_shared_crt=ON -DCXX=/usr/bin/clang++ -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_CXX_FLAGS=-DGTEST_USE_OWN_TR1_TUPLE=1 )
+	else()
+			set(cmake_command -Dgtest_force_shared_crt=ON)
+	endif()
 	# Add gtest (local build)
 	message("-- Use shipped version of GTest")
 	ExternalProject_Add(
@@ -45,8 +51,8 @@ else()
 		DOWNLOAD_COMMAND ""
 		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/gtest-1.6.0"
 		# Force separate output paths for debug and release builds to allow easy
-		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-		CMAKE_ARGS -Dgtest_force_shared_crt=ON
+		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES 
+		CMAKE_ARGS ${cmake_command}
 		# Disable install step
 		INSTALL_COMMAND ""
 		# Wrap download, configure and build steps in a script to log output
@@ -59,6 +65,7 @@ else()
 	
 	# Specify MainTest's link libraries
 	ExternalProject_Get_Property(googletest binary_dir)
+	
 	set(GTEST_LIBRARIES ${binary_dir}/libgtest.a ${binary_dir}/libgtest_main.a PARENT_SCOPE)
 
 	add_dependencies(resources googletest)
