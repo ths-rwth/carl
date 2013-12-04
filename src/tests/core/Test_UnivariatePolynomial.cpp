@@ -239,3 +239,35 @@ TEST(UnivariatePolynomial, factorization)
     std::cout << std::endl;
     EXPECT_EQ(pol6, productOfFactors);
 }
+
+TEST(UnivariatePolynomial, isNumber)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_FALSE(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).isNumber());
+	EXPECT_TRUE(UnivariatePolynomial<cln::cl_RA>(x, 1).isNumber());
+}
+
+TEST(UnivariatePolynomial, isUnivariate)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	//Variable y = VariablePool::getInstance().getFreshVariable();
+	EXPECT_TRUE(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).isUnivariate());
+	//TODO: How does this work?
+	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).isUnivariate());
+}
+
+TEST(UnivariatePolynomial, numericUnit)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).numericUnit(), 1);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {1,2,-3}).numericUnit(), -1);
+}
+
+TEST(UnivariatePolynomial, numericContent)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).numericContent(), 1);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {15,27,3}).numericContent(), 3);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-1,-2,-3}).numericContent(), 1);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-15,-27,-3}).numericContent(), 3);
+}

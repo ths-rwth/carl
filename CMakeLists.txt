@@ -73,7 +73,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	message("using clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ --verbose")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("using gcc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
