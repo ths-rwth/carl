@@ -79,7 +79,7 @@ private:
 	
 // public types
 public:
-	typedef UnivariatepolynomialComparator<Coefficient> PolynomialComparator;
+	typedef UnivariatePolynomialComparator<Coefficient> PolynomialComparator;
 
 // private members
 private:	
@@ -139,8 +139,8 @@ public:
 	 * @param g strict ordering for elimination queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
 	 */
 	EliminationSet(
-			PolynomialComparator f = UnivariatepolynomialComparator<Coefficient>(),
-			PolynomialComparator g = UnivariatepolynomialComparator<Coefficient>()
+			PolynomialComparator f = UnivariatePolynomialComparator<Coefficient>(),
+			PolynomialComparator g = UnivariatePolynomialComparator<Coefficient>()
 			):
 		polynomials(),
 		eliminationOrder(g),
