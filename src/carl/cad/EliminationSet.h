@@ -79,7 +79,7 @@ private:
 	
 // public types
 public:
-	typedef bool (*PolynomialComparator)( const UnivariatePolynomialPtr<Coefficient>&, const UnivariatePolynomialPtr<Coefficient>& );
+	typedef UnivariatepolynomialComparator<Coefficient> PolynomialComparator;
 
 // private members
 private:	
@@ -133,7 +133,44 @@ public:
 	 */
 	bool bounded;
 	
-	//TODO: constructor
+	/**
+	 * Constructs the elimination set with a given strict ordering f of univariate polynomials.
+	 * @param f strict ordering for lifting queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
+	 * @param g strict ordering for elimination queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
+	 */
+	EliminationSet(
+			PolynomialComparator f = UnivariatepolynomialComparator<Coefficient>(),
+			PolynomialComparator g = UnivariatepolynomialComparator<Coefficient>()
+			):
+		polynomials(),
+		eliminationOrder(g),
+		liftingOrder(f),
+		mSingleEliminationQueue(),
+		mPairedEliminationQueue(),
+		mLiftingQueue(),
+		mLiftingQueueReset(),
+		childrenPerParent(),
+		parentsPerChild(),
+		bounded(false)
+	{}
+
+	/**
+	 * Copy constructor.
+	 * @param s
+	 * @return
+	 */
+	EliminationSet(const EliminationSet<Coefficient>& s):
+		polynomials(s.polynomials),
+		eliminationOrder(s.eliminationOrder),
+		liftingOrder(s.liftingOrder),
+		mSingleEliminationQueue(s.mSingleEliminationQueue),
+		mPairedEliminationQueue(s.mPairedEliminationQueue),
+		mLiftingQueue(s.mLiftingQueue),
+		mLiftingQueueReset(s.mLiftingQueueReset),
+		childrenPerParent(s.childrenPerParent),
+		parentsPerChild(s.parentsPerChild),
+		bounded(s.bounded)
+	{}
 	
 	///////////////
 	// SELECTORS //
@@ -371,7 +408,211 @@ public:
 			const Variable& variable,
 			const CADSettings& setting
 			);
+	
+	
+	/// Determine whether _p is constant and possibly move it to the destination set while popping it from _queue and removing it from _otherqueue. _p is inserted into destination with avoidSingle=_avoidSingle.
+	std::list<UnivariatePolynomialPtr<Coefficient>> eliminateConstant(
+			const UnivariatePolynomialPtr<Coefficient>& p,
+			std::list<UnivariatePolynomialPtr<Coefficient>>& queue,
+			std::list<UnivariatePolynomialPtr<Coefficient>>& otherqueue,
+			bool avoidSingle,
+			EliminationSet<Coefficient>& destination,
+			const Variable& variable,
+			const CADSettings& setting
+			);
+	
+	/**
+	 * Does the elimination of the next polynomial in the elimination queue and stores the resulting polynomials into the specified
+	 * destination set.
+	 *
+	 * Remarks:
+	 * <ul>
+	 *  <li>The resulting polynomials are always made square-free and primitive.</li>
+	 * </ul>
+	 *
+	 * After the elimination, the polynomial is popped from the elimination queue.
+	 * @param destination
+	 * @param variable the main variable of the destination elimination set
+	 * @param setting special settings for simplifications etc.
+	 * @param synchronous (We use the assumption that single eliminations could be done already so that we need to catch up with the paired ones.)
+	 *                    If true, the next single elimination is done only if the next single and the next paired elimination polynomials are equal;
+	 *                      otherwise only the next paired elimination is done.
+	 *                      In the latter case, the resulting polynomials are added to the destination set avoiding single eliminations, i.e., these polynomials inherit their "asynchronicity".
+	 *                    If false the queues are queried without synchronizing.
+	 *                    Always: If all paired eliminations are done, the next single elimination is done.
+	 * @return list of polynomials added to destination
+	 */
+	std::list<UnivariatePolynomialPtr<Coefficient>> eliminateNextInto(
+			EliminationSet<Coefficient>& destination,
+			const Variable& variable,
+			const CADSettings& setting,
+			bool synchronous = true
+			);
 
+
+	
+	////////////////
+	// OPERATIONS //
+	////////////////
+	
+	/**
+	 * Move all constant polynomials from this set to the other set. Delete all polynomials which do not contain any variable.
+	 * @param to
+	 * @param variable
+	 */
+	void moveConstants(EliminationSet<Coefficient>& to, const Variable& variable);
+
+	/**
+	 * Removes all constant elements.
+	 * @complexity linear in the number of elements stored in the set
+	 */
+	void removeConstants();
+	
+	/**
+	 * Removes all elements without real roots.
+	 * @complexity linear in the number of elements stored in the set
+	 */
+	void removePolynomialsWithoutRealRoots();
+	
+	/**
+	 * Replaces all polynomials by their pseudo-separable part (currently uses UnivariatePolynomial::pseudoSepapart).
+	 * @complexity linear in the number of elements stored in the set
+	 */
+	void makeSquarefree();
+	
+	/**
+	 * Replaces all polynomials by their primitive part (currently uses UnivariatePolynomial::pseudoPrimpart).
+	 * @complexity linear in the number of elements stored in the set
+	 */
+	void makePrimitive();
+	
+	/**
+	 * Replaces all polynomials by their factors (currently uses GiNaC::factor).
+	 * In order to work properly, GiNaC::factor should receive integer polynomials. Thus, before the factorization, all polynomials are transformed to integral polynomials.
+	 * @complexity linear in the number of elements stored in the set
+	 */
+	void factorize();
+	
+	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coefficient>& s);
+	
+	//////////////////////////////
+	// STATIC AUXILIARY METHODS //
+	//////////////////////////////
+	
+	/**
+	 * Generates the set of truncations of the polynomial.
+	 * @see "Algorithms in Real Algebraic Geometry" - Saugata Basu, Richard Pollack, Marie-Francoise Roy see page 21-22
+	 * @param p The polynomial
+	 * @complexity O ( p.deg() )
+	 * @return The set of truncations
+	 */
+	static std::list<UnivariatePolynomialPtr<Coefficient>> truncation(const UnivariatePolynomialPtr<Coefficient>& p);
+	
+	/**
+	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
+	 * This elimination operator follows McCallums definition [McCallum - TR578, 1985].
+	 *
+	 *<p><strong>Note that the set returned by this method should be disjoint to the set returned by the two-polynomial variant of <code>eliminate</code>.</strong></p>
+	 *
+	 * Optimizations:
+	 * <ul>
+	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
+	 * </ul>
+	 *
+	 * @param p input polynomial for the elimination procedure
+	 * @param variable the new main variable for the returned set
+	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
+	 * @param avoidSingle If true, the polynomial added to eliminated is not added to the single-elimination queue (default: false).
+	 * @complexity O ( deg(P) ) subresultant computations. The degree of the output is bound by O(deg(P)^2)!
+	 * @return a list of polynomials in which the main variable of p is eliminated
+	 */
+	static void elimination(
+			const UnivariatePolynomialPtr<Coefficient>& p,
+			const Variable& variable,
+			EliminationSet<Coefficient>& eliminated,
+			bool avoidSingle
+			);
+
+	/**
+	 * Performs all steps of a CAD elimination/projection operator which are related to a pair of polynomials.
+	 * This elimination operator follows McCallums definition [McCallum - TR578, 1985].
+	 *
+	 *<p><strong>Note that the set returned by this method should be disjoint to the set returned by the single-polynomial variant of <code>eliminate</code>.</strong></p>
+	 *
+	 * Optimizations:
+	 * <ul>
+	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
+	 * </ul>
+	 *
+	 * @param p first input polynomial for the elimination procedure
+	 * @param q second input polynomial for the elimination procedure
+	 * @param variable the new main variable for the returned set
+	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
+	 * @param avoidSingle If true, the polynomials added to eliminated are not added to the single-elimination queue (default: false).
+	 * @complexity O( deg(P)^2 ) subresultant computations. The degree of the output is bound by O(max(deg(P),deg(Q))^2)!
+	 * @return a list of polynomials in which the main variable of p1 and p2 is eliminated
+	 */
+	static void elimination(
+			const UnivariatePolynomialPtr<Coefficient>& p,
+			const UnivariatePolynomialPtr<Coefficient>& q,
+			const Variable& variable,
+			EliminationSet<Coefficient>& eliminated,
+			bool avoidSingle 
+			);
+	
+	/**
+	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
+	 *
+	 * Optimizations:
+	 * <ul>
+	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
+	 * </ul>
+	 *
+	 * @param p input polynomial for the elimination procedure constrained by an equation
+	 * @param variable the new main variable for the returned set
+	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
+	 * @param avoidSingle If true, the polynomial added to eliminated is not added to the single-elimination queue (default: false).
+	 * @complexity
+	 * @see Scott McCallum - On Projection in CAD-Based Quantifier Elimination with Equational Constraint
+	 * @return a list of polynomials in which the main variable of p is eliminated
+	 */
+	static void eliminationEq(
+			const UnivariatePolynomialPtr<Coefficient>& p,
+			const Variable& variable,
+			EliminationSet<Coefficient>& eliminated,
+			bool avoidSingle
+			)
+	{
+		elimination(p, variable, eliminated, avoidSingle);
+	}
+	
+	/**
+	 * Performs all steps of a CAD elimination/projection operator which are related to a pair of polynomials.
+	 *
+	 * Optimizations:
+	 * <ul>
+	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
+	 * </ul>
+	 *
+	 * @param p first input polynomial for the elimination procedure constrained by an equation
+	 * @param q second input polynomial for the elimination procedure
+	 * @param variable the new main variable for the returned set
+	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
+	 * @param avoidSingle If true, the polynomial added to eliminated is not added to the single-elimination queue (default: false).
+	 * @complexity
+	 * @see Scott McCallum - On Projection in CAD-Based Quantifier Elimination with Equational Constraint
+	 * @return a list of polynomials in which the main variable of p1 and p2 is eliminated
+	 */
+	static void eliminationEq(
+			const UnivariatePolynomialPtr<Coefficient>& p,
+			const UnivariatePolynomialPtr<Coefficient>& q,
+			const Variable& variable,
+			EliminationSet<Coefficient>& eliminated,
+			bool avoidSingle
+			)
+	{
+		elimination(p, q, variable, eliminated, avoidSingle);
+	}
 };
 
 }

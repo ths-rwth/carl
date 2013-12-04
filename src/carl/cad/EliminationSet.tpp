@@ -288,57 +288,56 @@ std::list<UnivariatePolynomialPtr<Coefficient>> EliminationSet<Coefficient>::eli
 		const CADSettings& setting
 		)
 {
-	if (p->isConstant() )
+	if (p->isConstant())
 	{ /* constants can just be moved from this level to the next */
-		if( GiNaC::is_exactly_a<numeric>( *p )) /* discard numerics completely */
+		if (isNumber(*p))
+		//if( GiNaC::is_exactly_a<numeric>( *p )) /* discard numerics completely */
 		{
-			this->erase( p );
+			this->erase(p);
 			return {};
 		}
-		UnivariatePolynomialPtr pNewVar = make_shared<UnivariatePolynomial>( p->switchVariable( variable ));
-		destination.insert( pNewVar, this->getParentsOf( p ) );
-		if( setting.removeConstants || GiNaC::is_exactly_a<numeric>( *p )) /* remove constant from this level and discard numerics completely */
-			this->erase( p );
+		UnivariatePolynomialPtr<Coefficient> pNewVar = std::make_shared<UnivariatePolynomial<Coefficient>>( p->switchVariable( variable ));
+		destination.insert(pNewVar, this->getParentsOf(p));
+		if( setting.removeConstants || isNumber(*p)) /* remove constant from this level and discard numerics completely */
+			this->erase(p);
 		else {
-			std::list<UnivariatePolynomialPtr>::iterator queuePosition = std::lower_bound( mSingleEliminationQueue.begin(), mSingleEliminationQueue.end(), p, mEliminationOrder );
+			auto queuePosition = std::lower_bound(mSingleEliminationQueue.begin(), mSingleEliminationQueue.end(), p, this->eliminationOrder);
 			if( queuePosition != mSingleEliminationQueue.end() && *queuePosition == p )
 				mSingleEliminationQueue.erase( queuePosition );
-			queuePosition = std::lower_bound( mPairedEliminationQueue.begin(), mPairedEliminationQueue.end(), p, mEliminationOrder );
+			queuePosition = std::lower_bound(mPairedEliminationQueue.begin(), mPairedEliminationQueue.end(), p, this->eliminationOrder);
 			if( queuePosition != mPairedEliminationQueue.end() && *queuePosition == p )
 				mPairedEliminationQueue.erase( queuePosition );
 		}
 		return { pNewVar };
 	}
 
-	EliminationSet newEliminationPolynomials = EliminationSet( mLiftingOrder, mEliminationOrder );
+	EliminationSet<Coefficient> newEliminationPolynomials = EliminationSet<Coefficient>(this->liftingOrder, this->eliminationOrder);
 
 	// PAIRED elimination with the new polynomials: (1) together with the existing ones (2) among themselves
 
-	#ifdef GINACRA_CAD_DEBUG
-	cout << "Paired elimination of the polynomial " << *p << endl;
-	#endif
-	void (*elimPairOp)( const UnivariatePolynomialPtr&, const UnivariatePolynomialPtr&, const symbol&, EliminationSet&, bool );
-	if( setting.equationsOnly )
-		elimPairOp = EliminationSet::eliminationEq;
-	else
-		elimPairOp = EliminationSet::elimination;
-	// (1) elimination with existing polynomials
-	for( EliminationSet::const_iterator pol_it1 = this->begin(); pol_it1 != this->end(); ++pol_it1 )
-		elimPairOp( p, *pol_it1, variable, newEliminationPolynomials, false );
-	// (2) elimination with polynomial itself @todo: proof that we do not need that
-//                elimPairOp( p, p, variable, newEliminationPolynomials, setting );
+	if( setting.equationsOnly ) {
+		// (1) elimination with existing polynomials
+		for (auto pol_it1: this->polynomials)
+			eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+		// (2) elimination with polynomial itself @todo: proof that we do not need that
+		// eliminationEq( p, p, variable, newEliminationPolynomials, setting );
+	} else {
+		// (1) elimination with existing polynomials
+		for (auto pol_it1: this->polynomials)
+			elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+		// (2) elimination with polynomial itself @todo: proof that we do not need that
+		// elimination( p, p, variable, newEliminationPolynomials, setting );
+		
+	}
 
 	// !PAIRED (single) elimination
 
-	#ifdef GINACRA_CAD_DEBUG
-	cout << "Single elimination of the polynomial " << *p << endl;
-	#endif
-	void (*elimOp)( const UnivariatePolynomialPtr&, const symbol&, EliminationSet&, bool );
-	if( setting.equationsOnly )
-		elimOp = EliminationSet::eliminationEq;
-	else
-		elimOp = EliminationSet::elimination;
-	elimOp( p, variable, newEliminationPolynomials, false );
+	if( setting.equationsOnly ) {
+		eliminationEq( p, variable, newEliminationPolynomials, false );
+	} else {
+		elimination( p, variable, newEliminationPolynomials, false );
+	}
+	
 
 	// optimizations
 	if( setting.simplifyByFactorization )
@@ -349,6 +348,241 @@ std::list<UnivariatePolynomialPtr<Coefficient>> EliminationSet<Coefficient>::eli
 		newEliminationPolynomials.removePolynomialsWithoutRealRoots();
 	// insert the new polynomials of the last step into the new level (now currentLevel)
 	return destination.insert( newEliminationPolynomials );
+}
+
+template<typename Coefficient>
+std::list<UnivariatePolynomialPtr<Coefficient>> EliminationSet<Coefficient>::eliminateConstant(
+		const UnivariatePolynomialPtr<Coefficient>& p,
+		std::list<UnivariatePolynomialPtr<Coefficient>>& queue,
+		std::list<UnivariatePolynomialPtr<Coefficient>>& otherqueue,
+		bool avoidSingle,
+		EliminationSet<Coefficient>& destination,
+		const Variable& variable,
+		const CADSettings& setting
+		)
+{
+	if (isNumber(*p)) /* discard numerics completely */
+	{
+		this->erase(p);
+		return {};
+	}
+	UnivariatePolynomialPtr<Coefficient> pNewVar = std::make_shared<UnivariatePolynomial<Coefficient>>(p->switchVariable(variable));
+	destination.insert(pNewVar, this->getParentsOf(p), avoidSingle);
+	if( setting.removeConstants ) /* remove constant from this level */
+		this->erase(p);
+	else
+	{
+		if (!queue.empty())
+			queue.pop_front();
+		auto queuePosition = std::lower_bound(otherqueue.begin(), otherqueue.end(), p, this->eliminationOrder);
+		if (queuePosition != otherqueue.end())
+			otherqueue.erase(queuePosition);
+	}
+	return { pNewVar };
+}
+
+template<typename Coefficient>
+std::list<UnivariatePolynomialPtr<Coefficient>> EliminationSet<Coefficient>::eliminateNextInto(
+		EliminationSet<Coefficient>& destination,
+		const Variable& variable,
+		const CADSettings& setting,
+		bool synchronous
+		)
+{
+	#ifdef GINACRA_CAD_DEBUG
+	cout << *this << endl;
+	cout << "Single elimination queue: ";
+	for( list<UnivariatePolynomialPtr>::const_iterator i = mSingleEliminationQueue.begin(); i != mSingleEliminationQueue.end(); ++i )
+		cout << **i << "  ";
+	cout << endl << "Paired elimination queue: ";
+	for( list<UnivariatePolynomialPtr>::const_iterator i = mPairedEliminationQueue.begin(); i != mPairedEliminationQueue.end(); ++i )
+		cout << **i << "  ";
+	cout << endl;
+	#endif
+
+	UnivariatePolynomialPtr<Coefficient> p;
+	bool avoidSingle = false;
+	if( mPairedEliminationQueue.empty() )
+	{
+		if( !mSingleEliminationQueue.empty() )
+		{
+			if (p->isConstant()) {
+				return this->eliminateConstant(mSingleEliminationQueue.front(), this->mSingleEliminationQueue, this->mPairedEliminationQueue, false, destination, variable, setting);
+			}
+		}
+		else
+			return {};
+	}
+	else
+	{
+		if (p->isConstant()) {
+			return this->eliminateConstant(this->mPairedEliminationQueue.front(), this->mPairedEliminationQueue, this->mSingleEliminationQueue, false, destination, variable, setting);
+		}
+		avoidSingle = synchronous;
+	}
+
+	EliminationSet<Coefficient> newEliminationPolynomials = EliminationSet(this->liftingOrder, this->eliminationOrder);
+
+	// PAIRED elimination with the new polynomials: (1) together with the existing ones (2) among themselves
+	if( !mPairedEliminationQueue.empty() )
+	{
+		#ifdef GINACRA_CAD_DEBUG
+		cout << "Paired elimination of the polynomial " << *p << ( synchronous ? " synchronously" : " asynchronously" ) << endl;
+		#endif
+		if( setting.equationsOnly ) {
+			// (1) elimination with existing polynomials
+			for (auto pol_it1: this->polynomials)
+				eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+			// (2) elimination with polynomial itself @todo: proof that we do not need that
+			// eliminationEq( p, p, variable, newEliminationPolynomials, setting );	
+		} else {
+			// (1) elimination with existing polynomials
+			for (auto pol_it1: this->polynomials)
+				elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+			// (2) elimination with polynomial itself @todo: proof that we do not need that
+			// elimination( p, p, variable, newEliminationPolynomials, setting );
+		}
+		mPairedEliminationQueue.pop_front();
+	}
+
+	// !PAIRED (single) elimination
+	if( !mSingleEliminationQueue.empty() &&
+			( ( !synchronous || p == mSingleEliminationQueue.front() ) || mPairedEliminationQueue.empty() ) )
+	{
+		p = mSingleEliminationQueue.front();
+		#ifdef GINACRA_CAD_DEBUG
+		cout << "Single elimination of the polynomial " << *p << ( synchronous ? " synchronously" : " asynchronously" ) << endl;
+		#endif
+		if( setting.equationsOnly )
+			eliminationEq( p, variable, newEliminationPolynomials, false );
+		else
+			elimination( p, variable, newEliminationPolynomials, false );
+		
+		mSingleEliminationQueue.pop_front();
+	}
+
+	// optimizations
+	if( setting.simplifyByFactorization )
+		newEliminationPolynomials.factorize();
+	newEliminationPolynomials.makePrimitive();
+	newEliminationPolynomials.makeSquarefree();
+	if( setting.simplifyByRootcounting )
+		newEliminationPolynomials.removePolynomialsWithoutRealRoots();
+	// insert the new polynomials of the last step into the new level (now currentLevel)
+	return destination.insert( newEliminationPolynomials, avoidSingle );
+}
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to, const Variable& variable ) {
+	std::forward_list<UnivariatePolynomialPtr<Coefficient>> toDelete;
+	for (auto p: this->polynomials) {
+		if(p->isConstant()) {
+			if (isNumber(*p)) { // discard numerics completely
+				to.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(p->switchVariable(variable)), this->getParentsOf(p));
+			}	
+			toDelete.push_front(p);
+		}
+	}
+	for (auto p: toDelete) {
+		this->erase(p);
+	}
+}
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::removeConstants() {
+	if (this->empty()) return;
+	std::forward_list<UnivariatePolynomialPtr<Coefficient>> toDelete;
+	for (auto p: this->polynomials) {
+		if (p->isConstant()) {   // found candidate for removal
+			toDelete.push_front(p);
+		}
+	}
+	for (auto p: toDelete) {
+		this->erase(p);
+	}
+}
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::removePolynomialsWithoutRealRoots() {
+	if (this->empty()) return;
+	// collect polynomials which shall be deleted
+	std::forward_list<UnivariatePolynomialPtr<Coefficient>> toDelete;
+	for (auto p: this->polynomials) {
+		if (p->degree() % 2 == 0 && p->isUnivariate())
+		{    // this is a good candidate for having no real roots
+			if( RationalUnivariatePolynomial( *p ).countRealRoots() == 0 )
+				toDelete.push_front(p);
+		}
+	}
+	// delete collected polynomials
+	for (auto p: toDelete) {
+		this->erase(p);
+	}
+}
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::makeSquarefree() {
+	EliminationSet<Coefficient> squarefreeSet(this->liftingOrder, this->eliminationOrder);
+	for (auto p: this->polynomials) {
+		squarefreeSet.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(p->pseudoSepapart() ), this->getParentsOf(p));
+	}
+	std::swap(*this, squarefreeSet);
+}
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::makePrimitive() {
+	EliminationSet<Coefficient> primitiveSet(this->liftingOrder, this->eliminationOrder);
+	for (auto p: this->polynomials) {
+		if (p->isNumber()) continue; // numbers are discarded
+		
+		typename UnderlyingNumberType<Coefficient>::type c = p->pseudeoContent();
+		if( c != 1 && c != 0 ) // only non-trivial content parts are considered
+			primitiveSet.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(p->pseudoPrimpart( c ) ), this->getParentsOf(p) );
+		else
+			primitiveSet.insert(p, this->getParentsOf(p));
+	}
+	
+	std::swap(*this, primitiveSet);
+}
+
+
+template<typename Coefficient>
+void EliminationSet<Coefficient>::factorize() {
+	EliminationSet<Coefficient> factorizedSet(this->liftingOrder, this->eliminationOrder);
+	for (auto p: this->polynomials) {
+		ex factorizedI = GiNaC::factor( GiNaC::mdenom( *p ) * *p );
+		if( GiNaC::is_exactly_a<GiNaC::mul>( factorizedI ) )
+		{    // only proper products are considered, the others can stay as they are
+			#ifdef GINACRA_CAD_DEBUG
+			cout << "Replacing " << **i << " with " << factorizedI << " using " << GiNaC::mdenom( **i ) * **i << endl;
+			#endif
+			// insert the factors and omit the original
+			std::list<UnivariatePolynomialPtr<Coefficient>> parents = this->getParentsOf(p);
+			for (auto f: factorizedI)
+				factorizedSet.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(UnivariatePolynomial<Coefficient>(f, p->variable())), parents);
+		}
+		else
+			factorizedSet.insert(p, this->getParentsOf(p));
+	}
+	std::swap(*this, factorizedSet);
+}
+
+template<typename Coefficient>
+std::ostream& operator<<(std::ostream& os, const EliminationSet<Coefficient>& s) {
+	os << "{ ";
+	for (auto p: s.polynomials) {
+		os << *p << " ";
+//                    os << *p << " [ ";
+//                    for (auto j: s.getParentsOf(p)) {
+//                        if (j == nullptr) os << "0 ";
+//                        else os << *j << " ";
+//                    }
+//                    os << "] ";
+	}
+	os << "}( ";
+	for (auto i: s.mLiftingQueue) os << *i << " ";
+	os << ")";
+	return os;
 }
 
 }
