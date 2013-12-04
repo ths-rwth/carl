@@ -12,6 +12,7 @@
 #include <functional>
 #include <array>
 #include <map>
+#include "../util/SFINAE.h"
 
 namespace carl
 {
@@ -52,6 +53,39 @@ struct is_field<cln::cl_RA>
 
 template<>
 struct is_field<mpq_class>
+{
+	static const bool value = true;
+};
+
+/**
+ * Type trait is_fraction. 
+ * Default is false, but certain types which encode fractions should be set to true. 
+ * Note that we consider integral types to be fractional.
+ */
+template<typename type>
+struct is_fraction
+{
+	static const bool value = false;
+};
+
+template<>
+struct is_fraction<cln::cl_I>
+{
+	static const bool value = true;
+};
+template<>
+struct is_fraction<cln::cl_RA>
+{
+	static const bool value = true;
+};
+
+template<>
+struct is_fraction<mpz_class>
+{
+	static const bool value = true;
+};
+template<>
+struct is_fraction<mpq_class>
 {
 	static const bool value = true;
 };
@@ -162,8 +196,6 @@ struct IntegralT<GFNumber<C>>
 	typedef C type;
 };
 
-
-
 /**
  * Coefficient ring of numbers is just the type of the number. (TODO limit this to numbers)
  */
@@ -184,6 +216,29 @@ struct CoefficientRing<MultivariatePolynomial<C, O, P>>
 {
 	typedef C type;
 };
+
+
+/**
+ * Obtains the underlying number type of a polynomial type.
+ */
+template<typename C>
+struct UnderlyingNumberType
+{
+	typedef C type;
+};
+
+template<typename C>
+struct UnderlyingNumberType<UnivariatePolynomial<C>>
+{
+	typedef typename UnderlyingNumberType<C>::type type;
+};
+
+template<typename C, typename O, typename P>
+struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>
+{
+	typedef typename UnderlyingNumberType<C>::type type;
+};
+
 
 inline cln::cl_I getNum(const cln::cl_RA& rat)
 {
