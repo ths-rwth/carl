@@ -73,7 +73,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	message("using clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ --verbose")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ -DGTEST_USE_OWN_TR1_TUPLE=1")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("using gcc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
@@ -159,7 +159,6 @@ endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-#set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
