@@ -104,6 +104,11 @@ public:
 	bool isZero() const;
 	bool isConstant() const;
 	bool isLinear() const;
+
+	bool isNumber() const
+	{
+		return this->isConstant();
+	}
     
     Definiteness definiteness() const;
 

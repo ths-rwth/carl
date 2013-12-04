@@ -103,6 +103,35 @@ public:
 	}
 
 	/**
+	 * Checks whether the polynomial is only a number.
+     * @return
+     */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	bool isNumber() const
+	{
+		return this->isConstant();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	bool isNumber() const
+	{
+		return this->isConstant() && this->lcoeff().isNumber();
+	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	bool isUnivariate()
+	{
+		return true;
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	bool isUnivariate()
+	{
+		for (auto c: this->coefficients()) {
+			if (!c.isNumber()) return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Get the maximal exponent of the main variable.
 	 * @return 
 	 */
