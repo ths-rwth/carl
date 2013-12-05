@@ -1156,7 +1156,7 @@ bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomia
 }
 
 template<typename C>
-bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, ComparisonOrder order) {
+bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, ComparisonOrder order) const {
 	switch (order) {
 		case CauchyBound: /*{
 			C a = this->cauchyBound();
@@ -1177,11 +1177,16 @@ bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs
 	return lhs.less(rhs, order);
 }
 template<typename C>
-bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
 {
 	if (lhs == nullptr) return rhs != nullptr;
 	if (rhs == nullptr) return true;
 	return lhs->less(*rhs, order);
+}
+template<typename C>
+bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+{
+	return less(lhs.get(), rhs.get(), order);
 }
 
 template<typename C>
@@ -1198,7 +1203,7 @@ public:
 	{
 		return less(lhs, rhs, order);
 	}
-	bool operator()(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs) const
+	bool operator()(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs) const
 	{
 		return less(lhs, rhs, order);
 	}
