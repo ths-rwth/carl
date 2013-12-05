@@ -104,7 +104,7 @@ class DiophantineEquations
 		Polynomial beta(x,GFNumber<Integer>(1,mGf_pk),0);
 		for(unsigned j = 0; j < r-1; ++j)
 		{
-			std::vector<Polynomial> sigma = solveMultivariateDiophantine({q.at(j), a.at(j)}, beta, {}, (unsigned)0);
+			std::vector<Polynomial> sigma = solveMultivariateDiophantine({q.at(j), a.at(j)}, beta, std::map<Variable, Integer>(), (unsigned)0);
 			assert(sigma.size() == 2);
 			beta = sigma.front();
 			s.push_back(sigma.back());
