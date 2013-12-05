@@ -195,20 +195,20 @@ TEST(UnivariatePolynomial, factorization)
     {
         std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
         UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
-        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
+//        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
         for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {
-            std::cout << "           ";
-            if(factor != factors.begin())
-                std::cout << "* ";
-            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
+//            std::cout << "           ";
+//            if(factor != factors.begin())
+//                std::cout << "* ";
+//            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
             EXPECT_NE(0, factor->second);
             for(unsigned i=0; i < factor->second; ++i)
             {
                 productOfFactors *= factor->first;
             }
         }
-        std::cout << std::endl;
+//        std::cout << std::endl;
         EXPECT_EQ(pol, productOfFactors);
     }
     
@@ -222,21 +222,21 @@ TEST(UnivariatePolynomial, factorization)
     UnivariatePolynomial<cln::cl_RA> pol5(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)-1});
     UnivariatePolynomial<cln::cl_RA> pol6 = pol4*pol5*pol5*pol5;
     std::map<unsigned, UnivariatePolynomial<cln::cl_RA>> sffactors = pol6.squareFreeFactorization();
-    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
+//    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
     for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)
     {
-        std::cout << "        ";
-        if(factor != sffactors.begin())
-            std::cout << "* ";
-        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
+//        std::cout << "        ";
+//        if(factor != sffactors.begin())
+//            std::cout << "* ";
+//        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
         EXPECT_NE(0, factor->first);
         for(unsigned i=0; i < factor->first; ++i)
         {
             productOfFactors *= factor->second;
         }
     }
-    std::cout << std::endl;
+//    std::cout << std::endl;
     EXPECT_EQ(pol6, productOfFactors);
 }
 
