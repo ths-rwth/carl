@@ -9,6 +9,8 @@
 
 #include <cln/cln.h>
 #include <gmpxx.h>
+#include <random>
+#include <cmath>
 using namespace carl;
 
 TEST(UnivariatePolynomial, Constructor)
@@ -166,16 +168,40 @@ TEST(UnivariatePolynomial, factorization)
     
     std::vector<UnivariatePolynomial<cln::cl_RA>> polys = {linA, linC, linE, quaA, quaB, polA, polB, polC, polD, polE, polF, polG, polH, polI};
     
+    unsigned seed = 21344325;
+    std::default_random_engine generator (seed);
+    for(int e = 2; e <= 10; ++e)
+    {
+        std::cauchy_distribution<double> distribution(0.0,3.0+10.0*std::pow(0.9,e));
+        for(int j=0; j<10; ++j)
+        {
+            std::vector<cln::cl_RA> coeffs;
+            for(int i=0; i<=e; ++i)
+            {
+                double ran = distribution(generator);
+                int coe = (ran > INT_MAX || ran < INT_MIN) ? 0 : (int) ran;
+                coeffs.push_back((cln::cl_RA) coe);
+            }
+            if(coeffs.back() == (cln::cl_RA) 0)
+            {
+                coeffs.back() = (cln::cl_RA) 1;
+            }
+            UnivariatePolynomial<cln::cl_RA> randomPol(x, coeffs);
+            polys.push_back(randomPol);
+        }
+    }
+    
     for(UnivariatePolynomial<cln::cl_RA> pol : polys)
     {
         std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
         UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
-        std::cout << "Factorization of  " << pol << "  is  ";
+        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
         for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {
+            std::cout << "           ";
             if(factor != factors.begin())
-                std::cout << " * ";
-            std::cout << "(" << factor->first << ")^" << factor->second;
+                std::cout << "* ";
+            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
             EXPECT_NE(0, factor->second);
             for(unsigned i=0; i < factor->second; ++i)
             {
@@ -196,13 +222,14 @@ TEST(UnivariatePolynomial, factorization)
     UnivariatePolynomial<cln::cl_RA> pol5(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)-1});
     UnivariatePolynomial<cln::cl_RA> pol6 = pol4*pol5*pol5*pol5;
     std::map<unsigned, UnivariatePolynomial<cln::cl_RA>> sffactors = pol6.squareFreeFactorization();
-    std::cout << "Square free factorization of  " << pol6 << "  is  ";
+    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
     for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)
     {
+        std::cout << "        ";
         if(factor != sffactors.begin())
-            std::cout << " * ";
-        std::cout << "(" << factor->second << ")^" << factor->first;
+            std::cout << "* ";
+        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
         EXPECT_NE(0, factor->first);
         for(unsigned i=0; i < factor->first; ++i)
         {

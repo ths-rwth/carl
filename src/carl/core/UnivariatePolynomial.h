@@ -6,6 +6,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <memory>
 
 #include "Variable.h"
 #include "VariableInformation.h"
@@ -19,6 +20,11 @@
 
 namespace carl
 {
+
+template<typename Coefficient> class UnivariatePolynomial;
+	
+template<typename Coefficient>
+using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
 template<typename C, typename O, typename P>
 class MultivariatePolynomial;
@@ -202,19 +208,32 @@ public:
     std::map<UnivariatePolynomial, unsigned> factorization() const;
     
     template<typename Integer>
-    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum );
+    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum = 0 );
     
     Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 
 	template<typename C>
-	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	template<typename C>
+	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	
+	enum ComparisonOrder {
+		CauchyBound, LowDegree, Memory, Default = Memory
+	};
+	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default);
+	template<typename C>
+	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomialPtr<C>::ComparisonOrder order);
+	template<typename C>
+	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomialPtr<C>::ComparisonOrder order);
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 

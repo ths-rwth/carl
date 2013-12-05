@@ -68,10 +68,12 @@ endforeach()
 # path to put in the executables after building.
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for builed executables")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
+
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	message("using clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ -DGTEST_USE_OWN_TR1_TUPLE=1")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("using gcc")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
@@ -79,6 +81,7 @@ else()
 	message("possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
 endif()
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 if(DEVELOPER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion ")
 endif()
@@ -156,7 +159,7 @@ endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
+set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
 

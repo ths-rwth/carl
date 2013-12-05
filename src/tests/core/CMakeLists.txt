@@ -6,7 +6,7 @@ add_executable( runCoreTests
 				Test_Term.cpp
 				Test_MultivariatePolynomial.cpp
 				Test_UnivariatePolynomial.cpp
-				Test_MultivariateHensel.cpp
+				#Test_MultivariateHensel.cpp
 #				Test_MultivariateGCD.cpp
 				
 				 )
