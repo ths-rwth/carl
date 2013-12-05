@@ -1,17 +1,13 @@
 #include "gtest/gtest.h"
 
 #include <memory>
+#include <list>
 
-#include "carl/core/UnivariatePolynomial.h"
-//#include "carl/cad/EliminationSet.h"
+#include "carl/cad/ConflictGraph.h"
 
-//using namespace carl;
+using namespace carl;
 
-TEST(EliminationSet, Construction)
-{  /*
-	VariablePool& vpool = VariablePool::getInstance();
-	Variable x = vpool.getFreshVariable();
-
-	CAD::EliminationSet<int> s;
-	s.insert(std::make_shared<UnivariatePolynomial<int>>(x));*/
+TEST(ConflictGraph, BasicOperations)
+{  
+	CAD::ConflictGraph cg;
 }
