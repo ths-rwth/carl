@@ -305,7 +305,148 @@ class FLOAT_T<mpfr_t>
             mpfr_log(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
+        FLOAT_T<mpfr_t>& tan_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_tan(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
 
+        void tan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_tan(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& asin_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_asin(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void asin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_asin(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& acos_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_acos(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void acos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_acos(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& atan_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_atan(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void atan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_atan(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& sinh_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_sinh(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void sinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_sinh(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& cosh_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_cosh(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void cosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_cosh(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& tanh_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_tanh(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void tanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_tanh(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        FLOAT_T<mpfr_t>& asinh_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_asinh(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void asinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_asinh(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+        
+        FLOAT_T<mpfr_t>& acosh_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_acosh(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void acosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_acosh(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+        
+        FLOAT_T<mpfr_t>& atanh_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_atanh(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void atanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_atanh(_result, mValue, mpfr_rnd_t(_rnd));
+        }
+
+        void floor(int& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_t result;
+            mpfr_init(result);
+            mpfr_set_zero(result, 1);
+            mpfr_rint_floor(result, mValue, mpfr_rnd_t(_rnd));
+            _result = mpfr_integer_p(result);
+            mpfr_clear(result);
+        }
+
+        FLOAT_T& floor_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_rint_floor(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+
+        void ceil(int& _result, CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_t result;
+            mpfr_init(result);
+            mpfr_set_zero(result, 1);
+            mpfr_rint_ceil(result, mValue, mpfr_rnd_t(_rnd));
+            _result = mpfr_integer_p(result);
+            mpfr_clear(result);
+        }
+
+        FLOAT_T& ceil_assign(CARL_RND _rnd = CARL_RNDN)
+        {
+            mpfr_rint_ceil(mValue, mValue, mpfr_rnd_t(_rnd));
+            return *this;
+        }
+        
         /**
          * conversion operators
          */

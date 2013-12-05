@@ -47,7 +47,6 @@ namespace carl
     };
     
     template<typename FloatType>
-    class FLOAT_T
     {
         private:
             FloatType mValue;
@@ -322,7 +321,139 @@ namespace carl
             {
                 _result.mValue = log(mValue);
             }
+            
+            FLOAT_T& tan_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = tan(mValue);
+                return *this;
+            }
+            
+            void tan(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = tan(mValue);
+            }
+            
+            FLOAT_T& asin_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = asin(mValue);
+                return *this;
+            }
+            
+            void asin(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = asin(mValue);
+            }
+            
+            FLOAT_T& acos_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = acos(mValue);
+                return *this;
+            }
+            
+            void acos(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = acos(mValue);
+            }
+            
+            FLOAT_T& atan_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = atan(mValue);
+                return *this;
+            }
+            
+            void atan(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = atan(mValue);
+            }
 
+            FLOAT_T& sinh_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = sinh(mValue);
+                return *this;
+            }
+            
+            void sinh(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = sinh(mValue);
+            }
+            
+            FLOAT_T& cosh_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = cosh(mValue);
+                return *this;
+            }
+            
+            void cosh(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = cosh(mValue);
+            }
+            
+            FLOAT_T& tanh_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = tanh(mValue);
+                return *this;
+            }
+            
+            void tanh(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = tanh(mValue);
+            }
+            
+            FLOAT_T& asinh_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = asinh(mValue);
+                return *this;
+            }
+            
+            void asinh(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = asinh(mValue);
+            }
+            
+            FLOAT_T& acosh_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = acosh(mValue);
+                return *this;
+            }
+            
+            void acosh(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = acosh(mValue);
+            }
+            
+            FLOAT_T& atanh_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = atanh(mValue);
+                return *this;
+            }
+            
+            void atanh(FLOAT_T& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result.mValue = atanh(mValue);
+            }
+            
+            void floor(int& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result = floor(mValue);
+            }
+            
+            FLOAT_T& floor_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = floor(mValue);
+                return *this;
+            }
+            
+            void ceil(int& _result, CARL_RND _rnd = CARL_RNDN)
+            {
+                _result = ceil(mValue);
+            }
+            
+            FLOAT_T& ceil_assign(CARL_RND _rnd = CARL_RNDN)
+            {
+                mValue = ceil(mValue);
+                return *this;
+            }
+            
             /**
              * conversion operators
              */
