@@ -340,7 +340,7 @@ namespace carl
 
     DoubleInterval DoubleInterval::power( unsigned _exp ) const
     {
-		assert(_exp <= INT_MAX );
+        assert(_exp <= INT_MAX );
         if( _exp % 2 == 0 )
         {
             if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
