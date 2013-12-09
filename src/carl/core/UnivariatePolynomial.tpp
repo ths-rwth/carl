@@ -65,14 +65,6 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 }
 
 template<typename Coeff>
-template<typename T>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, T>& varinfoWithCoefficients)
-: UnivariatePolynomial(mainVar, varinfoWithCoefficients.coeffs())
-{
-	
-}
-
-template<typename Coeff>
 Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const 
 {
 	Coeff result(0);

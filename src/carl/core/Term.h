@@ -167,7 +167,6 @@ class Term
 		
 		Term calcLcmAndDivideBy( const Monomial&) const;
         
-		
         Term* derivative(Variable::Arg) const;
         
         Definiteness definiteness() const;
