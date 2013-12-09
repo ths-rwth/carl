@@ -11,6 +11,7 @@
 
 #include "Polynomial.h"
 #include "Term.h"
+#include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
 
@@ -188,7 +189,7 @@ public:
 	
 	bool isReducibleIdentity() const;
 
-	MultivariatePolynomial divideBy(const MultivariatePolynomial& divisor) const;
+	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
 	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
 	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
@@ -262,10 +263,6 @@ public:
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename O, typename P>
-	friend bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>

@@ -575,10 +575,58 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg mainVar) const
 {
-	
-	LOG_NOTIMPLEMENTED();
+	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(mainVar, getVarInfo<true>(mainVar));
 }
 
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::mod(const typename IntegralT<C>::type& modulo) const
+{
+	assert(modulo != 0);
+	MultivariatePolynomial<C,O,P> result;
+	result.mTerms.reserve(mTerms.size());
+	for(std::shared_ptr<const Term<C>> t : mTerms)
+	{
+		C m = carl::mod(t->coeff(), modulo);
+		if(m != 0)
+		{
+			result.mTerms.emplace_back(new Term<C>(m, t->monomial()));
+		}
+	}
+}
+
+template<typename C, typename O, typename P>
+DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::divideBy(const MultivariatePolynomial& divisor) const
+{
+	DivisionResult<MultivariatePolynomial<C,O,P>> res;
+	MultivariatePolynomial<C,O,P> p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->dividedBy(*divisor.lterm());
+		if(factor != nullptr)
+		{
+			
+			res.quotient += *factor;
+			p -= *factor * divisor;
+		}
+		else
+		{
+			res.remainder += *(p.lterm());
+			p.stripLT();
+		}
+		delete factor;
+	}
+	return res;
+}
+
+/**
+ * @param dividant 
+ * @return 
+ */
+template<typename C, typename O, typename P>
+bool MultivariatePolynomial<C,O,P>::divides(const MultivariatePolynomial<C,O,P>& dividant) const
+{
+	return !dividant.divideBy(*this).remainder.isZero();
+}
 
 template<typename C, typename O, typename P>
 bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
@@ -603,17 +651,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
 {
     return rhs == lhs;
 }
-template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
-{
-    LOG_NOTIMPLEMENTED();
-    return false;
-}
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
-{
-    return rhs == lhs;
-}
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
@@ -1552,6 +1590,22 @@ template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs * lhs;
+}
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P>& MultivariatePolynomial<C,O,P>::operator/=(const MultivariatePolynomial& rhs)
+{
+	assert(!rhs.isZero());
+	*this = divideBy(rhs).quotient;
+	return *this;
+}
+
+template<typename C, typename O, typename P>
+const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+{
+	MultivariatePolynomial<C,O,P> res(lhs);
+	res /= rhs;
+	return res;
 }
 
 template<typename C, typename O, typename P>
