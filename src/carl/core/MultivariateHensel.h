@@ -18,6 +18,13 @@
  */
 namespace carl
 {
+
+/**
+ * Includes the algorithms 6.2 and 6.3 from the book 
+ * Algorithms for Computer Algebra by Geddes, Czaper, Labahn.
+ * 
+ * The Algorithms are used to computer the Multivariate GCD.
+ */
 template<typename Integer>
 class DiophantineEquations
 {
@@ -163,11 +170,13 @@ class DiophantineEquations
 			modulus *= p;
 		}
 		assert((s.toFiniteDomain(mGf_pk)*a + t.toFiniteDomain(mGf_pk)*b).isOne());
-		return {s,t};
-		
+		return {s,t};	
 	}
-	
-	
-	
+};
+
+class MultivariateHensel
+{
+	static std::list<UnivReprPol> calculate()
+	{}
 };
 }
