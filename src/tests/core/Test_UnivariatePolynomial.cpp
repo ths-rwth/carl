@@ -1,4 +1,3 @@
-
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
@@ -58,21 +57,27 @@ TEST(UnivariatePolynomial, GCD)
 	UnivariatePolynomial<cln::cl_RA> v(x, {(cln::cl_RA)1, (cln::cl_RA)1});
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
 	UnivariatePolynomial<cln::cl_RA> g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,v,s,t);
-	std::cout << g << std::endl;
-    std::cout << s << std::endl;
-    std::cout << t << std::endl;
-	g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(v,p,s,t);
-	std::cout << g << std::endl;
-    std::cout << s << std::endl;
-    std::cout << t << std::endl;
+	EXPECT_EQ(v,g);
+	EXPECT_EQ((cln::cl_RA)0,s);
+	EXPECT_EQ((cln::cl_RA)1,t);
+    g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(v,p,s,t);
+	EXPECT_EQ(v,g);
+	EXPECT_EQ((cln::cl_RA)1,s);
+	EXPECT_EQ((cln::cl_RA)0,t);
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(v,p);
+	EXPECT_EQ(v,g);
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(p,v);
+	EXPECT_EQ(v,g);
 	
-	
+    
     UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)-6, (cln::cl_RA)-5,(cln::cl_RA)1});
     //std::cout << "gcd" << UnivariatePolynomial<cln::cl_RA>::gcd(p,q) << std::endl;
     g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,q,s,t);
-    std::cout << g << std::endl;
-    std::cout << s << std::endl;
-    std::cout << t << std::endl;
+    EXPECT_EQ(v,g);
+	EXPECT_EQ((cln::cl_RA)1/(cln::cl_RA)12,s);
+    EXPECT_EQ((cln::cl_RA)-1/(cln::cl_RA)12,t);
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(p,q);
+	EXPECT_EQ(v,g);
 	
     UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)0, (mpz_class)2});
 	const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
@@ -86,7 +91,12 @@ TEST(UnivariatePolynomial, GCD)
 	std::cout << s1 << std::endl;
 	std::cout << gp << std::endl;
     
-    
+    UnivariatePolynomial<cln::cl_RA> pola(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
+	UnivariatePolynomial<cln::cl_RA> polb(x, {(cln::cl_RA)5, (cln::cl_RA)-10, (cln::cl_RA)9});
+	g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(pola,polb,s,t);
+	std::cout << g << std::endl;
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(pola,polb);
+	std::cout << g << std::endl;
 }
 
 
