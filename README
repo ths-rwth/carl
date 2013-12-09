@@ -61,7 +61,7 @@ We have tested on the following platforms:
 Arch Linux (Kernel 3.10) with GCC 4.8.2
 Arch Linux (Kernel 3.10) with Clang 3.3
 Ubuntu 12.04 LTS with GCC 4.7.3
-
+Ubuntu 13.10 with GCC 4.8.1
 
 For more information see:
 https://sselab.de/lab9/private/intwiki/smtrat/index.php?title=Arithmetic_Lib
