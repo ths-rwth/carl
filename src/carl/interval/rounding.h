@@ -10,7 +10,7 @@
  */
 
 #pragma once
-#include "../../numbers/FLOAT_T.h"
+#include "../numbers/FLOAT_T.h"
 
 namespace carl
 {
@@ -18,8 +18,8 @@ namespace carl
     struct rounding 
     {
         // default constructor, destructor
-        rounding();
-        ~rounding();
+//        rounding();
+//        ~rounding();
         // mathematical operations
         FLOAT_T<FloatImplementation> add_down(FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
         {
@@ -266,9 +266,18 @@ namespace carl
             return result;
         }
         // conversion functions
-        FLOAT_T<FloatImplementation> conv_down(U);
-        FLOAT_T<FloatImplementation> conv_up  (U);
+        template<typename U>
+        FLOAT_T<FloatImplementation> conv_down(U _val)
+        {
+            return FLOAT_T<FloatImplementation>(_val, CARL_RND::CARL_RNDD);
+        }
+        
+        template<typename U>
+        FLOAT_T<FloatImplementation> conv_up(U _val)
+        {
+            return FLOAT_T<FloatImplementation>(_val, CARL_RND::CARL_RNDU);
+        }
         // unprotected rounding class
-    typedef ... unprotected_rounding;
+//    typedef ... unprotected_rounding;
     };
 }

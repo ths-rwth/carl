@@ -63,22 +63,22 @@ namespace carl
                 mValue = 0;
             }
             
-            FLOAT_T<FloatType>(const double _double)
+            FLOAT_T<FloatType>(const double _double, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
             {
                 mValue = _double;
             }
             
-            FLOAT_T<FloatType>(const float _float)
+            FLOAT_T<FloatType>(const float _float, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
             {
                 mValue = _float;
             }
             
-            FLOAT_T<FloatType>(const int _int)
+            FLOAT_T<FloatType>(const int _int, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
             {
                 mValue = _int;
             }
 
-            FLOAT_T<FloatType>(const double _double, precision _prec){}
+            FLOAT_T<FloatType>(const double _double, precision _prec, const CARL_RND _rnd=CARL_RND::CARL_RNDN){}
 
 //            template<>
 //            FLOAT_T<double>(const double _double, CARL_RND _rnd, precision _prec)
@@ -469,10 +469,35 @@ namespace carl
                 return ostr;
             }
             
-//            friend bool operator== (const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
-//            {
-//                return _lhs.mValue == _rhs.mValue;
-//            }
+            friend bool operator== (const FLOAT_T<FloatType>& _lhs, const int _rhs)
+            {
+                return _lhs.mValue == _rhs;
+            }
+            
+            friend bool operator== (const int _lhs, const FLOAT_T<FloatType>& _rhs)
+            {
+                return _rhs == _lhs;
+            }
+            
+            friend bool operator== (const FLOAT_T<FloatType>& _lhs, const double _rhs)
+            {
+                return _lhs.mValue == _rhs;
+            }
+            
+            friend bool operator== (const double _lhs, const FLOAT_T<FloatType>& _rhs)
+            {
+                return _rhs == _lhs;
+            }
+            
+            friend bool operator== (const FLOAT_T<FloatType>& _lhs, const float _rhs)
+            {
+                return _lhs.mValue == _rhs;
+            }
+            
+            friend bool operator== (const float _lhs, const FLOAT_T<FloatType>& _rhs)
+            {
+                return _rhs == _lhs;
+            }
             
             /**
              * Operators

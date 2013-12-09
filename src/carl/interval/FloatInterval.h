@@ -71,16 +71,22 @@ public:
             mRightType = BoundType::INFTY;
         }
 
+        FloatInterval<FloatImplementation>(const float_t& _left, BoundType _leftType, const float_t& _right, BoundType _rightType) : 
+                mInterval(BoostFloatInterval(_left,_right)),
+                mLeftType(_leftType),
+                mRightType(_rightType)
+        {}
+        
 	/** Creates point interval at n
 	 * @param n
 	 * @param overapproximate compute the approximations of the given bounds so that the interval is an over-approximation of the corresponding OpenInterval; otherwise under-approximate (default: false)
 	 */
-	FloatInterval<FloatImplementation>(const FloatImplementation& n)
+	FloatInterval<FloatImplementation>(const float_t& n)
         {
             FloatInterval<FloatImplementation>(n, BoundType::WEAK, n, BoundType::WEAK);
         }
 	
-	FloatInterval<FloatImplementation>(int n) : FloatInterval((FloatImplementation)n)  {}
+	FloatInterval<FloatImplementation>(int n) : FloatInterval( float_t(n) )  {}
 
 	/** Creates (preferably point) interval at n
 	 * @param n
@@ -123,7 +129,7 @@ public:
 	 */
 	FloatInterval<FloatImplementation>(double left, BoundType leftType, double right, BoundType rightType)
         {
-            FloatInterval<FloatImplementation>((float_t)left, leftType, (float_t)right, rightType);
+            FloatInterval<FloatImplementation>(float_t(left), leftType, float_t(right), rightType);
         }
         
 	FloatInterval<FloatImplementation>(int left, BoundType leftType, double right, BoundType rightType) :
@@ -137,7 +143,7 @@ public:
 
 	/** Destructor.
 	 */
-	~FloatInterval();
+	~FloatInterval<FloatImplementation>(){}
 
 	///////////////////////
 	//  Getter & Setter  //
@@ -273,7 +279,7 @@ public:
             {
                 mLeftType   = BoundType::STRICT;
                 mRightType  = BoundType::STRICT;
-                mInterval = BoostDoubleInterval( 0 );
+                mInterval = BoostFloatInterval( 0 );
             }
         }
 
@@ -291,7 +297,7 @@ public:
             {
                 mLeftType   = BoundType::STRICT;
                 mRightType  = BoundType::STRICT;
-                mInterval = BoostDoubleInterval( 0 );
+                mInterval = BoostFloatInterval( 0 );
             }
         }
         
@@ -329,7 +335,7 @@ public:
             float_t diameter = this->diameter();
             diameter /= n;
 
-            DoubleInterval tmp;
+            FloatInterval tmp;
             tmp.set(left(), left()+diameter);
             tmp.setLeftType(leftType());
             tmp.setRightType(BoundType::STRICT);
@@ -365,7 +371,7 @@ public:
 	 */
 	FloatInterval<FloatImplementation> add(const FloatInterval<FloatImplementation>& o) const
         {
-            return DoubleInterval( mInterval + o.content(),
+            return FloatInterval( mInterval + o.content(),
                       getWeakestBoundType( mLeftType, o.mLeftType ),
                       getWeakestBoundType( mRightType, o.mRightType ) );
         }
@@ -375,7 +381,7 @@ public:
 	 */
 	FloatInterval<FloatImplementation> inverse() const
         {
-            return DoubleInterval( -right(), mRightType, -left(), mLeftType );
+            return FloatInterval( -right(), mRightType, -left(), mLeftType );
         }
 
 	/** Returns the negative value.
@@ -390,21 +396,21 @@ public:
             float_t lvalue = (mLeftType == BoundType::INFTY || left() < 0) ? 0 : left();
             float_t rvalue = (mRightType == BoundType::INFTY || right() < 0) ? 0 : right();
             if( lvalue > rvalue && mRightType == BoundType::INFTY ) rvalue = lvalue;
-            BoostDoubleInterval content = boost::numeric::sqrt( BoostDoubleInterval( lvalue, rvalue ) ); //TODO: Sure to take boost::numeric::sqrt?
+            BoostFloatInterval content = boost::numeric::sqrt( BoostFloatInterval( lvalue, rvalue ) ); //TODO: Sure to take boost::numeric::sqrt?
             BoundType leftType = mLeftType;
             BoundType rightType = mRightType;
             if( mLeftType == BoundType::INFTY || left() < 0 )
             {
                 leftType = BoundType::WEAK;
             }
-            return DoubleInterval( content, leftType, rightType );
+            return FloatInterval( content, leftType, rightType );
         }
 
 	/** Multiplies two intervals and returns their product.
 	 * @param o
 	 * @return product
 	 */
-	FloatInterval<FloatImplementation> mul(const FloatInterval<FloatImplementation>& o) const
+	FloatInterval<FloatImplementation> mul(const FloatInterval<FloatImplementation>& _interval) const
         {
             BoundType leftType = BoundType::WEAK;
             BoundType rightType = BoundType::WEAK;
@@ -422,7 +428,7 @@ public:
             {
                 rightType = BoundType::INFTY;
             }
-            return DoubleInterval( BoostDoubleInterval( mInterval*_interval.content() ), leftType, rightType );
+            return FloatInterval( BoostFloatInterval( mInterval*_interval.content() ), leftType, rightType );
         }
 
 	/** Divides two intervals.
@@ -430,7 +436,7 @@ public:
 	 * @return this interval divided by the argument
 	 * @throws invalid_argument in case the argument interval contains zero
 	 */
-	FloatInterval<FloatImplementation> div(const FloatInterval<FloatImplementation>& o) const throw ( std::invalid_argument)
+	FloatInterval<FloatImplementation> div(const FloatInterval<FloatImplementation>& _interval) const throw ( std::invalid_argument)
         {
             if( _interval.contains( 0 ) ) throw ( std::invalid_argument( "Division by interval containing zero not allowed." ) );
             BoundType leftType = BoundType::WEAK;
@@ -449,7 +455,7 @@ public:
             {
                 rightType = BoundType::INFTY;
             }
-            return DoubleInterval( BoostDoubleInterval( mInterval/_interval.content() ), leftType, rightType );
+            return FloatInterval( BoostFloatInterval( mInterval/_interval.content() ), leftType, rightType );
         }
 
 	/** Extended Intervaldivision with intervals containing 0
@@ -516,35 +522,35 @@ public:
 	 * @param e exponent
 	 * @return power to <code>e</code> of this interval
 	 */
-	FloatInterval<FloatImplementation> power(unsigned e) const
+	FloatInterval<FloatImplementation> power(unsigned _exp) const
         {
             assert(_exp <= INT_MAX );
             if( _exp % 2 == 0 )
             {
                 if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
                 {
-                    return DoubleInterval();
+                    return FloatInterval();
                 }
                 else if( mLeftType == BoundType::INFTY )
                 {
                     if( contains( 0 ) )
                     {
-                        return DoubleInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
+                        return FloatInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
                     }
                     else
                     {
-                        return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), mRightType, BoundType::INFTY ); //TODO: Use boost::numeric::pow?
+                        return FloatInterval( boost::numeric::pow( mInterval, (int)_exp ), mRightType, BoundType::INFTY ); //TODO: Use boost::numeric::pow?
                     }
                 }
                 else if( mRightType == BoundType::INFTY )
                 {
                     if( contains( 0 ) )
                     {
-                        return DoubleInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
+                        return FloatInterval( 0, BoundType::WEAK, 0, BoundType::INFTY );
                     }
                     else
                     {
-                        return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), mLeftType, BoundType::INFTY ); //TODO: Use boost::numeric::pow?
+                        return FloatInterval( boost::numeric::pow( mInterval, (int)_exp ), mLeftType, BoundType::INFTY ); //TODO: Use boost::numeric::pow?
                     }
                 }
                 else
@@ -558,17 +564,17 @@ public:
                     }
                     if( contains( 0 ) )
                     {
-                        return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), BoundType::WEAK, rType ); //TODO: Use boost::numeric::pow?
+                        return FloatInterval( boost::numeric::pow( mInterval, (int)_exp ), BoundType::WEAK, rType ); //TODO: Use boost::numeric::pow?
                     }
                     else
                     {
-                        return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), lType, rType ); //TODO: Use boost::numeric::pow?
+                        return FloatInterval( boost::numeric::pow( mInterval, (int)_exp ), lType, rType ); //TODO: Use boost::numeric::pow?
                     }
                 }
             }
             else
             {
-                return DoubleInterval( boost::numeric::pow( mInterval, (int)_exp ), mLeftType, mRightType ); //TODO: Use boost::numeric::pow?
+                return FloatInterval( boost::numeric::pow( mInterval, (int)_exp ), mLeftType, mRightType ); //TODO: Use boost::numeric::pow?
             }
         }
 
@@ -589,21 +595,21 @@ public:
                 if( mLeftType == BoundType::INFTY )
                 {
                     a = FloatInterval<FloatImplementation>( 0, BoundType::INFTY, 0, BoundType::WEAK );
-                    b = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( right() ), BoundType::WEAK, BoundType::INFTY );
+                    b = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( right() ), BoundType::WEAK, BoundType::INFTY );
                 }
                 else if( mRightType == BoundType::INFTY )
                 {
-                    a = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( left() ), BoundType::INFTY, BoundType::WEAK );
+                    a = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( left() ), BoundType::INFTY, BoundType::WEAK );
                     b = FloatInterval<FloatImplementation>( 0, BoundType::WEAK, 0, BoundType::INFTY );
                 }
                 else if( left() == 0 && right() != 0 )
                 {
                     a = FloatInterval<FloatImplementation>( 0, BoundType::INFTY, 0, BoundType::INFTY );
-                    b = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( right() ), BoundType::WEAK, BoundType::INFTY );
+                    b = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( right() ), BoundType::WEAK, BoundType::INFTY );
                 }
                 else if( left() != 0 && right() == 0 )
                 {
-                    a = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( left() ), BoundType::INFTY, BoundType::WEAK );
+                    a = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( left() ), BoundType::INFTY, BoundType::WEAK );
                     b = unboundedInterval(); // todo: really the whole interval here?
                 }
                 else if( left() == 0 && right() == 0 )
@@ -613,8 +619,8 @@ public:
                 }
                 else
                 {
-                    a = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( left() ), BoundType::INFTY, BoundType::WEAK );
-                    b = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( right() ), BoundType::WEAK, BoundType::INFTY );
+                    a = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( left() ), BoundType::INFTY, BoundType::WEAK );
+                    b = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( right() ), BoundType::WEAK, BoundType::INFTY );
                 }
                 return true;
             }
@@ -638,15 +644,15 @@ public:
                 }
                 else if( left() != 0 && right() != 0 )
                 {
-                    a = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / mInterval, mRightType, mLeftType );
+                    a = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / mInterval, mRightType, mLeftType );
                 }
                 else if( left() == 0 && right() != 0 )
                 {
-                    a = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( right() ), mRightType, BoundType::INFTY );
+                    a = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( right() ), mRightType, BoundType::INFTY );
                 }
                 else if( left() != 0 && right() == 0 )
                 {
-                    a = FloatInterval<FloatImplementation>( BoostFloatInterval<FloatImplementation>( 1 ) / BoostFloatInterval<FloatImplementation>( left() ), BoundType::INFTY, mLeftType );
+                    a = FloatInterval<FloatImplementation>( BoostFloatInterval( 1 ) / BoostFloatInterval( left() ), BoundType::INFTY, mLeftType );
                 }
 
                 return false;
@@ -691,7 +697,7 @@ public:
             float_t pi_lo = 0;
 
             right().div(tmp_up, pi_lo, CARL_RND::CARL_RNDU);
-            left().div(tmp_low, pi_up, CARL_RND::CARL_RNDD);
+            left().div(tmp_lo, pi_up, CARL_RND::CARL_RNDD);
             tmp_up.mul_assign(2, CARL_RND::CARL_RNDU);
             tmp_lo.mul_assign(2, CARL_RND::CARL_RNDD);
 
@@ -819,7 +825,7 @@ public:
             float_t pi_lo = 0;
 
             right().div(tmp_up, pi_lo, CARL_RND::CARL_RNDU);
-            left().div(tmp_low, pi_up, CARL_RND::CARL_RNDD);
+            left().div(tmp_lo, pi_up, CARL_RND::CARL_RNDD);
             tmp_up.mul_assign(2, CARL_RND::CARL_RNDU);
             tmp_lo.mul_assign(2, CARL_RND::CARL_RNDD);
 
@@ -1194,7 +1200,7 @@ public:
             res.add_assign(left());
             res.add_assign(right());
             res.div_assign((float_t)2);
-            res = getWeakestBoundType( mLeftType, mRightType ) == BoundType::INFTY ? 0.0;
+            res = getWeakestBoundType( mLeftType, mRightType ) == BoundType::INFTY ? float_t(0): res;
             if( res < left() ) return left();
             if( res > right() ) return right();
             return res;
@@ -1210,7 +1216,7 @@ public:
             float_t res;
             BoundType rbt = ( mLeftType != BoundType::INFTY && mRightType != BoundType::INFTY ) ? (std::abs( left() ) <= std::abs( right() ) ? mRightType : mLeftType ) : BoundType::INFTY;
             BoundType lbt = ( mLeftType == BoundType::STRICT && left() >= 0 ) ? BoundType::STRICT : BoundType::WEAK;
-            return DoubleInterval( boost::numeric::abs( mInterval ), lbt, rbt );
+            return FloatInterval( boost::numeric::abs( mInterval ), lbt, rbt );
         }
 
 	///////////////////////////
@@ -1221,24 +1227,80 @@ public:
 	 * @param o
 	 * @return true in case the other interval equals this
 	 */
-	bool isEqual(const FloatInterval<FloatImplementation>& o) const;
+	bool isEqual(const FloatInterval<FloatImplementation>& _interval) const
+        {
+            if( mLeftType != _interval.leftType() || mRightType != _interval.rightType() )
+            {
+                return false;
+            }
+            else
+            {
+    //            return ( ( mInterval == _interval.content() ) == True );
+                return boost::numeric::equal(mInterval, _interval.content()); // TODO: Sure to use boost::numeric::equal
+            }
+        }
 
 	/** Checks whether the left bound of this interval is less or equal the left bound of the other interval.
 	 * @param o
 	 * @return true if the left bound of this interval is less or equal the left bound of the other interval
 	 */
-	bool isLessOrEqual(const FloatInterval<FloatImplementation>& o) const;
+	bool isLessOrEqual(const FloatInterval<FloatImplementation>& o) const
+        {
+            /**  -----|------------|------------    <=
+            *  ----------|------------|-------
+            * or
+            *  -----|------------|------------ <=
+            *  ----------|-----|-------------- holds.
+            */
+           // only compare left bounds
+           switch( mLeftType )
+           {
+               case BoundType::INFTY:
+                   return o.mLeftType == BoundType::INFTY;
+               default:
+                   return (left() <= o.left() );
+           }
+        }
 
 	/** Checks whether the right bound of this interval is greater or equal the right bound of the other interval
 	 * @param o
 	 * @return true if the right bound of this interval is greater or equal the right bound of the other interval
 	 */
-	bool isGreaterOrEqual(const FloatInterval<FloatImplementation>& o) const;
+	bool isGreaterOrEqual(const FloatInterval<FloatImplementation>& o) const
+        {
+            /**  ----------]------------[-------    >=
+            *  -----]------------[------------
+            * or
+            *  ----------]------------[------- >=
+            *  -------------]----[------------ holds.
+            */
+           // only compare right bounds
+           switch( mRightType )
+           {
+               case BoundType::INFTY:
+                   return o.mRightType == BoundType::INFTY;
+               default:
+                   return (right() >= o.right() );
+           }
+        }
 
 	/**
 	 * Prints out the Interval
 	 */
-	void dbgprint() const;
+	void dbgprint() const
+        {
+            std::cout.precision( 30 );
+            if( mLeftType == BoundType::INFTY )
+                std::cout << "]-infinity";
+            else
+                std::cout << (mLeftType == BoundType::STRICT ? "]" : "[") << left();
+            std::cout << ", ";
+            if( mRightType == BoundType::INFTY )
+                std::cout << "infinity[";
+            else
+                std::cout << right() << (mRightType == BoundType::WEAK ? "]" : "[") << std::endl;
+            std::cout.precision( 0 );
+        }
 
 
 	////////////////////
@@ -1251,7 +1313,7 @@ public:
 	 */
 	static FloatInterval<FloatImplementation> emptyInterval()
 	{
-		return FloatInterval<FloatImplementation>(BoostFloatInterval(0), BoundType::STRICT, BoundType::STRICT);
+            return FloatInterval<FloatImplementation>(BoostFloatInterval(0), BoundType::STRICT, BoundType::STRICT);
 	}
 
 	/**
@@ -1260,7 +1322,7 @@ public:
 	 */
 	static FloatInterval<FloatImplementation> unboundedInterval()
 	{
-		return FloatInterval<FloatImplementation>();
+            return FloatInterval<FloatImplementation>();
 	}
 
 
@@ -1270,7 +1332,11 @@ public:
 	 * @return double representation of o (underapprox) Note, that it can return the double INFINITY.
 	 */
 	template<typename Rational>
-	static float_t roundDown(const Rational& o, bool overapproximate = false);
+	static float_t roundDown(const Rational& o, bool overapproximate = false)
+        {
+            double result = getDouble(o);
+            return float_t(result, CARL_RND::CARL_RNDD);
+        }
 
 	/** Returns a up-rounded representation of the given numeric
 	 * @param numeric o
@@ -1278,15 +1344,118 @@ public:
 	 * @return double representation of o (overapprox) Note, that it can return the double INFINITY.
 	 */
 	template<typename Rational>
-	static float_t roundUp(const Rational& o, bool overapproximate = false);
+	static float_t roundUp(const Rational& o, bool overapproximate = false)
+        {
+            double result = getDouble(o);
+            return float_t(result, CARL_RND::CARL_RNDU);
+        }
 
-	void operator +=(const FloatInterval<FloatImplementation>&);
-	void operator -=(const FloatInterval<FloatImplementation>&);
-	void operator *=(const FloatInterval<FloatImplementation>&);
+	void operator +=(const FloatInterval<FloatImplementation>& _interval)
+        {
+            mLeftType = getWeakestBoundType( mLeftType, _interval.leftType() );
+            mRightType = getWeakestBoundType( mRightType, _interval.rightType() );
+            if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
+            {
+                mInterval = BoostFloatInterval( 0 );
+            }
+            else
+            {
+                mInterval += _interval.content();
+                if( mLeftType == BoundType::INFTY )
+                {
+                    mInterval = BoostFloatInterval( mInterval.upper() );
+                }
+                else if( mRightType == BoundType::INFTY )
+                {
+                    mInterval = BoostFloatInterval( mInterval.lower() );
+                }
+                else if( (mInterval.lower() == mInterval.upper() && mLeftType != mRightType) )
+                {
+                    mLeftType = BoundType::STRICT;
+                    mRightType = BoundType::STRICT;
+                    mInterval = BoostFloatInterval( 0 );
+                }
+            }
+        }
+        
+	void operator -=(const FloatInterval<FloatImplementation>& _interval)
+        {
+            mLeftType = getWeakestBoundType( mLeftType, _interval.rightType() );
+            mRightType = getWeakestBoundType( mRightType, _interval.leftType() );
+            if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
+            {
+                mInterval = BoostFloatInterval( 0 );
+            }
+            else
+            {
+                mInterval -= _interval.content();
+                if( mLeftType == BoundType::INFTY )
+                {
+                    mInterval = BoostFloatInterval( mInterval.upper() );
+                }
+                else if( mRightType == BoundType::INFTY )
+                {
+                    mInterval = BoostFloatInterval( mInterval.lower() );
+                }
+                else if( (mInterval.lower() == mInterval.upper() && mLeftType != mRightType) )
+                {
+                    mLeftType = BoundType::STRICT;
+                    mRightType = BoundType::STRICT;
+                    mInterval = BoostFloatInterval( 0 );
+                }
+            }
+        }
+        
+	void operator *=(const FloatInterval<FloatImplementation>& _interval)
+        {
+            BoundType leftType = BoundType::WEAK;
+            BoundType rightType = BoundType::WEAK;
+            if( (mLeftType == BoundType::INFTY && (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY))
+                || (mRightType == BoundType::INFTY && (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY))
+                || (_interval.mLeftType == BoundType::INFTY && (right() > 0 || mRightType == BoundType::INFTY))
+                || (_interval.mRightType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY))) )
+            {
+                leftType = BoundType::INFTY;
+            }
+            if( (mLeftType == BoundType::INFTY && (_interval.right() < 0 || (_interval.left() < 0 || _interval.mLeftType == BoundType::INFTY)))
+                || (mRightType == BoundType::INFTY && (_interval.left() > 0 || (_interval.right() > 0 || _interval.mRightType == BoundType::INFTY)))
+                || (_interval.mLeftType == BoundType::INFTY && (right() < 0 || (left() < 0 || mLeftType == BoundType::INFTY)))
+                || (_interval.mRightType == BoundType::INFTY && (left() > 0 || (right() > 0 || mRightType == BoundType::INFTY))) )
+            {
+                rightType = BoundType::INFTY;
+            }
+            mLeftType = leftType;
+            mRightType = rightType;
+            mInterval *= _interval.content();
+        }
 
 	// unary arithmetic operators of FloatInterval
-	const FloatInterval<FloatImplementation> operator -(const FloatInterval<FloatImplementation>& lh) const;
-	friend std::ostream& operator<<(std::ostream& str, const FloatInterval<FloatImplementation>&);
+	const FloatInterval<FloatImplementation> operator -(const FloatInterval<FloatImplementation>& lh) const
+        {
+            return lh.inverse();
+        }
+        
+	friend std::ostream& operator<<(std::ostream& str, const FloatInterval<FloatImplementation>& d)
+        {
+            if( d.leftType() == BoundType::INFTY )
+                str << "]-infinity";
+            else
+            {
+                str.precision( 30 );
+                str << (d.leftType() == BoundType::STRICT ? "]" : "[") << d.left();
+                str.precision( 0 );
+            }
+            str << ", ";
+            if( d.rightType() == BoundType::INFTY )
+                str << "infinity[";
+            else
+            {
+                str.precision( 30 );
+                str << d.right() << (d.rightType() == BoundType::WEAK ? "]" : "[");
+                str.precision( 0 );
+            }
+            return str;
+        }
 
 
 private:
@@ -1308,175 +1477,166 @@ private:
 }; // class FloatInterval
 
 
-template<typename Rational>
-FloatInterval::FloatInterval(const Rational& rat, bool overapprox) : 
-FloatInterval(rat, BoundType::WEAK,rat, BoundType::WEAK, overapprox, overapprox)
+//template<typename Rational, typename FloatImplementation>
+//FloatInterval::FloatInterval<FloatImplementation>(const Rational& rat, bool overapprox) : 
+//FloatInterval<FloatImplementation>(rat, BoundType::WEAK,rat, BoundType::WEAK, overapprox, overapprox)
+//{
+//    // TODO overapprox in both directions?
+//}
+
+//template<typename Rational, typename FloatImplementation>
+//FloatInterval<FloatImplementation>::FloatInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft, bool overapproxright) : 
+//    mLeftType( lowerType ),
+//    mRightType( upperType )
+//{
+//    FLOAT_T<FloatImplementation> dLeft = roundDown(lower, overapproxleft);
+//    FLOAT_T<FloatImplementation> dRight = roundUp(upper, overapproxright);
+//    if(dLeft == -INFINITY) mLeftType = BoundType::INFTY;
+//    if(dRight == INFINITY) mRightType = BoundType::INFTY;
+//    if(mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY)
+//    {
+//        mInterval = BoostFloatInterval(0);
+//    }
+//    else if(mLeftType == BoundType::INFTY)
+//    {
+//        mInterval = BoostFloatInterval(dRight);
+//    }
+//    else if(mRightType == BoundType::INFTY)
+//    {
+//        mInterval = BoostFloatInterval(dLeft);
+//    }
+//    else if((lower == upper && lowerType != upperType) || lower > upper)
+//    {
+//        mLeftType = BoundType::STRICT;
+//        mRightType = BoundType::STRICT;
+//        mInterval = BoostFloatInterval(0);
+//    }
+//    else
+//    {
+//        mInterval = BoostFloatInterval(dLeft, dRight);
+//    }
+//}
+
+//template<typename Rational, typename FloatImplementation>
+//FLOAT_T<FloatImplementation> FloatInterval::roundDown(const Rational& o, bool overapproximate)
+//{
+//    double result = getDouble(o);
+//    return FLOAT_T<FloatImplementation>(result, CARL_RND::CARL_RNDD);
+//}
+//
+//template<typename Rational>
+//FLOAT_T<FloatImplementation> FloatInterval::roundUp(const Rational& o, bool overapproximate)
+//{
+//    double result = getDouble(o);
+//    return FLOAT_T<FloatImplementation>(result, CARL_RND::CARL_RNDU);
+//} 
+
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator +(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-    // TODO overapprox in both directions?
+    return lh.add(rh);
 }
 
-template<typename Rational>
-FloatInterval::FloatInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft, bool overapproxright) : 
-    mLeftType( lowerType ),
-    mRightType( upperType )
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator +(const FloatInterval<FloatImplementation>& lh, const double& rh)
 {
-	double dLeft = roundDown(lower, overapproxleft);
-	double dRight = roundUp(upper, overapproxright);
-	if(dLeft == -INFINITY) mLeftType = BoundType::INFTY;
-	if(dRight == INFINITY) mRightType = BoundType::INFTY;
-	if(mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY)
-	{
-		mInterval = BoostFloatInterval(0);
-	}
-	else if(mLeftType == BoundType::INFTY)
-	{
-		mInterval = BoostFloatInterval(dRight);
-	}
-	else if(mRightType == BoundType::INFTY)
-	{
-		mInterval = BoostFloatInterval(dLeft);
-	}
-	else if((lower == upper && lowerType != upperType) || lower > upper)
-	{
-		mLeftType = BoundType::STRICT;
-		mRightType = BoundType::STRICT;
-		mInterval = BoostFloatInterval(0);
-	}
-	else
-	{
-		mInterval = BoostFloatInterval(dLeft, dRight);
-	}
+    // TODO optimization potential
+    return lh.add(FloatInterval<FloatImplementation>(rh));
 }
 
-template<typename Rational>
-double FloatInterval::roundDown(const Rational& o, bool overapproximate)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator +(const double& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	double result = getDouble(o);
-	if(result == -INFINITY) return result;
-	if(result == INFINITY) return DBL_MAX;
-	// If the cln::cl_RA cannot be represented exactly by a double, round.
-//	Rational r = rationalize<Rational>(result);
-	if(overapproximate || rationalize<Rational>(result) != o)
-	{
-		if(result == -DBL_MAX) return -INFINITY;
-		return std::nextafter(result, -INFINITY);
-	}
-	else
-	{
-		return result;
-	}
+    // TODO optimization potential
+    return rh.add(FloatInterval<FloatImplementation>(lh));
 }
 
-template<typename Rational>
-double FloatInterval::roundUp(const Rational& o, bool overapproximate)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator -(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	double result = getDouble(o);
-	if(result == INFINITY) return result;
-	if(result == -INFINITY) return -DBL_MAX;
-	// If the cln::cl_RA cannot be represented exactly by a double, round.
-//	Rational r = rationalize<Rational>(result);
-	if(overapproximate || rationalize<Rational>(result) != o)
-	{
-		if(result == DBL_MAX) return INFINITY;
-		return std::nextafter(result, INFINITY);
-	}
-	else
-	{
-		return result;
-	}
-} 
-
-inline const FloatInterval operator +(const FloatInterval& lh, const FloatInterval& rh)
-{
-	return lh.add(rh);
+    return lh.add(rh.inverse());
 }
 
-inline const FloatInterval operator +(const FloatInterval& lh, const double& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator -(const FloatInterval<FloatImplementation>& lh, const double& rh)
 {
-	// TODO optimization potential
-	return lh.add(FloatInterval(rh));
+    return lh + (-rh);
 }
 
-inline const FloatInterval operator +(const double& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator -(const double& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	// TODO optimization potential
-	return rh.add(FloatInterval(lh));
+    return (-lh) +rh;
 }
 
-inline const FloatInterval operator -(const FloatInterval& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator *(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	return lh.add(rh.inverse());
+    return lh.mul(rh);
 }
 
-inline const FloatInterval operator -(const FloatInterval& lh, const double& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator *(const FloatInterval<FloatImplementation>& lh, const double& rh)
 {
-	return lh + (-rh);
+    return FloatInterval<FloatImplementation>(lh.mul(FloatInterval<FloatImplementation>(rh)));
 }
 
-inline const FloatInterval operator -(const double& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator *(const double& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	return (-lh) +rh;
+    return rh * lh;
 }
 
-inline const FloatInterval operator *(const FloatInterval& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator /(const FloatInterval<FloatImplementation>& lh, const double& rh) throw ( std::overflow_error)
 {
-	return lh.mul(rh);
+    return lh.div(FloatInterval<FloatImplementation>(rh));
 }
 
-inline const FloatInterval operator *(const FloatInterval& lh, const double& rh)
+template<typename FloatImplementation>
+inline const FloatInterval<FloatImplementation> operator /(const double& lh, const FloatInterval<FloatImplementation>& rh) throw ( std::overflow_error)
 {
-	return FloatInterval(lh.mul(FloatInterval(rh)));
-}
-
-inline const FloatInterval operator *(const double& lh, const FloatInterval& rh)
-{
-	return rh * lh;
-}
-
-inline const FloatInterval operator /(const FloatInterval& lh, const double& rh) throw ( std::overflow_error)
-{
-	return lh.div(FloatInterval(rh));
-}
-
-inline const FloatInterval operator /(const double& lh, const FloatInterval& rh) throw ( std::overflow_error)
-{
-	FloatInterval result = FloatInterval(lh);
-	result.div(rh);
-	return result;
+    FloatInterval<FloatImplementation> result = FloatInterval<FloatImplementation>(lh);
+    result.div(rh);
+    return result;
 }
 
 // relational operators
 
-inline bool operator ==(const FloatInterval& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline bool operator ==(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	return lh.isEqual(rh);
+    return lh.isEqual(rh);
 }
 
-inline bool operator !=(const FloatInterval& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline bool operator !=(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	return !lh.isEqual(rh);
+    return !lh.isEqual(rh);
 }
 
-inline bool operator <=(const FloatInterval& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline bool operator <=(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	return lh.isLessOrEqual(rh);
+    return lh.isLessOrEqual(rh);
 }
 
-inline bool operator >=(const FloatInterval& lh, const FloatInterval& rh)
+template<typename FloatImplementation>
+inline bool operator >=(const FloatInterval<FloatImplementation>& lh, const FloatInterval<FloatImplementation>& rh)
 {
-	return lh.isGreaterOrEqual(rh);
+    return lh.isGreaterOrEqual(rh);
 }
 
 } // namespace carl
 
 namespace std
 {
-    template<>
-    struct hash<carl::FloatInterval> {    
-        size_t operator()(const carl::FloatInterval& double_interval) const 
+    template<typename FloatImplementation>
+    struct hash<carl::FloatInterval<FloatImplementation> > {    
+        size_t operator()(const carl::FloatInterval<FloatImplementation>& _interval) const 
         {
-            return (  ((size_t) double_interval.left() ^ (size_t) double_interval.leftType())
-                    ^ ((size_t) double_interval.right() ^ (size_t) double_interval.rightType()));
+            return (  ((size_t) _interval.left() ^ (size_t) _interval.leftType())
+                    ^ ((size_t) _interval.right() ^ (size_t) _interval.rightType()));
         }
     };
 } // namespace std

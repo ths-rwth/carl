@@ -9,13 +9,13 @@
  */
 
 #pragma once
-#include "../../numbers/FLOAT_T.h"
+#include "../numbers/FLOAT_T.h"
 #include <assert.h>
 
 namespace carl
 {
     /* requirements for checking policy */
-    template<FloatImplementation>
+    template<typename FloatImplementation>
     struct checking
     {
         static FLOAT_T<FloatImplementation> pos_inf()

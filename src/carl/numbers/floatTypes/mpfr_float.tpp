@@ -313,7 +313,7 @@ class FLOAT_T<mpfr_t>
 
         void tan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_tan(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_tan(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& asin_assign(CARL_RND _rnd = CARL_RNDN)
@@ -324,7 +324,7 @@ class FLOAT_T<mpfr_t>
 
         void asin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_asin(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_asin(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& acos_assign(CARL_RND _rnd = CARL_RNDN)
@@ -335,7 +335,7 @@ class FLOAT_T<mpfr_t>
 
         void acos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_acos(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_acos(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& atan_assign(CARL_RND _rnd = CARL_RNDN)
@@ -346,7 +346,7 @@ class FLOAT_T<mpfr_t>
 
         void atan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_atan(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_atan(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& sinh_assign(CARL_RND _rnd = CARL_RNDN)
@@ -357,7 +357,7 @@ class FLOAT_T<mpfr_t>
 
         void sinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_sinh(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_sinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& cosh_assign(CARL_RND _rnd = CARL_RNDN)
@@ -368,7 +368,7 @@ class FLOAT_T<mpfr_t>
 
         void cosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_cosh(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_cosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& tanh_assign(CARL_RND _rnd = CARL_RNDN)
@@ -379,7 +379,7 @@ class FLOAT_T<mpfr_t>
 
         void tanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_tanh(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_tanh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         FLOAT_T<mpfr_t>& asinh_assign(CARL_RND _rnd = CARL_RNDN)
@@ -390,7 +390,7 @@ class FLOAT_T<mpfr_t>
 
         void asinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_asinh(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_asinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
         
         FLOAT_T<mpfr_t>& acosh_assign(CARL_RND _rnd = CARL_RNDN)
@@ -401,7 +401,7 @@ class FLOAT_T<mpfr_t>
 
         void acosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_acosh(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_acosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
         
         FLOAT_T<mpfr_t>& atanh_assign(CARL_RND _rnd = CARL_RNDN)
@@ -412,7 +412,7 @@ class FLOAT_T<mpfr_t>
 
         void atanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
         {
-            mpfr_atanh(_result, mValue, mpfr_rnd_t(_rnd));
+            mpfr_atanh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
         void floor(int& _result, CARL_RND _rnd = CARL_RNDN)
@@ -459,6 +459,38 @@ class FLOAT_T<mpfr_t>
         friend std::ostream & operator<< (std::ostream& ostr, const FLOAT_T<mpfr_t> & p) {
             ostr << p.toString();
             return ostr;
+        }
+        
+        
+
+        friend bool operator== (const FLOAT_T<mpfr_t>& _lhs, const int _rhs)
+        {
+            return mpfr_cmp_si(_lhs.mValue, _rhs) == 0;
+        }
+
+        friend bool operator== (const int _lhs, const FLOAT_T<mpfr_t>& _rhs)
+        {
+            return _rhs == _lhs;
+        }
+
+        friend bool operator== (const FLOAT_T<mpfr_t>& _lhs, const double _rhs)
+        {
+            return mpfr_cmp_d(_lhs.mValue,_rhs) == 0;
+        }
+
+        friend bool operator== (const double _lhs, const FLOAT_T<mpfr_t>& _rhs)
+        {
+            return _rhs == _lhs;
+        }
+
+        friend bool operator== (const FLOAT_T<mpfr_t>& _lhs, const float _rhs)
+        {
+            return mpfr_cmp_d(_lhs.mValue, _rhs);
+        }
+
+        friend bool operator== (const float _lhs, const FLOAT_T<mpfr_t>& _rhs)
+        {
+            return _rhs == _lhs;
         }
         
         /**
@@ -544,7 +576,7 @@ class FLOAT_T<mpfr_t>
             mpfr_sprintf(out, "%.10RDe", mValue);
             return std::string(out);
         }
-
+        
     private:
 
         mpfr_rnd_t convRnd(CARL_RND _rnd) const
