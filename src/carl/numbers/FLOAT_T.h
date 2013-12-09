@@ -47,6 +47,7 @@ namespace carl
     };
     
     template<typename FloatType>
+    class FLOAT_T
     {
         private:
             FloatType mValue;
