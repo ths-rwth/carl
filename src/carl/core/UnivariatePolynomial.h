@@ -323,11 +323,13 @@ public:
 	enum ComparisonOrder {
 		CauchyBound, LowDegree, Memory, Default = Memory
 	};
-	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default);
+	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default) const;
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomialPtr<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
 	template<typename C>
-	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomialPtr<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	template<typename C>
+	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 

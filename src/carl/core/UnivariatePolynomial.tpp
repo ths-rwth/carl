@@ -127,6 +127,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 {
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
+	if(is_field<Coeff>::value && divisor.isConstant())
+	{
+		return UnivariatePolynomial<Coeff>(mMainVar);
+	}
 	//std::cout << *this << " / " << divisor << std::endl;
 	unsigned degdiff = degree() - divisor.degree();
 	Coeff factor = lcoeff()/divisor.lcoeff();
@@ -225,15 +229,22 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
 	// We want degree(b) <= degree(a).
-	if(a.degree() < b.degree()) return gcd_recursive(b,a);
-	else return gcd_recursive(a,b);
+	if(a.degree() < b.degree()) return gcd_recursive(b.normalized(),a.normalized()).normalized();
+	else return gcd_recursive(a.normalized(),b.normalized()).normalized();
 }
 
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
+	assert(b.degree() <= a.degree());
+	std::cout << "a: " << a << std::endl;
+	std::cout << "b: " << b << std::endl;
 	if(b.isZero()) return a;
+//	if(is_field<Coeff>::value)
+//	{
+//		if(b.isConstant()) return b;
+//	}
 	else return gcd_recursive(b, a.reduce(b));
 }
 
@@ -321,7 +332,7 @@ UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients()
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
-	UnivariatePolynomial<Integer> result;
+	UnivariatePolynomial<Integer> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& coeff : mCoefficients)
 	{
@@ -1156,7 +1167,7 @@ bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomia
 }
 
 template<typename C>
-bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, ComparisonOrder order) {
+bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, ComparisonOrder order) const {
 	switch (order) {
 		case CauchyBound: /*{
 			C a = this->cauchyBound();
@@ -1177,11 +1188,16 @@ bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs
 	return lhs.less(rhs, order);
 }
 template<typename C>
-bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
 {
 	if (lhs == nullptr) return rhs != nullptr;
 	if (rhs == nullptr) return true;
 	return lhs->less(*rhs, order);
+}
+template<typename C>
+bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+{
+	return less(lhs.get(), rhs.get(), order);
 }
 
 template<typename C>
@@ -1198,7 +1214,7 @@ public:
 	{
 		return less(lhs, rhs, order);
 	}
-	bool operator()(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs) const
+	bool operator()(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs) const
 	{
 		return less(lhs, rhs, order);
 	}

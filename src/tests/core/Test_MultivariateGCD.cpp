@@ -4,18 +4,18 @@
 
 using namespace carl;
 
-TEST(Diophantine, Constructor)
+TEST(MultivariateGCD, test1)
 {
 	VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
 	Variable y = vpool.getFreshVariable();
 	
-	MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
-    MultivariatePolynomial<cln::cl_RA> g1({(cln::cl_RA)3*x*x*x*x*y, (cln::cl_RA)1*y*y});
+	MultivariatePolynomial<mpz_class> f1({(mpz_class)1*x*x*x*y*y, (mpz_class)-1*x*x*y*y*y, (mpz_class)1*x});
+    MultivariatePolynomial<mpz_class> g1({(mpz_class)3*x*x*x*x*y, (mpz_class)1*y*y});
     
-	MultivariateGCD<cln::cl_RA> gcd(f1,g1);
-	gcd.calculate();
+    MultivariateGCD<mpz_class> gcd(f1,g1);
+//	gcd.calculate();
 //    UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)1, (mpz_class)1, (mpz_class)0, (mpz_class)1});
 //	const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
 //    UnivariatePolynomial<GFNumber<mpz_class>> a1 = A1.toFiniteDomain(gf5);

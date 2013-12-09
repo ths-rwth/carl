@@ -250,6 +250,16 @@ inline cln::cl_I getDenom(const cln::cl_RA& rat)
 	return cln::denominator(rat);
 }
 
+inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return cln::gcd(a,b);
+}
+
+inline cln::cl_I lcm(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return cln::lcm(a,b);
+}
+
 
 inline cln::cl_RA pow(const cln::cl_RA& base, unsigned exp)
 {
@@ -411,15 +421,6 @@ inline cln::cl_I mod(const cln::cl_I& n, const cln::cl_I& m)
 	return cln::mod(n, m);
 }
 
-inline cln::cl_I gcd(const cln::cl_I& v1, const cln::cl_I& v2)
-{
-	return cln::gcd(v1, v2);
-}
-
-inline cln::cl_I lcm(const cln::cl_I& v1, const cln::cl_I& v2)
-{
-	return cln::lcm(v1, v2);
-} 
 
 template<typename C>
 inline bool isInteger(const GFNumber<C>&)
