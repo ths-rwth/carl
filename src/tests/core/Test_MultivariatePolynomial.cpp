@@ -321,5 +321,5 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x});   
-    std::cout << f1.toUnivariatePolynomial() << std::endl;
+    //std::cout << f1.toUnivariatePolynomial() << std::endl;
 }

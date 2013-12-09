@@ -54,8 +54,8 @@ namespace carl {
 
             bool split = numerator.div_ext(result1, result2, denominator);
             if (split) {
-                result1 = result1.minus();
-                result2 = result2.minus();
+                result1 = result1.inverse();
+                result2 = result2.inverse();
 
                 if(result1.isLessOrEqual(result2)) {
 					resA = centerInterval.add(result1);
@@ -68,7 +68,7 @@ namespace carl {
                 }
                 return true;
             } else {
-                result1 = result1.minus();
+                result1 = result1.inverse();
                 resA = centerInterval.add(result1);
                 return false;
             }

@@ -77,6 +77,11 @@ namespace carl
             {
                 mLeft = l;
             }
+            
+            void setLeft( const ExactInterval& _interval )
+            {
+                mLeft = _interval.left();
+            }
 
             /**
              * Set new left bound type for the interval.
@@ -94,6 +99,11 @@ namespace carl
             void setRight( const Numeric& r )
             {
                 mRight = r;
+            }
+            
+            void setRight( const ExactInterval& _interval )
+            {
+                mRight = _interval.right();
             }
 
             /**
@@ -122,7 +132,19 @@ namespace carl
             {
                 return mRight;
             }
-
+            
+            void set( const Numeric& _left, const Numeric& _right )
+            {
+                mLeft = _left;
+                mRight = _right;
+            }
+            
+            void set( const Numeric& _c )
+            {
+                mLeft = _c;
+                mRight = _c;
+            }
+            
             /**
              * Selects the left bound type.
              * @return bound type of the left bound
@@ -230,7 +252,7 @@ namespace carl
             /** Returns the negative value.
              * @return negative value
              */
-            ExactInterval<Numeric> minus() const;
+            ExactInterval<Numeric> inverse() const;
 
             /** Multiplies two intervals and returns their product.
              * @param o
@@ -259,13 +281,59 @@ namespace carl
              */
             ExactInterval<Numeric> power( unsigned e ) const;
 
-            /** Computes the inverse to the interval with respect to division by zero and infinity
+            /** Computes the reciprocal to the interval with respect to division by zero and infinity
              * @param a first result reference
              * @param b second result reference
              * @return true if the result contains two intervals, else false
              */
-            bool inverse( ExactInterval<Numeric>& a, ExactInterval<Numeric>& b ) const;
+            bool reciprocal( ExactInterval<Numeric>& a, ExactInterval<Numeric>& b ) const;
 
+            /**
+             * Computes the exp of the interval.
+             * @return 
+             */
+            ExactInterval<Numeric> exp() const;
+            
+            /**
+             * Computes the logarithm of the interval.
+             * @return 
+             */
+            ExactInterval<Numeric> log() const;
+            
+            /**
+            * Split the interval at the midpoint.
+            * @param _left
+            * @param _right
+            */
+           void split(ExactInterval<Numeric>& _left, ExactInterval<Numeric>& _right) const;
+
+           /**
+            * Split the interval in n uniform intervals contained in the _result vector.
+            * @param _result
+            * @param n
+            */
+           void split(std::vector<ExactInterval<Numeric> >& _result, const unsigned n) const;
+
+           /**
+            * Bloat the interval by the given width.
+            * @param _width
+            */
+           void bloat(const Numeric& _width);
+           
+           /**
+            * Calculates the diameter of the interval
+            * @return the diameter of the interval
+            */
+           Numeric diameter() const;
+
+           Numeric diameterRatio( const ExactInterval<Numeric>& _interval) const;
+
+           /**
+            * Calculate the magnitude of the interval.
+            * @return 
+            */
+           Numeric magnitude() const;
+            
             ///////////////////////////
             // Relational Operations //
             ///////////////////////////

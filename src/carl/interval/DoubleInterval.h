@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cmath>
 #include <cfloat>
+#include <vector>
 
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
@@ -129,7 +130,7 @@ public:
 	 */
 	const BoostDoubleInterval& content() const
 	{
-		return mInterval;
+            return mInterval;
 	}
 
 	/**
@@ -138,7 +139,7 @@ public:
 	 */
 	const double& left() const
 	{
-		return mInterval.lower();
+            return mInterval.lower();
 	}
 
 	/**
@@ -147,7 +148,7 @@ public:
 	 */
 	const double& right() const
 	{
-		return mInterval.upper();
+            return mInterval.upper();
 	}
 
 	/**
@@ -156,7 +157,7 @@ public:
 	 */
 	void setLeft(const double l)
 	{
-		mInterval.set(l, mInterval.upper());
+            mInterval.set(l, mInterval.upper());
 	}
 
 	/**
@@ -165,8 +166,13 @@ public:
 	 */
 	void setLeft(const cln::cl_RA& l)
 	{
-		mInterval.set(roundDown(l), mInterval.upper());
+            mInterval.set(roundDown(l), mInterval.upper());
 	}
+        
+        void setLeft(const DoubleInterval& _interval)
+        {
+            mInterval.set(_interval.left(), mInterval.upper());
+        }
 
 	/**
 	 * Set new left bound type for the interval.
@@ -194,6 +200,11 @@ public:
 	{
 		mInterval.set(left(), roundUp(r));
 	}
+        
+        void setRight(const DoubleInterval& _interval)
+        {
+            mInterval.set(mInterval.lower(), _interval.right());
+        }
 
 	/**
 	 * Set new right bound type for the interval.
@@ -201,7 +212,7 @@ public:
 	 */
 	void setRightType(const BoundType& rType)
 	{
-		mRightType = rType;
+            mRightType = rType;
 	}
 
 	/** Get left BoundType
@@ -209,7 +220,7 @@ public:
 	 */
 	BoundType leftType() const
 	{
-		return mLeftType;
+            return mLeftType;
 	}
 
 	/** Get right BoundType
@@ -217,9 +228,28 @@ public:
 	 */
 	BoundType rightType() const
 	{
-		return mRightType;
+            return mRightType;
 	}
 
+        /**
+         * Set both bounds.
+         * @param l
+         * @param r
+         */
+        void set(const double& l, const double& r)
+        {
+            mInterval.set(l,r);
+        }
+        
+        /**
+         * Create a point interval.
+         * @param c
+         */
+        void set(const double& c)
+        {
+            mInterval.set(c, c);
+        }
+        
 	/** Set left bound
 	 * @param left
 	 */
@@ -229,6 +259,26 @@ public:
 	 * @param right
 	 */
 	void cutFrom(const double& right);
+        
+        /**
+         * Split the interval at the midpoint.
+         * @param _left
+         * @param _right
+         */
+        void split(DoubleInterval& _left, DoubleInterval& _right) const;
+        
+        /**
+         * Split the interval in n uniform intervals contained in the _result vector.
+         * @param _result
+         * @param n
+         */
+        void split(std::vector<DoubleInterval>& _result, const unsigned n) const;
+        
+        /**
+         * Bloat the interval by the given width.
+         * @param _width
+         */
+        void bloat(const double& _width);
 
 	//////////////////
 	//  Arithmetic  //
@@ -243,7 +293,7 @@ public:
 	/** Returns the negative value.
 	 * @return negative value
 	 */
-	DoubleInterval minus() const;
+	DoubleInterval inverse() const;
 
 	/** Returns the negative value.
 	 * @return negative value
@@ -277,19 +327,38 @@ public:
 	 */
 	DoubleInterval power(unsigned e) const;
 
-	/** Computes the inverse to the interval with respect to division by zero and infinity
+	/** Computes the reciprocal to the interval with respect to division by zero and infinity
 	 * @param a first result reference
 	 * @param b second result reference
 	 * @return true if the result contains two intervals, else false
 	 */
-	bool inverse(DoubleInterval& a, DoubleInterval& b) const;
+	bool reciprocal(DoubleInterval& a, DoubleInterval& b) const;
 
+        /**
+         * Computes the exp of the interval.
+         * @return 
+         */
+        DoubleInterval exp() const;
+        
+        /**
+         * Computes the logarithm of the interval.
+         * @return 
+         */
+        DoubleInterval log() const;
 
 	/**
 	 * Calculates the diameter of the interval
 	 * @return the diameter of the interval
 	 */
 	double diameter() const;
+        
+        double diameterRatio( const DoubleInterval& _interval) const;
+        
+        /**
+         * Calculate the magnitude of the interval.
+         * @return 
+         */
+        double magnitude() const;
 
 	//////////////////
 	//  Operations  //
@@ -543,7 +612,7 @@ inline const DoubleInterval operator +(const double& lh, const DoubleInterval& r
 
 inline const DoubleInterval operator -(const DoubleInterval& lh, const DoubleInterval& rh)
 {
-	return lh.add(rh.minus());
+	return lh.add(rh.inverse());
 }
 
 inline const DoubleInterval operator -(const DoubleInterval& lh, const double& rh)

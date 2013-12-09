@@ -19,6 +19,7 @@ add_subdirectory(interval)
 
 # Compose all the sources for the aritmetic library.
 set(carl_lib_sources 
+        ${carl_lib_cad_sources}
 	${carl_lib_core_sources}
 	${carl_lib_util_sources}
 	${carl_lib_number_sources}
