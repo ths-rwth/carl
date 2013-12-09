@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <list>
 #include "../numbers/GFNumber.h"
 #include "UnivariatePolynomial.h"
 #include "logging.h"
@@ -176,7 +177,7 @@ class DiophantineEquations
 
 class MultivariateHensel
 {
-	static std::list<UnivReprPol> calculate()
-	{}
+	//static std::list<UnivReprPol> calculate()
+	//{}
 };
 }
