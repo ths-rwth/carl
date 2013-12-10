@@ -14,13 +14,13 @@ namespace carl {
 namespace core {
 
 
-template<typename Number, typename isFraction>
+template<typename Number, typename isFraction = EnableIf<is_fraction<Number>>>
 class RealAlgebraicNumberIR {
 
 };
 
 template<typename Number>
-class RealAlgebraicNumberIR<Number, EnableIf<is_fraction<Number>>> : RealAlgebraicNumber<Number> {
+class RealAlgebraicNumberIR<Number, EnableIf<is_fraction<Number>>> : public RealAlgebraicNumber<Number> {
 
 protected:
 	/**
@@ -86,7 +86,7 @@ public:
 	///////////////
 
 	bool isZero() const {
-		return this->isNumeric() ? this->value() == 0 : this->interval.isZero();
+		return this->isNumeric() ? this->value() == 0 : (this->interval.left() == 0 && this->interval.right() == 0);
 	}
 
 	/**

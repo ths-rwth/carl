@@ -15,7 +15,7 @@ namespace core {
  * RealAlgebraicNumberNR always represents an exact number.
  */
 template<typename Number, EnableIf<is_fraction<Number>> = dummy>
-class RealAlgebraicNumberNR : RealAlgebraicNumber<Number> {
+class RealAlgebraicNumberNR : public RealAlgebraicNumber<Number> {
 public:
 
 	/**

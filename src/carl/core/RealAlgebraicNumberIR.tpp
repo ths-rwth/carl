@@ -8,7 +8,6 @@
 #include "../util/SFINAE.h"
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumberIR.h"
-#include "rootfinder/RootFinder.h"
 
 namespace carl {
 namespace core {
@@ -30,23 +29,23 @@ RANIR<Number>::RealAlgebraicNumberIR(
 		const bool normalize,
 		const bool isRoot ) :
         RealAlgebraicNumber<Number>(isRoot, false, 0),
-        polynomial(p.sepapart()),
+        polynomial(p.squareFreePart().template convert<Number>()),
         interval(i),
-        sturmSequence( seq.empty() ? UnivariatePolynomial<Number>::standardSturmSequence( polynomial, polynomial.derivative()) : seq ),
+        sturmSequence( seq.empty() ? polynomial.standardSturmSequence() : seq ),
         refinementCount(0)
 {
 	assert(!this->polynomial.isConstant());
 	if (normalize) this->normalizeInterval();
 	if (this->interval.contains(0)) {
-		this->numeric = true;
+		this->mIsNumeric = true;
 	}
 	if (this->polynomial.degree() <= 1) {
 		Number a = this->polynomial.coefficients()[1];
 		Number b = this->polynomial.coefficients()[0];
-		this->value = (a == 0) ? b : (-b/a);
-		this->numeric = true;
-		this->interval.setLeft(ExactInterval<Number>(this->interval.left(), this->value()).sampleFast());
-		this->interval.setRight(ExactInterval<Number>(this->value(), this->interval.right(), this->value()).sampleFast());
+		this->mValue = (a == 0) ? b : (-b/a);
+		this->mIsNumeric = true;
+		this->interval.setLeft(ExactInterval<Number>(this->interval.left(), this->value(), BoundType::STRICT).sample());
+		this->interval.setRight(ExactInterval<Number>(this->value(), this->interval.right(), BoundType::STRICT).sample());
 	}
 }
 
@@ -64,26 +63,26 @@ const RANIR<Number>& RANIR<Number>::operator=(const RANIR<Number>& obj) {
 
 template<typename Number>
 void RANIR<Number>::normalizeInterval() {
-	if (this->interval.isZero()) return; // already normalized
-	assert( carl::core::countRealRoots(this->polynomial, this->interval) != 0); // the interval should be isolating for this number
+	if (this->interval.left() == 0 && this->interval.right() == 0) return; // already normalized
+	assert( this->polynomial.countRealRoots(this->interval) != 0); // the interval should be isolating for this number
 	// shift the right border below 0 or set the zero interval
-	if (this->interval.contains(0) && this->polynomial.sgn(0) == Sign::ZERO) {
+	if (this->interval.contains(0) && sgn(this->polynomial.evaluate(0)) == Sign::ZERO) {
 		this->interval.set(0,0);
 		this->mValue = 0;
 		this->mIsNumeric = true;
 	} else if (this->interval.meets(0)) {
 		// one of the bounds might be 0
 		// the separation is computed following [p.329,Algorithmic Algebra ISBN 3-540-94090-1]
-		Number sep = 1 / (1 + this->polynomial.maxNorm());
-		assert(this->polynomial.sgn(sep) != Sign::ZERO);
+		Number sep = (Number)1 / (1 + this->polynomial.maximumNorm());
+		assert(sgn(this->polynomial.evaluate(sep)) != Sign::ZERO);
 		if ((this->interval.right() == 0) || 
-			(this->interval.left() < -sep && countRealRoots(this->polynomial, ExactInterval<Number>(this->interval.left(), -sep)) > 0)) {
+			(this->interval.left() < -sep && this->polynomial.countRealRoots(ExactInterval<Number>(this->interval.left(), -sep, BoundType::STRICT)) > 0)) {
 			this->interval.setRight(-sep);
 		} else {
 			this->interval.setLeft(sep);
 		}
 	}
-	assert( ( !this->interval.meets(0) && countRealRoots(this->polynomial, this->interval) == 1 ) || this->interval.isZero() ); // otherwise, the interval is not suitable for this real algebraic number
+	assert( ( !this->interval.meets(0) && this->polynomial.countRealRoots(this->interval) == 1 ) || (this->interval.left() == 0 && this->interval.right() == 0)); // otherwise, the interval is not suitable for this real algebraic number
 }
 
 template<typename Number>
