@@ -31,7 +31,7 @@ TEST(doubleFloatTest, Constructor)
 
 TEST(doubleFloatTest, BooleanOperators)
 {
-	double v1 = 7;
+    double v1 = 7;
     carl::FLOAT_T<double> f1 = carl::FLOAT_T<double>(v1);
     double v2 = 2;
     carl::FLOAT_T<double> f2 = carl::FLOAT_T<double>(v2);
@@ -48,7 +48,7 @@ TEST(doubleFloatTest, BooleanOperators)
 
 TEST(doubleFloatTest, Addition)
 {
-	double v1 = 7;
+    double v1 = 7;
     carl::FLOAT_T<double> f1 = carl::FLOAT_T<double>(v1);
     double v2 = 2;
     carl::FLOAT_T<double> f2 = carl::FLOAT_T<double>(v2);
@@ -62,7 +62,7 @@ TEST(doubleFloatTest, Addition)
 
 TEST(doubleFloatTest, Subtraction)
 {
-	double v1 = 9;
+    double v1 = 9;
     carl::FLOAT_T<double> f1 = carl::FLOAT_T<double>(v1);
     double v2 = 5;
     carl::FLOAT_T<double> f2 = carl::FLOAT_T<double>(v2);
@@ -104,8 +104,8 @@ TEST(doubleFloatTest, Division)
 
 TEST(doubleFloatTest, Roots)
 {
-	double v1 = 16;
-	carl::FLOAT_T<double> f1 = carl::FLOAT_T<double>(v1);
+    double v1 = 16;
+    carl::FLOAT_T<double> f1 = carl::FLOAT_T<double>(v1);
 }
 
 TEST(doubleFloatTest, ConversionOperators)

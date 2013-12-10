@@ -63,22 +63,22 @@ namespace carl
                 mValue = 0;
             }
             
-            FLOAT_T<FloatType>(const double _double, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+            FLOAT_T<FloatType>(const double _double)
             {
                 mValue = _double;
             }
             
-            FLOAT_T<FloatType>(const float _float, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+            FLOAT_T<FloatType>(const float _float)
             {
                 mValue = _float;
             }
             
-            FLOAT_T<FloatType>(const int _int, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+            FLOAT_T<FloatType>(const int _int)
             {
                 mValue = _int;
             }
 
-            FLOAT_T<FloatType>(const double _double, precision _prec, const CARL_RND _rnd=CARL_RND::CARL_RNDN){}
+            FLOAT_T<FloatType>(const double _double, precision _prec){}
 
 //            template<>
 //            FLOAT_T<double>(const double _double, CARL_RND _rnd, precision _prec)
@@ -105,13 +105,13 @@ namespace carl
                return mValue;
            }
 
-           const precision getPrec() const
+           precision getPrec() const
            {
                // TODO
                return 0;
            }
 
-           FLOAT_T<FloatType>& setPrec( const precision& _prec, const CARL_RND _rnd=CARL_RND::CARL_RNDN )
+           FLOAT_T<FloatType>& setPrec( const precision& _prec)
            {
                // TODO
                return *this;
@@ -165,33 +165,33 @@ namespace carl
              * arithmetic operations
              */
             
-            FLOAT_T& add_assign( const FLOAT_T<FloatType>& _op2, CARL_RND _rnd )
+            FLOAT_T& add_assign( const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RNDN)
             {
                 // TODO: Include rounding
                 mValue = mValue + _op2.mValue;
                 return *this;
             }
             
-            void add( FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd) const
+            void add( FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN) const
             {
                 // TODO: Include rounding
                 _result.mValue = mValue + _op2.mValue;
             }
 
-            FLOAT_T& sub_assign(const FLOAT_T& _op2, CARL_RND _rnd)
+            FLOAT_T& sub_assign(const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN)
             {
                 // TODO: Include rounding
                 mValue = mValue - _op2.mValue;
                 return *this;
             }
             
-            void sub(FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd) const
+            void sub(FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN) const
             {
                 // TODO: Include rounding
                 _result.mValue = mValue - _op2.mValue;
             }
             
-            FLOAT_T& mul_assign(const FLOAT_T& _op2, CARL_RND _rnd)
+            FLOAT_T& mul_assign(const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN)
             {
                 // TODO: Include rounding
                 mValue = mValue * _op2.mValue;
@@ -199,13 +199,13 @@ namespace carl
                 return *this;
             }
             
-            void mul(FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd) const
+            void mul(FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN) const
             {
                 // TODO: Include rounding
                 _result.mValue = mValue * _op2.mValue;
             }
             
-            FLOAT_T& div_assign(const FLOAT_T& _op2, CARL_RND _rnd)
+            FLOAT_T& div_assign(const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN)
             {
                 assert( _op2 != 0 );
                 // TODO: Include rounding
@@ -213,7 +213,7 @@ namespace carl
                 return *this;
             }
             
-            void div(FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd) const
+            void div(FLOAT_T& _result, const FLOAT_T& _op2, CARL_RND _rnd = CARL_RNDN) const
             {
                 assert( _op2 != 0 );
                 // TODO: Include rounding

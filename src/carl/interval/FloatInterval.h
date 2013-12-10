@@ -71,11 +71,21 @@ public:
             mRightType = BoundType::INFTY;
         }
 
-        FloatInterval<FloatImplementation>(const float_t& _left, BoundType _leftType, const float_t& _right, BoundType _rightType) : 
-                mInterval(BoostFloatInterval(_left,_right)),
-                mLeftType(_leftType),
-                mRightType(_rightType)
-        {}
+        FloatInterval<FloatImplementation>(const float_t& _left, BoundType _leftType, const float_t& _right, BoundType _rightType)
+        {
+            if FLOAT_BOUNDS_OK(_left, _leftType, _right, _rightType)
+            {
+                mLeftType = _leftType;
+                mRightType = _rightType;
+                mInterval = BoostFloatInterval(_left, _right);
+            }
+            else
+            {
+                mLeftType = BoundType::STRICT;
+                mRightType = BoundType::STRICT;
+                mInterval = BoostFloatInterval(float_t(0));
+            }
+        }
         
 	/** Creates point interval at n
 	 * @param n
@@ -119,7 +129,8 @@ public:
 	 * @param leftType
 	 * @param rightType
 	 */
-	FloatInterval<FloatImplementation>(const BoostFloatInterval& _content, BoundType leftType, BoundType rightType) : mInterval(_content), mLeftType(leftType), mRightType(rightType) {}
+	FloatInterval<FloatImplementation>(const BoostFloatInterval& _content, BoundType leftType, BoundType rightType) : mInterval(_content), mLeftType(leftType), mRightType(rightType) 
+        {}
 
 	/** Creates FloatInterval with BoundTypes
 	 * @param left
@@ -1236,7 +1247,8 @@ public:
             else
             {
     //            return ( ( mInterval == _interval.content() ) == True );
-                return boost::numeric::equal(mInterval, _interval.content()); // TODO: Sure to use boost::numeric::equal
+//                return boost::numeric::equal(mInterval, _interval.content()); // TODO: Sure to use boost::numeric::equal
+                return ( left() == _interval.left() && right() == _interval.right() );
             }
         }
 
@@ -1313,7 +1325,7 @@ public:
 	 */
 	static FloatInterval<FloatImplementation> emptyInterval()
 	{
-            return FloatInterval<FloatImplementation>(BoostFloatInterval(0), BoundType::STRICT, BoundType::STRICT);
+            return FloatInterval<FloatImplementation>(BoostFloatInterval(float_t(0)), BoundType::STRICT, BoundType::STRICT);
 	}
 
 	/**

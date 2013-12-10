@@ -21,43 +21,46 @@ class FLOAT_T<mpfr_t>
         // Default precision is initially set to 53 bits in mpfr implementation
         FLOAT_T(const double _double, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
         {
+            std::cout << "Double Constructor of" << _double << std::endl;
             mpfr_init2(mValue,_prec);
-            if( _double == 0)
-            {
-                mpfr_set_zero(mValue, 1);
-            }
-            else
-            {
-                mpfr_set_d(mValue,_double,mpfr_rnd_t((_rnd)));
-            }
+//            if( _double == 0)
+//            {
+//                mpfr_set_zero(mValue, 1);
+//            }
+//            else
+//            {
+                mpfr_set_d(mValue,_double,mpfr_rnd_t(_rnd));
+//            }
+            std::cout << this->toString() << std::endl;
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
         FLOAT_T(const float _float, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
         {
+            std::cout << "Float constructor" << std::endl;
             mpfr_init2(mValue, _prec);
-            if( _float == 0)
-            {
-                mpfr_set_zero(mValue, 1);
-            }
-            else
-            {
+//            if( _float == 0)
+//            {
+//                mpfr_set_zero(mValue, 1);
+//            }
+//            else
+//            {
                 mpfr_set_flt(mValue, _float, mpfr_rnd_t(_rnd));
-            }
+//            }
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
         FLOAT_T(const int _int, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
         {
             mpfr_init2(mValue,_prec);
-            if( _int == 0)
-            {
-                mpfr_set_zero(mValue, 1);
-            }
-            else
-            {
+//            if( _int == 0)
+//            {
+//                mpfr_set_zero(mValue, 1);
+//            }
+//            else
+//            {
                 mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
-            }
+//            }
         }
         
         FLOAT_T(const mpfr_t& _mpfrNumber)
@@ -83,10 +86,11 @@ class FLOAT_T<mpfr_t>
         
         const mpfr_t& getValue() const
         {
+            std::cout << "getValue" << std::endl;
             return mValue;
         }
         
-        const precision getPrec() const
+        precision getPrec() const
         {
             return mpfr_get_prec(mValue);
         }

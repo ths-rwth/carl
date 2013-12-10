@@ -12,7 +12,13 @@ TEST(FloatInterval, Constructor)
     FloatInterval<mpfr_t> test1 = FloatInterval<mpfr_t>(-1, BoundType::WEAK, 1, BoundType::WEAK);
     FloatInterval<mpfr_t> test2 = FloatInterval<mpfr_t>(-1, BoundType::STRICT, 1, BoundType::STRICT);
     FloatInterval<mpfr_t> test3 = FloatInterval<mpfr_t>(-1, BoundType::INFTY, 1, BoundType::INFTY);
-    EXPECT_EQ(FloatInterval<mpfr_t>(1, BoundType::WEAK, -1, BoundType::WEAK), FloatInterval<mpfr_t>::emptyInterval());
+    EXPECT_EQ(FloatInterval<mpfr_t>::emptyInterval(), FloatInterval<mpfr_t>(1, BoundType::WEAK, -1, BoundType::WEAK));
+    FloatInterval<mpfr_t> tmp = FloatInterval<mpfr_t>(1, BoundType::WEAK, -1, BoundType::WEAK);
+    tmp.dbgprint();
+    FloatInterval<mpfr_t> tmp2 = FloatInterval<mpfr_t>::emptyInterval();
+    tmp2.dbgprint();
+    EXPECT_EQ(tmp, FloatInterval<mpfr_t>(1, BoundType::WEAK, -1, BoundType::WEAK));
+    std::cout << "Equal: " << (tmp == tmp2) << std::endl; 
     FloatInterval<mpfr_t> test5 = FloatInterval<mpfr_t>::unboundedInterval();
     FloatInterval<mpfr_t> test6 = FloatInterval<mpfr_t>::emptyInterval();
 //    FloatInterval<mpfr_t> test7 = FloatInterval<mpfr_t>((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
@@ -23,7 +29,7 @@ TEST(FloatInterval, Constructor)
 TEST(FloatInterval, Getters)
 {
     FloatInterval<mpfr_t> test1 = FloatInterval<mpfr_t>(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
-    EXPECT_EQ(-1, test1.left());
+    EXPECT_EQ(FLOAT_T<mpfr_t>(-1.0).toString(), test1.left().toString());
     EXPECT_EQ(1, test1.right());
     EXPECT_EQ(BoundType::WEAK, test1.leftType());
     EXPECT_EQ(BoundType::STRICT, test1.rightType());
