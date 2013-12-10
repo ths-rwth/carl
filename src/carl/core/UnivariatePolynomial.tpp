@@ -72,6 +72,10 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff>::~UnivariatePolynomial() {
+}
+
+template<typename Coeff>
 Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const 
 {
 	Coeff result(0);
@@ -858,6 +862,43 @@ std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squ
         }
     }
     return result;
+}
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
+	unsigned int i = 0;
+	while ((i < this->mCoefficients.size()-1) && (this->mCoefficients[i] == 0)) i++;
+	if (i == 0) return;
+
+	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
+	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
+		this->mCoefficients[i] = this->mCoefficients[j+i];
+	}
+	this->mCoefficients.resize(this->mCoefficients.size()-i);
+}
+
+template<typename Coeff>
+std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
+	return this->standardSturmSequence(this->derivative());
+}
+
+template<typename Coeff>
+std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
+	assert(this->mainVar() == polynomial.mainVar());
+
+	std::list<UnivariatePolynomial<Coeff>> seq;
+
+	UnivariatePolynomial<Coeff> p = *this;
+	UnivariatePolynomial<Coeff> q = polynomial;
+
+	seq.push_back(p);
+	while (! q.isZero()) {
+		seq.push_back(q);
+		q = - p.reduce(q);
+		p = seq.back();
+	}
+
+	return seq;
 }
 
 template<typename Coeff>

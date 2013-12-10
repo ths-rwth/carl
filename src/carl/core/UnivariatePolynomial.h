@@ -4,9 +4,10 @@
  */
 
 #pragma once
+#include <list>
 #include <map>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "Variable.h"
 #include "VariableInformation.h"
@@ -50,6 +51,8 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 //	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
+
+	virtual ~UnivariatePolynomial();
 
 	//Polynomial interface implementations.
 
@@ -306,6 +309,14 @@ public:
     
     Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
+
+	bool zeroIsRoot() const {
+		return this->mCoefficients[0] == 0;
+	}
+	void eliminateZeroRoots();
+
+	std::list<UnivariatePolynomial> standardSturmSequence() const;
+	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
