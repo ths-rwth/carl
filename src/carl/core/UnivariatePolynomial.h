@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include <functional>
 #include <list>
 #include <map>
 #include <memory>
@@ -15,6 +16,7 @@
 #include "DivisionResult.h"
 #include "../numbers/numbers.h"
 #include "../numbers/GFNumber.h"
+#include "../interval/ExactInterval.h"
 
 #include "logging.h"
 #include "../util/SFINAE.h"
@@ -164,9 +166,9 @@ public:
      */
     Coefficient coprimeFactor() const;
     
-	template<typename Integer>
-	UnivariatePolynomial<Integer> coprimeCoefficients() const;
-	
+	template<typename C = Coefficient, EnableIf<is_fraction<C>> = dummy>
+	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
+
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	UnivariatePolynomial normalized() const;
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
@@ -179,7 +181,11 @@ public:
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	
 	
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+
 	bool divides(const UnivariatePolynomial&) const;
 	
 	UnivariatePolynomial& mod(const Coefficient& modulus);
@@ -188,7 +194,8 @@ public:
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
-	UnivariatePolynomial squareFreePart() const;
+	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	UnivariatePolynomial<typename IntegralT<Coefficient>::type> squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
@@ -232,6 +239,11 @@ public:
 	
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
 
+	template<typename NewCoeff>
+	UnivariatePolynomial<NewCoeff> convert() const;
+	template<typename NewCoeff>
+	UnivariatePolynomial<NewCoeff> convert(const std::function<NewCoeff(const Coefficient&)>& f) const;
+
 	/**
 	 * Notice, Cauchy bounds are only defined for polynomials over fields.
 	 * 
@@ -240,6 +252,13 @@ public:
 	 */
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
+
+	/** The maximum norm of a polynomial is the maximum absolute value of the coefficients of
+	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
+	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.
+	 */
+	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	IntNumberType maximumNorm() const;
 
 	/**
 	 * Returns the numeric content part of the i'th coefficient.
@@ -250,12 +269,12 @@ public:
      * @return numeric content part of i'th coefficient.
      */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	typename UnderlyingNumberType<Coefficient>::type numericContent(unsigned int i) const
+	NumberType numericContent(unsigned int i) const
 	{
 		return this->mCoefficients[i];
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	typename UnderlyingNumberType<Coefficient>::type numericContent(unsigned int i) const
+	NumberType numericContent(unsigned int i) const
 	{
 		return this->mCoefficients[i].numericContent();
 	}

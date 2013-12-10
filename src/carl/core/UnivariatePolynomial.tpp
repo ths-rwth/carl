@@ -11,6 +11,7 @@
 #include <iomanip>
 #include "../util/SFINAE.h"
 #include "logging.h"
+#include "Sign.h"
 
 namespace carl
 {
@@ -253,6 +254,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_fraction<C>>>
+UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::squareFreePart() const {
+	UnivariatePolynomial<typename IntegralT<Coeff>::type> normalized = this->coprimeCoefficients();
+	return normalized.divide(normalized.derivative()).quotient;
+}
+
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modulus)
 {
 	for(Coeff& coeff : mCoefficients)
@@ -273,6 +282,28 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::mod(const Coeff& modulu
 	}
 	result.stripLeadingZeroes();
 	return result;
+}
+
+template<typename Coeff>
+template<typename NewCoeff>
+UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
+	std::vector<NewCoeff> coeffs;
+	coeffs.reserve(this->mCoefficients.size());
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		coeffs[i] = (NewCoeff)(this->mCoefficients[i]);
+	}
+	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
+}
+
+template<typename Coeff>
+template<typename NewCoeff>
+UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert(const std::function<NewCoeff(const Coeff&)>& f) const {
+	std::vector<NewCoeff> coeffs;
+	coeffs.reserve(this->mCoefficients.size());
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		coeffs[i] = f(this->mCoefficients[i]);
+	}
+	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
 }
 
 template<typename Coeff>
@@ -330,22 +361,24 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 }
 
 template<typename Coeff>
-template<typename Integer>
-UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+template<typename C, EnableIf<is_fraction<C>>>
+UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
-	UnivariatePolynomial<Integer> result(mMainVar);
+	UnivariatePolynomial<typename IntegralT<Coeff>::type> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& coeff : mCoefficients)
 	{
-		result.mCoefficients.push_back(coeff * factor);
+		assert(getDenom(coeff*factor) == 1);
+		result.mCoefficients.push_back(getNum(coeff * factor));
 	}
 	return result;
 }	
 
 template<typename Coeff>
+template<typename C, DisableIf<is_integer<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!divisor.isZero());
@@ -370,6 +403,26 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_integer<C>>>
+DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	assert(!divisor.isZero());
+	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	assert(*this == divisor * result.quotient + result.remainder);
+
+	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
+
+	unsigned int degdiff = this->degree() - divisor.degree();
+	for (unsigned int offset = 0; offset <= degdiff; offset++) {
+		Coeff factor = carl::div(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
+		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
+		result.quotient.mCoefficients[degdiff-offset] += factor;
+	}
+	assert(*this == divisor * result.quotient + result.remainder);
+	return result;
+}
+
+template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& dividant) const
 {
 	return dividant.divide(*this).remainder.isZero();
@@ -383,6 +436,22 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Modified Cauchy bounds are only defined for field-coefficients");
 	LOG_NOTIMPLEMENTED();
+}
+
+template<typename Coeff>
+template<typename C, EnableIf<is_fraction<C>>>
+typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
+	typename std::vector<C>::const_iterator it = mCoefficients.begin();
+	Coeff max = *it;
+	IntNumberType num = getNum(*it);
+	IntNumberType den = getDenom(*it);
+	for (++it; it != mCoefficients.end(); ++it) {
+		if (*it > max) max = *it;
+		num = carl::gcd(num, getNum(*it));
+		den = carl::lcm(den, getDenom(*it));
+	}
+	assert(getDenom(max*den/num) == 1);
+	return getNum(max*den/num);
 }
 
 template<typename Coeff>
@@ -432,7 +501,7 @@ UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolyno
 
 template<typename Coeff>
 template<typename N, EnableIf<is_fraction<N>>>
-typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::numericContent() const
+typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
 {
 	if (this->isZero()) return 0;
 	// Obtain main denominator for all coefficients.
