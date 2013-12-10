@@ -947,6 +947,22 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 }
 
 template<typename Coeff>
+void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
+	if (root == 0) {
+		this->eliminateZeroRoots();
+		return;
+	}
+	do {
+		std::vector<Coeff> tmp(this->mCoefficients.size()-1);
+		for (unsigned long i = this->mCoefficients.size()-1; i > 0; i--) {
+			tmp[i-1] = this->mCoefficients[i];
+			this->mCoefficients[i-1] += this->mCoefficients[i] * root;
+		}
+		this->mCoefficients = tmp;
+	} while ((this->evaluate(root) == 0) && (this->mCoefficients.size() > 0));
+}
+
+template<typename Coeff>
 std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
 	return this->standardSturmSequence(this->derivative());
 }
@@ -971,6 +987,55 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 }
 
 template<typename Coeff>
+unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coeff>& interval) const {
+	UnivariatePolynomial<Coeff> p(*this);
+	p.shift(interval.left());
+	p.scale(interval.diameter());
+	p.reverse();
+	p.shift(1);
+	return carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
+}
+
+template<typename Coeff>
+unsigned int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& interval) const {
+	auto seq = this->standardSturmSequence();
+	unsigned int l = carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return sgn(p.evaluate(interval.left())); });
+	unsigned int r = carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return sgn(p.evaluate(interval.right())); });
+	return l - r;
+}
+
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::reverse() {
+	std::reverse(this->mCoefficients.begin(), this->mCoefficients.end());
+}
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::scale(const Coeff& factor) {
+	Coeff f = factor;
+	for (unsigned int i = 1; i < this->mCoefficients.size(); i++) {
+		this->mCoefficients[i] *= f;
+		f *= factor;
+	}
+}
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::shift(const Coeff& a) {
+	std::vector<Coeff> next;
+	next.reserve(this->mCoefficients.size());
+	next.push_back(this->mCoefficients.back());
+
+	for (unsigned int i = 0; i < this->mCoefficients.size()-1; i++) {
+		next.push_back(next.back());
+		for (unsigned int j = i; j > 0; j--) {
+			next[j] = a * next[j] + next[j-1];
+		}
+		next[0] = a * next[0] + this->mCoefficients[this->mCoefficients.size()-2-i];
+	}
+	this->mCoefficients = next;
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
@@ -979,7 +1044,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 	{
 		result.mCoefficients.push_back(-c);
 	}
-	
+
 	return result;		 
 }
 
