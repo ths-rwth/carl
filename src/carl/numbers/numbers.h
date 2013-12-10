@@ -91,6 +91,27 @@ struct is_fraction<mpq_class>
 };
 
 /**
+ * Type trait is_integer.
+ * Default is false, but certain types which encode integral types should be set to true. 
+ */
+template<typename type>
+struct is_integer
+{
+	static const bool value = false;
+};
+
+template<>
+struct is_integer<cln::cl_I>
+{
+	static const bool value = true;
+};
+template<>
+struct is_integer<mpz_class>
+{
+	static const bool value = true;
+};
+
+/**
  * Type trait for the characteristic of the given field (template argument).
  * Default is 0, but certain types which encode algebraic fields should be set to true. 
  * @see UnivariatePolynomial - squareFreeFactorization for example.
@@ -271,6 +292,19 @@ inline double getDouble(const cln::cl_RA& rational)
 	return cln::double_approx(rational);
 }
 
+inline cln::cl_I floor(const cln::cl_RA& n) {
+	return cln::floor1(n);
+}
+inline cln::cl_I floor(const cln::cl_I& n) {
+	return cln::floor1(n);
+}
+inline cln::cl_I ceil(const cln::cl_RA& n) {
+	return cln::ceiling1(n);
+}
+inline cln::cl_I ceil(const cln::cl_I& n) {
+	return cln::ceiling1(n);
+}
+
 template<typename t>
 inline t rationalize(double d)
 {
@@ -352,6 +386,23 @@ inline double getDouble(const mpq_class& rational)
 	return rational.get_d();
 }
 
+inline mpz_class floor(const mpq_class& n) {
+	mpz_class res;
+	mpz_fdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
+	return res;
+}
+inline mpz_class floor(const mpz_class& n) {
+	return n;
+}
+inline mpz_class ceil(const mpq_class& n) {
+	mpz_class res;
+	mpz_cdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
+	return res;
+}
+inline mpz_class ceil(const mpz_class& n) {
+	return n;
+}
+
 template<>
 inline mpq_class rationalize<mpq_class>(double d)
 {
@@ -419,6 +470,11 @@ inline int mod(const int& n, const int& m)
 inline cln::cl_I mod(const cln::cl_I& n, const cln::cl_I& m)
 {
 	return cln::mod(n, m);
+}
+
+inline cln::cl_I div(const cln::cl_I& n, const cln::cl_I& m)
+{
+	return cln::floor1(n / m);
 }
 
 
