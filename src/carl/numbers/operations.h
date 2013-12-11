@@ -22,13 +22,18 @@ namespace carl {
  */
 
 template<typename Number>
-inline typename IntegralT<Number>::type getNum(const Number&);
+inline const typename IntegralT<Number>::type getNum(const Number&);
 
 template<typename Number>
-inline typename IntegralT<Number>::type getDenom(const Number&);
+inline const typename IntegralT<Number>::type getDenom(const Number&);
 
 template<typename Number>
 inline bool isInteger(const Number&);
+
+template<typename C>
+inline bool isInteger(const GFNumber<C>&) {
+	return true;
+}
 
 /**
  * Conversion functions
@@ -38,7 +43,7 @@ inline bool isInteger(const Number&);
 template<typename Number>
 inline double toDouble(const Number&);
 
-template<typename Number, typename Integer>
+template<typename Integer, typename Number>
 inline Integer toInt(const Number&);
 
 template<typename Number>
@@ -49,6 +54,9 @@ inline Number rationalize(double);
  * 
  * The following functions implement simple operations on the given numbers.
  */
+template<typename Number>
+inline Number abs(const Number&);
+
 template<typename Number>
 inline typename IntegralT<Number>::type floor(const Number&);
 
@@ -70,6 +78,11 @@ inline Number mod(const Number&, const Number&);
 template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline Number div(const Number&, const Number&);
 
+template<typename Number, EnableIf<is_integer<Number>> = dummy>
+inline void divide(const Number& dividend, const Number& divisor, Number& quotient, Number& remainder);
+
 }
 
 #include "operations_cln.h"
+#include "operations_gmp.h"
+#include "operations_native.h"

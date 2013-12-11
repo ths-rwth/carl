@@ -1,14 +1,14 @@
 /* 
  * File:   operations_cln.h
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * 
+ * This file should never be included directly but only via operations.h
  */
 
 #pragma once
 
 #include <cassert>
 #include <climits>
-
-#include "typetraits.h"
 
 namespace carl {
 
@@ -19,12 +19,12 @@ namespace carl {
  */
 
 template<>
-inline cln::cl_I getNum(const cln::cl_RA& n) {
+inline const cln::cl_I getNum(const cln::cl_RA& n) {
 	return cln::numerator(n);
 }
 
 template<>
-inline cln::cl_I getDenom(const cln::cl_RA& n) {
+inline const cln::cl_I getDenom(const cln::cl_RA& n) {
 	return cln::denominator(n);
 }
 
@@ -52,16 +52,20 @@ inline double toDouble(const cln::cl_I& n) {
 }
 
 template<>
-inline int toInt(const cln::cl_I& n) {
+inline int toInt<int>(const cln::cl_I& n) {
     assert(n <= INT_MAX);
     return cln::cl_I_to_int(n);
 }
 template<>
-inline unsigned toInt(const cln::cl_I& n) {
+inline unsigned toInt<unsigned>(const cln::cl_I& n) {
     assert(n <= UINT_MAX);
     return cln::cl_I_to_uint(n);
 }
 
+template<typename T>
+inline T rationalize(double n) {
+	return cln::rationalize(cln::cl_R(n));
+}
 template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
 	return cln::rationalize(cln::cl_R(n));
@@ -76,10 +80,18 @@ template<>
 inline cln::cl_I floor(const cln::cl_RA& n) {
 	return cln::floor1(n);
 }
+template<>
+inline cln::cl_I floor(const cln::cl_I& n) {
+	return n;
+}
 
 template<>
 inline cln::cl_I ceil(const cln::cl_RA& n) {
 	return cln::ceiling1(n);
+}
+template<>
+inline cln::cl_I ceil(const cln::cl_I& n) {
+	return n;
 }
 
 template<>

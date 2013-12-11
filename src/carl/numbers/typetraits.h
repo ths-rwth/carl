@@ -98,19 +98,32 @@ struct is_fraction<mpq_class>
  * Default is false, but certain types which encode integral types should be set to true. 
  */
 template<typename type>
-struct is_integer
-{
+struct is_integer {
 	static const bool value = false;
 };
 
 template<>
-struct is_integer<cln::cl_I>
-{
+struct is_integer<cln::cl_I> {
 	static const bool value = true;
 };
 template<>
-struct is_integer<mpz_class>
-{
+struct is_integer<mpz_class> {
+	static const bool value = true;
+};
+template<>
+struct is_integer<long> {
+	static const bool value = true;
+};
+template<>
+struct is_integer<unsigned long> {
+	static const bool value = true;
+};
+template<>
+struct is_integer<unsigned> {
+	static const bool value = true;
+};
+template<>
+struct is_integer<int> {
 	static const bool value = true;
 };
 
