@@ -178,6 +178,7 @@ public:
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	
 	

@@ -128,6 +128,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
+template<typename C, DisableIf<is_integer<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial& divisor) const
 {
 	assert(degree() >= divisor.degree());
@@ -257,7 +258,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_fraction<C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::squareFreePart() const {
 	UnivariatePolynomial<typename IntegralT<Coeff>::type> normalized = this->coprimeCoefficients();
-	return normalized.divide(normalized.derivative()).quotient;
+	return normalized.divide(UnivariatePolynomial<typename IntegralT<Coeff>::type>::gcd(normalized, normalized.derivative())).quotient;
 }
 
 
@@ -288,7 +289,7 @@ template<typename Coeff>
 template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
 	std::vector<NewCoeff> coeffs;
-	coeffs.reserve(this->mCoefficients.size());
+	coeffs.resize(this->mCoefficients.size());
 	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
 		coeffs[i] = (NewCoeff)(this->mCoefficients[i]);
 	}
@@ -299,7 +300,7 @@ template<typename Coeff>
 template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert(const std::function<NewCoeff(const Coeff&)>& f) const {
 	std::vector<NewCoeff> coeffs;
-	coeffs.reserve(this->mCoefficients.size());
+	coeffs.resize(this->mCoefficients.size());
 	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
 		coeffs[i] = f(this->mCoefficients[i]);
 	}
