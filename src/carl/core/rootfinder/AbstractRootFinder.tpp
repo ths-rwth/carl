@@ -18,7 +18,8 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		bool tryTrivialSolver
 	) :
 		originalPolynomial(polynomial),
-		polynomial(polynomial.squareFreePart().template convert<Number>()),
+		//polynomial(polynomial.squareFreePart().template convert<Number>()),
+		polynomial(polynomial),
 		interval(interval),
 		finished(false)
 {

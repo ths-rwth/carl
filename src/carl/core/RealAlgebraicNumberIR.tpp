@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   RealAlgebraicNumberIR.tpp
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
@@ -28,11 +28,12 @@ RANIR<Number>::RealAlgebraicNumberIR(
 		const std::list<UnivariatePolynomial<Number>>& seq,
 		const bool normalize,
 		const bool isRoot ) :
-        RealAlgebraicNumber<Number>(isRoot, false, 0),
-        polynomial(p.squareFreePart().template convert<Number>()),
-        interval(i),
-        sturmSequence( seq.empty() ? polynomial.standardSturmSequence() : seq ),
-        refinementCount(0)
+		RealAlgebraicNumber<Number>(isRoot, false, 0),
+		//polynomial(p.squareFreePart().template convert<Number>()),
+		polynomial(p),
+		interval(i),
+		sturmSequence( seq.empty() ? polynomial.standardSturmSequence() : seq ),
+		refinementCount(0)
 {
 	assert(!this->polynomial.isConstant());
 	if (normalize) this->normalizeInterval();
