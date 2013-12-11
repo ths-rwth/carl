@@ -110,6 +110,51 @@ inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
 }
 
 template<>
+inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
+    cln::cl_R root = cln::sqrt(a);
+    cln::cl_RA rroot = cln::rationalize(root);
+    if( rroot == root ) // the result of the sqrt operation is a rational and thus an exact solution -> return a point-Interval
+    {
+        return std::make_pair(rroot, rroot);
+    }
+    else // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
+    {
+        if( cln::expt_pos(rroot,2) > a ) // we need to find the lower bound
+        {
+            cln::cl_R lower = cln::sqrt(a-rroot);
+            cln::cl_RA rlower = cln::rationalize(lower);
+            if( rlower == lower )
+            {
+                return std::make_pair(rlower, rroot);
+            }
+            else
+            {
+                cln::cl_I num = cln::numerator(rlower);
+                cln::cl_I den = cln::denominator(rlower);
+                --num;
+                return std::make_pair(rroot, num/den );
+            }
+        }
+        else // we need to find the upper bound
+        {
+            cln::cl_R upper = cln::sqrt(a+rroot);
+            cln::cl_RA rupper = cln::rationalize(upper);
+            if( rupper == upper )
+            {
+                return std::make_pair(rroot, rupper);
+            }
+            else
+            {
+                cln::cl_I num = cln::numerator(rupper);
+                cln::cl_I den = cln::denominator(rupper);
+                ++num;
+                return std::make_pair(rroot, num/den );
+            }
+        }
+    }
+}
+
+template<>
 inline cln::cl_I mod(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::mod(a, b);
 }

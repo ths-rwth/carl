@@ -14,7 +14,7 @@
 #include "../util/SFINAE.h"
 
 namespace carl {
-
+    
 /**
  * Informational functions
  * 
@@ -71,6 +71,9 @@ inline Number lcm(const Number&, const Number&);
 
 template<typename Number>
 inline Number pow(const Number&, unsigned);
+
+template<typename Number>
+inline std::pair<Number,Number> sqrt(const Number&);
 
 template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline Number mod(const Number&, const Number&);
