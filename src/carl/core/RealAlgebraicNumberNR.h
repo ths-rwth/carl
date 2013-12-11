@@ -8,7 +8,6 @@
 #include "RealAlgebraicNumber.h"
 
 namespace carl {
-namespace core {
 
 /**
  * RealAlgebraicNumberNR is a specialization of RealAlgebraicNumber.
@@ -45,5 +44,4 @@ std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>& 
 	return os << "RealAlgebraicNumberNR(" << g.value() << ")";
 }
 
-}
 }

@@ -10,7 +10,7 @@
 #include "RealAlgebraicNumberIR.h"
 
 namespace carl {
-namespace core {
+
 template<typename Number>
 RANIR<Number>::RealAlgebraicNumberIR() :
 		RealAlgebraicNumber<Number>(true, true, 0),
@@ -104,5 +104,4 @@ void RANIR<Number>::coarsen(const ExactInterval<Number>& i)
 	}
 }
 
-}
 }

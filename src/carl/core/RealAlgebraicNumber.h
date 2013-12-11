@@ -11,7 +11,6 @@
 #include "UnivariatePolynomial.h"
 
 namespace carl {
-namespace core {
 
 /**
  * This class is the base for all representations of real algebraic numbers and provides crucial operations such as arithmetic, ordering or sign determination on them.
@@ -150,13 +149,9 @@ public:
 		return this->value();
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Number>& g);
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Number>& g) {
+		return os << "RealAlgebraicNumber(" << g.value() << ", " << g.isNumeric() << ", " << g.isRoot() << ")";
+	}
 };
 
-template<typename Number>
-std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Number>& g) {
-	return os << "RealAlgebraicNumber(" << g.value() << ", " << g.isNumeric() << ", " << g.isRoot() << ")";
-}
-
-}
 }

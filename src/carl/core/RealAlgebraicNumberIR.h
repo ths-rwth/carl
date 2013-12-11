@@ -11,7 +11,6 @@
 #include "../util/SFINAE.h"
 
 namespace carl {
-namespace core {
 
 
 template<typename Number, typename isFraction = EnableIf<is_fraction<Number>>>
@@ -151,7 +150,6 @@ public:
 template<typename Number>
 using RANIR = class RealAlgebraicNumberIR<Number, EnableIf<is_fraction<Number>>>;
 
-}
 }
 
 #include "RealAlgebraicNumberIR.tpp"
