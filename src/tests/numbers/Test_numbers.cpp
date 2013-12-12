@@ -1,20 +1,17 @@
 #include <gmpxx.h>
 #include "gtest/gtest.h"
-#include "carl/numbers/numbers.h"
-#include "carl/numbers/GFNumber.h"
-#include "carl/util/SFINAE.h"
 
-#include <type_traits>
-#include <typeinfo>
+#include "carl/numbers/typetraits.h"
+#include "carl/numbers/operations.h"
+
+#include <cln/cln.h>
 
 using namespace carl;
 
-TEST(Numbers, IntegralT)
+TEST(Numbers, operations)
 {
-	static_assert(std::is_same<mpz_class, IntegralT<mpq_class>::type>::value, "IntegralType of mpq_class should be mpz_class");
-	static_assert(std::is_same<mpz_class, IntegralT<GFNumber<mpz_class>>::type>::value, "Should be the same");
-	static_assert(is_instantiation_of<GFNumber,GFNumber<mpz_class>>::value, "Check whether the is_instantiaton works correctly");
+	ASSERT_TRUE(carl::floor(cln::rationalize(1.5)) == (cln::cl_I)1);
+	ASSERT_TRUE(carl::ceil(cln::rationalize(1.5)) == (cln::cl_I)2);
 	
+	ASSERT_TRUE(carl::gcd((cln::cl_I)15, (cln::cl_I)20) == (cln::cl_I)5);
 }
-	
- 

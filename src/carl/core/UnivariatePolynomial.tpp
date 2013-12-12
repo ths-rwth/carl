@@ -11,6 +11,7 @@
 #include <iomanip>
 #include "../util/SFINAE.h"
 #include "logging.h"
+#include "Sign.h"
 
 namespace carl
 {
@@ -72,6 +73,10 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff>::~UnivariatePolynomial() {
+}
+
+template<typename Coeff>
 Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const 
 {
 	Coeff result(0);
@@ -123,6 +128,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
+template<typename C, DisableIf<is_integer<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial& divisor) const
 {
 	assert(degree() >= divisor.degree());
@@ -249,6 +255,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_fraction<C>>>
+UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::squareFreePart() const {
+	UnivariatePolynomial<typename IntegralT<Coeff>::type> normalized = this->coprimeCoefficients();
+	return normalized.divide(UnivariatePolynomial<typename IntegralT<Coeff>::type>::gcd(normalized, normalized.derivative())).quotient;
+}
+
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modulus)
 {
 	for(Coeff& coeff : mCoefficients)
@@ -269,6 +283,28 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::mod(const Coeff& modulu
 	}
 	result.stripLeadingZeroes();
 	return result;
+}
+
+template<typename Coeff>
+template<typename NewCoeff>
+UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
+	std::vector<NewCoeff> coeffs;
+	coeffs.resize(this->mCoefficients.size());
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		coeffs[i] = (NewCoeff)(this->mCoefficients[i]);
+	}
+	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
+}
+
+template<typename Coeff>
+template<typename NewCoeff>
+UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert(const std::function<NewCoeff(const Coeff&)>& f) const {
+	std::vector<NewCoeff> coeffs;
+	coeffs.resize(this->mCoefficients.size());
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		coeffs[i] = f(this->mCoefficients[i]);
+	}
+	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
 }
 
 template<typename Coeff>
@@ -326,22 +362,24 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 }
 
 template<typename Coeff>
-template<typename Integer>
-UnivariatePolynomial<Integer> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+template<typename C, EnableIf<is_fraction<C>>>
+UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
-	UnivariatePolynomial<Integer> result(mMainVar);
+	UnivariatePolynomial<typename IntegralT<Coeff>::type> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& coeff : mCoefficients)
 	{
-		result.mCoefficients.push_back(coeff * factor);
+		assert(getDenom(coeff*factor) == 1);
+		result.mCoefficients.push_back(getNum(coeff * factor));
 	}
 	return result;
 }	
 
 template<typename Coeff>
+template<typename C, DisableIf<is_integer<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!divisor.isZero());
@@ -366,6 +404,26 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_integer<C>>>
+DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	assert(!divisor.isZero());
+	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	assert(*this == divisor * result.quotient + result.remainder);
+
+	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
+
+	unsigned int degdiff = this->degree() - divisor.degree();
+	for (unsigned int offset = 0; offset <= degdiff; offset++) {
+		Coeff factor = carl::div(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
+		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
+		result.quotient.mCoefficients[degdiff-offset] += factor;
+	}
+	assert(*this == divisor * result.quotient + result.remainder);
+	return result;
+}
+
+template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& dividant) const
 {
 	return dividant.divide(*this).remainder.isZero();
@@ -379,6 +437,22 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Modified Cauchy bounds are only defined for field-coefficients");
 	LOG_NOTIMPLEMENTED();
+}
+
+template<typename Coeff>
+template<typename C, EnableIf<is_fraction<C>>>
+typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
+	typename std::vector<C>::const_iterator it = mCoefficients.begin();
+	Coeff max = *it;
+	IntNumberType num = getNum(*it);
+	IntNumberType den = getDenom(*it);
+	for (++it; it != mCoefficients.end(); ++it) {
+		if (*it > max) max = *it;
+		num = carl::gcd(num, getNum(*it));
+		den = carl::lcm(den, getDenom(*it));
+	}
+	assert(getDenom(max*den/num) == 1);
+	return getNum(max*den/num);
 }
 
 template<typename Coeff>
@@ -428,7 +502,7 @@ UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolyno
 
 template<typename Coeff>
 template<typename N, EnableIf<is_fraction<N>>>
-typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::numericContent() const
+typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
 {
 	if (this->isZero()) return 0;
 	// Obtain main denominator for all coefficients.
@@ -861,6 +935,108 @@ std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squ
 }
 
 template<typename Coeff>
+void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
+	unsigned int i = 0;
+	while ((i < this->mCoefficients.size()-1) && (this->mCoefficients[i] == 0)) i++;
+	if (i == 0) return;
+
+	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
+	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
+		this->mCoefficients[i] = this->mCoefficients[j+i];
+	}
+	this->mCoefficients.resize(this->mCoefficients.size()-i);
+}
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
+	if (root == 0) {
+		this->eliminateZeroRoots();
+		return;
+	}
+	do {
+		std::vector<Coeff> tmp(this->mCoefficients.size()-1);
+		for (unsigned long i = this->mCoefficients.size()-1; i > 0; i--) {
+			tmp[i-1] = this->mCoefficients[i];
+			this->mCoefficients[i-1] += this->mCoefficients[i] * root;
+		}
+		this->mCoefficients = tmp;
+	} while ((this->evaluate(root) == 0) && (this->mCoefficients.size() > 0));
+}
+
+template<typename Coeff>
+std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
+	return this->standardSturmSequence(this->derivative());
+}
+
+template<typename Coeff>
+std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
+	assert(this->mainVar() == polynomial.mainVar());
+
+	std::list<UnivariatePolynomial<Coeff>> seq;
+
+	UnivariatePolynomial<Coeff> p = *this;
+	UnivariatePolynomial<Coeff> q = polynomial;
+
+	seq.push_back(p);
+	while (! q.isZero()) {
+		seq.push_back(q);
+		q = - p.reduce(q);
+		p = seq.back();
+	}
+
+	return seq;
+}
+
+template<typename Coeff>
+unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coeff>& interval) const {
+	UnivariatePolynomial<Coeff> p(*this);
+	p.shift(interval.left());
+	p.scale(interval.diameter());
+	p.reverse();
+	p.shift(1);
+	return carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
+}
+
+template<typename Coeff>
+unsigned int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& interval) const {
+	auto seq = this->standardSturmSequence();
+	unsigned int l = carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return sgn(p.evaluate(interval.left())); });
+	unsigned int r = carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return sgn(p.evaluate(interval.right())); });
+	return l - r;
+}
+
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::reverse() {
+	std::reverse(this->mCoefficients.begin(), this->mCoefficients.end());
+}
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::scale(const Coeff& factor) {
+	Coeff f = factor;
+	for (unsigned int i = 1; i < this->mCoefficients.size(); i++) {
+		this->mCoefficients[i] *= f;
+		f *= factor;
+	}
+}
+
+template<typename Coeff>
+void UnivariatePolynomial<Coeff>::shift(const Coeff& a) {
+	std::vector<Coeff> next;
+	next.reserve(this->mCoefficients.size());
+	next.push_back(this->mCoefficients.back());
+
+	for (unsigned int i = 0; i < this->mCoefficients.size()-1; i++) {
+		next.push_back(next.back());
+		for (unsigned int j = i; j > 0; j--) {
+			next[j] = a * next[j] + next[j-1];
+		}
+		next[0] = a * next[0] + this->mCoefficients[this->mCoefficients.size()-2-i];
+	}
+	this->mCoefficients = next;
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 {
 	UnivariatePolynomial result(mMainVar);
@@ -869,7 +1045,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 	{
 		result.mCoefficients.push_back(-c);
 	}
-	
+
 	return result;		 
 }
 

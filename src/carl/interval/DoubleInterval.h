@@ -558,7 +558,7 @@ DoubleInterval::DoubleInterval(const Rational& lower, BoundType lowerType, const
 template<typename Rational>
 double DoubleInterval::roundDown(const Rational& o, bool overapproximate)
 {
-	double result = getDouble(o);
+	double result = toDouble(o);
 	if(result == -INFINITY) return result;
 	if(result == INFINITY) return DBL_MAX;
 	// If the cln::cl_RA cannot be represented exactly by a double, round.
@@ -577,7 +577,7 @@ double DoubleInterval::roundDown(const Rational& o, bool overapproximate)
 template<typename Rational>
 double DoubleInterval::roundUp(const Rational& o, bool overapproximate)
 {
-	double result = getDouble(o);
+	double result = toDouble(o);
 	if(result == INFINITY) return result;
 	if(result == -INFINITY) return -DBL_MAX;
 	// If the cln::cl_RA cannot be represented exactly by a double, round.

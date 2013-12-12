@@ -40,6 +40,12 @@ namespace carl
         assert( BOUNDS_OK( l, lType, r, rType ));    // Specified bounds do not define an interval.
     }
 
+	template<typename Numeric>
+    ExactInterval<Numeric>::ExactInterval( const Numeric& l, const Numeric& r, BoundType type ):
+		ExactInterval<Numeric>(l, type, r, type)
+	{
+	}
+
     template<typename Numeric>
     ExactInterval<Numeric>::ExactInterval( const ExactInterval<Numeric>& i ):
         mLeft( i.mLeft ),
@@ -204,6 +210,17 @@ namespace carl
     Numeric ExactInterval<Numeric>::midpoint() const
     {
         return getWeakestBoundType(mLeftType,mRightType) == BoundType::INFTY ? Numeric(0) : (mLeft + mRight) / Numeric( 2 );
+    }
+
+	template<typename Numeric>
+    Numeric ExactInterval<Numeric>::sample() const
+    {
+		Numeric mid = this->midpoint();
+		Numeric midf = carl::floor(mid);
+		if (this->contains(midf)) return midf;
+		Numeric midc = carl::ceil(mid);
+		if (this->contains(midc)) return midc;
+		return mid;
     }
 
     template<typename Numeric>
