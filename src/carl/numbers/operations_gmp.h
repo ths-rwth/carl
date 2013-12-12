@@ -15,30 +15,24 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
-template<>
-inline const mpz_class getNum(const mpq_class& n) {
+inline const mpz_class& getNum(const mpq_class& n) {
 	return n.get_num();
 }
-template<>
-inline const mpz_class getNum(const mpz_class& n) {
+inline const mpz_class& getNum(const mpz_class& n) {
 	return n;
 }
 
-template<>
-inline const mpz_class getDenom(const mpq_class& n) {
+inline const mpz_class& getDenom(const mpq_class& n) {
 	return n.get_den();
 }
-template<>
-inline const mpz_class getDenom(const mpz_class& n) {
+inline const mpz_class& getDenom(const mpz_class& n) {
 	return n;
 }
 
-template<>
 inline bool isInteger(const mpq_class& n) {
 	 return 0 != mpz_divisible_p(n.get_num_mpz_t(), n.get_den_mpz_t());
 }
 
-template<>
 inline bool isInteger(const mpz_class&) {
 	return true;
 }
@@ -49,7 +43,6 @@ inline bool isInteger(const mpz_class&) {
  * The following function convert types to other types.
  */
 
-template<>
 inline double toDouble(const mpq_class& n) {
 	return n.get_d();
 }
@@ -57,6 +50,8 @@ inline double toDouble(const mpz_class& n) {
 	return n.get_d();
 }
 
+template<typename Integer>
+inline Integer toInt(const mpz_class& n);
 template<>
 inline signed long int toInt<signed long int>(const mpz_class& n) {
     assert(n <= INT_MAX);
@@ -68,6 +63,8 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
     return mpz_get_ui(n.get_mpz_t());
 }
 
+template<typename T>
+inline T rationalize(double n);
 template<>
 inline mpq_class rationalize<mpq_class>(double d) {
 	return mpq_class(d);
@@ -79,71 +76,60 @@ inline mpq_class rationalize<mpq_class>(double d) {
  * The following functions implement simple operations on the given numbers.
  */
 
-template<>
 inline mpz_class abs(const mpz_class& n) {
 	mpz_class res;
 	mpz_abs(res.get_mpz_t(), n.get_mpz_t());
 	return res;
 }
 
-template<>
 inline mpq_class abs(const mpq_class& n) {
 	mpq_class res;
 	mpq_abs(res.get_mpq_t(), n.get_mpq_t());
 	return res;
 }
 
-template<>
 inline mpz_class floor(const mpq_class& n) {
 	mpz_class res;
 	mpz_fdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
 	return res;
 }
-template<>
 inline mpz_class floor(const mpz_class& n) {
 	return n;
 }
 
-template<>
 inline mpz_class ceil(const mpq_class& n) {
 	mpz_class res;
 	mpz_cdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
 	return res;
 }
-template<>
 inline mpz_class ceil(const mpz_class& n) {
 	return n;
 }
 
-template<>
 inline mpz_class gcd(const mpz_class& a, const mpz_class& b) {
 	mpz_class res;
 	mpz_gcd(res.get_mpz_t(), a.get_mpz_t(), b.get_mpz_t());
 	return res;
 }
 
-template<>
 inline mpz_class lcm(const mpz_class& a, const mpz_class& b) {
 	mpz_class res;
 	mpz_lcm(res.get_mpz_t(), a.get_mpz_t(), b.get_mpz_t());
 	return res;
 }
 
-template<>
 inline mpz_class pow(const mpz_class& b, unsigned e) {
 	mpz_class res;
 	mpz_pow_ui(res.get_mpz_t(), b.get_mpz_t(), e);
 	return res;
 }
 
-template<>
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
 	return res;
 }
 
-template<>
 inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
 }

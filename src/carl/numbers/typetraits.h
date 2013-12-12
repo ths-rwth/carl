@@ -212,23 +212,25 @@ struct IntegralT
 
 
 template<>
+struct IntegralT<double>
+{
+	typedef unsigned type;
+};
+template<>
 struct IntegralT<cln::cl_RA>
 {
 	typedef cln::cl_I type;
 };
-
 template<>
 struct IntegralT<cln::cl_I>
 {
 	typedef cln::cl_I type;
 };
-
 template<>
 struct IntegralT<mpq_class>
 {
 	typedef mpz_class type;
 };
-
 template<>
 struct IntegralT<mpz_class>
 {

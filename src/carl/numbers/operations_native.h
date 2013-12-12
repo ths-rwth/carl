@@ -21,7 +21,6 @@ namespace carl {
  * The following function convert types to other types.
  */
 
-template<>
 inline double toDouble(const int& n) {
 	return double(n);
 }
@@ -31,20 +30,22 @@ inline double toDouble(const int& n) {
  * 
  * The following functions implement simple operations on the given numbers.
  */
+inline unsigned floor(const double& n) {
+	return (unsigned)std::floor(n);
+}
+inline unsigned ceil(const double& n) {
+	return (unsigned)std::ceil(n);
+}
 
-template<>
 inline long mod(const long& n, const long& m) {
 	return n % m;
 }
-template<>
 inline unsigned long mod(const unsigned long& n, const unsigned long& m) {
 	return n % m;
 }
-template<>
 inline unsigned mod(const unsigned& n, const unsigned& m) {
 	return n % m;
 }
-template<>
 inline int mod(const int& n, const int& m) {
 	return n % m;
 }

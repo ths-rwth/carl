@@ -6,6 +6,7 @@
 /**
  * This file contains a common interface for basic number functions.
  * All methods here are meant as an interface that should be implemented for each specific number type, if applicable.
+ * The exact signatures, e.g. if variables are passed by reference, can be changed if necessary.
  */
 
 #pragma once
@@ -20,15 +21,13 @@ namespace carl {
  * 
  * The following functions return informations about the given numbers.
  */
+/*
+inline const Integer getNum(const Number&);
 
-template<typename Number>
-inline const typename IntegralT<Number>::type getNum(const Number&);
+inline const Integer getDenom(const Number&);
 
-template<typename Number>
-inline const typename IntegralT<Number>::type getDenom(const Number&);
-
-template<typename Number>
 inline bool isInteger(const Number&);
+*/
 
 template<typename C>
 inline bool isInteger(const GFNumber<C>&) {
@@ -40,49 +39,41 @@ inline bool isInteger(const GFNumber<C>&) {
  * 
  * The following function convert types to other types.
  */
-template<typename Number>
+/*
 inline double toDouble(const Number&);
 
-template<typename Integer, typename Number>
+template<typename Integer> 
 inline Integer toInt(const Number&);
 
-template<typename Number>
 inline Number rationalize(double);
+*/
 
 /**
  * Basic Operators
  * 
  * The following functions implement simple operations on the given numbers.
  */
-template<typename Number>
+/*
 inline Number abs(const Number&);
 
-template<typename Number>
-inline typename IntegralT<Number>::type floor(const Number&);
+inline Integer floor(const Number&);
 
-template<typename Number>
-inline typename IntegralT<Number>::type ceil(const Number&);
+inline Integer ceil(const Number&);
 
-template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline Number gcd(const Number&, const Number&);
 
-template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline Number lcm(const Number&, const Number&);
 
-template<typename Number>
 inline Number pow(const Number&, unsigned);
 
-template<typename Number>
 inline std::pair<Number,Number> sqrt(const Number&);
 
-template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline Number mod(const Number&, const Number&);
 
-template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline Number div(const Number&, const Number&);
 
-template<typename Number, EnableIf<is_integer<Number>> = dummy>
 inline void divide(const Number& dividend, const Number& divisor, Number& quotient, Number& remainder);
+*/
 
 }
 
