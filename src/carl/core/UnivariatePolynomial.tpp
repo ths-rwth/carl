@@ -256,9 +256,9 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 
 template<typename Coeff>
 template<typename C, EnableIf<is_fraction<C>>>
-UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::squareFreePart() const {
-	UnivariatePolynomial<typename IntegralT<Coeff>::type> normalized = this->coprimeCoefficients();
-	return normalized.divide(UnivariatePolynomial<typename IntegralT<Coeff>::type>::gcd(normalized, normalized.derivative())).quotient;
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
+	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
+	return normalized.divide(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
 
 
@@ -314,7 +314,7 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	// Just in case, if we want to use SFINAE, the right statement would be
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
-	Coeff maxCoeff = mCoefficients.front() > 0 ? mCoefficients.front() : -mCoefficients.front();
+	Coeff maxCoeff = abs(mCoefficients.front());
 	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
 	{
         Coeff absOfCoeff = abs( *it );
@@ -323,8 +323,7 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 			maxCoeff = absOfCoeff;
 		}
 	}
-	
-	return 1 + maxCoeff/lcoeff();
+	return 1 + maxCoeff/abs(lcoeff());
 }
 
 template<typename Coeff>

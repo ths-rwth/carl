@@ -196,7 +196,7 @@ public:
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
 	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> squareFreePart() const;
+	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
