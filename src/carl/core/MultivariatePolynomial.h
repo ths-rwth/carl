@@ -199,8 +199,14 @@ public:
 	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
-	 * For a polynomial p, returns p/gcd(all coefficients in p)
-     * @return 
+     * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
+     *         of the coefficients in p.
+     */
+	Coeff coprimeFactor() const;
+	
+	/**
+     * @return p * p.coprimeFactor()
+     * @see coprimeFactor()
      */
 	MultivariatePolynomial coprimeCoefficients() const;
 	

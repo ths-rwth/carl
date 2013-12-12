@@ -399,10 +399,9 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<V
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeCoefficients() const
+Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);
-	if(nrTerms() == 1) return *this;
 	typename TermsType::const_iterator it = mTerms.begin();
 	typename IntegralT<Coeff>::type num = getNum((*it)->coeff());
 	typename IntegralT<Coeff>::type den = getDenom((*it)->coeff());
@@ -411,7 +410,14 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		num = carl::gcd(num, getNum((*it)->coeff()));
 		den = carl::lcm(den, getDenom((*it)->coeff()));
 	}
-	Coeff factor = den/num;
+	return den/num;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeCoefficients() const
+{
+    if(nrTerms() == 1) return *this;
+	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
 	MultivariatePolynomial<Coeff, Ordering, Policies> result;
 	result.mTerms.reserve(mTerms.size());
