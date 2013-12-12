@@ -136,7 +136,7 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::inser
 	for (typename PolynomialSet::const_iterator i = s.begin(); i != s.end(); ++i) {
 		std::list<UnivariatePolynomial<Coefficient>*> parents = s.getParentsOf(*i);
 		if (parents.empty()) {
-			parents = std::list<UnivariatePolynomial<Coefficient>*>( 1, new UnivariatePolynomial<Coefficient>());
+			parents = std::list<UnivariatePolynomial<Coefficient>*>( 1, nullptr);
 		}
 		std::pair<typename PolynomialSet::iterator, bool> insertValue = this->insert(*i, parents, avoidSingle);
 		if(insertValue.second) {
