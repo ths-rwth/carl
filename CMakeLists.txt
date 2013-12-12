@@ -153,6 +153,8 @@ if(NOT FORCE_SHIPPED_RESOURCES)
 	find_package(Log4cplus)
 	# find googletest
 	find_package(GTest)
+	# find eigen
+	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
