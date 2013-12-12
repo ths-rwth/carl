@@ -155,3 +155,7 @@ public:
 };
 
 }
+
+#include "RealAlgebraicNumberIR.h"
+#include "RealAlgebraicNumberNR.h"
+#include "RealAlgebraicNumberOperations.h"
