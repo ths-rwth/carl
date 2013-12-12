@@ -85,11 +85,11 @@ template<typename Number>
 struct GridStrategy : public AbstractStrategy<GridStrategy<Number>, Number> {
 	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
 };
-/*template<typename Number>
+template<typename Number>
 struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, Number> {
 	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
-	itpp::mat companionDefault(const UnivariatePolynomial* polynomial);
-};*/
+	//itpp::mat companionDefault(const UnivariatePolynomial* polynomial);
+};
 template<typename Number>
 struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> {
 	std::vector<double> teruiSasaki(const UnivariatePolynomial<Number>& p, const unsigned int rootCount);
@@ -159,10 +159,11 @@ public:
 protected:
 	
 	virtual void addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial = true) {
-		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
+		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 	}
 	virtual void addRoot(const ExactInterval<Number>& interval) {
+		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(interval);
 	}
 	
