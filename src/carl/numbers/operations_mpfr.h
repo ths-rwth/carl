@@ -6,6 +6,10 @@
  * @version 2013-12-13
  */
 
+#pragma once
+
+#include <mpfr.h>
+
 namespace carl
 {
     /**
