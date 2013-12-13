@@ -198,6 +198,34 @@ struct is_number<mpz_class>
 	static const bool value = true;
 };
 
+/**
+ * Type trait is float
+ * Default is false. Should be set to true for all floating point numbers to enable floating point arithmetic, e.g. in the interval class.
+ */
+
+template<typename type>
+struct is_float
+{
+    static const bool value = false;
+};
+
+template<>
+struct is_float<mpfr_t>
+{
+    static const bool value = true;
+};
+
+template<>
+struct is_float<double>
+{
+    static const bool value = true;
+};
+
+template<>
+struct is_float<float>
+{
+    static const bool value = true;
+};
 
 /**
  * Type trait IntegralT.
