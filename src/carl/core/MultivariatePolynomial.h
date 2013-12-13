@@ -217,11 +217,29 @@ public:
 	MultivariatePolynomial normalize() const;
 	
 	/**
+	 * Replace the given variable by the given value within this multivariate polynomial.
+     */
+	void substituteIn(const Variable::Arg var, const MultivariatePolynomial& value);
+	
+	/**
+	 * Replace the given variable by the given value.
+     * @return A new polynomial without resulting from this substitution.
+     */
+	MultivariatePolynomial substitute(const Variable::Arg var, const MultivariatePolynomial& value) const;
+	
+	/**
+	 * Replace all variables by a value given in their map.
+     * @return A new polynomial without the variables in map.
+     */
+	MultivariatePolynomial substitute(const std::map<Variable, MultivariatePolynomial>& substitutions) const;
+    
+	/**
 	 * Replace all variables by a value given in their map.
      * @return A new polynomial without the variables in map.
      */
 	template<typename SubstitutionType = Coeff>
-	MultivariatePolynomial substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+	MultivariatePolynomial naive_substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+    
 	/**
 	 * Replace all variables by a Term in which the variable does not occur.
      * @param substitutions
@@ -248,6 +266,8 @@ public:
 	unsigned hash() const;
 	
 	MultivariatePolynomial pow(unsigned exp) const;
+    
+	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	

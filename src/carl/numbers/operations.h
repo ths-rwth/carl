@@ -12,6 +12,7 @@
 #pragma once
 
 #include "typetraits.h"
+#include <cmath>
 #include "../util/SFINAE.h"
 
 namespace carl {

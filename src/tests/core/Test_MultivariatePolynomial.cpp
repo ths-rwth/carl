@@ -198,11 +198,75 @@ TEST(MultivariatePolynomial, Substitute)
     mp += (cln::cl_RA)4 * v1;
     MultivariatePolynomial<cln::cl_RA> mp2((cln::cl_RA)2);
     mp2 += (cln::cl_RA)4 * v1;
-    std::map<Variable, cln::cl_RA> substitutions;
-    substitutions[v0] = (cln::cl_RA)12;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions;
+    substitutions[v0] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)12);
     EXPECT_EQ(mp2, mp.substitute(substitutions));
-    substitutions[v0] = (cln::cl_RA)0;
+    substitutions[v0] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
     EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)4 * v1), mp.substitute(substitutions));
+    
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable v = vpool.getFreshVariable();
+    vpool.setVariableName(v, "v");
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    vpool.setVariableName(y, "y");
+    Variable z = vpool.getFreshVariable();
+    vpool.setVariableName(z, "z");
+    
+    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*v*x*y*y, (cln::cl_RA)-2*x*x*y*y*y, (cln::cl_RA)312347*v*v*x, (cln::cl_RA)3*y*v*z*z*x, Term<cln::cl_RA>((cln::cl_RA)1)});
+    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)7*x*x*x*x*y*y, (cln::cl_RA)191*x*x*x*x*z*z*z ,(cln::cl_RA)-3*x*x*y, (cln::cl_RA)1*z*z*x*v*v, (cln::cl_RA)2*z*y*v*v, Term<cln::cl_RA>((cln::cl_RA)4)});
+    
+    MultivariatePolynomial<cln::cl_RA> sy({(cln::cl_RA)-2*y*y*y, (cln::cl_RA)-9*y, Term<cln::cl_RA>((cln::cl_RA)15)});
+    MultivariatePolynomial<cln::cl_RA> sxy1({(cln::cl_RA)1*x*y*y, (cln::cl_RA)-5*y*y*y, Term<cln::cl_RA>((cln::cl_RA)3377)});
+    MultivariatePolynomial<cln::cl_RA> sx({(cln::cl_RA)1*x, Term<cln::cl_RA>((cln::cl_RA)-1)});
+    MultivariatePolynomial<cln::cl_RA> svyz({(cln::cl_RA)8*v*v*y, (cln::cl_RA)1*y*z*y, (cln::cl_RA)29*z*z*z*z*z});
+    MultivariatePolynomial<cln::cl_RA> svz({(cln::cl_RA)1*v*v, (cln::cl_RA)-1*z, (cln::cl_RA)-2*v*z, Term<cln::cl_RA>((cln::cl_RA)10)});
+    MultivariatePolynomial<cln::cl_RA> sxy2({(cln::cl_RA)2*x*y*y});
+    MultivariatePolynomial<cln::cl_RA> sv({(cln::cl_RA)1*v*v*v*v});
+    MultivariatePolynomial<cln::cl_RA> sz({(cln::cl_RA)1*z});
+    MultivariatePolynomial<cln::cl_RA> sxz({(cln::cl_RA)8*x*z*z*z, (cln::cl_RA)-5*x*x*x, Term<cln::cl_RA>((cln::cl_RA)7)});
+    MultivariatePolynomial<cln::cl_RA> sxv({(cln::cl_RA)3*x, (cln::cl_RA)1*v*v, (cln::cl_RA)2*v*v*v*v});
+    MultivariatePolynomial<cln::cl_RA> svy({(cln::cl_RA)13*v*y, (cln::cl_RA)-3*y*y*y*v, Term<cln::cl_RA>((cln::cl_RA)100)});
+    
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions0;
+    substitutions0[v] = sy;
+    substitutions0[x] = svy;
+    substitutions0[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    substitutions0[z] = sy;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions1;
+    substitutions1[v] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    substitutions1[x] = svyz;
+    substitutions1[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1289);
+    substitutions1[z] = sxv;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions2;
+    substitutions2[v] = sx;
+    substitutions2[x] = sv;
+    substitutions2[y] = sxz;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions3;
+    substitutions3[v] = sxy1;
+    substitutions3[x] = svz;
+    substitutions3[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions4;
+    substitutions4[v] = sxy2;
+    substitutions4[x] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)12246789);
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions5;
+    substitutions5[y] = sz;
+    substitutions5[z] = svy;
+    
+    f1.substitute(substitutions0);
+    f1.substitute(substitutions1);
+    f1.substitute(substitutions2);
+    f1.substitute(substitutions3);
+    f1.substitute(substitutions4);
+    f1.substitute(substitutions5);
+    
+    f2.substitute(substitutions0);
+    f2.substitute(substitutions1);
+    f2.substitute(substitutions2);
+    f2.substitute(substitutions3);
+    f2.substitute(substitutions4);
+    f2.substitute(substitutions5);
 }
 
 TEST(MultivariatePolynomial, SPolynomial)

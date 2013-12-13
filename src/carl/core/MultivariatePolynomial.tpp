@@ -371,8 +371,284 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
+{
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  substitute " << *this << std::endl;
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  by " << var << "->" << value << std::endl;
+    if(isConstant())
+    {
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  result " << *this << std::endl;
+        return;
+    }
+    TermsType newTerms;
+    if(value == 0)
+    {
+        for(auto term : mTerms)
+        {
+            if(!term->has(var))
+            {
+                newTerms.push_back(term);
+            }
+        }
+        mTerms.swap(newTerms);
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  result " << *this << std::endl;
+        return;
+    }
+    // Find and sort all exponents occurring with the variable to substitute as basis.
+    std::map<exponent, std::pair<MultivariatePolynomial, unsigned>> expResults;
+    unsigned expectedResultSize = 0;
+    std::pair<MultivariatePolynomial, unsigned> def( MultivariatePolynomial((Coeff) 1), 1 );
+    for(auto term : mTerms)
+    {
+        if(term->monomial())
+        {
+            exponent e = term->monomial()->exponentOfVariable(var);
+            if(e > 1)
+            {
+                auto iterBoolPair = expResults.insert(std::pair<exponent, std::pair<MultivariatePolynomial, unsigned>>(e, def));
+                if(!iterBoolPair.second)
+                {
+                    ++(iterBoolPair.first->second.second);
+                }
+            }
+            else if(e == 1)
+            {
+                expectedResultSize += value.nrTerms();
+            }
+            else
+            {
+                ++expectedResultSize;
+            }
+        }
+        else
+        {
+            ++expectedResultSize;
+        }
+    }
+    // Calculate the exponentiation of the multivariate polynomial to substitute the
+    // variable for, reusing the already calculated exponentiations.
+    auto expResultA = expResults.begin();
+    auto expResultB = expResultA;
+    expResultB->second.first = value.pow(expResultB->first);
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << value << ")^" << expResultB->first << " = " << expResultB->second.first << std::endl;
+    expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
+    ++expResultB;
+    while(expResultB != expResults.end())
+    {
+        expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << value << ")^" << expResultB->first << " = " << expResultB->second.first << std::endl;
+        ++expResultA;
+        ++expResultB;
+    }
+    // Substitute the variable.
+    newTerms.reserve(expectedResultSize);
+    for(auto term : mTerms)
+    {
+        exponent e = term->monomial()->exponentOfVariable(var);
+        if(e > 1)
+        {
+            auto iter = expResults.find(e);
+            assert(iter != expResults.end());
+            for(auto term : iter->second.first.mTerms)
+            {
+                Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+                newTerms.push_back(std::make_shared<Term<Coeff>>(*term * t));
+            }
+        }
+        if(e == 1)
+        {
+            for(auto term : value.mTerms)
+            {
+                Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+                newTerms.push_back(std::make_shared<Term<Coeff>>(*term * t));
+            }
+        }
+        else
+        {
+            newTerms.push_back(term);
+        }
+    }
+    mTerms.clear();
+    // Sort the entries from newterms.
+    // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
+    std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
+    // remove duplicates by adding their coefficients.
+    // list.unique() fails because it does not handle coefficient updates.
+    std::shared_ptr<const Term<Coeff>> frontTerm = newTerms.front();
+    Coeff frontCoeff(frontTerm->coeff());
+    
+    for(auto it = ++newTerms.begin(); it != newTerms.end(); ++it)
+    {
+        if(Ordering::compare(*frontTerm, **it) == CompareResult::EQUAL)
+        {
+            // Do not add yet, but simply add the coefficient.
+            frontCoeff += (*it)->coeff();
+        }
+        else
+        {
+            if(frontCoeff == frontTerm->coeff())
+            {
+                assert(frontCoeff!=0);
+                mTerms.push_back(frontTerm);
+            }
+            else if(frontCoeff != 0)
+            {
+                mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
+            }
+            frontTerm = *it;
+            frontCoeff = (*it)->coeff();
+        }
+    }
+    
+    if(frontCoeff == frontTerm->coeff())
+    {
+        mTerms.push_back(frontTerm);
+    }
+    else
+    {
+        mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
+    }
+    assert(mTerms.size() <= expectedResultSize);
+    this->sortTerms();
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  result " << *this << std::endl;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value) const
+{
+    MultivariatePolynomial result(*this);
+    return result.substituteIn(var, value);
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable, MultivariatePolynomial<Coeff, Ordering, Policies>>& substitutions) const
+{
+    MultivariatePolynomial result(*this);
+    std::cout << std::endl;
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  substitute " << result << std::endl;
+    if(isConstant() || substitutions.empty())
+    {
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  result " << result << std::endl;
+        return result;
+    }
+    // Substitute the variables, which have to be replaced by 0, beforehand, 
+    // as this could significantly simplify this multivariate polynomial.
+    for(auto sub = substitutions.begin(); sub != substitutions.end(); ++sub)
+    {
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  by " << sub->first << " -> " << sub->second << std::endl;
+        if(sub->second.isZero())
+        {
+            result.substituteIn(sub->first, sub->second);
+            if(result.isConstant())
+            {
+                std::cout << "[" << __func__ << ":" << __LINE__ << "]  result " << result << std::endl;
+                return result;
+            }
+        }
+    }
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  intermediate result " << result << std::endl;
+    // Find and sort all exponents occurring for all variables to substitute as basis.
+    std::map<VarExpPair, MultivariatePolynomial> expResults;
+	for(auto term : result.mTerms)
+	{
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  consider term " << *term << std::endl;
+        if(term->monomial())
+        {
+            const Monomial& m = *(term->monomial());
+            for(unsigned i = 0; i < m.nrVariables(); ++i)
+            {
+                if(m[i].exp > 1 && substitutions.find(m[i].var) != substitutions.end())
+                {
+                    expResults[m[i]] = MultivariatePolynomial((Coeff) 1);
+                    std::cout << "[" << __func__ << ":" << __LINE__ << "]  store exponentiation " << m[i].var << "^" << m[i].exp << std::endl;
+                }
+            }
+        }
+	}
+    // Calculate the exponentiation of the multivariate polynomial to substitute the
+    // for variables for, reusing the already calculated exponentiations.
+    if(!expResults.empty())
+    {
+        auto expResultA = expResults.begin();
+        auto expResultB = expResultA;
+        auto sub = substitutions.begin();
+        while(sub->second.isZero()) 
+        {
+            assert(sub != substitutions.end());
+            ++sub;
+        }
+        assert(sub->first == expResultB->first.var);
+        expResultB->second = sub->second.pow(expResultB->first.exp);
+        std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << sub->second << ")^" << expResultB->first.exp << " = " << expResultB->second << std::endl;
+        ++expResultB;
+        while(expResultB != expResults.end())
+        {
+            if(expResultA->first.var != expResultB->first.var)
+            {
+                // Go to the next variable.
+                while(sub->second.isZero()) 
+                {
+                    assert(sub != substitutions.end());
+                    ++sub;
+                }
+                assert(sub->first == expResultB->first.var);
+                expResultB->second = sub->second.pow(expResultB->first.exp);
+            }
+            else
+            {
+                expResultB->second = expResultA->second * sub->second.pow(expResultB->first.exp-expResultA->first.exp);
+                std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << sub->second << ")^" << expResultB->first.exp << " = " << expResultB->second << std::endl;
+            }
+            ++expResultA;
+            ++expResultB;
+        }
+    }
+    MultivariatePolynomial resultB((Coeff)0);
+    // Substitute the variable for which all occurring exponentiations are calculated.
+    for(auto term : result.mTerms)
+    {
+        MultivariatePolynomial termResult(term->coeff());
+        if(term->monomial())
+        {   
+            const Monomial& m = *(term->monomial());
+            for(unsigned i = 0; i < m.nrVariables(); ++i)
+            {
+                if(m[i].exp == 1)
+                {
+                    auto iter = substitutions.find(m[i].var);
+                    if(iter != substitutions.end())
+                    {
+                        termResult *= iter->second;
+                    }
+                    else
+                    {
+                        termResult *= m[i].var;
+                    }
+                }
+                else
+                {
+                    auto iter = expResults.find(m[i]);
+                    if(iter != expResults.end())
+                    {
+                        termResult *= iter->second;
+                    }
+                    else
+                    {
+                        termResult *= Term<Coeff>((Coeff)1, m[i].var, m[i].exp);
+                    }
+                }
+            }
+            
+        }
+        resultB += termResult;
+    }
+    std::cout << "[" << __func__ << ":" << __LINE__ << "]  result " << resultB << std::endl;
+    return resultB;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::naive_substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	MultivariatePolynomial result;
 	for(auto term : mTerms)
@@ -489,6 +765,19 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(unsigned exp) const
 {
+    if(isZero()) return MultivariatePolynomial((Coeff)0);
+	MultivariatePolynomial<Coeff,Ordering,Policies> res((Coeff)1);
+    while(exp)
+    {
+        res *= exp & 1 ? *this : res;
+        exp >>= 1;
+    }
+	return res;	
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::naive_pow(unsigned exp) const
+{
 	if(exp == 0)
 	{
 		return MultivariatePolynomial((Coeff)1);
@@ -502,7 +791,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	}
 	return res;	
 }
-
 
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(std::set<Variable>& vars) const
