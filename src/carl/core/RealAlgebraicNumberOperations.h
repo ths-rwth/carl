@@ -5,6 +5,9 @@
  * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
+#include "RealAlgebraicNumberIR.h"
+
+
 #pragma once
 
 namespace carl {
@@ -17,13 +20,18 @@ struct Equal {
 			if (rhs->isNumeric()) {
 				return lhs->value() == rhs->value();
 			} else {
-				// TODO
+				if (!static_cast<RealAlgebraicNumberIR<Number>*>(rhs)->refineAvoiding(lhs->value())) {
+					return false;
+				}
 			}
 		} else {
+			auto lhsIR = static_cast<RealAlgebraicNumberIR<Number>*>(lhs);
 			if (rhs->isNumeric()) {
-				// TODO
+				if (!lhsIR->refineAvoiding(rhs->value())) {
+					return false;
+				}
 			} else {
-				// TODO
+				return lhsIR->equal(static_cast<RealAlgebraicNumberIR<Number>*>(rhs));
 			}
 		}
 	}
@@ -47,13 +55,15 @@ struct Less {
 			if (rhs->isNumeric()) {
 				return lhs->value() < rhs->value();
 			} else {
-				return lhs->value() < static_cast<const RealAlgebraicNumberIR<Number>*>(rhs)->getInterval().left();
+				return lhs->value() < static_cast<const RealAlgebraicNumberIR<Number>*>(rhs)->left();
 			}
 		} else {
+			auto lhsIR = static_cast<const RealAlgebraicNumberIR<Number>*>(lhs);
 			if (rhs->isNumeric()) {
-				return static_cast<const RealAlgebraicNumberIR<Number>*>(rhs)->getInterval().right() < rhs->value();
+				return lhsIR->right() < rhs->value();
 			} else {
-				// TODO
+				auto rhsIR = const_cast<RealAlgebraicNumberIR<Number>*>(static_cast<const RealAlgebraicNumberIR<Number>*>(rhs));
+				return const_cast<RealAlgebraicNumberIR<Number>*>(lhsIR)->lessWhileUnequal(rhsIR);
 			}
 		}
 	}
@@ -64,7 +74,7 @@ struct Greater {
 private:
 	Less<Number> l;
 public:
-	bool operator()(const RealAlgebraicNumber<Number>* lhs, const RealAlgebraicNumber<Number>* rhs) {
+	bool operator()(RealAlgebraicNumber<Number>* const lhs, RealAlgebraicNumber<Number>* const rhs) {
 		return l(rhs, lhs);
 	}
 };
