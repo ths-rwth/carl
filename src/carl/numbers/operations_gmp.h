@@ -130,21 +130,15 @@ inline std::pair<mpq_class&,mpq_class&> sqrt(const mpq_class& a) {
     mpz_class den = a.get_den();
     mpz_class nom = a.get_num();
     mpz_class root_den;
-    mpz_init(root_den);
     mpz_class root_den_rem;
-    mpz_init(root_den_rem);
     mpz_sqrtrem(root_den, root_den_rem, den);
     
     mpz_class root_num;
-    mpz_init(root_num);
     mpz_class root_num_rem;
-    mpz_init(root_num_rem);
     mpz_sqrtrem(root_num, root_num_rem, num);
     
     mpq_class lower;
     mpq_class upper;
-    mpq_init(lower);
-    mpq_init(upper);
     unsigned nom, den;
     
     nom = mpz_get_ui(root_nom);
@@ -152,7 +146,6 @@ inline std::pair<mpq_class&,mpq_class&> sqrt(const mpq_class& a) {
     
     mpq_set_ui(upper, mpz_sgn(root_den_rem) != 0 ? den+1 : den, nom);
     mpq_set_ui(lower, den, mpz_sgn(root_nom_rem) != 0 ? nom+1 : nom );
-    mpz_clears(root_den, root_den_rem, root_nom, root_nom_rem);
     return std::make_pair(lower,upper);
 }
 
