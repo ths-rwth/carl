@@ -104,6 +104,11 @@ public:
 	bool isZero() const;
 	bool isConstant() const;
 	bool isLinear() const;
+
+	bool isNumber() const
+	{
+		return this->isConstant();
+	}
     
     Definiteness definiteness() const;
 
@@ -194,8 +199,14 @@ public:
 	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
-	 * For a polynomial p, returns p/gcd(all coefficients in p)
-     * @return 
+     * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
+     *         of the coefficients in p.
+     */
+	Coeff coprimeFactor() const;
+	
+	/**
+     * @return p * p.coprimeFactor()
+     * @see coprimeFactor()
      */
 	MultivariatePolynomial coprimeCoefficients() const;
 	
@@ -254,6 +265,11 @@ public:
 
 	template<bool gatherCoeff>
 	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
+	
+	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
+	typename UnderlyingNumberType<C>::type numericContent() const;
+	template<typename C=Coeff, DisableIf<is_number<C>> = dummy>
+	typename UnderlyingNumberType<C>::type numericContent() const;
 
 	
 	template<typename C, typename O, typename P>

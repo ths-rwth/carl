@@ -77,8 +77,8 @@ class MultivariateGCD
 		A /= a;
 		B /= b;
 		Polynomial g = gcd(a,b);
-		a = a.divideBy(g);
-		b = b.divideBy(g);
+		a = a.divideBy(g).quotient;
+		b = b.divideBy(g).quotient;
 		
 		Integer p = getPrime(A,B);
 		std::map<Variable, Integer> eval_b = findEval(A,B,p); // bold b in book.
@@ -94,9 +94,9 @@ class MultivariateGCD
 		{
 			Integer p_prime = getPrime(A,B);
 			std::map<Variable, Integer> eval_c = findEval(A,B,p_prime); // bold c in book.
-			UnivPol A_I_prime(x);// = A.evaluateCoefficient(eval_c).mod(p_prime);
-			UnivPol B_I_prime(x);// = B.evaluateCoefficient(eval_c).mod(p_prime);
-			UnivPol C_I_prime(x);// = gcd(A_I, B_I);
+			UnivPol A_I_prime = A.evaluateCoefficient(eval_c).mod(p_prime);
+			UnivPol B_I_prime = B.evaluateCoefficient(eval_c).mod(p_prime);
+			UnivPol C_I_prime = UnivPol::gcd(A_I, B_I);
 			unsigned d_I_prime = C_I_prime.degree();
 			if(d_I_prime < d)
 			{
@@ -156,8 +156,9 @@ class MultivariateGCD
 			// Lifting step.
 			U_I = c*U_I;
 			mod(c.evaluate(eval_b),p);
-			Coeff c_I;// = mod(c.evaluate(eval_b),p);
+			Coeff c_I = mod(c.evaluate(eval_b),p);
 			C_I = c_I * C_I;
+			//MultivariateH
 			std::vector<Polynomial> CE; //= EZ_LIFT(U_I, C_I, H_i, b, c_I) // EZ_LIFT(U_I, C_I, H_i, b, c)
 			assert(CE.size() == 2);
 			if(U_I == CE.front()*CE.back()) 
@@ -167,7 +168,7 @@ class MultivariateGCD
 			Polynomial C;// = CE.front().primitivePart();
 			if(C.divides(mp2) && C.divides(mp1))
 			{
-				//return {a*mp1/C, b*mp2/C, g*C};
+				return {a*mp1/C, b*mp2/C, g*C};
 			}
 			else
 			{

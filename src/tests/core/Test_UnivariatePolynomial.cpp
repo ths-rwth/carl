@@ -1,4 +1,3 @@
-
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
@@ -60,21 +59,27 @@ TEST(UnivariatePolynomial, GCD)
 	UnivariatePolynomial<cln::cl_RA> v(x, {(cln::cl_RA)1, (cln::cl_RA)1});
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
 	UnivariatePolynomial<cln::cl_RA> g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,v,s,t);
-	std::cout << g << std::endl;
-    std::cout << s << std::endl;
-    std::cout << t << std::endl;
-	g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(v,p,s,t);
-	std::cout << g << std::endl;
-    std::cout << s << std::endl;
-    std::cout << t << std::endl;
+	EXPECT_EQ(v,g);
+	EXPECT_EQ((cln::cl_RA)0,s);
+	EXPECT_EQ((cln::cl_RA)1,t);
+    g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(v,p,s,t);
+	EXPECT_EQ(v,g);
+	EXPECT_EQ((cln::cl_RA)1,s);
+	EXPECT_EQ((cln::cl_RA)0,t);
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(v,p);
+	EXPECT_EQ(v,g);
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(p,v);
+	EXPECT_EQ(v,g);
 	
-	
+    
     UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)-6, (cln::cl_RA)-5,(cln::cl_RA)1});
     //std::cout << "gcd" << UnivariatePolynomial<cln::cl_RA>::gcd(p,q) << std::endl;
     g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(p,q,s,t);
-    std::cout << g << std::endl;
-    std::cout << s << std::endl;
-    std::cout << t << std::endl;
+    EXPECT_EQ(v,g);
+	EXPECT_EQ((cln::cl_RA)1/(cln::cl_RA)12,s);
+    EXPECT_EQ((cln::cl_RA)-1/(cln::cl_RA)12,t);
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(p,q);
+	EXPECT_EQ(v,g);
 	
     UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)0, (mpz_class)2});
 	const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
@@ -88,7 +93,12 @@ TEST(UnivariatePolynomial, GCD)
 	std::cout << s1 << std::endl;
 	std::cout << gp << std::endl;
     
-    
+    UnivariatePolynomial<cln::cl_RA> pola(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
+	UnivariatePolynomial<cln::cl_RA> polb(x, {(cln::cl_RA)5, (cln::cl_RA)-10, (cln::cl_RA)9});
+	g = UnivariatePolynomial<cln::cl_RA>::extended_gcd(pola,polb,s,t);
+	std::cout << g << std::endl;
+	g = UnivariatePolynomial<cln::cl_RA>::gcd(pola,polb);
+	std::cout << g << std::endl;
 }
 
 
@@ -195,20 +205,20 @@ TEST(UnivariatePolynomial, factorization)
     {
         std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
         UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
-        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
+//        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
         for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {
-            std::cout << "           ";
-            if(factor != factors.begin())
-                std::cout << "* ";
-            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
+//            std::cout << "           ";
+//            if(factor != factors.begin())
+//                std::cout << "* ";
+//            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
             EXPECT_NE(0, factor->second);
             for(unsigned i=0; i < factor->second; ++i)
             {
                 productOfFactors *= factor->first;
             }
         }
-        std::cout << std::endl;
+//        std::cout << std::endl;
         EXPECT_EQ(pol, productOfFactors);
     }
     
@@ -222,20 +232,52 @@ TEST(UnivariatePolynomial, factorization)
     UnivariatePolynomial<cln::cl_RA> pol5(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)-1});
     UnivariatePolynomial<cln::cl_RA> pol6 = pol4*pol5*pol5*pol5;
     std::map<unsigned, UnivariatePolynomial<cln::cl_RA>> sffactors = pol6.squareFreeFactorization();
-    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
+//    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
     for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)
     {
-        std::cout << "        ";
-        if(factor != sffactors.begin())
-            std::cout << "* ";
-        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
+//        std::cout << "        ";
+//        if(factor != sffactors.begin())
+//            std::cout << "* ";
+//        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
         EXPECT_NE(0, factor->first);
         for(unsigned i=0; i < factor->first; ++i)
         {
             productOfFactors *= factor->second;
         }
     }
-    std::cout << std::endl;
+//    std::cout << std::endl;
     EXPECT_EQ(pol6, productOfFactors);
+}
+
+TEST(UnivariatePolynomial, isNumber)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_FALSE(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).isNumber());
+	EXPECT_TRUE(UnivariatePolynomial<cln::cl_RA>(x, 1).isNumber());
+}
+
+TEST(UnivariatePolynomial, isUnivariate)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	//Variable y = VariablePool::getInstance().getFreshVariable();
+	EXPECT_TRUE(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).isUnivariate());
+	//TODO: How does this work?
+	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).isUnivariate());
+}
+
+TEST(UnivariatePolynomial, numericUnit)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).numericUnit(), 1);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {1,2,-3}).numericUnit(), -1);
+}
+
+TEST(UnivariatePolynomial, numericContent)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {1,2,3}).numericContent(), 1);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {15,27,3}).numericContent(), 3);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-1,-2,-3}).numericContent(), 1);
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-15,-27,-3}).numericContent(), 3);
 }

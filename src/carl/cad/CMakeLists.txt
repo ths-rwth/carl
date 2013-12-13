@@ -1,10 +1,15 @@
 # Header files in here (only headers from this directory!)
 set(carl_lib_cad_headers 
-	EliminationSet.h
+    EliminationSet.h
+    EliminationSet.tpp
+    ConflictGraph.h
+    ConflictGraph.tpp
 ) 
 # Source files in here
 set(carl_lib_cad_sources 
-PARENT_SCOPE)
+    cad/ConflictGraph.cpp
+    PARENT_SCOPE
+)
 
 # Write config.h 
 #configure_file( ${CMAKE_SOURCE_DIR}/src/carl/cad/config.h.in 

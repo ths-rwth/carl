@@ -54,6 +54,14 @@ namespace carl
              */
             ExactInterval( const Numeric& l, BoundType lType, const Numeric& r, BoundType rType );
 
+			/**
+			 * Constructs interval ]l, r[ or [l, r], depending on the given bound type.
+			 * @param l left bound
+			 * @param r right bound
+			 * @param type type of the bounds
+			 */
+			ExactInterval( const Numeric& l, const Numeric& r, BoundType type);
+
             /**
              * Constructs an open interval from another.
              * @param i other open interval
@@ -221,6 +229,12 @@ namespace carl
              * @return the midpoint of this interval
              */
             Numeric midpoint() const;
+
+			/**
+			 * Searches for some point in this interval, preferably near the midpoint and with a small representation.
+			 * @return some point within this interval
+			 */
+			Numeric sample() const;
 
             /**
              * Computes the absolute value of this interval, i.e. the maximum of the absolute values of its bounds.

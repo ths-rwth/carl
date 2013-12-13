@@ -399,10 +399,9 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<V
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeCoefficients() const
+Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);
-	if(nrTerms() == 1) return *this;
 	typename TermsType::const_iterator it = mTerms.begin();
 	typename IntegralT<Coeff>::type num = getNum((*it)->coeff());
 	typename IntegralT<Coeff>::type den = getDenom((*it)->coeff());
@@ -411,7 +410,14 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		num = carl::gcd(num, getNum((*it)->coeff()));
 		den = carl::lcm(den, getDenom((*it)->coeff()));
 	}
-	Coeff factor = den/num;
+	return den/num;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeCoefficients() const
+{
+    if(nrTerms() == 1) return *this;
+	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
 	MultivariatePolynomial<Coeff, Ordering, Policies> result;
 	result.mTerms.reserve(mTerms.size());
@@ -573,10 +579,34 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 }
 
 template<typename C, typename O, typename P>
-UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg mainVar) const
+UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg) const
 {
 	
 	LOG_NOTIMPLEMENTED();
+}
+
+template<typename Coeff, typename O, typename P>
+template<typename C, EnableIf<is_number<C>>>
+typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numericContent() const
+{
+	if (this->isZero()) return 0;
+	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
+	for (unsigned i = 0; i < this->mTerms; i++) {
+		res = gcd(res, this->mTerms[i]->coeff());
+	}
+	return res;
+}
+
+template<typename Coeff, typename O, typename P>
+template<typename C, DisableIf<is_number<C>>>
+typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numericContent() const
+{
+	if (this->isZero()) return 0;
+	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff().numericContent();
+	for (unsigned i = 0; i < this->mTerms; i++) {
+		res = gcd(res, this->mTerms[i]->coeff().numericContent());
+	}
+	return res;
 }
 
 

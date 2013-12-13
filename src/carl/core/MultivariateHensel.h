@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <list>
 #include "../numbers/GFNumber.h"
 #include "UnivariatePolynomial.h"
 #include "logging.h"
@@ -18,6 +19,13 @@
  */
 namespace carl
 {
+
+/**
+ * Includes the algorithms 6.2 and 6.3 from the book 
+ * Algorithms for Computer Algebra by Geddes, Czaper, Labahn.
+ * 
+ * The Algorithms are used to computer the Multivariate GCD.
+ */
 template<typename Integer>
 class DiophantineEquations
 {
@@ -104,7 +112,7 @@ class DiophantineEquations
 		Polynomial beta(x,GFNumber<Integer>(1,mGf_pk),0);
 		for(unsigned j = 0; j < r-1; ++j)
 		{
-			std::vector<Polynomial> sigma = solveMultivariateDiophantine({q.at(j), a.at(j)}, beta, {}, (unsigned)0);
+			std::vector<Polynomial> sigma = solveMultivariateDiophantine({q.at(j), a.at(j)}, beta, std::map<Variable, Integer>(), (unsigned)0);
 			assert(sigma.size() == 2);
 			beta = sigma.front();
 			s.push_back(sigma.back());
@@ -163,11 +171,13 @@ class DiophantineEquations
 			modulus *= p;
 		}
 		assert((s.toFiniteDomain(mGf_pk)*a + t.toFiniteDomain(mGf_pk)*b).isOne());
-		return {s,t};
-		
+		return {s,t};	
 	}
-	
-	
-	
+};
+
+class MultivariateHensel
+{
+	//static std::list<UnivReprPol> calculate()
+	//{}
 };
 }
