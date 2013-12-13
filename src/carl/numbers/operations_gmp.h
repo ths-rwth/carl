@@ -125,31 +125,30 @@ inline mpz_class pow(const mpz_class& b, unsigned e) {
 	return res;
 }
 
-template<>
-inline std::pair<mpq_class&,mpq_class&> sqrt(const mpq_class& a) {
+inline std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a) {
+    assert( mpq_sgn(a.__get_mp()) > 0 );
     mpz_class den = a.get_den();
-    mpz_class nom = a.get_num();
+    mpz_class num = a.get_num();
     mpz_class root_den;
     mpz_class root_den_rem;
-    mpz_sqrtrem(root_den, root_den_rem, den);
+    mpz_sqrtrem(root_den.__get_mp(), root_den_rem.__get_mp(), den.__get_mp());
     
     mpz_class root_num;
     mpz_class root_num_rem;
-    mpz_sqrtrem(root_num, root_num_rem, num);
+    mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
     
     mpq_class lower;
     mpq_class upper;
-    unsigned nom, den;
+    long unsigned numerator, denominator;
     
-    nom = mpz_get_ui(root_nom);
-    den = mpz_get_ui(root_den);
+    numerator = mpz_get_ui(root_num.__get_mp());
+    denominator = mpz_get_ui(root_den.__get_mp());
     
-    mpq_set_ui(upper, mpz_sgn(root_den_rem) != 0 ? den+1 : den, nom);
-    mpq_set_ui(lower, den, mpz_sgn(root_nom_rem) != 0 ? nom+1 : nom );
+    mpq_set_ui(upper.__get_mp(), mpz_sgn(root_den_rem.__get_mp()) != 0 ? denominator+1 : denominator, numerator);
+    mpq_set_ui(lower.__get_mp(), denominator, mpz_sgn(root_num_rem.__get_mp()) != 0 ? numerator+1 : numerator );
     return std::make_pair(lower,upper);
 }
 
-template<>
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
