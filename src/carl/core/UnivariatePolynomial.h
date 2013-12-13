@@ -196,9 +196,16 @@ public:
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
 	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> squareFreePart() const;
+	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
+	
+	carl::Sign sgn(const Coefficient& value) const {
+		return carl::sgn(this->evaluate(value));
+	}
+	bool isRoot(const Coefficient& value) const {
+		return this->sgn(value) == Sign::ZERO;
+	}
 	
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const

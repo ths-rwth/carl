@@ -99,6 +99,7 @@ inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
 }
 
 inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
+    assert( a >= 0 );
     cln::cl_R root = cln::sqrt(a);
     cln::cl_RA rroot = cln::rationalize(root);
     if( rroot == root ) // the result of the sqrt operation is a rational and thus an exact solution -> return a point-Interval
@@ -120,7 +121,7 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
                 cln::cl_I num = cln::numerator(rlower);
                 cln::cl_I den = cln::denominator(rlower);
                 --num;
-                return std::make_pair(rroot, num/den );
+                return std::make_pair( num/den, rroot );
             }
         }
         else // we need to find the upper bound

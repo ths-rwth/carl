@@ -18,23 +18,27 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		bool tryTrivialSolver
 	) :
 		originalPolynomial(polynomial),
-		//polynomial(polynomial.squareFreePart().template convert<Number>()),
-		polynomial(polynomial),
+		polynomial(polynomial.squareFreePart()),
+		//polynomial(polynomial),
 		interval(interval),
 		finished(false)
 {
+	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial);
 	if (this->polynomial.zeroIsRoot()) {
 		this->polynomial.eliminateZeroRoots();
 		this->addRoot(new RealAlgebraicNumberNR<Number>(0));
 	}
 	if (tryTrivialSolver && this->solveTrivial()) {
+		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
 		this->finished = true;
 	}
 	if (this->interval.leftType() == BoundType::INFTY) {
 		this->interval.setLeft(-this->polynomial.cauchyBound());
+		this->interval.setLeftType(BoundType::STRICT);
 	}
 	if (this->interval.rightType() == BoundType::INFTY) {
 		this->interval.setRight(this->polynomial.cauchyBound());
+		this->interval.setRightType(BoundType::STRICT);
 	}
 }
 
@@ -50,13 +54,11 @@ std::list<RealAlgebraicNumber<Number>*> AbstractRootFinder<Number>::getAllRoots(
 template<typename Number>
 void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial) {
 	if (root->isNumeric()) {
-		LOGMSG_TRACE("carl.core.rootfinder", "Found exact root: " << root->value());
 		if (reducePolynomial) {
 			this->polynomial.eliminateRoot(root->value());
 		}
 	} else {
 		RealAlgebraicNumberIR<Number>* r = static_cast<RealAlgebraicNumberIR<Number>*>(root);
-		LOGMSG_TRACE("carl.core.rootfinder", "Found interval root.");
 		if (r->getInterval().diameter() == 0) {
 			root = new RealAlgebraicNumberNR<Number>(r->getInterval().left());
 			delete r;
