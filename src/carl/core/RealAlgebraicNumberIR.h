@@ -105,6 +105,20 @@ public:
 	{
 		return this->interval;
 	}
+	
+	const Number& left() const {
+		return this->getInterval().left();
+	}
+	const Number& right() const {
+		return this->getInterval().right();
+	}
+	
+	void setLeft(const Number& n) {
+		return this->interval.setLeft(n);
+	}
+	void setRight(const Number& n) {
+		return this->interval.setRight(n);
+	}
 
 	/**
 	 * Returns a pre-computed standard Sturm sequence of the polynomial and its derivative.
@@ -131,6 +145,26 @@ public:
 	 */
 	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
+	bool equal(const RealAlgebraicNumberIR* n);
+	
+private:
+	// Helper functions for lessWhileUnequal
+	
+	/**
+	 * Checks if *this < *n.
+	 * If the method could not decide the order, it returns (false, false)
+	 * Otherwise, it returns (true, X), X being the value of *this < *n
+     * @param n Another RealAlgebraicNumberIR
+     * @return 
+     */
+	std::pair<bool,bool> checkOrder(RealAlgebraicNumberIR* n);
+	std::pair<bool,bool> intervalContained(RealAlgebraicNumberIR* n, bool twisted);
+	bool checkIntersection(RealAlgebraicNumberIR* n, const ExactInterval<Number> i);
+	
+
+public:	
+	bool lessWhileUnequal(RealAlgebraicNumberIR* n);
+	
 	////////////////
 	// Operations //
 	////////////////
@@ -145,6 +179,30 @@ public:
 	 * @param interval
 	 */
 	void coarsen(const ExactInterval<Number>& interval);
+	
+	
+	/** Refines the interval i of this real algebraic number yielding the interval j such that <code>2*(j.Right()-j.Left()) &lt;= i.Right()-i.Left()</code>. This is cutting the interval in the middle and choosing the half where the root lays in.
+	 * @param strategy strategy selection according to RealAlgebraicNumberFactory::searchRealRootsStrategy
+	 * @rcomplexity constant
+	 * @scomplexity constant
+	 */
+	void refine(RealAlgebraicNumberSettings::RefinementStrategy strategy = RealAlgebraicNumberSettings::RefinementStrategy::DEFAULT);
+
+	/** Refines the interval i of this real algebraic number yielding the interval j such that <code>(j.Right()-j.Left()) &lt;= eps</code>.
+	 * @param eps
+	 */
+	inline void refine(const Number& eps) {
+		while (this->getInterval().diameter() > eps)
+			this->refine();
+	}
+
+	/** Refines the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
+	 * @param n
+	 * @rcomplexity constant
+	 * @scomplexity constant
+	 * @return true, if n is the exact numeric representation of this root, otherwise false
+	 */
+	bool refineAvoiding(const Number& n);
 
 };
 

@@ -8,6 +8,7 @@
 #include "../util/SFINAE.h"
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumberIR.h"
+#include "RealAlgebraicNumber.h"
 
 namespace carl {
 
@@ -63,6 +64,175 @@ const RANIR<Number>& RANIR<Number>::operator=(const RANIR<Number>& obj) {
 }
 
 template<typename Number>
+bool RANIR<Number>::equal(const RANIR<Number>* n) {
+	if (this == n) return true;
+	if (this->isZero() && n->isZero()) return true;
+	return this->getInterval() == n->getInterval();
+}
+
+template<typename Number>
+std::pair<bool,bool> RANIR<Number>::checkOrder(RealAlgebraicNumberIR* n) {
+	if (this->isNumeric()) {
+		if (n->isNumeric()) {
+			return std::make_pair(true, this->value() < n->value());
+		} else {
+			n->refineAvoiding(this->value());
+			if (this->value() <= n->left()) {
+				this->setRight(n->right());
+				return std::make_pair(true, true);
+			} else {
+				assert(this->value() >= n->right());
+				this->setRight(n->right());
+				return std::make_pair(true, false);
+			}
+		}
+	}
+	if (n->isNumeric()) {
+		this->refineAvoiding(n->value());
+		if (n->value() <= this->left()) {
+			n->setRight(this->left());
+			return std::make_pair(true, false);
+		} else {
+			assert(n->value() >= this->right());
+			n->setLeft(this->right());
+			return std::make_pair(true, true);
+		}
+	}
+	
+	if (this->right() <= n->left()) {
+		return std::make_pair(true, true);
+	}
+	if (n->right() <= this->left()) {
+		return std::make_pair(true, false);
+	}
+	
+	return std::make_pair(false, false);
+}
+
+template<typename Number>
+std::pair<bool,bool> RANIR<Number>::intervalContained(RealAlgebraicNumberIR* n, bool twisted) {
+	if (this->getInterval().contains(n->getInterval())) {
+		if (this->getPolynomial().isRoot(n->left())) {
+			this->mValue = n->left();
+			this->mIsNumeric = true;
+			n->refineAvoiding(this->value());
+			this->setRight(n->left());
+			return std::make_pair(true, !twisted);
+		} else if (this->getPolynomial().isRoot(n->right())) {
+			this->mValue = n->right();
+			this->mIsNumeric = true;
+			n->refineAvoiding(this->value());
+			this->setLeft(n->right());
+			return std::make_pair(true, twisted);
+		} else if (this->getPolynomial().countRealRoots(n->getInterval()) == 0) {
+			if (this->left() != n->left() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), n->left(), BoundType::STRICT)) > 0) {
+				this->setRight(n->left());
+				return std::make_pair(true, !twisted);
+			} else if (this->right() != n->right() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->right(), n->right(), BoundType::STRICT)) > 0) {
+				this->setLeft(n->right());
+				return std::make_pair(true, twisted);
+			}
+			assert(this->getInterval() == n->getInterval());
+		} else {
+			this->setLeft(n->left());
+			this->setRight(n->right());
+		}
+	}
+	return std::make_pair(false, false);
+}
+
+template<typename Number>
+bool RANIR<Number>::checkIntersection(RealAlgebraicNumberIR<Number>* n, const ExactInterval<Number> i) {
+	// Proceed only if this.left < n2.left and this.right < n2.right
+	if ((this->left() < n->right()) && (this->left() < n->right())) {
+		assert( i.left() == n->left() && i.right() == this->right());
+		if (this->getPolynomial().isRoot(i.left())) {
+			// If i.left is root of n1.polynomial: convert n1 to NR
+			this->mValue = i.left();
+			this->mIsNumeric = true;
+			n->refineAvoiding(this->value());
+			this->setRight(n->left());
+			return true;
+		}
+		if (this->getPolynomial().countRealRoots(i) == 0) {
+			// i contains no roots of n1.polynomial
+			this->refineAvoiding(i.left());
+			return true;
+		}
+		if (n->getPolynomial().isRoot(i.right())) {
+			// If i.right is root of n2.polynomial: convert n2 to NR
+			n->mValue = i.right();
+			n->mIsNumeric = true;
+			this->refineAvoiding(n->value());
+			n->setLeft(this->right());
+			return true;
+		}
+		if (n->getPolynomial().countRealRoots(i) == 0) {
+			// i contains no roots of n2.polynomial
+			n->refineAvoiding(i.right());
+			return true;
+		}
+		this->setLeft(i.left());
+		n->setRight(i.right());
+	}
+		return false;
+}
+
+
+template<typename Number>
+bool RANIR<Number>::lessWhileUnequal(RANIR<Number>* n) {
+	assert(!this->equal(n));
+	if (this->isNumeric() && n->isNumeric()) {
+		return this->value() < n->value();
+	}
+	
+	#define CHECK_ORDER() {\
+		auto res = this->checkOrder(n);\
+		if (res.first) return res.second;\
+	}
+	#define INTERVAL_CONTAINED(n1, n2, twisted) {\
+		auto res = n1->intervalContained(n2, twisted);\
+		if (res.first) return res.second;\
+	}
+	
+	while (true) {
+		CHECK_ORDER();
+
+		// case: is o.mInterval contained in mInterval?
+		INTERVAL_CONTAINED( this, n, false );
+		
+		CHECK_ORDER();
+		//n->refine();
+		CHECK_ORDER();
+		//this->refine();
+		CHECK_ORDER();
+		
+		// case: is mInterval contained in o.mInterval?
+		INTERVAL_CONTAINED( n, this, true );
+		
+		CHECK_ORDER();
+		//n->refine();
+		CHECK_ORDER();
+		//this->refine();
+		CHECK_ORDER();
+
+		ExactInterval<Number> intersection = this->getInterval().intersect(n->getInterval());
+		
+		// invariant: intersection is nonempty and one bound belongs to an interval
+		assert( !intersection.empty() );
+		
+		// situation normal (not executed if situation is twisted)
+		if (this->checkIntersection(n, intersection)) return true;
+		// situation twisted
+		if (n->checkIntersection(this, intersection)) return false;
+		
+		//n->refine();
+		CHECK_ORDER();
+		//this->refine();
+	}
+}
+
+template<typename Number>
 void RANIR<Number>::normalizeInterval() {
 	if (this->interval.left() == 0 && this->interval.right() == 0) return; // already normalized
 	assert( this->polynomial.countRealRoots(this->interval) != 0); // the interval should be isolating for this number
@@ -103,6 +273,124 @@ void RANIR<Number>::coarsen(const ExactInterval<Number>& i)
 			this->interval.setRight(ExactInterval<Number>(r, this->interval.right()).sampleFast());
 		}
 	}
+}
+
+template<typename Number>
+void RANIR<Number>::refine(RealAlgebraicNumberSettings::RefinementStrategy strategy) {
+	if (this->isNumeric()) {
+		// This RANIR already has a numeric value
+		assert(this->left() != this->value());
+		assert(this->right() != this->value());
+		this->setLeft(ExactInterval<Number>(this->left(), this->value(), BoundType::STRICT).sample());
+		this->setRight(ExactInterval<Number>(this->value(), this->right(), BoundType::STRICT).sample());
+		return;
+	}
+	
+	Number m;
+	switch (strategy) {
+		case RealAlgebraicNumberSettings::RefinementStrategy::GENERIC:
+			m = this->getInterval().midpoint();
+			break;
+		case RealAlgebraicNumberSettings::RefinementStrategy::BINARYSAMPLE:
+			m = this->getInterval().sample();
+			break;
+		case RealAlgebraicNumberSettings::RefinementStrategy::BINARYNEWTON:
+			m = this->getInterval().sample();
+			break;
+	}
+	
+	if (this->getPolynomial().isRoot(m)) {
+		this->setLeft(ExactInterval<Number>(this->left(), this->value(), BoundType::STRICT).sample());
+		this->setRight(ExactInterval<Number>(this->value(), this->right(), BoundType::STRICT).sample());
+		this->mValue = m;
+		this->mIsNumeric = true;
+	} else {
+		if (this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), m, BoundType::STRICT)) > 0) {
+			this->setRight(m);
+		} else {
+			this->setLeft(m);
+		}
+	}
+	
+	this->refinementCount++;
+	assert(this->left() < this->right());
+}
+
+template<typename Number>
+bool RANIR<Number>::refineAvoiding(const Number& n) {
+	if (this->isNumeric()) {
+		if (!this->getInterval().meets(n)) return false;
+		if (this->value() < n) {
+			this->setRight(ExactInterval<Number>(this->value(), n, BoundType::STRICT).sample());
+		} else if (this->value() > n) {
+			this->setLeft(ExactInterval<Number>(n, this->value(), BoundType::STRICT).sample());
+		} else return true;
+		assert(this->left() < this->right());
+		return false;
+	}
+	
+	if (this->getInterval().contains(n)) {
+		if (this->getPolynomial().isRoot(n)) {
+			this->mValue = n;
+			this->mIsNumeric = true;
+			return true;
+		}
+		if (this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), n, BoundType::STRICT)) > 0) {
+			this->setRight(n);
+		} else {
+			this->setLeft(n);
+		}
+		this->refinementCount++;
+	} else if (this->left() != n && this->right() != n) {
+		return false;
+	}
+	
+	bool isLeft = this->left() == n;
+	
+	Number newBound = this->getInterval().sample();
+	
+	if (this->getPolynomial().isRoot(newBound)) {
+		this->mValue = newBound;
+		this->mIsNumeric = true;
+		if (isLeft) {
+			this->setLeft(ExactInterval<Number>(n, newBound, BoundType::STRICT).sample());
+		} else {
+			this->setRight(ExactInterval<Number>(newBound, n, BoundType::STRICT).sample());
+		}
+	}
+	
+	if (isLeft) {
+		this->setLeft(newBound);
+	} else {
+		this->setRight(newBound);
+	}
+	
+	while (this->getPolynomial().countRealRoots(this->getInterval()) == 0) {
+		if (isLeft) {
+			Number oldBound = this->left();
+			Number newBound = ExactInterval<Number>(n, oldBound, BoundType::STRICT).sample();
+			if (this->getPolynomial().isRoot(newBound)) {
+				this->mValue = newBound;
+				this->mIsNumeric = true;
+				this->setLeft(ExactInterval<Number>(n, newBound, BoundType::STRICT).sample());
+				return false;
+			}
+			this->setRight(oldBound);
+			this->setLeft(newBound);
+		} else {
+			Number oldBound = this->right();
+			Number newBound = ExactInterval<Number>(oldBound, n, BoundType::STRICT).sample();
+			if (this->getPolynomial().isRoot(newBound)) {
+				this->mValue = newBound;
+				this->mIsNumeric = true;
+				this->setRight(ExactInterval<Number>(newBound, n, BoundType::STRICT).sample());
+				return false;
+			}
+			this->setLeft(oldBound);
+			this->setRight(newBound);
+		}
+	}
+	return false;
 }
 
 }

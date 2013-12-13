@@ -5,6 +5,9 @@
  * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
+#include "RealAlgebraicNumber.h"
+
+
 #pragma once
 
 namespace carl {
@@ -34,6 +37,13 @@ public:
 	RealAlgebraicNumberNR(const RealAlgebraicNumberNR& n)
 		: RealAlgebraicNumber<Number>(n.isRoot(), true, n.value())
 	{
+	}
+	
+	bool equal(const RealAlgebraicNumberNR<Number>* n) {
+		return this->value() == n->value();
+	}
+	bool less(const RealAlgebraicNumberNR<Number>* n) {
+		return this->value() < n->value();
 	}
 	
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>& g);

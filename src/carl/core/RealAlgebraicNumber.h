@@ -10,6 +10,8 @@
 #include "../core/Sign.h"
 #include "UnivariatePolynomial.h"
 
+#include "RealAlgebraicNumberSettings.h"
+
 namespace carl {
 
 /**
@@ -96,7 +98,7 @@ public:
 	 * The method returns 0 if the value was never set during refinement.
 	 * @return an exact numeric representation of this real algebraic number which could have been found during the refinement steps
 	 */
-	const Number value() const {
+	const Number& value() const {
 		return mValue;
 	}
 	
