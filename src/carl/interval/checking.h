@@ -9,12 +9,12 @@
  */
 
 #pragma once
-#include "../numbers/FLOAT_T.h"
+//#include "../numbers/FLOAT_T.h"
 #include <assert.h>
 
+/*
 namespace carl
 {
-    /* requirements for checking policy */
     template<typename FloatImplementation>
     struct checking
     {
@@ -47,4 +47,4 @@ namespace carl
             return _left > _right;
         }
     };
-}
+}*/

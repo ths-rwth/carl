@@ -2,12 +2,13 @@
  * File:   operations_mpfr.h
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
- * @since 2013-12-13
- * @version 2013-12-13
+ * @since	2013-12-13
+ * @version 2013-12-15
  */
 
 #pragma once
 
+#ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 
 namespace carl
@@ -24,12 +25,13 @@ namespace carl
     
     inline bool isInteger(const Number&);
     */
-
+    
+    /*
     template<typename C>
     inline bool isInteger(const GFNumber<C>&) {
             return true;
     }
-
+    */
     /**
      * Conversion functions
      * 
@@ -45,7 +47,7 @@ namespace carl
     */
 
     /**
-     * Basic Operators
+     * Basic arithmetic operations
      * 
      * The following functions implement simple operations on the given numbers.
      */
@@ -123,10 +125,309 @@ namespace carl
 
     mpfr_t div( const mpfr_t& _op1, const mpfr_t& _op2, mpfr_rnd_t _rnd = MPFR_RNDN ) const
     {
-        assert( mpfr_zero_p(_op2.mValue) != 0 );
+        assert( mpfr_zero_p(_op2) != 0 );
         mpft_t result;
         mpfr_init(result);
         mpfr_div(result, _op1, _op2, _rnd);
         return result;
     }
+    
+    /**
+     * Transcendental functions
+     */
+    
+    mpfr_t& exp_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_exp(_val, _val , _rnd);
+        return _val;
+    }
+    
+    mpfr_t& exp(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_exp(res, _val , _rnd);
+        return res;
+    }
+    
+    mpfr_t& sin_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_sin(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& sin(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_sin(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& cos_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_cos(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& cos(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_cos(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& log_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_log(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& log(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_log(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& tan_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_tan(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& tan(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_tan(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& asin_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_asin(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& asin(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_asin(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& acos_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_acos(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& acos(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_acos(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& atan_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_atan(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& atan(const mpfr_t& _result, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_atan(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& sinh_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_sinh(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& sinh(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_sinh(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& cosh_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_cosh(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& cosh(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_cosh(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& tanh_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_tanh(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& tanh(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_tanh(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& asinh_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_asinh(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& asinh(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_asinh(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& acosh_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_acosh(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& acosh(const mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_acosh(res, _val, _rnd);
+        return res;
+    }
+    
+    mpfr_t& atanh_assign(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_atanh(_val, _val, _rnd);
+        return _val;
+    }
+    
+    mpfr_t& atanh(mpfr_t& _val, mpfr_rnd_t _rnd = MPFR_RNDN)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_atanh(res, _val, _rnd);
+        return res;
+    }
+    
+    
+    /**
+     * Basic arithmetic operators
+     */
+    
+    inline mpfr_t operator +(const mpfr_t& _lhs, const mpfr_t& _rhs)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_add(res, _lhs, _rhs, MPFR_RNDN);
+        return res;
+    }
+    
+    inline mpfr_t operator -(const mpfr_t& _lhs, const mpfr_t& _rhs)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_sub(res, _lhs, _rhs, MPFR_RNDN);
+        return res;
+    }
+    
+    inline mpfr_t operator *(const mpfr_t& _lhs, const mpfr_t& _rhs)
+    {
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_mul(res, _lhs, _rhs, MPFR_RNDN);
+        return res;
+    }
+    
+    inline mpfr_t operator /(const mpfr_t& _lhs, const mpfr_t& _rhs)
+    {
+        // TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
+        mpfr_t res;
+        mpfr_init(res);
+        mpfr_div(res, _lhs, _rhs, MPFR_RNDN);
+        return res;
+    }
+    
+    inline mpfr_t& operator +=(const mpfr_t& _rhs)
+    {
+        mpfr_add(*this, *this, _rhs, MPFR_RNDN);
+        return *this;
+    }
+    
+    inline mpfr_t& operator -=(const mpfr_t& _rhs)
+    {
+        mpfr_sub( *this, *this, _rhs, MPFR_RNDN);
+        return *this;
+    }
+    
+    inline mpfr_t& operator *=(const mpfr_t& _rhs)
+    {
+        mpfr_mul(*this, *this, _rhs, MPFR_RNDN);
+        return *this;
+    }
+    
+    inline mpfr_t& operator /=(const mpfr_t& _rhs)
+    {
+        // TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
+        mpfr_div(*this, *this, _rhs, MPFR_RNDN);
+        return *this;
+    }
+    
+    /*
+     * Comparison operators
+     */
+    inline bool operator== (const mpfr_t& _lhs, const int _rhs)
+    {
+        return mpfr_cmp_si(_lhs, _rhs) == 0;
+    }
+    
+    inline bool operator== (const int _lhs, const mpfr_t& _rhs)
+    {
+        return _rhs == _lhs;
+    }
+    
+    inline bool operator== (const mpfr_t& _lhs, const double _rhs)
+    {
+        return mpfr_cmp_d(_lhs,_rhs) == 0;
+    }
+    
+    inline bool operator== (const double _lhs, const mpfr_t& _rhs)
+    {
+        return _rhs == _lhs;
+    }
+    
+    inline bool operator== (const mpfr_t& _lhs, const float _rhs)
+    {
+        return mpfr_cmp_d(_lhs, _rhs);
+    }
+    
+    inline bool operator== (const float _lhs, const mpfr_t& _rhs)
+    {
+        return _rhs == _lhs;
+    }
+
+    
 }
+#endif

@@ -1,6 +1,6 @@
 /* 
  * This file contains the rounding policies needed from the boost interval class for the general
- * FLOAT_T<FloatImplementation> type used in carl.
+ * Number type used in carl.
  * 
  * @file   rounding.h
  * @author Stefan Schupp
@@ -10,272 +10,274 @@
  */
 
 #pragma once
-#include "../numbers/FLOAT_T.h"
+#include "../numbers/roundingConversion.h"
 
 namespace carl
 {
-    template<typename FloatImplementation>
+    template<typename Number>
     struct rounding 
     {
         // default constructor, destructor
 //        rounding();
 //        ~rounding();
         // mathematical operations
-        FLOAT_T<FloatImplementation> add_down(FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
+        Number add_down(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.add(result, _rhs, CARL_RND::CARL_RNDD);
+			
+            Number result;
+            //_lhs.add(result, _rhs, CARL_RND::CARL_RNDD);
+			_lhs.add(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> add_up  (FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
+        Number add_up  (Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.add(result, _rhs, CARL_RND::CARL_RNDU);
+            Number result;
+            _lhs.add(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> sub_down(FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
+        Number sub_down(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.sub(result, _rhs, CARL_RND::CARL_RNDD);
+            Number result;
+            _lhs.sub(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> sub_up  (FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
+        Number sub_up  (Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.sub(result, _rhs, CARL_RND::CARL_RNDU);
+            Number result;
+            _lhs.sub(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> mul_down(FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
+        Number mul_down(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.mul(result, _rhs, CARL_RND::CARL_RNDD);
+            Number result;
+            _lhs.mul(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> mul_up  (FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞][-∞;+∞]
+        Number mul_up  (Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.mul(result, _rhs, CARL_RND::CARL_RNDU);
+            Number result;
+            _lhs.mul(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> div_down(FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞]([-∞;+∞]-{0})
+        Number div_down(Number _lhs, Number _rhs) // [-∞;+∞]([-∞;+∞]-{0})
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.div(result, _rhs, CARL_RND::CARL_RNDD);
+            Number result;
+            _lhs.div(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> div_up  (FLOAT_T<FloatImplementation> _lhs, FLOAT_T<FloatImplementation> _rhs) // [-∞;+∞]([-∞;+∞]-{0})
+        Number div_up  (Number _lhs, Number _rhs) // [-∞;+∞]([-∞;+∞]-{0})
         {
-            FLOAT_T<FloatImplementation> result;
-            _lhs.div(result, _rhs, CARL_RND::CARL_RNDU);
+            Number result;
+            _lhs.div(result, _rhs, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
 
-        FLOAT_T<FloatImplementation> sqrt_down(FLOAT_T<FloatImplementation> _val)   // ]0;+∞]
+        Number sqrt_down(Number _val)   // ]0;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.sqrt(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.sqrt(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> sqrt_up  (FLOAT_T<FloatImplementation> _val)   // ]0;+∞]
+        Number sqrt_up  (Number _val)   // ]0;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.sqrt(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.sqrt(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> exp_down(FLOAT_T<FloatImplementation> _val)    // [-∞;+∞]
+        Number exp_down(Number _val)    // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.exp(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.exp(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> exp_up  (FLOAT_T<FloatImplementation> _val)    // [-∞;+∞]
+        Number exp_up  (Number _val)    // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.exp(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.exp(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> log_down(FLOAT_T<FloatImplementation> _val)    // ]0;+∞]
+        Number log_down(Number _val)    // ]0;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.log(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.log(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> log_up  (FLOAT_T<FloatImplementation> _val)    // ]0;+∞]
+        Number log_up  (Number _val)    // ]0;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.log(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.log(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> cos_down(FLOAT_T<FloatImplementation> _val)    // [0;2π]
+        Number cos_down(Number _val)    // [0;2π]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.cos(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.cos(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> cos_up  (FLOAT_T<FloatImplementation> _val)    // [0;2π]
+        Number cos_up  (Number _val)    // [0;2π]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.cos(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.cos(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> tan_down(FLOAT_T<FloatImplementation> _val)    // ]-π/2;π/2[
+        Number tan_down(Number _val)    // ]-π/2;π/2[
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.tan(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.tan(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> tan_up  (FLOAT_T<FloatImplementation> _val)    // ]-π/2;π/2[
+        Number tan_up  (Number _val)    // ]-π/2;π/2[
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.tan(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.tan(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> asin_down(FLOAT_T<FloatImplementation> _val)   // [-1;1]
+        Number asin_down(Number _val)   // [-1;1]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.asin(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.asin(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> asin_up  (FLOAT_T<FloatImplementation> _val)   // [-1;1]
+        Number asin_up  (Number _val)   // [-1;1]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.asin(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.asin(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> acos_down(FLOAT_T<FloatImplementation> _val)   // [-1;1]
+        Number acos_down(Number _val)   // [-1;1]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.acos(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.acos(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> acos_up  (FLOAT_T<FloatImplementation> _val)   // [-1;1]
+        Number acos_up  (Number _val)   // [-1;1]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.acos(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.acos(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> atan_down(FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number atan_down(Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.atan(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.atan(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> atan_up  (FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number atan_up  (Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.atan(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.atan(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> sinh_down(FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number sinh_down(Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.sinh(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.sinh(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> sinh_up  (FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number sinh_up  (Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.sinh(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.sinh(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> cosh_down(FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number cosh_down(Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.cosh(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.cosh(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> cosh_up  (FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number cosh_up  (Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.cosh(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.cosh(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> tanh_down(FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number tanh_down(Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.tanh(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.tanh(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> tanh_up  (FLOAT_T<FloatImplementation> _val)   // [-∞;+∞]
+        Number tanh_up  (Number _val)   // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.tanh(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.tanh(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> asinh_down(FLOAT_T<FloatImplementation> _val)  // [-∞;+∞]
+        Number asinh_down(Number _val)  // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.asinh(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.asinh(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> asinh_up  (FLOAT_T<FloatImplementation> _val)  // [-∞;+∞]
+        Number asinh_up  (Number _val)  // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.asinh(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.asinh(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> acosh_down(FLOAT_T<FloatImplementation> _val)  // [1;+∞]
+        Number acosh_down(Number _val)  // [1;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.acosh(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.acosh(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> acosh_up  (FLOAT_T<FloatImplementation> _val)  // [1;+∞]
+        Number acosh_up  (Number _val)  // [1;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.acosh(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.acosh(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> atanh_down(FLOAT_T<FloatImplementation> _val)  // [-1;1]
+        Number atanh_down(Number _val)  // [-1;1]
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.atanh(result, CARL_RND::CARL_RNDD);
+            Number result;
+            _val.atanh(result, convRnd<Number>(CARL_RND::CARL_RNDD) );
             return result;
         }
-        FLOAT_T<FloatImplementation> atanh_up  (FLOAT_T<FloatImplementation> _val)  // [-1;1] 
+        Number atanh_up  (Number _val)  // [-1;1] 
         {
-            FLOAT_T<FloatImplementation> result;
-            _val.atanh(result, CARL_RND::CARL_RNDU);
+            Number result;
+            _val.atanh(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> median(FLOAT_T<FloatImplementation> _val1, FLOAT_T<FloatImplementation> _val2)   // [-∞;+∞][-∞;+∞]
+        Number median(Number _val1, Number _val2)   // [-∞;+∞][-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result;
+            Number result;
             result.add_assign(_val1);
             result.add_assign(_val2);
-            result.div_assign(FLOAT_T<FloatImplementation>(2));
+            result.div_assign(Number(2));
             return result;
         }
-        FLOAT_T<FloatImplementation> int_down(FLOAT_T<FloatImplementation> _val)    // [-∞;+∞]
+        Number int_down(Number _val)    // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result(_val);
-            _val.floor(result, CARL_RND::CARL_RNDU);
+            Number result(_val);
+            _val.floor(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
-        FLOAT_T<FloatImplementation> int_up  (FLOAT_T<FloatImplementation> _val)    // [-∞;+∞]
+        Number int_up  (Number _val)    // [-∞;+∞]
         {
-            FLOAT_T<FloatImplementation> result(_val);
-            _val.ceil(result, CARL_RND::CARL_RNDU);
+            Number result(_val);
+            _val.ceil(result, convRnd<Number>(CARL_RND::CARL_RNDU) );
             return result;
         }
         // conversion functions
         template<typename U>
-        FLOAT_T<FloatImplementation> conv_down(U _val)
+        Number conv_down(U _val)
         {
-            return FLOAT_T<FloatImplementation>(_val, CARL_RND::CARL_RNDD);
+            return Number(_val, convRnd<Number>(CARL_RND::CARL_RNDD) );
         }
         
         template<typename U>
-        FLOAT_T<FloatImplementation> conv_up(U _val)
+        Number conv_up(U _val)
         {
-            return FLOAT_T<FloatImplementation>(_val, CARL_RND::CARL_RNDU);
+            return Number(_val, convRnd<Number>(CARL_RND::CARL_RNDU) );
         }
         // unprotected rounding class
 //    typedef ... unprotected_rounding;

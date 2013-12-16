@@ -23,14 +23,14 @@
 namespace carl
 {
 		// nearest, towards zero, towards infty, towards -infty, away from zero
-    enum CARL_RND
-    {
-        CARL_RNDN=0,
-        CARL_RNDZ=1,
-        CARL_RNDU=2,
-        CARL_RNDD=3,
-        CARL_RNDA=4
-    };
+//    enum CARL_RND
+//    {
+//        CARL_RNDN=0,
+//        CARL_RNDZ=1,
+//        CARL_RNDU=2,
+//        CARL_RNDD=3,
+//        CARL_RNDA=4
+//    };
 
     typedef unsigned long precision;
     

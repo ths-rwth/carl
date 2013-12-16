@@ -80,4 +80,7 @@ inline void divide(const Number& dividend, const Number& divisor, Number& quotie
 #include "operations_cln.h"
 #include "operations_gmp.h"
 #include "operations_native.h"
+#ifdef USE_MPFR_FLOAT
 #include "operations_mpfr.h"
+#endif
+

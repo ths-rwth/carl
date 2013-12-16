@@ -12,6 +12,9 @@
 
 #include <cln/cln.h>
 #include <type_traits>
+#ifdef USE_MPFR_FLOAT
+#include <mpfr.h>
+#endif
 
 #include "../util/SFINAE.h"
 
@@ -209,11 +212,13 @@ struct is_float
     static const bool value = false;
 };
 
+#ifdef USE_MPFR_FLOAT
 template<>
 struct is_float<mpfr_t>
 {
     static const bool value = true;
 };
+#endif
 
 template<>
 struct is_float<double>
@@ -227,6 +232,33 @@ struct is_float<float>
     static const bool value = true;
 };
 
+/**
+ * Type trait is_primitive required for BoostIntervals to use the preimlpemented default rounding and checking policies.
+ */
+	
+template<typename type>
+struct is_primitive
+{
+	static const bool value = false;
+};
+
+template<>
+struct is_primitive<float>
+{
+	static const bool value = true;
+};
+
+template<>
+struct is_primitive<double>
+{
+	static const bool value = true;
+};
+
+template<>
+struct is_primitive<long double>
+{
+	static const bool value = true;
+};
 /**
  * Type trait IntegralT.
  * Gives the corresponding integral type.
