@@ -42,6 +42,7 @@ option( DEVELOPER "Compile with extra warnings" ON )
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
+option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -162,6 +163,11 @@ enable_testing()
 #set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
+
+if(COMPARE_WITH_GINAC)
+  find_package( GiNaC 1.5.8 REQUIRED )
+  set(libraries ${libraries} ${GINAC_LIBRARY} )
+endif()
 
 
 # # # # # # # # # # # # # # # # # # # # # #

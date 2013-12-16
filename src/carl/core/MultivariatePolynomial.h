@@ -238,7 +238,7 @@ public:
      * @return A new polynomial without the variables in map.
      */
 	template<typename SubstitutionType = Coeff>
-	MultivariatePolynomial naive_substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+	MultivariatePolynomial substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
     
 	/**
 	 * Replace all variables by a Term in which the variable does not occur.

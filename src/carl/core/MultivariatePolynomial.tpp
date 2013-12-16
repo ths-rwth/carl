@@ -429,12 +429,14 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
     // variable for, reusing the already calculated exponentiations.
     auto expResultA = expResults.begin();
     auto expResultB = expResultA;
+    assert(value.pow(expResultB->first) == value.naive_pow(expResultB->first));
     expResultB->second.first = value.pow(expResultB->first);
     std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << value << ")^" << expResultB->first << " = " << expResultB->second.first << std::endl;
     expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
     ++expResultB;
     while(expResultB != expResults.end())
     {
+        assert(value.pow(expResultB->first - expResultA->first) == value.naive_pow(expResultB->first - expResultA->first));
         expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
         std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << value << ")^" << expResultB->first << " = " << expResultB->second.first << std::endl;
         ++expResultA;
@@ -578,6 +580,13 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
             ++sub;
         }
         assert(sub->first == expResultB->first.var);
+        if(!(sub->second.pow(expResultB->first.exp) == sub->second.naive_pow(expResultB->first.exp)))
+        {
+            std::cout << "(" << sub->second << ")^" << expResultB->first.exp << std::endl;
+            std::cout << "naive_pow:   " << sub->second.naive_pow(expResultB->first.exp) << std::endl;
+            std::cout << "pow:   " << sub->second.pow(expResultB->first.exp) << std::endl;
+        }
+        assert(sub->second.pow(expResultB->first.exp) == sub->second.naive_pow(expResultB->first.exp));
         expResultB->second = sub->second.pow(expResultB->first.exp);
         std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << sub->second << ")^" << expResultB->first.exp << " = " << expResultB->second << std::endl;
         ++expResultB;
@@ -585,6 +594,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         {
             if(expResultA->first.var != expResultB->first.var)
             {
+                ++sub;
+                assert(sub != substitutions.end());
                 // Go to the next variable.
                 while(sub->second.isZero()) 
                 {
@@ -592,10 +603,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
                     ++sub;
                 }
                 assert(sub->first == expResultB->first.var);
+                assert(sub->second.pow(expResultB->first.exp) == sub->second.naive_pow(expResultB->first.exp));
                 expResultB->second = sub->second.pow(expResultB->first.exp);
             }
             else
             {
+                assert(sub->second.pow(expResultB->first.exp-expResultA->first.exp) == sub->second.naive_pow(expResultB->first.exp-expResultA->first.exp));
                 expResultB->second = expResultA->second * sub->second.pow(expResultB->first.exp-expResultA->first.exp);
                 std::cout << "[" << __func__ << ":" << __LINE__ << "]  calculate (" << sub->second << ")^" << expResultB->first.exp << " = " << expResultB->second << std::endl;
             }
@@ -648,7 +661,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::naive_substitute(const std::map<Variable,SubstitutionType>& substitutions) const
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	MultivariatePolynomial result;
 	for(auto term : mTerms)
@@ -766,11 +779,17 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(unsigned exp) const
 {
     if(isZero()) return MultivariatePolynomial((Coeff)0);
-	MultivariatePolynomial<Coeff,Ordering,Policies> res((Coeff)1);
-    while(exp)
+    if(exp==0) return MultivariatePolynomial((Coeff)1);
+	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
+    std::cout << exp << std::endl;
+    std::cout << (exp ? "true" : "false") << std::endl;
+    while(exp > 1)
     {
-        res *= exp & 1 ? *this : res;
+        std::cout << (exp & 1 ? "odd" : "even") << std::endl;
+        res *= exp & 1 ? (res * (*this)) : res;
         exp >>= 1;
+        std::cout << exp << std::endl;
+        std::cout << (exp ? "true" : "false") << std::endl;
     }
 	return res;	
 }
