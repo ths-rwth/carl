@@ -16,9 +16,8 @@
 
 namespace carl
 {   
-    MultivariatePolynomial<cln::cl_RA> convert(const GiNaC::ex& _toConvert, const std::map<GiNaC::symbol, carl::Variable>& vars)
+    MultivariatePolynomial<cln::cl_RA> convert(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars)
     {
-        std::cout << __func__ << std::endl;
         carl::MultivariatePolynomial<cln::cl_RA> result;
         GiNaC::ex ginacPoly = _toConvert.expand();
         if(GiNaC::is_exactly_a<GiNaC::add>(ginacPoly))
@@ -29,13 +28,13 @@ namespace carl
                 const GiNaC::ex summandEx = *summand;
                 if(GiNaC::is_exactly_a<GiNaC::mul>(summandEx))
                 {
-                    carl::MultivariatePolynomial<cln::cl_RA> carlSummand;
+                    carl::MultivariatePolynomial<cln::cl_RA> carlSummand = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1);
                     for(auto factor = summandEx.begin(); factor != summandEx.end(); ++factor)
                     {
                         const GiNaC::ex factorEx = *factor;
                         if(GiNaC::is_exactly_a<GiNaC::symbol>(factorEx))
                         {
-                            auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(factorEx));
+                            auto iter = vars.find(factorEx);
                             assert(iter != vars.end());
                             carlSummand *= iter->second;
                         }
@@ -51,7 +50,7 @@ namespace carl
                             unsigned exp = static_cast<unsigned>(exponent.integer_content().to_int());
                             GiNaC::ex subterm = *factorEx.begin();
                             assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
-                            auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(subterm));
+                            auto iter = vars.find(subterm);
                             assert(iter != vars.end());
                             carlSummand *= Term<cln::cl_RA>((cln::cl_RA)1, iter->second, exp);
                         }
@@ -61,7 +60,7 @@ namespace carl
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::symbol>(summandEx))
                 {
-                    auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(summandEx));
+                    auto iter = vars.find(summandEx);
                     assert(iter != vars.end());
                     result += iter->second;
                 }
@@ -77,7 +76,7 @@ namespace carl
                     unsigned exp = static_cast<unsigned>(exponent.integer_content().to_int());
                     GiNaC::ex subterm = *summandEx.begin();
                     assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
-                    auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(subterm));
+                    auto iter = vars.find(subterm);
                     assert(iter != vars.end());
                     result += Term<cln::cl_RA>((cln::cl_RA)1, iter->second, exp);
                 }
@@ -92,7 +91,7 @@ namespace carl
                 const GiNaC::ex factorEx = *factor;
                 if(GiNaC::is_exactly_a<GiNaC::symbol>(factorEx))
                 {
-                    auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(factorEx));
+                    auto iter = vars.find(factorEx);
                     assert(iter != vars.end());
                     result *= iter->second;
                 }
@@ -108,7 +107,7 @@ namespace carl
                     unsigned exp = static_cast<unsigned>(exponent.integer_content().to_int());
                     GiNaC::ex subterm = *factorEx.begin();
                     assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
-                    auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(subterm));
+                    auto iter = vars.find(subterm);
                     assert(iter != vars.end());
                     result *= Term<cln::cl_RA>((cln::cl_RA)1, iter->second, exp);
                 }
@@ -117,7 +116,7 @@ namespace carl
         }
         else if(GiNaC::is_exactly_a<GiNaC::symbol>(ginacPoly))
         {
-            auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(ginacPoly));
+            auto iter = vars.find(ginacPoly);
             assert(iter != vars.end());
             result = MultivariatePolynomial<cln::cl_RA>(iter->second);
         }
@@ -133,7 +132,7 @@ namespace carl
             unsigned exp = static_cast<unsigned>(exponent.integer_content().to_int());
             GiNaC::ex subterm = *ginacPoly.begin();
             assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
-            auto iter = vars.find(GiNaC::ex_to<GiNaC::symbol>(subterm));
+            auto iter = vars.find(subterm);
             assert(iter != vars.end());
             result = MultivariatePolynomial<cln::cl_RA>(Term<cln::cl_RA>((cln::cl_RA)1, iter->second, exp));
         }

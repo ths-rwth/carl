@@ -3,4 +3,4 @@
  */ 
 #pragma once
 
-#define COMPARE_WITH_GINAC
+/* #undef COMPARE_WITH_GINAC */
