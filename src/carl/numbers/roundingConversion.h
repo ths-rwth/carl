@@ -9,14 +9,14 @@
 
 #pragma once
 
-#ifdef USE_MPFR_FLOAT
+
 #include <mpfr.h>
-#endif
+
 #include <assert.h>
 
 namespace carl {
 	
-	enum CARL_RND
+	enum class CARL_RND:int
     {
         CARL_RNDN=0,
         CARL_RNDZ=1,
@@ -25,40 +25,38 @@ namespace carl {
         CARL_RNDA=4
     };
 	
-	template<typename RoundingType>
+	template<typename NumberType>
 	struct convRnd
 	{
-		RoundingType operator() ( CARL_RND _rnd )
+		CARL_RND operator() ( CARL_RND _rnd )
 		{
-			return (RoundingType)_rnd;
+			return _rnd;
 		}
 	};
 	
-#ifdef USE_MPFR_FLOAT
 	// mpfr specialization
 	template<>
-	struct convRnd<mpfr_t>
+	struct convRnd<mpfr_ptr>
 	{
-		mpfr_rnd_t operator() ( CARL_RND _rnd )
+		inline mpfr_rnd_t operator() ( CARL_RND _rnd )
 		{
 			switch(_rnd)
 			{
-				case CARL_RNDA:
+				case CARL_RND::CARL_RNDA:
 					return MPFR_RNDA;
-				case CARL_RNDD:
+				case CARL_RND::CARL_RNDD:
 					return MPFR_RNDD;
-				case CARL_RNDN:
+				case CARL_RND::CARL_RNDN:
 					return MPFR_RNDN;
-				case CARL_RNDU:
+				case CARL_RND::CARL_RNDU:
 					return MPFR_RNDU;
-				case CARL_RNDZ:
+				case CARL_RND::CARL_RNDZ:
 					return MPFR_RNDZ;
 				default:
 					// should not happen!
 					assert(false);
-					return NULL;
+					//return nullptr;
 			}
 		}
 	};
-#endif
 }
