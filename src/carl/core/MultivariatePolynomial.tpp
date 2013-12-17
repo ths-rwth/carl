@@ -8,9 +8,7 @@
 #include "carl/numbers/numbers.h"
 
 namespace carl
-{
-
-	
+{	
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(int c) : MultivariatePolynomial((Coeff)c)
 {
@@ -32,6 +30,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(v))
 {
     
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Monomial& m) :
 Policies(),
@@ -39,6 +38,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(m))
 {
     
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Term<Coeff>& t) :
 Policies(),
@@ -46,6 +46,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(t))
 {
     
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(std::shared_ptr<const Monomial> m) :
 Policies(),
@@ -53,6 +54,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(m))
 {
 
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(std::shared_ptr<const Term<Coeff>> t) :
 Policies(),
@@ -60,12 +62,14 @@ mTerms(1,t)
 {
     
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>&) :
 Policies()
 {
     LOG_NOTIMPLEMENTED();
 }
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>&) :
 Policies()
@@ -157,7 +161,6 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	}
 	sortTerms();
 }
-
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::initializer_list<Variable>& terms)
@@ -295,9 +298,6 @@ const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,
 	return mTerms.at(index);
 }
 
-
-
-
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail() const
 {
@@ -342,7 +342,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const
 	}
 	return true;
 }
-
 
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
@@ -462,48 +461,8 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
             newTerms.push_back(term);
         }
     }
-    mTerms.clear();
-    // Sort the entries from newterms.
-    // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
-    std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
-    // remove duplicates by adding their coefficients.
-    // list.unique() fails because it does not handle coefficient updates.
-    std::shared_ptr<const Term<Coeff>> frontTerm = newTerms.front();
-    Coeff frontCoeff(frontTerm->coeff());
-    
-    for(auto it = ++newTerms.begin(); it != newTerms.end(); ++it)
-    {
-        if(Ordering::compare(*frontTerm, **it) == CompareResult::EQUAL)
-        {
-            // Do not add yet, but simply add the coefficient.
-            frontCoeff += (*it)->coeff();
-        }
-        else
-        {
-            if(frontCoeff == frontTerm->coeff())
-            {
-                assert(frontCoeff!=0);
-                mTerms.push_back(frontTerm);
-            }
-            else if(frontCoeff != 0)
-            {
-                mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-            }
-            frontTerm = *it;
-            frontCoeff = (*it)->coeff();
-        }
-    }
-    
-    if(frontCoeff == frontTerm->coeff())
-    {
-        mTerms.push_back(frontTerm);
-    }
-    else
-    {
-        mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-    }
+    setTerms(newTerms);
     assert(mTerms.size() <= expectedResultSize);
-    this->sortTerms();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -634,16 +593,17 @@ template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
+    TermsType newTerms;
 	MultivariatePolynomial result;
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
 		if(t->coeff() != 0)
 		{
-			result.mTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
+			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
-	}
-	result.sortTerms();
+	}   
+	result.setTerms(newTerms);
 	return result;
 }
 
@@ -716,7 +676,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	}
 	return MultivariatePolynomial(tmpTerms.begin(), tmpTerms.end(), true, false);
 }
-
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::SPolynomial(
@@ -831,7 +790,6 @@ VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies
 	
 }
 
-
 template<typename C, typename O, typename P>
 UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() const
 {
@@ -854,7 +812,6 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg) const
 {
-	
 	LOG_NOTIMPLEMENTED();
 }
 
@@ -882,7 +839,6 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 	return res;
 }
 
-
 template<typename C, typename O, typename P>
 bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
@@ -895,28 +851,33 @@ bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePol
                         return lterm == rterm || *lterm == *rterm;
                     });
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
     return false;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
 {
     return rhs == lhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
     return false;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
 {
     return rhs == lhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
@@ -924,22 +885,26 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
     if(lhs.mTerms.size() > 1) return false;
     return *(lhs.mTerms.front()) == rhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs == lhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
 {
     if(lhs.mTerms.size() != 1) return false;
     return *(lhs.mTerms.front()->monomial) == rhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs == lhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
@@ -947,17 +912,20 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
     if(lhs.mTerms.size() > 1) return false;
     return (lhs.mTerms.front()->coeff()) == rhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs == lhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
 {
     if(lhs.mTerms.size() != 1) return false;
     return *(lhs.mTerms.front()->monomial()) == rhs;
 }
+
 template<typename C, typename O, typename P>
 bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
@@ -978,67 +946,78 @@ bool operator==(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
 	return rhs == lhs;
 }
 
-
 template<typename C, typename O, typename P>
 bool operator!=( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs); // TODO: != could be much cheaper than ==
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
@@ -1050,42 +1029,12 @@ bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
 {
     return !(lhs == rhs);
 }
+
 template<typename C, typename O, typename P>
 bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return !(lhs == rhs);
 }
-
-
-//template<typename C, typename O, typename P>
-//bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-//{
-//    // Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
-//    return std::equal(lhs.mTerms.begin(), lhs.mTerms.end(), rhs.mTerms.begin(),
-//                    [](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
-//                    -> bool 
-//                    {
-//                        return lterm != rterm && *lterm < *rterm;
-//                    });
-//}
-//
-//template<typename C, typename O, typename P>
-//bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-//{
-//    return rhs<lhs;
-//}
-//
-//template<typename C, typename O, typename P>
-//bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-//{
-//    return !(rhs<lhs);
-//}
-//
-//template<typename C, typename O, typename P>
-//bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-//{
-//    return !(rhs>lhs);
-//}
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
@@ -1285,26 +1234,31 @@ const MultivariatePolynomial<C,O,P> operator+( const MultivariatePolynomial<C,O,
 	result += rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<C>&)
 {
     LOG_NOTIMPLEMENTED();
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<MultivariatePolynomial<C>>&)
 {
 	LOG_NOTIMPLEMENTED();
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
@@ -1314,11 +1268,13 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
 	result += rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs + lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
 {
@@ -1328,11 +1284,13 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
 	result += rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs + lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
@@ -1342,11 +1300,13 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
 	result += rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs + lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
 {
@@ -1357,13 +1317,12 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
 	return result;
 	
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs + lhs;
 }
-
-
 
 template<typename Coeff, typename Ordering, typename Policies>
 const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::operator -() const
@@ -1376,7 +1335,6 @@ const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<C
     }
     return negation;
 }
-
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const MultivariatePolynomial& rhs)
@@ -1591,21 +1549,25 @@ const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>&, co
 {
     LOG_NOTIMPLEMENTED();
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
 {
 	return rhs - lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
 {
 	return rhs - lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
@@ -1615,11 +1577,13 @@ const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P
 	result -= rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs - lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
 {
@@ -1629,11 +1593,13 @@ const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P
 	result -= rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs - lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
@@ -1643,11 +1609,13 @@ const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P
 	result -= rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
 	return rhs - lhs;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
 {
@@ -1657,6 +1625,7 @@ const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P
 	result -= rhs;
 	return result;
 }
+
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
@@ -1680,47 +1649,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
             newTerms.push_back(std::make_shared<Term<Coeff>>(*termLhs * *termRhs));
         }
     }
-    mTerms.clear();
-    // Sort the entries from newterms.
-    // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
-    std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
-    // remove duplicates by adding their coefficients.
-    // list.unique() fails because it does not handle coefficient updates.
-    std::shared_ptr<const Term<Coeff>> frontTerm = newTerms.front();
-    Coeff frontCoeff(frontTerm->coeff());
-    
-    for(auto it = ++newTerms.begin(); it != newTerms.end(); ++it)
-    {
-        if(Ordering::compare(*frontTerm, **it) == CompareResult::EQUAL)
-        {
-            // Do not add yet, but simply add the coefficient.
-            frontCoeff += (*it)->coeff();
-        }
-        else
-        {
-            if(frontCoeff == frontTerm->coeff())
-            {
-                assert(frontCoeff!=0);
-                mTerms.push_back(frontTerm);
-            }
-            else if(frontCoeff != 0)
-            {
-                mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-            }
-            frontTerm = *it;
-            frontCoeff = (*it)->coeff();
-        }
-    }
-    
-    if(frontCoeff == frontTerm->coeff())
-    {
-        mTerms.push_back(frontTerm);
-    }
-    else
-    {
-        mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-    }
-    
+    setTerms(newTerms);
     return *this;
     
 }
@@ -1888,6 +1817,51 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::sortTerms()
 {
     std::sort(mTerms.begin(), mTerms.end(), (bool (*)(const std::shared_ptr<const Term<Coeff>>&, const std::shared_ptr<const Term<Coeff>>& ))Ordering::less);
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
+{
+    mTerms.clear();
+    // Sort the entries from newterms.
+    // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
+    std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
+    // remove duplicates by adding their coefficients.
+    // list.unique() fails because it does not handle coefficient updates.
+    std::shared_ptr<const Term<Coeff>> frontTerm = newTerms.front();
+    Coeff frontCoeff(frontTerm->coeff());
+    
+    for(auto it = ++newTerms.begin(); it != newTerms.end(); ++it)
+    {
+        if(Ordering::compare(*frontTerm, **it) == CompareResult::EQUAL)
+        {
+            // Do not add yet, but simply add the coefficient.
+            frontCoeff += (*it)->coeff();
+        }
+        else
+        {
+            if(frontCoeff == frontTerm->coeff())
+            {
+                assert(frontCoeff!=0);
+                mTerms.push_back(frontTerm);
+            }
+            else if(frontCoeff != 0)
+            {
+                mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
+            }
+            frontTerm = *it;
+            frontCoeff = (*it)->coeff();
+        }
+    }
+    
+    if(frontCoeff == frontTerm->coeff())
+    {
+        mTerms.push_back(frontTerm);
+    }
+    else
+    {
+        mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
+    }
 }
 
 }

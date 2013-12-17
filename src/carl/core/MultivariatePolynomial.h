@@ -500,6 +500,7 @@ public:
 	
 private:
 	void sortTerms();
+    void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
 };
 
