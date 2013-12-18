@@ -177,6 +177,20 @@ public:
 	{
 		return mMainVar;
 	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	unsigned has(Variable::Arg v) const {
+		return v == this->mainVar();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	unsigned has(Variable::Arg v) const {
+		bool hasVar = v == this->mainVar();
+		for (auto c: this->mCoefficients) {
+			hasVar = hasVar || c.has(v);
+		}
+		return hasVar;
+	}
+
 	/**
 	 * 
      * @return copr
