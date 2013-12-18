@@ -13,7 +13,7 @@ namespace rootfinder {
 
 template<typename Number>
 AbstractRootFinder<Number>::AbstractRootFinder(
-		UnivariatePolynomial<Number>& polynomial, 
+		const UnivariatePolynomial<Number>& polynomial,
 		const ExactInterval<Number>& interval,
 		bool tryTrivialSolver
 	) :
