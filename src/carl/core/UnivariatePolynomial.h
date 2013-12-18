@@ -249,6 +249,8 @@ public:
 
 	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
+	template<typename C=Coefficient, DisableIf<is_fraction<C>> = dummy>
+	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
@@ -386,6 +388,8 @@ public:
      * @return the main denominator of all coefficients of this polynomial.
      */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	IntNumberType mainDenom() const;
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
 

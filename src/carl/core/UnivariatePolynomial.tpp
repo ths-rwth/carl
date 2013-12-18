@@ -262,6 +262,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 	return normalized.divide(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
 
+template<typename Coeff>
+template<typename C, DisableIf<is_fraction<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
+	LOG_NOTIMPLEMENTED();
+	return *this;
+}
+
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modulus)
@@ -526,6 +533,16 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 	IntNumberType denom = 1;
 	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
 		denom = carl::lcm(denom, getDenom(this->mCoefficients[i]));
+	}
+	return denom;
+}
+template<typename Coeff>
+template<typename C, DisableIf<is_number<C>>>
+typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::mainDenom() const
+{
+	IntNumberType denom = 1;
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		denom = carl::lcm(denom, this->mCoefficients[i].mainDenom());
 	}
 	return denom;
 }
