@@ -64,10 +64,12 @@ mTerms(1,t)
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>&) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p) :
 Policies()
 {
-    LOG_NOTIMPLEMENTED();
+	for (unsigned deg = 0; deg < p.degree(); deg++) {
+		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
+	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
