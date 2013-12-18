@@ -110,6 +110,9 @@ public:
 	{
 		return mCoefficients.size() <= 1;
 	}
+	Coefficient constantPart() const {
+		return this->mCoefficients[0];
+	}
 
 	/**
 	 * Checks whether the polynomial is only a number.
