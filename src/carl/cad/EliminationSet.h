@@ -23,7 +23,7 @@
 #include "CADSettings.h"
 
 namespace carl {
-namespace CAD {
+namespace cad {
 	
 /**
  * 
@@ -218,7 +218,15 @@ public:
 	 * @param order New order function.
 	 */
 	void setLiftingOrder( PolynomialComparator order );
-	
+
+	long unsigned size() const {
+		return this->polynomials.size();
+	}
+
+	bool empty() const {
+		return this->polynomials.empty();
+	}
+
 	////////////////////
 	// ACCESS METHODS //
 	////////////////////
@@ -309,7 +317,7 @@ public:
 	 * @param p
 	 * @return set entry for the given polynomial p if exists, otherwise nullptr
 	 */
-	UnivariatePolynomial<Coefficient>* find(const UnivariatePolynomial<Coefficient>* p);
+	const UnivariatePolynomial<Coefficient>* find(const UnivariatePolynomial<Coefficient>* p);
 	
 	/**
 	 * Swaps the contents (all attributes) of the two EliminationSets.
