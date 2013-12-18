@@ -31,6 +31,10 @@ using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient
 
 template<typename C, typename O, typename P>
 class MultivariatePolynomial;
+
+enum class PolynomialComparisonOrder : unsigned {
+	CauchyBound, LowDegree, Memory, Default = Memory
+};
 	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
@@ -123,13 +127,11 @@ public:
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	bool isUnivariate()
-	{
+	bool isUnivariate() const {
 		return true;
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool isUnivariate()
-	{
+	bool isUnivariate() const {
 		for (auto c: this->coefficients()) {
 			if (!c.isNumber()) return false;
 		}
