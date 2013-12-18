@@ -12,7 +12,7 @@
 #include "../core/RealAlgebraicNumber.h"
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 template<typename Number>
 std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(const RealAlgebraicNumber<Number>* r) {
@@ -78,9 +78,7 @@ void SampleSet<Number>::pop() {
 	if (this->samples.empty()) return;
 	
 	const RealAlgebraicNumber<Number>* r = this->next();
-	//iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, (bool(const RealAlgebraicNumber<Number>*,const RealAlgebraicNumber<Number>*))(carl::template less<Number>));
 	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::Less<Number>());
-	//iterator position = this->samples.begin();
 	
 	assert(position != this->samples.end()); // r should be in this list
 	this->samples.erase(position); // remove next()

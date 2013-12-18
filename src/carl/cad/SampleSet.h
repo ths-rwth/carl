@@ -14,7 +14,7 @@
 #include "../core/RealAlgebraicNumberNR.h"
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 template<typename Number>
 class SampleSet {
