@@ -8,7 +8,9 @@ add_executable( runCoreTests
 				Test_UnivariatePolynomial.cpp
 				Test_MultivariateHensel.cpp
 				Test_MultivariateGCD.cpp
-				
+				Test_RealAlgebraicNumber.cpp
+                                Test_RootFinder.cpp
+                                Test_Sign.cpp
 				 )
 target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
 

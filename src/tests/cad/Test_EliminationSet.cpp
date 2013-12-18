@@ -16,7 +16,7 @@ TEST(EliminationSet, BasicOperations)
 	Variable y = vpool.getFreshVariable();
 	Variable z = vpool.getFreshVariable();
 
-	CAD::EliminationSet<MultivariatePolynomial<cln::cl_RA>> s;
+	cad::EliminationSet<MultivariatePolynomial<cln::cl_RA>> s;
 	
 	MultivariatePolynomial<cln::cl_RA> mpz({z});
 	MultivariatePolynomial<cln::cl_RA> mpxz2({(cln::cl_RA)-1*x*z});
@@ -41,4 +41,10 @@ TEST(EliminationSet, BasicOperations)
 	ASSERT_EQ(s.erase(q), (size_t)0);
 	ASSERT_EQ(s.erase(w), (size_t)0);
 	ASSERT_EQ(s.erase(r), (size_t)1);
+	
+	delete one;
+	delete p;
+	delete q;
+	delete r;
+	delete w;
 }

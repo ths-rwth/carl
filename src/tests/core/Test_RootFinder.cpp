@@ -23,7 +23,7 @@ TEST(IncrementalRootFinder, Constructor)
 	Variable x = vpool.getFreshVariable();
 	carl::UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)-1});
 	
-    carl::core::IncrementalRootFinder<cln::cl_RA> finder(p);
+    carl::rootfinder::IncrementalRootFinder<cln::cl_RA> finder(p);
 	std::list<carl::RealAlgebraicNumber<cln::cl_RA>*> roots = finder.getAllRoots();
 	ASSERT_TRUE(roots.size() == 1 && represents(roots.front(), (cln::cl_RA)1));
 }
