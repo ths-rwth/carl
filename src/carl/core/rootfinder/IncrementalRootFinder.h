@@ -9,7 +9,7 @@
 #include "../logging.h"
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 /*!
  * Heuristic for order of queue items to be considered, comparing only the size of the intervals.
@@ -30,7 +30,7 @@ class IncrementalRootFinder;
 #include "AbstractRootFinder.h"
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 /*!
  * Enum of all strategies for splitting some interval.
  */

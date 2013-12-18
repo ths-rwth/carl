@@ -12,7 +12,7 @@
 #include "RootFinder.h"
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 template<typename Number, typename C>
 IncrementalRootFinder<Number, C>::IncrementalRootFinder(

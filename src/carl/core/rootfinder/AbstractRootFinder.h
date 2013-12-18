@@ -12,7 +12,7 @@
 #include "../UnivariatePolynomial.h"
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 template<typename Number>
 class AbstractRootFinder {

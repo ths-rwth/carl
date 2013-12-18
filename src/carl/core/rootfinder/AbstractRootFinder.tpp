@@ -9,7 +9,7 @@
 #pragma once
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 template<typename Number>
 AbstractRootFinder<Number>::AbstractRootFinder(
