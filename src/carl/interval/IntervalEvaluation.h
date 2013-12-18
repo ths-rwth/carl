@@ -27,9 +27,9 @@ public:
 	template<typename Coeff, typename Policy>
 	static DoubleInterval evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>&);
         
-        template<typename Numeric>
-        static ExactInterval<Numeric> evaluate(const Monomial& m, const std::map<Variable, ExactInterval<Numeric> >&);
-        template<typename Numeric>
+	template<typename Numeric>
+	static ExactInterval<Numeric> evaluate(const Monomial& m, const std::map<Variable, ExactInterval<Numeric> >&);
+	template<typename Numeric>
 	static ExactInterval<Numeric> evaluate(const Term<Numeric>& t, const std::map<Variable, ExactInterval<Numeric> >&);
 	template<typename Numeric, typename Policy>
 	static ExactInterval<Numeric> evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, ExactInterval<Numeric> >&);
