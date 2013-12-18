@@ -181,6 +181,24 @@ public:
 		return mMainVar;
 	}
 
+	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+		return MultivariatePolynomial<Coefficient>(*this).toUnivariatePolynomial(newVar);
+	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	std::set<Variable> gatherVariables() const {
+		return std::set<Variable>({this->mainVar()});
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	std::set<Variable> gatherVariables() const {
+		std::set<Variable> res({this->mainVar()});
+		for (auto c: this->mCoefficients) {
+			auto tmp = c.gatherVariables();
+			res.insert(tmp.begin(), tmp.end());
+		}
+		return res;
+	}
+
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	unsigned has(Variable::Arg v) const {
 		return v == this->mainVar();
