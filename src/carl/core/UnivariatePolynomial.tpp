@@ -6,12 +6,13 @@
  */
 
 #pragma once
-#include "UnivariatePolynomial.h"
+
 #include <algorithm>
 #include <iomanip>
 #include "../util/SFINAE.h"
 #include "logging.h"
 #include "Sign.h"
+#include "UnivariatePolynomial.h"
 
 namespace carl
 {
@@ -1342,35 +1343,35 @@ bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomia
 }
 
 template<typename C>
-bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, ComparisonOrder order) const {
+bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order) const {
 	switch (order) {
-		case CauchyBound: /*{
+		case PolynomialComparisonOrder::CauchyBound: /*{
 			C a = this->cauchyBound();
 			C b = rhs.cauchyBound();
 			if (a < b) return true;
 			return (a == b) && this->less(rhs);
 		}*/
-		case LowDegree:
+		case PolynomialComparisonOrder::LowDegree:
 			if (this->degree() < rhs.degree()) return true;
 			return (this->degree() == rhs.degree()) && this->less(rhs);
-		case Memory:
+		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
 	}
 }
 template<typename C>
-bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
 {
 	return lhs.less(rhs, order);
 }
 template<typename C>
-bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
 {
 	if (lhs == nullptr) return rhs != nullptr;
 	if (rhs == nullptr) return true;
 	return lhs->less(*rhs, order);
 }
 template<typename C>
-bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
 {
 	return less(lhs.get(), rhs.get(), order);
 }
@@ -1379,9 +1380,9 @@ template<typename C>
 class UnivariatePolynomialComparator
 {
 private:
-	typename UnivariatePolynomial<C>::ComparisonOrder order;
+	PolynomialComparisonOrder order;
 public:
-	UnivariatePolynomialComparator(typename UnivariatePolynomial<C>::ComparisonOrder order = UnivariatePolynomial<C>::Default)
+	UnivariatePolynomialComparator(PolynomialComparisonOrder order = PolynomialComparisonOrder::Default)
 				: order(order)
 	{}
 
