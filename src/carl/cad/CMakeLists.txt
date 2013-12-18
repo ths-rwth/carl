@@ -4,6 +4,8 @@ set(carl_lib_cad_headers
     EliminationSet.tpp
     ConflictGraph.h
     ConflictGraph.tpp
+    SampleSet.h
+    SampleSet.tpp
 ) 
 # Source files in here
 set(carl_lib_cad_sources 
