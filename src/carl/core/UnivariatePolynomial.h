@@ -147,6 +147,21 @@ public:
 		// todo add assertion that this is valid.
 		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
 	}
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	unsigned totalDegree() const {
+		return this->degree();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	unsigned totalDegree() const {
+		unsigned max = 0;
+		for (unsigned deg = 0; deg < this->mCoefficients.size(); deg++) {
+			if (!this->mCoefficients[deg].isZero()) {
+				unsigned tdeg = deg + this->mCoefficients[deg].totalDegree();
+				if (tdeg > max) max = tdeg;
+			}
+		}
+		return max;
+	}
 
 	const Coefficient& lcoeff() const
 	{

@@ -198,7 +198,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-exponent MultivariatePolynomial<Coeff,Ordering,Policies>::highestDegree() const
+exponent MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
     if(mTerms.size() == 0) return 0;
     if(Ordering::degreeOrder)
@@ -800,7 +800,7 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 	// TODO we could implement a method isUnivariate()
 	
 	Variable::Arg x = lmon()->getSingleVariable();
-	std::vector<C> coeffs(highestDegree()+1,0);
+	std::vector<C> coeffs(totalDegree()+1,0);
 	// TODO we do not use the fact that it is already sorted..
 	for(std::shared_ptr<const Term<C>> t : mTerms)
 	{

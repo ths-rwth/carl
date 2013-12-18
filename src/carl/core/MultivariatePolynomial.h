@@ -99,7 +99,7 @@ public:
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * @return 
 	 */
-	exponent highestDegree() const;
+	exponent totalDegree() const;
 
 	bool isZero() const;
 	bool isConstant() const;
