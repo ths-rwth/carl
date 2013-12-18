@@ -708,6 +708,24 @@ namespace carl
                 return (mRight >= o.mRight);
         }
     }
+	
+	template<typename Numeric>
+	void ExactInterval<Numeric>::operator+=( const ExactInterval<Numeric>& o )
+    {
+		*this = *this + o;
+    }
+	
+	template<typename Numeric>
+    void ExactInterval<Numeric>::operator-=( const ExactInterval<Numeric>& o )
+    {
+		*this = *this - o;
+    }
+	
+	template<typename Numeric>
+    void ExactInterval<Numeric>::operator*=( const ExactInterval<Numeric>& o )
+    {
+		*this = *this * o;
+    }
     
     template<typename Numeric>
     std::ostream& operator << (std::ostream& str, const ExactInterval<Numeric>& d)

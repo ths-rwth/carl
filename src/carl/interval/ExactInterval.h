@@ -382,6 +382,10 @@ namespace carl
                 return ExactInterval( Numeric(-1), BoundType::INFTY, Numeric(1), BoundType::INFTY );
             }
 
+		void operator +=(const ExactInterval<Numeric>& o);
+		void operator -=(const ExactInterval<Numeric>& o);
+		void operator *=(const ExactInterval<Numeric>& o);
+		
             friend std::ostream& operator<< <>(std::ostream& str, const ExactInterval<Numeric>&);
             
         protected:
@@ -414,6 +418,76 @@ namespace carl
 
     };    // class ExactInterval
     
+// Arithmetic operators
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator +(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.add(rh);
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator +(const ExactInterval<Numeric>& lh, const Numeric& rh)
+{
+	// TODO optimization potential
+	return lh.add(ExactInterval<Numeric>(rh));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator +(const Numeric& lh, const ExactInterval<Numeric>& rh)
+{
+	// TODO optimization potential
+	return rh.add(ExactInterval<Numeric>(lh));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator -(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.add(rh.inverse());
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator -(const ExactInterval<Numeric>& lh, const NUMERIC& rh)
+{
+	return lh + (-rh);
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator -(const Numeric& lh, const ExactInterval<Numeric>& rh)
+{
+	return (-lh) +rh;
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator *(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.mul(rh);
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator *(const ExactInterval<Numeric>& lh, const Numeric& rh)
+{
+	return ExactInterval<Numeric>(lh.mul(ExactInterval<Numeric>(rh)));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator *(const Numeric& lh, const ExactInterval<Numeric>& rh)
+{
+	return rh * lh;
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator /(const ExactInterval<Numeric>& lh, const Numeric& rh) throw ( std::overflow_error)
+{
+	return lh.div(ExactInterval<Numeric>(rh));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator /(const Numeric& lh, const ExactInterval<Numeric>& rh) throw ( std::overflow_error)
+{
+	ExactInterval<Numeric> result = ExactInterval<Numeric>(lh);
+	result.div(rh);
+	return result;
+}
 
 // relational operators
 

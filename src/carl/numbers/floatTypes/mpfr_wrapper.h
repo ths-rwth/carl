@@ -28,7 +28,6 @@ namespace carl {
 		carl_mpfr(double _d)
 		{
 			mpfr_init(val);
-			mpfr_set_d(val, _d);
 		}
 		
 		~carl_mpfr()
