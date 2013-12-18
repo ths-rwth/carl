@@ -351,6 +351,14 @@ public:
 	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
 
+	UnivariatePolynomial pseudoPrimpart(const Coefficient& content) const {
+		if (content == 0) return *this;
+		return this->divide(UnivariatePolynomial<Coefficient>(this->mainVar(), content)).quotient;
+	}
+	UnivariatePolynomial pseudoPrimpart() const {
+		return this->pseudoPrimpart(this->numericContent());
+	}
+
 	/**
      * Compute the main denominator of all numeric coefficients of this polynomial.
 	 * This method only applies if the Coefficient type is a number.
