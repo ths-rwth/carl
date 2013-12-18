@@ -42,6 +42,7 @@ option( DEVELOPER "Compile with extra warnings" ON )
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
+option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -72,18 +73,23 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	message("using clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+	if (APPLE)
+		message("-- Using clang on apple")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+	else()
+		message("-- Using clang")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	message("using gcc")
+	message("-- Using g++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
 else()
-	message("possibly unsupported compiler")
+	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
 endif()
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 if(DEVELOPER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion ")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion")
 endif()
 
 
@@ -148,6 +154,8 @@ if(NOT FORCE_SHIPPED_RESOURCES)
 	find_package(Log4cplus)
 	# find googletest
 	find_package(GTest)
+	# find eigen
+	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
@@ -155,6 +163,11 @@ enable_testing()
 #set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
+
+if(COMPARE_WITH_GINAC)
+  find_package( GiNaC 1.5.8 REQUIRED )
+  set(libraries ${libraries} ${GINAC_LIBRARY} )
+endif()
 
 
 # # # # # # # # # # # # # # # # # # # # # #

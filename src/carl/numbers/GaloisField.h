@@ -66,7 +66,7 @@ class GaloisField
 	
 	IntegerType symmetricModulo(const IntegerType& n) const
 	{
-		return n > (mPK-1)/2 ?  mod(n-(mPK+1)/2, mPK) - (mPK-1)/2 : mod(n, mPK);
+		return n > (mPK-1)/2 ?  mod((IntegerType)(n-(mPK+1)/2), mPK) - (mPK-1)/2 : mod(n, mPK);
 	}
 	
 	friend bool operator==(const GaloisField& lhs, const GaloisField& rhs)

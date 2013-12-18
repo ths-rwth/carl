@@ -4,9 +4,11 @@
  */
 
 #pragma once
+#include <functional>
+#include <list>
 #include <map>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "Variable.h"
 #include "VariableInformation.h"
@@ -14,6 +16,7 @@
 #include "DivisionResult.h"
 #include "../numbers/numbers.h"
 #include "../numbers/GFNumber.h"
+#include "../interval/ExactInterval.h"
 
 #include "logging.h"
 #include "../util/SFINAE.h"
@@ -28,6 +31,10 @@ using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient
 
 template<typename C, typename O, typename P>
 class MultivariatePolynomial;
+
+enum class PolynomialComparisonOrder : unsigned {
+	CauchyBound, LowDegree, Memory, Default = Memory
+};
 	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
@@ -50,6 +57,8 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 //	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
+	
+	virtual ~UnivariatePolynomial();
 
 	//Polynomial interface implementations.
 
@@ -118,13 +127,11 @@ public:
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	bool isUnivariate()
-	{
+	bool isUnivariate() const {
 		return true;
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool isUnivariate()
-	{
+	bool isUnivariate() const {
 		for (auto c: this->coefficients()) {
 			if (!c.isNumber()) return false;
 		}
@@ -139,6 +146,21 @@ public:
 	{
 		// todo add assertion that this is valid.
 		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
+	}
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	unsigned totalDegree() const {
+		return this->degree();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	unsigned totalDegree() const {
+		unsigned max = 0;
+		for (unsigned deg = 0; deg < this->mCoefficients.size(); deg++) {
+			if (!this->mCoefficients[deg].isZero()) {
+				unsigned tdeg = deg + this->mCoefficients[deg].totalDegree();
+				if (tdeg > max) max = tdeg;
+			}
+		}
+		return max;
 	}
 
 	const Coefficient& lcoeff() const
@@ -155,15 +177,29 @@ public:
 	{
 		return mMainVar;
 	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	unsigned has(Variable::Arg v) const {
+		return v == this->mainVar();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	unsigned has(Variable::Arg v) const {
+		bool hasVar = v == this->mainVar();
+		for (auto c: this->mCoefficients) {
+			hasVar = hasVar || c.has(v);
+		}
+		return hasVar;
+	}
+
 	/**
 	 * 
      * @return copr
      */
     Coefficient coprimeFactor() const;
     
-	template<typename Integer>
-	UnivariatePolynomial<Integer> coprimeCoefficients() const;
-	
+	template<typename C = Coefficient, EnableIf<is_fraction<C>> = dummy>
+	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
+
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	UnivariatePolynomial normalized() const;
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
@@ -173,10 +209,15 @@ public:
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	
 	
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+
 	bool divides(const UnivariatePolynomial&) const;
 	
 	UnivariatePolynomial& mod(const Coefficient& modulus);
@@ -185,9 +226,17 @@ public:
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
+	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
+	
+	carl::Sign sgn(const Coefficient& value) const {
+		return carl::sgn(this->evaluate(value));
+	}
+	bool isRoot(const Coefficient& value) const {
+		return this->sgn(value) == Sign::ZERO;
+	}
 	
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
@@ -229,6 +278,11 @@ public:
 	
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
 
+	template<typename NewCoeff>
+	UnivariatePolynomial<NewCoeff> convert() const;
+	template<typename NewCoeff>
+	UnivariatePolynomial<NewCoeff> convert(const std::function<NewCoeff(const Coefficient&)>& f) const;
+
 	/**
 	 * Notice, Cauchy bounds are only defined for polynomials over fields.
 	 * 
@@ -237,6 +291,13 @@ public:
 	 */
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
+
+	/** The maximum norm of a polynomial is the maximum absolute value of the coefficients of
+	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
+	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.
+	 */
+	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	IntNumberType maximumNorm() const;
 
 	/**
 	 * Returns the numeric content part of the i'th coefficient.
@@ -247,12 +308,12 @@ public:
      * @return numeric content part of i'th coefficient.
      */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	typename UnderlyingNumberType<Coefficient>::type numericContent(unsigned int i) const
+	NumberType numericContent(unsigned int i) const
 	{
 		return this->mCoefficients[i];
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	typename UnderlyingNumberType<Coefficient>::type numericContent(unsigned int i) const
+	NumberType numericContent(unsigned int i) const
 	{
 		return this->mCoefficients[i].numericContent();
 	}
@@ -290,6 +351,14 @@ public:
 	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
 
+	UnivariatePolynomial pseudoPrimpart(const Coefficient& content) const {
+		if (content == 0) return *this;
+		return this->divide(UnivariatePolynomial<Coefficient>(this->mainVar(), content)).quotient;
+	}
+	UnivariatePolynomial pseudoPrimpart() const {
+		return this->pseudoPrimpart(this->numericContent());
+	}
+
 	/**
      * Compute the main denominator of all numeric coefficients of this polynomial.
 	 * This method only applies if the Coefficient type is a number.
@@ -307,6 +376,69 @@ public:
     Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 
+	/**
+	 * Checks if zero is a real root of this polynomial.
+     * @return True if zero is a root.
+     */
+	bool zeroIsRoot() const {
+		return this->mCoefficients[0] == 0;
+	}
+	/**
+	 * Reduces the polynomial such that zero is not a root anymore.
+	 * Is functionally equivalent to eliminateRoot(0), but much faster.
+     */
+	void eliminateZeroRoots();
+	/**
+	 * Reduces the polynomial such that the given root is not a root anymore.
+	 * The reduction is achieved by removing the linear factor (mainVar - root) from the polynomial, possibly multiple times.
+	 *
+	 * This method assumes that the given root is an actual real root of this polynomial.
+	 * If this is not the case, i.e. <code>evaluate(root) != 0</code>, the polynomial will contain meaningless garbage.
+     * @param root Root to be eliminated.
+     */
+	void eliminateRoot(const Coefficient& root);
+
+	std::list<UnivariatePolynomial> standardSturmSequence() const;
+	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
+
+	/**
+	 * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
+	 * This is an upper bound for countRealRoots().
+     * @param interval Count roots within this interval.
+     * @return Upper bound for number of real roots within the interval.
+     */
+	unsigned int signVariations(const ExactInterval<Coefficient>& interval) const;
+
+	/**
+	 * Count the number of real roots within the given interval using Sturm sequences.
+     * @param interval Count roots within this interval.
+     * @return Number of real roots within the interval.
+     */
+	unsigned int countRealRoots(const ExactInterval<Coefficient>& interval) const;
+
+	/*!
+	 * Reverses the order of the coefficients of this polynomial.
+	 * This method is meant to be called by signVariations only.
+	 * @complexity O(n)
+	 */
+	void reverse();
+
+	/*!
+	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
+	 * This method is meant to be called by signVariations only.
+	 * @param factor Factor to scale x.
+	 * @complexity O(n)
+	 */
+	void scale(const Coefficient& factor);
+
+	/*!
+	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
+	 * This method is meant to be called by signVariations only.
+	 * @param a Offset to shift x.
+	 * @complexity O(n^2)
+	 */
+	void shift(const Coefficient& a);
+
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -320,16 +452,13 @@ public:
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
 	
-	enum ComparisonOrder {
-		CauchyBound, LowDegree, Memory, Default = Memory
-	};
-	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default) const;
+	bool less(const UnivariatePolynomial<Coefficient>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default) const;
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order);
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, const PolynomialComparisonOrder&);
 	template<typename C>
-	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, const PolynomialComparisonOrder&);
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 

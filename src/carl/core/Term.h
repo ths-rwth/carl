@@ -12,7 +12,7 @@
 
 namespace carl
 {
-    enum class Definiteness : int { NEGATIVE = -2, NEGATIVE_SEMI = -1, NON = 0, POSITIVE_SEMI = 1, POSITIVE = 2 };
+    enum class Definiteness : unsigned { NEGATIVE = 0, NEGATIVE_SEMI = 1, NON = 2, POSITIVE_SEMI = 3, POSITIVE = 4 };
 
 template<typename Coefficient>
 class Term

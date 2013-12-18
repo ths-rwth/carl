@@ -99,7 +99,7 @@ public:
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * @return 
 	 */
-	exponent highestDegree() const;
+	exponent totalDegree() const;
 
 	bool isZero() const;
 	bool isConstant() const;
@@ -199,8 +199,14 @@ public:
 	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
-	 * For a polynomial p, returns p/gcd(all coefficients in p)
-     * @return 
+     * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
+     *         of the coefficients in p.
+     */
+	Coeff coprimeFactor() const;
+	
+	/**
+     * @return p * p.coprimeFactor()
+     * @see coprimeFactor()
      */
 	MultivariatePolynomial coprimeCoefficients() const;
 	
@@ -211,11 +217,29 @@ public:
 	MultivariatePolynomial normalize() const;
 	
 	/**
+	 * Replace the given variable by the given value within this multivariate polynomial.
+     */
+	void substituteIn(const Variable::Arg var, const MultivariatePolynomial& value);
+	
+	/**
+	 * Replace the given variable by the given value.
+     * @return A new polynomial without resulting from this substitution.
+     */
+	MultivariatePolynomial substitute(const Variable::Arg var, const MultivariatePolynomial& value) const;
+	
+	/**
+	 * Replace all variables by a value given in their map.
+     * @return A new polynomial without the variables in map.
+     */
+	MultivariatePolynomial substitute(const std::map<Variable, MultivariatePolynomial>& substitutions) const;
+    
+	/**
 	 * Replace all variables by a value given in their map.
      * @return A new polynomial without the variables in map.
      */
 	template<typename SubstitutionType = Coeff>
 	MultivariatePolynomial substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+    
 	/**
 	 * Replace all variables by a Term in which the variable does not occur.
      * @param substitutions
@@ -242,6 +266,8 @@ public:
 	unsigned hash() const;
 	
 	MultivariatePolynomial pow(unsigned exp) const;
+    
+	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
@@ -474,6 +500,7 @@ public:
 	
 private:
 	void sortTerms();
+    void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
 };
 

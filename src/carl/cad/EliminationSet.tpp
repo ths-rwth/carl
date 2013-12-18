@@ -2,7 +2,7 @@
 #include "EliminationSet.h"
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 template <typename Coefficient>
 bool EliminationSet<Coefficient>::hasParents(const UnivariatePolynomial<Coefficient>* p) const {
@@ -123,7 +123,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
-	return this->insert(std::make_shared<UnivariatePolynomial<Coefficient>>(r), parents, avoidSingle);
+	return this->insert(new UnivariatePolynomial<Coefficient>(r), parents, avoidSingle);
 }
 
 template<typename Coefficient>
@@ -133,10 +133,10 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::inser
 		)
 {
 	std::list<UnivariatePolynomial<Coefficient>*> inserted = std::list<UnivariatePolynomial<Coefficient>*>();
-	for (typename PolynomialSet::const_iterator i = s.begin(); i != s.end(); ++i) {
+	for (auto i = s.polynomials.begin(); i != s.polynomials.end(); ++i) {
 		std::list<UnivariatePolynomial<Coefficient>*> parents = s.getParentsOf(*i);
 		if (parents.empty()) {
-			parents = std::list<UnivariatePolynomial<Coefficient>*>( 1, new UnivariatePolynomial<Coefficient>());
+			parents = std::list<UnivariatePolynomial<Coefficient>*>( 1, nullptr);
 		}
 		std::pair<typename PolynomialSet::iterator, bool> insertValue = this->insert(*i, parents, avoidSingle);
 		if(insertValue.second) {
@@ -237,7 +237,7 @@ std::forward_list<const UnivariatePolynomial<Coefficient>*> EliminationSet<Coeff
 }
 
 template<typename Coefficient>
-UnivariatePolynomial<Coefficient>* EliminationSet<Coefficient>::find(const UnivariatePolynomial<Coefficient>* p) {
+const UnivariatePolynomial<Coefficient>* EliminationSet<Coefficient>::find(const UnivariatePolynomial<Coefficient>* p) {
 	auto position = this->polynomials.find(p);
 	return (position == this->polynomials.end() ? nullptr : *position);
 }
@@ -289,15 +289,15 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::elimi
 {
 	if (p->isConstant())
 	{ /* constants can just be moved from this level to the next */
-		if (isNumber(*p))
+		if (p->isNumber())
 		//if( GiNaC::is_exactly_a<numeric>( *p )) /* discard numerics completely */
 		{
 			this->erase(p);
 			return {};
 		}
-		UnivariatePolynomial<Coefficient>* pNewVar = std::make_shared<UnivariatePolynomial<Coefficient>>( p->switchVariable( variable ));
+		UnivariatePolynomial<Coefficient>* pNewVar = new UnivariatePolynomial<Coefficient>(p->switchVariable(variable));
 		destination.insert(pNewVar, this->getParentsOf(p));
-		if( setting.removeConstants || isNumber(*p)) /* remove constant from this level and discard numerics completely */
+		if( setting.removeConstants || p->isNumber()) /* remove constant from this level and discard numerics completely */
 			this->erase(p);
 		else {
 			auto queuePosition = std::lower_bound(mSingleEliminationQueue.begin(), mSingleEliminationQueue.end(), p, this->eliminationOrder);
@@ -509,8 +509,9 @@ void EliminationSet<Coefficient>::removePolynomialsWithoutRealRoots() {
 	for (auto p: this->polynomials) {
 		if (p->degree() % 2 == 0 && p->isUnivariate())
 		{    // this is a good candidate for having no real roots
-			if( RationalUnivariatePolynomial( *p ).countRealRoots() == 0 )
+			if (rootfinder::countRealRoots(p) == 0) {
 				toDelete.push_front(p);
+			}
 		}
 	}
 	// delete collected polynomials
@@ -523,7 +524,7 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::makeSquarefree() {
 	EliminationSet<Coefficient> squarefreeSet(this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
-		squarefreeSet.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(p->pseudoSepapart() ), this->getParentsOf(p));
+		squarefreeSet.insert(new UnivariatePolynomial<Coefficient>(p->squareFreePart()), this->getParentsOf(p));
 	}
 	std::swap(*this, squarefreeSet);
 }
@@ -534,9 +535,9 @@ void EliminationSet<Coefficient>::makePrimitive() {
 	for (auto p: this->polynomials) {
 		if (p->isNumber()) continue; // numbers are discarded
 		
-		typename UnderlyingNumberType<Coefficient>::type c = p->pseudeoContent();
+		typename UnderlyingNumberType<Coefficient>::type c = p->numericContent();
 		if( c != 1 && c != 0 ) // only non-trivial content parts are considered
-			primitiveSet.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(p->pseudoPrimpart( c ) ), this->getParentsOf(p) );
+			primitiveSet.insert(new UnivariatePolynomial<Coefficient>(p->pseudoPrimpart(c)), this->getParentsOf(p));
 		else
 			primitiveSet.insert(p, this->getParentsOf(p));
 	}
@@ -551,7 +552,7 @@ void EliminationSet<Coefficient>::factorize() {
 	for (auto p: this->polynomials) {
 		// insert the factors and omit the original
 		for (auto factor: p->factorization()) {
-			factorizedSet.insert(std::make_shared(factor.first), this->getParentsOf(p));
+			factorizedSet.insert(factor.first, this->getParentsOf(p));
 		}
 	}
 	std::swap(*this, factorizedSet);

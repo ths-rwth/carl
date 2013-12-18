@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include "carl/converter/GinacConverter.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
 
@@ -198,11 +199,133 @@ TEST(MultivariatePolynomial, Substitute)
     mp += (cln::cl_RA)4 * v1;
     MultivariatePolynomial<cln::cl_RA> mp2((cln::cl_RA)2);
     mp2 += (cln::cl_RA)4 * v1;
-    std::map<Variable, cln::cl_RA> substitutions;
-    substitutions[v0] = (cln::cl_RA)12;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions;
+    substitutions[v0] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)12);
     EXPECT_EQ(mp2, mp.substitute(substitutions));
-    substitutions[v0] = (cln::cl_RA)0;
+    substitutions[v0] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
     EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)4 * v1), mp.substitute(substitutions));
+    #ifdef COMPARE_WITH_GINAC
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable v = vpool.getFreshVariable();
+    vpool.setVariableName(v, "v");
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    Variable y = vpool.getFreshVariable();
+    vpool.setVariableName(y, "y");
+    Variable z = vpool.getFreshVariable();
+    vpool.setVariableName(z, "z");
+    
+    std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> vars;
+    GiNaC::symbol vg("v"), xg("x"), yg("y"), zg("z");
+    vars.insert(std::pair<GiNaC::ex, Variable>(vg, v));
+    vars.insert(std::pair<GiNaC::ex, Variable>(xg, x));
+    vars.insert(std::pair<GiNaC::ex, Variable>(yg, y));
+    vars.insert(std::pair<GiNaC::ex, Variable>(zg, z));
+    
+    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*v*x*y*y, (cln::cl_RA)-2*x*x*y*y*y, (cln::cl_RA)312347*v*v*x, (cln::cl_RA)3*y*v*z*z*x, Term<cln::cl_RA>((cln::cl_RA)1)});
+    GiNaC::ex f1g = xg*xg*vg*xg*yg*yg-2*xg*xg*yg*yg*yg+312347*vg*vg*xg+3*yg*vg*zg*zg*xg+1;
+    EXPECT_EQ(f1, convert(f1g, vars));
+    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)7*x*x*x*x*y*y, (cln::cl_RA)191*x*x*x*x*z*z*z ,(cln::cl_RA)-3*x*x*y, (cln::cl_RA)1*z*z*x*v*v, (cln::cl_RA)2*z*y*v*v, Term<cln::cl_RA>((cln::cl_RA)4)});
+    GiNaC::ex f2g = 7*xg*xg*xg*xg*yg*yg+191*xg*xg*xg*xg*zg*zg*zg-3*xg*xg*yg+zg*zg*xg*vg*vg+2*zg*yg*vg*vg+4;
+    EXPECT_EQ(f2, convert(f2g, vars));
+    
+    MultivariatePolynomial<cln::cl_RA> sy({(cln::cl_RA)-2*y*y*y, (cln::cl_RA)-9*y, Term<cln::cl_RA>((cln::cl_RA)15)});
+    GiNaC::ex syg = -2*yg*yg*yg-9*yg+15;
+    EXPECT_EQ(sy, convert(syg, vars));
+    MultivariatePolynomial<cln::cl_RA> sxy1({(cln::cl_RA)1*x*y*y, (cln::cl_RA)-5*y*y*y, Term<cln::cl_RA>((cln::cl_RA)3377)});
+    GiNaC::ex sxy1g = xg*yg*yg-5*yg*yg*yg+3377;
+    EXPECT_EQ(sxy1, convert(sxy1g, vars));
+    MultivariatePolynomial<cln::cl_RA> sx({(cln::cl_RA)1*x, Term<cln::cl_RA>((cln::cl_RA)-1)});
+    GiNaC::ex sxg = xg-1;
+    EXPECT_EQ(sx, convert(sxg, vars));
+    MultivariatePolynomial<cln::cl_RA> svyz({(cln::cl_RA)8*v*v*y, (cln::cl_RA)1*y*z*y, (cln::cl_RA)29*z*z*z*z*z});
+    GiNaC::ex svyzg = 8*vg*vg*yg+yg*zg*yg+29*zg*zg*zg*zg*zg;
+    EXPECT_EQ(svyz, convert(svyzg, vars));
+    MultivariatePolynomial<cln::cl_RA> svz({(cln::cl_RA)1*v*v, (cln::cl_RA)-1*z, (cln::cl_RA)-2*v*z, Term<cln::cl_RA>((cln::cl_RA)10)});
+    GiNaC::ex svzg = vg*vg-zg-2*vg*zg+10;
+    EXPECT_EQ(svz, convert(svzg, vars));
+    MultivariatePolynomial<cln::cl_RA> sxy2({(cln::cl_RA)2*x*y*y});
+    GiNaC::ex sxy2g = 2*xg*yg*yg;
+    EXPECT_EQ(sxy2, convert(sxy2g, vars));
+    MultivariatePolynomial<cln::cl_RA> sv({(cln::cl_RA)1*v*v*v*v});
+    GiNaC::ex svg = vg*vg*vg*vg;
+    EXPECT_EQ(sv, convert(svg, vars));
+    MultivariatePolynomial<cln::cl_RA> sz({(cln::cl_RA)1*z});
+    GiNaC::ex szg = zg;
+    EXPECT_EQ(sz, convert(szg, vars));
+    MultivariatePolynomial<cln::cl_RA> sxz({(cln::cl_RA)8*x*z*z*z, (cln::cl_RA)-5*x*x*x, Term<cln::cl_RA>((cln::cl_RA)7)});
+    GiNaC::ex sxzg = 8*xg*zg*zg*zg-5*xg*xg*xg+7;
+    EXPECT_EQ(sxz, convert(sxzg, vars));
+    MultivariatePolynomial<cln::cl_RA> sxv({(cln::cl_RA)3*x, (cln::cl_RA)1*v*v, (cln::cl_RA)2*v*v*v*v});
+    GiNaC::ex sxvg = 3*xg+vg*vg+2*vg*vg*vg*vg;
+    EXPECT_EQ(sxv, convert(sxvg, vars));
+    MultivariatePolynomial<cln::cl_RA> svy({(cln::cl_RA)13*v*y, (cln::cl_RA)-3*y*y*y*v, Term<cln::cl_RA>((cln::cl_RA)100)});
+    GiNaC::ex svyg = 13*vg*yg-3*yg*yg*yg*vg+100;
+    EXPECT_EQ(svy, convert(svyg, vars));
+    
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions0;
+    substitutions0[v] = sy;
+    substitutions0[x] = svy;
+    substitutions0[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    substitutions0[z] = sy;
+    GiNaC::exmap substitutions0g;
+    substitutions0g[vg] = syg;
+    substitutions0g[xg] = svyg;
+    substitutions0g[yg] = 0;
+    substitutions0g[zg] = syg;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions1;
+    substitutions1[v] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    substitutions1[x] = svyz;
+    substitutions1[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1289);
+    substitutions1[z] = sxv;
+    GiNaC::exmap substitutions1g;
+    substitutions1g[vg] = 0;
+    substitutions1g[xg] = svyzg;
+    substitutions1g[yg] = 1289;
+    substitutions1g[zg] = sxvg;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions2;
+    substitutions2[v] = sx;
+    substitutions2[x] = sv;
+    substitutions2[y] = sxz;
+    GiNaC::exmap substitutions2g;
+    substitutions2g[vg] = sxg;
+    substitutions2g[xg] = svg;
+    substitutions2g[yg] = sxzg;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions3;
+    substitutions3[v] = sxy1;
+    substitutions3[x] = svz;
+    substitutions3[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    GiNaC::exmap substitutions3g;
+    substitutions3g[vg] = sxy1g;
+    substitutions3g[xg] = svzg;
+    substitutions3g[yg] = 0;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions4;
+    substitutions4[v] = sxy2;
+    substitutions4[x] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)12246789);
+    GiNaC::exmap substitutions4g;
+    substitutions4g[vg] = sxy2g;
+    substitutions4g[xg] = 12246789;
+    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions5;
+    substitutions5[y] = sz;
+    substitutions5[z] = svy;
+    GiNaC::exmap substitutions5g;
+    substitutions5g[yg] = szg;
+    substitutions5g[zg] = svyg;
+    
+    EXPECT_EQ(f1.substitute(substitutions0), convert(f1g.subs(substitutions0g), vars));
+    EXPECT_EQ(f1.substitute(substitutions1), convert(f1g.subs(substitutions1g), vars));
+    EXPECT_EQ(f1.substitute(substitutions2), convert(f1g.subs(substitutions2g), vars));
+    EXPECT_EQ(f1.substitute(substitutions3), convert(f1g.subs(substitutions3g), vars));
+    EXPECT_EQ(f1.substitute(substitutions4), convert(f1g.subs(substitutions4g), vars));
+    EXPECT_EQ(f1.substitute(substitutions5), convert(f1g.subs(substitutions5g), vars));
+    
+    EXPECT_EQ(f2.substitute(substitutions0), convert(f2g.subs(substitutions0g), vars));
+    EXPECT_EQ(f2.substitute(substitutions1), convert(f2g.subs(substitutions1g), vars));
+    EXPECT_EQ(f2.substitute(substitutions2), convert(f2g.subs(substitutions2g), vars));
+    EXPECT_EQ(f2.substitute(substitutions3), convert(f2g.subs(substitutions3g), vars));
+    EXPECT_EQ(f2.substitute(substitutions4), convert(f2g.subs(substitutions4g), vars));
+    EXPECT_EQ(f2.substitute(substitutions5), convert(f2g.subs(substitutions5g), vars));
+    #endif
 }
 
 TEST(MultivariatePolynomial, SPolynomial)
