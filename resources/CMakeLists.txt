@@ -77,7 +77,7 @@ if(NOT EIGEN_FOUND)
 		eigen
 		DOWNLOAD_COMMAND ""
 		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0"
-		#CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
 		#		   -DBUILD_SHARED_LIBS:BOOL=0
 		INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
 		# Wrap download, configure and build steps in a script to log output
@@ -87,5 +87,5 @@ if(NOT EIGEN_FOUND)
 
 	set( EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
 	set( EIGEN_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
-	add_dependencies(resources log4cplus)
+	add_dependencies(resources eigen)
 endif()
