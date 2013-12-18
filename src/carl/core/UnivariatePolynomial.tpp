@@ -943,7 +943,6 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 	unsigned int i = 0;
 	while ((i < this->mCoefficients.size()-1) && (this->mCoefficients[i] == 0)) i++;
 	if (i == 0) return;
-
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
 	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
 		this->mCoefficients[i] = this->mCoefficients[j+i];
@@ -987,7 +986,6 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 		q = - p.reduce(q);
 		p = seq.back();
 	}
-
 	return seq;
 }
 

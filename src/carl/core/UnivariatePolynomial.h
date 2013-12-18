@@ -57,6 +57,8 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 //	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
+	
+	virtual ~UnivariatePolynomial();
 
 	virtual ~UnivariatePolynomial();
 
@@ -375,6 +377,14 @@ public:
     
     Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
+	
+	bool zeroIsRoot() const {
+		return this->mCoefficients[0] == 0;
+	}
+	void eliminateZeroRoots();
+	
+	std::list<UnivariatePolynomial> standardSturmSequence() const;
+	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
