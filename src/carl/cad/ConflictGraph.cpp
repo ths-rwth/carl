@@ -5,7 +5,7 @@
 #include <forward_list>
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 ConflictGraph::ConflictGraph() :
 		data(),

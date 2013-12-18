@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 /**
  * Content of a ConflictGraph vertex.
