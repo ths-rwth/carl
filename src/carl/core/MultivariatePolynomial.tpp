@@ -823,8 +823,9 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 {
 	if (this->isZero()) return 0;
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
-	for (unsigned i = 0; i < this->mTerms; i++) {
-		res = gcd(res, this->mTerms[i]->coeff());
+	for (unsigned i = 0; i < this->mTerms.size(); i++) {
+		// TODO: gcd needed for fractions
+		//res = carl::gcd(res, this->mTerms[i]->coeff());
 	}
 	return res;
 }
@@ -837,6 +838,16 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff().numericContent();
 	for (unsigned i = 0; i < this->mTerms; i++) {
 		res = gcd(res, this->mTerms[i]->coeff().numericContent());
+	}
+	return res;
+}
+
+template<typename Coeff, typename O, typename P>
+template<typename C, EnableIf<is_number<C>>>
+typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial<Coeff,O,P>::mainDenom() const {
+	IntNumberType res = 1;
+	for (auto t: *this) {
+		res = carl::gcd(res, getDenom(t->coeff()));
 	}
 	return res;
 }
