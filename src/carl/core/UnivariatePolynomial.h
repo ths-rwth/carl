@@ -60,8 +60,6 @@ public:
 	
 	virtual ~UnivariatePolynomial();
 
-	virtual ~UnivariatePolynomial();
-
 	//Polynomial interface implementations.
 
 	/**
@@ -377,14 +375,6 @@ public:
     
     Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
-	
-	bool zeroIsRoot() const {
-		return this->mCoefficients[0] == 0;
-	}
-	void eliminateZeroRoots();
-	
-	std::list<UnivariatePolynomial> standardSturmSequence() const;
-	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
