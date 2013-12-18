@@ -39,33 +39,33 @@ CAD<Number>::CAD():
 
 template<typename Number>
 CAD<Number>::CAD(const std::vector<std::atomic_bool*>& i):
-		CAD(),
-		interrupts(i)
+		CAD()
 {
+	this->interrupts = i;
 }
 
 template<typename Number>
 CAD<Number>::CAD(const cad::CADSettings& setting):
-		CAD(),
-		setting(setting)
+		CAD()
 {
+	this->setting = setting;
 }
 
 template<typename Number>
 CAD<Number>::CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v, const cad::CADSettings& setting):
-		CAD(),
-		scheduledPolynomials(s.begin(), s.end()),
-		newVariables(v),
-		setting(setting)
+		CAD()
 {
+	this->scheduledPolynomials.assign(s.begin(), s.end());
+	this->newVariables = v;
+	this->setting = setting;
 	this->prepareElimination();
 }
 
 template<typename Number>
 CAD<Number>::CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting):
-		CAD(s, v, setting),
-		interrupts(c)
+		CAD(s, v, setting)
 {
+	this->interrupts = c;
 }
 
 template<typename Number>
