@@ -71,7 +71,7 @@ else()
 	add_dependencies(resources googletest)
 endif()
 
-if(NOT EIGEN_FOUND)
+if(NOT EIGEN3_FOUND)
 	message("-- Use shipped version of Eigen3")
 	ExternalProject_Add(
 		eigen
@@ -87,5 +87,5 @@ if(NOT EIGEN_FOUND)
 
 	set( EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
 	set( EIGEN_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
-	add_dependencies(resources log4cplus)
+	add_dependencies(resources eigen)
 endif()

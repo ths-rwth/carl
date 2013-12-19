@@ -48,8 +48,7 @@ namespace carl
         /**
          * Constructors & Destructor
          */
-		Interval::Interval()
-		{}
+		Interval::Interval() : mInterval(Number(0)), mLower(BoundType::STRICT), mUpper(BoundType::STRICT){}
 		
 		Interval::Interval(const Number& n) : mInterval(n), mLower(BoundType::WEAK), mUpper(BoundType::WEAK){}
 		
@@ -58,7 +57,27 @@ namespace carl
         /**
          * Getter & Setter
          */
+		
+		Number& lower () const
+		{
+			return mInterval.content();
+		}
         
+		Number& upper () const
+		{
+			return mUpper;
+		}
+		
+		BoundType lowerType() const
+		{
+			return mLower
+		}
+		
+		BoundType upperType() const
+		{
+			return mUpper;
+		}
+		
         /**
          * Arithmetic functions
          */
