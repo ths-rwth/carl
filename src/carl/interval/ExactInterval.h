@@ -515,6 +515,32 @@ inline bool operator >=(const ExactInterval<Numeric>& lh, const ExactInterval<Nu
 	return lh.isGreaterOrEqual(rh);
 }
 
+template<typename Numeric>
+inline bool operator <(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	if(rh.leftBound() != BoundType::INFTY)
+	{
+		if(lh.rightBound() != BoundType::INFTY)
+		{
+			return lh.right() < rh.left() || (lh.right() == rh.left() && lh.rightBound() == BoundType::STRICT && rh.leftBound() == BoundType::STRICT);
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+template<typename Numeric>
+inline bool operator >(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return rh < lh;
+}
+	
 }
 
 #include "ExactInterval.tpp"
