@@ -49,6 +49,7 @@ public:
 
 	typedef typename UnderlyingNumberType<Coefficient>::type NumberType;
 	typedef typename IntegralT<NumberType>::type IntNumberType;
+	typedef Coefficient CoefficientType;
 
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
@@ -57,7 +58,7 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
 //	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
-	
+
 	virtual ~UnivariatePolynomial();
 
 	//Polynomial interface implementations.
@@ -182,7 +183,7 @@ public:
 	}
 
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
-		return MultivariatePolynomial<Coefficient>(*this).toUnivariatePolynomial(newVar);
+		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -254,6 +255,11 @@ public:
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+
 	carl::Sign sgn(const Coefficient& value) const {
 		return carl::sgn(this->evaluate(value));
 	}
@@ -379,7 +385,7 @@ public:
 		return this->divide(UnivariatePolynomial<Coefficient>(this->mainVar(), content)).quotient;
 	}
 	UnivariatePolynomial pseudoPrimpart() const {
-		return this->pseudoPrimpart(this->numericContent());
+		return this->pseudoPrimpart(Coefficient(this->numericContent()));
 	}
 
 	/**

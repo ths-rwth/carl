@@ -91,6 +91,35 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_number<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variable& var, const Coeff& value) const {
+	if (var == this->mainVar()) {
+		return this->evaluate(value);
+	}
+	return *this;
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_number<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variable& var, const Coeff& value) const {
+	if (var == this->mainVar()) {
+		UnivariatePolynomial<Coeff> res(this->mainVar());
+		for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
+			res += this->mCoefficients[i].substitute(var, value);
+		}
+		return res;
+	} else {
+		std::vector<Coeff> res(this->mCoefficients.size());
+		for (unsigned i = 0; i < res.size(); i++) {
+			res[i] = this->mCoefficients[i].substitute(var, value);
+		}
+		UnivariatePolynomial<Coeff> resp(this->mainVar(), res);
+		resp.stripLeadingZeroes();
+		return resp;
+	}
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth ) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
