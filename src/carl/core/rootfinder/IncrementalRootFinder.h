@@ -126,7 +126,7 @@ public:
 	
 	IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
-			const ExactInterval<Number>& interval = ExactInterval<Number>(),
+			const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
 			SplittingStrategy splittingStrategy = SplittingStrategy::DEFAULT,
 			bool tryTrivialSolver = true
 			);

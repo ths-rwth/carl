@@ -14,44 +14,10 @@
 namespace carl {
 namespace rootfinder {
 
-/// Predefined flags for different real root isolation strategies in RealAlgebraicNumberFactory::realRoots.
-enum class IsolationStrategy : unsigned  {
-	/// Performs just interval splitting by OpenInterval::midpoint.
-	SIMPLE,
-	/// Performs interval splitting by OpenInterval::midpoint. If the midpoint happens to be the root itself, it is stored in RealAlgebraicNumberIR::mValue.
-	GENERIC,
-	/// During the splitting process, the midpoint is checked for being a root first. Then, OpenInterval::sample is checked. If it didn't prove to be a root, it is used to dissect the interval. Otherwise it is stored in RealAlgebraicNumberIR::mValue.
-	BINARYSAMPLE,
-	/// During the splitting process, the midpoint is checked for being a root first. Then, OpenInterval::sample is checked. If it didn't prove to be a root, both the midpoint and the sample point are used to split the interval.
-	TERNARYSAMPLE,
-	/// During the splitting process, the midpoint is checked for being a root first. Then, OpenInterval::sample is checked. If it didn't prove to be a root, both the midpoint and the sample point are used to split the interval.
-	TERNARYNEWTON,
-	DEFAULT = TERNARYSAMPLE
-};
-
 template<typename Number>
 using evalmap = std::map<Variable, RealAlgebraicNumberIR<Number>*, Less<Number>()>;
 template<typename Number>
 using evalintervalmap = std::map<Variable, ExactInterval<Number>>;
-
-template<typename Number, typename Finder = IncrementalRootFinder<Number>>
-std::list<RealAlgebraicNumber<Number>*> realRoots(const UnivariatePolynomial<Number>& polynomial, const ExactInterval<Number>& interval = ExactInterval<Number>()) {
-	Finder finder(polynomial, interval);
-	while (finder.next() != nullptr);
-	return finder.rootCache();
-}
-
-template<typename Number, typename Finder = IncrementalRootFinder<Number>>
-unsigned int countRealRoots(const UnivariatePolynomial<Number>& polynomial, const ExactInterval<Number>& interval) {
-	return realRoots<Number, Finder>(polynomial, interval).size();
-}
-
-template<typename Number>
-unsigned int countRealRoots(const std::list<UnivariatePolynomial<Number>> sturmSequence, const ExactInterval<Number>& interval) {
-	unsigned int l = signVariations(sturmSequence.begin(), sturmSequence.end(), [&interval](const UnivariatePolynomial<Number>& p){ return p.evaluate(interval.left()); });
-	unsigned int r = signVariations(sturmSequence.begin(), sturmSequence.end(), [&interval](const UnivariatePolynomial<Number>& p){ return p.evaluate(interval.right()); });
-	return l - r;
-}
 
 /**
  * Isolates the real roots of the given rational univariate polynomial.
@@ -63,30 +29,56 @@ unsigned int countRealRoots(const std::list<UnivariatePolynomial<Number>> sturmS
  * @param interval the initial interval for real-root isolation (default: zero interval)
  * @return sorted list containing the real roots of the given polynomial within interval
  */
-template<typename Number, EnableIf<is_number<Number>> = dummy>
+template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, EnableIf<std::is_same<Coeff, Number>> = dummy>
 std::list<RealAlgebraicNumber<Number>*> realRoots(
-		UnivariatePolynomial<Number>& p,
-		IsolationStrategy pivoting = IsolationStrategy::DEFAULT,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedInterval()
-);
-
-/**
- * Isolates the real roots of the given rational univariate polynomial.
- *
- * Note that the contents of p can be changed due to a normalization within the RealAlgebraicNumberIR constructor.
- *
- * @param p pointer to rational univariate polynomial
- * @param pivoting strategy selection according to RealAlgebraicNumberSettings::IsolationStrategy (standard option is RealAlgebraicNumberSettings::DEFAULT_ISOLATIONSTRATEGY)
- * @param interval the initial interval for real-root isolation (default: zero interval)
- * @return sorted list containing the real roots of the given polynomial within interval
- */
-template<typename Number, EnableIf<is_number<Number>> = dummy>
-std::list<RealAlgebraicNumber<Number>*> realRoots(
-		const UnivariatePolynomial<Number>* p,
-		IsolationStrategy pivoting = IsolationStrategy::DEFAULT,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedInterval()
+		const UnivariatePolynomial<Coeff>& polynomial,
+		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
-	return realRoots(*p, pivoting, interval);
+	Finder finder(polynomial, interval, pivoting);
+	return finder.getAllRoots();
+}
+
+template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, DisableIf<std::is_same<Coeff, Number>> = dummy>
+std::list<RealAlgebraicNumber<Number>*> realRoots(
+		const UnivariatePolynomial<Coeff>& polynomial,
+		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+) {
+	assert(polynomial.isUnivariate());
+	UnivariatePolynomial<Number> p = polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); }));
+	return realRoots(p, interval, pivoting);
+}
+
+template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
+std::list<RealAlgebraicNumber<Number>*> realRoots(
+		const UnivariatePolynomial<Coeff>& polynomial,
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+) {
+	return realRoots(polynomial, ExactInterval<Number>::unboundedExactInterval(), pivoting);
+}
+
+template<typename Coeff>
+unsigned long countRealRoots(
+		const UnivariatePolynomial<Coeff>& polynomial,
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+) {
+	return realRoots(polynomial, pivoting).size();
+}
+template<typename Coeff, typename Number>
+unsigned long countRealRoots(
+		const UnivariatePolynomial<Coeff>& polynomial,
+		const ExactInterval<Number>& interval,
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
+) {
+	return realRoots(polynomial, interval, pivoting).size();
+}
+
+template<typename Number>
+unsigned long countRealRoots(const std::list<UnivariatePolynomial<Number>> sturmSequence, const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval()) {
+	unsigned long l = signVariations(sturmSequence.begin(), sturmSequence.end(), [&interval](const UnivariatePolynomial<Number>& p){ return p.evaluate(interval.left()); });
+	unsigned long r = signVariations(sturmSequence.begin(), sturmSequence.end(), [&interval](const UnivariatePolynomial<Number>& p){ return p.evaluate(interval.right()); });
+	return l - r;
 }
 
 /**
@@ -110,7 +102,7 @@ std::list<RealAlgebraicNumber<Number>*> realRootsAt(
 		InputRIterator rEnd,
 		InputVIterator vBegin,
 		InputVIterator vEnd,
-		IsolationStrategy pivoting = IsolationStrategy::DEFAULT,
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
 		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedInterval()
 );
 
@@ -127,7 +119,7 @@ template<typename Number, EnableIf<is_number<Number>> = dummy>
 std::list<RealAlgebraicNumber<Number>*> realRootsEvalIR(
 		const UnivariatePolynomial<Number>& p,
 		const evalmap<Number>& m,
-		IsolationStrategy pivoting = IsolationStrategy::DEFAULT,
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
 		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedInterval()
 );
 
@@ -146,7 +138,7 @@ std::list<RealAlgebraicNumber<Number>*> realRootsEvalIR(
 		const UnivariatePolynomial<Number>& p,
 		const std::vector<RealAlgebraicNumberIR<Number>*>& a,
 		const std::vector<Variable>& v,
-		IsolationStrategy pivoting = IsolationStrategy::DEFAULT,
+		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
 		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedInterval()
 );
 
@@ -233,7 +225,7 @@ void searchRealRoots(
 		unsigned variationsLeft,
 		unsigned variationsRight,
 		std::list<RealAlgebraicNumber<Number>*>* roots,
-		IsolationStrategy pivoting
+		SplittingStrategy pivoting
 );
 
 /**

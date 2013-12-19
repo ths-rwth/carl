@@ -10,6 +10,12 @@
 namespace carl {
 namespace cad {
 
+
+template<typename Coeff>
+using MPolynomial = carl::MultivariatePolynomial<Coeff>;
+template<typename Coeff>
+using UPolynomial = carl::UnivariatePolynomial<MPolynomial<Coeff>>;
+
 /** Predefined settings for the CAD procedure.
  * Implementation of the types is located in CAD.h. Each setting is defined as a power of two in order to use several flags at a time.
  * Note that the order of the flags plays a role: If, e.g., A and B are set, then the last one (B) is used.
@@ -86,7 +92,7 @@ public:
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
 	/// standard strategy to be used for real root isolation
-	rootfinder::IsolationStrategy isolationStrategy;
+	rootfinder::SplittingStrategy splittingStrategy;
 
 	/**
 	 * Generate a CADSettings instance of the respective preset type.
@@ -97,10 +103,10 @@ public:
 	 */
 	static CADSettings getSettings(
 			unsigned setting = DEFAULT,
-			rootfinder::IsolationStrategy isolationStrategy = rootfinder::IsolationStrategy::DEFAULT,
+			rootfinder::SplittingStrategy isolationStrategy = rootfinder::SplittingStrategy::DEFAULT,
 			CADSettings cadSettings = CADSettings() )
 	{
-		cadSettings.isolationStrategy = isolationStrategy;
+		cadSettings.splittingStrategy = isolationStrategy;
 		if (setting & RATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
 			cadSettings.preferNRSamples = true;
@@ -267,7 +273,7 @@ private:
 		simplifyEliminationByBounds( true ),
 		improveBounds( true ),
 		order(PolynomialComparisonOrder::Default),
-		isolationStrategy(rootfinder::IsolationStrategy::DEFAULT)
+		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
 
 public:
@@ -297,7 +303,7 @@ public:
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),
 		improveBounds( s.improveBounds ),
 		order(PolynomialComparisonOrder::Default),
-		isolationStrategy(rootfinder::IsolationStrategy::DEFAULT)
+		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
 };
 
