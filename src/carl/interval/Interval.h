@@ -80,14 +80,14 @@ namespace carl
 			return mUpper;
 		}
 		
-		void setLower()
+		void setLower(const Number& n)
 		{
-			mContent.lower();
+			mContent = BoostInterval(n, mContent.upper());
 		}
         
-		void setUpper()
+		void setUpper(const Number& n)
 		{
-			return mContent.upper;
+			mContent = BoostINterval(mContent.lower(), n);
 		}
 		
 		void setLowerBoundType(BoundType b)
@@ -95,7 +95,7 @@ namespace carl
 			if(b == BoundType::INFTY)
 			{
 				mLowerBoundType = b;
-				mContent = ;
+				mContent = mUpperBoundType == BoundType::INFTY ? BoostInterval(Number(0)) : BoostInterval(mContent.lower());
 			}
 			else
 			{
@@ -103,7 +103,7 @@ namespace carl
 			}
 		}
 		
-		void setUpperBoundType()
+		void setUpperBoundType(BoundType b)
 		{
 			if(b == BoundType::INFTY)
 			{
@@ -119,18 +119,59 @@ namespace carl
         /**
          * Arithmetic functions
          */
-		
-        
-        /**
-         * Overloaded arithmetics operators
-         */
         
         /**
          * Trigonometric functions
          */
         
-        /**
-         * Comparison operators
-         */
-    };   
+    };
+	
+	/**
+	 * Overloaded arithmetics operators
+	 */
+	
+	template<typename Number>
+	inline const Interval<Number> operator +(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator *(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator /(const Number& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator /(const Interval<Number>& lhs, const Number& rhs);
+	
+	/**
+	 * Comparison operators
+	 */
+	
+	template<typename Number>
+	inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline bool operator !=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	
+	template<typename Number>
+	
 }
