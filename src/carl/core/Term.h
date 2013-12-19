@@ -18,7 +18,7 @@ template<typename Coefficient>
 class Term
 {
     private:
-        Coefficient                     mCoeff = 0;
+        Coefficient mCoeff = Coefficient(0);
         std::shared_ptr<const Monomial> mMonomial;
     
     public:
