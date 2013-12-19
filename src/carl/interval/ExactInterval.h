@@ -1,5 +1,9 @@
 /**
- * @author Stefan Schupp
+ * The class implements interval arithmetic for rational types.
+ *
+ * @file ExactInterval.h
+ * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
+ * @version 2013-12-19
  */
 
 #pragma once
