@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../core/UnivariatePolynomial.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicPoint.h"
@@ -30,7 +31,8 @@ class CAD {
 public:
 	typedef typename tree<RealAlgebraicNumber<Number>*>::iterator sampleIterator;
 	typedef std::vector<sampleIterator> CADTrace;
-	typedef carl::MultivariatePolynomial<Number> Polynomial;
+	typedef carl::cad::MPolynomial<Number> MPolynomial;
+	typedef carl::cad::UPolynomial<Number> UPolynomial;
 	typedef std::unordered_map<unsigned, ExactInterval<Number>> BoundMap;
 	typedef std::list<std::pair<std::list<cad::Constraint<Number>>, std::list<cad::Constraint<Number>>>> Deductions;
 private:
@@ -63,12 +65,12 @@ private:
 	/**
 	 * list of all polynomials for elimination
 	 */
-	std::list<Polynomial*> polynomials;
+	std::list<UPolynomial*> polynomials;
 	
 	/**
 	 * list of polynomials scheduled for elimination
 	 */
-	std::list<Polynomial*> scheduledPolynomials;
+	std::list<UPolynomial*> scheduledPolynomials;
 	
 	/**
 	 * list of new variables introduced by the scheduled elimination polynomials (mNewvariables and mVeriables are disjoint)
@@ -127,7 +129,7 @@ public:
 	 * @param bounds give additional bounds to prune the elimination polynomials
 	 * @complexity linear in the size of v and s
 	 */
-	CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v, const cad::CADSettings& setting = cad::CADSettings::getSettings());
+	CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const cad::CADSettings& setting = cad::CADSettings::getSettings());
 
 	/**
 	 *
@@ -138,7 +140,7 @@ public:
 	 * @param bounds give additional bounds to prune the elimination polynomials
 	 * @complexity linear in the size of v and s
 	 */
-	CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting = cad::CADSettings::getSettings());
+	CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting = cad::CADSettings::getSettings());
 
 	/*
 	 * Copy constructor.
@@ -324,7 +326,8 @@ public:
 				bool checkTraceFirst = false,
 				bool checkBounds = true)
 	{
-		return this->check(constraints, r, conflictGraph, bounds, Deductions(), next, checkTraceFirst, checkBounds);
+		Deductions d;
+		return this->check(constraints, r, conflictGraph, bounds, d, next, checkTraceFirst, checkBounds);
 	}
 
 	/// Reduced-parameter version of CAD::check.
@@ -335,7 +338,9 @@ public:
 				bool checkTraceFirst = false,
 				bool checkBounds = true)
 	{
-		return this->check(constraints, r, cad::ConflictGraph(), bounds, Deductions(), next, checkTraceFirst, checkBounds);
+		cad::ConflictGraph cg;
+		Deductions d;
+		return this->check(constraints, r, cg, bounds, d, next, checkTraceFirst, checkBounds);
 	}
 
 	/// Reduced-parameter version of CAD::check.
@@ -382,8 +387,8 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const Polynomial* p, const std::vector<Variable>& v) {
-		std::list<Polynomial*> l({p});
+	void addPolynomial(const MPolynomial* p, const std::vector<Variable>& v) {
+		std::list<MPolynomial*> l({p});
 		this->addPolynomials(l.begin(), l.end(), v);
 	}
 
@@ -394,7 +399,7 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const Polynomial* p) {
+	void addPolynomial(const MPolynomial* p) {
 		assert(!this->variables.empty());
 		this->addPolynomial(p, this->variables);
 	}
@@ -428,7 +433,7 @@ public:
 	 * Moreover, all elimination levels are safely cleaned of all elimination polynomials stemming from p.
 	 * @param polynomial
 	 */
-	void removePolynomial(const Polynomial& polynomial);
+	void removePolynomial(const UPolynomial& polynomial);
 
 	/**
 	 * Removes a polynomial by its pointer pPtr from the input polynomials of the CAD (elimination level 0) or the specified level.
@@ -437,7 +442,7 @@ public:
 	 * @param level
 	 * @param childrenOnly only remove the children of pPtr (recursively)
 	 */
-	void removePolynomial(const UnivariatePolynomial<Number>* p, unsigned level = 0, bool childrenOnly = false);
+	void removePolynomial(const UPolynomial* p, unsigned level = 0, bool childrenOnly = false);
 
 	/**
 	 * Removes a range of polynomials from the input polynomials of the CAD if they exist.
@@ -494,7 +499,7 @@ public:
 			const std::list<RealAlgebraicNumber<Number>*>& roots,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumber<Number>*>& replacedSamples,
-			const ExactInterval<Number>& bounds = ExactInterval<Number>::unboundedInterval()
+			const ExactInterval<Number>& bounds = ExactInterval<Number>::unboundedExactInterval()
 	);
 
 	/**
@@ -510,7 +515,7 @@ public:
 	* @complexity linear in the number of roots of <code>p</code> plus the complexity of <code>RealAlgebraicNumberFactory::realRoots( p )</code>
 	*/
 	static cad::SampleSet<Number> samples(
-			const UnivariatePolynomial<Number>* p,
+			const Polynomial* p,
 			const std::list<RealAlgebraicNumber<Number>*>& sample,
 			const std::list<Variable>& variables,
 			cad::SampleSet<Number>& currentSamples,
@@ -730,7 +735,7 @@ private:
 	 * @param recuperate if true, the polynomials computed are recuperated into this CAD's elimination sets (default: true)
 	 * @return true if p has a root in the given box, false otherwise
 	 */
-	bool vanishesInBox(const UnivariatePolynomial<Number>* p, const BoundMap& box, unsigned level, bool recuperate = true);
+	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, unsigned level, bool recuperate = true);
 
 	/**
 	 * Checks whether one of the flags indicating whether to stop a currently running check procedure is set to true.

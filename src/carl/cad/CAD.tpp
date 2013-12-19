@@ -52,7 +52,7 @@ CAD<Number>::CAD(const cad::CADSettings& setting):
 }
 
 template<typename Number>
-CAD<Number>::CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v, const cad::CADSettings& setting):
+CAD<Number>::CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const cad::CADSettings& setting):
 		CAD()
 {
 	this->scheduledPolynomials.assign(s.begin(), s.end());
@@ -62,7 +62,7 @@ CAD<Number>::CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v
 }
 
 template<typename Number>
-CAD<Number>::CAD(const std::list<Polynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting):
+CAD<Number>::CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting):
 		CAD(s, v, setting)
 {
 	this->interrupts = c;
@@ -136,27 +136,27 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 
 		smtlibFile << "(assert (and ";
 		for (auto constraint: constraints) {
-			switch (constraint->getSign()) {
+			switch (constraint.getSign()) {
 				case Sign::ZERO: {
-					if (constraint->isNegated())
-						smtlibFile << " (<> " << constraint.polynomial() << " 0)";
+					if (constraint.isNegated())
+						smtlibFile << " (<> " << constraint.getPolynomial() << " 0)";
 					else
-						smtlibFile << " (= " << constraint.polynomial() << " 0)";
+						smtlibFile << " (= " << constraint.getPolynomial() << " 0)";
 					break;
 				}
 				case Sign::POSITIVE: {
 					if (constraint.isNegated())
-						smtlibFile << " (<= " << constraint.polynomial() << " 0)";
+						smtlibFile << " (<= " << constraint.getPolynomial() << " 0)";
 					else
-						smtlibFile << " (> " << constraint.polynomial() << " 0)";
+						smtlibFile << " (> " << constraint.getPolynomial() << " 0)";
 					break;
 				}
 				case Sign::NEGATIVE:
 				{
 					if (constraint.isNegated())
-						smtlibFile << " (>= " << constraint.polynomial() << " 0)";
+						smtlibFile << " (>= " << constraint.getPolynomial() << " 0)";
 					else
-						smtlibFile << " (< " << constraint.polynomial() << " 0)";
+						smtlibFile << " (< " << constraint.getPolynomial() << " 0)";
 					break;
 				}
 				default: assert(false); // this should not happen
@@ -243,7 +243,7 @@ bool CAD<Number>::prepareElimination() {
 	// add new polynomials to level 0, unifying their variables, and the list of all polynomials
 	for (auto p: this->scheduledPolynomials) {
 		this->polynomials.push_back(p);
-		this->eliminationSets.front().insert(p->toUnivariatePolynomial());
+		this->eliminationSets.front().insert(p);
 	}
 	
 	// optimizations for the first elimination level
@@ -284,16 +284,16 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			unsigned l = b.first;
 			if (l >= this->variables.size()) continue;
 			// construct bound-related polynomials
-			std::list<UnivariatePolynomial<Number>> tmp;
+			std::list<UPolynomial> tmp;
 			if (b.second.leftType() != BoundType::INFTY) {
-				tmp.emplace_back(this->variables[l], {1, - b.second.left()});
+				tmp.emplace_back(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)});
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
-				tmp.emplace_back(this->variables[l], {1, - b.second.right()});
+				tmp.emplace_back(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)});
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -354,7 +354,7 @@ void CAD<Number>::clear() {
 template<typename Number>
 void CAD<Number>::complete() {
 	RealAlgebraicPoint<Number> r;
-	std::vector<cad::Constraint<Number>> c(1, cad::Constraint<Number>(Polynomial(1), Sign::ZERO, this->variables));
+	std::vector<cad::Constraint<Number>> c(1, cad::Constraint<Number>(UPolynomial(this->variables.front(), MPolynomial(1)), Sign::ZERO, this->variables));
 	this->check(c, r, true);
 }
 
@@ -399,10 +399,10 @@ bool CAD<Number>::check(
 			case BoundType::INFTY:
 				break;
 			case BoundType::STRICT:
-				constraints.emplace_back(Polynomial({this->variables[b.first], -b.second.left()}), Sign::POSITIVE, this->variables);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.left()), MPolynomial(1)}), Sign::POSITIVE, this->variables);
 				break;
 			case BoundType::WEAK:
-				constraints.emplace_back(Polynomial({this->variables[b.first], -b.second.left()}), Sign::NEGATIVE, this->variables, true);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.left()), MPolynomial(1)}), Sign::NEGATIVE, this->variables, true);
 				break;
 			default:
 				assert(false);
@@ -412,10 +412,10 @@ bool CAD<Number>::check(
 			case BoundType::INFTY:
 				break;
 			case BoundType::STRICT:
-				constraints.emplace_back(Polynomial({this->variables[b.first], -b.second.right()}), Sign::NEGATIVE, this->variables);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.right()), MPolynomial(1)}), Sign::NEGATIVE, this->variables);
 				break;
 			case BoundType::WEAK:
-				constraints.emplace_back(Polynomial({this->variables[b.first], -b.second.right()}), Sign::POSITIVE, this->variables, true);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.right()), MPolynomial(1)}), Sign::POSITIVE, this->variables, true);
 				break;
 			default:
 				assert(false);
@@ -440,7 +440,7 @@ bool CAD<Number>::check(
 			onlyStrictBounds = false;
 		}
 	}
-	std::vector<std::pair<UnivariatePolynomial<Number>*, UnivariatePolynomial<Number>*>> boundPolynomials(this->variables.size(), std::pair<UnivariatePolynomial<Number>*, UnivariatePolynomial<Number>*>());
+	std::vector<std::pair<UPolynomial*, UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
 	
 	//////////////////////
 	// Preprocessing
@@ -501,14 +501,14 @@ bool CAD<Number>::check(
 			for (cad::Constraint<Number> c: strictInequalities) {
 				this->removePolynomial(c.getPolynomial());
 			}
-			this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::IsolationStrategy::DEFAULT, this->setting));
+			this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
 		} else {
 			if (weakInequalities.empty()) {
 				if (!useBounds && strictInequalities.empty() && this->variables.size() <= 1) {
 					// root-only samples not valid in general!
-					this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::IsolationStrategy::DEFAULT, this->setting));
+					this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
 				} else if (onlyStrictBounds && equations.empty()) {
-					this->alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::IsolationStrategy::DEFAULT, this->setting));
+					this->alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
 				}
 			}
 			// else: mixed case, no optimization possible without zero-dimensional assumption
@@ -525,25 +525,27 @@ bool CAD<Number>::check(
 			if (b.first >= this->variables.size()) continue;
 			
 			// construct bound-related polynomials
-			std::list<UnivariatePolynomial<Number>> tmp;
+			std::list<UPolynomial> tmp;
 			if (b.second.leftType() != BoundType::INFTY) {
-				tmp.push_back(UnivariatePolynomial<Number>(this->variables[b.first], {-b.second.left(), 1}).coprimeCoefficients().template convert<Number>());
+				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.left())), MPolynomial(Term<Number>(1))});
+				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
-				boundPolynomials[b.first].first = new UnivariatePolynomial<Number>(tmp.back());
+				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
-				tmp.push_back(UnivariatePolynomial<Number>(this->variables[b.first], {-b.second.right(), 1}).coprimeCoefficients().template convert<Number>());
+				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.right())), MPolynomial(Term<Number>(1))});
+				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
-				boundPolynomials[b.first].first = new UnivariatePolynomial<Number>(tmp.back());
+				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
 			}
 			
 			// eliminate bound-related polynomials only
 			// l: variable index of the elimination destination
 			unsigned l = b.first + 1;
 			while (!tmp.empty() && l < this->variables.size()) {
-				std::list<UnivariatePolynomial<Number>> tmp2;
+				std::list<UPolynomial> tmp2;
 				for (auto p: tmp) {
-					auto res = this->eliminationSets[l-1].eliminateInto(new UnivariatePolynomial<Number>(p), this->eliminationSets[l], this->variables[l], this->setting);
+					auto res = this->eliminationSets[l-1].eliminateInto(new UPolynomial(p), this->eliminationSets[l], this->variables[l], this->setting);
 					tmp2.insert(tmp2.begin(), tmp.begin(), tmp.end());
 				}
 				std::swap(tmp, tmp2);
@@ -581,7 +583,7 @@ bool CAD<Number>::check(
 			// re-add the input polynomials to the top-level (for they could have been deleted)
 			this->eliminationSets.front().clear();
 			for (auto p: this->polynomials) {
-				this->eliminationSets.front().insert(p->toUnivariatePolynomial());
+				this->eliminationSets.front().insert(p);
 			}
 		} else {
 			// only reset the first elimination level
@@ -648,10 +650,10 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 }
 
 template<typename Number>
-void CAD<Number>::removePolynomial(const Polynomial& polynomial) {
+void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
 	// possibly remove the polynomial from the list of scheduled polynomials
 	for (auto p = this->scheduledPolynomials.begin(); p != this->scheduledPolynomials.end(); p++) {
-		if (*p == polynomial) {
+		if (**p == polynomial) {
 			// in this case, there is neither any other occurrence of p in mScheduledPolynomials nor in mEliminationSets[0] (see addPolynomial for reason)
 			this->scheduledPolynomials.erase(p);
 			return;
@@ -660,7 +662,7 @@ void CAD<Number>::removePolynomial(const Polynomial& polynomial) {
 	
 	// remove the polynomial from the list of all polynomials
 	for (auto p = this->polynomials.begin(); p != this->polynomials.end(); p++) {
-		if (*p == polynomial) {
+		if (**p == polynomial) {
 			this->polynomials.erase(p);
 			return;
 		}
@@ -669,9 +671,7 @@ void CAD<Number>::removePolynomial(const Polynomial& polynomial) {
 	// determine the level of the polynomial (first level from the top) and remove the respective pointer from it
 	for (unsigned level = 0; level < this->eliminationSets.size(); level++) {
 		// transform the polynomial according to possible optimizations in order to recognize its real shape in the elimination set
-		// TODO: add .coprimeCoefficients
-		auto pol = polynomial.toUnivariatePolynomial().coprimeCoefficients();
-		auto p = this->eliminationSets[level].find(&pol);
+		auto p = this->eliminationSets[level].find(new UPolynomial(polynomial.pseudoPrimpart()));
 		if (p != nullptr) {
 			this->removePolynomial(p, level);
 			return;
@@ -680,7 +680,7 @@ void CAD<Number>::removePolynomial(const Polynomial& polynomial) {
 }
 
 template<typename Number>
-void CAD<Number>::removePolynomial(const UnivariatePolynomial<Number>* p, unsigned level, bool childrenOnly) {
+void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool childrenOnly) {
 	// no equivalent polynomial for p in any level
 	if (p == nullptr) return;
 	
@@ -696,11 +696,11 @@ void CAD<Number>::removePolynomial(const UnivariatePolynomial<Number>* p, unsign
 	
 	// remove all elimination polynomials being children of p starting at the level following p
 	unsigned dim = this->eliminationSets.size();
-	std::forward_list<UnivariatePolynomial<Number>*> parents = { p };
+	std::forward_list<UPolynomial*> parents = { p };
 	for (unsigned l = level+1; !parents.empty() && l < dim; l++) {
-		std::forward_list<UnivariatePolynomial<Number>*> newParents(parents);
+		std::forward_list<Polynomial*> newParents(parents);
 		for (auto parent: parents) {
-			std::forward_list<UnivariatePolynomial<Number>*> curParents = this->eliminationSets[l].removeByParent(parent);
+			std::forward_list<Polynomial*> curParents = this->eliminationSets[l].removeByParent(parent);
 			newParents.insert_after(newParents.before_begin(), curParents.begin(), curParents.end());
 		}
 		newParents.sort(Less<Number>(this->setting.order));
@@ -827,10 +827,10 @@ cad::SampleSet<Number> CAD<Number>::samples(
 				insertValue = currentSamples.insert(r);
 				newSampleSet.insert(r);
 				replacedSamples.push_front(r);
-			} else if (!(*insertValue.first)->isNumeric() && (*i)->isNumeric()) {
+			} else if (!(*insertValue.first)->isNumeric() && i->isNumeric()) {
 				// there is already an interval-represented root with the same value present and it can be replaced by a numeric
 				currentSamples.remove(insertValue.first);
-				insertValue = currentSamples.insert(new RealAlgebraicNumberNR<Number>((*i)->value(), true));
+				insertValue = currentSamples.insert(new RealAlgebraicNumberNR<Number>(i->value(), true));
 				// this value might have been added to newSamples already, so switch the root status there as well
 				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, Less<Number>());
 				if (pos != newSampleSet.end()) {
@@ -866,7 +866,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if ((*insertValue.first)->isNumeric()) {
 				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>((*insertValue.first)->value() + 1, false));
 			} else {
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->interval().right(), false));
+				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().right(), false));
 			}
 		} else if ((*neighbor)->isRoot()) {
 			// sample between neighbor and insertValue.first needed and will be added to newSampleSet
@@ -874,11 +874,11 @@ cad::SampleSet<Number> CAD<Number>::samples(
 				if ((*neighbor)->isNumeric()) {
 					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(ExactInterval<Number>((*insertValue.first)->value(), (*neighbor)->value(), BoundType::STRICT).sample(), false));
 				} else {
-					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor)->interval().left(), false));
+					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor)->getInterval().left(), false));
 				}
 			} else {
 				// interval representation, take right bound of insertValue.first which must be strictly between insertValue.first and neighbor
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->interval().right(), false));
+				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().right(), false));
 			}
 		}
 		
@@ -890,7 +890,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if ((*insertValue.first)->isNumeric()) {
 				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>((*insertValue.first)->value() - 1, false));
 			} else {
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->interval().left(), false));
+				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().left(), false));
 			}
 		} else {
 			neighbor--;
@@ -901,11 +901,11 @@ cad::SampleSet<Number> CAD<Number>::samples(
 					if ((*neighbor)->isNumeric()) {
 						currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(ExactInterval<Number>((*neighbor)->value(), (*insertValue.first)->value(), BoundType::STRICT).sample(), false));
 					} else {
-						currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor)->interval().right(), false));
+						currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor)->getInterval().right(), false));
 					}
 				} else {
 					// interval representation, take left bound of insertValue.first which must be strictly between insertValue.first and neighbor
-					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->interval().left(), false));
+					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().left(), false));
 				}
 			}
 		}
@@ -925,7 +925,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
-		const UnivariatePolynomial<Number>* p,
+		const Polynomial* p,
 		const std::list<RealAlgebraicNumber<Number>*>& sample,
 		const std::list<Variable>& variables,
 		cad::SampleSet<Number>& currentSamples,
@@ -935,7 +935,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 ) {
 	assert(variables.size() == sample.size());
 	return CAD<Number>::samples(
-		carl::rootfinder::realRootsAt( p, sample.begin(), sample.end(), variables.begin(), variables.end(), settings.isolationStrategy, bounds ),
+		carl::rootfinder::realRootsAt( p, sample.begin(), sample.end(), variables.begin(), variables.end(), settings.splittingStrategy, bounds ),
 		currentSamples,
 		replacedSamples,
 		bounds
@@ -1079,12 +1079,12 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 	RealAlgebraicPoint<Number> sample(sampleList);
 	bool boundsOK = true;
 	// offset for incomplete samples (sample is filled from behind)
-	unsigned firstLevel = this->variables.size() - sample.size();
+	unsigned firstLevel = (unsigned)(this->variables.size() - sample.dim());
 	
 	// test if the sample _r is already outside the bounds (boundsOK=false) or if it can be checked against the constraints or further lifted (boundsOK=true)
 	for (auto i: bounds) {
 		// bounds correspond to mVariables indices, so shift those indices by firstLevel to the left
-		if (i.first < this->variables.size() && firstLevel <= i.first && !i->second.contains(sample[i->first - firstLevel])) {
+		if (i.first < this->variables.size() && firstLevel <= i.first && !sample[i.first - firstLevel]->containedIn(i.second)) {
 			boundsOK = false;
 			break;
 		}
@@ -1112,7 +1112,9 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		// prepare the variables for lifting
 		unsigned i = dim;
 		std::list<Variable> variables;
-		for (auto component: sampleList) {
+		// TODO: Check this
+		//for (auto component: sampleList) {
+		for (unsigned int j = 0; j < sampleList.size(); j++) {
 			i--;
 			variables.push_front(this->variables[i]);
 		}
@@ -1149,11 +1151,11 @@ bool CAD<Number>::mainCheck(
 		return constraints.empty();
 	}
 	
-	int dim = this->variables.size();
+	const unsigned dim = (unsigned)this->variables.size();
 	auto sampleTreeRoot = this->sampleTree.begin();
 	int maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
 	// if the elimination sets were extended (i.e. the sample tree is not developed completely), we obtain new samples already in phase one
-	next = next && (maxDepth == dim);
+	next = next && (maxDepth == (int)dim);
 	
 	// unify the variables for each constraint to match the CAD's variable order
 	for (unsigned i = 0; i < constraints.size(); ++i) {
@@ -1228,14 +1230,14 @@ bool CAD<Number>::mainCheck(
 	 */
 	
 	// invariant: either the last level is completely developed (dim or 0), or something in between due to bounds
-	assert(maxDepth == dim || maxDepth == 0 || boundsNontrivial);
+	assert(maxDepth == (int)dim || maxDepth == 0 || boundsNontrivial);
 	
 	while (true) {
 		// search base level with open lifting position
-		int level = dim - 1;
+		int level = (int)dim - 1;
 		for (; level >= 0; level--) {
 			// stop at the first level which has a non-empty lifting queue
-			if (!this->eliminationSets[level].emptyLiftingQueue()) break;
+			if (!this->eliminationSets[(unsigned)level].emptyLiftingQueue()) break;
 		}
 		if (level == -1) {
 			// no lifting position available, try elimination up to some level
@@ -1246,16 +1248,16 @@ bool CAD<Number>::mainCheck(
 				break;
 			}
 			// reset all lifting positions before this level
-			for (int l = level - 1; l >= 0; l--) {
+			for (unsigned l = 0; (int)l < level; l++) {
 				this->eliminationSets[l].resetLiftingPositionsFully();
 				this->eliminationSets[l].setLiftingPositionsReset();
 			}
 		}
 		
 		// lift all nodes at the corresponding tree depth according to the found lifting positions
-		int depth = dim - level - 1;
+		unsigned depth = (unsigned)((int)dim - level - 1);
 		assert(depth >= 0 && depth < dim);
-		for (auto node = this->sampleTree.begin_fixed(sampleTreeRoot, depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
+		for (auto node = this->sampleTree.begin_fixed(sampleTreeRoot, depth); this->sampleTree.is_valid(node) && (int)depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
 			// traverse all nodes at depth, i.e., sample points of dimension dim - level - 1 equaling the number of coefficient variables of the lifting position at level
 			std::list<RealAlgebraicNumber<Number>*> sampleList = this->constructSampleAt(node, sampleTreeRoot);
 			// no degenerate sample points are considered here because they were already discarded in Phase 2
@@ -1264,11 +1266,11 @@ bool CAD<Number>::mainCheck(
 			RealAlgebraicPoint<Number> sample(sampleList);
 			bool boundsOK = true;
 			// offset for incomplete samples (sample is filled from behind)
-			unsigned firstLevel = this->variables.size() - sample.size();
+			unsigned firstLevel = (unsigned)(this->variables.size() - sample.dim());
 			// test if the sample _r is already outside the bounds (boundsOK=false) or if it can be checked against the constraints or further lifted (boundsOK=true)
 			for (auto i: bounds) {
 				// bounds correspond to mVariables indices, so shift those indices by firstLevel to the left
-				if (i.first < this->variables.size() && firstLevel <= i.first && !i.second.contains(sample[i.first - firstLevel])) {
+				if (i.first < this->variables.size() && firstLevel <= i.first && !sample[i.first - firstLevel]->containedIn(i.second)) {
 					boundsOK = false;
 					break;
 				}
@@ -1277,20 +1279,23 @@ bool CAD<Number>::mainCheck(
 			if (!boundsOK) continue;
 			
 			// prepare the variables for lifting
-			int i = dim;
+			unsigned i = dim;
 			std::list<Variable> variables;
-			for (auto component: sampleList) {
+			// TODO: Check this
+			//for (auto component: sampleList) {
+			for (unsigned int j = 0; j < sampleList.size(); j++) {
+				assert(i > 0);
 				i--;
 				variables.push_front(this->variables[i]);
 			}
-			assert(level + 1 == i);
+			assert(level + 1 == (int)i);
 			// perform lifting at the incomplete leaf with the stored lifting queue (reset performed in liftCheck)
-			if(liftCheck( node, sampleList, i, false, variables, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph )) {
+			if (liftCheck(node, sampleList, i, false, variables, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
 				// lifting yields a satisfying sample
 				return true;
 			}
 		}
-		this->eliminationSets[level].setLiftingPositionsReset();
+		this->eliminationSets[(unsigned)level].setLiftingPositionsReset();
 	}
 	
 	if (!boundsNontrivial) {
@@ -1298,7 +1303,7 @@ bool CAD<Number>::mainCheck(
 		this->iscomplete = true;
 		// all liftings were considered, so store the reset states
 		for (auto i: this->eliminationSets) {
-			i->setLiftingPositionsReset();
+			i.setLiftingPositionsReset();
 		}
 	}
 	
@@ -1370,7 +1375,7 @@ bool CAD<Number>::liftCheck(
 	// previous variable will be substituted next
 	openVariableCount--;
 	
-	std::list<RealAlgebraicNumber<Number>*> extSample(sample);
+	std::list<const RealAlgebraicNumber<Number>*> extSample(sample);
 	std::list<Variable> newVariables(variables);
 	// the first variable is always the last one lifted
 	newVariables.push_front(this->variables[openVariableCount]);
@@ -1471,7 +1476,7 @@ bool CAD<Number>::liftCheck(
 			/*
 			 * Sample choice
 			 */
-			RealAlgebraicNumber<Number>* newSample;
+			const RealAlgebraicNumber<Number>* newSample;
 			if (this->setting.preferNRSamples) {
 				if (sampleSetIncrement.emptyNR() && !this->eliminationSets[openVariableCount].emptyLiftingQueue()) {
 					computeMoreSamples = true;
@@ -1491,7 +1496,7 @@ bool CAD<Number>::liftCheck(
 						break;
 					}
 					// otherwise take also IR samples (as implemented in nextNonroot)
-					newSample = sampleSetIncrement.nextNonroot();
+					newSample = sampleSetIncrement.nextNonRoot();
 				} else {
 					if (sampleSetIncrement.emptyRoot() && 
 						(!this->eliminationSets[openVariableCount].emptyLiftingQueue() xor this->setting.inequalitiesOnly)
@@ -1566,14 +1571,14 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 	while (true) {
 		if (!this->eliminationSets[level].emptyLiftingQueue()) return (int)level;
 		
-		int l = (int)level;
+		unsigned l = level - 1;
 		// find the first level where elimination polynomials can be generated
-		do {
+		while (l > 0 && this->eliminationSets[l-1].emptySingleEliminationQueue() && this->eliminationSets[l-1].emptyPairedEliminationQueue()) {
 			l--;
-		} while (l >= 0 && this->eliminationSets[l].emptySingleEliminationQueue() && this->eliminationSets[l].emptyPairedEliminationQueue());
+		}
 		
 		// check if no further elimination possible
-		if (l < 0) return -1;
+		if (l == 0 && this->eliminationSets[0].emptySingleEliminationQueue() && this->eliminationSets[0].emptyPairedEliminationQueue()) return -1;
 		// eliminate one polynomial per level down to the current level
 		l++;
 		
@@ -1582,7 +1587,7 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 			for (; l <= level; l++) {
 				while (!this->eliminationSets[l-1].emptySingleEliminationQueue()) {
 					// the polynomial can be analyzed for zeros
-					UnivariatePolynomial<Number> p = this->eliminationSets[l-1].popNextSingleEliminationPosition();
+					const UPolynomial* p = this->eliminationSets[l-1].popNextSingleEliminationPosition();
 					if (this->vanishesInBox(p, bounds, l-1)) break;
 					// delete polynomial and try the next one
 					this->eliminationSets[l-1].erase(p);
@@ -1607,8 +1612,8 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 				// possibly simplify base level (if not done by setting.simplifyByRootcounting)
 				while (!this->eliminationSets.back().emptySingleEliminationQueue()) {
 					// the polynomial can be analyzed for zeros (use paired-elimination queue because the single is always empty)
-					UnivariatePolynomial<Number> p = this->eliminationSets.back().popNextSingleEliminationPosition();
-					if (this->vanishesInBox(p, bounds, this->eliminationSets.size()-1)) break;
+					const UPolynomial* p = this->eliminationSets.back().popNextSingleEliminationPosition();
+					if (this->vanishesInBox(p, bounds, (unsigned)this->eliminationSets.size()-1)) break;
 					// delete polynomial and try the next one
 					this->eliminationSets.back().erase(p);
 				}
@@ -1820,7 +1825,7 @@ void CAD<Number>::trimVariables() {
 }
 
 template<typename Number>
-bool CAD<Number>::vanishesInBox(const UnivariatePolynomial<Number>* p, const BoundMap& box, unsigned level, bool recuperate) {
+bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsigned level, bool recuperate) {
 	cad::CADSettings boxSetting = cad::CADSettings::getSettings();
 	boxSetting.simplifyEliminationByBounds = false; // would cause recursion in vanishesInBox
 	boxSetting.earlyLiftingPruningByBounds = true; // important for efficiency
@@ -1848,7 +1853,7 @@ bool CAD<Number>::vanishesInBox(const UnivariatePolynomial<Number>* p, const Bou
 	
 	// optimization for equations not valid in general
 	boxSetting.equationsOnly = variables.size() <= 1;
-	CAD<Number> cadbox({*p}, variables, boxSetting);
+	CAD<Number> cadbox({p}, variables, boxSetting);
 	
 	RealAlgebraicPoint<Number> r;
 	std::vector<cad::Constraint<Number>> constraints(1, cad::Constraint<Number>(*p, Sign::ZERO, variables));
@@ -1860,7 +1865,7 @@ bool CAD<Number>::vanishesInBox(const UnivariatePolynomial<Number>* p, const Bou
 			for (unsigned i = level + 1; i < this->variables.size(); i++) {
 				// we start with level + 1 because p is already in mEliminationSets[level]
 				// search for the variables actually occurring in cadBox
-				while (j < cadbox.variables.size() && !this->variables[i] == cadbox.variables[j]) {
+				while (j < cadbox.variables.size() && this->variables[i] != cadbox.variables[j]) {
 					// cadBox.mVariables are ordered in the same way as mVariables and a subset of mVariables
 					j++;
 				}

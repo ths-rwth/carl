@@ -13,6 +13,8 @@
 #include "../core/MultivariatePolynomial.h"
 #include "../core/Sign.h"
 #include "../core/Variable.h"
+#include "../interval/IntervalEvaluation.h"
+#include "CADSettings.h"
 
 namespace carl {
 namespace cad {
@@ -20,7 +22,7 @@ namespace cad {
 template<typename Number>
 class Constraint {
 private:
-	MultivariatePolynomial<Number> polynomial;
+	cad::UPolynomial<Number> polynomial;
 	Sign sign;
 	std::vector<Variable> variables;
 	bool negated;
@@ -47,7 +49,7 @@ public:
 	 * @param v the variables of the polynomial
 	 * @param negated if set to <code>true</code>, <code>satisfiedBy</code> checks the negation of the specified sign condition. If otherwise <code>false</code> is specified (standard value), <code>satisfiedBy</code> checks the sign condition as specified.
 	 */
-	Constraint(const MultivariatePolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool negated = false):
+	Constraint(const cad::UPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool negated = false):
 		polynomial(p),
 		sign(s),
 		variables(checkVariables(p, v)),
@@ -61,7 +63,7 @@ public:
 	/**
 	 * @return the polynomial of the constraint
 	 */
-	const MultivariatePolynomial<Number>& getPolynomial() const {
+	const cad::UPolynomial<Number>& getPolynomial() const {
 		return this->polynomial;
 	}
 
@@ -98,22 +100,28 @@ public:
 	bool satisfiedBy(const RealAlgebraicPoint<Number>& r) const {
 		assert(this->variables.size() <= r.dim());
 		
-		std::vector<RealAlgebraicNumberIR<Number>*> numsIR(this->variables.size());
-		std::vector<Variable> varsIR(this->variables.size());
-		unsigned int j = 0;
-		MultivariatePolynomial<Number> p = this->polynomial;
+		std::map<Variable, ExactInterval<Number>> varMap;
+		cad::UPolynomial<Number> p = this->polynomial;
 		
 		for (unsigned int i = 0; i < this->variables.size(); i++) {
 			if (r[i]->isNumeric()) {
-				//TODO
-				//p.subs(this->variables[i], r.[i]->value());
+				p = p.substitute(this->variables[i], cad::MPolynomial<Number>(r[i]->value()));
 			} else {
-				numsIR[j] = r[i];
-				varsIR[j] = this->variables[i];
-				j++;
+				varMap[this->variables[i]] = static_cast<const RealAlgebraicNumberIR<Number>*>(r[i])->getInterval();
 			}
 		}
-		// TODO
+		if (p.isNumber()) {
+			if (this->negated) {
+				return carl::sgn(p.numericContent()) != this->sign;
+			} else {
+				return carl::sgn(p.numericContent()) == this->sign;
+			}
+		}
+		if (this->negated) {
+			return carl::sgn(IntervalEvaluation::evaluate(p, varMap)) != this->sign;
+		} else {
+			return carl::sgn(IntervalEvaluation::evaluate(p, varMap)) == this->sign;
+		}
 	}
 
 	/**
@@ -121,10 +129,7 @@ public:
 	 * @param v
 	 */
 	void unifyVariables(const std::vector<Variable>& v) {
-		this->variables.resize(v.size());
-		for (unsigned int i = 0; i < v.size(); i++) {
-			this->variables[i] = v[i];
-		}
+		this->variables.assign(v.begin(), v.end());
 	}
 	
 	friend std::ostream& operator<<(std::ostream& os, const Constraint<Number>& s) {
@@ -159,7 +164,7 @@ private:
 	 * @param v list of variables
 	 * @return v if the check was successful
 	 */
-	const std::vector<Variable> checkVariables(const MultivariatePolynomial<Number>& p, const std::vector<Variable>& v) const {
+	const std::vector<Variable> checkVariables(const cad::UPolynomial<Number>& p, const std::vector<Variable>& v) const {
 		std::set<Variable> occuring = p.gatherVariables();
 		for (Variable var: v) {
 			occuring.erase(var);

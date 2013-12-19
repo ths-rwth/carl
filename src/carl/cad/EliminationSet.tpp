@@ -5,7 +5,7 @@ namespace carl {
 namespace cad {
 
 template <typename Coefficient>
-bool EliminationSet<Coefficient>::hasParents(const UnivariatePolynomial<Coefficient>* p) const {
+bool EliminationSet<Coefficient>::hasParents(const UPolynomial* p) const {
 	auto parentsEntry =  this->parentsPerChild.find(p);
 	return
 		// There is an entry for this polynomial.
@@ -22,8 +22,8 @@ bool EliminationSet<Coefficient>::hasParents(const UnivariatePolynomial<Coeffici
 
 template <typename Coefficient>
 std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> EliminationSet<Coefficient>::insert(
-		const UnivariatePolynomial<Coefficient>* r,
-		const std::list<UnivariatePolynomial<Coefficient>*>& parents,
+		const UPolynomial* r,
+		const std::list<UPolynomial*>& parents,
 		bool avoidSingle
 		)
 {
@@ -41,7 +41,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		)
 	) {
 		bool oneParentFound = false;
-		UnivariatePolynomial<Coefficient>* parent1;
+		UPolynomial* parent1;
 		for (auto parent: parents) {
 			auto children = this->childrenPerParent.find(parent);
 			if (children == this->childrenPerParent.end()) {
@@ -99,14 +99,14 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 
 template<typename Coefficient>
 template<class InputIterator>
-std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::insert(
+std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::insert(
 		InputIterator first,
 		InputIterator last,
-		const std::list<UnivariatePolynomial<Coefficient>*>& parents,
+		const std::list<UPolynomial*>& parents,
 		bool avoidSingle 
 		)
 {
-	std::list<UnivariatePolynomial<Coefficient>*> inserted;
+	std::list<UPolynomial*> inserted;
 	for (InputIterator i = first; i != last; ++i) {
 		std::pair<typename PolynomialSet::iterator, bool> insertValue = this->insert(*i, parents, avoidSingle);
 		if (insertValue.second) {
@@ -117,26 +117,16 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::inser
 }
 
 template<typename Coefficient>
-std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> EliminationSet<Coefficient>::insert(
-		const UnivariatePolynomial<Coefficient>& r,
-		const std::list<UnivariatePolynomial<Coefficient>*>& parents,
-		bool avoidSingle
-		)
-{
-	return this->insert(new UnivariatePolynomial<Coefficient>(r), parents, avoidSingle);
-}
-
-template<typename Coefficient>
-std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::insert(
+std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::insert(
 		const EliminationSet<Coefficient>& s,
 		bool avoidSingle
 		)
 {
-	std::list<UnivariatePolynomial<Coefficient>*> inserted = std::list<UnivariatePolynomial<Coefficient>*>();
+	std::list<const UPolynomial*> inserted;
 	for (auto i = s.polynomials.begin(); i != s.polynomials.end(); ++i) {
-		std::list<UnivariatePolynomial<Coefficient>*> parents = s.getParentsOf(*i);
+		std::list<UPolynomial*> parents = s.getParentsOf(*i);
 		if (parents.empty()) {
-			parents = std::list<UnivariatePolynomial<Coefficient>*>( 1, nullptr);
+			parents = std::list<UPolynomial*>( 1, nullptr);
 		}
 		std::pair<typename PolynomialSet::iterator, bool> insertValue = this->insert(*i, parents, avoidSingle);
 		if(insertValue.second) {
@@ -148,7 +138,7 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::inser
 
 template<typename Coefficient>
 bool EliminationSet<Coefficient>::insertAmend(EliminationSet<Coefficient>& s) {
-	std::forward_list<UnivariatePolynomial<Coefficient>*> toDelete;
+	std::forward_list<UPolynomial> toDelete;
 	for (typename PolynomialSet::iterator i = s.begin(); i != s.end(); ++i) {
 		typename PolynomialSet::const_iterator iValue = this->polynomials.find(*i);
 		if (iValue != this->end()) { // polynomial is already present in the set
@@ -162,7 +152,7 @@ bool EliminationSet<Coefficient>::insertAmend(EliminationSet<Coefficient>& s) {
 }
 
 template<typename Coefficient>
-size_t EliminationSet<Coefficient>::erase( const UnivariatePolynomial<Coefficient>* p ) {
+size_t EliminationSet<Coefficient>::erase(const UPolynomial* p) {
 	if (p == 0) return 0;
 	
 	// remove the child for each parent from the children mapping
@@ -192,15 +182,15 @@ size_t EliminationSet<Coefficient>::erase( const UnivariatePolynomial<Coefficien
 }
 
 template<typename Coefficient>
-std::forward_list<const UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::removeByParent(const UnivariatePolynomial<Coefficient>* parent) {
-	std::forward_list<const UnivariatePolynomial<Coefficient>*> deleted;
+std::forward_list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::removeByParent(const UPolynomial* parent) {
+	std::forward_list<const UPolynomial*> deleted;
 	if (parent == nullptr) // zero parent is reserved for "no parent"
 		return deleted;
 	// remove all lone children of parent
 	auto position = this->childrenPerParent.find(parent);
 	if (position == this->childrenPerParent.end())
 		return deleted;    // parent not found
-	for (const UnivariatePolynomial<Coefficient>* child: position->second)	{
+	for (const UPolynomial* child: position->second)	{
 		// for all children of parent check their parents
 		auto parents = this->parentsPerChild.find(child);
 		if (parents == this->parentsPerChild.end() || parents->second.empty())
@@ -237,7 +227,7 @@ std::forward_list<const UnivariatePolynomial<Coefficient>*> EliminationSet<Coeff
 }
 
 template<typename Coefficient>
-const UnivariatePolynomial<Coefficient>* EliminationSet<Coefficient>::find(const UnivariatePolynomial<Coefficient>* p) {
+const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coefficient>::find(const UPolynomial* p) {
 	auto position = this->polynomials.find(p);
 	return (position == this->polynomials.end() ? nullptr : *position);
 }
@@ -273,15 +263,15 @@ void EliminationSet<Coefficient>::resetLiftingPositionsFully() {
 }
 
 template<typename Coefficient>
-const UnivariatePolynomial<Coefficient>* EliminationSet<Coefficient>::popNextSingleEliminationPosition() {
-	const UnivariatePolynomial<Coefficient>*& p = mSingleEliminationQueue.front();
+const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coefficient>::popNextSingleEliminationPosition() {
+	const UPolynomial* p = mSingleEliminationQueue.front();
 	mSingleEliminationQueue.pop_front();
 	return p;
 }
 
 template<typename Coefficient>
-std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::eliminateInto(
-		const UnivariatePolynomial<Coefficient>* p,
+std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::eliminateInto(
+		const UPolynomial* p,
 		EliminationSet<Coefficient>& destination,
 		const Variable& variable,
 		const CADSettings& setting
@@ -295,7 +285,7 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::elimi
 			this->erase(p);
 			return {};
 		}
-		UnivariatePolynomial<Coefficient>* pNewVar = new UnivariatePolynomial<Coefficient>(p->switchVariable(variable));
+		UPolynomial* pNewVar = new UPolynomial(p->switchVariable(variable));
 		destination.insert(pNewVar, this->getParentsOf(p));
 		if( setting.removeConstants || p->isNumber()) /* remove constant from this level and discard numerics completely */
 			this->erase(p);
@@ -350,10 +340,10 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::elimi
 }
 
 template<typename Coefficient>
-std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::eliminateConstant(
-		const UnivariatePolynomial<Coefficient>* p,
-		std::list<UnivariatePolynomial<Coefficient>*>& queue,
-		std::list<UnivariatePolynomial<Coefficient>*>& otherqueue,
+std::list<typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::eliminateConstant(
+		const UPolynomial* p,
+		std::list<UPolynomial*>& queue,
+		std::list<UPolynomial*>& otherqueue,
 		bool avoidSingle,
 		EliminationSet<Coefficient>& destination,
 		const Variable& variable,
@@ -365,7 +355,7 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::elimi
 		this->erase(p);
 		return {};
 	}
-	UnivariatePolynomial<Coefficient>* pNewVar = std::make_shared<UnivariatePolynomial<Coefficient>>(p->switchVariable(variable));
+	UPolynomial pNewVar = std::make_shared<UnivariatePolynomial<Coefficient>>(p->switchVariable(variable));
 	destination.insert(pNewVar, this->getParentsOf(p), avoidSingle);
 	if( setting.removeConstants ) /* remove constant from this level */
 		this->erase(p);
@@ -381,28 +371,16 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::elimi
 }
 
 template<typename Coefficient>
-std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::eliminateNextInto(
+std::list<typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::eliminateNextInto(
 		EliminationSet<Coefficient>& destination,
 		const Variable& variable,
 		const CADSettings& setting,
 		bool synchronous
 		)
 {
-	#ifdef GINACRA_CAD_DEBUG
-	cout << *this << endl;
-	cout << "Single elimination queue: ";
-	for( list<UnivariatePolynomial*>::const_iterator i = mSingleEliminationQueue.begin(); i != mSingleEliminationQueue.end(); ++i )
-		cout << **i << "  ";
-	cout << endl << "Paired elimination queue: ";
-	for( list<UnivariatePolynomial*>::const_iterator i = mPairedEliminationQueue.begin(); i != mPairedEliminationQueue.end(); ++i )
-		cout << **i << "  ";
-	cout << endl;
-	#endif
-
-	UnivariatePolynomial<Coefficient>* p;
+	UPolynomial* p;
 	bool avoidSingle = false;
-	if( mPairedEliminationQueue.empty() )
-	{
+	if (mPairedEliminationQueue.empty() ) {
 		if( !mSingleEliminationQueue.empty() )
 		{
 			if (p->isConstant()) {
@@ -473,10 +451,10 @@ std::list<UnivariatePolynomial<Coefficient>*> EliminationSet<Coefficient>::elimi
 
 template<typename Coefficient>
 void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to, const Variable& variable ) {
-	std::forward_list<UnivariatePolynomial<Coefficient>*> toDelete;
+	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		if(p->isConstant()) {
-			if (isNumber(*p)) { // discard numerics completely
+			if (p->isNumber()) { // discard numerics completely
 				to.insert(std::make_shared<UnivariatePolynomial<Coefficient>>(p->switchVariable(variable)), this->getParentsOf(p));
 			}	
 			toDelete.push_front(p);
@@ -490,7 +468,7 @@ void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to,
 template<typename Coefficient>
 void EliminationSet<Coefficient>::removeConstants() {
 	if (this->empty()) return;
-	std::forward_list<UnivariatePolynomial<Coefficient>*> toDelete;
+	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		if (p->isConstant()) {   // found candidate for removal
 			toDelete.push_front(p);
@@ -505,11 +483,11 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::removePolynomialsWithoutRealRoots() {
 	if (this->empty()) return;
 	// collect polynomials which shall be deleted
-	std::forward_list<UnivariatePolynomial<Coefficient>*> toDelete;
+	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		if (p->degree() % 2 == 0 && p->isUnivariate())
 		{    // this is a good candidate for having no real roots
-			if (rootfinder::countRealRoots(p) == 0) {
+			if (rootfinder::countRealRoots(*p) == 0) {
 				toDelete.push_front(p);
 			}
 		}
@@ -524,7 +502,7 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::makeSquarefree() {
 	EliminationSet<Coefficient> squarefreeSet(this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
-		squarefreeSet.insert(new UnivariatePolynomial<Coefficient>(p->squareFreePart()), this->getParentsOf(p));
+		squarefreeSet.insert(new UPolynomial(p->squareFreePart()), this->getParentsOf(p));
 	}
 	std::swap(*this, squarefreeSet);
 }
@@ -537,7 +515,7 @@ void EliminationSet<Coefficient>::makePrimitive() {
 		
 		typename UnderlyingNumberType<Coefficient>::type c = p->numericContent();
 		if( c != 1 && c != 0 ) // only non-trivial content parts are considered
-			primitiveSet.insert(new UnivariatePolynomial<Coefficient>(p->pseudoPrimpart(c)), this->getParentsOf(p));
+			primitiveSet.insert(p->pseudoPrimpart(cad::MPolynomial<Coefficient>(c)), this->getParentsOf(p));
 		else
 			primitiveSet.insert(p, this->getParentsOf(p));
 	}
@@ -551,9 +529,11 @@ void EliminationSet<Coefficient>::factorize() {
 	EliminationSet<Coefficient> factorizedSet(this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
 		// insert the factors and omit the original
-		for (auto factor: p->factorization()) {
+		// TODO: Perform multivariate factorization here.
+		/*for (auto factor: p->factorization()) {
 			factorizedSet.insert(factor.first, this->getParentsOf(p));
-		}
+		}*/
+		factorizedSet.insert(p, this->getParentsOf(p));
 	}
 	std::swap(*this, factorizedSet);
 }
