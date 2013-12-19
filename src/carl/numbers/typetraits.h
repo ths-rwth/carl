@@ -12,9 +12,7 @@
 
 #include <cln/cln.h>
 #include <type_traits>
-#ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
-#endif
 
 #include "../util/SFINAE.h"
 

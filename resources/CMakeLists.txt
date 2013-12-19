@@ -8,7 +8,9 @@ INCLUDE(ExternalProject)
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
 # Adding log4cplus.
-if(NOT LOG4CPLUS_FOUND)	
+if(LOG4CPLUS_FOUND)
+	message("-- Use system version of Log4CPlus")	
+else()
 # Add log4cplus (local build)
 	message("-- Use shipped version of Log4CPlus")
 	ExternalProject_Add(
@@ -34,6 +36,7 @@ endif()
 
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
+	message("-- Use system version of GTest")
 else()
 	# Create configure command dependend on compiler
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -71,13 +74,15 @@ else()
 	add_dependencies(resources googletest)
 endif()
 
-if(NOT EIGEN3_FOUND)
+if(EIGEN3_FOUND)
+	message("-- Use system version of Eigen3")
+else()
 	message("-- Use shipped version of Eigen3")
 	ExternalProject_Add(
 		eigen
 		DOWNLOAD_COMMAND ""
 		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0"
-		#CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
 		#		   -DBUILD_SHARED_LIBS:BOOL=0
 		INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
 		# Wrap download, configure and build steps in a script to log output
@@ -85,7 +90,7 @@ if(NOT EIGEN3_FOUND)
 		LOG_BUILD ON)
 
 
-	set( EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
-	set( EIGEN_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
+	set( EIGEN3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
+	#set( EIGEN3_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
 	add_dependencies(resources eigen)
 endif()
