@@ -229,10 +229,10 @@ template<typename Coeff, typename Ordering, typename Policies>
 Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 {
 	if(isZero()) return 0;
-	if(trailingTerm()->isConstant())
-	{
+	if(trailingTerm()->isConstant()) {
 		return trailingTerm()->coeff();
 	}
+	return 0;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -471,7 +471,8 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value) const
 {
     MultivariatePolynomial result(*this);
-    return result.substituteIn(var, value);
+    result.substituteIn(var, value);
+	return result;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
