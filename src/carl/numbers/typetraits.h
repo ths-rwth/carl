@@ -212,13 +212,11 @@ struct is_float
     static const bool value = false;
 };
 
-#ifdef USE_MPFR_FLOAT
 template<>
 struct is_float<mpfr_t>
 {
     static const bool value = true;
 };
-#endif
 
 template<>
 struct is_float<double>

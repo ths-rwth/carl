@@ -21,16 +21,13 @@ class FLOAT_T<mpfr_t>
         // Default precision is initially set to 53 bits in mpfr implementation
         FLOAT_T(const double _double, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
         {
-            std::cout << "Double Constructor of" << _double << std::endl;
             mpfr_init2(mValue,_prec);
             mpfr_set_d(mValue,_double,mpfr_rnd_t(_rnd));
-            std::cout << this->toString() << std::endl;
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
         FLOAT_T(const float _float, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
         {
-            std::cout << "Float constructor" << std::endl;
             mpfr_init2(mValue, _prec);
             mpfr_set_flt(mValue, _float, mpfr_rnd_t(_rnd));
         }
@@ -487,6 +484,20 @@ class FLOAT_T<mpfr_t>
             return res;
         }
 
+		friend FLOAT_T<mpfr_t> operator +(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_add(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
+			return res;
+		}
+		
+		friend FLOAT_T<mpfr_t> operator +(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_add(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+	
         friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
         {
             FLOAT_T<mpfr_t> res;
@@ -494,6 +505,20 @@ class FLOAT_T<mpfr_t>
             return res;
         }
 
+		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_sub(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
+			return res;
+		}
+		
+		friend FLOAT_T<mpfr_t> operator -(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_sub(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+	
         friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
         {
             FLOAT_T<mpfr_t> res;
@@ -501,6 +526,20 @@ class FLOAT_T<mpfr_t>
             return res;
         }
 
+		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+		
+		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+	
         friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
         {
             // TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.

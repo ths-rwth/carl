@@ -60,40 +60,35 @@ namespace carl
 
             FLOAT_T<FloatType>()
             {
+				assert(is_float(FloatType));
                 mValue = 0;
             }
-            
+        
             FLOAT_T<FloatType>(const double _double)
             {
+				assert(is_float(FloatType));
                 mValue = _double;
             }
             
             FLOAT_T<FloatType>(const float _float)
             {
+				assert(is_float(FloatType));
                 mValue = _float;
             }
             
             FLOAT_T<FloatType>(const int _int)
             {
+				assert(is_float(FloatType));
                 mValue = _int;
             }
-
-            FLOAT_T<FloatType>(const double _double, precision _prec){}
-
-//            template<>
-//            FLOAT_T<double>(const double _double, CARL_RND _rnd, precision _prec)
-//            {
-//                // TODO: What if a lesser precision than the default double precision is chosen? -> truncate with respect to _rnd!
-//                mValue = _double;
-//            }
             
             FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float) : mValue(_float.mValue)
-            {}
+            {
+				assert(is_float(FloatType));
+			}
             
             ~FLOAT_T()
-            {
-            	// TODO: clear mValue if needed
-            }
+            {}
 
             
             /*******************
@@ -507,22 +502,61 @@ namespace carl
             {
                 return FLOAT_T<FloatType>(_lhs.mValue + _rhs.mValue);
             }
-            
+		
+			friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs.mValue + _rhs);
+			}
+        
+			friend FLOAT_T<FloatType> operator +(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+			{
+				return _rhs + _lhs;
+			}
+		
             friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
             {
                 return FLOAT_T<FloatType>(_lhs.mValue - _rhs.mValue);
             }
-            
+
+			friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs.mValue - _rhs);
+			}
+			
+			friend FLOAT_T<FloatType> operator -(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
+			}
+		
             friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
             {
                 return FLOAT_T<FloatType>(_lhs.mValue * _rhs.mValue);
             }
-            
+			
+			friend FLOAT_T<FloatType> operator *(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
+			}
+			
+			friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
+			}
+        
             friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
             {
                 return FLOAT_T<FloatType>(_lhs.mValue / _rhs.mValue);
             }
-            
+
+			friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs.mValue / _rhs);
+			}
+			
+			friend FLOAT_T<FloatType> operator /(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+			{
+				return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
+			}
             friend FLOAT_T<FloatType>& operator ++(FLOAT_T<FloatType>& _num)
             {
                 _num.mValue +=1;
@@ -540,25 +574,49 @@ namespace carl
                 mValue + _rhs.mValue;
                 return *this;
             }
-            
+        
+			FLOAT_T<FloatType>& operator +=(const FloatType& _rhs)
+			{
+				mValue + _rhs;
+				return *this;
+			}
+		
             FLOAT_T<FloatType>& operator -=(const FLOAT_T<FloatType>& _rhs)
             {
                 mValue - _rhs.mValue;
                 return *this;
             }
-            
+        
+			FLOAT_T<FloatType>& operator -=(const FloatType& _rhs)
+			{
+				mValue - _rhs;
+				return *this;
+			}
+		
             FLOAT_T<FloatType>& operator *=(const FLOAT_T<FloatType>& _rhs)
             {
                 mValue * _rhs.mValue;
                 return *this;
             }
-            
+        
+			FLOAT_T<FloatType>& operator *=(const FloatType& _rhs)
+			{
+				mValue * _rhs;
+				return *this;
+			}
+		
             FLOAT_T<FloatType>& operator /=(const FLOAT_T<FloatType>& _rhs)
             {
                 mValue / _rhs.mValue;
                 return *this;
             }
-            
+        
+			FLOAT_T<FloatType>& operator /=(const FloatType& _rhs)
+			{
+				mValue / _rhs;
+				return *this;
+			}
+		
             /**
              * Auxiliary Functions
              */
