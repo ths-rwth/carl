@@ -82,7 +82,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("-- Using g++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
 else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
@@ -91,6 +91,8 @@ endif()
 if(DEVELOPER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion")
 endif()
+
+message("-- Compiler flags: ${CMAKE_CXX_FLAGS}")
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -164,8 +166,8 @@ enable_testing()
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
-set(libraries ${libraries} ${EIGEN_LIBRARY} pthread)
-set(include_dirs ${include_dirs} ${EIGEN_INCLUDE_DIR} )
+set(libraries ${libraries} ${EIGEN3_LIBRARY} pthread)
+set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
 
 
 if(COMPARE_WITH_GINAC)

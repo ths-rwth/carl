@@ -1,5 +1,4 @@
 # include directories.
-message(${include_dirs})
 include_directories( 
 	${include_dirs}
 )
