@@ -16,7 +16,7 @@ TEST(EliminationSet, BasicOperations)
 	Variable y = vpool.getFreshVariable();
 	Variable z = vpool.getFreshVariable();
 
-	cad::EliminationSet<MultivariatePolynomial<cln::cl_RA>> s;
+	cad::EliminationSet<cln::cl_RA> s;
 	
 	MultivariatePolynomial<cln::cl_RA> mpz({z});
 	MultivariatePolynomial<cln::cl_RA> mpxz2({(cln::cl_RA)-1*x*z});
