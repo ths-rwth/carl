@@ -86,6 +86,6 @@ if(NOT EIGEN_FOUND)
 
 
 	set( EIGEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
-	set( EIGEN_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
+	#set( EIGEN_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
 	add_dependencies(resources eigen)
 endif()

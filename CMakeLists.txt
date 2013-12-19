@@ -164,6 +164,10 @@ enable_testing()
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
+set(libraries ${libraries} ${EIGEN_LIBRARY} pthread)
+set(include_dirs ${include_dirs} ${EIGEN_INCLUDE_DIR} )
+
+
 if(COMPARE_WITH_GINAC)
   find_package( GiNaC 1.5.8 REQUIRED )
   set(libraries ${libraries} ${GINAC_LIBRARY} )
