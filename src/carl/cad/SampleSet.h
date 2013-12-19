@@ -42,6 +42,12 @@ public:
 	typedef typename std::list<RealAlgebraicNumberIR<Number>*>::iterator iteratorIR;
 	typedef typename std::list<RealAlgebraicNumberNR<Number>*>::iterator iteratorNR;
 	typedef std::unordered_map<RealAlgebraicNumberIR<Number>*, RealAlgebraicNumberNR<Number>*> SampleSimplification;
+
+	SampleSet() {}
+	template<typename InputIterator>
+	SampleSet(const InputIterator& first, const InputIterator& last)
+		: samples(first, last) {
+	}
 	
 	/**
 	 * Inserts an element into the sorted list at the correct position according to the order.
@@ -82,6 +88,20 @@ public:
 	 */
 	SampleSet::iterator remove(SampleSet::iterator position);
 	
+	SampleSet::iterator& begin() {
+		return this->samples.begin();
+	}
+	const SampleSet::iterator& begin() const {
+		return this->samples.begin();
+	}
+
+	SampleSet::iterator& end() {
+		return this->samples.end();
+	}
+	const SampleSet::iterator& end() const {
+		return this->samples.end();
+	}
+
 	/**
 	 * Determines the next sample in the order of insertion with no particular preference.
 	 *
@@ -171,7 +191,11 @@ public:
 	 * @return true if r is contained in the list, false otherwise
 	 */
 	bool contains(const RealAlgebraicNumber<Number>* r) const;
-	
+
+	bool empty() const {
+		return this->samples.empty();
+	}
+
 	/**
 	 * Answers whether there are numerically represented samples left.
 	 * @return true if there is no NR sample left in the list, false otherwise
