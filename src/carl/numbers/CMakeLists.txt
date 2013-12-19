@@ -1,7 +1,7 @@
 set(carl_lib_number_headers 
 	GF.h
 	PrimeFactory.h
-        #FLOAT_T.h
+        FLOAT_T.h
         numbers.h
         operations.h
         operations_cln.h

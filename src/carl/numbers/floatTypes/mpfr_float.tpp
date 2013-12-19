@@ -19,21 +19,21 @@ class FLOAT_T<mpfr_t>
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const double _double, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+        FLOAT_T(const double _double, precision _prec=53, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_d(mValue,_double,mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const float _float, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+        FLOAT_T(const float _float, precision _prec=53, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_init2(mValue, _prec);
             mpfr_set_flt(mValue, _float, mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const int _int, precision _prec=53, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+        FLOAT_T(const int _int, precision _prec=53, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
@@ -71,7 +71,7 @@ class FLOAT_T<mpfr_t>
             return mpfr_get_prec(mValue);
         }
         
-        FLOAT_T<mpfr_t>& setPrec( const precision& _prec, const CARL_RND _rnd=CARL_RND::CARL_RNDN )
+        FLOAT_T<mpfr_t>& setPrec( const precision& _prec, const CARL_RND _rnd=CARL_RND::N )
         {
             mpfr_prec_round(mValue, convPrec(_prec), mpfr_rnd_t(_rnd));
             return *this;
@@ -91,7 +91,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
         
-        FLOAT_T<mpfr_t>& safeSet (const FLOAT_T<mpfr_t>& _rhs, const CARL_RND _rnd=CARL_RND::CARL_RNDN)
+        FLOAT_T<mpfr_t>& safeSet (const FLOAT_T<mpfr_t>& _rhs, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_set_prec(mValue, mpfr_get_prec(_rhs.mValue));
             mpfr_set(mValue, _rhs.mValue, mpfr_rnd_t(_rnd));
@@ -171,14 +171,14 @@ class FLOAT_T<mpfr_t>
 
         FLOAT_T<mpfr_t>& div_assign(const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd)
         {
-            assert( mpfr_zero_p(_op2.mValue) != 0 );
+            assert( _op2 != 0 );
             mpfr_div(mValue, mValue, _op2.mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
         void div( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd) const
         {
-            assert( mpfr_zero_p(_op2.mValue) != 0 );
+            assert( _op2 != 0 );
             mpfr_div(_result.mValue, this->mValue, _op2.mValue, mpfr_rnd_t(_rnd));
         }
 
@@ -186,216 +186,222 @@ class FLOAT_T<mpfr_t>
          * special operators
          */
 
-        FLOAT_T<mpfr_t>& sqrt_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& sqrt_assign(CARL_RND _rnd = CARL_RND::N)
         {
+            assert( *this >= 0);
             mpfr_sqrt(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void sqrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void sqrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
+            assert( *this >= 0);
             mpfr_sqrt(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& cbrt_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& cbrt_assign(CARL_RND _rnd = CARL_RND::N)
         {
+            assert( *this >= 0);
             mpfr_cbrt(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void cbrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void cbrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
+            assert( *this >= 0);
             mpfr_cbrt(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& root_assign(unsigned long int _k, CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& root_assign(unsigned long int _k, CARL_RND _rnd = CARL_RND::N)
         {
+            assert( *this >= 0);
             mpfr_root(mValue, mValue, _k, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void root(FLOAT_T<mpfr_t>& _result, unsigned long int _k, CARL_RND _rnd = CARL_RNDN)
+        void root(FLOAT_T<mpfr_t>& _result, unsigned long int _k, CARL_RND _rnd = CARL_RND::N)
         {
+            assert( *this >= 0);
             mpfr_root(_result.mValue, mValue, _k, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& pow_assign(unsigned long int _exp, CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& pow_assign(unsigned long int _exp, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_pow_ui(mValue, mValue, _exp, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void pow(FLOAT_T<mpfr_t>& _result, unsigned long int _exp, CARL_RND _rnd = CARL_RNDN)
+        void pow(FLOAT_T<mpfr_t>& _result, unsigned long int _exp, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_pow_ui(_result.mValue, mValue, _exp, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& abs_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& abs_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_abs(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void abs(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void abs(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_abs(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
         
-        FLOAT_T<mpfr_t>& exp_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& exp_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_exp(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void exp(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void exp(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_exp(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& sin_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& sin_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_sin(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void sin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void sin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_sin(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& cos_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& cos_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_cos(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void cos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void cos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_cos(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& log_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& log_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_log(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void log(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void log(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_log(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& tan_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& tan_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_tan(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void tan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void tan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_tan(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& asin_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& asin_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_asin(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void asin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void asin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_asin(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& acos_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& acos_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_acos(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void acos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void acos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_acos(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& atan_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& atan_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_atan(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void atan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void atan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_atan(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& sinh_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& sinh_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_sinh(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void sinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void sinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_sinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& cosh_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& cosh_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_cosh(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void cosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void cosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_cosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& tanh_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& tanh_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_tanh(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void tanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void tanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_tanh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& asinh_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& asinh_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_asinh(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void asinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void asinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_asinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
         
-        FLOAT_T<mpfr_t>& acosh_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& acosh_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_acosh(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void acosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void acosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_acosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
         
-        FLOAT_T<mpfr_t>& atanh_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T<mpfr_t>& atanh_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_atanh(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void atanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RNDN)
+        void atanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_atanh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        void floor(int& _result, CARL_RND _rnd = CARL_RNDN)
+        void floor(int& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_t result;
             mpfr_init(result);
@@ -405,13 +411,13 @@ class FLOAT_T<mpfr_t>
             mpfr_clear(result);
         }
 
-        FLOAT_T& floor_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T& floor_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_rint_floor(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void ceil(int& _result, CARL_RND _rnd = CARL_RNDN)
+        void ceil(int& _result, CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_t result;
             mpfr_init(result);
@@ -421,7 +427,7 @@ class FLOAT_T<mpfr_t>
             mpfr_clear(result);
         }
 
-        FLOAT_T& ceil_assign(CARL_RND _rnd = CARL_RNDN)
+        FLOAT_T& ceil_assign(CARL_RND _rnd = CARL_RND::N)
         {
             mpfr_rint_ceil(mValue, mValue, mpfr_rnd_t(_rnd));
             return *this;
@@ -431,7 +437,7 @@ class FLOAT_T<mpfr_t>
          * conversion operators
          */
 
-        double toDouble(CARL_RND _rnd=CARL_RND::CARL_RNDN) const
+        double toDouble(CARL_RND _rnd=CARL_RND::N) const
         {
             return mpfr_get_d(mValue, mpfr_rnd_t(_rnd));
         }
@@ -483,20 +489,6 @@ class FLOAT_T<mpfr_t>
             mpfr_add(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
             return res;
         }
-
-		friend FLOAT_T<mpfr_t> operator +(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
-		{
-			FLOAT_T<mpfr_t> res;
-			mpfr_add(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
-			return res;
-		}
-		
-		friend FLOAT_T<mpfr_t> operator +(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
-		{
-			FLOAT_T<mpfr_t> res;
-			mpfr_add(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
-			return res;
-		}
 	
         friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
         {
@@ -504,20 +496,6 @@ class FLOAT_T<mpfr_t>
             mpfr_sub(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
             return res;
         }
-
-		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
-		{
-			FLOAT_T<mpfr_t> res;
-			mpfr_sub(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
-			return res;
-		}
-		
-		friend FLOAT_T<mpfr_t> operator -(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
-		{
-			FLOAT_T<mpfr_t> res;
-			mpfr_sub(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
-			return res;
-		}
 	
         friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
         {
@@ -525,20 +503,6 @@ class FLOAT_T<mpfr_t>
             mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
             return res;
         }
-
-		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
-		{
-			FLOAT_T<mpfr_t> res;
-			mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
-			return res;
-		}
-		
-		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
-		{
-			FLOAT_T<mpfr_t> res;
-			mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
-			return res;
-		}
 	
         friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
         {
@@ -600,30 +564,6 @@ class FLOAT_T<mpfr_t>
         }
         
     private:
-
-        mpfr_rnd_t convRnd(CARL_RND _rnd) const
-        {
-            switch(_rnd)
-            {
-                case 0:
-                    return MPFR_RNDN;
-                    break;
-                case 1:
-                    return MPFR_RNDZ;
-                    break;
-                case 2:
-                    return MPFR_RNDU;
-                    break;
-                case 3:
-                    return MPFR_RNDD;
-                    break;
-                case 4:
-                    return MPFR_RNDA;
-                    break;
-                default:
-                    return MPFR_RNDNA;
-            }
-        }
         
         mpfr_prec_t convPrec(precision _prec) const
         {

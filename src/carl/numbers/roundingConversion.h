@@ -18,11 +18,11 @@ namespace carl {
 	
 	enum class CARL_RND:int
     {
-        CARL_RNDN=0,
-        CARL_RNDZ=1,
-        CARL_RNDU=2,
-        CARL_RNDD=3,
-        CARL_RNDA=4
+        N=0,
+        Z=1,
+        U=2,
+        D=3,
+        A=4
     };
 	
 	template<typename NumberType>
@@ -42,15 +42,15 @@ namespace carl {
 		{
 			switch(_rnd)
 			{
-				case CARL_RND::CARL_RNDA:
+				case CARL_RND::A:
 					return MPFR_RNDA;
-				case CARL_RND::CARL_RNDD:
+				case CARL_RND::D:
 					return MPFR_RNDD;
-				case CARL_RND::CARL_RNDN:
+				case CARL_RND::N:
 					return MPFR_RNDN;
-				case CARL_RND::CARL_RNDU:
+				case CARL_RND::U:
 					return MPFR_RNDU;
-				case CARL_RND::CARL_RNDZ:
+				case CARL_RND::Z:
 					return MPFR_RNDZ;
 				default:
 					// should not happen!
