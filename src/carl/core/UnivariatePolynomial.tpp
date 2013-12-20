@@ -81,13 +81,35 @@ template<typename Coeff>
 Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const 
 {
 	Coeff result(0);
-	Coeff var = 1;
+	Coeff var(1);
 	for(const Coeff& coeff : mCoefficients)
 	{
 		result += (coeff * var);
 		var *= value;
 	}
     return result;
+}
+
+template<typename Coeff>
+template<typename C, EnableIf<is_number<C>>>
+void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	if (var == this->mainVar()) {
+		this->mCoefficients[0] = this->evaluate(value);
+		this->mCoefficients.resize(1);
+	}
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_number<C>>>
+void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	if (var == this->mainVar()) {
+		this->mCoefficients[0] = this->evaluate(value);
+		this->mCoefficients.resize(1);
+	} else {
+		for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
+			this->mCoefficients[i].substituteIn(var, value);
+		}
+	}
 }
 
 template<typename Coeff>
@@ -120,7 +142,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variab
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth ) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-nth);
@@ -128,18 +150,18 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 	if(nth == 1)
 	{
 		typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
-		unsigned i = 0;
+		int i = 0;
 		for(it += nth; it != mCoefficients.end(); ++it)
 		{
 			++i;
-			result.mCoefficients.push_back(i * *it);
+			result.mCoefficients.push_back(Coeff(i) * *it);
 		}
 		return result;
 	}
 	else
 	{
 		// here we handle nth > 1.
-		unsigned c = 1;
+		int c = 1;
 		for(unsigned k = 2; k <= nth; ++k)
 		{
 			c *= k;
@@ -148,7 +170,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 		unsigned i = nth;
 		for(it += nth; it != mCoefficients.end(); ++it)
 		{
-			result.mCoefficients.push_back(c * *it);
+			result.mCoefficients.push_back(Coeff(c) * *it);
 			++i;
 			c /= (i - nth);
 			c *= i;
@@ -1082,6 +1104,198 @@ void UnivariatePolynomial<Coeff>::shift(const Coeff& a) {
 		next[0] = a * next[0] + this->mCoefficients[this->mCoefficients.size()-2-i];
 	}
 	this->mCoefficients = next;
+}
+
+template<typename Coeff>
+const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subresultants(
+		const UnivariatePolynomial<Coeff>& p,
+		const UnivariatePolynomial<Coeff>& q,
+		const SubresultantStrategy strategy
+) {
+	/* The algorithm consists of three parts:
+	 * Part 1: Initialization, i.e. preparation1 of the input so that the requirements of the core algorithm in parts 2 and 3 are met.
+	 * Part 2: First part of the main loop. If the two subresultants which were added before (initially the two inputs) differ by more
+	 *         than 1 in their degree, an intermediate subresultant is computed by reducing the last one added with the leading coefficient
+	 *         of the one before this one.
+	 * Part 3: Second part of the main loop. The pseudo remainder of the last two subresultants (the one possibly added in Part 2 disregarded)
+	 *         is computed and added to the subresultant sequence.
+	 */
+
+	/* Part 1
+	 * Check and normalize input, initialize local variables.
+	 */
+	
+	assert(p.mainVar() == q.mainVar());
+	std::list<UnderlyingNumberType<Coeff>> subresultants;
+	Variable variable = p.mainVar();
+	
+	// a shall receive the smaller-degree polynomial
+	UnivariatePolynomial<Coeff> a, b;
+	
+	// aDeg >= bDeg shall hold, so switch if it does not hold
+	if (p.degree() < q.degree()) {
+		a = q;
+		b = p;
+	} else {
+		a = p;
+		b = q;
+	}
+	
+	subresultants.push_front(a);
+	if (b.isZero()) return subresultants;
+	subresultants.push_front(b);
+	
+	// SPECIAL CASE: both, a and b, are constant
+	if (b.isConstant()) return subresultants;
+	
+	UnivariatePolynomial<Coeff> tmp = b;
+	// TODO: check if reduce() is really prem()
+	b = a.reduce(-b);
+	a = tmp;
+	
+	// BUG in Duco's article(?):
+	//ex subresLcoeff = GiNaC::pow( a.lcoeff(), a.degree() - b.degree() );    // initialized on the basis of the smaller-degree polynomial
+	Coeff subresLcoeff = a.lcoeff(); // initialized on the basis of the smaller-degree polynomial
+	
+	/* Parts 2 and 3
+	 * Main loop filling the subresultants chain step by step.
+	 */
+	// MAIN: start main loop containing different computation strategies
+	while (true) {
+		if (b.isZero()) return subresultants;
+		unsigned aDeg = a.degree();
+		unsigned bDeg = b.degree();
+		subresultants.push_front(b);
+		
+		// Part 2
+		int delta = aDeg - bDeg;
+		
+		/** Case distinction on delta: either we choose b as next subresultant or we could reduce b (delta > 1)
+		 * and add the reduced version c as next subresultant. The reduction is done by division, which
+		 * depends on the internal variable order of GiNaC and might fail although for some order it would succeed.
+		 * In this case, we just do not reduce b. (A relaxed reduction could also be applied.)
+		 *
+		 * After the if-else block, bDeg is the degree of the front-most element of subresultants, be it c or b.
+		 */
+		UnivariatePolynomial<Coeff> c;
+		if (delta > 1) {
+			// compute c
+			// Notation hints: Compared to [Duc98], here S_{d-1} is b and S_d is a, and S_e is c.
+			switch (strategy) {
+				case SubresultantStrategy::Generic: {
+					UnivariatePolynomial<Coeff> reductionCoeff((b.lcoeff().pow(delta - 1) * b).toUnivariate(variable));
+					UnivariatePolynomial<Coeff> dividant(MultivariatePolynomial<Coeff>(subresLcoeff).pow(delta-1).toUnivariatePolynomial(variable));
+					DivisionResult<UnivariatePolynomial<Coeff>> res = reductionCoeff.divide(dividant);
+					if (res.remainder.isZero()) {
+						c = res.quotient;
+						subresultants.push_front(c);
+						bDeg = c.degree();
+					} else {
+						c = b;
+					}
+					break;
+				}
+				case SubresultantStrategy::Ducos:
+				case SubresultantStrategy::Lazard: {
+					// "dichotomous Lazard": efficient exponentiation
+					unsigned deltaReduced = delta-1;
+					// should be true by the loop condition
+					assert(deltaReduced > 0);
+					
+					Coeff lcoeffB = b.lcoeff();
+					UnivariatePolynomial<Coeff> reductionCoeff(variable, lcoeffB);
+					
+					unsigned exponent = highestPower(deltaReduced);
+					deltaReduced -= exponent;
+					
+					while (exponent != 1) {
+						exponent /= 2;
+						auto res = (reductionCoeff*reductionCoeff).divide(subresLcoeff);
+						if (res.remainder.isZero() && deltaReduced >= exponent) {
+							auto res2 = (res.quotient*lcoeffB).divide(subresLcoeff);
+							reductionCoeff = res2.quotient;
+							deltaReduced -= exponent;
+						}
+					}
+					reductionCoeff *= b;
+					auto res = reductionCoeff.divide(subresLcoeff);
+					if (res.remainder.isZero()) {
+						c = res.quotient;
+						subresultants.push_front(c);
+						bDeg = c.degree();
+					} else {
+						c = b;
+					}
+					break;
+				}
+			}
+		} else {
+			c = b;
+		}
+		if (bDeg == 0) return subresultants;
+		
+		// Part 3
+		switch (strategy) {
+			// Compared to [Duc98], here S_{d-1} is b and S_d is a, S_e is c, and s_d is subresLcoeff.
+			case SubresultantStrategy::Generic:
+			case SubresultantStrategy::Lazard: {
+				if (a.isZero()) return subresultants;
+				
+				/* If b was constant, the degree properties for subresultants are still met, enforcing us to disregard whether
+				 * the above division was successful (in this case, reducedNewB remains unchanged).
+				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
+				 */
+				// TODO: check if reduce() is really prem()
+				UnivariatePolynomial<Coeff> reducedNewB = a.reduce(-b);
+				auto res = reducedNewB.divide(subresLcoeff.pow(delta)*a.lcoeff());
+				b = res.quotient;
+				break;
+			}
+			case SubresultantStrategy::Ducos: {
+				// Ducos' optimization
+				Coeff lcoeffB = b.lcoeff();
+				Coeff lcoeffC = c.lcoeff();
+				std::vector<Coeff> h(aDeg);
+				
+				for (unsigned d = 0; d < bDeg; d++) {
+					h[d] = lcoeffC * Coeff(variable).pow(d);
+				}
+				if (aDeg != bDeg) { // => aDeg > bDeg
+					h[bDeg] = lcoeffC * Coeff(variable).pow(bDeg) - c; // H_e
+				}
+				for (unsigned d = bDeg + 1; d < aDeg; d++) {
+					Coeff t = h[d-1] * variable;
+					Coeff reducedNewB(t.toUnivariatePolynomial(variable).coefficients()[bDeg] * b);
+					auto res = reducedNewB.divide(lcoeffB);
+					reducedNewB = res.quotient;
+					assert(res.quotient.isZero() || reducedNewB.degree() == 0);
+					h[d] = t - reducedNewB;
+				}
+				
+				Coeff sum(h.front() * a.coefficients()[0]);
+				for (unsigned d = 1; d < aDeg; d++) {
+					sum += h[d] * a.coefficients()[d];
+				}
+				Coeff normalizedSum;
+				auto res = sum.divide(a.lcoeff());
+				normalizedSum = res.quotient;
+				assert(res.remainder.isZero() || sum.degree() == 0);
+				
+				Coeff t(h.back() * variable);
+				UnivariatePolynomial<Coeff> reducedNewB(((t + normalizedSum) * lcoeffB - t.coefficients()[bDeg]).toUnivariatePolynomial(variable));
+				auto res2 = reducedNewB.divide(a.lcoeff());
+				reducedNewB = res2.quotient;
+				if (delta % 2 == 0) {
+					b = -reducedNewB;
+				} else {
+					b = reducedNewB;
+				}
+				break;
+			}
+		}
+		a = c;
+		subresLcoeff = a.lcoeff();
+	}
 }
 
 template<typename Coeff>

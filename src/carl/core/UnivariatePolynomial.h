@@ -35,6 +35,9 @@ class MultivariatePolynomial;
 enum class PolynomialComparisonOrder : unsigned {
 	CauchyBound, LowDegree, Memory, Default = Memory
 };
+enum class SubresultantStrategy : unsigned {
+	Generic, Lazard, Ducos, Default = Lazard
+};
 	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
@@ -172,6 +175,13 @@ public:
 		return mCoefficients.back();
 	}
 
+	/**
+	 * Removes the leading term from the polynomial.
+	 */
+	void truncate() {
+		this->mCoefficients.resize(this->mCoefficients.size()-1);
+	}
+
 	const std::vector<Coefficient>& coefficients() const
 	{
 		return mCoefficients;
@@ -255,6 +265,11 @@ public:
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	void substituteIn(const Variable& var, const Coefficient& value);
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	void substituteIn(const Variable& var, const Coefficient& value);
+
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
@@ -469,6 +484,12 @@ public:
 	 * @complexity O(n^2)
 	 */
 	void shift(const Coefficient& a);
+
+	static const std::list<UnivariatePolynomial> subresultants(
+			const UnivariatePolynomial& p,
+			const UnivariatePolynomial& q,
+			const SubresultantStrategy strategy = SubresultantStrategy::Default
+	);
 
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
