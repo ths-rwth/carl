@@ -63,13 +63,13 @@ public:
 	 * @param r additional dimension given as real algebraic number
 	 * @return real algebraic point with higher dimension
 	 */
-	RealAlgebraicPoint conjoin( const RealAlgebraicNumber<Number>*& r ) {
+	RealAlgebraicPoint conjoin(const RealAlgebraicNumber<Number>*& r) {
 		RealAlgebraicPoint res = RealAlgebraicPoint(*this);
 		res.numbers.push_back(r);
 		return res;
 	}
 	
-	const RealAlgebraicNumber<Number>* operator[](unsigned int index) const {
+	RealAlgebraicNumber<Number>* operator[](unsigned int index) const {
 		return this->numbers[index];
 	}
 	

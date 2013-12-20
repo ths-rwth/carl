@@ -14,7 +14,7 @@ namespace carl {
 
 template<typename Number>
 struct Equal {
-	bool operator()(const RealAlgebraicNumber<Number>* lhs, const RealAlgebraicNumber<Number>* rhs) {
+	bool operator()(RealAlgebraicNumber<Number>* lhs, RealAlgebraicNumber<Number>* rhs) {
 		if (lhs == rhs) return true;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
@@ -34,6 +34,8 @@ struct Equal {
 				return lhsIR->equal(static_cast<RealAlgebraicNumberIR<Number>*>(rhs));
 			}
 		}
+		// nrA must be the exact numeric representation of irB OR nrB must be the exact numeric representation of irA
+		return true;
 	}
 };
 template<typename Number>
@@ -41,7 +43,7 @@ struct Inequal {
 private:
 	Equal<Number> e;
 public:
-	bool operator()(const RealAlgebraicNumber<Number>* lhs, const RealAlgebraicNumber<Number>* rhs) {
+	bool operator()(RealAlgebraicNumber<Number>* lhs, RealAlgebraicNumber<Number>* rhs) {
 		return !e(lhs, rhs);
 	}
 };
