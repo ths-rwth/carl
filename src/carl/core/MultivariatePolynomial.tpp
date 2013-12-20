@@ -813,9 +813,10 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 }
 
 template<typename C, typename O, typename P>
-UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg) const
+UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
 	LOG_NOTIMPLEMENTED();
+	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v);
 }
 
 template<typename Coeff, typename O, typename P>
