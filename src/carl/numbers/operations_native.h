@@ -9,6 +9,8 @@
 
 #include <cmath>
 
+#include "typetraits.h"
+
 namespace carl {
 
 /**
@@ -50,6 +52,29 @@ inline unsigned mod(const unsigned& n, const unsigned& m) {
 }
 inline int mod(const int& n, const int& m) {
 	return n % m;
+}
+
+/**
+ * Returns the highest power of two below n.
+ *
+ * Can also be seen as the highest bit set in n.
+ * @param n
+ * @return
+ */
+template<typename Number>
+inline unsigned highestPower(const Number& n) {
+	unsigned iterations = 0;
+	// Number has 2^k Bits, we do k iterations
+	if (sizeof(Number) == 2) iterations = 4;
+	else if (sizeof(Number) == 4) iterations = 5;
+	else if (sizeof(Number) == 8) iterations = 6;
+	assert(iterations > 0);
+
+	Number res = n;
+	for (unsigned i = 0; i < iterations; i++) {
+		res |= res >> (1 << i);
+	}
+	return res - res >> 1;
 }
 
 }
