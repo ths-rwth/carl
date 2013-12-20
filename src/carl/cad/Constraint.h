@@ -105,7 +105,7 @@ public:
 		
 		for (unsigned int i = 0; i < this->variables.size(); i++) {
 			if (r[i]->isNumeric()) {
-				p = p.substitute(this->variables[i], cad::MPolynomial<Number>(r[i]->value()));
+				p.substituteIn(this->variables[i], cad::MPolynomial<Number>(r[i]->value()));
 			} else {
 				varMap[this->variables[i]] = static_cast<const RealAlgebraicNumberIR<Number>*>(r[i])->getInterval();
 			}

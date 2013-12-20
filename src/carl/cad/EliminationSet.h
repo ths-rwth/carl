@@ -42,7 +42,7 @@ private:
 	 * Represents a pair of polynomials. 
 	 * Used to store the ancestors of a polynomial. If one is nullptr, the polynomial has only a single ancestor.
 	 */
-	typedef std::pair<UPolynomial*, UPolynomial*> PolynomialPair;
+	typedef std::pair<const UPolynomial*, const UPolynomial*> PolynomialPair;
 	
 	/**
 	 * Functor that compares two PolynomialPair objects.
@@ -196,7 +196,12 @@ public:
 	// SELECTORS //
 	///////////////
 	
-	std::list<UPolynomial*> getParentsOf(const UPolynomial* p) const;
+	/**
+	 * Give all parents of the specified elimination polynomial.
+	 * @param p
+	 * @return list of all parents of the specified elimination polynomial
+	 */
+	std::list<const UPolynomial*> getParentsOf(const UPolynomial* p) const;
 
 	/**
 	 * Checks if the given elimination polynomial has non-trivial parents, i.e. if it has more than a single parent.
@@ -209,12 +214,14 @@ public:
 	 * Set a new order for the elimination queue.
 	 * @param order New order function.
 	 */
-	void setEliminationOrder( PolynomialComparator order );
+	void setEliminationOrder(PolynomialComparator order);
 	/*
 	 * Set a new order for the lifting queue.
 	 * @param order New order function.
 	 */
-	void setLiftingOrder( PolynomialComparator order );
+	void setLiftingOrder(PolynomialComparator order) {
+		this->liftingOrder = order;
+	}
 
 	long unsigned size() const {
 		return this->polynomials.size();
@@ -239,7 +246,7 @@ public:
 	 */
 	std::pair<typename PolynomialSet::iterator, bool> insert(
 			const UPolynomial* r,
-			const std::list<UPolynomial*>& parents = std::list<UPolynomial*>(),
+			const std::list<const UPolynomial*>& parents = std::list<const UPolynomial*>(),
 			bool avoidSingle = false
 			);
 	
@@ -254,7 +261,7 @@ public:
 	 */
 	std::pair<typename PolynomialSet::iterator, bool> insert(
 			const UPolynomial& r,
-			const std::list<UPolynomial*>& parents = std::list<UPolynomial*>(),
+			const std::list<const UPolynomial*>& parents = std::list<const UPolynomial*>(),
 			bool avoidSingle = false
 			) {
 		return this->insert(new UPolynomial(r), parents, avoidSingle);
@@ -441,10 +448,10 @@ public:
 	
 	
 	/// Determine whether _p is constant and possibly move it to the destination set while popping it from _queue and removing it from _otherqueue. _p is inserted into destination with avoidSingle=_avoidSingle.
-	std::list<UPolynomial*> eliminateConstant(
+	std::list<const UPolynomial*> eliminateConstant(
 			const UPolynomial* p,
-			std::list<UPolynomial*>& queue,
-			std::list<UPolynomial*>& otherqueue,
+			std::list<const UPolynomial*>& queue,
+			std::list<const UPolynomial*>& otherqueue,
 			bool avoidSingle,
 			EliminationSet<Coefficient>& destination,
 			const Variable& variable,
@@ -472,7 +479,7 @@ public:
 	 *                    Always: If all paired eliminations are done, the next single elimination is done.
 	 * @return list of polynomials added to destination
 	 */
-	std::list<UPolynomial*> eliminateNextInto(
+	std::list<const UPolynomial*> eliminateNextInto(
 			EliminationSet<Coefficient>& destination,
 			const Variable& variable,
 			const CADSettings& setting,
@@ -523,7 +530,8 @@ public:
 	 */
 	void factorize();
 	
-	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coefficient>& s);
+	template<typename Coeff>
+	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coeff>& s);
 	
 	//////////////////////////////
 	// STATIC AUXILIARY METHODS //
@@ -536,7 +544,7 @@ public:
 	 * @complexity O ( p.deg() )
 	 * @return The set of truncations
 	 */
-	static std::list<UPolynomial*> truncation(const UPolynomial* p);
+	static std::list<const UPolynomial*> truncations(const UPolynomial* p);
 	
 	/**
 	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.

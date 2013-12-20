@@ -65,12 +65,12 @@ private:
 	/**
 	 * list of all polynomials for elimination
 	 */
-	std::list<UPolynomial*> polynomials;
+	std::list<const UPolynomial*> polynomials;
 	
 	/**
 	 * list of polynomials scheduled for elimination
 	 */
-	std::list<UPolynomial*> scheduledPolynomials;
+	std::list<const UPolynomial*> scheduledPolynomials;
 	
 	/**
 	 * list of new variables introduced by the scheduled elimination polynomials (mNewvariables and mVeriables are disjoint)
@@ -515,7 +515,7 @@ public:
 	* @complexity linear in the number of roots of <code>p</code> plus the complexity of <code>RealAlgebraicNumberFactory::realRoots( p )</code>
 	*/
 	static cad::SampleSet<Number> samples(
-			const Polynomial* p,
+			const UPolynomial* p,
 			const std::list<RealAlgebraicNumber<Number>*>& sample,
 			const std::list<Variable>& variables,
 			cad::SampleSet<Number>& currentSamples,
@@ -572,9 +572,9 @@ private:
 	 * @param root of the sample tree
 	 * @return RealAlgebraicPoint as list belonging to leaf
 	 */
-	std::list<RealAlgebraicNumber<Number>*> constructSampleAt(typename tree<RealAlgebraicNumber<Number>*>::iterator node, const typename tree<RealAlgebraicNumber<Number>*>::iterator& root) const;
+	std::list<RealAlgebraicNumber<Number>*> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
 
-	CADTrace constructTraceAt(typename tree<RealAlgebraicNumber<Number>*>::iterator node, const typename tree<RealAlgebraicNumber<Number>*>::iterator& root ) const;
+	CADTrace constructTraceAt(sampleIterator node, const sampleIterator& root ) const;
 	
 	/**
 	 * Helper method for mainCheck() routine.
@@ -589,7 +589,7 @@ private:
      * @return 
      */
 	std::pair<bool, bool> checkNode(
-		typename tree<RealAlgebraicNumber<Number>*>::iterator node,
+		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
 		bool updateTrace,
@@ -641,7 +641,7 @@ private:
      * @param newSample
      * @param node
      */
-	typename tree<RealAlgebraicNumber<Number>*>::iterator storeSampleInTree(const RealAlgebraicNumber<Number>* newSample, typename tree<RealAlgebraicNumber<Number>*>::iterator node);
+	sampleIterator storeSampleInTree(RealAlgebraicNumber<Number>* newSample, sampleIterator node);
 	
 	/**
 	 * Constructs sample points for the given number of open variables openVariableCount by lifting
@@ -670,7 +670,7 @@ private:
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
 	bool liftCheck(
-			typename tree<RealAlgebraicNumber<Number>*>::iterator node,
+			sampleIterator node,
 			const std::list<RealAlgebraicNumber<Number>*>& sample,
 			unsigned openVariableCount,
 			bool restartLifting,
@@ -702,7 +702,7 @@ private:
 	 * @param sample
 	 * @return a bounding Interval for sample at parent's children
 	 */
-	ExactInterval<Number> getBounds(const typename tree<RealAlgebraicNumber<Number>*>::iterator& parent, const RealAlgebraicNumber<Number>* sample) const;
+	ExactInterval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumber<Number>* sample) const;
 
 	/** CURRENTLY DISABLED
 	 *

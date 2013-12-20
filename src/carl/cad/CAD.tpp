@@ -274,7 +274,7 @@ template<typename Number>
 void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 	this->prepareElimination();
 	bool useBounds = !bounds.empty();
-	for (auto b = bounds.begin(); useBounds && b != bounds.end(); b++) {
+	for (auto b: bounds) {
 		useBounds = useBounds && !b.second.unbounded();
 	}
 	
@@ -284,16 +284,16 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			unsigned l = b.first;
 			if (l >= this->variables.size()) continue;
 			// construct bound-related polynomials
-			std::list<UPolynomial> tmp;
+			std::list<const UPolynomial*> tmp;
 			if (b.second.leftType() != BoundType::INFTY) {
-				tmp.emplace_back(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)});
+				tmp.push_back(new UPolynomial(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)}));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
-				tmp.emplace_back(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)});
+				tmp.push_back(new UPolynomial(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)}));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -303,7 +303,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			// eliminate bound-related polynomials
 			l++;
 			while (!tmp.empty() && l < this->variables.size()) {
-				std::list<UnivariatePolynomial<Number>> tmp2;
+				std::list<const UPolynomial*> tmp2;
 				for (auto p: tmp) {
 					auto res = this->eliminationSets[l-1].eliminateInto(p, this->eliminationSets[l], this->variables[l], this->setting);
 					tmp2.insert(tmp2.begin(), res.begin(), res.end());
@@ -695,15 +695,15 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	}
 	
 	// remove all elimination polynomials being children of p starting at the level following p
-	unsigned dim = this->eliminationSets.size();
-	std::forward_list<UPolynomial*> parents = { p };
+	unsigned dim = (unsigned)this->eliminationSets.size();
+	std::forward_list<const UPolynomial*> parents({ p });
 	for (unsigned l = level+1; !parents.empty() && l < dim; l++) {
-		std::forward_list<Polynomial*> newParents(parents);
+		std::forward_list<const UPolynomial*> newParents(parents);
 		for (auto parent: parents) {
-			std::forward_list<Polynomial*> curParents = this->eliminationSets[l].removeByParent(parent);
+			std::forward_list<const UPolynomial*> curParents = this->eliminationSets[l].removeByParent(parent);
 			newParents.insert_after(newParents.before_begin(), curParents.begin(), curParents.end());
 		}
-		newParents.sort(Less<Number>(this->setting.order));
+		newParents.sort(UnivariatePolynomialComparator<MPolynomial>(this->setting.order));
 		newParents.unique();
 		std::swap(parents, newParents);
 	}
@@ -722,7 +722,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 		if (this->eliminationSets[l].empty()) {
 			// there is nothing more to be done for this level, so erase all samples up to one
 			unsigned depth = dim - l;
-			if (depth <= maxDepth) {
+			if ((int)depth <= maxDepth) {
 				// merge everything into destinationNode
 				auto destination = this->sampleTree.begin_fixed(sampleTreeRoot, depth);
 				auto node = this->sampleTree.next_at_same_depth(destination);
@@ -742,8 +742,8 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	}
 	
 	// correct the trace
-	auto node = this->sampleTree.begin_fixed(sampleTreeRoot, maxDepth);
-	for (int lTrace = 0; lTrace <= maxDepth; lTrace++) {
+	auto node = this->sampleTree.begin_fixed(sampleTreeRoot, (unsigned)maxDepth);
+	for (unsigned lTrace = 0; (int)lTrace <= maxDepth; lTrace++) {
 		this->trace[lTrace] = node;
 		node = this->sampleTree.parent(node);
 	}
@@ -913,7 +913,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		if (boundsActive) {
 			// remove samples which do not lie within the (weak) bounds
 			for (auto i = currentSamplesIncrement.begin(); i != currentSamplesIncrement.end(); ) {
-				if (bounds.meets(*i)) i++;
+				if (bounds.meets((*i)->value())) i++;
 				else i = currentSamplesIncrement.erase(i);
 			}
 		}
@@ -925,7 +925,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
-		const Polynomial* p,
+		const UPolynomial* p,
 		const std::list<RealAlgebraicNumber<Number>*>& sample,
 		const std::list<Variable>& variables,
 		cad::SampleSet<Number>& currentSamples,
@@ -935,7 +935,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 ) {
 	assert(variables.size() == sample.size());
 	return CAD<Number>::samples(
-		carl::rootfinder::realRootsAt( p, sample.begin(), sample.end(), variables.begin(), variables.end(), settings.splittingStrategy, bounds ),
+		carl::rootfinder::realRoots(*p, sample.begin(), sample.end(), variables.begin(), variables.end(), settings.splittingStrategy, bounds),
 		currentSamples,
 		replacedSamples,
 		bounds
@@ -1013,7 +1013,7 @@ void CAD<Number>::alterSetting(const cad::CADSettings& setting) {
 }
 
 template<typename Number>
-std::list<RealAlgebraicNumber<Number>*> CAD<Number>::constructSampleAt(typename tree<RealAlgebraicNumber<Number>*>::iterator node, const typename tree<RealAlgebraicNumber<Number>*>::iterator& root) const {
+std::list<RealAlgebraicNumber<Number>*> CAD<Number>::constructSampleAt(sampleIterator node, const sampleIterator& root) const {
 	/* Main sample construction loop macro augmented by a conditional argument for termination with an empty sample.
 	 * @param _condition which has to be false for every node of the sample, otherwise an empty list is returned
 	 */
@@ -1046,7 +1046,7 @@ std::list<RealAlgebraicNumber<Number>*> CAD<Number>::constructSampleAt(typename 
 }
 
 template<typename Number>
-typename CAD<Number>::CADTrace CAD<Number>::constructTraceAt(typename tree<RealAlgebraicNumber<Number>*>::iterator node, const typename tree<RealAlgebraicNumber<Number>*>::iterator& root ) const {
+typename CAD<Number>::CADTrace CAD<Number>::constructTraceAt(sampleIterator node, const sampleIterator& root ) const {
 	CADTrace trace;
 	while (node != root) {
 		trace.push_back(node);
@@ -1058,7 +1058,7 @@ typename CAD<Number>::CADTrace CAD<Number>::constructTraceAt(typename tree<RealA
 
 template<typename Number>
 std::pair<bool, bool> CAD<Number>::checkNode(
-		typename tree<RealAlgebraicNumber<Number>*>::iterator node,
+		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
 		bool updateTrace,
@@ -1312,8 +1312,8 @@ bool CAD<Number>::mainCheck(
 
 
 template<typename Number>
-typename tree<RealAlgebraicNumber<Number>*>::iterator CAD<Number>::storeSampleInTree(const RealAlgebraicNumber<Number>* newSample, typename tree<RealAlgebraicNumber<Number>*>::iterator node) {
-	typename tree<RealAlgebraicNumber<Number>*>::iterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, Less<Number>());
+typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumber<Number>* newSample, sampleIterator node) {
+	sampleIterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, Less<Number>());
 	if (newNode == this->sampleTree.end(node)) {
 		newNode = this->sampleTree.append_child(node, newSample);
 	} else if (Equal<Number>()(*newNode, newSample)) {
@@ -1326,7 +1326,7 @@ typename tree<RealAlgebraicNumber<Number>*>::iterator CAD<Number>::storeSampleIn
 
 template<typename Number>
 bool CAD<Number>::liftCheck(
-		typename tree<RealAlgebraicNumber<Number>*>::iterator node,
+		sampleIterator node,
 		const std::list<RealAlgebraicNumber<Number>*>& sample,
 		unsigned openVariableCount,
 		bool restartLifting,
@@ -1345,7 +1345,7 @@ bool CAD<Number>::liftCheck(
 		// see if bounds are given for the previous level
 		auto bound = bounds.find(openVariableCount);
 		if (bound != bounds.end()) {
-			if (!bound->second.contains(sample.front())) {
+			if (!sample.front()->containedIn(bound->second)) {
 				return false;
 			}
 		}
@@ -1375,7 +1375,7 @@ bool CAD<Number>::liftCheck(
 	// previous variable will be substituted next
 	openVariableCount--;
 	
-	std::list<const RealAlgebraicNumber<Number>*> extSample(sample);
+	std::list<RealAlgebraicNumber<Number>*> extSample(sample.begin(), sample.end());
 	std::list<Variable> newVariables(variables);
 	// the first variable is always the last one lifted
 	newVariables.push_front(this->variables[openVariableCount]);
@@ -1476,7 +1476,7 @@ bool CAD<Number>::liftCheck(
 			/*
 			 * Sample choice
 			 */
-			const RealAlgebraicNumber<Number>* newSample;
+			RealAlgebraicNumber<Number>* newSample;
 			if (this->setting.preferNRSamples) {
 				if (sampleSetIncrement.emptyNR() && !this->eliminationSets[openVariableCount].emptyLiftingQueue()) {
 					computeMoreSamples = true;
@@ -1709,9 +1709,9 @@ void CAD<Number>::widenBounds(BoundMap&, std::vector<cad::Constraint<Number>>&) 
 template<typename Number>
 void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number>& r) {
 	// the size of variables should be compatible to the dimension of the given point
-	assert(this->variables.size() == r.size());
+	assert(this->variables.size() == r.dim());
 	
-	for (unsigned level = 0; level < r.size(); level++) {
+	for (unsigned level = 0; level < r.dim(); level++) {
 		// shrink the bounds in each level
 		auto bound = bounds.find(level);
 		if (bounds.end() != bound) {

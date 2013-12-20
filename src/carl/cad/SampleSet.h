@@ -57,7 +57,7 @@ public:
 	 * If a numeric representation is inserted, the method replaces a possibly existing interval representation.
 	 * @complexity at most logarithmic in the size of the list
 	 */
-	std::pair<iterator, bool> insert(const RealAlgebraicNumber<Number>* r);
+	std::pair<iterator, bool> insert(RealAlgebraicNumber<Number>* r);
 	
 	/**
 	 * Inserts a range of elements into the sorted list.
@@ -88,14 +88,14 @@ public:
 	 */
 	SampleSet::iterator remove(SampleSet::iterator position);
 	
-	SampleSet::iterator& begin() {
+	SampleSet::iterator begin() {
 		return this->samples.begin();
 	}
 	const SampleSet::iterator& begin() const {
 		return this->samples.begin();
 	}
 
-	SampleSet::iterator& end() {
+	SampleSet::iterator end() {
 		return this->samples.end();
 	}
 	const SampleSet::iterator& end() const {
@@ -107,7 +107,7 @@ public:
 	 *
 	 * @return next sample in the order of insertion
 	 */
-	inline const RealAlgebraicNumber<Number>* next();
+	inline RealAlgebraicNumber<Number>* next();
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the numerically represented samples.
@@ -116,21 +116,21 @@ public:
 	 *
 	 * @return next sample in the order of insertion, preferring the numerically represented samples
 	 */
-	inline const RealAlgebraicNumber<Number>* nextNR();
+	inline RealAlgebraicNumber<Number>* nextNR();
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the non-root samples.
 	 *
 	 * @return next sample in the order of insertion, preferring the non-root samples
 	 */
-	inline const RealAlgebraicNumber<Number>* nextNonRoot();
+	inline RealAlgebraicNumber<Number>* nextNonRoot();
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the non-root samples.
 	 *
 	 * @return next sample in the order of insertion, preferring the non-root samples
 	 */
-	inline const RealAlgebraicNumber<Number>* nextRoot();
+	inline RealAlgebraicNumber<Number>* nextRoot();
 	
 	/**
 	 * Removes the element returned by next() from the list.
@@ -164,7 +164,7 @@ public:
 	 * @return true if the element was replaced, false otherwise
 	 * @complexity logarithmic in the elements stored
 	 */
-	bool simplify(const RealAlgebraicNumberIR<Number>* from, const RealAlgebraicNumberNR<Number>* to);
+	bool simplify(const RealAlgebraicNumberIR<Number>* from, RealAlgebraicNumberNR<Number>* to);
 	
 	/**
 	 * Replaces the interval-represented element from, whose iterator in mNRsIRs is given by fromIt, by the numeric element to while maintaining the internal data structures.
@@ -175,7 +175,7 @@ public:
 	 * @return true if the element was replaced, false otherwise
 	 * @complexity logarithmic in the elements stored
 	 */
-	bool simplify(const RealAlgebraicNumberIR<Number>* from, const RealAlgebraicNumberNR<Number>* to, iteratorIR& fromIt);
+	bool simplify(const RealAlgebraicNumberIR<Number>* from, RealAlgebraicNumberNR<Number>* to, iteratorIR& fromIt);
 	
 	/**
 	 * Traverse all interval-represented samples and determine whether they could be simplified by numeric representations.
