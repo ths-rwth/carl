@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iomanip>
 #include "../util/SFINAE.h"
+#include "../util/platform.h"
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
@@ -941,11 +942,10 @@ std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squ
 {
     LOGMSG_TRACE("carl.core", "UnivSSF: " << *this);
     std::map<unsigned,UnivariatePolynomial<Coeff>> result;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-compare"
+CLANG_WARNING_DISABLE("-Wtautological-compare")
 	// degree() >= characteristic<Coeff>::value throws a warning in clang...
 	if(characteristic<Coeff>::value != 0 && degree() >= characteristic<Coeff>::value)
-#pragma clang diagnostic pop
+CLANG_WARNING_RESET
     {
         LOGMSG_TRACE("carl.core", "UnivSSF: degree greater than characteristic!");
         result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(1, *this));
