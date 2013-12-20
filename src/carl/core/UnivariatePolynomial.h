@@ -241,9 +241,10 @@ public:
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
+	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
+	
 	
 	
 	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
@@ -286,7 +287,7 @@ public:
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
 	{
-		
+		LOG_NOTIMPLEMENTED();
 	}
 	template<typename SubstitutionType, typename C = Coefficient, DisableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
