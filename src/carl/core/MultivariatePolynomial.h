@@ -219,7 +219,7 @@ public:
 	MultivariatePolynomial normalize() const;
 	
 	/**
-	 * Replace the given variable by the given value within this multivariate polynomial.
+	 * Replace the given variable by the given polynomial within this multivariate polynomial.
      */
 	void substituteIn(const Variable::Arg var, const MultivariatePolynomial& value);
 	

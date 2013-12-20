@@ -1173,7 +1173,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 		subresultants.push_front(b);
 		
 		// Part 2
-		int delta = aDeg - bDeg;
+		unsigned delta = aDeg - bDeg;
 		
 		/** Case distinction on delta: either we choose b as next subresultant or we could reduce b (delta > 1)
 		 * and add the reduced version c as next subresultant. The reduction is done by division, which
