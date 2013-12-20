@@ -181,8 +181,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_integer<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial& divisor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial& divisor, const Coeff* prefactor) const
 {
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
@@ -201,9 +200,19 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 	
 	// By construction, the leading coefficient will be zero.
-	for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+	if(prefactor != nullptr)
 	{
-		result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
+		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		{
+			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i] * *prefactor);
+		}
+	}
+	else
+	{
+		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		{
+			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
+		}
 	}
 	// strip zeros from the end as we might have pushed zeros.
 	result.stripLeadingZeroes();
@@ -218,10 +227,34 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 }
 
+/**
+ * 
+ */
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	LOG_NOTIMPLEMENTED();
+	assert(degree() >= divisor.degree());
+	Coeff b = divisor.lcoeff();
+	unsigned d = degree() - divisor.degree() + 1;
+	Coeff prefactor = pow(b,d);
+	return reduce(divisor, &prefactor);
+}
+
+/**
+ * Signed pseudoremainder.
+ * see 
+ * @param divisor
+ * @return 
+ */
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	assert(degree() >= divisor.degree());
+	Coeff b = divisor.lcoeff();
+	unsigned d = degree() - divisor.degree() + 1;
+	if(d%2) ++d;
+	Coeff prefactor = pow(b,d);
+	return reduce(divisor, &prefactor);
 }
 
 
