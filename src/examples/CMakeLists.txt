@@ -4,5 +4,9 @@ add_executable( IntervalContractionExample
 		IntervalContractionExample.cpp	  )
 add_executable( FloatExample
 		FloatExample.cpp	)
+add_executable( IntervalExample
+		IntervalExample.cpp		)
+		
 target_link_libraries(IntervalContractionExample lib_carl ${libraries} )
 target_link_libraries(FloatExample lib_carl ${libraries} )
+target_link_libraries(IntervalExample lib_carl ${libraries} )

@@ -5,8 +5,8 @@
  * @file   rounding.h
  * @author Stefan Schupp
  *
- * @since 2013-12-05
- * @version 2013-12-05
+ * @since	2013-12-05
+ * @version 2013-12-20
  */
 
 #pragma once

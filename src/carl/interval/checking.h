@@ -4,47 +4,47 @@
  * @file   checking.h
  * @author Stefan Schupp
  *
- * @since 2013-12-05
- * @version 2013-12-05
+ * @since	2013-12-05
+ * @version 2013-12-20
  */
 
 #pragma once
 //#include "../numbers/FLOAT_T.h"
 #include <assert.h>
 
-/*
+
 namespace carl
 {
-    template<typename FloatImplementation>
+    template<typename Number>
     struct checking
     {
-        static FLOAT_T<FloatImplementation> pos_inf()
+        static Number pos_inf()
         {
-            return FLOAT_T<FloatImplementation>(1);
+            return Number(1);
         }
-        static FLOAT_T<FloatImplementation> neg_inf()
+        static Number neg_inf()
         {
-            return FLOAT_T<FloatImplementation>(-1);
+            return Number(-1);
         }
-        static FLOAT_T<FloatImplementation> nan()
+        static Number nan()
         {
             assert(false);
         }
-        static bool is_nan(const FLOAT_T<FloatImplementation>&)
+        static bool is_nan(const Number&)
         {
             return false;
         }
-        static FLOAT_T<FloatImplementation> empty_lower()
+        static Number empty_lower()
         {
-            return FLOAT_T<FloatImplementation>(0);
+            return Number(0);
         }
-        static FLOAT_T<FloatImplementation> empty_upper()
+        static Number empty_upper()
         {
-            return FLOAT_T<FloatImplementation>(0);
+            return Number(0);
         }
-        static bool is_empty(const FLOAT_T<FloatImplementation>& _left, const FLOAT_T<FloatImplementation>& _right)
+        static bool is_empty(const Number& _left, const Number& _right)
         {
             return _left > _right;
         }
     };
-}*/
+}
