@@ -35,9 +35,9 @@ public:
 	static ExactInterval<Numeric> evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, ExactInterval<Numeric> >&);
 
 	template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
-	static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric> >&);
+	static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map);
 	template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>> = dummy>
-	static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric> >&);
+	static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map);
     
 private:
 
@@ -137,26 +137,26 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const MultivariatePol
 }
 
 template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>>>
-static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map) {
+inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map) {
 	assert(map.count(p.mainVar()) > 0);
 	ExactInterval<Numeric> res = ExactInterval<Numeric>::emptyExactInterval();
-	Numeric varValue = map[p.mainVar()];
-	Numeric exp = 1;
+	const ExactInterval<Numeric> varValue = map.at(p.mainVar());
+	ExactInterval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
-		res += p.coefficients() * exp;
+		res += p.coefficients()[i] * exp;
 		exp *= varValue;
 	}
 	return res;
 }
 
 template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>>>
-static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map) {
+inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map) {
 	assert(map.count(p.mainVar()) > 0);
 	ExactInterval<Numeric> res = ExactInterval<Numeric>::emptyExactInterval();
-	Numeric varValue = map[p.mainVar()];
-	Numeric exp = 1;
+	const ExactInterval<Numeric> varValue = map.at(p.mainVar());
+	ExactInterval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
-		res += evaluate(p.coefficients(), map) * exp;
+		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
 		exp *= varValue;
 	}
 	return res;
