@@ -26,6 +26,6 @@
 	
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
-#elif
+#else
 	#define __UNSUPPORTED
 #endif
