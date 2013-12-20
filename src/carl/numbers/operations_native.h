@@ -62,7 +62,7 @@ inline int mod(const int& n, const int& m) {
  * @return
  */
 template<typename Number>
-inline unsigned highestPower(const Number& n) {
+inline Number highestPower(const Number& n) {
 	unsigned iterations = 0;
 	// Number has 2^k Bits, we do k iterations
 	if (sizeof(Number) == 2) iterations = 4;
@@ -74,7 +74,8 @@ inline unsigned highestPower(const Number& n) {
 	for (unsigned i = 0; i < iterations; i++) {
 		res |= res >> (1 << i);
 	}
-	return res - res >> 1;
+	res -= res >> 1;
+	return res;
 }
 
 }
