@@ -231,6 +231,7 @@ Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 	{
 		return trailingTerm()->coeff();
 	}
+    return 0;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1823,6 +1824,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
 {
     mTerms.clear();
+    if(newTerms.empty()) return;
     // Sort the entries from newterms.
     // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
     std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);

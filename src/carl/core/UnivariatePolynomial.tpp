@@ -314,16 +314,16 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	// Just in case, if we want to use SFINAE, the right statement would be
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
-	Coeff maxCoeff = abs(mCoefficients.front());
+	Coeff maxCoeff = carl::abs(mCoefficients.front());
 	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
 	{
-        Coeff absOfCoeff = abs( *it );
+        Coeff absOfCoeff = carl::abs( *it );
 		if(absOfCoeff > maxCoeff) 
 		{
 			maxCoeff = absOfCoeff;
 		}
 	}
-	return 1 + maxCoeff/abs(lcoeff());
+	return 1 + maxCoeff/carl::abs(lcoeff());
 }
 
 template<typename Coeff>
@@ -640,8 +640,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
     {
         // Exclude the factor (x-r)^i, with r rational and r!=0, from result.
         assert(result.coefficients().size() > 1);
-        typename IntegralT<Coeff>::type lc = abs(getNum(result.lcoeff()));
-        typename IntegralT<Coeff>::type tc = abs(getNum(result.coefficients().front()));
+        typename IntegralT<Coeff>::type lc = carl::abs(getNum(result.lcoeff()));
+        typename IntegralT<Coeff>::type tc = carl::abs(getNum(result.coefficients().front()));
         if( maxInt != 0 && (tc > maxInt || lc > maxInt) )
         {
             return result;
@@ -719,11 +719,11 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
                 {
                     // Add a zero-preserving shift.
                     assert(isInteger(image));
-                    typename IntegralT<Coeff>::type imageInt = abs(getNum(image));
+                    typename IntegralT<Coeff>::type imageInt = carl::abs(getNum(image));
                     if( imageInt <= maxInt )
                     {
-                        LOGMSG_TRACE("carl.core", "UnivELF: new shift with " << getNum(posRatZero) << " to " << abs(getNum(image)));
-                        shiftedTcs.push_back(std::pair<Integer, Integer>(toInt<Integer>(getNum(posRatZero)), toInt<Integer>(abs(getNum(image)))));
+                        LOGMSG_TRACE("carl.core", "UnivELF: new shift with " << getNum(posRatZero) << " to " << carl::abs(getNum(image)));
+                        shiftedTcs.push_back(std::pair<Integer, Integer>(toInt<Integer>(getNum(posRatZero)), toInt<Integer>(carl::abs(getNum(image)))));
                     }
                 }
             }

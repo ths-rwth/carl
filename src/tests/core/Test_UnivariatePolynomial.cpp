@@ -154,19 +154,19 @@ TEST(UnivariatePolynomial, normalizeCoefficients)
 
 TEST(UnivariatePolynomial, factorization)
 {
-	VariablePool& vpool = VariablePool::getInstance();
+    VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
     
-	UnivariatePolynomial<cln::cl_RA> linA(x, {(cln::cl_RA)-2, (cln::cl_RA)5});
-	UnivariatePolynomial<cln::cl_RA> linB(x, {(cln::cl_RA)1, (cln::cl_RA)3});
-	UnivariatePolynomial<cln::cl_RA> linC(x, {(cln::cl_RA)2014, (cln::cl_RA)68});
-	UnivariatePolynomial<cln::cl_RA> linD(x, {(cln::cl_RA)-13, (cln::cl_RA)4});
-	UnivariatePolynomial<cln::cl_RA> linE(x, {(cln::cl_RA)-20, (cln::cl_RA)5});
-	UnivariatePolynomial<cln::cl_RA> quaA(x, {(cln::cl_RA)-2, (cln::cl_RA)0, (cln::cl_RA)1});
-	UnivariatePolynomial<cln::cl_RA> quaB(x, {(cln::cl_RA)3, (cln::cl_RA)6, (cln::cl_RA)9});
-    
-	UnivariatePolynomial<cln::cl_RA> polA(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
+    UnivariatePolynomial<cln::cl_RA> linA(x, {(cln::cl_RA)-2, (cln::cl_RA)5});
+    UnivariatePolynomial<cln::cl_RA> linB(x, {(cln::cl_RA)1, (cln::cl_RA)3});
+    UnivariatePolynomial<cln::cl_RA> linC(x, {(cln::cl_RA)2014, (cln::cl_RA)68});
+    UnivariatePolynomial<cln::cl_RA> linD(x, {(cln::cl_RA)-13, (cln::cl_RA)4});
+    UnivariatePolynomial<cln::cl_RA> linE(x, {(cln::cl_RA)-20, (cln::cl_RA)5});
+    UnivariatePolynomial<cln::cl_RA> quaA(x, {(cln::cl_RA)-2, (cln::cl_RA)0, (cln::cl_RA)1});
+    UnivariatePolynomial<cln::cl_RA> quaB(x, {(cln::cl_RA)3, (cln::cl_RA)6, (cln::cl_RA)9});
+
+    UnivariatePolynomial<cln::cl_RA> polA(x, {(cln::cl_RA)-2, (cln::cl_RA)5, (cln::cl_RA)-5, (cln::cl_RA)3});
     UnivariatePolynomial<cln::cl_RA> polB = linA*linA;
     UnivariatePolynomial<cln::cl_RA> polC = linA*linA*linA;
     UnivariatePolynomial<cln::cl_RA> polD = linA*linB*linC*linD*linE;
