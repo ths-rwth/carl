@@ -9,7 +9,7 @@
 #pragma once
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 template<class InputIterator>
 void ConflictGraph::addEdges(const InputIterator& first, const InputIterator& last)

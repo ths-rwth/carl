@@ -24,8 +24,8 @@ enum class Sign : int { NEGATIVE = -1, ZERO = 0, POSITIVE = 1 };
  */
 template<typename Number>
 Sign sgn(const Number& n) {
-	if (n < 0) return Sign::NEGATIVE;
-	if (n > 0) return Sign::POSITIVE;
+	if (n < Number(0)) return Sign::NEGATIVE;
+	if (n > Number(0)) return Sign::POSITIVE;
 	return Sign::ZERO;
 }
 

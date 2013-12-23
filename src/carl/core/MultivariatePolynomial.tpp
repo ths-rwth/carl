@@ -64,10 +64,12 @@ mTerms(1,t)
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>&) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p) :
 Policies()
 {
-    LOG_NOTIMPLEMENTED();
+	for (unsigned deg = 0; deg < p.degree(); deg++) {
+		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
+	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -198,7 +200,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-exponent MultivariatePolynomial<Coeff,Ordering,Policies>::highestDegree() const
+exponent MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
     if(mTerms.size() == 0) return 0;
     if(Ordering::degreeOrder)
@@ -227,8 +229,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 {
 	if(isZero()) return 0;
-	if(trailingTerm()->isConstant())
-	{
+	if(trailingTerm()->isConstant()) {
 		return trailingTerm()->coeff();
 	}
     return 0;
@@ -470,7 +471,8 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value) const
 {
     MultivariatePolynomial result(*this);
-    return result.substituteIn(var, value);
+    result.substituteIn(var, value);
+	return result;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -801,7 +803,7 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 	// TODO we could implement a method isUnivariate()
 	
 	Variable::Arg x = lmon()->getSingleVariable();
-	std::vector<C> coeffs(highestDegree()+1,0);
+	std::vector<C> coeffs(totalDegree()+1,0);
 	// TODO we do not use the fact that it is already sorted..
 	for(std::shared_ptr<const Term<C>> t : mTerms)
 	{
@@ -811,9 +813,10 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 }
 
 template<typename C, typename O, typename P>
-UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg) const
+UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
 	LOG_NOTIMPLEMENTED();
+	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v);
 }
 
 template<typename Coeff, typename O, typename P>
@@ -822,8 +825,9 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 {
 	if (this->isZero()) return 0;
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
-	for (unsigned i = 0; i < this->mTerms; i++) {
-		res = gcd(res, this->mTerms[i]->coeff());
+	for (unsigned i = 0; i < this->mTerms.size(); i++) {
+		// TODO: gcd needed for fractions
+		//res = carl::gcd(res, this->mTerms[i]->coeff());
 	}
 	return res;
 }
@@ -836,6 +840,16 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff().numericContent();
 	for (unsigned i = 0; i < this->mTerms; i++) {
 		res = gcd(res, this->mTerms[i]->coeff().numericContent());
+	}
+	return res;
+}
+
+template<typename Coeff, typename O, typename P>
+template<typename C, EnableIf<is_number<C>>>
+typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial<Coeff,O,P>::mainDenom() const {
+	IntNumberType res = 1;
+	for (auto t: *this) {
+		res = carl::gcd(res, getDenom(t->coeff()));
 	}
 	return res;
 }

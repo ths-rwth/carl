@@ -5,38 +5,47 @@
 
 #pragma once
 
+#include "../core/rootfinder/RootFinder.h"
+
 namespace carl {
-namespace CAD {
+namespace cad {
+
+
+template<typename Coeff>
+using MPolynomial = carl::MultivariatePolynomial<Coeff>;
+template<typename Coeff>
+using UPolynomial = carl::UnivariatePolynomial<MPolynomial<Coeff>>;
 
 /** Predefined settings for the CAD procedure.
  * Implementation of the types is located in CAD.h. Each setting is defined as a power of two in order to use several flags at a time.
- * Note that the order of the flags plays a role: If, e.g., A_CADSETTING and B_CADSETTING are set, then the last one (B_CADSETTING) is used.
+ * Note that the order of the flags plays a role: If, e.g., A and B are set, then the last one (B) is used.
  */
 enum CADSettingsType {
    /// generic setting: low-degree first polynomial order, nothing more
-   GENERIC_CADSETTING = 1,
+   GENERIC = 1,
    /// setting avoiding computations with interval-represented samples (low- and odd-degree order + preference of numeric samples)
-   RATIONALSAMPLE_CADSETTING = 2,
+   RATIONALSAMPLE = 2,
    /// setting preferring computations with interval-represented samples (low- and even-degree order + preference of root samples)
-   IRRATIONALSAMPLE_CADSETTING = 4,
+   IRRATIONALSAMPLE = 4,
    /// setting for an equation-only input to CAD::check
-   EQUATIONSONLY_CADSETTING = 8,
+   EQUATIONSONLY = 8,
    /// setting for an inequality-only input to CAD::check
-   INEQUALITIESONLY_CADSETTING = 16,
+   INEQUALITIESONLY = 16,
    /// equation- and inequality parts are treated separately, the equation part is solved first and checked against the other constraints
-   EQUATIONDETECT_CADSETTING = 32,
-   /// like EQUATIONDETECT_CADSETTING, but the equation part is assumed to be zero-dimensional
-   ZERODIM_CADSETTING = 64,
+   EQUATIONDETECT = 32,
+   /// like EQUATIONDETECT, but the equation part is assumed to be zero-dimensional
+   ZERODIM = 64,
    /// alternative polynomial ordering
-   ALTERNATIVEORDER_CADSETTING = 128,
+   ALTERNATIVEORDER = 128,
    /// everything optimized for the use with bounds
-   BOUNDED_CADSETTING = 256,
+   BOUNDED = 256,
    /// bounds-related optimizations explicitely deactivated
-   NOTBOUNDED_CADSETTING = 512
+   NOTBOUNDED = 512,
+   
+   DEFAULT = BOUNDED
 };
 
-/// The default setting for CAD settings, which is chosen if the CAD object is initialized without any other parameter.
-static const unsigned DEFAULT_CADSETTING = BOUNDED_CADSETTING;
+static const std::string DEFAULT_CAD_OUTPUTFILE = "cad_constraints.smt2";
 
 struct CADSettings {
 public:
@@ -81,9 +90,9 @@ public:
 	/// given bounds to the check method, the bounds are widened after determining unsatisfiability by check, or shrunk after determining satisfiability by check
 	bool improveBounds;
 	/// the order in which the polynomials in each elimination level are sorted
-	//bool (*up_isLess)( const UnivariatePolynomialPtr&, const UnivariatePolynomialPtr& );
+	PolynomialComparisonOrder order;
 	/// standard strategy to be used for real root isolation
-	//RealAlgebraicNumberSettings::IsolationStrategy isolationStrategy;
+	rootfinder::SplittingStrategy splittingStrategy;
 
 	/**
 	 * Generate a CADSettings instance of the respective preset type.
@@ -93,26 +102,29 @@ public:
 	 * @return a CADSettings instance of the respective preset type
 	 */
 	static CADSettings getSettings(
-			unsigned setting = DEFAULT_CADSETTING,
-			//RealAlgebraicNumberSettings::IsolationStrategy isolationStrategy = RealAlgebraicNumberSettings::DEFAULT_ISOLATIONSTRATEGY,
+			unsigned setting = DEFAULT,
+			rootfinder::SplittingStrategy isolationStrategy = rootfinder::SplittingStrategy::DEFAULT,
 			CADSettings cadSettings = CADSettings() )
 	{
-		//cadSettings.isolationStrategy = isolationStrategy;
-		if (setting & RATIONALSAMPLE_CADSETTING) {
+		cadSettings.splittingStrategy = isolationStrategy;
+		if (setting & RATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
-			cadSettings.preferNRSamples       = true;
+			cadSettings.preferNRSamples = true;
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessOddCB;
 		}
-		if (setting & IRRATIONALSAMPLE_CADSETTING) {
+		if (setting & IRRATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
 			cadSettings.preferNRSamples       = false;
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessEvenCB;
 		}
-		if (setting & EQUATIONDETECT_CADSETTING) {
+		if (setting & EQUATIONDETECT) {
 			cadSettings.autoSeparateEquations = true;
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
-		if (setting & BOUNDED_CADSETTING) {
+		if (setting & BOUNDED) {
 			cadSettings.autoSeparateEquations       = true;
 			cadSettings.computeConflictGraph        = false;
 			cadSettings.numberOfDeductions          = 0;
@@ -125,9 +137,10 @@ public:
 			cadSettings.simplifyEliminationByBounds = true;
 			cadSettings.trimVariables               = false;
 			cadSettings.warmRestart                 = true;
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
-		if (setting & NOTBOUNDED_CADSETTING) {
+		if (setting & NOTBOUNDED) {
 			cadSettings.autoSeparateEquations       = true;
 			cadSettings.computeConflictGraph        = false;
 			cadSettings.numberOfDeductions          = 0;
@@ -140,29 +153,33 @@ public:
 			cadSettings.simplifyEliminationByBounds = false;
 			cadSettings.trimVariables               = false;
 			cadSettings.warmRestart                 = true;
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
-		if (setting & EQUATIONSONLY_CADSETTING) {
+		if (setting & EQUATIONSONLY) {
 			cadSettings.autoSeparateEquations = false;
 			cadSettings.preferNRSamples       = false;
 			cadSettings.equationsOnly         = true;
 			cadSettings.inequalitiesOnly      = false;
 			cadSettings.preferSamplesByIsRoot = true;
 			cadSettings.preferNonrootSamples  = false;    // this has only effect if there are still samples in the cad which belong to inequalities
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
-		if (setting & INEQUALITIESONLY_CADSETTING) {
+		if (setting & INEQUALITIESONLY) {
 			cadSettings.preferNRSamples       = false;
 			cadSettings.equationsOnly         = false;
 			cadSettings.inequalitiesOnly      = true;
 			cadSettings.preferSamplesByIsRoot = true;
 			cadSettings.preferNonrootSamples  = true;    // this has only effect if there are still samples in the cad which belong to equations
+			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
-		if (setting & ZERODIM_CADSETTING) {
+		if (setting & ZERODIM) {
 			cadSettings.zeroDimEquations = true;
 		}
-		if (setting & ALTERNATIVEORDER_CADSETTING) {
+		if (setting & ALTERNATIVEORDER) {
+			cadSettings.order = PolynomialComparisonOrder::LowDegree;
 			//cadSettings.up_isLess = UnivariatePolynomial::univariatePolynomialIsLessLowDeg;
 		}
 
@@ -210,24 +227,14 @@ public:
 		if (settings.improveBounds)
 			settingStrs.push_back( "Given bounds to the check method, the bounds are widened after determining unsatisfiability by check, or shrunk after determining satisfiability by check." );
 		std::string orderStr = "Polynomial order: ";
-		/*
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLess)
-			settingStrs.push_back( orderStr + "Default ordering relying on the term order implemented in GiNaC." );
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessCB)
-			settingStrs.push_back( orderStr + "Take polynomials with small roots first." );
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessLowDeg)
-			settingStrs.push_back( orderStr + "Take polynomials with few roots first.");
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessOddLowDeg)
-			settingStrs.push_back( orderStr + "Take polynomials with rational roots first, then with few roots." );
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessOddCB)
-			settingStrs.push_back( orderStr + "Take polynomials with rational roots first, then small roots." );
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessEvenLowDeg)
-			settingStrs.push_back( orderStr + "Take polynomials with irrational roots first, then few roots." );
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessEvenCB)
-			settingStrs.push_back( orderStr + "Take polynomials with irrational roots first, then small roots." );
-		if (settings.up_isLess == UnivariatePolynomial::univariatePolynomialIsLessActivity)
-			settingStrs.push_back( orderStr + "Take polynomials with lower activity first." );
-		*/
+
+		if (settings.order == PolynomialComparisonOrder::CauchyBound)
+			settingStrs.push_back( orderStr + "Take polynomial with small cauchy bound first." );
+		if (settings.order == PolynomialComparisonOrder::LowDegree)
+			settingStrs.push_back( orderStr + "Take polynomial with small degree first." );
+		if (settings.order == PolynomialComparisonOrder::Memory)
+			settingStrs.push_back( orderStr + "Take polynomial with small memory address first." );
+
 		os << "+------------------------------------ CAD Setting -----------------------------------";
 		if (settingStrs.empty()) {
 			os << std::endl << "| Default ";
@@ -264,9 +271,9 @@ private:
 		preSolveByBounds( false ),
 		earlyLiftingPruningByBounds( true ),
 		simplifyEliminationByBounds( true ),
-		improveBounds( true )
-		//up_isLess( UnivariatePolynomial::univariatePolynomialIsLess ),
-		//isolationStrategy( RealAlgebraicNumberSettings::DEFAULT_ISOLATIONSTRATEGY )
+		improveBounds( true ),
+		order(PolynomialComparisonOrder::Default),
+		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
 
 public:
@@ -294,9 +301,9 @@ public:
 		preSolveByBounds( s.preSolveByBounds ),
 		earlyLiftingPruningByBounds( s.earlyLiftingPruningByBounds ),
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),
-		improveBounds( s.improveBounds )
-		//up_isLess( s.up_isLess ),
-		//isolationStrategy( s.isolationStrategy )
+		improveBounds( s.improveBounds ),
+		order(PolynomialComparisonOrder::Default),
+		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
 };
 

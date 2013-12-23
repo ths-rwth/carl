@@ -85,11 +85,6 @@ namespace carl
             {
                 mLeft = l;
             }
-            
-            void setLeft( const ExactInterval& _interval )
-            {
-                mLeft = _interval.left();
-            }
 
             /**
              * Set new left bound type for the interval.
@@ -107,11 +102,6 @@ namespace carl
             void setRight( const Numeric& r )
             {
                 mRight = r;
-            }
-            
-            void setRight( const ExactInterval& _interval )
-            {
-                mRight = _interval.right();
             }
 
             /**
@@ -392,6 +382,10 @@ namespace carl
                 return ExactInterval( Numeric(-1), BoundType::INFTY, Numeric(1), BoundType::INFTY );
             }
 
+		void operator +=(const ExactInterval<Numeric>& o);
+		void operator -=(const ExactInterval<Numeric>& o);
+		void operator *=(const ExactInterval<Numeric>& o);
+		
             friend std::ostream& operator<< <>(std::ostream& str, const ExactInterval<Numeric>&);
             
         protected:
@@ -424,6 +418,76 @@ namespace carl
 
     };    // class ExactInterval
     
+// Arithmetic operators
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator +(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.add(rh);
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator +(const ExactInterval<Numeric>& lh, const Numeric& rh)
+{
+	// TODO optimization potential
+	return lh.add(ExactInterval<Numeric>(rh));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator +(const Numeric& lh, const ExactInterval<Numeric>& rh)
+{
+	// TODO optimization potential
+	return rh.add(ExactInterval<Numeric>(lh));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator -(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.add(rh.inverse());
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator -(const ExactInterval<Numeric>& lh, const Numeric& rh)
+{
+	return lh + (-rh);
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator -(const Numeric& lh, const ExactInterval<Numeric>& rh)
+{
+	return (-lh) +rh;
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator *(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return lh.mul(rh);
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator *(const ExactInterval<Numeric>& lh, const Numeric& rh)
+{
+	return ExactInterval<Numeric>(lh.mul(ExactInterval<Numeric>(rh)));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator *(const Numeric& lh, const ExactInterval<Numeric>& rh)
+{
+	return rh * lh;
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator /(const ExactInterval<Numeric>& lh, const Numeric& rh) throw ( std::overflow_error)
+{
+	return lh.div(ExactInterval<Numeric>(rh));
+}
+
+template<typename Numeric>
+inline const ExactInterval<Numeric> operator /(const Numeric& lh, const ExactInterval<Numeric>& rh) throw ( std::overflow_error)
+{
+	ExactInterval<Numeric> result = ExactInterval<Numeric>(lh);
+	result.div(rh);
+	return result;
+}
 
 // relational operators
 
@@ -451,6 +515,32 @@ inline bool operator >=(const ExactInterval<Numeric>& lh, const ExactInterval<Nu
 	return lh.isGreaterOrEqual(rh);
 }
 
+template<typename Numeric>
+inline bool operator <(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	if(rh.leftType() != BoundType::INFTY)
+	{
+		if(lh.rightType() != BoundType::INFTY)
+		{
+			return lh.right() < rh.left() || (lh.right() == rh.left() && lh.rightType() == BoundType::STRICT && rh.leftType() == BoundType::STRICT);
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+template<typename Numeric>
+inline bool operator >(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
+{
+	return rh < lh;
+}
+	
 }
 
 #include "ExactInterval.tpp"

@@ -48,6 +48,18 @@ TEST(UnivariatePolynomial, Divide)
 //    std::cout << d.remainder << std::endl;
 }
 
+TEST(UnivariatePolynomial, DivideInteger)
+{
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setVariableName(x, "x");
+    UnivariatePolynomial<cln::cl_I> p(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)5});
+    UnivariatePolynomial<cln::cl_I> q(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)3});
+    DivisionResult<UnivariatePolynomial<cln::cl_I>> d = p.divide(q);
+    std::cout << d.quotient << std::endl;
+    std::cout << d.remainder << std::endl;
+}
+
 TEST(UnivariatePolynomial, GCD)
 {
     VariablePool& vpool = VariablePool::getInstance();

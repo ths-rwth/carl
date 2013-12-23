@@ -33,6 +33,8 @@ public:
 	typedef Monomial MonomType;
 	typedef Coeff CoeffType;
 	typedef Policies Policy;
+	typedef typename UnderlyingNumberType<Coeff>::type NumberType;
+	typedef typename IntegralT<NumberType>::type IntNumberType;
 protected:
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
 	
@@ -99,7 +101,7 @@ public:
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * @return 
 	 */
-	exponent highestDegree() const;
+	exponent totalDegree() const;
 
 	bool isZero() const;
 	bool isConstant() const;
@@ -217,7 +219,7 @@ public:
 	MultivariatePolynomial normalize() const;
 	
 	/**
-	 * Replace the given variable by the given value within this multivariate polynomial.
+	 * Replace the given variable by the given polynomial within this multivariate polynomial.
      */
 	void substituteIn(const Variable::Arg var, const MultivariatePolynomial& value);
 	
@@ -290,6 +292,9 @@ public:
 	typename UnderlyingNumberType<C>::type numericContent() const;
 	template<typename C=Coeff, DisableIf<is_number<C>> = dummy>
 	typename UnderlyingNumberType<C>::type numericContent() const;
+	
+	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
+	IntNumberType mainDenom() const;
 
 	
 	template<typename C, typename O, typename P>
@@ -357,8 +362,8 @@ public:
 	
  
 
-//	template<typename C, typename O, typename P>
-//	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 //	template<typename C, typename O, typename P>
 //	friend bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 //	template<typename C, typename O, typename P>

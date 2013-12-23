@@ -12,13 +12,13 @@
 #include "RootFinder.h"
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 template<typename Number, typename C>
 IncrementalRootFinder<Number, C>::IncrementalRootFinder(
-		UnivariatePolynomial<Number>& polynomial,
-		SplittingStrategy splittingStrategy, 
+		const UnivariatePolynomial<Number>& polynomial,
 		const ExactInterval<Number>& interval,
+		SplittingStrategy splittingStrategy,
 		bool tryTrivialSolver
 		) :
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),

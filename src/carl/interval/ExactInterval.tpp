@@ -216,6 +216,7 @@ namespace carl
     Numeric ExactInterval<Numeric>::sample() const
     {
 		Numeric mid = this->midpoint();
+		// TODO: check if mid is an integer already.
 		Numeric midf = carl::floor(mid);
 		if (this->contains(midf)) return midf;
 		Numeric midc = carl::ceil(mid);
@@ -707,6 +708,24 @@ namespace carl
             default:
                 return (mRight >= o.mRight);
         }
+    }
+	
+	template<typename Numeric>
+	void ExactInterval<Numeric>::operator+=( const ExactInterval<Numeric>& o )
+    {
+		*this = *this + o;
+    }
+	
+	template<typename Numeric>
+    void ExactInterval<Numeric>::operator-=( const ExactInterval<Numeric>& o )
+    {
+		*this = *this - o;
+    }
+	
+	template<typename Numeric>
+    void ExactInterval<Numeric>::operator*=( const ExactInterval<Numeric>& o )
+    {
+		*this = *this * o;
     }
     
     template<typename Numeric>
