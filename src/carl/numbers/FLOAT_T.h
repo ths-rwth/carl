@@ -18,9 +18,8 @@
 #include <math.h>
 #include "roundingConversion.h"
 #include "typetraits.h"
-#ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
-#endif
+#include <cmath>
 
 namespace carl
 {

@@ -42,6 +42,7 @@ option( DEVELOPER "Compile with extra warnings" ON )
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
+option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -81,7 +82,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("-- Using g++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
 else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
@@ -90,6 +91,8 @@ endif()
 if(DEVELOPER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion")
 endif()
+
+message("-- Compiler flags: ${CMAKE_CXX_FLAGS}")
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -168,6 +171,15 @@ add_subdirectory(resources EXCLUDE_FROM_ALL)
 enable_testing()
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
+
+set(libraries ${libraries} ${EIGEN3_LIBRARY} pthread)
+set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
+
+
+if(COMPARE_WITH_GINAC)
+  find_package( GiNaC 1.5.8 REQUIRED )
+  set(libraries ${libraries} ${GINAC_LIBRARY} )
+endif()
 
 
 # # # # # # # # # # # # # # # # # # # # # #

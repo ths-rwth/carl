@@ -31,6 +31,13 @@ using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient
 
 template<typename C, typename O, typename P>
 class MultivariatePolynomial;
+
+enum class PolynomialComparisonOrder : unsigned {
+	CauchyBound, LowDegree, Memory, Default = Memory
+};
+enum class SubresultantStrategy : unsigned {
+	Generic, Lazard, Ducos, Default = Lazard
+};
 	
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
@@ -45,6 +52,7 @@ public:
 
 	typedef typename UnderlyingNumberType<Coefficient>::type NumberType;
 	typedef typename IntegralT<NumberType>::type IntNumberType;
+	typedef Coefficient CoefficientType;
 
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
@@ -106,6 +114,9 @@ public:
 	{
 		return mCoefficients.size() <= 1;
 	}
+	Coefficient constantPart() const {
+		return this->mCoefficients[0];
+	}
 
 	/**
 	 * Checks whether the polynomial is only a number.
@@ -123,13 +134,11 @@ public:
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	bool isUnivariate()
-	{
+	bool isUnivariate() const {
 		return true;
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	bool isUnivariate()
-	{
+	bool isUnivariate() const {
 		for (auto c: this->coefficients()) {
 			if (!c.isNumber()) return false;
 		}
@@ -145,10 +154,32 @@ public:
 		// todo add assertion that this is valid.
 		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
 	}
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	unsigned totalDegree() const {
+		return this->degree();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	unsigned totalDegree() const {
+		unsigned max = 0;
+		for (unsigned deg = 0; deg < this->mCoefficients.size(); deg++) {
+			if (!this->mCoefficients[deg].isZero()) {
+				unsigned tdeg = deg + this->mCoefficients[deg].totalDegree();
+				if (tdeg > max) max = tdeg;
+			}
+		}
+		return max;
+	}
 
 	const Coefficient& lcoeff() const
 	{
 		return mCoefficients.back();
+	}
+
+	/**
+	 * Removes the leading term from the polynomial.
+	 */
+	void truncate() {
+		this->mCoefficients.resize(this->mCoefficients.size()-1);
 	}
 
 	const std::vector<Coefficient>& coefficients() const
@@ -160,6 +191,38 @@ public:
 	{
 		return mMainVar;
 	}
+
+	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
+	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	std::set<Variable> gatherVariables() const {
+		return std::set<Variable>({this->mainVar()});
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	std::set<Variable> gatherVariables() const {
+		std::set<Variable> res({this->mainVar()});
+		for (auto c: this->mCoefficients) {
+			auto tmp = c.gatherVariables();
+			res.insert(tmp.begin(), tmp.end());
+		}
+		return res;
+	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	unsigned has(Variable::Arg v) const {
+		return v == this->mainVar();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	unsigned has(Variable::Arg v) const {
+		bool hasVar = v == this->mainVar();
+		for (auto c: this->mCoefficients) {
+			hasVar = hasVar || c.has(v);
+		}
+		return hasVar;
+	}
+
 	/**
 	 * 
      * @return copr
@@ -178,8 +241,10 @@ public:
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
+	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
+	
 	
 	
 	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
@@ -197,9 +262,21 @@ public:
 
 	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
+	template<typename C=Coefficient, DisableIf<is_fraction<C>> = dummy>
+	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
 	
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	void substituteIn(const Variable& var, const Coefficient& value);
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	void substituteIn(const Variable& var, const Coefficient& value);
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+
 	carl::Sign sgn(const Coefficient& value) const {
 		return carl::sgn(this->evaluate(value));
 	}
@@ -210,7 +287,7 @@ public:
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
 	{
-		
+		LOG_NOTIMPLEMENTED();
 	}
 	template<typename SubstitutionType, typename C = Coefficient, DisableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
@@ -320,12 +397,22 @@ public:
 	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
 
+	UnivariatePolynomial pseudoPrimpart(const Coefficient& content) const {
+		if (content == 0) return *this;
+		return this->divide(UnivariatePolynomial<Coefficient>(this->mainVar(), content)).quotient;
+	}
+	UnivariatePolynomial pseudoPrimpart() const {
+		return this->pseudoPrimpart(Coefficient(this->numericContent()));
+	}
+
 	/**
      * Compute the main denominator of all numeric coefficients of this polynomial.
 	 * This method only applies if the Coefficient type is a number.
      * @return the main denominator of all coefficients of this polynomial.
      */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	IntNumberType mainDenom() const;
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
 
@@ -400,6 +487,12 @@ public:
 	 */
 	void shift(const Coefficient& a);
 
+	static const std::list<UnivariatePolynomial> subresultants(
+			const UnivariatePolynomial& p,
+			const UnivariatePolynomial& q,
+			const SubresultantStrategy strategy = SubresultantStrategy::Default
+	);
+
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -413,16 +506,13 @@ public:
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
 	
-	enum ComparisonOrder {
-		CauchyBound, LowDegree, Memory, Default = Memory
-	};
-	bool less(const UnivariatePolynomial<Coefficient>& rhs, ComparisonOrder order = Default) const;
+	bool less(const UnivariatePolynomial<Coefficient>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default) const;
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order);
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, const PolynomialComparisonOrder&);
 	template<typename C>
-	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, typename UnivariatePolynomial<C>::ComparisonOrder order);
+	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, const PolynomialComparisonOrder&);
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 

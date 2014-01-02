@@ -12,7 +12,7 @@
 #include "../UnivariatePolynomial.h"
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 template<typename Number>
 class AbstractRootFinder {
@@ -53,7 +53,7 @@ public:
 	 * @param tryTrivialSolver Flag indicating if the trivialSolve() method should be used.
      */
 	AbstractRootFinder(
-		UnivariatePolynomial<Number>& polynomial, 
+		const UnivariatePolynomial<Number>& polynomial,
 		const ExactInterval<Number>& interval = ExactInterval<Number>(),
 		bool tryTrivialSolver = true
 	);
@@ -61,6 +61,13 @@ public:
 	virtual ~AbstractRootFinder() {
 	}
 	
+	const UnivariatePolynomial<Number>& getPolynomial() const {
+		return this->polynomial;
+	}
+	const UnivariatePolynomial<Number>& getOriginalPolynomial() const {
+		return this->originalPolynomial;
+	}
+
 	/**
 	 * Returns the list of roots.
 	 * If called before computation is finished, this list will not contain all roots and will be in arbitrary order.

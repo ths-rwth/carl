@@ -7,6 +7,10 @@
 
 using namespace carl;
 
+typedef carl::UnivariatePolynomial<cln::cl_RA> UPolynomial;
+typedef carl::MultivariatePolynomial<cln::cl_RA> MPolynomial;
+typedef carl::UnivariatePolynomial<MPolynomial> UMPolynomial;
+
 template<typename Number>
 bool represents(const carl::RealAlgebraicNumber<Number>* root, const Number& exact) {
 	if (root->isNumeric()) {
@@ -17,13 +21,49 @@ bool represents(const carl::RealAlgebraicNumber<Number>* root, const Number& exa
 	}
 }
 
-TEST(IncrementalRootFinder, Constructor)
+TEST(RootFinder, realRoots)
 {
 	VariablePool& vpool = VariablePool::getInstance();
 	Variable x = vpool.getFreshVariable();
-	carl::UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)-1});
-	
-    carl::core::IncrementalRootFinder<cln::cl_RA> finder(p);
-	std::list<carl::RealAlgebraicNumber<cln::cl_RA>*> roots = finder.getAllRoots();
-	ASSERT_TRUE(roots.size() == 1 && represents(roots.front(), (cln::cl_RA)1));
+	Variable y = vpool.getFreshVariable();
+
+	{
+		UPolynomial p(x, {(cln::cl_RA)-1, (cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)1});
+		auto roots = carl::rootfinder::realRoots(p);
+		ASSERT_TRUE(roots.size() == 1);
+#ifdef __CLANG
+		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)1));
+#endif
+	}
+
+	{
+		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(0), MPolynomial(1)});
+		auto roots = carl::rootfinder::realRoots(p);
+		ASSERT_TRUE(roots.size() == 1);
+#ifdef __CLANG
+		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)1));
+#endif
+	}
+
+	{
+		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(1)});
+		auto roots = carl::rootfinder::realRoots(p);
+		ASSERT_TRUE(roots.size() == 2);
+#ifdef __CLANG
+		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)-1));
+		ASSERT_TRUE(represents(roots.back(), (cln::cl_RA)1));
+#endif
+	}
+
+	{
+		UMPolynomial p(x, {MPolynomial(y), MPolynomial(0), MPolynomial(1)});
+		std::map<Variable, RealAlgebraicNumber<cln::cl_RA>*> m;
+		m[y] = new RealAlgebraicNumberNR<cln::cl_RA>(-1);
+		auto roots = carl::rootfinder::realRoots(p, m);
+		ASSERT_TRUE(roots.size() == 2);
+#ifdef __CLANG
+		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)-1));
+		ASSERT_TRUE(represents(roots.back(), (cln::cl_RA)1));
+#endif
+	}
 }

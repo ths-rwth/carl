@@ -16,19 +16,19 @@ TEST(EliminationSet, BasicOperations)
 	Variable y = vpool.getFreshVariable();
 	Variable z = vpool.getFreshVariable();
 
-	CAD::EliminationSet<MultivariatePolynomial<cln::cl_RA>> s;
+	cad::EliminationSet<cln::cl_RA> s;
 	
-	MultivariatePolynomial<cln::cl_RA> mpz({z});
-	MultivariatePolynomial<cln::cl_RA> mpxz2({(cln::cl_RA)-1*x*z});
-	MultivariatePolynomial<cln::cl_RA> mpxz({(cln::cl_RA)-1*x*z, Term<cln::cl_RA>(2)});
-	MultivariatePolynomial<cln::cl_RA> mpzero;
-	MultivariatePolynomial<cln::cl_RA> mpone({1});
+	cad::MPolynomial<cln::cl_RA> mpz({z});
+	cad::MPolynomial<cln::cl_RA> mpxz2({(cln::cl_RA)-1*x*z});
+	cad::MPolynomial<cln::cl_RA> mpxz({(cln::cl_RA)-1*x*z, Term<cln::cl_RA>(2)});
+	cad::MPolynomial<cln::cl_RA> mpzero;
+	cad::MPolynomial<cln::cl_RA> mpone({1});
 
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>* one = new UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>(x, mpone);
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>* p = new UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>(x, {(cln::cl_RA)-2*mpone,mpzero,mpone});
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>* q = new UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>(y, {(cln::cl_RA)-3*mpone,mpzero,mpzero,mpone});
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>* r = new UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>(y, {mpz, mpzero, mpxz2});
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>* w = new UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>>(y, {mpz, mpzero, mpxz});
+	cad::UPolynomial<cln::cl_RA>* one = new cad::UPolynomial<cln::cl_RA>(x, mpone);
+	cad::UPolynomial<cln::cl_RA>* p = new cad::UPolynomial<cln::cl_RA>(x, {(cln::cl_RA)-2*mpone,mpzero,mpone});
+	cad::UPolynomial<cln::cl_RA>* q = new cad::UPolynomial<cln::cl_RA>(y, {(cln::cl_RA)-3*mpone,mpzero,mpzero,mpone});
+	cad::UPolynomial<cln::cl_RA>* r = new cad::UPolynomial<cln::cl_RA>(y, {mpz, mpzero, mpxz2});
+	cad::UPolynomial<cln::cl_RA>* w = new cad::UPolynomial<cln::cl_RA>(y, {mpz, mpzero, mpxz});
 	
 	s.insert(p);
 	s.insert(q, {one, p});
@@ -41,4 +41,10 @@ TEST(EliminationSet, BasicOperations)
 	ASSERT_EQ(s.erase(q), (size_t)0);
 	ASSERT_EQ(s.erase(w), (size_t)0);
 	ASSERT_EQ(s.erase(r), (size_t)1);
+	
+	delete one;
+	delete p;
+	delete q;
+	delete r;
+	delete w;
 }

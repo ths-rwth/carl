@@ -12,5 +12,5 @@
 
 int main (int argc, char** argv)
 {
-	Interval<double> doubleInterval(0);
+	carl::Interval<double> doubleInterval(0);
 }

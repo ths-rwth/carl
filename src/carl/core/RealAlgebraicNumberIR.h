@@ -145,6 +145,10 @@ public:
 	 */
 	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
+	virtual bool containedIn(const ExactInterval<Number>& i) const {
+		return i.contains(this->getInterval());
+	}
+
 	bool equal(const RealAlgebraicNumberIR* n);
 	
 private:

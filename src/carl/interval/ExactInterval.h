@@ -522,11 +522,11 @@ inline bool operator >=(const ExactInterval<Numeric>& lh, const ExactInterval<Nu
 template<typename Numeric>
 inline bool operator <(const ExactInterval<Numeric>& lh, const ExactInterval<Numeric>& rh)
 {
-	if(rh.leftBound() != BoundType::INFTY)
+	if(rh.leftType() != BoundType::INFTY)
 	{
-		if(lh.rightBound() != BoundType::INFTY)
+		if(lh.rightType() != BoundType::INFTY)
 		{
-			return lh.right() < rh.left() || (lh.right() == rh.left() && lh.rightBound() == BoundType::STRICT && rh.leftBound() == BoundType::STRICT);
+			return lh.right() < rh.left() || (lh.right() == rh.left() && lh.rightType() == BoundType::STRICT && rh.leftType() == BoundType::STRICT);
 		}
 		else
 		{

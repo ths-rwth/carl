@@ -28,32 +28,34 @@
 
 namespace carl
 {
-	template<typename Number, bool _isNative>
+	template<typename Number>
 	struct policies
 	{
-		typedef carl::rounding<Number> rounding;
-		typedef carl::checking<Number> checking;
+		typedef carl::rounding<Number> roundingP;
+		typedef carl::checking<Number> checkingP;
 	};
 	
-	template<typename Number>
-	struct policies<Number, true>
+	template<>
+	struct policies<double>
 	{
-		typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_arith_opp<Number> > rounding;
-		typedef boost::numeric::interval_lib::checking_no_nan<Number, boost::numeric::interval_lib::checking_no_nan<Number> > checking;
+		typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_arith_opp<double> > roundingP;
+		typedef boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> > checkingP;
 	};
 	
-    template<typename Number, bool _isNative = is_primitive<Number>::value>
-    class Interval : public policies<Number, _isNative>
+	// TODO: Create struct specialization for all types which are already covered by the standard boost interval policies.
+	
+    template<typename Number>
+    class Interval : public policies<Number>
     {
 	public:
         /***********************************************************************
          * Typedefs
          **********************************************************************/
-		typedef typename policies<Number, _isNative>::checking checking;
-		typedef typename policies<Number, _isNative>::rounding rounding;
+		//typedef typename policies<Number>::checking checking;
+		//typedef typename policies<Number>::rounding rounding;
 		
-		typedef boost::numeric::interval< Number, boost::numeric::interval_lib::policies< rounding, checking > > BoostInterval;
-		typedef std::map<Variable, Interval<Number>> evalintervalmap;
+		typedef boost::numeric::interval< Number, boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP > > BoostInterval;
+		typedef std::map<Variable, Interval<Number> > evalintervalmap;
 		
 	protected:
 		/***********************************************************************
@@ -69,49 +71,61 @@ namespace carl
          * Constructors & Destructor
          **********************************************************************/
 		
-		Interval<Number>::Interval() :
+		Interval() :
 			mContent(Number(0)),
 			mLowerBoundType(BoundType::STRICT),
 			mUpperBoundType(BoundType::STRICT)
 		{}
 		
-		Interval<Number>::Interval(const Number& n) :
+		Interval(const Number& n) :
 			mContent(n),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
 		
-		Interval<Number>::Interval(const Number& lower, const Number& upper) :
+		Interval(const Number& lower, const Number& upper) :
 			mContent(lower, upper),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
 		
-		Interval<Number>::Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType) :
+		Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType) :
 		mContent(lower, upper),
 		mLowerBoundType(lowerBoundType),
 		mUpperBoundType(upperBoundType)
 		{}
 		
-		Interval<Number>::Interval(const Interval<Number>& o) :
+		Interval(const Interval<Number>& o) :
 			mContent(BoostInterval(o.mContent)),
 			mLowerBoundType(o.mLowerBoundType),
 			mUpperBoundType(o.mUpperBoundType)
 		{}
 		
-		template<typename DisableIf<std::is_same<Number, double>>>
-		Interval<Number>::Interval(double n);
-		template<typename DisableIf<std::is_same<Number, double>::value>>
-		Interval<Number>::Interval(double lower, double upper);
-		template<typename DisableIf<std::is_same<Number, double>::value>>
-		Interval<Number>::Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType);
+		template<typename DisableIf<std::is_same<Number, double>>::type >
+		Interval(double n):
+			mContent(carl::Interval<Number>::BoostInterval(n)),
+			mLowerBoundType(BoundType::WEAK),
+			mUpperBoundType(BoundType::WEAK)
+		{}
+		template<typename DisableIf<std::is_same<Number, double>>::type>
+		Interval(double lower, double upper):
+			mContent(Interval<Number>::BoostInterval(lower, upper)),
+			mLowerBoundType(BoundType::WEAK),
+			mUpperBoundType(BoundType::WEAK)
+		{}
+		template<typename DisableIf<std::is_same<Number, double>>::type>
+		Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType):
+			mContent(Interval<Number>::BoostInterval(lower, upper)),
+			mLowerBoundType(lowerBoundType),
+			mUpperBoundType(upperBoundType)
+		{}
 		
-		template<typename Ratinal>
-		Interval<Number>::Interval(Rational n);
 		template<typename Rational>
-		Interval<Number>::Interval(Rational lower, Rational upper);
+		Interval(Rational n);
 		template<typename Rational>
-		Interval<Number>::Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType);
+		Interval(Rational lower, Rational upper);
+		template<typename Rational>
+		Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType);
 		
 		~Interval();
         
@@ -131,12 +145,12 @@ namespace carl
 		
 		BoundType lowerBoundType() const
 		{
-			return mLower
+			return mLowerBoundType;
 		}
 		
 		BoundType upperBoundType() const
 		{
-			return mUpper;
+			return mUpperBoundType;
 		}
 		
 		void setLower(const Number& n)
@@ -206,7 +220,7 @@ namespace carl
          **********************************************************************/
 		
 		Interval<Number>& add(const Interval<Number>& rhs) const;
-		void add_assign(const interval<Number>& rhs);
+		void add_assign(const Interval<Number>& rhs);
         Interval<Number>& sub(const Interval<Number>& rhs) const;
 		void sub_assign(const Interval<Number>& rhs);
 		Interval<Number>& mul(const Interval<Number>& rhs) const;
@@ -309,7 +323,7 @@ namespace carl
 	inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs);
 	
 	template<typename Number>
-	inline std::ostream& operator << <>(std::ostream& str, const INterval<Number>& i);
+	inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i);
 }
 
 #include "Interval.tpp"

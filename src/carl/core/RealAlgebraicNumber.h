@@ -88,6 +88,8 @@ public:
 
 	/**
 	 * Returns true if an exact numeric representation was found during the refinements.
+	 * 
+	 * If the return value is false, this guarantees that this object is an instance of RealAlgebraicNumberIR.
 	 * @return true if an exact numeric representation was found during the refinements, false otherwise.
 	 */
 	bool isNumeric() const {
@@ -115,6 +117,10 @@ public:
 	virtual const RealAlgebraicNumber<Number>& operator=(const RealAlgebraicNumber<Number>& o) {
 		mIsRoot = o.mIsRoot;
 		return *this;
+	}
+
+	virtual bool containedIn(const ExactInterval<Number>& i) const {
+		return i.contains(this->value());
 	}
 
 	////////////////

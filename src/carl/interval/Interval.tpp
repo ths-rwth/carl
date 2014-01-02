@@ -7,228 +7,276 @@
  * @since	2013-12-20
  * @version 2013-12-20
  */
-
+#pragma once
 #include "Interval.h"
+
+namespace carl
+{
 
 /*******************************************************************************
  * Constructors & Destructor
  ******************************************************************************/
-
-
-template<typename DisableIf<std::is_same<Number, double>::value>>
-Interval<Number>::Interval(double n) :
-	mContent(Interval<Number>::BoostInterval(n),
-	mLowerBoundType(BoundType::WEAK),
-	mUpperBoundType(BoundType::WEAK)
-{}
-
-template<typename DisableIf<std::is_same<Number, double>::value>>
-Interval<Number>::Interval(double lower, double upper) :
-	mContent(Interval<Number>::BoostInterval(lower, upper),
-	mLowerBoundType(BoundType::WEAK),
-	mUpperBoundType(BoundType::WEAK)
-{}
-
-template<typename DisableIf<std::is_same<Number, double>::value>>
-Interval<Number>::Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType);
-
-template<typename Ratinal>
+/*
+template<typename Rational, typename Number>
 Interval<Number>::Interval(Rational n);
 
-template<typename Rational>
+template<typename Rational, typename Number>
 Interval<Number>::Interval(Rational lower, Rational upper);
 
-template<typename Rational>
+template<typename Rational, typename Number>
 Interval<Number>::Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType);
-
+*/
 /*******************************************************************************
  * Transformations and advanced getters/setters
  ******************************************************************************/
+	
+template<typename Number>
+Number Interval<Number>::diameter() const
+	{
+		return 0;
+	}
 
 template<typename Number>
-Number Interval<Number>diameter() const;
+void Interval<Number>::diameter_assign()
+	{
+		
+	}
 
 template<typename Number>
-void diameter_assign();
+	Number Interval<Number>::diameterRatio(const Interval<Number>& rhs) const
+	{}
 
 template<typename Number>
-Number diameterRatio(const Interval<Number>& rhs) const;
+	void Interval<Number>::diameterRatio_assign(const Interval<Number>& rhs)
+	{}
 
 template<typename Number>
-void diameterRatio_assign(const Interval<Number>& rhs);
+	Number Interval<Number>::magnitude() const
+	{}
 
 template<typename Number>
-Number magnitude() const;
+	void Interval<Number>::magnitude_assign()
+	{}
 
 template<typename Number>
-void magnitude_assign();
+	Number Interval<Number>::center() const
+	{}
 
 template<typename Number>
-Number center() const;
+	void Interval<Number>::center_assign()
+	{}
 
 template<typename Number>
-void center_assign();
+	void Interval<Number>::bloat_by(const Number& width)
+	{}
 
 template<typename Number>
-void bloat_by(const Number& width);
+void Interval<Number>::bloat_times(const Number& factor)
+	{}
 
 template<typename Number>
-void bloat_times(const Number& factor);
+void Interval<Number>::shrink_by(const Number& width)
+	{}
 
 template<typename Number>
-void shrink_by(const Number& width);
+void Interval<Number>::shrink_times(const Number& factor)
+	{}
 
 template<typename Number>
-void shrink_times(const Number& factor);
+std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
+	{}
 
 template<typename Number>
-std::pair<Interval<Number>, Interval<Number>> split() const;
-
-template<typename Number>
-std::list<Interval<Number>> split(unsigned n) const;
+std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
+	{}
 
 /*******************************************************************************
  * Arithmetic functions
  ******************************************************************************/
 
 template<typename Number>
-Interval<Number>& add(const Interval<Number>& rhs) const;
+Interval<Number>& Interval<Number>::add(const Interval<Number>& rhs) const
+	{}
 
 template<typename Number>
-void add_assign(const interval<Number>& rhs);
+void Interval<Number>::add_assign(const Interval<Number>& rhs)
+	{}
 
 template<typename Number>
-Interval<Number>& sub(const Interval<Number>& rhs) const;
+Interval<Number>& Interval<Number>::sub(const Interval<Number>& rhs) const
+	{}
 
 template<typename Number>
-void sub_assign(const Interval<Number>& rhs);
+void Interval<Number>::sub_assign(const Interval<Number>& rhs)
+	{}
 
 template<typename Number>
-Interval<Number>& mul(const Interval<Number>& rhs) const;
+Interval<Number>& Interval<Number>::mul(const Interval<Number>& rhs) const
+	{}
 
 template<typename Number>
-void mul_assign(const Interval<Number>& rhs);
+void Interval<Number>::mul_assign(const Interval<Number>& rhs)
+	{}
 
 template<typename Number>
-Interval<Number>& div(const Interval<Number>& rhs) const;
+Interval<Number>& Interval<Number>::div(const Interval<Number>& rhs) const
+	{}
 
 template<typename Number>
-void div_assign(const Interval<Number>& rhs);
+void Interval<Number>::div_assign(const Interval<Number>& rhs)
+	{}
 
 template<typename Number>
-std::pair<Interval<Number>, Interval<Number>> div_ext(const Interval<Number>& rhs) const;
+std::pair<Interval<Number>, Interval<Number>> Interval<Number>::div_ext(const Interval<Number>& rhs) const
+	{}
 
 template<typename Number>
-Interval<Number>& inverse() const;
+Interval<Number>& Interval<Number>::inverse() const
+	{}
 
 template<typename Number>
-void inverse_assign();
+void Interval<Number>::inverse_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& reciprocal() const;
+Interval<Number>& Interval<Number>::reciprocal() const
+	{}
 
 template<typename Number>
-void reciprocal_assign();
+	void Interval<Number>::reciprocal_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& power(unsigned exp) const;
+Interval<Number>& Interval<Number>::power(unsigned exp) const
+	{}
 
 template<typename Number>
-void power_assign(unsigned exp);
+void Interval<Number>::power_assign(unsigned exp)
+	{}
 
 template<typename Number>
-Interval<Number>& sqrt() const;
+Interval<Number>& Interval<Number>::sqrt() const
+	{}
 
 template<typename Number>
-void sqrt_assign();
+void Interval<Number>::sqrt_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& root(unsigned deg) const;
+Interval<Number>& Interval<Number>::root(unsigned deg) const
+	{}
 
 template<typename Number>
-void root_assign(unsigned deg);
+void Interval<Number>::root_assign(unsigned deg)
+	{}
 
 template<typename Number>
-Interval<Number>& log() const;
+Interval<Number>& Interval<Number>::log() const
+	{}
 
 template<typename Number>
-void log_assign();
+void Interval<Number>::log_assign()
+	{}
 
 /*******************************************************************************
  * Trigonometric functions
  ******************************************************************************/
 
 template<typename Number>
-Interval<Number>& sin() const;
+Interval<Number>& Interval<Number>::sin() const
+	{}
 
 template<typename Number>
-void sin_assign();
+void Interval<Number>::sin_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& cos() const;
+Interval<Number>& Interval<Number>::cos() const
+	{}
 
 template<typename Number>
-void cos_assign();
+void Interval<Number>::cos_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& tan() const;
+Interval<Number>& Interval<Number>::tan() const
+	{}
 
 template<typename Number>
-void tan_assign();
+void Interval<Number>::tan_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& asin() const;
+Interval<Number>& Interval<Number>::asin() const
+	{}
 
 template<typename Number>
-void asin_assign();
+void Interval<Number>::asin_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& acos() const;
+Interval<Number>& Interval<Number>::acos() const
+	{}
 
 template<typename Number>
-void acos_assign();
+void Interval<Number>::acos_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& atan() const;
+Interval<Number>& Interval<Number>::atan() const
+	{}
 
 template<typename Number>
-void atan_assign();
+void Interval<Number>::atan_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& sinh() const;
+Interval<Number>& Interval<Number>::sinh() const
+	{}
 
 template<typename Number>
-void sinh_assign();
+void Interval<Number>::sinh_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& cosh() const;
+Interval<Number>& Interval<Number>::cosh() const
+	{}
 
 template<typename Number>
-void cosh_assign();
+void Interval<Number>::cosh_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& tanh() const;
+Interval<Number>& Interval<Number>::tanh() const
+	{}
 
 template<typename Number>
-void tanh_assign();
+void Interval<Number>::tanh_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& asinh() const;
+Interval<Number>& Interval<Number>::asinh() const
+	{}
 
 template<typename Number>
-void asinh_assign();
+void Interval<Number>::asinh_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& acosh() const;
+Interval<Number>& Interval<Number>::acosh() const
+	{}
 
 template<typename Number>
-void acosh_assign();
+void Interval<Number>::acosh_assign()
+	{}
 
 template<typename Number>
-Interval<Number>& atanh() const;
+Interval<Number>& Interval<Number>::atanh() const
+	{}
 
 template<typename Number>
-void atanh_assign();
+void Interval<Number>::atanh_assign()
+	{}
 
 /*******************************************************************************
  * Overloaded arithmetics operators
@@ -293,4 +341,5 @@ template<typename Number>
 inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
 template<typename Number>
-inline std::ostream& operator << <>(std::ostream& str, const INterval<Number>& i);
+inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i);
+}

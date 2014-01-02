@@ -23,11 +23,7 @@
 #include "CADSettings.h"
 
 namespace carl {
-namespace CAD {
-	
-/**
- * 
- */
+namespace cad {
 	
 /** Reminder
  * - SingleEliminationQueue p -> PairedEliminationQueue mit p und p'
@@ -36,6 +32,8 @@ namespace CAD {
  */
 template<typename Coefficient>
 class EliminationSet {
+public:
+	typedef cad::UPolynomial<Coefficient> UPolynomial;
 	
 // private types
 private:
@@ -44,7 +42,7 @@ private:
 	 * Represents a pair of polynomials. 
 	 * Used to store the ancestors of a polynomial. If one is nullptr, the polynomial has only a single ancestor.
 	 */
-	typedef std::pair<UnivariatePolynomial<Coefficient>*, UnivariatePolynomial<Coefficient>*> PolynomialPair;
+	typedef std::pair<const UPolynomial*, const UPolynomial*> PolynomialPair;
 	
 	/**
 	 * Functor that compares two PolynomialPair objects.
@@ -67,9 +65,9 @@ private:
 	
 	struct PolynomialPairContains {
 	private:
-		const UnivariatePolynomial<Coefficient>* p;
+		const UPolynomial* p;
 	public:
-		PolynomialPairContains(const UnivariatePolynomial<Coefficient>* p) : p(p) {
+		PolynomialPairContains(const UPolynomial* p) : p(p) {
 		}
 		bool operator()(const PolynomialPair& pp) {
 			if (p == nullptr) {
@@ -83,26 +81,25 @@ private:
 			}
 		}
 	};
-	
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::unordered_set<const UnivariatePolynomial<Coefficient>*> PolynomialSet;
+	typedef std::unordered_set<const UPolynomial*> PolynomialSet;
 
 	/**
 	 * A mapping from one polynomial to a sorted range of other polynomials.
 	 */
-	typedef std::unordered_map<const UnivariatePolynomial<Coefficient>*, PolynomialSet> PolynomialBucketMap;
+	typedef std::unordered_map<const UPolynomial*, PolynomialSet> PolynomialBucketMap;
 	
 	/// set of elimination parents
 	typedef std::set<PolynomialPair, PolynomialPairIsLess> parentbucket;
 	/// mapping one polynomial pointer to a set of elimination parents
-	typedef std::unordered_map<const UnivariatePolynomial<Coefficient>*, parentbucket> parentbucket_map;
+	typedef std::unordered_map<const UPolynomial*, parentbucket> parentbucket_map;
 
 	
 // public types
 public:
-	typedef UnivariatePolynomialComparator<Coefficient> PolynomialComparator;
+	typedef UnivariatePolynomialComparator<typename UPolynomial::CoefficientType> PolynomialComparator;
 
 // private members
 private:	
@@ -125,22 +122,22 @@ private:
 	 * Elimination queue containing all polynomials not yet considered for non-paired elimination.
 	 * Access permits reset of the queue, automatic update after insertion of new elements and a pop method.
 	 */
-	std::list<const UnivariatePolynomial<Coefficient>*> mSingleEliminationQueue;
+	std::list<const UPolynomial*> mSingleEliminationQueue;
 	/**
 	 * Elimination queue containing all polynomials not yet considered for paired elimination.
 	 * Access permits reset of the queue, automatic update after insertion of new elements and a pop method.
 	 */
-	std::list<const UnivariatePolynomial<Coefficient>*> mPairedEliminationQueue;
+	std::list<const UPolynomial*> mPairedEliminationQueue;
 	
 	/**
 	 * Lifting queue containing all polynomials not yet considered for lifting.
 	 * Access permits reset of the queue, automatic update after insertion of new elements and a pop method.
 	 */
-	std::list<const UnivariatePolynomial<Coefficient>*> mLiftingQueue;
+	std::list<const UPolynomial*> mLiftingQueue;
 	/**
 	 * Lifting queue containing a reset state for the lifting queue, which is a copy of the original container contents, but can be set to a concrete state
 	 */
-	std::list<const UnivariatePolynomial<Coefficient>*> mLiftingQueueReset;
+	std::list<const UPolynomial*> mLiftingQueueReset;
 	
 	/// maps an entry from another EliminationSet (parent) to the entry of elimination polynomial belonging to the parent
 	PolynomialBucketMap childrenPerParent;
@@ -162,8 +159,8 @@ public:
 	 * @param g strict ordering for elimination queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
 	 */
 	EliminationSet(
-			PolynomialComparator f = UnivariatePolynomialComparator<Coefficient>(),
-			PolynomialComparator g = UnivariatePolynomialComparator<Coefficient>()
+			PolynomialComparator f = UnivariatePolynomialComparator<MPolynomial<Coefficient>>(),
+			PolynomialComparator g = UnivariatePolynomialComparator<MPolynomial<Coefficient>>()
 			):
 		polynomials(),
 		eliminationOrder(g),
@@ -199,26 +196,41 @@ public:
 	// SELECTORS //
 	///////////////
 	
-	std::list<UnivariatePolynomial<Coefficient>*> getParentsOf(const UnivariatePolynomial<Coefficient>* p) const;
+	/**
+	 * Give all parents of the specified elimination polynomial.
+	 * @param p
+	 * @return list of all parents of the specified elimination polynomial
+	 */
+	std::list<const UPolynomial*> getParentsOf(const UPolynomial* p) const;
 
 	/**
 	 * Checks if the given elimination polynomial has non-trivial parents, i.e. if it has more than a single parent.
      * @param p Univariate polynomial
      * @return true, if the given polynomial has non-trivial parents.
      */
-	bool hasParents(const UnivariatePolynomial<Coefficient>* p) const;
+	bool hasParents(const UPolynomial* p) const;
 	
 	/*
 	 * Set a new order for the elimination queue.
 	 * @param order New order function.
 	 */
-	void setEliminationOrder( PolynomialComparator order );
+	void setEliminationOrder(PolynomialComparator order);
 	/*
 	 * Set a new order for the lifting queue.
 	 * @param order New order function.
 	 */
-	void setLiftingOrder( PolynomialComparator order );
-	
+	void setLiftingOrder(PolynomialComparator order) {
+		this->liftingOrder = order;
+	}
+
+	long unsigned size() const {
+		return this->polynomials.size();
+	}
+
+	bool empty() const {
+		return this->polynomials.empty();
+	}
+
 	////////////////////
 	// ACCESS METHODS //
 	////////////////////
@@ -233,10 +245,27 @@ public:
 	 * @see std::set::insert
 	 */
 	std::pair<typename PolynomialSet::iterator, bool> insert(
-			const UnivariatePolynomial<Coefficient>* r,
-			const std::list<UnivariatePolynomial<Coefficient>*>& parents = std::list<UnivariatePolynomial<Coefficient>*>(),
+			const UPolynomial* r,
+			const std::list<const UPolynomial*>& parents = std::list<const UPolynomial*>(),
 			bool avoidSingle = false
 			);
+	
+	/**
+	 * Inserts an elimination polynomial with the specified parent into the set.
+	 * @param r elimination polynomial
+	 * @param parents parents of the elimination (optional, standard is (0) ), if more than 1 parent is given, the list is interpreted as concatenation of parent pairs, e.g. (a, 0, b, c) defines  the parents (a) and (b,c).
+	 * @param avoidSingle If true, the polynomial added is not added to the single-elimination queue (default: false).
+	 * @return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element that already had its same key in the map. The pair::second element in the pair is set to true if a new element was inserted or false if an element with the same key existed.
+	 * @complexity amortized: logarithmic in the number of polynomials stored, worst: linear
+	 * @see std::set::insert
+	 */
+	std::pair<typename PolynomialSet::iterator, bool> insert(
+			const UPolynomial& r,
+			const std::list<const UPolynomial*>& parents = std::list<const UPolynomial*>(),
+			bool avoidSingle = false
+			) {
+		return this->insert(new UPolynomial(r), parents, avoidSingle);
+	}
 	
 	/**
 	 * Insert all polynomials from first to last (excl. last), while all have the same parent.
@@ -247,25 +276,10 @@ public:
 	 * @return the list of polynomials actually added to the set, which might be smaller than the input set
 	 */
 	template<class InputIterator>
-	std::list<UnivariatePolynomial<Coefficient>*> insert(
+	std::list<const UPolynomial*> insert(
 			InputIterator first,
 			InputIterator last,
-			const std::list<UnivariatePolynomial<Coefficient>*>& parents = std::list<UnivariatePolynomial<Coefficient>*>(),
-			bool avoidSingle = false
-			);
-	
-	/**
-	 * Insert an object which is allocated newly and stored as its new pointer value.
-	 * @param r
-	 * @param parents parents of the elimination (optional, standard is one 0 parent)
-	 * @param avoidSingle If true, all polynomials added are not added to the single-elimination queue (default: false).
-	 * @return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element that already had its same key in the map. The pair::second element in the pair is set to true if a new element was inserted or false if an element with the same key existed.
-	 * @complexity logarithmic in the number of polynomials stored
-	 * @see insert
-	 */
-	std::pair<typename PolynomialSet::iterator, bool> insert(
-			const UnivariatePolynomial<Coefficient>& r,
-			const std::list<UnivariatePolynomial<Coefficient>*>& parents = std::list<UnivariatePolynomial<Coefficient>*>(),
+			const std::list<UPolynomial*>& parents = std::list<UPolynomial*>(),
 			bool avoidSingle = false
 			);
 	
@@ -275,7 +289,7 @@ public:
 	 * @param avoidSingle If true, all polynomials added are not added to the single-elimination queue (default: false).
 	 * @return the list of polynomials actually added, which might be smaller than the input set
 	 */
-	std::list<UnivariatePolynomial<Coefficient>*> insert(
+	std::list<const UPolynomial*> insert(
 			const EliminationSet<Coefficient>& s,
 			bool avoidSingle = false
 			);
@@ -292,7 +306,7 @@ public:
 	 * @return 1 if p exited in the set, 0 otherwise
 	 * @complexity linear in the number of elimination polynomials one level above the level represented by this elimination set, i.e. the parents
 	 */
-	size_t erase(const UnivariatePolynomial<Coefficient>* p);
+	size_t erase(const UPolynomial* p);
 	
 	/** Asserts that parent is removed.
 	 * Removes all elimination polynomials from the set which have parent as only parent (lone polynomials) or as only other parent (divorce-suffering polynomials).
@@ -302,14 +316,14 @@ public:
 	 * @return list of elimination polynomials removed
 	 * @complexity linear in the number of elimination polynomials which do belong to the given parent
 	 */
-	std::forward_list<const UnivariatePolynomial<Coefficient>*> removeByParent(const UnivariatePolynomial<Coefficient>* parent);
+	std::forward_list<const UPolynomial*> removeByParent(const UPolynomial* parent);
 
 	/**
 	 * Searches the set entry for the given polynomial p if exists, otherwise nullptr.
 	 * @param p
 	 * @return set entry for the given polynomial p if exists, otherwise nullptr
 	 */
-	UnivariatePolynomial<Coefficient>* find(const UnivariatePolynomial<Coefficient>* p);
+	const UPolynomial* find(const UPolynomial* p);
 	
 	/**
 	 * Swaps the contents (all attributes) of the two EliminationSets.
@@ -334,7 +348,7 @@ public:
 	 * @return the smallest (w.r.t. set order) elimination polynomial not yet considered for lifting
 	 * @complexity constant
 	 */
-	const UnivariatePolynomial<Coefficient>* nextLiftingPosition() {
+	const UPolynomial* nextLiftingPosition() {
 		return this->mLiftingQueue.front();
 	}
 
@@ -396,7 +410,7 @@ public:
 	 * If the single-elimination queue is empty the behavior of this method is undefined.
 	 * @return the next position in the single-elimination queue
 	 */
-	const UnivariatePolynomial<Coefficient>* popNextSingleEliminationPosition();
+	const UPolynomial* popNextSingleEliminationPosition();
 
 	/**
 	 * Gives true if all single eliminations are done.
@@ -425,8 +439,8 @@ public:
 	 * @param setting
 	 * @return list of polynomials added to destination
 	 */
-	std::list<UnivariatePolynomial<Coefficient>*> eliminateInto(
-			const UnivariatePolynomial<Coefficient>* p,
+	std::list<const UPolynomial*> eliminateInto(
+			const UPolynomial* p,
 			EliminationSet<Coefficient>& destination,
 			const Variable& variable,
 			const CADSettings& setting
@@ -434,10 +448,10 @@ public:
 	
 	
 	/// Determine whether _p is constant and possibly move it to the destination set while popping it from _queue and removing it from _otherqueue. _p is inserted into destination with avoidSingle=_avoidSingle.
-	std::list<UnivariatePolynomial<Coefficient>*> eliminateConstant(
-			const UnivariatePolynomial<Coefficient>* p,
-			std::list<UnivariatePolynomial<Coefficient>*>& queue,
-			std::list<UnivariatePolynomial<Coefficient>*>& otherqueue,
+	std::list<const UPolynomial*> eliminateConstant(
+			const UPolynomial* p,
+			std::list<const UPolynomial*>& queue,
+			std::list<const UPolynomial*>& otherqueue,
 			bool avoidSingle,
 			EliminationSet<Coefficient>& destination,
 			const Variable& variable,
@@ -465,7 +479,7 @@ public:
 	 *                    Always: If all paired eliminations are done, the next single elimination is done.
 	 * @return list of polynomials added to destination
 	 */
-	std::list<UnivariatePolynomial<Coefficient>*> eliminateNextInto(
+	std::list<const UPolynomial*> eliminateNextInto(
 			EliminationSet<Coefficient>& destination,
 			const Variable& variable,
 			const CADSettings& setting,
@@ -516,7 +530,8 @@ public:
 	 */
 	void factorize();
 	
-	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coefficient>& s);
+	template<typename Coeff>
+	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coeff>& s);
 	
 	//////////////////////////////
 	// STATIC AUXILIARY METHODS //
@@ -529,7 +544,7 @@ public:
 	 * @complexity O ( p.deg() )
 	 * @return The set of truncations
 	 */
-	static std::list<UnivariatePolynomial<Coefficient>*> truncation(const UnivariatePolynomial<Coefficient>* p);
+	static std::list<const UPolynomial*> truncations(const UPolynomial* p);
 	
 	/**
 	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
@@ -550,7 +565,7 @@ public:
 	 * @return a list of polynomials in which the main variable of p is eliminated
 	 */
 	static void elimination(
-			const UnivariatePolynomial<Coefficient>* p,
+			const UPolynomial* p,
 			const Variable& variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
@@ -576,8 +591,8 @@ public:
 	 * @return a list of polynomials in which the main variable of p1 and p2 is eliminated
 	 */
 	static void elimination(
-			const UnivariatePolynomial<Coefficient>* p,
-			const UnivariatePolynomial<Coefficient>* q,
+			const UPolynomial* p,
+			const UPolynomial* q,
 			const Variable& variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle 
@@ -600,7 +615,7 @@ public:
 	 * @return a list of polynomials in which the main variable of p is eliminated
 	 */
 	static void eliminationEq(
-			const UnivariatePolynomial<Coefficient>* p,
+			const UPolynomial* p,
 			const Variable& variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
@@ -627,8 +642,8 @@ public:
 	 * @return a list of polynomials in which the main variable of p1 and p2 is eliminated
 	 */
 	static void eliminationEq(
-			const UnivariatePolynomial<Coefficient>* p,
-			const UnivariatePolynomial<Coefficient>* q,
+			const UPolynomial* p,
+			const UPolynomial* q,
 			const Variable& variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle

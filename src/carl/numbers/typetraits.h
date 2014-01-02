@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cln/cln.h>
+#include <gmpxx.h>
 #include <type_traits>
 #include <mpfr.h>
 #include <gmpxx.h>

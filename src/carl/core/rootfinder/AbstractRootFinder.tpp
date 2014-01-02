@@ -9,11 +9,11 @@
 #pragma once
 
 namespace carl {
-namespace core {
+namespace rootfinder {
 
 template<typename Number>
 AbstractRootFinder<Number>::AbstractRootFinder(
-		UnivariatePolynomial<Number>& polynomial, 
+		const UnivariatePolynomial<Number>& polynomial,
 		const ExactInterval<Number>& interval,
 		bool tryTrivialSolver
 	) :
@@ -88,12 +88,24 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 			}
 			case 2: {
 				Number a = polynomial.coefficients()[2], b = polynomial.coefficients()[1], c = polynomial.coefficients()[0];
-				// TODO implement
-				//Number s = carl::sqrt(b*b - 4*a*c);
-				Number s = 0;
-				/*if (s.is_real())*/ {
-					this->addRoot(new RealAlgebraicNumberNR<Number>((-b - s) / (2*a)), false);
-					this->addRoot(new RealAlgebraicNumberNR<Number>((-b + s) / (2*a)), false);
+				/* Use this formulation of p-q-formula:
+				 * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
+				 */
+				Number rad = b*b - 4*a*c;
+				if (rad == 0) {
+					this->addRoot(new RealAlgebraicNumberNR<Number>(-b / (2*a)), false);
+				} else if (rad > 0) {
+					std::pair<Number, Number> res = carl::sqrt(rad);
+					if (res.first == res.second) {
+						// Root could be calculated exactly
+						this->addRoot(new RealAlgebraicNumberNR<Number>((-b - res.first) / (2*a)), false);
+						this->addRoot(new RealAlgebraicNumberNR<Number>((-b + res.second) / (2*a)), false);
+					} else {
+						// Root is within interval (res.first, res.second)
+						ExactInterval<Number> r(res.first, res.second, BoundType::STRICT);
+						this->addRoot(new RealAlgebraicNumberIR<Number>(this->polynomial, (-b - r) / (2*a)), false);
+						this->addRoot(new RealAlgebraicNumberIR<Number>(this->polynomial, (-b + r) / (2*a)), false);
+					}
 				}
 				break;
 			}

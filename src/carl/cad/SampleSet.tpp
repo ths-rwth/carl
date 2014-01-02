@@ -12,15 +12,15 @@
 #include "../core/RealAlgebraicNumber.h"
 
 namespace carl {
-namespace CAD {
+namespace cad {
 
 template<typename Number>
-std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(const RealAlgebraicNumber<Number>* r) {
+std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(RealAlgebraicNumber<Number>* r) {
 	if (r->isNumeric()) {
 		RealAlgebraicNumberNR<Number>* rNR = new RealAlgebraicNumberNR<Number>(r->value(), r->isRoot());
 		iterator position = this->samples.begin();
 		if (! this->samples.empty()) {
-			position = std::lower_bound(position, this->samples.end(), rNR, carl::less);
+			position = std::lower_bound(position, this->samples.end(), rNR, Less<Number>());
 			if (position != this->samples.end() && carl::Equal<Number>()(*position, rNR)) { // already contained in the list
 				return std::pair<iterator, bool>(position, false);    // return iterator to the already contained element
 			}
@@ -35,6 +35,24 @@ std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(
 		this->queue.push_back(rNR);
 		return std::pair<iterator, bool>(this->samples.insert(position,rNR), true);    // insert safely and return iterator to the new element
 	}
+	auto position = this->samples.begin();
+	if (!this->samples.empty()) {
+		position = std::lower_bound(position, this->samples.end(), r, Less<Number>());
+		if (position != this->samples.end() && Equal<Number>()(*position, r)) {
+			// already contained in the list
+			// return iterator to the already contained element
+			return std::make_pair(position, false);
+		}
+		// else: append r to the end of the list
+	}
+	this->IRqueue.push_back(static_cast<RealAlgebraicNumberIR<Number>*>(r));
+	if (r->isRoot()) {
+		this->rootQueue.push_back(r);
+	} else {
+		this->nonRootQueue.push_back(r);
+	}
+	this->queue.push_back(r);
+	return std::make_pair(this->samples.insert(position, r), true);
 }
 
 template<typename Number>
@@ -47,27 +65,27 @@ typename SampleSet<Number>::iterator SampleSet<Number>::remove(typename SampleSe
 }
 
 template<typename Number>
-inline const RealAlgebraicNumber<Number>* SampleSet<Number>::next() {
+inline RealAlgebraicNumber<Number>* SampleSet<Number>::next() {
 	if (this->samples.empty()) assert(false);
 	return this->queue.front();
 }
 
 template<typename Number>
-inline const RealAlgebraicNumber<Number>* SampleSet<Number>::nextNR() {
+inline RealAlgebraicNumber<Number>* SampleSet<Number>::nextNR() {
 	if (this->samples.empty()) assert(false);
 	if (this->NRqueue.empty()) return this->IRqueue.front();
 	return this->NRqueue.front();
 }
 
 template<typename Number>
-inline const RealAlgebraicNumber<Number>* SampleSet<Number>::nextNonRoot() {
+inline RealAlgebraicNumber<Number>* SampleSet<Number>::nextNonRoot() {
 	if (this->samples.empty()) assert(false);
 	if (this->nonRootQueue.empty()) return this->rootQueue.front();
 	return this->nonRootQueue.front();
 }
 
 template<typename Number>
-inline const RealAlgebraicNumber<Number>* SampleSet<Number>::nextRoot() {
+inline RealAlgebraicNumber<Number>* SampleSet<Number>::nextRoot() {
 	if (this->samples.empty()) assert(false);
 	if (this->rootQueue.empty()) return this->nonRootQueue.front();
 	return this->rootQueue.front();
@@ -78,9 +96,7 @@ void SampleSet<Number>::pop() {
 	if (this->samples.empty()) return;
 	
 	const RealAlgebraicNumber<Number>* r = this->next();
-	//iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, (bool(const RealAlgebraicNumber<Number>*,const RealAlgebraicNumber<Number>*))(carl::template less<Number>));
 	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::Less<Number>());
-	//iterator position = this->samples.begin();
 	
 	assert(position != this->samples.end()); // r should be in this list
 	this->samples.erase(position); // remove next()
@@ -95,7 +111,7 @@ void SampleSet<Number>::popNR() {
 	if (this->samples.empty()) return;
 	
 	RealAlgebraicNumber<Number>* r = this->nextNR();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::less);
+	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, Less<Number>());
 	
 	assert(position != this->samples.end());
 	this->samples.erase(position); // remove nextNR()
@@ -116,7 +132,7 @@ void SampleSet<Number>::popNonroot() {
 	if (this->samples.empty()) return;
 	
 	RealAlgebraicNumber<Number>* r = this->nextNonRoot();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::less);
+	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, Less<Number>());
 	
 	assert(position != this->samples.end());
 	this->samples.erase(position); // remove nextNonRoot()
@@ -137,7 +153,7 @@ void SampleSet<Number>::popRoot() {
 	if (this->samples.empty()) return;
 	
 	RealAlgebraicNumber<Number>* r = this->nextRoot();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::less);
+	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, Less<Number>());
 
 	assert(position != this->samples.end());
 	this->samples.erase(position); // remove nextRoot()
@@ -154,7 +170,7 @@ void SampleSet<Number>::popRoot() {
 }
 
 template<typename Number>
-bool SampleSet<Number>::simplify(const RealAlgebraicNumberIR<Number>* from, const RealAlgebraicNumberNR<Number>* to) {
+bool SampleSet<Number>::simplify(const RealAlgebraicNumberIR<Number>* from, RealAlgebraicNumberNR<Number>* to) {
 	iteratorIR position = std::find(this->IRqueue.begin(), this->IRqueue.end(), from);
 	if (position != this->IRqueue.end()) {
 		return this->simplify(from, to, position);
@@ -163,11 +179,11 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIR<Number>* from, cons
 }
 
 template<typename Number>
-bool SampleSet<Number>::simplify(const RealAlgebraicNumberIR<Number>* from, const RealAlgebraicNumberNR<Number>* to, SampleSet<Number>::iteratorIR& fromIt ) {
+bool SampleSet<Number>::simplify(const RealAlgebraicNumberIR<Number>* from, RealAlgebraicNumberNR<Number>* to, SampleSet<Number>::iteratorIR& fromIt ) {
 	assert(from->isRoot() == to->isRoot());
 
 	// replace in basic list
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), from, carl::less);
+	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), from, Less<Number>());
 	if (position == this->samples.end()) return false;
 	*position = to; // replace ir by nr
 	
@@ -198,7 +214,7 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 	std::pair<SampleSimplification, bool> simplification;
 	simplification.second = false;
 	for (iteratorIR irIter = this->IRqueue.begin(); irIter != this->IRqueue.end(); irIter++) {
-		if (!(*irIter)->isNumeric() && (*irIter)->refinementCount() == 0) {// try at least one refinement
+		if (!(*irIter)->isNumeric() && (*irIter)->getRefinementCount() == 0) {// try at least one refinement
 			(*irIter)->refine();
 		}
 		if ((*irIter)->isNumeric()) {

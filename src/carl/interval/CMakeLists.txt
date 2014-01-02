@@ -4,7 +4,7 @@ set(carl_lib_interval_headers
         ExactInterval.h
 	IntervalEvaluation.h
         PointIntervalFactory.h
-        
+        Interval.h
 ) 
 # Source files in here
 set(carl_lib_interval_sources 

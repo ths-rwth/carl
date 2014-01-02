@@ -1,5 +1,4 @@
 # include directories.
-message(${include_dirs})
 include_directories( 
 	${include_dirs}
 )
@@ -7,6 +6,7 @@ include_directories(
 # include core in library. 
 add_subdirectory(core)
 add_subdirectory(util)
+add_subdirectory(converter)
 add_subdirectory(numbers)
 
 
@@ -20,6 +20,7 @@ add_subdirectory(interval)
 # Compose all the sources for the aritmetic library.
 set(carl_lib_sources 
         ${carl_lib_cad_sources}
+	${carl_lib_converter_sources}
 	${carl_lib_core_sources}
 	${carl_lib_util_sources}
 	${carl_lib_number_sources}
