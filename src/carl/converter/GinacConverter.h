@@ -16,6 +16,26 @@
 
 namespace carl
 {   
+    GiNaC::ex convert(const MultivariatePolynomial<cln::cl_RA>& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
+    {
+        GiNaC::ex result = 0;
+        for(auto term = poly.begin(); term != poly.end(); ++term)
+        {
+            GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( (*term)->coeff() ) );
+            if((*term)->monomial())
+            {
+                for(unsigned i = 0; i < (*term)->monomial()->nrVariables(); ++i)
+                {
+                    auto carlToGinacVar = vars.find((*(*term)->monomial())[i].var);
+                    assert(carlToGinacVar != vars.end());
+                    factor *= GiNaC::pow(carlToGinacVar->second, (*(*term)->monomial())[i].exp);
+                }
+            }
+            result += factor;
+        }
+        return result;
+    }
+    
     MultivariatePolynomial<cln::cl_RA> convert(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars)
     {
         carl::MultivariatePolynomial<cln::cl_RA> result;
@@ -138,6 +158,31 @@ namespace carl
         }
         else assert( false );
         return result;
+    }
+    
+    void gatherVariables(const MultivariatePolynomial<cln::cl_RA>& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap)
+    {
+        std::set<Variable> carlVars;
+        poly.gatherVariables(carlVars);
+        for(auto var = carlVars.begin(); var != carlVars.end(); ++var)
+        {
+            GiNaC::symbol vg(varToString(*var));
+            if( carlToGinacVarMap.insert(std::pair<Variable, GiNaC::ex>(*var, vg)).second )
+            {
+                ginacToCarlVarMap.insert(std::pair<GiNaC::ex, Variable>(vg, *var));
+            }
+        }
+    }
+    
+    MultivariatePolynomial<cln::cl_RA> ginacGcd(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB)
+    {
+        MultivariatePolynomial<cln::cl_RA> result;
+        std::map<Variable, GiNaC::ex> carlToGinacVarMap;
+        std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
+        gatherVariables(polyA, carlToGinacVarMap, ginacToCarlVarMap);
+        gatherVariables(polyB, carlToGinacVarMap, ginacToCarlVarMap);
+        GiNaC::ex ginacResult = GiNaC::gcd(convert(polyA, carlToGinacVarMap), convert(polyA, carlToGinacVarMap));
+        return convert(ginacResult, ginacToCarlVarMap);
     }
 }
 
