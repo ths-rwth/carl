@@ -4,6 +4,12 @@
  * for any non-primitive type such that the desired inclusion property can be 
  * mainained.
  *
+ * Requirements for the NumberType:
+ * - Operators +,-,*,/ with the expected functionality
+ * - Operators +=,-=,*=,/= with the expected functionality
+ * - Operators <,>,<=,>=,==,!= with the expected functionality
+ * - Operations abs, min, max, log
+ *
  * @file   Interval.h
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
@@ -25,6 +31,7 @@
 #include <boost/numeric/interval/interval.hpp>
 
 #include "../core/Variable.h"
+#include "../util/SFINAE.h"
 
 namespace carl
 {
@@ -89,6 +96,11 @@ namespace carl
 			mUpperBoundType(BoundType::WEAK)
 		{}
 		
+		Interval(const BoostInterval& content, BoundType lowerBoundType, BoundType upperBoundType) : mContent(content),
+			mLowerBoundType(lowerBoundType),
+			mUpperBoundType(upperBoundType)
+		{}
+		
 		Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType) :
 		mContent(lower, upper),
 		mLowerBoundType(lowerBoundType),
@@ -100,26 +112,26 @@ namespace carl
 			mLowerBoundType(o.mLowerBoundType),
 			mUpperBoundType(o.mUpperBoundType)
 		{}
-		
-		template<typename DisableIf<std::is_same<Number, double>>::type >
+		/*
+		template<typename N = Number, DisableIf<std::is_same<Number, double>> = dummy >
 		Interval(double n):
 			mContent(carl::Interval<Number>::BoostInterval(n)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
-		template<typename DisableIf<std::is_same<Number, double>>::type>
+		template<typename N = Number, DisableIf<std::is_same<Number, double>> = dummy>
 		Interval(double lower, double upper):
 			mContent(Interval<Number>::BoostInterval(lower, upper)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
-		template<typename DisableIf<std::is_same<Number, double>>::type>
+		template<typename N = Number, DisableIf<std::is_same<Number, double>> = dummy>
 		Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType):
 			mContent(Interval<Number>::BoostInterval(lower, upper)),
 			mLowerBoundType(lowerBoundType),
 			mUpperBoundType(upperBoundType)
 		{}
-		
+		*/
 		template<typename Rational>
 		Interval(Rational n);
 		template<typename Rational>
@@ -127,7 +139,18 @@ namespace carl
 		template<typename Rational>
 		Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType);
 		
-		~Interval();
+		Interval<Number> unboundedInterval()
+		{
+			return Interval<Number>(Number(0), BoundType::INFTY, Number(0), BoundType::INFTY);
+		}
+		
+		Interval<Number> emptyInterval()
+		{
+			return Interval<Number>(Number(0), BoundType::STRICT, Number(0), BoundType::STRICT);
+		}
+		
+		~Interval()
+		{}
         
         /***********************************************************************
          * Getter & Setter
@@ -141,6 +164,16 @@ namespace carl
 		Number& upper() const
 		{
 			return mContent.upper;
+		}
+		
+		BoostInterval& rContent()
+		{
+			return mContent;
+		}
+		
+		BoostInterval content() const
+		{
+			return mContent;
 		}
 		
 		BoundType lowerBoundType() const
@@ -189,6 +222,13 @@ namespace carl
 			}
 		}
 		
+		Interval<Number>& operator =(const Interval<Number>& rhs)
+		{
+			mContent = rhs.content();
+			mLowerBoundType = rhs.lowerBoundType();
+			mUpperBoundType = rhs.upperBoundType();
+		}
+		
 		/***********************************************************************
 		 * Transformations and advanced getters/setters
 		 **********************************************************************/
@@ -206,6 +246,8 @@ namespace carl
 		void magnitude_assign();
 		Number center() const;
 		void center_assign();
+		
+		bool contains(const Number& val) const;
 		
 		void bloat_by(const Number& width);
 		void bloat_times(const Number& factor);
@@ -227,12 +269,11 @@ namespace carl
 		void mul_assign(const Interval<Number>& rhs);
 		Interval<Number>& div(const Interval<Number>& rhs) const;
 		void div_assign(const Interval<Number>& rhs);
-		std::pair<Interval<Number>, Interval<Number>> div_ext(const Interval<Number>& rhs) const;
+		bool div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const;
 		
 		Interval<Number>& inverse() const;
 		void inverse_assign();
-		Interval<Number>& reciprocal() const;
-		void reciprocal_assign();
+		bool reciprocal(Interval<Number>& a, Interval<Number>& b) const;
 		
 		Interval<Number>& power(unsigned exp) const;
 		void power_assign(unsigned exp);
@@ -322,8 +363,13 @@ namespace carl
 	template<typename Number>
 	inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs);
 	
+	/*******************************************************************************
+	 * Other operators
+	 ******************************************************************************/
+	
 	template<typename Number>
 	inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i);
+	
 }
 
 #include "Interval.tpp"
