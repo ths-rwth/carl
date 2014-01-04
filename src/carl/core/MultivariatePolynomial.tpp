@@ -5,7 +5,7 @@
 
 #include "UnivariatePolynomial.h"
 #include "logging.h"
-#include "carl/numbers/numbers.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {	
