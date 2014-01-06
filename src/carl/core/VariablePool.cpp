@@ -28,15 +28,16 @@ VariablePool& VariablePool::operator= (const VariablePool& rs)
         instance  = rs.instance;
     }
     return *this;
-}   
+}
+
 VariablePool& VariablePool::getInstance(  )
 {
-    std::call_once( VariablePool::only_one, 
-        [] ()
-        {
+//    std::call_once( VariablePool::only_one, 
+//        [] ()
+//        {
             VariablePool::instance.reset( new VariablePool() );
             LOGMSG_INFO("carl","VariablePool created.");
-        });
+//        });
     return *VariablePool::instance;
 }
 

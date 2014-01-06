@@ -43,6 +43,7 @@ option( STATICLIB_SWITCH "Compile a statically linked version of the library." O
 option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
+option( TESTING "Compile the unit tests" ON )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -70,6 +71,10 @@ endforeach()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for builed executables")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
+if(${STATICLIB_SWITCH} STREQUAL "ON")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
+endif()
 
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -113,7 +118,10 @@ include( FindCLN )
 include( FindGMP )
 include( FindGMPXX )
 
-set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} pthread )
+set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} )
+if( ${TESTING} STREQUAL "ON" )
+  set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} pthread )
+endif()
 set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -135,7 +143,6 @@ message(ERROR "No local version of boost exists")
 endif()
 FIND_PACKAGE(Boost COMPONENTS REQUIRED)
 
-set( libraries  ${libraries} )
 set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -154,19 +161,25 @@ endif()
 if(NOT FORCE_SHIPPED_RESOURCES)
 	# find log4cplus
 	find_package(Log4cplus)
-	# find googletest
-	find_package(GTest)
+    # find googletest
+    if( ${TESTING} STREQUAL "ON" )
+	  find_package(GTest)
+    endif()
 	# find eigen
 	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
-enable_testing()
-#set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
-set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
-set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
+if( ${TESTING} STREQUAL "ON" )
+  enable_testing()
+endif()
+if(${CARL_LOGGING} STREQUAL "ON")
+  #set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
+  set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
+  set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
+endif()
 
-set(libraries ${libraries} ${EIGEN3_LIBRARY} pthread)
+set(libraries ${libraries} ${EIGEN3_LIBRARY})
 set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
 
 
