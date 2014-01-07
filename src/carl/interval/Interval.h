@@ -8,13 +8,16 @@
  * - Operators +,-,*,/ with the expected functionality
  * - Operators +=,-=,*=,/= with the expected functionality
  * - Operators <,>,<=,>=,==,!= with the expected functionality
- * - Operations abs, min, max, log
+ * - Operations abs, min, max, log, exp, power, sqrt
+ * - Trigonometric functions sin, cos, tan, asin, acos, atan, sinh, cosh, tanh,
+ *				asinh, acosh, atanh (these functions are needed for the 
+ *				specialization of the rounding modes.
  *
  * @file   Interval.h
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
  * @since	2013-12-13
- * @version 2013-12-20
+ * @version 2014-01-07
  */
 
 #pragma once
@@ -34,7 +37,7 @@
 #include "../util/SFINAE.h"
 
 namespace carl
-{
+{	
 	template<typename Number>
 	struct policies
 	{
@@ -45,7 +48,7 @@ namespace carl
 	template<>
 	struct policies<double>
 	{
-		typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_arith_opp<double> > roundingP;
+		typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_opp<double> > roundingP;
 		typedef boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> > checkingP;
 	};
 	
@@ -112,26 +115,28 @@ namespace carl
 			mLowerBoundType(o.mLowerBoundType),
 			mUpperBoundType(o.mUpperBoundType)
 		{}
-		/*
-		template<typename N = Number, DisableIf<std::is_same<Number, double>> = dummy >
-		Interval(double n):
+		
+		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy >
+		Interval(const double& n):
 			mContent(carl::Interval<Number>::BoostInterval(n)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
-		template<typename N = Number, DisableIf<std::is_same<Number, double>> = dummy>
+		
+		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy>
 		Interval(double lower, double upper):
 			mContent(Interval<Number>::BoostInterval(lower, upper)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
-		template<typename N = Number, DisableIf<std::is_same<Number, double>> = dummy>
+		
+		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy>
 		Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType):
 			mContent(Interval<Number>::BoostInterval(lower, upper)),
 			mLowerBoundType(lowerBoundType),
 			mUpperBoundType(upperBoundType)
 		{}
-		*/
+		
 		template<typename Rational>
 		Interval(Rational n);
 		template<typename Rational>
@@ -156,46 +161,82 @@ namespace carl
          * Getter & Setter
          **********************************************************************/
 		
+		/**
+		 * The getter for the lower boundary of the interval.
+		 * @return lower interval boundary
+		 */
 		Number& lower() const
 		{
 			return mContent.lower();
 		}
         
+		/**
+		 * The getter for the upper boundary of the interval.
+		 * @return upper interval boundary
+		 */
 		Number& upper() const
 		{
 			return mContent.upper;
 		}
 		
+		/**
+		 * Returns a reference to the included boost interval.
+		 * @return boost interval
+		 */
 		BoostInterval& rContent()
 		{
 			return mContent;
 		}
 		
+		/**
+		 * Returns a copy of the included boost interval.
+		 * @return boost interval
+		 */
 		BoostInterval content() const
 		{
 			return mContent;
 		}
 		
+		/**
+		 * The getter for the lower bound type of the interval.
+		 * @return lower bound type
+		 */
 		BoundType lowerBoundType() const
 		{
 			return mLowerBoundType;
 		}
 		
+		/**
+		 * The getter for the upper bound type of the interval.
+		 * @return upper bound type
+		 */
 		BoundType upperBoundType() const
 		{
 			return mUpperBoundType;
 		}
 		
+		/**
+		 * The setter for the lower boundary of the interval.
+		 * @param lower boundary
+		 */
 		void setLower(const Number& n)
 		{
 			mContent = BoostInterval(n, mContent.upper());
 		}
         
+		/**
+		 * The setter for the upper boundary of the interval.
+		 * @param upper boundary
+		 */
 		void setUpper(const Number& n)
 		{
 			mContent = BoostINterval(mContent.lower(), n);
 		}
 		
+		/**
+		 * The setter for the lower bound type of the interval.
+		 * @param lower bound type
+		 */
 		void setLowerBoundType(BoundType b)
 		{
 			if(b == BoundType::INFTY)
@@ -209,6 +250,10 @@ namespace carl
 			}
 		}
 		
+		/**
+		 * The setter for the upper bound type of the interval.
+		 * @param upper bound type
+		 */
 		void setUpperBoundType(BoundType b)
 		{
 			if(b == BoundType::INFTY)
@@ -222,11 +267,17 @@ namespace carl
 			}
 		}
 		
+		/**
+		 * The assignment operator.
+		 * @param source interval
+		 * @return
+		 */
 		Interval<Number>& operator =(const Interval<Number>& rhs)
 		{
 			mContent = rhs.content();
 			mLowerBoundType = rhs.lowerBoundType();
 			mUpperBoundType = rhs.upperBoundType();
+			return *this;
 		}
 		
 		/***********************************************************************
@@ -248,6 +299,9 @@ namespace carl
 		void center_assign();
 		
 		bool contains(const Number& val) const;
+		bool contains(const Interval<Number>& rhs) const;
+		bool subset(const Interval<Number>& rhs) const;
+		bool proper_subset(const Interval<Number>& rhs) const;
 		
 		void bloat_by(const Number& width);
 		void bloat_times(const Number& factor);
@@ -261,59 +315,59 @@ namespace carl
          * Arithmetic functions
          **********************************************************************/
 		
-		Interval<Number>& add(const Interval<Number>& rhs) const;
+		Interval<Number> add(const Interval<Number>& rhs) const;
 		void add_assign(const Interval<Number>& rhs);
-        Interval<Number>& sub(const Interval<Number>& rhs) const;
+        Interval<Number> sub(const Interval<Number>& rhs) const;
 		void sub_assign(const Interval<Number>& rhs);
-		Interval<Number>& mul(const Interval<Number>& rhs) const;
+		Interval<Number> mul(const Interval<Number>& rhs) const;
 		void mul_assign(const Interval<Number>& rhs);
-		Interval<Number>& div(const Interval<Number>& rhs) const;
+		Interval<Number> div(const Interval<Number>& rhs) const;
 		void div_assign(const Interval<Number>& rhs);
 		bool div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const;
 		
-		Interval<Number>& inverse() const;
+		Interval<Number> inverse() const;
 		void inverse_assign();
 		bool reciprocal(Interval<Number>& a, Interval<Number>& b) const;
 		
-		Interval<Number>& power(unsigned exp) const;
+		Interval<Number> power(unsigned exp) const;
 		void power_assign(unsigned exp);
-		Interval<Number>& sqrt() const;
+		Interval<Number> sqrt() const;
 		void sqrt_assign();
-		Interval<Number>& root(unsigned deg) const;
+		Interval<Number> root(unsigned deg) const;
 		void root_assign(unsigned deg);
-		Interval<Number>& log() const;
+		Interval<Number> log() const;
 		void log_assign();
 		
         /***********************************************************************
          * Trigonometric functions
          **********************************************************************/
         
-		Interval<Number>& sin() const;
+		Interval<Number> sin() const;
 		void sin_assign();
-		Interval<Number>& cos() const;
+		Interval<Number> cos() const;
 		void cos_assign();
-		Interval<Number>& tan() const;
+		Interval<Number> tan() const;
 		void tan_assign();
 		
-		Interval<Number>& asin() const;
+		Interval<Number> asin() const;
 		void asin_assign();
-		Interval<Number>& acos() const;
+		Interval<Number> acos() const;
 		void acos_assign();
-		Interval<Number>& atan() const;
+		Interval<Number> atan() const;
 		void atan_assign();
 		
-		Interval<Number>& sinh() const;
+		Interval<Number> sinh() const;
 		void sinh_assign();
-		Interval<Number>& cosh() const;
+		Interval<Number> cosh() const;
 		void cosh_assign();
-		Interval<Number>& tanh() const;
+		Interval<Number> tanh() const;
 		void tanh_assign();
 		
-		Interval<Number>& asinh() const;
+		Interval<Number> asinh() const;
 		void asinh_assign();
-		Interval<Number>& acosh() const;
+		Interval<Number> acosh() const;
 		void acosh_assign();
-		Interval<Number>& atanh() const;
+		Interval<Number> atanh() const;
 		void atanh_assign();
     };
 	

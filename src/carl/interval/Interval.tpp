@@ -5,13 +5,15 @@
  * @autor Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  * 
  * @since	2013-12-20
- * @version 2013-12-20
+ * @version 2014-01-07
  */
 #pragma once
 #include "Interval.h"
 
 namespace carl
 {
+	
+	using namespace boost::numeric;
 
 /*******************************************************************************
  * Constructors & Destructor
@@ -33,8 +35,7 @@ Interval<Number>::Interval(Rational lower, BoundType lowerBoundType, Rational up
 template<typename Number>
 Number Interval<Number>::diameter() const
 	{
-		assert(mContent.upper() >= mContent.lower());
-		return mContent.upper() - mContent.lower();
+		return boost::numeric::width(mContent);
 	}
 
 template<typename Number>
@@ -71,7 +72,7 @@ template<typename Number>
 template<typename Number>
 	Number Interval<Number>::center() const
 	{
-		return mContent.upper() - (this->diameter()/Number(2));
+		return boost::numeric::median(mContent);
 	}
 
 template<typename Number>
@@ -111,11 +112,101 @@ template<typename Number>
         }
         return true;    // for open intervals: (left() < n && right() > n) || (n == 0 && left() == cln::cl_RA( 0 ) && right() == cln::cl_RA( 0 ))	}
 	}
+	
+	template<typename Number>
+	bool Interval<Number>::contains(const Interval<Number>& rhs) const
+	{
+		if( mContent.lower() < rhs.lower() && mContent.upper() > rhs.upper() )
+		{
+			return true;
+		}
 		
+		if( mContent.lower() == rhs.lower() && mContent.upper() == rhs.upper() )
+		{
+			bool lowerOk = false;
+			switch( mLowerBoundType )
+			{
+				case BoundType::INFTY:
+					lowerOk = (rhs.lowerBoundType() == BoundType::INFTY);
+					break;
+				case BoundType::STRICT:
+					lowerOk = (rhs.lowerBoundType() == BoundType::STRICT);
+					break;
+				case BoundType::WEAK:
+					lowerOk = (rhs.lowerBoundType() != BoundType::INFTY);
+			}
+			if( lowerOk )
+			{
+				switch( mUpperBoundType )
+				{
+					case BoundType::INFTY:
+						return rhs.upperBoundType() == BoundType::INFTY;
+					case BoundType::STRICT:
+						return rhs.upperBoundType() == BoundType::STRICT;
+					case BoundType::WEAK:
+						return rhs.upperBoundType() != BoundType::INFTY;
+				}
+			}
+			return false; // the lower boundaries are not ok.
+		}
+		else
+		{
+			return false; // not less and not equal
+		}
+	}
+	
+	template<typename Number>
+	bool Interval<Number>::subset(const Interval<Number>& rhs) const
+	{
+		return this->contains(rhs);
+	}
+	
+	template<typename Number>
+	bool Interval<Number>::proper_subset(const Interval<Number>& rhs) const
+	{
+		if( mContent.lower() < rhs.lower() && mContent.upper() > rhs.upper() )
+		{
+			return true;
+		}
+		
+		if( mContent.lower() == rhs.lower() && mContent.upper() == rhs.upper() )
+		{
+			bool lowerOk = false;
+			switch( mLowerBoundType )
+			{
+				case BoundType::INFTY:
+					lowerOk = (rhs.lowerBoundType() == BoundType::INFTY);
+					break;
+				case BoundType::STRICT:
+					lowerOk = (rhs.lowerBoundType() == BoundType::STRICT);
+					break;
+				case BoundType::WEAK:
+					lowerOk = (rhs.lowerBoundType() != BoundType::INFTY);
+			}
+			if( lowerOk )
+			{
+				switch( mUpperBoundType )
+				{
+					case BoundType::INFTY:
+						return rhs.upperBoundType() == BoundType::INFTY;
+					case BoundType::STRICT:
+						return rhs.upperBoundType() == BoundType::STRICT;
+					case BoundType::WEAK:
+						return rhs.upperBoundType() != BoundType::INFTY;
+				}
+			}
+			return false; // the lower boundaries are not ok.
+		}
+		else
+		{
+			return false; // not less and not equal
+		}
+	}
+	
 template<typename Number>
 	void Interval<Number>::bloat_by(const Number& width)
 	{
-		mContent = BoostInterval(mContent.lower() - width, mContent.upper() + width);
+		mContent = boost::numeric::widen(mContent, width);
 	}
 
 template<typename Number>
@@ -139,7 +230,8 @@ void Interval<Number>::shrink_times(const Number& factor)
 template<typename Number>
 std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
 	{
-		return std::pair<Interval<Number>, Interval<Number> >(Interval(mLowerBoundType, mContent.lower(), this->center(), BoundType::STRICT), Interval(this->center(), BoundType::WEAK, mContent.upper(), mUpperBoundType));
+		std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
+		return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
 	}
 
 template<typename Number>
@@ -176,7 +268,7 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
  ******************************************************************************/
 
 template<typename Number>
-Interval<Number>& Interval<Number>::add(const Interval<Number>& rhs) const
+Interval<Number> Interval<Number>::add(const Interval<Number>& rhs) const
 	{
 		return Interval<Number>( mContent + rhs.content(),
                               getWeakestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
@@ -186,12 +278,11 @@ Interval<Number>& Interval<Number>::add(const Interval<Number>& rhs) const
 template<typename Number>
 void Interval<Number>::add_assign(const Interval<Number>& rhs)
 	{
-		Interval<Number> tmp = this->add(rhs);
-		*this = tmp;
+		*this = this->add(rhs);
 	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::sub(const Interval<Number>& rhs) const
+Interval<Number> Interval<Number>::sub(const Interval<Number>& rhs) const
 	{
 		return this->add(rhs.inverse());
 	}
@@ -199,12 +290,11 @@ Interval<Number>& Interval<Number>::sub(const Interval<Number>& rhs) const
 template<typename Number>
 void Interval<Number>::sub_assign(const Interval<Number>& rhs)
 	{
-		Interval<Number> tmp = this->sub(rhs);
-		*this = tmp;
+		*this = this->sub(rhs);
 	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::mul(const Interval<Number>& rhs) const
+Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
 	{
 		BoundType leftType = BoundType::WEAK;
         BoundType rightType = BoundType::WEAK;
@@ -228,12 +318,11 @@ Interval<Number>& Interval<Number>::mul(const Interval<Number>& rhs) const
 template<typename Number>
 void Interval<Number>::mul_assign(const Interval<Number>& rhs)
 	{
-		Interval<Number> tmp = this->mul(rhs);
-		*this = tmp;
+		*this = this->mul(rhs);
 	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::div(const Interval<Number>& rhs) const
+Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
 	{
 		BoundType leftType = BoundType::WEAK;
         BoundType rightType = BoundType::WEAK;
@@ -257,8 +346,7 @@ Interval<Number>& Interval<Number>::div(const Interval<Number>& rhs) const
 template<typename Number>
 void Interval<Number>::div_assign(const Interval<Number>& rhs)
 	{
-		Interval<Number> tmp = this->div(rhs);
-		*this = tmp;
+		*this = this->div(rhs);
 	}
 
 template<typename Number>
@@ -317,7 +405,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
 	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::inverse() const
+Interval<Number> Interval<Number>::inverse() const
 	{
 		return Interval<Number>( -mContent.upper(), mUpperBoundType, -mContent.lower(), mLowerBoundType );
 	}
@@ -325,8 +413,7 @@ Interval<Number>& Interval<Number>::inverse() const
 template<typename Number>
 void Interval<Number>::inverse_assign()
 	{
-		Interval<Number> tmp = this->inverse();
-		*this = tmp;
+		*this = this->inverse();
 	}
 
 template<typename Number>
@@ -407,7 +494,7 @@ bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) cons
 	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::power(unsigned exp) const
+Interval<Number> Interval<Number>::power(unsigned exp) const
 	{
 		assert(exp <= INT_MAX );
         if( exp % 2 == 0 )
@@ -467,38 +554,45 @@ Interval<Number>& Interval<Number>::power(unsigned exp) const
 template<typename Number>
 void Interval<Number>::power_assign(unsigned exp)
 	{
-		Interval<Number> tmp = this->power(exp);
-		*this = tmp;
+		*this = this->power(exp);
 	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::sqrt() const
-	{}
+Interval<Number> Interval<Number>::sqrt() const
+	{
+		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::sqrt_assign()
-	{}
+	{
+		*this = this->sqrt();
+	}
 
+	
 template<typename Number>
-Interval<Number>& Interval<Number>::root(unsigned deg) const
-	{}
+Interval<Number> Interval<Number>::root(unsigned deg) const
+	{
+		return Interval<Number>(boost::numeric::nth_root(mContent, deg), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::root_assign(unsigned deg)
-	{}
+	{
+		*this = this->root(deg);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::log() const
+Interval<Number> Interval<Number>::log() const
 	{
 		assert( mContent.lower() > 0 );
-        return Interval<Number>(log(mContent.lower()), mLowerBoundType, log(mContent.upper()), mUpperBoundType);
+        return Interval<Number>(boost::numeric::log(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
 template<typename Number>
 void Interval<Number>::log_assign()
 	{
-		Interval<Number> tmp = this->log();
-		*this = tmp;
+		mContent = boost::numeric::log(mContent);
 	}
 
 /*******************************************************************************
@@ -506,162 +600,302 @@ void Interval<Number>::log_assign()
  ******************************************************************************/
 
 template<typename Number>
-Interval<Number>& Interval<Number>::sin() const
-	{}
+Interval<Number> Interval<Number>::sin() const
+	{
+		return Interval<Number>(boost::numeric::sin(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::sin_assign()
-	{}
+	{
+		mContent = boost::numeric::sin(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::cos() const
-	{}
+Interval<Number> Interval<Number>::cos() const
+	{
+		return Interval<Number>(boost::numeric::cos(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::cos_assign()
-	{}
+	{
+		mContent = boost::numeric::cos(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::tan() const
-	{}
+Interval<Number> Interval<Number>::tan() const
+	{
+		return Interval<Number>(boost::numeric::tan(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::tan_assign()
-	{}
+	{
+		mContent = boost::numeric::tan(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::asin() const
-	{}
+Interval<Number> Interval<Number>::asin() const
+	{
+		return Interval<Number>(boost::numeric::asin(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::asin_assign()
-	{}
+	{
+		mContent = boost::numeric::asin(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::acos() const
-	{}
+Interval<Number> Interval<Number>::acos() const
+	{
+		return Interval<Number>(boost::numeric::acos(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::acos_assign()
-	{}
+	{
+		mContent = boost::numeric::acos(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::atan() const
-	{}
+Interval<Number> Interval<Number>::atan() const
+	{
+		return Interval<Number>(boost::numeric::atan(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::atan_assign()
-	{}
+	{
+		mContent = boost::numeric::atan(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::sinh() const
-	{}
+Interval<Number> Interval<Number>::sinh() const
+	{
+		return Interval<Number>(boost::numeric::sinh(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::sinh_assign()
-	{}
+	{
+		mContent = boost::numeric::sinh(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::cosh() const
-	{}
+Interval<Number> Interval<Number>::cosh() const
+	{
+		return Interval<Number>(boost::numeric::cosh(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::cosh_assign()
-	{}
+	{
+		mContent = boost::numeric::cosh(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::tanh() const
-	{}
+Interval<Number> Interval<Number>::tanh() const
+	{
+		return Interval<Number>(boost::numeric::tanh(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::tanh_assign()
-	{}
+	{
+		mContent = boost::numeric::tanh(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::asinh() const
-	{}
+Interval<Number> Interval<Number>::asinh() const
+	{
+		return Interval<Number>(boost::numeric::asinh(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::asinh_assign()
-	{}
+	{
+		mContent = boost::numeric::asinh(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::acosh() const
-	{}
+Interval<Number> Interval<Number>::acosh() const
+	{
+		return Interval<Number>(boost::numeric::acosh(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::acosh_assign()
-	{}
+	{
+		mContent = boost::numeric::acosh(mContent);
+	}
 
 template<typename Number>
-Interval<Number>& Interval<Number>::atanh() const
-	{}
+Interval<Number> Interval<Number>::atanh() const
+	{
+		return Interval<Number>(boost::numeric::atanh(mContent), mLowerBoundType, mUpperBoundType);
+	}
 
 template<typename Number>
 void Interval<Number>::atanh_assign()
-	{}
+	{
+		mContent = boost::numeric::atanh(mContent);
+	}
 
 /*******************************************************************************
  * Overloaded arithmetics operators
  ******************************************************************************/
 
 template<typename Number>
-inline const Interval<Number> operator +(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator +(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return lhs.add(rhs);
+	}
 
 template<typename Number>
-inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs)
+	{
+		return Interval<Number>(lhs + rhs, rhs.lowerBoundType(), rhs.UpperBoundType());
+	}
 
 template<typename Number>
-inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs);
+inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs)
+	{
+		return rhs + lhs;
+	}
 
 template<typename Number>
-inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return lhs.sub(rhs);
+	}
 
 template<typename Number>
-inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs)
+	{
+		return Interval<Number>(lhs).sub_assign(rhs);
+	}
 
 template<typename Number>
-inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs);
+inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs)
+	{
+		return lhs.sub(Interval<Number>(rhs));
+	}
 
 template<typename Number>
-inline const Interval<Number> operator *(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator *(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return lhs.mul(rhs);
+	}
 
 template<typename Number>
-inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs)
+	{
+		return Interval<Number>( lhs * rhs, rhs.lowerBoundType(), rhs.upperBoundType());
+	}
 
 template<typename Number>
-inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs);
+inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs)
+	{
+		return rhs * lhs;
+	}
 
 template<typename Number>
-inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return lhs.div(rhs);
+	}
 
 template<typename Number>
-inline const Interval<Number> operator /(const Number& lhs, const Interval<Number>& rhs);
+inline const Interval<Number> operator /(const Number& lhs, const Interval<Number>& rhs)
+	{
+		return Interval<Number>(lhs).div_assign(rhs);
+	}
 
 template<typename Number>
-inline const Interval<Number> operator /(const Interval<Number>& lhs, const Number& rhs);
+inline const Interval<Number> operator /(const Interval<Number>& lhs, const Number& rhs)
+	{
+		return lhs.div(Interval<Number>(rhs));
+	}
 
 /*******************************************************************************
  * Comparison operators
  ******************************************************************************/
 
 template<typename Number>
-inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return lhs.content() == rhs.content() && lhs.lowerBoundType() == rhs.lowerBoundType() && lhs.upperBoundType() == rhs.upperBoundType();
+	}
 
 template<typename Number>
-inline bool operator !=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline bool operator !=(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return !(lhs == rhs);
+	}
 
 template<typename Number>
-inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		if( lhs < rhs )
+		{
+			return true;
+		}
+		
+		if( lhs.upper() == rhs.lower() )
+		{
+			switch (lhs.upperBoundType()) {
+				case BoundType::STRICT:
+				case BoundType::WEAK:
+					return rhs.lowerBoundType() != BoundType::INFTY;
+				default:
+					return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
 
 template<typename Number>
-inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return rhs <= lhs;
+	}
 
 template<typename Number>
-inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		if( lhs.upper() < rhs.lower() )
+		{
+			return true;
+		}
+		
+		if( lhs.upper() == rhs.lower() )
+		{
+			switch (lhs.upperBoundType()) {
+				case BoundType::STRICT:
+					return rhs.lowerBoundType() != BoundType::INFTY;
+				case BoundType::WEAK:
+					return rhs.lowerBoundType() == BoundType::STRICT;
+				default:
+					return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 template<typename Number>
-inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs);
+inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		return rhs < lhs;
+	}
 	
 /*******************************************************************************
  * Other operators
