@@ -284,57 +284,196 @@ namespace carl
 		 * Transformations and advanced getters/setters
 		 **********************************************************************/
 		
+		/**
+		 * Advanced setter to modify both boundaries at once.
+		 * @param lower boundary
+		 * @param upper boundary
+		 */
 		void set(const Number& lower, const Number& upper)
 		{
 			mContent = BoostInterval(lower, upper);
 		}
 		
+		/**
+		 * Returns the diameter of the interval.
+		 * @return diameter
+		 */
 		Number diameter() const;
 		void diameter_assign();
+		
+		/**
+		 * Returns the ratio of the diameters of the given intervals.
+		 * @param interval
+		 * @return ratio
+		 */
 		Number diameterRatio(const Interval<Number>& rhs) const;
 		void diameterRatio_assign(const Interval<Number>& rhs);
+		
+		/**
+		 * Returns the magnitude of the interval.
+		 * @return magnitude
+		 */
 		Number magnitude() const;
 		void magnitude_assign();
+		
+		/**
+		 * Returns the center point of the interval.
+		 * @return center
+		 */
 		Number center() const;
 		void center_assign();
 		
+		/**
+		 * Checks if the interval contains the given value.
+		 * @param value
+		 * @return
+		 */
 		bool contains(const Number& val) const;
+		
+		/**
+		 * Checks if the interval contains the given interval.
+		 * @param interval
+		 * @return
+		 */
 		bool contains(const Interval<Number>& rhs) const;
+		
+		/**
+		 * Checks if the given interval is a subset of the calling interval.
+		 * @param interval
+		 * @return
+		 */
 		bool subset(const Interval<Number>& rhs) const;
+		
+		/**
+		 * Checks if the given interval is a proper subset of the calling interval.
+		 * @param interval
+		 * @return
+		 */
 		bool proper_subset(const Interval<Number>& rhs) const;
 		
+		/**
+		 * Bloats the interval by the given value.
+		 * @param width
+		 */
 		void bloat_by(const Number& width);
+		
+		/**
+		 * Bloats the interval times the factor (multiplies the overall width).
+		 * @param factor
+		 */
 		void bloat_times(const Number& factor);
+		
+		/**
+		 * Shrinks the interval by the given value.
+		 * @param width
+		 */
 		void shrink_by(const Number& width);
+		
+		/**
+		 * Shrinks the interval by a multiple of its width.
+		 * @param factor
+		 */
 		void shrink_times(const Number& factor);
 		
+		/**
+		 * Splits the interval into 2 equally sized parts (strict-weak-cut)
+		 * @return pair<interval, interval>
+		 */
 		std::pair<Interval<Number>, Interval<Number>> split() const;
+		
+		/**
+		 * Splits the interval into n equally sized parts (strict-weak-cut)
+		 * @return list<interval>
+		 */
 		std::list<Interval<Number>> split(unsigned n) const;
 		
         /***********************************************************************
          * Arithmetic functions
          **********************************************************************/
 		
+		/**
+		 * Adds two intervals according to natural interval arithmetic.
+		 * @param interval
+		 * @return result
+		 */
 		Interval<Number> add(const Interval<Number>& rhs) const;
 		void add_assign(const Interval<Number>& rhs);
+		
+		/**
+		 * Subtracts two intervals according to natural interval arithmetic.
+		 * @param interval
+		 * @return result
+		 */
         Interval<Number> sub(const Interval<Number>& rhs) const;
 		void sub_assign(const Interval<Number>& rhs);
+		
+		/**
+		 * Multiplies two intervals according to natural interval arithmetic.
+		 * @param interval
+		 * @return result
+		 */
 		Interval<Number> mul(const Interval<Number>& rhs) const;
 		void mul_assign(const Interval<Number>& rhs);
+		
+		/**
+		 * Divides two intervals according to natural interval arithmetic.
+		 * @param interval
+		 * @return result
+		 */
 		Interval<Number> div(const Interval<Number>& rhs) const;
 		void div_assign(const Interval<Number>& rhs);
+		
+		/**
+		 * Implements extended interval division with intervals containting zero.
+		 * @param interval
+		 * @param result a
+		 * @param result b
+		 * @return split occured
+		 */
 		bool div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const;
 		
+		/**
+		 * Calculates the additive inverse of an interval with respect to natural interval arithmetic.
+		 * @return
+		 */
 		Interval<Number> inverse() const;
 		void inverse_assign();
+		
+		/**
+		 * Calculates the multiplicative inverse of an interval with respect to natural interval arithmetic.
+		 * @param result a
+		 * @param result b
+		 * @return split occured
+		 */
 		bool reciprocal(Interval<Number>& a, Interval<Number>& b) const;
 		
+		/**
+		 * Calculates the power of the interval with respect to natural interval arithmetic.
+		 * @param exponent
+ 		 * @return result
+		 */
 		Interval<Number> power(unsigned exp) const;
 		void power_assign(unsigned exp);
+		
+		/**
+		 * Calculates the squareroot of the interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> sqrt() const;
 		void sqrt_assign();
+		
+		/**
+		 * Calculates the nth root of the interval with respect to natural interval arithmetic.
+		 * @param degree
+		 * @return result
+		 */
 		Interval<Number> root(unsigned deg) const;
 		void root_assign(unsigned deg);
+		
+		/**
+		 * Calculates the logarithm of the interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> log() const;
 		void log_assign();
 		
@@ -342,31 +481,87 @@ namespace carl
          * Trigonometric functions
          **********************************************************************/
         
+		/**
+		 * Calculates the sine of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> sin() const;
 		void sin_assign();
+		
+		/**
+		 * Calculates the cosine of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> cos() const;
 		void cos_assign();
+		
+		/**
+		 * Calculates the tangens of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> tan() const;
 		void tan_assign();
 		
+		/**
+		 * Calculates the arcussine of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> asin() const;
 		void asin_assign();
+		
+		/**
+		 * Calculates the arcuscosine of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> acos() const;
 		void acos_assign();
+		
+		/**
+		 * Calculates the arcustangens of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> atan() const;
 		void atan_assign();
 		
+		/**
+		 * Calculates the sine hyperbolicus of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> sinh() const;
 		void sinh_assign();
+		
+		/**
+		 * Calculates the cosine hyperbolicus of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> cosh() const;
 		void cosh_assign();
+		
+		/**
+		 * Calculates the tangens hyperbolicus of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> tanh() const;
 		void tanh_assign();
 		
+		/**
+		 * Calculates the arcussine hyperbolicus of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> asinh() const;
 		void asinh_assign();
+		
+		/**
+		 * Calculates the arcuscosine hyperbolicus of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> acosh() const;
 		void acosh_assign();
+		
+		/**
+		 * Calculates the arcustangens hyperbolicus of the given interval with respect to natural interval arithmetic.
+		 * @return result
+		 */
 		Interval<Number> atanh() const;
 		void atanh_assign();
     };
