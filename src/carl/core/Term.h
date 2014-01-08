@@ -127,7 +127,7 @@ class Term
          */
 		bool isSquare() const
 		{
-			return (mCoeff >= (Coefficient)0) && ((!mMonomial) || mMonomial->isSquare());
+			return (mCoeff >= Coefficient(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
         
         /**
@@ -135,7 +135,7 @@ class Term
          */
         void clear()
         {
-            mCoeff = 0;
+            mCoeff = Coefficient(0);
             mMonomial.reset();
         }
 		
