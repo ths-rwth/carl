@@ -181,6 +181,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
+template<typename C, EnableIf<is_number<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
 	assert(degree() >= divisor.degree());
@@ -223,6 +224,56 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 	else 
 	{	
+		return result.reduce(divisor);
+	}
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_number<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
+{
+	assert(degree() >= divisor.degree());
+	assert(!divisor.isZero());
+	if(is_field<Coeff>::value && divisor.isConstant())
+	{
+		return UnivariatePolynomial<Coeff>(mMainVar);
+	}
+	//std::cout << *this << " / " << divisor << std::endl;
+	unsigned degdiff = degree() - divisor.degree();
+	LOG_INEFFICIENT();
+	// Use lcm instead of naive multiplication...
+	Coeff lcoeff = this->lcoeff();
+	Coeff divlcoeff = divisor.lcoeff();
+	UnivariatePolynomial<Coeff> result(mMainVar);
+	result.mCoefficients.reserve(mCoefficients.size()-1);
+	for (unsigned i = 0; i < degdiff; i++) {
+		result.mCoefficients.push_back(mCoefficients[i] * divlcoeff);
+	}
+
+	// By construction, the leading coefficient will be zero.
+	if(prefactor != nullptr)
+	{
+		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		{
+			result.mCoefficients.push_back(mCoefficients[i + degdiff] * divlcoeff - lcoeff * divisor.mCoefficients[i] * *prefactor);
+		}
+	}
+	else
+	{
+		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		{
+			result.mCoefficients.push_back(mCoefficients[i + degdiff] * divlcoeff - lcoeff * divisor.mCoefficients[i]);
+		}
+	}
+	// strip zeros from the end as we might have pushed zeros.
+	result.stripLeadingZeroes();
+
+	if(result.degree() < divisor.degree())
+	{
+		return result;
+	}
+	else
+	{
 		return result.reduce(divisor);
 	}
 }
@@ -484,10 +535,30 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 		result.mCoefficients.push_back(getNum(coeff * factor));
 	}
 	return result;
-}	
+}
 
 template<typename Coeff>
-template<typename C, DisableIf<is_integer<C>>>
+template<typename C, EnableIf<is_integer<C>>>
+DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	assert(!divisor.isZero());
+	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	assert(*this == divisor * result.quotient + result.remainder);
+
+	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
+
+	unsigned int degdiff = this->degree() - divisor.degree();
+	for (unsigned int offset = 0; offset <= degdiff; offset++) {
+		Coeff factor = carl::div(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
+		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
+		result.quotient.mCoefficients[degdiff-offset] += factor;
+	}
+	assert(*this == divisor * result.quotient + result.remainder);
+	return result;
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_integer<C>>, EnableIf<is_number<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!divisor.isZero());
@@ -512,23 +583,10 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_integer<C>>>
+template<typename C, DisableIf<is_integer<C>>, DisableIf<is_number<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	assert(!divisor.isZero());
-	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
-	assert(*this == divisor * result.quotient + result.remainder);
-
-	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
-
-	unsigned int degdiff = this->degree() - divisor.degree();
-	for (unsigned int offset = 0; offset <= degdiff; offset++) {
-		Coeff factor = carl::div(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
-		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
-		result.quotient.mCoefficients[degdiff-offset] += factor;
-	}
-	assert(*this == divisor * result.quotient + result.remainder);
-	return result;
+	LOG_NOTIMPLEMENTED();
 }
 
 template<typename Coeff>
