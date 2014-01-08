@@ -384,12 +384,23 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::mod(const Coeff& modulu
 }
 
 template<typename Coeff>
+template<typename C, DisableIf<is_number<C>>>
+UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients() const {
+	std::vector<NumberType> coeffs;
+	coeffs.resize(this->mCoefficients.size());
+	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+		coeffs[i] = this->mCoefficients[i].constantPart();
+	}
+	return UnivariatePolynomial<NumberType>(this->mMainVar, coeffs);
+}
+
+template<typename Coeff>
 template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
 	std::vector<NewCoeff> coeffs;
 	coeffs.resize(this->mCoefficients.size());
 	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
-		coeffs[i] = (NewCoeff)(this->mCoefficients[i]);
+		coeffs[i] = NewCoeff(this->mCoefficients[i]);
 	}
 	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
 }
