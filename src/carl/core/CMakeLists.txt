@@ -10,6 +10,7 @@ set(carl_lib_core_headers
     RealAlgebraicNumberIR.tpp
     RealAlgebraicNumberOperations.h
     RealAlgebraicNumberSettings.h
+    RealAlgebraicNumberEvaluation.h
     RealAlgebraicPoint.h
     VarExpPair.h
     Variable.h
