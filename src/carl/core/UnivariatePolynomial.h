@@ -251,6 +251,10 @@ public:
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
 	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
+	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
 
 	bool divides(const UnivariatePolynomial&) const;
 	
@@ -492,6 +496,11 @@ public:
 			const UnivariatePolynomial& q,
 			const SubresultantStrategy strategy = SubresultantStrategy::Default
 	);
+	
+	UnivariatePolynomial<Coefficient> resultant(
+			const UnivariatePolynomial<Coefficient>& p,
+			const SubresultantStrategy strategy = SubresultantStrategy::Default
+	) const;
 
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
@@ -545,6 +554,7 @@ public:
 	
 	
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
+	// TODO: does this make any sense?
 	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
 	UnivariatePolynomial& operator*=(const typename IntegralT<Coefficient>::type& rhs);
 	/**
