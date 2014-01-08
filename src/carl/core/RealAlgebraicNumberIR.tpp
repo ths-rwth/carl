@@ -17,8 +17,18 @@ RANIR<Number>::RealAlgebraicNumberIR() :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(),
 		interval(),
-		sturmSequence(UnivariatePolynomial<Number>::standardSturmSequence( this->polynomial, this->polynomial.derivative())),
+		sturmSequence(this->polynomial.standardSturmSequence()),
 		refinementCount( 0 )
+{
+}
+
+template<typename Number>
+RANIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
+		RealAlgebraicNumber<Number>(true, true, 0),
+		polynomial(var),
+		interval(),
+		sturmSequence(this->polynomial.standardSturmSequence()),
+		refinementCount(0)
 {
 }
 
@@ -237,7 +247,7 @@ void RANIR<Number>::normalizeInterval() {
 	if (this->interval.left() == 0 && this->interval.right() == 0) return; // already normalized
 	assert( this->polynomial.countRealRoots(this->interval) != 0); // the interval should be isolating for this number
 	// shift the right border below 0 or set the zero interval
-	if (this->interval.contains(0) && sgn(this->polynomial.evaluate(0)) == Sign::ZERO) {
+	if (this->interval.contains(0) && this->polynomial.sgn(0) == Sign::ZERO) {
 		this->interval.set(0,0);
 		this->mValue = 0;
 		this->mIsNumeric = true;
@@ -245,7 +255,7 @@ void RANIR<Number>::normalizeInterval() {
 		// one of the bounds might be 0
 		// the separation is computed following [p.329,Algorithmic Algebra ISBN 3-540-94090-1]
 		Number sep = (Number)1 / (1 + this->polynomial.maximumNorm());
-		assert(sgn(this->polynomial.evaluate(sep)) != Sign::ZERO);
+		assert(this->polynomial.sgn(sep) != Sign::ZERO);
 		if ((this->interval.right() == 0) || 
 			(this->interval.left() < -sep && this->polynomial.countRealRoots(ExactInterval<Number>(this->interval.left(), -sep, BoundType::STRICT)) > 0)) {
 			this->interval.setRight(-sep);
@@ -391,6 +401,26 @@ bool RANIR<Number>::refineAvoiding(const Number& n) {
 		}
 	}
 	return false;
+}
+
+template<typename Number>
+Sign RANIR<Number>::sgn() const {
+	if (this->interval.isZero()) return Sign::ZERO;
+	if (this->interval.left() < 0) return Sign::NEGATIVE;
+	return Sign::POSITIVE;
+}
+
+template<typename Number>
+Sign RANIR<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
+	int variations = (this->polynomial.derivative() * p).countRealRoots(this->interval);
+	assert((variations == -1) || (variations == 0) || (variations == 1));
+	switch (variations) {
+		case -1: return Sign::NEGATIVE;
+		case 0: return Sign::ZERO;
+		case 1: return Sign::POSITIVE;
+	}
+	LOGMSG_ERROR("carl.RANIR", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+	return Sign::ZERO;
 }
 
 }
