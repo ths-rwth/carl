@@ -76,7 +76,7 @@ std::list<RealAlgebraicNumber<Number>*> realRoots(
 ) {
 	std::map<Variable, ExactInterval<Number>> varToInterval;
 	
-	UnivariatePolynomial<Coeff> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(p, m, varToInterval);
+	UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(p, m, varToInterval);
 	return realRoots(res, interval, pivoting);
 }
 

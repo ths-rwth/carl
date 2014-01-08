@@ -35,7 +35,7 @@ using RANIRMap = std::map<Variable, RealAlgebraicNumberIR<Number>*>;
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
+RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
 
 /**
  * Evaluates the given polynomial with the given values for the variables.
@@ -64,8 +64,8 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const
  * @return a univariate polynomial with rational coefficients (and p's main variable) that has the roots of p whose coefficient variables have been substituted by the roots given in m
  */
 template<typename Number, typename Coeff>
-UnivariatePolynomial<Coeff> evaluatePolynomial(
-		UnivariatePolynomial<Coeff>& p, 
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p, 
 		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
 );
@@ -82,7 +82,7 @@ UnivariatePolynomial<Coeff> evaluatePolynomial(
  * @see Constraint::satisfiedBy and CAD::samples for usages of this method
  */
 template<typename Number, typename Coeff>
-UnivariatePolynomial<Coeff> evaluateCoefficients(
+UnivariatePolynomial<Number> evaluateCoefficients(
 		UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
@@ -106,7 +106,7 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealA
 			pol.substituteIn(variables[i], Coeff(point[i]->value()));
 		} else {
 			// Defer interval representations
-			IRs[variables[i]] = static_cast<const RealAlgebraicNumberIR<Number>*>(point[i]);
+			IRs[variables[i]] = static_cast<RealAlgebraicNumberIR<Number>*>(point[i]);
 		}
 	}
 	if (pol.isNumber()) {
@@ -146,19 +146,19 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMa
  */
 template<typename Number, typename Coeff>
 RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
-	if (m.size() == 1 && m.begin()->second->sgn(p) == Sign::ZERO) {
+	if (m.size() == 1 && m.begin()->second->sgn(p.toNumberCoefficients()) == Sign::ZERO) {
 		return new RealAlgebraicNumberIR<Number>(p.mainVar());
 	}
 	Variable v = VariablePool::getInstance().getFreshVariable();
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, ExactInterval<Number>> varToInterval;
-	UnivariatePolynomial<Coeff> res = evaluatePolynomial(UnivariatePolynomial<Coeff>(v, {-Coeff(p), 1}), m, varToInterval);
+	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<Coeff>(v, {-Coeff(p), Coeff(1)}), m, varToInterval);
 	ExactInterval<Number> interval = IntervalEvaluation::evaluate(p, varToInterval);
 	
 	while (
 		res.sgn(interval.left()) == Sign::ZERO ||
 		res.sgn(interval.right()) == Sign::ZERO ||
-		p.countRealRoots(interval)) {
+		res.countRealRoots(interval) != 1) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it: m) {
 			it.second->refine();
@@ -171,23 +171,24 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const
 
 
 template<typename Number, typename Coeff>
-UnivariatePolynomial<Coeff> evaluatePolynomial(
-		UnivariatePolynomial<Coeff>& p, 
+UnivariatePolynomial<Number> evaluatePolynomial(
+		const UnivariatePolynomial<Coeff>& p, 
 		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
 ) {
 	Variable v = p.mainVar();
+	UnivariatePolynomial<Coeff> tmp = p;
 	for (auto i: m) {
 		UnivariatePolynomial<Coeff> p2(i.first, i.second->getPolynomial().template convert<Coeff>().coefficients());
-		p = p.switchVariable(i.first).resultant(p2);
+		tmp = tmp.switchVariable(i.first).resultant(p2);
 		varToInterval[i.first] = i.second->getInterval();
 	}
-	return p.switchVariable(v);
+	return tmp.switchVariable(v).toNumberCoefficients();
 }
 
 
 template<typename Number, typename Coeff>
-UnivariatePolynomial<Coeff> evaluateCoefficients(
+UnivariatePolynomial<Number> evaluateCoefficients(
 		UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
