@@ -1559,29 +1559,6 @@ const MultivariatePolynomial<C,O,P> operator-( const MultivariatePolynomial<C,O,
 	result -= rhs;
 	return result;
 }
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
-{
-    LOG_NOTIMPLEMENTED();
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
-{
-	return rhs - lhs;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
-{
-    LOG_NOTIMPLEMENTED();
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
-{
-	return rhs - lhs;
-}
 
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
