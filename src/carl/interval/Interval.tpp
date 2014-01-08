@@ -902,5 +902,28 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
  ******************************************************************************/
 
 template<typename Number>
-inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i);
+inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i)
+	{
+		switch (i.lowerBoundType()) {
+			case BoundType::INFTY:
+				str << "]-INF, ";
+				break;
+			case BoundType::STRICT:
+				str << "]" << i.lower() << ", ";
+				break;
+			case BoundType::WEAK:
+				str << "[" << i.lower() << ", ";
+		}
+		switch (i.upperBoundType()) {
+			case BoundType::INFTY:
+				str << "INF[";
+				break;
+			case BoundType::STRICT:
+				str << i.upper() << "[";
+				break;
+			case BoundType::WEAK:
+				str << i.upper() << "]";
+		}
+	}
+	
 }

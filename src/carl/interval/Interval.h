@@ -12,6 +12,7 @@
  * - Trigonometric functions sin, cos, tan, asin, acos, atan, sinh, cosh, tanh,
  *				asinh, acosh, atanh (these functions are needed for the 
  *				specialization of the rounding modes.
+ * - Operator <<
  *
  * @file   Interval.h
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
