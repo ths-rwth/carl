@@ -469,7 +469,7 @@ public:
      * @param interval Count roots within this interval.
      * @return Number of real roots within the interval.
      */
-	unsigned int countRealRoots(const ExactInterval<Coefficient>& interval) const;
+	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
 
 	/*!
 	 * Reverses the order of the coefficients of this polynomial.
