@@ -774,7 +774,7 @@ std::vector<ExactInterval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoi
 }
 
 template<typename Number>
-bool CAD<Number>::satisfies(const RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints) {
+bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints) {
 	for (unsigned i = 0; i < constraints.size(); i++) {
 		if (!constraints[i].satisfiedBy(r)) return false;
 	}
@@ -782,7 +782,7 @@ bool CAD<Number>::satisfies(const RealAlgebraicPoint<Number>& r, const std::vect
 }
 
 template<typename Number>
-bool CAD<Number>::satisfies(const RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph) {
+bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph) {
 	bool satisfied = true;
 	std::forward_list<unsigned> vertices;
 	for (unsigned i = 0; i < constraints.size(); i++) {
@@ -935,7 +935,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 ) {
 	assert(variables.size() == sample.size());
 	return CAD<Number>::samples(
-		carl::rootfinder::realRoots(*p, sample.begin(), sample.end(), variables.begin(), variables.end(), settings.splittingStrategy, bounds),
+		carl::rootfinder::realRoots(*p, variables, sample, bounds, settings.splittingStrategy),
 		currentSamples,
 		replacedSamples,
 		bounds

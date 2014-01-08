@@ -474,7 +474,7 @@ public:
 	 * @param constraints
 	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
 	 */
-	static bool satisfies(const RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints);
+	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints);
 
 	/**
 	 * Returns the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point r.
@@ -483,7 +483,7 @@ public:
 	 * @param conflictGraph See CAD::check for a full description.
 	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
 	 */
-	static bool satisfies(const RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
+	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
 
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.

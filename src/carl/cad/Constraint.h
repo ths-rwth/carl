@@ -99,14 +99,14 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(const RealAlgebraicPoint<Number>& r) const {
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r) const {
 		assert(this->variables.size() <= r.dim());
 		
 		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, this->variables);
 		if (this->negated) {
-			return carl::sgn(res) != this->sign;
+			return res.sgn() != this->sign;
 		} else {
-			return carl::sgn(res) == this->sign;
+			return res.sgn() == this->sign;
 		}
 	}
 
