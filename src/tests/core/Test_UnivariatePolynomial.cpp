@@ -30,10 +30,21 @@ TEST(UnivariatePolynomial, Reduction)
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setVariableName(x, "x");
-    UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)1,(cln::cl_RA)0, (cln::cl_RA)0,(cln::cl_RA)1});
-    UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)1,(cln::cl_RA)1});
-    //std::cout << p << "/" << q << "=" << p.reduce(q)<< std::endl;
-    
+
+	{
+		UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)1,(cln::cl_RA)0, (cln::cl_RA)0,(cln::cl_RA)1});
+		UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)1,(cln::cl_RA)1});
+		auto res = p.reduce(q);
+		ASSERT_EQ(res.degree(), 0);
+		ASSERT_EQ(res.lcoeff(), 1);
+	}
+	{
+		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1),MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
+		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1)});
+		auto res = p.reduce(q);
+		ASSERT_EQ(res.degree(), 0);
+		ASSERT_EQ(res.lcoeff(), MultivariatePolynomial<cln::cl_RA>(1));
+	}
 }
 
 TEST(UnivariatePolynomial, Divide)
