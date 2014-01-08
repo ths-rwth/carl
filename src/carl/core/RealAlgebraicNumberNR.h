@@ -46,7 +46,8 @@ public:
 		return this->value() < n->value();
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>& g);
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Num>& g);
 };
 
 template<typename Number>
