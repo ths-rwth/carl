@@ -3,7 +3,7 @@
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
-/**
+/*!
  * This file contains all type traits for our types.
  * We use the notation conventions of std, being lower cases with underscores.
  */

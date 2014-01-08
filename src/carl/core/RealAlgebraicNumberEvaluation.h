@@ -31,7 +31,8 @@ using RANIRMap = std::map<Variable, RealAlgebraicNumberIR<Number>*>;
  * All assignments of interval representations are passed on to <code>evaluate(UnivariatePolynomial, RANIRMap)</code>.
  * 
  * @param p Polynomial to be evaluated
- * @param m Variable assignment
+ * @param point Values for variables
+ * @param variables Variables to be assigned
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>

@@ -162,7 +162,6 @@ public:
 	/**
 	 * Adds a new item to the internal interval queue.
 	 * Convenience routine for splitting heuristics.
-	 * @param polynomial Polynomial to add.
 	 * @param interval Interval to add.
 	 * @param strategy Strategy to add.
 	 */
