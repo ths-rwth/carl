@@ -151,6 +151,9 @@ public:
 	virtual ~IncrementalRootFinder() {
 	}
 	
+	const UnivariatePolynomial<Number>& getPolynomial() const {
+		return this->polynomial;
+	}
 	
 	/**
 	 * Computes some new isolating root of the polynomial.

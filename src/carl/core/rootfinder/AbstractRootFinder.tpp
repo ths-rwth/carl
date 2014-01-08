@@ -48,7 +48,7 @@ std::list<RealAlgebraicNumber<Number>*> AbstractRootFinder<Number>::getAllRoots(
 		this->findRoots();
 		this->setFinished();
 	}
-	return this->roots();
+	return this->roots;
 }
 
 template<typename Number>
