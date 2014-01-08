@@ -174,6 +174,10 @@ namespace carl
 //                return !( BOUNDS_OK( mLeft, mLeftType, mRight, mRightType ) || ( mLeftType != BoundType::STRICT && mRightType != BoundType::STRICT && mLeft == mRight ) );
             }
 
+			bool isZero() const {
+				return (this->left() == 0) && (this->right() == 0);
+			}
+
             /**
              * @return true if the bounds define the whole real line, false otherwise
              */
