@@ -6,7 +6,7 @@ if( ${TESTING} STREQUAL "ON" )
 	################################
 	add_subdirectory(util)
 	add_subdirectory(numbers)
-	#add_subdirectory(cad)
+	add_subdirectory(cad)
 	add_subdirectory(core)
 	add_subdirectory(groebner)
 	add_subdirectory(interval)
