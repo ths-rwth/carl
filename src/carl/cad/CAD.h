@@ -66,7 +66,7 @@ private:
 	 * list of all polynomials for elimination
 	 */
 	std::list<const UPolynomial*> polynomials;
-	
+
 	/**
 	 * list of polynomials scheduled for elimination
 	 */
@@ -388,8 +388,9 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const MPolynomial* p, const std::vector<Variable>& v) {
-		std::list<MPolynomial*> l({p});
+	void addPolynomial(MPolynomial* p, const std::vector<Variable>& v) {
+		std::list<MPolynomial*> l;
+		l.push_back(p);
 		this->addPolynomials(l.begin(), l.end(), v);
 	}
 
@@ -400,7 +401,7 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const MPolynomial* p) {
+	void addPolynomial(MPolynomial* p) {
 		assert(!this->variables.empty());
 		this->addPolynomial(p, this->variables);
 	}

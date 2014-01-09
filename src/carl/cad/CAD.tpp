@@ -354,6 +354,7 @@ void CAD<Number>::clear() {
 template<typename Number>
 void CAD<Number>::complete() {
 	RealAlgebraicPoint<Number> r;
+	assert(this->variables.size() > 0);
 	std::vector<cad::Constraint<Number>> c(1, cad::Constraint<Number>(UPolynomial(this->variables.front(), MPolynomial(1)), Sign::ZERO, this->variables));
 	this->check(c, r, true);
 }
@@ -619,16 +620,25 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 	// add (only) the new polynomials to the list of new polynomials
 	bool nothingAdded = true;
 	for (InputIterator p = first; p != last; p++) {
-		if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), *p) != this->scheduledPolynomials.end()) {
+		Variable var = v.front();
+		if (!this->variables.empty()) var = this->variables.front();
+		else if (!this->newVariables.empty()) var = this->newVariables.front();
+
+		UPolynomial* up = new UPolynomial((*p)->toUnivariatePolynomial(var));
+		if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), up) != this->scheduledPolynomials.end()) {
 			// same polynomial was already considered in scheduled polynomials
+			delete up;
 			continue;
 		}
-		if (!this->eliminationSets.empty() && this->eliminationSets.front().find(p) != nullptr) {
-			// same polynomial was already considered in elimination polynomials
-			continue;
+		if (!this->eliminationSets.empty()) {
+			if (this->eliminationSets.front().find(up) != nullptr) {
+				// same polynomial was already considered in elimination polynomials
+				delete up;
+				continue;
+			}
 		}
 		// schedule the polynomial for the next elimination
-		this->scheduledPolynomials.push_back(*p);
+		this->scheduledPolynomials.push_back(up);
 		nothingAdded = false;
 	}
 	
