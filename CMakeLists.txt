@@ -122,18 +122,26 @@ set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # We use boost intervals for the interval arithmetic
 
-OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
-# If Boost was found, the Boost include directory will be saved in the variable
-# Boost_INCLUDE_DIR.
-if(BOOST_LOCAL)
-SET(BOOST_NO_BOOST_CMAKE ON)
+#OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
+## If Boost was found, the Boost include directory will be saved in the variable
+## Boost_INCLUDE_DIR.
+#if(BOOST)
+#SET(BOOST_NO_BOOST_CMAKE ON)
+#SET(BOOST_NO_SYSTEM_PATHS ON)
+#message(ERROR "No local version of boost exists")
+##SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
+##SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
+#endif()
+#FIND_PACKAGE(Boost COMPONENTS REQUIRED)
 
-SET(BOOST_NO_SYSTEM_PATHS ON)
-message(ERROR "No local version of boost exists")
-#SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
-#SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
+OPTION( OBTAIN_BOOST "Downloads and installs Boost in the resources folder." OFF )
+if( NOT OBTAIN_BOOST )
+find_package(Boost REQUIRED)
+set( libraries &{libraries} ${Boost_LIBRARIES} )
+set( include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
+else()
+set( BOOST_REQUESTED_LIBRARIES math,chrono,interval)
 endif()
-FIND_PACKAGE(Boost COMPONENTS REQUIRED)
 
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." ON )
 IF(USE_MPFR_FLOAT)
