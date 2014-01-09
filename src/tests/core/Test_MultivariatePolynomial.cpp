@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include "carl/core/UnivariatePolynomial.h"
 #include "carl/converter/GinacConverter.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
@@ -27,6 +28,17 @@ TEST(MultivariatePolynomial, Operators)
     EXPECT_EQ(p0a, p0b);
     
     EXPECT_TRUE(p0a.isUnivariate());
+}
+
+TEST(MultivariatePolynomial, toUnivariatePolynomial)
+{
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+	{
+		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> res(x, {(cln::cl_RA)0, (cln::cl_RA)1, (cln::cl_RA)-1, (cln::cl_RA)3});
+		ASSERT_EQ(p.toUnivariatePolynomial(x), res);
+	}
 }
 
 TEST(MultivariatePolynomial, Addition)
@@ -442,12 +454,4 @@ TEST(MultivariatePolynomial, cauchyBounds)
 TEST(MultivariatePolyonomial, factorization)
 {
     EXPECT_TRUE(false);
-}
-
-TEST(MultivariatePolynomial, toUnivariatePolynomial)
-{
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x});   
-    //std::cout << f1.toUnivariatePolynomial() << std::endl;
 }
