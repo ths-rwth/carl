@@ -195,6 +195,11 @@ TEST(MultivariatePolynomial, Substitute)
 {
     Variable v0(1);
     Variable v1(2);
+	{
+		MultivariatePolynomial<cln::cl_RA> p(v0);
+		p.substituteIn(v0, MultivariatePolynomial<cln::cl_RA>(-1));
+		ASSERT_EQ(p, MultivariatePolynomial<cln::cl_RA>(-1));
+	}
     MultivariatePolynomial<cln::cl_RA> mp((cln::cl_RA)1/6 * v0);
     mp += (cln::cl_RA)4 * v1;
     MultivariatePolynomial<cln::cl_RA> mp2((cln::cl_RA)2);
