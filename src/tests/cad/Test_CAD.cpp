@@ -12,5 +12,5 @@ TEST(CAD, BasicOperations)
 {  
 	carl::CAD<cln::cl_RA> cad;
 	cad.samples();
-	//cad.complete();
+	cad.complete();
 }
