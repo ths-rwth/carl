@@ -94,6 +94,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	LOGMSG_DEBUG("carl.core", "substituting " << var << " -> " << value << " in " << *this);
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -103,6 +104,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	LOGMSG_DEBUG("carl.core", "substituting " << var << " -> " << value << " in " << *this);
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -117,7 +119,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variable& var, const Coeff& value) const {
 	if (var == this->mainVar()) {
-		return this->evaluate(value);
+		return UnivariatePolynomial<Coeff>(this->mainVar(), this->evaluate(value));
 	}
 	return *this;
 }
@@ -584,9 +586,11 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(
 
 template<typename Coeff>
 template<typename C, DisableIf<is_integer<C>>, DisableIf<is_number<C>>>
-DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>& divisor) const
+DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divide(const UnivariatePolynomial<Coeff>&) const
 {
+	std::cerr << "Not Implemented!" << std::endl;
 	LOG_NOTIMPLEMENTED();
+	return DivisionResult<UnivariatePolynomial<Coeff>>(*this, *this);
 }
 
 template<typename Coeff>
