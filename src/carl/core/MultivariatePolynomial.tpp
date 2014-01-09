@@ -816,14 +816,21 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
-	std::vector<MultivariatePolynomial<C,O,P>> coeffs(0);
+	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (auto term: this->mTerms) {
 		if (term->monomial() == nullptr) coeffs[0] += *term;
 		else {
 			auto mon = term->monomial();
 			auto exponent = mon->exponentOfVariable(v);
-			if (exponent < coeffs.size()) coeffs.resize(exponent + 1);
-			coeffs[exponent] += term->coeff() * *mon->dropVariable(v);
+			if (exponent <= coeffs.size()) coeffs.resize(exponent + 1);
+			Monomial* tmp = mon->dropVariable(v);
+			LOGMSG_TRACE("carl.core", "Current coeff: " << coeffs[exponent]);
+			if (tmp == nullptr) {
+				coeffs[exponent] += term->coeff();
+			} else {
+				coeffs[exponent] += term->coeff() * *tmp;
+			}
+			delete tmp;
 		}
 	}
 	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
