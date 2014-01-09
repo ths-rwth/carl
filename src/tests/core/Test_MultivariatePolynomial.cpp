@@ -34,10 +34,21 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
+	Variable y = vpool.getFreshVariable();
+	{
+		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+		UnivariatePolynomial<cln::cl_RA> res(x, {(cln::cl_RA)0, (cln::cl_RA)1, (cln::cl_RA)-1, (cln::cl_RA)3});
+		ASSERT_EQ(p.toUnivariatePolynomial(), res);
+	}
 	{
 		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> res(x, {(cln::cl_RA)0, (cln::cl_RA)1, (cln::cl_RA)-1, (cln::cl_RA)3});
 		ASSERT_EQ(p.toUnivariatePolynomial(x), res);
+	}
+	{
+		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x*y, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> res(x, {MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0), MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1*y), MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)-1), MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)3)});
+		ASSERT_EQ(res, p.toUnivariatePolynomial(x));
 	}
 }
 
