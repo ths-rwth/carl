@@ -110,12 +110,13 @@ if(OBTAIN_BOOST)
 
 	ExternalProject_Add(
 	boost
+	GIT_SUBMODULES libs/numeric/interval
 	GIT_REPOSITORY https://github.com/boostorg/boost.git
 	INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/boost
 	BUILD_IN_SOURCE 1
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
-	CONFIGURE_COMMAND "./bootstrap.sh --with-libraries=chrono"
+	CONFIGURE_COMMAND "./bootstrap.sh --with-libraries=interval"
 	BUILD_COMMAND  ${Boost_b2_Command} 
 	--without-python
     --without-mpi
