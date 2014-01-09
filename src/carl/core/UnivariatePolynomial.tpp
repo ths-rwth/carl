@@ -27,7 +27,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, exponent e) :
 mMainVar(mainVar),
-mCoefficients(e+1,(Coeff)c-c) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
+mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
 {
 	if(c != 0)
 	{
@@ -44,6 +44,16 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<std::is_same<C, typename UnderlyingNumberType<C>::type>>>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients)
+: mMainVar(mainVar), mCoefficients()
+{
+	for (auto c: coefficients) {
+		this->mCoefficients.push_back(Coeff(c));
+	}
 }
 
 template<typename Coeff>
