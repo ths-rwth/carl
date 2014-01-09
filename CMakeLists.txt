@@ -67,7 +67,7 @@ foreach(p LIB BIN INCLUDE CMAKE)
 endforeach()
 
 # path to put in the executables after building.
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for builed executables")
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for built executables")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 
@@ -87,12 +87,13 @@ else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
 endif()
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 if(DEVELOPER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -ftemplate-backtrace-limit=0")
+	set(CMAKE_BUILD_TYPE "DEBUG")
 endif()
 
 message("-- Compiler flags: ${CMAKE_CXX_FLAGS}")
+message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -160,9 +161,9 @@ set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 # if doxygen is installed, create the make doc target
 include(FindDoxygen)
 if(DOXYGEN)
-  add_subdirectory(doxygen-conf)
+	add_subdirectory(doxygen-conf)
 else()
-  message(WARNING, "Doxygen not found")
+	message(WARNING, "Doxygen not found")
 endif()
 
 # we only search for this libraries in the system, if we do not force using the shipped resources.
@@ -185,8 +186,8 @@ set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
 
 
 if(COMPARE_WITH_GINAC)
-  find_package( GiNaC 1.5.8 REQUIRED )
-  set(libraries ${libraries} ${GINAC_LIBRARY} )
+	find_package( GiNaC 1.5.8 REQUIRED )
+	set(libraries ${libraries} ${GINAC_LIBRARY} )
 endif()
 
 
