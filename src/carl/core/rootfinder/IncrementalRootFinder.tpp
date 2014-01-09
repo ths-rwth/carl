@@ -64,7 +64,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 	LOGMSG_DEBUG("carl.core.rootfinder", "Processing interval " << interval);
 
 	if (strategy == SplittingStrategy::EIGENVALUES) {
-		EigenValueStrategy<Number>::instance()(interval, *this);
+		splittingStrategies::EigenValueStrategy<Number>::instance()(interval, *this);
 		return true;
 	} else if (strategy == SplittingStrategy::ABERTH) {
 		//AberthStrategy<Number>::instance()(interval, *this);
@@ -89,13 +89,13 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 
 	//std::cerr << "calling strategy " << strategy << std::endl;
 	switch (strategy) {
-		case SplittingStrategy::GENERIC: GenericStrategy<Number>::instance()(interval, *this);
+		case SplittingStrategy::GENERIC: splittingStrategies::GenericStrategy<Number>::instance()(interval, *this);
 			break;
 		case SplittingStrategy::EIGENVALUES:	// Should not happen, safe fallback anyway
 		case SplittingStrategy::ABERTH:		// Should not happen, safe fallback anyway
-		case SplittingStrategy::BINARYSAMPLE: BinarySampleStrategy<Number>::instance()(interval, *this);
+		case SplittingStrategy::BINARYSAMPLE: splittingStrategies::BinarySampleStrategy<Number>::instance()(interval, *this);
 			break;
-		case SplittingStrategy::BINARYNEWTON: BinaryNewtonStrategy<Number>::instance()(interval, *this);
+		case SplittingStrategy::BINARYNEWTON: splittingStrategies::BinaryNewtonStrategy<Number>::instance()(interval, *this);
 			break;
 		case SplittingStrategy::GRID: //GridStrategy<Number>::instance()(interval, *this);
 			break;
@@ -152,6 +152,8 @@ void buildIsolation(std::vector<double>& roots, const ExactInterval<Number>& int
 		finder.addQueue(ExactInterval<Number>(res[i], res[i+1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
 	}	
 }
+
+namespace splittingStrategies {
 
 template<typename Number>
 void GenericStrategy<Number>::operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder) {
@@ -212,6 +214,8 @@ void EigenValueStrategy<Number>::operator()(const ExactInterval<Number>& interva
 	
 	// Build isolation
 	buildIsolation(tmp, interval, finder);
+}
+
 }
 
 }

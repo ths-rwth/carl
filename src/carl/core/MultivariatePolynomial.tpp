@@ -374,12 +374,13 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
+	LOGMSG_TRACE("carl.core.mvpolynomial", "" << *this << " .substituteIn( " << var << " -> " << value << " )");
     if(isConstant())
     {
         return;
     }
     TermsType newTerms;
-    if(value == 0)
+    if(value.isZero())
     {
         for(auto term : mTerms)
         {

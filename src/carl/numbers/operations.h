@@ -3,7 +3,7 @@
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
-/**
+/*!
  * This file contains a common interface for basic number functions.
  * All methods here are meant as an interface that should be implemented for each specific number type, if applicable.
  * The exact signatures, e.g. if variables are passed by reference, can be changed if necessary.

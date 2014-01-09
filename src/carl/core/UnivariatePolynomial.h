@@ -240,16 +240,19 @@ public:
 	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	
+	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 	
 	
-	
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
 	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, EnableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, DisableIf<is_number<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
 	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
