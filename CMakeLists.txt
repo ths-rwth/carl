@@ -143,7 +143,7 @@ else()
 set( BOOST_REQUESTED_LIBRARIES math,chrono,interval)
 endif()
 
-OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." ON )
+OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
 find_package(MPFR REQUIRED)
 set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
