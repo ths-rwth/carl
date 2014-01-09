@@ -199,6 +199,12 @@ struct is_number<mpz_class>
 	static const bool value = true;
 };
 
+template<typename C>
+struct is_number<GFNumber<C>>
+{
+	static const bool value = true;
+};
+
 
 /**
  * Type trait IntegralT.
