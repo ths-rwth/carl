@@ -43,7 +43,6 @@ option( STATICLIB_SWITCH "Compile a statically linked version of the library." O
 option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
-option( TESTING "Compile the unit tests" ON )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -71,10 +70,6 @@ endforeach()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for builed executables")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
-if(${STATICLIB_SWITCH} STREQUAL "ON")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
-endif()
 
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -118,10 +113,7 @@ include( FindCLN )
 include( FindGMP )
 include( FindGMPXX )
 
-set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} )
-if( ${TESTING} STREQUAL "ON" )
-  set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} pthread )
-endif()
+set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} pthread )
 set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -130,19 +122,35 @@ set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # We use boost intervals for the interval arithmetic
 
-OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
-# If Boost was found, the Boost include directory will be saved in the variable
-# Boost_INCLUDE_DIR.
-if(BOOST_LOCAL)
-SET(BOOST_NO_BOOST_CMAKE ON)
+#OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
+## If Boost was found, the Boost include directory will be saved in the variable
+## Boost_INCLUDE_DIR.
+#if(BOOST)
+#SET(BOOST_NO_BOOST_CMAKE ON)
+#SET(BOOST_NO_SYSTEM_PATHS ON)
+#message(ERROR "No local version of boost exists")
+##SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
+##SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
+#endif()
+#FIND_PACKAGE(Boost COMPONENTS REQUIRED)
 
-SET(BOOST_NO_SYSTEM_PATHS ON)
-message(ERROR "No local version of boost exists")
-#SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
-#SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
+OPTION( OBTAIN_BOOST "Downloads and installs Boost in the resources folder." OFF )
+if( NOT OBTAIN_BOOST )
+find_package(Boost REQUIRED)
+set( libraries &{libraries} ${Boost_LIBRARIES} )
+set( include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
+else()
+set( BOOST_REQUESTED_LIBRARIES math,chrono,interval)
 endif()
-FIND_PACKAGE(Boost COMPONENTS REQUIRED)
 
+OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." ON )
+IF(USE_MPFR_FLOAT)
+find_package(MPFR REQUIRED)
+set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
+set(libraries ${libraries} ${MPFR_LIBRARY})
+endif()
+
+set( libraries  ${libraries} )
 set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -161,25 +169,18 @@ endif()
 if(NOT FORCE_SHIPPED_RESOURCES)
 	# find log4cplus
 	find_package(Log4cplus)
-    # find googletest
-    if( ${TESTING} STREQUAL "ON" )
-	  find_package(GTest)
-    endif()
+	# find googletest
+	find_package(GTest)
 	# find eigen
 	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
-if( ${TESTING} STREQUAL "ON" )
-  enable_testing()
-endif()
-if(${CARL_LOGGING} STREQUAL "ON")
-  #set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
-  set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
-  set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
-endif()
+enable_testing()
+set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
+set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
-set(libraries ${libraries} ${EIGEN3_LIBRARY})
+set(libraries ${libraries} ${EIGEN3_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
 
 
