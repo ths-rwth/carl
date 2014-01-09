@@ -6,4 +6,5 @@ CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
 Makefile
-/carl
+/src/carl/core/config.h
+/src/carl/numbers/config.h
