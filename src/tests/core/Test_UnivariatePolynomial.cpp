@@ -293,3 +293,11 @@ TEST(UnivariatePolynomial, numericContent)
 	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-1,-2,-3}).numericContent(), 1);
 	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-15,-27,-3}).numericContent(), 3);
 }
+
+TEST(UnivariatePolynomial, pseudoRem)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	
+	
+}
+
