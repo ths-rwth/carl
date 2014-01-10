@@ -233,7 +233,8 @@ public:
 	 * @param os output stream
 	 * @param s sample set
 	 */
-	friend std::ostream& operator<<(std::ostream& os, const SampleSet& s);
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const SampleSet<Num>& s);
 	
 private:
 	///////////////////////

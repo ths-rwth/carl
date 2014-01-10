@@ -5,7 +5,7 @@
 
 #include "UnivariatePolynomial.h"
 #include "logging.h"
-#include "carl/numbers/numbers.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {	
@@ -232,7 +232,7 @@ Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 	if(trailingTerm()->isConstant()) {
 		return trailingTerm()->coeff();
 	}
-	return 0;
+    return 0;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -374,12 +374,13 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
+	LOGMSG_TRACE("carl.core.mvpolynomial", "" << *this << " .substituteIn( " << var << " -> " << value << " )");
     if(isConstant())
     {
         return;
     }
     TermsType newTerms;
-    if(value == 0)
+    if(value.isZero())
     {
         for(auto term : mTerms)
         {
@@ -815,8 +816,24 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
-	LOG_INEFFICIENT();
-	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, getVarInfo<true>(v).coeffs());
+	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
+	for (auto term: this->mTerms) {
+		if (term->monomial() == nullptr) coeffs[0] += *term;
+		else {
+			auto mon = term->monomial();
+			auto exponent = mon->exponentOfVariable(v);
+			if (exponent <= coeffs.size()) coeffs.resize(exponent + 1);
+			Monomial* tmp = mon->dropVariable(v);
+			LOGMSG_TRACE("carl.core", "Current coeff: " << coeffs[exponent]);
+			if (tmp == nullptr) {
+				coeffs[exponent] += term->coeff();
+			} else {
+				coeffs[exponent] += term->coeff() * *tmp;
+			}
+			delete tmp;
+		}
+	}
+	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
 }
 
 template<typename Coeff, typename O, typename P>
@@ -1559,29 +1576,6 @@ const MultivariatePolynomial<C,O,P> operator-( const MultivariatePolynomial<C,O,
 	result -= rhs;
 	return result;
 }
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
-{
-    LOG_NOTIMPLEMENTED();
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
-{
-	return rhs - lhs;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
-{
-    LOG_NOTIMPLEMENTED();
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
-{
-	return rhs - lhs;
-}
 
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
@@ -1838,6 +1832,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
 {
     mTerms.clear();
+    if(newTerms.empty()) return;
     // Sort the entries from newterms.
     // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
     std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);

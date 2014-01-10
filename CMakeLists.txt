@@ -67,7 +67,7 @@ foreach(p LIB BIN INCLUDE CMAKE)
 endforeach()
 
 # path to put in the executables after building.
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for builed executables")
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for built executables")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 
@@ -87,12 +87,13 @@ else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")	
 endif()
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 if(DEVELOPER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -ftemplate-backtrace-limit=0")
+	set(CMAKE_BUILD_TYPE "DEBUG")
 endif()
 
 message("-- Compiler flags: ${CMAKE_CXX_FLAGS}")
+message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -122,18 +123,33 @@ set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 
 # We use boost intervals for the interval arithmetic
 
-OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
-# If Boost was found, the Boost include directory will be saved in the variable
-# Boost_INCLUDE_DIR.
-if(BOOST_LOCAL)
-SET(BOOST_NO_BOOST_CMAKE ON)
+#OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
+## If Boost was found, the Boost include directory will be saved in the variable
+## Boost_INCLUDE_DIR.
+#if(BOOST)
+#SET(BOOST_NO_BOOST_CMAKE ON)
+#SET(BOOST_NO_SYSTEM_PATHS ON)
+#message(ERROR "No local version of boost exists")
+##SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
+##SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
+#endif()
+#FIND_PACKAGE(Boost COMPONENTS REQUIRED)
 
-SET(BOOST_NO_SYSTEM_PATHS ON)
-message(ERROR "No local version of boost exists")
-#SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
-#SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_53_0")
+OPTION( OBTAIN_BOOST "Downloads and installs Boost in the resources folder." OFF )
+if( NOT OBTAIN_BOOST )
+find_package(Boost REQUIRED)
+set( libraries ${libraries} ${Boost_LIBRARIES} )
+set( include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
+else()
+set( BOOST_REQUESTED_LIBRARIES math,chrono,interval)
 endif()
-FIND_PACKAGE(Boost COMPONENTS REQUIRED)
+
+OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
+IF(USE_MPFR_FLOAT)
+find_package(MPFR REQUIRED)
+set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
+set(libraries ${libraries} ${MPFR_LIBRARY})
+endif()
 
 set( libraries  ${libraries} )
 set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
@@ -145,9 +161,9 @@ set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 # if doxygen is installed, create the make doc target
 include(FindDoxygen)
 if(DOXYGEN)
-  add_subdirectory(doxygen-conf)
+	add_subdirectory(doxygen-conf)
 else()
-  message(WARNING, "Doxygen not found")
+	message(WARNING, "Doxygen not found")
 endif()
 
 # we only search for this libraries in the system, if we do not force using the shipped resources.
@@ -162,7 +178,6 @@ endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-#set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} rt pthread)
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
@@ -171,8 +186,8 @@ set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
 
 
 if(COMPARE_WITH_GINAC)
-  find_package( GiNaC 1.5.8 REQUIRED )
-  set(libraries ${libraries} ${GINAC_LIBRARY} )
+	find_package( GiNaC 1.5.8 REQUIRED )
+	set(libraries ${libraries} ${GINAC_LIBRARY} )
 endif()
 
 

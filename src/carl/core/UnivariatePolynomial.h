@@ -57,6 +57,9 @@ public:
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
+
+	template<typename C = Coefficient, DisableIf<std::is_same<C, typename UnderlyingNumberType<C>::type>> = dummy>
+	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
 	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
@@ -240,17 +243,24 @@ public:
 	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	
+	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 	
 	
-	
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
 	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, EnableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, DisableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
+	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
+	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
 
 	bool divides(const UnivariatePolynomial&) const;
 	
@@ -323,6 +333,9 @@ public:
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
 	
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
+
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	UnivariatePolynomial<NumberType> toNumberCoefficients() const;
 
 	template<typename NewCoeff>
 	UnivariatePolynomial<NewCoeff> convert() const;
@@ -462,7 +475,7 @@ public:
      * @param interval Count roots within this interval.
      * @return Number of real roots within the interval.
      */
-	unsigned int countRealRoots(const ExactInterval<Coefficient>& interval) const;
+	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
 
 	/*!
 	 * Reverses the order of the coefficients of this polynomial.
@@ -492,6 +505,11 @@ public:
 			const UnivariatePolynomial& q,
 			const SubresultantStrategy strategy = SubresultantStrategy::Default
 	);
+	
+	UnivariatePolynomial<Coefficient> resultant(
+			const UnivariatePolynomial<Coefficient>& p,
+			const SubresultantStrategy strategy = SubresultantStrategy::Default
+	) const;
 
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
@@ -545,6 +563,7 @@ public:
 	
 	
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
+	// TODO: does this make any sense?
 	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
 	UnivariatePolynomial& operator*=(const typename IntegralT<Coefficient>::type& rhs);
 	/**

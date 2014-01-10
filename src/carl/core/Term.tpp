@@ -437,12 +437,12 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
             if(!infix) s << " ";
             bool negative = (mCoeff < 0);
             if(negative) s << "(-" << (infix ? "" : " ");
-            if(infix) s << abs(mCoeff);
+            if(infix) s << carl::abs(mCoeff);
             else
             {
                 typename IntegralT<Coefficient>::type d = getDenom(mCoeff);
-                if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << abs(getNum(mCoeff)) << " " << abs(d) << ")";
-                else s << abs(mCoeff);
+                if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << carl::abs(getNum(mCoeff)) << " " << carl::abs(d) << ")";
+                else s << carl::abs(mCoeff);
             }
             if(negative) 
                 s << ")";
@@ -461,12 +461,12 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
         bool negative = (mCoeff < 0);
         if(negative)
             s << "(-" << (infix ? "" : " ");
-        if(infix) s << abs(mCoeff);
+        if(infix) s << carl::abs(mCoeff);
         else
         {
             typename IntegralT<Coefficient>::type d = getDenom(mCoeff);
-            if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << abs(getNum(mCoeff)) << " " << abs(d) << ")";
-            else s << abs(mCoeff);
+            if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << carl::abs(getNum(mCoeff)) << " " << carl::abs(d) << ")";
+            else s << carl::abs(mCoeff);
         }
         if(negative)
             s << ")";

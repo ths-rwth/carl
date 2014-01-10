@@ -219,7 +219,7 @@ public:
 	MultivariatePolynomial normalize() const;
 	
 	/**
-	 * Replace the given variable by the given value within this multivariate polynomial.
+	 * Replace the given variable by the given polynomial within this multivariate polynomial.
      */
 	void substituteIn(const Variable::Arg var, const MultivariatePolynomial& value);
 	
@@ -423,14 +423,6 @@ public:
 
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>

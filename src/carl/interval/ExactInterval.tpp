@@ -216,6 +216,7 @@ namespace carl
     Numeric ExactInterval<Numeric>::sample() const
     {
 		Numeric mid = this->midpoint();
+		// TODO: check if mid is an integer already.
 		Numeric midf = carl::floor(mid);
 		if (this->contains(midf)) return midf;
 		Numeric midc = carl::ceil(mid);
@@ -669,44 +670,21 @@ namespace carl
          *  ----------|-----|-------------- holds.
          */
         // only compare left bounds
-        switch( mLeftType )
-        {
-            case BoundType::INFTY:
-                return o.mLeftType == BoundType::INFTY;
-            default:
-                return (mLeft <= o.mLeft);
-        }
+		if( mRightType == BoundType::INFTY || o.leftType() == BoundType::INFTY )
+		{
+			return false;
+		}
+		else
+		{
+			return mRight <= o.mLeft;
+		}
+		
     }
 
     template<typename Numeric>
     bool ExactInterval<Numeric>::isGreaterOrEqual( const ExactInterval<Numeric>& o ) const
     {
-        /** ----------]------------[------- >=
-         *  -----]------------[------------
-         * or
-         *  ----------]------------[------- >=
-         *  -------------]----[------------
-         * or
-         *  ----------]------------[------- >=
-         *  ----------]-------[------------
-         * or
-         *  ----------]------------[------- >=
-         *  -----]-----------------[-------
-         * or
-         *  ----------]------------[------- >=
-         *  -------------]---------[-------
-         * or
-         *  ----------]------------[------- >=
-         *  ----------]------------[------- holds.
-         */
-        // only compare right bounds
-        switch( mRightType )
-        {
-            case BoundType::INFTY:
-                return o.mRightType == BoundType::INFTY;
-            default:
-                return (mRight >= o.mRight);
-        }
+        return o.isLessOrEqual(*this);
     }
 	
 	template<typename Numeric>

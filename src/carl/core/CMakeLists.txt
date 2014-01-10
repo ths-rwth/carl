@@ -1,6 +1,5 @@
 # Header files in here (only headers from this directory!)
 set(carl_lib_core_headers 
-    AbstractPolynomial.h
     Monomial.h
     Polynomial.h Polynomial.tpp
     PolynomialPolicy.h
@@ -10,6 +9,7 @@ set(carl_lib_core_headers
     RealAlgebraicNumberIR.tpp
     RealAlgebraicNumberOperations.h
     RealAlgebraicNumberSettings.h
+    RealAlgebraicNumberEvaluation.h
     RealAlgebraicPoint.h
     VarExpPair.h
     Variable.h

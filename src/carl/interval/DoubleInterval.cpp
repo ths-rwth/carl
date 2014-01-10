@@ -64,10 +64,11 @@ namespace carl
 
     DoubleInterval::DoubleInterval( const BoostDoubleInterval& _interval, BoundType leftType, BoundType rightType ):
         mInterval( _interval ),
-        mLeftType( leftType ),
-        mRightType( rightType )
+        mLeftType( _interval.lower() == INFINITY ? BoundType::INFTY : leftType ),
+        mRightType( _interval.upper() == INFINITY ? BoundType::INFTY : rightType )
     {
-        assert( _interval.lower() != NAN && _interval.lower() != -INFINITY && _interval.upper() != NAN && _interval.upper() != INFINITY );
+        assert( _interval.lower() != NAN );
+        assert( _interval.upper() != NAN );
         if( mLeftType == BoundType::INFTY && mRightType == BoundType::INFTY )
         {
             mInterval = BoostDoubleInterval( 0 );

@@ -3,7 +3,7 @@
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
-/**
+/*!
  * This file contains all type traits for our types.
  * We use the notation conventions of std, being lower cases with underscores.
  */
@@ -195,6 +195,12 @@ struct is_number<mpq_class>
 
 template<>
 struct is_number<mpz_class>
+{
+	static const bool value = true;
+};
+
+template<typename C>
+struct is_number<GFNumber<C>>
 {
 	static const bool value = true;
 };

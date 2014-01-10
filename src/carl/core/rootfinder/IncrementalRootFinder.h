@@ -12,16 +12,18 @@ namespace carl {
 namespace rootfinder {
 
 /*!
+ * Orders QueueItems by the size of their intervals.
+ * 
  * Heuristic for order of queue items to be considered, comparing only the size of the intervals.
  */
-struct PolynomialDegreeComparator {
+struct IntervalSizeComparator {
 	template <typename QueueItem>
 	bool operator()(const QueueItem& a, const QueueItem& b) const {
 		return std::get<0>(a).diameter() > std::get<0>(b).diameter();
 	}
 };
 
-template<typename Number, typename Comparator = PolynomialDegreeComparator>
+template<typename Number, typename Comparator = IntervalSizeComparator>
 class IncrementalRootFinder;
 
 }
@@ -31,19 +33,31 @@ class IncrementalRootFinder;
 
 namespace carl {
 namespace rootfinder {
+
 /*!
  * Enum of all strategies for splitting some interval.
  */
 enum class SplittingStrategy : unsigned int {
+	/// Uses GenericStrategy
 	GENERIC,
+	/// Uses BinarySampleStrategy
 	BINARYSAMPLE,
+	/// Uses BinaryNewtonStrategy
 	BINARYNEWTON,
+	/// Uses GridStrategy
 	GRID,
+	/// Uses EigenValueStrategy for first step, BinarySampleStrategy afterwards
 	EIGENVALUES,
+	/// Uses AberthStrategy for first step, BinarySampleStrategy afterwards
 	ABERTH,
+	/// Defaults to EIGENVALUES
 	DEFAULT = EIGENVALUES
 };
 
+/**
+ * Interface of a RootFinder such that the Strategies can access the IncrementalRootFinder.
+ * @return 
+ */
 template<typename Number>
 class RootFinder {
 public:
@@ -52,6 +66,8 @@ public:
 	virtual void addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial = true) = 0;
 	virtual void addRoot(const ExactInterval<Number>& interval) = 0;
 };
+
+namespace splittingStrategies {
 
 template<typename Strategy, typename Number>
 struct AbstractStrategy {
@@ -88,7 +104,6 @@ struct GridStrategy : public AbstractStrategy<GridStrategy<Number>, Number> {
 template<typename Number>
 struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, Number> {
 	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
-	//itpp::mat companionDefault(const UnivariatePolynomial* polynomial);
 };
 template<typename Number>
 struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> {
@@ -99,6 +114,8 @@ struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> 
 
 	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
 };
+
+}
 
 template<typename Number, typename Comparator>
 class IncrementalRootFinder : public AbstractRootFinder<Number>, RootFinder<Number> {
@@ -116,7 +133,7 @@ private:
 	/*!
 	 * Interval queue containing all items that must still be processed.
 	 */
-	std::priority_queue<QueueItem, std::vector<QueueItem>, PolynomialDegreeComparator> queue;
+	std::priority_queue<QueueItem, std::vector<QueueItem>, IntervalSizeComparator> queue;
 	/*!
 	 * Iterator pointing to the next root within the root list that should be returned.
 	 */
@@ -138,17 +155,16 @@ public:
 		return this->polynomial;
 	}
 	
-	/*!
+	/**
 	 * Computes some new isolating root of the polynomial.
 	 * If all roots have already been found, a nullptr will be returned.
 	 * @return A new root, nullptr if all roots have been found.
 	 */
 	RealAlgebraicNumber<Number>* next();
 	
-	/*!
+	/**
 	 * Adds a new item to the internal interval queue.
 	 * Convenience routine for splitting heuristics.
-	 * @param polynomial Polynomial to add.
 	 * @param interval Interval to add.
 	 * @param strategy Strategy to add.
 	 */
@@ -167,9 +183,12 @@ protected:
 		AbstractRootFinder<Number>::addRoot(interval);
 	}
 	
+	/**
+	 * Overrides method from AbstractRootFinder.
+     */
 	virtual void findRoots();
 	
-	/*!
+	/**
 	 * Tries to work on the next item in queue to produce a new root.
 	 * If the queue is empty, it will return false.
 	 * Otherwise, the first item is taken and processed, the return value will be true.
