@@ -622,6 +622,7 @@ private:
 	 * @param checkBounds
 	 * @return
 	 */
+public:
 	bool mainCheck(
 			std::vector<cad::Constraint<Number>>& constraints,
 			BoundMap& bounds,

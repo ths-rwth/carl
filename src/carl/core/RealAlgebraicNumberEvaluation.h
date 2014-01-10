@@ -14,7 +14,6 @@
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicPoint.h"
-#include "rootfinder/RootFinder.h"
 
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {
