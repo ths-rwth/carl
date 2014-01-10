@@ -1,23 +1,23 @@
-#include "gtest/gtest.h"
+#include <type_traits>
 
-#include <list>
-#include <cln/cln.h>
-#include <map>
+enum class enabled {};
+constexpr enabled dummy = {};
 
-#include "carl/core/logging.h"
-#include "carl/core/RealAlgebraicNumber.h"
-#include "carl/core/rootfinder/RootFinder.h"
+template<typename T, typename std::enable_if<std::is_integral<T>::value, enabled>::type = dummy>
+class A {};
 
-using namespace carl;
+template<typename T, typename isFraction = typename std::enable_if<std::is_integral<T>::value, enabled>::type>
+class B {};
 
-TEST(GCC, BasicOperations)
-{
-	Variable x = VariablePool::getInstance().getFreshVariable();
-	
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(x);
-	std::map<Variable, RealAlgebraicNumber<cln::cl_RA>*> map;
-	ExactInterval<cln::cl_RA> interval;
-	rootfinder::SplittingStrategy strategy = rootfinder::SplittingStrategy::DEFAULT;
-	
-	rootfinder::realRoots(p, map, interval, strategy);
+template<typename T>
+class B<T, typename std::enable_if<std::is_integral<T>::value, enabled>::type> : public A<T> {
+};
+
+template<typename T> void f(const A<T>* m) {}
+template<typename T> void f(const B<T>* m) {}
+
+int main() {
+	A<int>* map = nullptr;
+	f(map);
+	return 0;
 }
