@@ -1,3 +1,15 @@
+/* Compile with
+ *	g++ Test_GCC.cpp -std=c++11 [-save-temps]
+ * Output:
+Test_GCC.cpp: In function ‘int main()’:
+Test_GCC.cpp:27:7: internal compiler error: in unify, at cp/pt.c:17171
+  f(map);
+       ^
+Please submit a full bug report,
+with preprocessed source if appropriate.
+See <https://bugs.archlinux.org/> for instructions.
+ */
+
 #include <type_traits>
 
 enum class enabled {};
