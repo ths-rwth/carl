@@ -5,7 +5,7 @@
  * @file FLOAT_T.h
  * @author  Stefan Schupp
  * @since   2013-10-14
- * @version 2013-10-14
+ * @version 2013-01-10
  */
 
 #pragma once
@@ -18,21 +18,12 @@
 #include <math.h>
 #include "roundingConversion.h"
 #include "typetraits.h"
+#include "../util/SFINAE.h"
 #include <mpfr.h>
 #include <cmath>
 
 namespace carl
 {
-		// nearest, towards zero, towards infty, towards -infty, away from zero
-//    enum CARL_RND
-//    {
-//        CARL_RND::N=0,
-//        CARL_RNDZ=1,
-//        CARL_RNDU=2,
-//        CARL_RNDD=3,
-//        CARL_RNDA=4
-//    };
-
     typedef unsigned long precision;
     
     template<typename FloatType>
@@ -87,6 +78,12 @@ namespace carl
             {
                 assert(is_float<FloatType>::value);
             }
+		
+		template<typename F = FloatType, DisableIf< std::is_same<F, double> > = dummy>
+			FLOAT_T<FloatType>(const FloatType& val)
+			{
+				mValue = val;
+			}
             
             ~FLOAT_T()
             {}
@@ -636,8 +633,5 @@ namespace carl
                 return std::to_string(mValue);
             }
     };
-#ifdef USE_MPFR_FLOAT
     #include "floatTypes/mpfr_float.tpp"
-#endif
-
 }

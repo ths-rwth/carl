@@ -166,7 +166,7 @@ namespace carl
 		 * The getter for the lower boundary of the interval.
 		 * @return lower interval boundary
 		 */
-		Number& lower() const
+		const Number& lower() const
 		{
 			return mContent.lower();
 		}
@@ -175,9 +175,9 @@ namespace carl
 		 * The getter for the upper boundary of the interval.
 		 * @return upper interval boundary
 		 */
-		Number& upper() const
+		const Number& upper() const
 		{
-			return mContent.upper;
+			return mContent.upper();
 		}
 		
 		/**
