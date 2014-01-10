@@ -22,7 +22,7 @@ namespace carl
  * INT: the integers ZZ
  * NATURAL: nonnegative integers NN
  */
-enum VariableType { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3 };
+enum VariableType { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4 };
 
 /**
  * Variables are bitvectors with  [ ordering | id | type]

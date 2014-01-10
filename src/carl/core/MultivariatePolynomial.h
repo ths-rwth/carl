@@ -424,14 +424,6 @@ public:
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
-	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);

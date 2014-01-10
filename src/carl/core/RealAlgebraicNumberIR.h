@@ -53,6 +53,8 @@ public:
 	 * Constructs a real algebraic number in interval representation (p, l, r) with a normalized interval w.r.t. normalizeInterval.
 	 */
 	RealAlgebraicNumberIR();
+
+	RealAlgebraicNumberIR(const Variable& var);
 	
 	/**
 	 * Constructs a real algebraic number in interval and order representation (p, l, r, o) with a normalized interval w.r.t. normalizeInterval.
@@ -207,6 +209,10 @@ public:
 	 * @return true, if n is the exact numeric representation of this root, otherwise false
 	 */
 	bool refineAvoiding(const Number& n);
+
+	Sign sgn() const;
+
+	Sign sgn(const UnivariatePolynomial<Number>& p) const;
 
 };
 

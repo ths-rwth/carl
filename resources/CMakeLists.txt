@@ -110,7 +110,7 @@ if(OBTAIN_BOOST)
 
 	ExternalProject_Add(
 	boost
-	GIT_SUBMODULES tools/build tools/inspect libs/numeric/interval 
+	GIT_SUBMODULES tools/build tools/inspect libs/numeric/interval
 	GIT_REPOSITORY https://github.com/boostorg/boost.git
 	INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/boost
 	BUILD_IN_SOURCE 1
@@ -118,6 +118,8 @@ if(OBTAIN_BOOST)
 	PATCH_COMMAND ""
 	CONFIGURE_COMMAND ${Boost_Bootstrap_Command}
 	BUILD_COMMAND  ${Boost_b2_Command}
+	--without-python
+    --without-mpi
     --disable-icu
     --prefix=${CMAKE_SOURCE_DIR}/resources/boost
     --threading=single,multi
@@ -137,4 +139,5 @@ else()
 endif()
 
 add_dependencies(resources boost)
+
 endif()

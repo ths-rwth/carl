@@ -66,7 +66,7 @@ private:
 	 * list of all polynomials for elimination
 	 */
 	std::list<const UPolynomial*> polynomials;
-	
+
 	/**
 	 * list of polynomials scheduled for elimination
 	 */
@@ -231,7 +231,8 @@ public:
 	 * @param cad
 	 * @return os containing the information about the CAD object cad
 	 */
-	friend std::ostream& operator <<(std::ostream& os, const CAD& cad);
+	template<typename Num>
+	friend std::ostream& operator <<(std::ostream& os, const CAD<Num>& cad);
 
 	
 	//////////////////////////////
@@ -387,8 +388,9 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const MPolynomial* p, const std::vector<Variable>& v) {
-		std::list<MPolynomial*> l({p});
+	void addPolynomial(MPolynomial* p, const std::vector<Variable>& v) {
+		std::list<MPolynomial*> l;
+		l.push_back(p);
 		this->addPolynomials(l.begin(), l.end(), v);
 	}
 
@@ -399,7 +401,7 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const MPolynomial* p) {
+	void addPolynomial(MPolynomial* p) {
 		assert(!this->variables.empty());
 		this->addPolynomial(p, this->variables);
 	}
@@ -474,7 +476,7 @@ public:
 	 * @param constraints
 	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
 	 */
-	static bool satisfies(const RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints);
+	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints);
 
 	/**
 	 * Returns the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point r.
@@ -483,7 +485,7 @@ public:
 	 * @param conflictGraph See CAD::check for a full description.
 	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
 	 */
-	static bool satisfies(const RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
+	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
 
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.

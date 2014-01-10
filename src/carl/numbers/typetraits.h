@@ -3,7 +3,7 @@
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
-/**
+/*!
  * This file contains all type traits for our types.
  * We use the notation conventions of std, being lower cases with underscores.
  */
@@ -240,8 +240,8 @@ struct is_primitive
 	static const bool value = false;
 };
 
-template<>
-struct is_primitive<float>
+template<typename C>
+struct is_number<GFNumber<C>>
 {
 	static const bool value = true;
 };

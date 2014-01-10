@@ -41,6 +41,8 @@ TEST(ExactInterval, Getters)
     EXPECT_EQ((cln::cl_RA)1, test4.right());
     EXPECT_EQ(BoundType::WEAK, test4.leftType());
     EXPECT_EQ(BoundType::STRICT, test4.rightType());
+	ExactInterval<cln::cl_RA> test5 ((cln::cl_RA)0, BoundType::WEAK, (cln::cl_RA)0, BoundType::WEAK);
+	EXPECT_TRUE(test5.isZero());
 }
 
 TEST(ExactInterval, Addition)

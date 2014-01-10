@@ -11,6 +11,8 @@
 
 #include "../core/logging.h"
 #include "../core/MultivariatePolynomial.h"
+#include "../core/RealAlgebraicPoint.h"
+#include "../core/RealAlgebraicNumberEvaluation.h"
 #include "../core/Sign.h"
 #include "../core/Variable.h"
 #include "../interval/IntervalEvaluation.h"
@@ -97,30 +99,14 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(const RealAlgebraicPoint<Number>& r) const {
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r) const {
 		assert(this->variables.size() <= r.dim());
 		
-		std::map<Variable, ExactInterval<Number>> varMap;
-		cad::UPolynomial<Number> p = this->polynomial;
-		
-		for (unsigned int i = 0; i < this->variables.size(); i++) {
-			if (r[i]->isNumeric()) {
-				p.substituteIn(this->variables[i], cad::MPolynomial<Number>(r[i]->value()));
-			} else {
-				varMap[this->variables[i]] = static_cast<const RealAlgebraicNumberIR<Number>*>(r[i])->getInterval();
-			}
-		}
-		if (p.isNumber()) {
-			if (this->negated) {
-				return carl::sgn(p.numericContent()) != this->sign;
-			} else {
-				return carl::sgn(p.numericContent()) == this->sign;
-			}
-		}
+		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, this->variables);
 		if (this->negated) {
-			return carl::sgn(IntervalEvaluation::evaluate(p, varMap)) != this->sign;
+			return res.sgn() != this->sign;
 		} else {
-			return carl::sgn(IntervalEvaluation::evaluate(p, varMap)) == this->sign;
+			return res.sgn() == this->sign;
 		}
 	}
 

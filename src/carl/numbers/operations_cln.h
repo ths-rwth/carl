@@ -72,6 +72,14 @@ inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
  * 
  * The following functions implement simple operations on the given numbers.
  */
+inline cln::cl_I abs(const cln::cl_I& n) {
+	return cln::abs(n);
+}
+
+inline cln::cl_RA abs(const cln::cl_RA& n) {
+	return cln::abs(n);
+}
+
 inline cln::cl_I floor(const cln::cl_RA& n) {
 	return cln::floor1(n);
 }
