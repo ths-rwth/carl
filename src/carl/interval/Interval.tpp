@@ -262,6 +262,33 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
         tmp.setUpperBoundType(mUpperBoundType);
         result.insert(result.end(), tmp);
 	}
+	
+template<typename Number>
+	std::string Interval<Number>::toString() const
+	{
+		std::ostringstream oss;
+		switch (mLowerBoundType) {
+			case BoundType::INFTY:
+				oss << std::string("]-INF, ");
+				break;
+			case BoundType::STRICT:
+				oss << std::string("]") << mContent.lower() << ", ";
+				break;
+			case BoundType::WEAK:
+				oss << std::string("[") << mContent.lower() << ", ";
+		}
+		switch (mUpperBoundType) {
+			case BoundType::INFTY:
+				oss << std::string("INF[");
+				break;
+			case BoundType::STRICT:
+				oss << mContent.upper() << std::string("[");
+				break;
+			case BoundType::WEAK:
+				oss << mContent.upper() << std::string("]");
+		}
+		return oss.str();
+	}
 
 /*******************************************************************************
  * Arithmetic functions
@@ -904,26 +931,8 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
 template<typename Number>
 inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i)
 	{
-		switch (i.lowerBoundType()) {
-			case BoundType::INFTY:
-				str << "]-INF, ";
-				break;
-			case BoundType::STRICT:
-				str << "]" << i.lower() << ", ";
-				break;
-			case BoundType::WEAK:
-				str << "[" << i.lower() << ", ";
-		}
-		switch (i.upperBoundType()) {
-			case BoundType::INFTY:
-				str << "INF[";
-				break;
-			case BoundType::STRICT:
-				str << i.upper() << "[";
-				break;
-			case BoundType::WEAK:
-				str << i.upper() << "]";
-		}
+		str << i.toString();
+		return str;
 	}
 	
 }

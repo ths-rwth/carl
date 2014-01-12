@@ -141,7 +141,7 @@ find_package(Boost REQUIRED)
 set( libraries ${libraries} ${Boost_LIBRARIES} )
 set( include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 else()
-set( BOOST_REQUESTED_LIBRARIES math,chrono,interval)
+set( BOOST_REQUESTED_LIBRARIES interval)
 endif()
 
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )

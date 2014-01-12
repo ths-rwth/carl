@@ -22,5 +22,5 @@ int main (int argc, char** argv)
 	
 	result.log_assign();
 	
-	std::cout << "Result: " << result << " and mpfrInterval: " << mpfrInterval << std::endl;
+	std::cout << "Result: " << result << " and mpfr: " << mpfrInterval << std::endl;
 }

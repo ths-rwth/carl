@@ -1,5 +1,15 @@
+/**
+ * Test cases for the double instanciation of the generic interval class.
+ * @file Test_DoubleInterval.cpp
+ * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
+ *
+ * @since	2014-01-10
+ * @version 2014-01-10
+ */
+
+
 #include "gtest/gtest.h"
-#include "carl/interval/DoubleInterval.h"
+#include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include <cln/cln.h>
@@ -9,43 +19,50 @@ using namespace carl;
 
 TEST(DoubleInterval, Constructor)
 {
+	typedef Interval<double> DoubleInterval;
     DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::emptyInterval());
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
+	/*
     DoubleInterval test7 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
-    DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
+    */
+	DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
     SUCCEED();
 }
 
 TEST(DoubleInterval, Getters)
 {
+	typedef Interval<double> DoubleInterval;
     DoubleInterval test1 = DoubleInterval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
-    EXPECT_EQ(-1, test1.left());
-    EXPECT_EQ(1, test1.right());
-    EXPECT_EQ(BoundType::WEAK, test1.leftType());
-    EXPECT_EQ(BoundType::STRICT, test1.rightType());
+    EXPECT_EQ(-1, test1.lower());
+    EXPECT_EQ(1, test1.upper());
+    EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test1.upperBoundType());
     DoubleInterval test2 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
-    EXPECT_EQ(-1, test2.left());
-    EXPECT_EQ(1, test2.right());
-    EXPECT_EQ(BoundType::WEAK, test2.leftType());
-    EXPECT_EQ(BoundType::STRICT, test2.rightType());
+    EXPECT_EQ(-1, test2.lower());
+    EXPECT_EQ(1, test2.upper());
+    EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
+	/*
     DoubleInterval test3 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::STRICT);
-    EXPECT_EQ(-1, test3.left());
-    EXPECT_EQ(1, test3.right());
-    EXPECT_EQ(BoundType::WEAK, test3.leftType());
-    EXPECT_EQ(BoundType::STRICT, test3.rightType());
+    EXPECT_EQ(-1, test3.lower());
+    EXPECT_EQ(1, test3.upper());
+    EXPECT_EQ(BoundType::WEAK, test3.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test3.upperBoundType());
     DoubleInterval test4 = DoubleInterval((cln::cl_RA)-1, BoundType::WEAK, (cln::cl_RA)1, BoundType::STRICT);
-    EXPECT_EQ(-1, test4.left());
-    EXPECT_EQ(1, test4.right());
-    EXPECT_EQ(BoundType::WEAK, test4.leftType());
-    EXPECT_EQ(BoundType::STRICT, test4.rightType());
+    EXPECT_EQ(-1, test4.lower());
+    EXPECT_EQ(1, test4.upper());
+    EXPECT_EQ(BoundType::WEAK, test4.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
+	 */
 }
 
 TEST(DoubleInterval, Addition)
 {
+	typedef Interval<double> DoubleInterval;
     DoubleInterval a0 = DoubleInterval( -1, BoundType::INFTY, 2, BoundType::WEAK);
     DoubleInterval a1 = DoubleInterval( -1, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval a2 = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::INFTY);
@@ -98,6 +115,8 @@ TEST(DoubleInterval, Addition)
 
 TEST(DoubleInterval, Subtraction)
 {
+	typedef Interval<double> DoubleInterval;
+	
     DoubleInterval a0 = DoubleInterval( -1, BoundType::INFTY, 2, BoundType::WEAK);
     DoubleInterval a1 = DoubleInterval( -1, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval a2 = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::INFTY);
@@ -150,6 +169,7 @@ TEST(DoubleInterval, Subtraction)
 
 TEST(DoubleInterval, Multiplication)
 {
+	typedef Interval<double> DoubleInterval;
     DoubleInterval c0  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::WEAK );
     DoubleInterval c1  = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::WEAK );
     DoubleInterval c2  = DoubleInterval( 1, BoundType::WEAK, 2, BoundType::WEAK );
@@ -177,59 +197,59 @@ TEST(DoubleInterval, Multiplication)
     DoubleInterval result;
 
     result = c0.mul( d0 );
-    EXPECT_EQ( DoubleInterval( c0.right() * d0.right(), BoundType::WEAK, c0.left() * d0.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c0.upper() * d0.upper(), BoundType::WEAK, c0.lower() * d0.lower(), BoundType::WEAK ),
                           result );
     result = c0.mul( d5 );
-    EXPECT_EQ( DoubleInterval( c0.right() * d5.right(), BoundType::WEAK, c0.left() * d5.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c0.upper() * d5.upper(), BoundType::WEAK, c0.lower() * d5.lower(), BoundType::WEAK ),
                           result );
     result = c1.mul( d0 );
-    EXPECT_EQ( DoubleInterval( c1.right() * d0.left(), BoundType::WEAK, c1.left() * d0.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c1.upper() * d0.lower(), BoundType::WEAK, c1.lower() * d0.lower(), BoundType::WEAK ),
                           result );
     result = c1.mul( d5 );
-    EXPECT_EQ( DoubleInterval( c1.right() * d5.left(), BoundType::WEAK, c1.left() * d5.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c1.upper() * d5.lower(), BoundType::WEAK, c1.lower() * d5.lower(), BoundType::WEAK ),
                           result );
     result = c2.mul( d0 );
-    EXPECT_EQ( DoubleInterval( c2.right() * d0.left(), BoundType::WEAK, c2.left() * d0.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c2.upper() * d0.lower(), BoundType::WEAK, c2.lower() * d0.upper(), BoundType::WEAK ),
                           result );
     result = c2.mul( d5 );
-    EXPECT_EQ( DoubleInterval( c2.right() * d5.left(), BoundType::WEAK, c2.left() * d5.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c2.upper() * d5.lower(), BoundType::WEAK, c2.lower() * d5.upper(), BoundType::WEAK ),
                           result );
     result = c3.mul( d0 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 0, BoundType::WEAK ), result );
     result = c3.mul( d5 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 0, BoundType::WEAK ), result );
     result = c4.mul( d0 );
-    EXPECT_EQ( DoubleInterval( c4.right() * d0.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c4.upper() * d0.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c4.mul( d5 );
-    EXPECT_EQ( DoubleInterval( c4.right() * d5.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c4.upper() * d5.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c5.mul( d0 );
-    EXPECT_EQ( DoubleInterval( c5.right() * d0.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c5.upper() * d0.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c5.mul( d5 );
-    EXPECT_EQ( DoubleInterval( c5.right() * d5.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c5.upper() * d5.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c6.mul( d0 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c6.left() * d0.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c6.lower() * d0.lower(), BoundType::WEAK ), result );
     result = c6.mul( d5 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c6.left() * d5.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c6.lower() * d5.lower(), BoundType::WEAK ), result );
     result = c7.mul( d0 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.left() * d0.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.lower() * d0.upper(), BoundType::WEAK ), result );
     result = c7.mul( d5 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.left() * d5.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.lower() * d5.upper(), BoundType::WEAK ), result );
     result = c8.mul( d0 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c8.mul( d5 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
 
     result = c0.mul( d6 );
-    EXPECT_EQ( DoubleInterval( c0.left() * d6.right(), BoundType::WEAK, c0.left() * d6.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c0.lower() * d6.upper(), BoundType::WEAK, c0.lower() * d6.lower(), BoundType::WEAK ),
                           result );
     result = c1.mul( d6 );
-    EXPECT_EQ( DoubleInterval( ( c1.left() * d6.right() < c1.right() * d6.left() ? c1.left() * d6.right() : c1.right() * d6.left()),
+    EXPECT_EQ( DoubleInterval( ( c1.lower() * d6.upper() < c1.upper() * d6.lower() ? c1.lower() * d6.upper() : c1.upper() * d6.lower()),
                                          BoundType::WEAK,
-                                         c1.left() * d6.left() > c1.right() * d6.right() ? c1.left() * d6.left() : c1.right() * d6.right(),
+                                         c1.lower() * d6.lower() > c1.upper() * d6.upper() ? c1.lower() * d6.lower() : c1.upper() * d6.upper(),
                                          BoundType::WEAK ),
                           result );
     result = c2.mul( d6 );
-    EXPECT_EQ( DoubleInterval( c2.right() * d6.left(), BoundType::WEAK, c2.right() * d6.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c2.upper() * d6.lower(), BoundType::WEAK, c2.upper() * d6.upper(), BoundType::WEAK ),
                           result );
     result = c3.mul( d6 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
@@ -245,43 +265,43 @@ TEST(DoubleInterval, Multiplication)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
 
     result = c0.mul( d1 );
-    EXPECT_EQ( DoubleInterval( c0.left() * d1.right(), BoundType::WEAK, c0.right() * d1.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c0.lower() * d1.upper(), BoundType::WEAK, c0.upper() * d1.lower(), BoundType::WEAK ),
                           result );
     result = c0.mul( d7 );
-    EXPECT_EQ( DoubleInterval( c0.left() * d7.right(), BoundType::WEAK, c0.right() * d7.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c0.lower() * d7.upper(), BoundType::WEAK, c0.upper() * d7.lower(), BoundType::WEAK ),
                           result );
     result = c1.mul( d1 );
-    EXPECT_EQ( DoubleInterval( c1.left() * d1.right(), BoundType::WEAK, c1.right() * d1.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c1.lower() * d1.upper(), BoundType::WEAK, c1.upper() * d1.upper(), BoundType::WEAK ),
                           result );
     result = c1.mul( d7 );
-    EXPECT_EQ( DoubleInterval( c1.left() * d7.right(), BoundType::WEAK, c1.right() * d7.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c1.lower() * d7.upper(), BoundType::WEAK, c1.upper() * d7.upper(), BoundType::WEAK ),
                           result );
     result = c2.mul( d1 );
-    EXPECT_EQ( DoubleInterval( c2.left() * d1.left(), BoundType::WEAK, c2.right() * d1.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c2.lower() * d1.lower(), BoundType::WEAK, c2.upper() * d1.upper(), BoundType::WEAK ),
                           result );
     result = c2.mul( d7 );
-    EXPECT_EQ( DoubleInterval( c2.left() * d7.left(), BoundType::WEAK, c2.right() * d7.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( c2.lower() * d7.lower(), BoundType::WEAK, c2.upper() * d7.upper(), BoundType::WEAK ),
                           result );
     result = c3.mul( d1 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c3.mul( d7 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c4.mul( d1 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.right() * d1.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.upper() * d1.lower(), BoundType::WEAK ), result );
     result = c4.mul( d7 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.right() * d7.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.upper() * d7.lower(), BoundType::WEAK ), result );
     result = c5.mul( d1 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c5.right() * d1.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c5.upper() * d1.upper(), BoundType::WEAK ), result );
     result = c5.mul( d7 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c5.right() * d7.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c5.upper() * d7.upper(), BoundType::WEAK ), result );
     result = c6.mul( d1 );
-    EXPECT_EQ( DoubleInterval( c6.left() * d1.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c6.lower() * d1.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c6.mul( d7 );
-    EXPECT_EQ( DoubleInterval( c6.left() * d7.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c6.lower() * d7.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c7.mul( d1 );
-    EXPECT_EQ( DoubleInterval( c7.left() * d1.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c7.lower() * d1.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c7.mul( d7 );
-    EXPECT_EQ( DoubleInterval( c7.left() * d7.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c7.lower() * d7.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c8.mul( d1 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c8.mul( d7 );
@@ -307,25 +327,25 @@ TEST(DoubleInterval, Multiplication)
     EXPECT_EQ( DoubleInterval( 0 ), result );
 
     result = c0.mul( d2 );
-    EXPECT_EQ( DoubleInterval( c0.right() * d2.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c0.upper() * d2.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c0.mul( d8 );
-    EXPECT_EQ( DoubleInterval( c0.right() * d8.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c0.upper() * d8.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c1.mul( d2 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c1.mul( d8 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c2.mul( d2 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.left() * d2.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.lower() * d2.upper(), BoundType::WEAK ), result );
     result = c2.mul( d8 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.left() * d8.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.lower() * d8.upper(), BoundType::WEAK ), result );
     result = c3.mul( d2 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c3.mul( d8 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c4.mul( d2 );
-    EXPECT_EQ( DoubleInterval( c4.right() * d2.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c4.upper() * d2.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c4.mul( d8 );
-    EXPECT_EQ( DoubleInterval( c4.right() * d8.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c4.upper() * d8.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c5.mul( d2 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c5.mul( d8 );
@@ -335,26 +355,26 @@ TEST(DoubleInterval, Multiplication)
     result = c6.mul( d8 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c7.mul( d2 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.left() * d2.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.lower() * d2.upper(), BoundType::WEAK ), result );
     result = c7.mul( d8 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.left() * d8.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c7.lower() * d8.upper(), BoundType::WEAK ), result );
     result = c8.mul( d2 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c8.mul( d8 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
 
     result = c0.mul( d9 );
-    EXPECT_EQ( DoubleInterval( c0.left() * d9.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c0.lower() * d9.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c0.mul( d8 );
-    EXPECT_EQ( DoubleInterval( c0.left() * d8.right(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c0.lower() * d8.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c1.mul( d9 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c1.mul( d8 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c2.mul( d9 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.right() * d9.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.upper() * d9.upper(), BoundType::WEAK ), result );
     result = c2.mul( d8 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.right() * d8.right(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c2.upper() * d8.upper(), BoundType::WEAK ), result );
     result = c3.mul( d9 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c3.mul( d8 );
@@ -381,17 +401,17 @@ TEST(DoubleInterval, Multiplication)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
 
     result = c0.mul( d11 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.left() * d11.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.lower() * d11.lower(), BoundType::WEAK ), result );
     result = c0.mul( d10 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.left() * d10.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.lower() * d10.lower(), BoundType::WEAK ), result );
     result = c1.mul( d11 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c1.mul( d10 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c2.mul( d11 );
-    EXPECT_EQ( DoubleInterval( c2.right() * d11.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c2.upper() * d11.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c2.mul( d10 );
-    EXPECT_EQ( DoubleInterval( c2.right() * d10.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c2.upper() * d10.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c3.mul( d11 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c3.mul( d10 );
@@ -418,25 +438,25 @@ TEST(DoubleInterval, Multiplication)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
 
     result = c0.mul( d11 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.right() * d11.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.upper() * d11.lower(), BoundType::WEAK ), result );
     result = c0.mul( d3 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.right() * d3.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c0.upper() * d3.lower(), BoundType::WEAK ), result );
     result = c1.mul( d11 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c1.mul( d3 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c2.mul( d11 );
-    EXPECT_EQ( DoubleInterval( c2.left() * d11.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c2.lower() * d11.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c2.mul( d3 );
-    EXPECT_EQ( DoubleInterval( c2.left() * d3.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c2.lower() * d3.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c3.mul( d11 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c3.mul( d3 );
     EXPECT_EQ( DoubleInterval( 0 ), result );
     result = c4.mul( d11 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.right() * d11.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.upper() * d11.lower(), BoundType::WEAK ), result );
     result = c4.mul( d3 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.right() * d3.left(), BoundType::WEAK ), result );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, c4.upper() * d3.lower(), BoundType::WEAK ), result );
     result = c5.mul( d11 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c5.mul( d3 );
@@ -446,9 +466,9 @@ TEST(DoubleInterval, Multiplication)
     result = c6.mul( d3 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c7.mul( d11 );
-    EXPECT_EQ( DoubleInterval( c7.left() * d11.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c7.lower() * d11.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c7.mul( d3 );
-    EXPECT_EQ( DoubleInterval( c7.left() * d3.left(), BoundType::WEAK, 1, BoundType::INFTY ), result );
+    EXPECT_EQ( DoubleInterval( c7.lower() * d3.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result );
     result = c8.mul( d11 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c8.mul( d3 );
@@ -477,6 +497,7 @@ TEST(DoubleInterval, Multiplication)
 
 TEST(DoubleInterval, ExtendedDivision)
 {
+	typedef Interval<double> DoubleInterval;
 
     DoubleInterval a0  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::WEAK );
     DoubleInterval a1  = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::WEAK );
@@ -505,84 +526,84 @@ TEST(DoubleInterval, ExtendedDivision)
     DoubleInterval result1, result2;
     // Table 7 Tests: Division without containing 0
     a0.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( a0.right() / b0.left(), BoundType::WEAK, a0.left() / b0.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a0.upper() / b0.lower(), BoundType::WEAK, a0.lower() / b0.upper(), BoundType::WEAK ),
                           result1 );
     a1.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( a1.right() / b0.right(), BoundType::WEAK, a1.left() / b0.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a1.upper() / b0.upper(), BoundType::WEAK, a1.lower() / b0.upper(), BoundType::WEAK ),
                           result1 );
     a2.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( a2.right() / b0.right(), BoundType::WEAK, a2.left() / b0.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a2.upper() / b0.upper(), BoundType::WEAK, a2.lower() / b0.lower(), BoundType::WEAK ),
                           result1 );
     a3.div_ext( result1, result2, b0 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 0, BoundType::WEAK ), result1 );
     a4.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( a4.right() / b0.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a4.upper() / b0.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a5.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( a5.right() / b0.right(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a5.upper() / b0.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a6.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a6.left() / b0.right(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a6.lower() / b0.upper(), BoundType::WEAK ), result1 );
     a7.div_ext( result1, result2, b0 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.left() / b0.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.lower() / b0.lower(), BoundType::WEAK ), result1 );
     a8.div_ext( result1, result2, b0 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 1, BoundType::INFTY ), result1 );
 
     a0.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( a0.left() / b1.left(), BoundType::WEAK, a0.right() / b1.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a0.lower() / b1.lower(), BoundType::WEAK, a0.upper() / b1.upper(), BoundType::WEAK ),
                           result1 );
     a1.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( a1.left() / b1.left(), BoundType::WEAK, a1.right() / b1.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a1.lower() / b1.lower(), BoundType::WEAK, a1.upper() / b1.lower(), BoundType::WEAK ),
                           result1 );
     a2.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( a2.left() / b1.right(), BoundType::WEAK, a2.right() / b1.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a2.lower() / b1.upper(), BoundType::WEAK, a2.upper() / b1.lower(), BoundType::WEAK ),
                           result1 );
     a3.div_ext( result1, result2, b1 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 0, BoundType::WEAK ), result1 );
     a4.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.right() / b1.right(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.upper() / b1.upper(), BoundType::WEAK ), result1 );
     a5.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a5.right() / b1.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a5.upper() / b1.lower(), BoundType::WEAK ), result1 );
     a6.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( a6.left() / b1.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a6.lower() / b1.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a7.div_ext( result1, result2, b1 );
-    EXPECT_EQ( DoubleInterval( a7.left() / b1.right(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a7.lower() / b1.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a8.div_ext( result1, result2, b1 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 1, BoundType::INFTY ), result1 );
 
     a0.div_ext( result1, result2, b2 );
-    EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, a0.left() / b2.right(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, a0.lower() / b2.upper(), BoundType::WEAK ), result1 );
     a1.div_ext( result1, result2, b2 );
-    EXPECT_EQ( DoubleInterval( a1.right() / b2.right(), BoundType::WEAK, a1.left() / b2.right(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a1.upper() / b2.upper(), BoundType::WEAK, a1.lower() / b2.upper(), BoundType::WEAK ),
                           result1 );
     a2.div_ext( result1, result2, b2 );
-    EXPECT_EQ( DoubleInterval( a2.right() / b2.right(), BoundType::WEAK, 0, BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( a2.upper() / b2.upper(), BoundType::WEAK, 0, BoundType::WEAK ), result1 );
     a3.div_ext( result1, result2, b2 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 0, BoundType::WEAK ), result1 );
     a4.div_ext( result1, result2, b2 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a5.div_ext( result1, result2, b2 );
-    EXPECT_EQ( DoubleInterval( a5.right() / b2.right(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a5.upper() / b2.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a6.div_ext( result1, result2, b2 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a6.left() / b2.right(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a6.lower() / b2.upper(), BoundType::WEAK ), result1 );
     a7.div_ext( result1, result2, b2 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 0, BoundType::WEAK ), result1 );
     a8.div_ext( result1, result2, b2 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 1, BoundType::INFTY ), result1 );
 
     a0.div_ext( result1, result2, b3 );
-    EXPECT_EQ( DoubleInterval( a0.left() / b3.left(), BoundType::WEAK, 0, BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( a0.lower() / b3.lower(), BoundType::WEAK, 0, BoundType::WEAK ), result1 );
     a1.div_ext( result1, result2, b3 );
-    EXPECT_EQ( DoubleInterval( a1.left() / b3.left(), BoundType::WEAK, a1.right() / b3.left(), BoundType::WEAK ),
+    EXPECT_EQ( DoubleInterval( a1.lower() / b3.lower(), BoundType::WEAK, a1.upper() / b3.lower(), BoundType::WEAK ),
                           result1 );
     a2.div_ext( result1, result2, b3 );
-    EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, a2.right() / b3.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, a2.upper() / b3.lower(), BoundType::WEAK ), result1 );
     a3.div_ext( result1, result2, b3 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 0, BoundType::WEAK ), result1 );
     a4.div_ext( result1, result2, b3 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 0, BoundType::WEAK ), result1 );
     a5.div_ext( result1, result2, b3 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a5.right() / b3.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a5.upper() / b3.lower(), BoundType::WEAK ), result1 );
     a6.div_ext( result1, result2, b3 );
-    EXPECT_EQ( DoubleInterval( a6.left() / b3.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a6.lower() / b3.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a7.div_ext( result1, result2, b3 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a8.div_ext( result1, result2, b3 );
@@ -608,60 +629,60 @@ TEST(DoubleInterval, ExtendedDivision)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 
     a0.div_ext( result1, result2, b5 );
-    EXPECT_EQ( DoubleInterval( a0.right() / b5.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a0.upper() / b5.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a1.div_ext( result1, result2, b5 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a2.div_ext( result1, result2, b5 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a2.left() / b5.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a2.lower() / b5.lower(), BoundType::WEAK ), result1 );
 
     a4.div_ext( result1, result2, b5 );
-    EXPECT_EQ( DoubleInterval( a4.right() / b5.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a4.upper() / b5.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a5.div_ext( result1, result2, b5 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a6.div_ext( result1, result2, b5 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a7.div_ext( result1, result2, b5 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.left() / b5.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.lower() / b5.lower(), BoundType::WEAK ), result1 );
     a8.div_ext( result1, result2, b5 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 
     a0.div_ext( result1, result2, b6 );
-    EXPECT_EQ( DoubleInterval( a0.right() / b6.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a0.right() / b6.right(), BoundType::WEAK ), result2 );
+    EXPECT_EQ( DoubleInterval( a0.upper() / b6.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a0.upper() / b6.upper(), BoundType::WEAK ), result2 );
     a1.div_ext( result1, result2, b6 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a2.div_ext( result1, result2, b6 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a2.left() / b6.left(), BoundType::WEAK ), result1 );
-    EXPECT_EQ( DoubleInterval( a2.left() / b6.right(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a2.lower() / b6.lower(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( a2.lower() / b6.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
 
     a4.div_ext( result1, result2, b6 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.right() / b6.right(), BoundType::WEAK ), result2 );
-    EXPECT_EQ( DoubleInterval( a4.right() / b6.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.upper() / b6.upper(), BoundType::WEAK ), result2 );
+    EXPECT_EQ( DoubleInterval( a4.upper() / b6.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a5.div_ext( result1, result2, b6 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a6.div_ext( result1, result2, b6 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a7.div_ext( result1, result2, b6 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.left() / b6.left(), BoundType::WEAK ), result1 );
-    EXPECT_EQ( DoubleInterval( a7.left() / b6.right(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.lower() / b6.lower(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( a7.lower() / b6.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
     a8.div_ext( result1, result2, b6 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 
     a0.div_ext( result1, result2, b7 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a0.right() / b7.right(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a0.upper() / b7.upper(), BoundType::WEAK ), result1 );
     a1.div_ext( result1, result2, b7 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a2.div_ext( result1, result2, b7 );
-    EXPECT_EQ( DoubleInterval( a2.left() / b7.right(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a2.lower() / b7.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
 
     a4.div_ext( result1, result2, b7 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.right() / b7.right(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.upper() / b7.upper(), BoundType::WEAK ), result1 );
     a5.div_ext( result1, result2, b7 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a6.div_ext( result1, result2, b7 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a7.div_ext( result1, result2, b7 );
-    EXPECT_EQ( DoubleInterval( a7.left() / b7.right(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a7.lower() / b7.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a8.div_ext( result1, result2, b7 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 
@@ -684,16 +705,16 @@ TEST(DoubleInterval, ExtendedDivision)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 
     a0.div_ext( result1, result2, b9 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a0.right() / b9.right(), BoundType::WEAK ), result2 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a0.upper() / b9.upper(), BoundType::WEAK ), result2 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a1.div_ext( result1, result2, b9 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a2.div_ext( result1, result2, b9 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 0, BoundType::WEAK ), result1 );
-    EXPECT_EQ( DoubleInterval( a2.left() / b9.right(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
+    EXPECT_EQ( DoubleInterval( a2.lower() / b9.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
 
     a4.div_ext( result1, result2, b9 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.right() / b9.right(), BoundType::WEAK ), result2 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a4.upper() / b9.upper(), BoundType::WEAK ), result2 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a5.div_ext( result1, result2, b9 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
@@ -701,28 +722,28 @@ TEST(DoubleInterval, ExtendedDivision)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a7.div_ext( result1, result2, b9 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 0, BoundType::WEAK ), result1 );
-    EXPECT_EQ( DoubleInterval( a7.left() / b9.right(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
+    EXPECT_EQ( DoubleInterval( a7.lower() / b9.upper(), BoundType::WEAK, 1, BoundType::INFTY ), result2 );
     a8.div_ext( result1, result2, b9 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 
     a0.div_ext( result1, result2, b10 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 0, BoundType::WEAK ), result2 );
-    EXPECT_EQ( DoubleInterval( a0.right() / b10.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a0.upper() / b10.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a1.div_ext( result1, result2, b10 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a2.div_ext( result1, result2, b10 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a2.left() / b10.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a2.lower() / b10.lower(), BoundType::WEAK ), result1 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 1, BoundType::INFTY ), result2 );
 
     a4.div_ext( result1, result2, b10 );
     EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, 0, BoundType::WEAK ), result2 );
-    EXPECT_EQ( DoubleInterval( a4.right() / b10.left(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
+    EXPECT_EQ( DoubleInterval( a4.upper() / b10.lower(), BoundType::WEAK, 1, BoundType::INFTY ), result1 );
     a5.div_ext( result1, result2, b10 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a6.div_ext( result1, result2, b10 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
     a7.div_ext( result1, result2, b10 );
-    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.left() / b10.left(), BoundType::WEAK ), result1 );
+    EXPECT_EQ( DoubleInterval( -1, BoundType::INFTY, a7.lower() / b10.lower(), BoundType::WEAK ), result1 );
     EXPECT_EQ( DoubleInterval( 0, BoundType::WEAK, 1, BoundType::INFTY ), result2 );
     a8.div_ext( result1, result2, b10 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
@@ -764,9 +785,11 @@ TEST(DoubleInterval, ExtendedDivision)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 }
 
-
+/*
 TEST(DoubleInterval, Intersection)
 {
+	typedef Interval<double> DoubleInterval;
+
     DoubleInterval a1(-1,BoundType::WEAK,1,BoundType::WEAK);
     
     DoubleInterval b01(2,BoundType::WEAK,3,BoundType::WEAK);
@@ -821,9 +844,11 @@ TEST(DoubleInterval, Intersection)
     
     EXPECT_EQ(DoubleInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
 }
-
+ 
 TEST(DoubleInterval, Split)
 {
+	typedef Interval<double> DoubleInterval;
+	
     DoubleInterval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);
     DoubleInterval i2(-1, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval i3(-1, BoundType::WEAK, 1, BoundType::WEAK);
@@ -860,3 +885,4 @@ TEST(DoubleInterval, Split)
     EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 4, BoundType::STRICT), results.at(3));
     EXPECT_EQ(DoubleInterval(4, BoundType::WEAK, 5, BoundType::STRICT), results.at(4));
 }
+*/

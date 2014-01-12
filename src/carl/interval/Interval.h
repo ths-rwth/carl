@@ -26,6 +26,8 @@
 #include <map>
 #include <cassert>
 #include <list>
+#include <sstream>
+
 
 #include "BoundType.h"
 #include "rounding.h"
@@ -138,6 +140,55 @@ namespace carl
 			mUpperBoundType(upperBoundType)
 		{}
 		
+		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy >
+		Interval(const int& n):
+		mContent(carl::Interval<Number>::BoostInterval(n)),
+		mLowerBoundType(BoundType::WEAK),
+		mUpperBoundType(BoundType::WEAK)
+		{}
+		
+		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy>
+		Interval(int lower, int upper):
+		mContent(Interval<Number>::BoostInterval(lower, upper)),
+		mLowerBoundType(BoundType::WEAK),
+		mUpperBoundType(BoundType::WEAK)
+		{}
+		
+		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy>
+		Interval(int lower, BoundType lowerBoundType, int upper, BoundType upperBoundType):
+		mContent(Interval<Number>::BoostInterval(lower, upper)),
+		mLowerBoundType(lowerBoundType),
+		mUpperBoundType(upperBoundType)
+		{}
+		
+		template<typename Other>
+		Interval(const Number& lower, const Other& upper):
+		mContent(Interval<Number>::BoostInterval(lower, Number(upper))),
+		mLowerBoundType(BoundType::WEAK),
+		mUpperBoundType(BoundType::WEAK)
+		{}
+		
+		template<typename Other>
+		Interval(const Other& lower, const Number& upper):
+		mContent(Interval<Number>::BoostInterval(Number(lower), upper)),
+		mLowerBoundType(BoundType::WEAK),
+		mUpperBoundType(BoundType::WEAK)
+		{}
+		
+		template<typename Other>
+		Interval(const Number& lower, BoundType lowerBoundType, const Other& upper, BoundType upperBoundType):
+		mContent(Interval<Number>::BoostInterval(lower, Number(upper))),
+		mLowerBoundType(lowerBoundType),
+		mUpperBoundType(upperBoundType)
+		{}
+		
+		template<typename Other>
+		Interval(const Other& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType):
+		mContent(Interval<Number>::BoostInterval(Number(lower), upper)),
+		mLowerBoundType(lowerBoundType),
+		mUpperBoundType(upperBoundType)
+		{}
+		
 		template<typename Rational>
 		Interval(Rational n);
 		template<typename Rational>
@@ -145,12 +196,12 @@ namespace carl
 		template<typename Rational>
 		Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType);
 		
-		Interval<Number> unboundedInterval()
+		static Interval<Number> unboundedInterval()
 		{
 			return Interval<Number>(Number(0), BoundType::INFTY, Number(0), BoundType::INFTY);
 		}
 		
-		Interval<Number> emptyInterval()
+		static Interval<Number> emptyInterval()
 		{
 			return Interval<Number>(Number(0), BoundType::STRICT, Number(0), BoundType::STRICT);
 		}
@@ -295,6 +346,16 @@ namespace carl
 			mContent = BoostInterval(lower, upper);
 		}
 		
+		bool unbounded() const
+		{
+			return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
+		}
+		
+		bool empty() const
+		{
+			return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
+		}
+		
 		/**
 		 * Returns the diameter of the interval.
 		 * @return diameter
@@ -387,6 +448,37 @@ namespace carl
 		 * @return list<interval>
 		 */
 		std::list<Interval<Number>> split(unsigned n) const;
+		
+		/**
+		 * Creates a string representation of the interval.
+		 * @return string
+		 */
+		std::string toString() const;
+		
+		friend inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i)
+		{
+			switch (i.mLowerBoundType) {
+				case BoundType::INFTY:
+					str << "]-INF, ";
+					break;
+				case BoundType::STRICT:
+					str << "]" << i.mContent.lower() << ", ";
+					break;
+				case BoundType::WEAK:
+					str << "[" << i.mContent.lower() << ", ";
+			}
+			switch (i.mUpperBoundType) {
+				case BoundType::INFTY:
+					str << "INF[";
+					break;
+				case BoundType::STRICT:
+					str << i.mContent.upper() << "[";
+					break;
+				case BoundType::WEAK:
+					str << i.mContent.upper() << "]";
+			}
+			return str;
+		}
 		
         /***********************************************************************
          * Arithmetic functions
@@ -565,6 +657,14 @@ namespace carl
 		 */
 		Interval<Number> atanh() const;
 		void atanh_assign();
+		
+		/***********************************************************************
+         * Boolean Operations
+         **********************************************************************/
+		
+		Interval<Number> intersect(const Interval<Number>& rhs) const;
+		Interval<Number>& intersect_assign(const Interval<Number>& rhs);
+		
     };
 	
 	/***************************************************************************
@@ -612,13 +712,6 @@ namespace carl
 	inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs);
 	template<typename Number>
 	inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs);
-	
-	/*******************************************************************************
-	 * Other operators
-	 ******************************************************************************/
-	
-	template<typename Number>
-	inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i);
 	
 }
 
