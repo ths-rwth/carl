@@ -1,3 +1,12 @@
+/**
+ * Tests for double intervals using the templated version.
+ * 
+ * @file Test_Interval_Double.h
+ * @author Benedikt Seidl
+ * @since 2014-01-12
+ * @version 2014-01-12
+ */
+
 #include "gtest/gtest.h"
 #include "carl/interval/Interval.h"
 #include "carl/numbers/FLOAT_T.h"
