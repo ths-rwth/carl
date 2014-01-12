@@ -20,7 +20,7 @@ int main (int argc, char** argv)
 	
 	result = doubleInterval.log();
 	
-	result.log_assign();
+	mpfrInterval.log_assign();
 	
 	std::cout << "Result: " << result << " and mpfrInterval: " << mpfrInterval << std::endl;
 }

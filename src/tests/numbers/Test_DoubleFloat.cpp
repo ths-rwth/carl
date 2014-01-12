@@ -1,5 +1,5 @@
 /**
- * @file Test_MpfrFloat.cpp
+ * @file Test_DoubleFloat.cpp
  * @author Benedikt Seidl
  */
 
