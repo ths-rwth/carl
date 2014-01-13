@@ -7,11 +7,12 @@
 
 #pragma once
 #include "numbers.h"
+
+namespace carl
+{
 /**
  * Extended euclidean algorithm for numbers.
  */
-namespace carl
-{
 template<typename IntegerType>
 struct EEA
 {
@@ -41,7 +42,7 @@ struct EEA
 		if(b < 0) t = -t;
 		return std::make_pair(s,t);
 	}
-	// TODO a iterative implementation might be faster
+	/// \todo a iterative implementation might be faster
 	static void calculate_recursive(const IntegerType& a, const IntegerType& b, IntegerType& s, IntegerType& t)
 	{
 		assert(a >= 0 && b >= 0);

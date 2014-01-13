@@ -1,11 +1,10 @@
-/* 
- * File:   typetraits.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
-/*!
+/** 
+ * @file:   typetraits.h
+ * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ *
+ *
  * This file contains all type traits for our types.
- * We use the notation conventions of std, being lower cases with underscores.
+ * We use the notation conventions of the STL, being lower cases with underscores.
  */
 
 #pragma once
