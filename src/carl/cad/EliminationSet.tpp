@@ -40,7 +40,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
-	LOG4CPLUS_TRACE("carl.cad", "Adding " << r << " to eliminationset.");
+	LOGMSG_TRACE("carl.cad", "Adding " << *r << " to eliminationset.");
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
 
