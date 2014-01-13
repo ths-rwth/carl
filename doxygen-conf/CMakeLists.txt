@@ -16,6 +16,7 @@ if("${PROJECT_NAME}" STREQUAL "")
 	project(CArL-doxygen NONE)
 	set(CMAKE_CURRENT_BINARY_DIR "build")
 	set(CMAKE_SOURCE_DIR "..")
+	set(PROJECT_SOURCE_DIR "..")
 	include(FindDoxygen)
 endif()
 
