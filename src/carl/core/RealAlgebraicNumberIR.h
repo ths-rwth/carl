@@ -147,6 +147,9 @@ public:
 	 */
 	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Num>* n);
+
 	virtual bool containedIn(const ExactInterval<Number>& i) const {
 		return i.contains(this->getInterval());
 	}
@@ -218,6 +221,11 @@ public:
 
 template<typename Number>
 using RANIR = class RealAlgebraicNumberIR<Number, EnableIf<is_fraction<Number>>>;
+
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
+	return os << "RealAlgebraicNumberIR(" << n->getInterval() << ", " << n->getPolynomial() << ")";
+}
 
 }
 
