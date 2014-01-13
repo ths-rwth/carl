@@ -253,6 +253,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() const
 {
     auto term = mTerms.rbegin();
+    if( term == mTerms.rend() ) return Definiteness::NON;
     Definiteness result = (*term)->definiteness();
     ++term;
     if( term == mTerms.rend() ) return result;

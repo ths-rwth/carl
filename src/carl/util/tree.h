@@ -9,7 +9,8 @@
 // version 2 applies. Special permission to use tree.hh under
 // the LGPL for other projects can be requested from the author.
 
-/** \mainpage tree.hh
+/**
+    \file	  Tree.h
     \author   Kasper Peeters
     \version  2.81
     \date     23-Aug-2011
@@ -22,13 +23,15 @@
    pre-order, and others). Where possible the access methods are
    compatible with the STL or alternative algorithms are
    available. 
-*/
+ */
 
-/**
+ /**
+  * @file Tree.h 
  * Modified by Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * 
  * - Using #pragma once instead of #ifdef
  * - Moved inside namespace carl
+ * - Removed the mainpage attribute from the doxygen comment.
  */
 
 

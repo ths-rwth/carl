@@ -1,4 +1,4 @@
-/*
+/**
  * @file:   initialize.h
  * @author Sebastian Junges
  
