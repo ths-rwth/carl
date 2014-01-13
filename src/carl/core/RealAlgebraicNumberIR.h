@@ -13,14 +13,9 @@
 
 namespace carl {
 
-
-template<typename Number, typename isFraction = EnableIf<is_fraction<Number>>>
-class RealAlgebraicNumberIR {
-
-};
-
+// TODO: EnableIf<is_fraction<Number>>
 template<typename Number>
-class RealAlgebraicNumberIR<Number, EnableIf<is_fraction<Number>>> : public RealAlgebraicNumber<Number> {
+class RealAlgebraicNumberIR : public RealAlgebraicNumber<Number> {
 
 protected:
 	/**
@@ -218,9 +213,6 @@ public:
 	Sign sgn(const UnivariatePolynomial<Number>& p) const;
 
 };
-
-template<typename Number>
-using RANIR = class RealAlgebraicNumberIR<Number, EnableIf<is_fraction<Number>>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
