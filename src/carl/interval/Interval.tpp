@@ -96,7 +96,7 @@ template<typename Number>
                 if( mContent.lower() > val )
                     return false;
         }
-        // Invariant: n is not conflicting with left bound
+        // Invariant: n is not conflicting with lower bound
         switch( mUpperBoundType )
         {
             case BoundType::INFTY:
@@ -110,7 +110,7 @@ template<typename Number>
                     return false;
                 break;
         }
-        return true;    // for open intervals: (left() < n && right() > n) || (n == 0 && left() == cln::cl_RA( 0 ) && right() == cln::cl_RA( 0 ))	}
+        return true;    // for open intervals: (lower() < n && upper() > n) || (n == 0 && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
 	}
 	
 	template<typename Number>
@@ -402,7 +402,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
             {
                 a = unboundedInterval();
                 return false;
-            }    // o.unbounded
+            }    // rhs.unbounded
             else
             {
                 //default case
@@ -771,6 +771,100 @@ void Interval<Number>::atanh_assign()
 		mContent = boost::numeric::atanh(mContent);
 	}
 
+template<typename Number>
+	Interval<Number> Interval<Number>::intersect(const Interval<Number>& rhs) const
+	{
+		Number lowerValue;
+        Number upperValue;
+        BoundType maxLowest;
+        BoundType minUppest;
+        // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
+        if ( mLowerBoundType != BoundType::INFTY && rhs.leftType() != BoundType::INFTY )
+        {
+            if ( mContent.lower() < rhs.lower() )
+            {
+                lowerValue = rhs.lower();
+                maxLowest = rhs.leftType();
+            }
+            else if ( rhs.lower() < mContent.lower() )
+            {
+                lowerValue = mContent.lower();
+                maxLowest = mLowerBoundType;
+            }
+            else
+            {
+                lowerValue = mContent.lower();
+                maxLowest = getWeakestBoundType(mLowerBoundType, rhs.leftType());
+            }
+        }
+        else if ( mLowerBoundType == BoundType::INFTY && rhs.leftType() != BoundType::INFTY )
+        {
+            lowerValue = rhs.lower();
+            maxLowest = rhs.leftType();
+        }
+        else if ( mLowerBoundType != BoundType::INFTY && rhs.leftType() == BoundType::INFTY )
+        {
+            lowerValue = mContent.lower();
+            maxLowest = mLowerBoundType;
+        }
+        else
+        {
+            lowerValue = Number(0);
+            maxLowest = BoundType::INFTY;
+        }
+        
+        // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
+        if ( mUpperBoundType != BoundType::INFTY && rhs.rightType() != BoundType::INFTY )
+        {
+            if ( mContent.lower() > rhs.upper() )
+            {
+                upperValue = rhs.upper();
+                minUppest = rhs.rightType();
+            }
+            else if ( rhs.upper() > mContent.lower() )
+            {
+                upperValue = mContent.lower();
+                minUppest = mUpperBoundType;
+            }
+            else
+            {
+                upperValue = mContent.lower();
+                minUppest = getWeakestBoundType(mUpperBoundType, rhs.rightType());
+            }
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else if ( mUpperBoundType == BoundType::INFTY && rhs.rightType() != BoundType::INFTY )
+        {
+            upperValue = rhs.upper();
+            minUppest = rhs.rightType();
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else if ( mUpperBoundType != BoundType::INFTY && rhs.rightType() == BoundType::INFTY )
+        {
+            upperValue = mContent.lower();
+            minUppest = mUpperBoundType;
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else
+        {
+            upperValue = lowerValue;
+            minUppest = BoundType::INFTY;
+        }
+        if ( lowerValue > upperValue )
+            return emptyInterval();
+        return DoubleInterval(lowerValue, maxLowest, upperValue, minUppest );
+
+	}
+	
 /*******************************************************************************
  * Overloaded arithmetics operators
  ******************************************************************************/
