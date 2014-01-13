@@ -232,7 +232,7 @@ public:
 	 * @return os containing the information about the CAD object cad
 	 */
 	template<typename Num>
-	friend std::ostream& operator <<(std::ostream& os, const CAD<Num>& cad);
+	friend std::ostream& operator<<(std::ostream& os, const CAD<Num>& cad);
 
 	
 	//////////////////////////////
