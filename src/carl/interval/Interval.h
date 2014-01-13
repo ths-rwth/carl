@@ -70,6 +70,15 @@ namespace carl
 		typedef boost::numeric::interval< Number, boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP > > BoostInterval;
 		typedef std::map<Variable, Interval<Number> > evalintervalmap;
 		
+#define BOUNDS_OK( lower, lowerBoundType, upper, upperBoundType )\
+(lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY || lower <= upper)
+		
+#define IS_EMPTY(lower, lowerBoundType, upper, upperBoundType )\
+(lowerBoundType == BoundType::STRICT && upperBoundType == BoundType::STRICT && lower == upper)
+		
+#define IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType )\
+(lowerBoundType == BoundType::INFTY && upperBoundType == BoundType::INFTY)
+		
 	protected:
 		/***********************************************************************
          * Members
@@ -91,27 +100,94 @@ namespace carl
 		{}
 		
 		Interval(const Number& n) :
-			mContent(n),
+			mContent(n, n),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
 		
-		Interval(const Number& lower, const Number& upper) :
-			mContent(lower, upper),
-			mLowerBoundType(BoundType::WEAK),
-			mUpperBoundType(BoundType::WEAK)
-		{}
+		Interval(const Number& lower, const Number& upper)
+		{
+			if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK)) {
+				mContent = BoostInterval(lower,upper);
+				mLowerBoundType = BoundType::WEAK;
+				mUpperBoundType = BoundType::WEAK;
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
-		Interval(const BoostInterval& content, BoundType lowerBoundType, BoundType upperBoundType) : mContent(content),
-			mLowerBoundType(lowerBoundType),
-			mUpperBoundType(upperBoundType)
-		{}
+		Interval(const BoostInterval& content, BoundType lowerBoundType, BoundType upperBoundType)
+		{
+			if (BOUNDS_OK(content.lower(), lowerBoundType, content.upper(), upperBoundType)) {
+				if(IS_EMPTY(content.lower(), lowerBoundType, content.upper(), upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::STRICT;
+					mUpperBoundType = BoundType::STRICT;
+				}
+				if(IS_UNBOUNDED(content.lower(), lowerBoundType, content.upper(), upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::INFTY;
+					mUpperBoundType = BoundType::INFTY;
+				}
+				else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+				{
+					mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? content.upper() : content.lower());
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+				else
+				{
+					mContent = content;
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
-		Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType) :
-		mContent(lower, upper),
-		mLowerBoundType(lowerBoundType),
-		mUpperBoundType(upperBoundType)
-		{}
+		Interval(const Number& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType)
+		{
+			if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType)) {
+				if(IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::STRICT;
+					mUpperBoundType = BoundType::STRICT;
+				}
+				else if(IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::INFTY;
+					mUpperBoundType = BoundType::INFTY;
+				}
+				else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+				{
+					mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? upper : lower);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+				else
+				{
+					mContent = BoostInterval(lower,upper);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		Interval(const Interval<Number>& o) :
 			mContent(BoostInterval(o.mContent)),
@@ -121,73 +197,221 @@ namespace carl
 		
 		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy >
 		Interval(const double& n):
-			mContent(carl::Interval<Number>::BoostInterval(n)),
+			mContent(carl::Interval<Number>::BoostInterval(n,n)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy>
-		Interval(double lower, double upper):
-			mContent(Interval<Number>::BoostInterval(lower, upper)),
-			mLowerBoundType(BoundType::WEAK),
-			mUpperBoundType(BoundType::WEAK)
-		{}
+		Interval(double lower, double upper)
+		{
+			if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK)) {
+				mContent = BoostInterval(lower,upper);
+				mLowerBoundType = BoundType::WEAK;
+				mUpperBoundType = BoundType::WEAK;
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy>
-		Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType):
-			mContent(Interval<Number>::BoostInterval(lower, upper)),
-			mLowerBoundType(lowerBoundType),
-			mUpperBoundType(upperBoundType)
-		{}
+		Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType)
+		{
+			if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType)) {
+				if(IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::STRICT;
+					mUpperBoundType = BoundType::STRICT;
+				}
+				else if(IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::INFTY;
+					mUpperBoundType = BoundType::INFTY;
+				}
+				else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+				{
+					mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? upper : lower);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+				else
+				{
+					mContent = BoostInterval(lower,upper);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy >
 		Interval(const int& n):
-		mContent(carl::Interval<Number>::BoostInterval(n)),
+		mContent(carl::Interval<Number>::BoostInterval(n, n)),
 		mLowerBoundType(BoundType::WEAK),
 		mUpperBoundType(BoundType::WEAK)
 		{}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy>
-		Interval(int lower, int upper):
-		mContent(Interval<Number>::BoostInterval(lower, upper)),
-		mLowerBoundType(BoundType::WEAK),
-		mUpperBoundType(BoundType::WEAK)
-		{}
+		Interval(int lower, int upper)
+		{
+			if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK)) {
+				mContent = BoostInterval(lower,upper);
+				mLowerBoundType = BoundType::WEAK;
+				mUpperBoundType = BoundType::WEAK;
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy>
-		Interval(int lower, BoundType lowerBoundType, int upper, BoundType upperBoundType):
-		mContent(Interval<Number>::BoostInterval(lower, upper)),
-		mLowerBoundType(lowerBoundType),
-		mUpperBoundType(upperBoundType)
-		{}
+		Interval(int lower, BoundType lowerBoundType, int upper, BoundType upperBoundType)
+		{
+			if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType)) {
+				if(IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::STRICT;
+					mUpperBoundType = BoundType::STRICT;
+				}
+				else if(IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::INFTY;
+					mUpperBoundType = BoundType::INFTY;
+				}
+				else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+				{
+					mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? upper : lower);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+				else
+				{
+					mContent = BoostInterval(lower,upper);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename Other>
-		Interval(const Number& lower, const Other& upper):
-		mContent(Interval<Number>::BoostInterval(lower, Number(upper))),
-		mLowerBoundType(BoundType::WEAK),
-		mUpperBoundType(BoundType::WEAK)
-		{}
+		Interval(const Number& lower, const Other& upper)
+		{
+			if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK)) {
+				mContent = BoostInterval(lower,upper);
+				mLowerBoundType = BoundType::WEAK;
+				mUpperBoundType = BoundType::WEAK;
+			}
+			else{
+				mContent = BoostInterval(Number(0), Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename Other>
-		Interval(const Other& lower, const Number& upper):
-		mContent(Interval<Number>::BoostInterval(Number(lower), upper)),
-		mLowerBoundType(BoundType::WEAK),
-		mUpperBoundType(BoundType::WEAK)
-		{}
+		Interval(const Other& lower, const Number& upper)
+		{
+			if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK)) {
+				mContent = BoostInterval(lower,upper);
+				mLowerBoundType = BoundType::WEAK;
+				mUpperBoundType = BoundType::WEAK;
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename Other>
-		Interval(const Number& lower, BoundType lowerBoundType, const Other& upper, BoundType upperBoundType):
-		mContent(Interval<Number>::BoostInterval(lower, Number(upper))),
-		mLowerBoundType(lowerBoundType),
-		mUpperBoundType(upperBoundType)
-		{}
+		Interval(const Number& lower, BoundType lowerBoundType, const Other& upper, BoundType upperBoundType)
+		{
+			if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType)) {
+				if(IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::STRICT;
+					mUpperBoundType = BoundType::STRICT;
+				}
+				else if(IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::INFTY;
+					mUpperBoundType = BoundType::INFTY;
+				}
+				else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+				{
+					mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? upper : lower);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+				else
+				{
+					mContent = BoostInterval(lower,upper);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename Other>
-		Interval(const Other& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType):
-		mContent(Interval<Number>::BoostInterval(Number(lower), upper)),
-		mLowerBoundType(lowerBoundType),
-		mUpperBoundType(upperBoundType)
-		{}
+		Interval(const Other& lower, BoundType lowerBoundType, const Number& upper, BoundType upperBoundType)
+		{
+			if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType)) {
+				if(IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::STRICT;
+					mUpperBoundType = BoundType::STRICT;
+				}
+				else if(IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
+				{
+					mContent = BoostInterval(Number(0));
+					mLowerBoundType = BoundType::INFTY;
+					mUpperBoundType = BoundType::INFTY;
+				}
+				else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+				{
+					mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? upper : lower);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+				else
+				{
+					mContent = BoostInterval(lower,upper);
+					mLowerBoundType = lowerBoundType;
+					mUpperBoundType = upperBoundType;
+				}
+			}
+			else{
+				mContent = BoostInterval(Number(0));
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+			}
+		}
 		
 		template<typename Rational>
 		Interval(Rational n);
@@ -346,12 +570,12 @@ namespace carl
 			mContent = BoostInterval(lower, upper);
 		}
 		
-		bool unbounded() const
+		bool isUnbounded() const
 		{
 			return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
 		}
 		
-		bool empty() const
+		bool isEmpty() const
 		{
 			return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
 		}
@@ -457,7 +681,8 @@ namespace carl
 		
 		friend inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i)
 		{
-			switch (i.mLowerBoundType) {
+			str << "lower: " << i.mContent.lower() << ", upper: " << i.mContent.upper() << " ";
+ 			switch (i.mLowerBoundType) {
 				case BoundType::INFTY:
 					str << "]-INF, ";
 					break;

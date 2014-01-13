@@ -240,7 +240,7 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
 		std::list<Interval<Number> > result;
 		if(n == 0)
 		{
-			result.insert(result.end(), *this);
+			result.push_back(*this);
 			return result;
 		}
 		Number diameter = this->diameter();
@@ -250,17 +250,18 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
         tmp.set(mContent.lower(), mContent.lower()+diameter);
         tmp.setLowerBoundType(mLowerBoundType);
         tmp.setUpperBoundType(BoundType::STRICT);
-        result.insert(result.end(), tmp);
+        result.push_back(tmp);
 		
         for( unsigned i = 1; i < (n-1); ++i )
         {
             tmp.set(diameter*i, diameter*(i+1));
-            result.insert(result.end(), tmp);
+            result.push_back(tmp);
         }
 		
         tmp.set(diameter*(n-1),diameter*n);
         tmp.setUpperBoundType(mUpperBoundType);
-        result.insert(result.end(), tmp);
+        result.push_back(tmp);
+		return result;
 	}
 	
 template<typename Number>
@@ -397,7 +398,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
         }
         else
         {
-            if( rhs.unbounded() )
+            if( rhs.isUnbounded() )
             {
                 a = unboundedInterval();
                 return false;
@@ -446,7 +447,7 @@ void Interval<Number>::inverse_assign()
 template<typename Number>
 bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const
 	{
-		if( this->unbounded() )
+		if( this->isUnbounded() )
         {
             a = emptyInterval();
             return false;
@@ -853,7 +854,7 @@ inline const Interval<Number> operator /(const Interval<Number>& lhs, const Numb
 template<typename Number>
 inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
-		return lhs.content() == rhs.content() && lhs.lowerBoundType() == rhs.lowerBoundType() && lhs.upperBoundType() == rhs.upperBoundType();
+		return lhs.content().lower() == rhs.content().lower() && lhs.content().upper() == rhs.content().upper() && lhs.lowerBoundType() == rhs.lowerBoundType() && lhs.upperBoundType() == rhs.upperBoundType();
 	}
 
 template<typename Number>
