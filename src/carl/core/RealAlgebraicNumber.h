@@ -157,9 +157,8 @@ public:
 		return this->value();
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Number>& g) {
-		return os << "RealAlgebraicNumber(" << g.value() << ", " << g.isNumeric() << ", " << g.isRoot() << ")";
-	}
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>* g);
 };
 
 }
@@ -167,3 +166,16 @@ public:
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicNumberOperations.h"
+
+namespace carl {
+
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Number>* g) {
+	if (g->isNumeric()) {
+		return os << static_cast<const carl::RealAlgebraicNumberNR<Number>*>(g);
+	} else {
+		return os << static_cast<const carl::RealAlgebraicNumberIR<Number>*>(g);
+	}
+}
+
+}
