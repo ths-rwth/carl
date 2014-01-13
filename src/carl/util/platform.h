@@ -1,6 +1,6 @@
-/* 
- * File:   platform.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/** 
+ * @file:   platform.h
+ * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * 
  * This file contains platform and compiler specific macros.
  */

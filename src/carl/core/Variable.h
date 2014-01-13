@@ -16,7 +16,7 @@ namespace carl
 {
 /**
  * Several types of variables are supported.
- * TODO: consider making this VariablePool vp& = Vstrongly typedefed (new in C++11). 
+ * TODO: consider making this strongly typedefed (new in C++11). 
  * REAL: the reals RR
  * RATIONAL: rational numbers QQ
  * INT: the integers ZZ

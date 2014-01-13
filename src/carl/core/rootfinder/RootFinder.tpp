@@ -3,10 +3,12 @@
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
-#include "RootFinder.h"
-
 
 #pragma once
+
+#include "RootFinder.h"
+
+#include "../RealAlgebraicNumberEvaluation.h"
 
 namespace carl {
 namespace rootfinder {
@@ -75,7 +77,6 @@ std::list<RealAlgebraicNumber<Number>*> realRoots(
 		SplittingStrategy pivoting
 ) {
 	std::map<Variable, ExactInterval<Number>> varToInterval;
-	
 	UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(p, m, varToInterval);
 	return realRoots(res, interval, pivoting);
 }

@@ -1,13 +1,13 @@
-/* 
- * File:   operations.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
-/*!
+/** 
+ * @file:   operations.h
+ * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ *
  * This file contains a common interface for basic number functions.
  * All methods here are meant as an interface that should be implemented for each specific number type, if applicable.
  * The exact signatures, e.g. if variables are passed by reference, can be changed if necessary.
  */
+
+
 
 #pragma once
 
@@ -17,7 +17,7 @@
 
 namespace carl {
     
-/**
+/*
  * Informational functions
  * 
  * The following functions return informations about the given numbers.
@@ -35,7 +35,7 @@ inline bool isInteger(const GFNumber<C>&) {
 	return true;
 }
 
-/**
+/*
  * Conversion functions
  * 
  * The following function convert types to other types.
@@ -49,7 +49,7 @@ inline Integer toInt(const Number&);
 inline Number rationalize(double);
 */
 
-/**
+/*
  * Basic Operators
  * 
  * The following functions implement simple operations on the given numbers.

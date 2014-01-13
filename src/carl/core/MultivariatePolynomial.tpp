@@ -253,6 +253,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() const
 {
     auto term = mTerms.rbegin();
+    if( term == mTerms.rend() ) return Definiteness::NON;
     Definiteness result = (*term)->definiteness();
     ++term;
     if( term == mTerms.rend() ) return result;
@@ -375,11 +376,12 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
 	LOGMSG_TRACE("carl.core.mvpolynomial", "" << *this << " .substituteIn( " << var << " -> " << value << " )");
-    if(isConstant())
+    if(!has(var))
     {
         return;
     }
     TermsType newTerms;
+    // If we replace a variable by zero, just eliminate all terms containing the variable.
     if(value.isZero())
     {
         for(auto term : mTerms)
@@ -425,16 +427,19 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
     }
     // Calculate the exponentiation of the multivariate polynomial to substitute the
     // variable for, reusing the already calculated exponentiations.
-    auto expResultA = expResults.begin();
-    auto expResultB = expResultA;
-    expResultB->second.first = value.pow(expResultB->first);
-    expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
-    ++expResultB;
-    while(expResultB != expResults.end())
+    if( !expResults.empty() )
     {
-        expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
-        ++expResultA;
+        auto expResultA = expResults.begin();
+        auto expResultB = expResultA;
+        expResultB->second.first = value.pow(expResultB->first);
+        expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
         ++expResultB;
+        while(expResultB != expResults.end())
+        {
+            expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
+            ++expResultA;
+            ++expResultB;
+        }
     }
     // Substitute the variable.
     newTerms.reserve(expectedResultSize);
@@ -445,18 +450,18 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
         {
             auto iter = expResults.find(e);
             assert(iter != expResults.end());
-            for(auto term : iter->second.first.mTerms)
+            for(auto vterm : iter->second.first.mTerms)
             {
                 Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-                newTerms.push_back(std::make_shared<Term<Coeff>>(*term * t));
+                newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
             }
         }
         if(e == 1)
         {
-            for(auto term : value.mTerms)
+            for(auto vterm : value.mTerms)
             {
                 Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-                newTerms.push_back(std::make_shared<Term<Coeff>>(*term * t));
+                newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
             }
         }
         else
@@ -640,7 +645,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeCoefficients() const
 {
-    if(nrTerms() == 1) return *this;
+    if(nrTerms() == 0) return *this;
 	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
 	MultivariatePolynomial<Coeff, Ordering, Policies> result;

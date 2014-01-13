@@ -59,6 +59,10 @@ class Term
             return mMonomial->tdeg();
         }
 		
+		/**
+		 * @todo check validity.
+         * @return 
+         */
 		bool isZero() const
 		{
 			return mCoeff == 0;

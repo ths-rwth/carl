@@ -6,6 +6,7 @@
 #pragma once
 
 #include <forward_list>
+#include <fstream>
 
 #include "CAD.h"
 
