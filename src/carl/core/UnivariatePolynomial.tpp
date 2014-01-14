@@ -1766,6 +1766,7 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
 	}
+	return false;
 }
 template<typename C>
 bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
