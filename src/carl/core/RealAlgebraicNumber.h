@@ -17,7 +17,7 @@ namespace carl {
 /**
  * This class is the base for all representations of real algebraic numbers and provides crucial operations such as arithmetic, ordering or sign determination on them.
  */
-// TODO: EnableIf<is_fraction<Number>>
+/// @todo EnableIf<is_fraction<Number>>
 template<typename Number>
 class RealAlgebraicNumber {
 protected:

@@ -16,7 +16,7 @@ namespace carl {
  * RealAlgebraicNumberNR is a specialization of RealAlgebraicNumber.
  * RealAlgebraicNumberNR always represents an exact number.
  */
-// TODO: EnableIf<is_fraction<Number>>
+/// @todo EnableIf<is_fraction<Number>>
 template<typename Number>
 class RealAlgebraicNumberNR : public RealAlgebraicNumber<Number> {
 public:
