@@ -61,7 +61,7 @@ public:
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	
-    virtual ~MultivariatePolynomial() {};
+    virtual ~MultivariatePolynomial() {}
     
 	//Polynomial interface implementations.
 	/**

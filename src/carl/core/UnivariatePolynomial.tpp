@@ -1792,8 +1792,8 @@ class UnivariatePolynomialComparator
 private:
 	PolynomialComparisonOrder order;
 public:
-	UnivariatePolynomialComparator(PolynomialComparisonOrder order = PolynomialComparisonOrder::Default)
-				: order(order)
+	UnivariatePolynomialComparator(PolynomialComparisonOrder cmporder = PolynomialComparisonOrder::Default)
+				: order(cmporder)
 	{}
 
 	bool operator()(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs) const

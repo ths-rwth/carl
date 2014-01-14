@@ -17,6 +17,8 @@ namespace carl
 
 class VariablesInformationInterface
 {
+public:
+	virtual ~VariablesInformationInterface() {}
 	virtual bool hasCoeff() const = 0;
 };
 
@@ -26,6 +28,8 @@ class VariablesInformation : public VariablesInformationInterface
 	std::map<Variable, VariableInformation<collectCoeff, CoeffType>> mVariableInfo;
 	
 public:
+	~VariablesInformation() {}
+
 	bool hasCoeff() const override
 	{
 		return collectCoeff;
