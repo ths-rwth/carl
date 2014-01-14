@@ -27,5 +27,10 @@
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
 #else
+	#warning "You are using an unsupported compiler."
 	#define __UNSUPPORTED
 #endif
+
+#include <iostream>
+
+std::ostream& printStacktrace(std::ostream& os);
