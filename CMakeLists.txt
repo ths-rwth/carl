@@ -43,6 +43,7 @@ option( STATICLIB_SWITCH "Compile a statically linked version of the library." O
 option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
+option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -94,6 +95,15 @@ endif()
 
 message("-- Compiler flags: ${CMAKE_CXX_FLAGS}")
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
+
+if(USE_COTIRE)
+	# We use cotire, simply include it
+	include(cotire)
+else()
+	# We do not use cotire, create dummy function.
+	function(cotire)
+	endfunction(cotire)
+endif()
 
 
 # # # # # # # # # # # # # # # # # # # # # #
