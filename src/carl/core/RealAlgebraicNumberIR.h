@@ -13,7 +13,7 @@
 
 namespace carl {
 
-/// @todo EnableIf<is_fraction<Number>>
+/// @todo Add `EnableIf<is_fraction<Number>>` such that gcc does not crash.
 template<typename Number>
 class RealAlgebraicNumberIR : public RealAlgebraicNumber<Number> {
 

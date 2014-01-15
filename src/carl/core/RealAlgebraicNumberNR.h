@@ -16,7 +16,7 @@ namespace carl {
  * RealAlgebraicNumberNR is a specialization of RealAlgebraicNumber.
  * RealAlgebraicNumberNR always represents an exact number.
  */
-/// @todo EnableIf<is_fraction<Number>>
+/// @todo Add `EnableIf<is_fraction<Number>>` such that gcc does not crash.
 template<typename Number>
 class RealAlgebraicNumberNR : public RealAlgebraicNumber<Number> {
 public:
