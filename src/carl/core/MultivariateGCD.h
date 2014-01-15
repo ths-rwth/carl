@@ -69,25 +69,27 @@ class MultivariateGCD
 		// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
 		// gcd(p, ay + b) is either ay + b or 1.
 		
+		// Here, we follow notation from GZL92. We also add the notation from MY73.
 		Variable x = getMainVar(mp1, mp2);
 		UnivReprPol A = mp1.toUnivariatePolynomial(x);
 		UnivReprPol B = mp2.toUnivariatePolynomial(x);
-		Polynomial a;// = A.cont();
-		Polynomial b;// = B.cont();
-		A /= a;
-		B /= b;
-		Polynomial g = gcd(a,b);
+		Polynomial a;// = A.cont(); // In MY73, fbar
+		Polynomial b;// = B.cont(); // In MY73, gbar.
+		A /= a; // In MY73, F
+		B /= b; // IN MY73, G.
+		Polynomial g = gcd(a,b); // In MY72, dbar
 		a = a.divideBy(g).quotient;
 		b = b.divideBy(g).quotient;
 		
 		Integer p = getPrime(A,B);
-		std::map<Variable, Integer> eval_b = findEval(A,B,p); // bold b in book.
-		UnivPol A_I = A.evaluateCoefficient(eval_b).mod(p);
-		UnivPol B_I = B.evaluateCoefficient(eval_b).mod(p);
-		UnivPol C_I = UnivPol::gcd(A_I, B_I);
-		unsigned d =  C_I.degree();
+		std::map<Variable, Integer> eval_b = findEval(A,B,p); // bold b in GZL92.
+		UnivPol A_I = A.evaluateCoefficient(eval_b).mod(p); // F_b
+		UnivPol B_I = B.evaluateCoefficient(eval_b).mod(p); // G_b
+		UnivPol C_I = UnivPol::gcd(A_I, B_I); // In MY73, D_b
+		unsigned d =  C_I.degree(); // In MY72, delta.
 		if(d == 0)
 		{
+			// In MY73 step A3.
 			return {Polynomial(a * A), Polynomial(b * B), g};
 		}
 		while(true)
@@ -133,33 +135,35 @@ class MultivariateGCD
 				}
 			}
 			// Check for relatively prime cofactors
+			// In MY73, step A6.
 			UnivReprPol U_I(x);
 			UnivPol H_I(x);
 			Polynomial c;
 			if(UnivPol::gcd(B_I, C_I).isOne())
 			{
-				U_I = B;
-				H_I = B_I.divide(C_I).quotient;
-				c = b;
+				U_I = B;   //  B = G.
+				H_I = B_I.divide(C_I).quotient; // B_o[hat] = G_b / D_b
+				c = b; // Could not find in MY73
 			}
 			else if(UnivPol::gcd(A_I, C_I).isOne())
 			{
-				U_I = A;
-				H_I = A_I.divide(C_I).quotient;
-				c = a;
+				U_I = A; // B = F.
+				H_I = A_I.divide(C_I).quotient; //B_o[hat] = F_b / D_b
+				c = a; // Could not find in MY73
 			}
 			else
 			{
+				// Special gcd.
 				LOG_NOTIMPLEMENTED();
 			}
 			
 			// Lifting step.
+			// 
 			U_I = c*U_I;
-			mod(c.evaluate(eval_b),p);
 			Coeff c_I = mod(c.evaluate(eval_b),p);
 			C_I = c_I * C_I;
 			//MultivariateH
-			std::vector<Polynomial> CE; //= EZ_LIFT(U_I, C_I, H_i, b, c_I) // EZ_LIFT(U_I, C_I, H_i, b, c)
+			std::vector<Polynomial> CE; //= EZ_LIFT(U_I, C_I, H_i, b, c_I) // EZ_LIFT(U_I, C_I, H_i, b, p, c)
 			assert(CE.size() == 2);
 			if(U_I == CE.front()*CE.back()) 
 			{

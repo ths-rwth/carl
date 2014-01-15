@@ -1,4 +1,5 @@
 /**
+ * @file DoubleInterval.h
  * @author Florian Corzilius
  * @author Sebastian Junges
  * @author Stefan Schupp

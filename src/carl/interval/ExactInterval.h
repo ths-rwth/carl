@@ -1,4 +1,5 @@
 /**
+ * @file ExactInterval.h
  * @author Stefan Schupp
  */
 

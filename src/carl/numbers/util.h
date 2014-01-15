@@ -1,6 +1,6 @@
 /** 
- * @file:   util.h
- * @author: Sebastian Junges
+ * @file   util.h
+ * @author Sebastian Junges
  *
  * @since October 16, 2013
  */

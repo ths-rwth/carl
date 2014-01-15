@@ -1,6 +1,6 @@
 /** 
- * @file:   Polynomial.h
- * @author: Sebastian Junges
+ * @file   Polynomial.h
+ * @author Sebastian Junges
  *
  * @since October 1, 2013
  */

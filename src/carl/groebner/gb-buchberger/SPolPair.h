@@ -1,4 +1,5 @@
 /**
+ * @file SPolPair.h
  * @author Sebastian Junges
  */
 #pragma once 
