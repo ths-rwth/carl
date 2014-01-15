@@ -611,6 +611,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		{
 			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
+//        else
+//        {
+//            delete t;
+//        }
 	}   
 	result.setTerms(newTerms);
 	return result;
@@ -1838,7 +1842,15 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
 {
     mTerms.clear();
-    if(newTerms.empty()) return;
+    if(newTerms.empty())
+    {
+        return;
+    }
+    else if(newTerms.size() == 1)
+    {
+        mTerms.push_back(newTerms.back());
+        return;
+    }
     // Sort the entries from newterms.
     // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
     std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
@@ -1878,6 +1890,7 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
     {
         mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
     }
+//    assert( newTerms.empty() );
 }
 
 }
