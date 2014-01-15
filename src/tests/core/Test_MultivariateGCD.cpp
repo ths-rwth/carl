@@ -8,7 +8,7 @@ TEST(MultivariateGCD, test1)
 {
 	VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 	Variable y = vpool.getFreshVariable();
 	
 	MultivariatePolynomial<mpz_class> f1({(mpz_class)1*x*x*x*y*y, (mpz_class)-1*x*x*y*y*y, (mpz_class)1*x});

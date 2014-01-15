@@ -16,11 +16,11 @@ TEST(UnivariatePolynomial, Constructor)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     UnivariatePolynomial<cln::cl_RA> pol(x, {(cln::cl_RA)0, (cln::cl_RA)2});
  
 }
@@ -29,7 +29,7 @@ TEST(UnivariatePolynomial, Reduction)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 
 	{
 		UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)1,(cln::cl_RA)0, (cln::cl_RA)0,(cln::cl_RA)1});
@@ -51,7 +51,7 @@ TEST(UnivariatePolynomial, Divide)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
     UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)-6, (cln::cl_RA)-5,(cln::cl_RA)1});
     DivisionResult<UnivariatePolynomial<cln::cl_RA>> d = p.divide(p);
@@ -63,7 +63,7 @@ TEST(UnivariatePolynomial, DivideInteger)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     UnivariatePolynomial<cln::cl_I> p(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)5});
     UnivariatePolynomial<cln::cl_I> q(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)3});
     DivisionResult<UnivariatePolynomial<cln::cl_I>> d = p.divide(q);
@@ -75,7 +75,7 @@ TEST(UnivariatePolynomial, GCD)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 	UnivariatePolynomial<cln::cl_RA> s(x);
     UnivariatePolynomial<cln::cl_RA> t(x);
     
@@ -130,7 +130,7 @@ TEST(UnivariatePolynomial, cauchyBounds)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 
     
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
@@ -142,11 +142,11 @@ TEST(UnivariatePolynomial, toFiniteDomain)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     
     UnivariatePolynomial<mpz_class> pol(x, {(mpz_class)1, (mpz_class)2});
     const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
@@ -161,11 +161,11 @@ TEST(UnivariatePolynomial, normalizeCoefficients)
 {
 	VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     
 	UnivariatePolynomial<mpz_class> pol(x, {(mpz_class)1, (mpz_class)2});
     const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
@@ -179,7 +179,7 @@ TEST(UnivariatePolynomial, factorization)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     
     UnivariatePolynomial<cln::cl_RA> linA(x, {(cln::cl_RA)-2, (cln::cl_RA)5});
     UnivariatePolynomial<cln::cl_RA> linB(x, {(cln::cl_RA)1, (cln::cl_RA)3});
@@ -307,7 +307,7 @@ TEST(UnivariatePolynomial, numericContent)
 
 TEST(UnivariatePolynomial, pseudoRem)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+	//Variable x = VariablePool::getInstance().getFreshVariable();
 	
 	
 }

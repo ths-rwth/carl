@@ -17,97 +17,111 @@ namespace carl
 {
 
 /**
- * Class which saves names of variables and can generate fresh variables etc.
- * 
- * We decided it to be a singleton:
- * 1) We need global access to the variable pool. Everywhere where we want to 
- * interpret some polynomial, we should have access to the pool. 
- * 2) We only want !exactly! one instance of the pool, as otherwise we would get potential clashes
- *  if variables are not available in some method.
- *  Local variable pools make no sense, as variables cannot distinguish from which pool they stem.
- * 
- * 
+ * This class generates new variables and stores human-readable names for them.
+ *
+ * As we want only a single unique VariablePool and need global access to it, it is implemented as a singleton.
+ *
+ * All methods that modify the pool, that are getInstance(), getFreshVariable() and setName(), are thread-safe.
  */
 class VariablePool
 {
 private:
-    
-    /// Counter for the number of used variables.
-    unsigned mNextVarId;
-    
-    /**
-     * The (only) instance of VariablePool.
-     */
-    static std::shared_ptr< VariablePool >  instance;
-    /**
-     * Making sure that creating a new instance is called only once.
-     * Note: According to the new C++11 standard this is not strictly necessary.
-     * However, this is currently only supported in gcc 4.8.1 and newer. Therefore,
-     * we decided to make explicit use of this flag, thereby supporting gcc 4.7 
-     * and some other compilers.
-     */
-    static std::once_flag                   only_one;
-    
-    std::map<Variable, std::string> mFriendlyNames;
-    /* 
-     * Constructors are all private, as we have a singleton.
-     */
-    VariablePool();
-    VariablePool(const VariablePool& rs) = delete;
-    VariablePool& operator = (const VariablePool& rs);
+	/**
+	 * Contains the id of the next variable to be created.
+	 * As such, is also a counter of the variables that exist.
+	 */
+	unsigned mNextVarId;
+
+	/**
+	 * The unique instance of VariablePool.
+	 */
+	static std::unique_ptr<VariablePool>  instance;
+
+	/**
+	 * Mutex for the creation of the singleton instance.
+	 */
+	static std::mutex singletonMutex;
+
+	/**
+	 * Mutex for calling getFreshVariable().
+	 */
+	std::mutex freshVarMutex;
+
+	/**
+	 * Mutex for calling setVariableName().
+	 */
+	std::mutex setNameMutex;
+
+	/**
+	 * Stores human-readable names for variables that can be set via setVariableName().
+	 */
+	std::map<Variable, std::string> mFriendlyNames;
+
+	/**
+	 * Private default constructor.
+	 */
+	VariablePool();
+
+	/**
+	 * This class is a singleton, hence there shall be no copy constructor.
+	 */
+	VariablePool(const VariablePool&) = delete;
+
+	/**
+	 * This class is a singleton, hence there shall be no assignment operator.
+	 */
+	VariablePool& operator=(const VariablePool&) = delete;
 public:
-    static VariablePool& getInstance(  );
-    
-    /**
-     * Get a variable which was not used before.
-     * @param type
-     * @return A variable of type type.
-     */
-    Variable getFreshVariable(VariableType type = VT_REAL);
-    /**
-     * Get the name recorded for this variable. If no special name was set,
-     * we use "x_id".
-     * @param v
-     * @return 
-     */
-    const std::string getVariableName(Variable::Arg v, bool friendlyVarName = true) const;
-    /**
-     * Add a name for a given variable.
-     * @param v
-     * @param name
-     */
-    void setVariableName(Variable::Arg v, const std::string& name);
+	/**
+	 * Returns the single instance of this class by reference.
+	 * If there is no instance yet, a new one is created.
+	 * This method is thread-safe.
+	 */
+	static VariablePool& getInstance();
+
+	/**
+	 * Get a variable which was not used before.
+	 * This method is thread-safe.
+	 * @param type Type for the new variable.
+	 * @return A new variable.
+	 */
+	Variable getFreshVariable(VariableType type = VT_REAL);
+
+	/**
+	 * Get a variable with was not used before and set a name for it.
+	 * This method is thread-safe.
+	 * @param name Name for the new variable.
+	 * @param type Type for the new variable.
+	 * @return A new variable.
+	 */
+	Variable getFreshVariable(const std::string& name, VariableType type = VT_REAL);
+
+	/**
+	 * Get a human-readable name for the given variable.
+	 * If the given Variable is Variable::NO_VARIABLE, "NO_VARIABLE" is returned.
+	 * If friendlyVarName is true, the name that was set via setVariableName() for this Variable, if there is any, is returned.
+	 * Otherwise "x_<id>" is returned, id being the internal id of the Variable.
+	 * @param v Variable.
+	 * @param friendlyVarName Flag, if a name set via setVariableName shall be considered.
+	 * @return Some name for the Variable.
+	 */
+
+	const std::string getName(Variable::Arg v, bool friendlyVarName = true) const;
+	/**
+	 * Add a name for a given Variable.
+	 * This method is thread-safe.
+	 * @param v Variable.
+	 * @param name Some string naming the variable.
+	 */
+	void setName(Variable::Arg v, const std::string& name);
    
-    /**
-     * The number of variables initialized by the pool.
-     * @return 
-     */
-    unsigned nrVariables() const
-    {
-        return mNextVarId;
-    }
-    
-    static unsigned NrVariables() 
-    {
-        return getInstance().nrVariables();
-    }
-    
-    static std::string getName(Variable::Arg v, bool friendlyVarName = true)
-    {
-        if(!instance) 
-        {
-            return getInstance().getVariableName(v, friendlyVarName);
-        }
-        else
-        {
-            return instance->getVariableName(v, friendlyVarName);
-        }
-        
-    }
-    /**
-     * Remove all information.
-     */
-    void clear();
+	/**
+	 * Returns the number of variables initialized by the pool.
+	 * @return Number of variables.
+	 */
+	unsigned nrVariables() const {
+		return mNextVarId;
+	}
 };
 
 }

@@ -1,6 +1,6 @@
-/* 
- * File:   CAD.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/** 
+ * @file CAD.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -126,7 +126,6 @@ public:
 	 * @param s input polynomials whose solution space is covered by this cad.
 	 * @param v main symbols of the polynomials in desired order of elimination (lifting order is vice versa!)
 	 * @param setting a setting type for a collection of CAD settings (standard option is the standard option of CADSettings::getSettings( ))
-	 * @param bounds give additional bounds to prune the elimination polynomials
 	 * @complexity linear in the size of v and s
 	 */
 	CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const cad::CADSettings& setting = cad::CADSettings::getSettings());
@@ -137,7 +136,6 @@ public:
 	 * @param v main symbols of the polynomials in desired order of elimination (lifting order is vice versa!)
 	 * @param c vector of Booleans: if any of them is true, we have to terminate a running check procedure
 	 * @param setting a setting type for a collection of CAD settings (standard option is the standard option of CADSettings::getSettings( ))
-	 * @param bounds give additional bounds to prune the elimination polynomials
 	 * @complexity linear in the size of v and s
 	 */
 	CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting = cad::CADSettings::getSettings());
@@ -221,7 +219,8 @@ public:
 
 	/**
 	 * Prints the current sample tree to the designated output stream.
-	 * @param os output stream (standard value is <code>std::cout</code>)
+	 * @param constraints
+	 * @param filename
 	 */
 	void printConstraints(const std::vector<cad::Constraint<Number>>& constraints, const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
 	
@@ -232,7 +231,7 @@ public:
 	 * @return os containing the information about the CAD object cad
 	 */
 	template<typename Num>
-	friend std::ostream& operator <<(std::ostream& os, const CAD<Num>& cad);
+	friend std::ostream& operator<<(std::ostream& os, const CAD<Num>& cad);
 
 	
 	//////////////////////////////
@@ -307,6 +306,7 @@ public:
 	 * @param next If set to true the method tries to compute a sample which was not found in previous runs before (if earlyLiftingPruning is on). If set to false, all
 	 * previously computed samples are traversed first and then lifting is continued.
 	 * @param checkTraceFirst If set to true, the trace of a previous computation is checked first before the actual checking starts. In combination with the flag next, this flag demands to check the trace first, then start with lifting immediately.
+	 * @param checkBounds
 	 * @return true if the constraints are satisfied by a cell in the cad or no constraint is given and the bounds are not conflicting, false otherwise
 	 */
 	bool check(	std::vector<cad::Constraint<Number>>& constraints,
@@ -398,7 +398,6 @@ public:
 	 * Insert the given polynomial into the cad. This method calls addPolynomial with the CAD's list of variables.
 	 *
 	 * @param p polynomial to be added
-	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
 	void addPolynomial(MPolynomial* p) {
@@ -422,7 +421,6 @@ public:
 	 *
 	 * @param first iterator marking the beginning of the elements to insert
 	 * @param last iterator marking the end of the elements to insert (not inserted!)
-	 * @param setting a setting type for a collection of CAD settings (standard option is CADSettings::GENERIC_CADSETTING). The settings are altered before the new polynomials are added.
 	 * @complexity quadratic in the number of the variables and quadratic in the number of polynomials
 	 */
 	template<typename InputIterator>
@@ -440,7 +438,7 @@ public:
 	/**
 	 * Removes a polynomial by its pointer pPtr from the input polynomials of the CAD (elimination level 0) or the specified level.
 	 * Moreover, all elimination levels are safely cleaned of all elimination polynomials stemming from p.
-	 * @param pPtr
+	 * @param p
 	 * @param level
 	 * @param childrenOnly only remove the children of pPtr (recursively)
 	 */
@@ -588,6 +586,13 @@ private:
      * @param fullRestart
      * @param excludePrevious
      * @param updateTrace
+	 * @param constraints
+	 * @param bounds
+	 * @param r
+	 * @param conflictGraph
+	 * @param boundsNontrivial
+	 * @param checkBounds
+	 * @param dim
      * @return 
      */
 	std::pair<bool, bool> checkNode(
@@ -648,7 +653,7 @@ public:
 	
 	/**
 	 * Constructs sample points for the given number of open variables openVariableCount by lifting
-	 * the polynomials available in the lifting queue in the corresponding level of CAD::mEliminationSets.
+	 * the polynomials available in the lifting queue in the corresponding level of CAD::eliminationSets.
 	 * The method performs every lifting for the given number of open variables and stops if either a satisfying
 	 * sample point is found (in case of which already computed sample components are stored in the sample tree),
 	 * or there is no lifting position available any more for any number of open variables less then or equal openVariableCount.
@@ -669,7 +674,7 @@ public:
 	 * @param boundsActive true if bounds are defined, false otherwise
 	 * @param checkBounds if true, all points are checked against the bounds
 	 * @param r RealAlgebraicPoint which contains the satisfying sample point if the check results true
-	 * @param conflictList This is the list of edges of a conflict graph. See CAD::check for a full description.
+	 * @param conflictGraph This is a conflict graph. See CAD::check for a full description.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
 	bool liftCheck(
@@ -687,10 +692,10 @@ public:
 	);
 	
 	/**
-	 * If CAD::mEliminationSets[level].emptyLiftingQueue() is true,
-	 * perform elimination steps so that CAD::mEliminationSets[level] or CAD::mEliminationSets[l] for any l smaller than level
+	 * If eliminationSets[level].emptyLiftingQueue() is true,
+	 * perform elimination steps so that eliminationSets[level] or eliminationSets[l] for any l smaller than level
 	 * gains new polynomials.
-	 * If this was successful or !CAD::mEliminationSets[level].emptyLiftingQueue(), the method returns true; otherwise false.
+	 * If this was successful or !eliminationSets[level].emptyLiftingQueue(), the method returns true; otherwise false.
 	 * @param level Level into which new polynomials shall be eliminated.
 	 * @param bounds bounds for the variables represented by their index. If bounds for variables are set, the lifting in the corresponding dimension will only be performed within these bounds.
 	 * @param boundsActive true if bounds are defined, false otherwise

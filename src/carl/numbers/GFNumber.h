@@ -1,6 +1,6 @@
 /** 
- * @file:   GFNumber.h
- * @author: Sebastian Junges
+ * @file   GFNumber.h
+ * @author Sebastian Junges
  *
  * @since October 16, 2013
  */
@@ -73,13 +73,13 @@ class GFNumber
 	template<typename IntegerT>
 	friend bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
 	/**
-	 * lhs == rhs, if rhs \in [lhs].
+	 * lhs == rhs, if rhs \\in [lhs].
      * @return 
      */
 	template<typename IntegerT>
 	friend bool operator==(const GFNumber<IntegerT>& lhs, const IntegerT& rhs);
 	/**
-	 * lhs == rhs, if lhs \in [rhs].
+	 * lhs == rhs, if lhs \\in [rhs].
      * @return 
      */
 	template<typename IntegerT>
@@ -87,13 +87,13 @@ class GFNumber
 	template<typename IntegerT>
 	friend bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs);
 	/**
-	 * lhs == rhs, if rhs \in [lhs].
+	 * lhs == rhs, if rhs \\in [lhs].
      * @return 
      */
 	template<typename IntegerT>
 	friend bool operator==(const GFNumber<IntegerT>& lhs, int rhs);
 	/**
-	 * lhs == rhs, if lhs \in [rhs].
+	 * lhs == rhs, if lhs \\in [rhs].
      * @return 
      */
 	template<typename IntegerT>

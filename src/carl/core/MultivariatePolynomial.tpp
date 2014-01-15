@@ -253,6 +253,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() const
 {
     auto term = mTerms.rbegin();
+    if( term == mTerms.rend() ) return Definiteness::NON;
     Definiteness result = (*term)->definiteness();
     ++term;
     if( term == mTerms.rend() ) return result;
@@ -374,7 +375,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
-	LOGMSG_TRACE("carl.core.mvpolynomial", "" << *this << " .substituteIn( " << var << " -> " << value << " )");
     if(!has(var))
     {
         return;
@@ -391,6 +391,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
             }
         }
         mTerms.swap(newTerms);
+		LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
     // Find and sort all exponents occurring with the variable to substitute as basis.
@@ -444,31 +445,36 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
     newTerms.reserve(expectedResultSize);
     for(auto term : mTerms)
     {
-        exponent e = term->monomial()->exponentOfVariable(var);
-        if(e > 1)
-        {
-            auto iter = expResults.find(e);
-            assert(iter != expResults.end());
-            for(auto vterm : iter->second.first.mTerms)
-            {
-                Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-                newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-            }
-        }
-        if(e == 1)
-        {
-            for(auto vterm : value.mTerms)
-            {
-                Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-                newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-            }
-        }
-        else
-        {
-            newTerms.push_back(term);
+		if (term->monomial() == nullptr) {
+			newTerms.push_back(term);
+		} else {
+			exponent e = term->monomial()->exponentOfVariable(var);
+			if(e > 1)
+			{
+				auto iter = expResults.find(e);
+				assert(iter != expResults.end());
+				for(auto vterm : iter->second.first.mTerms)
+				{
+					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+				}
+			}
+			else if(e == 1)
+			{
+				for(auto vterm : value.mTerms)
+				{
+					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+				}
+			}
+			else
+			{
+				newTerms.push_back(term);
+			}
         }
     }
     setTerms(newTerms);
+	LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
     assert(mTerms.size() <= expectedResultSize);
 }
 
@@ -610,6 +616,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		{
 			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
+//        else
+//        {
+//            delete t;
+//        }
 	}   
 	result.setTerms(newTerms);
 	return result;
@@ -820,15 +830,15 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
+	LOGMSG_TRACE("carl.core", "toUnivariatePolynomial(" << v << ")");
 	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (auto term: this->mTerms) {
 		if (term->monomial() == nullptr) coeffs[0] += *term;
 		else {
 			auto mon = term->monomial();
 			auto exponent = mon->exponentOfVariable(v);
-			if (exponent <= coeffs.size()) coeffs.resize(exponent + 1);
+			if (exponent >= coeffs.size()) coeffs.resize(exponent + 1, MultivariatePolynomial<C,O,P>(0));
 			Monomial* tmp = mon->dropVariable(v);
-			LOGMSG_TRACE("carl.core", "Current coeff: " << coeffs[exponent]);
 			if (tmp == nullptr) {
 				coeffs[exponent] += term->coeff();
 			} else {
@@ -837,6 +847,7 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 			delete tmp;
 		}
 	}
+	LOGMSG_TRACE("carl.core", "Result: " << (UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)));
 	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
 }
 
@@ -870,7 +881,7 @@ template<typename C, EnableIf<is_number<C>>>
 typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial<Coeff,O,P>::mainDenom() const {
 	IntNumberType res = 1;
 	for (auto t: *this) {
-		res = carl::gcd(res, getDenom(t->coeff()));
+		res = carl::lcm(res, getDenom(t->coeff()));
 	}
 	return res;
 }
@@ -1836,7 +1847,15 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
 {
     mTerms.clear();
-    if(newTerms.empty()) return;
+    if(newTerms.empty())
+    {
+        return;
+    }
+    else if(newTerms.size() == 1)
+    {
+        mTerms.push_back(newTerms.back());
+        return;
+    }
     // Sort the entries from newterms.
     // As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
     std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
@@ -1876,6 +1895,7 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
     {
         mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
     }
+//    assert( newTerms.empty() );
 }
 
 }

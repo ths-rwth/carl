@@ -73,15 +73,19 @@ public:
 		return this->numbers[index];
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
-		os << "(";
-		for (unsigned i = 0; i < r.dim(); i++) {
-			if (i > 0) os << ", ";
-			os << r.numbers[i];
-		}
-		os << ")";
-		return os;
-	}
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
 };
+
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
+	os << "(";
+	for (unsigned i = 0; i < r.dim(); i++) {
+		if (i > 0) os << ", ";
+		os << r.numbers[i];
+	}
+	os << ")";
+	return os;
+}
 
 }

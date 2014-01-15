@@ -434,7 +434,7 @@ namespace carl
 		}
 		
 		/**
-		 * For a monomial \prod_i x_i^e_i with e_i != 0, returns \prod_i x_i^1.
+		 * For a monomial \\prod_i x_i^e_i with e_i != 0, returns \\prod_i x_i^1.
          * @return 
          */
 		Monomial* seperablePart() const

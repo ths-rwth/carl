@@ -6,6 +6,7 @@
 #pragma once
 
 #include <forward_list>
+#include <fstream>
 
 #include "CAD.h"
 
@@ -206,11 +207,11 @@ bool CAD<Number>::prepareElimination() {
 
 	/* Part A */
 	
-	// TODO: Drop this whole loop?
+	/// @todo Check if this code is actually necessary
 	if (this->setting.simplifyByGroebner) {
 		// add new variables to the variable list pool
 		//for (auto v: this->newVariables) {
-			// TODO: VariableListPool::addVariable(v);
+			// VariableListPool::addVariable(v);
 		//}
 	}
 	if (!this->newVariables.empty()) {
@@ -223,7 +224,7 @@ bool CAD<Number>::prepareElimination() {
 		std::swap(this->variables, this->newVariables);
 		
 		// extend trace
-		// TODO: make this more efficient
+		/// @todo make this more efficient
 		CADTrace newTrace(this->variables.size()+1, this->sampleTree.begin());
 		long unsigned j = newVariableCount;
 		for (auto i: this->trace) {
@@ -232,7 +233,7 @@ bool CAD<Number>::prepareElimination() {
 		std::swap(this->trace, newTrace);
 		
 		// (1)
-		// TODO: make this more efficient
+		/// @todo make this more efficient
 		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this->setting.order, this->setting.order));
 		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
@@ -378,7 +379,7 @@ bool CAD<Number>::check(
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << "( " << this->eliminationSets[i].size() << " ): " << this->eliminationSets[i]);
 	}
 	
-	// TODO: make ifdef actually work
+	/// @todo take care of #ifdef CAD_CHECK_REDIRECT
 //#ifdef CAD_CHECK_REDIRECT
 	CAD<Number>::checkCallCount++;
 	this->setting.trimVariables = false;

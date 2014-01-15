@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <iostream>
 
 namespace carl {
 /**
@@ -15,6 +16,8 @@ namespace carl {
  * It can be either negative, zero or positive.
  */
 enum class Sign : int { NEGATIVE = -1, ZERO = 0, POSITIVE = 1 };
+
+std::ostream& operator<<(std::ostream& os, const Sign& sign);
 
 /**
  * Obtain the sign of the given number.

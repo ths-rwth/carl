@@ -35,7 +35,7 @@ using RANIRMap = std::map<Variable, RealAlgebraicNumberIR<Number>*>;
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
+RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
 
 /**
  * Evaluates the given polynomial with the given values for the variables.
@@ -48,9 +48,9 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealA
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANMap<Number>& m);
+RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, const RANMap<Number>& m);
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m);
+RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m);
 
 
 /**
@@ -94,7 +94,7 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 // Implementation
 
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
+RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
 	assert(point.dim() == variables.size());
 	RANIRMap<Number> IRs;
 	UnivariatePolynomial<Coeff> pol(p);
@@ -109,6 +109,7 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealA
 			IRs[variables[i]] = static_cast<RealAlgebraicNumberIR<Number>*>(point[i]);
 		}
 	}
+	LOGMSG_TRACE("carl.core", p << " at " << point << " = " << pol);
 	if (pol.isNumber()) {
 		return new RealAlgebraicNumberNR<Number>(pol.numericContent());
 	}
@@ -116,7 +117,7 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealA
 }
 
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMap<Number>& m) {
+RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, RANMap<Number>& m) {
 	RANIRMap<Number> IRs;
 	UnivariatePolynomial<Coeff> pol(p);
 	
@@ -145,7 +146,7 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMa
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
+RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
 	if (m.size() == 1 && m.begin()->second->sgn(p.toNumberCoefficients()) == Sign::ZERO) {
 		return new RealAlgebraicNumberIR<Number>(p.mainVar());
 	}

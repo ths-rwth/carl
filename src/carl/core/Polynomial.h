@@ -15,4 +15,5 @@ class Polynomial
 public:
 	virtual bool isUnivariateRepresented() const = 0;
 	virtual bool isMultivariateRepresented() const = 0;
+	virtual ~Polynomial() {}
 };

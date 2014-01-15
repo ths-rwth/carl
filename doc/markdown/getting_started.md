@@ -17,29 +17,29 @@ OPTIONAL:
 - doxygen
 
 Libraries marked with a plus (+) are included in the resources directory.
-You can find more about them in [External Resources](@ref extres).
+You can find more about them in [External Resources].
 
 Installation 
 --------------------------------------------
 Start with:
 
-	mkdir build && cd build && cmake ..
+    $ mkdir build && cd build && cmake ..
 
 To compile dependencies (1) not found in the system AND (2) which are included in the resources:
 
-	make resources
+    $ make resources
 
 To compile the arithmetic library:
 
-	make
+    $ make
 
 To run some unittests:
 
-	make test
+    $ make test
 
 To compile examples:
-	
-	make examples
+
+    $ make examples
 
 To install:
 
