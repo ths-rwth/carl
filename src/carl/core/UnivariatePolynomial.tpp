@@ -706,7 +706,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 	// Obtain main denominator for all coefficients.
 	IntNumberType mainDenom = this->mainDenom();
 	
-	// now, some coefficient times mainDenom is always integral.
+	// now, some coefficient * mainDenom is always integral.
 	// we convert such a product to an integral data type by getNum()
 	assert(getDenom(this->numericContent(0) * mainDenom) == 1);
 	IntNumberType res = getNum(this->numericContent(0) * mainDenom);
@@ -714,6 +714,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
 		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
 	}
+	LOGMSG_TRACE("carl.core", "numCon(" << *this << ") = " << (res / mainDenom));
 	return res / mainDenom;
 }
 
@@ -725,6 +726,7 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
 		denom = carl::lcm(denom, getDenom(this->mCoefficients[i]));
 	}
+	LOGMSG_TRACE("carl.core", "mainDenom of " << *this << " is " << denom);
 	return denom;
 }
 template<typename Coeff>
