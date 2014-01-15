@@ -19,9 +19,11 @@
  *
  */
 
-/*
- * @file:   Buchberger.h
- * @author: Sebastian Junges
+/**
+ * @file   Buchberger.h
+ * @ingroup gb
+ * @author Sebastian Junges
+ *
  *
  */
 

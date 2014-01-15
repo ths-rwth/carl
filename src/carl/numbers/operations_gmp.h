@@ -1,8 +1,10 @@
-/* 
- * File:   operations_gmp.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/** 
+ * @file   operations_gmp.h
+ * @ingroup gmp
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @autho Sebastian Junges
  * 
- * This file should never be included directly but only via operations.h
+ * @warning This file should never be included directly but only via operations.h
  */
 
 #pragma once

@@ -1,8 +1,11 @@
-/* 
- * File:   operations_cln.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/** 
+ * @file   operations_cln.h
+ * @ingroup cln
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @author Sebastian Junges
  * 
- * This file should never be included directly but only via operations.h
+ * @warning This file should never be included directly but only via operations.h
+ * 
  */
 
 #pragma once

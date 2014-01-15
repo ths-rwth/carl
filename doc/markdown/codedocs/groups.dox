@@ -1,0 +1,23 @@
+/**
+
+
+@defgroup group1 Test
+@{ @}
+ 
+@defgroup gb Groebner Bases
+@{ @}
+
+@defgroup cad Cylindrical Algebraic Decomposition
+@{ @}
+
+@defgroup gmp GMP Usage
+@{ @}
+
+@defgroup cln CLN Usage
+@{ @}
+
+@defgroup typetraits Type Traits
+
+
+*/
+ // end of a group
