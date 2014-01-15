@@ -1,5 +1,5 @@
 /**
- * @file AbstractPolynomial.h 
+ * @file MultivariatePolynomialPolicy.h 
  * @author Sebastian Junges
  */
 

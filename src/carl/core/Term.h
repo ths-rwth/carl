@@ -150,22 +150,22 @@ class Term
         
         /**
          * 
-         * @param a non-zero coefficient.
+         * @param c a non-zero coefficient.
          * @return 
          */
-        Term* dividedBy(const Coefficient&) const;
+        Term* dividedBy(const Coefficient& c) const;
         /**
          * 
-         * @param 
+         * @param v
          * @return 
          */
-        Term* dividedBy(Variable::Arg) const;
+        Term* dividedBy(Variable::Arg v) const;
         /**
          * 
-         * @param 
+         * @param m
          * @return 
          */
-        Term* dividedBy(const Monomial&) const;
+        Term* dividedBy(const Monomial& m) const;
         
         Term* dividedBy(const Term&) const;
 		

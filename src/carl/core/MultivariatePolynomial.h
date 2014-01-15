@@ -176,7 +176,7 @@ public:
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
-	 * @return true if polynomial is of the form \sum a_im_i^2 with a_i > 0 for all i.
+	 * @return true if polynomial is of the form \\sum a_im_i^2 with a_i > 0 for all i.
 	 */
 	bool isTsos() const;
 	

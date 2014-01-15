@@ -1,6 +1,6 @@
 /** 
- * @file:   GF.h
- * @author: Sebastian Junges
+ * @file   GFNumber.h
+ * @author Sebastian Junges
  *
  * @since October 16, 2013
  */

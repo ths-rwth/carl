@@ -1,6 +1,6 @@
 /** 
- * @file:   RealRadicalAwareAdding.h
- * @author: Sebastian Junges
+ * @file   GBUpdateProcedures.h
+ * @author Sebastian Junges
  *
  * @since August 28, 2013
  */
