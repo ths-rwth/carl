@@ -16,7 +16,7 @@ OPTIONAL:
 - doxygen
 
 Libraries marked with a plus (+) are included in the resources directory.
-You can find more about them in [External Resources](@ref extres).
+You can find more about them in [External Resources].
 
 ## Installation 
 Start with:
