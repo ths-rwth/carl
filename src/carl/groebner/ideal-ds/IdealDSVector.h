@@ -52,7 +52,7 @@ public:
 	
     /**
      * 
-     * @param f
+     * @param t
      * @return A divisionresult [divisor, factor]. 
      * 
      */

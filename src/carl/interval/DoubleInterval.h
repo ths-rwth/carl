@@ -67,7 +67,6 @@ public:
 
 	/** Creates point interval at n
 	 * @param n
-	 * @param overapproximate compute the approximations of the given bounds so that the interval is an over-approximation of the corresponding OpenInterval; otherwise under-approximate (default: false)
 	 */
 	DoubleInterval(const double& n);
 	
@@ -75,7 +74,7 @@ public:
 
 	/** Creates (preferably point) interval at n
 	 * @param n
-	 * @param bool overapproximate
+	 * @param overapproximate
 	 */
 	template<typename Rational>
 	DoubleInterval(const Rational& n, bool overapproximate = false);
@@ -472,16 +471,16 @@ public:
 
 
 	/** Returns a down-rounded representation of the given numeric
-	 * @param numeric o
-	 * @param bool overapproximate
+	 * @param o
+	 * @param overapproximate
 	 * @return double representation of o (underapprox) Note, that it can return the double INFINITY.
 	 */
 	template<typename Rational>
 	static double roundDown(const Rational& o, bool overapproximate = false);
 
 	/** Returns a up-rounded representation of the given numeric
-	 * @param numeric o
-	 * @param bool overapproximate
+	 * @param o
+	 * @param overapproximate
 	 * @return double representation of o (overapprox) Note, that it can return the double INFINITY.
 	 */
 	template<typename Rational>

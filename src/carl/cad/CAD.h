@@ -219,7 +219,8 @@ public:
 
 	/**
 	 * Prints the current sample tree to the designated output stream.
-	 * @param os output stream (standard value is <code>std::cout</code>)
+	 * @param constraints
+	 * @param filename
 	 */
 	void printConstraints(const std::vector<cad::Constraint<Number>>& constraints, const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
 	
@@ -437,7 +438,7 @@ public:
 	/**
 	 * Removes a polynomial by its pointer pPtr from the input polynomials of the CAD (elimination level 0) or the specified level.
 	 * Moreover, all elimination levels are safely cleaned of all elimination polynomials stemming from p.
-	 * @param pPtr
+	 * @param p
 	 * @param level
 	 * @param childrenOnly only remove the children of pPtr (recursively)
 	 */
@@ -673,7 +674,7 @@ public:
 	 * @param boundsActive true if bounds are defined, false otherwise
 	 * @param checkBounds if true, all points are checked against the bounds
 	 * @param r RealAlgebraicPoint which contains the satisfying sample point if the check results true
-	 * @param conflictList This is the list of edges of a conflict graph. See CAD::check for a full description.
+	 * @param conflictGraph This is a conflict graph. See CAD::check for a full description.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
 	bool liftCheck(

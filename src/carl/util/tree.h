@@ -25,11 +25,11 @@
    available. 
  */
 
- /**
-  * @file tree.h 
+/**
+ * @file tree.h 
  * Modified by Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * 
- * - Using #pragma once instead of #ifdef
+ * - Using \#pragma once instead of \#ifdef
  * - Moved inside namespace carl
  * - Removed the mainpage attribute from the doxygen comment.
  */
