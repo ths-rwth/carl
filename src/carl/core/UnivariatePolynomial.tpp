@@ -104,7 +104,6 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
-	LOGMSG_DEBUG("carl.core", "substituting " << var << " -> " << value << " in " << *this);
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -114,7 +113,6 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
-	LOGMSG_DEBUG("carl.core", "substituting " << var << " -> " << value << " in " << *this);
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -142,6 +140,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variab
 		for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
 			res += this->mCoefficients[i].substitute(var, value);
 		}
+		LOGMSG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << res);
 		return res;
 	} else {
 		std::vector<Coeff> res(this->mCoefficients.size());
@@ -150,6 +149,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variab
 		}
 		UnivariatePolynomial<Coeff> resp(this->mainVar(), res);
 		resp.stripLeadingZeroes();
+		LOGMSG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << resp);
 		return resp;
 	}
 }
@@ -486,6 +486,10 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 	// Just in case, if we want to use SFINAE, the right statement would be
 	// template<typename t = Coefficient, typename std::enable_if<is_field<t>::value, int>::type = 0>
 	static_assert(is_field<Coeff>::value, "Cauchy bounds are only defined for field-coefficients");
+	// For constants, the cauchy bound is always zero.
+	if (this->mCoefficients.size() <= 1) {
+		return Coeff(0);
+	}
 	Coeff maxCoeff = carl::abs(mCoefficients.front());
 	for(typename std::vector<Coeff>::const_iterator it = ++mCoefficients.begin(); it != --mCoefficients.end(); ++it)
 	{
