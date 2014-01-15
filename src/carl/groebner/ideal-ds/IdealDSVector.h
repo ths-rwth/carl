@@ -26,7 +26,7 @@ public:
     IdealDatastructureVector(const std::vector<Polynomial>& generators, const std::unordered_set<size_t>& eliminated, const sortByLeadingTerm<Polynomial>& order)
     : mGenerators(generators), mEliminated(eliminated), mOrder(order)
     {
-        mDivLists.resize(VariablePool::NrVariables(), std::vector<size_t> ());
+        mDivLists.resize(VariablePool::getInstance().nrVariables(), std::vector<size_t> ());
     }
 
     IdealDatastructureVector(const IdealDatastructureVector& id)

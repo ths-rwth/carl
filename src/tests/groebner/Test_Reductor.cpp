@@ -15,11 +15,11 @@ TEST(Reductor, Reduction)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     Ideal<MultivariatePolynomial<cln::cl_RA>> ideal;  
     MultivariatePolynomial<cln::cl_RA> p1;
     p1 += x*x;
