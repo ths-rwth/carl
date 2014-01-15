@@ -692,10 +692,10 @@ public:
 	);
 	
 	/**
-	 * If CAD::eliminationSets[level].emptyLiftingQueue() is true,
-	 * perform elimination steps so that CAD::eliminationSets[level] or CAD::eliminationSets[l] for any l smaller than level
+	 * If eliminationSets[level].emptyLiftingQueue() is true,
+	 * perform elimination steps so that eliminationSets[level] or eliminationSets[l] for any l smaller than level
 	 * gains new polynomials.
-	 * If this was successful or !CAD::eliminationSets[level].emptyLiftingQueue(), the method returns true; otherwise false.
+	 * If this was successful or !eliminationSets[level].emptyLiftingQueue(), the method returns true; otherwise false.
 	 * @param level Level into which new polynomials shall be eliminated.
 	 * @param bounds bounds for the variables represented by their index. If bounds for variables are set, the lifting in the corresponding dimension will only be performed within these bounds.
 	 * @param boundsActive true if bounds are defined, false otherwise
