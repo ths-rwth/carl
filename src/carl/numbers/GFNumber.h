@@ -1,5 +1,5 @@
 /** 
- * @file:   GF.h
+ * @file:   GFNumber.h
  * @author: Sebastian Junges
  *
  * @since October 16, 2013
@@ -13,11 +13,6 @@
 
 namespace carl
 {
-
-template<typename IntegerType>
-class GFNumber;
-
-
 
 /**
  * Galois Field numbers, i.e. numbers from fields with a finite characteristic.
