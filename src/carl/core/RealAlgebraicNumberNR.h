@@ -53,7 +53,7 @@ public:
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>* n) {
-	return os << "RealAlgebraicNumberNR(" << n->value() << ")";
+	return os << "(NR " << n->value() << ")";
 }
 
 }

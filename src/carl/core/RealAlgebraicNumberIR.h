@@ -216,7 +216,7 @@ public:
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
-	return os << "RealAlgebraicNumberIR(" << n->getInterval() << ", " << n->getPolynomial() << ")";
+	return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << ")";
 }
 
 }
