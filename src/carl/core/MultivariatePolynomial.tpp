@@ -375,9 +375,9 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
-	LOGMSG_TRACE("carl.core.mvpolynomial", "" << *this << " .substituteIn( " << var << " -> " << value << " )");
     if(!has(var))
     {
+		LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
     TermsType newTerms;
@@ -392,6 +392,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
             }
         }
         mTerms.swap(newTerms);
+		LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
     // Find and sort all exponents occurring with the variable to substitute as basis.
@@ -445,31 +446,36 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
     newTerms.reserve(expectedResultSize);
     for(auto term : mTerms)
     {
-        exponent e = term->monomial()->exponentOfVariable(var);
-        if(e > 1)
-        {
-            auto iter = expResults.find(e);
-            assert(iter != expResults.end());
-            for(auto vterm : iter->second.first.mTerms)
-            {
-                Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-                newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-            }
-        }
-        if(e == 1)
-        {
-            for(auto vterm : value.mTerms)
-            {
-                Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-                newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-            }
-        }
-        else
-        {
-            newTerms.push_back(term);
+		if (term->monomial() == nullptr) {
+			newTerms.push_back(term);
+		} else {
+			exponent e = term->monomial()->exponentOfVariable(var);
+			if(e > 1)
+			{
+				auto iter = expResults.find(e);
+				assert(iter != expResults.end());
+				for(auto vterm : iter->second.first.mTerms)
+				{
+					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+				}
+			}
+			else if(e == 1)
+			{
+				for(auto vterm : value.mTerms)
+				{
+					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+				}
+			}
+			else
+			{
+				newTerms.push_back(term);
+			}
         }
     }
     setTerms(newTerms);
+	LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
     assert(mTerms.size() <= expectedResultSize);
 }
 
