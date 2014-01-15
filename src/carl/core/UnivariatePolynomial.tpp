@@ -1766,6 +1766,7 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
 	}
+	return false;
 }
 template<typename C>
 bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
@@ -1791,8 +1792,8 @@ class UnivariatePolynomialComparator
 private:
 	PolynomialComparisonOrder order;
 public:
-	UnivariatePolynomialComparator(PolynomialComparisonOrder order = PolynomialComparisonOrder::Default)
-				: order(order)
+	UnivariatePolynomialComparator(PolynomialComparisonOrder cmporder = PolynomialComparisonOrder::Default)
+				: order(cmporder)
 	{}
 
 	bool operator()(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs) const

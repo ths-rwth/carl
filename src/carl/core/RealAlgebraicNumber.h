@@ -17,7 +17,8 @@ namespace carl {
 /**
  * This class is the base for all representations of real algebraic numbers and provides crucial operations such as arithmetic, ordering or sign determination on them.
  */
-template<typename Number, EnableIf<is_fraction<Number>> = dummy>
+/// @todo EnableIf<is_fraction<Number>>
+template<typename Number>
 class RealAlgebraicNumber {
 protected:
 	////////////////
@@ -157,9 +158,8 @@ public:
 		return this->value();
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Number>& g) {
-		return os << "RealAlgebraicNumber(" << g.value() << ", " << g.isNumeric() << ", " << g.isRoot() << ")";
-	}
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>* g);
 };
 
 }
@@ -167,3 +167,16 @@ public:
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicNumberOperations.h"
+
+namespace carl {
+
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Number>* g) {
+	if (g->isNumeric()) {
+		return os << static_cast<const carl::RealAlgebraicNumberNR<Number>*>(g);
+	} else {
+		return os << static_cast<const carl::RealAlgebraicNumberIR<Number>*>(g);
+	}
+}
+
+}

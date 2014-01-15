@@ -16,7 +16,8 @@ namespace carl {
  * RealAlgebraicNumberNR is a specialization of RealAlgebraicNumber.
  * RealAlgebraicNumberNR always represents an exact number.
  */
-template<typename Number, EnableIf<is_fraction<Number>> = dummy>
+/// @todo EnableIf<is_fraction<Number>>
+template<typename Number>
 class RealAlgebraicNumberNR : public RealAlgebraicNumber<Number> {
 public:
 
@@ -47,12 +48,12 @@ public:
 	}
 	
 	template<typename Num>
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Num>& g);
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Num>& n);
 };
 
 template<typename Number>
-std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>& g) {
-	return os << "RealAlgebraicNumberNR(" << g.value() << ")";
+std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>* n) {
+	return os << "RealAlgebraicNumberNR(" << n->value() << ")";
 }
 
 }

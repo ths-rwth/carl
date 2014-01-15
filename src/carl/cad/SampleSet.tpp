@@ -17,7 +17,7 @@ namespace cad {
 template<typename Number>
 std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(RealAlgebraicNumber<Number>* r) {
 	if (r->isNumeric()) {
-		RealAlgebraicNumberNR<Number>* rNR = new RealAlgebraicNumberNR<Number>(r->value(), r->isRoot());
+		RealAlgebraicNumberNR<Number>* rNR = static_cast<RealAlgebraicNumberNR<Number>*>(r);
 		iterator position = this->samples.begin();
 		if (! this->samples.empty()) {
 			position = std::lower_bound(position, this->samples.end(), rNR, Less<Number>());
