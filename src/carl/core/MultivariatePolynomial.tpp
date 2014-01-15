@@ -377,7 +377,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 {
     if(!has(var))
     {
-		LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
     TermsType newTerms;
@@ -882,7 +881,7 @@ template<typename C, EnableIf<is_number<C>>>
 typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial<Coeff,O,P>::mainDenom() const {
 	IntNumberType res = 1;
 	for (auto t: *this) {
-		res = carl::gcd(res, getDenom(t->coeff()));
+		res = carl::lcm(res, getDenom(t->coeff()));
 	}
 	return res;
 }
