@@ -235,13 +235,13 @@ TEST(MultivariatePolynomial, Substitute)
     #ifdef COMPARE_WITH_GINAC
     VariablePool& vpool = VariablePool::getInstance();
     Variable v = vpool.getFreshVariable();
-    vpool.setVariableName(v, "v");
+    vpool.setName(v, "v");
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     
     std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> vars;
     GiNaC::symbol vg("v"), xg("x"), yg("y"), zg("z");
