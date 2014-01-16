@@ -15,6 +15,7 @@
 #include "VarExpPair.h"
 #include "VariablesInformation.h"
 #include "logging.h"
+#include "../numbers/operations.h"
 
 namespace carl
 {   
@@ -447,6 +448,17 @@ namespace carl
 				m->mExponents.emplace_back(ve.var, 1);
 			}
 			return m;
+		}
+
+		Monomial pow(unsigned exp) const {
+			Monomial res(*this);
+			unsigned expsum = 0;
+			for (auto it: res.mExponents) {
+				it.exp = carl::pow(it.exp, exp);
+				expsum += it.exp;
+			}
+			res.mTotalDegree = expsum;
+			return res;
 		}
         
 		/**
