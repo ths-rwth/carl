@@ -2,7 +2,7 @@
  * @file   operations_gmp.h
  * @ingroup gmp
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * @autho Sebastian Junges
+ * @author Sebastian Junges
  * 
  * @warning This file should never be included directly but only via operations.h
  */

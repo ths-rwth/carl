@@ -1,6 +1,6 @@
 /** 
- * @file:   MultivariatePolynomial.tpp
- * @author: Sebastian Junges
+ * @file Sign.h
+ * @author Sebastian Junges
  *
  * @since August 23, 2013
  */
