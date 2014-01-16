@@ -69,7 +69,7 @@ public:
                 continue;
             }
 			
-            Term<typename Polynomial::CoeffType>* divres = t.dividedBy(*mGenerators[*it].lterm());
+            Term<typename Polynomial::CoeffType>* divres = t.divideBy(*mGenerators[*it].lterm());
 			
             //Division succeeded, so we have found a divisor;
             //To eliminate, we have to negate the factor.

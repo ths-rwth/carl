@@ -54,7 +54,7 @@ TEST(UnivariatePolynomial, Divide)
     vpool.setName(x, "x");
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
     UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)-6, (cln::cl_RA)-5,(cln::cl_RA)1});
-    DivisionResult<UnivariatePolynomial<cln::cl_RA>> d = p.divide(p);
+    DivisionResult<UnivariatePolynomial<cln::cl_RA>> d = p.divideBy(p);
 //    std::cout << d.quotient << std::endl;
 //    std::cout << d.remainder << std::endl;
 }
@@ -66,7 +66,7 @@ TEST(UnivariatePolynomial, DivideInteger)
     vpool.setName(x, "x");
     UnivariatePolynomial<cln::cl_I> p(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)5});
     UnivariatePolynomial<cln::cl_I> q(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)3});
-    DivisionResult<UnivariatePolynomial<cln::cl_I>> d = p.divide(q);
+    DivisionResult<UnivariatePolynomial<cln::cl_I>> d = p.divideBy(q);
     std::cout << d.quotient << std::endl;
     std::cout << d.remainder << std::endl;
 }

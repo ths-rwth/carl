@@ -126,7 +126,7 @@ class MultivariateGCD
 			{
 				if(A.divides(B))
 				{
-					return {Polynomial(a*(A.divide(B).quotient)), b, Polynomial(B*g)};
+					return {Polynomial(a*(A.divideBy(B).quotient)), b, Polynomial(B*g)};
 				}
 				else
 				{
@@ -142,13 +142,13 @@ class MultivariateGCD
 			if(UnivPol::gcd(B_I, C_I).isOne())
 			{
 				U_I = B;   //  B = G.
-				H_I = B_I.divide(C_I).quotient; // B_o[hat] = G_b / D_b
+				H_I = B_I.divideBy(C_I).quotient; // B_o[hat] = G_b / D_b
 				c = b; // Could not find in MY73
 			}
 			else if(UnivPol::gcd(A_I, C_I).isOne())
 			{
 				U_I = A; // B = F.
-				H_I = A_I.divide(C_I).quotient; //B_o[hat] = F_b / D_b
+				H_I = A_I.divideBy(C_I).quotient; //B_o[hat] = F_b / D_b
 				c = a; // Could not find in MY73
 			}
 			else
