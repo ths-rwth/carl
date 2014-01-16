@@ -123,8 +123,8 @@ public:
 
 	/**
 	 * Checks whether the polynomial is only a number.
-     * @return
-     */
+	 * @return
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool isNumber() const
 	{
@@ -228,10 +228,10 @@ public:
 
 	/**
 	 * 
-     * @return copr
-     */
-    Coefficient coprimeFactor() const;
-    
+	 * @return copr
+	 */
+	Coefficient coprimeFactor() const;
+	
 	template<typename C = Coefficient, EnableIf<is_fraction<C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
 
@@ -250,17 +250,53 @@ public:
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 	
-	
+	/**
+	 * Divides the polynomial by another polynomial.
+	 * Applies if the polynomial both have integer coefficients.
+	 * @param divisor
+	 * @return 
+	 */
 	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, EnableIf<is_number<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
-	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, DisableIf<is_number<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const UnivariatePolynomial& divisor) const;
-	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
-	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
-	DivisionResult<UnivariatePolynomial> divide(const C& divisor) const;
+	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
+
+	/**
+	 * Divides the polynomial by another polynomial.
+	 * Applies if the polynomial both have coefficients over a field.
+	 * @param divisor
+	 * @return 
+	 */
+	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, EnableIf<is_field<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
+
+	/**
+	 * Divides the polynomial by a coefficient.
+	 * Applies if the polynomial has coefficients from a field.
+	 * @param divisor
+	 * @return 
+	 */
+	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
+	DivisionResult<UnivariatePolynomial> divideBy(const Coefficient& divisor) const;
+
+	/**
+	 * Divides the polynomial by a coefficient.
+	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
+	 * Otherwise, false is returned and the content of quotient is undefined.
+	 * Applies if the polynomial has coefficients that are neither numeric nor from a field.
+	 * @param divisor
+	 * @param quotient
+	 * @return 
+	 */
+	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy>
+	bool divideBy(const Coefficient& divisor, UnivariatePolynomial& quotient) const;
+
+	/**
+	 * Divides the polynomial by a number.
+	 * Applies if the polynomial has coefficients that are polynomials with coefficients from a field.
+	 * @param divisor
+	 * @return 
+	 */
+	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy, EnableIf<is_field<typename UnderlyingNumberType<C>::type>> = dummy>
+	DivisionResult<UnivariatePolynomial> divideBy(const NumberType& divisor) const;
 
 	bool divides(const UnivariatePolynomial&) const;
 	
@@ -325,8 +361,8 @@ public:
 	}
 	/**
 	 * Works only from rationals, if the numbers are already integers.
-     * @return 
-     */
+	 * @return 
+	 */
 	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
 	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
@@ -363,9 +399,9 @@ public:
 	 *
 	 * If the coefficients are numbers, this is simply the i'th coefficient.
 	 * If the coefficients are polynomials, this is the numeric content part of the i'th coefficient.
-     * @param i number of the coefficient
-     * @return numeric content part of i'th coefficient.
-     */
+	 * @param i number of the coefficient
+	 * @return numeric content part of i'th coefficient.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType numericContent(unsigned int i) const
 	{
@@ -382,8 +418,8 @@ public:
 	 *
 	 * If the coefficients are numbers, this is the sign of the leading coefficient.
 	 * If the coefficients are polynomials, this is the unit part of the leading coefficient.s
-     * @return unit part of the polynomial.
-     */
+	 * @return unit part of the polynomial.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType numericUnit() const
 	{
@@ -404,50 +440,53 @@ public:
 	 * As for fractional numbers, we consider the following definition:
 	 *		gcd( a/b, c/d ) = gcd( a/b*l, c/d*l ) / l
 	 * where l = lcm(b,d).
-     * @return numeric content part of the polynomial.
+	 * @return numeric content part of the polynomial.
 	 * @see UnivariatePolynomials::numericContent(unsigned int)
-     */
+	 */
 	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
 
-	UnivariatePolynomial pseudoPrimpart(const Coefficient& content) const {
-		if (content == 0) return *this;
-		return this->divide(UnivariatePolynomial<Coefficient>(this->mainVar(), content)).quotient;
-	}
+	/**
+	 * Returns this/divisor where divisor is the numeric content of this polynomial.
+	 * @param content
+	 * @return 
+	 */
 	UnivariatePolynomial pseudoPrimpart() const {
-		return this->pseudoPrimpart(Coefficient(this->numericContent()));
+		auto c = this->numericContent();
+		if ((c == 0) || (c == 1)) return *this;
+		return this->divideBy(this->numericContent()).quotient;
 	}
 
 	/**
-     * Compute the main denominator of all numeric coefficients of this polynomial.
+	 * Compute the main denominator of all numeric coefficients of this polynomial.
 	 * This method only applies if the Coefficient type is a number.
-     * @return the main denominator of all coefficients of this polynomial.
-     */
+	 * @return the main denominator of all coefficients of this polynomial.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
 
-    std::map<UnivariatePolynomial, unsigned> factorization() const;
-    
-    template<typename Integer>
-    static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum = 0 );
-    
-    Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
+	std::map<UnivariatePolynomial, unsigned> factorization() const;
+
+	template<typename Integer>
+	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum = 0 );
+
+	Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
-     * @return True if zero is a root.
-     */
+	 * @return True if zero is a root.
+	 */
 	bool zeroIsRoot() const {
 		return this->mCoefficients[0] == 0;
 	}
 	/**
 	 * Reduces the polynomial such that zero is not a root anymore.
 	 * Is functionally equivalent to eliminateRoot(0), but much faster.
-     */
+	 */
 	void eliminateZeroRoots();
 	/**
 	 * Reduces the polynomial such that the given root is not a root anymore.
@@ -455,8 +494,8 @@ public:
 	 *
 	 * This method assumes that the given root is an actual real root of this polynomial.
 	 * If this is not the case, i.e. <code>evaluate(root) != 0</code>, the polynomial will contain meaningless garbage.
-     * @param root Root to be eliminated.
-     */
+	 * @param root Root to be eliminated.
+	 */
 	void eliminateRoot(const Coefficient& root);
 
 	std::list<UnivariatePolynomial> standardSturmSequence() const;
@@ -465,16 +504,16 @@ public:
 	/**
 	 * Counts the sign variations (i.e. an upper bound for the number of real roots) via Descarte's rule of signs.
 	 * This is an upper bound for countRealRoots().
-     * @param interval Count roots within this interval.
-     * @return Upper bound for number of real roots within the interval.
-     */
+	 * @param interval Count roots within this interval.
+	 * @return Upper bound for number of real roots within the interval.
+	 */
 	unsigned int signVariations(const ExactInterval<Coefficient>& interval) const;
 
 	/**
 	 * Count the number of real roots within the given interval using Sturm sequences.
-     * @param interval Count roots within this interval.
-     * @return Number of real roots within the interval.
-     */
+	 * @param interval Count roots within this interval.
+	 * @return Number of real roots within the interval.
+	 */
 	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
 
 	/*!

@@ -11,6 +11,7 @@
 
 #include "Polynomial.h"
 #include "Term.h"
+#include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
 
@@ -195,10 +196,28 @@ public:
 	
 	bool isReducibleIdentity() const;
 
-	MultivariatePolynomial divideBy(const MultivariatePolynomial& divisor) const;
+	/**
+	 * Divides the polynomial by the given coefficient.
+	 * Applies if the coefficients are from a field.
+     * @param divisor
+     * @return 
+     */
+	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
+	MultivariatePolynomial divideBy(const Coeff& divisor) const;
+
+	/**
+	 * Divides the polynomial by another polynomial.
+	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
+	 * Otherwise, false is returned and the content of quotient is undefined.
+	 * Applies if the coefficients are from a field.
+     * @param divisor
+     * @param quotient
+     * @return 
+     */
+	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
+	bool divideBy(const MultivariatePolynomial& divisor, MultivariatePolynomial& quotient) const;
 	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
-	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
      * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 

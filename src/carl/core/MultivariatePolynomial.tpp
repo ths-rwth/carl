@@ -373,6 +373,57 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+template<typename C, EnableIf<is_field<C>>>
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Coeff& divisor) const
+{
+	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
+	for (unsigned i = 0; i < res.mTerms.size(); i++) {
+		res.mTerms[i]->divideBy(divisor);
+	}
+	return res;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+template<typename C, EnableIf<is_field<C>>>
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b ,MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
+{
+	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
+	assert(!b.isZero());
+	quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
+	if (this->isZero()) return true;
+	if (a == b) {
+		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>(Coeff(1));
+		return true;
+	}
+	if (b.isConstant()) {
+		quotient = this->divideBy(b.lcoeff());
+		return true;
+	}
+	
+	Variable x = *b.gatherVariables().begin();
+	
+	auto ac = a.toUnivariatePolynomial(x);
+	auto bc = b.toUnivariatePolynomial(x);
+	bool leadisnum = bc.lcoeff().isNumber();
+	
+	while (ac.degree() >= bc.degree()) {
+		MultivariatePolynomial<Coeff,Ordering,Policies> term = ac.lcoeff();
+		if (leadisnum) {
+			term.divideBy(bc.lcoeff(), term);
+		} else {
+			if (!ac.lcoeff().divideBy(bc.lcoeff(), term)) {
+				return false;
+			}
+		}
+		quotient += term * Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		a = a - b * term;
+		if (a.isZero()) return true;
+		ac = a.toUnivariatePolynomial(x);
+	}
+	return false;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
     if(!has(var))
@@ -675,7 +726,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	result.mTerms.reserve(mTerms.size());
 	for(typename TermsType::const_iterator it = mTerms.begin(); it != mTerms.end(); ++it)
 	{
-		result.mTerms.emplace_back((*it)->dividedBy(lcoeff()));
+		result.mTerms.emplace_back((*it)->divideBy(lcoeff()));
 	}
 	return result;
 	
