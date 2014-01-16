@@ -153,21 +153,21 @@ class Term
          * @param c a non-zero coefficient.
          * @return 
          */
-        Term* dividedBy(const Coefficient& c) const;
+        Term* divideBy(const Coefficient& c) const;
         /**
          * 
          * @param v
          * @return 
          */
-        Term* dividedBy(Variable::Arg v) const;
+        Term* divideBy(Variable::Arg v) const;
         /**
          * 
          * @param m
          * @return 
          */
-        Term* dividedBy(const Monomial& m) const;
+        Term* divideBy(const Monomial& m) const;
         
-        Term* dividedBy(const Term&) const;
+        Term* divideBy(const Term&) const;
 		
 		Term calcLcmAndDivideBy( const Monomial&) const;
         
