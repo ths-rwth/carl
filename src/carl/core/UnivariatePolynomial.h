@@ -448,7 +448,6 @@ public:
 
 	/**
 	 * Returns this/divisor where divisor is the numeric content of this polynomial.
-	 * @param content
 	 * @return 
 	 */
 	UnivariatePolynomial pseudoPrimpart() const {
