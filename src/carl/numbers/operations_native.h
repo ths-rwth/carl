@@ -41,6 +41,19 @@ inline unsigned ceil(const double& n) {
 	return (unsigned)std::ceil(n);
 }
 
+template<typename Int>
+inline Int pow(const Int& n, const unsigned exp) {
+	Int res = 1;
+	Int mult = n;
+	unsigned e = exp;
+	while (e > 0) {
+		if (e & 1) res *= mult;
+		mult *= mult;
+		e /= 2;
+	}
+	return res;
+}
+
 inline long mod(const long& n, const long& m) {
 	return n % m;
 }
