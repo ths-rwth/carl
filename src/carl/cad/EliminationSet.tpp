@@ -515,11 +515,7 @@ void EliminationSet<Coefficient>::makePrimitive() {
 	for (auto p: this->polynomials) {
 		if (p->isNumber()) continue; // numbers are discarded
 		
-		typename UnderlyingNumberType<Coefficient>::type c = p->numericContent();
-		if( c != 1 && c != 0 ) // only non-trivial content parts are considered
-			primitiveSet.insert(p->pseudoPrimpart(cad::MPolynomial<Coefficient>(c)), this->getParentsOf(p));
-		else
-			primitiveSet.insert(p, this->getParentsOf(p));
+		primitiveSet.insert(p->pseudoPrimpart(), this->getParentsOf(p));
 	}
 	
 	std::swap(*this, primitiveSet);
