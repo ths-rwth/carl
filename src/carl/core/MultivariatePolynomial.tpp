@@ -361,7 +361,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::has(Variable::Arg v) const
 {
     for(const std::shared_ptr<const TermType>& term : mTerms)
-        if( term->has(v) ) return true;
+        if (term->has(v)) return true;
     return false;
 }
 
@@ -426,23 +426,22 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
-    if(!has(var))
-    {
+    if (!this->has(var)) {
         return;
     }
+	std::stringstream ss;
+	ss << *this;
     TermsType newTerms;
     // If we replace a variable by zero, just eliminate all terms containing the variable.
     if(value.isZero())
     {
-        for(auto term : mTerms)
-        {
-            if(!term->has(var))
-            {
+        for(auto term : mTerms) {
+            if (!term->has(var)) {
                 newTerms.push_back(term);
             }
         }
         mTerms.swap(newTerms);
-		LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
+		LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
     // Find and sort all exponents occurring with the variable to substitute as basis.
@@ -525,7 +524,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
         }
     }
     setTerms(newTerms);
-	LOGMSG_TRACE("carl.core.mvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << *this);
+	LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
     assert(mTerms.size() <= expectedResultSize);
 }
 
@@ -881,14 +880,16 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
-	LOGMSG_TRACE("carl.core", "toUnivariatePolynomial(" << v << ")");
+	LOGMSG_TRACE("carl.core", *this << " in R[" << v << "] ...");
 	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (auto term: this->mTerms) {
 		if (term->monomial() == nullptr) coeffs[0] += *term;
 		else {
 			auto mon = term->monomial();
 			auto exponent = mon->exponentOfVariable(v);
-			if (exponent >= coeffs.size()) coeffs.resize(exponent + 1, MultivariatePolynomial<C,O,P>(0));
+			if (exponent >= coeffs.size()) {
+				coeffs.resize(exponent + 1, MultivariatePolynomial<C,O,P>(0));
+			}
 			Monomial* tmp = mon->dropVariable(v);
 			if (tmp == nullptr) {
 				coeffs[exponent] += term->coeff();
@@ -898,7 +899,7 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 			delete tmp;
 		}
 	}
-	LOGMSG_TRACE("carl.core", "Result: " << (UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)));
+	LOGMSG_TRACE("carl.core", *this << " in R[" << v << "] = " << (UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)));
 	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
 }
 
