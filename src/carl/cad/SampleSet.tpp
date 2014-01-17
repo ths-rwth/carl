@@ -211,9 +211,10 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIR<Number>* from, Real
 
 template<typename Number>
 std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify() {
+	LOGMSG_TRACE("carl.cad", "Simplifying " << *this);
 	std::pair<SampleSimplification, bool> simplification;
 	simplification.second = false;
-	for (iteratorIR irIter = this->IRqueue.begin(); irIter != this->IRqueue.end(); irIter++) {
+	for (iteratorIR irIter = this->IRqueue.begin(); irIter != this->IRqueue.end(); ) {
 		if (!(*irIter)->isNumeric() && (*irIter)->getRefinementCount() == 0) {// try at least one refinement
 			(*irIter)->refine();
 		}
@@ -223,12 +224,13 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 				simplification.first[*irIter] = nr;
 				simplification.second = true;
 			} else {
-				assert( false );
+				assert(false);
 			}
 		} else { // try to maximally coarsen the interval
 			irIter++;
 		}
 	}
+	LOGMSG_TRACE("carl.cad", "Result: " << *this);
 	return simplification;
 }
 
@@ -240,10 +242,11 @@ bool SampleSet<Number>::contains(const RealAlgebraicNumber<Number>* r) const {
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
+	os << "{ ";
 	for (auto sample: s.samples) {
-		os << *sample << "  ";
+		os << sample << " ";
 	}
-	return os;
+	return os << "}";
 }
 
 template<typename Number>
