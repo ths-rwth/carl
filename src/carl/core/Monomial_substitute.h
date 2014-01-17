@@ -20,7 +20,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,SubstitutionType
 		}
 		else
 		{
-			factor *= pow(it->second, ve.exp);
+			factor *= carl::pow(it->second, ve.exp);
 			m->mTotalDegree -= ve.exp;
 		}
 	}
