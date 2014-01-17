@@ -565,32 +565,28 @@ void EliminationSet<Coeff>::elimination(
 			EliminationSet<Coeff>& eliminated,
 			bool avoidSingle
 ) {
-	std::list<const UPolynomial*> truncations = EliminationSet<Coeff>::truncations(p);
 	std::list<const UPolynomial*> parents({p});
+	// add all coefficients of p
+	std::list<const UPolynomial*> truncations({p});
 	for (auto it: truncations) {
 		auto lcoeff = it->lcoeff();
 		if (lcoeff.isNumber()) continue;
 		eliminated.insert(new UPolynomial(variable, lcoeff), parents, avoidSingle);
-		const UPolynomial diff = it->derivative();
-		if (!diff.isZero()) {
-			// TODO: continue implementing once subresultants are implemented
-		}
 	}
+	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
+	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);
 }
 
 template<typename Coeff>
 void EliminationSet<Coeff>::elimination(
 		const UPolynomial* p,
 		const UPolynomial* q,
-		const Variable&,
-		EliminationSet<Coeff>&,
-		bool 
+		const Variable& variable,
+		EliminationSet<Coeff>& eliminated,
+		bool avoidSingle
 ) {
-	std::list<const UPolynomial*> truncations = EliminationSet<Coeff>::truncations(p);
 	std::list<const UPolynomial*> parents({p, q});
-	//for (auto it: truncations) {
-		// TODO: continue implementing once subresultants are implemented
-	//}
+	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
 }
 
 }
