@@ -74,7 +74,7 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::equal(const RealAlgebraicNumberIR<Number>* n) {
+bool RealAlgebraicNumberIR<Number>::equal(const RealAlgebraicNumberIR<Number>* n) const {
 	if (this == n) return true;
 	if (this->isZero() && n->isZero()) return true;
 	return this->getInterval() == n->getInterval();

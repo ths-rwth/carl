@@ -149,7 +149,7 @@ public:
 		return i.contains(this->getInterval());
 	}
 
-	bool equal(const RealAlgebraicNumberIR* n);
+	bool equal(const RealAlgebraicNumberIR* n) const;
 	
 private:
 	// Helper functions for lessWhileUnequal
