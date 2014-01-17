@@ -212,18 +212,18 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Numbe
 		INTERVAL_CONTAINED( this, n, false );
 		
 		CHECK_ORDER();
-		//n->refine();
+		n->refine();
 		CHECK_ORDER();
-		//this->refine();
+		this->refine();
 		CHECK_ORDER();
 		
 		// case: is mInterval contained in o.mInterval?
 		INTERVAL_CONTAINED( n, this, true );
 		
 		CHECK_ORDER();
-		//n->refine();
+		n->refine();
 		CHECK_ORDER();
-		//this->refine();
+		this->refine();
 		CHECK_ORDER();
 
 		ExactInterval<Number> intersection = this->getInterval().intersect(n->getInterval());
@@ -236,9 +236,9 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Numbe
 		// situation twisted
 		if (n->checkIntersection(this, intersection)) return false;
 		
-		//n->refine();
+		n->refine();
 		CHECK_ORDER();
-		//this->refine();
+		this->refine();
 	}
 }
 
