@@ -42,7 +42,7 @@ public:
 	typedef std::vector<ConflictType> AdjacencyArray;
 	
 private:
-	std::vector<std::vector<ConflictType>> data;
+	std::vector<AdjacencyArray> data;
 	
 	/**
 	 *  Flag that indicates whether the entries of the adjacency arrays are read inverted (true) or not.
@@ -76,7 +76,15 @@ public:
 	 * @param m initial number of vertices in U (number of constraints)
 	 */
 	ConflictGraph(unsigned int m);
-	
+
+	/**
+	 * Re returns the number of vertices in this graph.
+	 * @return Number of vertices.
+	 */
+	long unsigned size() const {
+		return this->data.size();
+	}
+
 	/**
 	 * Invert the conflict graph.
 	 * Note that this operation does <b>not</b> change the current adjacency matrix, only the operations from now on are inverted.
