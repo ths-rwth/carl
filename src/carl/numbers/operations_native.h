@@ -41,10 +41,9 @@ inline unsigned ceil(const double& n) {
 	return (unsigned)std::ceil(n);
 }
 
-template<typename Int>
-inline Int pow(const Int& n, const unsigned exp) {
-	Int res = 1;
-	Int mult = n;
+inline unsigned long pow(const unsigned long& n, const unsigned exp) {
+	unsigned long res = 1;
+	unsigned long mult = n;
 	unsigned e = exp;
 	while (e > 0) {
 		if (e & 1) res *= mult;
