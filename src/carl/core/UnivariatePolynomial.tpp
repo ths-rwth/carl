@@ -725,7 +725,6 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
 		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
 	}
-	LOGMSG_TRACE("carl.core", "numCon(" << *this << ") = " << (res / mainDenom));
 	return res / mainDenom;
 }
 
@@ -1445,6 +1444,27 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 }
 
 template<typename Coeff>
+const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::principalSubresultantsCoefficients(
+		const UnivariatePolynomial<Coeff>& p,
+		const UnivariatePolynomial<Coeff>& q,
+		const SubresultantStrategy strategy
+) {
+	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
+	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs(subres.size());
+	unsigned i = 0;
+	for (auto s: subres) {
+		if (s.degree() < i) {
+			// this and all further subresultants won't have a non-zero i-th coefficient
+			break;
+		}
+		subresCoeffs[i] = s->coefficients()[i];
+		i++;
+	}
+	subresCoeffs.resize(i);
+	return subresCoeffs;
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 		const UnivariatePolynomial& p,
 		const SubresultantStrategy strategy
@@ -1455,6 +1475,21 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 	} else {
 		return UnivariatePolynomial(this->mainVar());
 	}
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::discriminant(const SubresultantStrategy strategy) const {
+	UnivariatePolynomial<Coeff> resultant = this->resultant(this->derivative(), strategy);
+	unsigned d = this->degree();
+	if (d >= 2) {
+		Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
+		// TODO: Ask Ulrich: Why collect()
+		// ex reductionCoeff = GiNaC::expand( sign * this->lcoeff() ).collect( mVariable );
+		Coeff redCoeff = sign * this->lcoeff();
+		bool res = resultant.divideBy(redCoeff, resultant);
+		assert(res);
+	}
+	return resultant;
 }
 
 template<typename Coeff>

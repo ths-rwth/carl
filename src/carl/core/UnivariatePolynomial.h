@@ -543,11 +543,19 @@ public:
 			const UnivariatePolynomial& q,
 			const SubresultantStrategy strategy = SubresultantStrategy::Default
 	);
-	
+
+	static const std::vector<UnivariatePolynomial> principalSubresultantsCoefficients(
+			const UnivariatePolynomial& p,
+			const UnivariatePolynomial& q,
+			const SubresultantStrategy strategy = SubresultantStrategy::Default
+	);
+
 	UnivariatePolynomial<Coefficient> resultant(
 			const UnivariatePolynomial<Coefficient>& p,
 			const SubresultantStrategy strategy = SubresultantStrategy::Default
 	) const;
+
+	UnivariatePolynomial<Coefficient> discriminant(const SubresultantStrategy strategy = SubresultantStrategy::Default) const;
 
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
