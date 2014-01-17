@@ -456,7 +456,7 @@ void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to,
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		if(p->isConstant()) {
-			if (p->isNumber()) { // discard numerics completely
+			if (!p->isNumber()) { // discard numerics completely
 				to.insert(p->switchVariable(variable), this->getParentsOf(p));
 			}	
 			toDelete.push_front(p);
