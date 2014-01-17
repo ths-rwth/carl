@@ -454,7 +454,7 @@ namespace carl
 			Monomial res(*this);
 			unsigned expsum = 0;
 			for (auto it: res.mExponents) {
-				it.exp = carl::pow(it.exp, exp);
+				it.exp = (exponent)carl::pow(it.exp, exp);
 				expsum += it.exp;
 			}
 			res.mTotalDegree = expsum;
