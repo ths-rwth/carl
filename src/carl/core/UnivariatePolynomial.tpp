@@ -1470,6 +1470,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 		const SubresultantStrategy strategy
 ) const {
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
+	LOGMSG_TRACE("carl.cad", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
 		return resultant;
 	} else {
@@ -1483,12 +1484,11 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::discriminant(const Subr
 	unsigned d = this->degree();
 	if (d >= 2) {
 		Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
-		// TODO: Ask Ulrich: Why collect()
-		// ex reductionCoeff = GiNaC::expand( sign * this->lcoeff() ).collect( mVariable );
 		Coeff redCoeff = sign * this->lcoeff();
 		bool res = resultant.divideBy(redCoeff, resultant);
 		assert(res);
 	}
+	LOGMSG_TRACE("carl.cad", "discriminant(" << *this << ") = " << resultant);
 	return resultant;
 }
 
