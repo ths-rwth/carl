@@ -65,6 +65,7 @@ struct Less {
 				return lhsIR->right() < rhs->value();
 			} else {
 				auto rhsIR = const_cast<RealAlgebraicNumberIR<Number>*>(static_cast<const RealAlgebraicNumberIR<Number>*>(rhs));
+				if (lhsIR->equal(rhsIR)) return false;
 				return const_cast<RealAlgebraicNumberIR<Number>*>(lhsIR)->lessWhileUnequal(rhsIR);
 			}
 		}
