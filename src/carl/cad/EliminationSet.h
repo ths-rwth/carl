@@ -1,11 +1,6 @@
 /*
  * @file   EliminationSet.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
- * ported from GiNaCRA:
- *	commit 00ba79d7117be72882c5864d44ff644cf4ccc76f
- *	Author: Ulrich Loup <loup@cs.rwth-aachen.de>
- *	Date:   Tue Dec 3 15:57:06 2013 +0100
  */
 
 #pragma once
