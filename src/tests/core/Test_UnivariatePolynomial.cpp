@@ -335,7 +335,7 @@ TEST(UnivariatePolynomial, primitivePart)
 
 TEST(UnivariatePolynomial, pseudoRem)
 {
-	//Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable x = VariablePool::getInstance().getFreshVariable();
 	
 	
 }

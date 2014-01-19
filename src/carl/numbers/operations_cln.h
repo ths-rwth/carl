@@ -166,6 +166,11 @@ inline cln::cl_I quotient(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return div(a,b);
 }
+//
+inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return div(a,b);
+}
 
 
 }

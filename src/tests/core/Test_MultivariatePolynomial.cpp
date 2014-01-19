@@ -193,14 +193,14 @@ TEST(MultivariatePolynomial, Coprime)
     mp2 += (cln::cl_RA)2 * v1;
     EXPECT_EQ(mp2, mp.coprimeCoefficients());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1/6 * v0);
+    mp = MultivariatePolynomial<cln::cl_RA>(((cln::cl_RA)1)/6 * v0);
     mp += (cln::cl_RA)4 * v1;
     mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1 * v0);
     mp2 += (cln::cl_RA)24 * v1;
     EXPECT_EQ(mp2, mp.coprimeCoefficients());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1/6 * v0);
-    mp += (cln::cl_RA)1/4 * v1;
+    mp = MultivariatePolynomial<cln::cl_RA>(((cln::cl_RA)1)/6 * v0);
+    mp += ((cln::cl_RA)1)/4 * v1;
     mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
     mp2 += (cln::cl_RA)3 * v1;
     EXPECT_EQ(mp2, mp.coprimeCoefficients());
@@ -457,12 +457,3 @@ TEST(MultivariatePolynomial, varInfo)
     EXPECT_EQ((cln::cl_RA)1, vi2.getVarInfo(z)->coeffs().at(1));
 }
 
-TEST(MultivariatePolynomial, cauchyBounds)
-{
-    EXPECT_TRUE(false);
-}
-
-TEST(MultivariatePolyonomial, factorization)
-{
-    EXPECT_TRUE(false);
-}
