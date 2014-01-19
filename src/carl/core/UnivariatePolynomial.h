@@ -235,11 +235,29 @@ public:
 	template<typename C = Coefficient, EnableIf<is_fraction<C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
 
-	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
-	UnivariatePolynomial normalized() const;
-	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	/**
+	 * The normal part of a polynomial is the polynomial divided by the unit part.
+	 * @see @ref GCL92, page 42.
+     * @return 
+     */
 	UnivariatePolynomial normalized() const;
 	
+	/**
+	 * The unit part of a polynomial over a field is its leading coefficient for nonzero polynomials, 
+	 * and one for zero polynomials.
+	 * @see @ref GCL92, page 42.
+     * @return The unit part of the polynomial.
+     */
+	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
+	const Coefficient& unitPart() const;
+	/**
+	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
+	 * and one for zero polynomials.
+	 * @see @ref GCL92, page 42.
+     * @return 
+     */
+	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	Coefficient unitPart() const;
 	
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
@@ -249,6 +267,7 @@ public:
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
+	
 	
 	/**
 	 * Divides the polynomial by another polynomial.

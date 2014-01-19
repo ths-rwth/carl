@@ -503,23 +503,40 @@ Coeff UnivariatePolynomial<Coeff>::cauchyBound() const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_field<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
 {
 	if(isZero())
 	{
 		return *this;
 	}
-	Coeff tmp(lcoeff());
-	return *this/tmp;
+	return *this/unitPart();
 }
+
+
+
+template<typename Coeff>
+template<typename C, EnableIf<is_field<C>>>
+const Coeff& UnivariatePolynomial<Coeff>::unitPart() const
+{
+	return lcoeff();
+}
+
 
 template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::normalized() const
+Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	// TODO implement
+	if(sgn(lcoeff().numericPart()) == Sign::NEGATIVE)
+	{
+		return Coeff(-1);
+	}
+	else
+	{
+		return Coeff(1);
+	}
 }
+
+
 	
 template<typename Coeff>
 Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
