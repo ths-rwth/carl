@@ -337,6 +337,11 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 		return Coeff(0);
 	}
 	assert(isNormal());
+	// As we consider normal polynomials, for fields, we know that the content must be 1.
+	if(is_field<Coeff>::value)
+	{
+		return Coeff(1);
+	}
 	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
 	Coeff gcd = *it;
 	for(++it; it != mCoefficients.end(); ++it)
