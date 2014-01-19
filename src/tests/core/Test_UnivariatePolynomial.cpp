@@ -305,6 +305,34 @@ TEST(UnivariatePolynomial, numericContent)
 	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-15,-27,-3}).numericContent(), 3);
 }
 
+TEST(UnivariatePolynomial, unitPart)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {1,2,3}).unitPart());
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {15,27,3}).unitPart());
+	EXPECT_EQ(-1,UnivariatePolynomial<cln::cl_I>(x, {-1,-2,-3}).unitPart());
+	EXPECT_EQ(-1,UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).unitPart());
+}
+
+TEST(UnivariatePolynomial, content)
+{
+    Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {1,2,3}).normalized().content());
+	EXPECT_EQ(3,UnivariatePolynomial<cln::cl_I>(x, {15,27,3}).normalized().content());
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {-1,-2,-3}).normalized().content());
+	EXPECT_EQ(3,UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).normalized().content());
+}
+
+
+TEST(UnivariatePolynomial, primitivePart)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {1,2,3}),UnivariatePolynomial<cln::cl_I>(x, {1,2,3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {5,9,1}),UnivariatePolynomial<cln::cl_I>(x, {15,27,3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {1,2,3}),UnivariatePolynomial<cln::cl_I>(x, {-1,-2,-3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {5,9,1}),UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
+}
+
 TEST(UnivariatePolynomial, pseudoRem)
 {
 	//Variable x = VariablePool::getInstance().getFreshVariable();
