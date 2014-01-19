@@ -202,8 +202,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	{
 		return UnivariatePolynomial<Coeff>(mMainVar);
 	}
+	if(isZero())
+	{
+		return UnivariatePolynomial<Coeff>(mMainVar);
+	}
 	//std::cout << *this << " / " << divisor << std::endl;
 	unsigned degdiff = degree() - divisor.degree();
+
 	Coeff factor = lcoeff()/divisor.lcoeff();
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-1);
@@ -355,6 +360,10 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
 {
+	if(isZero()) 
+	{
+		return *this;
+	}
 	assert(isNormal());
 	return *this/(content());
 }
@@ -564,14 +573,15 @@ template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(lcoeff() < 0)
+	if(isZero() || lcoeff() > 0)
+	{
+		return Coeff(1);
+	}	
+	else
 	{
 		return Coeff(-1);
 	}
-	else
-	{
-		return Coeff(1);
-	}
+	
 }
 
 
