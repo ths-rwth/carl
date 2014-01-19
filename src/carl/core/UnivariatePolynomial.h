@@ -236,6 +236,12 @@ public:
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
 
 	/**
+	 * Checks whether the polynomial is unit normal
+	 * @see @ref GCL92, page 39
+     * @return 
+     */
+	bool isNormal() const;
+	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
 	 * @see @ref GCL92, page 42.
      * @return 
@@ -259,6 +265,27 @@ public:
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 	Coefficient unitPart() const;
 	
+	/**
+	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
+	 * The content of zero is zero.
+	 * @see @ref GCL92, page 52
+     * @return 
+     */
+	Coefficient content() const;
+	
+	/**
+	 * The primitive part of p is the normal part of p divided by the content of p.
+	 * The primitive part of zero is zero.
+	 * @see @ref GCL92, page 53
+     * @return 
+     */
+	UnivariatePolynomial primitivePart() const;
+	
+	/**
+	 * The n'th derivative of the polynomial in its main variable.
+     * @param nth how many times the derivative should be applied.
+     * @return A polynomial (d/dx)^n p(x) where p(x) is the input polynomial.
+     */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
@@ -342,6 +369,11 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
 
+	/**
+	 * 
+     * @param value
+     * @return 
+     */
 	carl::Sign sgn(const Coefficient& value) const {
 		return carl::sgn(this->evaluate(value));
 	}
@@ -653,12 +685,12 @@ public:
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const C& lhs, const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& rhs);
 	
 	
-	/**
-	 * Only defined for field-coefficients.
-	 * @param rhs
-	 * @return 
-	 */
+
+	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
+	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	UnivariatePolynomial& operator/=(const Coefficient& rhs);
+	
 	
 	template<typename C>
 	friend UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs);

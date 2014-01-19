@@ -303,6 +303,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	return reduce(divisor, &prefactor);
 }
 
+
+
 /**
  * Signed pseudoremainder.
  * see 
@@ -320,6 +322,37 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariateP
 	return reduce(divisor, &prefactor);
 }
 
+template<typename Coeff>
+bool UnivariatePolynomial<Coeff>::isNormal() const
+{
+	return unitPart() == 1;
+}
+
+template<typename Coeff>
+Coeff UnivariatePolynomial<Coeff>::content() const
+{
+	if(isZero())
+	{
+		// By definition.
+		return Coeff(0);
+	}
+	assert(isNormal());
+	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
+	Coeff gcd = *it;
+	for(++it; it != mCoefficients.end(); ++it)
+	{
+		if(gcd == 1) break;
+		gcd = carl::gcd(gcd, *it);
+	}
+	return gcd;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
+{
+	assert(isNormal());
+	return *this/(content());
+}
 
 /**
  * See Algorithm 2.2 in GZL92.
@@ -526,7 +559,7 @@ template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(sgn(lcoeff().numericPart()) == Sign::NEGATIVE)
+	if(lcoeff() < 0)
 	{
 		return Coeff(-1);
 	}
@@ -1737,13 +1770,11 @@ UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const 
 }
 
 
+
 template<typename Coeff>
+template<typename C, EnableIf<is_field<C>>>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
 {
-	if(!is_field<Coeff>::value)
-	{
-		LOGMSG_WARN("carl.core", "Division by coefficients is only defined for field-coefficients");
-	}
 	assert(rhs != 0);
 	for(Coeff& c : mCoefficients)
 	{
@@ -1752,10 +1783,23 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 	return *this;		
 }
 
+template<typename Coeff>
+template<typename C, DisableIf<is_field<C>>>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
+{
+	assert(rhs != 0);
+	for(Coeff& c : mCoefficients)
+	{
+		c = quotient(c, rhs);
+	}
+	return *this;		
+}
+
+
+
 template<typename C>
 UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {
-	static_assert(is_field<C>::value, "Division by coefficients is only defined for field-coefficients");
 	assert(rhs != 0);
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
