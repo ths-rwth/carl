@@ -1,5 +1,6 @@
 /**
  * @file MultivariatePolynomialPolicy.h 
+ * @ingroup MultiRP
  * @author Sebastian Junges
  */
 

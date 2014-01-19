@@ -1,3 +1,9 @@
+/**
+ * @file Monomial_subsitute.h
+ * @ingroup MultiRP
+ * @author Sebastian Junges
+ */
+
 #pragma once
 
 #include "Monomial.h"

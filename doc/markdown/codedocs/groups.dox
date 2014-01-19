@@ -1,8 +1,14 @@
 /**
+@defgroup Polynomials Polynomials
+@{
 
-
-@defgroup group1 Test
+@defgroup MultiRP  Multivariate Represented Polynomials
 @{ @}
+
+@defgroup UniRP Univariate Represented Polynomials
+@{ @}
+
+@}
  
 @defgroup gb Groebner Bases
 @{ @}
@@ -10,12 +16,14 @@
 @defgroup cad Cylindrical Algebraic Decomposition
 @{ @}
 
+@defgroup number Number Types
+@{
 @defgroup gmp GMP Usage
 @{ @}
 
 @defgroup cln CLN Usage
 @{ @}
-
+@}
 @defgroup typetraits Type Traits
 
 

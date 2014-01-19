@@ -1,3 +1,9 @@
+/**
+ * @file MultivariatePolynomial.tpp
+ * @ingroup MultiRP
+ * @author Sebastian Junges
+ */
+
 #pragma once
 #include "MultivariatePolynomial.h"
 #include <memory>

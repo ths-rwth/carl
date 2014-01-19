@@ -1,5 +1,6 @@
 /**
  * @file MultivariatePolynomial.h 
+ * @ingroup MultiRP
  * @author Sebastian Junges
  * @author Florian Corzilius
  */

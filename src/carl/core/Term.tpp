@@ -1,3 +1,8 @@
+/**
+ * @file Term.tpp
+ * @ingroup MultiRP
+ * @author Sebastian Junges
+ */
 #pragma once
 
 // for code assistance

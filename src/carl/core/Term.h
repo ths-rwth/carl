@@ -1,5 +1,6 @@
 /**
- * @file Term.h 
+ * @file Term.h
+ * @ingroup MultiRP
  * @author Sebastian Junges
  * @author Florian Corzilius
  */

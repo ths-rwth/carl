@@ -1,8 +1,8 @@
 /** 
  * @file   Polynomial.h
+ * @ingroup Polynomials
  * @author Sebastian Junges
  *
- * @since October 1, 2013
  */
 
 #pragma once
