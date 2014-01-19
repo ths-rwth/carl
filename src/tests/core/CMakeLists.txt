@@ -14,5 +14,6 @@ add_executable(runCoreTests
 )
 cotire(runCoreTests)
 target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
+cotire(runCoreTests)
 
 add_test( NAME core COMMAND runCoreTests )

@@ -79,5 +79,5 @@ inline void divide(const Number& dividend, const Number& divisor, Number& quotie
 }
 
 #include "operations_cln.h"
-#include "operations_gmp.h"
+#include "operations_gmpxx.h"
 #include "operations_native.h"
