@@ -207,12 +207,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 		return UnivariatePolynomial<Coeff>(mMainVar);
 	}
 	
-	if(prefactor != nullptr)
-	{
-		std::cout << *prefactor << " * " << *this << " / " << divisor << std::endl;
-	}
 	unsigned degdiff = degree() - divisor.degree();
-	Coeff factor = Coeff(0); // We have to initialize it to prevent a compiler error.
+	Coeff factor0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
 		factor = *prefactor * lcoeff()/divisor.lcoeff();
@@ -221,7 +217,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	{
 		factor = lcoeff()/divisor.lcoeff();
 	}
-	std::cout << "factor: " << factor << std::endl;
+
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-1);
 	if(degdiff > 0)
