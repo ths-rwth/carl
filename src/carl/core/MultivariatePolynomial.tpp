@@ -704,7 +704,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 		num = carl::gcd(num, getNum((*it)->coeff()));
 		den = carl::lcm(den, getDenom((*it)->coeff()));
 	}
-	return den/num;
+	return Coeff(den)/num;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

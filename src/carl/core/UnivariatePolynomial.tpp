@@ -206,15 +206,34 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	{
 		return UnivariatePolynomial<Coeff>(mMainVar);
 	}
-	//std::cout << *this << " / " << divisor << std::endl;
+	
+	if(prefactor != nullptr)
+	{
+		std::cout << *prefactor << " * " << *this << " / " << divisor << std::endl;
+	}
 	unsigned degdiff = degree() - divisor.degree();
-
-	Coeff factor = lcoeff()/divisor.lcoeff();
+	Coeff factor = Coeff(0); // We have to initialize it to prevent a compiler error.
+	if(prefactor != nullptr)
+	{
+		factor = *prefactor * lcoeff()/divisor.lcoeff();
+	}
+	else
+	{
+		factor = lcoeff()/divisor.lcoeff();
+	}
+	std::cout << "factor: " << factor << std::endl;
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-1);
 	if(degdiff > 0)
 	{
 		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
+	}
+	if(prefactor != nullptr)
+	{
+		for(Coeff& c : result.mCoefficients)
+		{
+			c *= *prefactor;
+		}
 	}
 	
 	// By construction, the leading coefficient will be zero.
@@ -222,7 +241,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	{
 		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
 		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i] * *prefactor);
+			result.mCoefficients.push_back(mCoefficients[i + degdiff] * *prefactor - factor * divisor.mCoefficients[i]);
 		}
 	}
 	else
@@ -249,6 +268,7 @@ template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
+	/// @todo remove this, reduction 
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
 	if(is_field<Coeff>::value && divisor.isConstant())
@@ -301,7 +321,12 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	assert(degree() >= divisor.degree());
+	assert(!divisor.isZero());
+	if(degree() < divisor.degree())
+	{
+		// According to definition.
+		return *this;
+	}
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
 	Coeff prefactor = pow(b,d);
@@ -598,7 +623,7 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 		num = carl::gcd(num, getNum(*it));
 		den = carl::lcm(den, getDenom(*it));
 	}
-	return den/num;
+	return Coeff(den)/num;
 }
 
 template<typename Coeff>
@@ -622,6 +647,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_integer<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
 {
+	/// @todo is this pseudodivision?
 	assert(!divisor.isZero());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
 	assert(*this == divisor * result.quotient + result.remainder);
@@ -836,8 +862,8 @@ std::map<UnivariatePolynomial<Coeff>, unsigned> UnivariatePolynomial<Coeff>::fac
     else
     {
         // Store the rational factor and make the polynomial's coefficients coprime.
-        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), (Coeff) 1 / factor) << ")^" << 1 );
-        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), (Coeff) 1 / factor), 1));
+        LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor) << ")^" << 1 );
+        result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor), 1));
         remainingPoly.mCoefficients.reserve(mCoefficients.size());
         for(const Coeff& coeff : mCoefficients)
         {
@@ -1365,7 +1391,8 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	if (b.isConstant()) return subresultants;
 	
 	UnivariatePolynomial<Coeff> tmp = b;
-	// TODO: check if reduce() is really prem()
+	/// @todo check if reduce() is really prem() 
+	/// @bug reduce is not prem() if the coefficient is not a field.
 	b = a.reduce(-b);
 	a = tmp;
 	
