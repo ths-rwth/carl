@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace carl
+{
 /**
  * Abstract base class for polynomials.
  */
@@ -17,3 +19,4 @@ public:
 	virtual bool isMultivariateRepresented() const = 0;
 	virtual ~Polynomial() {}
 };
+}
