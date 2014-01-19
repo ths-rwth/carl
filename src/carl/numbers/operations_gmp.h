@@ -157,6 +157,13 @@ inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
 	return res;
 }
 
+inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
+{
+	mpz_class res;
+	mpz_div(res.get_mpz_t(), n.get_mpz_t(), d.get_mpz_t());
+	return res;
+}
+
 inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
 }
