@@ -383,7 +383,7 @@ const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs)
     return Term<Coeff>(lhs.mCoeff * rhs, lhs.mMonomial);
 }
 template<typename Coeff>
-const Term<Coeff> operator*(const Term<Coeff>& lhs, int rhs)
+const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs)
 {
     return Term<Coeff>(lhs.mCoeff * rhs, lhs.mMonomial);
 }
