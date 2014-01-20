@@ -111,7 +111,7 @@ RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, Real
 	}
 	LOGMSG_TRACE("carl.core", p << " at " << point << " = " << pol);
 	if (pol.isNumber()) {
-		return new RealAlgebraicNumberNR<Number>(pol.numericContent());
+		return new RealAlgebraicNumberNR<Number>(pol.constantPart());
 	}
 	return evaluate(pol, IRs);
 }
