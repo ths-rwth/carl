@@ -1,5 +1,5 @@
 /**
- * @file Monomial_subsitute.h
+ * @file Monomial_substitute.h
  * @ingroup MultiRP
  * @author Sebastian Junges
  */

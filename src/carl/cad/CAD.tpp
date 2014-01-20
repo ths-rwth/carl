@@ -1649,7 +1649,7 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 }
 
 template<typename Number>
-ExactInterval<Number> CAD<Number>::getBounds(const typename tree<RealAlgebraicNumber<Number>*>::iterator& parent, const RealAlgebraicNumber<Number>* sample) const {
+ExactInterval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleIterator& parent, const RealAlgebraicNumber<Number>* sample) const {
 	if (this->sampleTree.begin(parent) == this->sampleTree.end(parent)) {
 		// this tree level is empty
 		return ExactInterval<Number>::unboundedExactInterval();

@@ -1,5 +1,5 @@
 /** 
- * @file   operations_gmp.h
+ * @file   operations_gmpxx.h
  * @ingroup gmpxx
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
