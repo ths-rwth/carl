@@ -208,7 +208,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 	
 	unsigned degdiff = degree() - divisor.degree();
-	Coeff factor0); // We have to initialize it to prevent a compiler error.
+	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
 		factor = *prefactor * lcoeff()/divisor.lcoeff();
