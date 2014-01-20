@@ -108,6 +108,23 @@ public:
 		return UnivariatePolynomial(mMainVar, (C)1);
 	}
 	
+	/**
+	 * Returns the leading coefficient.
+	 * If the polynomial is empty, the return value is undefined.
+	 * @return 
+	 */
+	const Coefficient& lcoeff() const
+	{
+		return this->mCoefficients.back();
+	}
+	/**
+	 * Returns the trailing coefficient.
+	 * If the polynomial is empty, the return value is undefined.
+	 * @return 
+	 */
+	const Coefficient& tcoeff() const {
+		return this->mCoefficients.front();
+	}
 
 	/**
 	 * Checks whether the polynomial is constant with respect to the main variable.
@@ -117,12 +134,10 @@ public:
 	{
 		return mCoefficients.size() <= 1;
 	}
-	Coefficient constantPart() const {
-		return this->mCoefficients[0];
-	}
 
 	/**
 	 * Checks whether the polynomial is only a number.
+	 * Applies if the coefficients are numbers.
 	 * @return
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -130,10 +145,39 @@ public:
 	{
 		return this->isConstant();
 	}
+	/**
+	 * Checks whether the polynomial is only a number.
+	 * Applies if the coefficients are not numbers.
+	 * Calls isNumber() on the constant coefficient recursively.
+	 * @return
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isNumber() const
 	{
 		return this->isConstant() && this->lcoeff().isNumber();
+	}
+
+	/**
+	 * Returns the constant part of this polynomial.
+	 * Applies, if the coefficients are numbers.
+	 * @return 
+	 */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	NumberType constantPart() const
+	{
+		return this->lcoeff();
+	}
+	/**
+	 * Returns the constant part of this polynomial.
+	 * Applies, if the coefficients are not numbers.
+	 * Calls constantPart() on the trailing coefficient recursively.
+	 * @return 
+	 */
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	NumberType constantPart() const
+	{
+		if (this->isZero()) return 0;
+		return this->tcoeff().constantPart();
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -171,11 +215,6 @@ public:
 			}
 		}
 		return max;
-	}
-
-	const Coefficient& lcoeff() const
-	{
-		return mCoefficients.back();
 	}
 
 	/**
