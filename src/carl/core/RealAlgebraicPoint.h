@@ -48,6 +48,14 @@ public:
 		numbers(v.begin(), v.end())
 	{}
 
+	/**
+	 * Creates a real algebraic point with the specified components from a list.
+	 * @param v pointers to real algebraic numbers
+	 */
+	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>*>& v):
+		numbers(v.begin(), v.end())
+	{}
+
 	/** Gives the number of components of this point.
 	 * @return the dimension of this point
 	 */
