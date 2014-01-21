@@ -158,6 +158,9 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
+	if (this->degree() == 0) {
+		return result;
+	}
 	result.mCoefficients.reserve(mCoefficients.size()-nth);
 	// nth == 1 is most common case and can be implemented more efficient.
 	if(nth == 1)
