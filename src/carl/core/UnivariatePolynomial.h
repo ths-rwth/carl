@@ -605,6 +605,15 @@ public:
 	 */
 	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
 
+	/**
+	 * Calculated the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
+	 * @param seq
+	 * @param interval
+	 * @return
+	 */
+	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
+	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const ExactInterval<Number>& interval);
+
 	/*!
 	 * Reverses the order of the coefficients of this polynomial.
 	 * This method is meant to be called by signVariations only.

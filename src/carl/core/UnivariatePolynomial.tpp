@@ -1316,6 +1316,14 @@ int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& inte
 	return l - r;
 }
 
+template<typename Coeff>
+template<typename C, typename Number>
+int UnivariatePolynomial<Coeff>::countRealRoots(const std::list<UnivariatePolynomial<Coeff>>& seq, const ExactInterval<Number>& interval) {
+	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.left()); });
+	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.right()); });
+	return l - r;
+}
+
 
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::reverse() {
