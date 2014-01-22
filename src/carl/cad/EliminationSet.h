@@ -156,6 +156,7 @@ public:
 	
 	/**
 	 * Constructs the elimination set with a given strict ordering f of univariate polynomials.
+	 * @param owner PolynomialOwner object that recieves the ownership of all polynomials that are created within this EliminationSet.
 	 * @param f strict ordering for lifting queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
 	 * @param g strict ordering for elimination queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
 	 */

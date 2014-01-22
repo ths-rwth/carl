@@ -1,4 +1,7 @@
 /**
+ * @file EliminationSet.tpp
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 #include "EliminationSet.h"
 
