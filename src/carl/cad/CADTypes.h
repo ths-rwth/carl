@@ -9,6 +9,7 @@
 
 #include "../core/MultivariatePolynomial.h"
 #include "../core/UnivariatePolynomial.h"
+#include "../core/logging.h"
 
 namespace carl {
 namespace cad {
@@ -36,13 +37,21 @@ private:
 	std::list<const UPolynomial<Coeff>*> ownedPolynomials;
 public:
 	~PolynomialOwner() {
+		if (this->ownedPolynomials.size() > 0) {
+			LOGMSG_DEBUG("carl.cad", "Deleting " << this->ownedPolynomials.size() << " polynomials.");
+		}
 		for (auto p: this->ownedPolynomials) {
 			delete p;
 		}
 	}
 	
-	void takeOwnership(const UPolynomial<Coeff>* p) {
+	const UPolynomial<Coeff>* take(const UPolynomial<Coeff>* p) {
 		this->ownedPolynomials.push_back(p);
+		return p;
+	}
+	UPolynomial<Coeff>* take(UPolynomial<Coeff>* p) {
+		this->ownedPolynomials.push_back(p);
+		return p;
 	}
 };
 
