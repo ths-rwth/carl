@@ -160,7 +160,6 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 						smtlibFile << " (< " << constraint.getPolynomial() << " 0)";
 					break;
 				}
-				default: assert(false); // this should not happen
 			}
 		}
 		smtlibFile << "))\n";
@@ -227,6 +226,7 @@ bool CAD<Number>::prepareElimination() {
 		/// @todo make this more efficient
 		CADTrace newTrace(this->variables.size()+1, this->sampleTree.begin());
 		long unsigned j = newVariableCount;
+		assert(j + this->trace.size() <= newTrace.size());
 		for (auto i: this->trace) {
 			newTrace[j++] = i;
 		}
@@ -345,11 +345,15 @@ void CAD<Number>::clear() {
 	this->sampleTree.clear();
 	// Add empty root node
 	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
+	this->residueSampleTree.clear();
+	this->trace.clear();
 	this->eliminationSets.clear();
 	this->polynomials.clear();
 	this->scheduledPolynomials.clear();
 	this->newVariables.clear();
 	this->iscomplete = false;
+	this->interrupted = false;
+	this->checkCallCount = 0;
 }
 
 template<typename Number>
@@ -378,9 +382,8 @@ bool CAD<Number>::check(
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << "( " << this->eliminationSets[i].size() << " ): " << this->eliminationSets[i]);
 	}
-	
-	/// @todo take care of #ifdef CAD_CHECK_REDIRECT
-//#ifdef CAD_CHECK_REDIRECT
+
+#ifdef CAD_CHECK_REDIRECT
 	CAD<Number>::checkCallCount++;
 	this->setting.trimVariables = false;
 	this->prepareElimination();
@@ -425,7 +428,7 @@ bool CAD<Number>::check(
 	}
 	this->printConstraints(constraints, filename);
 	LOGMSG_INFO("carl.cad", "done.");
-//#endif
+#endif
 	
 	//////////////////////
 	// Initialization
@@ -443,6 +446,12 @@ bool CAD<Number>::check(
 		}
 	}
 	std::vector<std::pair<UPolynomial*, UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
+	if (this->setting.computeConflictGraph) {
+		// add necessary conflict graph vertices if required
+		for (auto i = conflictGraph.size(); i < constraints.size(); i++) {
+			conflictGraph.addConstraintVertex();
+		}
+	}
 	
 	//////////////////////
 	// Preprocessing
@@ -532,12 +541,14 @@ bool CAD<Number>::check(
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.left())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
+				this->iscomplete = false; // new polynomials induce new sample points
 				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.right())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
+				this->iscomplete = false; // new polynomials induce new sample points
 				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
 			}
 			
