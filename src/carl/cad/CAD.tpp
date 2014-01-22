@@ -173,12 +173,11 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	os << endl << cad.getSetting() << endl;
-		os << "Elimination set sizes:";
+	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (auto i: cad.getEliminationSets()) {
-		os << "  Level " << level++ << ": " << i.size();
+		os << "\tLevel " << level++ << ": " << i << std::endl;
 	}
-	os << endl;
 	os << "Number of samples computed: " << cad.samples().size() << endl;
 	os << "CAD complete: " << cad.isComplete() << endl;
 	return os;
@@ -186,11 +185,11 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 
 template<typename Number>
 bool CAD<Number>::prepareElimination() {
+	LOGMSG_TRACE("carl.cad", "prepareElimination()");
 	if (this->newVariables.empty() && this->scheduledPolynomials.empty()) {
 		return false;
 	}
 	
-	LOGMSG_DEBUG("carl.cad", "Number of new variables: " << this->newVariables.size());
 	long unsigned newVariableCount = this->newVariables.size();
 	
 	/* Algorithm overview:
@@ -217,6 +216,7 @@ bool CAD<Number>::prepareElimination() {
 		// introduce new elimination levels and fill them appropriately
 		// (1)
 		
+		LOGMSG_TRACE("carl.cad", "Adding " << this->newVariables.size() << " to " << this->variables.size() << " old variables.");
 		// variables, newVariables = newVariables:variables, []
 		this->newVariables.insert(this->newVariables.end(), this->variables.begin(), this->variables.end());
 		this->variables.clear();
@@ -259,6 +259,7 @@ bool CAD<Number>::prepareElimination() {
 	}
 	// done for the current scheduled polynomials
 	this->scheduledPolynomials.clear();
+	LOGMSG_TRACE("carl.cad", "Done with prepareElimination()");
 	return newVariableCount != 0;
 }
 
@@ -636,6 +637,7 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 		if (!this->variables.empty()) var = this->variables.front();
 		else if (!this->newVariables.empty()) var = this->newVariables.front();
 
+		LOGMSG_TRACE("carl.core", "Adding " << **p);
 		UPolynomial* up = new UPolynomial((*p)->toUnivariatePolynomial(var));
 		if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), up) != this->scheduledPolynomials.end()) {
 			// same polynomial was already considered in scheduled polynomials
@@ -1160,7 +1162,7 @@ bool CAD<Number>::mainCheck(
 		bool boundsNontrivial,
 		bool checkBounds
 ) {
-	
+	LOGMSG_TRACE("carl.cad", "mainCheck()");
 #define CHECK_NODE( _node, _fullRestart, _excludePrevious, _updateTrace )\
 	auto res = this->checkNode(_node, _fullRestart, _excludePrevious, _updateTrace, constraints, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);\
 	if (res.first) return true;\
@@ -1174,6 +1176,7 @@ bool CAD<Number>::mainCheck(
 	}
 	
 	const unsigned dim = (unsigned)this->variables.size();
+	LOGMSG_TRACE("carl.cad", "mainCheck: dimension is " << dim);
 	auto sampleTreeRoot = this->sampleTree.begin();
 	int maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
 	// if the elimination sets were extended (i.e. the sample tree is not developed completely), we obtain new samples already in phase one
@@ -1202,7 +1205,7 @@ bool CAD<Number>::mainCheck(
 	 * This can be, e.g., the sample which satisfied the last set of constraints.
 	 */
 	
-	LOGMSG_DEBUG("carl.cad", "Entering Phase 1...");
+	LOGMSG_DEBUG("carl.cad", "mainCheck: Entering Phase 1...");
 	
 	if (checkTraceFirst && maxDepth != 0) {
 		// only consider trace if there has been any sample before
@@ -1447,6 +1450,7 @@ bool CAD<Number>::liftCheck(
 	}
 	
 	while (true) {
+		LOGMSG_TRACE("carl.cad", "Phase 1 of lifting...");
 		/* Phase 1
 		 * Lifting position choice and corresponding sample construction.
 		 */
@@ -1476,7 +1480,6 @@ bool CAD<Number>::liftCheck(
 			for (auto replacedSample: replacedSamples) {
 				this->storeSampleInTree(replacedSample, node);
 			}
-			
 			// discard lifting position just used for sample construction
 			this->eliminationSets[openVariableCount].popLiftingPosition();
 			// try to simplify the current samples even further
@@ -1492,6 +1495,7 @@ bool CAD<Number>::liftCheck(
 		/* Phase 2
 		 * Lifting of the current level.
 		 */
+		LOGMSG_TRACE("carl.cad", "Phase 2 of lifting...");
 		while (!sampleSetIncrement.empty()) {
 			// iterate through all samples found by the next() method
 			
@@ -1600,11 +1604,15 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 		}
 		
 		// check if no further elimination possible
-		if (l == 0 && this->eliminationSets[0].emptySingleEliminationQueue() && this->eliminationSets[0].emptyPairedEliminationQueue()) return -1;
+		if (l == 0 && this->eliminationSets[0].emptySingleEliminationQueue() && this->eliminationSets[0].emptyPairedEliminationQueue()) {
+			LOGMSG_TRACE("carl.cad", "returning from eliminate(): -1");
+			return -1;
+		}
 		// eliminate one polynomial per level down to the current level
 		l++;
 		
 		if (boundsActive && this->setting.simplifyEliminationByBounds) {
+			LOGMSG_TRACE("carl.cad", "eliminate with bounds");
 			// eliminate from level l-1 to level l
 			for (; l <= level; l++) {
 				while (!this->eliminationSets[l-1].emptySingleEliminationQueue()) {
@@ -1627,6 +1635,7 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 				}
 				// possible change to the completeness status
 				this->iscomplete = false;
+				LOGMSG_TRACE("carl.cad", "returning from eliminate(): " << (int)level);
 				return (int)level;
 			}
 			assert(l == level+1);
@@ -1641,18 +1650,23 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 				}
 			}
 		} else {
+			LOGMSG_TRACE("carl.cad", "eliminate without bounds in level " << l);
 			for (; l <= level; l++) {
 				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], this->variables[l], this->setting, false);
+				LOGMSG_TRACE("carl.cad", "eliminated" << std::endl << (l-1) << ": " << this->eliminationSets[l-1] << std::endl << l << ": " << this->eliminationSets[l]);
 				level = (unsigned)l;
 				if (this->setting.removeConstants) {
 					// get rid of all constants moved to the current level
 					for (; l < this->eliminationSets.size(); l++) {
+						assert(l < this->eliminationSets.size());
+						assert(l < this->variables.size());
 						this->eliminationSets[l-1].moveConstants(this->eliminationSets[l], this->variables[l]);
 					}
 					this->eliminationSets.back().removeConstants();
 				}
 				// possible change to the completeness status
 				this->iscomplete = false;
+				LOGMSG_TRACE("carl.cad", "returning from eliminate(): " << (int)level);
 				return (int)level;
 			}
 		}
