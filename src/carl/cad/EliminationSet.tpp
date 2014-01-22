@@ -165,12 +165,12 @@ bool EliminationSet<Coefficient>::insertAmend(EliminationSet<Coefficient>& s) {
 
 template<typename Coefficient>
 size_t EliminationSet<Coefficient>::erase(const UPolynomial* p) {
-	if (p == 0) return 0;
+	if (p == nullptr) return 0;
 	
 	// remove the child for each parent from the children mapping
 	for (auto i:  this->parentsPerChild[p]) {
-		if (i.first != 0) this->childrenPerParent[i.first].erase( p );
-		if (i.second != 0) this->childrenPerParent[i.second].erase( p );
+		if (i.first != nullptr) this->childrenPerParent[i.first].erase( p );
+		if (i.second != nullptr) this->childrenPerParent[i.second].erase( p );
 	}
 	// remove the child from the parents mapping
 	this->parentsPerChild.erase(p);
@@ -255,6 +255,7 @@ void swap(EliminationSet<Coefficient>& lhs, EliminationSet<Coefficient>& rhs) {
 	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
 	std::swap(lhs.liftingOrder, rhs.liftingOrder);
 	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
+	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
 }
 
 template<typename Coefficient>
@@ -312,7 +313,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		return { pNewVar };
 	}
 
-	EliminationSet<Coefficient> newEliminationPolynomials = EliminationSet<Coefficient>(this->liftingOrder, this->eliminationOrder);
+	EliminationSet<Coefficient> newEliminationPolynomials(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 
 	// PAIRED elimination with the new polynomials: (1) together with the existing ones (2) among themselves
 
@@ -406,7 +407,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		avoidSingle = synchronous;
 	}
 
-	EliminationSet<Coefficient> newEliminationPolynomials = EliminationSet(this->liftingOrder, this->eliminationOrder);
+	EliminationSet<Coefficient> newEliminationPolynomials(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 
 	// PAIRED elimination with the new polynomials: (1) together with the existing ones (2) among themselves
 	if (!mPairedEliminationQueue.empty()) {
@@ -501,16 +502,16 @@ void EliminationSet<Coefficient>::removePolynomialsWithoutRealRoots() {
 
 template<typename Coefficient>
 void EliminationSet<Coefficient>::makeSquarefree() {
-	EliminationSet<Coefficient> squarefreeSet(this->liftingOrder, this->eliminationOrder);
+	EliminationSet<Coefficient> squarefreeSet(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
-		squarefreeSet.insert(new UPolynomial(p->squareFreePart()), this->getParentsOf(p));
+		squarefreeSet.insert(p->squareFreePart(), this->getParentsOf(p));
 	}
 	std::swap(*this, squarefreeSet);
 }
 
 template<typename Coefficient>
 void EliminationSet<Coefficient>::makePrimitive() {
-	EliminationSet<Coefficient> primitiveSet(this->liftingOrder, this->eliminationOrder);
+	EliminationSet<Coefficient> primitiveSet(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
 		if (p->isNumber()) continue; // numbers are discarded
 		
@@ -522,7 +523,7 @@ void EliminationSet<Coefficient>::makePrimitive() {
 
 template<typename Coefficient>
 void EliminationSet<Coefficient>::factorize() {
-	EliminationSet<Coefficient> factorizedSet(this->liftingOrder, this->eliminationOrder);
+	EliminationSet<Coefficient> factorizedSet(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
 		// insert the factors and omit the original
 		// TODO: Perform multivariate factorization here.
@@ -571,7 +572,7 @@ void EliminationSet<Coeff>::elimination(
 	for (auto it: truncations) {
 		auto lcoeff = it->lcoeff();
 		if (lcoeff.isNumber()) continue;
-		eliminated.insert(new UPolynomial(variable, lcoeff), parents, avoidSingle);
+		eliminated.insert(UPolynomial(variable, lcoeff), parents, avoidSingle);
 	}
 	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
 	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);

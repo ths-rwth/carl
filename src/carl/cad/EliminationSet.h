@@ -7,6 +7,7 @@
 
 #include <forward_list>
 #include <list>
+#include <memory>
 #include <set>
 #include <utility>
 #include <unordered_map>
@@ -15,6 +16,7 @@
 #include "../core/UnivariatePolynomial.h"
 #include "../core/logging.h"
 
+#include "CADTypes.h"
 #include "CADSettings.h"
 
 namespace carl {
@@ -28,9 +30,7 @@ namespace cad {
 template<typename Coefficient>
 class EliminationSet {
 public:
-	typedef cad::UPolynomial<Coefficient> UPolynomial;
-	
-// private types
+	typedef carl::cad::UPolynomial<Coefficient> UPolynomial;
 private:
 	
 	/**
@@ -79,17 +79,17 @@ private:
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::unordered_set<const UPolynomial*> PolynomialSet;
+	typedef std::set<const UPolynomial*> PolynomialSet;
 
 	/**
 	 * A mapping from one polynomial to a sorted range of other polynomials.
 	 */
-	typedef std::unordered_map<const UPolynomial*, PolynomialSet> PolynomialBucketMap;
+	typedef std::map<const UPolynomial*, PolynomialSet> PolynomialBucketMap;
 	
 	/// set of elimination parents
 	typedef std::set<PolynomialPair, PolynomialPairIsLess> parentbucket;
 	/// mapping one polynomial pointer to a set of elimination parents
-	typedef std::unordered_map<const UPolynomial*, parentbucket> parentbucket_map;
+	typedef std::map<const UPolynomial*, parentbucket> parentbucket_map;
 
 	
 // public types
@@ -138,7 +138,12 @@ private:
 	PolynomialBucketMap childrenPerParent;
 	/// assigns to each elimination polynomial its parents
 	parentbucket_map parentsPerChild;
-	
+
+	/**
+	 * Ownership of all polynomials created within this object are delegated to the polynomialOwner.
+	 */
+	PolynomialOwner<Coefficient>* polynomialOwner;
+
 // public members
 public:
 	
@@ -154,6 +159,7 @@ public:
 	 * @param g strict ordering for elimination queue (standard is UnivariatePolynomial::univariatePolynomialIsLess)
 	 */
 	EliminationSet(
+			PolynomialOwner<Coefficient>* owner,
 			PolynomialComparator f = UnivariatePolynomialComparator<MPolynomial<Coefficient>>(),
 			PolynomialComparator g = UnivariatePolynomialComparator<MPolynomial<Coefficient>>()
 			):
@@ -166,25 +172,8 @@ public:
 		mLiftingQueueReset(),
 		childrenPerParent(),
 		parentsPerChild(),
+		polynomialOwner(owner),
 		bounded(false)
-	{}
-
-	/**
-	 * Copy constructor.
-	 * @param s
-	 * @return
-	 */
-	EliminationSet(const EliminationSet<Coefficient>& s):
-		polynomials(s.polynomials),
-		eliminationOrder(s.eliminationOrder),
-		liftingOrder(s.liftingOrder),
-		mSingleEliminationQueue(s.mSingleEliminationQueue),
-		mPairedEliminationQueue(s.mPairedEliminationQueue),
-		mLiftingQueue(s.mLiftingQueue),
-		mLiftingQueueReset(s.mLiftingQueueReset),
-		childrenPerParent(s.childrenPerParent),
-		parentsPerChild(s.parentsPerChild),
-		bounded(s.bounded)
 	{}
 	
 	///////////////
@@ -259,7 +248,7 @@ public:
 			const std::list<const UPolynomial*>& parents = std::list<const UPolynomial*>(),
 			bool avoidSingle = false
 			) {
-		return this->insert(new UPolynomial(r), parents, avoidSingle);
+		return this->insert(this->polynomialOwner->take(new UPolynomial(r)), parents, avoidSingle);
 	}
 	
 	/**
