@@ -36,10 +36,11 @@ namespace carl {
 template<typename Number>
 class CAD {
 public:
-	typedef typename tree<RealAlgebraicNumber<Number>*>::iterator sampleIterator;
-	typedef std::vector<sampleIterator> CADTrace;
-	typedef carl::cad::MPolynomial<Number> MPolynomial;
 	typedef carl::cad::UPolynomial<Number> UPolynomial;
+	typedef carl::cad::MPolynomial<Number> MPolynomial;
+
+	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
+	typedef std::vector<sampleIterator> CADTrace;
 	typedef std::unordered_map<unsigned, ExactInterval<Number>> BoundMap;
 	typedef std::list<std::pair<std::list<cad::Constraint<Number>>, std::list<cad::Constraint<Number>>>> Deductions;
 private:
