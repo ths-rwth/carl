@@ -34,7 +34,7 @@
 namespace carl {
 
 template<typename Number>
-class CAD {
+class CAD : public carl::cad::PolynomialOwner<Number> {
 public:
 	typedef carl::cad::UPolynomial<Number> UPolynomial;
 	typedef carl::cad::MPolynomial<Number> MPolynomial;
