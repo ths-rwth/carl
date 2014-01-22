@@ -14,23 +14,23 @@ namespace carl {
 namespace rootfinder {
 
 template<typename Coeff, typename Number>
-std::list<RealAlgebraicNumber<Number>*> realRoots(
+std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>*>& m,
+		const std::map<Variable, RealAlgebraicNumberPtr<Number>>& m,
 		const ExactInterval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
 	assert(m.count(p.mainVar()) == 0);
 	
 	if (p.isZero()) {
-		return { new RealAlgebraicNumberNR<Number>(interval.sample(), true) };
+		return { RealAlgebraicNumberNR<Number>::create(interval.sample(), true) };
 	}
 	if (p.isConstant()) {
 		return {};
 	}
 	
 	UnivariatePolynomial<Coeff> tmp(p);
-	std::map<Variable, RealAlgebraicNumberIR<Number>*> IRmap;
+	std::map<Variable, RealAlgebraicNumberIRPtr<Number>> IRmap;
 	
 	for (Variable v: tmp.gatherVariables()) {
 		if (v == p.mainVar()) continue;
@@ -38,7 +38,7 @@ std::list<RealAlgebraicNumber<Number>*> realRoots(
 		if (m.at(v)->isNumeric()) {
 			tmp.substituteIn(v, Coeff(m.at(v)->value()));
 		} else {
-			IRmap[v] = static_cast<RealAlgebraicNumberIR<Number>*>(m.at(v));
+			IRmap[v] = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(m.at(v));
 		}
 	}
 	if (IRmap.size() == 0) {
@@ -49,14 +49,14 @@ std::list<RealAlgebraicNumber<Number>*> realRoots(
 }
 
 template<typename Coeff, typename Number>
-std::list<RealAlgebraicNumber<Number>*> realRoots(
+std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable> variables,
-		const std::list<RealAlgebraicNumber<Number>*> values,
+		const std::list<RealAlgebraicNumberPtr<Number>> values,
 		const ExactInterval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
-	std::map<Variable, RealAlgebraicNumber<Number>*> m;
+	std::map<Variable, RealAlgebraicNumberPtr<Number>> m;
 	
 	assert(variables.size() == values.size());
 	auto varit = variables.begin();
@@ -70,9 +70,9 @@ std::list<RealAlgebraicNumber<Number>*> realRoots(
 }
 
 template<typename Coeff, typename Number>
-std::list<RealAlgebraicNumber<Number>*> realRoots(
+std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
+		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
 		const ExactInterval<Number>& interval,
 		SplittingStrategy pivoting
 ) {

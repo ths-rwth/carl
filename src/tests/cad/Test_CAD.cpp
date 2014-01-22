@@ -47,21 +47,21 @@ protected:
 		this->c.clear();
 	}
 
-	bool hasNRValue(const carl::RealAlgebraicNumber<cln::cl_RA>* n, cln::cl_RA val) {
+	bool hasNRValue(const carl::RealAlgebraicNumberPtr<cln::cl_RA> n, cln::cl_RA val) {
 		if (n->isNumeric()) return n->value() == val;
 		return false;
 	}
-	bool hasValue(const carl::RealAlgebraicNumber<cln::cl_RA>* n, cln::cl_RA val) {
+	bool hasValue(const carl::RealAlgebraicNumberPtr<cln::cl_RA> n, cln::cl_RA val) {
 		if (n->isNumeric()) return n->value() == val;
 		else {
-			const carl::RealAlgebraicNumberIR<cln::cl_RA>* ir = static_cast<const carl::RealAlgebraicNumberIR<cln::cl_RA>*>(n);
+			carl::RealAlgebraicNumberIRPtr<cln::cl_RA> ir = std::static_pointer_cast<carl::RealAlgebraicNumberIR<cln::cl_RA>>(n);
 			return ir->getInterval().contains(val);
 		}
 	}
-	bool hasSqrtValue(const carl::RealAlgebraicNumber<cln::cl_RA>* n, cln::cl_RA val) {
+	bool hasSqrtValue(const carl::RealAlgebraicNumberPtr<cln::cl_RA> n, cln::cl_RA val) {
 		if (n->isNumeric()) return n->value() * n->value() == val;
 		else {
-			const carl::RealAlgebraicNumberIR<cln::cl_RA>* ir = static_cast<const carl::RealAlgebraicNumberIR<cln::cl_RA>*>(n);
+			carl::RealAlgebraicNumberIRPtr<cln::cl_RA> ir = std::static_pointer_cast<carl::RealAlgebraicNumberIR<cln::cl_RA>>(n);
 			return (ir->getInterval() * ir->getInterval()).contains(val);
 		}
 	}

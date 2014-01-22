@@ -14,16 +14,6 @@
 namespace carl {
 
 template<typename Number>
-RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR() :
-		RealAlgebraicNumber<Number>(true, true, 0),
-		polynomial(),
-		interval(),
-		sturmSequence(this->polynomial.standardSturmSequence()),
-		refinementCount( 0 )
-{
-}
-
-template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(var),
@@ -76,14 +66,14 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::equal(const RealAlgebraicNumberIR<Number>* n) const {
-	if (this == n) return true;
+bool RealAlgebraicNumberIR<Number>::equal(const RealAlgebraicNumberIRPtr<Number> n) const {
+	if (this == n.get()) return true;
 	if (this->isZero() && n->isZero()) return true;
 	return this->getInterval() == n->getInterval();
 }
 
 template<typename Number>
-std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumberIR<Number>* n) {
+std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumberIRPtr<Number> n) {
 	if (this->isNumeric()) {
 		if (n->isNumeric()) {
 			return std::make_pair(true, this->value() < n->value());
@@ -122,7 +112,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumb
 }
 
 template<typename Number>
-std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebraicNumberIR<Number>* n, bool twisted) {
+std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebraicNumberIRPtr<Number> n, bool twisted) {
 	if (this->getInterval().contains(n->getInterval())) {
 		if (this->getPolynomial().isRoot(n->left())) {
 			this->mValue = n->left();
@@ -154,7 +144,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebr
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIR<Number>* n, const ExactInterval<Number> i) {
+bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<Number> n, const ExactInterval<Number> i) {
 	// Proceed only if this.left < n2.left and this.right < n2.right
 	if ((this->left() < n->right()) && (this->left() < n->right())) {
 		assert( i.left() == n->left() && i.right() == this->right());
@@ -192,7 +182,7 @@ bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIR<Numb
 
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Number>* n) {
+bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIRPtr<Number> n) {
 	assert(!this->equal(n));
 	if (this->isNumeric() && n->isNumeric()) {
 		return this->value() < n->value();
@@ -220,7 +210,7 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Numbe
 		CHECK_ORDER();
 		
 		// case: is mInterval contained in o.mInterval?
-		INTERVAL_CONTAINED( n, this, true );
+		INTERVAL_CONTAINED( n, this->thisPtr(), true );
 		
 		CHECK_ORDER();
 		n->refine();
@@ -236,7 +226,7 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Numbe
 		// situation normal (not executed if situation is twisted)
 		if (this->checkIntersection(n, intersection)) return true;
 		// situation twisted
-		if (n->checkIntersection(this, intersection)) return false;
+		if (n->checkIntersection(this->thisPtr(), intersection)) return false;
 		
 		n->refine();
 		CHECK_ORDER();

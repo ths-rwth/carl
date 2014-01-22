@@ -12,6 +12,7 @@
 
 #include <atomic>
 #include <list>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -23,6 +24,7 @@
 #include "../interval/ExactInterval.h"
 #include "../util/tree.h"
 
+#include "CADTypes.h"
 #include "CADSettings.h"
 #include "ConflictGraph.h"
 #include "Constraint.h"
@@ -49,13 +51,13 @@ private:
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
-	carl::tree<RealAlgebraicNumber<Number>*> sampleTree;
+	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
 	
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 * These samples are not considered for satisfiability checking already, but are postponed.
 	 */
-	carl::tree<RealAlgebraicNumber<Number>*> residueSampleTree;
+	carl::tree<RealAlgebraicNumberPtr<Number>> residueSampleTree;
 	
 	/**
 	 * The trace of the last construction phase or empty.
@@ -145,7 +147,7 @@ public:
 	 */
 	CAD(const std::list<const UPolynomial*>& s, const std::vector<Variable>& v, const std::vector<std::atomic_bool*>& c, const cad::CADSettings& setting = cad::CADSettings::getSettings());
 
-	/*
+	/**
 	 * Copy constructor.
 	 */
 	CAD(const CAD& cad);
@@ -501,9 +503,9 @@ public:
 	 * @complexity linear in <code>roots.size()</code>
 	 */
 	static cad::SampleSet<Number> samples(
-			const std::list<RealAlgebraicNumber<Number>*>& roots,
+			const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 			cad::SampleSet<Number>& currentSamples,
-			std::forward_list<RealAlgebraicNumber<Number>*>& replacedSamples,
+			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 			const ExactInterval<Number>& bounds = ExactInterval<Number>::unboundedExactInterval()
 	);
 
@@ -521,10 +523,10 @@ public:
 	*/
 	static cad::SampleSet<Number> samples(
 			const UPolynomial* p,
-			const std::list<RealAlgebraicNumber<Number>*>& sample,
+			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 			const std::list<Variable>& variables,
 			cad::SampleSet<Number>& currentSamples,
-			std::forward_list<RealAlgebraicNumber<Number>*>& replacedSamples,
+			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 			const ExactInterval<Number>& bounds = ExactInterval<Number>::unboundedInterval(),
 			cad::CADSettings settings = cad::CADSettings::getSettings()
 	);
@@ -577,7 +579,7 @@ private:
 	 * @param root of the sample tree
 	 * @return RealAlgebraicPoint as list belonging to leaf
 	 */
-	std::list<RealAlgebraicNumber<Number>*> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
+	std::list<RealAlgebraicNumberPtr<Number>> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
 
 	CADTrace constructTraceAt(sampleIterator node, const sampleIterator& root ) const;
 	
@@ -654,7 +656,7 @@ public:
      * @param newSample
      * @param node
      */
-	sampleIterator storeSampleInTree(RealAlgebraicNumber<Number>* newSample, sampleIterator node);
+	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
 	/**
 	 * Constructs sample points for the given number of open variables openVariableCount by lifting
@@ -684,7 +686,7 @@ public:
 	 */
 	bool liftCheck(
 			sampleIterator node,
-			const std::list<RealAlgebraicNumber<Number>*>& sample,
+			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 			unsigned openVariableCount,
 			bool restartLifting,
 			const std::list<Variable>& variables,
@@ -715,7 +717,7 @@ public:
 	 * @param sample
 	 * @return a bounding Interval for sample at parent's children
 	 */
-	ExactInterval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumber<Number>* sample) const;
+	ExactInterval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const;
 
 	/** CURRENTLY DISABLED
 	 *

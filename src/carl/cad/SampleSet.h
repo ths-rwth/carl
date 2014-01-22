@@ -20,28 +20,28 @@ template<typename Number>
 class SampleSet {
 	
 private:
-	std::list<RealAlgebraicNumber<Number>*> samples;
+	std::list<RealAlgebraicNumberPtr<Number>> samples;
 
 	/// Queue containing all samples in the order of their insertion
-	std::list<RealAlgebraicNumber<Number>*> queue;
+	std::list<RealAlgebraicNumberPtr<Number>> queue;
 	
 	/// Queue containing all samples in numerical representation in the order of their insertion
-	std::list<RealAlgebraicNumberNR<Number>*> NRqueue;
+	std::list<RealAlgebraicNumberNRPtr<Number>> NRqueue;
 	
 	/// Queue containing all samples in interval representation in the order of their insertion
-	std::list<RealAlgebraicNumberIR<Number>*> IRqueue;
+	std::list<RealAlgebraicNumberIRPtr<Number>> IRqueue;
 
 	/// Queue containing all non-root samples in the order of their insertion
-	std::list<RealAlgebraicNumber<Number>*> nonRootQueue;
+	std::list<RealAlgebraicNumberPtr<Number>> nonRootQueue;
 	
 	/// Queue containing all root samples in the order of their insertion
-	std::list<RealAlgebraicNumber<Number>*> rootQueue;
+	std::list<RealAlgebraicNumberPtr<Number>> rootQueue;
 	
 public:
-	typedef typename std::list<RealAlgebraicNumber<Number>*>::iterator iterator;
-	typedef typename std::list<RealAlgebraicNumberIR<Number>*>::iterator iteratorIR;
-	typedef typename std::list<RealAlgebraicNumberNR<Number>*>::iterator iteratorNR;
-	typedef std::unordered_map<RealAlgebraicNumberIR<Number>*, RealAlgebraicNumberNR<Number>*> SampleSimplification;
+	typedef typename std::list<RealAlgebraicNumberPtr<Number>>::iterator iterator;
+	typedef typename std::list<RealAlgebraicNumberIRPtr<Number>>::iterator iteratorIR;
+	typedef typename std::list<RealAlgebraicNumberNRPtr<Number>>::iterator iteratorNR;
+	typedef std::unordered_map<RealAlgebraicNumberIRPtr<Number>, RealAlgebraicNumberNRPtr<Number>> SampleSimplification;
 
 	SampleSet() {}
 	template<typename InputIterator>
@@ -57,7 +57,7 @@ public:
 	 * If a numeric representation is inserted, the method replaces a possibly existing interval representation.
 	 * @complexity at most logarithmic in the size of the list
 	 */
-	std::pair<iterator, bool> insert(RealAlgebraicNumber<Number>* r);
+	std::pair<iterator, bool> insert(RealAlgebraicNumberPtr<Number> r);
 	
 	/**
 	 * Inserts a range of elements into the sorted list.
@@ -107,7 +107,7 @@ public:
 	 *
 	 * @return next sample in the order of insertion
 	 */
-	inline RealAlgebraicNumber<Number>* next();
+	inline RealAlgebraicNumberPtr<Number> next();
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the numerically represented samples.
@@ -116,21 +116,21 @@ public:
 	 *
 	 * @return next sample in the order of insertion, preferring the numerically represented samples
 	 */
-	inline RealAlgebraicNumber<Number>* nextNR();
+	inline RealAlgebraicNumberPtr<Number> nextNR();
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the non-root samples.
 	 *
 	 * @return next sample in the order of insertion, preferring the non-root samples
 	 */
-	inline RealAlgebraicNumber<Number>* nextNonRoot();
+	inline RealAlgebraicNumberPtr<Number> nextNonRoot();
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the non-root samples.
 	 *
 	 * @return next sample in the order of insertion, preferring the non-root samples
 	 */
-	inline RealAlgebraicNumber<Number>* nextRoot();
+	inline RealAlgebraicNumberPtr<Number> nextRoot();
 	
 	/**
 	 * Removes the element returned by next() from the list.
@@ -164,7 +164,7 @@ public:
 	 * @return true if the element was replaced, false otherwise
 	 * @complexity logarithmic in the elements stored
 	 */
-	bool simplify(const RealAlgebraicNumberIR<Number>* from, RealAlgebraicNumberNR<Number>* to);
+	bool simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to);
 	
 	/**
 	 * Replaces the interval-represented element from, whose iterator in mNRsIRs is given by fromIt, by the numeric element to while maintaining the internal data structures.
@@ -175,7 +175,7 @@ public:
 	 * @return true if the element was replaced, false otherwise
 	 * @complexity logarithmic in the elements stored
 	 */
-	bool simplify(const RealAlgebraicNumberIR<Number>* from, RealAlgebraicNumberNR<Number>* to, iteratorIR& fromIt);
+	bool simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to, iteratorIR& fromIt);
 	
 	/**
 	 * Traverse all interval-represented samples and determine whether they could be simplified by numeric representations.
@@ -190,7 +190,7 @@ public:
 	 * Determines containment of r in the list.
 	 * @return true if r is contained in the list, false otherwise
 	 */
-	bool contains(const RealAlgebraicNumber<Number>* r) const;
+	bool contains(const RealAlgebraicNumberPtr<Number> r) const;
 
 	bool empty() const {
 		return this->samples.empty();
@@ -241,11 +241,11 @@ private:
 	// AUXILIARY METHODS //
 	///////////////////////
 	
-	void removeFromNonrootRoot(const RealAlgebraicNumber<Number>* r);
+	void removeFromNonrootRoot(const RealAlgebraicNumberPtr<Number> r);
 	
-	void removeFromQueue(const RealAlgebraicNumber<Number>* r);
+	void removeFromQueue(const RealAlgebraicNumberPtr<Number> r);
 	
-	void removeFromNRIR(const RealAlgebraicNumber<Number>* r);
+	void removeFromNRIR(const RealAlgebraicNumberPtr<Number> r);
 	
 };
 

@@ -63,7 +63,7 @@ class RootFinder {
 public:
 	virtual const UnivariatePolynomial<Number>& getPolynomial() const = 0;
 	virtual void addQueue(const ExactInterval<Number>& interval, SplittingStrategy strategy) = 0;
-	virtual void addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial = true) = 0;
+	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) = 0;
 	virtual void addRoot(const ExactInterval<Number>& interval) = 0;
 };
 
@@ -137,7 +137,7 @@ private:
 	/*!
 	 * Iterator pointing to the next root within the root list that should be returned.
 	 */
-	typename std::list<RealAlgebraicNumber<Number>*>::iterator nextRoot;
+	typename std::list<RealAlgebraicNumberPtr<Number>>::iterator nextRoot;
 	
 public:
 	
@@ -160,7 +160,7 @@ public:
 	 * If all roots have already been found, a nullptr will be returned.
 	 * @return A new root, nullptr if all roots have been found.
 	 */
-	RealAlgebraicNumber<Number>* next();
+	RealAlgebraicNumberPtr<Number> next();
 	
 	/**
 	 * Adds a new item to the internal interval queue.
@@ -174,7 +174,7 @@ public:
 	
 protected:
 	
-	virtual void addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial = true) {
+	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) {
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 	}
