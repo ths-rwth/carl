@@ -1,12 +1,9 @@
 /* 
  * File:   RealAlgebraicNumberNR.h
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
- * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
 #include "RealAlgebraicNumber.h"
-
 
 #pragma once
 

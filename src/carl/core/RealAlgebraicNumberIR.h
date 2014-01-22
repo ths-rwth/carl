@@ -1,11 +1,11 @@
 /* 
  * File:   RealAlgebraicNumberIR.h
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
- * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
 #pragma once
+
+#include "RealAlgebraicNumber.h"
 
 #include "UnivariatePolynomial.h"
 #include "../interval/ExactInterval.h"
