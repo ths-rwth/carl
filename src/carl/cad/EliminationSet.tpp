@@ -40,7 +40,6 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
-	LOGMSG_TRACE("carl.cad", "Adding " << *r << " to eliminationset.");
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
 
@@ -517,7 +516,6 @@ void EliminationSet<Coefficient>::makePrimitive() {
 		
 		primitiveSet.insert(p->pseudoPrimpart(), this->getParentsOf(p));
 	}
-	
 	std::swap(*this, primitiveSet);
 }
 
@@ -538,11 +536,13 @@ void EliminationSet<Coefficient>::factorize() {
 
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff>& s) {
-	os << "{ ";
-	for (auto p: s.polynomials) os << *p << " ";
-	os << "}( ";
-	for (auto i: s.mLiftingQueue) os << *i << " ";
-	os << ")";
+	os << "{ Polynomials ";
+	for (auto p: s.polynomials) os << "[" << *p << "] ";
+	os << "}{ Single ";
+	for (auto p: s.mSingleEliminationQueue) os << "[" << *p << "] ";
+	os << "}{ Paired ";
+	for (auto p: s.mPairedEliminationQueue) os << "[" << *p << "] ";
+	os << "}";
 	return os;
 }
 
