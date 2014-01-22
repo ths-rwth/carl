@@ -13,6 +13,7 @@
 #include "../interval/IntervalEvaluation.h"
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumber.h"
+#include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicPoint.h"
 
 namespace carl {
@@ -109,7 +110,6 @@ RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, Real
 			IRs[variables[i]] = static_cast<RealAlgebraicNumberIR<Number>*>(point[i]);
 		}
 	}
-	LOGMSG_TRACE("carl.core", p << " at " << point << " = " << pol);
 	if (pol.isNumber()) {
 		return new RealAlgebraicNumberNR<Number>(pol.constantPart());
 	}
@@ -147,15 +147,19 @@ RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, RANM
  */
 template<typename Number, typename Coeff>
 RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
-	if (m.size() == 1 && m.begin()->second->sgn(p.toNumberCoefficients()) == Sign::ZERO) {
-		return new RealAlgebraicNumberIR<Number>(p.mainVar());
+	assert(m.size() > 0);
+	auto poly = p.switchVariable(m.begin()->first);
+	if (m.size() == 1 && m.begin()->second->sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
+		return new RealAlgebraicNumberIR<Number>(poly.mainVar());
 	}
 	Variable v = VariablePool::getInstance().getFreshVariable();
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, ExactInterval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<Coeff>(v, {-Coeff(p), Coeff(1)}), m, varToInterval);
-	ExactInterval<Number> interval = IntervalEvaluation::evaluate(p, varToInterval);
-	
+	ExactInterval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+
+	// the interval should include at least one root.
+	assert(res.countRealRoots(interval) >= 1);
 	while (
 		res.sgn(interval.left()) == Sign::ZERO ||
 		res.sgn(interval.right()) == Sign::ZERO ||
@@ -165,7 +169,7 @@ RealAlgebraicNumber<Number>* evaluate(const UnivariatePolynomial<Coeff>& p, cons
 			it.second->refine();
 			varToInterval[it.first] = it.second->getInterval();
 		}
-		interval = IntervalEvaluation::evaluate(p, varToInterval);
+		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
 	return new RealAlgebraicNumberIR<Number>(res, interval);
 }
