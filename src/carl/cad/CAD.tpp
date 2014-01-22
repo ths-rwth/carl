@@ -1,6 +1,7 @@
-/* 
- * File:   CAD.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file CAD.tpp
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once

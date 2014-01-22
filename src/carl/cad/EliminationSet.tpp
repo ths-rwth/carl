@@ -1,4 +1,5 @@
-
+/**
+ */
 #include "EliminationSet.h"
 
 namespace carl {

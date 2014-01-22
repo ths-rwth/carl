@@ -1,6 +1,7 @@
-/* 
- * File:   SampleSet.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file SampleSet.h
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once

@@ -1,6 +1,7 @@
-/* 
- * File:   ConflictGraph.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file ConflictGraph.h
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once

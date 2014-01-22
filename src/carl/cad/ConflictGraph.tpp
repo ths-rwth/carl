@@ -1,6 +1,7 @@
-/* 
- * File:   ConflictGraph.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file ConflictGraph.tpp
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #include "ConflictGraph.h"

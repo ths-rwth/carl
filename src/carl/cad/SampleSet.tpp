@@ -1,6 +1,7 @@
-/* 
- * File:   SampleSet.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file SampleSet.tpp
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once

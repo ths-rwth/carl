@@ -1,5 +1,6 @@
-/*
- * @file   EliminationSet.h
+/**
+ * @file EliminationSet.h
+ * @ingroup cad
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 

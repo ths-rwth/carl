@@ -1,5 +1,6 @@
-/* 
+/**
  * @file CADTypes.h
+ * @ingroup cad
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
