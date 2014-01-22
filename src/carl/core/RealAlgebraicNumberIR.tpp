@@ -9,6 +9,7 @@
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumber.h"
+#include "rootfinder/RootFinder.h"
 
 namespace carl {
 
@@ -59,6 +60,7 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		this->interval.setLeft(ExactInterval<Number>(this->interval.left(), this->value(), BoundType::STRICT).sample());
 		this->interval.setRight(ExactInterval<Number>(this->value(), this->interval.right(), BoundType::STRICT).sample());
 	}
+	assert(p.countRealRoots(i) == 1);
 }
 
 template<typename Number>
@@ -412,7 +414,8 @@ Sign RealAlgebraicNumberIR<Number>::sgn() const {
 
 template<typename Number>
 Sign RealAlgebraicNumberIR<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
-	int variations = (this->polynomial.derivative() * p).countRealRoots(this->interval);
+	auto seq = this->polynomial.standardSturmSequence(this->polynomial.derivative() * p);
+	int variations = UnivariatePolynomial<Number>::countRealRoots(seq, this->interval);
 	assert((variations == -1) || (variations == 0) || (variations == 1));
 	switch (variations) {
 		case -1: return Sign::NEGATIVE;
