@@ -199,6 +199,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
+	if (this->degree() < divisor.degree()) return *this;
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
 	if(is_field<Coeff>::value && divisor.isConstant())
