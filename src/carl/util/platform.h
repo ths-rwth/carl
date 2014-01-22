@@ -44,4 +44,4 @@
  * @param colors Flag is coloring shall be enabled.
  * @return os.
  */
-std::ostream& printStacktrace(std::ostream& os, bool colors = true);
+std::ostream& printStacktrace(std::ostream& os = std::cerr, bool colors = true);
