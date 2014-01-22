@@ -155,7 +155,7 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolyn
 	ExactInterval<Numeric> res = ExactInterval<Numeric>::emptyExactInterval();
 	const ExactInterval<Numeric> varValue = map.at(p.mainVar());
 	ExactInterval<Numeric> exp(1);
-	for (unsigned i = 0; i < p.degree(); i++) {
+	for (unsigned i = 0; i <= p.degree(); i++) {
 		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
 		exp *= varValue;
 	}
