@@ -234,7 +234,7 @@ bool CAD<Number>::prepareElimination() {
 		
 		// (1)
 		/// @todo make this more efficient
-		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this->setting.order, this->setting.order));
+		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this, this->setting.order, this->setting.order));
 		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
 		}
@@ -288,14 +288,14 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
 			if (b.second.leftType() != BoundType::INFTY) {
-				tmp.push_back(new UPolynomial(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)}));
+				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
-				tmp.push_back(new UPolynomial(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)}));
+				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -543,14 +543,14 @@ bool CAD<Number>::check(
 				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
-				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
+				boundPolynomials[b.first].first = this->take(new UPolynomial(tmp.back()));
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.right())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
-				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
+				boundPolynomials[b.first].first = this->take(new UPolynomial(tmp.back()));
 			}
 			
 			// eliminate bound-related polynomials only
@@ -559,7 +559,7 @@ bool CAD<Number>::check(
 			while (!tmp.empty() && l < this->variables.size()) {
 				std::list<UPolynomial> tmp2;
 				for (auto p: tmp) {
-					auto res = this->eliminationSets[l-1].eliminateInto(new UPolynomial(p), this->eliminationSets[l], this->variables[l], this->setting);
+					auto res = this->eliminationSets[l-1].eliminateInto(this->take(new UPolynomial(p)), this->eliminationSets[l], this->variables[l], this->setting);
 					tmp2.insert(tmp2.begin(), tmp.begin(), tmp.end());
 				}
 				std::swap(tmp, tmp2);
@@ -652,7 +652,7 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 			}
 		}
 		// schedule the polynomial for the next elimination
-		this->scheduledPolynomials.push_back(up);
+		this->scheduledPolynomials.push_back(this->take(up));
 		nothingAdded = false;
 	}
 	
@@ -695,7 +695,9 @@ void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
 	// determine the level of the polynomial (first level from the top) and remove the respective pointer from it
 	for (unsigned level = 0; level < this->eliminationSets.size(); level++) {
 		// transform the polynomial according to possible optimizations in order to recognize its real shape in the elimination set
-		auto p = this->eliminationSets[level].find(new UPolynomial(polynomial.pseudoPrimpart()));
+		auto tmp = new UPolynomial(polynomial.pseudoPrimpart());
+		auto p = this->eliminationSets[level].find(tmp);
+		delete tmp;
 		if (p != nullptr) {
 			this->removePolynomial(p, level);
 			return;
