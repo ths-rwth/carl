@@ -234,8 +234,21 @@ public:
 		return mMainVar;
 	}
 
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar).toNumberCoefficients();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
+	}
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+		return UnivariatePolynomial<Coefficient>(newVar, this->mCoefficients);
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+		return MultivariatePolynomial<NumberType>(*this).substitute(this->mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
