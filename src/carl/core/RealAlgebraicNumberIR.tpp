@@ -66,10 +66,41 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::equal(const RealAlgebraicNumberIRPtr<Number> n) const {
+RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebraicNumberIRPtr<Number>& n) {
+	if (this->isZero() || n->isZero()) return n;
+
+	Variable va = this->getPolynomial().mainVar();
+	Variable vb = n->getPolynomial().mainVar();
+	Variable y = VariablePool::getInstance().getFreshVariable();
+
+	MultivariatePolynomial<Number> tmp1(this->getPolynomial());
+	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(vb)}));
+	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
+	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).toNumberCoefficients());
+	
+	UnivariatePolynomial<typename IntegralT<Number>::type> ptmp = res.switchVariable(va).toIntegerDomain().primitivePart();
+	auto p = ptmp.template convert<Number>();
+	
+	auto seq = p.standardSturmSequence();
+
+	ExactInterval<Number> i = this->getInterval() + n->getInterval();
+	while (p.isRoot(i.left()) || p.isRoot(i.right()) ||
+		UnivariatePolynomial<Number>::countRealRoots(seq, i) > 0) {
+		this->refine();
+		n->refine();
+		i = this->getInterval() + n->getInterval();
+	}
+	return RealAlgebraicNumberIR<Number>::create(p, i, seq);
+}
+
+template<typename Number>
+bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number> n) {
 	if (this == n.get()) return true;
+	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
-	return this->getInterval() == n->getInterval();
+	if (this->right() <= n->left()) return false;
+	if (this->left() >= n->right()) return false;
+	return this->add(n)->isZero();
 }
 
 template<typename Number>
