@@ -85,7 +85,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("-- Using g++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ldl")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ldl") 
 else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
@@ -202,6 +202,8 @@ if(COMPARE_WITH_GINAC)
 	set(libraries ${libraries} ${GINAC_LIBRARY} )
 endif()
 
+#dl must be linked LAST as this is required for the stacktrace in util/platform.h
+set(libraries ${libraries} dl)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files
