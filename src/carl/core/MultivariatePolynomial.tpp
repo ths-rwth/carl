@@ -73,16 +73,24 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p) :
 Policies()
 {
-	for (unsigned deg = 0; deg < p.coefficients().size(); deg++) {
+	if (p.coefficients().size() > 0) {
+		*this += p.coefficients()[0];
+	}
+	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
 		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
 	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>&) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>& p) :
 Policies()
 {
-    LOG_NOTIMPLEMENTED();
+	if (p.coefficients().size() > 0) {
+		*this += p.coefficients()[0];
+	}
+	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
+		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
+	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
