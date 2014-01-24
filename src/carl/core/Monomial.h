@@ -60,7 +60,7 @@ namespace carl
             mExponents(1, VarExpPair(v,e)),
             mTotalDegree(e)
         {
-
+			assert(e > 0);
         }
         
         Monomial(const Monomial& rhs) :

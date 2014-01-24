@@ -25,7 +25,9 @@ namespace carl
         explicit VarExpPair(Variable v, exponent e=1) :
             var(v),
             exp(e)
-        {}
+		{
+			assert(e > 0);
+		}
         
         friend bool operator==(const VarExpPair& lhs, const VarExpPair& rhs)
         {
