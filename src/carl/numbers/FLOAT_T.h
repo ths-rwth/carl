@@ -497,6 +497,81 @@ namespace carl
             {
                 return _rhs == _lhs;
             }
+		
+			/**
+			 * operations required for the usage of Eigen3
+			 */
+		
+			inline const FLOAT_T<FloatType>& ei_conj(const FLOAT_T<FloatType>& x)
+			{
+				return x;
+			}
+			
+			inline const FLOAT_T<FloatType>& ei_real(const FLOAT_T<FloatType>& x)
+			{
+				return x;
+			}
+			
+			inline FLOAT_T<FloatType> ei_imag(const FLOAT_T<FloatType>&)
+			{
+				return FLOAT_T<FloatType>(0);
+			}
+		
+			inline FLOAT_T<FloatType> ei_abs(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.abs(res);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_abs2(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.mul(res, x);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_sqrt(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.sqrt(res);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_exp(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.exp(res);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_log(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.log(res);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_sin(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.sin(res);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_cos(const FLOAT_T<FloatType>& x)
+			{
+				FLOAT_T<FloatType> res;
+				x.cos(res);
+				return res;
+			}
+		
+			inline FLOAT_T<FloatType> ei_pow(const FLOAT_T<FloatType>& x, FLOAT_T<FloatType> y)
+			{
+				FLOAT_T<FloatType> res;
+				x.pow(res, unsigned(y));
+				return res;
+			}
             
             /**
              * Operators

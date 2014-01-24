@@ -78,10 +78,10 @@ public:
 	 * @param bool overapproximate
 	 */
 	template<typename Rational>
-	DoubleInterval(const Rational& n, bool overapproximate = false);
+	explicit DoubleInterval(const Rational& n, bool overapproximate = false);
 
 	template<typename Rational>
-	DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft = false, bool overapproxright = false);
+	explicit DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft = false, bool overapproxright = false);
 
 	/** Creates closed DoubleInterval
 	 * @param _content

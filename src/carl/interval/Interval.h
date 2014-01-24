@@ -890,6 +890,14 @@ namespace carl
 		Interval<Number> intersect(const Interval<Number>& rhs) const;
 		Interval<Number>& intersect_assign(const Interval<Number>& rhs);
 		
+		/***********************************************************************
+         * Comparison functions
+         **********************************************************************/
+		
+		Interval<Number> max(const Interval<Number>& rhs) const;
+		void max_assign(const Interval<Number>& rhs);
+		Interval<Number> min(const Interval<Number>& rhs) const;
+		void min_assign(const Interval<Number>& rhs)
     };
 	
 	/***************************************************************************

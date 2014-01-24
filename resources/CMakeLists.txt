@@ -130,14 +130,13 @@ if(OBTAIN_BOOST)
 )
 
 
-if( NOT WIN32 )
-  set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/build/resources/src/boost/stage/lib )
-  set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/build/resources/src/boost/ )
-else()
-  set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/resources/boost/lib/ )
-  set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/resources/boost/include/ )
-endif()
+  if( NOT WIN32 )
+    set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/build/resources/src/boost/stage/lib )
+    set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/build/resources/src/boost/ )
+  else()
+    set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/resources/boost/lib/ )
+    set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/resources/boost/include/ )
+  endif()
 
-add_dependencies(resources boost)
-
+  add_dependencies(resources boost)
 endif()
