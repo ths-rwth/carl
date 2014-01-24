@@ -17,13 +17,13 @@ TEST(IntervalEvaluation, Monomial)
     DoubleInterval::evaldoubleintervalmap map;
     VariablePool& vpool = VariablePool::getInstance();
     Variable a = vpool.getFreshVariable();
-    vpool.setVariableName(a, "a");
+    vpool.setName(a, "a");
     Variable b = vpool.getFreshVariable();
-    vpool.setVariableName(b, "b");
+    vpool.setName(b, "b");
     Variable c = vpool.getFreshVariable();
-    vpool.setVariableName(c, "c");
+    vpool.setName(c, "c");
     Variable d = vpool.getFreshVariable();
-    vpool.setVariableName(d, "d");
+    vpool.setName(d, "d");
     
     map[a] = ia;
     map[b] = ib;

@@ -18,9 +18,9 @@ TEST(GB_Buchberger, T1)
 {  
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
 //    Variable z = vpool.getFreshVariable();
     
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x, (cln::cl_RA)-2*x*y} );
@@ -53,9 +53,9 @@ TEST(GB_Buchberger, T1_ReasonSets)
 {  
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
 //    Variable z = vpool.getFreshVariable();
     
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x, (cln::cl_RA)-2*x*y} );

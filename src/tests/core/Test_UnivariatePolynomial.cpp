@@ -16,20 +16,30 @@ TEST(UnivariatePolynomial, Constructor)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     UnivariatePolynomial<cln::cl_RA> pol(x, {(cln::cl_RA)0, (cln::cl_RA)2});
  
+}
+
+TEST(UnivariatePolynomial, toInteger)
+{
+	VariablePool& vpool = VariablePool::getInstance();
+	Variable x = vpool.getFreshVariable();
+	vpool.setName(x, "x");
+	UnivariatePolynomial<cln::cl_RA> pRA(x, {(cln::cl_RA)0, (cln::cl_RA)2});
+	UnivariatePolynomial<cln::cl_I> pI(x, {(cln::cl_I)0, (cln::cl_I)2});
+	EXPECT_EQ(pI, pRA.toIntegerDomain());
 }
 
 TEST(UnivariatePolynomial, Reduction)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 
 	{
 		UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)1,(cln::cl_RA)0, (cln::cl_RA)0,(cln::cl_RA)1});
@@ -51,10 +61,10 @@ TEST(UnivariatePolynomial, Divide)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
     UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)-6, (cln::cl_RA)-5,(cln::cl_RA)1});
-    DivisionResult<UnivariatePolynomial<cln::cl_RA>> d = p.divide(p);
+    DivisionResult<UnivariatePolynomial<cln::cl_RA>> d = p.divideBy(p);
 //    std::cout << d.quotient << std::endl;
 //    std::cout << d.remainder << std::endl;
 }
@@ -63,10 +73,10 @@ TEST(UnivariatePolynomial, DivideInteger)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     UnivariatePolynomial<cln::cl_I> p(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)5});
     UnivariatePolynomial<cln::cl_I> q(x, {(cln::cl_I)0, (cln::cl_I)0,(cln::cl_I)3});
-    DivisionResult<UnivariatePolynomial<cln::cl_I>> d = p.divide(q);
+    DivisionResult<UnivariatePolynomial<cln::cl_I>> d = p.divideBy(q);
     std::cout << d.quotient << std::endl;
     std::cout << d.remainder << std::endl;
 }
@@ -75,7 +85,7 @@ TEST(UnivariatePolynomial, GCD)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 	UnivariatePolynomial<cln::cl_RA> s(x);
     UnivariatePolynomial<cln::cl_RA> t(x);
     
@@ -130,7 +140,7 @@ TEST(UnivariatePolynomial, cauchyBounds)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
 
     
     UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)6, (cln::cl_RA)7,(cln::cl_RA)1});
@@ -142,11 +152,11 @@ TEST(UnivariatePolynomial, toFiniteDomain)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     
     UnivariatePolynomial<mpz_class> pol(x, {(mpz_class)1, (mpz_class)2});
     const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
@@ -161,11 +171,11 @@ TEST(UnivariatePolynomial, normalizeCoefficients)
 {
 	VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     Variable y = vpool.getFreshVariable();
-    vpool.setVariableName(y, "y");
+    vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     
 	UnivariatePolynomial<mpz_class> pol(x, {(mpz_class)1, (mpz_class)2});
     const GaloisField<mpz_class>* gf5 = new GaloisField<mpz_class>(5);
@@ -179,7 +189,7 @@ TEST(UnivariatePolynomial, factorization)
 {
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
-    vpool.setVariableName(x, "x");
+    vpool.setName(x, "x");
     
     UnivariatePolynomial<cln::cl_RA> linA(x, {(cln::cl_RA)-2, (cln::cl_RA)5});
     UnivariatePolynomial<cln::cl_RA> linB(x, {(cln::cl_RA)1, (cln::cl_RA)3});
@@ -305,10 +315,65 @@ TEST(UnivariatePolynomial, numericContent)
 	EXPECT_EQ(UnivariatePolynomial<cln::cl_RA>(x, {-15,-27,-3}).numericContent(), 3);
 }
 
+TEST(UnivariatePolynomial, unitPart)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {1,2,3}).unitPart());
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {15,27,3}).unitPart());
+	EXPECT_EQ(-1,UnivariatePolynomial<cln::cl_I>(x, {-1,-2,-3}).unitPart());
+	EXPECT_EQ(-1,UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).unitPart());
+}
+
+TEST(UnivariatePolynomial, content)
+{
+    Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {1,2,3}).normalized().content());
+	EXPECT_EQ(3,UnivariatePolynomial<cln::cl_I>(x, {15,27,3}).normalized().content());
+	EXPECT_EQ(1,UnivariatePolynomial<cln::cl_I>(x, {-1,-2,-3}).normalized().content());
+	EXPECT_EQ(3,UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).normalized().content());
+}
+
+
+TEST(UnivariatePolynomial, primitivePart)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {1,2,3}),UnivariatePolynomial<cln::cl_I>(x, {1,2,3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {5,9,1}),UnivariatePolynomial<cln::cl_I>(x, {15,27,3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {1,2,3}),UnivariatePolynomial<cln::cl_I>(x, {-1,-2,-3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {5,9,1}),UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
+}
+
 TEST(UnivariatePolynomial, pseudoRem)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
 	
 	
+}
+
+TEST(UnivariatePolynomial, resultant)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable("x");
+	Variable y = VariablePool::getInstance().getFreshVariable("y");
+	
+	// p1 = x - y
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p1(x, {MultivariatePolynomial<cln::cl_RA>(-Term<cln::cl_RA>(y)), MultivariatePolynomial<cln::cl_RA>(1)});
+	// p2 = x^2 + y^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p2(x, {MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
+	// p3 = x^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p3(x, {MultivariatePolynomial<cln::cl_RA>(-Term<cln::cl_RA>(1)), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
+	
+	// r1 = 2*y^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r1(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y*2, Term<cln::cl_RA>(-1)}));
+	// r2 = y^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r2(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}));
+	// r3 = y^4
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r3(x, MultivariatePolynomial<cln::cl_RA>(Term<cln::cl_RA>(y)*y*y*y));
+	
+	EXPECT_EQ(r1, p1.resultant(p2));
+	EXPECT_EQ(r1, p2.resultant(p1));
+	EXPECT_EQ(r2, p1.resultant(p3));
+	EXPECT_EQ(r2, p3.resultant(p1));
+	EXPECT_EQ(r3, p2.resultant(p3));
+	EXPECT_EQ(r3, p3.resultant(p2));
 }
 

@@ -1,5 +1,6 @@
 /**
  * @file Monomial.h 
+ * @ingroup MultiRP
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -15,6 +16,7 @@
 #include "VarExpPair.h"
 #include "VariablesInformation.h"
 #include "logging.h"
+#include "../numbers/operations.h"
 
 namespace carl
 {   
@@ -434,7 +436,7 @@ namespace carl
 		}
 		
 		/**
-		 * For a monomial \prod_i x_i^e_i with e_i != 0, returns \prod_i x_i^1.
+		 * For a monomial \\prod_i x_i^e_i with e_i != 0, returns \\prod_i x_i^1.
          * @return 
          */
 		Monomial* seperablePart() const
@@ -447,6 +449,17 @@ namespace carl
 				m->mExponents.emplace_back(ve.var, 1);
 			}
 			return m;
+		}
+
+		Monomial pow(unsigned exp) const {
+			Monomial res(*this);
+			unsigned expsum = 0;
+			for (auto it: res.mExponents) {
+				it.exp = (exponent)carl::pow(it.exp, exp);
+				expsum += it.exp;
+			}
+			res.mTotalDegree = expsum;
+			return res;
 		}
         
 		/**

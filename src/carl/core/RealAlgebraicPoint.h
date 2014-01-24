@@ -14,7 +14,7 @@ namespace carl {
 template<typename Number>
 class RealAlgebraicPoint {
 private:
-	std::vector<RealAlgebraicNumber<Number>*> numbers;
+	std::vector<RealAlgebraicNumberPtr<Number>> numbers;
 
 public:
 	/**
@@ -36,7 +36,7 @@ public:
 	 * Creates a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>*>& v):
+	RealAlgebraicPoint(const std::vector<RealAlgebraicNumberPtr<Number>>& v):
 		numbers(v)
 	{}
 
@@ -44,7 +44,15 @@ public:
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>*>& v):
+	RealAlgebraicPoint(const std::list<RealAlgebraicNumberPtr<Number>>& v):
+		numbers(v.begin(), v.end())
+	{}
+
+	/**
+	 * Creates a real algebraic point with the specified components from a list.
+	 * @param v pointers to real algebraic numbers
+	 */
+	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumberPtr<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 
@@ -63,25 +71,29 @@ public:
 	 * @param r additional dimension given as real algebraic number
 	 * @return real algebraic point with higher dimension
 	 */
-	RealAlgebraicPoint conjoin(const RealAlgebraicNumber<Number>*& r) {
+	RealAlgebraicPoint conjoin(const RealAlgebraicNumberPtr<Number>& r) {
 		RealAlgebraicPoint res = RealAlgebraicPoint(*this);
 		res.numbers.push_back(r);
 		return res;
 	}
 	
-	RealAlgebraicNumber<Number>* operator[](unsigned int index) const {
+	RealAlgebraicNumberPtr<Number> operator[](unsigned int index) const {
 		return this->numbers[index];
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
-		os << "(";
-		for (unsigned i = 0; i < r.dim(); i++) {
-			if (i > 0) os << ", ";
-			os << r.numbers[i];
-		}
-		os << ")";
-		return os;
-	}
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
 };
+
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
+	os << "(";
+	for (unsigned i = 0; i < r.dim(); i++) {
+		if (i > 0) os << ", ";
+		os << r.numbers[i];
+	}
+	os << ")";
+	return os;
+}
 
 }

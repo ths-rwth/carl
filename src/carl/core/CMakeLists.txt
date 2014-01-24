@@ -19,10 +19,11 @@ set(carl_lib_core_headers
     config.h
 ) 
 # Source files in here
-set(carl_lib_core_sources 
+set(carl_lib_core_sources
+    core/logging.cpp
+    core/Sign.cpp
     core/VariablePool.cpp
     core/Variable.cpp
-    core/logging.cpp
 PARENT_SCOPE)
 
 # Write config.h 

@@ -15,7 +15,7 @@ TEST(Ideal, Construction)
     Variable x = vpool.getFreshVariable();
     Variable y = vpool.getFreshVariable();
     Variable z = vpool.getFreshVariable();
-    vpool.setVariableName(z, "z");
+    vpool.setName(z, "z");
     Ideal<MultivariatePolynomial<cln::cl_RA>> ideal;  
     MultivariatePolynomial<cln::cl_RA> p1;
     p1 += x*x;

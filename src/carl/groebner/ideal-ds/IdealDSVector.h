@@ -26,7 +26,7 @@ public:
     IdealDatastructureVector(const std::vector<Polynomial>& generators, const std::unordered_set<size_t>& eliminated, const sortByLeadingTerm<Polynomial>& order)
     : mGenerators(generators), mEliminated(eliminated), mOrder(order)
     {
-        mDivLists.resize(VariablePool::NrVariables(), std::vector<size_t> ());
+        mDivLists.resize(VariablePool::getInstance().nrVariables(), std::vector<size_t> ());
     }
 
     IdealDatastructureVector(const IdealDatastructureVector& id)
@@ -52,7 +52,7 @@ public:
 	
     /**
      * 
-     * @param f
+     * @param t
      * @return A divisionresult [divisor, factor]. 
      * 
      */
@@ -69,7 +69,7 @@ public:
                 continue;
             }
 			
-            Term<typename Polynomial::CoeffType>* divres = t.dividedBy(*mGenerators[*it].lterm());
+            Term<typename Polynomial::CoeffType>* divres = t.divideBy(*mGenerators[*it].lterm());
 			
             //Division succeeded, so we have found a divisor;
             //To eliminate, we have to negate the factor.

@@ -11,12 +11,7 @@
 #include "UnivariatePolynomial.h"
 #include "logging.h"
 
-/**
- * Includes the algorithms 6.2 and 6.3 from the book 
- * Algorithms for Computer Algebra by Geddes, Czaper, Labahn.
- * 
- * The Algorithms are used to computer the Multivariate GCD.
- */
+
 namespace carl
 {
 
@@ -57,6 +52,7 @@ class DiophantineEquations
 		}
 		else
 		{
+			/// @todo implement
 		}
 		//Prvent warning
 		return {};
@@ -77,7 +73,7 @@ class DiophantineEquations
 		if(a.size() == 2)
 		{
 			std::vector<Polynomial> s = EEAlift(a.back(), a.front());
-			DivisionResult<Polynomial> d = (xm * s.front()).divide(a.front());
+			DivisionResult<Polynomial> d = (xm * s.front()).divideBy(a.front());
 			Polynomial q = d.quotient.normalizeCoefficients();
 			return { d.remainder.normalizeCoefficients(), (xm * s.back() + q * a.back()).normalizeCoefficients() };
 		}
@@ -162,7 +158,7 @@ class DiophantineEquations
 			c = cf.toFiniteDomain(mGf_p);
 			Polynomial sigmaprime =  smodp * c;
 			Polynomial tauprime = tmodp * c;
-			DivisionResult<Polynomial> d = sigmaprime.divide(bmodp);
+			DivisionResult<Polynomial> d = sigmaprime.divideBy(bmodp);
 			Polynomial q = d.quotient.normalizeCoefficients();
 			Polynomial sigma = d.remainder.normalizeCoefficients();
 			Polynomial tau = (tauprime + q * amodp).normalizeCoefficients();
@@ -175,9 +171,17 @@ class DiophantineEquations
 	}
 };
 
+template<typename Coeff, typename Ordering, typename Policies>
 class MultivariateHensel
 {
-	//static std::list<UnivReprPol> calculate()
+	typedef Coeff Integer;
+	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
+	
+	
+	static std::list<UnivReprPol> calculate(const UnivReprPol& a, const std::map<Variable, Coeff>& I, Integer p)
+	{
+		
+	}
 	//{}
 };
 }

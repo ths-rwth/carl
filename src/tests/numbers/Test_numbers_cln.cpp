@@ -31,3 +31,8 @@ TEST(NumbersCLN, squareroot)
     resultB.first.debug_print();
     resultB.second.debug_print();
 }
+
+TEST(NumbersCLN, quotient)
+{
+	EXPECT_EQ(-1, quotient(cln::cl_I(-6),cln::cl_I(7)));
+}

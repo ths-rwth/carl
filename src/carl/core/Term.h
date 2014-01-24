@@ -1,5 +1,6 @@
 /**
- * @file Term.h 
+ * @file Term.h
+ * @ingroup MultiRP
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -150,24 +151,24 @@ class Term
         
         /**
          * 
-         * @param a non-zero coefficient.
+         * @param c a non-zero coefficient.
          * @return 
          */
-        Term* dividedBy(const Coefficient&) const;
+        Term* divideBy(const Coefficient& c) const;
         /**
          * 
-         * @param 
+         * @param v
          * @return 
          */
-        Term* dividedBy(Variable::Arg) const;
+        Term* divideBy(Variable::Arg v) const;
         /**
          * 
-         * @param 
+         * @param m
          * @return 
          */
-        Term* dividedBy(const Monomial&) const;
+        Term* divideBy(const Monomial& m) const;
         
-        Term* dividedBy(const Term&) const;
+        Term* divideBy(const Term&) const;
 		
 		Term calcLcmAndDivideBy( const Monomial&) const;
         
@@ -236,6 +237,8 @@ class Term
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs);
+        template<typename Coeff>
+        friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs);
 		template<typename Coeff>
         friend const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>

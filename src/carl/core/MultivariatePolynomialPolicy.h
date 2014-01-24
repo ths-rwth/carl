@@ -1,5 +1,6 @@
 /**
- * @file AbstractPolynomial.h 
+ * @file MultivariatePolynomialPolicy.h 
+ * @ingroup MultiRP
  * @author Sebastian Junges
  */
 

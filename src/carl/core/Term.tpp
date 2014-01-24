@@ -1,3 +1,8 @@
+/**
+ * @file Term.tpp
+ * @ingroup MultiRP
+ * @author Sebastian Junges
+ */
 #pragma once
 
 // for code assistance
@@ -72,14 +77,14 @@ Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomi
 
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::dividedBy(const Coefficient& c) const
+Term<Coefficient>* Term<Coefficient>::divideBy(const Coefficient& c) const
 {
     assert(c != 0);
     return new Term(mCoeff / c, mMonomial);
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::dividedBy(Variable::Arg v) const
+Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 {
     if(mMonomial)
     {
@@ -93,7 +98,7 @@ Term<Coefficient>* Term<Coefficient>::dividedBy(Variable::Arg v) const
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::dividedBy(const Monomial& m) const
+Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
 {
     if(mMonomial)
     {
@@ -107,7 +112,7 @@ Term<Coefficient>* Term<Coefficient>::dividedBy(const Monomial& m) const
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::dividedBy(const Term& t) const
+Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
 {
     assert(t.mCoeff != 0);
     if(mMonomial)
@@ -378,7 +383,7 @@ const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs)
     return Term<Coeff>(lhs.mCoeff * rhs, lhs.mMonomial);
 }
 template<typename Coeff>
-const Term<Coeff> operator*(const Term<Coeff>& lhs, int rhs)
+const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs)
 {
     return Term<Coeff>(lhs.mCoeff * rhs, lhs.mMonomial);
 }

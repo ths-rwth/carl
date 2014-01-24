@@ -21,6 +21,7 @@
 
 
 /**
+ * @file CriticalPairs.h
  * @author Sebastian Junges
  */
 #pragma once

@@ -1,0 +1,8 @@
+/**
+@namespace carl
+
+carl is the main namespace for the library. Everything included in this library is found in this namespace. 
+
+@todo check for exceptions.
+
+*/

@@ -1,8 +1,10 @@
-/* 
- * File:   operations_gmp.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/** 
+ * @file   operations_gmpxx.h
+ * @ingroup gmpxx
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @author Sebastian Junges
  * 
- * This file should never be included directly but only via operations.h
+ * @warning This file should never be included directly but only via operations.h
  */
 
 #pragma once
@@ -153,6 +155,18 @@ inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
 	return res;
+}
+
+inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
+{
+	mpz_class res;
+	mpz_div(res.get_mpz_t(), n.get_mpz_t(), d.get_mpz_t());
+	return res;
+}
+
+inline mpz_class operator/(const mpz_class& n, const mpz_class& d)
+{
+	return quotient(n,d);
 }
 
 inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {

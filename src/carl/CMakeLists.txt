@@ -55,7 +55,7 @@ if(${STATICLIB_SWITCH} STREQUAL "ON")
 endif()
 
 target_link_libraries( lib_carl ${libraries} ) # libraries definied in top-level CMakeLists.txt
-
+cotire(lib_carl)
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #

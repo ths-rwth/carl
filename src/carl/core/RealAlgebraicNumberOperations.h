@@ -14,24 +14,24 @@ namespace carl {
 
 template<typename Number>
 struct Equal {
-	bool operator()(RealAlgebraicNumber<Number>* lhs, RealAlgebraicNumber<Number>* rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
 		if (lhs == rhs) return true;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
 				return lhs->value() == rhs->value();
 			} else {
-				if (!static_cast<RealAlgebraicNumberIR<Number>*>(rhs)->refineAvoiding(lhs->value())) {
+				if (!std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->refineAvoiding(lhs->value())) {
 					return false;
 				}
 			}
 		} else {
-			auto lhsIR = static_cast<RealAlgebraicNumberIR<Number>*>(lhs);
+			auto lhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(lhs);
 			if (rhs->isNumeric()) {
 				if (!lhsIR->refineAvoiding(rhs->value())) {
 					return false;
 				}
 			} else {
-				return lhsIR->equal(static_cast<RealAlgebraicNumberIR<Number>*>(rhs));
+				return lhsIR->equal(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs));
 			}
 		}
 		// nrA must be the exact numeric representation of irB OR nrB must be the exact numeric representation of irA
@@ -43,7 +43,7 @@ struct Inequal {
 private:
 	Equal<Number> e;
 public:
-	bool operator()(RealAlgebraicNumber<Number>* lhs, RealAlgebraicNumber<Number>* rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number>& lhs, RealAlgebraicNumberPtr<Number>& rhs) {
 		return !e(lhs, rhs);
 	}
 };
@@ -51,21 +51,22 @@ public:
 
 template<typename Number>
 struct Less {
-	bool operator()(const RealAlgebraicNumber<Number>* lhs, const RealAlgebraicNumber<Number>* rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
 		if (lhs == rhs) return false;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
 				return lhs->value() < rhs->value();
 			} else {
-				return lhs->value() < static_cast<const RealAlgebraicNumberIR<Number>*>(rhs)->left();
+				return lhs->value() < std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->left();
 			}
 		} else {
-			auto lhsIR = static_cast<const RealAlgebraicNumberIR<Number>*>(lhs);
+			auto lhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(lhs);
 			if (rhs->isNumeric()) {
 				return lhsIR->right() < rhs->value();
 			} else {
-				auto rhsIR = const_cast<RealAlgebraicNumberIR<Number>*>(static_cast<const RealAlgebraicNumberIR<Number>*>(rhs));
-				return const_cast<RealAlgebraicNumberIR<Number>*>(lhsIR)->lessWhileUnequal(rhsIR);
+				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
+				if (lhsIR->equal(rhsIR)) return false;
+				return std::const_pointer_cast<RealAlgebraicNumberIR<Number>>(lhsIR)->lessWhileUnequal(rhsIR);
 			}
 		}
 	}
@@ -76,7 +77,7 @@ struct Greater {
 private:
 	Less<Number> l;
 public:
-	bool operator()(RealAlgebraicNumber<Number>* const lhs, RealAlgebraicNumber<Number>* const rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
 		return l(rhs, lhs);
 	}
 };

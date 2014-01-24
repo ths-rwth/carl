@@ -1,6 +1,7 @@
 /** 
- * @file:   GBProcedure.h
- * @author: Sebastian Junges
+ * @file   GBProcedure.h
+ * @ingroup gb
+ * @author Sebastian Junges
  *
  * @since August 26, 2013
  */

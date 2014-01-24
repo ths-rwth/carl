@@ -21,8 +21,8 @@
 
 
 /*
- * @file:   BuchbergerStats.cpp
- * @author: Sebastian Junges
+ * @file   BuchbergerStats.cpp
+ * @author Sebastian Junges
  *
  */
 

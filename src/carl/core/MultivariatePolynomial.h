@@ -1,5 +1,6 @@
 /**
  * @file MultivariatePolynomial.h 
+ * @ingroup MultiRP
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -11,6 +12,7 @@
 
 #include "Polynomial.h"
 #include "Term.h"
+#include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
 
@@ -61,7 +63,7 @@ public:
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	
-    virtual ~MultivariatePolynomial() {};
+    virtual ~MultivariatePolynomial() {}
     
 	//Polynomial interface implementations.
 	/**
@@ -176,7 +178,7 @@ public:
 
 	/**
 	 * Checks whether the polynomial is a trivial sum of squares.
-	 * @return true if polynomial is of the form \sum a_im_i^2 with a_i > 0 for all i.
+	 * @return true if polynomial is of the form \\sum a_im_i^2 with a_i > 0 for all i.
 	 */
 	bool isTsos() const;
 	
@@ -195,10 +197,28 @@ public:
 	
 	bool isReducibleIdentity() const;
 
-	MultivariatePolynomial divideBy(const MultivariatePolynomial& divisor) const;
+	/**
+	 * Divides the polynomial by the given coefficient.
+	 * Applies if the coefficients are from a field.
+     * @param divisor
+     * @return 
+     */
+	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
+	MultivariatePolynomial divideBy(const Coeff& divisor) const;
+
+	/**
+	 * Divides the polynomial by another polynomial.
+	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
+	 * Otherwise, false is returned and the content of quotient is undefined.
+	 * Applies if the coefficients are from a field.
+     * @param divisor
+     * @param quotient
+     * @return 
+     */
+	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
+	bool divideBy(const MultivariatePolynomial& divisor, MultivariatePolynomial& quotient) const;
 	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
-	UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policy>> coeffRepresentation(Variable::Arg v) const;
 	
 	/**
      * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 

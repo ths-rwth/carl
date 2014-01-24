@@ -1,6 +1,6 @@
 /** 
- * @file:   SFINAE.h
- * @author: Sebastian Junges
+ * @file   SFINAE.h
+ * @author Sebastian Junges
  *
  * @since September 10, 2013
  * 

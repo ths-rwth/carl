@@ -1,7 +1,8 @@
 /** 
- * @file:   typetraits.h
- * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- *
+ * @file   typetraits.h
+ * @ingroup typetraits
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @author Sebastian Junges
  *
  * This file contains all type traits for our types.
  * We use the notation conventions of the STL, being lower cases with underscores.

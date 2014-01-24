@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../util/SFINAE.h"
 #include "../numbers/numbers.h"
 #include "../core/Sign.h"
@@ -17,7 +19,8 @@ namespace carl {
 /**
  * This class is the base for all representations of real algebraic numbers and provides crucial operations such as arithmetic, ordering or sign determination on them.
  */
-template<typename Number, EnableIf<is_fraction<Number>> = dummy>
+/// @todo Add `EnableIf<is_fraction<Number>>` such that gcc does not crash.
+template<typename Number>
 class RealAlgebraicNumber {
 protected:
 	////////////////
@@ -37,7 +40,13 @@ protected:
 	 */
 	Number mValue;
 
-public:
+private:
+	std::weak_ptr<RealAlgebraicNumber> pThis;
+	std::shared_ptr<RealAlgebraicNumber> thisPtr() const {
+		return std::shared_ptr<RealAlgebraicNumber>(this->pThis);
+	}
+
+protected:
 	//////////////////////////
 	// Con- and destructors //
 	//////////////////////////
@@ -54,10 +63,17 @@ public:
 			mValue(value)
 	{
 	}
+public:
 	/**
 	 * Destructor.
 	 */
 	~RealAlgebraicNumber() {
+	}
+
+	static std::shared_ptr<RealAlgebraicNumber> create(bool isRoot, bool isNumeric = false, const Number& value = 0) {
+		auto res = std::shared_ptr<RealAlgebraicNumber>(new RealAlgebraicNumber(isRoot, isNumeric, value));
+		res->pThis = res;
+		return res;
 	}
 
 	///////////////
@@ -157,13 +173,27 @@ public:
 		return this->value();
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Number>& g) {
-		return os << "RealAlgebraicNumber(" << g.value() << ", " << g.isNumeric() << ", " << g.isRoot() << ")";
-	}
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>* g);
 };
 
+template<typename Number>
+using RealAlgebraicNumberPtr = std::shared_ptr<RealAlgebraicNumber<Number>>;
 }
 
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicNumberOperations.h"
+
+namespace carl {
+
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Number>* g) {
+	if (g->isNumeric()) {
+		return os << static_cast<const carl::RealAlgebraicNumberNR<Number>*>(g);
+	} else {
+		return os << static_cast<const carl::RealAlgebraicNumberIR<Number>*>(g);
+	}
+}
+
+}

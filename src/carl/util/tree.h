@@ -10,7 +10,7 @@
 // the LGPL for other projects can be requested from the author.
 
 /**
-    \file	  Tree.h
+    \file	  tree.h
     \author   Kasper Peeters
     \version  2.81
     \date     23-Aug-2011
@@ -25,11 +25,11 @@
    available. 
  */
 
- /**
-  * @file Tree.h 
+/**
+ * @file tree.h 
  * Modified by Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * 
- * - Using #pragma once instead of #ifdef
+ * - Using \#pragma once instead of \#ifdef
  * - Moved inside namespace carl
  * - Removed the mainpage attribute from the doxygen comment.
  */

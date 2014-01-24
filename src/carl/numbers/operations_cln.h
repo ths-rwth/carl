@@ -1,8 +1,11 @@
-/* 
- * File:   operations_cln.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/** 
+ * @file   operations_cln.h
+ * @ingroup cln
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @author Sebastian Junges
  * 
- * This file should never be included directly but only via operations.h
+ * @warning This file should never be included directly but only via operations.h
+ * 
  */
 
 #pragma once
@@ -56,6 +59,11 @@ template<>
 inline unsigned toInt<unsigned>(const cln::cl_I& n) {
     assert(n <= UINT_MAX);
     return cln::cl_I_to_uint(n);
+}
+
+inline cln::cl_I toInt(const cln::cl_RA& n) {
+	assert(isInteger(n));
+	return getNum(n);
 }
 
 template<typename T>
@@ -158,5 +166,16 @@ inline cln::cl_I mod(const cln::cl_I& a, const cln::cl_I& b) {
 inline cln::cl_I div(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::floor1(a / b);
 }
+
+inline cln::cl_I quotient(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return div(a,b);
+}
+//
+inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
+{
+	return div(a,b);
+}
+
 
 }

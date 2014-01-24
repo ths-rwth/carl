@@ -24,3 +24,8 @@ TEST(NumbersGMP, squareroot)
 	EXPECT_EQ(resultA.second.get_den(), 1);
 	EXPECT_EQ(resultA.second.get_num(), 2);
 }
+
+TEST(NumbersGMP, quotient)
+{
+	EXPECT_EQ(-1, quotient(mpz_class(-6),mpz_class(7)));
+}

@@ -145,7 +145,7 @@ namespace carl
                     return _index != node._index;
                 }
 
-                //private:
+            //private:
                 friend class CompactTree<Entry, FastIndex>;
                 static const bool   fi = FastIndex;
                 static const size_t S  = sizeof(Entry);

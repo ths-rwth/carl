@@ -9,4 +9,5 @@ add_subdirectory(cad)
 add_subdirectory(core)
 add_subdirectory(groebner)
 add_subdirectory(interval)
-add_subdirectory(debug)
+# Only for debugging.
+#add_subdirectory(debug)

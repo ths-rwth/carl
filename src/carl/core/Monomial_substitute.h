@@ -1,3 +1,9 @@
+/**
+ * @file Monomial_substitute.h
+ * @ingroup MultiRP
+ * @author Sebastian Junges
+ */
+
 #pragma once
 
 #include "Monomial.h"
@@ -20,7 +26,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,SubstitutionType
 		}
 		else
 		{
-			factor *= pow(it->second, ve.exp);
+			factor *= carl::pow(it->second, ve.exp);
 			m->mTotalDegree -= ve.exp;
 		}
 	}

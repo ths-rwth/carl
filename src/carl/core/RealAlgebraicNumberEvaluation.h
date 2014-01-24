@@ -13,15 +13,16 @@
 #include "../interval/IntervalEvaluation.h"
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumber.h"
+#include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicPoint.h"
 
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {
 
 template <typename Number>
-using RANMap = std::map<Variable, RealAlgebraicNumber<Number>*>;
+using RANMap = std::map<Variable, RealAlgebraicNumberPtr<Number>>;
 template <typename Number>
-using RANIRMap = std::map<Variable, RealAlgebraicNumberIR<Number>*>;
+using RANIRMap = std::map<Variable, RealAlgebraicNumberIRPtr<Number>>;
 
 /**
  * Evaluates the given polynomial at the given point based on the variable order.
@@ -35,7 +36,7 @@ using RANIRMap = std::map<Variable, RealAlgebraicNumberIR<Number>*>;
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
+RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
 
 /**
  * Evaluates the given polynomial with the given values for the variables.
@@ -48,9 +49,9 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealA
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANMap<Number>& m);
+RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANMap<Number>& m);
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m);
+RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m);
 
 
 /**
@@ -66,7 +67,7 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p, 
-		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
+		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
 );
 
@@ -84,7 +85,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
 		UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
+		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
 );
 
@@ -94,7 +95,7 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 // Implementation
 
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
+RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
 	assert(point.dim() == variables.size());
 	RANIRMap<Number> IRs;
 	UnivariatePolynomial<Coeff> pol(p);
@@ -106,17 +107,17 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealA
 			pol.substituteIn(variables[i], Coeff(point[i]->value()));
 		} else {
 			// Defer interval representations
-			IRs[variables[i]] = static_cast<RealAlgebraicNumberIR<Number>*>(point[i]);
+			IRs[variables[i]] = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(point[i]);
 		}
 	}
 	if (pol.isNumber()) {
-		return new RealAlgebraicNumberNR<Number>(pol.numericContent());
+		return RealAlgebraicNumberNR<Number>::create(pol.constantPart());
 	}
 	return evaluate(pol, IRs);
 }
 
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMap<Number>& m) {
+RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMap<Number>& m) {
 	RANIRMap<Number> IRs;
 	UnivariatePolynomial<Coeff> pol(p);
 	
@@ -127,11 +128,11 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMa
 			pol.substituteIn(it.first, Coeff(it.second->value()));
 		} else {
 			// Defer interval representations
-			IRs[it.first] = static_cast<const RealAlgebraicNumberIR<Number>*>(it.second);
+			IRs[it.first] = std::static_pointer_cast<const RealAlgebraicNumberIRPtr<Number>>(it.second);
 		}
 	}
 	if (pol.isNumber()) {
-		return new RealAlgebraicNumberNR<Number>(pol.numericContent());
+		return RealAlgebraicNumberNR<Number>::create(pol.numericContent());
 	}
 	return evaluate(pol, IRs);
 }
@@ -145,16 +146,20 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMa
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
-	if (m.size() == 1 && m.begin()->second->sgn(p.toNumberCoefficients()) == Sign::ZERO) {
-		return new RealAlgebraicNumberIR<Number>(p.mainVar());
+RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
+	assert(m.size() > 0);
+	auto poly = p.switchVariable(m.begin()->first);
+	if (m.size() == 1 && m.begin()->second->sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
+		return RealAlgebraicNumberIR<Number>::create(poly.mainVar());
 	}
 	Variable v = VariablePool::getInstance().getFreshVariable();
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, ExactInterval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<Coeff>(v, {-Coeff(p), Coeff(1)}), m, varToInterval);
-	ExactInterval<Number> interval = IntervalEvaluation::evaluate(p, varToInterval);
-	
+	ExactInterval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+
+	// the interval should include at least one root.
+	assert(res.countRealRoots(interval) >= 1);
 	while (
 		res.sgn(interval.left()) == Sign::ZERO ||
 		res.sgn(interval.right()) == Sign::ZERO ||
@@ -164,16 +169,16 @@ RealAlgebraicNumber<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const
 			it.second->refine();
 			varToInterval[it.first] = it.second->getInterval();
 		}
-		interval = IntervalEvaluation::evaluate(p, varToInterval);
+		interval = IntervalEvaluation::evaluate(poly, varToInterval);
 	}
-	return new RealAlgebraicNumberIR<Number>(res, interval);
+	return RealAlgebraicNumberIR<Number>::create(res, interval);
 }
 
 
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p, 
-		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
+		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
 ) {
 	Variable v = p.mainVar();
@@ -190,7 +195,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
 		UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumberIR<Number>*>& m,
+		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
 		std::map<Variable, ExactInterval<Number>>& varToInterval
 ) {
 	assert(m.find(p.mainVar()) == m.end());
