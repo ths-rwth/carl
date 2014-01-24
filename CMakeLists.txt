@@ -98,9 +98,11 @@ message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
 if(USE_COTIRE)
 	# We use cotire, simply include it
+	message("-- using cotire")
 	include(cotire)
 else()
 	# We do not use cotire, create dummy function.
+	message("-- not using cotire")
 	function(cotire)
 	endfunction(cotire)
 endif()
