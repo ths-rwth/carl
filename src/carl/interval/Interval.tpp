@@ -334,7 +334,7 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
             lowerBoundType = BoundType::INFTY;
         }
         if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < 0 || (rhs.lower() < 0 || rhs.lowerBoundType() == BoundType::INFTY)))
-		   || (upperBoundType() == BoundType::INFTY && (rhs.lower() > 0 || (rhs.upper() > 0 || rhs.upperBoundType() == BoundType::INFTY)))
+		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > 0 || (rhs.upper() > 0 || rhs.upperBoundType() == BoundType::INFTY)))
 		   || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() < 0 || (mContent.lower() < 0 || mLowerBoundType == BoundType::INFTY)))
 		   || (rhs.upperBoundType() == BoundType::INFTY && (mContent.lower() > 0 || (mContent.upper() > 0 || mUpperBoundType == BoundType::INFTY))) )
         {
@@ -884,7 +884,7 @@ template<typename Number>
 	}
 	
 template<typename Number>
-	void Interval<Number>::max_assign(const Interval<Number>& rhs);
+	void Interval<Number>::max_assign(const Interval<Number>& rhs)
 	{
 		
 	}

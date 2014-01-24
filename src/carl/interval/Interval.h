@@ -897,7 +897,7 @@ namespace carl
 		Interval<Number> max(const Interval<Number>& rhs) const;
 		void max_assign(const Interval<Number>& rhs);
 		Interval<Number> min(const Interval<Number>& rhs) const;
-		void min_assign(const Interval<Number>& rhs)
+		void min_assign(const Interval<Number>& rhs);
     };
 	
 	/***************************************************************************
