@@ -85,7 +85,7 @@ public:
     
     friend const Monomial operator*(const Variable& lhs, const Variable& rhs);
     
-    friend std::string varToString(carl::Variable::Arg rhs, bool friendlyVarName);
+    friend std::string varToString(carl::Variable::Arg rhs, bool friendlyVarName = true);
     
     friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs);
     
