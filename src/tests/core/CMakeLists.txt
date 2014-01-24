@@ -13,7 +13,11 @@ add_executable(runCoreTests
         Test_Sign.cpp
 )
 cotire(runCoreTests)
-target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
+if(COMPARE_WITH_GINAC)
+    target_link_libraries(runCoreTests ${GTEST_LIBRARIES} ginac lib_carl ${libraries})
+else()
+    target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
+endif()
 cotire(runCoreTests)
 
 add_test( NAME core COMMAND runCoreTests )
