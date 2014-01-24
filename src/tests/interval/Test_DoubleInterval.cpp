@@ -17,9 +17,10 @@
 
 using namespace carl;
 
+typedef Interval<double> DoubleInterval;
+
 TEST(DoubleInterval, Constructor)
 {
-	typedef Interval<double> DoubleInterval;
     DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
 	DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
@@ -35,7 +36,6 @@ TEST(DoubleInterval, Constructor)
 
 TEST(DoubleInterval, Getters)
 {
-	typedef Interval<double> DoubleInterval;
     DoubleInterval test1 = DoubleInterval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
@@ -62,7 +62,6 @@ TEST(DoubleInterval, Getters)
 
 TEST(DoubleInterval, Addition)
 {
-	typedef Interval<double> DoubleInterval;
     DoubleInterval a0 = DoubleInterval( -1, BoundType::INFTY, 2, BoundType::WEAK);
     DoubleInterval a1 = DoubleInterval( -1, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval a2 = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::INFTY);
@@ -115,8 +114,6 @@ TEST(DoubleInterval, Addition)
 
 TEST(DoubleInterval, Subtraction)
 {
-	typedef Interval<double> DoubleInterval;
-	
     DoubleInterval a0 = DoubleInterval( -1, BoundType::INFTY, 2, BoundType::WEAK);
     DoubleInterval a1 = DoubleInterval( -1, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval a2 = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::INFTY);
@@ -169,7 +166,6 @@ TEST(DoubleInterval, Subtraction)
 
 TEST(DoubleInterval, Multiplication)
 {
-	typedef Interval<double> DoubleInterval;
     DoubleInterval c0  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::WEAK );
     DoubleInterval c1  = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::WEAK );
     DoubleInterval c2  = DoubleInterval( 1, BoundType::WEAK, 2, BoundType::WEAK );
@@ -497,8 +493,6 @@ TEST(DoubleInterval, Multiplication)
 
 TEST(DoubleInterval, ExtendedDivision)
 {
-	typedef Interval<double> DoubleInterval;
-
     DoubleInterval a0  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::WEAK );
     DoubleInterval a1  = DoubleInterval( -1, BoundType::WEAK, 1, BoundType::WEAK );
     DoubleInterval a2  = DoubleInterval( 1, BoundType::WEAK, 2, BoundType::WEAK );
@@ -788,8 +782,6 @@ TEST(DoubleInterval, ExtendedDivision)
 /*
 TEST(DoubleInterval, Intersection)
 {
-	typedef Interval<double> DoubleInterval;
-
     DoubleInterval a1(-1,BoundType::WEAK,1,BoundType::WEAK);
     
     DoubleInterval b01(2,BoundType::WEAK,3,BoundType::WEAK);
@@ -847,8 +839,6 @@ TEST(DoubleInterval, Intersection)
  */
 TEST(DoubleInterval, Split)
 {
-	typedef Interval<double> DoubleInterval;
-	
     DoubleInterval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);
     DoubleInterval i2(-1, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval i3(-1, BoundType::WEAK, 1, BoundType::WEAK);
