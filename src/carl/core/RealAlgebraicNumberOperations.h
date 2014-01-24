@@ -51,16 +51,16 @@ public:
 
 template<typename Number>
 struct Less {
-	bool operator()(const RealAlgebraicNumberPtr<Number> lhs, const RealAlgebraicNumberPtr<Number> rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
 		if (lhs == rhs) return false;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
 				return lhs->value() < rhs->value();
 			} else {
-				return lhs->value() < std::static_pointer_cast<const RealAlgebraicNumberIR<Number>>(rhs)->left();
+				return lhs->value() < std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->left();
 			}
 		} else {
-			auto lhsIR = std::static_pointer_cast<const RealAlgebraicNumberIR<Number>>(lhs);
+			auto lhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(lhs);
 			if (rhs->isNumeric()) {
 				return lhsIR->right() < rhs->value();
 			} else {
@@ -77,7 +77,7 @@ struct Greater {
 private:
 	Less<Number> l;
 public:
-	bool operator()(RealAlgebraicNumber<Number>* const lhs, RealAlgebraicNumber<Number>* const rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
 		return l(rhs, lhs);
 	}
 };
