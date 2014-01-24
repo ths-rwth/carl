@@ -1587,6 +1587,7 @@ bool CAD<Number>::liftCheck(
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
 					this->storeSampleInTree(sampleSetIncrement.next(), node);
+					sampleSetIncrement.pop();
 				}
 			}
 			break;
@@ -1599,10 +1600,9 @@ template<typename Number>
 int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsActive) {
 	while (true) {
 		if (!this->eliminationSets[level].emptyLiftingQueue()) return (int)level;
-		
 		unsigned l = level - 1;
 		// find the first level where elimination polynomials can be generated
-		while (l > 0 && this->eliminationSets[l-1].emptySingleEliminationQueue() && this->eliminationSets[l-1].emptyPairedEliminationQueue()) {
+		while (l >= 0 && this->eliminationSets[l].emptySingleEliminationQueue() && this->eliminationSets[l].emptyPairedEliminationQueue()) {
 			l--;
 		}
 		
