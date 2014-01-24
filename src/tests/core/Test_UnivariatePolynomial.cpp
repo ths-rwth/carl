@@ -25,6 +25,16 @@ TEST(UnivariatePolynomial, Constructor)
  
 }
 
+TEST(UnivariatePolynomial, toInteger)
+{
+	VariablePool& vpool = VariablePool::getInstance();
+	Variable x = vpool.getFreshVariable();
+	vpool.setName(x, "x");
+	UnivariatePolynomial<cln::cl_RA> pRA(x, {(cln::cl_RA)0, (cln::cl_RA)2});
+	UnivariatePolynomial<cln::cl_I> pI(x, {(cln::cl_I)0, (cln::cl_I)2});
+	EXPECT_EQ(pI, pRA.toIntegerDomain());
+}
+
 TEST(UnivariatePolynomial, Reduction)
 {
     VariablePool& vpool = VariablePool::getInstance();
