@@ -687,7 +687,7 @@ namespace carl
 
         friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
         {
-            return (os << rhs.toString());
+            return (os << rhs.toString(true, true));
         }
 		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
