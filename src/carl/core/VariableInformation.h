@@ -1,7 +1,7 @@
 /** 
- * @file:   VariableInformation.h
- * @author: Sebastian Junges
- *
+ * @file   VariableInformation.h
+ * @ingroup multirp
+ * @author Sebastian Junges
  * @since September 3, 2013
  */
 

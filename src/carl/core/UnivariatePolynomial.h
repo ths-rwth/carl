@@ -1,5 +1,6 @@
 /**
  * @file UnivariatePolynomial.h 
+ * @ingroup unirp
  * @author Sebastian Junges
  */
 
@@ -24,6 +25,9 @@
 namespace carl
 {
 
+//
+// Forward declarations
+// 	
 template<typename Coefficient> class UnivariatePolynomial;
 	
 template<typename Coefficient>
@@ -39,6 +43,9 @@ enum class SubresultantStrategy : unsigned {
 	Generic, Lazard, Ducos, Default = Lazard
 };
 	
+/**
+ * @ingroup unirp
+ */
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {

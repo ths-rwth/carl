@@ -1,6 +1,6 @@
 /**
  * @file Term.h
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -15,6 +15,10 @@
 namespace carl
 {
 
+/**
+ * A coefficient times a monomial.
+ * @ingroup multirp
+ */
 template<typename Coefficient>
 class Term
 {
