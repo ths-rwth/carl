@@ -1,5 +1,5 @@
 /** 
- * @file   operations_cln.h
+ * @file   operations.h
  * @ingroup cln
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges

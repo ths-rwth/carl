@@ -12,5 +12,5 @@
 
 #include "typetraits.h"
 #include "operations.h"
-#include "hash_cln.h"
-#include "hash_gmpxx.h"
+#include "adaption_cln/hash.h"
+#include "adaption_gmpxx/hash.h"

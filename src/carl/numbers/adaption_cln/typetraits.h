@@ -1,5 +1,5 @@
 /** 
- * @file   typetraits_cln.h
+ * @file   typetraits.h
  * @ingroup cln
  * @ingroup typetraits
  * @author Sebastian Junges

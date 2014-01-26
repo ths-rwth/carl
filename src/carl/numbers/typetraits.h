@@ -273,5 +273,5 @@ struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>
 };
 }
 
-#include "typetraits_cln.h"
-#include "typetraits_gmpxx.h"
+#include "adaption_cln/typetraits.h"
+#include "adaption_gmpxx/typetraits.h"

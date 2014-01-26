@@ -1,5 +1,5 @@
 /** 
- * @file    hash_gmpxx.h
+ * @file    hash.h
  * @ingroup gmpxx
  * @author  Sebastian Junges
  * @author  Florian Corzilius
