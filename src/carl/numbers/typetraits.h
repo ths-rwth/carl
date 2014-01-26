@@ -28,29 +28,17 @@ template<typename C, typename O, typename P>
 class MultivariatePolynomial;
 
 /**
- * Type trait  is_field. 
- * Default is false, but certain types which encode algebraic fields should be set to true. 
  * @ingroup typetraits
- * @see UnivariatePolynomial - CauchyBound for example.
  */
 template<typename type>
-struct is_field
+struct is_real
 {
 	static const bool value = false;
 };
 
-template<typename C>
-struct is_field<GFNumber<C>>
-{
-	static const bool value = true;
-};
-
-
 /**
- * Type trait is_fraction. 
- * Default is false, but certain types which encode fractions should be set to true. 
- * Note that we consider integral types to be fractional.
- * @todo Document why?
+ * Type trait is_rational. 
+ * Default is false, but certain types which encode rationals should be set to true. 
  */
 template<typename type>
 struct is_rational
@@ -60,11 +48,31 @@ struct is_rational
 
 
 /**
+ * Type trait  is_field. 
+ * Default, we set rationals and reals to true and others to false, but additional types which encode algebraic fields should be set to true. 
+ * @ingroup typetraits
+ * @see UnivariatePolynomial - CauchyBound for example.
+ */
+template<typename T>
+struct is_field
+{
+	static const bool value = is_rational<T>::value || is_real<T>::value;
+};
+/**
+ * @ingroup typetraits
+ */
+template<typename C>
+struct is_field<GFNumber<C>>
+{
+	static const bool value = true;
+};
+
+/**
  * Type trait is_integer.
  * Default is false, but certain types which encode integral types should be set to true. 
  * @ingroup typetraits
  */
-template<typename type>
+template<typename T>
 struct is_integer {
 	static const bool value = false;
 };
@@ -79,23 +87,63 @@ struct is_integer<long> {
  * @ingroup typetraits
  */
 template<>
-struct is_integer<unsigned long> {
-	static const bool value = true;
-};
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_integer<unsigned> {
-	static const bool value = true;
-};
-/**
- * @ingroup typetraits
- */
-template<>
 struct is_integer<int> {
 	static const bool value = true;
 };
+
+/**
+ * @ingroup typetraits
+ */
+template<typename T>
+struct is_natural
+{
+	static constexpr bool value = false;
+};
+
+/**
+ * @ingroup typetraits
+ */
+template<>
+struct is_natural<unsigned> {
+	static constexpr bool value = false;
+};
+
+/**
+ * @ingroup typetraits
+ */
+template<>
+struct is_natural<unsigned long> {
+	static constexpr bool value = false;
+};
+
+
+/**
+ * @ingroup typetraits
+ */
+template<typename Type>
+struct is_subset_of_integers
+{
+	static constexpr bool value = is_integer<Type>::value || is_natural<Type>::value;
+};
+
+/**
+ * @ingroup typetraits
+ */
+template<typename Type>
+struct is_subset_of_rationals
+{
+	static constexpr bool value = is_rational<Type>::value || is_subset_of_integers<Type>::value;
+};
+
+/**
+ * @ingroup typetraits
+ */
+template<typename Type>
+struct is_subset_of_reals
+{
+	static constexpr bool value = is_real<Type>::value || is_subset_of_rationals<Type>::value;
+};
+
 
 
 /**
@@ -114,13 +162,17 @@ struct characteristic
  * Default is false.
  * @ingroup typetraits
  */
-
 template<typename C>
 struct is_finite_domain
 {
 	static constexpr bool value = false;
 };
 
+/**
+ * Type trait is_finite_domain.
+ * Default is false.
+ * @ingroup typetraits
+ */
 template<typename C>
 struct is_finite_domain<GFNumber<C>>
 {
@@ -130,27 +182,25 @@ struct is_finite_domain<GFNumber<C>>
 
 /**
  * Type trait is_number.
- * Default is false. Should be set to true for all number types to distinguish them from Polynomials for example.
+ * Default is that subsets of reals are true. Should be set to true for all number types to distinguish them from Polynomials for example.
  * @ingroup typetraits
  */
-template<typename type>
+template<typename T>
 struct is_number
 {
-	static const bool value = false;
+	static constexpr bool value = is_subset_of_reals<T>::value;
 };
 
-template<>
-struct is_number<int>
-{
-	static const bool value = true;
-};
-
-
+/**
+ * @ingroup typetraits
+ * @see GFNumber
+ */
 template<typename C>
 struct is_number<GFNumber<C>>
 {
-	static const bool value = true;
+	static constexpr bool value = true;
 };
+
 
 
 /**
@@ -163,7 +213,9 @@ struct IntegralT
 	typedef int type;
 };
 
-
+/**
+ * @todo Fix this?
+ */
 template<>
 struct IntegralT<double>
 {

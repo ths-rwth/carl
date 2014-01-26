@@ -20,7 +20,7 @@ namespace carl
  * @ingroup gmpxx
  */
 template<>
-struct is_field<mpq_class>
+struct is_integer<mpq_class>
 {
 	static const bool value = true;
 };
@@ -31,44 +31,6 @@ struct is_field<mpq_class>
  */
 template<>
 struct is_rational<mpz_class>
-{
-	static const bool value = true;
-};
-
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct is_rational<mpq_class>
-{
-	static const bool value = true;
-};
-
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct is_integer<mpz_class> {
-	static const bool value = true;
-};
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct is_number<mpq_class>
-{
-	static const bool value = true;
-};
-
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct is_number<mpz_class>
 {
 	static const bool value = true;
 };

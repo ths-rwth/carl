@@ -14,18 +14,10 @@
 
 namespace carl {
 
-
-template<>
-struct is_field<cln::cl_RA>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_rational<cln::cl_I>
-{
-	static const bool value = true;
-};
+/**
+ * @ingroup typetraits
+ * @ingroup cln
+ */
 template<>
 struct is_rational<cln::cl_RA>
 {
@@ -33,28 +25,30 @@ struct is_rational<cln::cl_RA>
 };
 
 
+/**
+ * @ingroup typetraits
+ * @ingroup cln
+ */
 template<>
 struct is_integer<cln::cl_I> {
 	static const bool value = true;
 };
 
-template<>
-struct is_number<cln::cl_RA>
-{
-	static const bool value = true;
-};
 
-template<>
-struct is_number<cln::cl_I>
-{
-	static const bool value = true;
-};
-
+/**
+ * @ingroup typetraits
+ * @ingroup cln
+ */
 template<>
 struct IntegralT<cln::cl_RA>
 {
 	typedef cln::cl_I type;
 };
+
+/**
+ * @ingroup typetraits
+ * @ingroup cln
+ */
 template<>
 struct IntegralT<cln::cl_I>
 {
