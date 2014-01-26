@@ -22,5 +22,4 @@ public:
 	Type quotient;
 	Type remainder;
 };
-
 }
