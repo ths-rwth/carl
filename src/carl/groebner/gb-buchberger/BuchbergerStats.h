@@ -20,16 +20,15 @@
  */
 
 
-/*
- * @file:   BuchbergerStats.h
- * @author: Sebastian Junges
+/**
+ * @file   BuchbergerStats.h
+ * @author Sebastian Junges
  *
  */
 
-#ifndef BUCHBERGERSTATS_H
-#define BUCHBERGERSTATS_H
+#pragma once
 
-namespace GiNaCRA
+namespace carl
 {
 
 /**
