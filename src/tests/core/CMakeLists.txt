@@ -12,7 +12,6 @@ add_executable(runCoreTests
         Test_RootFinder.cpp
         Test_Sign.cpp
 )
-cotire(runCoreTests)
 target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
 cotire(runCoreTests)
 
