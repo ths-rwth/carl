@@ -494,7 +494,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus)
 {
-	for(Coeff& coeff : mCoefficients)
+	for(Coefficient& coeff : mCoefficients)
 	{
 		coeff = carl::mod(coeff, modulus);
 	}
@@ -504,9 +504,9 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::mod(const 
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus) const
 {
-	UnivariatePolynomial<Coeff> result;
+	UnivariatePolynomial<Coefficient> result;
 	result.mCoefficients.reserve(mCoefficients.size());
-	for(auto coeff : mCoefficients)
+	for(const Coefficient& coeff : mCoefficients)
 	{
 		result.mCoefficients.push_back(mod(coeff, modulus));
 	}
@@ -1605,7 +1605,7 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator+=
 	else
 	{
 		mCoefficients.front() += rhs;
-		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coeff)0) 
+		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coefficient)0) 
 		{
 			// Result is zero.
 			mCoefficients.clear();
@@ -1614,8 +1614,8 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator+=
 	return *this;
 }
 
-template<typename Coefficient>
-UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
 {
 	assert(mMainVar == rhs.mMainVar);
 	
@@ -1711,12 +1711,12 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=
 		mCoefficients.clear();
 		return *this;
 	}
-	for(Coeff& c : mCoefficients)
+	for(Coefficient& c : mCoefficients)
 	{
 		c *= rhs;
 	}
 	
-	if(is_finite_domain<Coeff>::value)
+	if(is_finite_domain<Coefficient>::value)
 	{
 		stripLeadingZeroes();
 	}
