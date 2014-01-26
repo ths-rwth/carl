@@ -53,7 +53,7 @@ struct is_field<GFNumber<C>>
  * @todo Document why?
  */
 template<typename type>
-struct is_fraction
+struct is_rational
 {
 	static const bool value = false;
 };

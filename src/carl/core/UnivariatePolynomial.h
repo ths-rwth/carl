@@ -154,9 +154,9 @@ public:
 	 */
 	unsigned degree() const
 	{
-		// todo add assertion that this is valid.
 		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
 	}
+	
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	unsigned totalDegree() const {
 		return this->degree();
@@ -232,7 +232,7 @@ public:
 	 */
 	Coefficient coprimeFactor() const;
 	
-	template<typename C = Coefficient, EnableIf<is_fraction<C>> = dummy>
+	template<typename C = Coefficient, EnableIf<is_rational<C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
 
 	/**
@@ -352,9 +352,9 @@ public:
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
-	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	template<typename C=Coefficient, EnableIf<is_rational<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
-	template<typename C=Coefficient, DisableIf<is_fraction<C>> = dummy>
+	template<typename C=Coefficient, DisableIf<is_rational<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
@@ -442,7 +442,7 @@ public:
 	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
 	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.
 	 */
-	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	template<typename C=Coefficient, EnableIf<is_rational<C>> = dummy>
 	IntNumberType maximumNorm() const;
 
 	/**
@@ -494,7 +494,7 @@ public:
 	 * @return numeric content part of the polynomial.
 	 * @see UnivariatePolynomials::numericContent(unsigned int)
 	 */
-	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
+	template<typename N=NumberType, EnableIf<is_rational<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
 
 	/**
@@ -566,28 +566,6 @@ public:
 	 */
 	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
 
-	/*!
-	 * Reverses the order of the coefficients of this polynomial.
-	 * This method is meant to be called by signVariations only.
-	 * @complexity O(n)
-	 */
-	void reverse();
-
-	/*!
-	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
-	 * This method is meant to be called by signVariations only.
-	 * @param factor Factor to scale x.
-	 * @complexity O(n)
-	 */
-	void scale(const Coefficient& factor);
-
-	/*!
-	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
-	 * This method is meant to be called by signVariations only.
-	 * @param a Offset to shift x.
-	 * @complexity O(n^2)
-	 */
-	void shift(const Coefficient& a);
 
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,
@@ -700,6 +678,30 @@ public:
 	
 	
 	private:
+	
+	/*!
+	 * Reverses the order of the coefficients of this polynomial.
+	 * This method is meant to be called by signVariations only.
+	 * @complexity O(n)
+	 */
+	void reverse();
+
+	/*!
+	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
+	 * This method is meant to be called by signVariations only.
+	 * @param factor Factor to scale x.
+	 * @complexity O(n)
+	 */
+	void scale(const Coefficient& factor);
+
+	/*!
+	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
+	 * This method is meant to be called by signVariations only.
+	 * @param a Offset to shift x.
+	 * @complexity O(n^2)
+	 */
+	void shift(const Coefficient& a);	
+		
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{

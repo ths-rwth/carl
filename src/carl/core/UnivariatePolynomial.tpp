@@ -208,7 +208,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 	
 	unsigned degdiff = degree() - divisor.degree();
-	Coeff factor0); // We have to initialize it to prevent a compiler error.
+	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
 		factor = *prefactor * lcoeff()/divisor.lcoeff();
@@ -477,14 +477,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_fraction<C>>>
+template<typename C, EnableIf<is_rational<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
 	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
 	return normalized.divideBy(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_fraction<C>>>
+template<typename C, DisableIf<is_rational<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
 	LOG_NOTIMPLEMENTED();
 	return *this;
@@ -623,7 +623,7 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_fraction<C>>>
+template<typename C, EnableIf<is_rational<C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
@@ -736,7 +736,7 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_fraction<C>>>
+template<typename C, EnableIf<is_rational<C>>>
 typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
 	typename std::vector<C>::const_iterator it = mCoefficients.begin();
 	Coeff max = *it;
@@ -797,7 +797,7 @@ UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolyno
 }
 
 template<typename Coeff>
-template<typename N, EnableIf<is_fraction<N>>>
+template<typename N, EnableIf<is_rational<N>>>
 typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
 {
 	if (this->isZero()) return 0;

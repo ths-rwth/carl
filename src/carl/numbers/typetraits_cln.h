@@ -22,12 +22,12 @@ struct is_field<cln::cl_RA>
 };
 
 template<>
-struct is_fraction<cln::cl_I>
+struct is_rational<cln::cl_I>
 {
 	static const bool value = true;
 };
 template<>
-struct is_fraction<cln::cl_RA>
+struct is_rational<cln::cl_RA>
 {
 	static const bool value = true;
 };

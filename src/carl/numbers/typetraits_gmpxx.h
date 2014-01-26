@@ -30,7 +30,7 @@ struct is_field<mpq_class>
  * @ingroup gmpxx
  */
 template<>
-struct is_fraction<mpz_class>
+struct is_rational<mpz_class>
 {
 	static const bool value = true;
 };
@@ -40,7 +40,7 @@ struct is_fraction<mpz_class>
  * @ingroup gmpxx
  */
 template<>
-struct is_fraction<mpq_class>
+struct is_rational<mpq_class>
 {
 	static const bool value = true;
 };
