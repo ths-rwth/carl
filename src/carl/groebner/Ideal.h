@@ -1,8 +1,7 @@
 /** 
  * @file   Ideal.h
+ * @ingroup gb
  * @author Sebastian Junges
- *
- * @since July 12, 2013
  */
 
 #pragma once
@@ -16,7 +15,9 @@
 namespace carl
 {
 
-
+/**
+ * @ingroup gb
+ */
 template <class Polynomial, template<class> class Datastructure = IdealDatastructureVector, int CacheSize = 0>
 class Ideal
 {

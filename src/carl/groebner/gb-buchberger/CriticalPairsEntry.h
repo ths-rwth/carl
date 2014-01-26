@@ -22,6 +22,7 @@
 
 /**
  * @file CriticalPairsEntry.h
+ * @ingroup gb
  * @author Sebastian Junges
  */
 #pragma once
@@ -33,6 +34,9 @@
 namespace carl
 {
 
+/**
+ * @ingroup gb
+ */
 template<class Compare>
 class CriticalPairsEntry
 {

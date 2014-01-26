@@ -1,8 +1,7 @@
 /** 
  * @file   GBUpdateProcedures.h
+ * @ingroup gb
  * @author Sebastian Junges
- *
- * @since August 28, 2013
  */
 
 #pragma once
