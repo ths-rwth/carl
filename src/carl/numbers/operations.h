@@ -1,5 +1,5 @@
 /** 
- * @file:   operations.h
+ * @file:   numbers/operations.h
  * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  *
  * This file contains a common interface for basic number functions.

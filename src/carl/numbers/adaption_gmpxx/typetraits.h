@@ -1,5 +1,5 @@
 /** 
- * @file   typetraits_gmpxx.h
+ * @file   adaption_gmpxx/typetraits.h
  * @ingroup typetraits
  * @ingroup gmpxx
  * @author Sebastian Junges

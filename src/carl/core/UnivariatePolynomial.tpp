@@ -491,8 +491,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 }
 
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modulus)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus)
 {
 	for(Coeff& coeff : mCoefficients)
 	{
@@ -501,8 +501,8 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modul
 	return *this;
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::mod(const Coeff& modulus) const
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus) const
 {
 	UnivariatePolynomial<Coeff> result;
 	result.mCoefficients.reserve(mCoefficients.size());
@@ -1593,8 +1593,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 	return result;		 
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator+=(const Coefficient& rhs)
 {
 	if(rhs == 0) return *this;
 	if(mCoefficients.empty())
@@ -1614,8 +1614,8 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff
 	return *this;
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coeff>::operator+=(const UnivariatePolynomial& rhs)
 {
 	assert(mMainVar == rhs.mMainVar);
 	
@@ -1666,8 +1666,8 @@ UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& r
 }
 	
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const Coeff& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator-=(const Coefficient& rhs)
 {
 	LOG_INEFFICIENT();
 	return *this += -rhs;
@@ -1703,8 +1703,8 @@ UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& r
 	return rhs - lhs;
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(const Coefficient& rhs)
 {
 	if(rhs == 0)
 	{

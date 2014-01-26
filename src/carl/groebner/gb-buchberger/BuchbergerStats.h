@@ -124,5 +124,3 @@ private:
     static BuchbergerStats* instance;
 };
 }
-
-#endif   /* BUCHBERGERSTATS_H */

@@ -90,8 +90,7 @@ namespace carl
                 Node right() const;
                 Node sibling() const;
                 Node leftSibling() const;
-                Node next() const;
-                Node next( size_t count ) const;
+                Node next( size_t count = 1) const;
                 Node prev() const;
 
                 Node& operator ++()
@@ -312,11 +311,6 @@ namespace carl
         return fi ? Node( _index & ~S ) : Node( _index & ~1 );
     }
 
-    template<class E, bool FI>
-    typename CompactTree<E, FI>::Node CompactTree<E, FI>::Node::next() const
-    {
-        return fi ? Node( _index + S ) : Node( _index + 1 );
-    }
 
     template<class E, bool FI>
     typename CompactTree<E, FI>::Node CompactTree<E, FI>::Node::next( size_t count ) const

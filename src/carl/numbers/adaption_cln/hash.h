@@ -1,5 +1,5 @@
 /** 
- * @file   hash.h
+ * @file   adaption_cln/hash.h
  * @ingroup cln
  * @author Sebastian Junges
  * @author  Florian Corzilius

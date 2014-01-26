@@ -1,5 +1,5 @@
 /** 
- * @file   typetraits.h
+ * @file   numbers/typetraits.h
  * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
