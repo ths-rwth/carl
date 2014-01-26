@@ -25,6 +25,16 @@ TEST(UnivariatePolynomial, Constructor)
  
 }
 
+TEST(UnivariatePolynomial, toInteger)
+{
+	VariablePool& vpool = VariablePool::getInstance();
+	Variable x = vpool.getFreshVariable();
+	vpool.setName(x, "x");
+	UnivariatePolynomial<cln::cl_RA> pRA(x, {(cln::cl_RA)0, (cln::cl_RA)2});
+	UnivariatePolynomial<cln::cl_I> pI(x, {(cln::cl_I)0, (cln::cl_I)2});
+	EXPECT_EQ(pI, pRA.toIntegerDomain());
+}
+
 TEST(UnivariatePolynomial, Reduction)
 {
     VariablePool& vpool = VariablePool::getInstance();
@@ -338,5 +348,32 @@ TEST(UnivariatePolynomial, pseudoRem)
 	Variable x = VariablePool::getInstance().getFreshVariable();
 	
 	
+}
+
+TEST(UnivariatePolynomial, resultant)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable("x");
+	Variable y = VariablePool::getInstance().getFreshVariable("y");
+	
+	// p1 = x - y
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p1(x, {MultivariatePolynomial<cln::cl_RA>(-Term<cln::cl_RA>(y)), MultivariatePolynomial<cln::cl_RA>(1)});
+	// p2 = x^2 + y^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p2(x, {MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
+	// p3 = x^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p3(x, {MultivariatePolynomial<cln::cl_RA>(-Term<cln::cl_RA>(1)), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
+	
+	// r1 = 2*y^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r1(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y*2, Term<cln::cl_RA>(-1)}));
+	// r2 = y^2 - 1
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r2(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}));
+	// r3 = y^4
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r3(x, MultivariatePolynomial<cln::cl_RA>(Term<cln::cl_RA>(y)*y*y*y));
+	
+	EXPECT_EQ(r1, p1.resultant(p2));
+	EXPECT_EQ(r1, p2.resultant(p1));
+	EXPECT_EQ(r2, p1.resultant(p3));
+	EXPECT_EQ(r2, p3.resultant(p1));
+	EXPECT_EQ(r3, p2.resultant(p3));
+	EXPECT_EQ(r3, p3.resultant(p2));
 }
 

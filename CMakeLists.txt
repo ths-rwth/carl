@@ -81,11 +81,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		message("-- Using clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 	endif()
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ldl")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("-- Using g++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -ldl")
 else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
@@ -100,9 +98,11 @@ message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
 if(USE_COTIRE)
 	# We use cotire, simply include it
+	message("-- using cotire")
 	include(cotire)
 else()
 	# We do not use cotire, create dummy function.
+	message("-- not using cotire")
 	function(cotire)
 	endfunction(cotire)
 endif()
@@ -202,6 +202,8 @@ if(COMPARE_WITH_GINAC)
 	set(libraries ${libraries} ${GINAC_LIBRARY} )
 endif()
 
+#dl must be linked LAST as this is required for the stacktrace in util/platform.h
+set(libraries ${libraries} dl)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files

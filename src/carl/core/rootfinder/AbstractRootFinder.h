@@ -53,7 +53,7 @@ protected:
 	 * Roots that have been found.
 	 * If the instantiated root finder works in an incremental manner, this list may not contain all roots, if it is called before the root finder has indicated that it is finished.
 	 */
-	std::list<RealAlgebraicNumber<Number>*> roots;
+	std::list<RealAlgebraicNumberPtr<Number>> roots;
 	/**
 	 * Flag that indicates if the search has finished.
      */
@@ -101,7 +101,7 @@ public:
 	 * Additional calls will not recompute all roots but only return the cached result.
 	 * @returns List of roots.
 	 */
-	std::list<RealAlgebraicNumber<Number>*> getAllRoots();
+	std::list<RealAlgebraicNumberPtr<Number>> getAllRoots();
 	
 protected:
 	/**
@@ -110,7 +110,7 @@ protected:
 	 * @param root Pointer to new root.
 	 * @param reducePolynomial Indicates if the polynomial should be reduced.
 	 */
-	virtual void addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial = true);
+	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true);
 	
 	/**
 	 * Adds a new root to the internal root list from an interval.

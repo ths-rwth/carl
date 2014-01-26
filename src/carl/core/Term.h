@@ -237,6 +237,8 @@ class Term
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs);
+        template<typename Coeff>
+        friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs);
 		template<typename Coeff>
         friend const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>

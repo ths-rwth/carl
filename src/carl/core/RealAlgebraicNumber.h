@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../util/SFINAE.h"
 #include "../numbers/numbers.h"
 #include "../core/Sign.h"
@@ -38,7 +40,13 @@ protected:
 	 */
 	Number mValue;
 
-public:
+private:
+	std::weak_ptr<RealAlgebraicNumber> pThis;
+	std::shared_ptr<RealAlgebraicNumber> thisPtr() const {
+		return std::shared_ptr<RealAlgebraicNumber>(this->pThis);
+	}
+
+protected:
 	//////////////////////////
 	// Con- and destructors //
 	//////////////////////////
@@ -55,10 +63,17 @@ public:
 			mValue(value)
 	{
 	}
+public:
 	/**
 	 * Destructor.
 	 */
 	~RealAlgebraicNumber() {
+	}
+
+	static std::shared_ptr<RealAlgebraicNumber> create(bool isRoot, bool isNumeric = false, const Number& value = 0) {
+		auto res = std::shared_ptr<RealAlgebraicNumber>(new RealAlgebraicNumber(isRoot, isNumeric, value));
+		res->pThis = res;
+		return res;
 	}
 
 	///////////////
@@ -162,6 +177,8 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>* g);
 };
 
+template<typename Number>
+using RealAlgebraicNumberPtr = std::shared_ptr<RealAlgebraicNumber<Number>>;
 }
 
 #include "RealAlgebraicNumberIR.h"

@@ -1,11 +1,11 @@
 /* 
  * File:   RealAlgebraicNumberIR.h
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
- * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
 #pragma once
+
+#include "RealAlgebraicNumber.h"
 
 #include "UnivariatePolynomial.h"
 #include "../interval/ExactInterval.h"
@@ -38,16 +38,16 @@ protected:
 	 */
 	unsigned int refinementCount;
 	
-public:
+private:
+	std::weak_ptr<RealAlgebraicNumberIR> pThis;
+	std::shared_ptr<RealAlgebraicNumberIR> thisPtr() const {
+		return std::shared_ptr<RealAlgebraicNumberIR>(this->pThis);
+	}
 	
 	//////////////////////////
 	// Con- and destructors //
 	//////////////////////////
 
-	/**
-	 * Constructs a real algebraic number in interval representation (p, l, r) with a normalized interval w.r.t. normalizeInterval.
-	 */
-	RealAlgebraicNumberIR();
 
 	RealAlgebraicNumberIR(const Variable& var);
 	
@@ -71,6 +71,24 @@ public:
 			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true );
+
+public:
+	static std::shared_ptr<RealAlgebraicNumberIR> create(const Variable& var) {
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(var));
+		res->pThis = res;
+		return res;
+	}
+
+	static std::shared_ptr<RealAlgebraicNumberIR> create(
+			const UnivariatePolynomial<Number>& p,
+			const ExactInterval<Number>& i,
+			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
+			const bool normalize = true,
+			const bool isRoot = true) {
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, s, normalize, isRoot));
+		res->pThis = res;
+		return res;
+	}
 
 	/**
 	 * Destructor.
@@ -143,13 +161,15 @@ public:
 	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
 	template<typename Num>
-	friend std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Num>* n);
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);
+
+	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
 
 	virtual bool containedIn(const ExactInterval<Number>& i) const {
 		return i.contains(this->getInterval());
 	}
 
-	bool equal(const RealAlgebraicNumberIR* n) const;
+	bool equal(std::shared_ptr<RealAlgebraicNumberIR> n);
 	
 private:
 	// Helper functions for lessWhileUnequal
@@ -161,13 +181,13 @@ private:
      * @param n Another RealAlgebraicNumberIR
      * @return 
      */
-	std::pair<bool,bool> checkOrder(RealAlgebraicNumberIR* n);
-	std::pair<bool,bool> intervalContained(RealAlgebraicNumberIR* n, bool twisted);
-	bool checkIntersection(RealAlgebraicNumberIR* n, const ExactInterval<Number> i);
+	std::pair<bool,bool> checkOrder(std::shared_ptr<RealAlgebraicNumberIR> n);
+	std::pair<bool,bool> intervalContained(std::shared_ptr<RealAlgebraicNumberIR> n, bool twisted);
+	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const ExactInterval<Number> i);
 	
 
 public:	
-	bool lessWhileUnequal(RealAlgebraicNumberIR* n);
+	bool lessWhileUnequal(std::shared_ptr<RealAlgebraicNumberIR> n);
 	
 	////////////////
 	// Operations //
@@ -213,6 +233,9 @@ public:
 	Sign sgn(const UnivariatePolynomial<Number>& p) const;
 
 };
+
+template<typename Number>
+using RealAlgebraicNumberIRPtr = std::shared_ptr<RealAlgebraicNumberIR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {

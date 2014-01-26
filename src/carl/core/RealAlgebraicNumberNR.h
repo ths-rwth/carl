@@ -1,14 +1,11 @@
 /* 
  * File:   RealAlgebraicNumberNR.h
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
- * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
-#include "RealAlgebraicNumber.h"
-
-
 #pragma once
+
+#include "RealAlgebraicNumber.h"
 
 namespace carl {
 
@@ -19,7 +16,11 @@ namespace carl {
 /// @todo Add `EnableIf<is_fraction<Number>>` such that gcc does not crash.
 template<typename Number>
 class RealAlgebraicNumberNR : public RealAlgebraicNumber<Number> {
-public:
+private:
+	std::weak_ptr<RealAlgebraicNumberNR> pThis;
+	std::shared_ptr<RealAlgebraicNumberNR> thisPtr() const {
+		return std::shared_ptr<RealAlgebraicNumberNR>(this->pThis);
+	}
 
 	/**
 	 * Construct a real algebraic number from a numeric <code>n</code>.
@@ -30,14 +31,11 @@ public:
 		: RealAlgebraicNumber<Number>(isRoot, true, n)
 	{
 	}
-
-	/**
-	 * Copy constructor.
-	 * @param n
-	 */
-	RealAlgebraicNumberNR(const RealAlgebraicNumberNR& n)
-		: RealAlgebraicNumber<Number>(n.isRoot(), true, n.value())
-	{
+public:
+	static std::shared_ptr<RealAlgebraicNumberNR> create(const Number& n, bool isRoot = true) {
+		auto res = std::shared_ptr<RealAlgebraicNumberNR>(new RealAlgebraicNumberNR(n, isRoot));
+		res->pThis = res;
+		return res;
 	}
 	
 	bool equal(const RealAlgebraicNumberNR<Number>* n) {
@@ -48,8 +46,11 @@ public:
 	}
 	
 	template<typename Num>
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Num>& n);
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Num>* n);
 };
+
+template<typename Number>
+using RealAlgebraicNumberNRPtr = std::shared_ptr<RealAlgebraicNumberNR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>* n) {

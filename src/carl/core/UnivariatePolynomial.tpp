@@ -158,6 +158,9 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
+	if (this->degree() == 0) {
+		return result;
+	}
 	result.mCoefficients.reserve(mCoefficients.size()-nth);
 	// nth == 1 is most common case and can be implemented more efficient.
 	if(nth == 1)
@@ -196,6 +199,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
+	if (this->degree() < divisor.degree()) return *this;
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
 	if(is_field<Coeff>::value && divisor.isConstant())
@@ -775,9 +779,10 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 	for(const Coeff& c : mCoefficients)
 	{
 		assert(isInteger(c));
-		res.mCoefficients.push_back((typename IntegralT<Coeff>::type)c);
+		res.mCoefficients.push_back(toInt(c));
 	}
 	res.stripLeadingZeroes();
+	return res;
 }
 
 template<typename Coeff>
@@ -1308,6 +1313,14 @@ unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coe
 template<typename Coeff>
 int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& interval) const {
 	auto seq = this->standardSturmSequence();
+	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.left()); });
+	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.right()); });
+	return l - r;
+}
+
+template<typename Coeff>
+template<typename C, typename Number>
+int UnivariatePolynomial<Coeff>::countRealRoots(const std::list<UnivariatePolynomial<Coeff>>& seq, const ExactInterval<Number>& interval) {
 	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.left()); });
 	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.right()); });
 	return l - r;

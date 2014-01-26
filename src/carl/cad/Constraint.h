@@ -1,6 +1,9 @@
-/* 
- * File:   Constraint.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file Constraint.h
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * 
+ * Contains the Constraint class.
  */
 
 #pragma once
@@ -118,28 +121,8 @@ public:
 		this->variables.assign(v.begin(), v.end());
 	}
 	
-	friend std::ostream& operator<<(std::ostream& os, const Constraint<Number>& s) {
-		if (!s.negated) {
-			switch (s.sign) {
-				case Sign::NEGATIVE: os << s.polynomial << " < 0";
-					break;
-				case Sign::POSITIVE: os << s.polynomial << " > 0";
-					break;
-				case Sign::ZERO: os << s.polynomial << " = 0";
-					break;
-			}
-		} else {
-			switch (s.sign) {
-				case Sign::NEGATIVE: os << s.polynomial << " >= 0";
-					break;
-				case Sign::POSITIVE: os << s.polynomial << " <= 0";
-					break;
-				case Sign::ZERO: os << s.polynomial << " != 0";
-					break;
-			}
-		}
-		return os;
-	}
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const Constraint<Num>& s);
 		
 private:
 	
@@ -159,6 +142,38 @@ private:
 		return v;
 	}
 };
+
+/**
+ * Outputs the given constraint to an ostream.
+ * 
+ * The Constraint is displayed as polynomial inequality.
+ * @param os output stream
+ * @param c Constraint to be printed.
+ * @return Output stream os.
+ */
+template<typename Number>
+std::ostream& operator<<(std::ostream& os, const Constraint<Number>& c) {
+	if (!c.negated) {
+		switch (c.sign) {
+			case Sign::NEGATIVE: os << c.polynomial << " < 0";
+				break;
+			case Sign::POSITIVE: os << c.polynomial << " > 0";
+				break;
+			case Sign::ZERO: os << c.polynomial << " = 0";
+				break;
+		}
+	} else {
+		switch (c.sign) {
+			case Sign::NEGATIVE: os << c.polynomial << " >= 0";
+				break;
+			case Sign::POSITIVE: os << c.polynomial << " <= 0";
+				break;
+			case Sign::ZERO: os << c.polynomial << " != 0";
+				break;
+		}
+	}
+	return os;
+}
 
 }
 }

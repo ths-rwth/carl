@@ -1,6 +1,7 @@
-/* 
- * File:   CAD.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file CAD.tpp
+ * @ingroup cad
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -160,7 +161,6 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 						smtlibFile << " (< " << constraint.getPolynomial() << " 0)";
 					break;
 				}
-				default: assert(false); // this should not happen
 			}
 		}
 		smtlibFile << "))\n";
@@ -174,12 +174,11 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	os << endl << cad.getSetting() << endl;
-		os << "Elimination set sizes:";
+	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (auto i: cad.getEliminationSets()) {
-		os << "  Level " << level++ << ": " << i.size();
+		os << "\tLevel " << level++ << ": " << i << std::endl;
 	}
-	os << endl;
 	os << "Number of samples computed: " << cad.samples().size() << endl;
 	os << "CAD complete: " << cad.isComplete() << endl;
 	return os;
@@ -187,11 +186,11 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 
 template<typename Number>
 bool CAD<Number>::prepareElimination() {
+	LOGMSG_TRACE("carl.cad", "prepareElimination()");
 	if (this->newVariables.empty() && this->scheduledPolynomials.empty()) {
 		return false;
 	}
 	
-	LOGMSG_DEBUG("carl.cad", "Number of new variables: " << this->newVariables.size());
 	long unsigned newVariableCount = this->newVariables.size();
 	
 	/* Algorithm overview:
@@ -218,6 +217,7 @@ bool CAD<Number>::prepareElimination() {
 		// introduce new elimination levels and fill them appropriately
 		// (1)
 		
+		LOGMSG_TRACE("carl.cad", "Adding " << this->newVariables.size() << " to " << this->variables.size() << " old variables.");
 		// variables, newVariables = newVariables:variables, []
 		this->newVariables.insert(this->newVariables.end(), this->variables.begin(), this->variables.end());
 		this->variables.clear();
@@ -227,6 +227,7 @@ bool CAD<Number>::prepareElimination() {
 		/// @todo make this more efficient
 		CADTrace newTrace(this->variables.size()+1, this->sampleTree.begin());
 		long unsigned j = newVariableCount;
+		assert(j + this->trace.size() <= newTrace.size());
 		for (auto i: this->trace) {
 			newTrace[j++] = i;
 		}
@@ -234,7 +235,7 @@ bool CAD<Number>::prepareElimination() {
 		
 		// (1)
 		/// @todo make this more efficient
-		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this->setting.order, this->setting.order));
+		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this, this->setting.order, this->setting.order));
 		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
 		}
@@ -259,6 +260,7 @@ bool CAD<Number>::prepareElimination() {
 	}
 	// done for the current scheduled polynomials
 	this->scheduledPolynomials.clear();
+	LOGMSG_TRACE("carl.cad", "Done with prepareElimination()");
 	return newVariableCount != 0;
 }
 
@@ -287,14 +289,14 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
 			if (b.second.leftType() != BoundType::INFTY) {
-				tmp.push_back(new UPolynomial(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)}));
+				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
-				tmp.push_back(new UPolynomial(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)}));
+				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -345,11 +347,15 @@ void CAD<Number>::clear() {
 	this->sampleTree.clear();
 	// Add empty root node
 	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
+	this->residueSampleTree.clear();
+	this->trace.clear();
 	this->eliminationSets.clear();
 	this->polynomials.clear();
 	this->scheduledPolynomials.clear();
 	this->newVariables.clear();
 	this->iscomplete = false;
+	this->interrupted = false;
+	this->checkCallCount = 0;
 }
 
 template<typename Number>
@@ -378,9 +384,8 @@ bool CAD<Number>::check(
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << "( " << this->eliminationSets[i].size() << " ): " << this->eliminationSets[i]);
 	}
-	
-	/// @todo take care of #ifdef CAD_CHECK_REDIRECT
-//#ifdef CAD_CHECK_REDIRECT
+
+#ifdef CAD_CHECK_REDIRECT
 	CAD<Number>::checkCallCount++;
 	this->setting.trimVariables = false;
 	this->prepareElimination();
@@ -425,7 +430,7 @@ bool CAD<Number>::check(
 	}
 	this->printConstraints(constraints, filename);
 	LOGMSG_INFO("carl.cad", "done.");
-//#endif
+#endif
 	
 	//////////////////////
 	// Initialization
@@ -443,6 +448,12 @@ bool CAD<Number>::check(
 		}
 	}
 	std::vector<std::pair<UPolynomial*, UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
+	if (this->setting.computeConflictGraph) {
+		// add necessary conflict graph vertices if required
+		for (auto i = conflictGraph.size(); i < constraints.size(); i++) {
+			conflictGraph.addConstraintVertex();
+		}
+	}
 	
 	//////////////////////
 	// Preprocessing
@@ -532,13 +543,15 @@ bool CAD<Number>::check(
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.left())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
-				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
+				this->iscomplete = false; // new polynomials induce new sample points
+				boundPolynomials[b.first].first = this->take(new UPolynomial(tmp.back()));
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.right())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(p.pseudoPrimpart());
 				this->eliminationSets[b.first].insert(tmp.back());
-				boundPolynomials[b.first].first = new UPolynomial(tmp.back());
+				this->iscomplete = false; // new polynomials induce new sample points
+				boundPolynomials[b.first].first = this->take(new UPolynomial(tmp.back()));
 			}
 			
 			// eliminate bound-related polynomials only
@@ -547,7 +560,7 @@ bool CAD<Number>::check(
 			while (!tmp.empty() && l < this->variables.size()) {
 				std::list<UPolynomial> tmp2;
 				for (auto p: tmp) {
-					auto res = this->eliminationSets[l-1].eliminateInto(new UPolynomial(p), this->eliminationSets[l], this->variables[l], this->setting);
+					auto res = this->eliminationSets[l-1].eliminateInto(this->take(new UPolynomial(p)), this->eliminationSets[l], this->variables[l], this->setting);
 					tmp2.insert(tmp2.begin(), tmp.begin(), tmp.end());
 				}
 				std::swap(tmp, tmp2);
@@ -625,6 +638,7 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 		if (!this->variables.empty()) var = this->variables.front();
 		else if (!this->newVariables.empty()) var = this->newVariables.front();
 
+		LOGMSG_TRACE("carl.core", "Adding " << **p);
 		UPolynomial* up = new UPolynomial((*p)->toUnivariatePolynomial(var));
 		if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), up) != this->scheduledPolynomials.end()) {
 			// same polynomial was already considered in scheduled polynomials
@@ -639,7 +653,7 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 			}
 		}
 		// schedule the polynomial for the next elimination
-		this->scheduledPolynomials.push_back(up);
+		this->scheduledPolynomials.push_back(this->take(up));
 		nothingAdded = false;
 	}
 	
@@ -682,7 +696,9 @@ void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
 	// determine the level of the polynomial (first level from the top) and remove the respective pointer from it
 	for (unsigned level = 0; level < this->eliminationSets.size(); level++) {
 		// transform the polynomial according to possible optimizations in order to recognize its real shape in the elimination set
-		auto p = this->eliminationSets[level].find(new UPolynomial(polynomial.pseudoPrimpart()));
+		auto tmp = new UPolynomial(polynomial.pseudoPrimpart());
+		auto p = this->eliminationSets[level].find(tmp);
+		delete tmp;
 		if (p != nullptr) {
 			this->removePolynomial(p, level);
 			return;
@@ -737,7 +753,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 				// merge everything into destinationNode
 				auto destination = this->sampleTree.begin_fixed(sampleTreeRoot, depth);
 				auto node = this->sampleTree.next_at_same_depth(destination);
-				std::forward_list<typename tree<RealAlgebraicNumber<Number>*>::iterator> toDelete;
+				std::forward_list<typename tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
 				while (this->sampleTree.is_valid(node)) {
 					// merge each node's children into destinationNode's children
 					this->sampleTree.merge(destination.begin(), destination.end(), node.begin(), node.end());
@@ -768,7 +784,7 @@ std::vector<ExactInterval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoi
 	
 	for (int index = this->variables.size()-1; index >= 0; index--) {
 		// tree is build upside down, index is in [mVariables.size()-1, 0]
-		RealAlgebraicNumber<Number>* sample = r[index];
+		RealAlgebraicNumberPtr<Number> sample = r[index];
 		if (this->sampleTree.begin(parent) == this->sampleTree.end(parent)) {
 			// this tree level is empty
 			bounds[index] = ExactInterval<Number>::unboundedExactInterval();
@@ -810,9 +826,9 @@ bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad
 
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
-		const std::list<RealAlgebraicNumber<Number>*>& roots,
+		const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 		cad::SampleSet<Number>& currentSamples,
-		std::forward_list<RealAlgebraicNumber<Number>*>& replacedSamples,
+		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 		const ExactInterval<Number>& bounds
 ) {
 	cad::SampleSet<Number> newSampleSet;
@@ -828,7 +844,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if (!(*insertValue.first)->isRoot()) {
 				// the new root is already contained, but only as sample value => switch to root and start sample construction from scratch
 				assert(i->isRoot());
-				RealAlgebraicNumber<Number>* r = *insertValue.first;
+				RealAlgebraicNumberPtr<Number> r = *insertValue.first;
 				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), r, Less<Number>());
 				currentSamples.remove(insertValue.first);
 				if (pos != newSampleSet.end()) {
@@ -841,7 +857,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			} else if (!(*insertValue.first)->isNumeric() && i->isNumeric()) {
 				// there is already an interval-represented root with the same value present and it can be replaced by a numeric
 				currentSamples.remove(insertValue.first);
-				insertValue = currentSamples.insert(new RealAlgebraicNumberNR<Number>(i->value(), true));
+				insertValue = currentSamples.insert(RealAlgebraicNumberNR<Number>::create(i->value(), true));
 				// this value might have been added to newSamples already, so switch the root status there as well
 				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, Less<Number>());
 				if (pos != newSampleSet.end()) {
@@ -859,7 +875,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			newSampleSet.insert(*insertValue.first);
 		}
 		// local set storing the elements which shall be added to currentSampleSet and newSampleSet in the end
-		std::list<RealAlgebraicNumberNR<Number>*> currentSamplesIncrement;
+		std::list<RealAlgebraicNumberNRPtr<Number>> currentSamplesIncrement;
 		
 		/** Situation: One, next or previous, has to be a root (assumption) or we meet one of the outmost positions.
 		 * --------|-------------------|-----------------|---
@@ -875,21 +891,21 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			// rightmost position
 			// insert one rightmost sample (by adding 1 or taking the rightmost interval bound)
 			if ((*insertValue.first)->isNumeric()) {
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>((*insertValue.first)->value() + 1, false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create((*insertValue.first)->value() + 1, false));
 			} else {
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().right(), false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().right(), false));
 			}
 		} else if ((*neighbor)->isRoot()) {
 			// sample between neighbor and insertValue.first needed and will be added to newSampleSet
 			if ((*insertValue.first)->isNumeric()) {
 				if ((*neighbor)->isNumeric()) {
-					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(ExactInterval<Number>((*insertValue.first)->value(), (*neighbor)->value(), BoundType::STRICT).sample(), false));
+					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(ExactInterval<Number>((*insertValue.first)->value(), (*neighbor)->value(), BoundType::STRICT).sample(), false));
 				} else {
-					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor)->getInterval().left(), false));
+					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().left(), false));
 				}
 			} else {
 				// interval representation, take right bound of insertValue.first which must be strictly between insertValue.first and neighbor
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().right(), false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().right(), false));
 			}
 		}
 		
@@ -899,9 +915,9 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			// leftmost position
 			// insert one leftmost sample (by subtracting 1 or taking the leftmost interval bound)
 			if ((*insertValue.first)->isNumeric()) {
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>((*insertValue.first)->value() - 1, false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create((*insertValue.first)->value() - 1, false));
 			} else {
-				currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().left(), false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().left(), false));
 			}
 		} else {
 			neighbor--;
@@ -910,13 +926,13 @@ cad::SampleSet<Number> CAD<Number>::samples(
 				// sample between neighbor and insertValue.first needed and will be added to newSampleSet
 				if ((*insertValue.first)->isNumeric()) {
 					if ((*neighbor)->isNumeric()) {
-						currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(ExactInterval<Number>((*neighbor)->value(), (*insertValue.first)->value(), BoundType::STRICT).sample(), false));
+						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(ExactInterval<Number>((*neighbor)->value(), (*insertValue.first)->value(), BoundType::STRICT).sample(), false));
 					} else {
-						currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor)->getInterval().right(), false));
+						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().right(), false));
 					}
 				} else {
 					// interval representation, take left bound of insertValue.first which must be strictly between insertValue.first and neighbor
-					currentSamplesIncrement.push_front(new RealAlgebraicNumberNR<Number>(static_cast<RealAlgebraicNumberIR<Number>*>(*insertValue.first)->getInterval().left(), false));
+					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().left(), false));
 				}
 			}
 		}
@@ -937,10 +953,10 @@ cad::SampleSet<Number> CAD<Number>::samples(
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
 		const UPolynomial* p,
-		const std::list<RealAlgebraicNumber<Number>*>& sample,
+		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 		const std::list<Variable>& variables,
 		cad::SampleSet<Number>& currentSamples,
-		std::forward_list<RealAlgebraicNumber<Number>*>& replacedSamples,
+		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 		const ExactInterval<Number>& bounds,
 		cad::CADSettings settings
 ) {
@@ -1024,7 +1040,7 @@ void CAD<Number>::alterSetting(const cad::CADSettings& setting) {
 }
 
 template<typename Number>
-std::list<RealAlgebraicNumber<Number>*> CAD<Number>::constructSampleAt(sampleIterator node, const sampleIterator& root) const {
+std::list<RealAlgebraicNumberPtr<Number>> CAD<Number>::constructSampleAt(sampleIterator node, const sampleIterator& root) const {
 	/* Main sample construction loop macro augmented by a conditional argument for termination with an empty sample.
 	 * @param _condition which has to be false for every node of the sample, otherwise an empty list is returned
 	 */
@@ -1033,7 +1049,7 @@ std::list<RealAlgebraicNumber<Number>*> CAD<Number>::constructSampleAt(sampleIte
 		return {};
 	}
 	
-	std::list<RealAlgebraicNumber<Number>*> v;
+	std::list<RealAlgebraicNumberPtr<Number>> v;
 	// proceed from the leaf up to the root while the children of root represent the last component of the sample point and the leaf the first
 	if (this->setting.equationsOnly) {
 		while (node != root) {
@@ -1149,7 +1165,7 @@ bool CAD<Number>::mainCheck(
 		bool boundsNontrivial,
 		bool checkBounds
 ) {
-	
+	LOGMSG_TRACE("carl.cad", "mainCheck()");
 #define CHECK_NODE( _node, _fullRestart, _excludePrevious, _updateTrace )\
 	auto res = this->checkNode(_node, _fullRestart, _excludePrevious, _updateTrace, constraints, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);\
 	if (res.first) return true;\
@@ -1163,6 +1179,7 @@ bool CAD<Number>::mainCheck(
 	}
 	
 	const unsigned dim = (unsigned)this->variables.size();
+	LOGMSG_TRACE("carl.cad", "mainCheck: dimension is " << dim);
 	auto sampleTreeRoot = this->sampleTree.begin();
 	int maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
 	// if the elimination sets were extended (i.e. the sample tree is not developed completely), we obtain new samples already in phase one
@@ -1191,7 +1208,7 @@ bool CAD<Number>::mainCheck(
 	 * This can be, e.g., the sample which satisfied the last set of constraints.
 	 */
 	
-	LOGMSG_DEBUG("carl.cad", "Entering Phase 1...");
+	LOGMSG_DEBUG("carl.cad", "mainCheck: Entering Phase 1...");
 	
 	if (checkTraceFirst && maxDepth != 0) {
 		// only consider trace if there has been any sample before
@@ -1270,7 +1287,7 @@ bool CAD<Number>::mainCheck(
 		assert(depth >= 0 && depth < dim);
 		for (auto node = this->sampleTree.begin_fixed(sampleTreeRoot, depth); this->sampleTree.is_valid(node) && (int)depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
 			// traverse all nodes at depth, i.e., sample points of dimension dim - level - 1 equaling the number of coefficient variables of the lifting position at level
-			std::list<RealAlgebraicNumber<Number>*> sampleList = this->constructSampleAt(node, sampleTreeRoot);
+			std::list<RealAlgebraicNumberPtr<Number>> sampleList = this->constructSampleAt(node, sampleTreeRoot);
 			// no degenerate sample points are considered here because they were already discarded in Phase 2
 			if (depth != sampleList.size()) continue;
 			
@@ -1323,7 +1340,7 @@ bool CAD<Number>::mainCheck(
 
 
 template<typename Number>
-typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumber<Number>* newSample, sampleIterator node) {
+typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node) {
 	sampleIterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, Less<Number>());
 	if (newNode == this->sampleTree.end(node)) {
 		newNode = this->sampleTree.append_child(node, newSample);
@@ -1338,7 +1355,7 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 template<typename Number>
 bool CAD<Number>::liftCheck(
 		sampleIterator node,
-		const std::list<RealAlgebraicNumber<Number>*>& sample,
+		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 		unsigned openVariableCount,
 		bool restartLifting,
 		const std::list<Variable>& variables,
@@ -1386,7 +1403,7 @@ bool CAD<Number>::liftCheck(
 	// previous variable will be substituted next
 	openVariableCount--;
 	
-	std::list<RealAlgebraicNumber<Number>*> extSample(sample.begin(), sample.end());
+	std::list<RealAlgebraicNumberPtr<Number>> extSample(sample.begin(), sample.end());
 	std::list<Variable> newVariables(variables);
 	// the first variable is always the last one lifted
 	newVariables.push_front(this->variables[openVariableCount]);
@@ -1414,28 +1431,29 @@ bool CAD<Number>::liftCheck(
 	cad::SampleSet<Number> currentSamples(this->sampleTree.begin(node), this->sampleTree.end(node));
 	// the current samples queue for this lifting process
 	cad::SampleSet<Number> sampleSetIncrement;
-	std::forward_list<RealAlgebraicNumber<Number>*> replacedSamples;
+	std::forward_list<RealAlgebraicNumberPtr<Number>> replacedSamples;
 	
 	// fill in a standard sample to ensure termination in the main loop
 	if (boundActive) {
 		// add the bounds as roots and appropriate intermediate samples and start the lifting with this initial list
-		std::list<RealAlgebraicNumber<Number>*> boundRoots;
+		std::list<RealAlgebraicNumberPtr<Number>> boundRoots;
 		if (bound->second.leftType() != BoundType::INFTY) {
-			boundRoots.push_back(new RealAlgebraicNumberNR<Number>(bound->second.left(), true));
+			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.left(), true));
 		}
 		if (bound->second.rightType() != BoundType::INFTY) {
-			boundRoots.push_back(new RealAlgebraicNumberNR<Number>(bound->second.right(), true));
+			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.right(), true));
 		}
 		if (boundRoots.empty()) {
-			sampleSetIncrement.insert(this->samples({new RealAlgebraicNumberNR<Number>(bound->second.midpoint(), true)}, currentSamples, replacedSamples));
+			sampleSetIncrement.insert(this->samples({RealAlgebraicNumberNR<Number>::create(bound->second.midpoint(), true)}, currentSamples, replacedSamples));
 		} else {
 			sampleSetIncrement.insert(this->samples(boundRoots, currentSamples, replacedSamples));
 		}
 	} else {
-		sampleSetIncrement.insert(this->samples({new RealAlgebraicNumberNR<Number>(0, true)}, currentSamples, replacedSamples));
+		sampleSetIncrement.insert(this->samples({RealAlgebraicNumberNR<Number>::create(0, true)}, currentSamples, replacedSamples));
 	}
 	
 	while (true) {
+		LOGMSG_TRACE("carl.cad", "Phase 1 of lifting...");
 		/* Phase 1
 		 * Lifting position choice and corresponding sample construction.
 		 */
@@ -1465,7 +1483,6 @@ bool CAD<Number>::liftCheck(
 			for (auto replacedSample: replacedSamples) {
 				this->storeSampleInTree(replacedSample, node);
 			}
-			
 			// discard lifting position just used for sample construction
 			this->eliminationSets[openVariableCount].popLiftingPosition();
 			// try to simplify the current samples even further
@@ -1481,13 +1498,14 @@ bool CAD<Number>::liftCheck(
 		/* Phase 2
 		 * Lifting of the current level.
 		 */
+		LOGMSG_TRACE("carl.cad", "Phase 2 of lifting...");
 		while (!sampleSetIncrement.empty()) {
 			// iterate through all samples found by the next() method
 			
 			/*
 			 * Sample choice
 			 */
-			RealAlgebraicNumber<Number>* newSample;
+			RealAlgebraicNumberPtr<Number> newSample;
 			if (this->setting.preferNRSamples) {
 				if (sampleSetIncrement.emptyNR() && !this->eliminationSets[openVariableCount].emptyLiftingQueue()) {
 					computeMoreSamples = true;
@@ -1569,6 +1587,7 @@ bool CAD<Number>::liftCheck(
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
 					this->storeSampleInTree(sampleSetIncrement.next(), node);
+					sampleSetIncrement.pop();
 				}
 			}
 			break;
@@ -1581,19 +1600,22 @@ template<typename Number>
 int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsActive) {
 	while (true) {
 		if (!this->eliminationSets[level].emptyLiftingQueue()) return (int)level;
-		
 		unsigned l = level - 1;
 		// find the first level where elimination polynomials can be generated
-		while (l > 0 && this->eliminationSets[l-1].emptySingleEliminationQueue() && this->eliminationSets[l-1].emptyPairedEliminationQueue()) {
+		while (l >= 0 && this->eliminationSets[l].emptySingleEliminationQueue() && this->eliminationSets[l].emptyPairedEliminationQueue()) {
 			l--;
 		}
 		
 		// check if no further elimination possible
-		if (l == 0 && this->eliminationSets[0].emptySingleEliminationQueue() && this->eliminationSets[0].emptyPairedEliminationQueue()) return -1;
+		if (l == 0 && this->eliminationSets[0].emptySingleEliminationQueue() && this->eliminationSets[0].emptyPairedEliminationQueue()) {
+			LOGMSG_TRACE("carl.cad", "returning from eliminate(): -1");
+			return -1;
+		}
 		// eliminate one polynomial per level down to the current level
 		l++;
 		
 		if (boundsActive && this->setting.simplifyEliminationByBounds) {
+			LOGMSG_TRACE("carl.cad", "eliminate with bounds");
 			// eliminate from level l-1 to level l
 			for (; l <= level; l++) {
 				while (!this->eliminationSets[l-1].emptySingleEliminationQueue()) {
@@ -1616,6 +1638,7 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 				}
 				// possible change to the completeness status
 				this->iscomplete = false;
+				LOGMSG_TRACE("carl.cad", "returning from eliminate(): " << (int)level);
 				return (int)level;
 			}
 			assert(l == level+1);
@@ -1630,18 +1653,23 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 				}
 			}
 		} else {
+			LOGMSG_TRACE("carl.cad", "eliminate without bounds in level " << l);
 			for (; l <= level; l++) {
 				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], this->variables[l], this->setting, false);
+				LOGMSG_TRACE("carl.cad", "eliminated" << std::endl << (l-1) << ": " << this->eliminationSets[l-1] << std::endl << l << ": " << this->eliminationSets[l]);
 				level = (unsigned)l;
 				if (this->setting.removeConstants) {
 					// get rid of all constants moved to the current level
 					for (; l < this->eliminationSets.size(); l++) {
+						assert(l < this->eliminationSets.size());
+						assert(l < this->variables.size());
 						this->eliminationSets[l-1].moveConstants(this->eliminationSets[l], this->variables[l]);
 					}
 					this->eliminationSets.back().removeConstants();
 				}
 				// possible change to the completeness status
 				this->iscomplete = false;
+				LOGMSG_TRACE("carl.cad", "returning from eliminate(): " << (int)level);
 				return (int)level;
 			}
 		}
@@ -1649,7 +1677,7 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 }
 
 template<typename Number>
-ExactInterval<Number> CAD<Number>::getBounds(const typename tree<RealAlgebraicNumber<Number>*>::iterator& parent, const RealAlgebraicNumber<Number>* sample) const {
+ExactInterval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const {
 	if (this->sampleTree.begin(parent) == this->sampleTree.end(parent)) {
 		// this tree level is empty
 		return ExactInterval<Number>::unboundedExactInterval();
@@ -1665,7 +1693,7 @@ ExactInterval<Number> CAD<Number>::getBounds(const typename tree<RealAlgebraicNu
 		if ((*neighbor)->isNumeric()) {
 			return ExactInterval<Number>((*neighbor)->value(), BoundType::STRICT, (*neighbor)->value()+1, BoundType::INFTY);
 		} else {
-			RealAlgebraicNumberIR<Number>* nIR = static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor);
+			RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*neighbor);
 			return ExactInterval<Number>(nIR->right(), BoundType::WEAK, nIR->right()+1, BoundType::INFTY);
 		}
 	} else if (node == this->sampleTree.begin(parent)) {
@@ -1677,7 +1705,7 @@ ExactInterval<Number> CAD<Number>::getBounds(const typename tree<RealAlgebraicNu
 		} else if ((*neighbor)->isNumeric()) {
 			return ExactInterval<Number>((*neighbor)->value()-1, BoundType::INFTY, (*neighbor)->value(), BoundType::STRICT);
 		} else {
-			RealAlgebraicNumberIR<Number>* nIR = static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor);
+			RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*neighbor);
 			return ExactInterval<Number>(nIR->left()-1, BoundType::INFTY, nIR->left(), BoundType::WEAK);
 		}
 	} else {
@@ -1691,22 +1719,22 @@ ExactInterval<Number> CAD<Number>::getBounds(const typename tree<RealAlgebraicNu
 			if ((*leftNeighbor)->isNumeric()) {
 				return ExactInterval<Number>((*leftNeighbor)->value(), BoundType::STRICT, (*leftNeighbor)->value()+1, BoundType::INFTY);
 			} else {
-				RealAlgebraicNumberIR<Number>* nIR = static_cast<RealAlgebraicNumberIR<Number>*>(*leftNeighbor);
+				RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*leftNeighbor);
 				return ExactInterval<Number>(nIR->right(), BoundType::WEAK, nIR->right()+1, BoundType::INFTY);
 			}
 		} else if ((*neighbor)->isNumeric()) {
 			if ((*leftNeighbor)->isNumeric()) {
 				return ExactInterval<Number>((*leftNeighbor)->value(), BoundType::STRICT, (*neighbor)->value()+1, BoundType::STRICT);
 			} else {
-				RealAlgebraicNumberIR<Number>* nIR = static_cast<RealAlgebraicNumberIR<Number>*>(*leftNeighbor);
+				RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*leftNeighbor);
 				return ExactInterval<Number>(nIR->right(), BoundType::WEAK, (*neighbor)->value(), BoundType::STRICT);
 			}
 		} else {
-			RealAlgebraicNumberIR<Number>* nIR = static_cast<RealAlgebraicNumberIR<Number>*>(*neighbor);
+			RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*neighbor);
 			if ((*leftNeighbor)->isNumeric()) {
 				return ExactInterval<Number>((*leftNeighbor)->value(), BoundType::STRICT, nIR->left(), BoundType::WEAK);
 			} else {
-				RealAlgebraicNumberIR<Number>* nlIR = static_cast<RealAlgebraicNumberIR<Number>*>(*leftNeighbor);
+				RealAlgebraicNumberIRPtr<Number> nlIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*leftNeighbor);
 				return ExactInterval<Number>(nlIR->right(), BoundType::WEAK, (*neighbor)->value(), BoundType::STRICT);
 			}
 		}
@@ -1735,7 +1763,7 @@ void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number
 				bound->second.setRight( r[level]->value() );
 			} else {
 				// find a narrow interval within the bounds but with preferably small number representations
-				RealAlgebraicNumberIR<Number>* rIR = static_cast<RealAlgebraicNumberIR<Number>*>(r[level]);
+				RealAlgebraicNumberIRPtr<Number> rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(r[level]);
 				assert( rIR != 0 ); // non-numerical representations are by now only interval representations
 				if (rIR->refineAvoiding(bound->second.left()) || rIR->refineAvoiding(bound->second.right())) {
 					// found exact numeric representation anyway
@@ -1798,7 +1826,7 @@ void CAD<Number>::trimVariables() {
 			if (depth <= maxDepth) {
 				// remove the complete layer of samples from the sample tree at the given depth
 				// fix the iterators to be deleted in a separate list independent of merging with the children
-				std::queue<typename tree<RealAlgebraicNumber<Number>*>::iterator> toDelete;
+				std::queue<typename tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
 				for (auto node = this->sampleTree.begin_fixed(this->sampleTree.begin(), depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
 					toDelete.push(node);
 				}

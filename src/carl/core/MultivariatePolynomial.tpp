@@ -886,7 +886,6 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
-	LOGMSG_TRACE("carl.core", *this << " in R[" << v << "] ...");
 	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (auto term: this->mTerms) {
 		if (term->monomial() == nullptr) coeffs[0] += *term;

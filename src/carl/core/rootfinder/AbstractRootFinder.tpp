@@ -26,7 +26,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial);
 	if (this->polynomial.zeroIsRoot()) {
 		this->polynomial.eliminateZeroRoots();
-		this->addRoot(new RealAlgebraicNumberNR<Number>(0));
+		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
 	}
 	if (tryTrivialSolver && this->solveTrivial()) {
 		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
@@ -43,7 +43,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 }
 
 template<typename Number>
-std::list<RealAlgebraicNumber<Number>*> AbstractRootFinder<Number>::getAllRoots() {
+std::list<RealAlgebraicNumberPtr<Number>> AbstractRootFinder<Number>::getAllRoots() {
 	if (! this->isFinished()) {
 		this->findRoots();
 		this->setFinished();
@@ -52,16 +52,15 @@ std::list<RealAlgebraicNumber<Number>*> AbstractRootFinder<Number>::getAllRoots(
 }
 
 template<typename Number>
-void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumber<Number>* root, bool reducePolynomial) {
+void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial) {
 	if (root->isNumeric()) {
 		if (reducePolynomial) {
 			this->polynomial.eliminateRoot(root->value());
 		}
 	} else {
-		RealAlgebraicNumberIR<Number>* r = static_cast<RealAlgebraicNumberIR<Number>*>(root);
+		RealAlgebraicNumberIRPtr<Number> r = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(root);
 		if (r->getInterval().diameter() == 0) {
-			root = new RealAlgebraicNumberNR<Number>(r->getInterval().left());
-			delete r;
+			root = RealAlgebraicNumberNR<Number>::create(r->getInterval().left());
 		}
 	}
 	this->roots.push_back(root);
@@ -69,7 +68,7 @@ void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumber<Number>* root, bool
 
 template<typename Number>
 void AbstractRootFinder<Number>::addRoot(const ExactInterval<Number>& interval) {
-	this->addRoot(new RealAlgebraicNumberIR<Number>(this->polynomial, interval));
+	this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, interval));
 }
 
 template<typename Number>
@@ -77,13 +76,13 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 		switch (this->polynomial.degree()) {
 			case 0: {
 				if (this->polynomial.coefficients()[0] == 0) {
-					this->addRoot(new RealAlgebraicNumberNR<Number>(0), false);
+					this->addRoot(RealAlgebraicNumberNR<Number>::create(0), false);
 				}
 				break;
 			}
 			case 1: {
 				Number a = polynomial.coefficients()[1], b = polynomial.coefficients()[0];
-				this->addRoot(new RealAlgebraicNumberNR<Number>(-b / a), false);
+				this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / a), false);
 				break;
 			}
 			case 2: {
@@ -93,18 +92,18 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 				 */
 				Number rad = b*b - 4*a*c;
 				if (rad == 0) {
-					this->addRoot(new RealAlgebraicNumberNR<Number>(-b / (2*a)), false);
+					this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / (2*a)), false);
 				} else if (rad > 0) {
 					std::pair<Number, Number> res = carl::sqrt(rad);
 					if (res.first == res.second) {
 						// Root could be calculated exactly
-						this->addRoot(new RealAlgebraicNumberNR<Number>((-b - res.first) / (2*a)), false);
-						this->addRoot(new RealAlgebraicNumberNR<Number>((-b + res.second) / (2*a)), false);
+						this->addRoot(RealAlgebraicNumberNR<Number>::create((-b - res.first) / (2*a)), false);
+						this->addRoot(RealAlgebraicNumberNR<Number>::create((-b + res.second) / (2*a)), false);
 					} else {
 						// Root is within interval (res.first, res.second)
 						ExactInterval<Number> r(res.first, res.second, BoundType::STRICT);
-						this->addRoot(new RealAlgebraicNumberIR<Number>(this->polynomial, (-b - r) / (2*a)), false);
-						this->addRoot(new RealAlgebraicNumberIR<Number>(this->polynomial, (-b + r) / (2*a)), false);
+						this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b - r) / (2*a)), false);
+						this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b + r) / (2*a)), false);
 					}
 				}
 				break;

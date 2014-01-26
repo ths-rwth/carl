@@ -108,6 +108,23 @@ public:
 		return UnivariatePolynomial(mMainVar, (C)1);
 	}
 	
+	/**
+	 * Returns the leading coefficient.
+	 * If the polynomial is empty, the return value is undefined.
+	 * @return 
+	 */
+	const Coefficient& lcoeff() const
+	{
+		return this->mCoefficients.back();
+	}
+	/**
+	 * Returns the trailing coefficient.
+	 * If the polynomial is empty, the return value is undefined.
+	 * @return 
+	 */
+	const Coefficient& tcoeff() const {
+		return this->mCoefficients.front();
+	}
 
 	/**
 	 * Checks whether the polynomial is constant with respect to the main variable.
@@ -117,12 +134,10 @@ public:
 	{
 		return mCoefficients.size() <= 1;
 	}
-	Coefficient constantPart() const {
-		return this->mCoefficients[0];
-	}
 
 	/**
 	 * Checks whether the polynomial is only a number.
+	 * Applies if the coefficients are numbers.
 	 * @return
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -130,10 +145,39 @@ public:
 	{
 		return this->isConstant();
 	}
+	/**
+	 * Checks whether the polynomial is only a number.
+	 * Applies if the coefficients are not numbers.
+	 * Calls isNumber() on the constant coefficient recursively.
+	 * @return
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isNumber() const
 	{
 		return this->isConstant() && this->lcoeff().isNumber();
+	}
+
+	/**
+	 * Returns the constant part of this polynomial.
+	 * Applies, if the coefficients are numbers.
+	 * @return 
+	 */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	NumberType constantPart() const
+	{
+		return this->lcoeff();
+	}
+	/**
+	 * Returns the constant part of this polynomial.
+	 * Applies, if the coefficients are not numbers.
+	 * Calls constantPart() on the trailing coefficient recursively.
+	 * @return 
+	 */
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	NumberType constantPart() const
+	{
+		if (this->isZero()) return 0;
+		return this->tcoeff().constantPart();
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -173,11 +217,6 @@ public:
 		return max;
 	}
 
-	const Coefficient& lcoeff() const
-	{
-		return mCoefficients.back();
-	}
-
 	/**
 	 * Removes the leading term from the polynomial.
 	 */
@@ -195,8 +234,21 @@ public:
 		return mMainVar;
 	}
 
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar).toNumberCoefficients();
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
+	}
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+		return UnivariatePolynomial<Coefficient>(newVar, this->mCoefficients);
+	}
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+		return MultivariatePolynomial<NumberType>(*this).substitute(this->mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
 	}
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -566,6 +618,37 @@ public:
 	 */
 	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
 
+	/**
+	 * Calculated the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
+	 * @param seq
+	 * @param interval
+	 * @return
+	 */
+	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
+	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const ExactInterval<Number>& interval);
+
+	/*!
+	 * Reverses the order of the coefficients of this polynomial.
+	 * This method is meant to be called by signVariations only.
+	 * @complexity O(n)
+	 */
+	void reverse();
+
+	/*!
+	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
+	 * This method is meant to be called by signVariations only.
+	 * @param factor Factor to scale x.
+	 * @complexity O(n)
+	 */
+	void scale(const Coefficient& factor);
+
+	/*!
+	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
+	 * This method is meant to be called by signVariations only.
+	 * @param a Offset to shift x.
+	 * @complexity O(n^2)
+	 */
+	void shift(const Coefficient& a);
 
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,

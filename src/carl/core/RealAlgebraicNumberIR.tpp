@@ -9,18 +9,9 @@
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumber.h"
+#include "rootfinder/RootFinder.h"
 
 namespace carl {
-
-template<typename Number>
-RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR() :
-		RealAlgebraicNumber<Number>(true, true, 0),
-		polynomial(),
-		interval(),
-		sturmSequence(this->polynomial.standardSturmSequence()),
-		refinementCount( 0 )
-{
-}
 
 template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
@@ -59,6 +50,7 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		this->interval.setLeft(ExactInterval<Number>(this->interval.left(), this->value(), BoundType::STRICT).sample());
 		this->interval.setRight(ExactInterval<Number>(this->value(), this->interval.right(), BoundType::STRICT).sample());
 	}
+	assert(p.countRealRoots(i) == 1);
 }
 
 template<typename Number>
@@ -74,14 +66,45 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::equal(const RealAlgebraicNumberIR<Number>* n) const {
-	if (this == n) return true;
-	if (this->isZero() && n->isZero()) return true;
-	return this->getInterval() == n->getInterval();
+RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebraicNumberIRPtr<Number>& n) {
+	if (this->isZero() || n->isZero()) return n;
+
+	Variable va = this->getPolynomial().mainVar();
+	Variable vb = n->getPolynomial().mainVar();
+	Variable y = VariablePool::getInstance().getFreshVariable();
+
+	MultivariatePolynomial<Number> tmp1(this->getPolynomial());
+	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(vb)}));
+	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
+	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).toNumberCoefficients());
+	
+	UnivariatePolynomial<typename IntegralT<Number>::type> ptmp = res.switchVariable(va).toIntegerDomain().primitivePart();
+	auto p = ptmp.template convert<Number>();
+	
+	auto seq = p.standardSturmSequence();
+
+	ExactInterval<Number> i = this->getInterval() + n->getInterval();
+	while (p.isRoot(i.left()) || p.isRoot(i.right()) ||
+		UnivariatePolynomial<Number>::countRealRoots(seq, i) > 0) {
+		this->refine();
+		n->refine();
+		i = this->getInterval() + n->getInterval();
+	}
+	return RealAlgebraicNumberIR<Number>::create(p, i, seq);
 }
 
 template<typename Number>
-std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumberIR<Number>* n) {
+bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number> n) {
+	if (this == n.get()) return true;
+	if (n.get() == nullptr) return false;
+	if (this->isZero() && n->isZero()) return true;
+	if (this->right() <= n->left()) return false;
+	if (this->left() >= n->right()) return false;
+	return this->add(n)->isZero();
+}
+
+template<typename Number>
+std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumberIRPtr<Number> n) {
 	if (this->isNumeric()) {
 		if (n->isNumeric()) {
 			return std::make_pair(true, this->value() < n->value());
@@ -120,7 +143,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumb
 }
 
 template<typename Number>
-std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebraicNumberIR<Number>* n, bool twisted) {
+std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebraicNumberIRPtr<Number> n, bool twisted) {
 	if (this->getInterval().contains(n->getInterval())) {
 		if (this->getPolynomial().isRoot(n->left())) {
 			this->mValue = n->left();
@@ -152,7 +175,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebr
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIR<Number>* n, const ExactInterval<Number> i) {
+bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<Number> n, const ExactInterval<Number> i) {
 	// Proceed only if this.left < n2.left and this.right < n2.right
 	if ((this->left() < n->right()) && (this->left() < n->right())) {
 		assert( i.left() == n->left() && i.right() == this->right());
@@ -190,7 +213,7 @@ bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIR<Numb
 
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Number>* n) {
+bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIRPtr<Number> n) {
 	assert(!this->equal(n));
 	if (this->isNumeric() && n->isNumeric()) {
 		return this->value() < n->value();
@@ -218,7 +241,7 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Numbe
 		CHECK_ORDER();
 		
 		// case: is mInterval contained in o.mInterval?
-		INTERVAL_CONTAINED( n, this, true );
+		INTERVAL_CONTAINED( n, this->thisPtr(), true );
 		
 		CHECK_ORDER();
 		n->refine();
@@ -234,7 +257,7 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIR<Numbe
 		// situation normal (not executed if situation is twisted)
 		if (this->checkIntersection(n, intersection)) return true;
 		// situation twisted
-		if (n->checkIntersection(this, intersection)) return false;
+		if (n->checkIntersection(this->thisPtr(), intersection)) return false;
 		
 		n->refine();
 		CHECK_ORDER();
@@ -412,7 +435,8 @@ Sign RealAlgebraicNumberIR<Number>::sgn() const {
 
 template<typename Number>
 Sign RealAlgebraicNumberIR<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
-	int variations = (this->polynomial.derivative() * p).countRealRoots(this->interval);
+	auto seq = this->polynomial.standardSturmSequence(this->polynomial.derivative() * p);
+	int variations = UnivariatePolynomial<Number>::countRealRoots(seq, this->interval);
 	assert((variations == -1) || (variations == 0) || (variations == 1));
 	switch (variations) {
 		case -1: return Sign::NEGATIVE;

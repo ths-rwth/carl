@@ -12,11 +12,11 @@ TEST(SampleSet, BasicOperations)
 {  
 	cad::SampleSet<cln::cl_RA> s;
 
-	auto pos = s.insert(new RealAlgebraicNumberNR<cln::cl_RA>(0));
+	auto pos = s.insert(RealAlgebraicNumberNR<cln::cl_RA>::create(0));
 
-	std::list<RealAlgebraicNumber<cln::cl_RA>*> nums;
-	nums.push_back(new RealAlgebraicNumberNR<cln::cl_RA>(1));
-	nums.push_back(new RealAlgebraicNumberNR<cln::cl_RA>(2));
+	std::list<RealAlgebraicNumberPtr<cln::cl_RA>> nums;
+	nums.push_back(RealAlgebraicNumberNR<cln::cl_RA>::create(1));
+	nums.push_back(RealAlgebraicNumberNR<cln::cl_RA>::create(2));
 	s.insert(nums.begin(), nums.end());
 
 	ASSERT_NO_THROW(s.remove(pos.first));

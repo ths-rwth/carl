@@ -15,8 +15,9 @@ TEST(EliminationSet, BasicOperations)
 	Variable x = vpool.getFreshVariable();
 	Variable y = vpool.getFreshVariable();
 	Variable z = vpool.getFreshVariable();
+	cad::PolynomialOwner<cln::cl_RA> owner;
 
-	cad::EliminationSet<cln::cl_RA> s;
+	cad::EliminationSet<cln::cl_RA> s(&owner);
 	
 	cad::MPolynomial<cln::cl_RA> mpz({z});
 	cad::MPolynomial<cln::cl_RA> mpxz2({(cln::cl_RA)-1*x*z});
@@ -35,12 +36,12 @@ TEST(EliminationSet, BasicOperations)
 	s.insert(r, {w, nullptr, p, q});
 	s.insert(w, {p, q});
 	
-	ASSERT_EQ(s.erase(p), (size_t)1);
-	ASSERT_EQ(s.erase(p), (size_t)0);
+	ASSERT_EQ((size_t)1, s.erase(p));
+	ASSERT_EQ((size_t)0, s.erase(p));
 	s.removeByParent(p); // delete q and w
-	ASSERT_EQ(s.erase(q), (size_t)0);
-	ASSERT_EQ(s.erase(w), (size_t)0);
-	ASSERT_EQ(s.erase(r), (size_t)1);
+	ASSERT_EQ((size_t)0, s.erase(q));
+	ASSERT_EQ((size_t)0, s.erase(w));
+	ASSERT_EQ((size_t)1, s.erase(r));
 	
 	delete one;
 	delete p;
