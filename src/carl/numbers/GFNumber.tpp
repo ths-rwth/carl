@@ -204,8 +204,8 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const GFNumber& rhs)
 	return *this;
 }
 
-template<typename IntegerType>
-GFNumber<IntegerType>& GFNumber<IntegerT>::operator *=(const IntegerType& rhs)
+template<typename IntegerT>
+GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const IntegerT& rhs)
 {
 	mN *= rhs;
 	return *this;
