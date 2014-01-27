@@ -13,23 +13,12 @@
 
 namespace carl
 {
-std::unique_ptr<VariablePool> VariablePool::instance = nullptr;
-std::mutex VariablePool::singletonMutex;
 
 VariablePool::VariablePool():
+	Singleton(),
 	mNextVarId (1 << Variable::VARIABLE_BITS_RESERVED_FOR_TYPE)
 {
 	LOGMSG_INFO("carl.varpool", "Constructor called");
-}
-
-VariablePool& VariablePool::getInstance() {
-	if (VariablePool::instance == nullptr) {
-		std::lock_guard<std::mutex> lock(VariablePool::singletonMutex);
-		if (VariablePool::instance == nullptr) {
-			VariablePool::instance = std::unique_ptr<VariablePool>(new VariablePool());
-		}
-	}
-	return *VariablePool::instance;
 }
 
 Variable VariablePool::getFreshVariable(VariableType type) {
