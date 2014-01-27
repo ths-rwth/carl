@@ -3,9 +3,10 @@
  * 
  * @file   checking.h
  * @author Stefan Schupp
+ * @author Benedikt Seidl
  *
  * @since	2013-12-05
- * @version 2013-12-20
+ * @version 2014-01-27
  */
 
 #pragma once
@@ -47,4 +48,43 @@ namespace carl
             return _left > _right;
         }
     };
+
+	template<>
+	struct checking<FLOAT_T<mpfr_t> >
+	{
+		static FLOAT_T<mpfr_t> pos_inf()
+		{
+			FLOAT_T<mpfr_t> number();
+			mpfr_set_inf(number.getValue(), 1);
+			return number;
+		}
+		static FLOAT_T<mpfr_t> neg_inf()
+		{
+			FLOAT_T<mpfr_t> number();
+			mpfr_set_inf(number.getValue(), -1);
+			return number;
+		}
+		static FLOAT_T<mpfr_t> nan()
+		{
+			FLOAT_T<mpfr_t> number();
+			mpfr_set_nan(number.getValue());
+			return number;
+		}
+		static bool is_nan(const FLOAT_T<mpfr_t>& number)
+		{
+			return mpfr_nan_p(number) != 0;
+		}
+        static Number empty_lower()
+        {
+            return FLOAT_T<mpfr_t>(0);
+        }
+        static Number empty_upper()
+        {
+            return FLOAT_T<mpfr_t>(0);
+        }
+        static bool is_empty(const FLOAT_T<mpfr_t>& _left, const FLOAT_T<mpfr_t>& _right)
+        {
+            return _left > _right;
+        }
+	}
 }
