@@ -428,7 +428,7 @@ const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs)
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 {
-    return (os << rhs.toString());
+    return (os << rhs.toString(true, true));
 }
 
 template<typename Coefficient>

@@ -481,36 +481,36 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_fraction<C>>>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
 	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
 	return normalized.divideBy(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_fraction<C>>>
+template<typename C, DisableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
 	LOG_NOTIMPLEMENTED();
 	return *this;
 }
 
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::mod(const Coeff& modulus)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus)
 {
-	for(Coeff& coeff : mCoefficients)
+	for(Coefficient& coeff : mCoefficients)
 	{
 		coeff = carl::mod(coeff, modulus);
 	}
 	return *this;
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::mod(const Coeff& modulus) const
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus) const
 {
-	UnivariatePolynomial<Coeff> result;
+	UnivariatePolynomial<Coefficient> result;
 	result.mCoefficients.reserve(mCoefficients.size());
-	for(auto coeff : mCoefficients)
+	for(const Coefficient& coeff : mCoefficients)
 	{
 		result.mCoefficients.push_back(mod(coeff, modulus));
 	}
@@ -627,7 +627,7 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_fraction<C>>>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
@@ -740,7 +740,7 @@ Coeff UnivariatePolynomial<Coeff>::modifiedCauchyBound() const
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_fraction<C>>>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
 typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
 	typename std::vector<C>::const_iterator it = mCoefficients.begin();
 	Coeff max = *it;
@@ -802,7 +802,7 @@ UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolyno
 }
 
 template<typename Coeff>
-template<typename N, EnableIf<is_fraction<N>>>
+template<typename N, EnableIf<is_subset_of_rationals<N>>>
 typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
 {
 	if (this->isZero()) return 0;
@@ -1606,8 +1606,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 	return result;		 
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator+=(const Coefficient& rhs)
 {
 	if(rhs == 0) return *this;
 	if(mCoefficients.empty())
@@ -1618,7 +1618,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Coeff
 	else
 	{
 		mCoefficients.front() += rhs;
-		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coeff)0) 
+		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coefficient)0) 
 		{
 			// Result is zero.
 			mCoefficients.clear();
@@ -1679,8 +1679,8 @@ UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& r
 }
 	
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator-=(const Coeff& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator-=(const Coefficient& rhs)
 {
 	LOG_INEFFICIENT();
 	return *this += -rhs;
@@ -1716,20 +1716,20 @@ UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& r
 	return rhs - lhs;
 }
 
-template<typename Coeff>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Coeff& rhs)
+template<typename Coefficient>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(const Coefficient& rhs)
 {
 	if(rhs == 0)
 	{
 		mCoefficients.clear();
 		return *this;
 	}
-	for(Coeff& c : mCoefficients)
+	for(Coefficient& c : mCoefficients)
 	{
 		c *= rhs;
 	}
 	
-	if(is_finite_domain<Coeff>::value)
+	if(is_finite_domain<Coefficient>::value)
 	{
 		stripLeadingZeroes();
 	}
