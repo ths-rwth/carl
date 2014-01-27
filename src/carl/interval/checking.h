@@ -74,15 +74,48 @@ namespace carl
 		{
 			return mpfr_nan_p(number) != 0;
 		}
-        static Number empty_lower()
+        static FLOAT_T<mpfr_t> empty_lower()
         {
             return FLOAT_T<mpfr_t>(0);
         }
-        static Number empty_upper()
+        static FLOAT_T<mpfr_t> empty_upper()
         {
             return FLOAT_T<mpfr_t>(0);
         }
         static bool is_empty(const FLOAT_T<mpfr_t>& _left, const FLOAT_T<mpfr_t>& _right)
+        {
+            return _left > _right;
+        }
+	}
+
+	template<>
+	struct checking<mpq_class>
+	{
+		static mpq_class pos_inf()
+		{
+			return mpq_class(1, 0);
+		}
+		static mpq_class neg_inf()
+		{
+			return mpq_class(-1, 0);
+		}
+		static mpq_class nan()
+		{
+			return mpq_class(0, 0);
+		}
+		static bool is_nan(const mpq_class& number)
+		{
+			return number.get_num() == 0 && number.get_den() == 0;
+		}
+        static mpq_class empty_lower()
+        {
+            return mpq_class(0);
+        }
+        static mpq_class empty_upper()
+        {
+            return mpq_class(0);
+        }
+        static bool is_empty(const mpq_class& _left, const mpq_class& _right)
         {
             return _left > _right;
         }

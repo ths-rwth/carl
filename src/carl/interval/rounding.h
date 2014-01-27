@@ -249,6 +249,7 @@ namespace carl
         }
         Number median(Number _val1, Number _val2)   // [-∞;+∞][-∞;+∞]
         {
+			// @todo: Median <-> arithmetisches Mittel ???
             Number result;
             result->add_assign(*_val1);
             result->add_assign(*_val2);
