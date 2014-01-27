@@ -7,14 +7,11 @@
 
 #pragma once
 
+namespace carl
+{
 template<typename Type>
 struct DivisionResult
 {
-private:
-	DivisionResult()
-	{
-	}
-
 public:
 	DivisionResult(const Type& q, const Type& r) :
 	quotient(q), remainder(r)
@@ -25,3 +22,4 @@ public:
 	Type quotient;
 	Type remainder;
 };
+}

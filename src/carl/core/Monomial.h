@@ -60,7 +60,7 @@ namespace carl
             mExponents(1, VarExpPair(v,e)),
             mTotalDegree(e)
         {
-
+			assert(e > 0);
         }
         
         Monomial(const Monomial& rhs) :
@@ -687,7 +687,7 @@ namespace carl
 
         friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
         {
-            return (os << rhs.toString());
+            return (os << rhs.toString(true, true));
         }
 		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)

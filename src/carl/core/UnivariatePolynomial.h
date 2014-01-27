@@ -198,9 +198,9 @@ public:
 	 */
 	unsigned degree() const
 	{
-		// todo add assertion that this is valid.
 		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
 	}
+	
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	unsigned totalDegree() const {
 		return this->degree();
@@ -284,7 +284,7 @@ public:
 	 */
 	Coefficient coprimeFactor() const;
 	
-	template<typename C = Coefficient, EnableIf<is_fraction<C>> = dummy>
+	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
 
 	/**
@@ -404,9 +404,9 @@ public:
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
-	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	template<typename C=Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
-	template<typename C=Coefficient, DisableIf<is_fraction<C>> = dummy>
+	template<typename C=Coefficient, DisableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial squareFreePart() const;
 	
 	Coefficient evaluate(const Coefficient& value) const;
@@ -494,7 +494,7 @@ public:
 	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
 	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.
 	 */
-	template<typename C=Coefficient, EnableIf<is_fraction<C>> = dummy>
+	template<typename C=Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	IntNumberType maximumNorm() const;
 
 	/**
@@ -546,7 +546,7 @@ public:
 	 * @return numeric content part of the polynomial.
 	 * @see UnivariatePolynomials::numericContent(unsigned int)
 	 */
-	template<typename N=NumberType, EnableIf<is_fraction<N>> = dummy>
+	template<typename N=NumberType, EnableIf<is_subset_of_rationals<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
 
 	/**
@@ -758,9 +758,7 @@ public:
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
-	
-	
-	private:
+
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{

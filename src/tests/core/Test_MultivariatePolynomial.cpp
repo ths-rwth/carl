@@ -30,6 +30,21 @@ TEST(MultivariatePolynomial, Operators)
     EXPECT_TRUE(p0a.isUnivariate());
 }
 
+TEST(MultivariatePolynomial, variablePool)
+{
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable( carl::VT_INT );
+    vpool.setName(x, "test");
+    std::string name = vpool.getName(x, true);
+    std::stringstream o;
+    o << x;
+    ASSERT_EQ(name, o.str());
+    MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x});
+    std::stringstream op;
+    op << p;
+    ASSERT_EQ(name, op.str());
+}
+
 TEST(MultivariatePolynomial, toUnivariatePolynomial)
 {
     VariablePool& vpool = VariablePool::getInstance();

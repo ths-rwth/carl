@@ -193,6 +193,8 @@ TAB_SIZE               = 4
 ALIASES = "rcomplexity=\xrefitem rcomplexity \"Runtime complexity\" \"Runtime Complexity Bounds\""
 ALIASES += "complexity=\xrefitem rcomplexity \"Runtime complexity\" \"Runtime Complexity Bounds\""
 ALIASES += "scomplexity=\xrefitem scomplexity \"Space complexity\" \"Space Complexity Bounds\""
+ALIASES += startcomment="\htmlonly/&#42;&#42;\endhtmlonly\latexonly$/\ast\ast$\endlatexonly"
+ALIASES += endcomment="\htmlonly&#42;/\endhtmlonly\latexonly$\ast$/\endlatexonly"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C
 # sources only. Doxygen will then generate output that is more tailored for C.

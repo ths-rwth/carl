@@ -517,6 +517,11 @@ public:
 	
 private:
 	void sortTerms();
+	/**
+	 * Replaces the current terms by the given new terms.
+	 * Takes care of trailing zero terms.
+	 * @param newTerms
+	 */
     void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
 };

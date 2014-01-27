@@ -28,7 +28,7 @@
 
 #include "BuchbergerStats.h"
 
-namespace GiNaCRA
+namespace carl
 {
 BuchbergerStats* BuchbergerStats::instance = 0;
 
