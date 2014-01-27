@@ -425,6 +425,13 @@ namespace carl
     template<typename Numeric>
     bool ExactInterval<Numeric>::div_ext( ExactInterval<Numeric>& a, ExactInterval<Numeric>& b, const ExactInterval<Numeric>& o )
     {
+		// Special case: if both contain 0 we can directly skip and return the unbounded interval.
+		if(this->contains(0) && o.contains(0))
+		{
+			a = unboundedExactInterval();
+			return false;
+		}
+		
         ExactInterval<Numeric> reciprocalA, reciprocalB;
         bool     splitOccured;
 
