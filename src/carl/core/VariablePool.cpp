@@ -24,19 +24,20 @@ VariablePool::VariablePool():
 
 VariablePool& VariablePool::getInstance() {
 	if (VariablePool::instance == nullptr) {
-		VariablePool::singletonMutex.lock();
+		std::lock_guard<std::mutex> lock(VariablePool::singletonMutex);
 		if (VariablePool::instance == nullptr) {
 			VariablePool::instance = std::unique_ptr<VariablePool>(new VariablePool());
 		}
-		VariablePool::singletonMutex.unlock();
 	}
 	return *VariablePool::instance;
 }
 
 Variable VariablePool::getFreshVariable(VariableType type) {
-	this->freshVarMutex.lock();
-	unsigned tmp = mNextVarId++;
-	this->freshVarMutex.unlock();
+	unsigned tmp = 0;
+	{
+		std::lock_guard<std::mutex> lock(this->freshVarMutex);
+		tmp = mNextVarId++;
+	}
 	LOGMSG_DEBUG("carl.varpool", "New variable of type " << type << " with id " << tmp);
 	return Variable(tmp, type);
 }
@@ -63,9 +64,8 @@ const std::string VariablePool::getName(Variable::Arg v, bool friendly) const {
 
 void VariablePool::setName(Variable::Arg v, const std::string& name) {
 	#ifdef CARL_USE_FRIENDLY_VARNAMES
-	this->freshVarMutex.lock();
+	std::lock_guard<std::mutex> lock(this->freshVarMutex);
 	mFriendlyNames[v] = name;
-	this->freshVarMutex.unlock();
 	#endif
 }
 
