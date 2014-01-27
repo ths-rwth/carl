@@ -779,7 +779,7 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 	for(const Coeff& c : mCoefficients)
 	{
 		assert(isInteger(c));
-		res.mCoefficients.push_back(toInt(c));
+		res.mCoefficients.push_back(getNum(c));
 	}
 	res.stripLeadingZeroes();
 	return res;
