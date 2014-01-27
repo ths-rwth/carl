@@ -287,6 +287,13 @@ namespace carl
 
     bool DoubleInterval::div_ext( DoubleInterval& a, DoubleInterval& b, const DoubleInterval& o )
     {
+		// Special case: if both contain 0 we can directly skip and return the unbounded interval.
+		if(this->contains(0) && o.contains(0))
+		{
+			a = unboundedInterval();
+			return false;
+		}
+		
         DoubleInterval reciprocalA, reciprocalB;
         bool          splitOccured;
 

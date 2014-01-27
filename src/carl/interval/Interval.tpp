@@ -380,6 +380,13 @@ void Interval<Number>::div_assign(const Interval<Number>& rhs)
 template<typename Number>
 bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const
 	{
+		// Special case: if both contain 0 we can directly skip and return the unbounded interval.
+		if(this->contains(0) && o.contains(0))
+		{
+			a = unboundedInterval();
+			return false;
+		}
+		
 		Interval<Number> reciprocalA, reciprocalB;
         bool          splitOccured;
 		
