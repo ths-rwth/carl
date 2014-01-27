@@ -78,10 +78,10 @@ public:
 	 * @param overapproximate
 	 */
 	template<typename Rational>
-	DoubleInterval(const Rational& n, bool overapproximate = false);
+	explicit DoubleInterval(const Rational& n, bool overapproximate = false);
 
 	template<typename Rational>
-	DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft = false, bool overapproxright = false);
+	explicit DoubleInterval(const Rational& lower, BoundType lowerType, const Rational& upper, BoundType upperType, bool overapproxleft = false, bool overapproxright = false);
 
 	/** Creates closed DoubleInterval
 	 * @param _content
@@ -168,11 +168,6 @@ public:
 	{
             mInterval.set(roundDown(l), mInterval.upper());
 	}
-        
-        void setLeft(const DoubleInterval& _interval)
-        {
-            mInterval.set(_interval.left(), mInterval.upper());
-        }
 
 	/**
 	 * Set new left bound type for the interval.
@@ -200,11 +195,6 @@ public:
 	{
 		mInterval.set(left(), roundUp(r));
 	}
-        
-        void setRight(const DoubleInterval& _interval)
-        {
-            mInterval.set(mInterval.lower(), _interval.right());
-        }
 
 	/**
 	 * Set new right bound type for the interval.
@@ -345,6 +335,18 @@ public:
          * @return 
          */
         DoubleInterval log() const;
+        
+        /**
+         * Computes the sinus of the interval.
+         * @return 
+         */
+        DoubleInterval sin() const;
+        
+        /**
+         * Computes the cosinus of the interval.
+         * @return 
+         */
+        DoubleInterval cos() const;
 
 	/**
 	 * Calculates the diameter of the interval
