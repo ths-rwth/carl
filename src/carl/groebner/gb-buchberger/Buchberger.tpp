@@ -19,6 +19,11 @@
  *
  */
 
+/**
+ * @file Buchberger.tpp
+ * @ingroup gb
+ * @author Sebastian Junges
+ */
 #pragma once
 #include "Buchberger.h"
 //

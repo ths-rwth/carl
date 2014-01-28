@@ -1,8 +1,7 @@
 /** 
  * @file  ReductorEntry.h
+ * @ingroup gb
  * @author Sebastian Junges
- *
- * @since July 11, 2013
  */
 
 #pragma once
@@ -19,6 +18,7 @@ namespace carl
  * An entry in the reduction polynomial.
  * The class decodes a polynomial given by
  * mLead + mMultiple * mTail.
+ * @ingroup gb
  */
 template <class Polynomial>
 class ReductorEntry

@@ -1,3 +1,7 @@
+/**
+ * @file MonomialOrdering.h
+ * @ingroup multirp
+ */
 #pragma once
 
 #include "CompareResult.h"
@@ -9,6 +13,10 @@ namespace carl
 
 typedef CompareResult( *MonomialOrderingFc )(const Monomial&, const Monomial&);
 
+/**
+ * A class for term orderings.
+ * @ingroup multirp
+ */
 template<MonomialOrderingFc f, bool degreeOrdered>
 struct MonomialComparator
 {
@@ -117,6 +125,7 @@ struct MonomialComparator
 
     static const bool degreeOrder = degreeOrdered;
 };
+
 
 typedef MonomialComparator<Monomial::compareLexical, false > LexOrdering;
 typedef MonomialComparator<Monomial::compareGradedLexical, true > GrLexOrdering;

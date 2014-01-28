@@ -1,6 +1,6 @@
 /**
  * @file MultivariatePolynomial.tpp
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  */
 

@@ -22,6 +22,7 @@
 
 /**
  * @file CriticalPairs.h
+ * @ingroup gb
  * @author Sebastian Junges
  */
 #pragma once

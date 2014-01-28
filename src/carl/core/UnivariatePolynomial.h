@@ -1,5 +1,6 @@
 /**
  * @file UnivariatePolynomial.h 
+ * @ingroup unirp
  * @author Sebastian Junges
  */
 
@@ -24,6 +25,9 @@
 namespace carl
 {
 
+//
+// Forward declarations
+// 	
 template<typename Coefficient> class UnivariatePolynomial;
 	
 template<typename Coefficient>
@@ -39,6 +43,9 @@ enum class SubresultantStrategy : unsigned {
 	Generic, Lazard, Ducos, Default = Lazard
 };
 	
+/**
+ * @ingroup unirp
+ */
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
@@ -635,28 +642,6 @@ public:
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
 	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const ExactInterval<Number>& interval);
 
-	/*!
-	 * Reverses the order of the coefficients of this polynomial.
-	 * This method is meant to be called by signVariations only.
-	 * @complexity O(n)
-	 */
-	void reverse();
-
-	/*!
-	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
-	 * This method is meant to be called by signVariations only.
-	 * @param factor Factor to scale x.
-	 * @complexity O(n)
-	 */
-	void scale(const Coefficient& factor);
-
-	/*!
-	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
-	 * This method is meant to be called by signVariations only.
-	 * @param a Offset to shift x.
-	 * @complexity O(n^2)
-	 */
-	void shift(const Coefficient& a);
 
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,
@@ -766,7 +751,31 @@ public:
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
+private:
+	
+	/*!
+	 * Reverses the order of the coefficients of this polynomial.
+	 * This method is meant to be called by signVariations only.
+	 * @complexity O(n)
+	 */
+	void reverse();
 
+	/*!
+	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
+	 * This method is meant to be called by signVariations only.
+	 * @param factor Factor to scale x.
+	 * @complexity O(n)
+	 */
+	void scale(const Coefficient& factor);
+
+	/*!
+	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
+	 * This method is meant to be called by signVariations only.
+	 * @param a Offset to shift x.
+	 * @complexity O(n^2)
+	 */
+	void shift(const Coefficient& a);	
+		
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{

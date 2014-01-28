@@ -1,6 +1,6 @@
 /**
  * @file MultivariatePolynomialPolicy.h 
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  */
 
@@ -14,6 +14,7 @@ namespace carl
 {
     /**
      * The default policy for polynomials. 
+	 * @ingroup multirp
      */
 	template<typename ReasonsAdaptor = NoReasons, typename Allocator = NoAllocator>
     struct StdMultivariatePolynomialPolicies : public ReasonsAdaptor

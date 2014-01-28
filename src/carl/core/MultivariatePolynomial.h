@@ -1,6 +1,6 @@
 /**
  * @file MultivariatePolynomial.h 
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -24,6 +24,7 @@ class UnivariatePolynomial;
 
 /**
  *  The general-purpose multivariate polynomial class.
+ * @ingroup multirp
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariatePolynomial : public Polynomial, Policies
@@ -528,6 +529,9 @@ private:
 
 } // namespace carl
 
+/**
+ * @ingroup multirp
+ */
 namespace std
 {
     template<typename C, typename O, typename P>
