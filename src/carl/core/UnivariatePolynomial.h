@@ -165,7 +165,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
-		return this->lcoeff();
+		return this->tcoeff();
 	}
 	/**
 	 * Returns the constant part of this polynomial.
