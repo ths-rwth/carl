@@ -36,7 +36,7 @@ TEST(clRA_Interval, Constructor)
 
 TEST(clRA_Interval, Getters)
 {
-    clRA_Interval test1 = clRA_Interval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
+    clRA_Interval test1 = clRA_Interval(cln::cl_RA(-1), BoundType::WEAK, cln::cl_RA(1), BoundType::STRICT);
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
     EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
