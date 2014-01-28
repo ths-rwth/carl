@@ -73,16 +73,24 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p) :
 Policies()
 {
-	for (unsigned deg = 0; deg < p.coefficients().size(); deg++) {
+	if (p.coefficients().size() > 0) {
+		*this += p.coefficients()[0];
+	}
+	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
 		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
 	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>&) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>& p) :
 Policies()
 {
-    LOG_NOTIMPLEMENTED();
+	if (p.coefficients().size() > 0) {
+		*this += p.coefficients()[0];
+	}
+	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
+		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
+	}
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -527,11 +535,11 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 			{
 				newTerms.push_back(term);
 			}
-        }
-    }
-    setTerms(newTerms);
+		}
+	}
+	setTerms(newTerms);
 	LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
-    assert(mTerms.size() <= expectedResultSize);
+	assert(mTerms.size() <= expectedResultSize);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -904,7 +912,8 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 			delete tmp;
 		}
 	}
-	LOGMSG_TRACE("carl.core", *this << " in R[" << v << "] = " << (UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)));
+	// Convert result back to MultivariatePolynomial and check that the result is equal to *this
+	assert(MultivariatePolynomial<C>(UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs)) == *this);
 	return UnivariatePolynomial<MultivariatePolynomial<C,O,P>>(v, coeffs);
 }
 
@@ -1903,8 +1912,12 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::sortTerms()
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
 {
-    mTerms.clear();
-    if(newTerms.empty())
+	while ((newTerms.size() > 0) && newTerms.back()->isZero()) {
+		newTerms.pop_back();
+	}
+
+	mTerms.clear();
+	if(newTerms.empty())
     {
         return;
     }
