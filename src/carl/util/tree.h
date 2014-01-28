@@ -237,9 +237,9 @@ class tree {
       class leaf_iterator : public iterator_base {
          public:
             leaf_iterator();
-            leaf_iterator(tree_node *, tree_node *top=0);
-            leaf_iterator(const sibling_iterator&);
-            leaf_iterator(const iterator_base&);
+            leaf_iterator(tree_node * tn, tree_node *top=0);
+            leaf_iterator(const sibling_iterator&  other);
+            leaf_iterator(const iterator_base& other);
 
             bool    operator==(const leaf_iterator&) const;
             bool    operator!=(const leaf_iterator&) const;
