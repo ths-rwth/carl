@@ -61,6 +61,11 @@ inline unsigned toInt<unsigned>(const cln::cl_I& n) {
     return cln::cl_I_to_uint(n);
 }
 
+inline cln::cl_I toInt(const cln::cl_RA& n) {
+	assert(isInteger(n));
+	return getNum(n);
+}
+
 template<typename T>
 inline T rationalize(double n) {
 	return cln::rationalize(cln::cl_R(n));

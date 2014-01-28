@@ -173,5 +173,6 @@ inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_clas
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
 }
 
+
 }
 
