@@ -10,7 +10,7 @@
  */
 
 #pragma once
-//#include "../numbers/FLOAT_T.h"
+#include "../numbers/FLOAT_T.h"
 #include <assert.h>
 
 
@@ -49,31 +49,31 @@ namespace carl
         }
     };
 
-	template<>
-	struct checking<FLOAT_T<mpfr_t> >
-	{
-		static FLOAT_T<mpfr_t> pos_inf()
-		{
-			FLOAT_T<mpfr_t> number();
-			mpfr_set_inf(number.getValue(), 1);
-			return number;
-		}
-		static FLOAT_T<mpfr_t> neg_inf()
-		{
-			FLOAT_T<mpfr_t> number();
-			mpfr_set_inf(number.getValue(), -1);
-			return number;
-		}
-		static FLOAT_T<mpfr_t> nan()
-		{
-			FLOAT_T<mpfr_t> number();
-			mpfr_set_nan(number.getValue());
-			return number;
-		}
-		static bool is_nan(const FLOAT_T<mpfr_t>& number)
-		{
-			return mpfr_nan_p(number) != 0;
-		}
+    template<>
+    struct checking<FLOAT_T<mpfr_t> >
+    {
+        static FLOAT_T<mpfr_t> pos_inf()
+        {
+                FLOAT_T<mpfr_t> number();
+                mpfr_set_inf(number.getValue(), 1);
+                return number;
+        }
+        static FLOAT_T<mpfr_t> neg_inf()
+        {
+                FLOAT_T<mpfr_t> number();
+                mpfr_set_inf(number.getValue(), -1);
+                return number;
+        }
+        static FLOAT_T<mpfr_t> nan()
+        {
+                FLOAT_T<mpfr_t> number();
+                mpfr_set_nan(number.getValue());
+                return number;
+        }
+        static bool is_nan(const FLOAT_T<mpfr_t>& number)
+        {
+                return mpfr_nan_p(number) != 0;
+        }
         static FLOAT_T<mpfr_t> empty_lower()
         {
             return FLOAT_T<mpfr_t>(0);
@@ -86,27 +86,27 @@ namespace carl
         {
             return _left > _right;
         }
-	}
+    };
 
-	template<>
-	struct checking<mpq_class>
-	{
-		static mpq_class pos_inf()
-		{
-			return mpq_class(1, 0);
-		}
-		static mpq_class neg_inf()
-		{
-			return mpq_class(-1, 0);
-		}
-		static mpq_class nan()
-		{
-			return mpq_class(0, 0);
-		}
-		static bool is_nan(const mpq_class& number)
-		{
-			return number.get_num() == 0 && number.get_den() == 0;
-		}
+    template<>
+    struct checking<mpq_class>
+    {
+        static mpq_class pos_inf()
+        {
+                return mpq_class(1, 0);
+        }
+        static mpq_class neg_inf()
+        {
+                return mpq_class(-1, 0);
+        }
+        static mpq_class nan()
+        {
+                return mpq_class(0, 0);
+        }
+        static bool is_nan(const mpq_class& number)
+        {
+                return number.get_num() == 0 && number.get_den() == 0;
+        }
         static mpq_class empty_lower()
         {
             return mpq_class(0);
@@ -119,5 +119,5 @@ namespace carl
         {
             return _left > _right;
         }
-	}
+    };
 }
