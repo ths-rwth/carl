@@ -1,18 +1,15 @@
 /* 
- * This file contains the rounding policies needed from the boost interval class for the general
- * Number type used in carl.
+ * This file contains the rounding policies needed from the boost interval class
+ * for exact values using operator overloading.
  * 
  * @file   rounding.h
- * @author Stefan Schupp
+ * @author Benedikt Seidl
  *
- * @since	2013-12-05
- * @version 2013-12-20
+ * @since   2014-01-28
+ * @version 2014-01-28
  */
 
 #pragma once
-#include "../numbers/roundingConversion.h"
-#include "../numbers/operations_mpfr.h"
-#include <mpfr.h>
 
 namespace carl
 {
@@ -25,262 +22,192 @@ namespace carl
         // mathematical operations
         Number add_down(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            Number result;
-			result = add( _lhs, _rhs, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return _lhs + _rhs;
         }
 
         Number add_up(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            Number result;
-            _lhs->add(*result, *_rhs, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return _lhs + _rhs;
         }
 
         Number sub_down(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            Number result;
-            _lhs->sub(*result, *_rhs, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return _lhs - _rhs;
         }
 
         Number sub_up  (Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            Number result;
-            _lhs->sub(*result, *_rhs, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return _lhs - _rhs;
         }
 
         Number mul_down(Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            Number result;
-            _lhs->mul(*result, *_rhs, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return _lhs * _rhs;
         }
 
         Number mul_up  (Number _lhs, Number _rhs) // [-∞;+∞][-∞;+∞]
         {
-            Number result;
-            _lhs->mul(*result, *_rhs, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return _lhs * _rhs;
         }
 
         Number div_down(Number _lhs, Number _rhs) // [-∞;+∞]([-∞;+∞]-{0})
         {
-            Number result;
-            _lhs->div(*result, *_rhs, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return _lhs / _rhs;
         }
 
         Number div_up  (Number _lhs, Number _rhs) // [-∞;+∞]([-∞;+∞]-{0})
         {
-            Number result;
-            _lhs->div(*result, *_rhs, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return _lhs / _rhs;
         }
 
         Number sqrt_down(Number _val)   // ]0;+∞]
         {
-            Number result;
-            _val->sqrt(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return sqrt(_val);
         }
         Number sqrt_up  (Number _val)   // ]0;+∞]
         {
-            Number result;
-            _val->sqrt(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return sqrt(_val);
         }
         Number exp_down(Number _val)    // [-∞;+∞]
         {
-            Number result;
-            _val->exp(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return exp(_val);
         }
         Number exp_up  (Number _val)    // [-∞;+∞]
         {
-            Number result;
-            _val->exp(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return exp(_val);
         }
         Number log_down(Number _val)    // ]0;+∞]
         {
-            Number result;
-            _val->log(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return log(_val);
         }
         Number log_up  (Number _val)    // ]0;+∞]
         {
-            Number result;
-            _val->log(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return log(_val);
+        }
+        Number sin_up(Number _val)
+        {
+            return sin(_val);
+        }
+        Number sin_down(Number _val)
+        {
+            return sin(_val);
         }
         Number cos_down(Number _val)    // [0;2π]
         {
-            Number result;
-            _val->cos(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return cos(_val);
         }
         Number cos_up  (Number _val)    // [0;2π]
         {
-            Number result;
-            _val->cos(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return cos(_val);
         }
         Number tan_down(Number _val)    // ]-π/2;π/2[
         {
-            Number result;
-            _val->tan(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return tan(_val);
         }
         Number tan_up  (Number _val)    // ]-π/2;π/2[
         {
-            Number result;
-            _val->tan(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return tan(_val);
         }
         Number asin_down(Number _val)   // [-1;1]
         {
-            Number result;
-            _val->asin(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return asin(_val);
         }
         Number asin_up  (Number _val)   // [-1;1]
         {
-            Number result;
-            _val->asin(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return asin(_val);
         }
         Number acos_down(Number _val)   // [-1;1]
         {
-            Number result;
-            _val->acos(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return acos(_val);
         }
         Number acos_up  (Number _val)   // [-1;1]
         {
-            Number result;
-            _val->acos(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return acos(_val);
         }
         Number atan_down(Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->atan(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return atan(_val);
         }
         Number atan_up  (Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->atan(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return atan(_val);
         }
         Number sinh_down(Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->sinh(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return sinh(_val);
         }
         Number sinh_up  (Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->sinh(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return sinh(_val);
         }
         Number cosh_down(Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->cosh(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return cosh(_val);
         }
         Number cosh_up  (Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->cosh(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return cosh(_val);
         }
         Number tanh_down(Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->tanh(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return tanh(_val);
         }
         Number tanh_up  (Number _val)   // [-∞;+∞]
         {
-            Number result;
-            _val->tanh(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return tanh(_val);
         }
         Number asinh_down(Number _val)  // [-∞;+∞]
         {
-            Number result;
-            _val->asinh(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return asinh(_val);
         }
         Number asinh_up  (Number _val)  // [-∞;+∞]
         {
-            Number result;
-            _val->asinh(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return asinh(_val);
         }
         Number acosh_down(Number _val)  // [1;+∞]
         {
-            Number result;
-            _val->acosh(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return acosh(_val);
         }
         Number acosh_up  (Number _val)  // [1;+∞]
         {
-            Number result;
-            _val->acosh(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return acosh(_val);
         }
         Number atanh_down(Number _val)  // [-1;1]
         {
-            Number result;
-            _val->atanh(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return atanh(_val);
         }
         Number atanh_up  (Number _val)  // [-1;1] 
         {
-            Number result;
-            _val->atanh(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return atanh(_val);
         }
         Number median(Number _val1, Number _val2)   // [-∞;+∞][-∞;+∞]
         {
-			// @todo: Median <-> arithmetisches Mittel ???
-            Number result;
-            result->add_assign(*_val1);
-            result->add_assign(*_val2);
-            result->div_assign(Number(2));
-            return result;
+            // Note: this is the arithmetic mean
+            return (_val1 + _val2) / 2;
         }
         Number int_down(Number _val)    // [-∞;+∞]
         {
-            Number result;
-            _val->floor(*result, convRnd<Number>(CARL_RND::D) );
-            return result;
+            return floor(_val);
         }
         Number int_up  (Number _val)    // [-∞;+∞]
         {
-            Number result;
-            _val->ceil(*result, convRnd<Number>(CARL_RND::U) );
-            return result;
+            return ceil(_val);
         }
         // conversion functions
         template<typename U>
         Number conv_down(U _val)
         {
-            return Number(_val, convRnd<Number>(CARL_RND::D) );
+            return Number(_val);
         }
         
         template<typename U>
         Number conv_up(U _val)
         {
-            return Number(_val, convRnd<Number>(CARL_RND::U) );
+            return Number(_val);
         }
         // unprotected rounding class
 //    typedef ... unprotected_rounding;
     };
 }
+
+#include "rounding/rounding_float_t.tpp"

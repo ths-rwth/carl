@@ -381,7 +381,7 @@ template<typename Number>
 bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const
 	{
 		// Special case: if both contain 0 we can directly skip and return the unbounded interval.
-		if(this->contains(0) && o.contains(0))
+		if(this->contains(0) && rhs.contains(0))
 		{
 			a = unboundedInterval();
 			return false;
@@ -921,7 +921,7 @@ inline const Interval<Number> operator +(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(lhs + rhs, rhs.lowerBoundType(), rhs.UpperBoundType());
+		return Interval<Number>(lhs + rhs, rhs.lowerBoundType(), rhs.upperBoundType());
 	}
 
 template<typename Number>
