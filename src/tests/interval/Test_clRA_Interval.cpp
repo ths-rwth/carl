@@ -868,7 +868,7 @@ TEST(clRA_Interval, Split)
     std::list<clRA_Interval> results;
     results = i5.split(5);
     EXPECT_EQ(5, results.size());
-    EXPECT_EQ(clRA_Interval(0, BoundType::WEAK, 1, BoundType::WEAK), *results.begin());
+    EXPECT_EQ(clRA_Interval(0, BoundType::WEAK, 1, BoundType::STRICT), *results.begin());
 	results.pop_front();
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 2, BoundType::STRICT), *results.begin());
     results.pop_front();

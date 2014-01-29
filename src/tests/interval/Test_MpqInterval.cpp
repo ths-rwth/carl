@@ -865,7 +865,7 @@ TEST(MpqInterval, Split)
     std::list<MpqInterval> results;
     results = i5.split(5);
     EXPECT_EQ(5, results.size());
-    EXPECT_EQ(MpqInterval(0, BoundType::WEAK, mpq_class(1), BoundType::WEAK), *results.begin());
+    EXPECT_EQ(MpqInterval(0, BoundType::WEAK, mpq_class(1), BoundType::STRICT), *results.begin());
 	results.pop_front();
     EXPECT_EQ(MpqInterval(1, BoundType::WEAK, 2, BoundType::STRICT), *results.begin());
     results.pop_front();
