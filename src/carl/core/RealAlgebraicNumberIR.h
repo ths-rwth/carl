@@ -171,7 +171,7 @@ public:
 		return i.contains(this->getInterval());
 	}
 
-	bool equal(std::shared_ptr<RealAlgebraicNumberIR> n);
+	bool equal(std::shared_ptr<RealAlgebraicNumberIR>& n);
 	
 private:
 	// Helper functions for lessWhileUnequal

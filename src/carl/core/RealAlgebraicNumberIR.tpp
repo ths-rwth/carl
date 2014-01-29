@@ -102,13 +102,16 @@ std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::mi
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number> n) {
+bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this == n.get()) return true;
 	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
 	if (this->right() <= n->left()) return false;
 	if (this->left() >= n->right()) return false;
-	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) return true;
+	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) {
+		n = this->thisPtr();
+		return true;
+	}
 	return this->add(n->minus())->isZero();
 }
 
