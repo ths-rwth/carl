@@ -882,3 +882,25 @@ TEST(DoubleInterval, Split)
     results.pop_front();
 	EXPECT_EQ(DoubleInterval(4, BoundType::WEAK, 5, BoundType::STRICT), *results.begin());
 }
+
+TEST(DoubleInterval, Properties)
+{
+    DoubleInterval i1(3, BoundType::STRICT, 7, BoundType::STRICT);
+    DoubleInterval i2(-5, BoundType::STRICT, 3, BoundType::STRICT);
+    
+    // Diameter
+    EXPECT_EQ(4, i1.diameter());
+    EXPECT_EQ(8, i2.diameter());
+    
+    // Diameter ratio
+    EXPECT_EQ(2, i2.diameterRatio(i1));
+    EXPECT_EQ(0.5, i1.diameterRatio(i2));
+    
+    // Magnitude
+    //EXPECT_EQ(7, i1.magnitude());
+    //EXPECT_EQ(5, i2.magnitude());
+    
+    // Center
+    EXPECT_EQ(5, i1.center());
+    EXPECT_EQ(-1, i2.center());
+}
