@@ -94,7 +94,7 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 				if (rad == 0) {
 					this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / (2*a)), false);
 				} else if (rad > 0) {
-					std::pair<Number, Number> res = carl::sqrt(rad);
+					std::pair<Number, Number> res = carl::sqrt_fast(rad);
 					if (res.first == res.second) {
 						// Root could be calculated exactly
 						this->addRoot(RealAlgebraicNumberNR<Number>::create((-b - res.first) / (2*a)), false);

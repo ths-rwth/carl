@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   IncrementalRootFinder.tpp
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
@@ -30,11 +30,7 @@ IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 
 template<typename Number, typename C>
 void IncrementalRootFinder<Number, C>::findRoots() {
-	RealAlgebraicNumberPtr<Number> root = this->next();
-	while (root != nullptr) {
-		this->addRoot(root);
-		root = this->next();
-	}
+	while (this->next() != nullptr) {}
 	this->setFinished();
 }
 

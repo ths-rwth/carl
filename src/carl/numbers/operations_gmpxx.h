@@ -53,18 +53,6 @@ inline double toDouble(const mpz_class& n) {
 	return n.get_d();
 }
 
-template<typename Integer>
-inline Integer toInt(const mpz_class& n);
-template<>
-inline signed long int toInt<signed long int>(const mpz_class& n) {
-    assert(n <= INT_MAX);
-    return mpz_get_si(n.get_mpz_t());
-}
-template<>
-inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
-    assert(n <= UINT_MAX);
-    return mpz_get_ui(n.get_mpz_t());
-}
 
 template<typename T>
 inline T rationalize(double n);

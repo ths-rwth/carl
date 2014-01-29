@@ -61,6 +61,15 @@ inline unsigned toInt<unsigned>(const cln::cl_I& n) {
     return cln::cl_I_to_uint(n);
 }
 
+inline cln::cl_I toInt(const cln::cl_RA& n) {
+	assert(isInteger(n));
+	return getNum(n);
+}
+
+inline cln::cl_LF toLF(const cln::cl_RA& n) {
+	return cln::cl_R_to_LF(n, std::max(cln::integer_length(cln::numerator(n)), cln::integer_length(cln::denominator(n))));
+}
+
 template<typename T>
 inline T rationalize(double n) {
 	return cln::rationalize(cln::cl_R(n));
@@ -111,7 +120,7 @@ inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
 
 inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
     assert( a >= 0 );
-    cln::cl_R root = cln::sqrt(a);
+    cln::cl_R root = cln::sqrt(toLF(a));
     cln::cl_RA rroot = cln::rationalize(root);
     if( rroot == root ) // the result of the sqrt operation is a rational and thus an exact solution -> return a point-Interval
     {
@@ -119,9 +128,10 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
     }
     else // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
     {
+		// Check if root^2 > a
         if( cln::expt_pos(rroot,2) > a ) // we need to find the lower bound
         {
-            cln::cl_R lower = cln::sqrt(a-rroot);
+            cln::cl_R lower = cln::sqrt(toLF(a-rroot));
             cln::cl_RA rlower = cln::rationalize(lower);
             if( rlower == lower )
             {
@@ -137,7 +147,7 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
         }
         else // we need to find the upper bound
         {
-            cln::cl_R upper = cln::sqrt(a+rroot);
+            cln::cl_R upper = cln::sqrt(toLF(a+rroot));
             cln::cl_RA rupper = cln::rationalize(upper);
             if( rupper == upper )
             {
@@ -151,6 +161,30 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
                 return std::make_pair(rroot, num/den );
             }
         }
+    }
+}
+
+/**
+ * Compute square root in a fast but less precise way.
+ * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
+ * Otherwise use the nearest integers as bounds on the square root.
+ * @param a Some number.
+ * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z. 
+ */
+inline std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a) {
+	assert(a >= 0);
+	cln::cl_R tmp = cln::sqrt(toLF(a));
+	cln::cl_RA root = cln::rationalize(tmp);
+	if(root == tmp) {
+		// root is a cln::cl_RA
+		return std::make_pair(root, root);
+	} else {
+		// root is a cln::cl_LF. In this case, it is not integer and we can assume that the surrounding integers contain the actual root.
+		cln::cl_I lower = carl::floor(root);
+		cln::cl_I upper = carl::ceil(root);
+		assert(cln::expt_pos(lower,2) < a);
+		assert(cln::expt_pos(upper,2) > a);
+		return std::make_pair(lower, upper);
     }
 }
 

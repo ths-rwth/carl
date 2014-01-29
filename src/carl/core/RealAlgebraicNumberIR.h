@@ -163,13 +163,15 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);
 
-	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
+	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(const std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
+
+	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus();
 
 	virtual bool containedIn(const ExactInterval<Number>& i) const {
 		return i.contains(this->getInterval());
 	}
 
-	bool equal(std::shared_ptr<RealAlgebraicNumberIR> n);
+	bool equal(std::shared_ptr<RealAlgebraicNumberIR>& n);
 	
 private:
 	// Helper functions for lessWhileUnequal

@@ -16,6 +16,7 @@ namespace carl
 {
 
 /**
+ * @ingroup gb
  *  Class with the settings for the reduction algorithm.
  */
 template<class Polynomial>
@@ -59,6 +60,9 @@ public:
 	static const bool fastIndex = true;
 };
 
+/**
+ * @ingroup gb
+ */
 template<typename InputPolynomial, typename PolynomialInIdeal, template <class> class Datastructure = carl::Heap, template <typename Polynomial> class Configuration = ReductorConfiguration>
 class Reductor
 {

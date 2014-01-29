@@ -99,8 +99,8 @@ RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, Re
 	assert(point.dim() == variables.size());
 	RANIRMap<Number> IRs;
 	UnivariatePolynomial<Coeff> pol(p);
-	
 	for (unsigned i = 0; i < point.dim(); i++) {
+		if (!pol.has(variables[i])) continue;
 		assert(pol.has(variables[i]));
 		if (point[i]->isNumeric()) {
 			// Plug in numeric representations

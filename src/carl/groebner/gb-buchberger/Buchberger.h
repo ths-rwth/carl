@@ -44,6 +44,9 @@ namespace carl
 {
 
 
+/**
+ * @ingroup gb 
+ */
 template<typename BuchbergerProc>
 struct UpdateFnct : UpdateFnc
 {
@@ -61,6 +64,7 @@ public:
 
 /** 
  * Standard settings used if the Buchberger object is not instantiated with another template parameter.
+ * @ingroup gb
  */
 struct DefaultBuchbergerSettings
 {
@@ -72,7 +76,7 @@ struct DefaultBuchbergerSettings
 /**
  * Gebauer and Moeller style implementation of the Buchberger algorithm. For more information about this Algorithm.
  * More information can be found in the Bachelor Thesis On Groebner Bases in SMT-Compliant Decision Procedures. 
- * 
+ * @ingroup gb
  */
 template<typename Polynomial, template<typename> class AddingPolicy>
 class Buchberger : private AddingPolicy<Polynomial>

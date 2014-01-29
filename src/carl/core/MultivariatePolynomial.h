@@ -1,6 +1,6 @@
 /**
  * @file MultivariatePolynomial.h 
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -24,6 +24,7 @@ class UnivariatePolynomial;
 
 /**
  *  The general-purpose multivariate polynomial class.
+ * @ingroup multirp
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariatePolynomial : public Polynomial, Policies
@@ -209,8 +210,9 @@ public:
 	/**
 	 * Divides the polynomial by another polynomial.
 	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
-	 * Otherwise, false is returned and the content of quotient is undefined.
+	 * Otherwise, false is returned and the content of quotient remains unchanged.
 	 * Applies if the coefficients are from a field.
+	 * Note that the quotient must not be *this.
      * @param divisor
      * @param quotient
      * @return 
@@ -528,6 +530,9 @@ private:
 
 } // namespace carl
 
+/**
+ * @ingroup multirp
+ */
 namespace std
 {
     template<typename C, typename O, typename P>

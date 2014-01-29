@@ -1,6 +1,6 @@
 /**
  * @file Monomial.h 
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -27,6 +27,7 @@ namespace carl
      *  The general-purpose monomials. Notice that we aim to keep this object as small as possbible, 
      * while also limiting the use of expensive language features such as RTTI, exceptions and even 
      * polymorphism.
+	 * @ingroup multirp
      */
     class Monomial
     {
@@ -454,11 +455,12 @@ namespace carl
 		Monomial pow(unsigned exp) const {
 			Monomial res(*this);
 			unsigned expsum = 0;
-			for (auto it: res.mExponents) {
-				it.exp = (exponent)carl::pow(it.exp, exp);
+			for (auto& it: res.mExponents) {
+				it.exp = (exponent)(it.exp * exp);
 				expsum += it.exp;
 			}
 			res.mTotalDegree = expsum;
+			assert(res.validate());
 			return res;
 		}
         

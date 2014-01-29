@@ -1,3 +1,8 @@
+/**
+ * @file CriticalPairs.tpp
+ * @ingroup gb
+ * @author Sebastian Junges
+ */
 #pragma once
 #include "CriticalPairs.h"
 

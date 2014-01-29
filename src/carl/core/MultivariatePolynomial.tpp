@@ -1,6 +1,6 @@
 /**
  * @file MultivariatePolynomial.tpp
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  */
 
@@ -392,19 +392,23 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
 	for (unsigned i = 0; i < res.mTerms.size(); i++) {
-		res.mTerms[i]->divideBy(divisor);
+		res.mTerms[i].reset(res.mTerms[i]->divideBy(divisor));
 	}
 	return res;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b ,MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
+	assert(this != &quotient);
+
 	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
 	assert(!b.isZero());
-	quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
-	if (this->isZero()) return true;
+	if (this->isZero()) {
+		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
+		return true;
+	}
 	if (a == b) {
 		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>(Coeff(1));
 		return true;
@@ -413,25 +417,30 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		quotient = this->divideBy(b.lcoeff());
 		return true;
 	}
-	
+
 	Variable x = *b.gatherVariables().begin();
-	
+
 	auto ac = a.toUnivariatePolynomial(x);
 	auto bc = b.toUnivariatePolynomial(x);
 	bool leadisnum = bc.lcoeff().isNumber();
-	
+	MultivariatePolynomial<Coeff,Ordering,Policies> res;
+
 	while (ac.degree() >= bc.degree()) {
-		MultivariatePolynomial<Coeff,Ordering,Policies> term = ac.lcoeff();
+		MultivariatePolynomial<Coeff,Ordering,Policies> term;
 		if (leadisnum) {
-			term.divideBy(bc.lcoeff(), term);
+			auto r = ac.lcoeff().divideBy(bc.lcoeff(), term);
+			assert(r);
 		} else {
 			if (!ac.lcoeff().divideBy(bc.lcoeff(), term)) {
 				return false;
 			}
 		}
-		quotient += term * Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		res += term * Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
 		a = a - b * term;
-		if (a.isZero()) return true;
+		if (a.isZero()) {
+			quotient = res;
+			return true;
+		}
 		ac = a.toUnivariatePolynomial(x);
 	}
 	return false;
