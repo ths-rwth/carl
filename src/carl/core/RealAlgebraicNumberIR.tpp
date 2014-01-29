@@ -74,18 +74,16 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 	Variable y = VariablePool::getInstance().getFreshVariable();
 
 	MultivariatePolynomial<Number> tmp1(this->getPolynomial());
-	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(vb)}));
+	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(y)}));
 	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
-	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).toNumberCoefficients());
+	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).switchVariable(va).toNumberCoefficients());
 	
 	UnivariatePolynomial<typename IntegralT<Number>::type> ptmp = res.switchVariable(va).toIntegerDomain().primitivePart();
 	auto p = ptmp.template convert<Number>();
-	
 	auto seq = p.standardSturmSequence();
 
 	ExactInterval<Number> i = this->getInterval() + n->getInterval();
-	while (p.isRoot(i.left()) || p.isRoot(i.right()) ||
-		UnivariatePolynomial<Number>::countRealRoots(seq, i) > 0) {
+	while (p.isRoot(i.left()) || p.isRoot(i.right()) || UnivariatePolynomial<Number>::countRealRoots(seq, i) > 1) {
 		this->refine();
 		n->refine();
 		i = this->getInterval() + n->getInterval();
