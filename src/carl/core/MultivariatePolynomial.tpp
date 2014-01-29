@@ -394,6 +394,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	for (unsigned i = 0; i < res.mTerms.size(); i++) {
 		res.mTerms[i].reset(res.mTerms[i]->divideBy(divisor));
 	}
+	LOGMSG_TRACE("carl.core", *this << " / " << divisor << " = " << res);
 	return res;
 }
 
@@ -401,6 +402,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
+	LOGMSG_TRACE("carl.core", *this << " / " << b);
 	assert(this != &quotient);
 
 	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
@@ -419,6 +421,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	}
 
 	Variable x = *b.gatherVariables().begin();
+	LOGMSG_TRACE("carl.core", "Chose " << x);
 
 	auto ac = a.toUnivariatePolynomial(x);
 	auto bc = b.toUnivariatePolynomial(x);
@@ -555,7 +558,8 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 		}
 	}
 	setTerms(newTerms);
-	LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+	LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+	LOGMSG_TRACE("carl.core", "should hold: " << mTerms.size() << " <= " << expectedResultSize);
 	assert(mTerms.size() <= expectedResultSize);
 }
 
