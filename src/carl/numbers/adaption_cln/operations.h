@@ -120,7 +120,7 @@ inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
 
 inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
     assert( a >= 0 );
-    cln::cl_R root = cln::sqrt(a);
+    cln::cl_R root = cln::sqrt(toLF(a));
     cln::cl_RA rroot = cln::rationalize(root);
     if( rroot == root ) // the result of the sqrt operation is a rational and thus an exact solution -> return a point-Interval
     {
@@ -128,9 +128,10 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
     }
     else // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
     {
+		// Check if root^2 > a
         if( cln::expt_pos(rroot,2) > a ) // we need to find the lower bound
         {
-            cln::cl_R lower = cln::sqrt(a-rroot);
+            cln::cl_R lower = cln::sqrt(toLF(a-rroot));
             cln::cl_RA rlower = cln::rationalize(lower);
             if( rlower == lower )
             {
@@ -146,7 +147,7 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
         }
         else // we need to find the upper bound
         {
-            cln::cl_R upper = cln::sqrt(a+rroot);
+            cln::cl_R upper = cln::sqrt(toLF(a+rroot));
             cln::cl_RA rupper = cln::rationalize(upper);
             if( rupper == upper )
             {
