@@ -428,14 +428,15 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	while (ac.degree() >= bc.degree()) {
 		MultivariatePolynomial<Coeff,Ordering,Policies> term;
 		if (leadisnum) {
-			auto r = ac.lcoeff().divideBy(bc.lcoeff(), term);
-			assert(r);
+			term = ac.lcoeff().divideBy(bc.lcoeff().constantPart());
 		} else {
 			if (!ac.lcoeff().divideBy(bc.lcoeff(), term)) {
 				return false;
 			}
 		}
-		res += term * Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		assert(!term.isZero());
+		term *= Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		res += term;
 		a = a - b * term;
 		if (a.isZero()) {
 			quotient = res;
