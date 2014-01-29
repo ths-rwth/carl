@@ -66,6 +66,10 @@ inline cln::cl_I toInt(const cln::cl_RA& n) {
 	return getNum(n);
 }
 
+inline cln::cl_LF toLF(const cln::cl_RA& n) {
+	return cln::cl_R_to_LF(n, std::max(cln::integer_length(cln::numerator(n)), cln::integer_length(cln::denominator(n))));
+}
+
 template<typename T>
 inline T rationalize(double n) {
 	return cln::rationalize(cln::cl_R(n));
