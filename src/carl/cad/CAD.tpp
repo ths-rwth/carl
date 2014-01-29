@@ -8,6 +8,7 @@
 
 #include <forward_list>
 #include <fstream>
+#include <vector>
 
 #include "CAD.h"
 
@@ -173,7 +174,7 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
-	os << endl << cad.getSetting() << endl;
+	//os << endl << cad.getSetting() << endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (auto i: cad.getEliminationSets()) {
@@ -611,19 +612,14 @@ bool CAD<Number>::check(
 			this->eliminationSets[l].setLiftingPositionsReset();
 		}
 	}
-	
+
 	if (satisfiable) {
 		LOGMSG_DEBUG("carl.cad", "Result: sat (by sample point " << r << ")");
 	} else {
 		LOGMSG_DEBUG("carl.cad", "Result: unsat");
 	}
-	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
-		LOGMSG_DEBUG("carl.cad", "  Level " << i << "( " << this->eliminationSets[i].size() << " ): " << this->eliminationSets[i]);
-	}
-	LOGMSG_DEBUG("carl.cad", "samples: " << this->samples().size());
-	LOGMSG_DEBUG("carl.cad", "isComplete: " << this->isComplete());
-	LOGMSG_DEBUG("carl.cad", "Conflict graph: " << conflictGraph);
-	
+	LOGMSG_TRACE("carl.cad", "Status:" << std::endl << *this);
+
 	this->alterSetting(backup);
 	return satisfiable;
 }
@@ -1464,6 +1460,7 @@ bool CAD<Number>::liftCheck(
 			(this->setting.preferSamplesByIsRoot && this->setting.preferNonrootSamples && sampleSetIncrement.emptyNonroot()) ||
 			(this->setting.preferSamplesByIsRoot && !this->setting.preferNonrootSamples && sampleSetIncrement.emptyRoot())
 		) {
+			LOGMSG_TRACE("carl.cad", "computing more samples.");
 			// disable blind sample construction
 			computeMoreSamples = false;
 			replacedSamples.clear();
@@ -1566,11 +1563,12 @@ bool CAD<Number>::liftCheck(
 			} else {
 				sampleSetIncrement.pop();
 			}
-			
+
 			// clean sample point component again
 			extSample.pop_front();
-			
+
 			if (liftingSuccessful) {
+				LOGMSG_TRACE("carl.cad", "Lifting was successfull");
 				// there might still be samples left but not stored yet
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
@@ -1584,6 +1582,7 @@ bool CAD<Number>::liftCheck(
 			// all lifting positions used
 			if (this->setting.equationsOnly || this->setting.inequalitiesOnly) {
 				// there might still be samples not yet considered but unimportant for the current lifting
+				LOGMSG_TRACE("carl.cad", "storing in sample tree");
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
 					this->storeSampleInTree(sampleSetIncrement.next(), node);
