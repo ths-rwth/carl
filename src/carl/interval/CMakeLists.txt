@@ -12,6 +12,8 @@ set(carl_lib_interval_sources
 
 PARENT_SCOPE)
 
+configure_file( config.h.in config.h )
+
 # Installation of header files
 install(FILES			${carl_lib_interval_headers}
 		DESTINATION		include/carl/interval

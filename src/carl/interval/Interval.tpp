@@ -244,7 +244,7 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
 			return result;
 		}
 		Number diameter = this->diameter();
-        diameter /= n;
+        diameter /= Number(n);
 		
         Interval<Number> tmp;
         tmp.set(mContent.lower(), mContent.lower()+diameter);
@@ -442,7 +442,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
 template<typename Number>
 Interval<Number> Interval<Number>::inverse() const
 	{
-		return Interval<Number>( -mContent.upper(), mUpperBoundType, -mContent.lower(), mLowerBoundType );
+		return Interval<Number>( mContent.upper()*Number(-1), mUpperBoundType, mContent.lower()*Number(-1), mLowerBoundType );
 	}
 
 template<typename Number>
