@@ -507,7 +507,7 @@ namespace carl
 		 */
 		void setUpper(const Number& n)
 		{
-			mContent = BoostINterval(mContent.lower(), n);
+			mContent = BoostInterval(mContent.lower(), n);
 		}
 		
 		/**

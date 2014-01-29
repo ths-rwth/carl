@@ -46,18 +46,22 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(1, test2.upper());
     EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
-	/*
-    DoubleInterval test3 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::STRICT);
-    EXPECT_EQ(-1, test3.lower());
-    EXPECT_EQ(1, test3.upper());
-    EXPECT_EQ(BoundType::WEAK, test3.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test3.upperBoundType());
-    DoubleInterval test4 = DoubleInterval((cln::cl_RA)-1, BoundType::WEAK, (cln::cl_RA)1, BoundType::STRICT);
-    EXPECT_EQ(-1, test4.lower());
-    EXPECT_EQ(1, test4.upper());
-    EXPECT_EQ(BoundType::WEAK, test4.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
-	 */
+    test1.setLower(-3);
+    test1.setUpper(5);
+    test1.setLowerBoundType(BoundType::STRICT);
+    test1.setUpperBoundType(BoundType::WEAK);
+    EXPECT_EQ(-3, test1.lower());
+    EXPECT_EQ(5, test1.upper());
+    EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
+    EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    test1.set(4, 8);
+    EXPECT_EQ(4, test1.lower());
+    EXPECT_EQ(8, test1.upper());
+    test1.setLowerBoundType(BoundType::INFTY);
+    test1.setUpperBoundType(BoundType::INFTY);
+    EXPECT_TRUE(test1.isUnbounded());
+    DoubleInterval test3 = DoubleInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
+    EXPECT_TRUE(test3.isEmpty());
 }
 
 TEST(DoubleInterval, Addition)
