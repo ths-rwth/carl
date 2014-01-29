@@ -164,6 +164,23 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
     }
 }
 
+inline std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a) {
+	assert(a >= 0);
+	cln::cl_R tmp = cln::sqrt(toLF(a));
+	cln::cl_RA root = cln::rationalize(tmp);
+	if(root == tmp) {
+		// root is a cln::cl_RA
+		return std::make_pair(root, root);
+	} else {
+		// root is a cln::cl_LF. In this case, it is not integer and we can assume that the surrounding integers contain the actual root.
+		cln::cl_I lower = carl::floor(root);
+		cln::cl_I upper = carl::ceil(root);
+		assert(cln::expt_pos(lower,2) < a);
+		assert(cln::expt_pos(upper,2) > a);
+		return std::make_pair(lower, upper);
+    }
+}
+
 inline cln::cl_I mod(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::mod(a, b);
 }
