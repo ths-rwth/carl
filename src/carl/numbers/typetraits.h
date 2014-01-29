@@ -10,7 +10,8 @@
 
 #pragma once
 
-#include <type_traits>#include <mpfr.h>
+#include <type_traits>
+#include <mpfr.h>
 #include <gmpxx.h>
 
 #include "../util/SFINAE.h"

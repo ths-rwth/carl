@@ -160,6 +160,17 @@ inline mpz_class operator/(const mpz_class& n, const mpz_class& d)
 inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
 }
+	
+	inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
+	{
+		return mpq_class(lhs*rhs);
+	}
+	
+	inline mpq_class operator /(const mpq_class& lhs, const mpq_class& rhs)
+	{
+		return mpq_class(lhs/rhs);
+	}
+	
 
 }
 
