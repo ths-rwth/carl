@@ -21,13 +21,13 @@
 
 		int frames = backtrace(stack, maxFrames);
 		char** symbols = backtrace_symbols(stack, frames);
-		
+
 		if (frames == 0) {
 			return os << "\t<empty, probably corrupt>" << std::endl;
 		}
 
 		for (int i = 1; i < frames; i++) {
-			os << col["green"] << "#" << i << col["reset"] << "\t" << symbols[i] << std::endl;
+			os << col["green"] << "#" << i << col["reset"];
 			Dl_info info;
 			if (dladdr(stack[i], &info) && info.dli_sname) {
 				char* demangled = nullptr;
@@ -42,7 +42,7 @@
 			}
 			os << std::endl;
 		}
-		
+
 		free(symbols);
 		if (frames == maxFrames) os << "[truncated]" << std::endl;
 		return os;
