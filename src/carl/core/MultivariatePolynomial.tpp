@@ -464,20 +464,22 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
             }
         }
         mTerms.swap(newTerms);
-		LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+		LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
-    // Find and sort all exponents occurring with the variable to substitute as basis.
+    // Find all exponents occurring with the variable to substitute as basis.
+    // expResults will finally be a mapping from every exponent e for which var^e occurs to the value^e and the number of times var^e occurs.
+    // Meanwhile, we store an upper bound on the expected number of terms of the result in expectedResultSize.
     std::map<exponent, std::pair<MultivariatePolynomial, size_t>> expResults;
     size_t expectedResultSize = 0;
     std::pair<MultivariatePolynomial, unsigned> def( MultivariatePolynomial((Coeff) 1), 1 );
     for(auto term : mTerms)
     {
         if(term->monomial())
-        {
+        { // This is not the constant part.
             exponent e = term->monomial()->exponentOfVariable(var);
             if(e > 1)
-            {
+            { // Variable occurs with exponent at least two. Insert into map and increase counter in map.
                 auto iterBoolPair = expResults.insert(std::pair<exponent, std::pair<MultivariatePolynomial, size_t>>(e, def));
                 if(!iterBoolPair.second)
                 {
@@ -485,16 +487,16 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
                 }
             }
             else if(e == 1)
-            {
+            { // Variable occurs with exponent one.
                 expectedResultSize += value.nrTerms();
             }
             else
-            {
+            { // Variable does not occur in this term.
                 ++expectedResultSize;
             }
         }
         else
-        {
+        { // This is the constant part.
             ++expectedResultSize;
         }
     }
