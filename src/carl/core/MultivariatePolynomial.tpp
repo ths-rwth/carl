@@ -505,14 +505,19 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
     // variable for, reusing the already calculated exponentiations.
     if( !expResults.empty() )
     {
+		// Last var^e
         auto expResultA = expResults.begin();
+		// Next var^e
         auto expResultB = expResultA;
+		// Calculate first one
         expResultB->second.first = value.pow(expResultB->first);
         expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
         ++expResultB;
         while(expResultB != expResults.end())
         {
+			// Calculate next var^e based on the last one.
             expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
+            expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
             ++expResultA;
             ++expResultB;
         }
