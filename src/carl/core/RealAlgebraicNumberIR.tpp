@@ -66,7 +66,7 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebraicNumberIRPtr<Number>& n) {
+RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() || n->isZero()) return n;
 
 	Variable va = this->getPolynomial().mainVar();
