@@ -66,7 +66,7 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebraicNumberIRPtr<Number>& n) {
+RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() || n->isZero()) return n;
 
 	Variable va = this->getPolynomial().mainVar();
@@ -94,13 +94,22 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebrai
 }
 
 template<typename Number>
+std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() {
+	if (this->isZero()) {
+		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval, this->sturmSequence);
+	}
+	return RealAlgebraicNumberIR<Number>::create(this->polynomial.negateVariable(), this->interval.inverse());
+}
+
+template<typename Number>
 bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number> n) {
 	if (this == n.get()) return true;
 	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
 	if (this->right() <= n->left()) return false;
 	if (this->left() >= n->right()) return false;
-	return this->add(n)->isZero();
+	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) return true;
+	return this->add(n->minus())->isZero();
 }
 
 template<typename Number>
