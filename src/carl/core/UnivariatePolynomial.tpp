@@ -329,7 +329,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	}
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
-	Coeff prefactor = pow(b,d);
+	Coeff prefactor = carl::pow(b,d);
 	return reduce(divisor, &prefactor);
 }
 
