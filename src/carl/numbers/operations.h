@@ -1,5 +1,5 @@
 /** 
- * @file:   operations.h
+ * @file:   numbers/operations.h
  * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  *
  * This file contains a common interface for basic number functions.
@@ -78,6 +78,6 @@ inline void divide(const Number& dividend, const Number& divisor, Number& quotie
 
 }
 
-#include "operations_cln.h"
-#include "operations_gmpxx.h"
+#include "adaption_cln/operations.h"
+#include "adaption_gmpxx/operations.h"
 #include "operations_native.h"

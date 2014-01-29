@@ -1,6 +1,6 @@
 /**
  * @file Monomial_derivative.h
- * @ingroup MultiRP
+ * @ingroup multirp
  */
 #pragma once
 

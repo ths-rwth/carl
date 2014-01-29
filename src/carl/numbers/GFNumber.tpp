@@ -116,8 +116,8 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator ++()
 	return *this;
 }
 
-template<typename IntegerT>
-GFNumber<IntegerT>& GFNumber<IntegerT>::operator +=(const GFNumber& rhs)
+template<typename IntegerType>
+GFNumber<IntegerType>& GFNumber<IntegerType>::operator +=(const GFNumber& rhs)
 {
 	if(mGf == nullptr)
 	{
@@ -127,8 +127,8 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator +=(const GFNumber& rhs)
 	return *this;
 }
 
-template<typename IntegerT>
-GFNumber<IntegerT>& GFNumber<IntegerT>::operator +=(const IntegerT& rhs)
+template<typename IntegerType>
+GFNumber<IntegerType>& GFNumber<IntegerType>::operator +=(const IntegerType& rhs)
 {
 	mN += rhs;
 	return *this;
@@ -159,8 +159,8 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator --()
 	return *this;
 }
 
-template<typename IntegerT>
-GFNumber<IntegerT>& GFNumber<IntegerT>::operator -=(const GFNumber& rhs)
+template<typename IntegerType>
+GFNumber<IntegerType>& GFNumber<IntegerType>::operator -=(const GFNumber& rhs)
 {
 	if(rhs.isZero()) return *this;
 	if(mGf == nullptr)
@@ -171,8 +171,8 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator -=(const GFNumber& rhs)
 	return *this;
 }
 
-template<typename IntegerT>
-GFNumber<IntegerT>& GFNumber<IntegerT>::operator -=(const IntegerT& rhs)
+template<typename IntegerType>
+GFNumber<IntegerType>& GFNumber<IntegerType>::operator -=(const IntegerType& rhs)
 {
 	mN -= rhs;
 	return *this;
@@ -204,8 +204,8 @@ GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const GFNumber& rhs)
 	return *this;
 }
 
-template<typename IntegerT>
-GFNumber<IntegerT>& GFNumber<IntegerT>::operator *=(const IntegerT& rhs)
+template<typename IntegerType>
+GFNumber<IntegerType>& GFNumber<IntegerType>::operator *=(const IntegerType& rhs)
 {
 	mN *= rhs;
 	return *this;

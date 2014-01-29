@@ -1,8 +1,8 @@
 /** 
  * @file   DivisionResult.h
+ * @ingroup gb
  * @author Sebastian Junges
  *
- * @since July 19, 2013
  */
 
 #pragma once

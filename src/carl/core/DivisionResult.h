@@ -1,27 +1,26 @@
 /** 
- * @file:   DivisionResult.h
- * @author: Sebastian Junges
+ * @file   DivisionResult.h
+ * @author Sebastian Junges
  *
- * @since October 15, 2013
  */
 
 #pragma once
 
+namespace carl
+{
+	
+/**
+ * A strongly typed pair encoding the result of a division, 
+ * being a quotient and a remainder.
+ */	
 template<typename Type>
 struct DivisionResult
 {
-private:
-	DivisionResult()
-	{
-	}
-
 public:
 	DivisionResult(const Type& q, const Type& r) :
 	quotient(q), remainder(r)
-	{
-		
-	}
-	
+	{}
 	Type quotient;
 	Type remainder;
 };
+}

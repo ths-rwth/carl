@@ -1,6 +1,6 @@
 /**
  * @file Monomial.h 
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -27,6 +27,7 @@ namespace carl
      *  The general-purpose monomials. Notice that we aim to keep this object as small as possbible, 
      * while also limiting the use of expensive language features such as RTTI, exceptions and even 
      * polymorphism.
+	 * @ingroup multirp
      */
     class Monomial
     {
@@ -60,7 +61,7 @@ namespace carl
             mExponents(1, VarExpPair(v,e)),
             mTotalDegree(e)
         {
-
+			assert(e > 0);
         }
         
         Monomial(const Monomial& rhs) :
@@ -687,7 +688,7 @@ namespace carl
 
         friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
         {
-            return (os << rhs.toString());
+            return (os << rhs.toString(true, true));
         }
 		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)

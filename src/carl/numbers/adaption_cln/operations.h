@@ -1,5 +1,5 @@
 /** 
- * @file   operations_cln.h
+ * @file   adaption_cln/operations.h
  * @ingroup cln
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
@@ -48,6 +48,23 @@ inline double toDouble(const cln::cl_I& n) {
 	return cln::double_approx(n);
 }
 
+template<typename Integer>
+inline Integer toInt(const cln::cl_I& n);
+template<>
+inline int toInt<int>(const cln::cl_I& n) {
+    assert(n <= INT_MAX);
+    return cln::cl_I_to_int(n);
+}
+template<>
+inline unsigned toInt<unsigned>(const cln::cl_I& n) {
+    assert(n <= UINT_MAX);
+    return cln::cl_I_to_uint(n);
+}
+
+inline cln::cl_I toInt(const cln::cl_RA& n) {
+	assert(isInteger(n));
+	return getNum(n);
+}
 
 template<typename T>
 inline T rationalize(double n) {

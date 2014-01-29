@@ -1,5 +1,5 @@
 /** 
- * @file   operations_gmpxx.h
+ * @file   adaption_gmpxx/operations.h
  * @ingroup gmpxx
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
@@ -53,6 +53,18 @@ inline double toDouble(const mpz_class& n) {
 	return n.get_d();
 }
 
+template<typename Integer>
+inline Integer toInt(const mpz_class& n);
+template<>
+inline signed long int toInt<signed long int>(const mpz_class& n) {
+    assert(n <= INT_MAX);
+    return mpz_get_si(n.get_mpz_t());
+}
+template<>
+inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
+    assert(n <= UINT_MAX);
+    return mpz_get_ui(n.get_mpz_t());
+}
 
 template<typename T>
 inline T rationalize(double n);
@@ -160,6 +172,7 @@ inline mpz_class operator/(const mpz_class& n, const mpz_class& d)
 inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
 }
+
 
 }
 

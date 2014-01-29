@@ -11,6 +11,7 @@
 #include <map>
 #include "initialize.h"
 #include "Variable.h"
+#include "../util/Singleton.h"
 
 
 namespace carl 
@@ -23,24 +24,15 @@ namespace carl
  *
  * All methods that modify the pool, that are getInstance(), getFreshVariable() and setName(), are thread-safe.
  */
-class VariablePool
+class VariablePool : public Singleton<VariablePool>
 {
+friend Singleton<VariablePool>;
 private:
 	/**
 	 * Contains the id of the next variable to be created.
 	 * As such, is also a counter of the variables that exist.
 	 */
 	unsigned mNextVarId;
-
-	/**
-	 * The unique instance of VariablePool.
-	 */
-	static std::unique_ptr<VariablePool>  instance;
-
-	/**
-	 * Mutex for the creation of the singleton instance.
-	 */
-	static std::mutex singletonMutex;
 
 	/**
 	 * Mutex for calling getFreshVariable().
@@ -57,27 +49,13 @@ private:
 	 */
 	std::map<Variable, std::string> mFriendlyNames;
 
+protected:
 	/**
 	 * Private default constructor.
 	 */
 	VariablePool();
 
-	/**
-	 * This class is a singleton, hence there shall be no copy constructor.
-	 */
-	VariablePool(const VariablePool&) = delete;
-
-	/**
-	 * This class is a singleton, hence there shall be no assignment operator.
-	 */
-	VariablePool& operator=(const VariablePool&) = delete;
 public:
-	/**
-	 * Returns the single instance of this class by reference.
-	 * If there is no instance yet, a new one is created.
-	 * This method is thread-safe.
-	 */
-	static VariablePool& getInstance();
 
 	/**
 	 * Get a variable which was not used before.

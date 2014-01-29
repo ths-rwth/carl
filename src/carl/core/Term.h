@@ -1,6 +1,6 @@
 /**
  * @file Term.h
- * @ingroup MultiRP
+ * @ingroup multirp
  * @author Sebastian Junges
  * @author Florian Corzilius
  */
@@ -10,11 +10,15 @@
 #include <memory>
 #include "Monomial.h"
 #include "VariablesInformation.h"
+#include "Definiteness.h"
 
 namespace carl
 {
-    enum class Definiteness : unsigned { NEGATIVE = 0, NEGATIVE_SEMI = 1, NON = 2, POSITIVE_SEMI = 3, POSITIVE = 4 };
 
+/**
+ * A coefficient times a monomial.
+ * @ingroup multirp
+ */
 template<typename Coefficient>
 class Term
 {

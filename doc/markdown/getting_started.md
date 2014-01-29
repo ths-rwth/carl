@@ -53,9 +53,9 @@ which simplifies finding carl to a simple find_package(carl), no matter if carl 
 
 Supported platforms
 --------------------------------------------
-We have tested carl on the following platforms:
+We have tested carl successfully on the following platforms:
 
--                       Arch Linux (Kernel 3.10) with GCC 4.8.2
+- @if Sebastian @endif  Arch Linux (Kernel 3.10) with GCC 4.8.2
 -                       Arch Linux (Kernel 3.10) with Clang 3.3
 - @if Gereon @endif     Arch Linux (Kernel 3.12) with Clang 3.4 and GCC 4.8.2
 - @if Florian @endif    Ubuntu 12.04 LTS with GCC 4.8.1
@@ -66,7 +66,4 @@ We have tested carl on the following platforms:
 Troubleshooting
 --------------------------------------------
 
-To be able to build and configure GTest under Mac OSX with clang and libc++ we adjust the CONFIGURE command for gtest in the file resources/CMakeLists.txt to:
-~~~~~~
-CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> CXX=/usr/bin/clang++ "CXXFLAGS=-stdlib=libc++ -std=c++11 -DGTEST_USE_OWN_TR1_TUPLE=1"
-~~~~~~
+If you're experiencing problems, take a look at our [troubleshooting] section. If that doesn't help you, feel free to contact us.

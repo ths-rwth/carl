@@ -3,7 +3,6 @@
  * @ingroup gb
  * @author Sebastian Junges
  *
- * @since August 26, 2013
  */
 
 #pragma once
@@ -15,6 +14,10 @@
 namespace carl
 {
 
+/**
+ * A general class for Groebner Basis calculation
+ * @ingroup gb 
+ */
 template<typename Polynomial, template<typename, template<typename> class > class Procedure, template<typename> class AddingPolynomialPolicy>
 class GBProcedure : private Procedure<Polynomial, AddingPolynomialPolicy>
 {
