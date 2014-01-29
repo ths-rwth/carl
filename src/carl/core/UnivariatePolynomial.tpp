@@ -385,12 +385,15 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
 {
-	if(isZero()) 
-	{
+	if(isZero()) {
 		return *this;
 	}
-	assert(isNormal());
-	return *this/(content());
+	if (this->isNormal()) {
+		return *this / this->content();
+	} else {
+		auto tmp = *this * Coeff(-1);
+		return tmp / tmp.content();
+	}
 }
 
 /**
