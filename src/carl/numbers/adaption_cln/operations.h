@@ -164,6 +164,13 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a) {
     }
 }
 
+/**
+ * Compute square root in a fast but less precise way.
+ * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
+ * Otherwise use the nearest integers as bounds on the square root.
+ * @param a Some number.
+ * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z. 
+ */
 inline std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a) {
 	assert(a >= 0);
 	cln::cl_R tmp = cln::sqrt(toLF(a));
