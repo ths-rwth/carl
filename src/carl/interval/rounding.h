@@ -4,9 +4,10 @@
  * 
  * @file   rounding.h
  * @author Benedikt Seidl
+ * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
  * @since   2014-01-28
- * @version 2014-01-28
+ * @version 2014-01-30
  */
 
 #pragma once
@@ -182,7 +183,6 @@ namespace carl
         }
         Number median(Number _val1, Number _val2)   // [-∞;+∞][-∞;+∞]
         {
-            // Note: this is the arithmetic mean
             return (_val1 + _val2) / 2;
         }
         Number int_down(Number _val)    // [-∞;+∞]

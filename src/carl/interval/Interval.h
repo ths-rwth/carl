@@ -18,7 +18,7 @@
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
  * @since	2013-12-13
- * @version 2014-01-07
+ * @version 2014-01-30
  */
 
 #pragma once
@@ -36,6 +36,7 @@
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 #include "../numbers/adaption_gmpxx/operations.h"
+#include <cmath>
 
 #include "../core/Variable.h"
 #include "../util/SFINAE.h"
@@ -196,14 +197,14 @@ namespace carl
 			mUpperBoundType(o.mUpperBoundType)
 		{}
 		
-		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy >
+		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy, DisableIf<is_rational<N>> = dummy >
 		Interval(const double& n):
 			mContent(carl::Interval<Number>::BoostInterval(n,n)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
 		
-		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy>
+		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy, DisableIf<is_rational<N>> = dummy >
 		Interval(double lower, double upper)
 		{
 			if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK)) {
@@ -218,7 +219,7 @@ namespace carl
 			}
 		}
 		
-		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy>
+		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy, DisableIf<is_rational<N>> = dummy>
 		Interval(double lower, BoundType lowerBoundType, double upper, BoundType upperBoundType)
 		{
 			if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType)) {
@@ -682,7 +683,6 @@ namespace carl
 		
 		friend inline std::ostream& operator <<(std::ostream& str, const Interval<Number>& i)
 		{
-			str << "lower: " << i.mContent.lower() << ", upper: " << i.mContent.upper() << " ";
  			switch (i.mLowerBoundType) {
 				case BoundType::INFTY:
 					str << "]-INF, ";
@@ -888,8 +888,51 @@ namespace carl
          * Boolean Operations
          **********************************************************************/
 		
+		/**
+		 * Intersects two intervals in a set-theoretic manner.
+		 * @param rhs
+		 * @return result
+		 */
 		Interval<Number> intersect(const Interval<Number>& rhs) const;
 		Interval<Number>& intersect_assign(const Interval<Number>& rhs);
+		
+		/**
+		 * Unites two intervals in a set-theoretic manner (can result in two distinct intervals).
+		 * @param rhs
+		 * @param resultA
+		 * @param resultB
+		 * @return True, if the result is twofold
+		 */
+		bool unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
+		
+		/**
+		 * Calculates the difference of two intervals in a set-theoretic manner:
+		 * lhs - rhs (can result in two distinct intervals).
+		 * @param rhs
+		 * @param resultA
+		 * @param resultB
+		 * @return True, if the result is twofold
+		 */
+		bool difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
+		
+		/**
+		 * Calculates the complement in a set-theoretic manner (can result 
+		 * in two distinct intervals).
+		 * @param resultA
+		 * @param resultB
+		 * @return True, if the result is twofold
+		 */
+		bool complement(Interval<Number>& resultA, Interval<Number>& resultB) const;
+		
+		/**
+		 * Calculates the symmetric difference of two intervals in a 
+		 * set-theoretic manner (can result in two distinct intervals).
+		 * @param rhs
+		 * @param resultA
+		 * @param resultB
+		 * @return True, if the result is twofold
+		 */
+		bool symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
 		
 		/***********************************************************************
          * Comparison functions

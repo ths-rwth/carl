@@ -3,9 +3,9 @@
  * other types if necessary.
  * 
  * @file FLOAT_T.h
- * @author  Stefan Schupp
+ * @author  Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  * @since   2013-10-14
- * @version 2013-01-10
+ * @version 2014-01-30
  */
 
 #pragma once
