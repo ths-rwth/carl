@@ -1,15 +1,15 @@
 set(carl_lib_util_headers 
 	BitVector.h
 	CompactTree.h
+	debug.h
 	Heap.h
-        SFINAE.h
-        platform.h
-        tree.h
+	SFINAE.h
+	tree.h
 ) 
 # Source files in here
 set(carl_lib_util_sources 
 	util/BitVector.cpp
-        util/platform.cpp
+	util/debug.cpp
 	
 PARENT_SCOPE)
 
