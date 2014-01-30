@@ -1,12 +1,15 @@
 #include "debug.h"
 
-#include <cassert>
+#include "platform.h"
 
+#if defined(__CLANG) || defined(__GCC)
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <cxxabi.h>
 #include <stdlib.h>
 #include <unistd.h>
+#endif
+#include <cassert>
 #include <map>
 #include <sstream>
 
@@ -53,7 +56,7 @@ void Stacktrace::storeTrace(const std::string& name) {
 	for (unsigned i = 1; i < frames; i++) {
 		std::stringstream ss;
 		ss << this->col["red"] << "#" << (frames - i) << this->col["reset"] << "\t";
-		ss << this->demangle(stack[i], symbols[i]) << " @ " << stack[i];
+		ss << this->demangle(stack[i], symbols[i]) << this->col["gray"] << " @ " << stack[i] << this->col["reset"];
 		trace[trace.size()-i] = ss.str();
 	}
 	this->traces[name] = trace;

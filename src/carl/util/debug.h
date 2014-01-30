@@ -4,6 +4,8 @@
  * This file contains convenience routines for debugging, e.g. to print more complex data structures like STL container or print stack traces.
  */
 
+#pragma once
+
 #include <iostream>
 #include <list>
 #include <map>
