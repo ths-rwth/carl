@@ -4,11 +4,13 @@
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
  * @since	2014-01-10
- * @version 2014-01-10
+ * @version 2014-01-30
  */
 
-
+#include "../../carl/util/platform.h"
+CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
+CLANG_WARNING_RESET
 #include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"

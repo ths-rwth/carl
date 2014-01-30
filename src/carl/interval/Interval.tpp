@@ -1017,33 +1017,6 @@ template<typename Number>
 		resultB = rhs;
 		return true;
 	}
-
-/***********************************************************************
- * Comparison functions
- **********************************************************************/
-template<typename Number>
-	Interval<Number> Interval<Number>::max(const Interval<Number>& rhs) const
-	{
-		
-	}
-	
-template<typename Number>
-	void Interval<Number>::max_assign(const Interval<Number>& rhs)
-	{
-		
-	}
-	
-template<typename Number>
-	Interval<Number> Interval<Number>::min(const Interval<Number>& rhs) const
-	{
-		
-	}
-	
-template<typename Number>
-	void Interval<Number>::min_assign(const Interval<Number>& rhs)
-	{
-		
-	}
 	
 /*******************************************************************************
  * Overloaded arithmetics operators

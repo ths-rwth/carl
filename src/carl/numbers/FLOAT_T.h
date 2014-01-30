@@ -24,7 +24,7 @@
 
 namespace carl
 {
-    typedef unsigned long precision;
+    typedef long precision;
     
     template<typename FloatType>
     class FLOAT_T;
@@ -100,13 +100,11 @@ namespace carl
 
            precision getPrec() const
            {
-               // TODO
                return 0;
            }
 
-           FLOAT_T<FloatType>& setPrec( const precision& _prec)
+           FLOAT_T<FloatType>& setPrec( const precision&)
            {
-               // TODO
                return *this;
            }
             
@@ -158,58 +156,49 @@ namespace carl
              * arithmetic operations
              */
             
-            FLOAT_T<FloatType>& add_assign( const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& add_assign( const FLOAT_T<FloatType>& _op2, CARL_RND)
             {
-                // TODO: Include rounding
                 mValue = mValue + _op2.mValue;
                 return *this;
             }
             
-            void add( FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N) const
+            void add( FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND) const
             {
-                // TODO: Include rounding
                 _result.mValue = mValue + _op2.mValue;
             }
 
-            FLOAT_T<FloatType>& sub_assign(const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& sub_assign(const FLOAT_T<FloatType>& _op2, CARL_RND)
             {
-                // TODO: Include rounding
                 mValue = mValue - _op2.mValue;
                 return *this;
             }
             
-            void sub(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N) const
+            void sub(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND) const
             {
-                // TODO: Include rounding
                 _result.mValue = mValue - _op2.mValue;
             }
             
-            FLOAT_T<FloatType>& mul_assign(const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& mul_assign(const FLOAT_T<FloatType>& _op2, CARL_RND)
             {
-                // TODO: Include rounding
                 mValue = mValue * _op2.mValue;
-                // mValue.mul_assign(_op2.mValue, _rnd);
                 return *this;
             }
             
-            void mul(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N) const
+            void mul(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND) const
             {
-                // TODO: Include rounding
                 _result.mValue = mValue * _op2.mValue;
             }
             
-            FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND)
             {
                 assert( _op2 != 0 );
-                // TODO: Include rounding
                 mValue = mValue / _op2.mValue;
                 return *this;
             }
             
-            void div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND _rnd = CARL_RND::N) const
+            void div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND) const
             {
                 assert( _op2 != 0 );
-                // TODO: Include rounding
                 _result.mValue = mValue / _op2.mValue;
             }
             
@@ -217,238 +206,238 @@ namespace carl
              * special operators
              */
 
-            FLOAT_T<FloatType>& sqrt_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& sqrt_assign(CARL_RND)
             {
                 assert( *this >= 0);
                 mValue = std::sqrt(mValue);
                 return *this;
             }
             
-            void sqrt(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void sqrt(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 assert( *this >= 0);
             	_result.mValue = std::sqrt(mValue);
             }
 
-            FLOAT_T<FloatType>& cbrt_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& cbrt_assign(CARL_RND)
             {
                 assert( *this >= 0);
                 mValue = std::cbrt(mValue);
                 return *this;
             }
             
-            FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 assert( *this >= 0);
             	_result.mValue = std::cbrt(mValue);
             }
 
-            FLOAT_T<FloatType>& root_assign(unsigned long int _k, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& root_assign(unsigned long int _k, CARL_RND)
             {
                 assert( *this >= 0);
-                // TODO
+                /// @TODO implement root_assign for FLOAT_T
                 return *this;
             }
             
-            void root(FLOAT_T<FloatType>& _result, unsigned long int _k, CARL_RND _rnd = CARL_RND::N)
+            void root(FLOAT_T<FloatType>& _result, unsigned long int _k, CARL_RND)
             {
                 assert( *this >= 0);
-            	// TODO
+            	/// @TODO implement root for FLOAT_T
             }
 
-            FLOAT_T<FloatType>& pow_assign(unsigned long int _exp, CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& pow_assign(unsigned long int _exp, CARL_RND)
             {
                 mValue = std::pow(mValue, _exp);
                 return *this;
             }
             
-            void pow(FLOAT_T<FloatType>& _result, unsigned long int _exp, CARL_RND _rnd = CARL_RND::N)
+            void pow(FLOAT_T<FloatType>& _result, unsigned long int _exp, CARL_RND)
             {
             	_result.mValue = std::pow(mValue, _exp);
             }
 
-            FLOAT_T<FloatType>& abs_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& abs_assign(CARL_RND)
             {
                 mValue = std::abs(mValue);
                 return *this;
             }
             
-            void abs(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void abs(FLOAT_T<FloatType>& _result, CARL_RND)
             {
             	_result.mValue = std::abs(mValue);
             }
             
-            FLOAT_T<FloatType>& exp_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& exp_assign(CARL_RND)
             {
                 mValue = std::exp(mValue);
                 return *this;
             }
             
-            void exp(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void exp(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::exp(mValue);
             }
             
-            FLOAT_T<FloatType>& sin_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& sin_assign(CARL_RND)
             {
                 mValue = std::sin(mValue);
                 return *this;
             }
             
-            void sin(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void sin(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::sin(mValue);
             }
             
-            FLOAT_T<FloatType>& cos_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& cos_assign(CARL_RND)
             {
                 mValue = std::cos(mValue);
                 return *this;
             }
             
-            void cos(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void cos(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::cos(mValue);
             }
             
-            FLOAT_T<FloatType>& log_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& log_assign(CARL_RND)
             {
                 mValue = std::log(mValue);
                 return *this;
             }
             
-            void log(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void log(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::log(mValue);
             }
             
-            FLOAT_T<FloatType>& tan_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& tan_assign(CARL_RND)
             {
                 mValue = std::tan(mValue);
                 return *this;
             }
             
-            void tan(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void tan(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::tan(mValue);
             }
             
-            FLOAT_T<FloatType>& asin_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& asin_assign(CARL_RND)
             {
                 mValue = std::asin(mValue);
                 return *this;
             }
             
-            void asin(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void asin(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::asin(mValue);
             }
             
-            FLOAT_T<FloatType>& acos_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& acos_assign(CARL_RND)
             {
                 mValue = std::acos(mValue);
                 return *this;
             }
             
-            void acos(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void acos(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::acos(mValue);
             }
             
-            FLOAT_T<FloatType>& atan_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& atan_assign(CARL_RND)
             {
                 mValue = std::atan(mValue);
                 return *this;
             }
             
-            void atan(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void atan(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::atan(mValue);
             }
 
-            FLOAT_T<FloatType>& sinh_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& sinh_assign(CARL_RND)
             {
                 mValue = std::sinh(mValue);
                 return *this;
             }
             
-            void sinh(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void sinh(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::sinh(mValue);
             }
             
-            FLOAT_T<FloatType>& cosh_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& cosh_assign(CARL_RND)
             {
                 mValue = std::cosh(mValue);
                 return *this;
             }
             
-            void cosh(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void cosh(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::cosh(mValue);
             }
             
-            FLOAT_T<FloatType>& tanh_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& tanh_assign(CARL_RND)
             {
                 mValue = std::tanh(mValue);
                 return *this;
             }
             
-            void tanh(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void tanh(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::tanh(mValue);
             }
             
-            FLOAT_T<FloatType>& asinh_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& asinh_assign(CARL_RND)
             {
                 mValue = std::asinh(mValue);
                 return *this;
             }
             
-            void asinh(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void asinh(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::asinh(mValue);
             }
             
-            FLOAT_T<FloatType>& acosh_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& acosh_assign(CARL_RND)
             {
                 mValue = std::acosh(mValue);
                 return *this;
             }
             
-            void acosh(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void acosh(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::acosh(mValue);
             }
             
-            FLOAT_T<FloatType>& atanh_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& atanh_assign(CARL_RND)
             {
                 mValue = std::atanh(mValue);
                 return *this;
             }
             
-            void atanh(FLOAT_T<FloatType>& _result, CARL_RND _rnd = CARL_RND::N)
+            void atanh(FLOAT_T<FloatType>& _result, CARL_RND)
             {
                 _result.mValue = std::atanh(mValue);
             }
             
-            void floor(int& _result, CARL_RND _rnd = CARL_RND::N)
+            void floor(int& _result, CARL_RND)
             {
                 _result = std::floor(mValue);
             }
             
-            FLOAT_T<FloatType>& floor_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& floor_assign(CARL_RND)
             {
                 mValue = std::floor(mValue);
                 return *this;
             }
             
-            void ceil(int& _result, CARL_RND _rnd = CARL_RND::N)
+            void ceil(int& _result, CARL_RND)
             {
                 _result = std::ceil(mValue);
             }
             
-            FLOAT_T<FloatType>& ceil_assign(CARL_RND _rnd = CARL_RND::N)
+            FLOAT_T<FloatType>& ceil_assign(CARL_RND)
             {
                 mValue = std::ceil(mValue);
                 return *this;
@@ -457,7 +446,7 @@ namespace carl
             /**
              * conversion operators
              */
-            double toDouble(CARL_RND _rnd=CARL_RND::N) const
+            double toDouble(CARL_RND) const
             {
                 return (double) mValue;
             }
@@ -702,9 +691,6 @@ namespace carl
             
             std::string toString() const
             {
-//                std::stringstream str;
-//                str << mValue;   
-//                return str.str();
                 return std::to_string(mValue);
             }
     };

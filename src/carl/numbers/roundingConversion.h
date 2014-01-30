@@ -9,8 +9,10 @@
 
 #pragma once
 
-
+#include "../util/platform.h"
+CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <mpfr.h>
+CLANG_WARNING_RESET
 
 #include <assert.h>
 

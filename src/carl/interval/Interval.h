@@ -23,18 +23,20 @@
 
 #pragma once
 
+#include "../util/platform.h"
 #include <map>
 #include <cassert>
 #include <list>
 #include <sstream>
-
-
 #include "BoundType.h"
-#include "rounding.h"
 #include "checking.h"
+#include "rounding.h"
 #include "../numbers/typetraits.h"
+
+CLANG_WARNING_DISABLE("-Wunused-parameter")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
+CLANG_WARNING_RESET
 #include "../numbers/adaption_gmpxx/operations.h"
 #include <cmath>
 
@@ -414,7 +416,6 @@ namespace carl
 				mUpperBoundType = BoundType::STRICT;
 			}
 		}
-		/*
 		template<typename Rational>
 		Interval(Rational n);
 		template<typename Rational>
@@ -933,15 +934,6 @@ namespace carl
 		 * @return True, if the result is twofold
 		 */
 		bool symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
-		
-		/***********************************************************************
-         * Comparison functions
-         **********************************************************************/
-		
-		Interval<Number> max(const Interval<Number>& rhs) const;
-		void max_assign(const Interval<Number>& rhs);
-		Interval<Number> min(const Interval<Number>& rhs) const;
-		void min_assign(const Interval<Number>& rhs);
     };
 	
 	/***************************************************************************
