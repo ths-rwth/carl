@@ -1424,7 +1424,8 @@ bool CAD<Number>::liftCheck(
 	// determines whether new samples shall be constructed regardless of other flags
 	bool computeMoreSamples = false;
 	// the current list of samples at this position in the sample tree
-	cad::SampleSet<Number> currentSamples(this->sampleTree.begin(node), this->sampleTree.end(node));
+	cad::SampleSet<Number> currentSamples;
+	currentSamples.insert(this->sampleTree.begin(node), this->sampleTree.end(node));
 	// the current samples queue for this lifting process
 	cad::SampleSet<Number> sampleSetIncrement;
 	std::forward_list<RealAlgebraicNumberPtr<Number>> replacedSamples;

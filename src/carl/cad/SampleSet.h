@@ -43,12 +43,6 @@ public:
 	typedef typename std::list<RealAlgebraicNumberIRPtr<Number>>::iterator iteratorIR;
 	typedef typename std::list<RealAlgebraicNumberNRPtr<Number>>::iterator iteratorNR;
 	typedef std::unordered_map<RealAlgebraicNumberIRPtr<Number>, RealAlgebraicNumberNRPtr<Number>> SampleSimplification;
-
-	SampleSet() {}
-	template<typename InputIterator>
-	SampleSet(const InputIterator& first, const InputIterator& last)
-		: samples(first, last) {
-	}
 	
 	/**
 	 * Inserts an element into the sorted list at the correct position according to the order.
