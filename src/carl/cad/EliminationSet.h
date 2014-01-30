@@ -310,13 +310,6 @@ public:
 	 * @return set entry for the given polynomial p if exists, otherwise nullptr
 	 */
 	const UPolynomial* find(const UPolynomial* p);
-	
-	/**
-	 * Swaps the contents (all attributes) of the two EliminationSets.
-	 * @see std::set::swap
-	 */
-	template<typename Coeff>
-	friend void swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
 
 	/**
 	 * Remove every data from this set.
@@ -520,6 +513,13 @@ public:
 	template<typename Coeff>
 	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coeff>& s);
 	
+	/**
+	 * Swaps the contents (all attributes) of the two EliminationSets.
+	 * @see std::set::swap
+	 */
+	template<typename Coeff>
+	friend void std::swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
+
 	//////////////////////////////
 	// STATIC AUXILIARY METHODS //
 	//////////////////////////////
@@ -641,6 +641,11 @@ public:
 };
 
 }
+}
+
+namespace std {
+template<typename Coeff>
+void swap(carl::cad::EliminationSet<Coeff>& lhs, carl::cad::EliminationSet<Coeff>& rhs);
 }
 
 #include "EliminationSet.tpp"
