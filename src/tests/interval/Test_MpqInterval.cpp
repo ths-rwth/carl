@@ -45,18 +45,22 @@ TEST(MpqInterval, Getters)
     EXPECT_EQ(1, test2.upper());
     EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
-	/*
-    MpqInterval test3 = MpqInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::STRICT);
-    EXPECT_EQ(-1, test3.lower());
-    EXPECT_EQ(1, test3.upper());
-    EXPECT_EQ(BoundType::WEAK, test3.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test3.upperBoundType());
-    MpqInterval test4 = MpqInterval((cln::cl_RA)-1, BoundType::WEAK, (cln::cl_RA)1, BoundType::STRICT);
-    EXPECT_EQ(-1, test4.lower());
-    EXPECT_EQ(1, test4.upper());
-    EXPECT_EQ(BoundType::WEAK, test4.lowerBoundType());
-    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
-	 */
+    test1.setLower(-3);
+    test1.setUpper(5);
+    test1.setLowerBoundType(BoundType::STRICT);
+    test1.setUpperBoundType(BoundType::WEAK);
+    EXPECT_EQ(-3, test1.lower());
+    EXPECT_EQ(5, test1.upper());
+    EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
+    EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    test1.set(4, 8);
+    EXPECT_EQ(4, test1.lower());
+    EXPECT_EQ(8, test1.upper());
+    test1.setLowerBoundType(BoundType::INFTY);
+    test1.setUpperBoundType(BoundType::INFTY);
+    EXPECT_TRUE(test1.isUnbounded());
+    MpqInterval test3 = MpqInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
+    EXPECT_TRUE(test3.isEmpty());
 }
 
 TEST(MpqInterval, Addition)
@@ -874,4 +878,26 @@ TEST(MpqInterval, Split)
 	EXPECT_EQ(MpqInterval(3, BoundType::WEAK, 4, BoundType::STRICT), *results.begin());
     results.pop_front();
 	EXPECT_EQ(MpqInterval(4, BoundType::WEAK, 5, BoundType::STRICT), *results.begin());
+}
+
+TEST(MpqInterval, Properties)
+{
+    MpqInterval i1(3, BoundType::STRICT, 7, BoundType::STRICT);
+    MpqInterval i2(-5, BoundType::STRICT, 3, BoundType::STRICT);
+    
+    // Diameter
+    EXPECT_EQ(4, i1.diameter());
+    EXPECT_EQ(8, i2.diameter());
+    
+    // Diameter ratio
+    EXPECT_EQ(2, i2.diameterRatio(i1));
+    EXPECT_EQ(0.5, i1.diameterRatio(i2));
+    
+    // Magnitude
+    //EXPECT_EQ(7, i1.magnitude());
+    //EXPECT_EQ(5, i2.magnitude());
+    
+    // Center
+    EXPECT_EQ(5, i1.center());
+    EXPECT_EQ(-1, i2.center());
 }

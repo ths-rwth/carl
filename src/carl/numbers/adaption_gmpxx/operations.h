@@ -9,6 +9,7 @@
 
 #pragma once
 #include <gmpxx.h>
+#include <limits.h>
 
 namespace carl {
 
