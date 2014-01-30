@@ -231,6 +231,13 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const SampleSet<Num>& s);
 	
+	/**
+	 * Swaps the contents (all attributes) of the two SampleSets.
+	 * @see std::set::swap
+	 */
+	template<typename Num>
+	friend void std::swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
+
 private:
 	///////////////////////
 	// AUXILIARY METHODS //
@@ -245,6 +252,11 @@ private:
 };
 
 }
+}
+
+namespace std {
+template<typename Num>
+void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs);
 }
 
 #include "SampleSet.tpp"

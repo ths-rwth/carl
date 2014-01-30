@@ -287,3 +287,16 @@ void SampleSet<Number>::removeFromNRIR(const RealAlgebraicNumberPtr<Number> r) {
 
 }
 }
+
+namespace std {
+
+template<typename Num>
+void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
+	std::swap(lhs.samples, rhs.samples);
+	std::swap(lhs.NRqueue, rhs.NRqueue);
+	std::swap(lhs.IRqueue, rhs.IRqueue);
+	std::swap(lhs.nonRootQueue, rhs.nonRootQueue);
+	std::swap(lhs.rootQueue, rhs.rootQueue);
+}
+
+}
