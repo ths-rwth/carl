@@ -70,7 +70,6 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 	if (this->isZero() || n->isZero()) return n;
 
 	Variable va = this->getPolynomial().mainVar();
-	Variable vb = n->getPolynomial().mainVar();
 	Variable y = VariablePool::getInstance().getFreshVariable();
 
 	MultivariatePolynomial<Number> tmp1(this->getPolynomial());
