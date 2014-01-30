@@ -35,7 +35,7 @@ std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(
 			this->nonRootQueue.push_back(rNR);
 		}
 		this->queue.push_back(rNR);
-		return std::pair<iterator, bool>(this->samples.insert(position,rNR), true);    // insert safely and return iterator to the new element
+		return std::make_pair(this->samples.insert(position,rNR), true);    // insert safely and return iterator to the new element
 	}
 	auto position = this->samples.begin();
 	if (!this->samples.empty()) {
