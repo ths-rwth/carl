@@ -244,11 +244,7 @@ bool SampleSet<Number>::contains(const RealAlgebraicNumberPtr<Number> r) const {
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
-	os << "{ ";
-	for (auto sample: s.samples) {
-		os << sample << " ";
-	}
-	return os << "}";
+	return os << s.queue;
 }
 
 template<typename Number>
