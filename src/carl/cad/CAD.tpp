@@ -1600,19 +1600,18 @@ template<typename Number>
 int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsActive) {
 	while (true) {
 		if (!this->eliminationSets[level].emptyLiftingQueue()) return (int)level;
-		unsigned l = level - 1;
+		unsigned l = level;
 		// find the first level where elimination polynomials can be generated
-		while (l >= 0 && this->eliminationSets[l].emptySingleEliminationQueue() && this->eliminationSets[l].emptyPairedEliminationQueue()) {
-			l--;
-		}
-		
+		int ltmp = (int)l;
+		do {
+			ltmp--;
+		} while (ltmp >= 0 && this->eliminationSets[(unsigned)ltmp].emptySingleEliminationQueue() && this->eliminationSets[(unsigned)ltmp].emptyPairedEliminationQueue());
 		// check if no further elimination possible
-		if (l == 0 && this->eliminationSets[0].emptySingleEliminationQueue() && this->eliminationSets[0].emptyPairedEliminationQueue()) {
-			LOGMSG_TRACE("carl.cad", "returning from eliminate(): -1");
+		if (ltmp < 0) {
 			return -1;
 		}
 		// eliminate one polynomial per level down to the current level
-		l++;
+		l = (unsigned)ltmp + 1;
 		
 		if (boundsActive && this->setting.simplifyEliminationByBounds) {
 			LOGMSG_TRACE("carl.cad", "eliminate with bounds");
