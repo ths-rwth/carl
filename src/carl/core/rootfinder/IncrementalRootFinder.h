@@ -1,6 +1,7 @@
-/*
- * File:   IncrementalRootFinder.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file IncrementalRootFinder.h
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -81,20 +82,9 @@ public:
 namespace splittingStrategies {
 
 template<typename Strategy, typename Number>
-struct AbstractStrategy {
+struct AbstractStrategy: Singleton<Strategy> {
 	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder) = 0;
-	static Strategy& instance() {
-		if (instanceObject == nullptr) {
-			instanceObject = new Strategy();
-		}
-		return *instanceObject;
-	}
-private:
-	static Strategy* instanceObject;
 };
-
-template <typename Strategy, typename Number>
-Strategy* AbstractStrategy<Strategy, Number>::instanceObject;
 
 template<typename Number>
 struct GenericStrategy : public AbstractStrategy<GenericStrategy<Number>, Number> {

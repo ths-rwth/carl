@@ -1,6 +1,7 @@
-/*
- * File:   IncrementalRootFinder.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file IncrementalRootFinder.tpp
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -60,7 +61,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 	LOGMSG_DEBUG("carl.core.rootfinder", "Processing interval " << interval);
 
 	if (strategy == SplittingStrategy::EIGENVALUES) {
-		splittingStrategies::EigenValueStrategy<Number>::instance()(interval, *this);
+		splittingStrategies::EigenValueStrategy<Number>::getInstance()(interval, *this);
 		return true;
 	} else if (strategy == SplittingStrategy::ABERTH) {
 		//AberthStrategy<Number>::instance()(interval, *this);
@@ -85,13 +86,13 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 
 	//std::cerr << "calling strategy " << strategy << std::endl;
 	switch (strategy) {
-		case SplittingStrategy::GENERIC: splittingStrategies::GenericStrategy<Number>::instance()(interval, *this);
+		case SplittingStrategy::GENERIC: splittingStrategies::GenericStrategy<Number>::getInstance()(interval, *this);
 			break;
 		case SplittingStrategy::EIGENVALUES:	// Should not happen, safe fallback anyway
 		case SplittingStrategy::ABERTH:		// Should not happen, safe fallback anyway
-		case SplittingStrategy::BINARYSAMPLE: splittingStrategies::BinarySampleStrategy<Number>::instance()(interval, *this);
+		case SplittingStrategy::BINARYSAMPLE: splittingStrategies::BinarySampleStrategy<Number>::getInstance()(interval, *this);
 			break;
-		case SplittingStrategy::BINARYNEWTON: splittingStrategies::BinaryNewtonStrategy<Number>::instance()(interval, *this);
+		case SplittingStrategy::BINARYNEWTON: splittingStrategies::BinaryNewtonStrategy<Number>::getInstance()(interval, *this);
 			break;
 		case SplittingStrategy::GRID: //GridStrategy<Number>::instance()(interval, *this);
 			break;

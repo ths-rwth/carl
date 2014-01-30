@@ -1,6 +1,7 @@
-/* 
- * File:   AbstractRootFinder.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file AbstractRootFinder.tpp
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #include "AbstractRootFinder.h"
