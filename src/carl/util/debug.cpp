@@ -132,7 +132,7 @@ std::ostream& operator<<(std::ostream& os, const Stacktrace& s) {
 std::ostream& printStacktrace(std::ostream& os) {
 	Stacktrace s;
 	s.storeTrace("");
-	return os << s.all();
+	return s.all(os);
 }
 
 }
