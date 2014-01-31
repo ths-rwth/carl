@@ -2,8 +2,9 @@
  * Test cases for the double instanciation of the generic interval class.
  * @file Test_DoubleInterval.cpp
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
+ * @author Benedikt Seidl
  *
- * @since	2014-01-10
+ * @since	2014-01-31
  * @version 2014-01-10
  */
 
@@ -897,8 +898,8 @@ TEST(DoubleInterval, Properties)
     EXPECT_EQ(0.5, i1.diameterRatio(i2));
     
     // Magnitude
-    //EXPECT_EQ(7, i1.magnitude());
-    //EXPECT_EQ(5, i2.magnitude());
+    EXPECT_EQ(7, i1.magnitude());
+    EXPECT_EQ(5, i2.magnitude());
     
     // Center
     EXPECT_EQ(5, i1.center());
