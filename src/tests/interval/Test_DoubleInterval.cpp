@@ -887,21 +887,56 @@ TEST(DoubleInterval, Split)
 TEST(DoubleInterval, Properties)
 {
     DoubleInterval i1(3, BoundType::STRICT, 7, BoundType::STRICT);
-    DoubleInterval i2(-5, BoundType::STRICT, 3, BoundType::STRICT);
+    DoubleInterval i2(-5, BoundType::STRICT, 3, BoundType::WEAK);
+    DoubleInterval i3(3, BoundType::WEAK, 7, BoundType::STRICT);
+    DoubleInterval i4(-5, BoundType::WEAK, 3, BoundType::WEAK);
     
     // Diameter
     EXPECT_EQ(4, i1.diameter());
     EXPECT_EQ(8, i2.diameter());
+    EXPECT_EQ(4, i3.diameter());
+    EXPECT_EQ(8, i4.diameter());
     
     // Diameter ratio
-    EXPECT_EQ(2, i2.diameterRatio(i1));
     EXPECT_EQ(0.5, i1.diameterRatio(i2));
+    EXPECT_EQ(2, i2.diameterRatio(i1));
+    EXPECT_EQ(0.5, i3.diameterRatio(i2));
+    EXPECT_EQ(2, i4.diameterRatio(i1));
     
     // Magnitude
     EXPECT_EQ(7, i1.magnitude());
     EXPECT_EQ(5, i2.magnitude());
+    EXPECT_EQ(7, i3.magnitude());
+    EXPECT_EQ(5, i4.magnitude());
     
     // Center
     EXPECT_EQ(5, i1.center());
     EXPECT_EQ(-1, i2.center());
+    EXPECT_EQ(5, i3.center());
+    EXPECT_EQ(-1, i4.center());
+    
+    // Contains
+    EXPECT_TRUE(i1.contains(4));
+    EXPECT_FALSE(i1.contains(2));
+    EXPECT_FALSE(i1.contains(12));
+    EXPECT_FALSE(i1.contains(3));
+    EXPECT_FALSE(i1.contains(7));
+    
+    EXPECT_TRUE(i2.contains(-1));
+    EXPECT_FALSE(i2.contains(-13));
+    EXPECT_FALSE(i2.contains(6));
+    EXPECT_FALSE(i2.contains(-5));
+    EXPECT_TRUE(i2.contains(3));
+    
+    EXPECT_TRUE(i3.contains(4));
+    EXPECT_FALSE(i3.contains(2));
+    EXPECT_FALSE(i3.contains(12));
+    EXPECT_TRUE(i3.contains(3));
+    EXPECT_FALSE(i3.contains(7));
+    
+    EXPECT_TRUE(i4.contains(-1));
+    EXPECT_FALSE(i4.contains(-13));
+    EXPECT_FALSE(i4.contains(6));
+    EXPECT_TRUE(i4.contains(-5));
+    EXPECT_TRUE(i4.contains(3));
 }
