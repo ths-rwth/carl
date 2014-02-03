@@ -600,7 +600,7 @@ public:
 	 * @return True if zero is a root.
 	 */
 	bool zeroIsRoot() const {
-		return this->mCoefficients[0] == 0;
+		return this->isZero() || (this->mCoefficients[0] == Coefficient(0));
 	}
 	/**
 	 * Reduces the polynomial such that zero is not a root anymore.
