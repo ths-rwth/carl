@@ -404,6 +404,18 @@ public:
 	}
 
 	/**
+	 * Insert the given polynomial into the cad.
+	 * Creates a copy from the given polynomial.
+	 *
+	 * @param p polynomial to be added
+	 * @param v the polynomial's variables (parameters and main variable)
+	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
+	 */
+	void addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
+		this->addPolynomial(new MPolynomial(p), v);
+	}
+
+	/**
 	 * Insert the given polynomial into the cad. This method calls addPolynomial with the CAD's list of variables.
 	 *
 	 * @param p polynomial to be added
