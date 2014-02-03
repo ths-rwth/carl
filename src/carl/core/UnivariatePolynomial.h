@@ -161,6 +161,7 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isNumber() const
 	{
+		if (this->isZero()) return true;
 		return this->isConstant() && this->lcoeff().isNumber();
 	}
 
@@ -172,6 +173,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
+		if (this->isZero()) return 0;
 		return this->tcoeff();
 	}
 	/**
@@ -598,7 +600,7 @@ public:
 	 * @return True if zero is a root.
 	 */
 	bool zeroIsRoot() const {
-		return this->mCoefficients[0] == 0;
+		return this->isZero() || (this->mCoefficients[0] == Coefficient(0));
 	}
 	/**
 	 * Reduces the polynomial such that zero is not a root anymore.

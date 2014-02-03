@@ -76,7 +76,7 @@ template<typename Number>
 bool AbstractRootFinder<Number>::solveTrivial() {
 		switch (this->polynomial.degree()) {
 			case 0: {
-				if (this->polynomial.coefficients()[0] == 0) {
+				if (this->polynomial.isZero()) {
 					this->addRoot(RealAlgebraicNumberNR<Number>::create(0), false);
 				}
 				break;

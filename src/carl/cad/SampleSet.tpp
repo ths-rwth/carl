@@ -11,6 +11,7 @@
 #include <cassert>
 
 #include "../core/RealAlgebraicNumber.h"
+#include "../util/debug.h"
 
 namespace carl {
 namespace cad {
