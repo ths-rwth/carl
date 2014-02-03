@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "RealAlgebraicNumber.h"
+#include "RealAlgebraicNumberOperations.h"
 
 namespace carl {
 
@@ -83,6 +84,15 @@ public:
 	
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
+
+	bool operator==(RealAlgebraicPoint<Number>& r) {
+		if (this->dim() != r.dim()) return false;
+		carl::Inequal<Number> ne;
+		for (unsigned i = 0; i < this->numbers.size(); i++) {
+			if (ne(this->numbers[i], r.numbers[i])) return false;
+		}
+		return true;
+	}
 };
 
 template<typename Number>
