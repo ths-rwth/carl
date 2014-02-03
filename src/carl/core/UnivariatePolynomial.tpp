@@ -492,6 +492,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
+	if (this->isZero()) return *this;
 	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
 	return normalized.divideBy(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
@@ -1265,7 +1266,7 @@ CLANG_WARNING_RESET
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 	unsigned int i = 0;
-	while ((i < this->mCoefficients.size()-1) && (this->mCoefficients[i] == 0)) i++;
+	while ((i < this->mCoefficients.size()) && (this->mCoefficients[i] == Coeff(0))) i++;
 	if (i == 0) return;
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
 	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
