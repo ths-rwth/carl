@@ -161,6 +161,7 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isNumber() const
 	{
+		if (this->isZero()) return true;
 		return this->isConstant() && this->lcoeff().isNumber();
 	}
 
@@ -172,6 +173,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
+		if (this->isZero()) return 0;
 		return this->tcoeff();
 	}
 	/**

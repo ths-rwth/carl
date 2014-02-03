@@ -37,13 +37,14 @@ mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not 
 	{
 		mCoefficients.clear();
 	}
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coeff> coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
@@ -54,19 +55,21 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 	for (auto c: coefficients) {
 		this->mCoefficients.push_back(Coeff(c));
 	}
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coeff>& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coeff>&& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
@@ -82,6 +85,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 		}
 		mCoefficients.push_back(expAndCoeff.second);
 	}
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
@@ -108,6 +112,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
 	}
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
@@ -121,6 +126,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 			this->mCoefficients[i].substituteIn(var, value);
 		}
 	}
+	this->stripLeadingZeroes();
 }
 
 template<typename Coeff>
@@ -633,11 +639,15 @@ template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
+	LOGMSG_TRACE("carl.core", *this << " .coprimeCoefficients()");
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
-	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralT<Coeff>::type> result(mMainVar);
+	if (this->isZero()) {
+		return result;
+	}
 	result.mCoefficients.reserve(mCoefficients.size());
+	Coeff factor = this->coprimeFactor();
 	for(const Coeff& coeff : mCoefficients)
 	{
 		assert(getDenom(coeff*factor) == 1);
