@@ -1,6 +1,7 @@
-/* 
- * File:   RootFinder.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RootFinder.h
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once

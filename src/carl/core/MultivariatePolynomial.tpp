@@ -392,19 +392,25 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
 	for (unsigned i = 0; i < res.mTerms.size(); i++) {
-		res.mTerms[i]->divideBy(divisor);
+		res.mTerms[i].reset(res.mTerms[i]->divideBy(divisor));
 	}
+	LOGMSG_TRACE("carl.core", *this << " / " << divisor << " = " << res);
 	return res;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b ,MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
+	LOGMSG_TRACE("carl.core", *this << " / " << b);
+	assert(this != &quotient);
+
 	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
 	assert(!b.isZero());
-	quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
-	if (this->isZero()) return true;
+	if (this->isZero()) {
+		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
+		return true;
+	}
 	if (a == b) {
 		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>(Coeff(1));
 		return true;
@@ -413,25 +419,32 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		quotient = this->divideBy(b.lcoeff());
 		return true;
 	}
-	
+
 	Variable x = *b.gatherVariables().begin();
-	
+	LOGMSG_TRACE("carl.core", "Chose " << x);
+
 	auto ac = a.toUnivariatePolynomial(x);
 	auto bc = b.toUnivariatePolynomial(x);
 	bool leadisnum = bc.lcoeff().isNumber();
-	
+	MultivariatePolynomial<Coeff,Ordering,Policies> res;
+
 	while (ac.degree() >= bc.degree()) {
-		MultivariatePolynomial<Coeff,Ordering,Policies> term = ac.lcoeff();
+		MultivariatePolynomial<Coeff,Ordering,Policies> term;
 		if (leadisnum) {
-			term.divideBy(bc.lcoeff(), term);
+			term = ac.lcoeff().divideBy(bc.lcoeff().constantPart());
 		} else {
 			if (!ac.lcoeff().divideBy(bc.lcoeff(), term)) {
 				return false;
 			}
 		}
-		quotient += term * Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		assert(!term.isZero());
+		term *= Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		res += term;
 		a = a - b * term;
-		if (a.isZero()) return true;
+		if (a.isZero()) {
+			quotient = res;
+			return true;
+		}
 		ac = a.toUnivariatePolynomial(x);
 	}
 	return false;
@@ -455,20 +468,22 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
             }
         }
         mTerms.swap(newTerms);
-		LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+		LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
         return;
     }
-    // Find and sort all exponents occurring with the variable to substitute as basis.
+    // Find all exponents occurring with the variable to substitute as basis.
+    // expResults will finally be a mapping from every exponent e for which var^e occurs to the value^e and the number of times var^e occurs.
+    // Meanwhile, we store an upper bound on the expected number of terms of the result in expectedResultSize.
     std::map<exponent, std::pair<MultivariatePolynomial, size_t>> expResults;
     size_t expectedResultSize = 0;
     std::pair<MultivariatePolynomial, unsigned> def( MultivariatePolynomial((Coeff) 1), 1 );
     for(auto term : mTerms)
     {
         if(term->monomial())
-        {
+        { // This is not the constant part.
             exponent e = term->monomial()->exponentOfVariable(var);
             if(e > 1)
-            {
+            { // Variable occurs with exponent at least two. Insert into map and increase counter in map.
                 auto iterBoolPair = expResults.insert(std::pair<exponent, std::pair<MultivariatePolynomial, size_t>>(e, def));
                 if(!iterBoolPair.second)
                 {
@@ -476,16 +491,16 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
                 }
             }
             else if(e == 1)
-            {
+            { // Variable occurs with exponent one.
                 expectedResultSize += value.nrTerms();
             }
             else
-            {
+            { // Variable does not occur in this term.
                 ++expectedResultSize;
             }
         }
         else
-        {
+        { // This is the constant part.
             ++expectedResultSize;
         }
     }
@@ -493,14 +508,19 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
     // variable for, reusing the already calculated exponentiations.
     if( !expResults.empty() )
     {
+		// Last var^e
         auto expResultA = expResults.begin();
+		// Next var^e
         auto expResultB = expResultA;
+		// Calculate first one
         expResultB->second.first = value.pow(expResultB->first);
         expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
         ++expResultB;
         while(expResultB != expResults.end())
         {
+			// Calculate next var^e based on the last one.
             expResultB->second.first = expResultA->second.first * value.pow(expResultB->first - expResultA->first);
+            expectedResultSize += expResultB->second.second * expResultB->second.first.nrTerms();
             ++expResultA;
             ++expResultB;
         }
@@ -538,7 +558,8 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 		}
 	}
 	setTerms(newTerms);
-	LOGMSG_TRACE("carl.core.mvpolynomial", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+	LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+	LOGMSG_TRACE("carl.core", "should hold: " << mTerms.size() << " <= " << expectedResultSize);
 	assert(mTerms.size() <= expectedResultSize);
 }
 

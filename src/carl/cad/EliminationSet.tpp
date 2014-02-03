@@ -249,20 +249,6 @@ const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coeffici
 }
 
 template<typename Coefficient>
-void swap(EliminationSet<Coefficient>& lhs, EliminationSet<Coefficient>& rhs) {
-	std::swap(lhs.polynomials, rhs.polynomials);
-	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
-	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
-	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
-	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
-	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
-	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
-	std::swap(lhs.liftingOrder, rhs.liftingOrder);
-	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
-	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
-}
-
-template<typename Coefficient>
 void EliminationSet<Coefficient>::clear() {
 	this->polynomials.clear();
 	this->mLiftingQueue.clear();
@@ -597,3 +583,19 @@ void EliminationSet<Coeff>::elimination(
 }
 }
 
+namespace std {
+
+template<typename Coefficient>
+void swap(carl::cad::EliminationSet<Coefficient>& lhs, carl::cad::EliminationSet<Coefficient>& rhs) {
+	std::swap(lhs.polynomials, rhs.polynomials);
+	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
+	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
+	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
+	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
+	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
+	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
+	std::swap(lhs.liftingOrder, rhs.liftingOrder);
+	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
+	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
+}
+}

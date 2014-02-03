@@ -455,11 +455,12 @@ namespace carl
 		Monomial pow(unsigned exp) const {
 			Monomial res(*this);
 			unsigned expsum = 0;
-			for (auto it: res.mExponents) {
-				it.exp = (exponent)carl::pow(it.exp, exp);
+			for (auto& it: res.mExponents) {
+				it.exp = (exponent)(it.exp * exp);
 				expsum += it.exp;
 			}
 			res.mTotalDegree = expsum;
+			assert(res.validate());
 			return res;
 		}
         
