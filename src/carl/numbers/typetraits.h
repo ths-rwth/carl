@@ -235,7 +235,8 @@ struct is_primitive
 {
 	static const bool value = false;
 };
-
+	
+	
 /**
  * @ingroup typetraits
  * @see GFNumber
@@ -254,6 +255,24 @@ struct is_primitive<double>
 
 	template<>
 struct is_primitive<long double>
+{
+	static const bool value = true;
+};
+	
+template<>
+struct is_primitive<int>
+{
+	static const bool value = true;
+};
+
+template<>
+struct is_primitive<float>
+{
+	static const bool value = true;
+};
+
+template<>
+struct is_primitive<unsigned>
 {
 	static const bool value = true;
 };

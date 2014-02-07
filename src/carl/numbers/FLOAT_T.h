@@ -52,19 +52,19 @@ namespace carl
 
             FLOAT_T<FloatType>()
             {
-		assert(is_float<FloatType>::value);
-                mValue = 0;
+				assert(is_float<FloatType>::value);
+                mValue = FloatType(0);
             }
         
             FLOAT_T<FloatType>(const double _double)
             {
-		assert(is_float<FloatType>::value);
+				assert(is_float<FloatType>::value);
                 mValue = _double;
             }
             
             FLOAT_T<FloatType>(const float _float)
             {
-		assert(is_float<FloatType>::value);
+				assert(is_float<FloatType>::value);
                 mValue = _float;
             }
             
@@ -112,12 +112,12 @@ namespace carl
              * Operators *
              *************/
             
-            FLOAT_T<FloatType>& operator = (const FLOAT_T<FloatType> & _rhs)
+            FLOAT_T<FloatType>& operator =(const FLOAT_T<FloatType> & _rhs)
             {
                 mValue = _rhs.mValue;
                 return *this;
             }
-            
+		
             /**
              * Boolean operators 
              */
@@ -565,7 +565,7 @@ namespace carl
             /**
              * Operators
              */
-            
+			     
             friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
             {
                 return FLOAT_T<FloatType>(_lhs.mValue + _rhs.mValue);
