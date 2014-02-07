@@ -122,6 +122,7 @@ public:
 	 */
 	const Coefficient& lcoeff() const
 	{
+		assert(this->mCoefficients.size() > 0);
 		return this->mCoefficients.back();
 	}
 	/**
@@ -130,6 +131,7 @@ public:
 	 * @return 
 	 */
 	const Coefficient& tcoeff() const {
+		assert(this->mCoefficients.size() > 0);
 		return this->mCoefficients.front();
 	}
 
@@ -139,6 +141,7 @@ public:
 	 */
 	bool isConstant() const
 	{
+		this->checkConsistency();
 		return mCoefficients.size() <= 1;
 	}
 
@@ -230,7 +233,9 @@ public:
 	 * Removes the leading term from the polynomial.
 	 */
 	void truncate() {
+		assert(this->mCoefficients.size() > 0);
 		this->mCoefficients.resize(this->mCoefficients.size()-1);
+		this->stripLeadingZeroes();
 	}
 
 	const std::vector<Coefficient>& coefficients() const
@@ -786,6 +791,11 @@ private:
 			mCoefficients.pop_back();
 		}
 	}
+
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	void checkConsistency() const;
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	void checkConsistency() const;
 };
 }
 
