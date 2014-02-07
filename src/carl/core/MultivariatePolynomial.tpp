@@ -811,15 +811,16 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(unsigned exp) const
 {
-    if(isZero()) return MultivariatePolynomial((Coeff)0);
-    if(exp==0) return MultivariatePolynomial((Coeff)1);
-	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
-    while(exp > 1)
-    {
-        res *= exp & 1 ? (res * (*this)) : res;
-        exp >>= 1;
-    }
-	return res;	
+	if (exp == 0) return MultivariatePolynomial((Coeff)1);
+	if (isZero()) return MultivariatePolynomial((Coeff)0);
+	MultivariatePolynomial<Coeff,Ordering,Policies> res(Coeff(1));
+	MultivariatePolynomial<Coeff,Ordering,Policies> mult(*this);
+	while(exp > 0) {
+		if (exp & 1) res *= mult;
+		mult *= mult;
+		exp /= 2;
+	}
+	return res;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
