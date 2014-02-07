@@ -105,8 +105,9 @@ class Term
          */
         bool has(Variable::Arg v) const
         {
-            if(mMonomial) return mMonomial->has(v);
-            return false;
+			if (!mMonomial) return false;
+			LOGMSG_TRACE("carl.core", this << " Accessing " << mMonomial);
+            return mMonomial->has(v);
         }
 		
 		/**
