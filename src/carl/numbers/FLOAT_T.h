@@ -639,49 +639,49 @@ namespace carl
             
             FLOAT_T<FloatType>& operator +=(const FLOAT_T<FloatType>& _rhs)
             {
-                mValue + _rhs.mValue;
+                mValue = mValue + _rhs.mValue;
                 return *this;
             }
         
 			FLOAT_T<FloatType>& operator +=(const FloatType& _rhs)
 			{
-				mValue + _rhs;
+				mValue = mValue + _rhs;
 				return *this;
 			}
 		
             FLOAT_T<FloatType>& operator -=(const FLOAT_T<FloatType>& _rhs)
             {
-                mValue - _rhs.mValue;
+                mValue = mValue - _rhs.mValue;
                 return *this;
             }
         
 			FLOAT_T<FloatType>& operator -=(const FloatType& _rhs)
 			{
-				mValue - _rhs;
+				mValue = mValue - _rhs;
 				return *this;
 			}
 		
             FLOAT_T<FloatType>& operator *=(const FLOAT_T<FloatType>& _rhs)
             {
-                mValue * _rhs.mValue;
+                mValue = mValue * _rhs.mValue;
                 return *this;
             }
         
 			FLOAT_T<FloatType>& operator *=(const FloatType& _rhs)
 			{
-				mValue * _rhs;
+				mValue = mValue * _rhs;
 				return *this;
 			}
 		
             FLOAT_T<FloatType>& operator /=(const FLOAT_T<FloatType>& _rhs)
             {
-                mValue / _rhs.mValue;
+                mValue = mValue / _rhs.mValue;
                 return *this;
             }
         
 			FLOAT_T<FloatType>& operator /=(const FloatType& _rhs)
 			{
-				mValue / _rhs;
+				mValue = mValue / _rhs;
 				return *this;
 			}
 		
