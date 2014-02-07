@@ -740,7 +740,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	 */
 	int maxDepth = this->sampleTree.max_depth();
 	auto sampleTreeRoot = this->sampleTree.begin();
-	for (unsigned l = dim - 1; l >= level; l--) {
+	for (int l = dim - 1; l >= (int)level; l--) {
 		// iterate from the leaves to the root (more efficient if several levels are to be cleaned)
 		if (this->eliminationSets[l].empty()) {
 			// there is nothing more to be done for this level, so erase all samples up to one
