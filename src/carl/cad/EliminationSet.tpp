@@ -558,11 +558,11 @@ void EliminationSet<Coeff>::elimination(
 ) {
 	std::list<const UPolynomial*> parents({p});
 	// add all coefficients of p
-	std::list<const UPolynomial*> truncations({p});
+	std::list<const UPolynomial*> truncations = EliminationSet<Coeff>::truncations(p);
 	for (auto it: truncations) {
 		auto lcoeff = it->lcoeff();
 		if (lcoeff.isNumber()) continue;
-		eliminated.insert(UPolynomial(variable, lcoeff), parents, avoidSingle);
+		eliminated.insert(lcoeff.toUnivariatePolynomial(variable), parents, avoidSingle);
 	}
 	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
 	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);
