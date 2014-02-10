@@ -456,15 +456,18 @@ namespace carl
 			return m;
 		}
 
-		Monomial pow(unsigned exp) const {
-			Monomial res(*this);
+		Monomial* pow(unsigned exp) const {
+			if (exp == 0) {
+				return nullptr;
+			}
+			Monomial* res = new Monomial(*this);
 			unsigned expsum = 0;
-			for (auto& it: res.mExponents) {
+			for (auto& it: res->mExponents) {
 				it.exp = (exponent)(it.exp * exp);
 				expsum += it.exp;
 			}
-			res.mTotalDegree = expsum;
-			assert(res.validate());
+			res->mTotalDegree = expsum;
+			res->checkConsistency();
 			return res;
 		}
         
