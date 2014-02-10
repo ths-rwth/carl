@@ -20,7 +20,7 @@ namespace carl {
 
 /**
  * Output a list with arbitrary content.
- * The format is [<length>: <item>, <item>, ...]
+ * The format is `[<length>: <item>, <item>, ...]`
  * @param Output stream.
  * @param list to be printed.
  * @return Output stream.
@@ -39,7 +39,7 @@ std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
 
 /**
  * Output a vector with arbitrary content.
- * The format is [<length>: <item>, <item>, ...]
+ * The format is `[<length>: <item>, <item>, ...]`
  * @param Output stream.
  * @param Vector to be printed.
  * @return Output stream.
@@ -58,7 +58,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& l) {
 
 /**
  * Output a map with arbitrary content.
- * The format is {<key>:<value>, <key>:<value>, ...}
+ * The format is `{<key>:<value>, <key>:<value>, ...}`
  * @param Output stream.
  * @param map to be printed.
  * @return Output stream.
