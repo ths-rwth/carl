@@ -21,8 +21,8 @@ namespace carl {
 /**
  * Output a list with arbitrary content.
  * The format is `[<length>: <item>, <item>, ...]`
- * @param Output stream.
- * @param list to be printed.
+ * @param os Output stream.
+ * @param l list to be printed.
  * @return Output stream.
  */
 template<typename T>
@@ -40,15 +40,15 @@ std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
 /**
  * Output a vector with arbitrary content.
  * The format is `[<length>: <item>, <item>, ...]`
- * @param Output stream.
- * @param Vector to be printed.
+ * @param os Output stream.
+ * @param v Vector to be printed.
  * @return Output stream.
  */
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& l) {
-	os << "[" << l.size() << ": ";
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
+	os << "[" << v.size() << ": ";
 	bool first = true;
-	for (auto it: l) {
+	for (auto it: v) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -59,15 +59,15 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& l) {
 /**
  * Output a map with arbitrary content.
  * The format is `{<key>:<value>, <key>:<value>, ...}`
- * @param Output stream.
- * @param map to be printed.
+ * @param os Output stream.
+ * @param m map to be printed.
  * @return Output stream.
  */
 template<typename Key, typename Value>
-std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& l) {
+std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
 	os << "{";
 	bool first = true;
-	for (auto it: l) {
+	for (auto it: m) {
 		if (!first) os << ", ";
 		first = false;
 		os << it.first << ":" << it.second;
