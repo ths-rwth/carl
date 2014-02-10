@@ -45,19 +45,20 @@ namespace carl
         
         typedef std::vector<VarExpPair>::iterator exponents_it;
         typedef std::vector<VarExpPair>::const_iterator exponents_cIt;
+
+        /**
+         */
+        Monomial() = default;
     public:
         //
         // Constructors
         //
         /**
-         */
-        Monomial() = default;
-        /**
          * Generate a monomial from a variable, with constant 1 (one).
          * @param v The variable.
          * @param e The exponent.
          */
-        Monomial(Variable::Arg v, exponent e=1) :
+        Monomial(Variable::Arg v, exponent e = 1) :
             mExponents(1, VarExpPair(v,e)),
             mTotalDegree(e)
         {
