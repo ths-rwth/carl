@@ -421,7 +421,6 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	}
 
 	Variable x = *b.gatherVariables().begin();
-	LOGMSG_TRACE("carl.core", "Chose " << x);
 
 	auto ac = a.toUnivariatePolynomial(x);
 	auto bc = b.toUnivariatePolynomial(x);
@@ -438,7 +437,10 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 			}
 		}
 		assert(!term.isZero());
-		term *= Term<Coeff>(Monomial(x).pow(ac.degree() - bc.degree()));
+		auto mon = Monomial(x).pow(ac.degree() - bc.degree());
+		if (mon != nullptr) {
+			term *= Term<Coeff>(*mon);
+		}
 		res += term;
 		a = a - b * term;
 		if (a.isZero()) {
