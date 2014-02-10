@@ -204,6 +204,9 @@ namespace carl
          */
 		Monomial* dropVariable(Variable::Arg v) const
 		{
+			if (!this->has(v)) {
+				return new Monomial(*this);
+			}
 			Monomial* m = new Monomial();
 			m->mExponents.reserve(mExponents.size()-1);
 			m->mTotalDegree = mTotalDegree;
