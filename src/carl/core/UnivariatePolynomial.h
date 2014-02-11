@@ -814,8 +814,24 @@ private:
 		}
 	}
 
+	/**
+	 * Asserts that this polynomial over numeric coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>The leading term is not zero.</li>
+	 * </ul>
+     */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	void checkConsistency() const;
+
+	/**
+	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>The leading term is not zero.</li>
+	 * <li>The main variable does not occur in any coefficient.</li>
+	 * </ul>
+     */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	void checkConsistency() const;
 };

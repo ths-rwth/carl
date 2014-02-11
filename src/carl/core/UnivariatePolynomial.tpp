@@ -2071,11 +2071,9 @@ void UnivariatePolynomial<Coefficient>::checkConsistency() const {
 template<typename Coefficient>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coefficient>::checkConsistency() const {
-	LOGMSG_TRACE("carl.core", this << " Checking consistency");
 	if (this->mCoefficients.size() > 0) {
 		assert(this->lcoeff() != Coefficient(0));
 	}
-	LOGMSG_TRACE("carl.core", "Checking " << this->mCoefficients);
 	for (auto c: this->mCoefficients) {
 		assert(!c.has(this->mainVar()));
 	}
