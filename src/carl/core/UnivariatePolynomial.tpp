@@ -11,12 +11,42 @@
 #include <iomanip>
 #include "../util/SFINAE.h"
 #include "../util/platform.h"
+#include "../util/debug.h"
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
 
 namespace carl
 {
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p)
+: mMainVar(p.mMainVar), mCoefficients(p.mCoefficients) {
+	this->checkConsistency();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p)
+: mMainVar(p.mMainVar) {
+	std::swap(this->mCoefficients, p.mCoefficients);
+	this->checkConsistency();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(const UnivariatePolynomial& p) {
+	this->mMainVar = p.mMainVar;
+	this->mCoefficients = p.mCoefficients;
+	this->checkConsistency();
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) {
+	std::swap(this->mMainVar, p.mMainVar);
+	std::swap(this->mCoefficients, p.mCoefficients);
+	this->checkConsistency();
+	return *this;
+}
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)

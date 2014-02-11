@@ -61,6 +61,28 @@ public:
 	typedef typename IntegralT<NumberType>::type IntNumberType;
 	typedef Coefficient CoefficientType;
 
+	// Rule of five
+	/**
+	 * Default constructor shall not exist. Use UnivariatePolynomial(Variable::Arg) instead.
+	 */
+	UnivariatePolynomial() = delete;
+	/**
+	 * Copy constructor.
+	 */
+	UnivariatePolynomial(const UnivariatePolynomial& p);
+	/**
+	 * Move constructor.
+	 */
+	UnivariatePolynomial(UnivariatePolynomial&& p);
+	/**
+	 * Copy assignment operator.
+	 */
+	UnivariatePolynomial& operator=(const UnivariatePolynomial& p);
+	/**
+	 * Move assignment operator.
+	 */
+	UnivariatePolynomial& operator=(UnivariatePolynomial&& p);
+
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
