@@ -1621,6 +1621,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 		const UnivariatePolynomial& p,
 		const SubresultantStrategy strategy
 ) const {
+	assert(p.mainVar() == this->mainVar());
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
 	LOGMSG_TRACE("carl.cad", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {

@@ -562,6 +562,7 @@ void EliminationSet<Coeff>::elimination(
 		EliminationSet<Coeff>& eliminated,
 		bool avoidSingle
 ) {
+	assert(p->mainVar() == q->mainVar());
 	std::list<const UPolynomial*> parents({p, q});
 	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
 }
