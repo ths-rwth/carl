@@ -1306,9 +1306,10 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 	if (i == 0) return;
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
 	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
-		this->mCoefficients[i] = this->mCoefficients[j+i];
+		this->mCoefficients[j] = this->mCoefficients[j+i];
 	}
 	this->mCoefficients.resize(this->mCoefficients.size()-i);
+	this->checkConsistency();
 }
 
 template<typename Coeff>
