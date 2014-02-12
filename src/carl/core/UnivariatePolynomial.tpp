@@ -795,13 +795,14 @@ template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
 	typename std::vector<C>::const_iterator it = mCoefficients.begin();
-	Coeff max = *it;
-	IntNumberType num = getNum(*it);
-	IntNumberType den = getDenom(*it);
+	Coeff max = carl::abs(*it);
+	IntNumberType num = carl::abs(getNum(*it));
+	IntNumberType den = carl::abs(getDenom(*it));
 	for (++it; it != mCoefficients.end(); ++it) {
-		if (*it > max) max = *it;
-		num = carl::gcd(num, getNum(*it));
-		den = carl::lcm(den, getDenom(*it));
+		auto tmp = carl::abs(*it);
+		if (tmp > max) max = tmp;
+		num = carl::gcd(num, getNum(tmp));
+		den = carl::lcm(den, getDenom(tmp));
 	}
 	assert(getDenom(max*den/num) == 1);
 	return getNum(max*den/num);
