@@ -146,6 +146,12 @@ TEST(ExactInterval, Subtraction)
     EXPECT_EQ( true, result.unbounded());
     result = a3.add(b3.inverse());
     EXPECT_EQ( true, result.unbounded());
+
+	{
+		ExactInterval<cln::cl_RA> interval((cln::cl_RA)72, (cln::cl_RA)73, BoundType::STRICT);
+		ExactInterval<cln::cl_RA> result((cln::cl_RA)-173, (cln::cl_RA)-172, BoundType::STRICT);
+		EXPECT_EQ(result, -cln::cl_RA(70) - interval);
+	}
 }
 
 
