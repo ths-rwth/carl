@@ -138,6 +138,11 @@ public:
 	CAD();
 
 	/*
+	 * Constructor that delegates the ownership of polynomials to the given parent.
+	 */
+	CAD(cad::PolynomialOwner<Number>* parent);
+
+	/*
 	 * Constructor just passing interruption flags.
 	 * @param interruptionFlags
 	 */
@@ -577,7 +582,7 @@ public:
 	* @complexity cubic in the number of variables
 	*/
 	template<class VariableIterator, class PolynomialIterator>
-	static std::vector<Variable> orderVariablesGreeedily(
+	std::vector<Variable> orderVariablesGreeedily(
 			VariableIterator firstVariable,
 			VariableIterator lastVariable,
 			PolynomialIterator firstPolynomial,
