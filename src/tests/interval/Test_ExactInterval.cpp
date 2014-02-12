@@ -149,7 +149,7 @@ TEST(ExactInterval, Subtraction)
 
 	{
 		ExactInterval<cln::cl_RA> interval((cln::cl_RA)72, (cln::cl_RA)73, BoundType::STRICT);
-		ExactInterval<cln::cl_RA> result((cln::cl_RA)-173, (cln::cl_RA)-172, BoundType::STRICT);
+		ExactInterval<cln::cl_RA> result((cln::cl_RA)-143, (cln::cl_RA)-142, BoundType::STRICT);
 		EXPECT_EQ(result, -cln::cl_RA(70) - interval);
 	}
 }
