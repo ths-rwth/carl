@@ -1942,11 +1942,10 @@ template<typename Coeff, typename Ordering, typename Policies>
 std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool infix, bool friendlyVarNames) const
 {
     if(mTerms.size() == 0) return "0";
-    auto term = mTerms.rbegin();
-    if(mTerms.size() == 1) return (*term)->toString(infix, friendlyVarNames);
+    if(mTerms.size() == 1) return this->mTerms.front()->toString(infix, friendlyVarNames);
     std::string result = "";
     if( !infix ) result += "(+";
-    for( ; term != mTerms.rend(); ++term)
+    for (auto term = mTerms.rbegin(); term != mTerms.rend(); term++)
     {
         if(infix)
         {
