@@ -50,6 +50,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Te
 Policies(),
 mTerms(1,std::make_shared<const Term<Coeff>>(t))
 {
+	if (t.isZero()) {
+		this->mTerms.clear();
+	}
 	this->checkConsistency();
 }
 
@@ -66,6 +69,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(std::sha
 Policies(),
 mTerms(1,t)
 {
+	if (t->isZero()) {
+		this->mTerms.clear();
+	}
 	this->checkConsistency();
 }
 
