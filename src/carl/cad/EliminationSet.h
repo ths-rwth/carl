@@ -154,6 +154,8 @@ public:
 	 */
 	bool bounded;
 	
+	EliminationSet() = delete;
+
 	/**
 	 * Constructs the elimination set with a given strict ordering f of univariate polynomials.
 	 * @param owner PolynomialOwner object that recieves the ownership of all polynomials that are created within this EliminationSet.
