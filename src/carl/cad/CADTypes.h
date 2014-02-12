@@ -36,8 +36,22 @@ private:
 	 * This list contains all polynomials that are owned by this EliminationSet.
 	 */
 	std::list<const UPolynomial<Coeff>*> ownedPolynomials;
+
+	/**
+	 * 
+	 * @param p
+	 * @return 
+	 */
+	PolynomialOwner<Coeff>* parentOwner;
 public:
-	~PolynomialOwner() {
+	PolynomialOwner() {
+		this->parentOwner = nullptr;
+	}
+	PolynomialOwner(PolynomialOwner<Coeff>* parent) {
+		this->parentOwner = parent;
+	}
+
+	virtual ~PolynomialOwner() {
 		if (this->ownedPolynomials.size() > 0) {
 			LOGMSG_DEBUG("carl.cad", "Deleting " << this->ownedPolynomials.size() << " polynomials.");
 		}
@@ -47,10 +61,12 @@ public:
 	}
 	
 	const UPolynomial<Coeff>* take(const UPolynomial<Coeff>* p) {
+		if (this->parentOwner != nullptr) return this->parentOwner->take(p);
 		this->ownedPolynomials.push_back(p);
 		return p;
 	}
 	UPolynomial<Coeff>* take(UPolynomial<Coeff>* p) {
+		if (this->parentOwner != nullptr) return this->parentOwner->take(p);
 		this->ownedPolynomials.push_back(p);
 		return p;
 	}
