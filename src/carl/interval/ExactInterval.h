@@ -459,7 +459,7 @@ inline const ExactInterval<Numeric> operator -(const ExactInterval<Numeric>& lh,
 template<typename Numeric>
 inline const ExactInterval<Numeric> operator -(const Numeric& lh, const ExactInterval<Numeric>& rh)
 {
-	return (-lh) +rh;
+	return rh.inverse() + lh;
 }
 
 template<typename Numeric>
