@@ -101,7 +101,7 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 				if (res.first == res.second) {
 					// Root could be calculated exactly
 					this->addRoot(RealAlgebraicNumberNR<Number>::create((-b - res.first) / (2*a)), false);
-					this->addRoot(RealAlgebraicNumberNR<Number>::create((-b + res.second) / (2*a)), false);
+					this->addRoot(RealAlgebraicNumberNR<Number>::create((-b + res.first) / (2*a)), false);
 				} else {
 					// Root is within interval (res.first, res.second)
 					ExactInterval<Number> r(res.first, res.second, BoundType::STRICT);
