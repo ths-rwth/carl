@@ -526,6 +526,7 @@ private:
 	 */
     void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
+public:
 	/**
 	 * Asserts that this polynomial complies with the requirements and assumptions for MultivariatePolynomial objects.
 	 * 

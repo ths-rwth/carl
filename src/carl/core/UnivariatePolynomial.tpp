@@ -149,6 +149,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 		this->mCoefficients.resize(1);
 	}
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -163,6 +164,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 		}
 	}
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -2077,6 +2079,7 @@ void UnivariatePolynomial<Coefficient>::checkConsistency() const {
 	}
 	for (auto c: this->mCoefficients) {
 		assert(!c.has(this->mainVar()));
+		c.checkConsistency();
 	}
 }
 

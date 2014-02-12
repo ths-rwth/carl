@@ -272,10 +272,12 @@ public:
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+		this->checkConsistency();
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar).toNumberCoefficients();
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+		this->checkConsistency();
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -780,6 +782,27 @@ public:
 	
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
+
+	/**
+	 * Asserts that this polynomial over numeric coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>The leading term is not zero.</li>
+	 * </ul>
+     */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	void checkConsistency() const;
+
+	/**
+	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>The leading term is not zero.</li>
+	 * <li>The main variable does not occur in any coefficient.</li>
+	 * </ul>
+     */
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	void checkConsistency() const;
 private:
 	
 	/*!
@@ -813,27 +836,6 @@ private:
 			mCoefficients.pop_back();
 		}
 	}
-
-	/**
-	 * Asserts that this polynomial over numeric coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
-	 * 
-	 * <ul>
-	 * <li>The leading term is not zero.</li>
-	 * </ul>
-     */
-	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void checkConsistency() const;
-
-	/**
-	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
-	 * 
-	 * <ul>
-	 * <li>The leading term is not zero.</li>
-	 * <li>The main variable does not occur in any coefficient.</li>
-	 * </ul>
-     */
-	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	void checkConsistency() const;
 };
 }
 
