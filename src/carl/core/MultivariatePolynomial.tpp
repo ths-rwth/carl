@@ -457,6 +457,8 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
+	this->checkConsistency();
+	value.checkConsistency();
     if (!this->has(var)) {
         return;
     }
@@ -565,6 +567,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 	LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
 	LOGMSG_TRACE("carl.core", "should hold: " << mTerms.size() << " <= " << expectedResultSize);
 	assert(mTerms.size() <= expectedResultSize);
+	this->checkConsistency();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1178,6 +1181,8 @@ bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
+	this->checkConsistency();
+	rhs.checkConsistency();
     if(mTerms.size() == 0) 
 	{
 		mTerms = rhs.mTerms;
@@ -1206,7 +1211,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         {
             if( (**lhsIt).coeff() != -(**rhsIt).coeff() )
             {
-                newTerms.push_back(std::make_shared<const Term<Coeff>>( (**lhsIt).coeff() + (**rhsIt).coeff(), (**lhsIt).monomial() ));
+				auto tmp = (**lhsIt).coeff() + (**rhsIt).coeff();
+				if (tmp != Coeff(0)) {
+					newTerms.push_back(std::make_shared<const Term<Coeff>>( tmp, (**lhsIt).monomial() ));
+				}
             }
             ++lhsIt;
             ++rhsIt;
@@ -1217,6 +1225,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
     newTerms.insert(newTerms.end(), rhsIt, rhs.mTerms.cend());
     
     mTerms = std::move(newTerms);
+	this->checkConsistency();
     return *this;
 }
 
@@ -1244,18 +1253,21 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
                 {
                     *it = std::make_shared<const Term<Coeff>>((**it).coeff()+rhs.coeff(), (**it).monomial());
                 }
+				this->checkConsistency();
                 return *this;
             }
             ++it;    
         }
         // no equal monomial does occur. We can simply insert.
         mTerms.insert(it,std::make_shared<const Term<Coeff>>(rhs));
+		this->checkConsistency();
         return *this;
     }
     else 
     {
         LOG_NOTIMPLEMENTED();
     }
+	this->checkConsistency();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1281,18 +1293,21 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
                 {
                     *it = std::make_shared<const Term<Coeff>>((**it).coeff()+1, (**it).monomial());
                 }
+				this->checkConsistency();
                 return *this;
             }
             ++it;    
         }
         // no eq ual monomial does occur. We can simply insert.
         mTerms.insert(it,std::make_shared<const Term<Coeff>>(rhs));
+		this->checkConsistency();
         return *this;
     }
     else 
     {
         LOG_NOTIMPLEMENTED();
     }
+	this->checkConsistency();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1317,6 +1332,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
                 {
                     *it = std::make_shared<const Term<Coeff>>((**it).coeff()+1, (**it).monomial());
                 }
+				this->checkConsistency();
                 return *this;
             }
             ++it;    
@@ -1329,6 +1345,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         LOG_NOTIMPLEMENTED();
         
     }
+	this->checkConsistency();
     return *this;
 }
 
@@ -1361,6 +1378,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         LOG_NOTIMPLEMENTED();
         
     }
+	this->checkConsistency();
     return *this;
 }
 
@@ -1371,6 +1389,7 @@ const MultivariatePolynomial<C,O,P> operator+( const MultivariatePolynomial<C,O,
     LOG_INEFFICIENT();
 	MultivariatePolynomial<C,O,P> result(lhs);
 	result += rhs;
+	result.checkConsistency();
 	return result;
 }
 
@@ -1405,6 +1424,7 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
     LOG_INEFFICIENT();
 	MultivariatePolynomial<C,O,P> result(lhs);
 	result += rhs;
+	result.checkConsistency();
 	return result;
 }
 
@@ -1421,6 +1441,7 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
     LOG_INEFFICIENT();
 	MultivariatePolynomial<C,O,P> result(lhs);
 	result += rhs;
+	result.checkConsistency();
 	return result;
 }
 
@@ -1437,6 +1458,7 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
     LOG_INEFFICIENT();
 	MultivariatePolynomial<C,O,P> result(lhs);
 	result += rhs;
+	result.checkConsistency();
 	return result;
 }
 
@@ -1453,6 +1475,7 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
     LOG_INEFFICIENT();
 	MultivariatePolynomial<C,O,P> result(lhs);
 	result += rhs;
+	result.checkConsistency();
 	return result;
 	
 }
@@ -1472,6 +1495,7 @@ const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<C
     {
         negation.mTerms.push_back(std::make_shared<const Term<Coeff>>(-*term));
     }
+	negation.checkConsistency();
     return negation;
 }
 
@@ -1969,15 +1993,16 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
         }
         else
         {
-            if(frontCoeff == frontTerm->coeff())
-            {
-                assert(frontCoeff!=0);
-                mTerms.push_back(frontTerm);
-            }
-            else if(frontCoeff != 0)
-            {
-                mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-            }
+			if (frontCoeff != 0) {
+				if(frontCoeff == frontTerm->coeff())
+				{
+					mTerms.push_back(frontTerm);
+				}
+				else if(frontCoeff != 0)
+				{
+					mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
+				}
+			}
             frontTerm = *it;
             frontCoeff = (*it)->coeff();
         }
@@ -1985,9 +2010,10 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
     
     if(frontCoeff == frontTerm->coeff())
     {
+		assert(frontCoeff != 0);
         mTerms.push_back(frontTerm);
     }
-    else
+    else if (frontCoeff != 0)
     {
         mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
     }
@@ -1998,6 +2024,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::checkConsistency() const {
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		assert(this->mTerms[i]);
+		assert(!this->mTerms[i]->isZero());
 		if (i > 0) {
 			assert(this->mTerms[i]->tdeg() > 0);
 		}

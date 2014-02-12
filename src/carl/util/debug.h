@@ -11,8 +11,7 @@
 #include <list>
 #include <map>
 #include <vector>
-
-#include "Singleton.h"
+#include <unistd.h>
 
 namespace carl {
 
@@ -75,74 +74,13 @@ std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
 	return os << "}";
 }
 
-
-/**
- * Convenience class to print stack traces to an output stream.
- *
- * Retrieves the current stack trace (up to 128 stack frames) and prints them to a given output stream.
- * This class can store multiple stack traces and merge them, i.e. determine a common prefix of stack frames and print this.
- * For supported compilers (that is gcc and clang), it will try to demangle the symbol names using the abi.
- *
- * This class is a singleton.
- * However, if you want to print a single stacktrace without having it stored in the global Stacktrace object, you can use the printStacktrace routine.
- */
-class Stacktrace : public Singleton<Stacktrace> {
-friend Singleton<Stacktrace>;
-private:
-	// Stores stack traces.
-	std::map<std::string, std::vector<std::string>> traces;
-	// Stores ANSI color codes.
-	std::map<std::string, std::string> col = {
-		{"red", "\033[31m"},
-		{"green", "\033[32m"},
-		{"gray", "\033[37m"},
-		{"reset", "\033[39m"}
-	};
-	
-	/**
-	 * Use abi to demangle symbol of a stackframe.
-	 * @param stackframe Pointer to the current stackframe.
-	 * @param sym Symbols of the current stackframe.
-	 * @return Somewhat human readable version of the stackframe.
-	 */
-	std::string demangle(const void* stackframe, const char* sym) const;
-public:
-	/**
-	 * Clear the stored stack traces.
-	 */
-	void clear() {
-		this->traces.clear();
-	}
-	/**
-	 * Store the current stack trace using the given name.
-	 * @param name Name for the stack trace.
-	 */
-	void storeTrace(const std::string& name);
-	
-	/**
-	 * Output all stored stack traces.
-	 * @param os Output stream.
-	 * @return Output stream.
-	 */
-	std::ostream& all(std::ostream& os = std::cerr) const;
-	/**
-	 * Output all stored stack traces with common stack traces merged.
-	 * @param os Output stream.
-	 * @return Output stream.
-	 */
-	std::ostream& merged(std::ostream& os = std::cerr) const;
-	
-	friend std::ostream& operator<<(std::ostream& os, const Stacktrace& s);
-	friend std::ostream& printStacktrace(std::ostream& os);
-};
-
-/**
- * Convenience method to use the Stacktrace class.
- * If this method is used, the stack trace is not stored and hence not considered in the output of the global Stacktrace object.
- */
-std::ostream& printStacktrace(std::ostream& os = std::cerr);
-
 #ifdef DEBUG
+
+/**
+ * Uses GDB to print a stack trace.
+ */
+void printStacktrace(bool interaction = false);
+
 /**
  * Stores a textual representation of the last assertion that was registered via REGISTER_ASSERT.
  */
@@ -172,6 +110,16 @@ extern int last_assertion_code;
 	carl::last_assertion_string = ss.str(); \
 	carl::last_assertion_code = __LINE__; \
 	}
+#define UNREGISTER_ASSERT {\
+	carl::last_assertion_string = ""; \
+	carl::last_assertion_code = 23; \
+	}
+#define REGISTERED_ASSERT(condition) REGISTER_ASSERT; assert(condition); UNREGISTER_ASSERT
+
+#else
+#define REGISTER_ASSERT #warning "REGISTER_ASSERT is disabled as DEBUG is not defined."
+#define UNREGISTER_ASSERT #warning "UNREGISTER_ASSERT is disabled as DEBUG is not defined."
+#define REGISTERED_ASSERT(condition) #warning "REGISTER_ASSERT(condition) is disabled as DEBUG is not defined."
 #endif
 
 }
