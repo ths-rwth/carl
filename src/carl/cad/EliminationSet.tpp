@@ -538,18 +538,6 @@ std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff
 }
 
 template<typename Coeff>
-std::list<const typename EliminationSet<Coeff>::UPolynomial*> EliminationSet<Coeff>::truncations(const UPolynomial* p) {
-	std::list<const UPolynomial*> truncations;
-	truncations.push_back(p);
-	UPolynomial truncation(*p);
-	while (!truncation.isConstant()) {
-		truncation.truncate();
-		truncations.push_back(new UPolynomial(truncation));
-	}
-	return truncations;
-}
-
-template<typename Coeff>
 void EliminationSet<Coeff>::elimination(
 			const UPolynomial* p,
 			const Variable& variable,
@@ -558,11 +546,9 @@ void EliminationSet<Coeff>::elimination(
 ) {
 	std::list<const UPolynomial*> parents({p});
 	// add all coefficients of p
-	std::list<const UPolynomial*> truncations = EliminationSet<Coeff>::truncations(p);
-	for (auto it: truncations) {
-		auto lcoeff = it->lcoeff();
-		if (lcoeff.isNumber()) continue;
-		eliminated.insert(lcoeff.toUnivariatePolynomial(variable), parents, avoidSingle);
+	for (auto coeff: p->coefficients()) {
+		if (coeff.isNumber()) continue;
+		eliminated.insert(coeff.toUnivariatePolynomial(variable), parents, avoidSingle);
 	}
 	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
 	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);
@@ -576,6 +562,7 @@ void EliminationSet<Coeff>::elimination(
 		EliminationSet<Coeff>& eliminated,
 		bool avoidSingle
 ) {
+	assert(p->mainVar() == q->mainVar());
 	std::list<const UPolynomial*> parents({p, q});
 	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
 }

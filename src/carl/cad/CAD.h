@@ -9,6 +9,25 @@
  *	Date:   Tue Dec 3 15:57:06 2013 +0100
  */
 
+/**
+ * @todo Fix bug in CAD concerning CAD::removePolynomial().
+ * 
+ * beim Aufschreiben des CAD::removePolynomial-Algorithmus' ist mir aufgefallen, 
+ * dass darin ein Teil zu Problemen führen kann, sobald ein Polynom entfernt 
+ * wird, während die Elimination nicht vollständig durchgeführt worden war:
+ * 
+ * Falls ein Eliminationslevel leer ist, nehme ich an, dass die Variable nicht 
+ * mehr gebraucht wird und beschneide entsprechend den Sample-Tree. Das ist im 
+ * Falle einer unvollständigen Elimination falsch.
+ * 1. Lösung: Bestimme a.H.v. den Eingabepolynomen, ob tatsächlich die 
+ * vermeintlich überflüssige Variable nicht mehr vorkommt, bevor der Sample-Tree 
+ * beschnitten wird.
+ * 2. Lösung: Entferne nie Variablen (u.U. ineffizient).
+ * 
+ * Als schnellen Fix könntest du den Teil in CAD::removePolynomial(pPtr, level, 
+ * childrenOnly), der den Sample-Tree löscht, auskommentieren.
+ */
+
 #pragma once
 
 #include <atomic>

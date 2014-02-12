@@ -61,6 +61,28 @@ public:
 	typedef typename IntegralT<NumberType>::type IntNumberType;
 	typedef Coefficient CoefficientType;
 
+	// Rule of five
+	/**
+	 * Default constructor shall not exist. Use UnivariatePolynomial(Variable::Arg) instead.
+	 */
+	UnivariatePolynomial() = delete;
+	/**
+	 * Copy constructor.
+	 */
+	UnivariatePolynomial(const UnivariatePolynomial& p);
+	/**
+	 * Move constructor.
+	 */
+	UnivariatePolynomial(UnivariatePolynomial&& p);
+	/**
+	 * Copy assignment operator.
+	 */
+	UnivariatePolynomial& operator=(const UnivariatePolynomial& p);
+	/**
+	 * Move assignment operator.
+	 */
+	UnivariatePolynomial& operator=(UnivariatePolynomial&& p);
+
 	UnivariatePolynomial(Variable::Arg mainVar);
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
@@ -122,6 +144,7 @@ public:
 	 */
 	const Coefficient& lcoeff() const
 	{
+		assert(this->mCoefficients.size() > 0);
 		return this->mCoefficients.back();
 	}
 	/**
@@ -130,6 +153,7 @@ public:
 	 * @return 
 	 */
 	const Coefficient& tcoeff() const {
+		assert(this->mCoefficients.size() > 0);
 		return this->mCoefficients.front();
 	}
 
@@ -139,6 +163,7 @@ public:
 	 */
 	bool isConstant() const
 	{
+		this->checkConsistency();
 		return mCoefficients.size() <= 1;
 	}
 
@@ -230,7 +255,9 @@ public:
 	 * Removes the leading term from the polynomial.
 	 */
 	void truncate() {
+		assert(this->mCoefficients.size() > 0);
 		this->mCoefficients.resize(this->mCoefficients.size()-1);
+		this->stripLeadingZeroes();
 	}
 
 	const std::vector<Coefficient>& coefficients() const
@@ -786,6 +813,27 @@ private:
 			mCoefficients.pop_back();
 		}
 	}
+
+	/**
+	 * Asserts that this polynomial over numeric coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>The leading term is not zero.</li>
+	 * </ul>
+     */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	void checkConsistency() const;
+
+	/**
+	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>The leading term is not zero.</li>
+	 * <li>The main variable does not occur in any coefficient.</li>
+	 * </ul>
+     */
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	void checkConsistency() const;
 };
 }
 

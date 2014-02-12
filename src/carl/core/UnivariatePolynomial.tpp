@@ -11,6 +11,7 @@
 #include <iomanip>
 #include "../util/SFINAE.h"
 #include "../util/platform.h"
+#include "../util/debug.h"
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
@@ -19,10 +20,39 @@ namespace carl
 {
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p)
+: mMainVar(p.mMainVar), mCoefficients(p.mCoefficients) {
+	this->checkConsistency();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p)
+: mMainVar(p.mMainVar) {
+	std::swap(this->mCoefficients, p.mCoefficients);
+	this->checkConsistency();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(const UnivariatePolynomial& p) {
+	this->mMainVar = p.mMainVar;
+	this->mCoefficients = p.mCoefficients;
+	this->checkConsistency();
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) {
+	std::swap(this->mMainVar, p.mMainVar);
+	std::swap(this->mCoefficients, p.mCoefficients);
+	this->checkConsistency();
+	return *this;
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
 : mMainVar(mainVar), mCoefficients()
 {
-	
+	this->checkConsistency();
 }
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, exponent e) :
@@ -38,6 +68,7 @@ mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not 
 		mCoefficients.clear();
 	}
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -45,6 +76,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -56,6 +88,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 		this->mCoefficients.push_back(Coeff(c));
 	}
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -63,6 +96,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -70,6 +104,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::ve
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -86,6 +121,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 		mCoefficients.push_back(expAndCoeff.second);
 	}
 	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -1270,9 +1306,10 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 	if (i == 0) return;
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
 	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
-		this->mCoefficients[i] = this->mCoefficients[j+i];
+		this->mCoefficients[j] = this->mCoefficients[j+i];
 	}
 	this->mCoefficients.resize(this->mCoefficients.size()-i);
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -1584,6 +1621,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 		const UnivariatePolynomial& p,
 		const SubresultantStrategy strategy
 ) const {
+	assert(p.mainVar() == this->mainVar());
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
 	LOGMSG_TRACE("carl.cad", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
@@ -2022,4 +2060,24 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	os << rhs.mCoefficients[0];
 	return os;
 }
+
+template<typename Coefficient>
+template<typename C, EnableIf<is_number<C>>>
+void UnivariatePolynomial<Coefficient>::checkConsistency() const {
+	if (this->mCoefficients.size() > 0) {
+		assert(this->lcoeff() != Coefficient(0));
+	}
+}
+
+template<typename Coefficient>
+template<typename C, DisableIf<is_number<C>>>
+void UnivariatePolynomial<Coefficient>::checkConsistency() const {
+	if (this->mCoefficients.size() > 0) {
+		assert(this->lcoeff() != Coefficient(0));
+	}
+	for (auto c: this->mCoefficients) {
+		assert(!c.has(this->mainVar()));
+	}
+}
+
 }

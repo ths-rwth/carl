@@ -135,4 +135,32 @@ std::ostream& printStacktrace(std::ostream& os) {
 	return s.all(os);
 }
 
+#ifdef DEBUG
+std::string last_assertion_string = "";
+int last_assertion_code = 23;
+
+/**
+ * Actual signal handler.
+ */
+void handle_signal(int signal) {
+	std::cerr << std::endl << "Catched SIGABRT " << signal << ", exiting with " << (last_assertion_code%128) << std::endl;
+	if (last_assertion_string.size() != 0) {
+		std::cerr << "Last Assertion catched is: " << last_assertion_string << std::endl;
+		std::cerr << "Please check if this is the assertion that is actually thrown." << std::endl;
+	}
+	exit(last_assertion_code);
+}
+/**
+ * Installs the signal handler.
+ */
+bool install_signal_handler() {
+	std::signal(SIGABRT, handle_signal);
+	return true;
+}
+/**
+ * Static variable that ensures that install_signal_handler is called.
+ */
+static bool signal_installed = install_signal_handler();
+#endif
+
 }
