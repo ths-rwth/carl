@@ -110,8 +110,16 @@ extern int last_assertion_code;
 	carl::last_assertion_string = ss.str(); \
 	carl::last_assertion_code = __LINE__; \
 	}
+#define UNREGISTER_ASSERT {\
+	carl::last_assertion_string = ""; \
+	carl::last_assertion_code = 23; \
+	}
+#define REGISTERED_ASSERT(condition) REGISTER_ASSERT; assert(condition); UNREGISTER_ASSERT
+
 #else
 #define REGISTER_ASSERT #warning "REGISTER_ASSERT is disabled as DEBUG is not defined."
+#define UNREGISTER_ASSERT #warning "UNREGISTER_ASSERT is disabled as DEBUG is not defined."
+#define REGISTERED_ASSERT(condition) #warning "REGISTER_ASSERT(condition) is disabled as DEBUG is not defined."
 #endif
 
 }
