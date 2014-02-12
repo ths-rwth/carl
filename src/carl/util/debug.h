@@ -117,9 +117,9 @@ extern int last_assertion_code;
 #define REGISTERED_ASSERT(condition) REGISTER_ASSERT; assert(condition); UNREGISTER_ASSERT
 
 #else
-#define REGISTER_ASSERT #warning "REGISTER_ASSERT is disabled as DEBUG is not defined."
-#define UNREGISTER_ASSERT #warning "UNREGISTER_ASSERT is disabled as DEBUG is not defined."
-#define REGISTERED_ASSERT(condition) #warning "REGISTER_ASSERT(condition) is disabled as DEBUG is not defined."
+#define REGISTER_ASSERT
+#define UNREGISTER_ASSERT
+#define REGISTERED_ASSERT(condition)
 #endif
 
 }
