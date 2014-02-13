@@ -171,7 +171,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebr
 			if (this->left() != n->left() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), n->left(), BoundType::STRICT)) > 0) {
 				this->setRight(n->left());
 				return std::make_pair(true, !twisted);
-			} else if (this->right() != n->right() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->right(), n->right(), BoundType::STRICT)) > 0) {
+			} else if (this->right() != n->right() && this->getPolynomial().countRealRoots(ExactInterval<Number>(n->right(), this->right(), BoundType::STRICT)) > 0) {
 				this->setLeft(n->right());
 				return std::make_pair(true, twisted);
 			}
