@@ -343,16 +343,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const
-{
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 	// A constant polynomial is obviously univariate.
-	if(isConstant()) return true;
+	if (isConstant()) return true;
+	
+	if (this->lterm()->getNrVariables() > 1) {
+		return false;
+	}
 	
 	Variable v = lterm()->getSingleVariable();
-	
-	for(const std::shared_ptr<const Term<Coeff>>& term : mTerms)
-	{
-		if(!term->hasNoOtherVariable(v)) return false;
+	for (auto term : mTerms) {
+		if (!term->hasNoOtherVariable(v)) return false;
 	}
 	return true;
 }
