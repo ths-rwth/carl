@@ -1914,6 +1914,8 @@ UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& r
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
+	lhs.checkConsistency();
+	rhs.checkConsistency();
 	if(lhs.mMainVar == rhs.mMainVar)
 	{
 		return lhs.mCoefficients == rhs.mCoefficients;
@@ -1928,6 +1930,13 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 }
 template<typename C>
 bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs)
+{
+	if (lhs == nullptr && rhs == nullptr) return true;
+	if (lhs == nullptr || rhs == nullptr) return false;
+	return *lhs == *rhs;
+}
+template<typename C>
+bool operator==(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs)
 {
 	if (lhs == nullptr && rhs == nullptr) return true;
 	if (lhs == nullptr || rhs == nullptr) return false;
