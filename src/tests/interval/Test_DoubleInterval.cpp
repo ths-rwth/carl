@@ -914,8 +914,18 @@ TEST(DoubleInterval, Properties)
     EXPECT_EQ(-1, i2.center());
     EXPECT_EQ(5, i3.center());
     EXPECT_EQ(-1, i4.center());
+}
+
+TEST(DoubleInterval, Contains)
+{
+    DoubleInterval i1(3, BoundType::STRICT, 7, BoundType::STRICT);
+    DoubleInterval i2(-5, BoundType::STRICT, 3, BoundType::WEAK);
+    DoubleInterval i3(3, BoundType::WEAK, 7, BoundType::STRICT);
+    DoubleInterval i4(-5, BoundType::WEAK, 3, BoundType::WEAK);
+    DoubleInterval i5(4, BoundType::STRICT, 5, BoundType::STRICT);
+    DoubleInterval i6(3, BoundType::WEAK, 7, BoundType::WEAK);
     
-    // Contains
+    // Contains number
     EXPECT_TRUE(i1.contains(4));
     EXPECT_FALSE(i1.contains(2));
     EXPECT_FALSE(i1.contains(12));
@@ -939,4 +949,14 @@ TEST(DoubleInterval, Properties)
     EXPECT_FALSE(i4.contains(6));
     EXPECT_TRUE(i4.contains(-5));
     EXPECT_TRUE(i4.contains(3));
+    
+    // Contains interval
+    EXPECT_FALSE(i1.contains(i2));
+    EXPECT_FALSE(i2.contains(i1));
+    EXPECT_TRUE(i1.contains(i5));
+    EXPECT_FALSE(i5.contains(i1));
+    EXPECT_FALSE(i1.contains(i6));
+    EXPECT_TRUE(i6.contains(i1));
+    EXPECT_TRUE(i1.contains(i1));
+    EXPECT_TRUE(i6.contains(i6));
 }
