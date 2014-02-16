@@ -176,7 +176,7 @@ template<typename Number>
 template<typename Number>
 void Interval<Number>::bloat_times(const Number& factor)
 	{
-		mContent = BoostInterval(mContent.lower() - (this->diameter / Number(2) * factor), mContent.upper() + (this->diameter / Number(2) * factor));
+		mContent = BoostInterval(mContent.lower() - (this->diameter() / Number(2) * factor), mContent.upper() + (this->diameter() / Number(2) * factor));
 	}
 
 template<typename Number>

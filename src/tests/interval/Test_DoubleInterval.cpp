@@ -979,3 +979,45 @@ TEST(DoubleInterval, Contains)
     EXPECT_TRUE(i1.proper_subset(i1));
     EXPECT_TRUE(i6.proper_subset(i6));
 }
+
+TEST(DoubleInterval, BloatShrink)
+{
+    DoubleInterval i1(3, BoundType::WEAK, 7, BoundType::WEAK);
+    DoubleInterval i2(-13, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval i3(0, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval i4(2, BoundType::WEAK, 5, BoundType::WEAK);
+    DoubleInterval i5(-6, BoundType::STRICT, 2, BoundType::STRICT);
+    DoubleInterval i6(5, BoundType::STRICT, 13, BoundType::STRICT);
+    DoubleInterval i7(3, BoundType::WEAK, 6, BoundType::WEAK);
+    DoubleInterval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
+    DoubleInterval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
+    DoubleInterval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
+    DoubleInterval result4(-4, BoundType::WEAK, 11, BoundType::WEAK);
+    DoubleInterval result5(-2, BoundType::STRICT, 0, BoundType::STRICT);
+    DoubleInterval result6(7, BoundType::STRICT, 11, BoundType::STRICT);
+    DoubleInterval result7(0, BoundType::WEAK, 1, BoundType::WEAK);
+    
+    // Bloat by adding
+    i1.bloat_by(5);
+    EXPECT_EQ(result1, i1);
+    i2.bloat_by(-3);
+    EXPECT_EQ(result2, i2);
+    // Note that here exist inconsistencies
+    // as we can create in valid intervals using this method
+    i3.bloat_by(-2);
+    //EXPECT_EQ(result3, i3);
+    
+    // Bloat by multiplying
+    i4.bloat_times(4);
+    EXPECT_EQ(result4, i4);
+    i5.bloat_times(-4); // this actually does not work, i5 is [nan, nan]
+    //EXPECT_EQ(result5, i5);
+    
+    // Shrink by subtracting
+    i6.shrink_by(2);
+    EXPECT_EQ(result6, i6);
+    
+    // Shrink by multiplying
+    i7.shrink_times(3); // this actually does not work, i7 is [nan, nan]
+    // EXPECT_EQ(result7, i7);
+}
