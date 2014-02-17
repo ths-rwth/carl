@@ -87,6 +87,11 @@ TEST(MpqInterval, Getters)
     EXPECT_EQ(test2.lower(), test2.upper());
     
     test1.set(MpqInterval::BoostInterval(3, 27));
+    EXPECT_EQ(0, test1.lower());
+    EXPECT_EQ(0, test1.upper());
+    
+    test1 = MpqInterval();
+    test1.set(MpqInterval::BoostInterval(3, 27));
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
     
