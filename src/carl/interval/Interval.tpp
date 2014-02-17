@@ -904,27 +904,27 @@ template<typename Number>
 	{
 		if( this->proper_subset(rhs) )
 		{
-			BoundType upperType = rhs.lowerBoundType() == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-			BoundType lowerType = rhs.upperBoundType() == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
+			BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
+			BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
 			resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
 			resultB = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
 			return true;
 		}
 		else
 		{
-			if( rhs.proper_subset(this) )
+			if( rhs.proper_subset(*this) )
 			{
 				resultA = emptyInterval();
 			}
 			else if( this->contains(rhs.lower()) )
 			{
-				BoundType lowerType = rhs.lowerBoundType() == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-				resultA = Interval<Number>(rhs.lower(), lowerType, mContent.upper(), mUpperBoundType);
+				BoundType lowerType = getOtherBoundType(rhs.lowerBoundType());
+				resultA = Interval<Number>(rhs.lower(), lowerType, mContent.upper(), getOtherBoundType(mUpperBoundType));
 			}
 			else if( this->contains(rhs.upper()) )
 			{
-				BoundType upperType = rhs.upperBoundType() == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
-				resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.upper(), upperType);
+				BoundType upperType = getOtherBoundType(rhs.upperBoundType());
+				resultA = Interval<Number>(mContent.lower(), getOtherBoundType(mLowerBoundType), rhs.upper(), upperType);
 			}
 			else //both are totally distinct
 			{

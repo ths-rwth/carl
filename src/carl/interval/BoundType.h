@@ -25,6 +25,14 @@ namespace carl
 		return (type1 == BoundType::INFTY || type2 == BoundType::INFTY)
 		? BoundType::INFTY : (type1 == BoundType::WEAK || type2 == BoundType::WEAK) ? BoundType::WEAK : BoundType::STRICT;
 	}
+        
+        inline static BoundType getOtherBoundType( BoundType type ) 
+        {
+            return (type == BoundType::INFTY)
+                    ? BoundType::INFTY
+                    : (type == BoundType::WEAK) ? BoundType::STRICT : BoundType::WEAK;
+                
+        }
 
 }
 

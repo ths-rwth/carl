@@ -905,8 +905,8 @@ TEST(DoubleInterval, Union)
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
     
     EXPECT_TRUE(i1.unite(i3, result1, result2));
-    EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
-    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
     
     EXPECT_FALSE(i3.unite(i2, result1, result2));
     EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
@@ -934,6 +934,28 @@ TEST(DoubleInterval, Union)
     EXPECT_TRUE(i6.unite(i3, result1, result2));
     EXPECT_EQ(DoubleInterval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
     EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+}
+
+TEST(DoubleInterval, Difference)
+{
+    DoubleInterval i1(3, BoundType::WEAK, 5, BoundType::WEAK);
+    DoubleInterval i2(1, BoundType::WEAK, 4, BoundType::WEAK);
+    DoubleInterval i3(-1, BoundType::WEAK, 2, BoundType::WEAK);
+    DoubleInterval i4(2, BoundType::WEAK, 3, BoundType::WEAK);
+    DoubleInterval result1, result2;
+    
+    EXPECT_FALSE(i1.difference(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval(4, BoundType::STRICT, 5, BoundType::STRICT), result1);
+    
+    EXPECT_FALSE(i3.difference(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i2.difference(i4, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 2, BoundType::STRICT), result1);
+    EXPECT_EQ(DoubleInterval(3, BoundType::STRICT, 4, BoundType::WEAK), result2);
+    
+    EXPECT_FALSE(i4.difference(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
 }
 
 TEST(DoubleInterval, Split)
