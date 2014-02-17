@@ -197,6 +197,11 @@ class Term
 				mMonomial->gatherVariables(variables);
 			}
 		}
+		
+		Term* pow(unsigned exp) const
+		{
+			return new Term(pow(coeff(),exp),mMonomial ? mMonomial->pow(exp) : mMonomial);
+		}
         
         std::string toString(bool infix=true, bool friendlyVarNames=true) const;
         
@@ -268,6 +273,7 @@ class Term
 		}
 };
 
+		
 } // namespace carl
 
 namespace std
