@@ -68,27 +68,27 @@ typename SampleSet<Number>::iterator SampleSet<Number>::remove(typename SampleSe
 }
 
 template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::next() {
+inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::next() const {
 	if (this->samples.empty()) assert(false);
 	return this->queue.front();
 }
 
 template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextNR() {
+inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextNR() const {
 	if (this->samples.empty()) assert(false);
 	if (this->NRqueue.empty()) return this->IRqueue.front();
 	return this->NRqueue.front();
 }
 
 template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextNonRoot() {
+inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextNonRoot() const {
 	if (this->samples.empty()) assert(false);
 	if (this->nonRootQueue.empty()) return this->rootQueue.front();
 	return this->nonRootQueue.front();
 }
 
 template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextRoot() {
+inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextRoot() const {
 	if (this->samples.empty()) assert(false);
 	if (this->rootQueue.empty()) return this->nonRootQueue.front();
 	return this->rootQueue.front();
