@@ -220,8 +220,8 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, Re
 
 template<typename Number>
 std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify() {
-	LOGMSG_TRACE("carl.cad", "Simplifying " << *this);
 	std::pair<SampleSimplification, bool> simplification;
+	if (this->empty()) return simplification;
 	simplification.second = false;
 	for (iteratorIR irIter = this->IRqueue.begin(); irIter != this->IRqueue.end(); ) {
 		if (!(*irIter)->isNumeric() && (*irIter)->getRefinementCount() == 0) {// try at least one refinement
@@ -251,7 +251,14 @@ bool SampleSet<Number>::contains(const RealAlgebraicNumberPtr<Number> r) const {
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
-	return os << s.queue;
+	os << "SampleSet " << &s << std::endl;
+	os << "samples: " << s.samples << std::endl;
+	os << "queue: " << s.queue << std::endl;
+	os << "NRqueue: " << s.NRqueue << std::endl;
+	os << "IRqueue: " << s.IRqueue << std::endl;
+	os << "Rootqueue: " << s.rootQueue << std::endl;
+	os << "Nonrootqueue: " << s.nonRootQueue << std::endl;
+	return os;
 }
 
 template<typename Number>
