@@ -283,7 +283,7 @@ void SampleSet<Number>::removeFromQueue(const RealAlgebraicNumberPtr<Number> r) 
 
 template<typename Number>
 void SampleSet<Number>::removeFromNRIR(const RealAlgebraicNumberPtr<Number> r) {
-	if (r->isNumeric()) {
+	if (r->isNumericRepresentation()) {
 		RealAlgebraicNumberNRPtr<Number> rNR = std::static_pointer_cast<RealAlgebraicNumberNR<Number>>(r); // needs to be a dynamic cast here in order to determine the correct type always
 		iteratorNR pos = std::find(this->NRqueue.begin(), this->NRqueue.end(), rNR);
 		assert(pos != this->NRqueue.end()); // r should be in this list, otherwise it was maybe simplified and moved to the other list
