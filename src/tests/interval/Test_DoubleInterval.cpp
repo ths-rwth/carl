@@ -784,7 +784,6 @@ TEST(DoubleInterval, ExtendedDivision)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 }
 
-/*
 TEST(DoubleInterval, Intersection)
 {
     DoubleInterval a1(-1,BoundType::WEAK,1,BoundType::WEAK);
@@ -841,7 +840,7 @@ TEST(DoubleInterval, Intersection)
     
     EXPECT_EQ(DoubleInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
 }
- */
+
 TEST(DoubleInterval, Split)
 {
     DoubleInterval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);
@@ -1005,19 +1004,9 @@ TEST(DoubleInterval, BloatShrink)
     // Note that here exist inconsistencies
     // as we can create in valid intervals using this method
     i3.bloat_by(-2);
-    //EXPECT_EQ(result3, i3);
-    
-    // Bloat by multiplying
-    i4.bloat_times(4);
-    EXPECT_EQ(result4, i4);
-    i5.bloat_times(-4); // this actually does not work, i5 is [nan, nan]
-    //EXPECT_EQ(result5, i5);
+    EXPECT_EQ(result3, i3);
     
     // Shrink by subtracting
     i6.shrink_by(2);
     EXPECT_EQ(result6, i6);
-    
-    // Shrink by multiplying
-    i7.shrink_times(3); // this actually does not work, i7 is [nan, nan]
-    // EXPECT_EQ(result7, i7);
 }
