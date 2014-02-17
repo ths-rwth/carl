@@ -779,19 +779,19 @@ template<typename Number>
                 // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
                 if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
                 {
-                    if ( mContent.lower() > rhs.upper() )
+                    if ( mContent.upper() > rhs.upper() )
                     {
                         upperValue = rhs.upper();
                         minUppest = rhs.upperBoundType();
                     }
-                    else if ( rhs.upper() > mContent.lower() )
+                    else if ( rhs.upper() > mContent.upper() )
                     {
-                        upperValue = mContent.lower();
+                        upperValue = mContent.upper();
                         minUppest = mUpperBoundType;
                     }
                     else
                     {
-                        upperValue = mContent.lower();
+                        upperValue = mContent.upper();
                         minUppest = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
                     }
                     if( maxLowest == BoundType::INFTY )
@@ -810,7 +810,7 @@ template<typename Number>
                 }
                 else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
                 {
-                    upperValue = mContent.lower();
+                    upperValue = mContent.upper();
                     minUppest = mUpperBoundType;
                     if( maxLowest == BoundType::INFTY )
                     {
@@ -844,40 +844,56 @@ template<typename Number>
 		{
 			Number lower;
 			Number upper;
-			BoundType lowerType;
-			BoundType upperType;
+			BoundType lowerType = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
+			BoundType upperType = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
 			// calculate lowerBound and lowerBoundType
-			if( mContent.lower() < rhs.lower() )
-			{
-				lower = mContent.lower();
-				lowerType = mLowerBoundType;
-			}
-			else if ( mContent.lower() == rhs.lower() )
-			{
-				lower = mContent.lower();
-				lowerType = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
-			}
-			else
-			{
-				lower = rhs.lower();
-				lowerType = rhs.lowerBoundType();
-			}
+                        if( lowerType != BoundType::INFTY )
+                        {
+                            if( mContent.lower() < rhs.lower() )
+                            {
+                                    lower = mContent.lower();
+                                    lowerType = mLowerBoundType;
+                            }
+                            else if ( mContent.lower() == rhs.lower() )
+                            {
+                                    lower = mContent.lower();
+                                    lowerType = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
+                            }
+                            else
+                            {
+                                    lower = rhs.lower();
+                                    lowerType = rhs.lowerBoundType();
+                            }
+                        }
+                        else
+                        {
+                            lower = mContent.upper();
+                        }
+			
 			// calculate upperBound and upperBoundType
-			if( mContent.upper() > rhs.upper() )
-			{
-				upper = mContent.upper();
-				upperType = mUpperBoundType;
-			}
-			else if ( mContent.upper() == rhs.upper() )
-			{
-				upper = mContent.upper();
-				upperType = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
-			}
-			else
-			{
-				upper = rhs.upper();
-				upperType = rhs.upperBoundType();
-			}
+                        if( upperType != BoundType::INFTY )
+                        {
+                            if( mContent.upper() > rhs.upper() )
+                            {
+                                    upper = mContent.upper();
+                                    upperType = mUpperBoundType;
+                            }
+                            else if ( mContent.upper() == rhs.upper() )
+                            {
+                                    upper = mContent.upper();
+                                    upperType = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
+                            }
+                            else
+                            {
+                                    upper = rhs.upper();
+                                    upperType = rhs.upperBoundType();
+                            }
+                        }
+                        else
+                        {
+                            upper = lower;
+                        }
+			
 			resultA = Interval<Number>(lower, lowerType, upper, upperType);
 			return false;
 		}

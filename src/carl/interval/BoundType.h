@@ -23,7 +23,7 @@ namespace carl
 	inline static BoundType getWeakestBoundType( BoundType type1, BoundType type2 )
 	{
 		return (type1 == BoundType::INFTY || type2 == BoundType::INFTY)
-		? BoundType::INFTY : (type1 == BoundType::STRICT || type2 == BoundType::STRICT) ? BoundType::STRICT : BoundType::WEAK;
+		? BoundType::INFTY : (type1 == BoundType::WEAK || type2 == BoundType::WEAK) ? BoundType::WEAK : BoundType::STRICT;
 	}
         
         inline static BoundType getOtherBoundType( BoundType type ) 
