@@ -38,16 +38,33 @@ TEST(MpqInterval, Constructor)
 
 TEST(MpqInterval, Getters)
 {
-    MpqInterval test1 = MpqInterval(mpq_class(-1.0), BoundType::WEAK, mpq_class(1.0), BoundType::STRICT);
+    MpqInterval test1 = MpqInterval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
+    MpqInterval test2 = MpqInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
+    MpqInterval test3 = MpqInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
+    MpqInterval test4 = MpqInterval(4, BoundType::WEAK, 2, BoundType::WEAK);
+    MpqInterval test5 = MpqInterval();
+    MpqInterval test6 = MpqInterval(4);
+    
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
     EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test1.upperBoundType());
-    MpqInterval test2 = MpqInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
     EXPECT_EQ(-1, test2.lower());
     EXPECT_EQ(1, test2.upper());
     EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
+    EXPECT_TRUE(test3.isEmpty());
+    EXPECT_EQ(BoundType::STRICT, test4.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
+    EXPECT_EQ(0, test4.lower());
+    EXPECT_EQ(0, test4.upper());
+    EXPECT_TRUE(test4.isEmpty());
+    EXPECT_EQ(0, test5.lower());
+    EXPECT_EQ(0, test5.upper());
+    EXPECT_TRUE(test5.isEmpty());
+    EXPECT_EQ(4, test6.lower());
+    EXPECT_EQ(4, test6.upper());
+    
     test1.setLower(-3);
     test1.setUpper(5);
     test1.setLowerBoundType(BoundType::STRICT);
@@ -56,14 +73,43 @@ TEST(MpqInterval, Getters)
     EXPECT_EQ(5, test1.upper());
     EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
     EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    
     test1.set(4, 8);
     EXPECT_EQ(4, test1.lower());
     EXPECT_EQ(8, test1.upper());
+    
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
     EXPECT_TRUE(test1.isUnbounded());
-    MpqInterval test3 = MpqInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
-    EXPECT_TRUE(test3.isEmpty());
+
+    test2.setUpperBoundType(BoundType::INFTY);
+    EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
+    EXPECT_EQ(test2.lower(), test2.upper());
+    
+    test1.set(MpqInterval::BoostInterval(3, 27));
+    EXPECT_EQ(3, test1.lower());
+    EXPECT_EQ(27, test1.upper());
+    
+    MpqInterval::BoostInterval bi(0, 1);
+    bi = boost::numeric::widen(bi, mpq_class(-3)); // create an invalid interval by this hack
+    test2.set(bi);
+    EXPECT_EQ(0, test2.lower());
+    EXPECT_EQ(0, test2.upper());
+    EXPECT_TRUE(test2.isEmpty());
+}
+
+TEST(MpqInterval, StaticCreators)
+{
+    MpqInterval i1 = MpqInterval::emptyInterval();
+    MpqInterval i2 = MpqInterval::unboundedInterval();
+    
+    EXPECT_TRUE(i1.isEmpty());
+    EXPECT_EQ(0, i1.lower());
+    EXPECT_EQ(0, i1.upper());
+    
+    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
+    EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 }
 
 TEST(MpqInterval, Addition)
@@ -783,7 +829,6 @@ TEST(MpqInterval, ExtendedDivision)
     EXPECT_EQ( MpqInterval::unboundedInterval(), result1 );
 }
 
-/*
 TEST(MpqInterval, Intersection)
 {
     MpqInterval a1(mpq_class(-1),BoundType::WEAK,1,BoundType::WEAK);
@@ -840,7 +885,7 @@ TEST(MpqInterval, Intersection)
     
     EXPECT_EQ(MpqInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
 }
- */
+
 TEST(MpqInterval, Split)
 {
     MpqInterval i1(mpq_class(-1), BoundType::INFTY, mpq_class(1), BoundType::INFTY);
@@ -977,4 +1022,30 @@ TEST(MpqInterval, Contains)
     EXPECT_TRUE(i6.proper_subset(i1));
     EXPECT_TRUE(i1.proper_subset(i1));
     EXPECT_TRUE(i6.proper_subset(i6));
+}
+
+TEST(MpqInterval, BloatShrink)
+{
+    MpqInterval i1(3, BoundType::WEAK, 7, BoundType::WEAK);
+    MpqInterval i2(-13, BoundType::STRICT, 1, BoundType::STRICT);
+    MpqInterval i3(0, BoundType::STRICT, 1, BoundType::STRICT);
+    MpqInterval i4(5, BoundType::STRICT, 13, BoundType::STRICT);
+    MpqInterval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
+    MpqInterval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
+    MpqInterval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
+    MpqInterval result4(7, BoundType::STRICT, 11, BoundType::STRICT);
+    
+    // Bloat by adding
+    i1.bloat_by(5);
+    EXPECT_EQ(result1, i1);
+    i2.bloat_by(-3);
+    EXPECT_EQ(result2, i2);
+    // Note that here exist inconsistencies
+    // as we can create in valid intervals using this method
+    i3.bloat_by(-2);
+    EXPECT_EQ(result3, i3);
+    
+    // Shrink by subtracting
+    i4.shrink_by(2);
+    EXPECT_EQ(result4, i4);
 }

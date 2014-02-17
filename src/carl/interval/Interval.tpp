@@ -41,7 +41,7 @@ Number Interval<Number>::diameter() const
 template<typename Number>
 void Interval<Number>::diameter_assign()
 	{
-		mContent = BoostInterval(this->diameter());
+		this->set(BoostInterval(this->diameter()));
 	}
 
 template<typename Number>
@@ -54,7 +54,7 @@ template<typename Number>
 template<typename Number>
 	void Interval<Number>::diameterRatio_assign(const Interval<Number>& rhs)
 	{
-		mContent = BoostInterval(this->diameterRatio(rhs));
+		this->set(BoostInterval(this->diameterRatio(rhs)));
 	}
 
 template<typename Number>
@@ -66,7 +66,7 @@ template<typename Number>
 template<typename Number>
 	void Interval<Number>::magnitude_assign()
 	{
-		mContent = BoostInterval(this->magnitude());
+		this->set(BoostInterval(this->magnitude()));
 	}
 
 template<typename Number>
@@ -78,7 +78,7 @@ template<typename Number>
 template<typename Number>
 	void Interval<Number>::center_assign()
 	{
-		mContent = BoostInterval(this->center());
+		this->set(BoostInterval(this->center()));
 	}
 	
 	template<typename Number>
@@ -579,7 +579,7 @@ Interval<Number> Interval<Number>::log() const
 template<typename Number>
 void Interval<Number>::log_assign()
 	{
-		mContent = boost::numeric::log(mContent);
+		this->set(boost::numeric::log(mContent));
 	}
 
 /*******************************************************************************
@@ -595,7 +595,7 @@ Interval<Number> Interval<Number>::sin() const
 template<typename Number>
 void Interval<Number>::sin_assign()
 	{
-		mContent = boost::numeric::sin(mContent);
+		this->set(boost::numeric::sin(mContent));
 	}
 
 template<typename Number>
@@ -607,7 +607,7 @@ Interval<Number> Interval<Number>::cos() const
 template<typename Number>
 void Interval<Number>::cos_assign()
 	{
-		mContent = boost::numeric::cos(mContent);
+		this->set(boost::numeric::cos(mContent));
 	}
 
 template<typename Number>
@@ -619,7 +619,7 @@ Interval<Number> Interval<Number>::tan() const
 template<typename Number>
 void Interval<Number>::tan_assign()
 	{
-		mContent = boost::numeric::tan(mContent);
+		this->set(boost::numeric::tan(mContent));
 	}
 
 template<typename Number>
@@ -631,7 +631,7 @@ Interval<Number> Interval<Number>::asin() const
 template<typename Number>
 void Interval<Number>::asin_assign()
 	{
-		mContent = boost::numeric::asin(mContent);
+		this->set(boost::numeric::asin(mContent));
 	}
 
 template<typename Number>
@@ -643,7 +643,7 @@ Interval<Number> Interval<Number>::acos() const
 template<typename Number>
 void Interval<Number>::acos_assign()
 	{
-		mContent = boost::numeric::acos(mContent);
+		this->set(boost::numeric::acos(mContent));
 	}
 
 template<typename Number>
@@ -655,7 +655,7 @@ Interval<Number> Interval<Number>::atan() const
 template<typename Number>
 void Interval<Number>::atan_assign()
 	{
-		mContent = boost::numeric::atan(mContent);
+		this->set(boost::numeric::atan(mContent));
 	}
 
 template<typename Number>
@@ -667,7 +667,7 @@ Interval<Number> Interval<Number>::sinh() const
 template<typename Number>
 void Interval<Number>::sinh_assign()
 	{
-		mContent = boost::numeric::sinh(mContent);
+		this->set(boost::numeric::sinh(mContent));
 	}
 
 template<typename Number>
@@ -679,7 +679,7 @@ Interval<Number> Interval<Number>::cosh() const
 template<typename Number>
 void Interval<Number>::cosh_assign()
 	{
-		mContent = boost::numeric::cosh(mContent);
+		this->set(boost::numeric::cosh(mContent));
 	}
 
 template<typename Number>
@@ -691,7 +691,7 @@ Interval<Number> Interval<Number>::tanh() const
 template<typename Number>
 void Interval<Number>::tanh_assign()
 	{
-		mContent = boost::numeric::tanh(mContent);
+		this->set(boost::numeric::tanh(mContent));
 	}
 
 template<typename Number>
@@ -703,7 +703,7 @@ Interval<Number> Interval<Number>::asinh() const
 template<typename Number>
 void Interval<Number>::asinh_assign()
 	{
-		mContent = boost::numeric::asinh(mContent);
+		this->set(boost::numeric::asinh(mContent));
 	}
 
 template<typename Number>
@@ -715,7 +715,7 @@ Interval<Number> Interval<Number>::acosh() const
 template<typename Number>
 void Interval<Number>::acosh_assign()
 	{
-		mContent = boost::numeric::acosh(mContent);
+		this->set(boost::numeric::acosh(mContent));
 	}
 
 template<typename Number>
@@ -727,7 +727,7 @@ Interval<Number> Interval<Number>::atanh() const
 template<typename Number>
 void Interval<Number>::atanh_assign()
 	{
-		mContent = boost::numeric::atanh(mContent);
+		this->set(boost::numeric::atanh(mContent));
 	}
 
 /*******************************************************************************
@@ -738,93 +738,91 @@ template<typename Number>
 	Interval<Number> Interval<Number>::intersect(const Interval<Number>& rhs) const
 	{
 		Number lowerValue;
-        Number upperValue;
-        BoundType maxLowest;
-        BoundType minUppest;
-        // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
-        if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-        {
-            if ( mContent.lower() < rhs.lower() )
-            {
-                lowerValue = rhs.lower();
-                maxLowest = rhs.lowerBoundType();
-            }
-            else if ( rhs.lower() < mContent.lower() )
-            {
-                lowerValue = mContent.lower();
-                maxLowest = mLowerBoundType;
-            }
-            else
-            {
-                lowerValue = mContent.lower();
-                maxLowest = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
-            }
-        }
-        else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-        {
-            lowerValue = rhs.lower();
-            maxLowest = rhs.lowerBoundType();
-        }
-        else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
-        {
-            lowerValue = mContent.lower();
-            maxLowest = mLowerBoundType;
-        }
-        else
-        {
-            lowerValue = Number(0);
-            maxLowest = BoundType::INFTY;
-        }
-        
-        // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
-        if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-        {
-            if ( mContent.lower() > rhs.upper() )
-            {
-                upperValue = rhs.upper();
-                minUppest = rhs.upperBoundType();
-            }
-            else if ( rhs.upper() > mContent.lower() )
-            {
-                upperValue = mContent.lower();
-                minUppest = mUpperBoundType;
-            }
-            else
-            {
-                upperValue = mContent.lower();
-                minUppest = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
-            }
-            if( maxLowest == BoundType::INFTY )
-            {
-                lowerValue = upperValue;
-            }
-        }
-        else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-        {
-            upperValue = rhs.upper();
-            minUppest = rhs.upperBoundType();
-            if( maxLowest == BoundType::INFTY )
-            {
-                lowerValue = upperValue;
-            }
-        }
-        else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-        {
-            upperValue = mContent.lower();
-            minUppest = mUpperBoundType;
-            if( maxLowest == BoundType::INFTY )
-            {
-                lowerValue = upperValue;
-            }
-        }
-        else
-        {
-            upperValue = lowerValue;
-            minUppest = BoundType::INFTY;
-        }
-        if ( lowerValue > upperValue )
-            return emptyInterval();
-        return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
+                Number upperValue;
+                BoundType maxLowest;
+                BoundType minUppest;
+                // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
+                if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+                {
+                    if ( mContent.lower() < rhs.lower() )
+                    {
+                        lowerValue = rhs.lower();
+                        maxLowest = rhs.lowerBoundType();
+                    }
+                    else if ( rhs.lower() < mContent.lower() )
+                    {
+                        lowerValue = mContent.lower();
+                        maxLowest = mLowerBoundType;
+                    }
+                    else
+                    {
+                        lowerValue = mContent.lower();
+                        maxLowest = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
+                    }
+                }
+                else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+                {
+                    lowerValue = rhs.lower();
+                    maxLowest = rhs.lowerBoundType();
+                }
+                else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
+                {
+                    lowerValue = mContent.lower();
+                    maxLowest = mLowerBoundType;
+                }
+                else
+                {
+                    lowerValue = Number(0);
+                    maxLowest = BoundType::INFTY;
+                }
+
+                // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
+                if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+                {
+                    if ( mContent.lower() > rhs.upper() )
+                    {
+                        upperValue = rhs.upper();
+                        minUppest = rhs.upperBoundType();
+                    }
+                    else if ( rhs.upper() > mContent.lower() )
+                    {
+                        upperValue = mContent.lower();
+                        minUppest = mUpperBoundType;
+                    }
+                    else
+                    {
+                        upperValue = mContent.lower();
+                        minUppest = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
+                    }
+                    if( maxLowest == BoundType::INFTY )
+                    {
+                        lowerValue = upperValue;
+                    }
+                }
+                else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+                {
+                    upperValue = rhs.upper();
+                    minUppest = rhs.upperBoundType();
+                    if( maxLowest == BoundType::INFTY )
+                    {
+                        lowerValue = upperValue;
+                    }
+                }
+                else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+                {
+                    upperValue = mContent.lower();
+                    minUppest = mUpperBoundType;
+                    if( maxLowest == BoundType::INFTY )
+                    {
+                        lowerValue = upperValue;
+                    }
+                }
+                else
+                {
+                    upperValue = lowerValue;
+                    minUppest = BoundType::INFTY;
+                }
+                return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
 	}
 	
 template<typename Number>

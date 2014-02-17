@@ -15,6 +15,7 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
+#include <iostream>
 
 using namespace carl;
 
@@ -24,7 +25,7 @@ TEST(DoubleInterval, Constructor)
 {
     DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
-	DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
+    DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::emptyInterval());
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
@@ -38,15 +39,32 @@ TEST(DoubleInterval, Constructor)
 TEST(DoubleInterval, Getters)
 {
     DoubleInterval test1 = DoubleInterval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
+    DoubleInterval test2 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
+    DoubleInterval test3 = DoubleInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval test4 = DoubleInterval(4, BoundType::WEAK, 2, BoundType::WEAK);
+    DoubleInterval test5 = DoubleInterval();
+    DoubleInterval test6 = DoubleInterval(4);
+    
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
     EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test1.upperBoundType());
-    DoubleInterval test2 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
     EXPECT_EQ(-1, test2.lower());
     EXPECT_EQ(1, test2.upper());
     EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
+    EXPECT_TRUE(test3.isEmpty());
+    EXPECT_EQ(BoundType::STRICT, test4.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
+    EXPECT_EQ(0, test4.lower());
+    EXPECT_EQ(0, test4.upper());
+    EXPECT_TRUE(test4.isEmpty());
+    EXPECT_EQ(0, test5.lower());
+    EXPECT_EQ(0, test5.upper());
+    EXPECT_TRUE(test5.isEmpty());
+    EXPECT_EQ(4, test6.lower());
+    EXPECT_EQ(4, test6.upper());
+    
     test1.setLower(-3);
     test1.setUpper(5);
     test1.setLowerBoundType(BoundType::STRICT);
@@ -55,17 +73,43 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(5, test1.upper());
     EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
     EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    
     test1.set(4, 8);
     EXPECT_EQ(4, test1.lower());
     EXPECT_EQ(8, test1.upper());
+    
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
     EXPECT_TRUE(test1.isUnbounded());
-    DoubleInterval test3 = DoubleInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
-    EXPECT_TRUE(test3.isEmpty());
+
+    test2.setUpperBoundType(BoundType::INFTY);
+    EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
+    EXPECT_EQ(test2.lower(), test2.upper());
+    
     test1.set(DoubleInterval::BoostInterval(3, 27));
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
+    
+    DoubleInterval::BoostInterval bi(0, 1);
+    bi = boost::numeric::widen(bi, double(-3)); // create an invalid interval by this hack
+    test2.set(bi);
+    EXPECT_EQ(0, test2.lower());
+    EXPECT_EQ(0, test2.upper());
+    EXPECT_TRUE(test2.isEmpty());
+}
+
+TEST(DoubleInterval, StaticCreators)
+{
+    DoubleInterval i1 = DoubleInterval::emptyInterval();
+    DoubleInterval i2 = DoubleInterval::unboundedInterval();
+    
+    EXPECT_TRUE(i1.isEmpty());
+    EXPECT_EQ(0, i1.lower());
+    EXPECT_EQ(0, i1.upper());
+    
+    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
+    EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 }
 
 TEST(DoubleInterval, Addition)

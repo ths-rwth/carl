@@ -104,7 +104,7 @@ namespace carl
 		{}
 		
 		Interval(const Number& n) :
-			mContent(n, n),
+			mContent(n),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
@@ -500,7 +500,7 @@ namespace carl
 		 */
 		inline void setLower(const Number& n)
 		{
-			mContent = BoostInterval(n, mContent.upper());
+			this->set(BoostInterval(n, mContent.upper()));
 		}
         
 		/**
@@ -509,7 +509,7 @@ namespace carl
 		 */
 		inline void setUpper(const Number& n)
 		{
-			mContent = BoostInterval(mContent.lower(), n);
+			this->set(BoostInterval(mContent.lower(), n));
 		}
 		
 		/**
@@ -521,7 +521,9 @@ namespace carl
 			if(b == BoundType::INFTY)
 			{
 				mLowerBoundType = b;
-				mContent = (mUpperBoundType == BoundType::INFTY) ? BoostInterval(Number(0)) : BoostInterval(mContent.lower());
+				mContent = (mUpperBoundType == BoundType::INFTY)
+                                        ? BoostInterval(Number(0))
+                                        : BoostInterval(mContent.lower());
 			}
 			else
 			{
@@ -538,7 +540,9 @@ namespace carl
 			if(b == BoundType::INFTY)
 			{
 				mUpperBoundType = b;
-				mContent = mLowerBoundType == BoundType::INFTY ? BoostInterval(Number(0)) : BoostInterval(mContent.lower());
+				mContent = (mLowerBoundType == BoundType::INFTY)
+                                        ? BoostInterval(Number(0))
+                                        : BoostInterval(mContent.upper());
 			}
 			else
 			{
