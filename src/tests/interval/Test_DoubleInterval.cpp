@@ -90,9 +90,15 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
     
+    test2 = DoubleInterval();
     DoubleInterval::BoostInterval bi(0, 1);
     bi = boost::numeric::widen(bi, double(-3)); // create an invalid interval by this hack
     test2.set(bi);
+    EXPECT_EQ(0, test2.lower());
+    EXPECT_EQ(0, test2.upper());
+    EXPECT_TRUE(test2.isEmpty());
+    
+    test2 = DoubleInterval(bi, BoundType::WEAK, BoundType::WEAK);
     EXPECT_EQ(0, test2.lower());
     EXPECT_EQ(0, test2.upper());
     EXPECT_TRUE(test2.isEmpty());

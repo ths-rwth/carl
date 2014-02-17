@@ -91,9 +91,15 @@ TEST(clRA_Interval, Getters)
     EXPECT_EQ(3, test1.lower());
     EXPECT_EQ(27, test1.upper());
     
+    test2 = clRA_Interval();
     clRA_Interval::BoostInterval bi(0, 1);
     bi = boost::numeric::widen(bi, cln::cl_RA(-3)); // create an invalid interval by this hack
     test2.set(bi);
+    EXPECT_EQ(0, test2.lower());
+    EXPECT_EQ(0, test2.upper());
+    EXPECT_TRUE(test2.isEmpty());
+    
+    test2 = clRA_Interval(bi, BoundType::WEAK, BoundType::WEAK);
     EXPECT_EQ(0, test2.lower());
     EXPECT_EQ(0, test2.upper());
     EXPECT_TRUE(test2.isEmpty());
