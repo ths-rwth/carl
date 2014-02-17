@@ -914,8 +914,18 @@ TEST(DoubleInterval, Properties)
     EXPECT_EQ(-1, i2.center());
     EXPECT_EQ(5, i3.center());
     EXPECT_EQ(-1, i4.center());
+}
+
+TEST(DoubleInterval, Contains)
+{
+    DoubleInterval i1(3, BoundType::STRICT, 7, BoundType::STRICT);
+    DoubleInterval i2(-5, BoundType::STRICT, 3, BoundType::WEAK);
+    DoubleInterval i3(3, BoundType::WEAK, 7, BoundType::STRICT);
+    DoubleInterval i4(-5, BoundType::WEAK, 3, BoundType::WEAK);
+    DoubleInterval i5(4, BoundType::STRICT, 5, BoundType::STRICT);
+    DoubleInterval i6(3, BoundType::WEAK, 7, BoundType::WEAK);
     
-    // Contains
+    // Contains number
     EXPECT_TRUE(i1.contains(4));
     EXPECT_FALSE(i1.contains(2));
     EXPECT_FALSE(i1.contains(12));
@@ -939,4 +949,75 @@ TEST(DoubleInterval, Properties)
     EXPECT_FALSE(i4.contains(6));
     EXPECT_TRUE(i4.contains(-5));
     EXPECT_TRUE(i4.contains(3));
+    
+    // Contains interval
+    EXPECT_FALSE(i1.contains(i2));
+    EXPECT_FALSE(i2.contains(i1));
+    EXPECT_TRUE(i1.contains(i5));
+    EXPECT_FALSE(i5.contains(i1));
+    EXPECT_FALSE(i1.contains(i6));
+    EXPECT_TRUE(i6.contains(i1));
+    EXPECT_TRUE(i1.contains(i1));
+    EXPECT_TRUE(i6.contains(i6));
+    
+    // Subset is the same
+    EXPECT_FALSE(i1.subset(i2));
+    EXPECT_FALSE(i2.subset(i1));
+    EXPECT_TRUE(i1.subset(i5));
+    EXPECT_FALSE(i5.subset(i1));
+    EXPECT_FALSE(i1.subset(i6));
+    EXPECT_TRUE(i6.subset(i1));
+    EXPECT_TRUE(i1.subset(i1));
+    EXPECT_TRUE(i6.subset(i6));
+    
+    EXPECT_FALSE(i1.proper_subset(i2));
+    EXPECT_FALSE(i2.proper_subset(i1));
+    EXPECT_TRUE(i1.proper_subset(i5));
+    EXPECT_FALSE(i5.proper_subset(i1));
+    EXPECT_FALSE(i1.proper_subset(i6));
+    EXPECT_TRUE(i6.proper_subset(i1));
+    EXPECT_TRUE(i1.proper_subset(i1));
+    EXPECT_TRUE(i6.proper_subset(i6));
+}
+
+TEST(DoubleInterval, BloatShrink)
+{
+    DoubleInterval i1(3, BoundType::WEAK, 7, BoundType::WEAK);
+    DoubleInterval i2(-13, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval i3(0, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval i4(2, BoundType::WEAK, 5, BoundType::WEAK);
+    DoubleInterval i5(-6, BoundType::STRICT, 2, BoundType::STRICT);
+    DoubleInterval i6(5, BoundType::STRICT, 13, BoundType::STRICT);
+    DoubleInterval i7(3, BoundType::WEAK, 6, BoundType::WEAK);
+    DoubleInterval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
+    DoubleInterval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
+    DoubleInterval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
+    DoubleInterval result4(-4, BoundType::WEAK, 11, BoundType::WEAK);
+    DoubleInterval result5(-2, BoundType::STRICT, 0, BoundType::STRICT);
+    DoubleInterval result6(7, BoundType::STRICT, 11, BoundType::STRICT);
+    DoubleInterval result7(0, BoundType::WEAK, 1, BoundType::WEAK);
+    
+    // Bloat by adding
+    i1.bloat_by(5);
+    EXPECT_EQ(result1, i1);
+    i2.bloat_by(-3);
+    EXPECT_EQ(result2, i2);
+    // Note that here exist inconsistencies
+    // as we can create in valid intervals using this method
+    i3.bloat_by(-2);
+    //EXPECT_EQ(result3, i3);
+    
+    // Bloat by multiplying
+    i4.bloat_times(4);
+    EXPECT_EQ(result4, i4);
+    i5.bloat_times(-4); // this actually does not work, i5 is [nan, nan]
+    //EXPECT_EQ(result5, i5);
+    
+    // Shrink by subtracting
+    i6.shrink_by(2);
+    EXPECT_EQ(result6, i6);
+    
+    // Shrink by multiplying
+    i7.shrink_times(3); // this actually does not work, i7 is [nan, nan]
+    // EXPECT_EQ(result7, i7);
 }

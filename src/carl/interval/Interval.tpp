@@ -164,43 +164,7 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::proper_subset(const Interval<Number>& rhs) const
 	{
-		if( mContent.lower() < rhs.lower() && mContent.upper() > rhs.upper() )
-		{
-			return true;
-		}
-		
-		if( mContent.lower() == rhs.lower() && mContent.upper() == rhs.upper() )
-		{
-			bool lowerOk = false;
-			switch( mLowerBoundType )
-			{
-				case BoundType::INFTY:
-					lowerOk = (rhs.lowerBoundType() == BoundType::INFTY);
-					break;
-				case BoundType::STRICT:
-					lowerOk = (rhs.lowerBoundType() == BoundType::STRICT);
-					break;
-				case BoundType::WEAK:
-					lowerOk = (rhs.lowerBoundType() != BoundType::INFTY);
-			}
-			if( lowerOk )
-			{
-				switch( mUpperBoundType )
-				{
-					case BoundType::INFTY:
-						return rhs.upperBoundType() == BoundType::INFTY;
-					case BoundType::STRICT:
-						return rhs.upperBoundType() == BoundType::STRICT;
-					case BoundType::WEAK:
-						return rhs.upperBoundType() != BoundType::INFTY;
-				}
-			}
-			return false; // the lower boundaries are not ok.
-		}
-		else
-		{
-			return false; // not less and not equal
-		}
+                return this->contains(rhs);
 	}
 	
 template<typename Number>
@@ -212,7 +176,7 @@ template<typename Number>
 template<typename Number>
 void Interval<Number>::bloat_times(const Number& factor)
 	{
-		mContent = BoostInterval(mContent.lower() - (this->diameter / Number(2) * factor), mContent.upper() + (this->diameter / Number(2) * factor));
+		mContent = BoostInterval(mContent.lower() - (this->diameter() / Number(2) * factor), mContent.upper() + (this->diameter() / Number(2) * factor));
 	}
 
 template<typename Number>
