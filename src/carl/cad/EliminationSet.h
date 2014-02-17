@@ -80,7 +80,8 @@ private:
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::set<const UPolynomial*> PolynomialSet;
+	typedef std::unordered_set<const UPolynomial*, UnivariatePolynomialPtrHasher<cad::MPolynomial<Coefficient>>> PolynomialSet;
+	//typedef std::set<const UPolynomial*> PolynomialSet;
 
 	/**
 	 * A mapping from one polynomial to a sorted range of other polynomials.
@@ -218,6 +219,8 @@ public:
 	bool empty() const {
 		return this->polynomials.empty();
 	}
+
+	void checkConsistency() const;
 
 	////////////////////
 	// ACCESS METHODS //
