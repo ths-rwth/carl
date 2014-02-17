@@ -1356,11 +1356,15 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 
 template<typename Coeff>
 unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coeff>& interval) const {
+	if (interval.empty()) return 0;
+	/// @todo check future interval.isPointInterval() and only evaluate polynomial at this point.
 	UnivariatePolynomial<Coeff> p(*this);
 	p.shift(interval.left());
 	p.scale(interval.diameter());
 	p.reverse();
 	p.shift(1);
+	p.stripLeadingZeroes();
+	p.checkConsistency();
 	return carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
 }
 
