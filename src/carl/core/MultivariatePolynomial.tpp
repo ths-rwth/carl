@@ -977,6 +977,8 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 	return res;
 }
 
+
+
 template<typename C, typename O, typename P>
 bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {

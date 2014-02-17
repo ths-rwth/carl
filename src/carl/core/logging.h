@@ -16,6 +16,8 @@
 #pragma once
 
 #include "config.h"
+#include "../util/platform.h"
+
 #include <string>
 
 //#define LOGi2_DISABLE_FATAL_MSG
@@ -174,7 +176,9 @@ inline void configureLogging() {
     #endif
     // Set layout. 
     // Notice that the current version of log4cplus uses the deprecated auto_ptr
+	CLANG_WARNING_DISABLE("-Wdeprecated-declarations")
     fileAppender->setLayout(std::auto_ptr<log4cplus::Layout>( new log4cplus::PatternLayout("%r [%T] %-5p %-25c |%-25b:%4L| -\t %m%n")));
+	CLANG_WARNING_RESET
     // Set output.
     logger.addAppender(fileAppender);
 	setInitialLogLevel();

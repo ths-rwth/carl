@@ -318,7 +318,6 @@ public:
 	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-	
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
@@ -538,6 +537,11 @@ public:
 	void checkConsistency() const;
 };
 
+	template<typename C, typename O, typename P>
+	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, unsigned exp)
+	{
+		return p.pow(exp);
+	}
 } // namespace carl
 
 /**
