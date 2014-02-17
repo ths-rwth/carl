@@ -104,6 +104,10 @@ public:
 		return this->isNumeric() ? this->value() == 0 : (this->interval.left() == 0 && this->interval.right() == 0);
 	}
 
+	virtual bool isNumericRepresentation() const {
+		return false;
+	}
+
 	/**
 	 * Selects the polynomial having this real algebraic number as one of its roots.
 	 * @return polynomial having the number as one of its roots
@@ -241,6 +245,9 @@ using RealAlgebraicNumberIRPtr = std::shared_ptr<RealAlgebraicNumberIR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
+	if (n->isNumeric()) {
+		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << ")";
+	}
 	return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << ")";
 }
 
