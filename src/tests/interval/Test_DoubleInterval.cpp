@@ -1057,6 +1057,7 @@ TEST(DoubleInterval, Contains)
     DoubleInterval i4(-5, BoundType::WEAK, 3, BoundType::WEAK);
     DoubleInterval i5(4, BoundType::STRICT, 5, BoundType::STRICT);
     DoubleInterval i6(3, BoundType::WEAK, 7, BoundType::WEAK);
+    DoubleInterval i7(3, BoundType::STRICT, 4, BoundType::STRICT);
     
     // Contains number
     EXPECT_TRUE(i1.contains(4));
@@ -1094,6 +1095,10 @@ TEST(DoubleInterval, Contains)
     EXPECT_TRUE(i6.contains(i1));
     EXPECT_TRUE(i1.contains(i1));
     EXPECT_TRUE(i6.contains(i6));
+    EXPECT_TRUE(i1.contains(i7));
+    EXPECT_FALSE(i7.contains(i1));
+    EXPECT_TRUE(i6.contains(i7));
+    EXPECT_FALSE(i7.contains(i6));
     
     // Subset is the opposite
     EXPECT_FALSE(i2.isSubset(i1));
@@ -1106,6 +1111,10 @@ TEST(DoubleInterval, Contains)
     EXPECT_TRUE(i1.isSubset(i6));
     EXPECT_TRUE(i1.isSubset(i1));
     EXPECT_TRUE(i6.isSubset(i6));
+    EXPECT_TRUE(i7.isSubset(i1));
+    EXPECT_FALSE(i1.isSubset(i7));
+    EXPECT_TRUE(i7.isSubset(i6));
+    EXPECT_FALSE(i6.isSubset(i7));
     
     EXPECT_FALSE(i2.isProperSubset(i1));
     EXPECT_FALSE(i1.isProperSubset(i2));
@@ -1117,6 +1126,10 @@ TEST(DoubleInterval, Contains)
     EXPECT_TRUE(i1.isProperSubset(i6));
     EXPECT_TRUE(i1.isProperSubset(i1));
     EXPECT_TRUE(i6.isProperSubset(i6));
+    EXPECT_TRUE(i7.isProperSubset(i1));
+    EXPECT_FALSE(i1.isProperSubset(i7));
+    EXPECT_TRUE(i7.isProperSubset(i6));
+    EXPECT_FALSE(i6.isProperSubset(i7));
 }
 
 TEST(DoubleInterval, BloatShrink)

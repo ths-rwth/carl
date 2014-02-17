@@ -1022,6 +1022,7 @@ TEST(MpqInterval, Contains)
     MpqInterval i4(-5, BoundType::WEAK, 3, BoundType::WEAK);
     MpqInterval i5(4, BoundType::STRICT, 5, BoundType::STRICT);
     MpqInterval i6(3, BoundType::WEAK, 7, BoundType::WEAK);
+    MpqInterval i7(3, BoundType::STRICT, 4, BoundType::STRICT);
     
     // Contains number
     EXPECT_TRUE(i1.contains(mpq_class(4)));
@@ -1051,12 +1052,18 @@ TEST(MpqInterval, Contains)
     // Contains interval
     EXPECT_FALSE(i1.contains(i2));
     EXPECT_FALSE(i2.contains(i1));
+    EXPECT_FALSE(i1.contains(i3));
+    EXPECT_TRUE(i3.contains(i1));
     EXPECT_TRUE(i1.contains(i5));
     EXPECT_FALSE(i5.contains(i1));
     EXPECT_FALSE(i1.contains(i6));
     EXPECT_TRUE(i6.contains(i1));
     EXPECT_TRUE(i1.contains(i1));
     EXPECT_TRUE(i6.contains(i6));
+    EXPECT_TRUE(i1.contains(i7));
+    EXPECT_FALSE(i7.contains(i1));
+    EXPECT_TRUE(i6.contains(i7));
+    EXPECT_FALSE(i7.contains(i6));
     
     // Subset is the opposite
     EXPECT_FALSE(i2.isSubset(i1));
@@ -1069,6 +1076,10 @@ TEST(MpqInterval, Contains)
     EXPECT_TRUE(i1.isSubset(i6));
     EXPECT_TRUE(i1.isSubset(i1));
     EXPECT_TRUE(i6.isSubset(i6));
+    EXPECT_TRUE(i7.isSubset(i1));
+    EXPECT_FALSE(i1.isSubset(i7));
+    EXPECT_TRUE(i7.isSubset(i6));
+    EXPECT_FALSE(i6.isSubset(i7));
     
     EXPECT_FALSE(i2.isProperSubset(i1));
     EXPECT_FALSE(i1.isProperSubset(i2));
@@ -1080,6 +1091,10 @@ TEST(MpqInterval, Contains)
     EXPECT_TRUE(i1.isProperSubset(i6));
     EXPECT_TRUE(i1.isProperSubset(i1));
     EXPECT_TRUE(i6.isProperSubset(i6));
+    EXPECT_TRUE(i7.isProperSubset(i1));
+    EXPECT_FALSE(i1.isProperSubset(i7));
+    EXPECT_TRUE(i7.isProperSubset(i6));
+    EXPECT_FALSE(i6.isProperSubset(i7));
 }
 
 TEST(MpqInterval, BloatShrink)
