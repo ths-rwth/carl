@@ -341,10 +341,10 @@ void RealAlgebraicNumberIR<Number>::refine(RealAlgebraicNumberSettings::Refineme
 			m = this->getInterval().sample();
 			break;
 	}
-	
+	assert(this->interval.contains(m));
 	if (this->getPolynomial().isRoot(m)) {
-		this->setLeft(ExactInterval<Number>(this->left(), this->value(), BoundType::STRICT).sample());
-		this->setRight(ExactInterval<Number>(this->value(), this->right(), BoundType::STRICT).sample());
+		this->setLeft(ExactInterval<Number>(this->left(), m, BoundType::STRICT).sample());
+		this->setRight(ExactInterval<Number>(m, this->right(), BoundType::STRICT).sample());
 		this->mValue = m;
 		this->mIsNumeric = true;
 	} else {
