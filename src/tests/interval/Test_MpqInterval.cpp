@@ -903,8 +903,8 @@ TEST(MpqInterval, Union)
     EXPECT_EQ(MpqInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
     
     EXPECT_TRUE(i1.unite(i3, result1, result2));
-    EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
-    EXPECT_EQ(MpqInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
+    EXPECT_EQ(MpqInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
     
     EXPECT_FALSE(i3.unite(i2, result1, result2));
     EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);

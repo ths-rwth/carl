@@ -906,8 +906,8 @@ TEST(clRA_Interval, Union)
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
     
     EXPECT_TRUE(i1.unite(i3, result1, result2));
-    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
-    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
+    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
     
     EXPECT_FALSE(i3.unite(i2, result1, result2));
     EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);

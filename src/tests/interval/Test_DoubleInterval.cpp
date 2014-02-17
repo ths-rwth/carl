@@ -945,7 +945,10 @@ TEST(DoubleInterval, Difference)
     DoubleInterval result1, result2;
     
     EXPECT_FALSE(i1.difference(i2, result1, result2));
-    EXPECT_EQ(DoubleInterval(4, BoundType::STRICT, 5, BoundType::STRICT), result1);
+    EXPECT_EQ(DoubleInterval(4, BoundType::STRICT, 5, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i2.difference(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 3, BoundType::STRICT), result1);
     
     EXPECT_FALSE(i3.difference(i1, result1, result2));
     EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);

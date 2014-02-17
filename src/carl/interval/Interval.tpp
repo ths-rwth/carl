@@ -902,13 +902,13 @@ template<typename Number>
 			}
 			else if( this->contains(rhs.lower()) )
 			{
-				BoundType lowerType = getOtherBoundType(rhs.lowerBoundType());
-				resultA = Interval<Number>(rhs.lower(), lowerType, mContent.upper(), getOtherBoundType(mUpperBoundType));
+				BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
+				resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
 			}
 			else if( this->contains(rhs.upper()) )
 			{
-				BoundType upperType = getOtherBoundType(rhs.upperBoundType());
-				resultA = Interval<Number>(mContent.lower(), getOtherBoundType(mLowerBoundType), rhs.upper(), upperType);
+				BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
+				resultA = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
 			}
 			else //both are totally distinct
 			{
