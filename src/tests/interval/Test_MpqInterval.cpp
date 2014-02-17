@@ -886,6 +886,54 @@ TEST(MpqInterval, Intersection)
     EXPECT_EQ(MpqInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
 }
 
+TEST(MpqInterval, Union)
+{
+    MpqInterval i1(3, BoundType::WEAK, 5, BoundType::WEAK);
+    MpqInterval i2(1, BoundType::WEAK, 4, BoundType::WEAK);
+    MpqInterval i3(-2, BoundType::WEAK, 1, BoundType::WEAK);
+    MpqInterval i4(4, BoundType::STRICT, 9, BoundType::STRICT);
+    MpqInterval i5(1, BoundType::STRICT, 4, BoundType::STRICT);
+    MpqInterval i6(3, BoundType::STRICT, 3, BoundType::INFTY);
+    MpqInterval result1, result2;
+    
+    EXPECT_FALSE(i1.unite(i2, result1, result2));
+    EXPECT_EQ(MpqInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i2.unite(i1, result1, result2));
+    EXPECT_EQ(MpqInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i1.unite(i3, result1, result2));
+    EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(MpqInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
+    
+    EXPECT_FALSE(i3.unite(i2, result1, result2));
+    EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i4.unite(i1, result1, result2));
+    EXPECT_EQ(MpqInterval(3, BoundType::WEAK, 9, BoundType::STRICT), result1);
+    
+    EXPECT_TRUE(i3.unite(i4, result1, result2));
+    EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(MpqInterval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
+    
+    EXPECT_FALSE(i2.unite(i4, result1, result2));
+    EXPECT_EQ(MpqInterval(1, BoundType::WEAK, 9, BoundType::STRICT), result1);
+    
+    EXPECT_FALSE(i2.unite(i5, result1, result2));
+    EXPECT_EQ(MpqInterval(1, BoundType::WEAK, 4, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i5.unite(i4, result1, result2));
+    EXPECT_EQ(MpqInterval(1, BoundType::STRICT, 4, BoundType::STRICT), result1);
+    EXPECT_EQ(MpqInterval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
+    
+    EXPECT_FALSE(i6.unite(i1, result1, result2));
+    EXPECT_EQ(MpqInterval(3, BoundType::WEAK, 3, BoundType::INFTY), result1);
+    
+    EXPECT_TRUE(i6.unite(i3, result1, result2));
+    EXPECT_EQ(MpqInterval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
+    EXPECT_EQ(MpqInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+}
+
 TEST(MpqInterval, Split)
 {
     MpqInterval i1(mpq_class(-1), BoundType::INFTY, mpq_class(1), BoundType::INFTY);
