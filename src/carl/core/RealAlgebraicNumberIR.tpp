@@ -78,8 +78,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
 	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).switchVariable(va).toNumberCoefficients());
 	
-	UnivariatePolynomial<typename IntegralT<Number>::type> ptmp = res.switchVariable(va).toIntegerDomain().primitivePart();
-	auto p = ptmp.template convert<Number>();
+	auto p = res.switchVariable(va).coprimeCoefficients().primitivePart().template convert<Number>();
 	auto seq = p.standardSturmSequence();
 
 	ExactInterval<Number> i = this->getInterval() + n->getInterval();
