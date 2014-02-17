@@ -753,13 +753,13 @@ namespace carl
          * @return 
          */
 		bool checkConsistency() const {
-			if (!this->mExponents.size() > 0) return false;
+			if (this->mExponents.size() <= 0) return false;
 			unsigned tdeg = 0;
 			unsigned lastVarIndex = 0;
 			for(VarExpPair ve : mExponents)
 			{
-				if (!ve.exp > 0) return false;
-				if (!ve.var.getId() >= lastVarIndex) return false;
+				if (ve.exp <= 0) return false;
+				if (ve.var.getId() < lastVarIndex) return false;
 				tdeg += ve.exp;
 				lastVarIndex = ve.var.getId();
 			}
