@@ -156,16 +156,16 @@ template<typename Number>
 	}
 	
 	template<typename Number>
-	bool Interval<Number>::subset(const Interval<Number>& rhs) const
+	bool Interval<Number>::isSubset(const Interval<Number>& rhs) const
 	{
-		return this->contains(rhs);
+		return rhs.contains(*this);
 	}
 	
 	template<typename Number>
-	bool Interval<Number>::proper_subset(const Interval<Number>& rhs) const
+	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
 	{
-                return this->contains(rhs);
-	}
+                return this->isSubset(rhs);
+        }
 	
 template<typename Number>
 	void Interval<Number>::bloat_by(const Number& width)
@@ -902,7 +902,7 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
-		if( this->proper_subset(rhs) )
+		if( this->contains(rhs) )
 		{
 			BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
 			BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
@@ -912,7 +912,7 @@ template<typename Number>
 		}
 		else
 		{
-			if( rhs.proper_subset(*this) )
+			if( this->isSubset(rhs) )
 			{
 				resultA = emptyInterval();
 			}

@@ -948,6 +948,7 @@ TEST(DoubleInterval, Difference)
     DoubleInterval i2(1, BoundType::WEAK, 4, BoundType::WEAK);
     DoubleInterval i3(-1, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval i4(2, BoundType::WEAK, 3, BoundType::WEAK);
+    DoubleInterval i5(1, BoundType::STRICT, 3, BoundType::STRICT);
     DoubleInterval result1, result2;
     
     EXPECT_FALSE(i1.difference(i2, result1, result2));
@@ -965,6 +966,13 @@ TEST(DoubleInterval, Difference)
     
     EXPECT_FALSE(i4.difference(i2, result1, result2));
     EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
+    
+    EXPECT_FALSE(i5.difference(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
+    
+    EXPECT_TRUE(i2.difference(i5, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 4, BoundType::WEAK), result2);
 }
 
 TEST(DoubleInterval, Split)
@@ -1078,6 +1086,8 @@ TEST(DoubleInterval, Contains)
     // Contains interval
     EXPECT_FALSE(i1.contains(i2));
     EXPECT_FALSE(i2.contains(i1));
+    EXPECT_FALSE(i1.contains(i3));
+    EXPECT_TRUE(i3.contains(i1));
     EXPECT_TRUE(i1.contains(i5));
     EXPECT_FALSE(i5.contains(i1));
     EXPECT_FALSE(i1.contains(i6));
@@ -1085,24 +1095,28 @@ TEST(DoubleInterval, Contains)
     EXPECT_TRUE(i1.contains(i1));
     EXPECT_TRUE(i6.contains(i6));
     
-    // Subset is the same
-    EXPECT_FALSE(i1.subset(i2));
-    EXPECT_FALSE(i2.subset(i1));
-    EXPECT_TRUE(i1.subset(i5));
-    EXPECT_FALSE(i5.subset(i1));
-    EXPECT_FALSE(i1.subset(i6));
-    EXPECT_TRUE(i6.subset(i1));
-    EXPECT_TRUE(i1.subset(i1));
-    EXPECT_TRUE(i6.subset(i6));
+    // Subset is the opposite
+    EXPECT_FALSE(i2.isSubset(i1));
+    EXPECT_FALSE(i1.isSubset(i2));
+    EXPECT_FALSE(i3.isSubset(i1));
+    EXPECT_TRUE(i1.isSubset(i3));
+    EXPECT_TRUE(i5.isSubset(i1));
+    EXPECT_FALSE(i1.isSubset(i5));
+    EXPECT_FALSE(i6.isSubset(i1));
+    EXPECT_TRUE(i1.isSubset(i6));
+    EXPECT_TRUE(i1.isSubset(i1));
+    EXPECT_TRUE(i6.isSubset(i6));
     
-    EXPECT_FALSE(i1.proper_subset(i2));
-    EXPECT_FALSE(i2.proper_subset(i1));
-    EXPECT_TRUE(i1.proper_subset(i5));
-    EXPECT_FALSE(i5.proper_subset(i1));
-    EXPECT_FALSE(i1.proper_subset(i6));
-    EXPECT_TRUE(i6.proper_subset(i1));
-    EXPECT_TRUE(i1.proper_subset(i1));
-    EXPECT_TRUE(i6.proper_subset(i6));
+    EXPECT_FALSE(i2.isProperSubset(i1));
+    EXPECT_FALSE(i1.isProperSubset(i2));
+    EXPECT_FALSE(i3.isProperSubset(i1));
+    EXPECT_TRUE(i1.isProperSubset(i3));
+    EXPECT_TRUE(i5.isProperSubset(i1));
+    EXPECT_FALSE(i1.isProperSubset(i5));
+    EXPECT_FALSE(i6.isProperSubset(i1));
+    EXPECT_TRUE(i1.isProperSubset(i6));
+    EXPECT_TRUE(i1.isProperSubset(i1));
+    EXPECT_TRUE(i6.isProperSubset(i6));
 }
 
 TEST(DoubleInterval, BloatShrink)

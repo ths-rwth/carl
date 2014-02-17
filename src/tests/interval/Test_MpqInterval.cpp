@@ -1058,24 +1058,28 @@ TEST(MpqInterval, Contains)
     EXPECT_TRUE(i1.contains(i1));
     EXPECT_TRUE(i6.contains(i6));
     
-    // Subset is the same
-    EXPECT_FALSE(i1.subset(i2));
-    EXPECT_FALSE(i2.subset(i1));
-    EXPECT_TRUE(i1.subset(i5));
-    EXPECT_FALSE(i5.subset(i1));
-    EXPECT_FALSE(i1.subset(i6));
-    EXPECT_TRUE(i6.subset(i1));
-    EXPECT_TRUE(i1.subset(i1));
-    EXPECT_TRUE(i6.subset(i6));
+    // Subset is the opposite
+    EXPECT_FALSE(i2.isSubset(i1));
+    EXPECT_FALSE(i1.isSubset(i2));
+    EXPECT_FALSE(i3.isSubset(i1));
+    EXPECT_TRUE(i1.isSubset(i3));
+    EXPECT_TRUE(i5.isSubset(i1));
+    EXPECT_FALSE(i1.isSubset(i5));
+    EXPECT_FALSE(i6.isSubset(i1));
+    EXPECT_TRUE(i1.isSubset(i6));
+    EXPECT_TRUE(i1.isSubset(i1));
+    EXPECT_TRUE(i6.isSubset(i6));
     
-    EXPECT_FALSE(i1.proper_subset(i2));
-    EXPECT_FALSE(i2.proper_subset(i1));
-    EXPECT_TRUE(i1.proper_subset(i5));
-    EXPECT_FALSE(i5.proper_subset(i1));
-    EXPECT_FALSE(i1.proper_subset(i6));
-    EXPECT_TRUE(i6.proper_subset(i1));
-    EXPECT_TRUE(i1.proper_subset(i1));
-    EXPECT_TRUE(i6.proper_subset(i6));
+    EXPECT_FALSE(i2.isProperSubset(i1));
+    EXPECT_FALSE(i1.isProperSubset(i2));
+    EXPECT_FALSE(i3.isProperSubset(i1));
+    EXPECT_TRUE(i1.isProperSubset(i3));
+    EXPECT_TRUE(i5.isProperSubset(i1));
+    EXPECT_FALSE(i1.isProperSubset(i5));
+    EXPECT_FALSE(i6.isProperSubset(i1));
+    EXPECT_TRUE(i1.isProperSubset(i6));
+    EXPECT_TRUE(i1.isProperSubset(i1));
+    EXPECT_TRUE(i6.isProperSubset(i6));
 }
 
 TEST(MpqInterval, BloatShrink)

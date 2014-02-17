@@ -647,14 +647,14 @@ namespace carl
 		 * @param interval
 		 * @return
 		 */
-		bool subset(const Interval<Number>& rhs) const;
+		bool isSubset(const Interval<Number>& rhs) const;
 		
 		/**
 		 * Checks if the given interval is a proper subset of the calling interval.
 		 * @param interval
 		 * @return
 		 */
-		bool proper_subset(const Interval<Number>& rhs) const;
+		bool isProperSubset(const Interval<Number>& rhs) const;
 		
 		/**
 		 * Bloats the interval by the given value.
