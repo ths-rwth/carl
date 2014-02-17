@@ -39,16 +39,33 @@ TEST(clRA_Interval, Constructor)
 
 TEST(clRA_Interval, Getters)
 {
-    clRA_Interval test1 = clRA_Interval(cln::cl_RA(-1), BoundType::WEAK, cln::cl_RA(1), BoundType::STRICT);
+    clRA_Interval test1 = clRA_Interval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
+    clRA_Interval test2 = clRA_Interval(-1, BoundType::WEAK, 1, BoundType::STRICT);
+    clRA_Interval test3 = clRA_Interval(1, BoundType::STRICT, 1, BoundType::STRICT);
+    clRA_Interval test4 = clRA_Interval(4, BoundType::WEAK, 2, BoundType::WEAK);
+    clRA_Interval test5 = clRA_Interval();
+    clRA_Interval test6 = clRA_Interval(4);
+    
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
     EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test1.upperBoundType());
-    clRA_Interval test2 = clRA_Interval(-1, BoundType::WEAK, 1, BoundType::STRICT);
     EXPECT_EQ(-1, test2.lower());
     EXPECT_EQ(1, test2.upper());
     EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
+    EXPECT_TRUE(test3.isEmpty());
+    EXPECT_EQ(BoundType::STRICT, test4.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
+    EXPECT_EQ(0, test4.lower());
+    EXPECT_EQ(0, test4.upper());
+    EXPECT_TRUE(test4.isEmpty());
+    EXPECT_EQ(0, test5.lower());
+    EXPECT_EQ(0, test5.upper());
+    EXPECT_TRUE(test5.isEmpty());
+    EXPECT_EQ(4, test6.lower());
+    EXPECT_EQ(4, test6.upper());
+    
     test1.setLower(-3);
     test1.setUpper(5);
     test1.setLowerBoundType(BoundType::STRICT);
@@ -57,14 +74,43 @@ TEST(clRA_Interval, Getters)
     EXPECT_EQ(5, test1.upper());
     EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
     EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    
     test1.set(4, 8);
     EXPECT_EQ(4, test1.lower());
     EXPECT_EQ(8, test1.upper());
+    
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
     EXPECT_TRUE(test1.isUnbounded());
-    clRA_Interval test3 = clRA_Interval(1, BoundType::STRICT, 1, BoundType::STRICT);
-    EXPECT_TRUE(test3.isEmpty());
+
+    test2.setUpperBoundType(BoundType::INFTY);
+    EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
+    EXPECT_EQ(test2.lower(), test2.upper());
+    
+    test1.set(clRA_Interval::BoostInterval(3, 27));
+    EXPECT_EQ(3, test1.lower());
+    EXPECT_EQ(27, test1.upper());
+    
+    clRA_Interval::BoostInterval bi(0, 1);
+    bi = boost::numeric::widen(bi, cln::cl_RA(-3)); // create an invalid interval by this hack
+    test2.set(bi);
+    EXPECT_EQ(0, test2.lower());
+    EXPECT_EQ(0, test2.upper());
+    EXPECT_TRUE(test2.isEmpty());
+}
+
+TEST(clRA_Interval, StaticCreators)
+{
+    clRA_Interval i1 = clRA_Interval::emptyInterval();
+    clRA_Interval i2 = clRA_Interval::unboundedInterval();
+    
+    EXPECT_TRUE(i1.isEmpty());
+    EXPECT_EQ(0, i1.lower());
+    EXPECT_EQ(0, i1.upper());
+    
+    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
+    EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 }
 
 TEST(clRA_Interval, Addition)
@@ -786,7 +832,6 @@ TEST(clRA_Interval, ExtendedDivision)
     EXPECT_EQ( clRA_Interval::unboundedInterval(), result1 );
 }
 
-/*
 TEST(clRA_Interval, Intersection)
 {
     clRA_Interval a1(-1,BoundType::WEAK,1,BoundType::WEAK);
@@ -843,7 +888,55 @@ TEST(clRA_Interval, Intersection)
     
     EXPECT_EQ(clRA_Interval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
 }
- */
+
+TEST(clRA_Interval, Union)
+{
+    clRA_Interval i1(3, BoundType::WEAK, 5, BoundType::WEAK);
+    clRA_Interval i2(1, BoundType::WEAK, 4, BoundType::WEAK);
+    clRA_Interval i3(-2, BoundType::WEAK, 1, BoundType::WEAK);
+    clRA_Interval i4(4, BoundType::STRICT, 9, BoundType::STRICT);
+    clRA_Interval i5(1, BoundType::STRICT, 4, BoundType::STRICT);
+    clRA_Interval i6(3, BoundType::STRICT, 3, BoundType::INFTY);
+    clRA_Interval result1, result2;
+    
+    EXPECT_FALSE(i1.unite(i2, result1, result2));
+    EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i2.unite(i1, result1, result2));
+    EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i1.unite(i3, result1, result2));
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
+    
+    EXPECT_FALSE(i3.unite(i2, result1, result2));
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i4.unite(i1, result1, result2));
+    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 9, BoundType::STRICT), result1);
+    
+    EXPECT_TRUE(i3.unite(i4, result1, result2));
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(clRA_Interval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
+    
+    EXPECT_FALSE(i2.unite(i4, result1, result2));
+    EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 9, BoundType::STRICT), result1);
+    
+    EXPECT_FALSE(i2.unite(i5, result1, result2));
+    EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, 4, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i5.unite(i4, result1, result2));
+    EXPECT_EQ(clRA_Interval(1, BoundType::STRICT, 4, BoundType::STRICT), result1);
+    EXPECT_EQ(clRA_Interval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
+    
+    EXPECT_FALSE(i6.unite(i1, result1, result2));
+    EXPECT_EQ(clRA_Interval(3, BoundType::WEAK, 3, BoundType::INFTY), result1);
+    
+    EXPECT_TRUE(i6.unite(i3, result1, result2));
+    EXPECT_EQ(clRA_Interval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
+    EXPECT_EQ(clRA_Interval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+}
+
 TEST(clRA_Interval, Split)
 {
     clRA_Interval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);
@@ -980,4 +1073,30 @@ TEST(clRA_Interval, Contains)
     EXPECT_TRUE(i6.proper_subset(i1));
     EXPECT_TRUE(i1.proper_subset(i1));
     EXPECT_TRUE(i6.proper_subset(i6));
+}
+
+TEST(clRA_Interval, BloatShrink)
+{
+    clRA_Interval i1(3, BoundType::WEAK, 7, BoundType::WEAK);
+    clRA_Interval i2(-13, BoundType::STRICT, 1, BoundType::STRICT);
+    clRA_Interval i3(0, BoundType::STRICT, 1, BoundType::STRICT);
+    clRA_Interval i4(5, BoundType::STRICT, 13, BoundType::STRICT);
+    clRA_Interval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
+    clRA_Interval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
+    clRA_Interval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
+    clRA_Interval result4(7, BoundType::STRICT, 11, BoundType::STRICT);
+    
+    // Bloat by adding
+    i1.bloat_by(5);
+    EXPECT_EQ(result1, i1);
+    i2.bloat_by(-3);
+    EXPECT_EQ(result2, i2);
+    // Note that here exist inconsistencies
+    // as we can create in valid intervals using this method
+    i3.bloat_by(-2);
+    EXPECT_EQ(result3, i3);
+    
+    // Shrink by subtracting
+    i4.shrink_by(2);
+    EXPECT_EQ(result4, i4);
 }

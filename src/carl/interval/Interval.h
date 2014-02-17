@@ -104,7 +104,7 @@ namespace carl
 		{}
 		
 		Interval(const Number& n) :
-			mContent(n, n),
+			mContent(n),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
 		{}
@@ -444,7 +444,7 @@ namespace carl
 		 * The getter for the lower boundary of the interval.
 		 * @return lower interval boundary
 		 */
-		const Number& lower() const
+		inline const Number& lower() const
 		{
 			return mContent.lower();
 		}
@@ -453,7 +453,7 @@ namespace carl
 		 * The getter for the upper boundary of the interval.
 		 * @return upper interval boundary
 		 */
-		const Number& upper() const
+		inline const Number& upper() const
 		{
 			return mContent.upper();
 		}
@@ -462,7 +462,7 @@ namespace carl
 		 * Returns a reference to the included boost interval.
 		 * @return boost interval
 		 */
-		BoostInterval& rContent()
+		inline BoostInterval& rContent()
 		{
 			return mContent;
 		}
@@ -471,7 +471,7 @@ namespace carl
 		 * Returns a copy of the included boost interval.
 		 * @return boost interval
 		 */
-		BoostInterval content() const
+		inline BoostInterval content() const
 		{
 			return mContent;
 		}
@@ -480,7 +480,7 @@ namespace carl
 		 * The getter for the lower bound type of the interval.
 		 * @return lower bound type
 		 */
-		BoundType lowerBoundType() const
+		inline BoundType lowerBoundType() const
 		{
 			return mLowerBoundType;
 		}
@@ -489,7 +489,7 @@ namespace carl
 		 * The getter for the upper bound type of the interval.
 		 * @return upper bound type
 		 */
-		BoundType upperBoundType() const
+		inline BoundType upperBoundType() const
 		{
 			return mUpperBoundType;
 		}
@@ -498,30 +498,32 @@ namespace carl
 		 * The setter for the lower boundary of the interval.
 		 * @param lower boundary
 		 */
-		void setLower(const Number& n)
+		inline void setLower(const Number& n)
 		{
-			mContent = BoostInterval(n, mContent.upper());
+			this->set(BoostInterval(n, mContent.upper()));
 		}
         
 		/**
 		 * The setter for the upper boundary of the interval.
 		 * @param upper boundary
 		 */
-		void setUpper(const Number& n)
+		inline void setUpper(const Number& n)
 		{
-			mContent = BoostInterval(mContent.lower(), n);
+			this->set(BoostInterval(mContent.lower(), n));
 		}
 		
 		/**
 		 * The setter for the lower bound type of the interval.
 		 * @param lower bound type
 		 */
-		void setLowerBoundType(BoundType b)
+		inline void setLowerBoundType(BoundType b)
 		{
 			if(b == BoundType::INFTY)
 			{
 				mLowerBoundType = b;
-				mContent = mUpperBoundType == BoundType::INFTY ? BoostInterval(Number(0)) : BoostInterval(mContent.lower());
+				mContent = (mUpperBoundType == BoundType::INFTY)
+                                        ? BoostInterval(Number(0))
+                                        : BoostInterval(mContent.lower());
 			}
 			else
 			{
@@ -533,12 +535,14 @@ namespace carl
 		 * The setter for the upper bound type of the interval.
 		 * @param upper bound type
 		 */
-		void setUpperBoundType(BoundType b)
+		inline void setUpperBoundType(BoundType b)
 		{
 			if(b == BoundType::INFTY)
 			{
 				mUpperBoundType = b;
-				mContent = mLowerBoundType == BoundType::INFTY ? BoostInterval(Number(0)) : BoostInterval(mContent.lower());
+				mContent = (mLowerBoundType == BoundType::INFTY)
+                                        ? BoostInterval(Number(0))
+                                        : BoostInterval(mContent.upper());
 			}
 			else
 			{
@@ -568,17 +572,29 @@ namespace carl
 		 * @param lower boundary
 		 * @param upper boundary
 		 */
-		void set(const Number& lower, const Number& upper)
+		inline void set(const Number& lower, const Number& upper)
 		{
-			mContent = BoostInterval(lower, upper);
+			this->set(BoostInterval(lower, upper));
 		}
+                
+                inline void set(const BoostInterval& interval)
+                {
+                    if (BOUNDS_OK(interval.lower(), mLowerBoundType, interval.upper(), mUpperBoundType)) {
+                            mContent = interval;
+                    }
+                    else{
+                            mContent = BoostInterval(Number(0));
+                            mLowerBoundType = BoundType::STRICT;
+                            mUpperBoundType = BoundType::STRICT;
+                    }
+                }
 		
-		bool isUnbounded() const
+		inline bool isUnbounded() const
 		{
 			return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
 		}
 		
-		bool isEmpty() const
+		inline bool isEmpty() const
 		{
 			return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
 		}

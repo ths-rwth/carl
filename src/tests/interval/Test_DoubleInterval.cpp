@@ -15,6 +15,7 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
+#include <iostream>
 
 using namespace carl;
 
@@ -24,7 +25,7 @@ TEST(DoubleInterval, Constructor)
 {
     DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
-	DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
+    DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::emptyInterval());
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
@@ -38,15 +39,32 @@ TEST(DoubleInterval, Constructor)
 TEST(DoubleInterval, Getters)
 {
     DoubleInterval test1 = DoubleInterval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
+    DoubleInterval test2 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
+    DoubleInterval test3 = DoubleInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval test4 = DoubleInterval(4, BoundType::WEAK, 2, BoundType::WEAK);
+    DoubleInterval test5 = DoubleInterval();
+    DoubleInterval test6 = DoubleInterval(4);
+    
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
     EXPECT_EQ(BoundType::WEAK, test1.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test1.upperBoundType());
-    DoubleInterval test2 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::STRICT);
     EXPECT_EQ(-1, test2.lower());
     EXPECT_EQ(1, test2.upper());
     EXPECT_EQ(BoundType::WEAK, test2.lowerBoundType());
     EXPECT_EQ(BoundType::STRICT, test2.upperBoundType());
+    EXPECT_TRUE(test3.isEmpty());
+    EXPECT_EQ(BoundType::STRICT, test4.lowerBoundType());
+    EXPECT_EQ(BoundType::STRICT, test4.upperBoundType());
+    EXPECT_EQ(0, test4.lower());
+    EXPECT_EQ(0, test4.upper());
+    EXPECT_TRUE(test4.isEmpty());
+    EXPECT_EQ(0, test5.lower());
+    EXPECT_EQ(0, test5.upper());
+    EXPECT_TRUE(test5.isEmpty());
+    EXPECT_EQ(4, test6.lower());
+    EXPECT_EQ(4, test6.upper());
+    
     test1.setLower(-3);
     test1.setUpper(5);
     test1.setLowerBoundType(BoundType::STRICT);
@@ -55,14 +73,43 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(5, test1.upper());
     EXPECT_EQ(BoundType::STRICT, test1.lowerBoundType());
     EXPECT_EQ(BoundType::WEAK, test1.upperBoundType());
+    
     test1.set(4, 8);
     EXPECT_EQ(4, test1.lower());
     EXPECT_EQ(8, test1.upper());
+    
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
     EXPECT_TRUE(test1.isUnbounded());
-    DoubleInterval test3 = DoubleInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
-    EXPECT_TRUE(test3.isEmpty());
+
+    test2.setUpperBoundType(BoundType::INFTY);
+    EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
+    EXPECT_EQ(test2.lower(), test2.upper());
+    
+    test1.set(DoubleInterval::BoostInterval(3, 27));
+    EXPECT_EQ(3, test1.lower());
+    EXPECT_EQ(27, test1.upper());
+    
+    DoubleInterval::BoostInterval bi(0, 1);
+    bi = boost::numeric::widen(bi, double(-3)); // create an invalid interval by this hack
+    test2.set(bi);
+    EXPECT_EQ(0, test2.lower());
+    EXPECT_EQ(0, test2.upper());
+    EXPECT_TRUE(test2.isEmpty());
+}
+
+TEST(DoubleInterval, StaticCreators)
+{
+    DoubleInterval i1 = DoubleInterval::emptyInterval();
+    DoubleInterval i2 = DoubleInterval::unboundedInterval();
+    
+    EXPECT_TRUE(i1.isEmpty());
+    EXPECT_EQ(0, i1.lower());
+    EXPECT_EQ(0, i1.upper());
+    
+    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
+    EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 }
 
 TEST(DoubleInterval, Addition)
@@ -784,7 +831,6 @@ TEST(DoubleInterval, ExtendedDivision)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result1 );
 }
 
-/*
 TEST(DoubleInterval, Intersection)
 {
     DoubleInterval a1(-1,BoundType::WEAK,1,BoundType::WEAK);
@@ -841,7 +887,55 @@ TEST(DoubleInterval, Intersection)
     
     EXPECT_EQ(DoubleInterval(1,BoundType::WEAK,1,BoundType::WEAK), a1.intersect(b21));
 }
- */
+
+TEST(DoubleInterval, Union)
+{
+    DoubleInterval i1(3, BoundType::WEAK, 5, BoundType::WEAK);
+    DoubleInterval i2(1, BoundType::WEAK, 4, BoundType::WEAK);
+    DoubleInterval i3(-2, BoundType::WEAK, 1, BoundType::WEAK);
+    DoubleInterval i4(4, BoundType::STRICT, 9, BoundType::STRICT);
+    DoubleInterval i5(1, BoundType::STRICT, 4, BoundType::STRICT);
+    DoubleInterval i6(3, BoundType::STRICT, 3, BoundType::INFTY);
+    DoubleInterval result1, result2;
+    
+    EXPECT_FALSE(i1.unite(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i2.unite(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 5, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i1.unite(i3, result1, result2));
+    EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result2);
+    
+    EXPECT_FALSE(i3.unite(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 4, BoundType::WEAK), result1);
+    
+    EXPECT_FALSE(i4.unite(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 9, BoundType::STRICT), result1);
+    
+    EXPECT_TRUE(i3.unite(i4, result1, result2));
+    EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result1);
+    EXPECT_EQ(DoubleInterval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
+    
+    EXPECT_FALSE(i2.unite(i4, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 9, BoundType::STRICT), result1);
+    
+    EXPECT_FALSE(i2.unite(i5, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 4, BoundType::WEAK), result1);
+    
+    EXPECT_TRUE(i5.unite(i4, result1, result2));
+    EXPECT_EQ(DoubleInterval(1, BoundType::STRICT, 4, BoundType::STRICT), result1);
+    EXPECT_EQ(DoubleInterval(4, BoundType::STRICT, 9, BoundType::STRICT), result2);
+    
+    EXPECT_FALSE(i6.unite(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 3, BoundType::INFTY), result1);
+    
+    EXPECT_TRUE(i6.unite(i3, result1, result2));
+    EXPECT_EQ(DoubleInterval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
+    EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+}
+
 TEST(DoubleInterval, Split)
 {
     DoubleInterval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);
@@ -985,17 +1079,11 @@ TEST(DoubleInterval, BloatShrink)
     DoubleInterval i1(3, BoundType::WEAK, 7, BoundType::WEAK);
     DoubleInterval i2(-13, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval i3(0, BoundType::STRICT, 1, BoundType::STRICT);
-    DoubleInterval i4(2, BoundType::WEAK, 5, BoundType::WEAK);
-    DoubleInterval i5(-6, BoundType::STRICT, 2, BoundType::STRICT);
-    DoubleInterval i6(5, BoundType::STRICT, 13, BoundType::STRICT);
-    DoubleInterval i7(3, BoundType::WEAK, 6, BoundType::WEAK);
+    DoubleInterval i4(5, BoundType::STRICT, 13, BoundType::STRICT);
     DoubleInterval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
     DoubleInterval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
     DoubleInterval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
-    DoubleInterval result4(-4, BoundType::WEAK, 11, BoundType::WEAK);
-    DoubleInterval result5(-2, BoundType::STRICT, 0, BoundType::STRICT);
-    DoubleInterval result6(7, BoundType::STRICT, 11, BoundType::STRICT);
-    DoubleInterval result7(0, BoundType::WEAK, 1, BoundType::WEAK);
+    DoubleInterval result4(7, BoundType::STRICT, 11, BoundType::STRICT);
     
     // Bloat by adding
     i1.bloat_by(5);
@@ -1005,19 +1093,9 @@ TEST(DoubleInterval, BloatShrink)
     // Note that here exist inconsistencies
     // as we can create in valid intervals using this method
     i3.bloat_by(-2);
-    //EXPECT_EQ(result3, i3);
-    
-    // Bloat by multiplying
-    i4.bloat_times(4);
-    EXPECT_EQ(result4, i4);
-    i5.bloat_times(-4); // this actually does not work, i5 is [nan, nan]
-    //EXPECT_EQ(result5, i5);
+    EXPECT_EQ(result3, i3);
     
     // Shrink by subtracting
-    i6.shrink_by(2);
-    EXPECT_EQ(result6, i6);
-    
-    // Shrink by multiplying
-    i7.shrink_times(3); // this actually does not work, i7 is [nan, nan]
-    // EXPECT_EQ(result7, i7);
+    i4.shrink_by(2);
+    EXPECT_EQ(result4, i4);
 }
