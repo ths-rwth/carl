@@ -123,7 +123,7 @@ namespace carl
 			}
 		}
 		
-		Interval(const BoostInterval& content, BoundType lowerBoundType, BoundType upperBoundType)
+		Interval(const BoostInterval& content, BoundType lowerBoundType = BoundType::WEAK, BoundType upperBoundType = BoundType::WEAK)
 		{
 			if (BOUNDS_OK(content.lower(), lowerBoundType, content.upper(), upperBoundType)) {
 				if(IS_EMPTY(content.lower(), lowerBoundType, content.upper(), upperBoundType))
