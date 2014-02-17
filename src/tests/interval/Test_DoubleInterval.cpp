@@ -902,6 +902,7 @@ TEST(DoubleInterval, Union)
     DoubleInterval i4(4, BoundType::STRICT, 9, BoundType::STRICT);
     DoubleInterval i5(1, BoundType::STRICT, 4, BoundType::STRICT);
     DoubleInterval i6(3, BoundType::STRICT, 3, BoundType::INFTY);
+    DoubleInterval i7(0, BoundType::INFTY, 0, BoundType::INFTY);
     DoubleInterval result1, result2;
     
     EXPECT_FALSE(i1.unite(i2, result1, result2));
@@ -940,6 +941,12 @@ TEST(DoubleInterval, Union)
     EXPECT_TRUE(i6.unite(i3, result1, result2));
     EXPECT_EQ(DoubleInterval(3, BoundType::STRICT, 3, BoundType::INFTY), result1);
     EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
+    
+    EXPECT_FALSE(i1.unite(i7, result1, result2));
+    EXPECT_EQ(DoubleInterval::unboundedInterval(), result1);
+    
+    EXPECT_FALSE(i7.unite(i6, result1, result2));
+    EXPECT_EQ(DoubleInterval::unboundedInterval(), result1);
 }
 
 TEST(DoubleInterval, Difference)
@@ -949,6 +956,7 @@ TEST(DoubleInterval, Difference)
     DoubleInterval i3(-1, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval i4(2, BoundType::WEAK, 3, BoundType::WEAK);
     DoubleInterval i5(1, BoundType::STRICT, 3, BoundType::STRICT);
+    DoubleInterval i6(2, BoundType::WEAK, 2, BoundType::INFTY);
     DoubleInterval result1, result2;
     
     EXPECT_FALSE(i1.difference(i2, result1, result2));
@@ -956,6 +964,9 @@ TEST(DoubleInterval, Difference)
     
     EXPECT_FALSE(i2.difference(i1, result1, result2));
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 3, BoundType::STRICT), result1);
+    
+    EXPECT_FALSE(i1.difference(i3, result1, result2));
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
     
     EXPECT_FALSE(i3.difference(i1, result1, result2));
     EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
@@ -973,6 +984,22 @@ TEST(DoubleInterval, Difference)
     EXPECT_TRUE(i2.difference(i5, result1, result2));
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 1, BoundType::WEAK), result1);
     EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 4, BoundType::WEAK), result2);
+    
+    EXPECT_FALSE(i1.difference(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
+    
+    EXPECT_FALSE(i6.difference(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval(4, BoundType::STRICT, 4, BoundType::INFTY), result1);
+    
+    EXPECT_TRUE(i6.difference(i1, result1, result2));
+    EXPECT_EQ(DoubleInterval(2, BoundType::WEAK, 3, BoundType::STRICT), result1);
+    EXPECT_EQ(DoubleInterval(5, BoundType::STRICT, 5, BoundType::INFTY), result2);
+    
+    EXPECT_FALSE(i1.difference(i6, result1, result2));
+    EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
+    
+    EXPECT_FALSE(i3.difference(i6, result1, result2));
+    EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::STRICT), result2);
 }
 
 TEST(DoubleInterval, Split)
@@ -1054,10 +1081,11 @@ TEST(DoubleInterval, Contains)
     DoubleInterval i1(3, BoundType::STRICT, 7, BoundType::STRICT);
     DoubleInterval i2(-5, BoundType::STRICT, 3, BoundType::WEAK);
     DoubleInterval i3(3, BoundType::WEAK, 7, BoundType::STRICT);
-    DoubleInterval i4(-5, BoundType::WEAK, 3, BoundType::WEAK);
+    DoubleInterval i4(-5, BoundType::WEAK, 4, BoundType::WEAK);
     DoubleInterval i5(4, BoundType::STRICT, 5, BoundType::STRICT);
     DoubleInterval i6(3, BoundType::WEAK, 7, BoundType::WEAK);
     DoubleInterval i7(3, BoundType::STRICT, 4, BoundType::STRICT);
+    DoubleInterval i8(3, BoundType::WEAK, 3, BoundType::INFTY);
     
     // Contains number
     EXPECT_TRUE(i1.contains(4));
@@ -1082,7 +1110,13 @@ TEST(DoubleInterval, Contains)
     EXPECT_FALSE(i4.contains(-13));
     EXPECT_FALSE(i4.contains(6));
     EXPECT_TRUE(i4.contains(-5));
-    EXPECT_TRUE(i4.contains(3));
+    EXPECT_TRUE(i4.contains(4));
+    
+    EXPECT_FALSE(i8.contains(1));
+    EXPECT_TRUE(i8.contains(3));
+    EXPECT_TRUE(i8.contains(4));
+    EXPECT_TRUE(i8.contains(100));
+    EXPECT_FALSE(i8.contains(-2));
     
     // Contains interval
     EXPECT_FALSE(i1.contains(i2));
@@ -1099,6 +1133,12 @@ TEST(DoubleInterval, Contains)
     EXPECT_FALSE(i7.contains(i1));
     EXPECT_TRUE(i6.contains(i7));
     EXPECT_FALSE(i7.contains(i6));
+    EXPECT_TRUE(i8.contains(i5));
+    EXPECT_FALSE(i5.contains(i8));
+    EXPECT_TRUE(i8.contains(i6));
+    EXPECT_FALSE(i6.contains(i8));
+    EXPECT_FALSE(i8.contains(i4));
+    EXPECT_FALSE(i4.contains(i8));
     
     // Subset is the opposite
     EXPECT_FALSE(i2.isSubset(i1));
@@ -1115,6 +1155,12 @@ TEST(DoubleInterval, Contains)
     EXPECT_FALSE(i1.isSubset(i7));
     EXPECT_TRUE(i7.isSubset(i6));
     EXPECT_FALSE(i6.isSubset(i7));
+    EXPECT_TRUE(i5.contains(i8));
+    EXPECT_FALSE(i8.contains(i5));
+    EXPECT_TRUE(i6.contains(i8));
+    EXPECT_FALSE(i8.contains(i6));
+    EXPECT_FALSE(i4.contains(i8));
+    EXPECT_FALSE(i8.contains(i4));
     
     EXPECT_FALSE(i2.isProperSubset(i1));
     EXPECT_FALSE(i1.isProperSubset(i2));
@@ -1130,6 +1176,12 @@ TEST(DoubleInterval, Contains)
     EXPECT_FALSE(i1.isProperSubset(i7));
     EXPECT_TRUE(i7.isProperSubset(i6));
     EXPECT_FALSE(i6.isProperSubset(i7));
+    EXPECT_TRUE(i5.isProperSubset(i8));
+    EXPECT_FALSE(i8.isProperSubset(i5));
+    EXPECT_TRUE(i6.isProperSubset(i8));
+    EXPECT_FALSE(i8.isProperSubset(i6));
+    EXPECT_FALSE(i4.isProperSubset(i8));
+    EXPECT_FALSE(i8.isProperSubset(i4));
 }
 
 TEST(DoubleInterval, BloatShrink)
