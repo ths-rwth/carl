@@ -63,6 +63,9 @@ TEST(DoubleInterval, Getters)
     EXPECT_TRUE(test1.isUnbounded());
     DoubleInterval test3 = DoubleInterval(1, BoundType::STRICT, 1, BoundType::STRICT);
     EXPECT_TRUE(test3.isEmpty());
+    test1.set(DoubleInterval::BoostInterval(3, 27));
+    EXPECT_EQ(3, test1.lower());
+    EXPECT_EQ(27, test1.upper());
 }
 
 TEST(DoubleInterval, Addition)
@@ -984,17 +987,11 @@ TEST(DoubleInterval, BloatShrink)
     DoubleInterval i1(3, BoundType::WEAK, 7, BoundType::WEAK);
     DoubleInterval i2(-13, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval i3(0, BoundType::STRICT, 1, BoundType::STRICT);
-    DoubleInterval i4(2, BoundType::WEAK, 5, BoundType::WEAK);
-    DoubleInterval i5(-6, BoundType::STRICT, 2, BoundType::STRICT);
-    DoubleInterval i6(5, BoundType::STRICT, 13, BoundType::STRICT);
-    DoubleInterval i7(3, BoundType::WEAK, 6, BoundType::WEAK);
+    DoubleInterval i4(5, BoundType::STRICT, 13, BoundType::STRICT);
     DoubleInterval result1(-2, BoundType::WEAK, 12, BoundType::WEAK);
     DoubleInterval result2(-10, BoundType::STRICT, -2, BoundType::STRICT);
     DoubleInterval result3(2, BoundType::STRICT, -1, BoundType::STRICT);
-    DoubleInterval result4(-4, BoundType::WEAK, 11, BoundType::WEAK);
-    DoubleInterval result5(-2, BoundType::STRICT, 0, BoundType::STRICT);
-    DoubleInterval result6(7, BoundType::STRICT, 11, BoundType::STRICT);
-    DoubleInterval result7(0, BoundType::WEAK, 1, BoundType::WEAK);
+    DoubleInterval result4(7, BoundType::STRICT, 11, BoundType::STRICT);
     
     // Bloat by adding
     i1.bloat_by(5);
@@ -1007,6 +1004,6 @@ TEST(DoubleInterval, BloatShrink)
     EXPECT_EQ(result3, i3);
     
     // Shrink by subtracting
-    i6.shrink_by(2);
-    EXPECT_EQ(result6, i6);
+    i4.shrink_by(2);
+    EXPECT_EQ(result4, i4);
 }

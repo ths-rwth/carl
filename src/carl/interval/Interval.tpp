@@ -170,7 +170,7 @@ template<typename Number>
 template<typename Number>
 	void Interval<Number>::bloat_by(const Number& width)
 	{
-		mContent = boost::numeric::widen(mContent, width);
+                this->set(boost::numeric::widen(mContent, width));
 	}
 
 template<typename Number>
