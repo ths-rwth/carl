@@ -5,13 +5,6 @@
 
 using namespace carl;
 
-TEST(Monomial, Constructor)
-{
-    Monomial m1;
-    Monomial m2;
-    SUCCEED();
-}
-
 TEST(Monomial, Operators)
 {
     Variable v0 = Variable((unsigned)1);
@@ -28,13 +21,9 @@ TEST(Monomial, Operators)
     m0 *= v2;
     EXPECT_EQ((unsigned)4,m0.tdeg());
     EXPECT_EQ((unsigned)3,m0.nrVariables());
-    Monomial m1;
-    EXPECT_EQ((unsigned)0,m1.tdeg());
-    EXPECT_EQ((unsigned)0,m1.exponentOfVariable(v1));
-    EXPECT_EQ((unsigned)0,m1.nrVariables());
     
-    Monomial m2;
-    Monomial m3;
+    Monomial m2(v1);
+    Monomial m3(v1);
     m2 *= v1;
     m3 *= v1;
     EXPECT_EQ(m2, m3);

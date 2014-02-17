@@ -526,6 +526,16 @@ private:
 	 */
     void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
+public:
+	/**
+	 * Asserts that this polynomial complies with the requirements and assumptions for MultivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>All terms are actually valid and not nullptr or alike</li>
+	 * <li>Only the trailing term may be constant.</li>
+	 * </ul>
+     */
+	void checkConsistency() const;
 };
 
 } // namespace carl

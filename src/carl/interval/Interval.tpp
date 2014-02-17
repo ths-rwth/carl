@@ -834,7 +834,7 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
-		if( !this->intersect(rhs).isEmpty() )
+		if( this->intersect(rhs).isEmpty() )
 		{
 			resultA = *this;
 			resultB = rhs;

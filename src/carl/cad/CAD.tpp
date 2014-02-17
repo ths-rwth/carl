@@ -448,7 +448,7 @@ bool CAD<Number>::check(
 			onlyStrictBounds = false;
 		}
 	}
-	std::vector<std::pair<UPolynomial*, UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
+	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
 	if (this->setting.computeConflictGraph) {
 		// add necessary conflict graph vertices if required
 		for (auto i = conflictGraph.size(); i < constraints.size(); i++) {
@@ -539,30 +539,30 @@ bool CAD<Number>::check(
 			if (b.first >= this->variables.size()) continue;
 			
 			// construct bound-related polynomials
-			std::list<UPolynomial> tmp;
+			std::list<const UPolynomial*> tmp;
 			if (b.second.leftType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.left())), MPolynomial(Term<Number>(1))});
-				tmp.push_back(p.pseudoPrimpart());
+				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
-				boundPolynomials[b.first].first = this->take(new UPolynomial(tmp.back()));
+				boundPolynomials[b.first].first = tmp.back();
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.right())), MPolynomial(Term<Number>(1))});
-				tmp.push_back(p.pseudoPrimpart());
+				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
-				boundPolynomials[b.first].first = this->take(new UPolynomial(tmp.back()));
+				boundPolynomials[b.first].first = tmp.back();
 			}
 			
 			// eliminate bound-related polynomials only
 			// l: variable index of the elimination destination
 			unsigned l = b.first + 1;
 			while (!tmp.empty() && l < this->variables.size()) {
-				std::list<UPolynomial> tmp2;
+				std::list<const UPolynomial*> tmp2;
 				for (auto p: tmp) {
-					auto res = this->eliminationSets[l-1].eliminateInto(this->take(new UPolynomial(p)), this->eliminationSets[l], this->variables[l], this->setting);
-					tmp2.insert(tmp2.begin(), tmp.begin(), tmp.end());
+					auto res = this->eliminationSets[l-1].eliminateInto(p, this->eliminationSets[l], this->variables[l], this->setting);
+					tmp2.insert(tmp2.begin(), res.begin(), res.end());
 				}
 				std::swap(tmp, tmp2);
 				l++;
@@ -740,11 +740,11 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	 */
 	int maxDepth = this->sampleTree.max_depth();
 	auto sampleTreeRoot = this->sampleTree.begin();
-	for (unsigned l = dim - 1; l >= level; l--) {
+	for (int l = (int)dim - 1; l >= (int)level; l--) {
 		// iterate from the leaves to the root (more efficient if several levels are to be cleaned)
-		if (this->eliminationSets[l].empty()) {
+		if (this->eliminationSets[(size_t)l].empty()) {
 			// there is nothing more to be done for this level, so erase all samples up to one
-			unsigned depth = dim - l;
+			unsigned depth = dim - (unsigned)l;
 			if ((int)depth <= maxDepth) {
 				// merge everything into destinationNode
 				auto destination = this->sampleTree.begin_fixed(sampleTreeRoot, depth);

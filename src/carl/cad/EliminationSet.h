@@ -525,15 +525,6 @@ public:
 	//////////////////////////////
 	
 	/**
-	 * Generates the set of truncations of the polynomial.
-	 * @see "Algorithms in Real Algebraic Geometry" - Saugata Basu, Richard Pollack, Marie-Francoise Roy see page 21-22
-	 * @param p The polynomial
-	 * @complexity O ( p.deg() )
-	 * @return The set of truncations
-	 */
-	static std::list<const UPolynomial*> truncations(const UPolynomial* p);
-	
-	/**
 	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
 	 * This elimination operator follows McCallums definition [McCallum - TR578, 1985].
 	 *

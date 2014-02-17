@@ -38,6 +38,7 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		refinementCount(0)
 {
 	assert(!this->polynomial.isConstant());
+	assert(p.countRealRoots(i) == 1);
 	if (normalize) this->normalizeInterval();
 	if (this->interval.contains(0)) {
 		this->mIsNumeric = true;
@@ -277,7 +278,8 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIRPtr<Nu
 template<typename Number>
 void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 	if (this->interval.left() == 0 && this->interval.right() == 0) return; // already normalized
-	assert( this->polynomial.countRealRoots(this->interval) != 0); // the interval should be isolating for this number
+	if (this->isNumeric()) return;
+	assert(this->polynomial.countRealRoots(this->interval) == 1); // the interval should be isolating for this number
 	// shift the right border below 0 or set the zero interval
 	if (this->interval.contains(0) && this->polynomial.sgn(0) == Sign::ZERO) {
 		this->interval.set(0,0);
