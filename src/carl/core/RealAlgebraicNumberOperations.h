@@ -31,7 +31,8 @@ struct Equal {
 					return false;
 				}
 			} else {
-				return lhsIR->equal(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs));
+				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
+				return lhsIR->equal(rhsIR);
 			}
 		}
 		// nrA must be the exact numeric representation of irB OR nrB must be the exact numeric representation of irA

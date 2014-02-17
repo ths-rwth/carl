@@ -11,6 +11,7 @@
 #include <cassert>
 
 #include "../core/RealAlgebraicNumber.h"
+#include "../util/debug.h"
 
 namespace carl {
 namespace cad {
@@ -18,7 +19,8 @@ namespace cad {
 template<typename Number>
 std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(RealAlgebraicNumberPtr<Number> r) {
 	if (r->isNumeric()) {
-		RealAlgebraicNumberNRPtr<Number> rNR = std::static_pointer_cast<RealAlgebraicNumberNR<Number>>(r);
+		// Make sure that r gets inserted as NR. It may still be an IR...
+		RealAlgebraicNumberNRPtr<Number> rNR = RealAlgebraicNumberNR<Number>::create(r->value(), r->isRoot());
 		iterator position = this->samples.begin();
 		if (! this->samples.empty()) {
 			position = std::lower_bound(position, this->samples.end(), rNR, Less<Number>());
@@ -34,7 +36,7 @@ std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(
 			this->nonRootQueue.push_back(rNR);
 		}
 		this->queue.push_back(rNR);
-		return std::pair<iterator, bool>(this->samples.insert(position,rNR), true);    // insert safely and return iterator to the new element
+		return std::make_pair(this->samples.insert(position,rNR), true);    // insert safely and return iterator to the new element
 	}
 	auto position = this->samples.begin();
 	if (!this->samples.empty()) {
@@ -243,11 +245,7 @@ bool SampleSet<Number>::contains(const RealAlgebraicNumberPtr<Number> r) const {
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
-	os << "{ ";
-	for (auto sample: s.samples) {
-		os << sample << " ";
-	}
-	return os << "}";
+	return os << s.queue;
 }
 
 template<typename Number>
@@ -286,4 +284,17 @@ void SampleSet<Number>::removeFromNRIR(const RealAlgebraicNumberPtr<Number> r) {
 }
 
 }
+}
+
+namespace std {
+
+template<typename Num>
+void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
+	std::swap(lhs.samples, rhs.samples);
+	std::swap(lhs.NRqueue, rhs.NRqueue);
+	std::swap(lhs.IRqueue, rhs.IRqueue);
+	std::swap(lhs.nonRootQueue, rhs.nonRootQueue);
+	std::swap(lhs.rootQueue, rhs.rootQueue);
+}
+
 }

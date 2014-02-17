@@ -1,6 +1,7 @@
-/* 
- * File:   RootFinder.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RootFinder.tpp
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 

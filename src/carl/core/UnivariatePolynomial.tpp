@@ -11,6 +11,7 @@
 #include <iomanip>
 #include "../util/SFINAE.h"
 #include "../util/platform.h"
+#include "../util/debug.h"
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
@@ -19,10 +20,39 @@ namespace carl
 {
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p)
+: mMainVar(p.mMainVar), mCoefficients(p.mCoefficients) {
+	this->checkConsistency();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p)
+: mMainVar(p.mMainVar) {
+	std::swap(this->mCoefficients, p.mCoefficients);
+	this->checkConsistency();
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(const UnivariatePolynomial& p) {
+	this->mMainVar = p.mMainVar;
+	this->mCoefficients = p.mCoefficients;
+	this->checkConsistency();
+	return *this;
+}
+
+template<typename Coeff>
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) {
+	std::swap(this->mMainVar, p.mMainVar);
+	std::swap(this->mCoefficients, p.mCoefficients);
+	this->checkConsistency();
+	return *this;
+}
+
+template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
 : mMainVar(mainVar), mCoefficients()
 {
-	
+	this->checkConsistency();
 }
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, exponent e) :
@@ -37,13 +67,16 @@ mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not 
 	{
 		mCoefficients.clear();
 	}
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coeff> coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -54,19 +87,24 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::in
 	for (auto c: coefficients) {
 		this->mCoefficients.push_back(Coeff(c));
 	}
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coeff>& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
-	
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coeff>&& coefficients)
 : mMainVar(mainVar), mCoefficients(coefficients)
 {
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -82,6 +120,8 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 		}
 		mCoefficients.push_back(expAndCoeff.second);
 	}
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -108,6 +148,8 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
 	}
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -121,6 +163,8 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 			this->mCoefficients[i].substituteIn(var, value);
 		}
 	}
+	this->stripLeadingZeroes();
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -329,7 +373,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	}
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
-	Coeff prefactor = pow(b,d);
+	Coeff prefactor = carl::pow(b,d);
 	return reduce(divisor, &prefactor);
 }
 
@@ -385,12 +429,15 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
 {
-	if(isZero()) 
-	{
+	if(isZero()) {
 		return *this;
 	}
-	assert(isNormal());
-	return *this/(content());
+	if (this->isNormal()) {
+		return *this / this->content();
+	} else {
+		auto tmp = *this * Coeff(-1);
+		return tmp / tmp.content();
+	}
 }
 
 /**
@@ -483,6 +530,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
+	if (this->isZero()) return *this;
 	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
 	return normalized.divideBy(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
@@ -630,11 +678,15 @@ template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
+	LOGMSG_TRACE("carl.core", *this << " .coprimeCoefficients()");
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
-	Coeff factor = coprimeFactor();
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralT<Coeff>::type> result(mMainVar);
+	if (this->isZero()) {
+		return result;
+	}
 	result.mCoefficients.reserve(mCoefficients.size());
+	Coeff factor = this->coprimeFactor();
 	for(const Coeff& coeff : mCoefficients)
 	{
 		assert(getDenom(coeff*factor) == 1);
@@ -743,13 +795,14 @@ template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::maximumNorm() const {
 	typename std::vector<C>::const_iterator it = mCoefficients.begin();
-	Coeff max = *it;
-	IntNumberType num = getNum(*it);
-	IntNumberType den = getDenom(*it);
+	Coeff max = carl::abs(*it);
+	IntNumberType num = carl::abs(getNum(*it));
+	IntNumberType den = carl::abs(getDenom(*it));
 	for (++it; it != mCoefficients.end(); ++it) {
-		if (*it > max) max = *it;
-		num = carl::gcd(num, getNum(*it));
-		den = carl::lcm(den, getDenom(*it));
+		auto tmp = carl::abs(*it);
+		if (tmp > max) max = tmp;
+		num = carl::gcd(num, getNum(tmp));
+		den = carl::lcm(den, getDenom(tmp));
 	}
 	assert(getDenom(max*den/num) == 1);
 	return getNum(max*den/num);
@@ -1252,13 +1305,14 @@ CLANG_WARNING_RESET
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 	unsigned int i = 0;
-	while ((i < this->mCoefficients.size()-1) && (this->mCoefficients[i] == 0)) i++;
+	while ((i < this->mCoefficients.size()) && (this->mCoefficients[i] == Coeff(0))) i++;
 	if (i == 0) return;
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
 	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
-		this->mCoefficients[i] = this->mCoefficients[j+i];
+		this->mCoefficients[j] = this->mCoefficients[j+i];
 	}
 	this->mCoefficients.resize(this->mCoefficients.size()-i);
+	this->checkConsistency();
 }
 
 template<typename Coeff>
@@ -1570,6 +1624,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 		const UnivariatePolynomial& p,
 		const SubresultantStrategy strategy
 ) const {
+	assert(p.mainVar() == this->mainVar());
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
 	LOGMSG_TRACE("carl.cad", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
@@ -2008,4 +2063,25 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	os << rhs.mCoefficients[0];
 	return os;
 }
+
+template<typename Coefficient>
+template<typename C, EnableIf<is_number<C>>>
+void UnivariatePolynomial<Coefficient>::checkConsistency() const {
+	if (this->mCoefficients.size() > 0) {
+		assert(this->lcoeff() != Coefficient(0));
+	}
+}
+
+template<typename Coefficient>
+template<typename C, DisableIf<is_number<C>>>
+void UnivariatePolynomial<Coefficient>::checkConsistency() const {
+	if (this->mCoefficients.size() > 0) {
+		assert(this->lcoeff() != Coefficient(0));
+	}
+	for (auto c: this->mCoefficients) {
+		assert(!c.has(this->mainVar()));
+		c.checkConsistency();
+	}
+}
+
 }

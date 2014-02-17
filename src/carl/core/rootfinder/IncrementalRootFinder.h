@@ -1,6 +1,7 @@
-/* 
- * File:   IncrementalRootFinder.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file IncrementalRootFinder.h
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -13,7 +14,7 @@ namespace rootfinder {
 
 /*!
  * Orders QueueItems by the size of their intervals.
- * 
+ *
  * Heuristic for order of queue items to be considered, comparing only the size of the intervals.
  */
 struct IntervalSizeComparator {
@@ -54,9 +55,20 @@ enum class SplittingStrategy : unsigned int {
 	DEFAULT = EIGENVALUES
 };
 
+inline std::ostream& operator<<(std::ostream& os, const SplittingStrategy& s) {
+	switch (s) {
+		case SplittingStrategy::GENERIC: return os << "Generic";
+		case SplittingStrategy::BINARYSAMPLE: return os << "BinarySample";
+		case SplittingStrategy::BINARYNEWTON: return os << "BinaryNewton";
+		case SplittingStrategy::GRID: return os << "Grid";
+		case SplittingStrategy::EIGENVALUES: return os << "Eigenvalues";
+		case SplittingStrategy::ABERTH: return os << "Aberth";
+	}
+}
+
 /**
  * Interface of a RootFinder such that the Strategies can access the IncrementalRootFinder.
- * @return 
+ * @return
  */
 template<typename Number>
 class RootFinder {
@@ -70,20 +82,9 @@ public:
 namespace splittingStrategies {
 
 template<typename Strategy, typename Number>
-struct AbstractStrategy {
+struct AbstractStrategy: Singleton<Strategy> {
 	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder) = 0;
-	static Strategy& instance() {
-		if (instanceObject == nullptr) {
-			instanceObject = new Strategy();
-		}
-		return *instanceObject;
-	}
-private:
-	static Strategy* instanceObject;
 };
-
-template <typename Strategy, typename Number>
-Strategy* AbstractStrategy<Strategy, Number>::instanceObject;
 
 template<typename Number>
 struct GenericStrategy : public AbstractStrategy<GenericStrategy<Number>, Number> {
@@ -119,7 +120,7 @@ struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> 
 
 template<typename Number, typename Comparator>
 class IncrementalRootFinder : public AbstractRootFinder<Number>, RootFinder<Number> {
-	
+
 public:
 	typedef std::tuple<ExactInterval<Number>, SplittingStrategy> QueueItem;
 
@@ -138,30 +139,30 @@ private:
 	 * Iterator pointing to the next root within the root list that should be returned.
 	 */
 	typename std::list<RealAlgebraicNumberPtr<Number>>::iterator nextRoot;
-	
+
 public:
-	
+
 	IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
 			const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
 			SplittingStrategy splittingStrategy = SplittingStrategy::DEFAULT,
 			bool tryTrivialSolver = true
 			);
-	
+
 	virtual ~IncrementalRootFinder() {
 	}
-	
+
 	const UnivariatePolynomial<Number>& getPolynomial() const {
 		return this->polynomial;
 	}
-	
+
 	/**
 	 * Computes some new isolating root of the polynomial.
 	 * If all roots have already been found, a nullptr will be returned.
 	 * @return A new root, nullptr if all roots have been found.
 	 */
 	RealAlgebraicNumberPtr<Number> next();
-	
+
 	/**
 	 * Adds a new item to the internal interval queue.
 	 * Convenience routine for splitting heuristics.
@@ -171,9 +172,9 @@ public:
 	void addQueue(const ExactInterval<Number>& interval, SplittingStrategy strategy) {
 	   this->queue.push(std::make_tuple(interval, strategy));
 	}
-	
+
 protected:
-	
+
 	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) {
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
@@ -182,12 +183,12 @@ protected:
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(interval);
 	}
-	
+
 	/**
 	 * Overrides method from AbstractRootFinder.
      */
 	virtual void findRoots();
-	
+
 	/**
 	 * Tries to work on the next item in queue to produce a new root.
 	 * If the queue is empty, it will return false.

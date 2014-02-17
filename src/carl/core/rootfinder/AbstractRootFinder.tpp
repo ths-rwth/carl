@@ -1,6 +1,7 @@
-/* 
- * File:   AbstractRootFinder.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file AbstractRootFinder.tpp
+ * @ingroup rootfinder
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #include "AbstractRootFinder.h"
@@ -73,46 +74,48 @@ void AbstractRootFinder<Number>::addRoot(const ExactInterval<Number>& interval) 
 
 template<typename Number>
 bool AbstractRootFinder<Number>::solveTrivial() {
-		switch (this->polynomial.degree()) {
-			case 0: {
-				if (this->polynomial.coefficients()[0] == 0) {
-					this->addRoot(RealAlgebraicNumberNR<Number>::create(0), false);
-				}
-				break;
+	switch (this->polynomial.degree()) {
+		case 0: {
+			if (this->polynomial.isZero()) {
+				this->addRoot(RealAlgebraicNumberNR<Number>::create(0), false);
 			}
-			case 1: {
-				Number a = polynomial.coefficients()[1], b = polynomial.coefficients()[0];
-				this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / a), false);
-				break;
-			}
-			case 2: {
-				Number a = polynomial.coefficients()[2], b = polynomial.coefficients()[1], c = polynomial.coefficients()[0];
-				/* Use this formulation of p-q-formula:
-				 * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
-				 */
-				Number rad = b*b - 4*a*c;
-				if (rad == 0) {
-					this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / (2*a)), false);
-				} else if (rad > 0) {
-					std::pair<Number, Number> res = carl::sqrt(rad);
-					if (res.first == res.second) {
-						// Root could be calculated exactly
-						this->addRoot(RealAlgebraicNumberNR<Number>::create((-b - res.first) / (2*a)), false);
-						this->addRoot(RealAlgebraicNumberNR<Number>::create((-b + res.second) / (2*a)), false);
-					} else {
-						// Root is within interval (res.first, res.second)
-						ExactInterval<Number> r(res.first, res.second, BoundType::STRICT);
-						this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b - r) / (2*a)), false);
-						this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b + r) / (2*a)), false);
-					}
-				}
-				break;
-			}
-			default:
-				return false;
+			break;
 		}
-		return true;
+		case 1: {
+			Number a = this->polynomial.coefficients()[1], b = this->polynomial.coefficients()[0];
+			assert(a != Number(0));
+			this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / a), false);
+			break;
+		}
+		case 2: {
+			Number a = this->polynomial.coefficients()[2], b = this->polynomial.coefficients()[1], c = this->polynomial.coefficients()[0];
+			assert(a != Number(0));
+			/* Use this formulation of p-q-formula:
+			 * x = ( -b +- \sqrt{ b*b - 4*a*c } ) / (2*a)
+			 */
+			Number rad = b*b - 4*a*c;
+			if (rad == 0) {
+				this->addRoot(RealAlgebraicNumberNR<Number>::create(-b / (2*a)), false);
+			} else if (rad > 0) {
+				std::pair<Number, Number> res = carl::sqrt_fast(rad);
+				if (res.first == res.second) {
+					// Root could be calculated exactly
+					this->addRoot(RealAlgebraicNumberNR<Number>::create((-b - res.first) / (2*a)), false);
+					this->addRoot(RealAlgebraicNumberNR<Number>::create((-b + res.first) / (2*a)), false);
+				} else {
+					// Root is within interval (res.first, res.second)
+					ExactInterval<Number> r(res.first, res.second, BoundType::STRICT);
+					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b - r) / (2*a)), false);
+					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b + r) / (2*a)), false);
+				}
+			}
+			break;
+		}
+		default:
+			return false;
 	}
+	return true;
+}
 
 }
 }

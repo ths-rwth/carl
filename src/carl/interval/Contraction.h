@@ -16,7 +16,7 @@ namespace carl {
     class Contraction : private Operator<Polynomial> {
 
     private:
-        const Polynomial& mConstraint;
+        const Polynomial mConstraint; // Todo: Should be a reference.
         std::map<Variable, Polynomial> mDerivatives;
     public:
 

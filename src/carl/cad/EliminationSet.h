@@ -154,6 +154,8 @@ public:
 	 */
 	bool bounded;
 	
+	EliminationSet() = delete;
+
 	/**
 	 * Constructs the elimination set with a given strict ordering f of univariate polynomials.
 	 * @param owner PolynomialOwner object that recieves the ownership of all polynomials that are created within this EliminationSet.
@@ -310,13 +312,6 @@ public:
 	 * @return set entry for the given polynomial p if exists, otherwise nullptr
 	 */
 	const UPolynomial* find(const UPolynomial* p);
-	
-	/**
-	 * Swaps the contents (all attributes) of the two EliminationSets.
-	 * @see std::set::swap
-	 */
-	template<typename Coeff>
-	friend void swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
 
 	/**
 	 * Remove every data from this set.
@@ -520,18 +515,16 @@ public:
 	template<typename Coeff>
 	friend std::ostream& operator<<(std::ostream& os, const EliminationSet<Coeff>& s);
 	
+	/**
+	 * Swaps the contents (all attributes) of the two EliminationSets.
+	 * @see std::set::swap
+	 */
+	template<typename Coeff>
+	friend void std::swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
+
 	//////////////////////////////
 	// STATIC AUXILIARY METHODS //
 	//////////////////////////////
-	
-	/**
-	 * Generates the set of truncations of the polynomial.
-	 * @see "Algorithms in Real Algebraic Geometry" - Saugata Basu, Richard Pollack, Marie-Francoise Roy see page 21-22
-	 * @param p The polynomial
-	 * @complexity O ( p.deg() )
-	 * @return The set of truncations
-	 */
-	static std::list<const UPolynomial*> truncations(const UPolynomial* p);
 	
 	/**
 	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
@@ -641,6 +634,11 @@ public:
 };
 
 }
+}
+
+namespace std {
+template<typename Coeff>
+void swap(carl::cad::EliminationSet<Coeff>& lhs, carl::cad::EliminationSet<Coeff>& rhs);
 }
 
 #include "EliminationSet.tpp"

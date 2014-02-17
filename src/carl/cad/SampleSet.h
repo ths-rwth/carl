@@ -43,12 +43,6 @@ public:
 	typedef typename std::list<RealAlgebraicNumberIRPtr<Number>>::iterator iteratorIR;
 	typedef typename std::list<RealAlgebraicNumberNRPtr<Number>>::iterator iteratorNR;
 	typedef std::unordered_map<RealAlgebraicNumberIRPtr<Number>, RealAlgebraicNumberNRPtr<Number>> SampleSimplification;
-
-	SampleSet() {}
-	template<typename InputIterator>
-	SampleSet(const InputIterator& first, const InputIterator& last)
-		: samples(first, last) {
-	}
 	
 	/**
 	 * Inserts an element into the sorted list at the correct position according to the order.
@@ -237,6 +231,13 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const SampleSet<Num>& s);
 	
+	/**
+	 * Swaps the contents (all attributes) of the two SampleSets.
+	 * @see std::set::swap
+	 */
+	template<typename Num>
+	friend void std::swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
+
 private:
 	///////////////////////
 	// AUXILIARY METHODS //
@@ -251,6 +252,11 @@ private:
 };
 
 }
+}
+
+namespace std {
+template<typename Num>
+void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs);
 }
 
 #include "SampleSet.tpp"

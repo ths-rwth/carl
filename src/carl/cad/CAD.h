@@ -9,6 +9,25 @@
  *	Date:   Tue Dec 3 15:57:06 2013 +0100
  */
 
+/**
+ * @todo Fix bug in CAD concerning CAD::removePolynomial().
+ * 
+ * beim Aufschreiben des CAD::removePolynomial-Algorithmus' ist mir aufgefallen, 
+ * dass darin ein Teil zu Problemen führen kann, sobald ein Polynom entfernt 
+ * wird, während die Elimination nicht vollständig durchgeführt worden war:
+ * 
+ * Falls ein Eliminationslevel leer ist, nehme ich an, dass die Variable nicht 
+ * mehr gebraucht wird und beschneide entsprechend den Sample-Tree. Das ist im 
+ * Falle einer unvollständigen Elimination falsch.
+ * 1. Lösung: Bestimme a.H.v. den Eingabepolynomen, ob tatsächlich die 
+ * vermeintlich überflüssige Variable nicht mehr vorkommt, bevor der Sample-Tree 
+ * beschnitten wird.
+ * 2. Lösung: Entferne nie Variablen (u.U. ineffizient).
+ * 
+ * Als schnellen Fix könntest du den Teil in CAD::removePolynomial(pPtr, level, 
+ * childrenOnly), der den Sample-Tree löscht, auskommentieren.
+ */
+
 #pragma once
 
 #include <atomic>
@@ -117,6 +136,11 @@ public:
 	 * Standard constructor doing nothing.
 	 */
 	CAD();
+
+	/*
+	 * Constructor that delegates the ownership of polynomials to the given parent.
+	 */
+	CAD(cad::PolynomialOwner<Number>* parent);
 
 	/*
 	 * Constructor just passing interruption flags.
@@ -404,6 +428,18 @@ public:
 	}
 
 	/**
+	 * Insert the given polynomial into the cad.
+	 * Creates a copy from the given polynomial.
+	 *
+	 * @param p polynomial to be added
+	 * @param v the polynomial's variables (parameters and main variable)
+	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
+	 */
+	void addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
+		this->addPolynomial(new MPolynomial(p), v);
+	}
+
+	/**
 	 * Insert the given polynomial into the cad. This method calls addPolynomial with the CAD's list of variables.
 	 *
 	 * @param p polynomial to be added
@@ -546,7 +582,7 @@ public:
 	* @complexity cubic in the number of variables
 	*/
 	template<class VariableIterator, class PolynomialIterator>
-	static std::vector<Variable> orderVariablesGreeedily(
+	std::vector<Variable> orderVariablesGreeedily(
 			VariableIterator firstVariable,
 			VariableIterator lastVariable,
 			PolynomialIterator firstPolynomial,

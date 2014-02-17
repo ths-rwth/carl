@@ -210,8 +210,9 @@ public:
 	/**
 	 * Divides the polynomial by another polynomial.
 	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
-	 * Otherwise, false is returned and the content of quotient is undefined.
+	 * Otherwise, false is returned and the content of quotient remains unchanged.
 	 * Applies if the coefficients are from a field.
+	 * Note that the quotient must not be *this.
      * @param divisor
      * @param quotient
      * @return 
@@ -525,6 +526,16 @@ private:
 	 */
     void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
+public:
+	/**
+	 * Asserts that this polynomial complies with the requirements and assumptions for MultivariatePolynomial objects.
+	 * 
+	 * <ul>
+	 * <li>All terms are actually valid and not nullptr or alike</li>
+	 * <li>Only the trailing term may be constant.</li>
+	 * </ul>
+     */
+	void checkConsistency() const;
 };
 
 } // namespace carl

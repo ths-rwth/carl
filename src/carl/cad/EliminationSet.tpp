@@ -44,6 +44,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
+	r->checkConsistency();
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
 
@@ -249,20 +250,6 @@ const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coeffici
 }
 
 template<typename Coefficient>
-void swap(EliminationSet<Coefficient>& lhs, EliminationSet<Coefficient>& rhs) {
-	std::swap(lhs.polynomials, rhs.polynomials);
-	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
-	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
-	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
-	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
-	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
-	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
-	std::swap(lhs.liftingOrder, rhs.liftingOrder);
-	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
-	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
-}
-
-template<typename Coefficient>
 void EliminationSet<Coefficient>::clear() {
 	this->polynomials.clear();
 	this->mLiftingQueue.clear();
@@ -323,14 +310,18 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 
 	if( setting.equationsOnly ) {
 		// (1) elimination with existing polynomials
-		for (auto pol_it1: this->polynomials)
+		for (auto pol_it1: this->polynomials) {
+			assert(p->mainVar() == pol_it1->mainVar());
 			eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+		}
 		// (2) elimination with polynomial itself @todo: proof that we do not need that
 		// eliminationEq( p, p, variable, newEliminationPolynomials, setting );
 	} else {
 		// (1) elimination with existing polynomials
-		for (auto pol_it1: this->polynomials)
+		for (auto pol_it1: this->polynomials) {
+			assert(p->mainVar() == pol_it1->mainVar());
 			elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+		}
 		// (2) elimination with polynomial itself @todo: proof that we do not need that
 		// elimination( p, p, variable, newEliminationPolynomials, setting );
 		
@@ -552,18 +543,6 @@ std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff
 }
 
 template<typename Coeff>
-std::list<const typename EliminationSet<Coeff>::UPolynomial*> EliminationSet<Coeff>::truncations(const UPolynomial* p) {
-	std::list<const UPolynomial*> truncations;
-	truncations.push_back(p);
-	UPolynomial truncation(*p);
-	while (!truncation.isConstant()) {
-		truncation.truncate();
-		truncations.push_back(new UPolynomial(truncation));
-	}
-	return truncations;
-}
-
-template<typename Coeff>
 void EliminationSet<Coeff>::elimination(
 			const UPolynomial* p,
 			const Variable& variable,
@@ -572,11 +551,9 @@ void EliminationSet<Coeff>::elimination(
 ) {
 	std::list<const UPolynomial*> parents({p});
 	// add all coefficients of p
-	std::list<const UPolynomial*> truncations({p});
-	for (auto it: truncations) {
-		auto lcoeff = it->lcoeff();
-		if (lcoeff.isNumber()) continue;
-		eliminated.insert(UPolynomial(variable, lcoeff), parents, avoidSingle);
+	for (auto coeff: p->coefficients()) {
+		if (coeff.isNumber()) continue;
+		eliminated.insert(coeff.toUnivariatePolynomial(variable), parents, avoidSingle);
 	}
 	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
 	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);
@@ -590,6 +567,7 @@ void EliminationSet<Coeff>::elimination(
 		EliminationSet<Coeff>& eliminated,
 		bool avoidSingle
 ) {
+	assert(p->mainVar() == q->mainVar());
 	std::list<const UPolynomial*> parents({p, q});
 	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
 }
@@ -597,3 +575,19 @@ void EliminationSet<Coeff>::elimination(
 }
 }
 
+namespace std {
+
+template<typename Coefficient>
+void swap(carl::cad::EliminationSet<Coefficient>& lhs, carl::cad::EliminationSet<Coefficient>& rhs) {
+	std::swap(lhs.polynomials, rhs.polynomials);
+	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
+	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
+	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
+	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
+	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
+	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
+	std::swap(lhs.liftingOrder, rhs.liftingOrder);
+	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
+	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
+}
+}

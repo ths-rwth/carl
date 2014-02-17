@@ -38,6 +38,7 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		refinementCount(0)
 {
 	assert(!this->polynomial.isConstant());
+	assert(p.countRealRoots(i) == 1);
 	if (normalize) this->normalizeInterval();
 	if (this->interval.contains(0)) {
 		this->mIsNumeric = true;
@@ -66,26 +67,23 @@ const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(co
 }
 
 template<typename Number>
-RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebraicNumberIRPtr<Number>& n) {
+RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() || n->isZero()) return n;
 
 	Variable va = this->getPolynomial().mainVar();
-	Variable vb = n->getPolynomial().mainVar();
 	Variable y = VariablePool::getInstance().getFreshVariable();
 
 	MultivariatePolynomial<Number> tmp1(this->getPolynomial());
-	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(vb)}));
+	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(y)}));
 	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
-	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).toNumberCoefficients());
+	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).switchVariable(va).toNumberCoefficients());
 	
 	UnivariatePolynomial<typename IntegralT<Number>::type> ptmp = res.switchVariable(va).toIntegerDomain().primitivePart();
 	auto p = ptmp.template convert<Number>();
-	
 	auto seq = p.standardSturmSequence();
 
 	ExactInterval<Number> i = this->getInterval() + n->getInterval();
-	while (p.isRoot(i.left()) || p.isRoot(i.right()) ||
-		UnivariatePolynomial<Number>::countRealRoots(seq, i) > 0) {
+	while (p.isRoot(i.left()) || p.isRoot(i.right()) || UnivariatePolynomial<Number>::countRealRoots(seq, i) > 1) {
 		this->refine();
 		n->refine();
 		i = this->getInterval() + n->getInterval();
@@ -94,13 +92,25 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(RealAlgebrai
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number> n) {
+std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() {
+	if (this->isZero()) {
+		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval, this->sturmSequence);
+	}
+	return RealAlgebraicNumberIR<Number>::create(this->polynomial.negateVariable(), this->interval.inverse());
+}
+
+template<typename Number>
+bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this == n.get()) return true;
 	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
 	if (this->right() <= n->left()) return false;
 	if (this->left() >= n->right()) return false;
-	return this->add(n)->isZero();
+	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) {
+		n = this->thisPtr();
+		return true;
+	}
+	return this->add(n->minus())->isZero();
 }
 
 template<typename Number>
@@ -161,7 +171,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebr
 			if (this->left() != n->left() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), n->left(), BoundType::STRICT)) > 0) {
 				this->setRight(n->left());
 				return std::make_pair(true, !twisted);
-			} else if (this->right() != n->right() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->right(), n->right(), BoundType::STRICT)) > 0) {
+			} else if (this->right() != n->right() && this->getPolynomial().countRealRoots(ExactInterval<Number>(n->right(), this->right(), BoundType::STRICT)) > 0) {
 				this->setLeft(n->right());
 				return std::make_pair(true, twisted);
 			}
@@ -268,7 +278,8 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIRPtr<Nu
 template<typename Number>
 void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 	if (this->interval.left() == 0 && this->interval.right() == 0) return; // already normalized
-	assert( this->polynomial.countRealRoots(this->interval) != 0); // the interval should be isolating for this number
+	if (this->isNumeric()) return;
+	assert(this->polynomial.countRealRoots(this->interval) == 1); // the interval should be isolating for this number
 	// shift the right border below 0 or set the zero interval
 	if (this->interval.contains(0) && this->polynomial.sgn(0) == Sign::ZERO) {
 		this->interval.set(0,0);
