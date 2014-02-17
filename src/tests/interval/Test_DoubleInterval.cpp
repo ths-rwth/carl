@@ -936,6 +936,16 @@ TEST(DoubleInterval, Union)
     EXPECT_EQ(DoubleInterval(-2, BoundType::WEAK, 1, BoundType::WEAK), result2);
 }
 
+TEST(DoubleInterval, Difference)
+{
+    DoubleInterval i1(3, BoundType::WEAK, 5, BoundType::WEAK);
+    DoubleInterval i2(1, BoundType::WEAK, 4, BoundType::WEAK);
+    DoubleInterval result1, result2;
+    
+    EXPECT_FALSE(i1.difference(i2, result1, result2));
+    EXPECT_EQ(DoubleInterval(3, BoundType::STRICT, 4, BoundType::STRICT), result1);
+}
+
 TEST(DoubleInterval, Split)
 {
     DoubleInterval i1(-1, BoundType::INFTY, 1, BoundType::INFTY);

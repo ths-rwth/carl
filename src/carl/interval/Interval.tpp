@@ -896,7 +896,7 @@ template<typename Number>
 		}
 		else
 		{
-			if( rhs.proper_subset(this) )
+			if( rhs.proper_subset(*this) )
 			{
 				resultA = emptyInterval();
 			}
