@@ -186,7 +186,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebr
 template<typename Number>
 bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<Number> n, const ExactInterval<Number> i) {
 	// Proceed only if this.left < n2.left and this.right < n2.right
-	if ((this->left() < n->right()) && (this->left() < n->right())) {
+	if ((this->left() < n->left()) && (this->right() < n->right())) {
 		assert( i.left() == n->left() && i.right() == this->right());
 		if (this->getPolynomial().isRoot(i.left())) {
 			// If i.left is root of n1.polynomial: convert n1 to NR
@@ -217,7 +217,7 @@ bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<N
 		this->setLeft(i.left());
 		n->setRight(i.right());
 	}
-		return false;
+	return false;
 }
 
 
