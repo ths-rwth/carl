@@ -577,10 +577,29 @@ namespace carl
 			this->set(BoostInterval(lower, upper));
 		}
                 
-                inline void set(const BoostInterval& interval)
+                inline void set(const BoostInterval& content)
                 {
-                    if (BOUNDS_OK(interval.lower(), mLowerBoundType, interval.upper(), mUpperBoundType)) {
-                            mContent = interval;
+                    if (BOUNDS_OK(content.lower(), mLowerBoundType, content.upper(), mUpperBoundType)) {
+                            if(IS_EMPTY(content.lower(), mLowerBoundType, content.upper(), mUpperBoundType))
+                            {
+                                    mContent = BoostInterval(Number(0));
+                                    mLowerBoundType = BoundType::STRICT;
+                                    mUpperBoundType = BoundType::STRICT;
+                            }
+                            if(IS_UNBOUNDED(content.lower(), mLowerBoundType, content.upper(), mUpperBoundType))
+                            {
+                                    mContent = BoostInterval(Number(0));
+                                    mLowerBoundType = BoundType::INFTY;
+                                    mUpperBoundType = BoundType::INFTY;
+                            }
+                            else if (mLowerBoundType == BoundType::INFTY || mUpperBoundType == BoundType::INFTY)
+                            {
+                                    mContent = BoostInterval(mLowerBoundType == BoundType::INFTY ? content.upper() : content.lower());
+                            }
+                            else
+                            {
+                                    mContent = content;
+                            }
                     }
                     else{
                             mContent = BoostInterval(Number(0));

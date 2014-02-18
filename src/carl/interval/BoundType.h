@@ -33,6 +33,5 @@ namespace carl
                     : (type == BoundType::WEAK) ? BoundType::STRICT : BoundType::WEAK;
                 
         }
-
 }
 

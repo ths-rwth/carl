@@ -116,43 +116,49 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::contains(const Interval<Number>& rhs) const
 	{
-		if( mContent.lower() < rhs.lower() && mContent.upper() > rhs.upper() )
+                // if one bound is totally wrong, we can just return false
+                if (mContent.lower() > rhs.lower() || mContent.upper() < rhs.upper())
+                {
+                    return false;
+                }
+
+                // check the bounds
+                bool lowerOk = mContent.lower() < rhs.lower();
+                bool upperOk = mContent.upper() > rhs.upper();
+                
+                // if both are ok, return true
+		if( lowerOk && upperOk )
 		{
 			return true;
 		}
-		
-		if( mContent.lower() == rhs.lower() && mContent.upper() == rhs.upper() )
-		{
-			bool lowerOk = false;
-			switch( mLowerBoundType )
-			{
-				case BoundType::INFTY:
-					lowerOk = (rhs.lowerBoundType() == BoundType::INFTY);
-					break;
-				case BoundType::STRICT:
-					lowerOk = (rhs.lowerBoundType() == BoundType::STRICT);
-					break;
-				case BoundType::WEAK:
-					lowerOk = (rhs.lowerBoundType() != BoundType::INFTY);
-			}
-			if( lowerOk )
-			{
-				switch( mUpperBoundType )
-				{
-					case BoundType::INFTY:
-						return rhs.upperBoundType() == BoundType::INFTY;
-					case BoundType::STRICT:
-						return rhs.upperBoundType() == BoundType::STRICT;
-					case BoundType::WEAK:
-						return rhs.upperBoundType() != BoundType::INFTY;
-				}
-			}
-			return false; // the lower boundaries are not ok.
-		}
-		else
-		{
-			return false; // not less and not equal
-		}
+                
+                // Note that from this point on at least one bound is equal
+                // to our bounds but no bound is outside of our bounds
+	
+                // check the bound types
+                bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
+                bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
+
+                // if upper bounds are ok and lower bound types are ok, return true
+                if (upperOk && lowerBoundTypesOk)
+                {
+                    return true;
+                }
+
+                // if lower bounds are ok and upper bound types are ok, return true
+                if (lowerOk && upperBoundTypesOk)
+                {
+                    return true;
+                }
+                
+                // if both bound types are ok, return true
+                if (lowerBoundTypesOk && upperBoundTypesOk)
+                {
+                    return true;
+                }
+            
+                // otherwise return false
+                return false; // not less and not equal
 	}
 	
 	template<typename Number>
@@ -902,7 +908,14 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
-		if( this->contains(rhs) )
+                // check for subset before contains because we may want to get
+                // the difference from ourselves which is empty.
+		if( this->isSubset(rhs) )
+                {
+                        resultA = emptyInterval();
+                        return false;
+                }
+                else if( this->contains(rhs) )
 		{
 			BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
 			BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
