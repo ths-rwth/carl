@@ -912,7 +912,7 @@ template<typename Number>
 		}
 		else
 		{
-			if( this->isSubset(rhs) )
+			if( this->isProperSubset(rhs) )
 			{
 				resultA = emptyInterval();
 			}
