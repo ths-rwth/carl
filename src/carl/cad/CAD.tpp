@@ -626,7 +626,11 @@ bool CAD<Number>::check(
 			// re-add the input polynomials to the top-level (for they could have been deleted)
 			this->eliminationSets.front().clear();
 			for (auto p: this->polynomials) {
-				this->eliminationSets.front().insert(p);
+				if (p->mainVar() == this->variables.front()) {
+					this->eliminationSets.front().insert(p);
+				} else {
+					this->eliminationSets.front().insert(this->take(new UPolynomial(p->switchVariable(this->variables.front()))));
+				}
 			}
 		} else {
 			// only reset the first elimination level
