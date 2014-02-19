@@ -80,7 +80,7 @@ private:
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::unordered_set<const UPolynomial*, UnivariatePolynomialPtrHasher<cad::MPolynomial<Coefficient>>> PolynomialSet;
+	typedef std::unordered_set<const UPolynomial*, UnivariatePolynomialPtrHasher<cad::MPolynomial<Coefficient>>, UnivariatePolynomialPtrEquals<cad::MPolynomial<Coefficient>>> PolynomialSet;
 	//typedef std::set<const UPolynomial*> PolynomialSet;
 
 	/**
