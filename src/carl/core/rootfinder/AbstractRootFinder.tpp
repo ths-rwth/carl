@@ -24,7 +24,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		interval(interval),
 		finished(false)
 {
-	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial);
+	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
 	if (this->polynomial.zeroIsRoot()) {
 		this->polynomial.eliminateZeroRoots();
 		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
