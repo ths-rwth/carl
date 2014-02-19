@@ -21,13 +21,7 @@ std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(
 	assert(this->isConsistent());
 	if (r->isNumeric()) {
 		// Make sure that r gets inserted as NR. It may still be an IR...
-		RealAlgebraicNumberNRPtr<Number> rNR;
-		if (r->isNumericRepresentation()) {
-			rNR = std::static_pointer_cast<RealAlgebraicNumberNR<Number>>(r);
-		} else {
-			rNR = RealAlgebraicNumberNR<Number>::create(r->value(), r->isRoot());
-			LOGMSG_TRACE("carl.cad", "Converting " << r << " to " << rNR);
-		}
+		RealAlgebraicNumberNRPtr<Number> rNR = RealAlgebraicNumberNR<Number>::create(r->value(), r->isRoot());
 		iterator position = this->samples.begin();
 		if (! this->samples.empty()) {
 			position = std::lower_bound(position, this->samples.end(), rNR, Less<Number>());
