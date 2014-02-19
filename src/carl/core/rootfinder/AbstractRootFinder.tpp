@@ -26,7 +26,6 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 {
 	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
 	if (this->polynomial.zeroIsRoot()) {
-		this->polynomial.eliminateZeroRoots();
 		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
 	}
 	if (tryTrivialSolver && this->solveTrivial()) {
@@ -51,6 +50,19 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 			} else {
 				this->interval.setRight(this->interval.left());
 			}
+		}
+	}
+	
+	if (this->interval.leftType() == BoundType::WEAK) {
+		this->interval.setLeftType(BoundType::STRICT);
+		if (this->polynomial.isRoot(this->interval.left())) {
+			this->addRoot(RealAlgebraicNumberNR<Number>::create(this->interval.left()));
+		}
+	}
+	if (this->interval.rightType() == BoundType::WEAK) {
+		this->interval.setRightType(BoundType::STRICT);
+		if (this->polynomial.isRoot(this->interval.right())) {
+			this->addRoot(RealAlgebraicNumberNR<Number>::create(this->interval.right()));
 		}
 	}
 }
