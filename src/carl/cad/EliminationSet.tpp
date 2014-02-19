@@ -543,6 +543,7 @@ void EliminationSet<Coefficient>::factorize() {
 
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff>& s) {
+	os << "{ Sizes: " << s.polynomials.size() << ", " << s.mSingleEliminationQueue.size() << ", " << s.mPairedEliminationQueue.size() << " }";
 	os << "{ Polynomials ";
 	for (auto p: s.polynomials) os << "[" << *p << "] ";
 	os << "}{ Single ";
