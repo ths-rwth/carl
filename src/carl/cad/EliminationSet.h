@@ -220,7 +220,7 @@ public:
 		return this->polynomials.empty();
 	}
 
-	void checkConsistency() const;
+	bool isConsistent() const;
 
 	////////////////////
 	// ACCESS METHODS //

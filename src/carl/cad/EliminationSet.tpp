@@ -38,12 +38,13 @@ bool EliminationSet<Coefficient>::hasParents(const UPolynomial* p) const {
 }
 
 template <typename Coefficient>
-void EliminationSet<Coefficient>::checkConsistency() const {
-	if (this->polynomials.empty()) return;
+bool EliminationSet<Coefficient>::isConsistent() const {
+	if (this->polynomials.empty()) return true;
 	Variable var = (*this->polynomials.begin())->mainVar();
 	for (auto p: this->polynomials) {
 		assert(p->mainVar() == var);
 	}
+	return true;
 }
 
 template <typename Coefficient>
@@ -119,7 +120,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 			this->mPairedEliminationQueue.insert(queuePosition, *pos);
 		}
 	}
-	this->checkConsistency();
+	assert(this->isConsistent());
 	return insertValue;
 }
 
