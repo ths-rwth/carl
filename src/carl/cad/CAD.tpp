@@ -1247,7 +1247,8 @@ bool CAD<Number>::mainCheck(
 			CHECK_NODE(node, false, next, false)
 		}
 		// update maximum sample tree depth
-		maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
+		assert(this->sampleTree.max_depth(sampleTreeRoot) >= 0);
+		maxDepth = (unsigned)this->sampleTree.max_depth(sampleTreeRoot);
 	}
 	
 	/* Phase 2
