@@ -264,8 +264,12 @@ bool CAD<Number>::prepareElimination() {
 	
 	// add new polynomials to level 0, unifying their variables, and the list of all polynomials
 	for (auto p: this->scheduledPolynomials) {
-		this->polynomials.push_back(p);
-		this->eliminationSets.front().insert(p);
+		auto tmp = p;
+		if (p->mainVar() != this->variables.front()) {
+			tmp = this->take(new UPolynomial(p->switchVariable(this->variables.front())));
+		}
+		this->polynomials.push_back(tmp);
+		this->eliminationSets.front().insert(tmp);
 	}
 	
 	// optimizations for the first elimination level
