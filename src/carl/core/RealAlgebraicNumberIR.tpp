@@ -91,7 +91,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 }
 
 template<typename Number>
-std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() {
+std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() const {
 	if (this->isZero()) {
 		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval, this->sturmSequence);
 	}
@@ -300,8 +300,7 @@ void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 }
 
 template<typename Number>
-void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i)
-{
+void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i) const {
 	if (i.left() < this->interval.left()) { // coarsen the left bound
 		Number l = this->interval.left();
 		this->interval.setLeft(i.left());
