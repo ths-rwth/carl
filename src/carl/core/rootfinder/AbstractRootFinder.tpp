@@ -33,13 +33,25 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
 		this->finished = true;
 	}
-	if (this->interval.leftType() == BoundType::INFTY) {
-		this->interval.setLeft(-this->polynomial.cauchyBound());
-		this->interval.setLeftType(BoundType::STRICT);
-	}
-	if (this->interval.rightType() == BoundType::INFTY) {
-		this->interval.setRight(this->polynomial.cauchyBound());
-		this->interval.setRightType(BoundType::STRICT);
+	if ((this->interval.leftType() == BoundType::INFTY) || (this->interval.rightType() == BoundType::INFTY)) {
+		Number bound = this->polynomial.cauchyBound();
+
+		if (this->interval.leftType() == BoundType::INFTY) {
+			this->interval.setLeftType(BoundType::STRICT);
+			if (-bound < this->interval.right()) {
+				this->interval.setLeft(-bound);
+			} else {
+				this->interval.setLeft(this->interval.right());
+			}
+		}
+		if (this->interval.rightType() == BoundType::INFTY) {
+			this->interval.setRightType(BoundType::STRICT);
+			if (this->interval.left() < bound) {
+				this->interval.setRight(bound);
+			} else {
+				this->interval.setRight(this->interval.left());
+			}
+		}
 	}
 }
 
