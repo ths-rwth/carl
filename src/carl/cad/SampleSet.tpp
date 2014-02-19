@@ -18,6 +18,7 @@ namespace cad {
 
 template<typename Number>
 std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(RealAlgebraicNumberPtr<Number> r) {
+	assert(this->isConsistent());
 	if (r->isNumeric()) {
 		// Make sure that r gets inserted as NR. It may still be an IR...
 		RealAlgebraicNumberNRPtr<Number> rNR;
@@ -61,15 +62,21 @@ std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(
 		this->nonRootQueue.push_back(r);
 	}
 	this->queue.push_back(r);
-	return std::make_pair(this->samples.insert(position, r), true);
+	//LOGMSG_TRACE("carl.cad", "Inserted " << r << " into " << *this);
+	auto res = std::make_pair(this->samples.insert(position, r), true);
+	LOGMSG_TRACE("carl.cad", "Inserted " << r << " into " << *this);
+	assert(this->isConsistent());
+	return res;
 }
 
 template<typename Number>
 typename SampleSet<Number>::iterator SampleSet<Number>::remove(typename SampleSet<Number>::iterator position) {
 	assert(position != this->samples.end());
+	assert(this->isConsistent());
 	this->removeFromQueue(*position);
 	this->removeFromNRIR(*position);
 	this->removeFromNonrootRoot(*position);
+	assert(this->isConsistent());
 	return this->samples.erase(position);
 }
 
@@ -103,6 +110,7 @@ inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextRoot() const {
 template<typename Number>
 void SampleSet<Number>::pop() {
 	if (this->samples.empty()) return;
+	assert(this->isConsistent());
 	
 	const RealAlgebraicNumberPtr<Number> r = this->next();
 	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::Less<Number>());
@@ -113,6 +121,7 @@ void SampleSet<Number>::pop() {
 	this->queue.pop_front();
 	this->removeFromNRIR(r);
 	this->removeFromNonrootRoot(r);
+	assert(this->isConsistent());
 }
 
 template<typename Number>
@@ -134,6 +143,7 @@ void SampleSet<Number>::popNR() {
 	
 	this->removeFromQueue(r);
 	this->removeFromNonrootRoot(r);
+	assert(this->isConsistent());
 }
 
 template<typename Number>
@@ -294,6 +304,44 @@ void SampleSet<Number>::removeFromNRIR(const RealAlgebraicNumberPtr<Number> r) {
 		assert(pos != this->IRqueue.end()); // r should be in this list
 		this->IRqueue.erase(pos);
 	}
+}
+
+template<typename Number>
+bool SampleSet<Number>::isConsistent() const {
+	std::list<RealAlgebraicNumberPtr<Number>> NRIR(this->queue);
+	std::list<RealAlgebraicNumberPtr<Number>> RR(this->queue);
+
+	for (auto n: this->rootQueue) {
+		assert(n->isRoot());
+		RR.remove(n);
+	}
+	for (auto n: this->nonRootQueue) {
+		REGISTERED_ASSERT(!n->isRoot());
+		RR.remove(n);
+	}
+	assert(RR.empty());
+
+	for (auto n: this->IRqueue) {
+		assert(!n->isNumericRepresentation());
+		NRIR.remove(n);
+	}
+	for (auto n: this->NRqueue) {
+		assert(n->isNumericRepresentation());
+		NRIR.remove(n);
+	}
+	assert(NRIR.empty());
+
+	RealAlgebraicNumberPtr<Number> last = nullptr;
+	for (auto cur: this->samples) {
+		if (last != nullptr) {
+			if (!Less<Number>()(last, cur)) {
+				LOGMSG_TRACE("carl.cad", "Not: " << last << " < " << cur);
+			}
+			assert(Less<Number>()(last, cur));
+		}
+		last = cur;
+	}
+	return true;
 }
 
 }
