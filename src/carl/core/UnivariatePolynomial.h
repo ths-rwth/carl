@@ -385,7 +385,7 @@ public:
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
-	UnivariatePolynomial negateVariable() {
+	UnivariatePolynomial negateVariable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		for (unsigned int deg = 0; deg < res.coefficients().size(); deg++) {
 			if (deg % 2 == 1) res.mCoefficients[deg] = -res.mCoefficients[deg];
