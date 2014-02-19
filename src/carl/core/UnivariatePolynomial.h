@@ -846,6 +846,15 @@ struct UnivariatePolynomialPtrHasher : public std::hash<UnivariatePolynomial<Coe
 		return p == nullptr ? 0 : 1;
 	}
 };
+
+template<typename Coeff>
+struct UnivariatePolynomialPtrEquals : public std::equal_to<UnivariatePolynomial<Coeff>*>{
+	size_t operator()(const UnivariatePolynomial<Coeff>* lhs, const UnivariatePolynomial<Coeff>* rhs) const {
+		if (lhs == nullptr && rhs == nullptr) return true;
+		if (lhs == nullptr || rhs == nullptr) return false;
+		return *lhs == *rhs;
+	}
+};
 }
 
 #include "UnivariatePolynomial.tpp"
