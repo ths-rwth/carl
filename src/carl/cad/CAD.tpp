@@ -194,6 +194,7 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;
+	os << "Variables: " << cad.variables << std::endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (auto i: cad.getEliminationSets()) {
@@ -406,7 +407,7 @@ bool CAD<Number>::check(
 	LOGMSG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
 	for (auto b: bounds) LOGMSG_DEBUG("carl.cad", "  " << b.second << " for " << this->variables[b.first]);
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
-		LOGMSG_DEBUG("carl.cad", "  Level " << i << "( " << this->eliminationSets[i].size() << " ): " << this->eliminationSets[i]);
+		LOGMSG_DEBUG("carl.cad", "  Level " << i << " (" << this->eliminationSets[i].size() << "): " << this->eliminationSets[i]);
 	}
 
 #ifdef CAD_CHECK_REDIRECT
@@ -489,7 +490,8 @@ bool CAD<Number>::check(
 			if (b.second.empty()) return false;
 		}
 		// each bound non-empty
-		return true;
+		///@todo Maybe faster to generate a solution point directly here? In any case, we must fill r before returning true.
+		//return true;
 	}
 	
 	// try to solve the constraints by interval arithmetic
@@ -572,6 +574,7 @@ bool CAD<Number>::check(
 				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
+				assert(b.first < boundPolynomials.size());
 				boundPolynomials[b.first].first = tmp.back();
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
@@ -926,6 +929,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			// sample between neighbor and insertValue.first needed and will be added to newSampleSet
 			if ((*insertValue.first)->isNumeric()) {
 				if ((*neighbor)->isNumeric()) {
+					assert((*insertValue.first)->value() < (*neighbor)->value());
 					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(ExactInterval<Number>((*insertValue.first)->value(), (*neighbor)->value(), BoundType::STRICT).sample(), false));
 				} else {
 					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().left(), false));
@@ -1258,7 +1262,10 @@ bool CAD<Number>::mainCheck(
 	if (maxDepth == 0) {
 		// there is no sample component computed yet, so we are at the base level
 		// perform an initial elimination so that the base level contains lifting positions
-		while (this->eliminationSets.back().emptyLiftingQueue() && this->eliminate(dim-1, bounds, boundsNontrivial)) {};
+		int lastRes = 0;
+		while (this->eliminationSets.back().emptyLiftingQueue() && (lastRes = this->eliminate(dim-1, bounds, boundsNontrivial))) {
+			LOGMSG_DEBUG("carl.cad", "Waiting for something to lift, lastRes = " << lastRes << std::endl << *this);
+		};
 		
 		// perform an initial lifting step in order to fill the tree once
 		if (this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
