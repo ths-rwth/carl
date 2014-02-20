@@ -382,10 +382,8 @@ public:
      */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
-	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
@@ -834,6 +832,7 @@ private:
 	 */
 	void shift(const Coefficient& a);	
 		
+	UnivariatePolynomial reduce_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{

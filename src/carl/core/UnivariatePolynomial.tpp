@@ -15,6 +15,7 @@
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
+#include "MultivariatePolynomial.h"
 #include "MultivariateGCD.h"
 
 namespace carl
@@ -243,8 +244,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
 	if (this->degree() < divisor.degree()) return *this;
 	assert(degree() >= divisor.degree());
@@ -262,11 +262,15 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
-		factor = *prefactor * lcoeff()/divisor.lcoeff();
+		///@todo enable assert once carl::remainder exists.
+		//assert(carl::remainder(*prefactor * lcoeff(), divisor.lcoeff()) == Coeff(0));
+		factor = carl::quotient(*prefactor * lcoeff(), divisor.lcoeff());
 	}
 	else
 	{
-		factor = lcoeff()/divisor.lcoeff();
+		///@todo enable assert once carl::remainder exists.
+		//assert(carl::remainder(lcoeff(), divisor.lcoeff()) == Coeff(0));
+		factor = carl::quotient(lcoeff(), divisor.lcoeff());
 	}
 
 	UnivariatePolynomial<Coeff> result(mMainVar);
@@ -307,59 +311,21 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 	else 
 	{	
-		return result.reduce(divisor);
+		return result.reduce_helper(divisor, nullptr);
 	}
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff& prefactor) const
 {
-	/// @todo remove this, reduction 
-	assert(degree() >= divisor.degree());
-	assert(!divisor.isZero());
-	if(is_field<Coeff>::value && divisor.isConstant())
-	{
-		return UnivariatePolynomial<Coeff>(mMainVar);
-	}
-	//std::cout << *this << " / " << divisor << std::endl;
-	unsigned degdiff = degree() - divisor.degree();
-	LOG_INEFFICIENT();
-	// Use lcm instead of naive multiplication...
-	Coeff lcoeff = this->lcoeff();
-	Coeff divlcoeff = divisor.lcoeff();
-	UnivariatePolynomial<Coeff> result(mMainVar);
-	result.mCoefficients.reserve(mCoefficients.size()-1);
-	for (unsigned i = 0; i < degdiff; i++) {
-		result.mCoefficients.push_back(mCoefficients[i] * divlcoeff);
-	}
+	return this->reduce_helper(divisor, &prefactor);
+}
 
-	// By construction, the leading coefficient will be zero.
-	if(prefactor != nullptr)
-	{
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] * divlcoeff - lcoeff * divisor.mCoefficients[i] * *prefactor);
-		}
-	}
-	else
-	{
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] * divlcoeff - lcoeff * divisor.mCoefficients[i]);
-		}
-	}
-	// strip zeros from the end as we might have pushed zeros.
-	result.stripLeadingZeroes();
-
-	if(result.degree() < divisor.degree())
-	{
-		return result;
-	}
-	else
-	{
-		return result.reduce(divisor);
-	}
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	static_assert(is_field<Coeff>::value, "Reduce must be called with a prefactor if the Coeffients are not from a field.");
+	return this->reduce_helper(divisor);
 }
 
 /**
@@ -377,7 +343,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
 	Coeff prefactor = carl::pow(b,d);
-	return reduce(divisor, &prefactor);
+	return reduce(divisor, prefactor);
 }
 
 
