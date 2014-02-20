@@ -1446,9 +1446,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	if (b.isConstant()) return subresultants;
 	
 	UnivariatePolynomial<Coeff> tmp = b;
-	/// @todo check if reduce() is really prem() 
-	/// @bug reduce is not prem() if the coefficient is not a field.
-	b = a.reduce(-b);
+	b = a.prem(-b);
 	a = tmp;
 	
 	// BUG in Duco's article(?):
@@ -1466,6 +1464,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 		subresultants.push_front(b);
 		
 		// Part 2
+		assert(aDeg >= bDeg);
 		unsigned delta = aDeg - bDeg;
 		
 		/** Case distinction on delta: either we choose b as next subresultant or we could reduce b (delta > 1)
@@ -1541,8 +1540,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				 * the above division was successful (in this case, reducedNewB remains unchanged).
 				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
 				 */
-				// TODO: check if reduce() is really prem()
-				UnivariatePolynomial<Coeff> reducedNewB = a.reduce(-b);
+				UnivariatePolynomial<Coeff> reducedNewB = a.prem(-b);
 				reducedNewB.divideBy(subresLcoeff.pow(delta)*a.lcoeff(), b);
 				break;
 			}
