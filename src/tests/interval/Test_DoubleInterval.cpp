@@ -1004,7 +1004,7 @@ TEST(DoubleInterval, Difference)
     EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
     
     EXPECT_FALSE(i3.difference(i6, result1, result2));
-    EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::STRICT), result2);
+    EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::STRICT), result1);
 }
 
 TEST(DoubleInterval, Split)
@@ -1160,12 +1160,12 @@ TEST(DoubleInterval, Contains)
     EXPECT_FALSE(i1.isSubset(i7));
     EXPECT_TRUE(i7.isSubset(i6));
     EXPECT_FALSE(i6.isSubset(i7));
-    EXPECT_TRUE(i5.contains(i8));
-    EXPECT_FALSE(i8.contains(i5));
-    EXPECT_TRUE(i6.contains(i8));
-    EXPECT_FALSE(i8.contains(i6));
-    EXPECT_FALSE(i4.contains(i8));
-    EXPECT_FALSE(i8.contains(i4));
+    EXPECT_TRUE(i5.isSubset(i8));
+    EXPECT_FALSE(i8.isSubset(i5));
+    EXPECT_TRUE(i6.isSubset(i8));
+    EXPECT_FALSE(i8.isSubset(i6));
+    EXPECT_FALSE(i4.isSubset(i8));
+    EXPECT_FALSE(i8.isSubset(i4));
     
     EXPECT_FALSE(i2.isProperSubset(i1));
     EXPECT_FALSE(i1.isProperSubset(i2));

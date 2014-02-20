@@ -84,8 +84,8 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
-		switch( mLowerBoundType )
-        {
+            switch( mLowerBoundType )
+            {
             case BoundType::INFTY:
                 break;
             case BoundType::STRICT:
@@ -95,36 +95,39 @@ template<typename Number>
             case BoundType::WEAK:
                 if( mContent.lower() > val )
                     return false;
-        }
-        // Invariant: n is not conflicting with lower bound
-        switch( mUpperBoundType )
-        {
-            case BoundType::INFTY:
-                break;
-            case BoundType::STRICT:
-                if( mContent.upper() <= val )
-                    return false;
-                break;
-            case BoundType::WEAK:
-                if( mContent.upper() < val )
-                    return false;
-                break;
-        }
-        return true;    // for open intervals: (lower() < n && upper() > n) || (n == Number(0) && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
+            }
+            // Invariant: n is not conflicting with lower bound
+            switch( mUpperBoundType )
+            {
+                case BoundType::INFTY:
+                    break;
+                case BoundType::STRICT:
+                    if( mContent.upper() <= val )
+                        return false;
+                    break;
+                case BoundType::WEAK:
+                    if( mContent.upper() < val )
+                        return false;
+                    break;
+            }
+            return true;    // for open intervals: (lower() < n && upper() > n) || (n == Number(0) && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
 	}
 	
 	template<typename Number>
 	bool Interval<Number>::contains(const Interval<Number>& rhs) const
 	{
                 // if one bound is totally wrong, we can just return false
-                if (mContent.lower() > rhs.lower() || mContent.upper() < rhs.upper())
+                if (
+                        (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
+                        || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY)
+                    )
                 {
                     return false;
                 }
 
                 // check the bounds
-                bool lowerOk = mContent.lower() < rhs.lower();
-                bool upperOk = mContent.upper() > rhs.upper();
+                bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
+                bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
                 
                 // if both are ok, return true
 		if( lowerOk && upperOk )
