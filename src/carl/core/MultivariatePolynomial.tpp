@@ -488,9 +488,13 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 		if(factor != nullptr)
 		{
 			result += *factor;
+			p -= *factor * divisor;
 			delete factor;
 		}
-		p.stripLT();
+		else
+		{
+			p.stripLT();
+		}
 	}
 	return result;
 }
