@@ -1288,7 +1288,7 @@ bool CAD<Number>::mainCheck(
 	 */
 	
 	// invariant: either the last level is completely developed (dim or 0), or something in between due to bounds
-	assert(maxDepth == (int)dim || maxDepth == (unsigned)0 || boundsNontrivial);
+	assert(maxDepth == (unsigned)dim || maxDepth == (unsigned)0 || boundsNontrivial);
 	
 	while (true) {
 		// search base level with open lifting position

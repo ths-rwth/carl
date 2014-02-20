@@ -15,6 +15,7 @@
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
+#include "MultivariateGCD.h"
 
 namespace carl
 {
@@ -643,9 +644,23 @@ const Coeff& UnivariatePolynomial<Coeff>::unitPart() const
 	return lcoeff();
 }
 
+template<typename Coeff>
+template<typename C, EnableIf<Not<is_number<C>>>>
+Coeff UnivariatePolynomial<Coeff>::unitPart() const
+{
+	if(lcoeff().isZero() || lcoeff().lcoeff() > 0)
+	{
+		return Coeff(1);
+	}	
+	else
+	{
+		return Coeff(-1);
+	}
+}
+
 
 template<typename Coeff>
-template<typename C, DisableIf<is_field<C>>>
+template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
 	if(isZero() || lcoeff() > 0)
@@ -656,8 +671,10 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 	{
 		return Coeff(-1);
 	}
-	
 }
+
+
+
 
 
 	
