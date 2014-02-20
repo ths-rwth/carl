@@ -389,7 +389,7 @@ public:
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
-	UnivariatePolynomial negateVariable() {
+	UnivariatePolynomial negateVariable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		for (unsigned int deg = 0; deg < res.coefficients().size(); deg++) {
 			if (deg % 2 == 1) res.mCoefficients[deg] = -res.mCoefficients[deg];
@@ -706,6 +706,8 @@ public:
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
 	template<typename C>
+	friend bool operator==(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs);
+	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
@@ -839,6 +841,22 @@ private:
 		{
 			mCoefficients.pop_back();
 		}
+	}
+};
+
+template<typename Coeff>
+struct UnivariatePolynomialPtrHasher : public std::hash<UnivariatePolynomial<Coeff>*>{
+	size_t operator()(const UnivariatePolynomial<Coeff>* p) const {
+		return p == nullptr ? 0 : 1;
+	}
+};
+
+template<typename Coeff>
+struct UnivariatePolynomialPtrEquals : public std::equal_to<UnivariatePolynomial<Coeff>*>{
+	size_t operator()(const UnivariatePolynomial<Coeff>* lhs, const UnivariatePolynomial<Coeff>* rhs) const {
+		if (lhs == nullptr && rhs == nullptr) return true;
+		if (lhs == nullptr || rhs == nullptr) return false;
+		return *lhs == *rhs;
 	}
 };
 }

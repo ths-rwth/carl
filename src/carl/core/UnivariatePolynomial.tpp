@@ -1373,11 +1373,15 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 
 template<typename Coeff>
 unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coeff>& interval) const {
+	if (interval.empty()) return 0;
+	/// @todo check future interval.isPointInterval() and only evaluate polynomial at this point.
 	UnivariatePolynomial<Coeff> p(*this);
 	p.shift(interval.left());
 	p.scale(interval.diameter());
 	p.reverse();
 	p.shift(1);
+	p.stripLeadingZeroes();
+	p.checkConsistency();
 	return carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
 }
 
@@ -1931,6 +1935,8 @@ UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& r
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
 {
+	lhs.checkConsistency();
+	rhs.checkConsistency();
 	if(lhs.mMainVar == rhs.mMainVar)
 	{
 		return lhs.mCoefficients == rhs.mCoefficients;
@@ -1945,6 +1951,13 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 }
 template<typename C>
 bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs)
+{
+	if (lhs == nullptr && rhs == nullptr) return true;
+	if (lhs == nullptr || rhs == nullptr) return false;
+	return *lhs == *rhs;
+}
+template<typename C>
+bool operator==(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs)
 {
 	if (lhs == nullptr && rhs == nullptr) return true;
 	if (lhs == nullptr || rhs == nullptr) return false;

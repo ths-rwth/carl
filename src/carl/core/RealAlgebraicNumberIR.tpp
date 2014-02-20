@@ -78,8 +78,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
 	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).switchVariable(va).toNumberCoefficients());
 	
-	UnivariatePolynomial<typename IntegralT<Number>::type> ptmp = res.switchVariable(va).toIntegerDomain().primitivePart();
-	auto p = ptmp.template convert<Number>();
+	auto p = res.switchVariable(va).coprimeCoefficients().primitivePart().template convert<Number>();
 	auto seq = p.standardSturmSequence();
 
 	ExactInterval<Number> i = this->getInterval() + n->getInterval();
@@ -92,7 +91,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 }
 
 template<typename Number>
-std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() {
+std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() const {
 	if (this->isZero()) {
 		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval, this->sturmSequence);
 	}
@@ -187,7 +186,7 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebr
 template<typename Number>
 bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<Number> n, const ExactInterval<Number> i) {
 	// Proceed only if this.left < n2.left and this.right < n2.right
-	if ((this->left() < n->right()) && (this->left() < n->right())) {
+	if ((this->left() < n->left()) && (this->right() < n->right())) {
 		assert( i.left() == n->left() && i.right() == this->right());
 		if (this->getPolynomial().isRoot(i.left())) {
 			// If i.left is root of n1.polynomial: convert n1 to NR
@@ -218,7 +217,7 @@ bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<N
 		this->setLeft(i.left());
 		n->setRight(i.right());
 	}
-		return false;
+	return false;
 }
 
 
@@ -301,8 +300,7 @@ void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 }
 
 template<typename Number>
-void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i)
-{
+void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i) const {
 	if (i.left() < this->interval.left()) { // coarsen the left bound
 		Number l = this->interval.left();
 		this->interval.setLeft(i.left());
@@ -342,10 +340,10 @@ void RealAlgebraicNumberIR<Number>::refine(RealAlgebraicNumberSettings::Refineme
 			m = this->getInterval().sample();
 			break;
 	}
-	
+	assert(this->interval.contains(m));
 	if (this->getPolynomial().isRoot(m)) {
-		this->setLeft(ExactInterval<Number>(this->left(), this->value(), BoundType::STRICT).sample());
-		this->setRight(ExactInterval<Number>(this->value(), this->right(), BoundType::STRICT).sample());
+		this->setLeft(ExactInterval<Number>(this->left(), m, BoundType::STRICT).sample());
+		this->setRight(ExactInterval<Number>(m, this->right(), BoundType::STRICT).sample());
 		this->mValue = m;
 		this->mIsNumeric = true;
 	} else {

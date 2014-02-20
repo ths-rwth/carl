@@ -264,8 +264,12 @@ bool CAD<Number>::prepareElimination() {
 	
 	// add new polynomials to level 0, unifying their variables, and the list of all polynomials
 	for (auto p: this->scheduledPolynomials) {
-		this->polynomials.push_back(p);
-		this->eliminationSets.front().insert(p);
+		auto tmp = p;
+		if (p->mainVar() != this->variables.front()) {
+			tmp = this->take(new UPolynomial(p->switchVariable(this->variables.front())));
+		}
+		this->polynomials.push_back(tmp);
+		this->eliminationSets.front().insert(tmp);
 	}
 	
 	// optimizations for the first elimination level
@@ -622,7 +626,11 @@ bool CAD<Number>::check(
 			// re-add the input polynomials to the top-level (for they could have been deleted)
 			this->eliminationSets.front().clear();
 			for (auto p: this->polynomials) {
-				this->eliminationSets.front().insert(p);
+				if (p->mainVar() == this->variables.front()) {
+					this->eliminationSets.front().insert(p);
+				} else {
+					this->eliminationSets.front().insert(this->take(new UPolynomial(p->switchVariable(this->variables.front()))));
+				}
 			}
 		} else {
 			// only reset the first elimination level
@@ -1239,7 +1247,8 @@ bool CAD<Number>::mainCheck(
 			CHECK_NODE(node, false, next, false)
 		}
 		// update maximum sample tree depth
-		maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
+		assert(this->sampleTree.max_depth(sampleTreeRoot) >= 0);
+		maxDepth = (unsigned)this->sampleTree.max_depth(sampleTreeRoot);
 	}
 	
 	/* Phase 2
