@@ -79,6 +79,7 @@ public:
 	}
 	
 	RealAlgebraicNumberPtr<Number> operator[](unsigned int index) const {
+		assert(index < this->numbers.size());
 		return this->numbers[index];
 	}
 	
