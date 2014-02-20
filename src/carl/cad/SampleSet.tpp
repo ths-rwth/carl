@@ -57,10 +57,7 @@ std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(
 	}
 	this->queue.push_back(r);
 	//LOGMSG_TRACE("carl.cad", "Inserted " << r << " into " << *this);
-	auto res = std::make_pair(this->samples.insert(position, r), true);
-	LOGMSG_TRACE("carl.cad", "Inserted " << r << " into " << *this);
-	assert(this->isConsistent());
-	return res;
+	return std::make_pair(this->samples.insert(position, r), true);
 }
 
 template<typename Number>
@@ -194,6 +191,7 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, Re
 template<typename Number>
 bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to, SampleSet<Number>::iteratorIR& fromIt ) {
 	assert(from->isRoot() == to->isRoot());
+	assert(from->getInterval().contains(to->value()));
 
 	// replace in basic list
 	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), from, Less<Number>());
@@ -243,7 +241,6 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 			irIter++;
 		}
 	}
-	LOGMSG_TRACE("carl.cad", "Result: " << *this);
 	return simplification;
 }
 
