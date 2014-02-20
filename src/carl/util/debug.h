@@ -10,6 +10,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <unistd.h>
 
@@ -69,7 +70,18 @@ std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
 	for (auto it: m) {
 		if (!first) os << ", ";
 		first = false;
-		os << it.first << ":" << it.second;
+		os << it.first << " : " << it.second;
+	}
+	return os << "}";
+}
+template<typename Key, typename Value>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value>& m) {
+	os << "{";
+	bool first = true;
+	for (auto it: m) {
+		if (!first) os << ", ";
+		first = false;
+		os << it.first << " : " << it.second;
 	}
 	return os << "}";
 }
