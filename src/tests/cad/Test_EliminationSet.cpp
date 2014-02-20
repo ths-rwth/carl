@@ -49,3 +49,19 @@ TEST(EliminationSet, BasicOperations)
 	delete r;
 	delete w;
 }
+
+TEST(EliminationSet, SetProperty)
+{
+	VariablePool& vpool = VariablePool::getInstance();
+	Variable x = vpool.getFreshVariable();
+	cad::PolynomialOwner<cln::cl_RA> owner;
+	cad::EliminationSet<cln::cl_RA> s(&owner);
+	
+	cad::MPolynomial<cln::cl_RA> mpone({1});
+	
+	for (unsigned int i = 0; i < 10; i++) {
+		cad::UPolynomial<cln::cl_RA>* p = new cad::UPolynomial<cln::cl_RA>(x, {mpone, mpone, mpone});
+		s.insert(p);
+	}
+	EXPECT_EQ(1, s.size());
+}
