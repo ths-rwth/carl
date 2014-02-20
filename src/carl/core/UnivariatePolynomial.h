@@ -352,8 +352,12 @@ public:
 	 * @see @ref GCL92, page 42.
      * @return 
      */
-	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
+	
+	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
+	Coefficient unitPart() const;
+	
 	
 	/**
 	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
