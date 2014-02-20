@@ -62,14 +62,14 @@ namespace carl
             mExponents(1, VarExpPair(v,e)),
             mTotalDegree(e)
         {
-			assert(checkConsistency());
+			assert(isConsistent());
         }
         
         Monomial(const Monomial& rhs) :
 			mExponents(rhs.mExponents),
 			mTotalDegree(rhs.mTotalDegree)
 		{
-			assert(checkConsistency());
+			assert(isConsistent());
 		}
         
         /**
@@ -81,7 +81,7 @@ namespace carl
             mExponents(exponents),
             mTotalDegree(totalDegree)
         {
-            assert(checkConsistency());
+            assert(isConsistent());
         }
 
         Monomial& operator=(const Monomial& rhs)
@@ -264,7 +264,7 @@ namespace carl
 		
 		bool dividableBy(const Monomial& m) const
 		{
-			assert(checkConsistency());
+			assert(isConsistent());
 			if(m.mTotalDegree > mTotalDegree) return false;
 			if(m.nrVariables() > nrVariables()) return false;
 			// Linear, as we expect small monomials.
@@ -330,7 +330,7 @@ namespace carl
                 {
                     // Insert remaining part
                     result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
-					assert(result->checkConsistency());
+					assert(result->isConsistent());
                     return result;
                 }
                 // Variable is present in both monomials.
@@ -367,7 +367,7 @@ namespace carl
 				delete result;
 				return nullptr;
 			}
-			assert(result->checkConsistency());
+			assert(result->isConsistent());
             return result;
             
         }
@@ -421,7 +421,7 @@ namespace carl
 					++itleft;
 				}
             }
-			assert(result->checkConsistency());
+			assert(result->isConsistent());
 			return result;
 		}
 		
@@ -467,7 +467,7 @@ namespace carl
 				expsum += it.exp;
 			}
 			res->mTotalDegree = expsum;
-			assert(res->checkConsistency());
+			assert(res->isConsistent());
 			return res;
 		}
         
@@ -622,7 +622,7 @@ namespace carl
             }
             // Insert remainder of rhs.
             mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
-			assert(checkConsistency());
+			assert(isConsistent());
             return *this;
         }
 
@@ -702,8 +702,8 @@ namespace carl
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
 		{
 			Monomial result;
-			assert(lhs.checkConsistency());
-			assert(rhs.checkConsistency());
+			assert(lhs.isConsistent());
+			assert(rhs.isConsistent());
 			result.mTotalDegree = lhs.tdeg() + rhs.tdeg();
             // Linear, as we expect small monomials.
             exponents_cIt itright = rhs.mExponents.begin();
@@ -741,7 +741,7 @@ namespace carl
             }
 			 // Insert remaining part
 			result.mExponents.insert(result.mExponents.end(), itright, rhs.mExponents.end());
-			assert(result.checkConsistency());
+			assert(result.isConsistent());
 			return result;
 			
 		}
@@ -752,8 +752,7 @@ namespace carl
 		 * Asserts that the data is valid.
          * @return 
          */
-		bool checkConsistency() const {
-			if (this->mExponents.size() <= 0) return false;
+		bool isConsistent() const {
 			unsigned tdeg = 0;
 			unsigned lastVarIndex = 0;
 			for(VarExpPair ve : mExponents)
