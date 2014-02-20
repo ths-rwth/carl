@@ -231,8 +231,9 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 		}
 		if ((*irIter)->isNumeric()) {
 			RealAlgebraicNumberNRPtr<Number> nr = RealAlgebraicNumberNR<Number>::create((*irIter)->value(), (*irIter)->isRoot());
+			auto ir = *irIter;
 			if (this->simplify(*irIter, nr, irIter)) { // store simplification result
-				simplification.first[*irIter] = nr;
+				simplification.first[ir] = nr;
 				simplification.second = true;
 			} else {
 				assert(false);
