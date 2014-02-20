@@ -144,6 +144,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -155,6 +156,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -1317,6 +1319,8 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
+	assert(this->isRoot(root));
+	if (this->isZero()) return;
 	if (root == 0) {
 		this->eliminateZeroRoots();
 		return;
@@ -1370,6 +1374,7 @@ unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coe
 
 template<typename Coeff>
 int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& interval) const {
+	assert(!this->isZero());
 	auto seq = this->standardSturmSequence();
 	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.left()); });
 	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.right()); });
