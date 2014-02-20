@@ -444,6 +444,10 @@ Sign RealAlgebraicNumberIR<Number>::sgn() const {
 
 template<typename Number>
 Sign RealAlgebraicNumberIR<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
+	if (this->polynomial == p) {
+		// this number is defined as a root of the given polynomial.
+		return Sign::ZERO;
+	}
 	auto seq = this->polynomial.standardSturmSequence(this->polynomial.derivative() * p);
 	int variations = UnivariatePolynomial<Number>::countRealRoots(seq, this->interval);
 	assert((variations == -1) || (variations == 0) || (variations == 1));
