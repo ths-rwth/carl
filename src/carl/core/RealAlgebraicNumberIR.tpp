@@ -399,6 +399,7 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 		} else {
 			this->setRight(ExactInterval<Number>(newBound, n, BoundType::STRICT).sample());
 		}
+		return false;
 	}
 	
 	if (isLeft) {
