@@ -163,7 +163,7 @@ public:
 	 */
 	bool isConstant() const
 	{
-		this->checkConsistency();
+		assert(this->isConsistent());
 		return mCoefficients.size() <= 1;
 	}
 
@@ -272,12 +272,12 @@ public:
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
-		this->checkConsistency();
+		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar).toNumberCoefficients();
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
-		this->checkConsistency();
+		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -793,7 +793,7 @@ public:
 	 * </ul>
      */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void checkConsistency() const;
+	bool isConsistent() const;
 
 	/**
 	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
@@ -804,7 +804,7 @@ public:
 	 * </ul>
      */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	void checkConsistency() const;
+	bool isConsistent() const;
 private:
 	
 	/*!
