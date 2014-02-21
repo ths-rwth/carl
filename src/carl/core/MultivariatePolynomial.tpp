@@ -463,13 +463,15 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 		if(factor != nullptr)
 		{
 			result.quotient += *factor;
+			p -= *factor * divisor;
 			delete factor;
 		}
 		else
 		{
 			result.remainder += p.lterm();
+			p.stripLT();
 		}
-		p.stripLT();
+		
 	}
 	assert(*this == result.quotient * divisor + result.remainder);
 	return result;
