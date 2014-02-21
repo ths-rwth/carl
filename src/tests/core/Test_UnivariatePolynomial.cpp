@@ -45,14 +45,14 @@ TEST(UnivariatePolynomial, Reduction)
 		UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)1,(cln::cl_RA)0, (cln::cl_RA)0,(cln::cl_RA)1});
 		UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)1,(cln::cl_RA)1});
 		auto res = p.reduce(q);
-		ASSERT_EQ(res.degree(), 0);
+		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), 1);
 	}
 	{
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1),MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1)});
 		auto res = p.reduce(q);
-		ASSERT_EQ(res.degree(), 0);
+		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), MultivariatePolynomial<cln::cl_RA>(1));
 	}
 }
@@ -245,7 +245,7 @@ TEST(UnivariatePolynomial, factorization)
 //            if(factor != factors.begin())
 //                std::cout << "* ";
 //            std::cout << "(" << factor->first << ")^" << factor->second << std::endl;
-            EXPECT_NE(0, factor->second);
+            EXPECT_NE((unsigned)0, factor->second);
             for(unsigned i=0; i < factor->second; ++i)
             {
                 productOfFactors *= factor->first;
@@ -273,7 +273,7 @@ TEST(UnivariatePolynomial, factorization)
 //        if(factor != sffactors.begin())
 //            std::cout << "* ";
 //        std::cout << "(" << factor->second << ")^" << factor->first << std::endl;
-        EXPECT_NE(0, factor->first);
+        EXPECT_NE((unsigned)0, factor->first);
         for(unsigned i=0; i < factor->first; ++i)
         {
             productOfFactors *= factor->second;
@@ -345,7 +345,7 @@ TEST(UnivariatePolynomial, primitivePart)
 
 TEST(UnivariatePolynomial, pseudoRem)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+//	Variable x = VariablePool::getInstance().getFreshVariable();
 	
 	
 }
