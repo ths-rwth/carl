@@ -53,7 +53,7 @@ TEST(UnivariatePolynomial, Reduction)
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1),MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1)});
 		auto res = p.reduce(q, MultivariatePolynomial<cln::cl_RA>(1));
-		ASSERT_EQ(res.degree(), 0);
+		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), MultivariatePolynomial<cln::cl_RA>(1));
 	}
 }

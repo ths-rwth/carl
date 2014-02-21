@@ -853,7 +853,7 @@ TEST(DoubleInterval, Split)
     
     std::vector<DoubleInterval> results;
     i5.split(results,5);
-    EXPECT_EQ(5, results.size());
+    EXPECT_EQ((unsigned)5, results.size());
     EXPECT_EQ(DoubleInterval(0, BoundType::WEAK, 1, BoundType::STRICT), results.at(0));
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, 2, BoundType::STRICT), results.at(1));
     EXPECT_EQ(DoubleInterval(2, BoundType::WEAK, 3, BoundType::STRICT), results.at(2));
