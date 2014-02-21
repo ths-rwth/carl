@@ -818,26 +818,34 @@ namespace carl
         {
             case BoundType::INFTY:
                 break;
-            default:
-                if( left() > o.left() )
-                    return false;
             case BoundType::STRICT:
-                if( left() == o.left() && o.mLeftType != BoundType::STRICT )
+                if( o.mLeftType == BoundType::INFTY )
+                    return false;
+                if( left() == o.left() && o.mLeftType == BoundType::WEAK )
                     return false;
                 break;
+            default:
+                if( o.mLeftType == BoundType::INFTY )
+                    return false;
+                if( left() > o.left() )
+                    return false;
         }
         // Invariant: left bound of o is not conflicting with left bound
         switch( mRightType )
         {
             case BoundType::INFTY:
                 break;
-            default:
-                if( right() < o.right() )
-                    return false;
             case BoundType::STRICT:
+                if( o.mRightType == BoundType::INFTY )
+                    return false;
                 if( right() == o.right() && o.mRightType != BoundType::STRICT )
                     return false;
                 break;
+            default:
+                if( o.mRightType == BoundType::INFTY )
+                    return false;
+                if( right() < o.right() )
+                    return false;
         }
         return true;    // for open intervals: left() <= o.left() && right() >= o.mRight
     }

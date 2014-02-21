@@ -54,7 +54,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
-	r->checkConsistency();
+	assert(r->isConsistent());
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
 
@@ -460,7 +460,7 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to, const Variable& variable ) {
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
-		p->checkConsistency();
+		assert(p->isConsistent());
 		if(p->isConstant()) {
 			if (!p->isNumber()) { // discard numerics completely
 				to.insert(p->switchVariable(variable), this->getParentsOf(p));

@@ -163,7 +163,7 @@ public:
 	 */
 	bool isConstant() const
 	{
-		this->checkConsistency();
+		assert(this->isConsistent());
 		return mCoefficients.size() <= 1;
 	}
 
@@ -272,12 +272,12 @@ public:
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
-		this->checkConsistency();
+		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar).toNumberCoefficients();
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
-		this->checkConsistency();
+		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -382,10 +382,8 @@ public:
      */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
-	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
@@ -706,8 +704,6 @@ public:
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
 	template<typename C>
-	friend bool operator==(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs);
-	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
@@ -797,7 +793,7 @@ public:
 	 * </ul>
      */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void checkConsistency() const;
+	bool isConsistent() const;
 
 	/**
 	 * Asserts that this polynomial over polynomial coefficients complies with the requirements and assumptions for UnivariatePolynomial objects.
@@ -808,7 +804,7 @@ public:
 	 * </ul>
      */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	void checkConsistency() const;
+	bool isConsistent() const;
 private:
 	
 	/*!
@@ -834,6 +830,7 @@ private:
 	 */
 	void shift(const Coefficient& a);	
 		
+	UnivariatePolynomial reduce_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{

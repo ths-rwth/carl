@@ -164,5 +164,11 @@ class GFNumber
 	}
 	
 };
+
+template<typename IntegerT>
+GFNumber<IntegerT> quotient(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs) {
+	return lhs / rhs;
+}
+
 }
 #include "GFNumber.tpp"
