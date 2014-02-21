@@ -1351,17 +1351,18 @@ unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coe
 	p.reverse();
 	p.shift(1);
 	p.stripLeadingZeroes();
-	p.checkConsistency();
-	return carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
+	assert(p.isConsistent());
+	auto res = carl::signVariations(p.mCoefficients.begin(), p.mCoefficients.end(), [](const Coeff& c){ return carl::sgn(c); });
+	LOGMSG_TRACE("carl.core", *this << " has " << res << " sign variations within " << interval);
+	return res;
 }
 
 template<typename Coeff>
 int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& interval) const {
 	assert(!this->isZero());
-	auto seq = this->standardSturmSequence();
-	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.left()); });
-	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.right()); });
-	return l - r;
+	assert(!this->isRoot(interval.left()));
+	assert(!this->isRoot(interval.right()));
+	return UnivariatePolynomial<Coeff>::countRealRoots(this->standardSturmSequence(), interval);
 }
 
 template<typename Coeff>
