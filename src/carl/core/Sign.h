@@ -69,7 +69,8 @@ unsigned int signVariations(InputIterator begin, InputIterator end) {
  */
 template<typename InputIterator, typename Function>
 unsigned int signVariations(InputIterator begin, InputIterator end, const Function& f) {
-	while ((f(*begin) == Sign::ZERO) && (begin != end)) begin++;
+	while ((begin != end) && (f(*begin) == Sign::ZERO)) begin++;
+	if (begin == end) return 0;
 
 	unsigned int changes = 0;
 	for (Sign last = f(*begin); begin != end; begin++) {

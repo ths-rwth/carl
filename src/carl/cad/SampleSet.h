@@ -62,6 +62,7 @@ public:
 	 */
 	template<class InputIterator>
 	void insert(InputIterator first, InputIterator last) {
+		assert(this->isConsistent());
 		for (InputIterator i = first; i != last; i++) {
 			this->insert(*i);
 		}
@@ -248,7 +249,8 @@ private:
 	void removeFromQueue(const RealAlgebraicNumberPtr<Number> r);
 	
 	void removeFromNRIR(const RealAlgebraicNumberPtr<Number> r);
-	
+
+	bool isConsistent() const;
 };
 
 }

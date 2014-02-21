@@ -15,6 +15,8 @@
 #include "logging.h"
 #include "Sign.h"
 #include "UnivariatePolynomial.h"
+#include "MultivariatePolynomial.h"
+#include "MultivariateGCD.h"
 
 namespace carl
 {
@@ -144,6 +146,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -155,6 +158,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
 		this->mCoefficients.resize(1);
@@ -240,8 +244,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
-template<typename C, EnableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
 	if (this->degree() < divisor.degree()) return *this;
 	assert(degree() >= divisor.degree());
@@ -259,11 +262,15 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
-		factor = *prefactor * lcoeff()/divisor.lcoeff();
+		///@todo enable assert once carl::remainder exists.
+		//assert(carl::remainder(*prefactor * lcoeff(), divisor.lcoeff()) == Coeff(0));
+		factor = carl::quotient(*prefactor * lcoeff(), divisor.lcoeff());
 	}
 	else
 	{
-		factor = lcoeff()/divisor.lcoeff();
+		///@todo enable assert once carl::remainder exists.
+		//assert(carl::remainder(lcoeff(), divisor.lcoeff()) == Coeff(0));
+		factor = carl::quotient(lcoeff(), divisor.lcoeff());
 	}
 
 	UnivariatePolynomial<Coeff> result(mMainVar);
@@ -304,59 +311,21 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 	}
 	else 
 	{	
-		return result.reduce(divisor);
+		return result.reduce_helper(divisor, nullptr);
 	}
 }
 
 template<typename Coeff>
-template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff& prefactor) const
 {
-	/// @todo remove this, reduction 
-	assert(degree() >= divisor.degree());
-	assert(!divisor.isZero());
-	if(is_field<Coeff>::value && divisor.isConstant())
-	{
-		return UnivariatePolynomial<Coeff>(mMainVar);
-	}
-	//std::cout << *this << " / " << divisor << std::endl;
-	unsigned degdiff = degree() - divisor.degree();
-	LOG_INEFFICIENT();
-	// Use lcm instead of naive multiplication...
-	Coeff lcoeff = this->lcoeff();
-	Coeff divlcoeff = divisor.lcoeff();
-	UnivariatePolynomial<Coeff> result(mMainVar);
-	result.mCoefficients.reserve(mCoefficients.size()-1);
-	for (unsigned i = 0; i < degdiff; i++) {
-		result.mCoefficients.push_back(mCoefficients[i] * divlcoeff);
-	}
+	return this->reduce_helper(divisor, &prefactor);
+}
 
-	// By construction, the leading coefficient will be zero.
-	if(prefactor != nullptr)
-	{
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] * divlcoeff - lcoeff * divisor.mCoefficients[i] * *prefactor);
-		}
-	}
-	else
-	{
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
-		{
-			result.mCoefficients.push_back(mCoefficients[i + degdiff] * divlcoeff - lcoeff * divisor.mCoefficients[i]);
-		}
-	}
-	// strip zeros from the end as we might have pushed zeros.
-	result.stripLeadingZeroes();
-
-	if(result.degree() < divisor.degree())
-	{
-		return result;
-	}
-	else
-	{
-		return result.reduce(divisor);
-	}
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	static_assert(is_field<Coeff>::value, "Reduce must be called with a prefactor if the Coeffients are not from a field.");
+	return this->reduce_helper(divisor);
 }
 
 /**
@@ -374,7 +343,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
 	Coeff prefactor = carl::pow(b,d);
-	return reduce(divisor, &prefactor);
+	return reduce(divisor, prefactor);
 }
 
 
@@ -641,9 +610,23 @@ const Coeff& UnivariatePolynomial<Coeff>::unitPart() const
 	return lcoeff();
 }
 
+template<typename Coeff>
+template<typename C, EnableIf<Not<is_number<C>>>>
+Coeff UnivariatePolynomial<Coeff>::unitPart() const
+{
+	if(lcoeff().isZero() || lcoeff().lcoeff() > 0)
+	{
+		return Coeff(1);
+	}	
+	else
+	{
+		return Coeff(-1);
+	}
+}
+
 
 template<typename Coeff>
-template<typename C, DisableIf<is_field<C>>>
+template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
 	if(isZero() || lcoeff() > 0)
@@ -654,8 +637,10 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 	{
 		return Coeff(-1);
 	}
-	
 }
+
+
+
 
 
 	
@@ -1317,6 +1302,8 @@ void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
 
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
+	assert(this->isRoot(root));
+	if (this->isZero()) return;
 	if (root == 0) {
 		this->eliminateZeroRoots();
 		return;
@@ -1370,6 +1357,7 @@ unsigned int UnivariatePolynomial<Coeff>::signVariations(const ExactInterval<Coe
 
 template<typename Coeff>
 int UnivariatePolynomial<Coeff>::countRealRoots(const ExactInterval<Coeff>& interval) const {
+	assert(!this->isZero());
 	auto seq = this->standardSturmSequence();
 	int l = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.left()); });
 	int r = (int)carl::signVariations(seq.begin(), seq.end(), [&interval](const UnivariatePolynomial<Coeff>& p){ return p.sgn(interval.right()); });
@@ -1458,9 +1446,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	if (b.isConstant()) return subresultants;
 	
 	UnivariatePolynomial<Coeff> tmp = b;
-	/// @todo check if reduce() is really prem() 
-	/// @bug reduce is not prem() if the coefficient is not a field.
-	b = a.reduce(-b);
+	b = a.prem(-b);
 	a = tmp;
 	
 	// BUG in Duco's article(?):
@@ -1478,6 +1464,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 		subresultants.push_front(b);
 		
 		// Part 2
+		assert(aDeg >= bDeg);
 		unsigned delta = aDeg - bDeg;
 		
 		/** Case distinction on delta: either we choose b as next subresultant or we could reduce b (delta > 1)
@@ -1553,8 +1540,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				 * the above division was successful (in this case, reducedNewB remains unchanged).
 				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
 				 */
-				// TODO: check if reduce() is really prem()
-				UnivariatePolynomial<Coeff> reducedNewB = a.reduce(-b);
+				UnivariatePolynomial<Coeff> reducedNewB = a.prem(-b);
 				reducedNewB.divideBy(subresLcoeff.pow(delta)*a.lcoeff(), b);
 				break;
 			}

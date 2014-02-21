@@ -52,18 +52,35 @@ public:
 
 template<typename Number>
 struct Less {
+private:
+	Equal<Number> e;
+public:
 	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
+		assert(lhs != nullptr);
+		assert(rhs != nullptr);
 		if (lhs == rhs) return false;
+		if (this->e(lhs,rhs)) return false;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
 				return lhs->value() < rhs->value();
 			} else {
-				return lhs->value() < std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->left();
+				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
+				rhsIR->refineAvoiding(lhs->value());
+				if (rhs->isNumeric()) {
+					return lhs->value() < rhs->value();
+				} else {
+					return lhs->value() <= std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->left();
+				}
 			}
 		} else {
 			auto lhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(lhs);
 			if (rhs->isNumeric()) {
-				return lhsIR->right() < rhs->value();
+				lhsIR->refineAvoiding(rhs->value());
+				if (lhs->isNumeric()) {
+					return lhs->value() < rhs->value();
+				} else {
+					return lhsIR->right() <= rhs->value();
+				}
 			} else {
 				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
 				if (lhsIR->equal(rhsIR)) return false;

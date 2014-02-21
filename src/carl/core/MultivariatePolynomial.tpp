@@ -450,6 +450,82 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	return false;
 }
 
+template<typename C, typename O, typename P>
+DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::divideBy(const MultivariatePolynomial& divisor) const
+{
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	DivisionResult<MultivariatePolynomial<C,O,P>> result;
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			result.quotient += *factor;
+			delete factor;
+		}
+		else
+		{
+			result.remainder += p.lterm();
+		}
+		p.stripLT();
+	}
+	assert(*this == result.quotient * divisor + result.remainder);
+	return result;
+}
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const MultivariatePolynomial& divisor) const
+{
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial<C,O,P> result;
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			result += *factor;
+			p -= *factor * divisor;
+			delete factor;
+		}
+		else
+		{
+			p.stripLT();
+		}
+	}
+	return result;
+}
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const MultivariatePolynomial& divisor) const
+{
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial<C,O,P> result;
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor == nullptr)
+		{
+			result += p.lterm();
+		}
+		else
+		{
+			delete factor;
+		}
+		p.stripLT();
+	}
+	return result;
+}
+
+
+
+
+
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {

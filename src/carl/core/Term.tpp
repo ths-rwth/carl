@@ -17,48 +17,48 @@ template<typename Coefficient>
 Term<Coefficient>::Term() :
     mCoeff((Coefficient)0), mMonomial()
 {
-    
+    assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :
     mCoeff(c), mMonomial()
 {
-    
+    assert(this->isConsistent());
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
     mCoeff(1), mMonomial(new Monomial(v))
 {
-    
+    assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Monomial& m) :
     mCoeff(1), mMonomial(new Monomial(m))
 {
-    
+    assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const std::shared_ptr<const Monomial>& m) :
     mCoeff(1), mMonomial(m)
 {
-    
+    assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const Monomial* m) :
     mCoeff(c), mMonomial(std::shared_ptr<const Monomial>(m))
 {
-    
+    assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned exponent) :
 mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, exponent)))
 {
-    
+    assert(this->isConsistent());
 }
 
 template<typename Coefficient>
@@ -66,6 +66,7 @@ Term<Coefficient>::Term(const Coefficient& c, const Monomial& m)
 : mCoeff(c)
 {
     if (c != 0) mMonomial = std::make_shared<const Monomial>(m);
+	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
@@ -73,6 +74,7 @@ Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomi
 : mCoeff(c)
 {
     if(c != 0) mMonomial = m;
+	assert(this->isConsistent());
 }
 
 
@@ -91,6 +93,10 @@ Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
         Monomial* div = mMonomial->dividedBy(v);
         if(div != nullptr)
         {
+			if (div->tdeg() == 0) {
+				delete div;
+				return new Term<Coefficient>(mCoeff);
+			}
             return new Term<Coefficient>(mCoeff, div);
         }   
     }
@@ -105,6 +111,10 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
         Monomial* div = mMonomial->dividedBy(m);
         if(div != nullptr)
         {
+			if (div->tdeg() == 0) {
+				delete div;
+				return new Term<Coefficient>(mCoeff);
+			}
             return new Term<Coefficient>(mCoeff, div);
         }   
     }
@@ -125,6 +135,10 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
         Monomial* div = mMonomial->dividedBy(*(t.mMonomial));
         if(div != nullptr)
         {
+			if (div->tdeg() == 0) {
+				delete div;
+				return new Term<Coefficient>(mCoeff / t.mCoeff);
+			}
             return new Term<Coefficient>(mCoeff / t.mCoeff, div);
         }   
     } 
@@ -477,6 +491,14 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
             s << ")";
         return s.str();
     }
+}
+
+template<typename Coefficient>
+bool Term<Coefficient>::isConsistent() const {
+	if (this->mMonomial) {
+		assert(!this->mMonomial->isConstant());
+	}
+	return true;
 }
 
 }

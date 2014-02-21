@@ -91,7 +91,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 }
 
 template<typename Number>
-std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() {
+std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() const {
 	if (this->isZero()) {
 		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval, this->sturmSequence);
 	}
@@ -300,8 +300,7 @@ void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 }
 
 template<typename Number>
-void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i)
-{
+void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i) const {
 	if (i.left() < this->interval.left()) { // coarsen the left bound
 		Number l = this->interval.left();
 		this->interval.setLeft(i.left());
@@ -445,6 +444,10 @@ Sign RealAlgebraicNumberIR<Number>::sgn() const {
 
 template<typename Number>
 Sign RealAlgebraicNumberIR<Number>::sgn(const UnivariatePolynomial<Number>& p) const {
+	if (this->polynomial == p) {
+		// this number is defined as a root of the given polynomial.
+		return Sign::ZERO;
+	}
 	auto seq = this->polynomial.standardSturmSequence(this->polynomial.derivative() * p);
 	int variations = UnivariatePolynomial<Number>::countRealRoots(seq, this->interval);
 	assert((variations == -1) || (variations == 0) || (variations == 1));

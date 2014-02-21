@@ -204,6 +204,8 @@ class Term
 		}
         
         std::string toString(bool infix=true, bool friendlyVarNames=true) const;
+
+		bool isConsistent() const;
         
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);

@@ -352,8 +352,12 @@ public:
 	 * @see @ref GCL92, page 42.
      * @return 
      */
-	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
+	
+	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
+	Coefficient unitPart() const;
+	
 	
 	/**
 	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
@@ -378,14 +382,12 @@ public:
      */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	template<typename C = Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
-	template<typename C = Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
+	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
-	UnivariatePolynomial negateVariable() {
+	UnivariatePolynomial negateVariable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		for (unsigned int deg = 0; deg < res.coefficients().size(); deg++) {
 			if (deg % 2 == 1) res.mCoefficients[deg] = -res.mCoefficients[deg];
@@ -830,6 +832,7 @@ private:
 	 */
 	void shift(const Coefficient& a);	
 		
+	UnivariatePolynomial reduce_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{
@@ -844,6 +847,15 @@ template<typename Coeff>
 struct UnivariatePolynomialPtrHasher : public std::hash<UnivariatePolynomial<Coeff>*>{
 	size_t operator()(const UnivariatePolynomial<Coeff>* p) const {
 		return p == nullptr ? 0 : 1;
+	}
+};
+
+template<typename Coeff>
+struct UnivariatePolynomialPtrEquals : public std::equal_to<UnivariatePolynomial<Coeff>*>{
+	size_t operator()(const UnivariatePolynomial<Coeff>* lhs, const UnivariatePolynomial<Coeff>* rhs) const {
+		if (lhs == nullptr && rhs == nullptr) return true;
+		if (lhs == nullptr || rhs == nullptr) return false;
+		return *lhs == *rhs;
 	}
 };
 }

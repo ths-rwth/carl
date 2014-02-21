@@ -19,24 +19,27 @@ class RealAlgebraicNumberIR : public RealAlgebraicNumber<Number> {
 
 protected:
 	/**
-	 * pointer to the polynomial of this interval representation
+	 * Pointer to the polynomial of this interval representation.
 	 */
 	UnivariatePolynomial<Number> polynomial;
 	
 	/**
-	 * isolating interval of this interval representation
+	 * Isolating interval of this interval representation.
+	 * 
+	 * The interval is mutable, that means it may be changed by const methods, as the actual data is the represented root.
+	 * However, all methods must make sure, that the interval always includes the same root.
 	 */
-	ExactInterval<Number> interval;
+	mutable ExactInterval<Number> interval;
 	
 	/**
-	 * Standard Sturm sequence of the polynomial and its derivative
+	 * Standard Sturm sequence of the polynomial and its derivative.
 	 */
 	std::list<UnivariatePolynomial<Number>> sturmSequence;
 	
 	/**
-	 * number of refinements executed to the isolating interval
+	 * Number of refinements executed to the isolating interval.
 	 */
-	unsigned int refinementCount;
+	mutable unsigned int refinementCount;
 	
 private:
 	std::weak_ptr<RealAlgebraicNumberIR> pThis;
@@ -132,11 +135,11 @@ public:
 		return this->getInterval().right();
 	}
 	
-	void setLeft(const Number& n) {
-		return this->interval.setLeft(n);
+	void setLeft(const Number& n) const {
+		this->interval.setLeft(n);
 	}
-	void setRight(const Number& n) {
-		return this->interval.setRight(n);
+	void setRight(const Number& n) const {
+		this->interval.setRight(n);
 	}
 
 	/**
@@ -169,7 +172,7 @@ public:
 
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(const std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
 
-	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus();
+	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus() const;
 
 	virtual bool containedIn(const ExactInterval<Number>& i) const {
 		return i.contains(this->getInterval());
@@ -208,7 +211,7 @@ public:
 	 * If interval is no over-approximation of the current isolating interval, do nothing.
 	 * @param interval
 	 */
-	void coarsen(const ExactInterval<Number>& interval);
+	void coarsen(const ExactInterval<Number>& interval) const;
 	
 	
 	/** Refines the interval i of this real algebraic number yielding the interval j such that <code>2*(j.Right()-j.Left()) &lt;= i.Right()-i.Left()</code>. This is cutting the interval in the middle and choosing the half where the root lays in.

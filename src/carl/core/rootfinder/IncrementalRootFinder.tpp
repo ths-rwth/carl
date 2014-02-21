@@ -11,6 +11,8 @@
 
 #include "AbstractRootFinder.h"
 #include "RootFinder.h"
+#include "../logging.h"
+#include "../../util/debug.h"
 
 namespace carl {
 namespace rootfinder {
@@ -26,7 +28,9 @@ IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		splittingStrategy(splittingStrategy),
 		nextRoot(this->roots.end())
 {
-	this->addQueue(this->interval, this->splittingStrategy);
+	if (!this->interval.empty()) {
+		this->addQueue(this->interval, this->splittingStrategy);
+	}
 }
 
 template<typename Number, typename C>
@@ -108,6 +112,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
  */
 template<typename Number>
 void buildIsolation(std::vector<double>& roots, const ExactInterval<Number>& interval, RootFinder<Number>& finder) {
+	assert(interval.left() < interval.right());
 	std::sort(roots.begin(), roots.end());
 	auto it = std::unique(roots.begin(), roots.end());
 	roots.resize((size_t)std::distance(roots.begin(), it));
@@ -140,13 +145,19 @@ void buildIsolation(std::vector<double>& roots, const ExactInterval<Number>& int
 		if (interval.contains(tmp)) res.push_back(tmp);
 	}
 	res.push_back(interval.right());
-	
-	finder.addQueue(ExactInterval<Number>(res[0], res[1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
+
+	assert(res[0] <= res[1]);
+	if (res[0] < res[1]) {
+		finder.addQueue(ExactInterval<Number>(res[0], res[1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
+	}
 	for (unsigned int i = 1; i < res.size()-1; i++) {
 		if (finder.getPolynomial().evaluate(res[i]) == 0) {
 			finder.addRoot(RealAlgebraicNumberNR<Number>::create(res[i]));
 		}
-		finder.addQueue(ExactInterval<Number>(res[i], res[i+1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
+		assert(res[i] <= res[i+1]);
+		if (res[i] < res[i+1]) {
+			finder.addQueue(ExactInterval<Number>(res[i], res[i+1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
+		}
 	}	
 }
 
