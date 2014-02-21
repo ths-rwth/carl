@@ -1925,13 +1925,6 @@ bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomia
 	if (lhs == nullptr || rhs == nullptr) return false;
 	return *lhs == *rhs;
 }
-template<typename C>
-bool operator==(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs)
-{
-	if (lhs == nullptr && rhs == nullptr) return true;
-	if (lhs == nullptr || rhs == nullptr) return false;
-	return *lhs == *rhs;
-}
 
 template<typename C>
 bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs)

@@ -704,8 +704,6 @@ public:
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
 	template<typename C>
-	friend bool operator==(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs);
-	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
