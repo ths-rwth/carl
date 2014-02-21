@@ -84,8 +84,12 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 
 	if (variations == 0) return true;
 	if (variations == 1) {
-		this->addRoot(interval);
-		return true;
+		// If one of the interval bounds is a root, sturm sequences will break. Hence we continue splitting.
+		if (!this->polynomial.isRoot(interval.left()) && !this->polynomial.isRoot(interval.right())) {
+			assert(this->polynomial.countRealRoots(interval) == 1);
+			this->addRoot(interval);
+			return true;
+		}
 	}
 
 	//std::cerr << "calling strategy " << strategy << std::endl;
