@@ -911,9 +911,19 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
+                if ( rhs.isEmpty() )
+                {
+                    resultA = *this;
+                    return false;
+                }
+                else if ( this->isEmpty() )
+                {
+                    resultA = rhs;
+                    return false;
+                }
                 // check for subset before contains because we may want to get
                 // the difference from ourselves which is empty.
-		if( this->isSubset(rhs) )
+		else if( this->isSubset(rhs) )
                 {
                         resultA = emptyInterval();
                         return false;
@@ -928,11 +938,7 @@ template<typename Number>
 		}
 		else
 		{
-			if( this->isProperSubset(rhs) )
-			{
-				resultA = emptyInterval();
-			}
-			else if( this->contains(rhs.lower()) )
+			if( this->contains(rhs.lower()) )
 			{
 				BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
 				resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);

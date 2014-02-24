@@ -1022,13 +1022,13 @@ TEST(DoubleInterval, Difference)
     EXPECT_EQ(DoubleInterval(3, BoundType::STRICT, 5, BoundType::WEAK), result1);
     
     EXPECT_FALSE(i8.difference(i1, result1, result2));
-    EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
+    EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
     
     EXPECT_FALSE(i1.difference(i8, result1, result2));
     EXPECT_EQ(DoubleInterval(3, BoundType::WEAK, 5, BoundType::WEAK), result1);
     
     EXPECT_FALSE(i8.difference(i3, result1, result2));
-    EXPECT_EQ(DoubleInterval::emptyInterval(), result1);
+    EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
     
     EXPECT_FALSE(i3.difference(i8, result1, result2));
     EXPECT_EQ(DoubleInterval(-1, BoundType::WEAK, 2, BoundType::WEAK), result1);
