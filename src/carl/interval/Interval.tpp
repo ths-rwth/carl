@@ -132,7 +132,7 @@ template<typename Number>
                 // if both are ok, return true
 		if( lowerOk && upperOk )
 		{
-			return true;
+                    return true;
 		}
                 
                 // Note that from this point on at least one bound is equal
@@ -911,46 +911,86 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
-                if ( rhs.isEmpty() )
-                {
-                    resultA = *this;
-                    return false;
-                }
-                else if ( this->isEmpty() )
-                {
-                    resultA = rhs;
-                    return false;
-                }
                 // check for subset before contains because we may want to get
                 // the difference from ourselves which is empty.
 		else if( this->isSubset(rhs) )
                 {
-                        resultA = emptyInterval();
-                        return false;
+                    resultA = emptyInterval();
+                    return false;
                 }
                 else if( this->contains(rhs) )
-		{
+                {
+                    if( rhs.isEmpty() )
+                    {
+                        resultA = *this;
+                        return false;
+                    }
+                    else if ( this->isEmpty() )
+                    {
+                        resultA = rhs;
+                        return false;
+                    }
+                    if( mContent.lower() != rhs.lower() && mContent.upper() != rhs.upper() )
+                    {
 			BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
 			BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
 			resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
 			resultB = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
 			return true;
+                    }
+                    else if( mContent.lower() == rhs.lower() && mContent.upper() != rhs.upper() )
+                    {
+                        if( mLowerBoundType == rhs.lowerBoundType() )
+                        {
+                            BoundType upperType = mUpperBoundType;
+                            BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
+                            resultA = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType );
+                            return false;
+                        }
+                        else
+                        {
+                            resultA = Interval<Number>( mContent.lower(),mLowerBoundType, mContent.lower(), getOtherBoundType(rhs.lowerBoundType()) );
+                            resultB = Interval<Number>(rhs.upper(), getOtherBoundType(rhs.upperBoundType()), mContent.upper(), mUpperBoundType);
+                            return true;
+                        }
+                    }
+                    else if( mContent.lower() != rhs.lower() && mContent.upper() == rhs.upper() )
+                    {
+                        if( mUpperBoundType == rhs.upperBoundType() )
+                        {
+                            BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
+                            BoundType lowerType = mLowerBoundType;
+                            resultA = Interval<Number>(mContent.lower(), lowerType, rhs.upper(), upperType);
+                            return false;
+                        }
+                        else
+                        {
+                            resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.upper(), getOtherBoundType(rhs.upperBoundType()));
+                            resultB = Interval<Number>(mContent.upper(), getOtherBoundType(rhs.upperBoundType()), mContent.upper(), mUpperBoundType);
+                            return true;
+                        }
+                    }
+                    else if( mContent.lower() == rhs.lower() && mContent.upper() == rhs.upper() )
+                    {
+                        resultA = emptyInterval();
+                        return false;
+                    }
 		}
 		else
 		{
 			if( this->contains(rhs.lower()) )
 			{
-				BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
-				resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
+                            BoundType upperType = getOtherBoundType(rhs.lowerBoundType());
+                            resultA = Interval<Number>(mContent.lower(), mLowerBoundType, rhs.lower(), upperType);
 			}
 			else if( this->contains(rhs.upper()) )
 			{
-				BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
-				resultA = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
+                            BoundType lowerType = getOtherBoundType(rhs.upperBoundType());
+                            resultA = Interval<Number>(rhs.upper(), lowerType, mContent.upper(), mUpperBoundType);
 			}
 			else //both are totally distinct
 			{
-				resultA = *this;
+                            resultA = *this;
 			}
 			return false;
 		}
