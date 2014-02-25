@@ -12,19 +12,19 @@ TEST(doubleFloatTest, Constructor)
     double dVal = 4;
     ASSERT_NO_THROW(carl::FLOAT_T<double> hf1 = carl::FLOAT_T<double>(dVal));
     dVal = 0;
-    EXPECT_EQ(0, carl::FLOAT_T<double>(dVal).getValue());
+    EXPECT_EQ(0, carl::FLOAT_T<double>(dVal).value());
     
     // float constructor tests
     float fVal = 4;
     ASSERT_NO_THROW(carl::FLOAT_T<double> hf1 = carl::FLOAT_T<double>(fVal));
     fVal = 0;
-    EXPECT_EQ(0, carl::FLOAT_T<double>(fVal).getValue());
+    EXPECT_EQ(0, carl::FLOAT_T<double>(fVal).value());
     
     // integer constructor tests
     int iVal = 4;
     ASSERT_NO_THROW(carl::FLOAT_T<double> hf1 = carl::FLOAT_T<double>(iVal));
     iVal = 0;
-    EXPECT_EQ(0, carl::FLOAT_T<double>(iVal).getValue());
+    EXPECT_EQ(0, carl::FLOAT_T<double>(iVal).value());
     
     // mpfr constructor tests
     dVal = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899;

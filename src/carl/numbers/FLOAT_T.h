@@ -24,7 +24,7 @@
 
 namespace carl
 {
-    typedef long precision;
+    typedef long precision_t;
     
     template<typename FloatType>
     class FLOAT_T;
@@ -93,17 +93,17 @@ namespace carl
             * Getter & Setter *
             *******************/
 
-           const FloatType& getValue() const
+           const FloatType& value() const
            {
                return mValue;
            }
 
-           precision getPrec() const
+           precision_t precision() const
            {
                return 0;
            }
 
-           FLOAT_T<FloatType>& setPrec( const precision&)
+           FLOAT_T<FloatType>& setPrecision( const precision_t&)
            {
                return *this;
            }

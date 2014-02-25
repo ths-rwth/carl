@@ -19,21 +19,21 @@ class FLOAT_T<mpfr_t>
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const double _double, precision _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const double _double, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_d(mValue,_double,mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const float _float, precision _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const float _float, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_init2(mValue, _prec);
             mpfr_set_flt(mValue, _float, mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const int _int, precision _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const int _int, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
@@ -66,12 +66,12 @@ class FLOAT_T<mpfr_t>
             return mValue;
         }
         
-        precision getPrec() const
+        precision_t getPrec() const
         {
             return mpfr_get_prec(mValue);
         }
         
-        FLOAT_T<mpfr_t>& setPrec( const precision& _prec, const CARL_RND _rnd=CARL_RND::N )
+        FLOAT_T<mpfr_t>& setPrec( const precision_t& _prec, const CARL_RND _rnd=CARL_RND::N )
         {
             mpfr_prec_round(mValue, convPrec(_prec), mpfr_rnd_t(_rnd));
             return *this;
@@ -565,7 +565,7 @@ class FLOAT_T<mpfr_t>
         
     private:
         
-        mpfr_prec_t convPrec(precision _prec) const
+        mpfr_prec_t convPrec(precision_t _prec) const
         {
             return _prec;
         }
