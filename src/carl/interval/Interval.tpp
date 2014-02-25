@@ -192,6 +192,10 @@ template<typename Number>
 std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
 	{
 		std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
+                if( this->isEmpty() || this->isPointInterval() )
+                {
+                    return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
+                }
 		return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
 	}
 
@@ -845,9 +849,23 @@ template<typename Number>
 	{
 		if( this->intersect(rhs).isEmpty() )
 		{
-			resultA = *this;
+                    // special case: [a;b] U (b;c]
+                    if( (mContent.lower() == rhs.upper() && (rhs.upperBoundType() == BoundType::WEAK || mLowerBoundType == BoundType::WEAK) ) || 
+                        (mContent.upper() == rhs.lower() && (mUpperBoundType == BoundType::WEAK || rhs.lowerBoundType() == BoundType::WEAK) ) ) 
+                    {
+                        Number lower = rhs.lower() <= mContent.lower() ? rhs.lower() : mContent.lower();
+                        Number upper = rhs.upper() >= mContent.upper() ? rhs.upper() : mContent.upper();
+                        BoundType lowerBoundType = lower == mContent.lower() ? mLowerBoundType : rhs.lowerBoundType();
+                        BoundType upperBoundType = upper == mContent.upper() ? mUpperBoundType : rhs.upperBoundType();
+                        resultA = Interval<Number>(lower, lowerBoundType, upper, upperBoundType);
+                        return false;
+                    }
+                    else
+                    {
+                        resultA = *this;
 			resultB = rhs;
 			return true;
+                    }		
 		}
 		else
 		{

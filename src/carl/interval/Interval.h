@@ -78,7 +78,7 @@ namespace carl
 (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY || lower <= upper)
 		
 #define IS_EMPTY(lower, lowerBoundType, upper, upperBoundType )\
-(((lowerBoundType == BoundType::STRICT || upperBoundType != BoundType::INFTY) || (lowerBoundType != BoundType::INFTY || upperBoundType == BoundType::STRICT)) && lower == upper)
+(((lowerBoundType == BoundType::STRICT && upperBoundType != BoundType::INFTY) || (lowerBoundType != BoundType::INFTY && upperBoundType == BoundType::STRICT)) && lower == upper)
 		
 #define IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType )\
 (lowerBoundType == BoundType::INFTY && upperBoundType == BoundType::INFTY)
