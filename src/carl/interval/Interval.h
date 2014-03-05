@@ -617,11 +617,16 @@ namespace carl
 		{
 			return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
 		}
-		
-                inline bool isPointInterval() const
-                {
-                    return (mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK );
-                }
+
+		inline bool isPointInterval() const
+		{
+			return (mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK );
+		}
+
+		inline bool isZero() const
+		{
+			return this->isPointInterval() && (mContent.lower() == 0);
+		}
                 
 		/**
 		 * Returns the diameter of the interval.
