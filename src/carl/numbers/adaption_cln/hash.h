@@ -8,7 +8,10 @@
 
 #pragma once
 #include <functional>
+#include "../../util/platform.h"
+CLANG_WARNING_DISABLE("-Wmismatched-tags")
 #include <cln/cln.h>
+CLANG_WARNING_RESET
 namespace std
 {
 	

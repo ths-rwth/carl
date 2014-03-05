@@ -8,9 +8,12 @@
 
 #pragma once
 
+#include "../../util/platform.h"
 #include <type_traits>
+CLANG_WARNING_DISABLE("-Wmismatched-tags")
+CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <cln/cln.h>
-
+CLANG_WARNING_RESET
 
 namespace carl {
 

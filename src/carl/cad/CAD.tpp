@@ -303,7 +303,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 	this->prepareElimination();
 	bool useBounds = !bounds.empty();
 	for (auto b: bounds) {
-		useBounds = useBounds && !b.second.unbounded();
+		useBounds = useBounds && !b.second.isUnbounded();
 	}
 	
 	if (useBounds) {
@@ -313,15 +313,15 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			if (l >= this->variables.size()) continue;
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
-			if (b.second.leftType() != BoundType::INFTY) {
-				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.left()), MPolynomial(1)})));
+			if (b.second.lowerBoundType() != BoundType::INFTY) {
+				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.lower()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
-			if (b.second.rightType() != BoundType::INFTY) {
-				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.right()), MPolynomial(1)})));
+			if (b.second.upperBoundType() != BoundType::INFTY) {
+				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.upper()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -405,7 +405,7 @@ bool CAD<Number>::check(
 	LOGMSG_DEBUG("carl.cad", "Checking the system");
 	for (auto c: constraints) LOGMSG_DEBUG("carl.cad", "  " << c);
 	LOGMSG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
-	for (auto b: bounds) LOGMSG_DEBUG("carl.cad", "  " << b.second << " for " << this->variables[b.first]);
+	for (auto b: bounds) LOGMSG_DEBUG("carl.cad", "  " << b.second << " for variable " << b.first);
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << " (" << this->eliminationSets[i].size() << "): " << this->eliminationSets[i]);
 	}
@@ -427,27 +427,27 @@ bool CAD<Number>::check(
 	for (auto b: bounds) {
 		if (b.first >= this->variables.size()) continue;
 		
-		switch (b.second.leftType()) {
+		switch (b.second.lowerBoundType()) {
 			case BoundType::INFTY:
 				break;
 			case BoundType::STRICT:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.left()), MPolynomial(1)}), Sign::POSITIVE, this->variables);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.lower()), MPolynomial(1)}), Sign::POSITIVE, this->variables);
 				break;
 			case BoundType::WEAK:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.left()), MPolynomial(1)}), Sign::NEGATIVE, this->variables, true);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.lower()), MPolynomial(1)}), Sign::NEGATIVE, this->variables, true);
 				break;
 			default:
 				assert(false);
 		}
 		
-		switch (b.second.rightType()) {
+		switch (b.second.upperBoundType()) {
 			case BoundType::INFTY:
 				break;
 			case BoundType::STRICT:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.right()), MPolynomial(1)}), Sign::NEGATIVE, this->variables);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.upper()), MPolynomial(1)}), Sign::NEGATIVE, this->variables);
 				break;
 			case BoundType::WEAK:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.right()), MPolynomial(1)}), Sign::POSITIVE, this->variables, true);
+				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.upper()), MPolynomial(1)}), Sign::POSITIVE, this->variables, true);
 				break;
 			default:
 				assert(false);
@@ -465,10 +465,10 @@ bool CAD<Number>::check(
 	bool useBounds = false;
 	bool onlyStrictBounds = true;
 	for (auto b: bounds) {
-		if (!b.second.unbounded() && !b.second.empty()) {
+		if (!b.second.isUnbounded() && !b.second.isEmpty()) {
 			useBounds = true;
 		}
-		if (b.second.leftType() == BoundType::WEAK || b.second.rightType() == BoundType::WEAK) {
+		if (b.second.lowerBoundType() == BoundType::WEAK || b.second.upperBoundType() == BoundType::WEAK) {
 			onlyStrictBounds = false;
 		}
 	}
@@ -487,7 +487,7 @@ bool CAD<Number>::check(
 	if (constraints.empty()) {
 		// check bounds for empty interval
 		for (auto b: bounds) {
-			if (b.second.empty()) return false;
+			if (b.second.isEmpty()) return false;
 		}
 		// each bound non-empty
 		///@todo Maybe faster to generate a solution point directly here? In any case, we must fill r before returning true.
@@ -496,7 +496,7 @@ bool CAD<Number>::check(
 	
 	// try to solve the constraints by interval arithmetic
 	if (this->setting.preSolveByBounds) {
-		std::map<Variable, ExactInterval<Number>> m;
+		typename Interval<Number>::evalintervalmap m;
 		for (auto b: bounds) {
 			if (b.first >= this->variables.size()) continue;
 			m[this->variables[b.first]] = b.second;
@@ -569,16 +569,16 @@ bool CAD<Number>::check(
 			
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
-			if (b.second.leftType() != BoundType::INFTY) {
-				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.left())), MPolynomial(Term<Number>(1))});
+			if (b.second.lowerBoundType() != BoundType::INFTY) {
+				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.lower())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
 				assert(b.first < boundPolynomials.size());
 				boundPolynomials[b.first].first = tmp.back();
 			}
-			if (b.second.rightType() != BoundType::INFTY) {
-				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.right())), MPolynomial(Term<Number>(1))});
+			if (b.second.upperBoundType() != BoundType::INFTY) {
+				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.upper())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
@@ -807,8 +807,8 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 }
 
 template<typename Number>
-std::vector<ExactInterval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoint<Number>& r) const {
-	std::vector<ExactInterval<Number>> bounds(this->variables.size());
+std::vector<Interval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoint<Number>& r) const {
+	std::vector<Interval<Number>> bounds(this->variables.size());
 	// initially, parent is the root
 	auto parent = this->sampleTree.begin();
 	
@@ -817,7 +817,7 @@ std::vector<ExactInterval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoi
 		RealAlgebraicNumberPtr<Number> sample = r[index];
 		if (this->sampleTree.begin(parent) == this->sampleTree.end(parent)) {
 			// this tree level is empty
-			bounds[index] = ExactInterval<Number>::unboundedExactInterval();
+			bounds[index] = Interval<Number>::unboundedInterval();
 			continue;
 		}
 		// search for the left and right boundaries in the first variable eliminated
@@ -859,13 +859,13 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 		cad::SampleSet<Number>& currentSamples,
 		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-		const ExactInterval<Number>& bounds
+		const Interval<Number>& bounds
 ) {
 	cad::SampleSet<Number> newSampleSet;
 	replacedSamples.clear();
 	if (roots.empty()) return newSampleSet;
 	
-	bool boundsActive = !bounds.empty() && !bounds.unbounded();
+	bool boundsActive = !bounds.isEmpty() && !bounds.isUnbounded();
 	
 	for (auto i: roots) {
 		auto insertValue = currentSamples.insert(i);
@@ -923,20 +923,20 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if ((*insertValue.first)->isNumeric()) {
 				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create((*insertValue.first)->value() + 1, false));
 			} else {
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().right(), false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().upper(), false));
 			}
 		} else if ((*neighbor)->isRoot()) {
 			// sample between neighbor and insertValue.first needed and will be added to newSampleSet
 			if ((*insertValue.first)->isNumeric()) {
 				if ((*neighbor)->isNumeric()) {
 					assert((*insertValue.first)->value() < (*neighbor)->value());
-					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(ExactInterval<Number>((*insertValue.first)->value(), (*neighbor)->value(), BoundType::STRICT).sample(), false));
+					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(Interval<Number>((*insertValue.first)->value(), BoundType::STRICT, (*neighbor)->value(), BoundType::STRICT).sample(), false));
 				} else {
-					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().left(), false));
+					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().lower(), false));
 				}
 			} else {
 				// interval representation, take right bound of insertValue.first which must be strictly between insertValue.first and neighbor
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().right(), false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().upper(), false));
 			}
 		}
 		
@@ -948,7 +948,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if ((*insertValue.first)->isNumeric()) {
 				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create((*insertValue.first)->value() - 1, false));
 			} else {
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().left(), false));
+				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().lower(), false));
 			}
 		} else {
 			neighbor--;
@@ -957,13 +957,13 @@ cad::SampleSet<Number> CAD<Number>::samples(
 				// sample between neighbor and insertValue.first needed and will be added to newSampleSet
 				if ((*insertValue.first)->isNumeric()) {
 					if ((*neighbor)->isNumeric()) {
-						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(ExactInterval<Number>((*neighbor)->value(), (*insertValue.first)->value(), BoundType::STRICT).sample(), false));
+						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(Interval<Number>((*neighbor)->value(), BoundType::STRICT, (*insertValue.first)->value(), BoundType::STRICT).sample(), false));
 					} else {
-						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().right(), false));
+						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().upper(), false));
 					}
 				} else {
 					// interval representation, take left bound of insertValue.first which must be strictly between insertValue.first and neighbor
-					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().left(), false));
+					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().lower(), false));
 				}
 			}
 		}
@@ -988,7 +988,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		const std::list<Variable>& variables,
 		cad::SampleSet<Number>& currentSamples,
 		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-		const ExactInterval<Number>& bounds,
+		const Interval<Number>& bounds,
 		cad::CADSettings settings
 ) {
 	assert(variables.size() == sample.size());
@@ -1475,14 +1475,14 @@ bool CAD<Number>::liftCheck(
 	if (boundActive) {
 		// add the bounds as roots and appropriate intermediate samples and start the lifting with this initial list
 		std::list<RealAlgebraicNumberPtr<Number>> boundRoots;
-		if (bound->second.leftType() != BoundType::INFTY) {
-			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.left(), true));
+		if (bound->second.lowerBoundType() != BoundType::INFTY) {
+			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.lower(), true));
 		}
-		if (bound->second.rightType() != BoundType::INFTY) {
-			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.right(), true));
+		if (bound->second.upperBoundType() != BoundType::INFTY) {
+			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.upper(), true));
 		}
 		if (boundRoots.empty()) {
-			sampleSetIncrement.insert(this->samples({RealAlgebraicNumberNR<Number>::create(bound->second.midpoint(), true)}, currentSamples, replacedSamples));
+			sampleSetIncrement.insert(this->samples({RealAlgebraicNumberNR<Number>::create(bound->second.center(), true)}, currentSamples, replacedSamples));
 		} else {
 			sampleSetIncrement.insert(this->samples(boundRoots, currentSamples, replacedSamples));
 		}
@@ -1515,7 +1515,7 @@ bool CAD<Number>::liftCheck(
 				// found bounds for the current lifting variable => remove all samples outside these bounds
 				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, bound->second, this->setting));
 			} else {
-				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, ExactInterval<Number>::unboundedExactInterval(), this->setting));
+				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, Interval<Number>::unboundedInterval(), this->setting));
 			}
 			
 			// replace all samples in the tree which were changed in the current samples list
@@ -1717,10 +1717,10 @@ int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsAc
 }
 
 template<typename Number>
-ExactInterval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const {
+Interval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const {
 	if (this->sampleTree.begin(parent) == this->sampleTree.end(parent)) {
 		// this tree level is empty
-		return ExactInterval<Number>::unboundedExactInterval();
+		return Interval<Number>::unboundedExactInterval();
 	}
 	// search for the left and right boundaries in the first variable eliminated
 	auto node = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), sample, Less<Number>());
@@ -1731,22 +1731,22 @@ ExactInterval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleI
 		// well-defined since level non-empty
 		neighbor--;
 		if ((*neighbor)->isNumeric()) {
-			return ExactInterval<Number>((*neighbor)->value(), BoundType::STRICT, (*neighbor)->value()+1, BoundType::INFTY);
+			return Interval<Number>((*neighbor)->value(), BoundType::STRICT, (*neighbor)->value()+1, BoundType::INFTY);
 		} else {
 			RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*neighbor);
-			return ExactInterval<Number>(nIR->right(), BoundType::WEAK, nIR->right()+1, BoundType::INFTY);
+			return Interval<Number>(nIR->upper(), BoundType::WEAK, nIR->upper()+1, BoundType::INFTY);
 		}
 	} else if (node == this->sampleTree.begin(parent)) {
 		// node is the left-most (intermediate) sample
 		// well-defined since level non-empty
 		neighbor++;
 		if (neighbor == this->sampleTree.end(parent)) {
-			return ExactInterval<Number>::unboundedExactInterval();
+			return Interval<Number>::unboundedExactInterval();
 		} else if ((*neighbor)->isNumeric()) {
-			return ExactInterval<Number>((*neighbor)->value()-1, BoundType::INFTY, (*neighbor)->value(), BoundType::STRICT);
+			return Interval<Number>((*neighbor)->value()-1, BoundType::INFTY, (*neighbor)->value(), BoundType::STRICT);
 		} else {
 			RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*neighbor);
-			return ExactInterval<Number>(nIR->left()-1, BoundType::INFTY, nIR->left(), BoundType::WEAK);
+			return Interval<Number>(nIR->lower()-1, BoundType::INFTY, nIR->lower(), BoundType::WEAK);
 		}
 	} else {
 		// node has left neighbor
@@ -1757,25 +1757,25 @@ ExactInterval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleI
 		
 		if (neighbor == this->sampleTree.end(parent)) {
 			if ((*leftNeighbor)->isNumeric()) {
-				return ExactInterval<Number>((*leftNeighbor)->value(), BoundType::STRICT, (*leftNeighbor)->value()+1, BoundType::INFTY);
+				return Interval<Number>((*leftNeighbor)->value(), BoundType::STRICT, (*leftNeighbor)->value()+1, BoundType::INFTY);
 			} else {
 				RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*leftNeighbor);
-				return ExactInterval<Number>(nIR->right(), BoundType::WEAK, nIR->right()+1, BoundType::INFTY);
+				return Interval<Number>(nIR->upper(), BoundType::WEAK, nIR->upper()+1, BoundType::INFTY);
 			}
 		} else if ((*neighbor)->isNumeric()) {
 			if ((*leftNeighbor)->isNumeric()) {
-				return ExactInterval<Number>((*leftNeighbor)->value(), BoundType::STRICT, (*neighbor)->value()+1, BoundType::STRICT);
+				return Interval<Number>((*leftNeighbor)->value(), BoundType::STRICT, (*neighbor)->value()+1, BoundType::STRICT);
 			} else {
 				RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*leftNeighbor);
-				return ExactInterval<Number>(nIR->right(), BoundType::WEAK, (*neighbor)->value(), BoundType::STRICT);
+				return Interval<Number>(nIR->upper(), BoundType::WEAK, (*neighbor)->value(), BoundType::STRICT);
 			}
 		} else {
 			RealAlgebraicNumberIRPtr<Number> nIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*neighbor);
 			if ((*leftNeighbor)->isNumeric()) {
-				return ExactInterval<Number>((*leftNeighbor)->value(), BoundType::STRICT, nIR->left(), BoundType::WEAK);
+				return Interval<Number>((*leftNeighbor)->value(), BoundType::STRICT, nIR->lower(), BoundType::WEAK);
 			} else {
 				RealAlgebraicNumberIRPtr<Number> nlIR = static_cast<RealAlgebraicNumberIRPtr<Number>>(*leftNeighbor);
-				return ExactInterval<Number>(nlIR->right(), BoundType::WEAK, (*neighbor)->value(), BoundType::STRICT);
+				return Interval<Number>(nlIR->upper(), BoundType::WEAK, (*neighbor)->value(), BoundType::STRICT);
 			}
 		}
 	}
@@ -1797,26 +1797,26 @@ void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number
 			// found bounds for this level
 			if (r[level]->isNumeric()) {
 				// give point interval representing the exact numeric value of this component
-				bound->second.setLeftType(BoundType::WEAK);
-				bound->second.setLeft( r[level]->value() );
-				bound->second.setRightType(BoundType::WEAK);
-				bound->second.setRight( r[level]->value() );
+				bound->second.setLowerBoundType(BoundType::WEAK);
+				bound->second.setLower( r[level]->value() );
+				bound->second.setUpperBoundType(BoundType::WEAK);
+				bound->second.setUpper( r[level]->value() );
 			} else {
 				// find a narrow interval within the bounds but with preferably small number representations
 				RealAlgebraicNumberIRPtr<Number> rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(r[level]);
 				assert( rIR != 0 ); // non-numerical representations are by now only interval representations
-				if (rIR->refineAvoiding(bound->second.left()) || rIR->refineAvoiding(bound->second.right())) {
+				if (rIR->refineAvoiding(bound->second.lower()) || rIR->refineAvoiding(bound->second.upper())) {
 					// found exact numeric representation anyway
-					bound->second.setLeftType(BoundType::WEAK);
-					bound->second.setLeft(r[level]->value());
-					bound->second.setRightType(BoundType::WEAK);
-					bound->second.setRight(r[level]->value());
+					bound->second.setLowerBoundType(BoundType::WEAK);
+					bound->second.setLower(r[level]->value());
+					bound->second.setUpperBoundType(BoundType::WEAK);
+					bound->second.setUpper(r[level]->value());
 				} else {
 					// translate given open interval into the bounds
-					bound->second.setLeftType(BoundType::STRICT);
-					bound->second.setLeft(rIR->left());
-					bound->second.setRightType(BoundType::STRICT);
-					bound->second.setRight(rIR->right());
+					bound->second.setLowerBoundType(BoundType::STRICT);
+					bound->second.setLower(rIR->lower());
+					bound->second.setUpperBoundType(BoundType::STRICT);
+					bound->second.setUpper(rIR->upper());
 				}
 			}
 		}

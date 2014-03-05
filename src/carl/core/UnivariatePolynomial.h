@@ -14,10 +14,12 @@
 #include "Variable.h"
 #include "VariableInformation.h"
 #include "Polynomial.h"
+#include "Sign.h"
 #include "DivisionResult.h"
+#include "MultivariatePolynomial.h"
 #include "../numbers/numbers.h"
 #include "../numbers/GFNumber.h"
-#include "../interval/ExactInterval.h"
+#include "../interval/Interval.h"
 
 #include "logging.h"
 #include "../util/SFINAE.h"
@@ -32,9 +34,6 @@ template<typename Coefficient> class UnivariatePolynomial;
 	
 template<typename Coefficient>
 using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
-
-template<typename C, typename O, typename P>
-class MultivariatePolynomial;
 
 enum class PolynomialComparisonOrder : unsigned {
 	CauchyBound, LowDegree, Memory, Default = Memory
@@ -657,14 +656,14 @@ public:
 	 * @param interval Count roots within this interval.
 	 * @return Upper bound for number of real roots within the interval.
 	 */
-	unsigned int signVariations(const ExactInterval<Coefficient>& interval) const;
+	unsigned int signVariations(const Interval<Coefficient>& interval) const;
 
 	/**
 	 * Count the number of real roots within the given interval using Sturm sequences.
 	 * @param interval Count roots within this interval.
 	 * @return Number of real roots within the interval.
 	 */
-	int countRealRoots(const ExactInterval<Coefficient>& interval) const;
+	int countRealRoots(const Interval<Coefficient>& interval) const;
 
 	/**
 	 * Calculated the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
@@ -673,9 +672,17 @@ public:
 	 * @return
 	 */
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
-	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const ExactInterval<Number>& interval);
+	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
 
 
+	/**
+	 * Implements subresultants algorithm with optimizations described in
+	 * http://dx.doi.org/10.1016/S0022-4049(98)00081-4
+	 * @param p
+	 * @param q
+	 * @param strategy
+	 * @return 
+	 */
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,
 			const UnivariatePolynomial& q,

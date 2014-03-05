@@ -144,7 +144,7 @@ public:
 		return *this;
 	}
 
-	virtual bool containedIn(const ExactInterval<Number>& i) const {
+	virtual bool containedIn(const Interval<Number>& i) const {
 		return i.contains(this->value());
 	}
 

@@ -12,7 +12,7 @@
 #include "../RealAlgebraicNumber.h"
 #include "../RealAlgebraicNumberEvaluation.h"
 #include "../UnivariatePolynomial.h"
-#include "../../interval/ExactInterval.h"
+#include "../../interval/Interval.h"
 #include "../Sign.h"
 #include "IncrementalRootFinder.h"
 
@@ -33,7 +33,7 @@ namespace rootfinder {
 template<typename Coeff, typename Number, typename Finder = IncrementalRootFinder<Number>, EnableIf<std::is_same<Coeff, Number>> = dummy>
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
 	return Finder(polynomial, interval, pivoting).getAllRoots();
@@ -50,7 +50,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 template<typename Coeff, typename Number, DisableIf<std::is_same<Coeff, Number>> = dummy>
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
 	assert(polynomial.isUnivariate());
@@ -69,7 +69,7 @@ template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>:
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval()
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval()
 ) {
 	return realRoots(polynomial, interval, pivoting);
 }
@@ -97,7 +97,7 @@ template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>:
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberPtr<Number>>& m,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 );
 
@@ -106,7 +106,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable> variables,
 		const std::list<RealAlgebraicNumberPtr<Number>> values,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 );
 
@@ -114,7 +114,7 @@ template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>:
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 );
 
@@ -133,7 +133,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 template<typename Coeff, typename Number= typename UnderlyingNumberType<Coeff>::type>
 unsigned long countRealRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
-		const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
 	return realRoots(polynomial, interval, pivoting).size();

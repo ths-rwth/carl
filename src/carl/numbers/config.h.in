@@ -3,4 +3,4 @@
  */ 
 #pragma once
 
-/* #undef USE_MPFR_FLOAT */
+#cmakedefine USE_MPFR_FLOAT

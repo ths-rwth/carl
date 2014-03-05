@@ -5,7 +5,8 @@
  * Created on August 30, 2013, 4:55 PM
  */
 
-#include "DoubleInterval.h"
+#include "Interval.h"
+#include "../core/Sign.h"
 
 
 #pragma once
@@ -25,7 +26,7 @@ namespace carl {
 
         }
 
-        bool operator()(const DoubleInterval::evaldoubleintervalmap& intervals, Variable::Arg variable, DoubleInterval& resA, DoubleInterval& resB) {
+        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB) {
             typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
             if( it == mDerivatives.end() )
             {
@@ -39,32 +40,32 @@ namespace carl {
     class SimpleNewton {
     public:
         
-        bool contract(const DoubleInterval::evaldoubleintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, DoubleInterval& resA, DoubleInterval& resB) {
-            double center = intervals.at(variable).midpoint();
-            DoubleInterval centerInterval = DoubleInterval(center);
+        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB) {
+            double center = intervals.at(variable).center();
+            Interval<double> centerInterval = Interval<double>(center);
 
             // Create map for replacement of variables by intervals and replacement of center by point interval
-            typename DoubleInterval::evaldoubleintervalmap substitutedIntervalMap = intervals;
+            typename Interval<double>::evalintervalmap substitutedIntervalMap = intervals;
             substitutedIntervalMap[variable] = centerInterval;
 
             // Create Newton Operator
-            DoubleInterval numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
-            DoubleInterval denominator = IntervalEvaluation::evaluate(derivative, intervals);
-            DoubleInterval result1, result2;
+            Interval<double> numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
+            Interval<double> denominator = IntervalEvaluation::evaluate(derivative, intervals);
+            Interval<double> result1, result2;
 
             bool split = numerator.div_ext(result1, result2, denominator);
             if (split) {
                 result1 = result1.inverse();
                 result2 = result2.inverse();
 
-                if(result1.isLessOrEqual(result2)) {
-					resA = centerInterval.add(result1);
-					resB = centerInterval.add(result2);
-				}
-				else
-				{
-					resA = centerInterval.add(result2);
-					resB = centerInterval.add(result1);
+                if(result1 <= result2) {
+                        resA = centerInterval.add(result1);
+                        resB = centerInterval.add(result2);
+                }
+                else
+                {
+                        resA = centerInterval.add(result2);
+                        resB = centerInterval.add(result1);
                 }
                 return true;
             } else {

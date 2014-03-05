@@ -99,7 +99,7 @@ if(OBTAIN_BOOST)
 	message("-- Get actual version of Boost and install it in resources")
 	set( Boost_Bootstrap_Command )
 	if( UNIX )
-		set( Boost_Bootstrap_Command ./bootstrap.sh --with-libraries=chrono )
+		set( Boost_Bootstrap_Command ./bootstrap.sh )
 		set( Boost_b2_Command ./b2 )
 	else()
 		if( WIN32 )
@@ -110,14 +110,14 @@ if(OBTAIN_BOOST)
 
 	ExternalProject_Add(
 	boost
-	GIT_SUBMODULES libs/numeric/interval
+	GIT_SUBMODULES tools/build tools/inspect libs/numeric/interval
 	GIT_REPOSITORY https://github.com/boostorg/boost.git
 	INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/boost
 	BUILD_IN_SOURCE 1
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
-	CONFIGURE_COMMAND "./bootstrap.sh --with-libraries=interval"
-	BUILD_COMMAND  ${Boost_b2_Command} 
+	CONFIGURE_COMMAND ${Boost_Bootstrap_Command}
+	BUILD_COMMAND  ${Boost_b2_Command}
 	--without-python
     --without-mpi
     --disable-icu
@@ -130,13 +130,13 @@ if(OBTAIN_BOOST)
 )
 
 
-if( NOT WIN32 )
-  set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/resources/boost/lib/boost/ )
-  set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/resources/boost/include/ )
-else()
-  set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/resources/boost/lib/ )
-  set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/resources/boost/include/ )
-endif()
+  if( NOT WIN32 )
+    set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/build/resources/src/boost/stage/lib )
+    set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/build/resources/src/boost/ )
+  else()
+    set(Boost_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/resources/boost/lib/ )
+    set(Boost_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/resources/boost/include/ )
+  endif()
 
-#add_dependencies(resources boost)
+  add_dependencies(resources boost)
 endif()

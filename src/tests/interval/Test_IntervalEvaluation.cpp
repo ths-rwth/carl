@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "carl/interval/DoubleInterval.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include <cln/cln.h>
@@ -9,12 +9,12 @@ using namespace carl;
 
 TEST(IntervalEvaluation, Monomial)
 {
-    DoubleInterval ia = DoubleInterval( 1, 4 );
-    DoubleInterval ib = DoubleInterval( 2, 5 );
-    DoubleInterval ic = DoubleInterval( -2, 3 );
-    DoubleInterval id = DoubleInterval( 0, 2 );
+    Interval<cln::cl_RA> ia( 1, 4 );
+    Interval<cln::cl_RA> ib( 2, 5 );
+    Interval<cln::cl_RA> ic( -2, 3 );
+    Interval<cln::cl_RA> id( 0, 2 );
 
-    DoubleInterval::evaldoubleintervalmap map;
+    std::map<Variable, Interval<cln::cl_RA>> map;
     VariablePool& vpool = VariablePool::getInstance();
     Variable a = vpool.getFreshVariable();
     vpool.setName(a, "a");
@@ -42,26 +42,26 @@ TEST(IntervalEvaluation, Monomial)
     
 //    e7     = a + b * pow( c + a, 2 ) * d;
     
-    DoubleInterval result = IntervalEvaluation::evaluate( e1, map );
-    EXPECT_EQ( DoubleInterval( 1, 14 ), result );
+    Interval<cln::cl_RA> result = IntervalEvaluation::evaluate( e1, map );
+    EXPECT_EQ( Interval<cln::cl_RA>( 1, 14 ), result );
 
     result = IntervalEvaluation::evaluate( e2, map );
-    EXPECT_EQ( DoubleInterval( -2, 26 ), result );
+    EXPECT_EQ( Interval<cln::cl_RA>( -2, 26 ), result );
 
     result = IntervalEvaluation::evaluate( e3, map );
-    EXPECT_EQ( DoubleInterval( -40, 62 ), result );
+    EXPECT_EQ( Interval<cln::cl_RA>( -40, 62 ), result );
 
     result = IntervalEvaluation::evaluate( e4, map );
-    EXPECT_EQ( DoubleInterval( -2, 11 ), result );
+    EXPECT_EQ( Interval<cln::cl_RA>( -2, 11 ), result );
 
     result = IntervalEvaluation::evaluate( e5, map );
-    EXPECT_EQ( DoubleInterval( 10, 16 ), result );
+    EXPECT_EQ( Interval<cln::cl_RA>( 10, 16 ), result );
 
     result = IntervalEvaluation::evaluate( e6, map );
-    EXPECT_EQ( DoubleInterval( 10,72 ), result );
+    EXPECT_EQ( Interval<cln::cl_RA>( 10,72 ), result );
 
     result = IntervalEvaluation::evaluate( e7, map );
-    EXPECT_EQ( DoubleInterval( -159, 494 ), result );
+    EXPECT_EQ( Interval<cln::cl_RA>( -159, 494 ), result );
 }
 
 

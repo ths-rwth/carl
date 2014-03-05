@@ -10,7 +10,7 @@
 #pragma once
 
 #include "DoubleInterval.h"
-#include "ExactInterval.h"
+#include "Interval.h"
 
 #include "../core/Monomial.h"
 #include "../core/Term.h"
@@ -21,31 +21,31 @@ namespace carl
 class IntervalEvaluation
 {
 public:
-    static DoubleInterval evaluate(const Monomial& m, const std::map<Variable, DoubleInterval>&);
-	template<typename Coeff>
-	static DoubleInterval evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>&);
-	template<typename Coeff, typename Policy>
-	static DoubleInterval evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>&);
-        
 	template<typename Numeric>
-	static ExactInterval<Numeric> evaluate(const Monomial& m, const std::map<Variable, ExactInterval<Numeric> >&);
-	template<typename Numeric>
-	static ExactInterval<Numeric> evaluate(const Term<Numeric>& t, const std::map<Variable, ExactInterval<Numeric> >&);
-	template<typename Numeric, typename Policy>
-	static ExactInterval<Numeric> evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, ExactInterval<Numeric> >&);
+	static Interval<Numeric> evaluate(const Monomial& m, const std::map<Variable, Interval<Numeric>>&);
+
+	template<typename Coeff, typename Numeric, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
+	static Interval<Numeric> evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>&);
+	template<typename Coeff, typename Numeric, DisableIf<std::is_same<Numeric, Coeff>> = dummy>
+	static Interval<Numeric> evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>&);
+
+	template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
+	static Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>&);
 
 	template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
-	static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map);
+	static Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map);
 	template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>> = dummy>
-	static ExactInterval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map);
+	static Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map);
     
 private:
 
 };
 
-inline DoubleInterval IntervalEvaluation::evaluate(const Monomial& m, const std::map<Variable, DoubleInterval>& map)
+
+template<typename Numeric>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const std::map<Variable, Interval<Numeric>>& map)
 {
-	DoubleInterval result(1);
+	Interval<Numeric> result(1);
 	// TODO use iterator.
 	for(unsigned i = 0; i < m.nrVariables(); ++i)
 	{
@@ -56,60 +56,10 @@ inline DoubleInterval IntervalEvaluation::evaluate(const Monomial& m, const std:
 	return result;
 }
 
-template<typename Coeff>
-inline DoubleInterval IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, DoubleInterval>& map)
+template<typename Coeff, typename Numeric, EnableIf<std::is_same<Numeric, Coeff>>>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
 {
-	DoubleInterval result(t.coeff());
-	if(t.monomial())
-	{
-		const Monomial& m = *t.monomial();
-		// TODO use iterator.
-		for(unsigned i = 0; i < m.nrVariables(); ++i)
-		{
-			// We expect every variable to be in the map.
-			assert(map.count(m[i].var) > 0);
-			result *= map.at(m[i].var).power(m[i].exp);
-		}
-	}
-	return result;
-}
-
-template<typename Coeff, typename Policy>
-inline DoubleInterval IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy>& p, const std::map<Variable, DoubleInterval>& map)
-{
-    if(p.isZero())
-    {
-        return DoubleInterval(0);
-    }
-    else
-    {
-		DoubleInterval result(evaluate(*p[0], map)); 
-		for(unsigned i = 1; i < p.nrTerms(); ++i)
-		{
-			result += evaluate(*p[i], map);
-		}
-        return result;
-    }
-}
-
-template<typename Numeric>
-inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const std::map<Variable, ExactInterval<Numeric> >& map)
-{
-	ExactInterval<Numeric> result(1);
-	// TODO use iterator.
-	for(unsigned i = 0; i < m.nrVariables(); ++i)
-	{
-		// We expect every variable to be in the map.
-		LOG_ASSERT(map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
-		result *= map.at(m[i].var).power(m[i].exp);
-	}
-	return result;
-}
-
-template<typename Numeric>
-inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Term<Numeric>& t, const std::map<Variable, ExactInterval<Numeric> >& map)
-{
-	ExactInterval<Numeric> result(t.coeff());
+	Interval<Numeric> result(t.coeff());
 	if (t.monomial()) {
 		const Monomial& m = *t.monomial();
 		// TODO use iterator.
@@ -122,13 +72,29 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const Term<Numeric>& 
 	return result;
 }
 
-template<typename Numeric, typename Policy>
-inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, ExactInterval<Numeric> >& map)
+template<typename Coeff, typename Numeric, DisableIf<std::is_same<Numeric, Coeff>>>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
+{
+	Interval<Numeric> result(carl::toDouble(t.coeff()));
+	if (t.monomial()) {
+		const Monomial& m = *t.monomial();
+		// TODO use iterator.
+		for (unsigned i = 0; i < m.nrVariables(); ++i) {
+			// We expect every variable to be in the map.
+			assert(map.count(m[i].var) > 0);
+			result *= map.at(m[i].var).power(m[i].exp);
+		}
+	}
+	return result;
+}
+
+template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>& map)
 {
 	if(p.isZero()) {
-		return ExactInterval<Numeric>(0);
+		return Interval<Numeric>(0);
 	} else {
-		ExactInterval<Numeric> result(evaluate(*p[0], map)); 
+		Interval<Numeric> result(evaluate(*p[0], map)); 
 		for (unsigned i = 1; i < p.nrTerms(); ++i) {
 			result += evaluate(*p[i], map);
 		}
@@ -137,11 +103,11 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const MultivariatePol
 }
 
 template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>>>
-inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map) {
+inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	assert(map.count(p.mainVar()) > 0);
-	ExactInterval<Numeric> res = ExactInterval<Numeric>::emptyExactInterval();
-	const ExactInterval<Numeric> varValue = map.at(p.mainVar());
-	ExactInterval<Numeric> exp(1);
+	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
+	const Interval<Numeric> varValue = map.at(p.mainVar());
+	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
 		res += p.coefficients()[i] * exp;
 		exp *= varValue;
@@ -150,11 +116,11 @@ inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolyn
 }
 
 template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>>>
-inline ExactInterval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, ExactInterval<Numeric>>& map) {
+inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
 	assert(map.count(p.mainVar()) > 0);
-	ExactInterval<Numeric> res = ExactInterval<Numeric>::emptyExactInterval();
-	const ExactInterval<Numeric> varValue = map.at(p.mainVar());
-	ExactInterval<Numeric> exp(1);
+	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
+	const Interval<Numeric> varValue = map.at(p.mainVar());
+	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i <= p.degree(); i++) {
 		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
 		exp *= varValue;

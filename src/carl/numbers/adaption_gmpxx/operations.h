@@ -8,7 +8,11 @@
  */
 
 #pragma once
+#include "../../util/platform.h"
+CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <gmpxx.h>
+CLANG_WARNING_RESET
+#include <limits.h>
 
 namespace carl {
 
@@ -173,6 +177,21 @@ inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_clas
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
 }
 
+inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
+{
+	mpq_t res;
+	mpq_init(res);
+	mpq_mul(res, lhs.get_mpq_t(), rhs.get_mpq_t());
+	return mpq_class(res);
+}
+
+inline mpq_class operator /(const mpq_class& lhs, const mpq_class& rhs)
+{
+	mpq_t res;
+	mpq_init(res);
+	mpq_div(res, lhs.get_mpq_t(), rhs.get_mpq_t());
+	return mpq_class(res);
+}
 
 }
 
