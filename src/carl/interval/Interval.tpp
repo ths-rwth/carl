@@ -562,7 +562,7 @@ Interval<Number> Interval<Number>::power(unsigned exp) const
             {
                 BoundType rType = mUpperBoundType;
                 BoundType lType = mLowerBoundType;
-                if( abs( mContent.lower() ) > abs( mContent.upper() ) )
+                if( carl::abs( mContent.lower() ) > carl::abs( mContent.upper() ) )
                 {
                     rType = mLowerBoundType;
                     lType = mUpperBoundType;
@@ -1109,7 +1109,7 @@ inline const Interval<Number> operator +(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(BoostInterval(lhs + rhs.content().lower(), lhs + rhs.content().upper()), rhs.lowerBoundType(), rhs.upperBoundType());
+		return Interval<Number>( lhs + rhs.content().lower(), rhs.lowerBoundType(), lhs + rhs.content().upper(), rhs.upperBoundType());
 	}
 
 template<typename Number>
@@ -1145,7 +1145,7 @@ inline const Interval<Number> operator *(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>( BoostInterval(lhs * rhs.content().lower(), lhs * rhs.content().upper()), rhs.lowerBoundType(), rhs.upperBoundType());
+		return Interval<Number>(lhs * rhs.content().lower(), rhs.lowerBoundType(), lhs * rhs.content().upper(), rhs.upperBoundType());
 	}
 
 template<typename Number>
