@@ -1118,7 +1118,7 @@ inline const Interval<Number> operator -(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(lhs).sub_assign(rhs);
+		return Interval<Number>(lhs).sub(rhs);
 	}
 
 template<typename Number>
