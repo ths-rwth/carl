@@ -658,6 +658,13 @@ namespace carl
 		void center_assign();
 		
 		/**
+		 * Searches for some point in this interval, preferably near the midpoint and with a small representation.
+		 * @return some point within this interval
+		 */
+		Number sample() const;
+		void sample_assign();
+
+		/**
 		 * Checks if the interval contains the given value.
 		 * @param value
 		 * @return

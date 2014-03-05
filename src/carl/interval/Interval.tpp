@@ -80,7 +80,25 @@ template<typename Number>
 	{
 		this->set(BoostInterval(this->center()));
 	}
-	
+
+template<typename Number>
+	Number Interval<Number>::sample() const
+	{
+		Number mid = this->center();
+		// TODO: check if mid is an integer already.
+		Number midf = carl::floor(mid);
+		if (this->contains(midf)) return midf;
+		Number midc = carl::ceil(mid);
+		if (this->contains(midc)) return midc;
+		return mid;
+	}
+
+template<typename Number>
+	void Interval<Number>::sample_assign()
+	{
+		this->set(BoostInterval(this->sample()));
+	}
+
 	template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
