@@ -23,10 +23,14 @@ class IntervalEvaluation
 public:
 	template<typename Numeric>
 	static Interval<Numeric> evaluate(const Monomial& m, const std::map<Variable, Interval<Numeric>>&);
-	template<typename Numeric>
-	static Interval<Numeric> evaluate(const Term<Numeric>& t, const std::map<Variable, Interval<Numeric>>&);
-	template<typename Numeric, typename Policy>
-	static Interval<Numeric> evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, Interval<Numeric>>&);
+
+	template<typename Coeff, typename Numeric, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
+	static Interval<Numeric> evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>&);
+	template<typename Coeff, typename Numeric, DisableIf<std::is_same<Numeric, Coeff>> = dummy>
+	static Interval<Numeric> evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>&);
+
+	template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
+	static Interval<Numeric> evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>&);
 
 	template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>> = dummy>
 	static Interval<Numeric> evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map);
@@ -52,8 +56,8 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 	return result;
 }
 
-template<typename Numeric>
-inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Numeric>& t, const std::map<Variable, Interval<Numeric>>& map)
+template<typename Coeff, typename Numeric, EnableIf<std::is_same<Numeric, Coeff>>>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
 {
 	Interval<Numeric> result(t.coeff());
 	if (t.monomial()) {
@@ -68,8 +72,24 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Numeric>& t, co
 	return result;
 }
 
-template<typename Numeric, typename Policy>
-inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Numeric, Policy>& p, const std::map<Variable, Interval<Numeric>>& map)
+template<typename Coeff, typename Numeric, DisableIf<std::is_same<Numeric, Coeff>>>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
+{
+	Interval<Numeric> result(carl::toDouble(t.coeff()));
+	if (t.monomial()) {
+		const Monomial& m = *t.monomial();
+		// TODO use iterator.
+		for (unsigned i = 0; i < m.nrVariables(); ++i) {
+			// We expect every variable to be in the map.
+			assert(map.count(m[i].var) > 0);
+			result *= map.at(m[i].var).power(m[i].exp);
+		}
+	}
+	return result;
+}
+
+template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
+inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>& map)
 {
 	if(p.isZero()) {
 		return Interval<Numeric>(0);
