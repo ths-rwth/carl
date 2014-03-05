@@ -9,6 +9,7 @@
  */
 #pragma once
 #include "Interval.h"
+#include "../numbers/operations.h"
 
 namespace carl
 {
