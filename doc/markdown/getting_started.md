@@ -56,11 +56,11 @@ Supported platforms
 We have tested carl successfully on the following platforms:
 
 - @if Sebastian @endif  Arch Linux (Kernel 3.10) with GCC 4.8.2
--                       Arch Linux (Kernel 3.10) with Clang 3.3
 - @if Gereon @endif     Arch Linux (Kernel 3.12) with Clang 3.4 and GCC 4.8.2
 - @if Florian @endif    Ubuntu 12.04 LTS with GCC 4.8.1
 -                       Ubuntu 13.10 with GCC 4.8.1
 - @if Florian @endif    MacOSX 10.9 with Clang 3.3
+- @if Stefan @endif	MacOSX 10.9.1 with Clang 3.3
 
 
 Troubleshooting

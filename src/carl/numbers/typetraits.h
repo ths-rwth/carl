@@ -10,7 +10,13 @@
 
 #pragma once
 
+#include "../util/platform.h"
 #include <type_traits>
+#include <mpfr.h>
+CLANG_WARNING_DISABLE("-Wsign-conversion")
+#include <gmpxx.h>
+CLANG_WARNING_RESET
+
 #include "../util/SFINAE.h"
 
 namespace carl {
@@ -192,6 +198,46 @@ struct is_number
 };
 
 /**
+ * Type trait is float
+ * Default is false. Should be set to true for all floating point numbers to enable floating point arithmetic, e.g. in the interval class.
+ */
+
+template<typename type>
+struct is_float
+{
+    static const bool value = false;
+};
+
+template<>
+struct is_float<mpfr_t>
+{
+    static const bool value = true;
+};
+
+template<>
+struct is_float<double>
+{
+    static const bool value = true;
+};
+
+template<>
+struct is_float<float>
+{
+    static const bool value = true;
+};
+
+/**
+ * Type trait is_primitive required for BoostIntervals to use the preimlpemented default rounding and checking policies.
+ */
+	
+template<typename type>
+struct is_primitive
+{
+	static const bool value = false;
+};
+	
+	
+/**
  * @ingroup typetraits
  * @see GFNumber
  */
@@ -201,8 +247,35 @@ struct is_number<GFNumber<C>>
 	static constexpr bool value = true;
 };
 
+template<>
+struct is_primitive<double>
+{
+	static const bool value = true;
+};
 
+	template<>
+struct is_primitive<long double>
+{
+	static const bool value = true;
+};
+	
+template<>
+struct is_primitive<int>
+{
+	static const bool value = true;
+};
 
+template<>
+struct is_primitive<float>
+{
+	static const bool value = true;
+};
+
+template<>
+struct is_primitive<unsigned>
+{
+	static const bool value = true;
+};
 /**
  * Gives the corresponding integral type.
  * Default is int.
