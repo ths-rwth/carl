@@ -69,7 +69,7 @@ public:
 				if (rhs->isNumeric()) {
 					return lhs->value() < rhs->value();
 				} else {
-					return lhs->value() <= std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->left();
+					return lhs->value() <= std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->lower();
 				}
 			}
 		} else {
@@ -79,7 +79,7 @@ public:
 				if (lhs->isNumeric()) {
 					return lhs->value() < rhs->value();
 				} else {
-					return lhsIR->right() <= rhs->value();
+					return lhsIR->upper() <= rhs->value();
 				}
 			} else {
 				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
