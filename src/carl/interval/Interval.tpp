@@ -80,7 +80,25 @@ template<typename Number>
 	{
 		this->set(BoostInterval(this->center()));
 	}
-	
+
+template<typename Number>
+	Number Interval<Number>::sample() const
+	{
+		Number mid = this->center();
+		// TODO: check if mid is an integer already.
+		Number midf = carl::floor(mid);
+		if (this->contains(midf)) return midf;
+		Number midc = carl::ceil(mid);
+		if (this->contains(midc)) return midc;
+		return mid;
+	}
+
+template<typename Number>
+	void Interval<Number>::sample_assign()
+	{
+		this->set(BoostInterval(this->sample()));
+	}
+
 	template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
@@ -164,6 +182,12 @@ template<typename Number>
                 return false; // not less and not equal
 	}
 	
+	template<typename Number>
+	bool Interval<Number>::meets(const Number& n) const
+	{
+		return (mContent.lower() <= n || mLowerBoundType == BoundType::INFTY) && (mContent.upper() >= n || mUpperBoundType == BoundType::INFTY);
+	}
+
 	template<typename Number>
 	bool Interval<Number>::isSubset(const Interval<Number>& rhs) const
 	{
@@ -1107,7 +1131,7 @@ inline const Interval<Number> operator -(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(lhs).sub_assign(rhs);
+		return Interval<Number>(lhs).sub(rhs);
 	}
 
 template<typename Number>

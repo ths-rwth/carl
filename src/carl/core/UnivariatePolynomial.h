@@ -676,6 +676,14 @@ public:
 	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const ExactInterval<Number>& interval);
 
 
+	/**
+	 * Implements subresultants algorithm with optimizations described in
+	 * http://dx.doi.org/10.1016/S0022-4049(98)00081-4
+	 * @param p
+	 * @param q
+	 * @param strategy
+	 * @return 
+	 */
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,
 			const UnivariatePolynomial& q,

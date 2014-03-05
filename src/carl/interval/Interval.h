@@ -103,7 +103,7 @@ namespace carl
 			mUpperBoundType(BoundType::STRICT)
 		{}
 		
-		Interval(const Number& n) :
+		explicit Interval(const Number& n) :
 			mContent(n),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
@@ -200,7 +200,7 @@ namespace carl
 		{}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, double>> = dummy, DisableIf<is_rational<N>> = dummy >
-		Interval(const double& n):
+		explicit Interval(const double& n):
 			mContent(carl::Interval<Number>::BoostInterval(n,n)),
 			mLowerBoundType(BoundType::WEAK),
 			mUpperBoundType(BoundType::WEAK)
@@ -258,7 +258,7 @@ namespace carl
 		}
 		
 		template<typename N = Number, DisableIf<std::is_same<N, int>> = dummy >
-		Interval(const int& n):
+		explicit Interval(const int& n):
 		mContent(carl::Interval<Number>::BoostInterval(n, n)),
 		mLowerBoundType(BoundType::WEAK),
 		mUpperBoundType(BoundType::WEAK)
@@ -617,11 +617,16 @@ namespace carl
 		{
 			return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
 		}
-		
-                inline bool isPointInterval() const
-                {
-                    return (mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK );
-                }
+
+		inline bool isPointInterval() const
+		{
+			return (mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK );
+		}
+
+		inline bool isZero() const
+		{
+			return this->isPointInterval() && (mContent.lower() == 0);
+		}
                 
 		/**
 		 * Returns the diameter of the interval.
@@ -653,6 +658,13 @@ namespace carl
 		void center_assign();
 		
 		/**
+		 * Searches for some point in this interval, preferably near the midpoint and with a small representation.
+		 * @return some point within this interval
+		 */
+		Number sample() const;
+		void sample_assign();
+
+		/**
 		 * Checks if the interval contains the given value.
 		 * @param value
 		 * @return
@@ -666,6 +678,13 @@ namespace carl
 		 */
 		bool contains(const Interval<Number>& rhs) const;
 		
+		/**
+		 * Checks if the interval meets the given value, that is if the given value is contained in the <b>closed</b> interval defined by the bounds.
+		 * @param value
+		 * @return
+		 */
+		bool meets(const Number& val) const;
+
 		/**
 		 * Checks if the given interval is a subset of the calling interval.
 		 * @param interval
