@@ -68,7 +68,7 @@ template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p, 
 		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		std::map<Variable, ExactInterval<Number>>& varToInterval
+		std::map<Variable, Interval<Number>>& varToInterval
 );
 
 /**
@@ -86,7 +86,7 @@ template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
 		UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		std::map<Variable, ExactInterval<Number>>& varToInterval
+		std::map<Variable, Interval<Number>>& varToInterval
 );
 
 
@@ -154,16 +154,16 @@ RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, co
 	}
 	Variable v = VariablePool::getInstance().getFreshVariable();
 	// compute the result polynomial and the initial result interval
-	std::map<Variable, ExactInterval<Number>> varToInterval;
+	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<Coeff>(v, {-Coeff(p), Coeff(1)}), m, varToInterval);
-	ExactInterval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
+	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
 
 	// the interval should include at least one root.
 	assert(!res.isZero());
 	assert(res.countRealRoots(interval) >= 1);
 	while (
-		res.sgn(interval.left()) == Sign::ZERO ||
-		res.sgn(interval.right()) == Sign::ZERO ||
+		res.sgn(interval.lower()) == Sign::ZERO ||
+		res.sgn(interval.upper()) == Sign::ZERO ||
 		res.countRealRoots(interval) != 1) {
 		// refine the result interval until it isolates exactly one real root of the result polynomial
 		for (auto it: m) {
@@ -180,7 +180,7 @@ template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluatePolynomial(
 		const UnivariatePolynomial<Coeff>& p, 
 		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		std::map<Variable, ExactInterval<Number>>& varToInterval
+		std::map<Variable, Interval<Number>>& varToInterval
 ) {
 	Variable v = p.mainVar();
 	UnivariatePolynomial<Coeff> tmp = p;
@@ -197,7 +197,7 @@ template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
 		UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		std::map<Variable, ExactInterval<Number>>& varToInterval
+		std::map<Variable, Interval<Number>>& varToInterval
 ) {
 	assert(m.find(p.mainVar()) == m.end());
 	return evaluatePolynomial(p, m, varToInterval);

@@ -38,10 +38,11 @@ CLANG_WARNING_DISABLE("-Wunused-parameter")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 CLANG_WARNING_RESET
-#include "../numbers/adaption_gmpxx/operations.h"
+#include "../numbers/operations.h"
 #include <cmath>
 
 #include "../core/Variable.h"
+#include "../core/Sign.h"
 #include "../util/SFINAE.h"
 
 namespace carl

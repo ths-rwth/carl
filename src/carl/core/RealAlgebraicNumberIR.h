@@ -8,7 +8,7 @@
 #include "RealAlgebraicNumber.h"
 
 #include "UnivariatePolynomial.h"
-#include "../interval/ExactInterval.h"
+#include "../interval/Interval.h"
 #include "../util/SFINAE.h"
 
 namespace carl {
@@ -29,7 +29,7 @@ protected:
 	 * The interval is mutable, that means it may be changed by const methods, as the actual data is the represented root.
 	 * However, all methods must make sure, that the interval always includes the same root.
 	 */
-	mutable ExactInterval<Number> interval;
+	mutable Interval<Number> interval;
 	
 	/**
 	 * Standard Sturm sequence of the polynomial and its derivative.
@@ -70,7 +70,7 @@ private:
 	 */
 	RealAlgebraicNumberIR(
 			const UnivariatePolynomial<Number>& p,
-			const ExactInterval<Number>& i,
+			const Interval<Number>& i,
 			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true );
@@ -84,7 +84,7 @@ public:
 
 	static std::shared_ptr<RealAlgebraicNumberIR> create(
 			const UnivariatePolynomial<Number>& p,
-			const ExactInterval<Number>& i,
+			const Interval<Number>& i,
 			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true) {
@@ -104,7 +104,7 @@ public:
 	///////////////
 
 	bool isZero() const {
-		return this->isNumeric() ? this->value() == 0 : (this->interval.left() == 0 && this->interval.right() == 0);
+		return this->isNumeric() ? this->value() == 0 : (this->interval.lower() == 0 && this->interval.upper() == 0);
 	}
 
 	virtual bool isNumericRepresentation() const {
@@ -123,23 +123,23 @@ public:
 	 * Selects the open interval ]l, r[ containing the real algebraic number.
 	 * @return open interval ]l, r[ containing the real algebraic number
 	 */
-	const ExactInterval<Number>& getInterval() const
+	const Interval<Number>& getInterval() const
 	{
 		return this->interval;
 	}
 	
-	const Number& left() const {
-		return this->getInterval().left();
+	const Number& lower() const {
+		return this->getInterval().lower();
 	}
-	const Number& right() const {
-		return this->getInterval().right();
+	const Number& upper() const {
+		return this->getInterval().upper();
 	}
 	
-	void setLeft(const Number& n) const {
-		this->interval.setLeft(n);
+	void setLower(const Number& n) const {
+		this->interval.setLower(n);
 	}
-	void setRight(const Number& n) const {
-		this->interval.setRight(n);
+	void setUpper(const Number& n) const {
+		this->interval.setUpper(n);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public:
 
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus() const;
 
-	virtual bool containedIn(const ExactInterval<Number>& i) const {
+	virtual bool containedIn(const Interval<Number>& i) const {
 		return i.contains(this->getInterval());
 	}
 
@@ -192,7 +192,7 @@ private:
      */
 	std::pair<bool,bool> checkOrder(std::shared_ptr<RealAlgebraicNumberIR> n);
 	std::pair<bool,bool> intervalContained(std::shared_ptr<RealAlgebraicNumberIR> n, bool twisted);
-	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const ExactInterval<Number> i);
+	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
 	
 
 public:	
@@ -211,7 +211,7 @@ public:
 	 * If interval is no over-approximation of the current isolating interval, do nothing.
 	 * @param interval
 	 */
-	void coarsen(const ExactInterval<Number>& interval) const;
+	void coarsen(const Interval<Number>& interval) const;
 	
 	
 	/** Refines the interval i of this real algebraic number yielding the interval j such that <code>2*(j.Right()-j.Left()) &lt;= i.Right()-i.Left()</code>. This is cutting the interval in the middle and choosing the half where the root lays in.

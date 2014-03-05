@@ -61,7 +61,7 @@ public:
 
 	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	typedef std::vector<sampleIterator> CADTrace;
-	typedef std::unordered_map<unsigned, ExactInterval<Number>> BoundMap;
+	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
 	typedef std::list<std::pair<std::list<cad::Constraint<Number>>, std::list<cad::Constraint<Number>>>> Deductions;
 private:
 	/**
@@ -507,7 +507,7 @@ public:
 	 * @param r
 	 * @return one Interval per variable index, representing the bounds of r in the respective level of the sample tree
 	 */
-	std::vector<ExactInterval<Number>> getBounds(const RealAlgebraicPoint<Number>& r) const;
+	std::vector<Interval<Number>> getBounds(const RealAlgebraicPoint<Number>& r) const;
 	
 	///////////////////////////
 	// PUBLIC STATIC METHODS //
@@ -544,7 +544,7 @@ public:
 			const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-			const ExactInterval<Number>& bounds = ExactInterval<Number>::unboundedExactInterval()
+			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
 	);
 
 	/**
@@ -565,7 +565,7 @@ public:
 			const std::list<Variable>& variables,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-			const ExactInterval<Number>& bounds = ExactInterval<Number>::unboundedInterval(),
+			const Interval<Number>& bounds = Interval<Number>::unboundedInterval(),
 			cad::CADSettings settings = cad::CADSettings::getSettings()
 	);
 
@@ -755,7 +755,7 @@ public:
 	 * @param sample
 	 * @return a bounding Interval for sample at parent's children
 	 */
-	ExactInterval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const;
+	Interval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const;
 
 	/** CURRENTLY DISABLED
 	 *

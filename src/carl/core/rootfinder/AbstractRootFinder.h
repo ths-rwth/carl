@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../../interval/ExactInterval.h"
+#include "../../interval/Interval.h"
 #include "../RealAlgebraicNumber.h"
 #include "../RealAlgebraicNumberIR.h"
 #include "../RealAlgebraicNumberNR.h"
@@ -49,7 +49,7 @@ protected:
 	/**
 	 * Interval to be searched.
 	 */
-	ExactInterval<Number> interval;
+	Interval<Number> interval;
 	/**
 	 * Roots that have been found.
 	 * If the instantiated root finder works in an incremental manner, this list may not contain all roots, if it is called before the root finder has indicated that it is finished.
@@ -73,7 +73,7 @@ public:
      */
 	AbstractRootFinder(
 		const UnivariatePolynomial<Number>& polynomial,
-		const ExactInterval<Number>& interval = ExactInterval<Number>(),
+		const Interval<Number>& interval = Interval<Number>(),
 		bool tryTrivialSolver = true
 	);
 	
@@ -117,7 +117,7 @@ protected:
 	 * Adds a new root to the internal root list from an interval.
      * @param interval Isolating interval.
      */
-	virtual void addRoot(const ExactInterval<Number>& interval);
+	virtual void addRoot(const Interval<Number>& interval);
 	
 	/**
 	 * Informational method for subclasses specifying the maximum degree of the polynomial that solveTrivial() can handle.

@@ -500,8 +500,8 @@ namespace carl
         tmp_up *= 2;
         tmp_lo *= 2;
 
-        int iUp = std::floor(tmp_up);
-        int iLo = std::floor(tmp_lo);
+        int iUp = (int)std::floor(tmp_up);
+        int iLo = (int)std::floor(tmp_lo);
 	int iPeriod = iUp - iLo;
 
         DoubleInterval result(-1,1);
@@ -622,8 +622,8 @@ namespace carl
         tmp_up *= 2;
         tmp_lo *= 2;
 
-        int iUp = std::floor(tmp_up);
-        int iLo = std::floor(tmp_lo);
+        int iUp = (int)std::floor(tmp_up);
+        int iLo = (int)std::floor(tmp_lo);
 	int iPeriod = iUp - iLo;
 
         DoubleInterval result(-1,1);

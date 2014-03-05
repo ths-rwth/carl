@@ -26,7 +26,7 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
 template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		const UnivariatePolynomial<Number>& p,
-		const ExactInterval<Number>& i,
+		const Interval<Number>& i,
 		const std::list<UnivariatePolynomial<Number>>& seq,
 		const bool normalize,
 		const bool isRoot ) :
@@ -48,8 +48,8 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		Number b = this->polynomial.coefficients()[0];
 		this->mValue = (a == 0) ? b : (-b/a);
 		this->mIsNumeric = true;
-		this->interval.setLeft(ExactInterval<Number>(this->interval.left(), this->value(), BoundType::STRICT).sample());
-		this->interval.setRight(ExactInterval<Number>(this->value(), this->interval.right(), BoundType::STRICT).sample());
+		this->interval.setLower(Interval<Number>(this->interval.lower(), BoundType::STRICT, this->value(), BoundType::STRICT).sample());
+		this->interval.setUpper(Interval<Number>(this->value(), BoundType::STRICT, this->interval.upper(), BoundType::STRICT).sample());
 	}
 	assert(p.countRealRoots(i) == 1);
 }
@@ -81,8 +81,8 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 	auto p = res.switchVariable(va).coprimeCoefficients().primitivePart().template convert<Number>();
 	auto seq = p.standardSturmSequence();
 
-	ExactInterval<Number> i = this->getInterval() + n->getInterval();
-	while (p.isRoot(i.left()) || p.isRoot(i.right()) || UnivariatePolynomial<Number>::countRealRoots(seq, i) > 1) {
+	Interval<Number> i = this->getInterval() + n->getInterval();
+	while (p.isRoot(i.lower()) || p.isRoot(i.upper()) || UnivariatePolynomial<Number>::countRealRoots(seq, i) > 1) {
 		this->refine();
 		n->refine();
 		i = this->getInterval() + n->getInterval();
@@ -103,8 +103,8 @@ bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this == n.get()) return true;
 	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
-	if (this->right() <= n->left()) return false;
-	if (this->left() >= n->right()) return false;
+	if (this->upper() <= n->lower()) return false;
+	if (this->lower() >= n->upper()) return false;
 	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) {
 		n = this->thisPtr();
 		return true;
@@ -119,32 +119,32 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumb
 			return std::make_pair(true, this->value() < n->value());
 		} else {
 			n->refineAvoiding(this->value());
-			if (this->value() <= n->left()) {
-				this->setRight(n->right());
+			if (this->value() <= n->lower()) {
+				this->setUpper(n->upper());
 				return std::make_pair(true, true);
 			} else {
-				assert(this->value() >= n->right());
-				this->setRight(n->right());
+				assert(this->value() >= n->upper());
+				this->setUpper(n->upper());
 				return std::make_pair(true, false);
 			}
 		}
 	}
 	if (n->isNumeric()) {
 		this->refineAvoiding(n->value());
-		if (n->value() <= this->left()) {
-			n->setRight(this->left());
+		if (n->value() <= this->lower()) {
+			n->setUpper(this->lower());
 			return std::make_pair(true, false);
 		} else {
-			assert(n->value() >= this->right());
-			n->setLeft(this->right());
+			assert(n->value() >= this->upper());
+			n->setLower(this->upper());
 			return std::make_pair(true, true);
 		}
 	}
 	
-	if (this->right() <= n->left()) {
+	if (this->upper() <= n->lower()) {
 		return std::make_pair(true, true);
 	}
-	if (n->right() <= this->left()) {
+	if (n->upper() <= this->lower()) {
 		return std::make_pair(true, false);
 	}
 	
@@ -154,68 +154,68 @@ std::pair<bool,bool> RealAlgebraicNumberIR<Number>::checkOrder(RealAlgebraicNumb
 template<typename Number>
 std::pair<bool,bool> RealAlgebraicNumberIR<Number>::intervalContained(RealAlgebraicNumberIRPtr<Number> n, bool twisted) {
 	if (this->getInterval().contains(n->getInterval())) {
-		if (this->getPolynomial().isRoot(n->left())) {
-			this->mValue = n->left();
+		if (this->getPolynomial().isRoot(n->lower())) {
+			this->mValue = n->lower();
 			this->mIsNumeric = true;
 			n->refineAvoiding(this->value());
-			this->setRight(n->left());
+			this->setUpper(n->lower());
 			return std::make_pair(true, !twisted);
-		} else if (this->getPolynomial().isRoot(n->right())) {
-			this->mValue = n->right();
+		} else if (this->getPolynomial().isRoot(n->upper())) {
+			this->mValue = n->upper();
 			this->mIsNumeric = true;
 			n->refineAvoiding(this->value());
-			this->setLeft(n->right());
+			this->setLower(n->upper());
 			return std::make_pair(true, twisted);
 		} else if (this->getPolynomial().countRealRoots(n->getInterval()) == 0) {
-			if (this->left() != n->left() && this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), n->left(), BoundType::STRICT)) > 0) {
-				this->setRight(n->left());
+			if (this->lower() != n->lower() && this->getPolynomial().countRealRoots(Interval<Number>(this->lower(), BoundType::STRICT, n->lower(), BoundType::STRICT)) > 0) {
+				this->setUpper(n->lower());
 				return std::make_pair(true, !twisted);
-			} else if (this->right() != n->right() && this->getPolynomial().countRealRoots(ExactInterval<Number>(n->right(), this->right(), BoundType::STRICT)) > 0) {
-				this->setLeft(n->right());
+			} else if (this->upper() != n->upper() && this->getPolynomial().countRealRoots(Interval<Number>(n->upper(), BoundType::STRICT, this->upper(), BoundType::STRICT)) > 0) {
+				this->setLower(n->upper());
 				return std::make_pair(true, twisted);
 			}
 			assert(this->getInterval() == n->getInterval());
 		} else {
-			this->setLeft(n->left());
-			this->setRight(n->right());
+			this->setLower(n->lower());
+			this->setUpper(n->upper());
 		}
 	}
 	return std::make_pair(false, false);
 }
 
 template<typename Number>
-bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<Number> n, const ExactInterval<Number> i) {
+bool RealAlgebraicNumberIR<Number>::checkIntersection(RealAlgebraicNumberIRPtr<Number> n, const Interval<Number> i) {
 	// Proceed only if this.left < n2.left and this.right < n2.right
-	if ((this->left() < n->left()) && (this->right() < n->right())) {
-		assert( i.left() == n->left() && i.right() == this->right());
-		if (this->getPolynomial().isRoot(i.left())) {
+	if ((this->lower() < n->lower()) && (this->upper() < n->upper())) {
+		assert( i.lower() == n->lower() && i.upper() == this->upper());
+		if (this->getPolynomial().isRoot(i.lower())) {
 			// If i.left is root of n1.polynomial: convert n1 to NR
-			this->mValue = i.left();
+			this->mValue = i.lower();
 			this->mIsNumeric = true;
 			n->refineAvoiding(this->value());
-			this->setRight(n->left());
+			this->setUpper(n->lower());
 			return true;
 		}
 		if (this->getPolynomial().countRealRoots(i) == 0) {
 			// i contains no roots of n1.polynomial
-			this->refineAvoiding(i.left());
+			this->refineAvoiding(i.lower());
 			return true;
 		}
-		if (n->getPolynomial().isRoot(i.right())) {
+		if (n->getPolynomial().isRoot(i.upper())) {
 			// If i.right is root of n2.polynomial: convert n2 to NR
-			n->mValue = i.right();
+			n->mValue = i.upper();
 			n->mIsNumeric = true;
 			this->refineAvoiding(n->value());
-			n->setLeft(this->right());
+			n->setLower(this->upper());
 			return true;
 		}
 		if (n->getPolynomial().countRealRoots(i) == 0) {
 			// i contains no roots of n2.polynomial
-			n->refineAvoiding(i.right());
+			n->refineAvoiding(i.upper());
 			return true;
 		}
-		this->setLeft(i.left());
-		n->setRight(i.right());
+		this->setLower(i.lower());
+		n->setUpper(i.upper());
 	}
 	return false;
 }
@@ -258,10 +258,10 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIRPtr<Nu
 		this->refine();
 		CHECK_ORDER();
 
-		ExactInterval<Number> intersection = this->getInterval().intersect(n->getInterval());
+		Interval<Number> intersection = this->getInterval().intersect(n->getInterval());
 		
 		// invariant: intersection is nonempty and one bound belongs to an interval
-		assert( !intersection.empty() );
+		assert( !intersection.isEmpty() );
 		
 		// situation normal (not executed if situation is twisted)
 		if (this->checkIntersection(n, intersection)) return true;
@@ -276,7 +276,7 @@ bool RealAlgebraicNumberIR<Number>::lessWhileUnequal(RealAlgebraicNumberIRPtr<Nu
 
 template<typename Number>
 void RealAlgebraicNumberIR<Number>::normalizeInterval() {
-	if (this->interval.left() == 0 && this->interval.right() == 0) return; // already normalized
+	if (this->interval.lower() == 0 && this->interval.upper() == 0) return; // already normalized
 	if (this->isNumeric()) return;
 	assert(this->polynomial.countRealRoots(this->interval) == 1); // the interval should be isolating for this number
 	// shift the right border below 0 or set the zero interval
@@ -289,30 +289,30 @@ void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 		// the separation is computed following [p.329,Algorithmic Algebra ISBN 3-540-94090-1]
 		Number sep = (Number)1 / (1 + this->polynomial.maximumNorm());
 		assert(this->polynomial.sgn(sep) != Sign::ZERO);
-		if ((this->interval.right() == 0) || 
-			(this->interval.left() < -sep && this->polynomial.countRealRoots(ExactInterval<Number>(this->interval.left(), -sep, BoundType::STRICT)) > 0)) {
-			this->interval.setRight(-sep);
+		if ((this->interval.upper() == 0) || 
+			(this->interval.lower() < -sep && this->polynomial.countRealRoots(Interval<Number>(this->interval.lower(), BoundType::STRICT, -sep, BoundType::STRICT)) > 0)) {
+			this->interval.setUpper(-sep);
 		} else {
-			this->interval.setLeft(sep);
+			this->interval.setLower(sep);
 		}
 	}
-	assert( ( !this->interval.meets(0) && this->polynomial.countRealRoots(this->interval) == 1 ) || (this->interval.left() == 0 && this->interval.right() == 0)); // otherwise, the interval is not suitable for this real algebraic number
+	assert( ( !this->interval.meets(0) && this->polynomial.countRealRoots(this->interval) == 1 ) || (this->interval.lower() == 0 && this->interval.upper() == 0)); // otherwise, the interval is not suitable for this real algebraic number
 }
 
 template<typename Number>
-void RealAlgebraicNumberIR<Number>::coarsen(const ExactInterval<Number>& i) const {
-	if (i.left() < this->interval.left()) { // coarsen the left bound
-		Number l = this->interval.left();
-		this->interval.setLeft(i.left());
-		while (this->polynomial.sgn(this->interval.left()) == Sign::ZERO || countRealRoots(this->sturmSequence, this->interval) != 1) {
-			this->interval.setLeft(ExactInterval<Number>(this->interval.left(), l).sampleFast());
+void RealAlgebraicNumberIR<Number>::coarsen(const Interval<Number>& i) const {
+	if (i.lower() < this->interval.lower()) { // coarsen the left bound
+		Number l = this->interval.lower();
+		this->interval.setLower(i.lower());
+		while (this->polynomial.sgn(this->interval.lower()) == Sign::ZERO || countRealRoots(this->sturmSequence, this->interval) != 1) {
+			this->interval.setLower(Interval<Number>(this->interval.lower(), l).sampleFast());
 		}
 	}
-	if (i.right() > this->interval.right()) { // coarsen the right bound
-		Number r = this->interval.right();
-		this->interval.setRight( interval.right() );
-		while (this->polynomial->sgn(this->interval.right()) == Sign::ZERO || countRealRoots(this->sturmSequence, this->interval) != 1) {
-			this->interval.setRight(ExactInterval<Number>(r, this->interval.right()).sampleFast());
+	if (i.upper() > this->interval.upper()) { // coarsen the right bound
+		Number r = this->interval.upper();
+		this->interval.setUpper( interval.upper() );
+		while (this->polynomial->sgn(this->interval.upper()) == Sign::ZERO || countRealRoots(this->sturmSequence, this->interval) != 1) {
+			this->interval.setUpper(Interval<Number>(r, this->interval.upper()).sampleFast());
 		}
 	}
 }
@@ -321,17 +321,17 @@ template<typename Number>
 void RealAlgebraicNumberIR<Number>::refine(RealAlgebraicNumberSettings::RefinementStrategy strategy) {
 	if (this->isNumeric()) {
 		// This RANIR already has a numeric value
-		assert(this->left() != this->value());
-		assert(this->right() != this->value());
-		this->setLeft(ExactInterval<Number>(this->left(), this->value(), BoundType::STRICT).sample());
-		this->setRight(ExactInterval<Number>(this->value(), this->right(), BoundType::STRICT).sample());
+		assert(this->lower() != this->value());
+		assert(this->upper() != this->value());
+		this->setLower(Interval<Number>(this->lower(), BoundType::STRICT, this->value(), BoundType::STRICT).sample());
+		this->setUpper(Interval<Number>(this->value(), BoundType::STRICT, this->upper(), BoundType::STRICT).sample());
 		return;
 	}
 	
 	Number m;
 	switch (strategy) {
 		case RealAlgebraicNumberSettings::RefinementStrategy::GENERIC:
-			m = this->getInterval().midpoint();
+			m = this->getInterval().center();
 			break;
 		case RealAlgebraicNumberSettings::RefinementStrategy::BINARYSAMPLE:
 			m = this->getInterval().sample();
@@ -342,20 +342,20 @@ void RealAlgebraicNumberIR<Number>::refine(RealAlgebraicNumberSettings::Refineme
 	}
 	assert(this->interval.contains(m));
 	if (this->getPolynomial().isRoot(m)) {
-		this->setLeft(ExactInterval<Number>(this->left(), m, BoundType::STRICT).sample());
-		this->setRight(ExactInterval<Number>(m, this->right(), BoundType::STRICT).sample());
+		this->setLower(Interval<Number>(this->lower(), BoundType::STRICT, m, BoundType::STRICT).sample());
+		this->setUpper(Interval<Number>(m, BoundType::STRICT, this->upper(), BoundType::STRICT).sample());
 		this->mValue = m;
 		this->mIsNumeric = true;
 	} else {
-		if (this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), m, BoundType::STRICT)) > 0) {
-			this->setRight(m);
+		if (this->getPolynomial().countRealRoots(Interval<Number>(this->lower(), BoundType::STRICT, m, BoundType::STRICT)) > 0) {
+			this->setUpper(m);
 		} else {
-			this->setLeft(m);
+			this->setLower(m);
 		}
 	}
 	
 	this->refinementCount++;
-	assert(this->left() < this->right());
+	assert(this->lower() < this->upper());
 }
 
 template<typename Number>
@@ -363,11 +363,11 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 	if (this->isNumeric()) {
 		if (!this->getInterval().meets(n)) return false;
 		if (this->value() < n) {
-			this->setRight(ExactInterval<Number>(this->value(), n, BoundType::STRICT).sample());
+			this->setUpper(Interval<Number>(this->value(), BoundType::STRICT, n, BoundType::STRICT).sample());
 		} else if (this->value() > n) {
-			this->setLeft(ExactInterval<Number>(n, this->value(), BoundType::STRICT).sample());
+			this->setLower(Interval<Number>(n, BoundType::STRICT, this->value(), BoundType::STRICT).sample());
 		} else return true;
-		assert(this->left() < this->right());
+		assert(this->lower() < this->upper());
 		return false;
 	}
 	
@@ -377,17 +377,17 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 			this->mIsNumeric = true;
 			return true;
 		}
-		if (this->getPolynomial().countRealRoots(ExactInterval<Number>(this->left(), n, BoundType::STRICT)) > 0) {
-			this->setRight(n);
+		if (this->getPolynomial().countRealRoots(Interval<Number>(this->lower(), BoundType::STRICT, n, BoundType::STRICT)) > 0) {
+			this->setUpper(n);
 		} else {
-			this->setLeft(n);
+			this->setLower(n);
 		}
 		this->refinementCount++;
-	} else if (this->left() != n && this->right() != n) {
+	} else if (this->lower() != n && this->upper() != n) {
 		return false;
 	}
 	
-	bool isLeft = this->left() == n;
+	bool isLeft = this->lower() == n;
 	
 	Number newBound = this->getInterval().sample();
 	
@@ -395,42 +395,42 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 		this->mValue = newBound;
 		this->mIsNumeric = true;
 		if (isLeft) {
-			this->setLeft(ExactInterval<Number>(n, newBound, BoundType::STRICT).sample());
+			this->setLower(Interval<Number>(n, BoundType::STRICT, newBound, BoundType::STRICT).sample());
 		} else {
-			this->setRight(ExactInterval<Number>(newBound, n, BoundType::STRICT).sample());
+			this->setUpper(Interval<Number>(newBound, BoundType::STRICT, n, BoundType::STRICT).sample());
 		}
 		return false;
 	}
 	
 	if (isLeft) {
-		this->setLeft(newBound);
+		this->setLower(newBound);
 	} else {
-		this->setRight(newBound);
+		this->setUpper(newBound);
 	}
 	
 	while (this->getPolynomial().countRealRoots(this->getInterval()) == 0) {
 		if (isLeft) {
-			Number oldBound = this->left();
-			Number newBound = ExactInterval<Number>(n, oldBound, BoundType::STRICT).sample();
+			Number oldBound = this->lower();
+			Number newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
 			if (this->getPolynomial().isRoot(newBound)) {
 				this->mValue = newBound;
 				this->mIsNumeric = true;
-				this->setLeft(ExactInterval<Number>(n, newBound, BoundType::STRICT).sample());
+				this->setLower(Interval<Number>(n, BoundType::STRICT, newBound, BoundType::STRICT).sample());
 				return false;
 			}
-			this->setRight(oldBound);
-			this->setLeft(newBound);
+			this->setUpper(oldBound);
+			this->setLower(newBound);
 		} else {
-			Number oldBound = this->right();
-			Number newBound = ExactInterval<Number>(oldBound, n, BoundType::STRICT).sample();
+			Number oldBound = this->upper();
+			Number newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
 			if (this->getPolynomial().isRoot(newBound)) {
 				this->mValue = newBound;
 				this->mIsNumeric = true;
-				this->setRight(ExactInterval<Number>(newBound, n, BoundType::STRICT).sample());
+				this->setUpper(Interval<Number>(newBound, BoundType::STRICT, n, BoundType::STRICT).sample());
 				return false;
 			}
-			this->setLeft(oldBound);
-			this->setRight(newBound);
+			this->setLower(oldBound);
+			this->setUpper(newBound);
 		}
 	}
 	return false;
@@ -439,7 +439,7 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 template<typename Number>
 Sign RealAlgebraicNumberIR<Number>::sgn() const {
 	if (this->interval.isZero()) return Sign::ZERO;
-	if (this->interval.left() < 0) return Sign::NEGATIVE;
+	if (this->interval.lower() < 0) return Sign::NEGATIVE;
 	return Sign::POSITIVE;
 }
 
