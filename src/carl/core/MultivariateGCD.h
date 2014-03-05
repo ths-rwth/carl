@@ -118,7 +118,7 @@ class MultivariateGCD : GCDCalculation
  * @see MultivariateGCD
  */
 template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
+MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>&, const MultivariatePolynomial<C,O,P>&);
 	
 	
 }
