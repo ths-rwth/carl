@@ -398,10 +398,11 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
 {
-	if(isZero()) {
+	if(this->isZero()) {
 		return *this;
 	}
-	if (this->isNormal()) {
+	if (this->isNormal())
+	{
 		return *this / this->content();
 	} else {
 		auto tmp = *this * Coeff(-1);
@@ -426,8 +427,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	
 	LOGMSG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
 	const Variable& x = a.mMainVar;
-	UnivariatePolynomial<Coeff> c = a;
-	UnivariatePolynomial<Coeff> d = b;
+	UnivariatePolynomial<Coeff> c(a);
+	UnivariatePolynomial<Coeff> d(b);
 	c.normalizeCoefficients();
 	d.normalizeCoefficients();
 	c = c.normalized();
@@ -486,8 +487,6 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
 	assert(b.degree() <= a.degree());
-	std::cout << "a: " << a << std::endl;
-	std::cout << "b: " << b << std::endl;
 	if(b.isZero()) return a;
 //	if(is_field<Coeff>::value)
 //	{
@@ -723,6 +722,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 		result.quotient.mCoefficients[degdiff] += factor;
 	}
 	while(divisor.degree() <= result.remainder.degree() && !result.remainder.isZero());
+	
 	assert(*this == divisor * result.quotient + result.remainder);
 	return result;
 }
@@ -1889,6 +1889,8 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 	{
 		c = quotient(c, rhs);
 	}
+	/// TODO not fully sure whether this is necessary
+	this->stripLeadingZeroes();
 	return *this;		
 }
 
@@ -1898,6 +1900,8 @@ template<typename C>
 UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {
 	assert(rhs != 0);
+	if(lhs.isZero()) return lhs;
+	std::cout <<  "LHS " << lhs << std::endl;
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
 }
@@ -2070,7 +2074,7 @@ template<typename Coefficient>
 template<typename C, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 	if (this->mCoefficients.size() > 0) {
-		assert(this->lcoeff() != Coefficient(0));
+		assert(!this->lcoeff().isZero());
 	}
 	for (auto c: this->mCoefficients) {
 		assert(!c.has(this->mainVar()));

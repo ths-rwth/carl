@@ -1153,7 +1153,10 @@ bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
 {
-    if(lhs.mTerms.empty() && rhs == 0) return true;
+    if(lhs.mTerms.empty())
+	{
+		return rhs == 0;
+	}
     if(lhs.mTerms.size() > 1) return false;
     return (lhs.mTerms.front()->coeff()) == rhs;
 }
