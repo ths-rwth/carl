@@ -13,12 +13,12 @@ using PolynomialContraction = Contraction<Operator, MultivariatePolynomial<cln::
 
 TEST(Contraction, SimpleNewton)
 {
-    Interval<cln::cl_RA> ia = Interval<cln::cl_RA>( 1, 4 );
-    Interval<cln::cl_RA> ib = Interval<cln::cl_RA>( 2, 5 );
-    Interval<cln::cl_RA> ic = Interval<cln::cl_RA>( -2, 3 );
-    Interval<cln::cl_RA> id = Interval<cln::cl_RA>( 0, 2 );
+    Interval<double> ia = Interval<double>( 1, 4 );
+    Interval<double> ib = Interval<double>( 2, 5 );
+    Interval<double> ic = Interval<double>( -2, 3 );
+    Interval<double> id = Interval<double>( 0, 2 );
 
-    Interval<cln::cl_RA>::evalintervalmap map;
+    Interval<double>::evalintervalmap map;
     VariablePool& vpool = VariablePool::getInstance();
     Variable a = vpool.getFreshVariable();
     vpool.setName(a, "a");
@@ -43,7 +43,7 @@ TEST(Contraction, SimpleNewton)
     MultivariatePolynomial<cln::cl_RA> e7({a,c});
     e7 = e7.pow(2)*b*d+a;
     
-    Interval<cln::cl_RA> resultA, resultB, overapprox;
+    Interval<double> resultA, resultB, overapprox;
     PolynomialContraction<SimpleNewton> e1_contractor(e1);
     PolynomialContraction<SimpleNewton> e2_contractor(e2);
     PolynomialContraction<SimpleNewton> e3_contractor(e3);
@@ -53,43 +53,43 @@ TEST(Contraction, SimpleNewton)
     PolynomialContraction<SimpleNewton> e7_contractor(e7);
     
     bool split;
-    /*
+    
     split = e1_contractor(map,a,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<cln::cl_RA>(-10,BoundType::WEAK, 0, BoundType::WEAK), resultA);
+    EXPECT_EQ(Interval<double>(-10,BoundType::WEAK, 0, BoundType::WEAK), resultA);
     
     split = e1_contractor(map,b,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<cln::cl_RA>(-9,BoundType::WEAK, 1,BoundType::WEAK), resultA);
+    EXPECT_EQ(Interval<double>(-9,BoundType::WEAK, 1,BoundType::WEAK), resultA);
     
     split = e1_contractor(map,c,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<cln::cl_RA>(-11,BoundType::WEAK, -3, BoundType::WEAK), resultA);
+    EXPECT_EQ(Interval<double>(-11,BoundType::WEAK, -3, BoundType::WEAK), resultA);
     
     split = e1_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
-    EXPECT_EQ(Interval<cln::cl_RA>(-12,BoundType::WEAK, -1, BoundType::WEAK), resultA);
+    EXPECT_EQ(Interval<double>(-12,BoundType::WEAK, -1, BoundType::WEAK), resultA);
     
     split = e6_contractor(map,a,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = Interval<cln::cl_RA>(-2.00000000000000177635683940025, BoundType::WEAK, 0.166666666666667406815349750104, BoundType::WEAK);
+    overapprox = Interval<double>(-2.00000000000000177635683940025, BoundType::WEAK, 0.166666666666667406815349750104, BoundType::WEAK);
     EXPECT_EQ(overapprox <= resultA && overapprox >= resultA, true);
     
     split = e6_contractor(map,b,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = Interval<cln::cl_RA>(-19.000000000000007105427357601, BoundType::WEAK, -1.33333333333333214909544039983, BoundType::WEAK);
+    overapprox = Interval<double>(-19.000000000000007105427357601, BoundType::WEAK, -1.33333333333333214909544039983, BoundType::WEAK);
     EXPECT_EQ(overapprox <= resultA && overapprox >= resultA, true);
     
     split = e6_contractor(map,c,resultA,resultB);
     EXPECT_EQ(split, true);
-    overapprox = Interval<cln::cl_RA>(-1.0, BoundType::INFTY, -1.2, BoundType::WEAK);
+    overapprox = Interval<double>(-1.0, BoundType::INFTY, -1.2, BoundType::WEAK);
     EXPECT_EQ(overapprox <= resultA && overapprox >= resultA, true);
-    overapprox = Interval<cln::cl_RA>(3.0625, BoundType::WEAK, 1.0, BoundType::INFTY);
+    overapprox = Interval<double>(3.0625, BoundType::WEAK, 1.0, BoundType::INFTY);
     EXPECT_EQ(overapprox <= resultB && overapprox >= resultB, true);
     
     split = e6_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = Interval<cln::cl_RA>(2.41666666666666651863693004998, BoundType::WEAK, 1.0, BoundType::INFTY);
+    overapprox = Interval<double>(2.41666666666666651863693004998, BoundType::WEAK, 1.0, BoundType::INFTY);
     EXPECT_EQ(overapprox <= resultA && overapprox >= resultA, true);
-     */
+    
 }
