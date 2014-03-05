@@ -47,9 +47,10 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 
 
 template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>&, const MultivariatePolynomial<C,O,P>&)
+MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
 {
 	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
 	return gcd_calc.calculate();
 }
+
 }
