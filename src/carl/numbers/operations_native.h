@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
 
 #include "typetraits.h"
 
@@ -39,6 +40,49 @@ inline unsigned floor(const double& n) {
 }
 inline unsigned ceil(const double& n) {
 	return (unsigned)std::ceil(n);
+}
+inline double abs(const double& n) {
+	return std::abs(n);
+}
+
+/** Returns a down-rounded representation of the given numeric
+ * @param o
+ * @param overapproximate
+ * @return double representation of o (underapprox) Note, that it can return the double INFINITY.
+ */
+template<typename Rational>
+static double roundDown(const Rational& o, bool overapproximate = false) {
+	typedef std::numeric_limits<double> limits;
+	double result = carl::toDouble(o);
+	if (result == -limits::infinity()) return result;
+	if (result == limits::infinity()) return limits::max();
+	// If the cln::cl_RA cannot be represented exactly by a double, round.
+	if (overapproximate || carl::rationalize<Rational>(result) != o) {
+		if (result == -limits::max()) return -limits::infinity();
+		return std::nextafter(result, -limits::infinity());
+	} else {
+		return result;
+	}
+}
+
+/** Returns a up-rounded representation of the given numeric
+ * @param o
+ * @param overapproximate
+ * @return double representation of o (overapprox) Note, that it can return the double INFINITY.
+ */
+template<typename Rational>
+static double roundUp(const Rational& o, bool overapproximate = false) {
+	typedef std::numeric_limits<double> limits;
+	double result = carl::toDouble(o);
+	if (result == limits::infinity()) return result;
+	if (result == -limits::infinity()) return -limits::max();
+	// If the cln::cl_RA cannot be represented exactly by a double, round.
+	if (overapproximate || carl::rationalize<Rational>(result) != o) {
+		if (result == limits::max()) return limits::infinity();
+		return std::nextafter(result, limits::infinity());
+	} else {
+		return result;
+	}
 }
 
 inline unsigned long pow(const unsigned long& n, const unsigned exp) {
