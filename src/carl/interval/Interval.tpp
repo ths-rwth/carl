@@ -1025,6 +1025,7 @@ template<typename Number>
                         resultA = emptyInterval();
                         return false;
                     }
+                    // Todo return festlegen.
 		}
 		else
 		{
