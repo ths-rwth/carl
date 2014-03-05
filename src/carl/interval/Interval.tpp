@@ -1086,6 +1086,19 @@ inline const Interval<Number> operator +(const Interval<Number>& lhs, const Numb
 	}
 
 template<typename Number>
+inline const Interval<Number> operator +=(Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		lhs.add_assign(rhs);
+                return lhs;
+	}
+
+template<typename Number>
+inline const Interval<Number> operator +=(Interval<Number>& lhs, const Number& rhs)
+	{
+		return lhs += Interval<Number>(rhs);
+	}
+
+template<typename Number>
 inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.sub(rhs);
@@ -1119,6 +1132,19 @@ template<typename Number>
 inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs)
 	{
 		return rhs * lhs;
+	}
+
+template<typename Number>
+inline const Interval<Number> operator *=(Interval<Number>& lhs, const Interval<Number>& rhs)
+	{
+		lhs.mul_assign(rhs);
+                return lhs;
+	}
+
+template<typename Number>
+inline const Interval<Number> operator *=(Interval<Number>& lhs, const Number& rhs)
+	{
+		return lhs *= Interval<Number>(rhs);
 	}
 
 template<typename Number>

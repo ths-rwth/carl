@@ -987,6 +987,10 @@ namespace carl
 	template<typename Number>
 	inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs);
 	template<typename Number>
+	inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Number& rhs);
+        template<typename Number>
 	inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs);
 	template<typename Number>
 	inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs);
@@ -998,6 +1002,10 @@ namespace carl
 	inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs);
 	template<typename Number>
 	inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs);
+        template<typename Number>
+        inline const Interval<Number> operator *=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+	template<typename Number>
+	inline const Interval<Number> operator *=(const Interval<Number>& lhs, const Number& rhs);
 	template<typename Number>
 	inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs);
 	template<typename Number>
