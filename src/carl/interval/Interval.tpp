@@ -31,7 +31,16 @@ Interval<Number>::Interval(Rational lower, BoundType lowerBoundType, Rational up
 /*******************************************************************************
  * Transformations and advanced getters/setters
  ******************************************************************************/
-	
+
+template<typename Number>
+Sign Interval<Number>::sgn() const
+	{
+		if (this->isUnbounded()) return Sign::ZERO;
+		if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= 0) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > 0)) return Sign::POSITIVE;
+		if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= 0) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < 0)) return Sign::NEGATIVE;
+		return Sign::ZERO;
+	}
+
 template<typename Number>
 Number Interval<Number>::diameter() const
 	{

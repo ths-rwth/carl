@@ -627,6 +627,12 @@ namespace carl
 		{
 			return this->isPointInterval() && (mContent.lower() == 0);
 		}
+
+		/**
+		 * Determine whether the interval lays entirely left of 0 (NEGATIVE_SIGN), right of 0 (POSITIVE_SIGN) or contains 0 (ZERO_SIGN).
+		 * @return NEGATIVE_SIGN, if the interval lays entirely left of 0; POSITIVE_SIGN, if right of 0; or ZERO_SIGN, if contains 0.
+		 */
+		inline Sign sgn() const;
                 
 		/**
 		 * Returns the diameter of the interval.
