@@ -24,7 +24,6 @@ GFNumber<IntegerT> GFNumber<IntegerT>::inverse() const
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {	
-	std::cout << lhs << " == " << rhs << std::endl;
 	if(lhs.isZero() && rhs.isZero()) return true;
 	if(lhs.isUnit() && rhs.isUnit()) return true;
 	if(rhs.mGf == nullptr)
