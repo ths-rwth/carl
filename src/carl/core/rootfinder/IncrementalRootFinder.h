@@ -74,37 +74,37 @@ template<typename Number>
 class RootFinder {
 public:
 	virtual const UnivariatePolynomial<Number>& getPolynomial() const = 0;
-	virtual void addQueue(const ExactInterval<Number>& interval, SplittingStrategy strategy) = 0;
+	virtual void addQueue(const Interval<Number>& interval, SplittingStrategy strategy) = 0;
 	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) = 0;
-	virtual void addRoot(const ExactInterval<Number>& interval) = 0;
+	virtual void addRoot(const Interval<Number>& interval) = 0;
 };
 
 namespace splittingStrategies {
 
 template<typename Strategy, typename Number>
 struct AbstractStrategy: Singleton<Strategy> {
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder) = 0;
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder) = 0;
 };
 
 template<typename Number>
 struct GenericStrategy : public AbstractStrategy<GenericStrategy<Number>, Number> {
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 template<typename Number>
 struct BinarySampleStrategy : public AbstractStrategy<BinarySampleStrategy<Number>, Number> {
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 template<typename Number>
 struct BinaryNewtonStrategy : public AbstractStrategy<BinaryNewtonStrategy<Number>, Number> {
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 template<typename Number>
 struct GridStrategy : public AbstractStrategy<GridStrategy<Number>, Number> {
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 template<typename Number>
 struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, Number> {
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 template<typename Number>
 struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> {
@@ -113,7 +113,7 @@ struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> 
 	Number step(std::vector<Number>& roots, const UnivariatePolynomial<Number>& p, const UnivariatePolynomial<Number>& pd);
 	bool Aberth(const UnivariatePolynomial<Number>& polynomial, std::vector<double>& roots, const double epsilon = 0.01);
 
-	virtual void operator()(const ExactInterval<Number>& interval, RootFinder<Number>& finder);
+	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 
 }
@@ -122,7 +122,7 @@ template<typename Number, typename Comparator>
 class IncrementalRootFinder : public AbstractRootFinder<Number>, RootFinder<Number> {
 
 public:
-	typedef std::tuple<ExactInterval<Number>, SplittingStrategy> QueueItem;
+	typedef std::tuple<Interval<Number>, SplittingStrategy> QueueItem;
 
 private:
 	std::list<UnivariatePolynomial<Number>> sturmSequence;
@@ -144,7 +144,7 @@ public:
 
 	IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
-			const ExactInterval<Number>& interval = ExactInterval<Number>::unboundedExactInterval(),
+			const Interval<Number>& interval = Interval<Number>::unboundedExactInterval(),
 			SplittingStrategy splittingStrategy = SplittingStrategy::DEFAULT,
 			bool tryTrivialSolver = true
 			);
@@ -169,7 +169,7 @@ public:
 	 * @param interval Interval to add.
 	 * @param strategy Strategy to add.
 	 */
-	void addQueue(const ExactInterval<Number>& interval, SplittingStrategy strategy) {
+	void addQueue(const Interval<Number>& interval, SplittingStrategy strategy) {
 	   this->queue.push(std::make_tuple(interval, strategy));
 	}
 
@@ -179,7 +179,7 @@ protected:
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 	}
-	virtual void addRoot(const ExactInterval<Number>& interval) {
+	virtual void addRoot(const Interval<Number>& interval) {
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(interval);
 	}

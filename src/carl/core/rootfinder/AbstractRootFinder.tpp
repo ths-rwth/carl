@@ -15,7 +15,7 @@ namespace rootfinder {
 template<typename Number>
 AbstractRootFinder<Number>::AbstractRootFinder(
 		const UnivariatePolynomial<Number>& polynomial,
-		const ExactInterval<Number>& interval,
+		const Interval<Number>& interval,
 		bool tryTrivialSolver
 	) :
 		originalPolynomial(polynomial),
@@ -32,37 +32,37 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
 		this->finished = true;
 	}
-	if ((this->interval.leftType() == BoundType::INFTY) || (this->interval.rightType() == BoundType::INFTY)) {
+	if ((this->interval.lowerBoundType() == BoundType::INFTY) || (this->interval.upperBoundType() == BoundType::INFTY)) {
 		Number bound = this->polynomial.cauchyBound();
 
-		if (this->interval.leftType() == BoundType::INFTY) {
-			this->interval.setLeftType(BoundType::STRICT);
-			if (-bound < this->interval.right()) {
-				this->interval.setLeft(-bound);
+		if (this->interval.lowerBoundType() == BoundType::INFTY) {
+			this->interval.setLowerBoundType(BoundType::STRICT);
+			if (-bound < this->interval.upper()) {
+				this->interval.setLower(-bound);
 			} else {
-				this->interval.setLeft(this->interval.right());
+				this->interval.setLower(this->interval.upper());
 			}
 		}
-		if (this->interval.rightType() == BoundType::INFTY) {
-			this->interval.setRightType(BoundType::STRICT);
-			if (this->interval.left() < bound) {
-				this->interval.setRight(bound);
+		if (this->interval.upperBoundType() == BoundType::INFTY) {
+			this->interval.setUpperBoundType(BoundType::STRICT);
+			if (this->interval.lower() < bound) {
+				this->interval.setUpper(bound);
 			} else {
-				this->interval.setRight(this->interval.left());
+				this->interval.setUpper(this->interval.lower());
 			}
 		}
 	}
 	
-	if (this->interval.leftType() == BoundType::WEAK) {
-		this->interval.setLeftType(BoundType::STRICT);
-		if (this->polynomial.isRoot(this->interval.left())) {
-			this->addRoot(RealAlgebraicNumberNR<Number>::create(this->interval.left()));
+	if (this->interval.lowerBoundType() == BoundType::WEAK) {
+		this->interval.setLowerBoundType(BoundType::STRICT);
+		if (this->polynomial.isRoot(this->interval.lower())) {
+			this->addRoot(RealAlgebraicNumberNR<Number>::create(this->interval.lower()));
 		}
 	}
-	if (this->interval.rightType() == BoundType::WEAK) {
-		this->interval.setRightType(BoundType::STRICT);
-		if (this->polynomial.isRoot(this->interval.right())) {
-			this->addRoot(RealAlgebraicNumberNR<Number>::create(this->interval.right()));
+	if (this->interval.upperBoundType() == BoundType::WEAK) {
+		this->interval.setUpperBoundType(BoundType::STRICT);
+		if (this->polynomial.isRoot(this->interval.upper())) {
+			this->addRoot(RealAlgebraicNumberNR<Number>::create(this->interval.upper()));
 		}
 	}
 }
@@ -85,14 +85,14 @@ void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumberPtr<Number> root, bo
 	} else {
 		RealAlgebraicNumberIRPtr<Number> r = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(root);
 		if (r->getInterval().diameter() == 0) {
-			root = RealAlgebraicNumberNR<Number>::create(r->getInterval().left());
+			root = RealAlgebraicNumberNR<Number>::create(r->getInterval().lower());
 		}
 	}
 	this->roots.push_back(root);
 }
 
 template<typename Number>
-void AbstractRootFinder<Number>::addRoot(const ExactInterval<Number>& interval) {
+void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
 	this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, interval));
 }
 
@@ -128,7 +128,7 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 					this->addRoot(RealAlgebraicNumberNR<Number>::create((-b + res.first) / (2*a)), false);
 				} else {
 					// Root is within interval (res.first, res.second)
-					ExactInterval<Number> r(res.first, res.second, BoundType::STRICT);
+					Interval<Number> r(res.first, BoundType::STRICT, res.second, BoundType::STRICT);
 					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b - r) / (2*a)), false);
 					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b + r) / (2*a)), false);
 				}

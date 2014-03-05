@@ -18,7 +18,7 @@ template<typename Coeff, typename Number>
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberPtr<Number>>& m,
-		const ExactInterval<Number>& interval,
+		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
 	assert(m.count(p.mainVar()) == 0);
@@ -54,7 +54,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable> variables,
 		const std::list<RealAlgebraicNumberPtr<Number>> values,
-		const ExactInterval<Number>& interval,
+		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
 	std::map<Variable, RealAlgebraicNumberPtr<Number>> m;
@@ -74,10 +74,10 @@ template<typename Coeff, typename Number>
 std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		const ExactInterval<Number>& interval,
+		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
-	std::map<Variable, ExactInterval<Number>> varToInterval;
+	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(p, m, varToInterval);
 	return realRoots(res, interval, pivoting);
 }
