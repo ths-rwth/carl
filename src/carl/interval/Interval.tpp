@@ -183,6 +183,12 @@ template<typename Number>
 	}
 	
 	template<typename Number>
+	bool Interval<Number>::meets(const Number& n) const
+	{
+		return (mContent.lower() <= n || mLowerBoundType == BoundType::INFTY) && (mContent.upper() >= n || mUpperBoundType == BoundType::INFTY);
+	}
+
+	template<typename Number>
 	bool Interval<Number>::isSubset(const Interval<Number>& rhs) const
 	{
 		return rhs.contains(*this);

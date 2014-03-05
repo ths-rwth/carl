@@ -679,6 +679,13 @@ namespace carl
 		bool contains(const Interval<Number>& rhs) const;
 		
 		/**
+		 * Checks if the interval meets the given value, that is if the given value is contained in the <b>closed</b> interval defined by the bounds.
+		 * @param value
+		 * @return
+		 */
+		bool meets(const Number& val) const;
+
+		/**
 		 * Checks if the given interval is a subset of the calling interval.
 		 * @param interval
 		 * @return
