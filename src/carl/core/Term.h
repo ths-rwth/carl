@@ -197,8 +197,15 @@ class Term
 				mMonomial->gatherVariables(variables);
 			}
 		}
+		
+		Term* pow(unsigned exp) const
+		{
+			return new Term(pow(coeff(),exp),mMonomial ? std::make_shared<const Monomial>(mMonomial->pow(exp)) : mMonomial);
+		}
         
         std::string toString(bool infix=true, bool friendlyVarNames=true) const;
+
+		bool isConsistent() const;
         
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
@@ -268,6 +275,7 @@ class Term
 		}
 };
 
+		
 } // namespace carl
 
 namespace std

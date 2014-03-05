@@ -80,7 +80,8 @@ private:
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::set<const UPolynomial*> PolynomialSet;
+	typedef std::unordered_set<const UPolynomial*, UnivariatePolynomialPtrHasher<cad::MPolynomial<Coefficient>>, UnivariatePolynomialPtrEquals<cad::MPolynomial<Coefficient>>> PolynomialSet;
+	//typedef std::set<const UPolynomial*> PolynomialSet;
 
 	/**
 	 * A mapping from one polynomial to a sorted range of other polynomials.
@@ -154,6 +155,8 @@ public:
 	 */
 	bool bounded;
 	
+	EliminationSet() = delete;
+
 	/**
 	 * Constructs the elimination set with a given strict ordering f of univariate polynomials.
 	 * @param owner PolynomialOwner object that recieves the ownership of all polynomials that are created within this EliminationSet.
@@ -216,6 +219,8 @@ public:
 	bool empty() const {
 		return this->polynomials.empty();
 	}
+
+	bool isConsistent() const;
 
 	////////////////////
 	// ACCESS METHODS //

@@ -47,7 +47,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
             m->mExponents.assign(mExponents.begin(), mExponents.end());
             m->mExponents[(unsigned)(it - mExponents.begin())].exp -= (unsigned)1;
             m->mTotalDegree = mTotalDegree - 1;
-            return new Term<Coefficient>(it->exp, m);
+            return new Term<Coefficient>((int)it->exp, m);
         }
     }
 }

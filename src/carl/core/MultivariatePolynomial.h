@@ -220,6 +220,32 @@ public:
 	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
 	bool divideBy(const MultivariatePolynomial& divisor, MultivariatePolynomial& quotient) const;
 	
+	/**
+	 * Calculating the quotient and the remainder, such that for a given polynomial p we have
+	 * p = divisor * quotient + remainder.
+     * @param divisor Another polynomial
+     * @return A divisionresult, holding the quotient and the remainder.
+	 * @see
+	 * @note Division is only defined on fields
+     */
+	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
+	/**
+	 * Calculates the quotient
+     * @param divisor
+     * @return 
+	 * @see MultivariatePolynomial::divideBy
+     */
+	MultivariatePolynomial quotient(const MultivariatePolynomial& divisor) const;
+	/**
+	 * Calculates the remainder
+     * @param divisor
+     * @return 
+	 * @see MultivariatePolynomial::divideBy
+     */
+	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
+	MultivariatePolynomial prem(const MultivariatePolynomial& divisor) const;
+	
+	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
 	
 	/**
@@ -318,7 +344,6 @@ public:
 	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-	
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
@@ -537,7 +562,17 @@ public:
      */
 	void checkConsistency() const;
 };
+	template<typename C, typename O, typename P>
+	MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q)
+	{
+		return p.quotient(q);
+	}
 
+	template<typename C, typename O, typename P>
+	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, unsigned exp)
+	{
+		return p.pow(exp);
+	}
 } // namespace carl
 
 /**

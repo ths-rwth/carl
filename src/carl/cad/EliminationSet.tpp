@@ -38,12 +38,23 @@ bool EliminationSet<Coefficient>::hasParents(const UPolynomial* p) const {
 }
 
 template <typename Coefficient>
+bool EliminationSet<Coefficient>::isConsistent() const {
+	if (this->polynomials.empty()) return true;
+	Variable var = (*this->polynomials.begin())->mainVar();
+	for (auto p: this->polynomials) {
+		assert(p->mainVar() == var);
+	}
+	return true;
+}
+
+template <typename Coefficient>
 std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> EliminationSet<Coefficient>::insert(
 		const UPolynomial* r,
 		const std::list<const UPolynomial*>& parents,
 		bool avoidSingle
 		)
 {
+	assert(r->isConsistent());
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
 
@@ -109,7 +120,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 			this->mPairedEliminationQueue.insert(queuePosition, *pos);
 		}
 	}
-
+	assert(this->isConsistent());
 	return insertValue;
 }
 
@@ -309,14 +320,18 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 
 	if( setting.equationsOnly ) {
 		// (1) elimination with existing polynomials
-		for (auto pol_it1: this->polynomials)
+		for (auto pol_it1: this->polynomials) {
+			assert(p->mainVar() == pol_it1->mainVar());
 			eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+		}
 		// (2) elimination with polynomial itself @todo: proof that we do not need that
 		// eliminationEq( p, p, variable, newEliminationPolynomials, setting );
 	} else {
 		// (1) elimination with existing polynomials
-		for (auto pol_it1: this->polynomials)
+		for (auto pol_it1: this->polynomials) {
+			assert(p->mainVar() == pol_it1->mainVar());
 			elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+		}
 		// (2) elimination with polynomial itself @todo: proof that we do not need that
 		// elimination( p, p, variable, newEliminationPolynomials, setting );
 		
@@ -445,6 +460,7 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to, const Variable& variable ) {
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
+		assert(p->isConsistent());
 		if(p->isConstant()) {
 			if (!p->isNumber()) { // discard numerics completely
 				to.insert(p->switchVariable(variable), this->getParentsOf(p));
@@ -527,6 +543,7 @@ void EliminationSet<Coefficient>::factorize() {
 
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff>& s) {
+	os << "{ Sizes: " << s.polynomials.size() << ", " << s.mSingleEliminationQueue.size() << ", " << s.mPairedEliminationQueue.size() << " }";
 	os << "{ Polynomials ";
 	for (auto p: s.polynomials) os << "[" << *p << "] ";
 	os << "}{ Single ";

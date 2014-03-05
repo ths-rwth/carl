@@ -159,6 +159,7 @@ RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, co
 	ExactInterval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
 
 	// the interval should include at least one root.
+	assert(!res.isZero());
 	assert(res.countRealRoots(interval) >= 1);
 	while (
 		res.sgn(interval.left()) == Sign::ZERO ||

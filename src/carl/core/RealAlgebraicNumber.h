@@ -112,6 +112,15 @@ public:
 		return mIsNumeric;
 	}
 
+	/**
+	 * Returns true if the number is represented numericly, that means not as an interval.
+	 * 
+	 * @return 
+	 */
+	virtual bool isNumericRepresentation() const {
+		return true;
+	}
+
 	/** Gives an exact numeric representation of this real algebraic number which could have been found during the refinement steps.
 	 * The method returns 0 if the value was never set during refinement.
 	 * @return an exact numeric representation of this real algebraic number which could have been found during the refinement steps
@@ -189,7 +198,7 @@ namespace carl {
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Number>* g) {
-	if (g->isNumeric()) {
+	if (g->isNumericRepresentation()) {
 		return os << static_cast<const carl::RealAlgebraicNumberNR<Number>*>(g);
 	} else {
 		return os << static_cast<const carl::RealAlgebraicNumberIR<Number>*>(g);

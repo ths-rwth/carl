@@ -59,7 +59,9 @@ public:
 		sign(s),
 		variables(checkVariables(p, v)),
 		negated(negated)
-	{}
+	{
+		assert(this->polynomial.isConsistent());
+	}
 
 	///////////////
 	// Selectors //

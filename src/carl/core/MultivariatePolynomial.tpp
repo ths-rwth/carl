@@ -50,6 +50,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Te
 Policies(),
 mTerms(1,std::make_shared<const Term<Coeff>>(t))
 {
+	if (t.isZero()) {
+		this->mTerms.clear();
+	}
 	this->checkConsistency();
 }
 
@@ -66,6 +69,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(std::sha
 Policies(),
 mTerms(1,t)
 {
+	if (t->isZero()) {
+		this->mTerms.clear();
+	}
 	this->checkConsistency();
 }
 
@@ -337,27 +343,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const
-{
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 	// A constant polynomial is obviously univariate.
-	if(isConstant()) return true;
+	if (isConstant()) return true;
 	
-	Variable v = Variable::NO_VARIABLE;
-	// If the leading term is nonlinear, than there are several variables involved.
-	if(lterm()->isLinear())
-	{
-		//As the monomials are ordered, a leading term is non-constant in a non-constant polynomial,
-		//and thus, we can be sure that the variable actually exists.
-		v = lterm()->getSingleVariable();
-	}
-	else
-	{
+	if (this->lterm()->getNrVariables() > 1) {
 		return false;
 	}
 	
-	for(const std::shared_ptr<const Term<Coeff>>& term : mTerms)
-	{
-		if(!term->hasNoOtherVariable(v)) return false;
+	Variable v = lterm()->getSingleVariable();
+	for (auto term : mTerms) {
+		if (!term->hasNoOtherVariable(v)) return false;
 	}
 	return true;
 }
@@ -453,6 +449,82 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	}
 	return false;
 }
+
+template<typename C, typename O, typename P>
+DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::divideBy(const MultivariatePolynomial& divisor) const
+{
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	DivisionResult<MultivariatePolynomial<C,O,P>> result;
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			result.quotient += *factor;
+			delete factor;
+		}
+		else
+		{
+			result.remainder += p.lterm();
+		}
+		p.stripLT();
+	}
+	assert(*this == result.quotient * divisor + result.remainder);
+	return result;
+}
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const MultivariatePolynomial& divisor) const
+{
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial<C,O,P> result;
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			result += *factor;
+			p -= *factor * divisor;
+			delete factor;
+		}
+		else
+		{
+			p.stripLT();
+		}
+	}
+	return result;
+}
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const MultivariatePolynomial& divisor) const
+{
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial<C,O,P> result;
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor == nullptr)
+		{
+			result += p.lterm();
+		}
+		else
+		{
+			delete factor;
+		}
+		p.stripLT();
+	}
+	return result;
+}
+
+
+
+
 
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
@@ -980,6 +1052,8 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 	}
 	return res;
 }
+
+
 
 template<typename C, typename O, typename P>
 bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
@@ -1936,11 +2010,10 @@ template<typename Coeff, typename Ordering, typename Policies>
 std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool infix, bool friendlyVarNames) const
 {
     if(mTerms.size() == 0) return "0";
-    auto term = mTerms.rbegin();
-    if(mTerms.size() == 1) return (*term)->toString(infix, friendlyVarNames);
+    if(mTerms.size() == 1) return this->mTerms.front()->toString(infix, friendlyVarNames);
     std::string result = "";
     if( !infix ) result += "(+";
-    for( ; term != mTerms.rend(); ++term)
+    for (auto term = mTerms.rbegin(); term != mTerms.rend(); term++)
     {
         if(infix)
         {

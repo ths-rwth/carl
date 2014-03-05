@@ -62,6 +62,7 @@ public:
 	 */
 	template<class InputIterator>
 	void insert(InputIterator first, InputIterator last) {
+		assert(this->isConsistent());
 		for (InputIterator i = first; i != last; i++) {
 			this->insert(*i);
 		}
@@ -102,7 +103,7 @@ public:
 	 *
 	 * @return next sample in the order of insertion
 	 */
-	inline RealAlgebraicNumberPtr<Number> next();
+	inline RealAlgebraicNumberPtr<Number> next() const;
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the numerically represented samples.
@@ -111,22 +112,22 @@ public:
 	 *
 	 * @return next sample in the order of insertion, preferring the numerically represented samples
 	 */
-	inline RealAlgebraicNumberPtr<Number> nextNR();
+	inline RealAlgebraicNumberPtr<Number> nextNR() const;
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the non-root samples.
 	 *
 	 * @return next sample in the order of insertion, preferring the non-root samples
 	 */
-	inline RealAlgebraicNumberPtr<Number> nextNonRoot();
+	inline RealAlgebraicNumberPtr<Number> nextNonRoot() const;
 	
 	/**
 	 * Determines the next sample in the order of insertion, preferring the non-root samples.
 	 *
 	 * @return next sample in the order of insertion, preferring the non-root samples
 	 */
-	inline RealAlgebraicNumberPtr<Number> nextRoot();
-	
+	inline RealAlgebraicNumberPtr<Number> nextRoot() const;
+
 	/**
 	 * Removes the element returned by next() from the list.
 	 * @complexity at most linear in the size of the list
@@ -248,7 +249,8 @@ private:
 	void removeFromQueue(const RealAlgebraicNumberPtr<Number> r);
 	
 	void removeFromNRIR(const RealAlgebraicNumberPtr<Number> r);
-	
+
+	bool isConsistent() const;
 };
 
 }

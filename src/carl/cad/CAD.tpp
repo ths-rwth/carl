@@ -41,6 +41,25 @@ CAD<Number>::CAD():
 }
 
 template<typename Number>
+CAD<Number>::CAD(cad::PolynomialOwner<Number>* parent):
+		cad::PolynomialOwner<Number>(parent),
+		variables(),
+		sampleTree(),
+		trace(),
+		eliminationSets(),
+		polynomials(),
+		scheduledPolynomials(),
+		newVariables(),
+		iscomplete(false),
+		interrupted(false),
+		interrupts(),
+		setting(cad::CADSettings::getSettings())
+{
+	// initialize root with empty node
+	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
+}
+
+template<typename Number>
 CAD<Number>::CAD(const std::vector<std::atomic_bool*>& i):
 		CAD()
 {
@@ -175,6 +194,7 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;
+	os << "Variables: " << cad.variables << std::endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (auto i: cad.getEliminationSets()) {
@@ -245,8 +265,12 @@ bool CAD<Number>::prepareElimination() {
 	
 	// add new polynomials to level 0, unifying their variables, and the list of all polynomials
 	for (auto p: this->scheduledPolynomials) {
-		this->polynomials.push_back(p);
-		this->eliminationSets.front().insert(p);
+		auto tmp = p;
+		if (p->mainVar() != this->variables.front()) {
+			tmp = this->take(new UPolynomial(p->switchVariable(this->variables.front())));
+		}
+		this->polynomials.push_back(tmp);
+		this->eliminationSets.front().insert(tmp);
 	}
 	
 	// optimizations for the first elimination level
@@ -381,9 +405,9 @@ bool CAD<Number>::check(
 	LOGMSG_DEBUG("carl.cad", "Checking the system");
 	for (auto c: constraints) LOGMSG_DEBUG("carl.cad", "  " << c);
 	LOGMSG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
-	for (auto b: bounds) LOGMSG_DEBUG("carl.cad", "  " << b.second << " for " << this->variables[b.first]);
+	for (auto b: bounds) LOGMSG_DEBUG("carl.cad", "  " << b.second << " for variable " << b.first);
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
-		LOGMSG_DEBUG("carl.cad", "  Level " << i << "( " << this->eliminationSets[i].size() << " ): " << this->eliminationSets[i]);
+		LOGMSG_DEBUG("carl.cad", "  Level " << i << " (" << this->eliminationSets[i].size() << "): " << this->eliminationSets[i]);
 	}
 
 #ifdef CAD_CHECK_REDIRECT
@@ -448,7 +472,7 @@ bool CAD<Number>::check(
 			onlyStrictBounds = false;
 		}
 	}
-	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
+
 	if (this->setting.computeConflictGraph) {
 		// add necessary conflict graph vertices if required
 		for (auto i = conflictGraph.size(); i < constraints.size(); i++) {
@@ -466,7 +490,8 @@ bool CAD<Number>::check(
 			if (b.second.empty()) return false;
 		}
 		// each bound non-empty
-		return true;
+		///@todo Maybe faster to generate a solution point directly here? In any case, we must fill r before returning true.
+		//return true;
 	}
 	
 	// try to solve the constraints by interval arithmetic
@@ -533,6 +558,10 @@ bool CAD<Number>::check(
 	// Main check procedure
 	
 	this->prepareElimination();
+	
+	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
+	LOGMSG_TRACE("carl.cad", "Creating boundPolynomials of size " << this->variables.size());
+	
 	if (useBounds) {
 		// construct constraints and polynomials representing the bounds
 		for (auto b: bounds) {
@@ -545,6 +574,7 @@ bool CAD<Number>::check(
 				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
+				assert(b.first < boundPolynomials.size());
 				boundPolynomials[b.first].first = tmp.back();
 			}
 			if (b.second.rightType() != BoundType::INFTY) {
@@ -599,7 +629,11 @@ bool CAD<Number>::check(
 			// re-add the input polynomials to the top-level (for they could have been deleted)
 			this->eliminationSets.front().clear();
 			for (auto p: this->polynomials) {
-				this->eliminationSets.front().insert(p);
+				if (p->mainVar() == this->variables.front()) {
+					this->eliminationSets.front().insert(p);
+				} else {
+					this->eliminationSets.front().insert(this->take(new UPolynomial(p->switchVariable(this->variables.front()))));
+				}
 			}
 		} else {
 			// only reset the first elimination level
@@ -895,6 +929,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			// sample between neighbor and insertValue.first needed and will be added to newSampleSet
 			if ((*insertValue.first)->isNumeric()) {
 				if ((*neighbor)->isNumeric()) {
+					assert((*insertValue.first)->value() < (*neighbor)->value());
 					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(ExactInterval<Number>((*insertValue.first)->value(), (*neighbor)->value(), BoundType::STRICT).sample(), false));
 				} else {
 					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().left(), false));
@@ -980,7 +1015,7 @@ std::vector<Variable> CAD<Number>::orderVariablesGreeedily(
 	
 	for (auto variable = firstVariable; variable != lastVariable; variable++) {
 		// build the first elimination set w.r.t. variable and measure its sum of total degrees
-		cad::EliminationSet<Number> eliminationInput;
+		cad::EliminationSet<Number> eliminationInput(this);
 		// add input polynomials to temporary input set, unifying their variables
 		for (auto p = firstPolynomial; p != lastPolynomial; p++) {
 			if (!p.isConstant()) {
@@ -988,7 +1023,7 @@ std::vector<Variable> CAD<Number>::orderVariablesGreeedily(
 			}
 		}
 		// perform the elimination step
-		cad::EliminationSet<Number> eliminationOutput;
+		cad::EliminationSet<Number> eliminationOutput(this);
 		while (!(eliminationInput.emptySingleEliminationQueue() || eliminationInput.emptyPairedEliminationQueue())) {
 			eliminationInput.eliminateNextInto(eliminationOutput, variable, s);
 		}
@@ -1177,9 +1212,11 @@ bool CAD<Number>::mainCheck(
 	const unsigned dim = (unsigned)this->variables.size();
 	LOGMSG_TRACE("carl.cad", "mainCheck: dimension is " << dim);
 	auto sampleTreeRoot = this->sampleTree.begin();
-	int maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
+	int tmp = this->sampleTree.max_depth(sampleTreeRoot);
+	assert(tmp >= 0);
+	unsigned maxDepth = (unsigned)tmp;
 	// if the elimination sets were extended (i.e. the sample tree is not developed completely), we obtain new samples already in phase one
-	next = next && (maxDepth == (int)dim);
+	next = next && (maxDepth == dim);
 	
 	// unify the variables for each constraint to match the CAD's variable order
 	for (unsigned i = 0; i < constraints.size(); ++i) {
@@ -1214,7 +1251,8 @@ bool CAD<Number>::mainCheck(
 			CHECK_NODE(node, false, next, false)
 		}
 		// update maximum sample tree depth
-		maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
+		assert(this->sampleTree.max_depth(sampleTreeRoot) >= 0);
+		maxDepth = (unsigned)this->sampleTree.max_depth(sampleTreeRoot);
 	}
 	
 	/* Phase 2
@@ -1224,7 +1262,10 @@ bool CAD<Number>::mainCheck(
 	if (maxDepth == 0) {
 		// there is no sample component computed yet, so we are at the base level
 		// perform an initial elimination so that the base level contains lifting positions
-		while (this->eliminationSets.back().emptyLiftingQueue() && this->eliminate(dim-1, bounds, boundsNontrivial)) {};
+		int lastRes = 0;
+		while (this->eliminationSets.back().emptyLiftingQueue() && (lastRes = this->eliminate(dim-1, bounds, boundsNontrivial))) {
+			LOGMSG_DEBUG("carl.cad", "Waiting for something to lift, lastRes = " << lastRes << std::endl << *this);
+		};
 		
 		// perform an initial lifting step in order to fill the tree once
 		if (this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
@@ -1254,7 +1295,7 @@ bool CAD<Number>::mainCheck(
 	 */
 	
 	// invariant: either the last level is completely developed (dim or 0), or something in between due to bounds
-	assert(maxDepth == (int)dim || maxDepth == 0 || boundsNontrivial);
+	assert(maxDepth == (unsigned)dim || maxDepth == (unsigned)0 || boundsNontrivial);
 	
 	while (true) {
 		// search base level with open lifting position
@@ -1891,7 +1932,10 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	
 	// optimization for equations not valid in general
 	boxSetting.equationsOnly = variables.size() <= 1;
-	CAD<Number> cadbox({p}, variables, boxSetting);
+	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(this));
+	cadbox.scheduledPolynomials.assign({p});
+	cadbox.newVariables = variables;
+	cadbox.setting = boxSetting;
 	
 	RealAlgebraicPoint<Number> r;
 	std::vector<cad::Constraint<Number>> constraints(1, cad::Constraint<Number>(*p, Sign::ZERO, variables));
