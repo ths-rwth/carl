@@ -1076,7 +1076,7 @@ inline const Interval<Number> operator +(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(lhs + rhs, rhs.lowerBoundType(), rhs.upperBoundType());
+		return Interval<Number>(BoostInterval(lhs + rhs.content().lower(), lhs + rhs.content().upper()), rhs.lowerBoundType(), rhs.upperBoundType());
 	}
 
 template<typename Number>
@@ -1112,7 +1112,7 @@ inline const Interval<Number> operator *(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>( lhs * rhs, rhs.lowerBoundType(), rhs.upperBoundType());
+		return Interval<Number>( BoostInterval(lhs * rhs.content().lower(), lhs * rhs.content().upper()), rhs.lowerBoundType(), rhs.upperBoundType());
 	}
 
 template<typename Number>
