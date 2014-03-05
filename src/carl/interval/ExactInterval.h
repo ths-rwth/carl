@@ -26,11 +26,7 @@ namespace carl
     class ExactInterval
     {
         public:
-
-            /// Standard assertion for checking the input to constructors and setters: the interval bounds might define an empty interval but can never cross (left > right).
-            #define BOUNDS_OK( left, leftType, right, rightType )\
-                ( leftType == BoundType::INFTY || rightType == BoundType::INFTY || left <= right )
-
+            
             //////////////////////////
             // Con- and destructors //
             //////////////////////////
