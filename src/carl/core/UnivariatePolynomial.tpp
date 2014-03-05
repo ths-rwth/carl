@@ -1901,7 +1901,6 @@ UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& r
 {
 	assert(rhs != 0);
 	if(lhs.isZero()) return lhs;
-	std::cout <<  "LHS " << lhs << std::endl;
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
 }
