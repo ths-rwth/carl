@@ -28,6 +28,7 @@
 #include <cassert>
 #include <list>
 #include <sstream>
+#include <limits>
 #include "BoundType.h"
 #include "checking.h"
 #include "rounding.h"
@@ -422,9 +423,31 @@ namespace carl
 		Interval(Rational n);
 		template<typename Rational>
 		Interval(Rational lower, Rational upper);
-		template<typename Rational>
-		Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType);
 		*/
+		template<typename Num = Number, typename Rational, EnableIf<std::is_same<double, Num>> = dummy, DisableIf<std::is_same<Num, Rational>> = dummy>
+		Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType)
+		{
+			mLowerBoundType = lowerBoundType;
+			mUpperBoundType = upperBoundType;
+			double dLeft = carl::roundDown(lower, false);
+			double dRight = carl::roundUp(upper, false);
+			if(dLeft == -std::numeric_limits<double>::infinity()) mLowerBoundType = BoundType::INFTY;
+			if(dRight == std::numeric_limits<double>::infinity()) mUpperBoundType = BoundType::INFTY;
+			if(mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY) {
+				mContent = BoostInterval(0);
+			} else if(mLowerBoundType == BoundType::INFTY) {
+				mContent = BoostInterval(dRight);
+			} else if(mUpperBoundType == BoundType::INFTY) {
+				mContent = BoostInterval(dLeft);
+			} else if((lower == upper && lowerBoundType != upperBoundType) || lower > upper) {
+				mLowerBoundType = BoundType::STRICT;
+				mUpperBoundType = BoundType::STRICT;
+				mContent = BoostInterval(0);
+			} else {
+				mContent = BoostInterval(dLeft, dRight);
+			}
+		}
+
 		static Interval<Number> unboundedInterval()
 		{
 			return Interval<Number>(Number(0), BoundType::INFTY, Number(0), BoundType::INFTY);
