@@ -6,8 +6,11 @@
 
 #pragma once
 
-#include "PrimitiveEuclideanAlgorithm.h"
+#include "MultivariateGCD.h"
 #include "UnivariatePolynomial.h"
+
+
+
 namespace carl
 {
 	template<typename Coeff>

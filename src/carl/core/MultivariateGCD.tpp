@@ -9,11 +9,48 @@
 
 #include "MultivariateGCD.h"
 
+#include "UnivariatePolynomial.h"
+
+#include "MultivariatePolynomial.h"
+
 namespace carl
 {
-template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>&, const MultivariatePolynomial<C,O,P>&)
+
+template<typename GCDCalculation, typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculate() 
 {
-//	MultivariateGCD<PrimitiveEuclideanAlgorithm, C, O, P>
+	// We start with some trivial cases.
+	if(mp1 == 1 || mp2 == 1) return Polynomial(1);
+	if(mp1.nrTerms() == 1 && mp2.nrTerms() == 1)
+	{
+		//return Polynomial(Term::gcd(*mp1.lterm(), *mp2.lterm()));
+	}
+
+	// And we do some simplifications for the input.
+	// In order to do so, we gather some information about the polynomials, as we most certainly need them later on.
+
+	// We check for mutual trivial factorizations.
+
+	// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
+	// gcd(p, ay + b) is either ay + b or 1.
+
+	Variable x = getMainVar(mp1, mp2);
+	UnivReprPol A = mp1.toUnivariatePolynomial(x);
+	UnivReprPol B = mp2.toUnivariatePolynomial(x);
+	UnivReprPol GCD = (*static_cast<GCDCalculation*>(this))(A,B);
+	
+	return Polynomial(GCD);
+	//return Result()
+//		return Result(GCD, A/GCD, B/GCD);
+
+}	
+
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
+{
+	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
+	return gcd_calc.calculate();
 }
+
 }

@@ -8,16 +8,37 @@
 
 #pragma once
 
-#include "MultivariatePolynomial.h"
-#include "UnivariatePolynomial.h"
+#include "MonomialOrdering.h"
+#include "MultivariatePolynomialPolicy.h"
 
 namespace carl
 {
+	
+template<typename C, typename O, typename P>
+class MultivariatePolynomial;
+template<typename C>
+class UnivariatePolynomial;
+
+
+	
+/**
+ * @param a A multivariately represented polynomial.
+ * @param b A multivariately represented polynomial.
+ * @return The greatest common divisor of a and b.
+ * @ingroup gcd
+ * @ingroup multirp
+ * @see MultivariatePolynomial
+ * @see MultivariateGCD
+ */
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
+	
+
 /**
  * The result of a gcd calculation, as with the extended gcd.
  * @ingroup gcd
  */	
-template<typename Coeff, typename Ordering= GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
+template<typename Coeff, typename Ordering, typename Policies>
 struct GCDResult
 {
 	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
@@ -45,39 +66,16 @@ class MultivariateGCD : GCDCalculation
 	
 	public:
 	MultivariateGCD(const MultivariatePolynomial<Coeff,Ordering,Policies>& p1,const MultivariatePolynomial<Coeff,Ordering,Policies>& p2)
-	: mp1(p1), mp2(p2), GCDCalculation()
+	: GCDCalculation(), mp1(p1), mp2(p2)
 	{
 		
 	}
 	
 	/**
 	 * 
-     * @param approx
      * @return 
      */
-	Result calculate(bool approx=true)
-	{
-		assert(approx);
-		
-		// We start with some trivial cases.
-		if(mp1 == (Coeff)1 || mp2 == (Coeff)1) return {Polynomial((Coeff)1), Polynomial((Coeff)1), Polynomial((Coeff)1)};
-		if(mp1.nrTerms() == 1 && mp2.nrTerms() == 1)
-		{
-			//return Polynomial(Term::gcd(*mp1.lterm(), *mp2.lterm()));
-		}
-		
-		// And we do some simplifications for the input.
-		// In order to do so, we gather some information about the polynomials, as we most certainly need them later on.
-		
-		// We check for mutual trivial factorizations.
-		
-		// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
-		// gcd(p, ay + b) is either ay + b or 1.
-		
-		Variable x = getMainVar(mp1, mp2);
-		UnivReprPol A = mp1.toUnivariatePolynomial(x);
-		UnivReprPol B = mp2.toUnivariatePolynomial(x);
-	}
+	Polynomial calculate();
 	
 	private:
 	/**
@@ -108,18 +106,8 @@ class MultivariateGCD : GCDCalculation
 		
 };
 
-/**
- * @param a
- * @param b
- * @return 
- * @ingroup gcd
- * @ingroup multirp
- * @see MultivariatePolynomial
- * @see MultivariateGCD
- */
-template<typename C, typename O, typename P>
-MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>&, const MultivariatePolynomial<C,O,P>&);
-	
-	
 }
+#include "PrimitiveEuclideanAlgorithm.h"
 #include "MultivariateGCD.tpp"
+#include "PrimitiveEuclideanAlgorithm.tpp"	
+

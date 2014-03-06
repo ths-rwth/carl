@@ -26,6 +26,20 @@ bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {	
 	if(lhs.isZero() && rhs.isZero()) return true;
 	if(lhs.isUnit() && rhs.isUnit()) return true;
+	if(rhs.mGf == nullptr)
+	{
+		if(rhs.isZero())
+		{
+			if(lhs.mGf->modulo(lhs.mN) == 0) 
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
 	// same field AND same number after normalization.
 	assert(lhs.mGf != nullptr);
 	assert(rhs.mGf != nullptr);
