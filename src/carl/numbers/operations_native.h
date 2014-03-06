@@ -29,6 +29,9 @@ namespace carl {
 inline double toDouble(const int& n) {
 	return double(n);
 }
+inline double toDouble(const double& n) {
+	return n;
+}
 
 /**
  * Basic Operators
