@@ -27,7 +27,7 @@ class UnivariatePolynomial;
  * @ingroup multirp
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
-class MultivariatePolynomial : public Polynomial, Policies
+class MultivariatePolynomial : public Polynomial, public Policies
 {
 public:
 	/// The ordering of the terms.

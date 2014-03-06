@@ -20,6 +20,10 @@ struct BVReasons
 	static const bool has_reasons = false;
 	
 	void setReason(unsigned index);
+	BitVector getReasons() const
+	{
+		return mReasonset;
+	}
 private:
 	BitVector mReasonset;
 };
