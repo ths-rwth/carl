@@ -232,14 +232,14 @@ namespace carl
             	_result.mValue = std::cbrt(mValue);
             }
 
-            FLOAT_T<FloatType>& root_assign(unsigned long int _k, CARL_RND)
+            FLOAT_T<FloatType>& root_assign(unsigned long int , CARL_RND)
             {
                 assert( *this >= 0);
                 /// @TODO implement root_assign for FLOAT_T
                 return *this;
             }
             
-            void root(FLOAT_T<FloatType>& _result, unsigned long int _k, CARL_RND)
+            void root(FLOAT_T<FloatType>& , unsigned long int , CARL_RND)
             {
                 assert( *this >= 0);
             	/// @TODO implement root for FLOAT_T
