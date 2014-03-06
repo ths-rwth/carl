@@ -51,6 +51,16 @@ public:
 		mOrigGenerators.push_back(p);
 	}
 
+	bool basisIsConstant() const
+	{
+		return getIdeal().isConstant();
+	}
+	
+	const std::vector<Polynomial>& getBasisPolynomials() const
+	{
+		getIdeal().getGenerators();
+	}
+	
 	const Ideal<Polynomial>& getIdeal() const
 	{
 		return *mGb;
