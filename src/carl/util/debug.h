@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 #include <unistd.h>
+#include <bitset>
+#include <sstream>
 
 namespace carl {
 
@@ -84,6 +86,20 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value>&
 		os << it.first << " : " << it.second;
 	}
 	return os << "}";
+}
+
+
+template<typename T>
+std::string binary(const T& a)
+{
+	std::stringstream ss;
+    const char* begin = reinterpret_cast<const char*>(&a);
+	const char* end = begin + sizeof(T);
+	while (begin != end) {
+		ss << std::bitset<8>((unsigned)*begin);
+		begin++;
+	}
+	return ss.str();
 }
 
 #ifdef DEBUG
