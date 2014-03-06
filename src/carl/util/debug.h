@@ -96,7 +96,7 @@ std::string binary(const T& a)
     const char* begin = reinterpret_cast<const char*>(&a);
 	const char* end = begin + sizeof(T);
 	while (begin != end) {
-		ss << std::bitset<8>(*begin);
+		ss << std::bitset<8>((unsigned)*begin);
 		begin++;
 	}
 	return ss.str();
