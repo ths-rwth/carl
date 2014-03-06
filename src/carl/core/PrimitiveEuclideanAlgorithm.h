@@ -8,6 +8,9 @@
 
 namespace carl
 {
+	
+	template<typename C>
+	class UnivariatePolynomial;
 /**
  * Algorithm to compute the GCD in Unique factorization domains.
  * @see @ref GCL92, Algorithm 2.3 

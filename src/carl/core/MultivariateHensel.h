@@ -178,7 +178,7 @@ class MultivariateHensel
 	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
 	
 	
-	static std::list<UnivReprPol> calculate(const UnivReprPol& a, const std::map<Variable, Coeff>& I, Integer p)
+	static std::list<UnivReprPol> calculate(const UnivReprPol& , const std::map<Variable, Coeff>& , Integer )
 	{
 		
 	}

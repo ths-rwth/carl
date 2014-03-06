@@ -63,5 +63,5 @@ TEST(EliminationSet, SetProperty)
 		cad::UPolynomial<cln::cl_RA>* p = new cad::UPolynomial<cln::cl_RA>(x, {mpone, mpone, mpone});
 		s.insert(p);
 	}
-	EXPECT_EQ(1, s.size());
+	EXPECT_EQ((unsigned)1, s.size());
 }

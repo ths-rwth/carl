@@ -463,13 +463,15 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 		if(factor != nullptr)
 		{
 			result.quotient += *factor;
+			p -= *factor * divisor;
 			delete factor;
 		}
 		else
 		{
 			result.remainder += p.lterm();
+			p.stripLT();
 		}
-		p.stripLT();
+		
 	}
 	assert(*this == result.quotient * divisor + result.remainder);
 	return result;
@@ -1151,7 +1153,10 @@ bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
 {
-    if(lhs.mTerms.empty() && rhs == 0) return true;
+    if(lhs.mTerms.empty())
+	{
+		return rhs == 0;
+	}
     if(lhs.mTerms.size() > 1) return false;
     return (lhs.mTerms.front()->coeff()) == rhs;
 }

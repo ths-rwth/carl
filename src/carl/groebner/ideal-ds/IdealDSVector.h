@@ -58,14 +58,13 @@ public:
      */
     DivisionLookupResult<Polynomial> getDivisor(const Term<typename Polynomial::CoeffType>& t) const
     {
-        typename std::vector<size_t>::iterator end = mDivList.end();
-        for(typename std::vector<size_t>::iterator it = mDivList.begin(); it != end;)
+        for(typename std::vector<size_t>::iterator it = mDivList.begin(); it != mDivList.end();)
         {
             // First, we check whether the possible divisor is still in the ideal.
             // TODO As this mostly yields false, maybe, we should move it.
             if(mEliminated.count(*it) == 1)
             {
-                mDivList.erase(it);
+                it = mDivList.erase(it);
                 continue;
             }
 			

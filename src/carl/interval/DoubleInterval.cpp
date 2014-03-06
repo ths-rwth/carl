@@ -31,6 +31,7 @@
  */
 
 #include "DoubleInterval.h"
+#include "../core/logging.h"
 
 #include <cfloat>
 #include <cmath>
@@ -491,242 +492,246 @@ namespace carl
     
     DoubleInterval DoubleInterval::sin() const
     {
-        double tmp_up,tmp_lo;
-        double pi_up = 0;
-        double pi_lo = 0;
-
-        tmp_up = right()/pi_lo;
-        tmp_lo = left()/pi_up;
-        tmp_up *= 2;
-        tmp_lo *= 2;
-
-        int iUp = (int)std::floor(tmp_up);
-        int iLo = (int)std::floor(tmp_lo);
-	int iPeriod = iUp - iLo;
-
-        DoubleInterval result(-1,1);
-	if(iPeriod >= 4)
-	{
-            return result;
-	}
-	else
-	{
-            int modUp = iUp % 4;
-            if(modUp < 0)
-            {
-                modUp += 4;
-            }
-
-            int modLo = iLo % 4;
-            if(modLo < 0)
-            {
-                modLo += 4;
-            }
-
-            double tmp1 = std::sin(left());
-            double tmp2 = std::sin(right());
-
-            switch(modLo)
-            {
-            case 0:
-                    switch(modUp)
-                    {
-                        case 0:
-                            if(iPeriod == 0)
-                            {
-                                result.set(tmp1, tmp2);
-                            }
-                            break;
-                        case 1:
-                            result.set(tmp1 > tmp2 ? tmp2 : tmp1, 1);
-                            break;
-                        case 2:
-                            result.set(tmp2, 1);
-                            break;
-                        case 3:
-                            break;
-                    }
-                    break;
-            case 1:
-                    switch(modUp)
-                    {
-                        case 0:
-                            result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2);
-                            break;
-                        case 1:
-                            if(iPeriod == 0)
-                            {
-                                result.set(tmp2, tmp1);
-                            }
-                            break;
-                        case 2:
-                            result.set(tmp2, tmp1);
-                            break;
-                        case 3:
-                            result.set(-1, tmp1);
-                            break;
-                    }
-                    break;
-            case 2:
-                    switch(modUp)
-                    {
-                        case 0:
-                            result.set(-1, tmp2);
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                                if(iPeriod == 0)
-                                {
-                                    result.set(tmp2, tmp1);
-                                }
-                                break;
-                        case 3:
-                            result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2 );
-                            break;
-                    }
-                    break;
-            case 3:
-                    switch(modUp)
-                    {
-                        case 0:
-                            result.set(tmp1, tmp2);
-                            break;
-                        case 1:
-                            result.set(tmp1, 1);
-                            break;
-                        case 2:
-                            result.set( tmp1 > tmp2 ? tmp2 : tmp1, 1);
-                            break;
-                        case 3:
-                            if(iPeriod == 0)
-                            {
-                                result.set(tmp1, tmp2);
-                            }
-                            break;
-                    }
-                    break;
-            }
-            return result;
-	}
+		LOG_NOTIMPLEMENTED();
+		return *this;
+//        double tmp_up,tmp_lo;
+//        double pi_up = 0;
+//        double pi_lo = 0;
+//
+//        tmp_up = right()/pi_lo;
+//        tmp_lo = left()/pi_up;
+//        tmp_up *= 2;
+//        tmp_lo *= 2;
+//
+//        int iUp = std::floor(tmp_up);
+//        int iLo = std::floor(tmp_lo);
+//	int iPeriod = iUp - iLo;
+//
+//        DoubleInterval result(-1,1);
+//		if(iPeriod >= 4)
+//		{
+//				return result;
+//		}
+//		else
+//		{
+//				int modUp = iUp % 4;
+//				if(modUp < 0)
+//				{
+//					modUp += 4;
+//				}
+//
+//				int modLo = iLo % 4;
+//				if(modLo < 0)
+//				{
+//					modLo += 4;
+//				}
+//
+//				double tmp1 = std::sin(left());
+//				double tmp2 = std::sin(right());
+//
+//				switch(modLo)
+//				{
+//				case 0:
+//						switch(modUp)
+//						{
+//							case 0:
+//								if(iPeriod == 0)
+//								{
+//									result.set(tmp1, tmp2);
+//								}
+//								break;
+//							case 1:
+//								result.set(tmp1 > tmp2 ? tmp2 : tmp1, 1);
+//								break;
+//							case 2:
+//								result.set(tmp2, 1);
+//								break;
+//							case 3:
+//								break;
+//						}
+//						break;
+//				case 1:
+//						switch(modUp)
+//						{
+//							case 0:
+//								result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2);
+//								break;
+//							case 1:
+//								if(iPeriod == 0)
+//								{
+//									result.set(tmp2, tmp1);
+//								}
+//								break;
+//							case 2:
+//								result.set(tmp2, tmp1);
+//								break;
+//							case 3:
+//								result.set(-1, tmp1);
+//								break;
+//						}
+//						break;
+//				case 2:
+//						switch(modUp)
+//						{
+//							case 0:
+//								result.set(-1, tmp2);
+//								break;
+//							case 1:
+//								break;
+//							case 2:
+//									if(iPeriod == 0)
+//									{
+//										result.set(tmp2, tmp1);
+//									}
+//									break;
+//							case 3:
+//								result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2 );
+//								break;
+//						}
+//						break;
+//				case 3:
+//						switch(modUp)
+//						{
+//							case 0:
+//								result.set(tmp1, tmp2);
+//								break;
+//							case 1:
+//								result.set(tmp1, 1);
+//								break;
+//							case 2:
+//								result.set( tmp1 > tmp2 ? tmp2 : tmp1, 1);
+//								break;
+//							case 3:
+//								if(iPeriod == 0)
+//								{
+//									result.set(tmp1, tmp2);
+//								}
+//								break;
+//						}
+//						break;
+//				}
+//				return result;
+//		}
     }
     
     DoubleInterval DoubleInterval::cos() const
     {
-        double tmp_up, tmp_lo;
-        double pi_up = 0;
-        double pi_lo = 0;
-
-        tmp_up = right()/pi_lo;
-        tmp_lo = left()/pi_up;
-        tmp_up *= 2;
-        tmp_lo *= 2;
-
-        int iUp = (int)std::floor(tmp_up);
-        int iLo = (int)std::floor(tmp_lo);
-	int iPeriod = iUp - iLo;
-
-        DoubleInterval result(-1,1);
-	if(iPeriod >= 4)
-	{
-            return result;
-	}
-	else
-	{
-            int modUp = iUp % 4;
-            if(modUp < 0)
-                modUp += 4;
-
-            int modLo = iLo % 4;
-            if(modLo < 0)
-                modLo += 4;
-
-            double tmp1 = std::cos(left());
-            double tmp2 = std::cos(right());
-
-            switch(modLo)
-            {
-            case 0:
-                    switch(modUp)
-                    {
-                    case 0:
-                        if(iPeriod == 0)
-                        {
-                            result.set(tmp2, tmp1);
-                        }
-                        break;
-                    case 1:
-                        result.set(tmp2, tmp1);
-                        break;
-                    case 2:
-                        result.set(-1, tmp1);
-                        break;
-                    case 3:
-                        result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2 );
-                        break;
-                    }
-                    break;
-            case 1:
-                    switch(modUp)
-                    {
-                    case 0:
-                        break;
-                    case 1:
-                        if(iPeriod == 0)
-                        {
-                            result.set(tmp2, tmp1);
-                        }
-                        break;
-                    case 2:
-                        result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2 );
-                        break;
-                    case 3:
-                        result.set(-1, tmp2);
-                        break;
-                    }
-                    break;
-            case 2:
-                    switch(modUp)
-                    {
-                    case 0:
-                        result.set(tmp1, 1);
-                        break;
-                    case 1:
-                        result.set(tmp1 > tmp2 ? tmp2 : tmp1, 1);
-                        break;
-                    case 2:
-                        if(iPeriod == 0)
-                        {
-                            result.set(tmp1, tmp2);
-                        }
-                        break;
-                    case 3:
-                        result.set(tmp1, tmp2);
-                        break;
-                    }
-                    break;
-            case 3:
-                    switch(modUp)
-                    {
-                    case 0:
-                        result.set(tmp1 > tmp2 ? tmp2 : tmp1, 1);
-                        break;
-                    case 1:
-                        result.set(tmp2, 1);
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        if(iPeriod == 0)
-                        {
-                            result.set(tmp1, tmp2);
-                        }
-                        break;
-                    }
-                    break;
-            }
-            return result;
-	}
+		LOG_NOTIMPLEMENTED();
+		return *this;
+//        double tmp_up, tmp_lo;
+//        double pi_up = 0;
+//        double pi_lo = 0;
+//
+//        tmp_up = right()/pi_lo;
+//        tmp_lo = left()/pi_up;
+//        tmp_up *= 2;
+//        tmp_lo *= 2;
+//
+//        int iUp = std::floor(tmp_up);
+//        int iLo = std::floor(tmp_lo);
+//		int iPeriod = iUp - iLo;
+//
+//		DoubleInterval result(-1,1);
+//		if(iPeriod >= 4)
+//		{
+//				return result;
+//		}
+//		else
+//		{
+//				int modUp = iUp % 4;
+//				if(modUp < 0)
+//					modUp += 4;
+//
+//				int modLo = iLo % 4;
+//				if(modLo < 0)
+//					modLo += 4;
+//
+//				double tmp1 = std::cos(left());
+//				double tmp2 = std::cos(right());
+//
+//				switch(modLo)
+//				{
+//				case 0:
+//						switch(modUp)
+//						{
+//						case 0:
+//							if(iPeriod == 0)
+//							{
+//								result.set(tmp2, tmp1);
+//							}
+//							break;
+//						case 1:
+//							result.set(tmp2, tmp1);
+//							break;
+//						case 2:
+//							result.set(-1, tmp1);
+//							break;
+//						case 3:
+//							result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2 );
+//							break;
+//						}
+//						break;
+//				case 1:
+//						switch(modUp)
+//						{
+//						case 0:
+//							break;
+//						case 1:
+//							if(iPeriod == 0)
+//							{
+//								result.set(tmp2, tmp1);
+//							}
+//							break;
+//						case 2:
+//							result.set(-1, tmp1 > tmp2 ? tmp1 : tmp2 );
+//							break;
+//						case 3:
+//							result.set(-1, tmp2);
+//							break;
+//						}
+//						break;
+//				case 2:
+//						switch(modUp)
+//						{
+//						case 0:
+//							result.set(tmp1, 1);
+//							break;
+//						case 1:
+//							result.set(tmp1 > tmp2 ? tmp2 : tmp1, 1);
+//							break;
+//						case 2:
+//							if(iPeriod == 0)
+//							{
+//								result.set(tmp1, tmp2);
+//							}
+//							break;
+//						case 3:
+//							result.set(tmp1, tmp2);
+//							break;
+//						}
+//						break;
+//				case 3:
+//						switch(modUp)
+//						{
+//						case 0:
+//							result.set(tmp1 > tmp2 ? tmp2 : tmp1, 1);
+//							break;
+//						case 1:
+//							result.set(tmp2, 1);
+//							break;
+//						case 2:
+//							break;
+//						case 3:
+//							if(iPeriod == 0)
+//							{
+//								result.set(tmp1, tmp2);
+//							}
+//							break;
+//						}
+//						break;
+//				}
+//				return result;
+//		}
     }
 
     double DoubleInterval::diameter() const

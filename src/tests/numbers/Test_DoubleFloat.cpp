@@ -267,7 +267,7 @@ TEST(doubleFloatTest, Roots)
     double vResult2 = 3;
     double vResult3 = 2;
     
-    int i1 = 8;
+    
     carl::FLOAT_T<double> f1 = carl::FLOAT_T<double>(v1);
     carl::FLOAT_T<double> f2 = carl::FLOAT_T<double>(v2);
     carl::FLOAT_T<double> f3 = carl::FLOAT_T<double>(v3);
