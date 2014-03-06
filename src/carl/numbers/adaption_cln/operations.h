@@ -12,6 +12,7 @@
 
 #include <cassert>
 #include <climits>
+#include <cmath>
 
 namespace carl {
 
@@ -76,7 +77,19 @@ inline T rationalize(double n) {
 }
 template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
-	return cln::rationalize(cln::cl_R(n));
+	switch (std::fpclassify(n)) {
+		case FP_NORMAL: // normalized are fully supported
+			return cln::rationalize(cln::cl_R(n));
+		case FP_SUBNORMAL: // subnormals result in underflows, hence we just return zero.
+			return 0;
+		case FP_ZERO:
+			return 0;
+		case FP_NAN: // NaN and infinite are not supported
+		case FP_INFINITE:
+			assert(false);
+			break;
+	}
+	return 0;
 }
 
 /**
