@@ -393,8 +393,8 @@ namespace carl
         {
             mLowerBoundType = lowerBoundType;
             mUpperBoundType = upperBoundType;
-            Num left = carl::rationalize(toDouble(lower));
-            Num right = carl::rationalize(toDouble(upper));
+            Num left = carl::rationalize<Num>(toDouble(lower));
+            Num right = carl::rationalize<Num>(toDouble(upper));
             //if(left == -std::numeric_limits<double>::infinity()) mLowerBoundType = BoundType::INFTY;
             //if(right == std::numeric_limits<double>::infinity()) mUpperBoundType = BoundType::INFTY;
             if(mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY)
