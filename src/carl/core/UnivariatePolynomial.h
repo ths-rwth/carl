@@ -851,7 +851,13 @@ private:
 template<typename Coeff>
 struct UnivariatePolynomialPtrHasher : public std::hash<UnivariatePolynomial<Coeff>*>{
 	size_t operator()(const UnivariatePolynomial<Coeff>* p) const {
-		return p == nullptr ? 0 : 1;
+		if (p == nullptr) return 0;
+		size_t result = 0;
+		std::hash<Coeff> h;
+		for(auto c: p->coefficients()) {
+			result ^= h(c);
+		}
+		return result;
 	}
 };
 
