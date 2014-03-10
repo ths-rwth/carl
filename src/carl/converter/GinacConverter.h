@@ -12,6 +12,10 @@
 #ifdef COMPARE_WITH_GINAC
 #include <unordered_map>
 #include <ginac/ginac.h>
+namespace carl
+{
+	bool similar(GiNaC::ex a, GiNaC::ex b);
+}
 #include "../core/MultivariatePolynomial.h"
 
 namespace carl
