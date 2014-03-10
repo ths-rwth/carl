@@ -392,7 +392,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	for (unsigned i = 0; i < res.mTerms.size(); i++) {
 		res.mTerms[i].reset(res.mTerms[i]->divideBy(divisor));
 	}
-	LOGMSG_TRACE("carl.core", *this << " / " << divisor << " = " << res);
 	return res;
 }
 
@@ -400,7 +399,6 @@ template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
-	LOGMSG_TRACE("carl.core", *this << " / " << b);
 	assert(this != &quotient);
 
 	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
