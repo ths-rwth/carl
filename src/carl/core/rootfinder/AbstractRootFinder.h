@@ -15,6 +15,8 @@
 namespace carl {
 namespace rootfinder {
 
+//#define ROOTFINDER_CACHE
+
 /**
  * Base class for a root finding algorithm for a single univariate polynomial.
  * 
@@ -59,6 +61,9 @@ protected:
 	 * Flag that indicates if the search has finished.
      */
 	bool finished;
+#ifdef ROOTFINDER_CACHE
+	static std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumberPtr<Number>>> cache;
+#endif
 
 public:
 	/**
@@ -158,9 +163,29 @@ protected:
 		if (! this->isFinished()) {
 			this->finished = true;
 			this->roots.sort();
+#ifdef ROOTFINDER_CACHE
+			this->storeInCache();
+#endif
 		}
 	}
+#ifdef ROOTFINDER_CACHE
+	bool storeInCache() {
+		if (cache.find(this->originalPolynomial) == cache.end()) {
+			cache[this->originalPolynomial] = this->roots;
+			return true;
+		}
+		return false;
+	}
+	bool inCache() {
+		return cache.find(this->originalPolynomial) != cache.end();
+	}
+#endif
 };
+
+#ifdef ROOTFINDER_CACHE
+template<typename Number>
+std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumberPtr<Number>>> AbstractRootFinder<Number>::cache;
+#endif
 
 }
 }
