@@ -24,13 +24,22 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		interval(interval),
 		finished(false)
 {
+#ifdef ROOTFINDER_CACHE
+	if (this->inCache()) {
+		LOGMSG_TRACE("carl.core.rootfinder", "Hit cache: " << this->originalPolynomial);
+		this->roots = cache[this->originalPolynomial];
+		this->finished = true;
+		return;
+	}
+#endif
 	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
 	if (this->polynomial.zeroIsRoot()) {
 		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
 	}
 	if (tryTrivialSolver && this->solveTrivial()) {
 		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
-		this->finished = true;
+		this->setFinished();
+		return;
 	}
 	if ((this->interval.lowerBoundType() == BoundType::INFTY) || (this->interval.upperBoundType() == BoundType::INFTY)) {
 		Number bound = this->polynomial.cauchyBound();

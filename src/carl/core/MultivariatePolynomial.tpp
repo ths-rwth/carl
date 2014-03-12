@@ -636,8 +636,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 		}
 	}
 	setTerms(newTerms);
-	LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
-	LOGMSG_TRACE("carl.core", "should hold: " << mTerms.size() << " <= " << expectedResultSize);
 	assert(mTerms.size() <= expectedResultSize);
 	this->checkConsistency();
 }
@@ -1124,9 +1122,12 @@ bool operator==(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
-    if(lhs.mTerms.empty() && rhs == 0) return true;
-    if(lhs.mTerms.size() > 1) return false;
-    return (lhs.mTerms.front()->coeff()) == rhs;
+    if (lhs.mTerms.empty()) {
+		return rhs == 0;
+	}
+    if (lhs.mTerms.size() > 1) return false;
+	if (lhs.lmon()) return false;
+    return lhs.lcoeff() == rhs;
 }
 
 template<typename C, typename O, typename P>
@@ -1155,8 +1156,9 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
 	{
 		return rhs == 0;
 	}
-    if(lhs.mTerms.size() > 1) return false;
-    return (lhs.mTerms.front()->coeff()) == rhs;
+    if (lhs.mTerms.size() > 1) return false;
+	if (lhs.lmon()) return false;
+    return lhs.lcoeff() == rhs;
 }
 
 template<typename C, typename O, typename P>
