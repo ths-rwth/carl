@@ -10,6 +10,7 @@
 #pragma once
 #include "Interval.h"
 #include "../numbers/operations.h"
+#include <iostream>
 
 namespace carl
 {
@@ -36,6 +37,7 @@ Interval<Number>::Interval(Rational lower, BoundType lowerBoundType, Rational up
 template<typename Number>
 Sign Interval<Number>::sgn() const
 	{
+		assert(this->isConsistent());
 		if (this->isUnbounded()) return Sign::ZERO;
 		if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= 0) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > 0)) return Sign::POSITIVE;
 		if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= 0) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < 0)) return Sign::NEGATIVE;
@@ -45,6 +47,7 @@ Sign Interval<Number>::sgn() const
 template<typename Number>
 Number Interval<Number>::diameter() const
 	{
+		assert(this->isConsistent());
 		return boost::numeric::width(mContent);
 	}
 
@@ -70,6 +73,7 @@ template<typename Number>
 template<typename Number>
 	Number Interval<Number>::magnitude() const
 	{
+		assert(this->isConsistent());
 		return boost::numeric::norm(mContent);
 	}
 
@@ -82,6 +86,7 @@ template<typename Number>
 template<typename Number>
 	Number Interval<Number>::center() const
 	{
+		assert(this->isConsistent());
 		return boost::numeric::median(mContent);
 	}
 
@@ -94,6 +99,7 @@ template<typename Number>
 template<typename Number>
 	Number Interval<Number>::sample() const
 	{
+		assert(this->isConsistent());
 		Number mid = this->center();
 		// TODO: check if mid is an integer already.
 		Number midf = carl::floor(mid);
@@ -112,6 +118,7 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
+		assert(this->isConsistent());
             switch( mLowerBoundType )
             {
             case BoundType::INFTY:
@@ -144,6 +151,7 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::contains(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
                 // if one bound is totally wrong, we can just return false
                 if (
                         (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
@@ -195,12 +203,14 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::meets(const Number& n) const
 	{
+		assert(this->isConsistent());
 		return (mContent.lower() <= n || mLowerBoundType == BoundType::INFTY) && (mContent.upper() >= n || mUpperBoundType == BoundType::INFTY);
 	}
 
 	template<typename Number>
 	bool Interval<Number>::isSubset(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
 		return rhs.contains(*this);
 	}
 	
@@ -297,9 +307,11 @@ template<typename Number>
 template<typename Number>
 Interval<Number> Interval<Number>::add(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		return Interval<Number>( mContent + rhs.content(),
-                              getWeakestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
-                              getWeakestBoundType( mUpperBoundType, rhs.upperBoundType() ) );
+                              getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
+                              getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() ) );
 	}
 
 template<typename Number>
@@ -311,6 +323,8 @@ void Interval<Number>::add_assign(const Interval<Number>& rhs)
 template<typename Number>
 Interval<Number> Interval<Number>::sub(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		return this->add(rhs.inverse());
 	}
 
@@ -323,6 +337,8 @@ void Interval<Number>::sub_assign(const Interval<Number>& rhs)
 template<typename Number>
 Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		BoundType lowerBoundType = BoundType::WEAK;
         BoundType upperBoundType = BoundType::WEAK;
         if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > Number(0) || rhs.upperBoundType() == BoundType::INFTY))
@@ -351,6 +367,8 @@ void Interval<Number>::mul_assign(const Interval<Number>& rhs)
 template<typename Number>
 Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		BoundType lowerBoundType = BoundType::WEAK;
         BoundType upperBoundType = BoundType::WEAK;
         if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > Number(0) || rhs.upperBoundType() == BoundType::INFTY))
@@ -367,6 +385,12 @@ Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
         {
             upperBoundType = BoundType::INFTY;
         }
+		///@todo Correctly determine if bounds are strict or weak.
+		if (this->isOpenInterval() || rhs.isOpenInterval()) {
+			// just a quick heuristic, by no means complete.
+            lowerBoundType = BoundType::STRICT;
+            upperBoundType = BoundType::STRICT;
+		}
         return Interval<Number>(BoostInterval( mContent/rhs.content() ), lowerBoundType, upperBoundType );
 	}
 
@@ -441,6 +465,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
 template<typename Number>
 Interval<Number> Interval<Number>::inverse() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>( mContent.upper()*Number(-1), mUpperBoundType, mContent.lower()*Number(-1), mLowerBoundType );
 	}
 
@@ -530,6 +555,7 @@ bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) cons
 template<typename Number>
 Interval<Number> Interval<Number>::power(unsigned exp) const
 	{
+		assert(this->isConsistent());
 		assert(exp <= INT_MAX );
         if( exp % 2 == Number(0) )
         {
@@ -594,6 +620,7 @@ void Interval<Number>::power_assign(unsigned exp)
 template<typename Number>
 Interval<Number> Interval<Number>::sqrt() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -607,6 +634,7 @@ void Interval<Number>::sqrt_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::root(unsigned deg) const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::nth_root(mContent, deg), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -619,6 +647,7 @@ void Interval<Number>::root_assign(unsigned deg)
 template<typename Number>
 Interval<Number> Interval<Number>::log() const
 	{
+		assert(this->isConsistent());
 		assert( mContent.lower() > Number(0) );
         return Interval<Number>(boost::numeric::log(mContent), mLowerBoundType, mUpperBoundType);
 	}
@@ -636,6 +665,7 @@ void Interval<Number>::log_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::sin() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::sin(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -648,6 +678,7 @@ void Interval<Number>::sin_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::cos() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::cos(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -660,6 +691,7 @@ void Interval<Number>::cos_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::tan() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::tan(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -672,6 +704,7 @@ void Interval<Number>::tan_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::asin() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::asin(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -684,6 +717,7 @@ void Interval<Number>::asin_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::acos() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::acos(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -696,6 +730,7 @@ void Interval<Number>::acos_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::atan() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::atan(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -708,6 +743,7 @@ void Interval<Number>::atan_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::sinh() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::sinh(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -720,6 +756,7 @@ void Interval<Number>::sinh_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::cosh() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::cosh(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -732,6 +769,7 @@ void Interval<Number>::cosh_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::tanh() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::tanh(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -744,6 +782,7 @@ void Interval<Number>::tanh_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::asinh() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::asinh(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -756,6 +795,7 @@ void Interval<Number>::asinh_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::acosh() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::acosh(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -768,6 +808,7 @@ void Interval<Number>::acosh_assign()
 template<typename Number>
 Interval<Number> Interval<Number>::atanh() const
 	{
+		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::atanh(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
@@ -784,6 +825,8 @@ void Interval<Number>::atanh_assign()
 template<typename Number>
 	Interval<Number> Interval<Number>::intersect(const Interval<Number>& rhs) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		Number lowerValue;
                 Number upperValue;
                 BoundType maxLowest;
@@ -881,6 +924,8 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		if( this->intersect(rhs).isEmpty() )
 		{
                     // special case: [a;b] U (b;c]
@@ -963,6 +1008,8 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
                 if( rhs.isEmpty() )
                 {
                     resultA = *this;
@@ -1086,6 +1133,8 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
+		assert(this->isConsistent());
+		assert(rhs.isConsistent());
 		Interval<Number> intersection = this->intersect(rhs);
 		if( !intersection.isEmpty() )
 		{
