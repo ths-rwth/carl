@@ -89,15 +89,23 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value>&
 }
 
 
+/**
+ * Returns the binary representation given value as bit string.
+ * Note that this method is tailored to little endian systems.
+ * @param a A value of any type
+ * @param spacing Specifies if the bytes shall be separated by a space.
+ * @return Bit string representing a.
+ */
 template<typename T>
-std::string binary(const T& a)
+std::string binary(const T& a, const bool& spacing = true)
 {
 	std::stringstream ss;
     const char* begin = reinterpret_cast<const char*>(&a);
 	const char* end = begin + sizeof(T);
 	while (begin != end) {
-		ss << std::bitset<8>((unsigned)*begin);
-		begin++;
+		end--;
+		ss << std::bitset<8>((unsigned)*end);
+		if (spacing && (begin != end)) ss << " ";
 	}
 	return ss.str();
 }

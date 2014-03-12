@@ -14,10 +14,10 @@ void printStacktrace(bool interaction) {
 	system(cmd.str().c_str());
 }
 
-#ifdef DEBUG
 std::string last_assertion_string = "";
 int last_assertion_code = 23;
 
+#ifdef DEBUG
 /**
  * Actual signal handler.
  */
