@@ -1,5 +1,10 @@
 include_directories(${CMAKE_SOURCE_DIR}/src ${include_dirs})
 
+# Write config.h 
+configure_file( ${CMAKE_SOURCE_DIR}/src/examples/config.h.in 
+                ${CMAKE_SOURCE_DIR}/src/examples/config.h
+)  
+
 add_executable( IntervalContractionExample
 		IntervalContractionExample.cpp	  )
 add_executable( FloatExample

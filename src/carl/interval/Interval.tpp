@@ -1073,7 +1073,9 @@ template<typename Number>
                         resultA = emptyInterval();
                         return false;
                     }
-                    // Todo return festlegen.
+                    // Shouldn't happen
+                    assert(false);
+                    return false;
 		}
 		else
 		{

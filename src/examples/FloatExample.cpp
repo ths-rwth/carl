@@ -6,13 +6,15 @@
  * @since	2013-12-16
  * @version	2013-12-16
  */
-
 #include "../carl/interval/rounding.h"
 #include "../carl/numbers/roundingConversion.h"
+#ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
+#endif
 
 int main (int argc, char** argv)
 {
+#ifdef USE_MPFR_FLOAT
 	mpfr_ptr numberA = new mpfr_t();
 	mpfr_init(numberA);
 	mpfr_set_ui(numberA, 5, MPFR_RNDN);
@@ -30,5 +32,6 @@ int main (int argc, char** argv)
 	//result = carl::add_down(numberA, numberB);
 	
 	mpfr_clears(numberA, numberB, result);
+#endif
 	return 0;
 }

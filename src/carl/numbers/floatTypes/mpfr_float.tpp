@@ -1,5 +1,5 @@
 #include "../FLOAT_T.h"
-
+#ifdef USE_MPFR_FLOAT
 template<>
 class FLOAT_T<mpfr_t>
 {
@@ -570,3 +570,4 @@ class FLOAT_T<mpfr_t>
             return _prec;
         }
 };
+#endif

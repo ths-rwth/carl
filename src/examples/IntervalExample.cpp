@@ -9,7 +9,9 @@
 
 #include "../carl/interval/Interval.h"
 #include "../carl/numbers/FLOAT_T.h"
+#ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
+#endif
 #include <gmpxx.h>
 #include <cln/cln.h>
 
@@ -38,7 +40,7 @@ int main (int argc, char** argv)
 	cln::cl_RA magCln = clnInterval.magnitude();
 	
 	std::cout << "Magnitudes: " << mag << " MPQ: " << mpqInterval << " -> "<< magMpq << " CLN:" << clnInterval << " -> " << magCln << std::endl;
-	
+#ifdef USE_MPFR_FLOAT
 	carl::Interval<carl::FLOAT_T<mpfr_t>> mpfrInterval(carl::FLOAT_T<mpfr_t>(2.0));
 	
 	result = doubleInterval.log();
@@ -46,4 +48,5 @@ int main (int argc, char** argv)
 	mpfrInterval.log_assign();
 	
 	std::cout << "Result: " << result << " and mpfr: " << mpfrInterval << std::endl;
+#endif
 }
