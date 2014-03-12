@@ -12,8 +12,6 @@
 #pragma once
 #include "../../numbers/roundingConversion.h"
 #include "../../numbers/FLOAT_T.h"
-//#include "../numbers/operations_mpfr.h"
-//#include <mpfr.h>
 
 namespace carl
 {

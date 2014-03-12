@@ -1,3 +1,8 @@
+# Write config.h 
+configure_file( ${CMAKE_SOURCE_DIR}/src/tests/numbers/config.h.in 
+                ${CMAKE_SOURCE_DIR}/src/tests/numbers/config.h
+)  
+
 # Add test cpp file
 add_executable( runNumbersTests
         Test_numbers_cln.cpp

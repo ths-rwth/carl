@@ -11,8 +11,11 @@
 #pragma once
 
 #include "../util/platform.h"
+#include "config.h"
 #include <type_traits>
+#ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
+#endif
 CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <gmpxx.h>
 CLANG_WARNING_RESET
@@ -208,11 +211,13 @@ struct is_float
     static const bool value = false;
 };
 
+#ifdef USE_MPFR_FLOAT
 template<>
 struct is_float<mpfr_t>
 {
     static const bool value = true;
 };
+#endif
 
 template<>
 struct is_float<double>
