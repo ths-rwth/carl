@@ -2,6 +2,7 @@ set(carl_lib_number_headers
 	GF.h
 	PrimeFactory.h
         FLOAT_T.h
+        Numeric.h
         numbers.h
         operations.h
         operations_cln.h
@@ -19,8 +20,7 @@ configure_file( ${CMAKE_SOURCE_DIR}/src/carl/numbers/config.h.in
 
 # Source files in here
 set(carl_lib_number_sources 
-	
-	
+    numbers/Numeric.cpp
 PARENT_SCOPE)
 
 # Installation of header files

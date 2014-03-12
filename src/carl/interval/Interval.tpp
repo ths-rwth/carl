@@ -403,63 +403,63 @@ void Interval<Number>::div_assign(const Interval<Number>& rhs)
 template<typename Number>
 bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const
 	{
-		// Special case: if both contain 0 we can directly skip and return the unbounded interval.
-		if(this->contains(Number(0)) && rhs.contains(Number(0)))
-		{
-			a = unboundedInterval();
-			return false;
-		}
-		
-		Interval<Number> reciprocalA, reciprocalB;
-        bool          splitOccured;
-		
-        if( rhs.lowerBoundType() != BoundType::INFTY && rhs.lower() == Number(0) && rhs.upperBoundType() != BoundType::INFTY && rhs.upper() == Number(0) )    // point interval 0
-        {
-            splitOccured = false;
-            if( this->contains( Number(0) ))
+            // Special case: if both contain 0 we can directly skip and return the unbounded interval.
+            if(this->contains(Number(0)) && rhs.contains(Number(0)))
             {
-                a = unboundedInterval();
-            }
-            else
-            {
-                a = emptyInterval();
-            }
-            return false;
-        }
-        else
-        {
-            if( rhs.isUnbounded() )
-            {
-                a = unboundedInterval();
-                return false;
-            }    // rhs.unbounded
-            else
-            {
-                //default case
-                splitOccured = rhs.reciprocal( reciprocalA, reciprocalB );
-                if( !splitOccured )
-                {
-                    a = this->mul( reciprocalA );
+                    a = unboundedInterval();
                     return false;
+            }
+
+            Interval<Number> reciprocalA, reciprocalB;
+            bool          splitOccured;
+
+            if( rhs.lowerBoundType() != BoundType::INFTY && rhs.lower() == Number(0) && rhs.upperBoundType() != BoundType::INFTY && rhs.upper() == Number(0) )    // point interval 0
+            {
+                splitOccured = false;
+                if( this->contains( Number(0) ))
+                {
+                    a = unboundedInterval();
                 }
                 else
                 {
-                    a = this->mul( reciprocalA );
-                    b = this->mul( reciprocalB );
-					
-                    if( a == b )
+                    a = emptyInterval();
+                }
+                return false;
+            }
+            else
+            {
+                if( rhs.isUnbounded() )
+                {
+                    a = unboundedInterval();
+                    return false;
+                }    // rhs.unbounded
+                else
+                {
+                    //default case
+                    splitOccured = rhs.reciprocal( reciprocalA, reciprocalB );
+                    if( !splitOccured )
                     {
+                        a = this->mul( reciprocalA );
                         return false;
                     }
                     else
                     {
-                        return true;
+                        a = this->mul( reciprocalA );
+                        b = this->mul( reciprocalB );
+
+                        if( a == b )
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+
                     }
-					
-                }
-            }    // !rhs.unbounded
-			
-        }    // !pointinterval 0
+                }    // !rhs.unbounded
+
+            }    // !pointinterval 0
 	}
 
 template<typename Number>
@@ -561,7 +561,7 @@ Interval<Number> Interval<Number>::power(unsigned exp) const
         {
             if( mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY )
             {
-                return unboundedInterval();
+                return Interval<Number>( Number(0), BoundType::WEAK, Number(0), BoundType::INFTY );
             }
             else if( mLowerBoundType == BoundType::INFTY )
             {

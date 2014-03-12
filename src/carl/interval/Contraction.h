@@ -40,10 +40,11 @@ namespace carl {
     class SimpleNewton {
     public:
         
-        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB) {
+        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB) 
+        {
             double center = intervals.at(variable).center();
             Interval<double> centerInterval = Interval<double>(center);
-
+            
             // Create map for replacement of variables by intervals and replacement of center by point interval
             typename Interval<double>::evalintervalmap substitutedIntervalMap = intervals;
             substitutedIntervalMap[variable] = centerInterval;
@@ -52,25 +53,22 @@ namespace carl {
             Interval<double> numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
             Interval<double> denominator = IntervalEvaluation::evaluate(derivative, intervals);
             Interval<double> result1, result2;
-
-            bool split = numerator.div_ext(result1, result2, denominator);
+            
+            bool split = numerator.div_ext(denominator, result1, result2);
             if (split) {
-                result1 = result1.inverse();
-                result2 = result2.inverse();
-
+                
                 if(result1 <= result2) {
-                        resA = centerInterval.add(result1);
-                        resB = centerInterval.add(result2);
+                    resB = centerInterval.sub(result1);
+                    resA = centerInterval.sub(result2);
                 }
                 else
                 {
-                        resA = centerInterval.add(result2);
-                        resB = centerInterval.add(result1);
+                    resA = centerInterval.sub(result2);
+                    resB = centerInterval.sub(result1);
                 }
                 return true;
             } else {
-                result1 = result1.inverse();
-                resA = centerInterval.add(result1);
+                resA = centerInterval.sub(result1);
                 return false;
             }
         }
