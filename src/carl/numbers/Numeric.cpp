@@ -70,8 +70,7 @@ namespace carl
      * Constructing from an integer.
      * @param _value The integer.
      */
-    template<bool is_definitely_int>
-    Numeric::Numeric( ContentType _value ):
+    Numeric::Numeric( ContentType _value, bool is_definitely_int ):
         mContent( is_definitely_int || IS_INT( _value ) ? _value : allocate( _value ) )
     {}
     
@@ -129,7 +128,7 @@ namespace carl
      * @param _value The integer.
      * @return The corresponding Numeric.
      */
-    Numeric& Numeric::operator=( int _value )
+    Numeric& Numeric::operator=( ContentType _value )
     {
         if( IS_INT( this->mContent ) )
         {
@@ -415,7 +414,7 @@ namespace carl
         assert( isInteger( _value ) );
         if( this->mContent == 0 || _value.mContent == 0 )
         {
-            if( !(IS_INT( *this )) )
+            if( !(IS_INT( this->mContent )) )
                 mFreeRationalIds.push_back( mContent );
             this->mContent = 0;
         }
@@ -460,8 +459,7 @@ namespace carl
     {
         if( IS_INT( _value.content() ) )
         {
-            return Numeric( std::abs( _value.content() ) );
-//            return Numeric<true>( std::abs( _value.content() ) );
+            return Numeric( std::abs( _value.content() ), true );
         }
         else
         {
@@ -723,8 +721,7 @@ namespace carl
     Numeric operator-( const Numeric& _value )
     {
         if( IS_INT( _value.content() ) )
-            return Numeric( -_value.content() );
-//            return Numeric<true>( -_value.content() );
+            return Numeric( -_value.content(), true );
         else
             return Numeric( -_value.rational() );
     }

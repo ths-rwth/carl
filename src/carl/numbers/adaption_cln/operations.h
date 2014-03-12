@@ -11,7 +11,7 @@
 #pragma once
 
 #include <cassert>
-#include <climits>
+#include <limits>
 #include <cmath>
 
 namespace carl {
@@ -51,15 +51,25 @@ inline double toDouble(const cln::cl_I& n) {
 
 template<typename Integer>
 inline Integer toInt(const cln::cl_I& n);
+
 template<>
 inline int toInt<int>(const cln::cl_I& n) {
-    assert(n <= INT_MAX);
+    assert(n <= std::numeric_limits<int>::max());
+    assert(n >= std::numeric_limits<int>::min());
     return cln::cl_I_to_int(n);
 }
+
 template<>
 inline unsigned toInt<unsigned>(const cln::cl_I& n) {
-    assert(n <= UINT_MAX);
+    assert(n <= std::numeric_limits<unsigned>::max());
     return cln::cl_I_to_uint(n);
+}
+
+template<>
+inline long int toInt<long int>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<long int>::max());
+    assert(n >= std::numeric_limits<long int>::min());
+    return cln::cl_I_to_long(n);
 }
 
 inline cln::cl_I toInt(const cln::cl_RA& n) {

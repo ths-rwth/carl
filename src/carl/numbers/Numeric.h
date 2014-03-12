@@ -12,12 +12,13 @@
 #include <assert.h>
 #include <vector>
 #include <cln/cln.h>
+#include <limits>
 #include "numbers.h"
 
 namespace carl
 {
-    typedef int ContentType;
-    const ContentType HIGHTEST_INTEGER_VALUE = 1000000;
+    typedef long int ContentType;
+    const ContentType HIGHTEST_INTEGER_VALUE = std::numeric_limits<ContentType>::max() >> (std::numeric_limits<ContentType>::digits/2);
     
     class Numeric
     {   
@@ -38,8 +39,7 @@ namespace carl
          */
         Numeric();
         Numeric( const cln::cl_RA& );
-        template<bool is_definitely_int = false>
-        Numeric( ContentType );
+        Numeric( ContentType, bool = false );
         Numeric( const Numeric& );
         ~Numeric();
         
@@ -151,7 +151,7 @@ namespace carl
     Numeric& operator--( Numeric& );
     std::ostream& operator <<( std::ostream&, const Numeric& );
     
-    #define IS_INT( value ) abs( value ) < HIGHTEST_INTEGER_VALUE
+    #define IS_INT( value ) std::abs( value ) < HIGHTEST_INTEGER_VALUE
     
     inline bool isInteger( const Numeric& _value )
     {
