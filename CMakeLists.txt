@@ -165,12 +165,12 @@ endif()
 
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
-find_package(MPFR REQUIRED)
-set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
-set(libraries ${libraries} ${MPFR_LIBRARY})
+	find_package(MPFR REQUIRED)
+	set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
+	set(libraries ${libraries} ${MPFR_LIBRARY})
 endif()
 
-set( libraries  ${libraries} )
+set(libraries  ${libraries} )
 set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
