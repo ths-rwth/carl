@@ -613,21 +613,37 @@ namespace carl
 		
 		inline bool isUnbounded() const
 		{
+			assert(this->isConsistent());
 			return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
 		}
 		
 		inline bool isEmpty() const
 		{
+			assert(this->isConsistent());
 			return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
 		}
 
 		inline bool isPointInterval() const
 		{
-			return (mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK );
+			assert(this->isConsistent());
+			return (mContent.lower() == mContent.upper() && this->isClosedInterval());
+		}
+
+		inline bool isOpenInterval() const
+		{
+			assert(this->isConsistent());
+			return (mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT);
+		}
+
+		inline bool isClosedInterval() const
+		{
+			assert(this->isConsistent());
+			return (mLowerBoundType == BoundType::WEAK && mUpperBoundType == BoundType::WEAK);
 		}
 
 		inline bool isZero() const
 		{
+			assert(this->isConsistent());
 			return this->isPointInterval() && (mContent.lower() == 0);
 		}
 
@@ -1002,6 +1018,11 @@ namespace carl
 		 * @return True, if the result is twofold
 		 */
 		bool symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
+
+		bool isConsistent() const {
+			assert(this->lower() <= this->upper());
+			return true;
+		}
     };
 	
 	/***************************************************************************
