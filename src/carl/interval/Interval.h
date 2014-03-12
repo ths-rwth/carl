@@ -431,6 +431,11 @@ namespace carl
             return Interval<Number>(Number(0), BoundType::STRICT, Number(0), BoundType::STRICT);
         }
 
+		static Interval<Number> zeroInterval()
+		{
+			return Interval<Number>(Number(0), BoundType::WEAK, Number(0), BoundType::WEAK);
+		}
+
         ~Interval()
         {}
         
