@@ -3,6 +3,7 @@
  * @author Benedikt Seidl
  */
 
+#ifdef USE_MPFR_FLOAT
 #include "gtest/gtest.h"
 #include "../../carl/numbers/FLOAT_T.h"
 
@@ -309,3 +310,4 @@ TEST(mpfrFloatTest, ConversionOperators)
 TEST(mpfrFloatTest, Precision)
 {
 }
+#endif

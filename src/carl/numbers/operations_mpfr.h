@@ -9,7 +9,6 @@
 #pragma once
 
 #include <gmpxx.h>
-#include "floatTypes/mpfr_wrapper.h"
 
 namespace carl
 {
