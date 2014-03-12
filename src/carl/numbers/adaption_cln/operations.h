@@ -123,8 +123,20 @@ inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::gcd(a,b);
 }
 
+inline cln::cl_RA gcd(const cln::cl_RA& a, const cln::cl_RA& b) {
+    assert( carl::isInteger( a ) );
+    assert( carl::isInteger( b ) );
+	return cln::gcd(carl::getNum(a),carl::getNum(b));
+}
+
 inline cln::cl_I lcm(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::lcm(a,b);
+}
+
+inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
+    assert( carl::isInteger( a ) );
+    assert( carl::isInteger( b ) );
+	return cln::lcm(carl::getNum(a),carl::getNum(b));
 }
 
 inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
@@ -203,6 +215,10 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a) {
 
 inline cln::cl_I mod(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::mod(a, b);
+}
+
+inline cln::cl_RA div(const cln::cl_RA& a, const cln::cl_RA& b) {
+	return (a / b);
 }
 
 inline cln::cl_I div(const cln::cl_I& a, const cln::cl_I& b) {

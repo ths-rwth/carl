@@ -535,7 +535,7 @@ Interval<Number> Interval<Number>::power(unsigned exp) const
         {
             if( mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY )
             {
-                return unboundedInterval();
+                return Interval<Number>( Number(0), BoundType::WEAK, Number(0), BoundType::INFTY );
             }
             else if( mLowerBoundType == BoundType::INFTY )
             {
