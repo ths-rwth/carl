@@ -88,8 +88,9 @@ public:
 			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true) {
-		assert(i.isOpenInterval());
+		assert(i.isOpenInterval() || i.isPointInterval());
 		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, s, normalize, isRoot));
+		LOGMSG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
 	}
