@@ -12,7 +12,11 @@ set(carl_lib_interval_sources
 
 PARENT_SCOPE)
 
-configure_file( config.h.in config.h )
+
+# Write config.h
+configure_file( ${CMAKE_SOURCE_DIR}/src/carl/interval/config.h.in
+     ${CMAKE_SOURCE_DIR}/src/carl/interval/config.h
+)
 
 # Installation of header files
 install(FILES			${carl_lib_interval_headers}

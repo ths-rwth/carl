@@ -807,12 +807,14 @@ namespace std
     {
         size_t operator()(const carl::Monomial& monomial) const 
         {
+			std::hash<carl::Variable> h;
             size_t result = 0;
             for(unsigned i = 0; i < monomial.nrVariables(); ++i)
             {
-                result <<= 5;
-                result ^= hash<carl::Variable>()( monomial[i].var );
-                result <<= 5;
+				// perform a circular shift by 5 bits.
+				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+                result ^= h( monomial[i].var );
+				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
                 result ^= monomial[i].exp;
             }
             return result;

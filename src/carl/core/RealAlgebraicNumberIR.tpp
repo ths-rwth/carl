@@ -17,7 +17,7 @@ template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(var),
-		interval(),
+		interval(Interval<Number>::zeroInterval()),
 		sturmSequence(this->polynomial.standardSturmSequence()),
 		refinementCount(0)
 {

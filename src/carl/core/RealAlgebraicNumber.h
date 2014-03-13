@@ -198,6 +198,7 @@ namespace carl {
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Number>* g) {
+	if (g == nullptr) return os << "nullptr";
 	if (g->isNumericRepresentation()) {
 		return os << static_cast<const carl::RealAlgebraicNumberNR<Number>*>(g);
 	} else {

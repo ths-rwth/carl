@@ -586,8 +586,9 @@ namespace std
         size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
         {
             size_t result = 0;
+			std::hash<carl::Term<C>> h;
             for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
-                result ^= hash<carl::Term<C>>()(**iter);
+                result ^= h(**iter);
             return result;
         }
     };
