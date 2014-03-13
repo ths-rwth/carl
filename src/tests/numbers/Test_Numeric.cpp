@@ -197,4 +197,10 @@ TEST(Numeric, gcd)
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( -d, e ).toRational() );
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( e, -d ).toRational() );
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( d, -e ).toRational() );
+    
+    Numeric g( 997002998000 );
+    Numeric h( 996005994003 );
+    Numeric j = g * h;
+    Numeric i( -997002998000 );
+    EXPECT_EQ( carl::gcd( j.toRational(), i.toRational() ), carl::gcd( j, i ).toRational() );
 }

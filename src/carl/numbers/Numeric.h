@@ -160,6 +160,10 @@ namespace carl
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _rat ) );
             }
+            else
+            {
+                this->rRational() = _rat;
+            }
         }
     };
 
