@@ -22,17 +22,21 @@ template<typename Polynomial, template<typename, template<typename> class > clas
 class GBProcedure : private Procedure<Polynomial, AddingPolynomialPolicy>
 {
 private:
-	Ideal<Polynomial>* mGb;
+	std::shared_ptr<Ideal<Polynomial>> mGb;
 	std::list<Polynomial> mInputScheduled;
 	std::vector<Polynomial> mOrigGenerators;
 	std::vector<size_t> mOrigGeneratorsIndices;
 
 public:
 
-	GBProcedure() : Procedure<Polynomial, AddingPolynomialPolicy>()
+	GBProcedure() : Procedure<Polynomial, AddingPolynomialPolicy>(),
+	mGb()
 	{
-		mGb = new Ideal<Polynomial>();
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
+	}
+	
+	virtual ~GBProcedure() {
+		
 	}
 
 	bool inputEmpty() const
@@ -56,9 +60,20 @@ public:
 		return getIdeal().isConstant();
 	}
 	
+	std::list<Polynomial> listBasisPolynomials() const
+	{
+		std::list<Polynomial>(getBasisPolynomials().begin(), getBasisPolynomials().end());
+	}
+	
 	const std::vector<Polynomial>& getBasisPolynomials() const
 	{
 		getIdeal().getGenerators();
+	}
+	
+	void reset() 
+	{
+		mGb.rest(new Ideal<Polynomial>());
+		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 	
 	const Ideal<Polynomial>& getIdeal() const
@@ -156,7 +171,7 @@ private:
 		// The number of polynomials will not change anymore!
 		std::vector<size_t> toBeReduced(mGb->getOrderedIndices());
 
-		Ideal<Polynomial>* reduced = new Ideal<Polynomial>();
+		std::shared_ptr<Ideal<Polynomial>> reduced(new Ideal<Polynomial>());
 		for(std::vector<size_t>::const_iterator index = toBeReduced.begin(); index != toBeReduced.end(); ++index)
 		{
 			Reductor<Polynomial, Polynomial> reduct(*reduced, mGb->getGenerator(*index));
@@ -164,7 +179,7 @@ private:
 			LOGMSG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);
 			reduced->addGenerator(res);
 		}
-		delete mGb;
+
 		mGb = reduced;
 	}
 };
