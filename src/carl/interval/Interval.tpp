@@ -45,6 +45,18 @@ Sign Interval<Number>::sgn() const
 	}
 
 template<typename Number>
+Interval<Number> Interval<Number>::integralPart() const
+{
+    return Interval<Number>(BoostInterval(ceil(mContent.lower()), floor(mContent.upper())), mLowerBoundType, mUpperBoundType);
+}
+
+template<typename Number>
+        void Interval<Number>::integralPart_assign()
+{
+    *this = integralPart();
+}
+
+template<typename Number>
 Number Interval<Number>::diameter() const
 	{
 		assert(this->isConsistent());

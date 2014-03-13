@@ -14,3 +14,4 @@
 #include "operations.h"
 #include "adaption_cln/hash.h"
 #include "adaption_gmpxx/hash.h"
+#include "Numeric.h"

@@ -506,7 +506,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-	LOG_NOTIMPLEMENTED();
+//	LOG_NOTIMPLEMENTED();
 	return *this;
 }
 
