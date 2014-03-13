@@ -124,7 +124,7 @@ class Term
 		 * For terms with exactly one variable, get this variable.
          * @return The only variable occuring in the term.
          */
-		Variable::Arg getSingleVariable() const
+		const Variable& getSingleVariable() const
 		{
 			assert(getNrVariables() == 1);
 			return mMonomial->getSingleVariable();

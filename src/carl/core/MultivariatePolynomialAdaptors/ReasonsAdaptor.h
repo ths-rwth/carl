@@ -13,6 +13,7 @@ namespace carl
 struct NoReasons
 {
 	static const bool has_reasons = false;
+	void setReason(unsigned index);
 };
 
 struct BVReasons
@@ -20,9 +21,18 @@ struct BVReasons
 	static const bool has_reasons = false;
 	
 	void setReason(unsigned index);
+	void extendReasons(const BitVector& extendWith)
+	{
+		mReasonset |= extendWith;
+	}
 	BitVector getReasons() const
 	{
 		return mReasonset;
+	}
+	
+	void setReasons(const BitVector& reasons)
+	{
+		mReasonset = reasons;
 	}
 private:
 	BitVector mReasonset;
