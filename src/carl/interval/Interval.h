@@ -656,6 +656,13 @@ namespace carl
         inline Sign sgn() const;
 
         /**
+         * Computes the integral part of the given interval.
+         * @return interval
+         */
+        Interval<Number> integralPart() const;
+        void integralPart_assign();
+        
+        /**
          * Returns the diameter of the interval.
          * @return diameter
          */
