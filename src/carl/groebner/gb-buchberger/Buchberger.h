@@ -83,7 +83,7 @@ class Buchberger : private AddingPolicy<Polynomial>
 {
 
 protected:
-	Ideal<Polynomial>* pGb;
+	std::shared_ptr<Ideal<Polynomial>> pGb;
 	std::vector<size_t> mGbElementsIndices;
     CritPairs mCritPairs;
 	UpdateFnct<Buchberger<Polynomial, AddingPolicy>> mUpdateCallBack;
@@ -99,8 +99,13 @@ public:
 		
 	}
 	
+	virtual ~Buchberger()
+	{
+	
+	}
+	
 	void calculate(const std::list<Polynomial>& scheduledForAdding);
-	void setIdeal(Ideal<Polynomial>* ideal)
+	void setIdeal(std::shared_ptr<Ideal<Polynomial>> ideal)
 	{
 		pGb = ideal;
 	}
