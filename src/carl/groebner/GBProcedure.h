@@ -30,15 +30,36 @@ private:
 public:
 
 	GBProcedure() : Procedure<Polynomial, AddingPolynomialPolicy>(),
-	mGb()
+	mGb(new Ideal<Polynomial>)
 	{
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
+	}
+	
+	
+	GBProcedure(const GBProcedure& old)
+	:
+	mGb(new Ideal<Polynomial>(*mGb)),
+	mInputScheduled(old.mInputScheduled),
+	mOrigGenerators(old.mOrigGenerators),
+	mOrigGeneratorsIndices(old.mOrigGeneratorsIndices)
+	{
+		
 	}
 	
 	virtual ~GBProcedure() {
 		
 	}
 
+	GBProcedure& operator=(const GBProcedure& rhs)
+	{
+		if(this == &rhs) return *this;
+		mGb = rhs.mGb;
+		mInputScheduled = rhs.mInputScheduled;
+		mOrigGenerators = rhs.mOrigGenerators;
+		mOrigGeneratorsIndices = rhs.mOrigGeneratorsIndices;
+		return *this;
+	}
+	
 	bool inputEmpty() const
 	{
 		return mInputScheduled.empty();
@@ -62,17 +83,17 @@ public:
 	
 	std::list<Polynomial> listBasisPolynomials() const
 	{
-		std::list<Polynomial>(getBasisPolynomials().begin(), getBasisPolynomials().end());
+		return std::list<Polynomial>(getBasisPolynomials().begin(), getBasisPolynomials().end());
 	}
 	
 	const std::vector<Polynomial>& getBasisPolynomials() const
 	{
-		getIdeal().getGenerators();
+		return getIdeal().getGenerators();
 	}
 	
 	void reset() 
 	{
-		mGb.rest(new Ideal<Polynomial>());
+		mGb.reset(new Ideal<Polynomial>());
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 	

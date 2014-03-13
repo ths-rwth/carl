@@ -57,7 +57,7 @@ public:
     }
 	
 	Ideal(const Ideal& rhs) : 
-	mGenerators(rhs.mGenerators.begin(), rhs.mGenerators.end()), 
+	mGenerators(rhs.mGenerators), 
     mTermOrder(mGenerators), 
     mEliminated(rhs.mEliminated), 
     mDivisorLookup(mGenerators, mEliminated, mTermOrder)
@@ -71,8 +71,9 @@ public:
         if(this == &rhs) return *this;
         this->mGenerators.assign(rhs.mGenerators.begin(), rhs.mGenerators.end());
         this->mEliminated = rhs.mEliminated;
+		this->mDivisorLookup = Datastructure<Polynomial>(mGenerators, mEliminated, mTermOrder);
         removeEliminated();
-        mDivisorLookup.reset();
+		mDivisorLookup.reset();
         return *this;
     }
 
