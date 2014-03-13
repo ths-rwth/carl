@@ -191,9 +191,16 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Substit
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,Term<Coefficient>>&) const
+Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
-    LOG_NOTIMPLEMENTED();
+    if(mMonomial)
+	{
+		return mMonomial->substitute<Coefficient>(substitutions, coeff());
+	}
+	else
+	{
+		return new Term<Coefficient>(mCoeff);
+	}
 }
 
 

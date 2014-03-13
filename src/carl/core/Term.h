@@ -200,7 +200,7 @@ class Term
 		
 		Term* pow(unsigned exp) const
 		{
-			return new Term(pow(coeff(),exp),mMonomial ? std::make_shared<const Monomial>(mMonomial->pow(exp)) : mMonomial);
+			return new Term(carl::pow(coeff(),exp), mMonomial ? std::make_shared<const Monomial>(mMonomial->pow(exp)) : mMonomial);
 		}
         
         std::string toString(bool infix=true, bool friendlyVarNames=true) const;
