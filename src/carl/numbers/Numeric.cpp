@@ -363,7 +363,7 @@ namespace carl
     {
         assert( isInteger( *this ) );
         assert( isInteger( _value ) );
-        assert( *this >= _value );
+        assert( abs( *this ) >= abs( _value ) );
         if( IS_INT( this->mContent ) )
         {
             assert( IS_INT( _value.mContent ) );
@@ -385,28 +385,28 @@ namespace carl
         return *this;
     }
     
+//    void gcd_( ContentType& _a, ContentType _b )
+//    {
+//        assert( _a > 0 && _b > 0 );
+//        while( true )
+//        {
+//            if( _a > _b ) _a -= _b;
+//            else if( _a < _b ) _b -= _a;
+//            else return;
+//        }
+//    }
+    
     void gcd_( ContentType& _a, ContentType _b )
     {
         assert( _a > 0 && _b > 0 );
-        while( true )
+        ContentType c;
+        while( _b != 0 )
         {
-            if( _a > _b ) _a -= _b;
-            else if( _a < _b ) _b -= _a;
-            else return;
+            c = _b;
+            _b = _a%_b;
+            _a = c;
         }
     }
-    
-//    void gcd__( ContentType& _a, ContentType _b )
-//    {
-//        ContentType c;
-//        while( _a != 0 )
-//        {
-//            c = _a;
-//            _a = _b%_a;
-//            _b = c;
-//        }
-//        return _b;
-//    }
   
     Numeric& Numeric::gcd( const Numeric& _value )
     {
@@ -428,8 +428,9 @@ namespace carl
             else
             {
                 cln::cl_I a = carl::abs( carl::getNum( _value.rational() ) );
-                while( a > this->mContent ) a -= this->mContent;
-                gcd_( this->mContent, carl::toInt<ContentType>( a ) );
+                a = carl::mod( a, this->mContent );
+                if( a != 0 )
+                    gcd_( this->mContent, carl::toInt<ContentType>( a ) );
             }
         }
         else
@@ -439,8 +440,9 @@ namespace carl
                 cln::cl_I a = carl::abs( carl::getNum( this->rational() ) );
                 mFreeRationalIds.push_back( mContent );
                 this->mContent = std::abs( _value.mContent );
-                while( a > this->mContent ) a -= this->mContent;
-                gcd_( this->mContent, carl::toInt<ContentType>( a ) );
+                a = carl::mod( a, this->mContent );
+                if( a != 0 )
+                    gcd_( this->mContent, carl::toInt<ContentType>( a ) );
             }
             else
             {
@@ -459,7 +461,7 @@ namespace carl
     {
         assert( isInteger( _valueA ) );
         assert( isInteger( _valueB ) );
-        assert( _valueA >= _valueB );
+        assert( abs( _valueA ) >= abs( _valueB ) );
         if( IS_INT( _valueA.content() ) )
         {
             assert( IS_INT( _valueB.content() ) );

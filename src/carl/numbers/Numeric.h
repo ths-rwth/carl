@@ -92,6 +92,23 @@ namespace carl
                 return mRationalPool[(size_t)this->mContent-1-(size_t)HIGHTEST_INTEGER_VALUE];
         }
         
+        operator cln::cl_RA() const
+        {
+            return this->toRational();
+        }
+        
+        operator cln::cl_I() const
+        {
+            if( std::abs( this->mContent ) <= HIGHTEST_INTEGER_VALUE )
+                return cln::cl_I( this->mContent );
+            else
+            {
+                cln::cl_RA& rat = mRationalPool[(size_t)this->mContent-1-(size_t)HIGHTEST_INTEGER_VALUE];
+                assert( carl::isInteger( rat ) );
+                return carl::getNum( rat );
+            }
+        }
+        
         Numeric& gcd( const Numeric& );
         
     private:
