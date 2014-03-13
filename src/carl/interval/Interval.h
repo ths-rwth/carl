@@ -1025,8 +1025,7 @@ namespace carl
 
         bool isConsistent() const
         {
-            assert(this->lower() <= this->upper());
-            return true;
+            return this->lower() <= this->upper();
         }
     };
 

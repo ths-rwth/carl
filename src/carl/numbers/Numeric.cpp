@@ -22,14 +22,15 @@ namespace carl
         if( mFreeRationalIds.empty() )
         {
             mRationalPool.emplace_back( _value );
-            assert( (ContentType) mRationalPool.size() < HIGHTEST_INTEGER_VALUE );
+            assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE <= std::numeric_limits<size_t>::max() );
             return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE;
         }
         else
         {
             size_t id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
-            mRationalPool[id-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
+            assert( id > (size_t)HIGHTEST_INTEGER_VALUE );
+            mRationalPool[id-1-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
             return (ContentType) id;
         }
     }
@@ -39,14 +40,15 @@ namespace carl
         if( mFreeRationalIds.empty() )
         {
             mRationalPool.emplace_back( _value );
-            assert( (ContentType) mRationalPool.size() < HIGHTEST_INTEGER_VALUE );
+            assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE <= std::numeric_limits<size_t>::max() );
             return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE;
         }
         else
         {
             size_t id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
-            mRationalPool[id-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
+            assert( id > (size_t)HIGHTEST_INTEGER_VALUE );
+            mRationalPool[id-1-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
             return (ContentType) id;
         }
     }
@@ -63,7 +65,7 @@ namespace carl
      * @param The Rational.
      */
     Numeric::Numeric( const cln::cl_RA& _value ):
-        mContent( (carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) < HIGHTEST_INTEGER_VALUE) ? carl::toInt<ContentType>( carl::getNum( _value ) ) : allocate( _value ) )
+        mContent( (carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) <= HIGHTEST_INTEGER_VALUE) ? carl::toInt<ContentType>( carl::getNum( _value ) ) : allocate( _value ) )
     {}
 
     /**
@@ -79,7 +81,7 @@ namespace carl
      * @param _value The Numeric to copy.
      */
     Numeric::Numeric( const Numeric& _value ):
-        mContent( IS_INT( _value.mContent ) ? _value.mContent : allocate( _value.mContent ) )
+        mContent( IS_INT( _value.mContent ) ? _value.mContent : allocate( _value.rational() ) )
     {}
 
     Numeric::~Numeric()
@@ -99,7 +101,7 @@ namespace carl
     {
         if( IS_INT( this->mContent ) )
         {
-            if( carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) <= HIGHTEST_INTEGER_VALUE )
             {
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
             }
@@ -110,7 +112,7 @@ namespace carl
         }
         else
         {
-            if( carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) <= HIGHTEST_INTEGER_VALUE )
             {
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
@@ -191,7 +193,7 @@ namespace carl
                 return this->mContent == _value.mContent;
             else
             {
-                assert( _value.rational() == cln::cl_RA( this->mContent ) );
+                assert( _value.rational() != cln::cl_RA( this->mContent ) );
                 return false;
             }
         }
@@ -199,11 +201,13 @@ namespace carl
         {
             if( IS_INT( _value.mContent ) )
             {
-                assert( this->rational() == cln::cl_RA( _value.mContent ) );
+                assert( this->rational() != cln::cl_RA( _value.mContent ) );
                 return false;
             }
             else
-                return this->rational() == _value.rational();
+            {
+                return (this->rational() == _value.rational());
+            }
         }
     }
 
@@ -221,7 +225,7 @@ namespace carl
                 return this->mContent != _value.mContent;
             else
             {
-                assert( _value.rational() != this->mContent );
+                assert( _value.rational() != cln::cl_RA( this->mContent ) );
                 return true;
             }
         }
@@ -229,11 +233,13 @@ namespace carl
         {
             if( IS_INT( _value.mContent ) )
             {
-                assert( this->rational() != _value.mContent );
+                assert( this->rational() != cln::cl_RA( _value.mContent ) );
                 return true;
             }
             else
-                return this->rational() != _value.rational();
+            {
+                return (this->rational() != _value.rational());
+            }
         }
     }
 
@@ -349,36 +355,18 @@ namespace carl
         }
     }
     
-    Numeric Numeric::divide( const Numeric& _value ) const
-    {
-        assert( isInteger( *this ) );
-        assert( isInteger( _value ) );
-        if( IS_INT( this->mContent ) )
-        {
-            assert( IS_INT( _value.mContent ) );
-            assert( this->mContent > _value.mContent );
-            return this->mContent / _value.mContent;
-        }
-        else
-        {
-            if( IS_INT( _value.mContent ) )
-            {
-                return Numeric( this->rational() / _value.mContent );
-            }
-            else
-                return Numeric( this->rational() / _value.rational() );
-        }
-    }
-    
-    
+    /**
+     * @param _value An integer.
+     * @result The quotient of this integer and the given integer.
+     */
     Numeric& Numeric::divideBy( const Numeric& _value )
     {
         assert( isInteger( *this ) );
         assert( isInteger( _value ) );
+        assert( abs( *this ) >= abs( _value ) );
         if( IS_INT( this->mContent ) )
         {
             assert( IS_INT( _value.mContent ) );
-            assert( this->mContent > _value.mContent );
             this->mContent /= _value.mContent;
         }
         else
@@ -388,7 +376,7 @@ namespace carl
                 rat /= cln::cl_RA( _value.mContent );
             else
                 rat /= _value.rational();
-            if( carl::abs( rat ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::abs( rat ) <= HIGHTEST_INTEGER_VALUE )
             {
                 mFreeRationalIds.push_back( mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( rat ) );
@@ -397,17 +385,29 @@ namespace carl
         return *this;
     }
     
+//    void gcd_( ContentType& _a, ContentType _b )
+//    {
+//        assert( _a > 0 && _b > 0 );
+//        while( true )
+//        {
+//            if( _a > _b ) _a -= _b;
+//            else if( _a < _b ) _b -= _a;
+//            else return;
+//        }
+//    }
+    
     void gcd_( ContentType& _a, ContentType _b )
     {
         assert( _a > 0 && _b > 0 );
-        while( true )
+        ContentType c;
+        while( _b != 0 )
         {
-            if( _a > _b ) _a -= _b;
-            if( _a < _b ) _b -= _a;
-            else return;
+            c = _b;
+            _b = _a%_b;
+            _a = c;
         }
     }
-    
+  
     Numeric& Numeric::gcd( const Numeric& _value )
     {
         assert( isInteger( *this ) );
@@ -420,16 +420,17 @@ namespace carl
         }
         if( IS_INT( this->mContent ) )
         {
+            this->mContent = std::abs( this->mContent );
             if( IS_INT( _value.mContent ) )
             {
-                gcd_( this->mContent, _value.mContent );
+                gcd_( this->mContent, std::abs( _value.mContent ) );
             }
             else
             {
                 cln::cl_I a = carl::abs( carl::getNum( _value.rational() ) );
-                this->mContent = std::abs( this->mContent );
-                while( a > this->mContent ) a -= this->mContent;
-                gcd_( this->mContent, carl::toInt<ContentType>( a ) );
+                a = carl::mod( a, this->mContent );
+                if( a != 0 )
+                    gcd_( this->mContent, carl::toInt<ContentType>( a ) );
             }
         }
         else
@@ -439,8 +440,9 @@ namespace carl
                 cln::cl_I a = carl::abs( carl::getNum( this->rational() ) );
                 mFreeRationalIds.push_back( mContent );
                 this->mContent = std::abs( _value.mContent );
-                while( a > this->mContent ) a -= this->mContent;
-                gcd_( this->mContent, carl::toInt<ContentType>( a ) );
+                a = carl::mod( a, this->mContent );
+                if( a != 0 )
+                    gcd_( this->mContent, carl::toInt<ContentType>( a ) );
             }
             else
             {
@@ -448,6 +450,32 @@ namespace carl
             }
         }
         return *this;
+    }
+    
+    /**
+     * @param _valueA An integer.
+     * @param _valueB An integer.
+     * @result The quotient of the two given integer.
+     */
+    Numeric div( const Numeric& _valueA, const Numeric& _valueB )
+    {
+        assert( isInteger( _valueA ) );
+        assert( isInteger( _valueB ) );
+        assert( abs( _valueA ) >= abs( _valueB ) );
+        if( IS_INT( _valueA.content() ) )
+        {
+            assert( IS_INT( _valueB.content() ) );
+            return _valueA.content() / _valueB.content();
+        }
+        else
+        {
+            if( IS_INT( _valueB.content() ) )
+            {
+                return Numeric( _valueA.rational() / cln::cl_RA( _valueB.content() ) );
+            }
+            else
+                return Numeric( _valueA.rational() / _valueB.rational() );
+        }
     }
 
     /**
@@ -482,8 +510,8 @@ namespace carl
         {
             if( IS_INT( _valueB.content() ) )
             {
-                ContentType g = _valueA.content();
-                gcd_( g, _valueB.content() );
+                ContentType g = std::abs( _valueA.content() );
+                gcd_( g, std::abs( _valueB.content() ) );
                 return Numeric( (std::abs(_valueA.content()*_valueB.content())/g) );
             }
             else
@@ -617,8 +645,8 @@ namespace carl
             }
             else
             {
-                cln::cl_RA rat = _valueB.rational();
-                rat -= _valueA.mContent;
+                cln::cl_RA rat = -_valueB.rational();
+                rat += _valueA.mContent;
                 _valueA.maybeRationalize( rat );
             }
         }
@@ -734,9 +762,15 @@ namespace carl
     Numeric& operator++( Numeric& _value )
     {
         if( IS_INT( _value.mContent ) )
-            _value.mContent++;
+        {
+            ++(_value.mContent);
+            _value.maybeRationalize();
+        }
         else
-            _value.rRational()++;
+        {
+            ++(_value.rRational());
+            _value.maybeIntegralize();
+        }
         return _value;
     }
 
@@ -748,9 +782,15 @@ namespace carl
     Numeric& operator--( Numeric& _value )
     {
         if( IS_INT( _value.mContent ) )
-            _value.mContent--;
+        {
+            --(_value.mContent);
+            _value.maybeRationalize();
+        }
         else
-            _value.rRational()--;
+        {
+            --(_value.rRational());
+            _value.maybeIntegralize();
+        }
         return _value;
     }
 

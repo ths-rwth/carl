@@ -27,6 +27,8 @@ public:
 
     bool operator( )( size_t a, size_t b ) const
     {
+		assert(a < mGenerators.size()); 
+		assert(b < mGenerators.size());
         return Polynomial::compareByLeadingTerm( mGenerators[a], mGenerators[b] );
     }
 private:
