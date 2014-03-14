@@ -488,6 +488,8 @@ namespace carl
         
 		template<typename Coefficient, typename SubstitutionType>
 		Term<Coefficient>* substitute(const std::map<Variable, SubstitutionType>& substitutions, Coefficient factor) const;
+		template<typename Coefficient>
+		Term<Coefficient>* substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
         ///////////////////////////
         // Orderings
         ///////////////////////////

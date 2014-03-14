@@ -26,6 +26,7 @@ set(carl_lib_sources
 	${carl_lib_util_sources}
 	${carl_lib_number_sources}
 	${carl_lib_interval_sources}
+	${carl_lib_groebner_sources}
 )
 
 
