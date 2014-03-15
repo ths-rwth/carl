@@ -63,10 +63,14 @@ namespace carl
 
         Number sqrt_down(Number _val)   // ]0;+∞]
         {
+            if(_val <= 0)
+                return 0;
             return sqrt(_val);
         }
         Number sqrt_up  (Number _val)   // ]0;+∞]
         {
+            if(_val <= 0)
+                return 0;
             return sqrt(_val);
         }
         Number exp_down(Number _val)    // [-∞;+∞]

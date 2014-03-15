@@ -58,17 +58,35 @@ namespace carl {
             if (split) {
                 
                 if(result1 <= result2) {
-                    resB = centerInterval.sub(result1);
-                    resA = centerInterval.sub(result2);
+                    resB = intervals.at(variable).intersect(centerInterval.sub(result1));
+                    resA = intervals.at(variable).intersect(centerInterval.sub(result2));
+                    if( resB.isEmpty() )
+                    {
+                        return false;
+                    }
+                    if( resA.isEmpty() ) // resB is not empty at this state
+                    {
+                        resA = resB;
+                        return false;
+                    }
                 }
                 else
                 {
-                    resA = centerInterval.sub(result2);
-                    resB = centerInterval.sub(result1);
+                    resA = intervals.at(variable).intersect(centerInterval.sub(result2));
+                    resB = intervals.at(variable).intersect(centerInterval.sub(result1));
+                    if( resB.isEmpty() )
+                    {
+                        return false;
+                    }
+                    if( resA.isEmpty() ) // resB is not empty at this state
+                    {
+                        resA = resB;
+                        return false;
+                    }
                 }
                 return true;
             } else {
-                resA = centerInterval.sub(result1);
+                resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                 return false;
             }
         }
