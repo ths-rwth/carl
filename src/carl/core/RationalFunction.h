@@ -55,12 +55,17 @@ public:
 
 	template<typename Pol>
 	RationalFunction<Pol> operator+(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
+	template<typename Pol>
 	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
+	template<typename Pol>
 	RationalFunction<Pol> operator*(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
+	template<typename Pol>
 	RationalFunction<Pol> operator/(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
+	template<typename Pol>
 	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs);
 	
-	std::ostream& operator<<(std::ostream& os, const RationalFunction& rhs);
+	template<typename Pol>
+	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol>& rhs);
 }
 
 #include "RationalFunction.tpp"
