@@ -65,7 +65,15 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient
 		assert(m.mExponents.size() == 0);
 		return new Term<Coefficient>(coeff * factor.coeff());
 	}
-	return new Term<Coefficient>(coeff * factor.coeff(),m * *factor.monomial());	
+	
+	if(factor.monomial())
+	{
+		return new Term<Coefficient>(coeff * factor.coeff(),m * *factor.monomial());	
+	}
+	else
+	{
+		return new Term<Coefficient>(coeff * factor.coeff(),m);	
+	}
 }
 
 
