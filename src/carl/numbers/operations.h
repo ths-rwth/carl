@@ -35,6 +35,10 @@ inline bool isInteger(const GFNumber<C>&) {
 	return true;
 }
 
+template<typename C>
+inline void reserve(size_t) {
+}
+
 /*
  * Conversion functions
  * 
