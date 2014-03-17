@@ -385,11 +385,12 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 	{
 		return Coeff(1);
 	}
-	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
+	typename std::vector<Coeff>::const_reverse_iterator it = mCoefficients.rbegin();
 	Coeff gcd = *it;
-	for(++it; it != mCoefficients.end(); ++it)
+	for(++it; it != mCoefficients.rend(); ++it)
 	{
 		if(gcd == 1) break;
+		if(*it == 0) continue;
 		gcd = carl::gcd(gcd, *it);
 	}
 	return gcd;
@@ -401,10 +402,13 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
 	if(this->isZero()) {
 		return *this;
 	}
+	
 	if (this->isNormal())
 	{
 		return *this / this->content();
-	} else {
+	}
+	else
+	{
 		auto tmp = *this * Coeff(-1);
 		return tmp / tmp.content();
 	}
@@ -613,7 +617,7 @@ template<typename Coeff>
 template<typename C, EnableIf<Not<is_number<C>>>>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(lcoeff().isZero() || lcoeff().lcoeff() > 0)
+	if(isZero() || lcoeff().isZero() || lcoeff().lcoeff() > 0)
 	{
 		return Coeff(1);
 	}	
