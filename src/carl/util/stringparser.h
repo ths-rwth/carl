@@ -171,7 +171,7 @@ namespace carl
 						}
 						else
 						{
-							coeff *= 1;//constructCoefficient(veStr);
+							coeff *= constructCoefficient<C>(veStr);
 						}
 					}
 					else
@@ -213,5 +213,21 @@ namespace carl
 			return result;
 		}
 		
+	protected:
+		template<typename C>
+		C constructCoefficient(const std::string& inputString) const
+		{
+			try
+			{
+				return C(inputString);
+			}
+			catch(std::exception& e)
+			{
+				throw InvalidInputStringException("Could not build coefficient", inputString);
+			}
+			
+		}
+		
 	};
+	
 }
