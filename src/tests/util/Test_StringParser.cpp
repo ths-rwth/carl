@@ -1,16 +1,56 @@
 #include <gmpxx.h>
 #include "gtest/gtest.h"
-#include "carl/numbers/GFNumber.h"
-#include "carl/util/SFINAE.h"
+#include "carl/util/stringparser.h"
+#include "carl/core/MultivariatePolynomial.h"
 
 #include <type_traits>
 #include <typeinfo>
 
 using namespace carl;
 
-TEST(Numbers, IntegralT)
+class StringParserTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+     spSingleSymbExplicit.setImplicitMultiplicationMode(false);
+     spSingleSymbExplicit.setVariables({"x", "y", "z"});
+  }
+
+  // virtual void TearDown() {}
+
+  StringParser spSingleSymbExplicit;
+};
+
+TEST_F(StringParserTest, termsWithExplicitMultiplication)
 {
-	static_assert(is_instantiation_of<GFNumber,GFNumber<mpz_class>>::value, "Check whether the is_instantiaton works correctly");	
+    const StringParser& sp = spSingleSymbExplicit;
+   
+    EXPECT_NO_THROW(sp.parseTerm<mpq_class>("x*y^3*z^2"));
+    Term<mpq_class> t1 = sp.parseTerm<mpq_class>("x*y^3*z^2");
+    EXPECT_EQ((unsigned)6, t1.tdeg());
+    EXPECT_EQ((unsigned)3, t1.getNrVariables());
+    EXPECT_NO_THROW(sp.parseTerm<mpq_class>("x^23*y^4*z"));
+    Term<mpq_class> t2 = sp.parseTerm<mpq_class>("x^23*y^4*z");
+    EXPECT_EQ((unsigned)28, t2.tdeg());
+    EXPECT_EQ((unsigned)3, t2.getNrVariables());
+    EXPECT_THROW(sp.parseTerm<mpq_class>("x^y"), InvalidInputStringException);
+    EXPECT_THROW(sp.parseTerm<mpq_class>("3^3"), InvalidInputStringException);
+}
+
+
+TEST_F(StringParserTest, polynomialsWithExplicitMultiplication)
+{
+    const StringParser& sp = spSingleSymbExplicit;
+    
+    EXPECT_NO_THROW(sp.parseTerm<mpq_class>("x*y^3*z^2"));
+    MultivariatePolynomial<mpq_class> p1 = sp.parseMultivariatePolynomial<mpq_class>("x*y^3*z^2");
+    EXPECT_EQ((unsigned)1, p1.nrTerms());
+    EXPECT_NO_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^23*y^4*z"));
+    MultivariatePolynomial<mpq_class> p2 = sp.parseMultivariatePolynomial<mpq_class>("x^23*y^4*z");
+    EXPECT_EQ((unsigned)1, p2.nrTerms());
+    EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^y"), InvalidInputStringException);
+    EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("3^3"), InvalidInputStringException);
+    
+    
 }
 	
  

@@ -67,7 +67,7 @@ namespace carl
 	protected:
 		bool mSingleSymbVariables;
 		bool mImplicitMultiplicationMode; 
-		bool mSumOfTermsForm;
+		bool mSumOfTermsForm = true;
 		std::map<std::string, Variable> mVars;
 		
 	public:
