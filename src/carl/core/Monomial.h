@@ -76,11 +76,11 @@ namespace carl
 		explicit Monomial(const std::vector<VarExpPair>& exponents)
 		: mExponents(exponents), mTotalDegree(0)
 		{
-			sort(mExponents.begin(), mExponents.end(), CompareByVariable());
 			for(const VarExpPair&  ve : exponents)
 			{
 				mTotalDegree += ve.exp;
 			}
+			assert(isConsistent());
 		}
         /**
          * Generate a monomial from a vector of variable-exponent pairs and a total degree.
