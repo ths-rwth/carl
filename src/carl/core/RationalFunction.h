@@ -42,6 +42,11 @@ public:
 		*this =/ carl::gcd(mNominator, mDenominator);
 	}
 	
+	bool isZero() const
+	{
+		assert(!mDenominator.isZero());
+		return mNominator.isZero();
+	}
 	
 	RationalFunction& operator+=(const RationalFunction& rhs);
 	
