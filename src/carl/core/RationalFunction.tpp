@@ -13,7 +13,7 @@
 namespace carl
 {
 	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator+=(RationalFunction<Pol>& rhs)
+	RationalFunction<Pol>& RationalFunction<Pol>::operator+=(const RationalFunction<Pol>& rhs)
 	{
 		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
 		mNominator = this->mNominator * (leastCommonMultiple/this->mDenominator) + rhs.mNominator * (leastCommonMultiple/rhs.mDenominator);
@@ -21,21 +21,21 @@ namespace carl
 		return *this;
 	}
 	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator-=(RationalFunction<Pol>& rhs)
+	RationalFunction<Pol>& RationalFunction<Pol>::operator-=(const RationalFunction<Pol>& rhs)
 	{
 		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
 		mNominator = this->mNominator * (leastCommonMultiple/this->mDenominator) - rhs.mNominator * (leastCommonMultiple/rhs.mDenominator);
 		mDenominator = leastCommonMultiple;
 	}
 	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator*=(RationalFunction<Pol>& rhs)
+	RationalFunction<Pol>& RationalFunction<Pol>::operator*=(const RationalFunction<Pol>& rhs)
 	{
 		mNominator *= rhs.mNominator;
 		mDenominator *= rhs.mDenominator;
 		return *this;
 	}
 	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator/=(RationalFunction<Pol>& rhs)
+	RationalFunction<Pol>& RationalFunction<Pol>::operator/=(const RationalFunction<Pol>& rhs)
 	{
 		mNominator *= rhs.mDenominator;
 		mDenominator *= rhs.mNominator;

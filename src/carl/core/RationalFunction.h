@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "MultivariateGCD.h"
 
 namespace carl
 {
@@ -24,7 +25,7 @@ public:
 	RationalFunction(const Pol& nom, const Pol& denom)
 	: mNominator(nom), mDenominator(denom)
 	{
-		
+		assert(!denom.isZero());
 	}
 	
 	const Pol& nominator() const
@@ -39,7 +40,7 @@ public:
 	
 	void simplify() 
 	{
-		*this =/ carl::gcd(mNominator, mDenominator);
+		*this /= carl::gcd(mNominator, mDenominator);
 	}
 	
 	bool isZero() const
