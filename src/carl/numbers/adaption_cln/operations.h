@@ -232,7 +232,7 @@ inline cln::cl_RA div(const cln::cl_RA& a, const cln::cl_RA& b) {
 }
 
 inline cln::cl_I div(const cln::cl_I& a, const cln::cl_I& b) {
-	return cln::floor1(a / b);
+	return cln::exquo(a, b);
 }
 
 inline cln::cl_RA quotient(const cln::cl_RA& a, const cln::cl_RA& b)
@@ -248,6 +248,5 @@ inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return div(a,b);
 }
-
 
 }

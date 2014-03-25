@@ -8,4 +8,3 @@ CTestTestfile.cmake
 Makefile
 /src/carl/core/config.h
 /src/carl/numbers/config.h
-carl/

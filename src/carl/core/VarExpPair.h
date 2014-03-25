@@ -14,6 +14,8 @@
 namespace carl
 {
     typedef unsigned exponent;
+	
+	
     /**
      * Internal struct used in monomials to represent a variable with an exponent.
      */
@@ -74,5 +76,13 @@ namespace carl
             return os;
         }
     };
+	
+	struct CompareByVariable
+	{
+		bool operator()(const VarExpPair& v1, const VarExpPair& v2) const
+		{
+			return v1.var < v2.var;
+		}
+	};
 }
 

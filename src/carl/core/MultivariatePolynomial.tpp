@@ -478,7 +478,7 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const MultivariatePolynomial& divisor) const
 {
-	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial<C,O,P> result;
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())

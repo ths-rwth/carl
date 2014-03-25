@@ -16,8 +16,12 @@ namespace carl
 	template<typename Coeff>
 	UnivariatePolynomial<Coeff> PrimitiveEuclidean::operator ()(const UnivariatePolynomial<Coeff>& a, const UnivariatePolynomial<Coeff>& b) const
 	{
+		assert(!a.isZero());
+		assert(!b.isZero());
 		assert(a.isNormal());
 		assert(b.isNormal());
+		std::cout << "a = " << a << std::endl;
+		std::cout << "b = " << b << std::endl;
 		UnivariatePolynomial<Coeff> c = a.primitivePart();
 		UnivariatePolynomial<Coeff> d = b.primitivePart();
 		
