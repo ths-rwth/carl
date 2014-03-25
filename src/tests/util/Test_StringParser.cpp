@@ -60,8 +60,11 @@ TEST_F(StringParserTest, polynomialsWithExplicitMultiplication)
     EXPECT_EQ((unsigned)3, p3.nrTerms());
     EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("x^y"), InvalidInputStringException);
     EXPECT_THROW(sp.parseMultivariatePolynomial<mpq_class>("3^3"), InvalidInputStringException);
-    
+}
+
+TEST_F(StringParserTest, rationalFunctionsWithExplicitMultiplication)
+{
     
 }
 	
- 
+

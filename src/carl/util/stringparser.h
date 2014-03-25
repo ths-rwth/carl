@@ -20,6 +20,7 @@
 #include "../core/Term.h"
 #include "../core/MultivariatePolynomial.h"
 #include "../core/logging.h"
+#include "../core/RationalFunction.h"
 
 
 namespace carl
@@ -110,6 +111,34 @@ namespace carl
 		{
 			LOG_ASSERT(to, "Extended parser not supported");
 			mSumOfTermsForm = to;
+		}
+		
+		template<typename C>
+		RationalFunction<MultivariatePolynomial<C,typename MultivariatePolynomial<C>::OrderedBy, typename MultivariatePolynomial<C>::Policy>> parseRationalFunction(const std::string& inputString) const
+		{
+			std::vector<std::string> nomAndDenom;
+			boost::split(nomAndDenom, inputString, boost::is_any_of("/"));
+			assert(!nomAndDenom.empty());
+			if(nomAndDenom.size() > 2)
+			{
+				throw InvalidInputStringException("Multiple divisions, unclear which is division", inputString , inputString);
+			}
+			else if(nomAndDenom.size() == 2)
+			{
+				auto nom = parseMultivariatePolynomial<C>(nomAndDenom.front());
+				auto denom = parseMultivariatePolynomial<C>(nomAndDenom.back());
+				if(denom.isZero())
+				{
+					throw InvalidInputStringException("Denominator is zero", nomAndDenom.back() , inputString);
+				}
+				return {nom, denom};
+			}
+			else
+			{
+				assert(nomAndDenom.size() == 1);
+				auto pol = parseMultivariatePolynomial<C>(nomAndDenom.front());
+				return {pol};
+			}
 		}
 		
 		template<typename C>
