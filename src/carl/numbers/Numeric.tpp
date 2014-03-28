@@ -6,46 +6,49 @@
  * Created on 2014-03-11
  */
 
-#include "Numeric.h"
+#include "typetraits.h"
 
-using namespace std;
 
 namespace carl
 {
+    template<typename T>
+    std::vector<T> Numeric<T>::mRationalPool = std::vector<T>();
+    template<typename T>
+    std::vector<size_t> Numeric<T>::mFreeRationalIds = std::vector<size_t>();
     
-    vector<cln::cl_RA> Numeric::mRationalPool = vector<cln::cl_RA>();
-    vector<size_t> Numeric::mFreeRationalIds = vector<size_t>();
-    
-   
-    ContentType Numeric::allocate( const cln::cl_RA& _value )
+    template<typename T>
+    ContentType Numeric<T>::allocate( const T& _value )
     {
         if( mFreeRationalIds.empty() )
         {
             mRationalPool.emplace_back( _value );
-            assert( (ContentType) mRationalPool.size() < HIGHTEST_INTEGER_VALUE );
-            return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE;
+            assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE - 1 <= std::numeric_limits<size_t>::max() );
+            return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1;
         }
         else
         {
             size_t id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
+            assert( id >= (size_t)HIGHTEST_INTEGER_VALUE );
             mRationalPool[id-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
             return (ContentType) id;
         }
     }
     
-    ContentType Numeric::allocate( ContentType _value )
+    template<typename T>
+    ContentType Numeric<T>::allocate( ContentType _value )
     {
         if( mFreeRationalIds.empty() )
         {
             mRationalPool.emplace_back( _value );
-            assert( (ContentType) mRationalPool.size() < HIGHTEST_INTEGER_VALUE );
-            return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE;
+            assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE - 1 <= std::numeric_limits<size_t>::max() );
+            return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1;
         }
         else
         {
             size_t id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
+            assert( id >= (size_t)HIGHTEST_INTEGER_VALUE );
             mRationalPool[id-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
             return (ContentType) id;
         }
@@ -54,7 +57,8 @@ namespace carl
     /**
      * Default constructor.
      */
-    Numeric::Numeric():
+    template<typename T>
+    Numeric<T>::Numeric():
         mContent( 0 )
     {}
 
@@ -62,15 +66,17 @@ namespace carl
      * Constructing from a Rational.
      * @param The Rational.
      */
-    Numeric::Numeric( const cln::cl_RA& _value ):
-        mContent( (carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) < HIGHTEST_INTEGER_VALUE) ? carl::toInt<ContentType>( carl::getNum( _value ) ) : allocate( _value ) )
+    template<typename T>
+    Numeric<T>::Numeric( const T& _value ):
+        mContent( (carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE) ? carl::toInt<ContentType>( carl::getNum( _value ) ) : allocate( _value ) )
     {}
 
     /**
      * Constructing from an integer.
      * @param _value The integer.
      */
-    Numeric::Numeric( ContentType _value, bool is_definitely_int ):
+    template<typename T>
+    Numeric<T>::Numeric( ContentType _value, bool is_definitely_int ):
         mContent( is_definitely_int || IS_INT( _value ) ? _value : allocate( _value ) )
     {}
     
@@ -78,11 +84,13 @@ namespace carl
      * Copy constructor.
      * @param _value The Numeric to copy.
      */
-    Numeric::Numeric( const Numeric& _value ):
-        mContent( IS_INT( _value.mContent ) ? _value.mContent : allocate( _value.mContent ) )
+    template<typename T>
+    Numeric<T>::Numeric( const Numeric<T>& _value ):
+        mContent( IS_INT( _value.mContent ) ? _value.mContent : allocate( _value.rational() ) )
     {}
 
-    Numeric::~Numeric()
+    template<typename T>
+    Numeric<T>::~Numeric()
     {
         if( !(IS_INT( mContent )) )
         {
@@ -95,11 +103,12 @@ namespace carl
      * @param _value The rational.
      * @return The corresponding Numeric.
      */
-    Numeric& Numeric::operator=( const cln::cl_RA& _value )
+    template<typename T>
+    Numeric<T>& Numeric<T>::operator=( const T& _value )
     {
         if( IS_INT( this->mContent ) )
         {
-            if( carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE )
             {
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
             }
@@ -110,7 +119,7 @@ namespace carl
         }
         else
         {
-            if( carl::isInteger( _value ) && carl::abs( carl::getNum( _value ) ) < HIGHTEST_INTEGER_VALUE )
+            if( carl::isInteger( _value ) && carl::getNum( _value ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( _value ) < HIGHTEST_INTEGER_VALUE )
             {
                 mFreeRationalIds.push_back( this->mContent );
                 this->mContent = carl::toInt<ContentType>( carl::getNum( _value ) );
@@ -128,7 +137,8 @@ namespace carl
      * @param _value The integer.
      * @return The corresponding Numeric.
      */
-    Numeric& Numeric::operator=( ContentType _value )
+    template<typename T>
+    Numeric<T>& Numeric<T>::operator=( ContentType _value )
     {
         if( IS_INT( this->mContent ) )
         {
@@ -145,7 +155,7 @@ namespace carl
                 this->mContent = _value;
             }
             else
-                this->rRational() = cln::cl_RA( _value );
+                this->rRational() = T( _value );
         }
         return *this;
     }
@@ -155,7 +165,8 @@ namespace carl
      * @param _value The char array.
      * @return The corresponding Numeric.
      */
-    Numeric& Numeric::operator=( const Numeric& _value )
+    template<typename T>
+    Numeric<T>& Numeric<T>::operator=( const Numeric<T>& _value )
     {
         if( IS_INT( this->mContent ) )
         {
@@ -183,7 +194,8 @@ namespace carl
      * @return true, if the two Numerics are equal;
      *          false, otherwise.
      */
-    bool Numeric::operator==( const Numeric& _value ) const
+    template<typename T>
+    bool Numeric<T>::operator==( const Numeric<T>& _value ) const
     {
         if( IS_INT( this->mContent ) )
         {
@@ -191,7 +203,7 @@ namespace carl
                 return this->mContent == _value.mContent;
             else
             {
-                assert( _value.rational() == cln::cl_RA( this->mContent ) );
+                assert( _value.rational() != T( this->mContent ) );
                 return false;
             }
         }
@@ -199,11 +211,13 @@ namespace carl
         {
             if( IS_INT( _value.mContent ) )
             {
-                assert( this->rational() == cln::cl_RA( _value.mContent ) );
+                assert( this->rational() != T( _value.mContent ) );
                 return false;
             }
             else
-                return this->rational() == _value.rational();
+            {
+                return (this->rational() == _value.rational());
+            }
         }
     }
 
@@ -213,7 +227,8 @@ namespace carl
      * @return true, if the two Numerics are not equal;
      *          false, otherwise.
      */
-    bool Numeric::operator!=( const Numeric& _value ) const
+    template<typename T>
+    bool Numeric<T>::operator!=( const Numeric<T>& _value ) const
     {
         if( IS_INT( this->mContent ) )
         {
@@ -221,7 +236,7 @@ namespace carl
                 return this->mContent != _value.mContent;
             else
             {
-                assert( _value.rational() != this->mContent );
+                assert( _value.rational() != T( this->mContent ) );
                 return true;
             }
         }
@@ -229,11 +244,13 @@ namespace carl
         {
             if( IS_INT( _value.mContent ) )
             {
-                assert( this->rational() != _value.mContent );
+                assert( this->rational() != T( _value.mContent ) );
                 return true;
             }
             else
-                return this->rational() != _value.rational();
+            {
+                return (this->rational() != _value.rational());
+            }
         }
     }
 
@@ -243,7 +260,8 @@ namespace carl
      * @return true, if this Numeric is less than the given one;
      *          false, otherwise.
      */
-    bool Numeric::operator<( const Numeric& _value ) const
+    template<typename T>
+    bool Numeric<T>::operator<( const Numeric<T>& _value ) const
     {
         if( IS_INT( this->mContent ) )
         {
@@ -271,7 +289,8 @@ namespace carl
      * @return true, if this Numeric is less or equal than the given one;
      *          false, otherwise.
      */
-    bool Numeric::operator<=( const Numeric& _value ) const
+    template<typename T>
+    bool Numeric<T>::operator<=( const Numeric<T>& _value ) const
     {
         if( IS_INT( this->mContent ) )
         {
@@ -299,7 +318,8 @@ namespace carl
      * @return true, if this Numeric is greater than the given one;
      *          false, otherwise.
      */
-    bool Numeric::operator>( const Numeric& _value ) const
+    template<typename T>
+    bool Numeric<T>::operator>( const Numeric<T>& _value ) const
     {
         if( IS_INT( this->mContent ) )
         {
@@ -327,7 +347,8 @@ namespace carl
      * @return true, if this Numeric is greater or equal than the given one;
      *          false, otherwise.
      */
-    bool Numeric::operator>=( const Numeric& _value ) const
+    template<typename T>
+    bool Numeric<T>::operator>=( const Numeric<T>& _value ) const
     {
         if( IS_INT( this->mContent ) )
         {
@@ -349,105 +370,121 @@ namespace carl
         }
     }
     
-    Numeric Numeric::divide( const Numeric& _value ) const
+    /**
+     * @param _valueA An integer.
+     * @param _valueB An integer.
+     * @result The quotient of this integer and the given integer.
+     */
+    template<typename T>
+    Numeric<T>& div_here( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        assert( isInteger( *this ) );
-        assert( isInteger( _value ) );
-        if( IS_INT( this->mContent ) )
+        assert( isInteger( _valueA ) );
+        assert( isInteger( _valueB ) );
+        assert( abs( _valueA ) >= abs( _valueB ) );
+        if( IS_INT( _valueA.mContent ) )
         {
-            assert( IS_INT( _value.mContent ) );
-            assert( this->mContent > _value.mContent );
-            return this->mContent / _value.mContent;
+            assert( IS_INT( _valueB.mContent ) );
+            _valueA.mContent /= _valueB.mContent;
         }
         else
         {
-            if( IS_INT( _value.mContent ) )
-            {
-                return Numeric( this->rational() / _value.mContent );
-            }
+            T& rat = _valueA.rRational();
+            if( IS_INT( _valueB.mContent ) )
+                rat = carl::div( carl::getNum( rat ), typename IntegralT<T>::type( _valueB.mContent ) );
             else
-                return Numeric( this->rational() / _value.rational() );
-        }
-    }
-    
-    
-    Numeric& Numeric::divideBy( const Numeric& _value )
-    {
-        assert( isInteger( *this ) );
-        assert( isInteger( _value ) );
-        if( IS_INT( this->mContent ) )
-        {
-            assert( IS_INT( _value.mContent ) );
-            assert( this->mContent > _value.mContent );
-            this->mContent /= _value.mContent;
-        }
-        else
-        {
-            cln::cl_RA& rat = this->rRational();
-            if( IS_INT( _value.mContent ) )
-                rat /= cln::cl_RA( _value.mContent );
-            else
-                rat /= _value.rational();
-            if( carl::abs( rat ) < HIGHTEST_INTEGER_VALUE )
+                rat = carl::div( carl::getNum( rat ), carl::getNum( _valueB.rational() ) );
+            if( carl::getNum( rat ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( rat ) < HIGHTEST_INTEGER_VALUE )
             {
-                mFreeRationalIds.push_back( mContent );
-                this->mContent = carl::toInt<ContentType>( carl::getNum( rat ) );
+                Numeric<T>::mFreeRationalIds.push_back( _valueA.mContent );
+                _valueA.mContent = carl::toInt<ContentType>( carl::getNum( rat ) );
             }
         }
-        return *this;
+        return _valueA;
     }
     
-    void gcd_( ContentType& _a, ContentType _b )
+    template<typename T>
+    void Numeric<T>::gcd_( ContentType& _a, ContentType _b )
     {
         assert( _a > 0 && _b > 0 );
-        while( true )
+        ContentType c;
+        while( _b != 0 )
         {
-            if( _a > _b ) _a -= _b;
-            if( _a < _b ) _b -= _a;
-            else return;
+            c = _b;
+            _b = _a%_b;
+            _a = c;
         }
     }
-    
-    Numeric& Numeric::gcd( const Numeric& _value )
+  
+    template<typename T>
+    Numeric<T>& gcd_here( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        assert( isInteger( *this ) );
-        assert( isInteger( _value ) );
-        if( this->mContent == 0 || _value.mContent == 0 )
+        assert( isInteger( _valueA ) );
+        assert( isInteger( _valueB ) );
+        if( _valueA.mContent == 0 || _valueB.mContent == 0 )
         {
-            if( !(IS_INT( this->mContent )) )
-                mFreeRationalIds.push_back( mContent );
-            this->mContent = 0;
+            if( !(IS_INT( _valueA.mContent )) )
+                Numeric<T>::mFreeRationalIds.push_back( _valueA.mContent );
+            _valueA.mContent = 0;
         }
-        if( IS_INT( this->mContent ) )
+        if( IS_INT( _valueA.mContent ) )
         {
-            if( IS_INT( _value.mContent ) )
+            _valueA.mContent = std::abs( _valueA.mContent );
+            if( IS_INT( _valueB.mContent ) )
             {
-                gcd_( this->mContent, _value.mContent );
+                Numeric<T>::gcd_( _valueA.mContent, std::abs( _valueB.mContent ) );
             }
             else
             {
-                cln::cl_I a = carl::abs( carl::getNum( _value.rational() ) );
-                this->mContent = std::abs( this->mContent );
-                while( a > this->mContent ) a -= this->mContent;
-                gcd_( this->mContent, carl::toInt<ContentType>( a ) );
+                typename IntegralT<T>::type a = carl::abs( carl::getNum( _valueB.rational() ) );
+                a = carl::mod( a, _valueA.mContent );
+                if( a != 0 )
+                    Numeric<T>::gcd_( _valueA.mContent, carl::toInt<ContentType>( a ) );
             }
         }
         else
         {
-            if( IS_INT( _value.mContent ) )
+            if( IS_INT( _valueB.mContent ) )
             {
-                cln::cl_I a = carl::abs( carl::getNum( this->rational() ) );
-                mFreeRationalIds.push_back( mContent );
-                this->mContent = std::abs( _value.mContent );
-                while( a > this->mContent ) a -= this->mContent;
-                gcd_( this->mContent, carl::toInt<ContentType>( a ) );
+                typename IntegralT<T>::type a = carl::abs( carl::getNum( _valueA.rational() ) );
+                Numeric<T>::mFreeRationalIds.push_back( _valueA.mContent );
+                _valueA.mContent = std::abs( _valueB.mContent );
+                a = carl::mod( a, _valueA.mContent );
+                if( a != 0 )
+                    Numeric<T>::gcd_( _valueA.mContent, carl::toInt<ContentType>( a ) );
             }
             else
             {
-                this->maybeIntegralize( carl::gcd( carl::getNum( this->rational() ), carl::getNum( _value.rational() ) ) );
+                _valueA.maybeIntegralize( carl::gcd( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
             }
         }
-        return *this;
+        return _valueA;
+    }
+    
+    /**
+     * @param _valueA An integer.
+     * @param _valueB An integer.
+     * @result The quotient of the two given integer.
+     */
+    template<typename T>
+    Numeric<T> div( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
+    {
+        assert( isInteger( _valueA ) );
+        assert( isInteger( _valueB ) );
+        assert( abs( _valueA ) >= abs( _valueB ) );
+        if( IS_INT( _valueA.content() ) )
+        {
+            assert( IS_INT( _valueB.content() ) );
+            return _valueA.content() / _valueB.content();
+        }
+        else
+        {
+            if( IS_INT( _valueB.content() ) )
+            {
+                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), typename IntegralT<T>::type( _valueB.content() ) ) );
+            }
+            else
+                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
+        }
     }
 
     /**
@@ -455,15 +492,16 @@ namespace carl
      * @param _value The Numeric to calculate the Numeric for.
      * @return The absolute value of the given Numeric.
      */
-    Numeric abs( const Numeric& _value )
+    template<typename T>
+    Numeric<T> abs( const Numeric<T>& _value )
     {
         if( IS_INT( _value.content() ) )
         {
-            return Numeric( std::abs( _value.content() ), true );
+            return Numeric<T>( std::abs( _value.content() ), true );
         }
         else
         {
-            return Numeric( carl::abs( _value.rational() ) ); 
+            return Numeric<T>( carl::abs( _value.rational() ) ); 
         }
     }
 
@@ -474,7 +512,8 @@ namespace carl
      * @param _valueB An integer.
      * @return The least common multiple of the two arguments.
      */
-    Numeric lcm( const Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T> lcm( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         assert( isInteger( _valueA ) );
         assert( isInteger( _valueB ) );
@@ -482,19 +521,19 @@ namespace carl
         {
             if( IS_INT( _valueB.content() ) )
             {
-                ContentType g = _valueA.content();
-                gcd_( g, _valueB.content() );
-                return Numeric( (std::abs(_valueA.content()*_valueB.content())/g) );
+                ContentType g = std::abs( _valueA.content() );
+                Numeric<T>::gcd_( g, std::abs( _valueB.content() ) );
+                return Numeric<T>( (std::abs(_valueA.content()*_valueB.content())/g) );
             }
             else
-                return Numeric( carl::lcm( cln::cl_I( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
+                return Numeric<T>( carl::lcm( typename IntegralT<T>::type( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
         }
         else
         {
             if( IS_INT( _valueB.content() ) )
-                return Numeric( carl::lcm( carl::getNum( _valueA.rational() ), cln::cl_I( _valueB.content() ) ) );
+                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), typename IntegralT<T>::type( _valueB.content() ) ) );
             else
-                return Numeric( carl::lcm( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
+                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
         }
     }
 
@@ -505,9 +544,11 @@ namespace carl
      * @param _valueB An integer.
      * @return The least common divisor of the two arguments.
      */
-    Numeric gcd( const Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T> gcd( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        return Numeric( _valueA ).gcd( _valueB );
+        Numeric<T> result( _valueA );
+        return gcd_here( result, _valueB );
     }
     
     /**
@@ -516,9 +557,10 @@ namespace carl
      * @param _valueB The second summand.
      * @return The sum of the two given Numerics.
      */
-    Numeric operator+( const Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T> operator+( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        Numeric result( _valueA );
+        Numeric<T> result( _valueA );
         result += _valueB;
         return result;
     }
@@ -529,9 +571,10 @@ namespace carl
      * @param _valueB The subtrahend.
      * @return The difference between the two given Numerics.
      */
-    Numeric operator-( const Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T> operator-( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        Numeric result( _valueA );
+        Numeric<T> result( _valueA );
         result -= _valueB;
         return result;
     }
@@ -542,9 +585,10 @@ namespace carl
      * @param _valueB The second factor.
      * @return The product of the two given Numerics.
      */
-    Numeric operator*( const Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T> operator*( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        Numeric result( _valueA );
+        Numeric<T> result( _valueA );
         result *= _valueB;
         return result;
     }
@@ -555,9 +599,10 @@ namespace carl
      * @param _valueB The divisor.
      * @return The difference of the two given Numerics.
      */
-    Numeric operator/( const Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T> operator/( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
-        Numeric result( _valueA );
+        Numeric<T> result( _valueA );
         result /= _valueB;
         return result;
     }
@@ -568,7 +613,8 @@ namespace carl
      * @param _valueB The Numeric to add.
      * @return The first given Numeric increased by the second given Numeric.
      */
-    Numeric& operator+=( Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T>& operator+=( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         if( IS_INT( _valueA.mContent ) )
         {
@@ -579,14 +625,14 @@ namespace carl
             }
             else
             {
-                cln::cl_RA rat = _valueB.rational();
+                T rat = _valueB.rational();
                 rat += _valueA.mContent;
                 _valueA.maybeRationalize( rat );
             }
         }
         else
         {
-            cln::cl_RA& rat = _valueA.rRational();
+            T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
                 rat += _valueB.mContent;
@@ -606,7 +652,8 @@ namespace carl
      * @param _valueB The Numeric to subtract.
      * @return The first given Numeric subtracted by the second given Numeric.
      */
-    Numeric& operator-=( Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T>& operator-=( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         if( IS_INT( _valueA.mContent ) )
         {
@@ -617,14 +664,14 @@ namespace carl
             }
             else
             {
-                cln::cl_RA rat = _valueB.rational();
-                rat -= _valueA.mContent;
+                T rat = -_valueB.rational();
+                rat += _valueA.mContent;
                 _valueA.maybeRationalize( rat );
             }
         }
         else
         {
-            cln::cl_RA& rat = _valueA.rRational();
+            T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
                 rat -= _valueB.mContent;
@@ -644,7 +691,8 @@ namespace carl
      * @param _valueB The Numeric to multiply by.
      * @return The first given Numeric multiplied by the second given Numeric.
      */
-    Numeric& operator*=( Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T>& operator*=( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         if( IS_INT( _valueA.mContent ) )
         {
@@ -655,17 +703,17 @@ namespace carl
             }
             else
             {
-                cln::cl_RA rat = _valueB.rational();
-                rat *= cln::cl_RA( _valueA.mContent );
+                T rat = _valueB.rational();
+                rat *= T( _valueA.mContent );
                 _valueA.maybeRationalize( rat );
             }
         }
         else
         {
-            cln::cl_RA& rat = _valueA.rRational();
+            T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
-                rat *= cln::cl_RA( _valueB.mContent );
+                rat *= T( _valueB.mContent );
             }
             else
             {
@@ -682,14 +730,15 @@ namespace carl
      * @param _valueB The Numeric to divide by.
      * @return The first given Numeric divided by the second given Numeric.
      */
-    Numeric& operator/=( Numeric& _valueA, const Numeric& _valueB )
+    template<typename T>
+    Numeric<T>& operator/=( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         if( IS_INT( _valueA.mContent ) )
         {
-            cln::cl_RA rat = cln::cl_RA( _valueA.mContent );
+            T rat = T( _valueA.mContent );
             if( IS_INT( _valueB.mContent ) )
             {
-                rat /= cln::cl_RA( _valueB.mContent );
+                rat /= T( _valueB.mContent );
             }
             else
             {
@@ -699,10 +748,10 @@ namespace carl
         }
         else
         {
-            cln::cl_RA& rat = _valueA.rRational();
+            T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
             {
-                rat /= cln::cl_RA( _valueB.mContent );
+                rat /= T( _valueB.mContent );
             }
             else
             {
@@ -718,12 +767,13 @@ namespace carl
      * @param _value The Numeric to calculate the additive inverse for.
      * @return The additive inverse of the given Numeric.
      */
-    Numeric operator-( const Numeric& _value )
+    template<typename T>
+    Numeric<T> operator-( const Numeric<T>& _value )
     {
         if( IS_INT( _value.content() ) )
-            return Numeric( -_value.content(), true );
+            return Numeric<T>( -_value.content(), true );
         else
-            return Numeric( -_value.rational() );
+            return Numeric<T>( -_value.rational() );
     }
 
     /**
@@ -731,12 +781,19 @@ namespace carl
      * @param _value The Numeric to increment.
      * @return The given Numeric incremented by one.
      */
-    Numeric& operator++( Numeric& _value )
+    template<typename T>
+    Numeric<T>& operator++( Numeric<T>& _value )
     {
         if( IS_INT( _value.mContent ) )
-            _value.mContent++;
+        {
+            ++(_value.mContent);
+            _value.maybeRationalize();
+        }
         else
-            _value.rRational()++;
+        {
+            ++(_value.rRational());
+            _value.maybeIntegralize();
+        }
         return _value;
     }
 
@@ -745,12 +802,19 @@ namespace carl
      * @param _value The Numeric to decrement.
      * @return The given Numeric decremented by one.
      */
-    Numeric& operator--( Numeric& _value )
+    template<typename T>
+    Numeric<T>& operator--( Numeric<T>& _value )
     {
         if( IS_INT( _value.mContent ) )
-            _value.mContent--;
+        {
+            --(_value.mContent);
+            _value.maybeRationalize();
+        }
         else
-            _value.rRational()--;
+        {
+            --(_value.rRational());
+            _value.maybeIntegralize();
+        }
         return _value;
     }
 
@@ -760,7 +824,8 @@ namespace carl
      * @param _value The Numeric to print.
      * @return The output stream after printing the given Numerics representation on it.
      */
-    ostream& operator <<( ostream& _out, const Numeric& _value )
+    template<typename T>
+    std::ostream& operator <<( std::ostream& _out, const Numeric<T>& _value )
     {
         if( IS_INT( _value.content() ) )
             _out << _value.content();

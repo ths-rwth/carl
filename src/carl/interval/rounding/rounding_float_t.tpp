@@ -80,12 +80,18 @@ namespace carl
 
         FLOAT_T<FloatType> sqrt_down(FLOAT_T<FloatType> _val)   // ]0;+∞]
         {
+            if( _val <= 0 )
+                return FLOAT_T<FloatType>(0);
+            
             FLOAT_T<FloatType> result;
             _val.sqrt(result, CARL_RND::D );
             return result;
         }
         FLOAT_T<FloatType> sqrt_up  (FLOAT_T<FloatType> _val)   // ]0;+∞]
         {
+            if( _val <= 0 )
+                return FLOAT_T<FloatType>(0);
+            
             FLOAT_T<FloatType> result;
             _val.sqrt(result, CARL_RND::U );
             return result;

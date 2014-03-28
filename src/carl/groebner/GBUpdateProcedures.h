@@ -21,7 +21,12 @@ struct StdAdding
 private:
 	
 public:
-	bool addToGb(const Polynomial& p, Ideal<Polynomial>* gb, UpdateFnc* update)
+	virtual ~StdAdding()
+	{
+		
+	}
+	
+	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{
 		size_t index = gb->addGenerator(p);
 		(*update)(index);
@@ -41,7 +46,12 @@ struct RealRadicalAwareAdding
 private:
 	
 public:
-	bool addToGb(const Polynomial& p, Ideal<Polynomial>* gb, UpdateFnc* update)
+	virtual ~RealRadicalAwareAdding() 
+	{
+		
+	}
+	
+	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{
 		
 		if(!p.isConstant() && p.nrTerms() == 1)

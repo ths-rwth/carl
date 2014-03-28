@@ -656,6 +656,13 @@ namespace carl
         inline Sign sgn() const;
 
         /**
+         * Computes the integral part of the given interval.
+         * @return interval
+         */
+        Interval<Number> integralPart() const;
+        void integralPart_assign();
+        
+        /**
          * Returns the diameter of the interval.
          * @return diameter
          */
@@ -1025,8 +1032,7 @@ namespace carl
 
         bool isConsistent() const
         {
-            assert(this->lower() <= this->upper());
-            return true;
+            return this->lower() <= this->upper();
         }
     };
 

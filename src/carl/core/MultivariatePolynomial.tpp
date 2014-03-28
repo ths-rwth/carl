@@ -478,7 +478,7 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const MultivariatePolynomial& divisor) const
 {
-	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial<C,O,P> result;
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
@@ -769,6 +769,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
+	static_assert(!std::is_same<SubstitutionType, Term<Coeff>>::value, "Terms are handled by a seperate method.");
     TermsType newTerms;
 	MultivariatePolynomial result;
 	for(auto term : mTerms)
@@ -786,6 +787,28 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	result.setTerms(newTerms);
 	return result;
 }
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, Ordering, Policies>::substitute(const std::map<Variable, Term<Coeff>>& substitutions) const
+{
+	TermsType newTerms;
+	MultivariatePolynomial result;
+	for(auto term : mTerms)
+	{
+		Term<Coeff>* t = term->substitute(substitutions);
+		if(t->coeff() != 0)
+		{
+			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
+		}
+//        else
+//        {
+//            delete t;
+//        }
+	}   
+	result.setTerms(newTerms);
+	return result;
+}
+
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>

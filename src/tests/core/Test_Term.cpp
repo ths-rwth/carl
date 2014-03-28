@@ -45,5 +45,18 @@ TEST(Term, Derivative)
     t *= v0 * v0 * v0 * v1;
     Term<mpz_class>* tprime = t.derivative(v0);
     EXPECT_EQ(9,tprime->coeff());
-    
+}
+
+TEST(Term, Substitute)
+{
+    Variable v0(1);
+    Variable v1(2);
+    Term<mpz_class> t(3);
+    Term<mpz_class> c4(4);
+    t *= v0 * v0 * v1;
+    std::map<Variable, Term<mpz_class>> substitutes;
+    substitutes.emplace(v1, c4);
+    Term<mpz_class>* res = t.substitute(substitutes);
+    EXPECT_EQ(12, res->coeff());
+    EXPECT_EQ((unsigned)2, res->tdeg());
 }

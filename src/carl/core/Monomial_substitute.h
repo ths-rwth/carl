@@ -39,4 +39,42 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,SubstitutionType
 	return new Term<Coefficient>(factor, std::shared_ptr<const Monomial>(m));	
 }
 
+template<typename Coefficient>
+Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient>>& substitutions, const Coefficient&  coeff) const
+{
+	Monomial m;
+	m.mTotalDegree = mTotalDegree;
+	Term<Coefficient> factor(1);
+	for(const VarExpPair& ve : mExponents) 
+	{
+		typename std::map<Variable,Term<Coefficient>>::const_iterator it = substitutions.find(ve.var);
+		if(it == substitutions.end())
+		{
+			m.mExponents.push_back(ve);
+		}
+		else
+		{
+			Term<Coefficient>* power = it->second.pow(ve.exp);
+			factor *= *power;
+			delete power;
+			m.mTotalDegree -= ve.exp;
+		}
+	}
+	if(m.mTotalDegree == 0)
+	{
+		assert(m.mExponents.size() == 0);
+		return new Term<Coefficient>(coeff * factor.coeff());
+	}
+	
+	if(factor.monomial())
+	{
+		return new Term<Coefficient>(coeff * factor.coeff(),m * *factor.monomial());	
+	}
+	else
+	{
+		return new Term<Coefficient>(coeff * factor.coeff(),m);	
+	}
+}
+
+
 }
