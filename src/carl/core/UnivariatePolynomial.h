@@ -11,6 +11,17 @@
 #include <memory>
 #include <vector>
 
+namespace carl {
+//
+// Forward declarations
+//
+template<typename Coefficient> class UnivariatePolynomial;
+
+template<typename Coefficient>
+using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
+
+}
+
 #include "Variable.h"
 #include "VariableInformation.h"
 #include "Polynomial.h"
@@ -26,14 +37,6 @@
 
 namespace carl
 {
-
-//
-// Forward declarations
-// 	
-template<typename Coefficient> class UnivariatePolynomial;
-	
-template<typename Coefficient>
-using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
 enum class PolynomialComparisonOrder : unsigned {
 	CauchyBound, LowDegree, Memory, Default = Memory
