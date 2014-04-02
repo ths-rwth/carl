@@ -42,6 +42,7 @@ protected:
 	Singleton() {};
 
 public:
+        virtual ~Singleton() {};
 	/**
 	 * Returns the single instance of this class by reference.
 	 * If there is no instance yet, a new one is created.
