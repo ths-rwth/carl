@@ -133,6 +133,18 @@ inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::gcd(a,b);
 }
 
+inline cln::cl_I& gcd_here(cln::cl_I& a, const cln::cl_I& b) {
+    a = cln::gcd(a,b);
+	return a;
+}
+
+inline cln::cl_RA& gcd_here(cln::cl_RA& a, const cln::cl_RA& b) {
+    assert( carl::isInteger( a ) );
+    assert( carl::isInteger( b ) );
+	a = cln::gcd(carl::getNum(a),carl::getNum(b));
+	return a;
+}
+
 inline cln::cl_RA gcd(const cln::cl_RA& a, const cln::cl_RA& b) {
     assert( carl::isInteger( a ) );
     assert( carl::isInteger( b ) );
@@ -233,6 +245,16 @@ inline cln::cl_RA div(const cln::cl_RA& a, const cln::cl_RA& b) {
 
 inline cln::cl_I div(const cln::cl_I& a, const cln::cl_I& b) {
 	return cln::exquo(a, b);
+}
+
+inline cln::cl_RA& div_here(cln::cl_RA& a, const cln::cl_RA& b) {
+    a /= b;
+	return a;
+}
+
+inline cln::cl_I& div_here(cln::cl_I& a, const cln::cl_I& b) {
+	a = cln::exquo(a, b);
+    return a;
 }
 
 inline cln::cl_RA quotient(const cln::cl_RA& a, const cln::cl_RA& b)
