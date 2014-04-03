@@ -27,9 +27,9 @@ TEST(EliminationSet, BasicOperations)
 
 	cad::UPolynomial<cln::cl_RA>* one = new cad::UPolynomial<cln::cl_RA>(x, mpone);
 	cad::UPolynomial<cln::cl_RA>* p = new cad::UPolynomial<cln::cl_RA>(x, {(cln::cl_RA)-2*mpone,mpzero,mpone});
-	cad::UPolynomial<cln::cl_RA>* q = new cad::UPolynomial<cln::cl_RA>(y, {(cln::cl_RA)-3*mpone,mpzero,mpzero,mpone});
-	cad::UPolynomial<cln::cl_RA>* r = new cad::UPolynomial<cln::cl_RA>(y, {mpz, mpzero, mpxz2});
-	cad::UPolynomial<cln::cl_RA>* w = new cad::UPolynomial<cln::cl_RA>(y, {mpz, mpzero, mpxz});
+	cad::UPolynomial<cln::cl_RA>* q = new cad::UPolynomial<cln::cl_RA>(x, (cln::cl_RA)-3*mpone + mpone*y*y*y);
+	cad::UPolynomial<cln::cl_RA>* r = new cad::UPolynomial<cln::cl_RA>(x, mpz + mpxz2*y*y);
+	cad::UPolynomial<cln::cl_RA>* w = new cad::UPolynomial<cln::cl_RA>(x, mpz + mpxz*y*y);
 	
 	s.insert(p);
 	s.insert(q, {one, p});
