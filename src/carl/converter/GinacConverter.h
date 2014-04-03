@@ -12,19 +12,38 @@
 #ifdef COMPARE_WITH_GINAC
 #include <unordered_map>
 #include <ginac/ginac.h>
-namespace carl
-{
+#include "../core/Variable.h"
+
+namespace carl {
 	bool similar(GiNaC::ex a, GiNaC::ex b);
+	template<typename Poly> void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap);
 }
+
 #include "../core/MultivariatePolynomial.h"
 
 namespace carl
 {
+
+	bool similar(GiNaC::ex a, GiNaC::ex b);
+	
     GiNaC::ex convertToGinac(const MultivariatePolynomial<cln::cl_RA>& poly, const std::map<carl::Variable, GiNaC::ex>& vars);
     
     MultivariatePolynomial<cln::cl_RA> convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars);
     
-    void gatherVariables(const MultivariatePolynomial<cln::cl_RA>& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap);
+	template<typename Poly>
+	void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap)
+	{
+        std::set<Variable> carlVars;
+        poly.gatherVariables(carlVars);
+        for(auto var = carlVars.begin(); var != carlVars.end(); ++var)
+        {
+            GiNaC::symbol vg(varToString(*var));
+            if( carlToGinacVarMap.insert(std::pair<Variable, GiNaC::ex>(*var, vg)).second )
+            {
+                ginacToCarlVarMap.insert(std::pair<GiNaC::ex, Variable>(vg, *var));
+            }
+        }
+	}
     
     MultivariatePolynomial<cln::cl_RA> ginacGcd(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB);
     
