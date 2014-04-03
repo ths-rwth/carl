@@ -104,16 +104,22 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 template<class Polynomial, template<typename> class AddingPolicy>
 void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 {
+	
 	std::vector<Polynomial>& generators = pGb->getGenerators();
+	assert(generators.size() > index);
+	assert(!generators[index].isConstant());
 	std::vector<size_t>::const_iterator jEnd = mGbElementsIndices.end();
 
 	std::unordered_map<size_t, SPolPair> spairs;
 	std::vector<size_t> primelist;
 	for(std::vector<size_t>::const_iterator jt = mGbElementsIndices.begin(); jt != jEnd; ++jt)
 	{
+		// TODO why do we update if otherIndex is something constant?!
 		size_t otherIndex = *jt;
-		SPolPair sp(otherIndex, index, Monomial::lcm(*generators[index].lmon(), *generators[otherIndex].lmon()));
-		if(sp.mLcm.tdeg() == generators[index].lmon()->tdeg() + generators[otherIndex].lmon()->tdeg())
+		assert(generators.size() > otherIndex);
+		unsigned oideg = generators[otherIndex].lmon() ? generators[otherIndex].lmon()->tdeg() : 0;
+		SPolPair sp(otherIndex, index, Monomial::lcm(generators[index].lmon(), generators[otherIndex].lmon()));
+		if(sp.mLcm.tdeg() == generators[index].lmon()->tdeg() + oideg)
 		{
 			// *generators[index].lmon( ), *generators[otherIndex].lmon( ) are prime.
 			primelist.push_back(otherIndex);
@@ -121,6 +127,7 @@ void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 		spairs.emplace(otherIndex, sp);
 	}
 
+	
 	mCritPairs.elimMultiples(*generators[index].lmon(), index, spairs);
 
 	removeBuchbergerTriples(spairs, primelist);

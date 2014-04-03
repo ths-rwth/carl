@@ -80,7 +80,7 @@ public:
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const InputPolynomial& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
 	{
-		insert(f, new Term<Coeff>(Coeff(1)));
+		insert(f, std::shared_ptr<const Term<Coeff>>(new Term<Coeff>(Coeff(1))));
 	}
 
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const Term<Coeff> f) :
@@ -199,7 +199,7 @@ private:
 		if(entry->getTail().isZero())
 		{
 			mDatastruct.pop();
-			delete entry;
+			//delete entry;
 			if(mDatastruct.empty()) return false;
 		}
 		else
@@ -210,7 +210,7 @@ private:
 		return true;
 	}
 
-	void insert(const InputPolynomial& g, const Term<Coeff>* fact)
+	void insert(const InputPolynomial& g, std::shared_ptr<const Term<Coeff>> fact)
 	{
 		if(!g.isZero())
 		{
@@ -219,9 +219,9 @@ private:
 		}
 	}
 
-	void insert(const Term<Coeff>& g)
+	void insert(std::shared_ptr<const Term<Coeff>> g)
 	{
-		assert(g.getCoeff() != 0);
+		assert(g->getCoeff() != 0);
 		mDatastruct.push(new EntryType(g));
 	}
 
