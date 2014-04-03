@@ -564,7 +564,8 @@ bool CAD<Number>::check(
 	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
 	LOGMSG_TRACE("carl.cad", "Creating boundPolynomials of size " << this->variables.size());
 	
-	if (useBounds) {
+	/*if (useBounds) {
+		LOGMSG_DEBUG("carl.cad", "Preprocess bounds");
 		// construct constraints and polynomials representing the bounds
 		for (auto b: bounds) {
 			if (b.first >= this->variables.size()) continue;
@@ -600,12 +601,14 @@ bool CAD<Number>::check(
 				l++;
 			}
 		}
-	}
+	}*/
 	
 	// call the main check function according to the settings
 	bool satisfiable = this->mainCheck(constraints, bounds, r, conflictGraph, deductions, next, checkTraceFirst, useBounds, checkBounds);
+	LOGMSG_DEBUG("carl.cad", "mainCheck returned " << satisfiable);
 	
-	if (useBounds) {
+	/*if (useBounds) {
+		LOGMSG_DEBUG("carl.cad", "Postprocess bounds");
 		// possibly tweak the bounds
 		if (this->setting.improveBounds) {
 			if (satisfiable) {
@@ -647,7 +650,7 @@ bool CAD<Number>::check(
 			this->eliminationSets[l].resetLiftingPositionsFully();
 			this->eliminationSets[l].setLiftingPositionsReset();
 		}
-	}
+	}*/
 
 	if (satisfiable) {
 		LOGMSG_DEBUG("carl.cad", "Result: sat (by sample point " << r << ")");
