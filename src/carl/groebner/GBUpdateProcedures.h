@@ -124,7 +124,7 @@ public:
 			LOG_NOTIMPLEMENTED();
 			//Polynomial r(p.getReducibleIdentity());
 			//r.setOrigins(p.getOrigins());
-			size_t index = gb->addGenerator(r);
+			size_t index = gb->addGenerator(p);
 			(*update)(index);
 		}
 		else
