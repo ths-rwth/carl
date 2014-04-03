@@ -61,4 +61,10 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 	return gcd_calc.calculate();
 }
 
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> lcm(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
+{
+	return quotient((a*b),gcd(a,b));
+}
+
 }
