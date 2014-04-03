@@ -219,7 +219,7 @@ public:
 		return os << "}";
 	}
 	
-    void print(bool printOrigins=false, std::ostream& os = std::cout) const
+    void print(bool printOrigins=true, std::ostream& os = std::cout) const
     {
         for(typename std::vector<Polynomial>::const_iterator it = mGenerators.begin(); it != mGenerators.end(); ++it)
         {
@@ -227,7 +227,7 @@ public:
             if(printOrigins)
             {
                 os << " [";
-//                it->getOrigins().print();
+				it->getReasons().print();
                 os << "]";
             }
             os << ";\n";

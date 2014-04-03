@@ -91,11 +91,17 @@ public:
 		return getIdeal().getGenerators();
 	}
 	
-	void printScheduledPolynomials(bool breakLines = true, std::ostream& os = std::cout) const
+	void printScheduledPolynomials(bool breakLines = true, bool printReasons = true, std::ostream& os = std::cout) const
 	{
 		for(Polynomial p : mInputScheduled)
 		{
 			os << p;
+			if(printReasons)
+			{
+				os << "[";
+				p.getReasons().print(os);
+				os << "]";
+			}
 			if(breakLines)
 			{
 				os << std::endl;
