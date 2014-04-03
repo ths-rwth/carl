@@ -859,7 +859,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
 		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
 	}
-	return res / mainDenom;
+	return NumberType(res) / mainDenom;
 }
 
 template<typename Coeff>
