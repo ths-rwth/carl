@@ -43,7 +43,7 @@ public:
 	mOrigGenerators(old.mOrigGenerators),
 	mOrigGeneratorsIndices(old.mOrigGeneratorsIndices)
 	{
-		
+		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 	
 	virtual ~GBProcedure() {
@@ -57,6 +57,7 @@ public:
 		mInputScheduled = rhs.mInputScheduled;
 		mOrigGenerators = rhs.mOrigGenerators;
 		mOrigGeneratorsIndices = rhs.mOrigGeneratorsIndices;
+		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 		return *this;
 	}
 	

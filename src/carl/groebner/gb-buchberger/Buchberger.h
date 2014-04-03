@@ -104,8 +104,17 @@ public:
 	
 	}
 	
+	Buchberger(const Buchberger& rhs) :
+	pGb(new Ideal<Polynomial>(*rhs.pGb)),
+	mGbElementsIndices(rhs.mGbElementsIndices),
+	mCritPairs(rhs.mCritPairs),
+	mUpdateCallBack(this)
+	{
+		
+	}
+	
 	void calculate(const std::list<Polynomial>& scheduledForAdding);
-	void setIdeal(std::shared_ptr<Ideal<Polynomial>> ideal)
+	void setIdeal(const std::shared_ptr<Ideal<Polynomial>>& ideal)
 	{
 		pGb = ideal;
 	}
