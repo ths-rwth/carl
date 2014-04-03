@@ -107,6 +107,7 @@ namespace carl
 		
 		friend BitVector operator| (const BitVector& lhs, const BitVector& rhs);
 		
+		
 		BitVector& operator|= (const BitVector& rhs) {
 			std::vector<unsigned>::iterator lhsIt = mBits.begin();
 			std::vector<unsigned>::const_iterator rhsIt = rhs.mBits.begin();
@@ -192,5 +193,11 @@ namespace carl
 		protected:
 			std::vector<unsigned> mBits;
 	};
+	
+	inline std::ostream& operator<<(std::ostream& os, const BitVector& bv)
+	{
+		bv.print(os);
+		return os;
+	}	
 
 }
