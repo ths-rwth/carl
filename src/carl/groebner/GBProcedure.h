@@ -91,6 +91,23 @@ public:
 		return getIdeal().getGenerators();
 	}
 	
+	void printScheduledPolynomials(bool breakLines = true, std::ostream& os = std::cout) const
+	{
+		for(Polynomial p : mInputScheduled)
+		{
+			os << p;
+			if(breakLines)
+			{
+				os << std::endl;
+			}
+			else
+			{
+				os.flush();
+			}
+			
+		}
+	}
+	
 	void reset() 
 	{
 		mGb.reset(new Ideal<Polynomial>());
