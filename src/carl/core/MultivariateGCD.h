@@ -32,7 +32,9 @@ class UnivariatePolynomial;
  */
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
-	
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> lcm(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
 
 /**
  * The result of a gcd calculation, as with the extended gcd.
