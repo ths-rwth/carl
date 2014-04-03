@@ -26,8 +26,8 @@ class ReductorEntry
 protected:
     typedef typename Polynomial::CoeffType   Coeff;
     Polynomial                         mTail;
-    std::shared_ptr<const Term<Coeff>>          mLead;
-    const Term<Coeff>*    mMultiple;
+    std::shared_ptr<const Term<Coeff>>    mLead;
+    std::shared_ptr<const Term<Coeff>>    mMultiple;
 
 public:
     /**
@@ -36,7 +36,7 @@ public:
      * @param pol
      * Resulting polynomial = multiple * pol.
      */
-    ReductorEntry(const Term<Coeff>* multiple, const Polynomial& pol) :
+    ReductorEntry(std::shared_ptr<const Term<Coeff>>  multiple, const Polynomial& pol) :
     mTail(pol.tail()), mLead(std::make_shared<const Term<Coeff>>(*multiple * *pol.lterm())), mMultiple(multiple)
     {
     }
@@ -46,7 +46,7 @@ public:
      * @param pol
      */
     ReductorEntry(const Term<Coeff>& pol)
-    : mTail(), mLead(pol), mMultiple(Coeff(1))
+    : mTail(), mLead(pol), mMultiple(std::make_shared<const Term<Coeff>>(Coeff(1)))
     {
     }
 
@@ -71,7 +71,7 @@ public:
      * 
      * @return 
      */
-    const Term<Coeff>& getMultiple() const
+    std::shared_ptr<const Term<Coeff>> getMultiple() const
     {
         return mMultiple;
     }

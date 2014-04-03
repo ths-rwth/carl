@@ -378,3 +378,21 @@ TEST(UnivariatePolynomial, resultant)
 	EXPECT_EQ(r3, p3.resultant(p2));
 }
 
+TEST(UnivariatePolynomial, resultant2)
+{
+	Variable x = VariablePool::getInstance().getFreshVariable("x");
+	Variable c = VariablePool::getInstance().getFreshVariable("c");
+	Variable t = VariablePool::getInstance().getFreshVariable("t");
+	
+	MultivariatePolynomial<cln::cl_RA> mc(c);
+	MultivariatePolynomial<cln::cl_RA> mt(t);
+	
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(x, {mt, mc, mc});
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(x, {(cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)1});
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r(x, MultivariatePolynomial<cln::cl_RA>(Term<cln::cl_RA>(t)*t*t*t));
+	
+	//std::cout << "resultant[" << p << ", " << q << "] = " << p.resultant(q) << std::endl;
+	
+	EXPECT_EQ(r, p.resultant(q));
+}
+

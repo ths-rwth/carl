@@ -711,11 +711,38 @@ namespace carl
             return (os << rhs.toString(true, true));
         }
 		
+		static Monomial lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+		{
+			if(!lhs)
+			{
+				if(!rhs)
+				{
+					return Monomial();
+				}
+				else
+				{
+					return *rhs;
+				}
+			}
+			else
+			{
+				if(!rhs)
+				{
+					return *lhs;
+				}
+				else
+				{
+					return lcm(*lhs, *rhs);
+				}
+			}
+				
+		}
+		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
 		{
-			Monomial result;
 			assert(lhs.isConsistent());
 			assert(rhs.isConsistent());
+			Monomial result;
 			result.mTotalDegree = lhs.tdeg() + rhs.tdeg();
             // Linear, as we expect small monomials.
             exponents_cIt itright = rhs.mExponents.begin();

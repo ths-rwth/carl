@@ -25,6 +25,11 @@ namespace carl
 			setBit(pos);
 		}
 		
+		void clear() 
+		{
+			mBits = {};
+		}
+		
 		size_t size() const {
 			return mBits.size() * sizeOfUnsigned * 8;
 		}
@@ -101,6 +106,7 @@ namespace carl
 		}
 		
 		friend BitVector operator| (const BitVector& lhs, const BitVector& rhs);
+		
 		
 		BitVector& operator|= (const BitVector& rhs) {
 			std::vector<unsigned>::iterator lhsIt = mBits.begin();
@@ -187,5 +193,11 @@ namespace carl
 		protected:
 			std::vector<unsigned> mBits;
 	};
+	
+	inline std::ostream& operator<<(std::ostream& os, const BitVector& bv)
+	{
+		bv.print(os);
+		return os;
+	}	
 
 }

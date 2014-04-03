@@ -20,6 +20,10 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
+inline bool isNumber(const double& d) {
+	return (d == d) && !isinf(d);
+}
+
 /**
  * Conversion functions
  * 

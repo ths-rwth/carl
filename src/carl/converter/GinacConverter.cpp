@@ -1,6 +1,8 @@
 
 #include "GinacConverter.h"
 
+#include "../core/MultivariatePolynomial.h"
+
 #ifdef COMPARE_WITH_GINAC
 
 namespace carl
@@ -147,20 +149,6 @@ namespace carl
         }
         else assert( false );
         return result;
-    }
-
-    void gatherVariables(const MultivariatePolynomial<cln::cl_RA>& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap)
-    {
-        std::set<Variable> carlVars;
-        poly.gatherVariables(carlVars);
-        for(auto var = carlVars.begin(); var != carlVars.end(); ++var)
-        {
-            GiNaC::symbol vg(varToString(*var));
-            if( carlToGinacVarMap.insert(std::pair<Variable, GiNaC::ex>(*var, vg)).second )
-            {
-                ginacToCarlVarMap.insert(std::pair<GiNaC::ex, Variable>(vg, *var));
-            }
-        }
     }
 
     MultivariatePolynomial<cln::cl_RA> ginacGcd(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB)

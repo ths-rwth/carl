@@ -857,6 +857,10 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::normalize() const
 {
 	MultivariatePolynomial result;
+	if(Policies::has_reasons)
+	{
+		result.setReasons(this->getReasons());
+	}
 	result.mTerms.reserve(mTerms.size());
 	for(typename TermsType::const_iterator it = mTerms.begin(); it != mTerms.end(); ++it)
 	{

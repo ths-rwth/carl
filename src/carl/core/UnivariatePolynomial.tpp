@@ -859,7 +859,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
 		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
 	}
-	return res / mainDenom;
+	return NumberType(res) / mainDenom;
 }
 
 template<typename Coeff>
@@ -1657,7 +1657,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 ) const {
 	assert(p.mainVar() == this->mainVar());
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
-	LOGMSG_TRACE("carl.cad", "resultant(" << *this << ", " << p << ") = " << resultant);
+	LOGMSG_TRACE("carl.core.resultant", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
 		return resultant;
 	} else {
