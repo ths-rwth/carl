@@ -20,7 +20,7 @@ struct NoReasons
 
 struct BVReasons
 {
-	static const bool has_reasons = false;
+	static const bool has_reasons = true;
 	
 	void setReason(unsigned index);
 	void extendReasons(const BitVector& extendWith)

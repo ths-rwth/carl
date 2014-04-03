@@ -172,7 +172,7 @@ public:
 			Polynomial res = reduct.fullReduce();
 			if(res.isZero())
 			{
-				//result.push_back(std::pair<BitVector, BitVector>(index->getOrigins().getBitVector(), res.getOrigins().getBitVector()));
+				result.push_back(std::pair<BitVector, BitVector>(index->getReasons(), res.getReasons()));
 			}
 			else // ( !res.isZero( ) )
 			{

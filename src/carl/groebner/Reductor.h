@@ -82,6 +82,11 @@ public:
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
 	{
 		insert(f, std::shared_ptr<const Term<Coeff>>(new Term<Coeff>(Coeff(1))));
+		if(InputPolynomial::Policy::has_reasons)
+		{
+			mReasons = f.getReasons();
+		}
+				
 	}
 
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const Term<Coeff> f) :
@@ -140,7 +145,7 @@ public:
 			if(divres.success())
 			{
 				mReductionOccured = true;
-				if(InputPolynomial::Policy::has_reasons)
+				if(PolynomialInIdeal::Policy::has_reasons)
 				{
 					mReasons.calculateUnion(divres.mDivisor->getReasons());
 				}
@@ -187,6 +192,7 @@ public:
 			result.setReasons(mReasons);
 			mReasons.clear();
 		}
+		return result;
 				
 	}
 	
