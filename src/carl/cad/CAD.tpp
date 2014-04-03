@@ -200,6 +200,8 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	for (auto i: cad.getEliminationSets()) {
 		os << "\tLevel " << level++ << ": " << i << std::endl;
 	}
+	os << "Sample tree:" << std::endl;
+	os << cad.sampleTree << std::endl;
 	os << "Number of samples computed: " << cad.samples().size() << endl;
 	os << "CAD complete: " << cad.isComplete() << endl;
 	return os;
@@ -562,7 +564,8 @@ bool CAD<Number>::check(
 	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
 	LOGMSG_TRACE("carl.cad", "Creating boundPolynomials of size " << this->variables.size());
 	
-	if (useBounds) {
+	/*if (useBounds) {
+		LOGMSG_DEBUG("carl.cad", "Preprocess bounds");
 		// construct constraints and polynomials representing the bounds
 		for (auto b: bounds) {
 			if (b.first >= this->variables.size()) continue;
@@ -598,12 +601,14 @@ bool CAD<Number>::check(
 				l++;
 			}
 		}
-	}
+	}*/
 	
 	// call the main check function according to the settings
 	bool satisfiable = this->mainCheck(constraints, bounds, r, conflictGraph, deductions, next, checkTraceFirst, useBounds, checkBounds);
+	LOGMSG_DEBUG("carl.cad", "mainCheck returned " << satisfiable);
 	
-	if (useBounds) {
+	/*if (useBounds) {
+		LOGMSG_DEBUG("carl.cad", "Postprocess bounds");
 		// possibly tweak the bounds
 		if (this->setting.improveBounds) {
 			if (satisfiable) {
@@ -645,7 +650,7 @@ bool CAD<Number>::check(
 			this->eliminationSets[l].resetLiftingPositionsFully();
 			this->eliminationSets[l].setLiftingPositionsReset();
 		}
-	}
+	}*/
 
 	if (satisfiable) {
 		LOGMSG_DEBUG("carl.cad", "Result: sat (by sample point " << r << ")");
@@ -706,6 +711,7 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 
 template<typename Number>
 void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
+	LOGMSG_TRACE("carl.core", "Removing " << polynomial);
 	// possibly remove the polynomial from the list of scheduled polynomials
 	for (auto p = this->scheduledPolynomials.begin(); p != this->scheduledPolynomials.end(); p++) {
 		if (**p == polynomial) {
@@ -719,14 +725,16 @@ void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
 	for (auto p = this->polynomials.begin(); p != this->polynomials.end(); p++) {
 		if (**p == polynomial) {
 			this->polynomials.erase(p);
-			return;
+			break;
 		}
 	}
 	
 	// determine the level of the polynomial (first level from the top) and remove the respective pointer from it
 	for (unsigned level = 0; level < this->eliminationSets.size(); level++) {
 		// transform the polynomial according to possible optimizations in order to recognize its real shape in the elimination set
-		auto tmp = new UPolynomial(polynomial.pseudoPrimpart());
+		//auto tmp = new UPolynomial(polynomial.pseudoPrimpart());
+		auto tmp = new UPolynomial(polynomial);
+		LOGMSG_TRACE("carl.core", "Removing " << *tmp << " from " << this->eliminationSets[level]);
 		auto p = this->eliminationSets[level].find(tmp);
 		delete tmp;
 		if (p != nullptr) {
@@ -740,6 +748,7 @@ template<typename Number>
 void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool childrenOnly) {
 	// no equivalent polynomial for p in any level
 	if (p == nullptr) return;
+	LOGMSG_TRACE("carl.core", "Removing " << *p);
 	
 	/* Delete
 	 * 1. the polynomial from the given level in the elimination sets,
@@ -1196,7 +1205,7 @@ bool CAD<Number>::mainCheck(
 		bool boundsNontrivial,
 		bool checkBounds
 ) {
-	LOGMSG_TRACE("carl.cad", "mainCheck()");
+	LOGMSG_TRACE("carl.cad", "mainCheck() on " << constraints);
 #define CHECK_NODE( _node, _fullRestart, _excludePrevious, _updateTrace )\
 	auto res = this->checkNode(_node, _fullRestart, _excludePrevious, _updateTrace, constraints, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);\
 	if (res.first) return true;\
@@ -1425,14 +1434,17 @@ bool CAD<Number>::liftCheck(
 		if (this->anAnswerFound()) {
 			// interrupt the check procedure
 			this->interrupted = true;
+			LOGMSG_TRACE("carl.cad", "Returning true as an answer was found");
 			return true;
 		}
 		RealAlgebraicPoint<Number> t(sample);
 		if ((this->setting.computeConflictGraph && this->satisfies(t, constraints, conflictGraph)) ||
 			(!this->setting.computeConflictGraph && this->satisfies(t, constraints))) {
 			r = t;
+			LOGMSG_TRACE("carl.cad", "Returning true as a satisfying sample was found");
 			return true;
 		}
+		LOGMSG_TRACE("carl.cad", "Returning false...");
 		return false;
 	}
 	
@@ -1540,7 +1552,7 @@ bool CAD<Number>::liftCheck(
 		LOGMSG_TRACE("carl.cad", "Phase 2 of lifting...");
 		while (!sampleSetIncrement.empty()) {
 			// iterate through all samples found by the next() method
-			
+			LOGMSG_TRACE("carl.cad", "Iterating...");
 			/*
 			 * Sample choice
 			 */
@@ -1618,9 +1630,11 @@ bool CAD<Number>::liftCheck(
 					sampleSetIncrement.pop();
 				}
 				return true;
+				LOGMSG_TRACE("carl.cad", "Returning true as lifting was successful");
 			}
 		}
 		if (this->eliminationSets[openVariableCount].emptyLiftingQueue()) {
+			LOGMSG_TRACE("carl.cad", "Lifting queue is empty");
 			// all lifting positions used
 			if (this->setting.equationsOnly || this->setting.inequalitiesOnly) {
 				// there might still be samples not yet considered but unimportant for the current lifting
@@ -1634,6 +1648,7 @@ bool CAD<Number>::liftCheck(
 			break;
 		}
 	}
+	LOGMSG_TRACE("carl.cad", "Returning false as nothing else happened");
 	return false;
 }
 
@@ -1933,6 +1948,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	// optimization for equations not valid in general
 	boxSetting.equationsOnly = variables.size() <= 1;
 	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(this));
+	LOGMSG_TRACE("carl.core", "Now in nested CAD " << &cadbox);
 	cadbox.scheduledPolynomials.assign({p});
 	cadbox.newVariables = variables;
 	cadbox.setting = boxSetting;
@@ -1941,6 +1957,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	std::vector<cad::Constraint<Number>> constraints(1, cad::Constraint<Number>(*p, Sign::ZERO, variables));
 	if (cadbox.check(constraints, r, bounds, false, false, false)) {
 		cadbox.completeElimination();
+		LOGMSG_TRACE("carl.core", "Back from nested CAD " << &cadbox);
 		if (recuperate) {
 			// recuperate eliminated polynomials and go on with the elimination
 			unsigned j = 0;
@@ -1959,6 +1976,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 		}
 		return true;
 	}
+	LOGMSG_TRACE("carl.core", "Back from nested CAD " << &cadbox);
 	return false;
 }
 

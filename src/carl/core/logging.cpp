@@ -13,9 +13,10 @@ void setInitialLogLevel()
 	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.cad")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core.rootfinder")).setLogLevel(log4cplus::INFO_LOG_LEVEL);
-	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core.evaluation")).setLogLevel(log4cplus::INFO_LOG_LEVEL);
+	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core.evaluation")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core.mvpolynomial")).setLogLevel(log4cplus::INFO_LOG_LEVEL);
 	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core.hensel")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
+	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.core.resultant")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 	log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("carl.gb")).setLogLevel(log4cplus::TRACE_LOG_LEVEL);
 }
 #endif

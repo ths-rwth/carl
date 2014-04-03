@@ -117,6 +117,10 @@ template<typename Number>
 void buildIsolation(std::vector<double>& roots, const Interval<Number>& interval, RootFinder<Number>& finder) {
 	assert(interval.lower() < interval.upper());
 	std::sort(roots.begin(), roots.end());
+	for (auto it = roots.begin(); it != roots.end(); ) {
+		if (!isNumber(*it)) roots.erase(it);
+		else it++;
+	}
 	auto it = std::unique(roots.begin(), roots.end());
 	roots.resize((size_t)std::distance(roots.begin(), it));
 

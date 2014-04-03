@@ -282,6 +282,8 @@ void RealAlgebraicNumberIR<Number>::normalizeInterval() {
 	// shift the right border below 0 or set the zero interval
 	if (this->interval.contains(0) && this->polynomial.sgn(0) == Sign::ZERO) {
 		this->interval.set(0,0);
+		this->interval.setLowerBoundType(BoundType::WEAK);
+		this->interval.setUpperBoundType(BoundType::WEAK);
 		this->mValue = 0;
 		this->mIsNumeric = true;
 	} else if (this->interval.meets(0)) {

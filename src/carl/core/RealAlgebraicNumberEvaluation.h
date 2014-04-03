@@ -160,7 +160,11 @@ RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, co
 
 	// the interval should include at least one root.
 	assert(!res.isZero());
-	assert(res.countRealRoots(interval) >= 1);
+	assert(
+		res.sgn(interval.lower()) == Sign::ZERO ||
+		res.sgn(interval.upper()) == Sign::ZERO ||
+		res.countRealRoots(interval) >= 1
+	);
 	while (
 		res.sgn(interval.lower()) == Sign::ZERO ||
 		res.sgn(interval.upper()) == Sign::ZERO ||

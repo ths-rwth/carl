@@ -82,6 +82,7 @@ std::list<RealAlgebraicNumberPtr<Number>> AbstractRootFinder<Number>::getAllRoot
 		this->findRoots();
 		this->setFinished();
 	}
+	this->roots.sort(carl::Less<Number>());
 	return this->roots;
 }
 
