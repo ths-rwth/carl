@@ -76,6 +76,7 @@ private:
 	Datastructure<Configuration<InputPolynomial>> mDatastruct;
 	std::vector<std::shared_ptr<const Term<Coeff>>> mRemainder;
 	bool mReductionOccured;
+	BitVector mReasons;
 public:
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const InputPolynomial& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
@@ -141,7 +142,7 @@ public:
 				mReductionOccured = true;
 				if(InputPolynomial::Policy::has_reasons)
 				{
-					//mOrigins.calculateUnion(divres.mDivisor->getOrigins());
+					mReasons.calculateUnion(divres.mDivisor->getReasons());
 				}
 				if(divres.mDivisor->nrTerms() > 1)
 				{
@@ -180,7 +181,13 @@ public:
 			// no operation.
 		}
 		// TODO check whether this is sorted.
-		return InputPolynomial(mRemainder.begin(), mRemainder.end(), false, false);
+		InputPolynomial result(mRemainder.begin(), mRemainder.end(), false, false);
+		if(InputPolynomial::Policy::has_reasons)
+		{
+			result.setReasons(mReasons);
+			mReasons.clear();
+		}
+				
 	}
 	
 	

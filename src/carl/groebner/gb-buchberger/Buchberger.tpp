@@ -67,6 +67,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 			LOGMSG_DEBUG("carl.gb.buchberger", "Calculate SPol for: " << pGb->getGenerators()[critPair.mP1] << ", " << pGb->getGenerators()[critPair.mP2]);
 			// Calculates the S-Polynomial
 			Polynomial spol = Polynomial::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
+			spol.setReasons(pGb->getGenerators()[critPair.mP1].getReasons() | pGb->getGenerators()[critPair.mP2].getReasons());
 			LOGMSG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
 			// Schedules the S-polynomial for reduction
 			Reductor<Polynomial, Polynomial> reductor(*pGb, spol);

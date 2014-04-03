@@ -25,6 +25,11 @@ namespace carl
 			setBit(pos);
 		}
 		
+		void clear() 
+		{
+			mBits = {};
+		}
+		
 		size_t size() const {
 			return mBits.size() * sizeOfUnsigned * 8;
 		}

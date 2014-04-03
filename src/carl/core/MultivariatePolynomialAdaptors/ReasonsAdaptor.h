@@ -14,8 +14,8 @@ struct NoReasons
 {
 	static const bool has_reasons = false;
 	void setReason(unsigned index);
-	int getReasons() const { return 0;}
-	void setReasons(...) const {}
+	BitVector getReasons() const { return 0;}
+	void setReasons(const BitVector&) const {}
 };
 
 struct BVReasons
