@@ -30,6 +30,7 @@ namespace carl
         static Number nan()
         {
             assert(false);
+			return Number(0);
         }
         static bool is_nan(const Number&)
         {
