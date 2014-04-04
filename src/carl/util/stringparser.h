@@ -67,7 +67,7 @@ namespace carl
 		VariablePool& mVPool = VariablePool::getInstance();		
 	protected:
 		bool mSingleSymbVariables;
-		bool mImplicitMultiplicationMode; 
+		bool mImplicitMultiplicationMode = false; 
 		bool mSumOfTermsForm = true;
 		std::map<std::string, Variable> mVars;
 		
