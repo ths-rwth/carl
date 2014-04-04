@@ -10,6 +10,9 @@
 
 @}
  
+@defgroup constraints Constraints
+@{ @}
+
 @defgroup algorithm Algorithms
 @{
 @defgroup gcd Greatest Common Divisor
