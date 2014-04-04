@@ -238,7 +238,15 @@ namespace carl
 			{
 				throw InvalidInputStringException("Variable occurs twice", inputStr);
 			}
-			Term<C> result(coeff, Monomial(varExpPairs));
+			Term<C> result;
+			if(varExpPairs.empty())
+			{
+				result = Term<C>(coeff);
+			}
+			else
+			{
+				result = Term<C>(coeff, Monomial(varExpPairs));
+			}
 			return result;
 		}
 		
