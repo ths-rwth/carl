@@ -9,6 +9,7 @@
 #include <memory>
 #include <list>
 
+#include "Term.h"
 #include "UnivariatePolynomial.h"
 #include "logging.h"
 #include "../numbers/numbers.h"
@@ -2026,6 +2027,20 @@ template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
     return rhs * lhs;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator/=(const Coeff& c)
+{
+	assert(c != 0);
+    if(c == 1) return *this;
+	TermsType newTerms;
+    newTerms.reserve(mTerms.size());
+    for(auto term : mTerms) {
+        newTerms.push_back(std::shared_ptr<Term<Coeff>>(term->divideBy(c)));
+    }
+    mTerms = std::move(newTerms);
+    return *this;
 }
 
 template<typename C, typename O, typename P>
