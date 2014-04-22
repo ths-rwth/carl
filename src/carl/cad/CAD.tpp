@@ -407,7 +407,10 @@ bool CAD<Number>::check(
 	LOGMSG_DEBUG("carl.cad", "Checking the system");
 	for (auto c: constraints) LOGMSG_DEBUG("carl.cad", "  " << c);
 	LOGMSG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
-	for (auto b: bounds) LOGMSG_DEBUG("carl.cad", "  " << b.second << " for variable " << b.first);
+	for (auto b: bounds) {
+		if (this->variables.size() > b.first) { LOGMSG_DEBUG("carl.cad", "  " << b.second << " for variable " << this->variables[b.first]); }
+		else { LOGMSG_DEBUG("carl.cad", "  " << b.second << " for variable " << b.first); }
+	}
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << " (" << this->eliminationSets[i].size() << "): " << this->eliminationSets[i]);
 	}
@@ -485,15 +488,10 @@ bool CAD<Number>::check(
 	//////////////////////
 	// Preprocessing
 	
-	// empty input
-	if (constraints.empty()) {
-		// check bounds for empty interval
-		for (auto b: bounds) {
-			if (b.second.isEmpty()) return false;
-		}
-		// each bound non-empty
-		///@todo Maybe faster to generate a solution point directly here? In any case, we must fill r before returning true.
-		//return true;
+	// check bounds for empty interval
+	for (auto b: bounds) {
+		LOGMSG_DEBUG("carl.cad", "Checking " << b.first << " : " << b.second);
+		if (b.second.isEmpty()) return false;
 	}
 	
 	// try to solve the constraints by interval arithmetic
