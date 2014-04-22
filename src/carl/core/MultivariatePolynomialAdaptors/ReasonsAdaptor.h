@@ -14,11 +14,13 @@ struct NoReasons
 {
 	static const bool has_reasons = false;
 	void setReason(unsigned index);
+	BitVector getReasons() const { return 0;}
+	void setReasons(const BitVector&) const {}
 };
 
 struct BVReasons
 {
-	static const bool has_reasons = false;
+	static const bool has_reasons = true;
 	
 	void setReason(unsigned index);
 	void extendReasons(const BitVector& extendWith)

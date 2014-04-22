@@ -28,8 +28,19 @@ public:
 	
 	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{
-		size_t index = gb->addGenerator(p);
-		(*update)(index);
+		if(p.isConstant())
+		{
+			gb->clear();
+			Polynomial q(1);
+			q.setReasons(p.getReasons());
+			gb->addGenerator(q);
+			return true;
+		}
+		else
+		{
+			size_t index = gb->addGenerator(p);
+			(*update)(index);
+		}
 		return false;
 	}
 };
@@ -53,14 +64,22 @@ public:
 	
 	bool addToGb(const Polynomial& p, std::shared_ptr<Ideal<Polynomial>> gb, UpdateFnc* update)
 	{
-		
-		if(!p.isConstant() && p.nrTerms() == 1)
+		if(p.isConstant())
 		{
+			gb->clear();
+			Polynomial q(1);
+			q.setReasons(p.getReasons());
+			gb->addGenerator(q);
+			return true;
+		}
+		else if(p.nrTerms() == 1)
+		{
+			assert(!p.isConstant());
 			Polynomial q(std::shared_ptr<Monomial>(p.lmon()->seperablePart()));
 #ifdef BUCHBERGER_STATISTICS
 			if(q.lterm().tdeg() != p.lterm().tdeg()) mStats->SingleTermSFP();
 #endif
-			//q.setOrigins(p.getOrigins());
+			q.setReasons(p.getReasons());
 			size_t index = gb->addGenerator(q);
 			(*update)(index);
 		}
@@ -73,7 +92,7 @@ public:
 #endif
 				gb->clear();
 				Polynomial q(1);
-				//q.setOrigins(p.getOrigins());
+				q.setReasons(p.getReasons());
 				gb->addGenerator(q);
 				return true;
 			}
@@ -89,7 +108,7 @@ public:
 #ifdef BUCHBERGER_STATISTICS
 					if(remainder.lterm().tdeg() != r1.lterm().tdeg()) mStats->SingleTermSFP();
 #endif
-					//r1.setOrigins(p.getOrigins());
+					r1.setReasons(p.getReasons());
 					remainder.stripLT();
 					size_t index = gb->addGenerator(r1);
 					(*update)(index);
@@ -105,7 +124,7 @@ public:
 			LOG_NOTIMPLEMENTED();
 			//Polynomial r(p.getReducibleIdentity());
 			//r.setOrigins(p.getOrigins());
-			size_t index = gb->addGenerator(r);
+			size_t index = gb->addGenerator(p);
 			(*update)(index);
 		}
 		else

@@ -76,11 +76,17 @@ private:
 	Datastructure<Configuration<InputPolynomial>> mDatastruct;
 	std::vector<std::shared_ptr<const Term<Coeff>>> mRemainder;
 	bool mReductionOccured;
+	BitVector mReasons;
 public:
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const InputPolynomial& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
 	{
-		insert(f, new Term<Coeff>(Coeff(1)));
+		insert(f, std::shared_ptr<const Term<Coeff>>(new Term<Coeff>(Coeff(1))));
+		if(InputPolynomial::Policy::has_reasons)
+		{
+			mReasons = f.getReasons();
+		}
+				
 	}
 
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const Term<Coeff> f) :
@@ -139,9 +145,9 @@ public:
 			if(divres.success())
 			{
 				mReductionOccured = true;
-				if(InputPolynomial::Policy::has_reasons)
+				if(PolynomialInIdeal::Policy::has_reasons)
 				{
-					//mOrigins.calculateUnion(divres.mDivisor->getOrigins());
+					mReasons.calculateUnion(divres.mDivisor->getReasons());
 				}
 				if(divres.mDivisor->nrTerms() > 1)
 				{
@@ -180,7 +186,14 @@ public:
 			// no operation.
 		}
 		// TODO check whether this is sorted.
-		return InputPolynomial(mRemainder.begin(), mRemainder.end(), false, false);
+		InputPolynomial result(mRemainder.begin(), mRemainder.end(), false, false);
+		if(InputPolynomial::Policy::has_reasons)
+		{
+			result.setReasons(mReasons);
+			mReasons.clear();
+		}
+		return result;
+				
 	}
 	
 	
@@ -199,7 +212,7 @@ private:
 		if(entry->getTail().isZero())
 		{
 			mDatastruct.pop();
-			delete entry;
+			//delete entry;
 			if(mDatastruct.empty()) return false;
 		}
 		else
@@ -210,7 +223,7 @@ private:
 		return true;
 	}
 
-	void insert(const InputPolynomial& g, const Term<Coeff>* fact)
+	void insert(const InputPolynomial& g, std::shared_ptr<const Term<Coeff>> fact)
 	{
 		if(!g.isZero())
 		{
@@ -219,9 +232,9 @@ private:
 		}
 	}
 
-	void insert(const Term<Coeff>& g)
+	void insert(std::shared_ptr<const Term<Coeff>> g)
 	{
-		assert(g.getCoeff() != 0);
+		assert(g->getCoeff() != 0);
 		mDatastruct.push(new EntryType(g));
 	}
 

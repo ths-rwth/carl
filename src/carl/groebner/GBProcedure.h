@@ -38,12 +38,12 @@ public:
 	
 	GBProcedure(const GBProcedure& old)
 	:
-	mGb(new Ideal<Polynomial>(*mGb)),
+	mGb(new Ideal<Polynomial>(*old.mGb)),
 	mInputScheduled(old.mInputScheduled),
 	mOrigGenerators(old.mOrigGenerators),
 	mOrigGeneratorsIndices(old.mOrigGeneratorsIndices)
 	{
-		
+		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 	
 	virtual ~GBProcedure() {
@@ -53,10 +53,11 @@ public:
 	GBProcedure& operator=(const GBProcedure& rhs)
 	{
 		if(this == &rhs) return *this;
-		mGb = rhs.mGb;
+		mGb.reset(new Ideal<Polynomial>(*rhs.mGb));
 		mInputScheduled = rhs.mInputScheduled;
 		mOrigGenerators = rhs.mOrigGenerators;
 		mOrigGeneratorsIndices = rhs.mOrigGeneratorsIndices;
+		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 		return *this;
 	}
 	
@@ -89,6 +90,29 @@ public:
 	const std::vector<Polynomial>& getBasisPolynomials() const
 	{
 		return getIdeal().getGenerators();
+	}
+	
+	void printScheduledPolynomials(bool breakLines = true, bool printReasons = true, std::ostream& os = std::cout) const
+	{
+		for(Polynomial p : mInputScheduled)
+		{
+			os << p;
+			if(printReasons)
+			{
+				os << "[";
+				p.getReasons().print(os);
+				os << "]";
+			}
+			if(breakLines)
+			{
+				os << std::endl;
+			}
+			else
+			{
+				os.flush();
+			}
+			
+		}
 	}
 	
 	void reset() 
@@ -149,7 +173,7 @@ public:
 			Polynomial res = reduct.fullReduce();
 			if(res.isZero())
 			{
-				//result.push_back(std::pair<BitVector, BitVector>(index->getOrigins().getBitVector(), res.getOrigins().getBitVector()));
+				result.push_back(std::pair<BitVector, BitVector>(index->getReasons(), res.getReasons()));
 			}
 			else // ( !res.isZero( ) )
 			{
