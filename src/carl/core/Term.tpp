@@ -151,6 +151,12 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
 }
 
 template<typename Coefficient>
+void Term<Coefficient>::quotient(unsigned long i)
+{
+	mCoeff /= i;
+}
+
+template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 {
 	if(!mMonomial)
@@ -454,6 +460,13 @@ template<typename Coeff>
 const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs)
 {
     return rhs * lhs;
+}
+
+
+template<typename Coeff>
+const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs)
+{
+	return Term<Coeff>(lhs.coeff()/rhs, lhs.monomial());
 }
 
 template<typename Coeff>
