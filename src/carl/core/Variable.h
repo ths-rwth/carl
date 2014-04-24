@@ -51,13 +51,13 @@ public:
 private:
     unsigned mVariable;
     
+public:
     /**
      * Default constructor, constructing a variable, which is considered as not an actual variable.
      * The resulting variable is store in NO_VARIABLE, so use this if you need a default value for a variable.
      */
     explicit Variable() : mVariable(0) {} 
     
-public:
     /**
      * Although we recommend access through the VariablePool, we allow public construction of variables
      * for local purposes. However, please be aware that clashes may occur, as all variables with the 
