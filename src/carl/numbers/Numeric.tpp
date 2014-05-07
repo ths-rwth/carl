@@ -7,6 +7,7 @@
  */
 
 #include "typetraits.h"
+#include "Numeric.h"
 
 
 namespace carl
@@ -14,7 +15,7 @@ namespace carl
     template<typename T>
     std::vector<T> Numeric<T>::mRationalPool = std::vector<T>();
     template<typename T>
-    std::vector<size_t> Numeric<T>::mFreeRationalIds = std::vector<size_t>();
+    std::vector<ContentType> Numeric<T>::mFreeRationalIds = std::vector<ContentType>();
     
     template<typename T>
     ContentType Numeric<T>::allocate( const T& _value )
@@ -27,11 +28,11 @@ namespace carl
         }
         else
         {
-            size_t id = mFreeRationalIds.back();
+            ContentType id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
-            assert( id >= (size_t)HIGHTEST_INTEGER_VALUE );
-            mRationalPool[id-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
-            return (ContentType) id;
+            assert( id >= HIGHTEST_INTEGER_VALUE );
+            mRationalPool[(size_t)(id-HIGHTEST_INTEGER_VALUE)] = _value;
+            return id;
         }
     }
     
@@ -46,11 +47,11 @@ namespace carl
         }
         else
         {
-            size_t id = mFreeRationalIds.back();
+            ContentType id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
-            assert( id >= (size_t)HIGHTEST_INTEGER_VALUE );
-            mRationalPool[id-(size_t)HIGHTEST_INTEGER_VALUE] = _value;
-            return (ContentType) id;
+            assert( id >= HIGHTEST_INTEGER_VALUE );
+            mRationalPool[(size_t)(id-HIGHTEST_INTEGER_VALUE)] = _value;
+            return id;
         }
     }
     

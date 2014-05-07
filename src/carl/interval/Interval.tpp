@@ -633,6 +633,10 @@ template<typename Number>
 Interval<Number> Interval<Number>::sqrt() const
 	{
 		assert(this->isConsistent());
+        if( mContent.upper() < 0 )
+            return Interval<Number>::emptyInterval();
+        if( mContent.lower() < 0 )
+            return Interval<Number>(boost::numeric::sqrt(BoostInterval(0,mContent.upper())), mLowerBoundType, mUpperBoundType);
 		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
