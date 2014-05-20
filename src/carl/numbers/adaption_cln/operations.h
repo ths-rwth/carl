@@ -51,6 +51,8 @@ inline double toDouble(const cln::cl_I& n) {
 
 template<typename Integer>
 inline Integer toInt(const cln::cl_I& n);
+template<typename Integer>
+inline Integer toInt(const cln::cl_RA& n);
 
 template<>
 inline int toInt<int>(const cln::cl_I& n) {
@@ -72,9 +74,15 @@ inline long int toInt<long int>(const cln::cl_I& n) {
     return cln::cl_I_to_long(n);
 }
 
+template<>
 inline cln::cl_I toInt(const cln::cl_RA& n) {
 	assert(isInteger(n));
 	return getNum(n);
+}
+
+template<>
+inline unsigned toInt(const cln::cl_RA& n) {
+	return toInt<unsigned>(toInt<cln::cl_I>(n));
 }
 
 inline cln::cl_LF toLF(const cln::cl_RA& n) {
