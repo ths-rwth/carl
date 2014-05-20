@@ -35,7 +35,7 @@ namespace carl
      * @param newpairs
      */
     template<template <class> class Datastructure, class Configuration>
-    void CriticalPairs<Datastructure, Configuration>::elimMultiples( const Monomial& lm, size_t ind, const std::unordered_map<size_t, SPolPair>& newpairs )
+    void CriticalPairs<Datastructure, Configuration>::elimMultiples( const Monomial& lm, const std::unordered_map<size_t, SPolPair>& newpairs )
     {
         typename Datastructure<Configuration>::const_iterator it( mDatastruct.begin( ) );
         while( it != mDatastruct.end( ) )

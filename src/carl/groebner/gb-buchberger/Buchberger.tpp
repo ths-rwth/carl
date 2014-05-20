@@ -129,7 +129,8 @@ void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 	}
 
 	
-	mCritPairs.elimMultiples(*generators[index].lmon(), index, spairs);
+	mCritPairs.elimMultiples(*generators[index].lmon(), spairs);
+//	mCritPairs.elimMultiples(*generators[index].lmon(), index, spairs);
 
 	removeBuchbergerTriples(spairs, primelist);
 
