@@ -23,6 +23,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(int c) :
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(unsigned c) : MultivariatePolynomial((Coeff)c)
+{
+	this->checkConsistency();
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Coeff& c) :
 Policies(),
 mTerms(c == 0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
@@ -197,6 +203,35 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 		mTerms.push_back(std::make_shared<const Term<Coeff>>(term));
 	}
 	sortTerms();
+	this->checkConsistency();
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p)
+{
+	auto op = p.first;
+	auto sub = p.second;
+	assert(!sub.empty());
+	auto it = sub.begin();
+	*this = *it;
+	if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
+		// special treatment of unary minus
+		*this *= -1;
+		return;
+	}
+	// all other operators shall have at least two arguments.
+	assert(sub.size() >= 2);
+	for (it++; it != sub.end(); it++) {
+	switch (op) {
+		case ConstructorOperation::ADD: *this += *it; break;
+		case ConstructorOperation::SUB: *this -= *it; break;
+		case ConstructorOperation::MUL: *this *= *it; break;
+		case ConstructorOperation::DIV: 
+			assert(it->isConstant());
+			*this /= it->constantPart();
+			break;
+		}
+	}
 	this->checkConsistency();
 }
     

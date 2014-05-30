@@ -49,6 +49,7 @@ protected:
 public:
 	MultivariatePolynomial() = default;
 	explicit MultivariatePolynomial(int c);
+	explicit MultivariatePolynomial(unsigned c);
 	explicit MultivariatePolynomial(const Coeff& c);
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Monomial& m);
@@ -63,6 +64,9 @@ public:
 	MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
 	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
+	
+	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
+	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
 	
     virtual ~MultivariatePolynomial() {}
     
