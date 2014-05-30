@@ -95,6 +95,8 @@ private:
 	 */
 	std::list<const UPolynomial*> polynomials;
 
+	std::unordered_map<const MPolynomial, const UPolynomial*, std::hash<MPolynomial>> polynomialMap;
+
 	/**
 	 * list of polynomials scheduled for elimination
 	 */
@@ -414,18 +416,6 @@ public:
 		return this->check(constraints, r, cg, next, checkTraceFirst, checkBounds);
 	}
 	
-	/**
-	 * Insert the given polynomial into the cad.
-	 *
-	 * @param p polynomial to be added
-	 * @param v the polynomial's variables (parameters and main variable)
-	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
-	 */
-	void addPolynomial(MPolynomial* p, const std::vector<Variable>& v) {
-		std::list<MPolynomial*> l;
-		l.push_back(p);
-		this->addPolynomials(l.begin(), l.end(), v);
-	}
 
 	/**
 	 * Insert the given polynomial into the cad.
@@ -435,43 +425,7 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
-		this->addPolynomial(new MPolynomial(p), v);
-	}
-
-	/**
-	 * Insert the given polynomial into the cad. This method calls addPolynomial with the CAD's list of variables.
-	 *
-	 * @param p polynomial to be added
-	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
-	 */
-	void addPolynomial(MPolynomial* p) {
-		assert(!this->variables.empty());
-		this->addPolynomial(p, this->variables);
-	}
-
-	/**
-	 * Insert the polynomials starting at first ending the point before last.
-	 *
-	 * @param first iterator marking the beginning of the elements to insert
-	 * @param last iterator marking the end of the elements to insert (not inserted!)
-	 * @param v the polynomials' variables (parameters and main variable)
-	 * @complexity quadratic in the number of the variables and quadratic in the number of polynomials
-	 */
-	template<typename InputIterator>
-	void addPolynomials(InputIterator first, InputIterator last, const std::vector<Variable>& v);
-
-	/**
-	 * Insert the polynomials starting at first ending the point before last. This method calls addPolynomials with the CAD's list of variables.
-	 *
-	 * @param first iterator marking the beginning of the elements to insert
-	 * @param last iterator marking the end of the elements to insert (not inserted!)
-	 * @complexity quadratic in the number of the variables and quadratic in the number of polynomials
-	 */
-	template<typename InputIterator>
-	void addPolynomials(InputIterator first, InputIterator last) {
-		this->addPolynomials(first, last, this->variables);
-	}
+	void addPolynomial(const MPolynomial& p, const std::vector<Variable>& v);
 	
 	/**
 	 * Removes a polynomial from the first elimination level where it occurs and possibly from the list of scheduled polynomials.
@@ -479,6 +433,7 @@ public:
 	 * @param polynomial
 	 */
 	void removePolynomial(const UPolynomial& polynomial);
+	void removePolynomial(const MPolynomial& polynomial);
 
 	/**
 	 * Removes a polynomial by its pointer pPtr from the input polynomials of the CAD (elimination level 0) or the specified level.
@@ -488,19 +443,6 @@ public:
 	 * @param childrenOnly only remove the children of pPtr (recursively)
 	 */
 	void removePolynomial(const UPolynomial* p, unsigned level = 0, bool childrenOnly = false);
-
-	/**
-	 * Removes a range of polynomials from the input polynomials of the CAD if they exist.
-	 * Moreover, all elimination levels are safely cleaned of all elimination polynomials stemming from the given range of polynomials.
-	 * @param first
-	 * @param last
-	 */
-	template<typename InputIterator>
-	void removePolynomials(InputIterator first, InputIterator last) {
-		for (auto i = first; i != last; i++) {
-			this->removePolynomial(*i);
-		}
-	}
 	
 	/**
 	 * Get the boundaries of the cad cell intervals in each level for the solution point r.

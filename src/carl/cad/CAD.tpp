@@ -532,26 +532,15 @@ bool CAD<Number>::check(
 				strictInequalities.push_back(c);
 			}
 		}
-		if (this->setting.zeroDimEquations && !equations.empty()) {
-			// @todo: incorporate bounds
-			/* Remove all occurrences of polynomials belonging to the inequalities.
-			 * If the cad is not build upon more than the constraints' polynomials, this step leaves only polynomials of equations.
-			 */
-			for (cad::Constraint<Number> c: strictInequalities) {
-				this->removePolynomial(c.getPolynomial());
+		if (weakInequalities.empty()) {
+			if (!useBounds && strictInequalities.empty() && this->variables.size() <= 1) {
+				// root-only samples not valid in general!
+				this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
+			} else if (onlyStrictBounds && equations.empty()) {
+				this->alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
 			}
-			this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
-		} else {
-			if (weakInequalities.empty()) {
-				if (!useBounds && strictInequalities.empty() && this->variables.size() <= 1) {
-					// root-only samples not valid in general!
-					this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
-				} else if (onlyStrictBounds && equations.empty()) {
-					this->alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
-				}
-			}
-			// else: mixed case, no optimization possible without zero-dimensional assumption
 		}
+		// else: mixed case, no optimization possible without zero-dimensional assumption
 	}
 	
 	//////////////////////
@@ -662,39 +651,31 @@ bool CAD<Number>::check(
 }
 
 template<typename Number>
-template<typename InputIterator>
-void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const std::vector<Variable>& v) {
-	// add (only) the new polynomials to the list of new polynomials
-	bool nothingAdded = true;
-	for (InputIterator p = first; p != last; p++) {
-		Variable var = v.front();
-		if (!this->variables.empty()) var = this->variables.front();
-		else if (!this->newVariables.empty()) var = this->newVariables.front();
+void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
+	//std::cout << "\t" << this->polynomialMap.size() << " adding " << p << std::endl;
+	Variable var = v.front();
+	if (!this->variables.empty()) var = this->variables.front();
+	else if (!this->newVariables.empty()) var = this->newVariables.front();
 
-		LOGMSG_TRACE("carl.core", "Adding " << **p);
-		UPolynomial* up = new UPolynomial((*p)->toUnivariatePolynomial(var));
-		if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), up) != this->scheduledPolynomials.end()) {
-			// same polynomial was already considered in scheduled polynomials
-			delete up;
-			continue;
-		}
-		if (!this->eliminationSets.empty()) {
-			if (this->eliminationSets.front().find(up) != nullptr) {
-				// same polynomial was already considered in elimination polynomials
-				delete up;
-				continue;
-			}
-		}
-		// schedule the polynomial for the next elimination
-		this->scheduledPolynomials.push_back(this->take(up));
-		nothingAdded = false;
-	}
-	
-	if (nothingAdded) {
-		// no polynomial to add, so do not touch the variables
+	LOGMSG_TRACE("carl.core", "Adding " << p);
+	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var));
+	if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), up) != this->scheduledPolynomials.end()) {
+		// same polynomial was already considered in scheduled polynomials
+		delete up;
 		return;
-	
 	}
+	if (!this->eliminationSets.empty()) {
+		if (this->eliminationSets.front().find(up) != nullptr) {
+			// same polynomial was already considered in elimination polynomials
+			delete up;
+			return;
+		}
+	}
+	//std::cout << "\t inserting " << p << std::endl;
+	this->polynomialMap[p] = up;
+	// schedule the polynomial for the next elimination
+	this->scheduledPolynomials.push_back(this->take(up));
+	
 	// determine the variables differing from mVariables and add them to the front of the existing variables
 	for (Variable var: v) {
 		if (
@@ -708,11 +689,23 @@ void CAD<Number>::addPolynomials(InputIterator first, InputIterator last, const 
 }
 
 template<typename Number>
-void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
-	LOGMSG_TRACE("carl.core", "Removing " << polynomial);
+void CAD<Number>::removePolynomial(const MPolynomial& polynomial) {
+	//std::cout << "\t" << this->polynomialMap.size() << " remove " << polynomial << std::endl;
+	auto upit = this->polynomialMap.find(polynomial);
+	if (upit == this->polynomialMap.end()) {
+		return;
+		/*std::cout << "Map:" << std::endl;
+		for (auto it: this->polynomialMap) {
+			std::cout << "\t" << it.first << " -> " << it.second << std::endl;
+		}*/
+	}
+	assert(upit != this->polynomialMap.end());
+	auto up = upit->second;
+	this->polynomialMap.erase(upit);
+	
 	// possibly remove the polynomial from the list of scheduled polynomials
 	for (auto p = this->scheduledPolynomials.begin(); p != this->scheduledPolynomials.end(); p++) {
-		if (**p == polynomial) {
+		if (*p == up) {
 			// in this case, there is neither any other occurrence of p in mScheduledPolynomials nor in mEliminationSets[0] (see addPolynomial for reason)
 			this->scheduledPolynomials.erase(p);
 			return;
@@ -721,7 +714,7 @@ void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
 	
 	// remove the polynomial from the list of all polynomials
 	for (auto p = this->polynomials.begin(); p != this->polynomials.end(); p++) {
-		if (**p == polynomial) {
+		if (*p == up) {
 			this->polynomials.erase(p);
 			break;
 		}
@@ -731,10 +724,8 @@ void CAD<Number>::removePolynomial(const UPolynomial& polynomial) {
 	for (unsigned level = 0; level < this->eliminationSets.size(); level++) {
 		// transform the polynomial according to possible optimizations in order to recognize its real shape in the elimination set
 		//auto tmp = new UPolynomial(polynomial.pseudoPrimpart());
-		auto tmp = new UPolynomial(polynomial);
-		LOGMSG_TRACE("carl.core", "Removing " << *tmp << " from " << this->eliminationSets[level]);
-		auto p = this->eliminationSets[level].find(tmp);
-		delete tmp;
+		LOGMSG_TRACE("carl.core", "Removing " << *up << " from " << this->eliminationSets[level]);
+		auto p = this->eliminationSets[level].find(up);
 		if (p != nullptr) {
 			this->removePolynomial(p, level);
 			return;
@@ -1952,7 +1943,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	cadbox.setting = boxSetting;
 	
 	RealAlgebraicPoint<Number> r;
-	std::vector<cad::Constraint<Number>> constraints(1, cad::Constraint<Number>(*p, Sign::ZERO, variables));
+	std::vector<cad::Constraint<Number>> constraints(1, cad::Constraint<Number>(MultivariatePolynomial<Number>(*p), Sign::ZERO, variables));
 	if (cadbox.check(constraints, r, bounds, false, false, false)) {
 		cadbox.completeElimination();
 		LOGMSG_TRACE("carl.core", "Back from nested CAD " << &cadbox);
