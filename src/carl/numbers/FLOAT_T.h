@@ -60,31 +60,31 @@ namespace carl
             mValue = FloatType(0);
         }
 
-        FLOAT_T<FloatType>(const double _double)
+        FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
         {
             assert(is_float<FloatType>::value);
             mValue = _double;
         }
 
-        FLOAT_T<FloatType>(const float _float)
+        FLOAT_T<FloatType>(const float _float, const CARL_RND=CARL_RND::N)
         {
             assert(is_float<FloatType>::value);
             mValue = _float;
         }
 
-        FLOAT_T<FloatType>(const int _int)
+        FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
         {
             assert(is_float<FloatType>::value);
             mValue = _int;
         }
 
-        FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float) : mValue(_float.mValue)
+        FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
         {
             assert(is_float<FloatType>::value);
         }
 
         template<typename F = FloatType, DisableIf< std::is_same<F, double> > = dummy>
-        FLOAT_T<FloatType>(const FloatType& val)
+        FLOAT_T<FloatType>(const FloatType& val, const CARL_RND=CARL_RND::N)
         {
             mValue = val;
         }
@@ -447,7 +447,7 @@ namespace carl
             return _result;
         }
 
-        FLOAT_T<FloatType>& floor(int& _result, CARL_RND = CARL_RND::N) const
+        FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
             _result = std::floor(mValue);
             return _result;
@@ -459,7 +459,7 @@ namespace carl
             return *this;
         }
 
-        FLOAT_T<FloatType>& ceil(int& _result, CARL_RND = CARL_RND::N) const
+        FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
             _result = std::ceil(mValue);
             return _result;
