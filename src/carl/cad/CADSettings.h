@@ -176,9 +176,6 @@ public:
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
-		if (setting & ZERODIM) {
-			cadSettings.zeroDimEquations = true;
-		}
 		if (setting & ALTERNATIVEORDER) {
 			cadSettings.order = PolynomialComparisonOrder::LowDegree;
 			//cadSettings.up_isLess = UnivariatePolynomial::univariatePolynomialIsLessLowDeg;
@@ -213,8 +210,6 @@ public:
 			settingStrs.push_back( "If a polynomial is removed from the CAD, remove also those variables and the respective elimination and sample levels which correspond to empty elimination levels." );
 		if (settings.autoSeparateEquations)
 			settingStrs.push_back( "Treat equations separately by tuning the cad object to equations." );
-		if (settings.zeroDimEquations)
-			settingStrs.push_back( "If equationsOnly is set, tune the CAD as if all input equation systems are zero-dimensional." );
 		if (settings.computeConflictGraph)
 			settingStrs.push_back( "Compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check." );
 		if (settings.warmRestart)
@@ -265,7 +260,6 @@ private:
 		removeConstants( true ),
 		trimVariables( false ),
 		autoSeparateEquations( false ),
-		zeroDimEquations( false ),
 		computeConflictGraph( true ),
 		numberOfDeductions( 1 ),
 		warmRestart( false ),
@@ -295,7 +289,6 @@ public:
 		removeConstants( s.removeConstants ),
 		trimVariables( s.trimVariables ),
 		autoSeparateEquations( s.autoSeparateEquations ),
-		zeroDimEquations( s.zeroDimEquations ),
 		computeConflictGraph( s.computeConflictGraph ),
 		numberOfDeductions( s.numberOfDeductions ),
 		warmRestart( s.warmRestart ),
