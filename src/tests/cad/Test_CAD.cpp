@@ -28,21 +28,21 @@ protected:
 
 	virtual void SetUp() {
 		// p[0] = x^2 + y^2 - 1
-		this->p.push_back(new Polynomial({Term<cln::cl_RA>(x)*x, Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}));
+		this->p.push_back(Polynomial({Term<cln::cl_RA>(x)*x, Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}));
 		// p[1] = x + 1 - y
-		this->p.push_back(new Polynomial({Term<cln::cl_RA>(x), -Term<cln::cl_RA>(y), Term<cln::cl_RA>(1)}));
+		this->p.push_back(Polynomial({Term<cln::cl_RA>(x), -Term<cln::cl_RA>(y), Term<cln::cl_RA>(1)}));
 		// p[2] = x - y
-		this->p.push_back(new Polynomial({Term<cln::cl_RA>(x), -Term<cln::cl_RA>(y)}));
+		this->p.push_back(Polynomial({Term<cln::cl_RA>(x), -Term<cln::cl_RA>(y)}));
 		// p[3] = x^2 + y^2 + z^2 - 1
-		this->p.push_back(new Polynomial({Term<cln::cl_RA>(x)*x, Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(z)*z, Term<cln::cl_RA>(-1)}));
+		this->p.push_back(Polynomial({Term<cln::cl_RA>(x)*x, Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(z)*z, Term<cln::cl_RA>(-1)}));
 		// p[4] = x^2 + y^2
-		this->p.push_back(new Polynomial({Term<cln::cl_RA>(x)*x, Term<cln::cl_RA>(y)*y}));
+		this->p.push_back(Polynomial({Term<cln::cl_RA>(x)*x, Term<cln::cl_RA>(y)*y}));
 		// p[5] = z^3 - 1/2
-		this->p.push_back(new Polynomial({Term<cln::cl_RA>(z)*z*z, Term<cln::cl_RA>(cln::cl_RA(-1)/2)}));
+		this->p.push_back(Polynomial({Term<cln::cl_RA>(z)*z*z, Term<cln::cl_RA>(cln::cl_RA(-1)/2)}));
 	}
 
 	virtual void TearDown() {
-		for (auto pol: this->p) delete pol;
+		//for (auto pol: this->p) delete pol;
 		this->p.clear();
 	}
 
@@ -67,7 +67,7 @@ protected:
 
 	carl::CAD<cln::cl_RA> cad;
 	carl::Variable x, y, z;
-	std::vector<Polynomial*> p;
+	std::vector<Polynomial> p;
 };
 
 TEST_F(CADTest, Check1)
@@ -78,8 +78,8 @@ TEST_F(CADTest, Check1)
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[1], {x, y});
 	cons.assign({
-		Constraint(this->p[0]->toUnivariatePolynomial(x), Sign::ZERO, {x,y}),
-		Constraint(this->p[1]->toUnivariatePolynomial(x), Sign::ZERO, {x,y})
+		Constraint(this->p[0], Sign::ZERO, {x,y}),
+		Constraint(this->p[1], Sign::ZERO, {x,y})
 	});
 	this->cad.prepareElimination();
 	ASSERT_TRUE(cad.check(cons, r));
@@ -100,8 +100,8 @@ TEST_F(CADTest, Check2)
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0]->toUnivariatePolynomial(x), Sign::ZERO, {x,y}),
-		Constraint(this->p[2]->toUnivariatePolynomial(x), Sign::ZERO, {x,y})
+		Constraint(this->p[0], Sign::ZERO, {x,y}),
+		Constraint(this->p[2], Sign::ZERO, {x,y})
 	});
 	ASSERT_TRUE(cad.check(cons, r));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
@@ -119,8 +119,8 @@ TEST_F(CADTest, Check3)
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0]->toUnivariatePolynomial(x), Sign::POSITIVE, {x,y}),
-		Constraint(this->p[2]->toUnivariatePolynomial(x), Sign::NEGATIVE, {x,y})
+		Constraint(this->p[0], Sign::POSITIVE, {x,y}),
+		Constraint(this->p[2], Sign::NEGATIVE, {x,y})
 	});
 	ASSERT_TRUE(cad.check(cons, r));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
@@ -135,8 +135,8 @@ TEST_F(CADTest, Check4)
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0]->toUnivariatePolynomial(x), Sign::NEGATIVE, {x,y}),
-		Constraint(this->p[2]->toUnivariatePolynomial(x), Sign::POSITIVE, {x,y})
+		Constraint(this->p[0], Sign::NEGATIVE, {x,y}),
+		Constraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
 	ASSERT_TRUE(cad.check(cons, r));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
@@ -151,8 +151,8 @@ TEST_F(CADTest, Check5)
 	this->cad.addPolynomial(this->p[2], {x, y});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[0]->toUnivariatePolynomial(x), Sign::ZERO, {x,y}),
-		Constraint(this->p[2]->toUnivariatePolynomial(x), Sign::POSITIVE, {x,y})
+		Constraint(this->p[0], Sign::ZERO, {x,y}),
+		Constraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
 	ASSERT_TRUE(cad.check(cons, r));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
@@ -168,9 +168,9 @@ TEST_F(CADTest, Check6)
 	this->cad.addPolynomial(this->p[5], {x, y, z});
 	this->cad.prepareElimination();
 	cons.assign({
-		Constraint(this->p[3]->toUnivariatePolynomial(x), Sign::NEGATIVE, {x,y,z}),
-		Constraint(this->p[4]->toUnivariatePolynomial(x), Sign::POSITIVE, {x,y,z}),
-		Constraint(this->p[5]->toUnivariatePolynomial(x), Sign::POSITIVE, {x,y,z})
+		Constraint(this->p[3], Sign::NEGATIVE, {x,y,z}),
+		Constraint(this->p[4], Sign::POSITIVE, {x,y,z}),
+		Constraint(this->p[5], Sign::POSITIVE, {x,y,z})
 	});
 	ASSERT_TRUE(cad.check(cons, r));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
