@@ -45,7 +45,7 @@ void ConflictGraph::removeConstraintVertex(const Vertex& i) {
 }
 
 void ConflictGraph::clearSampleVertices() {
-	for (auto constraintVertex: this->data) {
+	for (auto& constraintVertex: this->data) {
 		constraintVertex.clear();
 	}
 	mDegrees.assign(mDegrees.size(), 0);
@@ -79,10 +79,10 @@ void ConflictGraph::invertConflictingVertices(const Vertex& vertex) {
 	// sort the sample-point index list descendantly
 	toClear.sort(std::greater<Vertex>());
 	// switch all constraint-sample connections from UNSATISFIABLE to SATISFIABLE
-	for (auto j: toClear) {
+	for (auto& j: toClear) {
 		// complete column j in adjacency matrix
-		for(Vertex i = 0; i < this->data.size(); ++i) {
-			if(this->data.at(i).at(j) == ConflictType::UNSATISFIED) {
+		for (Vertex i = 0; i < this->data.size(); ++i) {
+			if (this->data.at(i).at(j) == ConflictType::UNSATISFIED) {
 				// update degree for the constraint vertex i
 				mDegrees.at(i)++;
 				// add adjacency information
