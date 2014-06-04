@@ -114,7 +114,7 @@ namespace carl
          * Operators *
          *************/
 
-        FLOAT_T<FloatType>& operator =(const FLOAT_T<FloatType> & _rhs)
+        FLOAT_T<FloatType>& operator =(const FLOAT_T<FloatType>& _rhs)
         {
             mValue = _rhs.mValue;
             return *this;
@@ -483,7 +483,7 @@ namespace carl
          * Typecast operators
          */
         
-        explicit operator int()
+        explicit operator int() const
         {
             return (int) mValue;
         }
