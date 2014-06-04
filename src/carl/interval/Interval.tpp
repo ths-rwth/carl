@@ -635,7 +635,7 @@ Interval<Number> Interval<Number>::sqrt() const
 		assert(this->isConsistent());
         if( mUpperBoundType != BoundType::INFTY &&  mContent.upper() < 0 )
             return Interval<Number>::emptyInterval();
-        if( mContent.lower() < 0 )
+        if( mLowerBoundType == BoundType::INFTY || mContent.lower() < 0 )
         {
             if( mUpperBoundType == BoundType::INFTY )
             {
