@@ -196,14 +196,14 @@ namespace carl
 
         FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
-            assert(_op2 != 0);
+            //assert(_op2 != 0);
             mValue = mValue / _op2.mValue;
             return *this;
         }
 
         FLOAT_T<FloatType>& div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
-            assert(_op2 != 0);
+            //assert(_op2 != 0);
             _result.mValue = mValue / _op2.mValue;
             return _result;
         }
@@ -214,35 +214,35 @@ namespace carl
 
         FLOAT_T<FloatType>& sqrt_assign(CARL_RND = CARL_RND::N)
         {
-            assert(*this >= 0);
+            //assert(*this >= 0);
             mValue = std::sqrt(mValue);
             return *this;
         }
 
         FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            assert(*this >= 0);
+            //assert(*this >= 0);
             _result.mValue = std::sqrt(mValue);
             return _result;
         }
 
         FLOAT_T<FloatType>& cbrt_assign(CARL_RND = CARL_RND::N)
         {
-            assert(*this >= 0);
+            //assert(*this >= 0);
             mValue = std::cbrt(mValue);
             return *this;
         }
 
         FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            assert(*this >= 0);
+            //assert(*this >= 0);
             _result.mValue = std::cbrt(mValue);
             return _result;
         }
 
         FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
         {
-            assert(*this >= 0);
+            //assert(*this >= 0);
             /// @TODO implement root_assign for FLOAT_T
             LOG_NOTIMPLEMENTED();
             return *this;
@@ -250,7 +250,7 @@ namespace carl
 
         FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
         {
-            assert(*this >= 0);
+            //assert(*this >= 0);
             LOG_NOTIMPLEMENTED();
             /// @TODO implement root for FLOAT_T
         }
@@ -326,7 +326,7 @@ namespace carl
             _result.mValue = std::log(mValue);
             return _result;
         }
-
+        
         FLOAT_T<FloatType>& tan_assign(CARL_RND = CARL_RND::N)
         {
             mValue = std::tan(mValue);
@@ -479,6 +479,15 @@ namespace carl
             return (double) mValue;
         }
 
+        /**
+         * Typecast operators
+         */
+        
+        explicit operator int()
+        {
+            return (int) mValue;
+        }
+        
         friend std::ostream & operator<<(std::ostream& ostr, const FLOAT_T<FloatType>& p)
         {
             ostr << p.toString();
@@ -689,6 +698,13 @@ namespace carl
             mValue = mValue - _rhs;
             return *this;
         }
+        
+        FLOAT_T<FloatType> operator-()
+        {
+            FLOAT_T<FloatType> result = FLOAT_T<FloatType>(*this);
+            result *= FLOAT_T<FloatType>(-1);
+            return result;
+        }
 
         FLOAT_T<FloatType>& operator *=(const FLOAT_T<FloatType>& _rhs)
         {
@@ -713,7 +729,7 @@ namespace carl
             mValue = mValue / _rhs;
             return *this;
         }
-
+        
         /**
          * Auxiliary Functions
          */
@@ -723,6 +739,31 @@ namespace carl
             return std::to_string(mValue);
         }
     };
+    
+    template<typename FloatType>
+    static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& in)
+    {
+        FLOAT_T<FloatType> result;
+        in.log(result);
+        return result;
+    }
+    
+    template<typename FloatType>
+    static FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& in)
+    {
+        FLOAT_T<FloatType> result;
+        in.floor(result);
+        return result;
+    }
+    
+    template<typename FloatType>
+    static FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& in)
+    {
+        FLOAT_T<FloatType> result;
+        in.ceil(result);
+        return result;
+    }
+    
 #ifdef USE_MPFR_FLOAT
 #include "floatTypes/mpfr_float.tpp"
 #endif
