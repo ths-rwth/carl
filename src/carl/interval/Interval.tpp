@@ -633,10 +633,19 @@ template<typename Number>
 Interval<Number> Interval<Number>::sqrt() const
 	{
 		assert(this->isConsistent());
-        if( mContent.upper() < 0 )
+        if( mUpperBoundType != BoundType::INFTY &&  mContent.upper() < 0 )
             return Interval<Number>::emptyInterval();
-        if( mContent.lower() < 0 )
-            return Interval<Number>(boost::numeric::sqrt(BoostInterval(0,mContent.upper())), mLowerBoundType, mUpperBoundType);
+        if( mLowerBoundType == BoundType::INFTY || mContent.lower() < 0 )
+        {
+            if( mUpperBoundType == BoundType::INFTY )
+            {
+                return Interval<Number>(BoostInterval(Number(0)), mLowerBoundType, mUpperBoundType);
+            }
+            else
+            {
+                return Interval<Number>(boost::numeric::sqrt(BoostInterval(0,mContent.upper())), mLowerBoundType, mUpperBoundType);
+            }
+        }
 		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
 	}
 
