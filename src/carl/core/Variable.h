@@ -60,6 +60,8 @@ public:
  
 private:
     unsigned mVariable;
+
+public:
     
     /**
      * Default constructor, constructing a variable, which is considered as not an actual variable.
@@ -67,7 +69,6 @@ private:
      */
     explicit Variable() : mVariable(0) {} 
     
-public:
     /**
      * Although we recommend access through the VariablePool, we allow public construction of variables
      * for local purposes. However, please be aware that clashes may occur, as all variables with the 
