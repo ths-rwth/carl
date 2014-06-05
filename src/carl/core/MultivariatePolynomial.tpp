@@ -219,8 +219,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 		*this *= -1;
 		return;
 	}
-	// all other operators shall have at least two arguments.
-	assert(sub.size() >= 2);
+	if (op == ConstructorOperation::DIV) {
+		// division shall have at least two arguments
+		assert(sub.size() >= 2);
+	}
 	for (it++; it != sub.end(); it++) {
 	switch (op) {
 		case ConstructorOperation::ADD: *this += *it; break;
