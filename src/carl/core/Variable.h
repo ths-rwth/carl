@@ -22,7 +22,17 @@ namespace carl
  * INT: the integers ZZ
  * NATURAL: nonnegative integers NN
  */
-enum VariableType { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4 };
+enum class VariableType : unsigned { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4 };
+
+inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
+	switch (t) {
+		case VariableType::VT_BOOL: return os << "Bool";
+		case VariableType::VT_INT: return os << "Int";
+		case VariableType::VT_NATURAL: return os << "Natural";
+		case VariableType::VT_RATIONAL: return os << "Rational";
+		case VariableType::VT_REAL: return os << "Real";
+	}
+}
 
 /**
  * Variables are bitvectors with  [ ordering | id | type]
@@ -65,7 +75,7 @@ public:
      * @param id The identifier of the variable
      * @param type The type (domain)
      */
-    explicit Variable(unsigned id, VariableType type = VT_REAL) :
+    explicit Variable(unsigned id, VariableType type = VariableType::VT_REAL) :
     mVariable((unsigned)type | id << VARIABLE_BITS_RESERVED_FOR_TYPE )
     {
         assert( id > 0 );

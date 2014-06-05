@@ -63,7 +63,7 @@ public:
 	 * @param type Type for the new variable.
 	 * @return A new variable.
 	 */
-	Variable getFreshVariable(VariableType type = VT_REAL);
+	Variable getFreshVariable(VariableType type = VariableType::VT_REAL);
 
 	/**
 	 * Get a variable with was not used before and set a name for it.
@@ -72,7 +72,7 @@ public:
 	 * @param type Type for the new variable.
 	 * @return A new variable.
 	 */
-	Variable getFreshVariable(const std::string& name, VariableType type = VT_REAL);
+	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 	/**
 	 * Get a human-readable name for the given variable.

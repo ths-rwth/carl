@@ -18,7 +18,7 @@ TEST(VariablePool, singleton)
 TEST(VariablePool, variablePool)
 {
 	VariablePool& vpool = VariablePool::getInstance();
-	Variable x = vpool.getFreshVariable( carl::VT_INT );
+	Variable x = vpool.getFreshVariable( carl::VariableType::VT_INT );
 	vpool.setName(x, "test");
 	std::string name = vpool.getName(x, true);
 	std::stringstream o;
