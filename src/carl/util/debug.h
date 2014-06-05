@@ -9,6 +9,7 @@
 #include <csignal>
 #include <iostream>
 #include <list>
+#include <forward_list>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -30,6 +31,17 @@ namespace carl {
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
 	os << "[" << l.size() << ": ";
+	bool first = true;
+	for (auto it: l) {
+		if (!first) os << ", ";
+		first = false;
+		os << it;
+	}
+	return os << "]";
+}
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
+	os << "[";
 	bool first = true;
 	for (auto it: l) {
 		if (!first) os << ", ";
