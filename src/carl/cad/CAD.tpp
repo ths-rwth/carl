@@ -1259,7 +1259,12 @@ bool CAD<Number>::mainCheck(
 		// there is no sample component computed yet, so we are at the base level
 		// perform an initial elimination so that the base level contains lifting positions
 		int lastRes = 0;
-		while (this->eliminationSets.back().emptyLiftingQueue() && (lastRes = this->eliminate(dim-1, bounds, boundsNontrivial))) {
+		while (this->eliminationSets.back().emptyLiftingQueue()) {
+			lastRes = this->eliminate(dim-1, bounds, boundsNontrivial);
+			if (lastRes == -1) {
+				// eliminate will not be able to produce a new polynomial.
+				return this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph);
+			}
 			LOGMSG_DEBUG("carl.cad", "Waiting for something to lift, lastRes = " << lastRes << std::endl << *this);
 		};
 		
