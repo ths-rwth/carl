@@ -113,6 +113,14 @@ public:
 		return false;
 	}
 
+	virtual Number branchingPoint() const {
+		Number m = this->interval.sample();
+		while (isInteger(m)) {
+			m = Interval<Number>(this->interval.lower(), m).sample();
+		}
+		return m;
+	}
+
 	/**
 	 * Selects the polynomial having this real algebraic number as one of its roots.
 	 * @return polynomial having the number as one of its roots

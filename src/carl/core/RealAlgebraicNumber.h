@@ -121,6 +121,17 @@ public:
 		return true;
 	}
 
+	/**
+	 * Returns a point that is suitable for splitting during branch and bound when searching for integer solutions.
+	 * If this number is numeric, it returns the same as value().
+	 * If this number is represented by an interval, it returns some value from this interval that is not integral.
+	 * Thus, if the result of this method is integral, an integral value has been found and otherwise, branching at the returned point guarantees progress.
+	 * @return a suitable branching point.
+	 */
+	virtual Number branchingPoint() const {
+		return this->value();
+	}
+
 	/** Gives an exact numeric representation of this real algebraic number which could have been found during the refinement steps.
 	 * The method returns 0 if the value was never set during refinement.
 	 * @return an exact numeric representation of this real algebraic number which could have been found during the refinement steps
