@@ -473,8 +473,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		assert(!term.isZero());
 		Monomial* mon = Monomial(x).pow(ac.degree() - bc.degree());
 		if (mon != nullptr) {
-			term *= Term<Coeff>(*mon);
-            delete mon;
+			term *= Term<Coeff>(std::shared_ptr<Monomial>(mon));
 		}
 		res += term;
 		a = a - b * term;
