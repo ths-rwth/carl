@@ -775,28 +775,26 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	for (int l = (int)dim - 1; l >= (int)level; l--) {
 		// iterate from the leaves to the root (more efficient if several levels are to be cleaned)
 		if (this->eliminationSets[(size_t)l].empty()) {
-			// there is nothing more to be done for this level, so erase all samples up to one
+			// there is nothing more to be done for this level, so erase all samples
 			unsigned depth = dim - (unsigned)l;
 			if ((int)depth <= maxDepth) {
-				// merge everything into destinationNode
-				auto destination = this->sampleTree.begin_fixed(sampleTreeRoot, depth);
-				auto node = this->sampleTree.next_at_same_depth(destination);
+				// erase all samples on this level
+				auto node = this->sampleTree.begin_fixed(sampleTreeRoot, depth);
 				std::forward_list<typename tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
 				while (this->sampleTree.is_valid(node)) {
-					// merge each node's children into destinationNode's children
-					this->sampleTree.merge(destination.begin(), destination.end(), node.begin(), node.end());
+					this->sampleTree.erase_children(node);
 					toDelete.push_front(node);
 					node = this->sampleTree.next_at_same_depth(node);
 				}
-				// clean the remaining nodes
 				for (auto node: toDelete) {
 					this->sampleTree.erase(node);
 				}
 			}
 		}
 	}
-	
 	// correct the trace
+	maxDepth = this->sampleTree.max_depth();
+	this->trace.resize(maxDepth);
 	auto node = this->sampleTree.begin_fixed(sampleTreeRoot, (unsigned)maxDepth);
 	for (unsigned lTrace = 0; (int)lTrace <= maxDepth; lTrace++) {
 		this->trace[lTrace] = node;
