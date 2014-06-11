@@ -959,8 +959,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	MultivariatePolynomial<Coeff,Ordering,Policies> mult(*this);
 	while(exp > 0) {
 		if (exp & 1) res *= mult;
-		mult *= mult;
 		exp /= 2;
+        if(exp > 0)
+            mult *= mult;
 	}
 	return res;
 }
