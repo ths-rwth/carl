@@ -32,6 +32,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 		case VariableType::VT_RATIONAL: return os << "Rational";
 		case VariableType::VT_REAL: return os << "Real";
 	}
+	return os << "Unknown";
 }
 
 /**
