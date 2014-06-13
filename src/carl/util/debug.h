@@ -11,6 +11,7 @@
 #include <list>
 #include <forward_list>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <vector>
 #include <unistd.h>
@@ -49,6 +50,25 @@ std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
 		os << it;
 	}
 	return os << "]";
+}
+
+/**
+ * Output a set with arbitrary content.
+ * The format is `{<length>: <item>, <item>, ...}`
+ * @param os Output stream.
+ * @param s set to be printed.
+ * @return Output stream.
+ */
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::set<T>& s) {
+	os << "{" << s.size() << ": ";
+	bool first = true;
+	for (auto it: s) {
+		if (!first) os << ", ";
+		first = false;
+		os << it;
+	}
+	return os << "}";
 }
 
 /**
