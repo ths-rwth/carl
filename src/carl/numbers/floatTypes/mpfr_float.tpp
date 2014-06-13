@@ -50,6 +50,13 @@ class FLOAT_T<mpfr_t>
             mpfr_init2(mValue, mpfr_get_prec(_float.mValue));
             mpfr_set(mValue, _float.mValue, MPFR_RNDN);
         }
+        
+        template<typename F, DisableIf< std::is_same<F, mpfr_t> > = dummy>
+        FLOAT_T(const FLOAT_T<F>& _float, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        {
+            mpfr_init2(mValue,_prec);
+            mpfr_set_d(mValue,_float.toDouble(),mpfr_rnd_t(_rnd));
+        }
 
         ~FLOAT_T()
         {

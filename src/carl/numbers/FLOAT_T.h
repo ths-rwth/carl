@@ -88,6 +88,12 @@ namespace carl
         {
             mValue = val;
         }
+        
+        template<typename F, DisableIf< std::is_same<F, FloatType> > = dummy>
+        FLOAT_T<FloatType>(const FLOAT_T<F>& _float, const CARL_RND=CARL_RND::N)
+        {
+            mValue = _float.toDouble();
+        }
 
         ~FLOAT_T() { }
 
