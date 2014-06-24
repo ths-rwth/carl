@@ -62,7 +62,7 @@ namespace carl
     template<>
     struct policies<double>
     {
-        typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_opp<double> > roundingP;
+        typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_std<double> > roundingP;
         typedef boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double> > checkingP;
     };
 
