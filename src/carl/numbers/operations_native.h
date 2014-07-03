@@ -21,7 +21,7 @@ namespace carl {
  */
 
 inline bool isNumber(const double& d) {
-	return (d == d) && !isinf(d);
+	return (d == d) && !std::isinf(d);
 }
 
 /**
