@@ -499,6 +499,11 @@ namespace carl
             return (long) mValue;
         }
         
+        explicit operator double() const
+        {
+            return (double) mValue;
+        }
+        
         friend std::ostream & operator<<(std::ostream& ostr, const FLOAT_T<FloatType>& p)
         {
             ostr << p.toString();
