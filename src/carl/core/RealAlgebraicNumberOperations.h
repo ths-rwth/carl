@@ -14,7 +14,7 @@ namespace carl {
 
 template<typename Number>
 struct Equal {
-	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) const {
 		if (lhs == rhs) return true;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
@@ -44,7 +44,7 @@ struct Inequal {
 private:
 	Equal<Number> e;
 public:
-	bool operator()(RealAlgebraicNumberPtr<Number>& lhs, RealAlgebraicNumberPtr<Number>& rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number>& lhs, RealAlgebraicNumberPtr<Number>& rhs) const {
 		return !e(lhs, rhs);
 	}
 };
@@ -55,7 +55,7 @@ struct Less {
 private:
 	Equal<Number> e;
 public:
-	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) const {
 		assert(lhs != nullptr);
 		assert(rhs != nullptr);
 		if (lhs == rhs) return false;
@@ -95,8 +95,22 @@ struct Greater {
 private:
 	Less<Number> l;
 public:
-	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) {
+	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) const {
 		return l(rhs, lhs);
+	}
+};
+
+}
+
+namespace std {
+
+template<typename Number>
+struct less<carl::RealAlgebraicNumberPtr<Number>> {
+private:
+	carl::Less<Number> l;
+public:
+	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
+		return l(lhs, rhs);
 	}
 };
 
