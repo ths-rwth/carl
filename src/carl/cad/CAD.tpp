@@ -212,7 +212,7 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 template<typename Number>
 bool CAD<Number>::prepareElimination() {
 	LOGMSG_TRACE("carl.cad", __func__ << "()");
-	if (this->newVariables.empty() && this->scheduledPolynomials.empty()) {
+	if ((this->newVariables.empty() && this->scheduledPolynomials.empty()) || (variables.empty() && newVariables.empty())) {
 		return false;
 	}
 	
@@ -253,11 +253,12 @@ bool CAD<Number>::prepareElimination() {
 		CADTrace newTrace(this->variables.size()+1, this->sampleTree.begin());
 		long unsigned j = newVariableCount;
 		assert(j + this->trace.size() <= newTrace.size());
-		for (auto i: this->trace) {
-			newTrace[j++] = i;
+		if (setting.warmRestart) {
+			for (auto i: this->trace) {
+				newTrace[j++] = i;
+			}
+			std::swap(this->trace, newTrace);
 		}
-		std::swap(this->trace, newTrace);
-		
 		// (1)
 		/// @todo make this more efficient
 		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this, this->setting.order, this->setting.order));
@@ -384,6 +385,7 @@ void CAD<Number>::clear() {
 	this->newVariables.clear();
 	this->iscomplete = false;
 	this->interrupted = false;
+	this->interrupts.clear();
 	this->checkCallCount = 0;
 }
 
@@ -494,6 +496,10 @@ bool CAD<Number>::check(
 	for (auto b: bounds) {
 		LOGMSG_DEBUG("carl.cad", "Checking " << b.first << " : " << b.second);
 		if (b.second.isEmpty()) return false;
+	}
+	if (constraints.empty() && useBounds) {
+		// each bound non-empty plus empty input constraints
+		return true;
 	}
 	
 	// try to solve the constraints by interval arithmetic
@@ -792,13 +798,15 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 			}
 		}
 	}
-	// correct the trace
-	assert(maxDepth == this->sampleTree.max_depth());
-	this->trace.resize((unsigned)maxDepth);
-	auto node = this->sampleTree.begin_fixed(sampleTreeRoot, (unsigned)maxDepth);
-	for (unsigned lTrace = 0; (int)lTrace <= maxDepth; lTrace++) {
-		this->trace[lTrace] = node;
-		node = this->sampleTree.parent(node);
+	if (setting.warmRestart) {
+		// correct the trace
+		assert(maxDepth == this->sampleTree.max_depth());
+		this->trace.resize((unsigned)maxDepth + 1);
+		auto node = this->sampleTree.begin_fixed(sampleTreeRoot, (unsigned)maxDepth);
+		for (unsigned lTrace = 0; (int)lTrace <= maxDepth; lTrace++) {
+			this->trace[lTrace] = node;
+			node = this->sampleTree.parent(node);
+		}
 	}
 }
 
@@ -1073,7 +1081,7 @@ std::list<RealAlgebraicNumberPtr<Number>> CAD<Number>::constructSampleAt(sampleI
 	/* Main sample construction loop macro augmented by a conditional argument for termination with an empty sample.
 	 * @param _condition which has to be false for every node of the sample, otherwise an empty list is returned
 	 */
-	if (!this->sampleTree.is_valid(node) && *node == nullptr) {
+	if ((!this->sampleTree.is_valid(node) && *node == nullptr) || node == root) {
 		// node is invalid
 		return {};
 	}
@@ -1094,6 +1102,7 @@ std::list<RealAlgebraicNumberPtr<Number>> CAD<Number>::constructSampleAt(sampleI
 		}
 	} else {
 		while (node != root) {
+			assert(sampleTree.is_valid(node));
 			v.push_back(*node);
 			node = this->sampleTree.parent(node);
 		}
@@ -1281,7 +1290,7 @@ bool CAD<Number>::mainCheck(
 		// the sample tree contains valid sample points
 		for (auto leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
 			// traverse the current sample tree leaves for satisfying samples
-			CHECK_NODE(leaf, true, next, true)
+			CHECK_NODE(leaf, true, next, setting.warmRestart)
 		}
 	}
 	
@@ -1424,8 +1433,10 @@ bool CAD<Number>::liftCheck(
 		}
 	}
 	
-	// update the current trace node
-	this->trace[openVariableCount] = node;
+	if (setting.warmRestart) {
+		// update the current trace node
+		this->trace[openVariableCount] = node;
+	}
 	
 	// base level: zero variables left to substitute => evaluate the constraint
 	if (openVariableCount == 0) {
@@ -1877,8 +1888,10 @@ void CAD<Number>::trimVariables() {
 
 			eliminationSet = this->eliminationSets.erase(eliminationSet);
 			variable = this->variables.erase(variable);
-			// reduce the trace at the given depth
-			this->trace.erase(this->trace.end() - 1 - depth);
+			if (setting.warmRestart) {
+				// reduce the trace at the given depth
+				this->trace.erase(this->trace.end() - 1 - depth);
+			}
 			if (depth <= maxDepth) {
 				// remove the complete layer of samples from the sample tree at the given depth
 				// fix the iterators to be deleted in a separate list independent of merging with the children
