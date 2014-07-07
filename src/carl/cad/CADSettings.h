@@ -137,7 +137,7 @@ public:
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = true;
 			cadSettings.trimVariables               = false;
-			cadSettings.warmRestart                 = true;
+			cadSettings.warmRestart                 = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
@@ -153,7 +153,7 @@ public:
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = false;
 			cadSettings.trimVariables               = false;
-			cadSettings.warmRestart                 = true;
+			cadSettings.warmRestart                 = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
