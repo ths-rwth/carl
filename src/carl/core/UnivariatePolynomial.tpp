@@ -1448,7 +1448,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	}
 	subresultants.push_front(q);
 	
-	// SPECIAL CASE: both, a and b, are constant
+	// SPECIAL CASE: both, p and q, are constant
 	if (q.isConstant()) {
 		LOGMSG_TRACE("carl.core.resultant", "q is constant.");
 		return subresultants;
