@@ -61,6 +61,18 @@ private:
          * @return True if lhs < rhs.
          */
 		bool operator()(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const;
+
+		/**
+		 * Checks if the given sample is optimal with respect to the ordering.
+		 * @param s Sample.
+		 * @return True if s is optimal.
+		 */
+		bool isOptimal(const RealAlgebraicNumberPtr<Number>& s) const;
+
+		/**
+		 * Returns the current ordering.
+		 * @return Ordering.
+		 */
 		SampleOrdering ordering() const {
 			return this->mOrdering;
 		}
@@ -194,6 +206,16 @@ public:
 		assert(!mQueue.empty());
 		return *mQueue.begin();
 	}
+
+	/**
+	 * Checks if the best sample remaining is optimal with respect to the configured ordering.
+	 * @return True, if next sample is optimal.
+	 */
+	inline bool hasOptimal() const {
+		if (mQueue.empty()) return false;
+		return mQueue.key_comp().isOptimal(*mQueue.begin());
+	}
+
 	/**
 	 * Changes the ordering and retrieves the next sample according to this ordering.
      * @param ordering New ordering.
@@ -237,6 +259,10 @@ public:
 		return mSamples.find(r) != mSamples.end();
 	}
 
+	/**
+	 * Checks if there are any samples left.
+     * @return True, if no sample is left.
+     */
 	bool empty() const {
 		return this->mQueue.empty();
 	}
@@ -268,6 +294,11 @@ private:
 }
 
 namespace std {
+/**
+ * Swaps the contents of two SampleSet objects.
+ * @param lhs First SampleSet.
+ * @param rhs Second SampleSet.
+ */
 template<typename Num>
 void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs);
 }

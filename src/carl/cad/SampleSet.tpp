@@ -38,6 +38,19 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 }
 
 template<typename Number>
+bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr<Number>& s) const {
+	switch (mOrdering) {
+		case SampleOrdering::IntRatRoot:
+			return s->isNumeric() && carl::isInteger(s->value());
+		case SampleOrdering::RatRoot:
+			return s->isNumeric();
+		default:
+			assert(false);
+			return false;
+	}
+}
+
+template<typename Number>
 void SampleSet<Number>::pop() {
 	if (this->mQueue.empty()) return;
 	this->mSamples.erase(*mQueue.begin());
