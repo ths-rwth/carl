@@ -114,7 +114,7 @@ unsigned CAD<Number>::indexOf(const Variable& v) const {
 
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samplesAt(const sampleIterator& node) const {
-	cad::SampleSet<Number> samples;
+	cad::SampleSet<Number> samples(setting.sampleOrdering);
 	samples.insert(this->sampleTree.begin(node), this->sampleTree.end(node));
 	return samples;
 }
@@ -866,7 +866,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		const Interval<Number>& bounds
 ) {
 	LOGMSG_TRACE("carl.cad", __func__ << "( " << roots << ", " << bounds << " )");
-	cad::SampleSet<Number> newSampleSet;
+	cad::SampleSet<Number> newSampleSet(currentSamples.ordering());
 	replacedSamples.clear();
 	if (roots.empty()) return newSampleSet;
 	
@@ -1487,10 +1487,10 @@ bool CAD<Number>::liftCheck(
 	// determines whether new samples shall be constructed regardless of other flags
 	bool computeMoreSamples = false;
 	// the current list of samples at this position in the sample tree
-	cad::SampleSet<Number> currentSamples;
+	cad::SampleSet<Number> currentSamples(setting.sampleOrdering);
 	currentSamples.insert(this->sampleTree.begin(node), this->sampleTree.end(node));
 	// the current samples queue for this lifting process
-	cad::SampleSet<Number> sampleSetIncrement;
+	cad::SampleSet<Number> sampleSetIncrement(setting.sampleOrdering);
 	std::forward_list<RealAlgebraicNumberPtr<Number>> replacedSamples;
 	
 	// fill in a standard sample to ensure termination in the main loop
@@ -1519,10 +1519,7 @@ bool CAD<Number>::liftCheck(
 		 */
 		// loop if no samples are present at all or heuristics according to the respective setting demand to continue with a new lifting position, construct new samples
 		while (
-			computeMoreSamples || sampleSetIncrement.empty() ||
-			(this->setting.preferNRSamples && sampleSetIncrement.emptyNR()) ||
-			(this->setting.preferSamplesByIsRoot && this->setting.preferNonrootSamples && sampleSetIncrement.emptyNonroot()) ||
-			(this->setting.preferSamplesByIsRoot && !this->setting.preferNonrootSamples && sampleSetIncrement.emptyRoot())
+			computeMoreSamples || !sampleSetIncrement.hasOptimal()
 		) {
 			LOGMSG_TRACE("carl.cad", "computing more samples.");
 			// disable blind sample construction
@@ -1566,44 +1563,11 @@ bool CAD<Number>::liftCheck(
 			/*
 			 * Sample choice
 			 */
-			RealAlgebraicNumberPtr<Number> newSample;
-			if (this->setting.preferNRSamples) {
-				if (sampleSetIncrement.emptyNR() && !this->eliminationSets[openVariableCount].emptyLiftingQueue()) {
-					computeMoreSamples = true;
-					// construct new samples until there are lifting positions
-					break;
-				}
-				// otherwise take also IR samples (as implemented in nextNR)
-				newSample = sampleSetIncrement.nextNR();
-			} else if (this->setting.preferSamplesByIsRoot) {
-				if (this->setting.preferNonrootSamples) {
-					if (sampleSetIncrement.emptyNonroot() && 
-						(!this->eliminationSets[openVariableCount].emptyLiftingQueue() xor this->setting.inequalitiesOnly)
-						) {
-						// no intermediate sample available, but still lifting positions available xor
-						// no intermediate sample available, but no lifting position available and we do not want to consider root samples
-						computeMoreSamples = true;
-						break;
-					}
-					// otherwise take also IR samples (as implemented in nextNonroot)
-					newSample = sampleSetIncrement.nextNonRoot();
-				} else {
-					if (sampleSetIncrement.emptyRoot() && 
-						(!this->eliminationSets[openVariableCount].emptyLiftingQueue() xor this->setting.inequalitiesOnly)
-						) {
-						// no root sample available, but still lifting positions available xor
-						// no root sample available, but no lifting position available and we do not want to consider intermediate samples
-						// construct new samples until there are lifting positions or stop if all roots have been lifted
-						computeMoreSamples = true;
-						break;
-					}
-					// otherwise take also IR samples (as implemented in nextNonroot)
-					newSample = sampleSetIncrement.nextRoot();
-				}
-			} else {
-				// use FCFS
-				newSample = sampleSetIncrement.next();
+			if (!this->eliminationSets[openVariableCount].emptyLiftingQueue() && sampleSetIncrement.hasOptimal()) {
+				computeMoreSamples = true;
+				break;
 			}
+			RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
 			
 			// Sample storage
 			auto newNode = this->storeSampleInTree(newSample, node);
@@ -1616,18 +1580,7 @@ bool CAD<Number>::liftCheck(
 			
 			///@todo warum hier pop() und nicht oben jeweils nach dem get()?
 			// Sample pop if lifting unsuccessful or at the last level, i.e. level == 0
-			if (this->setting.preferNRSamples) {
-				// remove sample from increment list because it was completely lifted (pop() uses heuristics already used in next())
-				sampleSetIncrement.popNR();
-			} else if (this->setting.preferSamplesByIsRoot) {
-				if (this->setting.preferNonrootSamples) {
-					sampleSetIncrement.popNonroot();
-				} else {
-					sampleSetIncrement.popRoot();
-				}
-			} else {
-				sampleSetIncrement.pop();
-			}
+			sampleSetIncrement.pop();
 
 			// clean sample point component again
 			extSample.pop_front();
