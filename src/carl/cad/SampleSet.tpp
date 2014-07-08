@@ -19,22 +19,23 @@ namespace cad {
 
 template<typename Number>
 bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+#define CHECK(expr) res = (expr); if (res.first) return res.second;
 	std::pair<bool, bool> res;
 	switch (mOrdering) {
 		case SampleOrdering::IntRatRoot:
-			res = compareInt(lhs, rhs);
-			if (res.first) return res.second;
-			res = compareRat(lhs, rhs);
-			if (res.first) return res.second;
-			return compareRoot(lhs, rhs).second;
+			CHECK(compareInt(lhs, rhs));
+			CHECK(compareRat(lhs, rhs));
+			CHECK(compareRoot(lhs, rhs));
+			break;
 		case SampleOrdering::RatRoot:
-			res = compareRat(lhs, rhs);
-			if (res.first) return res.second;
-			return compareRoot(lhs, rhs).second;
+			CHECK(compareRat(lhs, rhs));
+			CHECK(compareRoot(lhs, rhs));
+			break;
 		default:
 			assert(false);
 			return false;
 	}
+	return lhs < rhs;
 }
 
 template<typename Number>
