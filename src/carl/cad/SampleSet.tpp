@@ -53,6 +53,7 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 
 template<typename Number>
 void SampleSet<Number>::pop() {
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	if (this->mQueue.empty()) return;
 	this->mSamples.erase(*mQueue.begin());
 	this->mQueue.erase(mQueue.begin());
@@ -61,6 +62,7 @@ void SampleSet<Number>::pop() {
 
 template<typename Number>
 bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to) {
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << from << " -> " << to << " )");
 	if (mSamples.count(from) > 0) {
 		mSamples.erase(from);
 		mSamples.insert(to);
@@ -73,6 +75,7 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, Re
 
 template<typename Number>
 std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify() {
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	std::pair<SampleSimplification, bool> simplification;
 	if (this->empty()) return simplification;
 	simplification.second = false;
@@ -106,25 +109,26 @@ std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
 
 template<typename Number>
 bool SampleSet<Number>::isConsistent() const {
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	std::set<RealAlgebraicNumberPtr<Number>> queue(mQueue.begin(), mQueue.end());
-	RealAlgebraicNumberPtr<Number> last = nullptr;
+	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
 	for (auto n: this->mSamples) {
-		if (last != nullptr) {
-			if (!carl::Less<Number>()(last, n)) {
-				LOGMSG_INFO("carl.cad", "Samples not in order: " << last << " < " << n);
-				assert(false);
+		if (lastSample != nullptr) {
+			if (!carl::Less<Number>()(lastSample, n)) {
+				LOGMSG_INFO("carl.cad", "Samples not in order: " << lastSample << " < " << n);
+				assert(carl::Less<Number>()(lastSample, n));
 			}
 		}
 		if (queue.find(n) == queue.end()) {
 			LOGMSG_INFO("carl.cad", "Sample " << n << " is not in queue.");
-			assert(false);
+			assert(queue.find(n) != queue.end());
 		}
 		queue.erase(n);
-		last = n;
+		lastSample = n;
 	}
 	if (!queue.empty()) {
 		LOGMSG_INFO("carl.cad", "Additional samples in queue: " << queue);
-		assert(false);
+		assert(queue.empty());
 	}
 	return true;
 }

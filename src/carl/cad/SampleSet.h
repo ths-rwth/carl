@@ -118,6 +118,7 @@ private:
      */
 	void resetOrdering(SampleOrdering ordering) {
 		if (ordering != mQueue.key_comp().ordering()) {
+			LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
 			// Ordering differes from current ordering.
 			std::set<RealAlgebraicNumberPtr<Number>, SampleComparator> newSet(ordering);
 			// Copy samples to a new set with new ordering.
@@ -130,6 +131,15 @@ private:
 public:
 	SampleSet(SampleOrdering ordering = SampleOrdering::Default): mQueue(SampleComparator(ordering))
 	{
+		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
+	}
+
+	/**
+	 * Returns the current ordering.
+	 * @return Ordering.
+	 */
+	SampleOrdering ordering() const {
+		return this->mQueue.key_comp().ordering();
 	}
 
 	/**
@@ -138,9 +148,12 @@ public:
      * @return An iterator to the inserted sample and a flag that indicates if the inserted value was new or already present.
      */
 	std::pair<Iterator, bool> insert(RealAlgebraicNumberPtr<Number> r) {
+		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
 		assert(this->isConsistent());
 		this->mQueue.insert(r);
-		return this->mSamples.insert(r);
+		auto res = this->mSamples.insert(r);
+		assert(this->isConsistent());
+		return res;
 	}
 	
 	/**
@@ -169,8 +182,12 @@ public:
 	 * @return Iterator to the next position in the container.
 	 */
 	SampleSet::Iterator remove(SampleSet::Iterator position) {
+		assert(position != mSamples.end());
+		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
 		mQueue.erase(*position);
-		return mSamples.erase(position);
+		auto res = mSamples.erase(position);
+		assert(this->isConsistent());
+		return res;
 	}
 
 	SampleSet::Iterator begin() {
@@ -272,10 +289,14 @@ public:
 	friend void std::swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
 
 private:
-	///////////////////////
-	// AUXILIARY METHODS //
-	///////////////////////
-
+	/**
+	 * Checks if this sample set fulfills the following conditions:
+	 * <ul>
+	 * <li>mSamples and mQueue contain the same samples.</li>
+	 * <li>The samples in mSamples are ordered by their value.</li>
+	 * </ul>
+	 * @return True, if this SampleSet is consistent.
+	 */
 	bool isConsistent() const;
 };
 
