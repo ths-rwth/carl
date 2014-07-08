@@ -27,11 +27,21 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 			CHECK(compareRat(lhs, rhs));
 			CHECK(compareRoot(lhs, rhs));
 			break;
+		case SampleOrdering::Interval:
+			CHECK(compareRat(rhs, lhs));
+			break;
+		case SampleOrdering::NonRoot:
+			CHECK(compareRoot(rhs, lhs));
+			break;
 		case SampleOrdering::RatRoot:
 			CHECK(compareRat(lhs, rhs));
 			CHECK(compareRoot(lhs, rhs));
 			break;
+		case SampleOrdering::Root:
+			CHECK(compareRoot(lhs, rhs));
+			break;
 		default:
+			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
 			return false;
 	}
@@ -43,9 +53,16 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 	switch (mOrdering) {
 		case SampleOrdering::IntRatRoot:
 			return s->isNumeric() && carl::isInteger(s->value());
+		case SampleOrdering::Interval:
+			return !s->isNumericRepresentation();
+		case SampleOrdering::NonRoot:
+			return !s->isRoot();
 		case SampleOrdering::RatRoot:
 			return s->isNumeric();
+		case SampleOrdering::Root:
+			return s->isRoot();
 		default:
+			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
 			return false;
 	}
