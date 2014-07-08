@@ -59,8 +59,8 @@ std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
  * @param s set to be printed.
  * @return Output stream.
  */
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::set<T>& s) {
+template<typename T, typename C>
+std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
 	os << "{" << s.size() << ": ";
 	bool first = true;
 	for (auto it: s) {
