@@ -12,26 +12,15 @@
 #include <queue>
 #include <utility>
 
+#include "../core/logging.h"
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicNumberIR.h"
 #include "../core/RealAlgebraicNumberNR.h"
 
+#include "CADSettings.h"
+
 namespace carl {
 namespace cad {
-
-enum class SampleOrdering : unsigned {
-	IntRatRoot,
-	RatRoot,
-	Default = SampleOrdering::IntRatRoot
-};
-
-inline std::ostream& operator<<(std::ostream& os, SampleOrdering so) {
-	switch (so) {
-		case SampleOrdering::IntRatRoot: return os << "Integer-Rational-Root";
-		case SampleOrdering::RatRoot: return os << "Rational-Root";
-		default: return os << "Unknown ordering";
-	}
-}
 
 template<typename Number>
 class SampleSet {
