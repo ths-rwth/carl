@@ -75,7 +75,7 @@ private:
          */
 		inline std::pair<bool, bool> compare(bool l, bool r) const {
 			if (l && r) return std::make_pair(false, false);
-			if (l || r) return std::make_pair(true, r);
+			if (l || r) return std::make_pair(true, l);
 			return std::make_pair(false, false);
 		}
 		/**
@@ -108,7 +108,7 @@ private:
 	};
 	
 	/// Contains all samples in the order of their value.
-	std::set<RealAlgebraicNumberPtr<Number>> mSamples;
+	std::set<RealAlgebraicNumberPtr<Number>, carl::Less<Number>> mSamples;
 	/// Contains all samples in the order specified by the comparator.
 	std::set<RealAlgebraicNumberPtr<Number>, SampleComparator> mQueue;
 	

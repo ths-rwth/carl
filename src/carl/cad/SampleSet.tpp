@@ -45,7 +45,7 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 			assert(false);
 			return false;
 	}
-	return lhs < rhs;
+	return carl::Less<Number>()(lhs, rhs);
 }
 
 template<typename Number>
