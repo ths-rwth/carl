@@ -119,6 +119,9 @@ private:
 	void resetOrdering(SampleOrdering ordering) {
 		if (ordering != mQueue.key_comp().ordering()) {
 			LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
+			if (mQueue.size() > 5) {
+				LOGMSG_WARN("carl.cad.sampleset", "Reordering sample set of size " << mQueue.size());
+			}
 			// Ordering differes from current ordering.
 			std::set<RealAlgebraicNumberPtr<Number>, SampleComparator> newSet(ordering);
 			// Copy samples to a new set with new ordering.
@@ -150,8 +153,21 @@ public:
 	std::pair<Iterator, bool> insert(RealAlgebraicNumberPtr<Number> r) {
 		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
 		assert(this->isConsistent());
-		this->mQueue.insert(r);
 		auto res = this->mSamples.insert(r);
+		if (!res.second) {
+			// There is an equivalent sample.
+			// Check if new sample is better (i.e. smaller) than the previous sample.
+			if (mQueue.key_comp()(r, *res.first)) {
+				LOGMSG_TRACE("carl.cad.sampleset", "\tsample already exists, replace in queue and update in samples");
+				assert(mQueue.count(*res.first) == 1);
+				std::size_t cnt = mQueue.erase(*res.first);
+				assert(cnt == 1);
+				mQueue.insert(r);
+				**res.first = *r;
+			}
+		} else {
+			mQueue.insert(r);
+		}
 		assert(this->isConsistent());
 		return res;
 	}
