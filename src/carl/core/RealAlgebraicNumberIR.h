@@ -95,6 +95,10 @@ public:
 		return res;
 	}
 
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
+	}
+
 	/**
 	 * Destructor.
 	 */

@@ -37,6 +37,10 @@ public:
 		res->pThis = res;
 		return res;
 	}
+
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumberNR<Number>::create(this->value(), this->isRoot());
+	}
 	
 	bool equal(const RealAlgebraicNumberNR<Number>* n) {
 		return this->value() == n->value();

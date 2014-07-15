@@ -76,6 +76,10 @@ public:
 		return res;
 	}
 
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumber<Number>::create(isRoot(), isNumeric(), value());
+	}
+
 	///////////////
 	// Selectors //
 	///////////////
@@ -152,6 +156,8 @@ public:
 	 */
 	virtual const RealAlgebraicNumber<Number>& operator=(const RealAlgebraicNumber<Number>& o) {
 		mIsRoot = o.mIsRoot;
+		mValue = o.mValue;
+		mIsNumeric = o.mIsNumeric;
 		return *this;
 	}
 
