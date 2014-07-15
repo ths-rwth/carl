@@ -879,12 +879,12 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if (!(*insertValue.first)->isRoot()) {
 				// the new root is already contained, but only as sample value => switch to root and start sample construction from scratch
 				assert(i->isRoot());
-				RealAlgebraicNumberPtr<Number> r = *insertValue.first;
-				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), r, Less<Number>());
+				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, Less<Number>());
 				currentSamples.remove(insertValue.first);
 				if (pos != newSampleSet.end()) {
 					newSampleSet.remove(pos);
 				}
+				RealAlgebraicNumberPtr<Number> r = (*insertValue.first)->clone();
 				r->setIsRoot(true);
 				insertValue = currentSamples.insert(r);
 				newSampleSet.insert(r);
