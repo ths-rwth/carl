@@ -163,7 +163,7 @@ public:
 				assert(cnt == 1);
 				mQueue.insert(r);
 				mSamples.erase(res.first);
-				mSamples.insert(r);
+				res = mSamples.insert(r);
 			}
 		} else {
 			mQueue.insert(r);
