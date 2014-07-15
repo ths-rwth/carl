@@ -143,23 +143,6 @@ public:
 	const Number& value() const {
 		return mValue;
 	}
-	
-	///////////////
-	// Operators //
-	///////////////
-
-	// assignment operators
-
-	/**
-	 * This real algebraic number gets all values of the other.
-	 * @param o other real algebraic number
-	 */
-	virtual const RealAlgebraicNumber<Number>& operator=(const RealAlgebraicNumber<Number>& o) {
-		mIsRoot = o.mIsRoot;
-		mValue = o.mValue;
-		mIsNumeric = o.mIsNumeric;
-		return *this;
-	}
 
 	virtual bool containedIn(const Interval<Number>& i) const {
 		return i.contains(this->value());

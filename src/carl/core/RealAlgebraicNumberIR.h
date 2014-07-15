@@ -175,11 +175,6 @@ public:
 	///////////////
 	// Operators //
 	///////////////
-
-	/**
-	 * This number gets all values of the other.
-	 */
-	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);

@@ -55,18 +55,6 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 }
 
 template<typename Number>
-const RealAlgebraicNumberIR<Number>& RealAlgebraicNumberIR<Number>::operator=(const RealAlgebraicNumberIR<Number>& obj) {
-	this->interval = obj.getInterval();
-	this->polynomial = obj.getPolynomial();
-	this->sturmSequence = obj.getSturmSequence();
-	this->refinementCount = obj.getRefinementCount();
-	this->mIsNumeric = obj.isNumeric();
-	this->mIsRoot = obj.isRoot();
-	this->mValue = obj.value();
-	return *this;
-}
-
-template<typename Number>
 RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() || n->isZero()) return n;
 
