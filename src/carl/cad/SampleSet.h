@@ -117,11 +117,11 @@ private:
      */
 	void resetOrdering(SampleOrdering ordering) {
 		if (ordering != mQueue.key_comp().ordering()) {
+			// Ordering differs from current ordering.
 			LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
 			if (mQueue.size() > 5) {
 				LOGMSG_WARN("carl.cad.sampleset", "Reordering sample set of size " << mQueue.size());
 			}
-			// Ordering differes from current ordering.
 			std::set<RealAlgebraicNumberPtr<Number>, SampleComparator> newSet(ordering);
 			// Copy samples to a new set with new ordering.
 			newSet.insert(mQueue.begin(), mQueue.end());
@@ -162,7 +162,8 @@ public:
 				std::size_t cnt = mQueue.erase(*res.first);
 				assert(cnt == 1);
 				mQueue.insert(r);
-				**res.first = *r;
+				mSamples.erase(res.first);
+				mSamples.insert(r);
 			}
 		} else {
 			mQueue.insert(r);
