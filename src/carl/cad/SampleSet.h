@@ -74,8 +74,7 @@ private:
          * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
          */
 		inline std::pair<bool, bool> compare(bool l, bool r) const {
-			if (l && r) return std::make_pair(false, false);
-			if (l || r) return std::make_pair(true, l);
+			if (l xor r) return std::make_pair(true, l);
 			return std::make_pair(false, false);
 		}
 		/**
@@ -85,7 +84,7 @@ private:
          * @return Comparison result.
          */
 		inline std::pair<bool, bool> compareInt(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
-			return compare(lhs->isNumeric() && carl::isInteger(lhs->value()), rhs->isNumeric() && carl::isInteger(rhs->value()));
+			return compare(lhs->isNumericRepresentation() && carl::isInteger(lhs->value()), rhs->isNumericRepresentation() && carl::isInteger(rhs->value()));
 		}
 		/**
 		 * Compares two samples checking if they are rationals.
@@ -94,7 +93,7 @@ private:
          * @return Comparison result.
          */
 		inline std::pair<bool, bool> compareRat(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
-			return compare(lhs->isNumeric(), rhs->isNumeric());
+			return compare(lhs->isNumericRepresentation(), rhs->isNumericRepresentation());
 		}
 		/**
 		 * Compares two samples checking if they are roots.

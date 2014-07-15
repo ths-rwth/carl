@@ -52,13 +52,13 @@ template<typename Number>
 bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr<Number>& s) const {
 	switch (mOrdering) {
 		case SampleOrdering::IntRatRoot:
-			return s->isNumeric() && carl::isInteger(s->value());
+			return s->isNumericRepresentation() && carl::isInteger(s->value());
 		case SampleOrdering::Interval:
 			return !s->isNumericRepresentation();
 		case SampleOrdering::NonRoot:
 			return !s->isRoot();
 		case SampleOrdering::RatRoot:
-			return s->isNumeric();
+			return s->isNumericRepresentation();
 		case SampleOrdering::Root:
 			return s->isRoot();
 		default:
