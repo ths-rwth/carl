@@ -267,11 +267,12 @@ public:
 	/**
 	 * Traverse all interval-represented samples and determine whether they could be simplified by numeric representations.
 	 * If so, move these samples to the NRs.
+	 * @param fast If fast is set to true, no refined is performed. Only samples that have already been refined are simplified.
 	 * @return pair whose first component is a map from unsimplified real algebraic number pointers to real algebraic number pointers
 	 * which were simplified; the second component is true if there were samples found which could be simplified.
 	 * @complexity logarithmic in the number
 	 */
-	std::pair<SampleSimplification, bool> simplify();
+	std::pair<SampleSimplification, bool> simplify(bool fast = false);
 	
 	/**
 	 * Determines containment of r in the list.

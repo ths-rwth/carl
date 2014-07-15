@@ -80,18 +80,20 @@ void SampleSet<Number>::pop() {
 template<typename Number>
 bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to) {
 	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << from << " -> " << to << " )");
+	assert(this->isConsistent());
 	if (mSamples.count(from) > 0) {
 		mSamples.erase(from);
 		mSamples.insert(to);
 		mQueue.erase(from);
 		mQueue.insert(to);
+		assert(this->isConsistent());
 		return true;
 	}
 	return false;
 }
 
 template<typename Number>
-std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify() {
+std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify(bool fast) {
 	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	std::pair<SampleSimplification, bool> simplification;
 	if (this->empty()) return simplification;
@@ -99,20 +101,23 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 	for (auto n: this->mSamples) {
 		if (n->isNumericRepresentation()) continue;
 		auto nIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(n);
-		if (!nIR->isNumeric() && nIR->getRefinementCount() == 0) {
+		if (!fast && !nIR->isNumeric() && nIR->getRefinementCount() == 0) {
 			// Try at least one refinement.
 			nIR->refine();
 		}
 		if (nIR->isNumeric()) {
 			auto nNR = RealAlgebraicNumberNR<Number>::create(nIR->value(), nIR->isRoot());
-			if (this->simplify(nIR, nNR)) {
-				simplification.first[nIR] = nNR;
-				simplification.second = true;
-			} else {
-				assert(false);
-			}
+			simplification.first[nIR] = nNR;
 		}
 	}
+	for (auto it: simplification.first) {
+		if (this->simplify(it.first, it.second)) {
+			simplification.second = true;
+		} else {
+			assert(false);
+		}
+	}
+	assert(this->isConsistent());
 	return simplification;
 }
 
@@ -128,23 +133,34 @@ template<typename Number>
 bool SampleSet<Number>::isConsistent() const {
 	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	std::set<RealAlgebraicNumberPtr<Number>> queue(mQueue.begin(), mQueue.end());
-	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
 	for (auto n: this->mSamples) {
-		if (lastSample != nullptr) {
-			if (!carl::Less<Number>()(lastSample, n)) {
-				LOGMSG_INFO("carl.cad", "Samples not in order: " << lastSample << " < " << n);
-				assert(carl::Less<Number>()(lastSample, n));
-			}
-		}
-		if (queue.find(n) == queue.end()) {
-			LOGMSG_INFO("carl.cad", "Sample " << n << " is not in queue.");
+		auto it = queue.find(n);
+		if (it == queue.end()) {
+			LOGMSG_ERROR("carl.cad.sampleset", "Sample " << n << " is not in queue.");
 			assert(queue.find(n) != queue.end());
 		}
-		queue.erase(n);
+		queue.erase(it);
+	}
+	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
+	for (auto n: this->mSamples) {
+		if (lastSample != nullptr && !carl::Less<Number>()(lastSample, n)) {
+			LOGMSG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
+			LOGMSG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
+			assert(carl::Less<Number>()(lastSample, n));
+		}
+		lastSample = n;
+	}
+	lastSample = nullptr;
+	for (auto n: this->mQueue) {
+		if (lastSample != nullptr && !this->mQueue.key_comp()(lastSample, n)) {
+			LOGMSG_ERROR("carl.cad.sampleset", "queue: " << mQueue);
+			LOGMSG_ERROR("carl.cad.sampleset", "Samples in queue not in order: " << lastSample << " < " << n);
+			assert(this->mQueue.key_comp()(lastSample, n));
+		}
 		lastSample = n;
 	}
 	if (!queue.empty()) {
-		LOGMSG_INFO("carl.cad", "Additional samples in queue: " << queue);
+		LOGMSG_ERROR("carl.cad.sampleset", "Additional samples in queue: " << queue);
 		assert(queue.empty());
 	}
 	return true;
