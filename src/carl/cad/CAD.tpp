@@ -1546,10 +1546,9 @@ bool CAD<Number>::liftCheck(
 			// try to simplify the current samples even further
 			auto simplification = sampleSetIncrement.simplify();
 			if (simplification.second) {
-				// simplification took place => replace all
-				for (auto i: simplification.first) {
-					currentSamples.simplify(i.first, i.second);
-				}
+				// simplifications are visible in currentSamples due to shared pointer.
+				// only do a fast simplification.
+				currentSamples.simplify(true);
 			}
 		}
 		
