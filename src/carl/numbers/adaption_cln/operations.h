@@ -64,6 +64,7 @@ inline int toInt<int>(const cln::cl_I& n) {
 template<>
 inline unsigned toInt<unsigned>(const cln::cl_I& n) {
     assert(n <= std::numeric_limits<unsigned>::max());
+	assert(n >= std::numeric_limits<unsigned>::min());
     return cln::cl_I_to_uint(n);
 }
 
