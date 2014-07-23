@@ -67,7 +67,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~RealAlgebraicNumber() {
+	virtual ~RealAlgebraicNumber() {
 	}
 
 	static std::shared_ptr<RealAlgebraicNumber> create(bool isRoot, bool isNumeric = false, const Number& value = 0) {

@@ -257,6 +257,7 @@ using RealAlgebraicNumberIRPtr = std::shared_ptr<RealAlgebraicNumberIR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
+	if (n == nullptr) return os << "nullptr";
 	if (n->isNumeric()) {
 		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << ")";
 	}
