@@ -6,11 +6,13 @@
 
 #pragma once
 
-#include <list>
-#include <unordered_map>
+#include <algorithm>
 #include <iostream>
+#include <list>
 #include <queue>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "../core/logging.h"
 #include "../core/RealAlgebraicNumber.h"
@@ -108,30 +110,25 @@ private:
 	
 	/// Contains all samples in the order of their value.
 	std::set<RealAlgebraicNumberPtr<Number>, carl::Less<Number>> mSamples;
-	/// Contains all samples in the order specified by the comparator.
-	std::set<RealAlgebraicNumberPtr<Number>, SampleComparator> mQueue;
+
+	SampleComparator mComp;
+	std::vector<RealAlgebraicNumberPtr<Number>> mHeap;
 	
 	/**
 	 * Change the ordering of mQueue.
      * @param ordering New ordering.
      */
-	void resetOrdering(SampleOrdering ordering) {
-		if (ordering != mQueue.key_comp().ordering()) {
-			// Ordering differs from current ordering.
-			LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
-			if (mQueue.size() > 5) {
-				LOGMSG_WARN("carl.cad.sampleset", "Reordering sample set of size " << mQueue.size());
-			}
-			std::set<RealAlgebraicNumberPtr<Number>, SampleComparator> newSet(ordering);
-			// Copy samples to a new set with new ordering.
-			newSet.insert(mQueue.begin(), mQueue.end());
-			// Swap the sets.
-			std::swap(mQueue, newSet);
-		}
+	void restoreOrdering() {
+		std::make_heap(mHeap.begin(), mHeap.end(), mComp);
+	}
+	void restoreOrdering(SampleOrdering ordering) {
+		mComp = SampleComparator(ordering);
+		restoreOrdering();
 	}
 	
 public:
-	SampleSet(SampleOrdering ordering = SampleOrdering::Default): mQueue(SampleComparator(ordering))
+	SampleSet(SampleOrdering ordering = SampleOrdering::Default):
+		mComp(ordering)
 	{
 		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
 	}
@@ -141,7 +138,7 @@ public:
 	 * @return Ordering.
 	 */
 	SampleOrdering ordering() const {
-		return this->mQueue.key_comp().ordering();
+		return mComp.ordering();
 	}
 
 	/**
@@ -156,17 +153,23 @@ public:
 		if (!res.second) {
 			// There is an equivalent sample.
 			// Check if new sample is better (i.e. smaller) than the previous sample.
-			if (mQueue.key_comp()(r, *res.first)) {
+			if (mComp(r, *res.first)) {
 				LOGMSG_TRACE("carl.cad.sampleset", "\tsample already exists, replace in queue and update in samples");
-				assert(mQueue.count(*res.first) == 1);
-				std::size_t cnt = mQueue.erase(*res.first);
-				assert(cnt == 1);
-				mQueue.insert(r);
-				mSamples.erase(res.first);
-				res = mSamples.insert(r);
+				carl::Equal<Number> eq;
+				bool found = false;
+				for (auto n: mHeap) {
+					if (eq(n, r)) {
+						*n = *r;
+						found = true;
+						break;
+					}
+				}
+				assert(found);
+				restoreOrdering();
 			}
 		} else {
-			mQueue.insert(r);
+			mHeap.push_back(r);
+			std::push_heap(mHeap.begin(), mHeap.end(), mComp);
 		}
 		assert(this->isConsistent());
 		return res;
@@ -200,7 +203,10 @@ public:
 	SampleSet::Iterator remove(SampleSet::Iterator position) {
 		assert(position != mSamples.end());
 		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
-		mQueue.erase(*position);
+		auto it = std::find(mHeap.begin(), mHeap.end(), *position);
+		std::swap(*it, mHeap.back());
+		mHeap.pop_back();
+		restoreOrdering();
 		auto res = mSamples.erase(position);
 		assert(this->isConsistent());
 		return res;
@@ -225,8 +231,8 @@ public:
 	 * @return Next sample.
 	 */
 	inline RealAlgebraicNumberPtr<Number> next() const {
-		assert(!mQueue.empty());
-		return *mQueue.begin();
+		assert(!mHeap.empty());
+		return mHeap.front();
 	}
 
 	/**
@@ -234,8 +240,8 @@ public:
 	 * @return True, if next sample is optimal.
 	 */
 	inline bool hasOptimal() const {
-		if (mQueue.empty()) return false;
-		return mQueue.key_comp().isOptimal(*mQueue.begin());
+		if (mHeap.empty()) return false;
+		return mComp.isOptimal(next());
 	}
 
 	/**
@@ -244,7 +250,7 @@ public:
      * @return Next sample.
      */
 	inline RealAlgebraicNumberPtr<Number> next(SampleOrdering ordering) {
-		this->resetOrdering(ordering);
+		this->restoreOrdering(ordering);
 		return this->next();
 	}
 
@@ -287,7 +293,7 @@ public:
      * @return True, if no sample is left.
      */
 	bool empty() const {
-		return this->mQueue.empty();
+		return mHeap.empty();
 	}
 	
 	/**

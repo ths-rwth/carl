@@ -71,9 +71,10 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 template<typename Number>
 void SampleSet<Number>::pop() {
 	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
-	if (this->mQueue.empty()) return;
-	this->mSamples.erase(*mQueue.begin());
-	this->mQueue.erase(mQueue.begin());
+	if (this->mHeap.empty()) return;
+	this->mSamples.erase(mHeap.front());
+	std::pop_heap(mHeap.begin(), mHeap.end(), mComp);
+	mHeap.pop_back();
 	assert(this->isConsistent());
 }
 
@@ -84,8 +85,8 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, Re
 	if (mSamples.count(from) > 0) {
 		mSamples.erase(from);
 		mSamples.insert(to);
-		mQueue.erase(from);
-		mQueue.insert(to);
+		auto it = std::find(mHeap.begin(), mHeap.end(), from);
+		*it = to;
 		assert(this->isConsistent());
 		return true;
 	}
@@ -125,14 +126,16 @@ template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
 	os << "SampleSet " << &s << " with ordering " << s.mQueue.key_comp().ordering() << std::endl;
 	os << "samples: " << s.mSamples << std::endl;
-	os << "queue: " << s.mQueue << std::endl;
+	os << "heap: " << s.mHeap << std::endl;
 	return os;
 }
 
 template<typename Number>
 bool SampleSet<Number>::isConsistent() const {
 	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
-	std::set<RealAlgebraicNumberPtr<Number>> queue(mQueue.begin(), mQueue.end());
+	LOGMSG_TRACE("carl.cad.sampleset", "samples: " << mSamples);
+	LOGMSG_TRACE("carl.cad.sampleset", "heap:    " << mHeap);
+	std::set<RealAlgebraicNumberPtr<Number>> queue(mHeap.begin(), mHeap.end());
 	for (auto n: this->mSamples) {
 		auto it = queue.find(n);
 		if (it == queue.end()) {
@@ -147,15 +150,6 @@ bool SampleSet<Number>::isConsistent() const {
 			LOGMSG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
 			LOGMSG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
 			assert(carl::Less<Number>()(lastSample, n));
-		}
-		lastSample = n;
-	}
-	lastSample = nullptr;
-	for (auto n: this->mQueue) {
-		if (lastSample != nullptr && !this->mQueue.key_comp()(lastSample, n)) {
-			LOGMSG_ERROR("carl.cad.sampleset", "queue: " << mQueue);
-			LOGMSG_ERROR("carl.cad.sampleset", "Samples in queue not in order: " << lastSample << " < " << n);
-			assert(this->mQueue.key_comp()(lastSample, n));
 		}
 		lastSample = n;
 	}
@@ -174,7 +168,7 @@ namespace std {
 template<typename Num>
 void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
 	std::swap(lhs.mSamples, rhs.mSamples);
-	std::swap(lhs.mQueue, rhs.mQueue);
+	std::swap(lhs.mHeap, rhs.mHeap);
 }
 
 }
