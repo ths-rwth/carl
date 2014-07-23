@@ -101,8 +101,6 @@ public:
 	bool computeConflictGraph;
 	/// number of points to be used for the premise of the deduction computed after determining satisfiability of a set of constraints via CAD::check (0: give constraints for the whole CAD cell so that the resulting implication can be quantified universally, k>0: take at most k points for existential quantification)
 	unsigned numberOfDeductions;
-	/// use the precomputed and maintained sample trace mTrace for the check of a new set of constraints whenever possible
-	bool warmRestart;
 	/// given bounds to the check method, these bounds are used to solve the constraints just by interval arithmetic
 	bool preSolveByBounds;
 	/// given bounds to the check method, these bounds are used wherever possible to reduce the sample sets during the lifting and to reduce the elimination polynomials if simplifyEliminationByBounds is set
@@ -158,7 +156,6 @@ public:
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = true;
 			cadSettings.trimVariables               = false;
-			cadSettings.warmRestart                 = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
@@ -174,7 +171,6 @@ public:
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = false;
 			cadSettings.trimVariables               = false;
-			cadSettings.warmRestart                 = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
@@ -223,8 +219,6 @@ public:
 			settingStrs.push_back( "Treat equations separately by tuning the cad object to equations." );
 		if (settings.computeConflictGraph)
 			settingStrs.push_back( "Compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check." );
-		if (settings.warmRestart)
-			settingStrs.push_back( "Use the precomputed and maintained sample trace CAD::mTrace for the check of a new set of constraints whenever possible." );
 		if (settings.preSolveByBounds)
 			settingStrs.push_back( "Given bounds to the check method, these bounds are used to solve the constraints just by interval arithmetic." );
 		if (settings.earlyLiftingPruningByBounds)
@@ -271,7 +265,6 @@ private:
 		autoSeparateEquations( false ),
 		computeConflictGraph( true ),
 		numberOfDeductions( 1 ),
-		warmRestart( false ),
 		preSolveByBounds( false ),
 		earlyLiftingPruningByBounds( true ),
 		simplifyEliminationByBounds( true ),
@@ -298,7 +291,6 @@ public:
 		autoSeparateEquations( s.autoSeparateEquations ),
 		computeConflictGraph( s.computeConflictGraph ),
 		numberOfDeductions( s.numberOfDeductions ),
-		warmRestart( s.warmRestart ),
 		preSolveByBounds( s.preSolveByBounds ),
 		earlyLiftingPruningByBounds( s.earlyLiftingPruningByBounds ),
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),
