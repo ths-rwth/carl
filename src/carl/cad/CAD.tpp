@@ -1166,11 +1166,6 @@ bool CAD<Number>::mainCheck(
 		bool checkBounds
 ) {
 	LOGMSG_TRACE("carl.cad", __func__ << "( " << constraints << ", " << bounds << " )");
-#define CHECK_NODE( _node, _fullRestart, _excludePrevious )\
-	auto res = this->checkNode(_node, _fullRestart, _excludePrevious, constraints, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);\
-	if (res.first) return true;\
-	if (res.second) continue;
-// END CHECK_NODE
 
 	if (this->variables.empty()) {
 		// there are no valid samples available
