@@ -16,6 +16,7 @@ namespace cad {
  */
 enum class SampleOrdering : unsigned {
 	IntRatRoot,
+	IntRatSize,
 	RatRoot,
 	Interval,
 	Root,

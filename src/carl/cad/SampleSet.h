@@ -70,15 +70,28 @@ private:
 	private:
 		/**
 		 * Creates a comparison result from the information if a certain property holds for two objects.
-		 * a  is less than b if the property does not hold for a, but does for b.
-         * @param l Property of a.
-         * @param r Property of b.
-         * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
-         */
+		 * a is less than b if the property does not hold for a, but does for b.
+		 * @param l Property of a.
+		 * @param r Property of b.
+		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
+		 */
 		inline std::pair<bool, bool> compare(bool l, bool r) const {
 			if (l xor r) return std::make_pair(true, l);
 			return std::make_pair(false, false);
 		}
+		/**
+		 * Creates a comparison result from the rankings for a certain property of two objects.
+		 * a is less than b if the ranking of a is less than the one of b.
+		 * @param l Ranking of a.
+		 * @param r Ranking of b.
+		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
+		 */
+		template<typename T>
+		inline std::pair<bool, bool> compare(T l, T r) const {
+			if (l != r) return std::make_pair(true, l < r);
+			return std::make_pair(false, false);
+		}
+
 		/**
 		 * Compares two samples checking if they are integers.
          * @param lhs First Sample.
@@ -96,6 +109,17 @@ private:
          */
 		inline std::pair<bool, bool> compareRat(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
 			return compare(lhs->isNumericRepresentation(), rhs->isNumericRepresentation());
+		}
+		/**
+		 * Compares two samples with respect to their representation size.
+		 * Requires that both samples have a numeric value.
+		 * @param lhs First Sample.
+		 * @param rhs Second Sample.
+		 * @return Comparison result.
+		 */
+		inline std::pair<bool, bool> compareSize(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+			assert(lhs->isNumeric() && rhs->isNumeric());
+			return compare(carl::bitsize(lhs->value()), carl::bitsize(lhs->value()));
 		}
 		/**
 		 * Compares two samples checking if they are roots.

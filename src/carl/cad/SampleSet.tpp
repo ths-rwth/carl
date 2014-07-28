@@ -27,6 +27,11 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 			CHECK(compareRat(lhs, rhs));
 			CHECK(compareRoot(lhs, rhs));
 			break;
+		case SampleOrdering::IntRatSize:
+			CHECK(compareInt(lhs, rhs));
+			CHECK(compareRat(lhs, rhs));
+			CHECK(compareSize(lhs, rhs));
+			break;
 		case SampleOrdering::Interval:
 			CHECK(compareRat(rhs, lhs));
 			break;
@@ -52,6 +57,8 @@ template<typename Number>
 bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr<Number>& s) const {
 	switch (mOrdering) {
 		case SampleOrdering::IntRatRoot:
+			return s->isNumericRepresentation() && carl::isInteger(s->value());
+		case SampleOrdering::IntRatSize:
 			return s->isNumericRepresentation() && carl::isInteger(s->value());
 		case SampleOrdering::Interval:
 			return !s->isNumericRepresentation();
