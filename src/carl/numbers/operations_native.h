@@ -24,6 +24,10 @@ inline bool isNumber(const double& d) {
 	return (d == d) && !std::isinf(d);
 }
 
+inline std::size_t bitsize(unsigned) {
+	return sizeof(unsigned) * 8;
+}
+
 /**
  * Conversion functions
  * 

@@ -37,6 +37,13 @@ inline bool isInteger(const cln::cl_RA& n) {
 	return getDenom(n) == (cln::cl_I)(1);
 }
 
+inline std::size_t bitsize(const cln::cl_I& n) {
+	return cln::integer_length(n);
+}
+inline std::size_t bitsize(const cln::cl_RA& n) {
+	return cln::integer_length(getNum(n)) + cln::integer_length(getDenom(n));
+}
+
 /**
  * Conversion functions
  * 
