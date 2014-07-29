@@ -8,16 +8,13 @@
 #include <cassert>
 #include <chrono>
 #include <fstream>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <mutex>
 #include <sstream>
 #include <string.h>
-#include <time.h>
 #include <utility>
-#include <vector>
 
 #include "../util/Singleton.h"
 
@@ -87,15 +84,16 @@ struct FileSink: public Sink {
 struct Filter {
 	std::map<std::string, LogLevel> data;
 	Filter(LogLevel level = LogLevel::WARN) {
-		set("", level);
+		(*this)("", level);
 	}
 	/**
 	 * Set the minimum log level for some channel.
      * @param channel
      * @param level
      */
-	void set(const std::string& channel, LogLevel level) {
+	Filter& operator()(const std::string& channel, LogLevel level) {
 		data[channel] = level;
+		return *this;
 	}
 	/**
 	 * Checks if the given log level is sufficient for the log message to be displayed in this channel.
@@ -164,7 +162,7 @@ struct Formatter {
  */
 class Logger: public carl::Singleton<Logger> {
 	friend carl::Singleton<Logger>;
-	std::vector<std::tuple<Sink*, Filter, Formatter>> data;
+	std::map<std::string, std::tuple<Sink*, Filter, Formatter>> data;
 	std::mutex mutex;
 	Timer timer;
 
@@ -172,36 +170,44 @@ class Logger: public carl::Singleton<Logger> {
 	}
 public:
 	~Logger() {
-		for (auto t: data) delete std::get<0>(t);
+		for (auto t: data) delete std::get<0>(t.second);
 		data.clear();
 	}
-	void configure(const std::string& filename, const Filter& fl = Filter()) {
+	void configure(const std::string& id, Sink* sink, const Filter& fl = Filter()) {
 		Formatter fm;
 		fm.configure(fl);
-		this->data.emplace_back(new FileSink(filename), fl, fm);
+		this->data[id] = std::make_tuple(sink, fl, fm);
 	}
-	void configure(const std::string& filename, const Filter& fl, const Formatter& fm) {
-		this->data.emplace_back(new FileSink(filename), fl, fm);
+	void configure(const std::string& id, const std::string& filename) {
+		configure(id, new FileSink(filename));
 	}
-	void configure(std::ostream& os, const Filter& fl = Filter()) {
-		Formatter fm;
-		fm.configure(fl);
-		this->data.emplace_back(new StreamSink(os), fl, fm);
+	void configure(const std::string& id, std::ostream& os) {
+		configure(id, new StreamSink(os));
 	}
-	void configure(std::ostream& os, const Filter& fl, const Formatter& fm) {
-		this->data.emplace_back(new StreamSink(os), fl, fm);
+	Filter& filter(const std::string& id) {
+		auto it = data.find(id);
+		assert(it != data.end());
+		return std::get<1>(it->second);
+	}
+	Formatter& formatter(const std::string& id) {
+		auto it = data.find(id);
+		assert(it != data.end());
+		return std::get<2>(it->second);
 	}
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mutex);
-		std::cout << (void*)(this) << " Logging " << ss.str() << std::endl;
 		for (auto t: data) {
-			if (!std::get<1>(t).check(channel, level)) continue;
-			std::get<2>(t).prefix(std::get<0>(t)->log(), timer, channel, level, info);
-			std::get<0>(t)->log() << ss.str();
-			std::get<2>(t).suffix(std::get<0>(t)->log());
+			if (!std::get<1>(t.second).check(channel, level)) continue;
+			std::get<2>(t.second).prefix(std::get<0>(t.second)->log(), timer, channel, level, info);
+			std::get<0>(t.second)->log() << ss.str();
+			std::get<2>(t.second).suffix(std::get<0>(t.second)->log());
 		}
 	}
 };
+
+inline Logger& logger() {
+	return Logger::getInstance();
+}
 
 #define __CARLLOG_RECORD carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
 #define __CARLLOG(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD); }
