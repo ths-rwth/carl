@@ -46,6 +46,8 @@
 		#include <log4cplus/consoleappender.h>
 		#include <log4cplus/loglevel.h>
 		#include "log4cplus/helpers/loglog.h"
+	#else
+		#include "carlLogging.h"
 	#endif
 #endif
 
@@ -123,24 +125,23 @@ namespace carl
 		typedef void* Log;
 		#define getLog(name) NULL;
 
-		#define LOGMSG(level, log, msg) std::cout << "(" << (level) << ")[" << __FUNCTION__ << ", l." << __LINE__  << "]\t" << msg << std::endl
 		#ifndef LOGi2_DISABLE_FATAL_MSG
-			#define LOGMSG_FATAL(log, msg) LOGMSG("fatal", log, msg)
+			#define LOGMSG_FATAL(log, msg) CARLLOG_FATAL(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_ERROR_MSG
-			#define LOGMSG_ERROR(log, msg) LOGMSG("error", log, msg)
+			#define LOGMSG_ERROR(log, msg) CARLLOG_ERROR(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_WARN_MSG
-			#define LOGMSG_WARN(log, msg) LOGMSG("warn", log, msg)
+			#define LOGMSG_WARN(log, msg) CARLLOG_WARN(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_INFO_MSG
-			#define LOGMSG_INFO(log, msg) LOGMSG("info", log, msg)
+			#define LOGMSG_INFO(log, msg) CARLLOG_INFO(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_DEBUG_MSG
-			#define LOGMSG_DEBUG(log, msg) LOGMSG("debug", log, msg)
+			#define LOGMSG_DEBUG(log, msg) CARLLOG_TRACE(log, msg)
 		#endif
 		#ifndef LOGi2_DISABLE_TRACE_MSG
-			#define LOGMSG_TRACE(log, msg) LOGMSG("trace", log, msg)
+			#define LOGMSG_TRACE(log, msg) CARLLOG_TRACE(log, msg)
 		#endif
 	#endif //USELOG4CPLUS
 #else
@@ -156,7 +157,7 @@ namespace carl
 	#else
 		#define LOG_ASSERT(condition, message) assert(condition)
 		#define LOG_NOTIMPLEMENTED() assert(false);
-		#define LOG_INEFFICIENT() std::cout <<  "Inefficient method called:" << __PRETTY_FUNCTION__ << std::endl;
+		#define LOG_INEFFICIENT() //std::cout <<  "Inefficient method called:" << __PRETTY_FUNCTION__ << std::endl;
 	#endif
 #else
 	#define LOG_ASSERT(condition, message) assert(condition)
@@ -181,6 +182,8 @@ inline void configureLogging() {
 	CLANG_WARNING_RESET
     // Set output.
     logger.addAppender(fileAppender);
+	setInitialLogLevel();
+#else
 	setInitialLogLevel();
 #endif
 }
