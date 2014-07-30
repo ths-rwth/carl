@@ -26,13 +26,12 @@ void setInitialLogLevel()
 	carl::logging::logger().configure("logfile", "carl.log");
 	carl::logging::logger().filter("logfile")
 		("carl", carl::logging::LogLevel::INFO)
-		("smtrat", carl::logging::LogLevel::INFO)
+		("carl.cad", carl::logging::LogLevel::TRACE)
 	;
 
 	carl::logging::logger().configure("stdout", std::cout);
 	carl::logging::logger().filter("stdout")
 		("carl", carl::logging::LogLevel::WARN)
-		("smtrat", carl::logging::LogLevel::WARN)
 	;
 #endif
 }
