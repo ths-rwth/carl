@@ -695,7 +695,7 @@ namespace carl
          * Searches for some point in this interval, preferably near the midpoint and with a small representation.
          * @return some point within this interval
          */
-        Number sample() const;
+        Number sample(bool _includingBounds = true) const;
         void sample_assign();
 
         /**

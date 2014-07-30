@@ -109,15 +109,17 @@ template<typename Number>
 	}
 
 template<typename Number>
-	Number Interval<Number>::sample() const
+	Number Interval<Number>::sample( bool _includingBounds ) const
 	{
 		assert(this->isConsistent());
 		Number mid = this->center();
 		// TODO: check if mid is an integer already.
 		Number midf = carl::floor(mid);
-		if (this->contains(midf)) return midf;
+		if (this->contains(midf) && (_includingBounds || this->lowerBoundType() == BoundType::INFTY || this->lower() < midf ))
+            return midf;
 		Number midc = carl::ceil(mid);
-		if (this->contains(midc)) return midc;
+		if (this->contains(midc) && (_includingBounds || this->upperBoundType() == BoundType::INFTY || this->upper() > midc ))
+            return midc;
 		return mid;
 	}
 
