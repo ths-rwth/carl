@@ -152,7 +152,7 @@ struct Formatter {
 		os << level << " ";
 		os << std::left << std::setw((int)channelwidth) << channel << " ";
 		os << std::right << std::setw(25) << carl::basename(info.filename) << ":" << std::left << std::setw(4) << info.line << " ";
-		if (!info.func.empty()) os << info.func << " ";
+		if (!info.func.empty()) os << info.func << "(): ";
 	}
 	virtual void suffix(std::ostream& os) {
 		os << std::endl;
@@ -225,7 +225,7 @@ inline Logger& logger() {
 #define MACRO_dispatcher_(func, nargs) func ## nargs
 
 #define CARLLOG_FUNC_2(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << ")");
-#define CARLLOG_FUNC_3(channel, args, expr) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << ") " << expr);
+#define CARLLOG_FUNC_3(channel, args, expr) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << "): " << expr);
 #define CARLLOG_FUNC( ... ) MACRO_dispatcher(CARLLOG_FUNC_, __VA_ARGS__)(__VA_ARGS__)
 
 #define CARLLOG_TRACE(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_TRACE, channel, expr)
