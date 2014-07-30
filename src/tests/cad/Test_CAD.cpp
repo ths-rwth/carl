@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 #include <cln/cln.h>
+#include <c++/4.9.1/bits/unordered_map.h>
 
 #include "carl/core/logging.h"
 #include "carl/cad/CAD.h"
@@ -44,6 +45,7 @@ protected:
 	virtual void TearDown() {
 		//for (auto pol: this->p) delete pol;
 		this->p.clear();
+		this->bounds.clear();
 	}
 
 	bool hasNRValue(const carl::RealAlgebraicNumberPtr<cln::cl_RA> n, cln::cl_RA val) {
@@ -68,6 +70,7 @@ protected:
 	carl::CAD<cln::cl_RA> cad;
 	carl::Variable x, y, z;
 	std::vector<Polynomial> p;
+	carl::CAD<cln::cl_RA>::BoundMap bounds;
 };
 
 TEST_F(CADTest, Check1)
@@ -82,10 +85,10 @@ TEST_F(CADTest, Check1)
 		Constraint(this->p[1], Sign::ZERO, {x,y})
 	});
 	this->cad.prepareElimination();
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 	ASSERT_TRUE((hasNRValue(r[0], -1) && hasNRValue(r[1], 0)) || (hasNRValue(r[0], 0) && hasNRValue(r[1], 1)));
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 	ASSERT_TRUE((hasNRValue(r[0], -1) && hasNRValue(r[1], 0)) || (hasNRValue(r[0], 0) && hasNRValue(r[1], 1)));
 }
@@ -103,10 +106,10 @@ TEST_F(CADTest, Check2)
 		Constraint(this->p[0], Sign::ZERO, {x,y}),
 		Constraint(this->p[2], Sign::ZERO, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 	ASSERT_TRUE((hasSqrtValue(r[0], -half) && hasSqrtValue(r[1], -half)) || (hasSqrtValue(r[0], half) && hasSqrtValue(r[1], half)));
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 }
 
@@ -122,7 +125,7 @@ TEST_F(CADTest, Check3)
 		Constraint(this->p[0], Sign::POSITIVE, {x,y}),
 		Constraint(this->p[2], Sign::NEGATIVE, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 }
 
@@ -138,7 +141,7 @@ TEST_F(CADTest, Check4)
 		Constraint(this->p[0], Sign::NEGATIVE, {x,y}),
 		Constraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 }
 
@@ -154,7 +157,7 @@ TEST_F(CADTest, Check5)
 		Constraint(this->p[0], Sign::ZERO, {x,y}),
 		Constraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 }
 
@@ -172,6 +175,6 @@ TEST_F(CADTest, Check6)
 		Constraint(this->p[4], Sign::POSITIVE, {x,y,z}),
 		Constraint(this->p[5], Sign::POSITIVE, {x,y,z})
 	});
-	ASSERT_TRUE(cad.check(cons, r));
+	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 }
