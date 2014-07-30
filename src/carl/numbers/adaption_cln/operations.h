@@ -37,6 +37,13 @@ inline bool isInteger(const cln::cl_RA& n) {
 	return getDenom(n) == (cln::cl_I)(1);
 }
 
+inline std::size_t bitsize(const cln::cl_I& n) {
+	return cln::integer_length(n);
+}
+inline std::size_t bitsize(const cln::cl_RA& n) {
+	return cln::integer_length(getNum(n)) + cln::integer_length(getDenom(n));
+}
+
 /**
  * Conversion functions
  * 
@@ -64,6 +71,7 @@ inline int toInt<int>(const cln::cl_I& n) {
 template<>
 inline unsigned toInt<unsigned>(const cln::cl_I& n) {
     assert(n <= std::numeric_limits<unsigned>::max());
+	assert(n >= std::numeric_limits<unsigned>::min());
     return cln::cl_I_to_uint(n);
 }
 

@@ -67,13 +67,17 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~RealAlgebraicNumber() {
+	virtual ~RealAlgebraicNumber() {
 	}
 
 	static std::shared_ptr<RealAlgebraicNumber> create(bool isRoot, bool isNumeric = false, const Number& value = 0) {
 		auto res = std::shared_ptr<RealAlgebraicNumber>(new RealAlgebraicNumber(isRoot, isNumeric, value));
 		res->pThis = res;
 		return res;
+	}
+
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumber<Number>::create(isRoot(), isNumeric(), value());
 	}
 
 	///////////////
@@ -138,21 +142,6 @@ public:
 	 */
 	const Number& value() const {
 		return mValue;
-	}
-	
-	///////////////
-	// Operators //
-	///////////////
-
-	// assignment operators
-
-	/**
-	 * This real algebraic number gets all values of the other.
-	 * @param o other real algebraic number
-	 */
-	virtual const RealAlgebraicNumber<Number>& operator=(const RealAlgebraicNumber<Number>& o) {
-		mIsRoot = o.mIsRoot;
-		return *this;
 	}
 
 	virtual bool containedIn(const Interval<Number>& i) const {

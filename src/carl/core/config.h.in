@@ -3,7 +3,7 @@
  */ 
 #pragma once
 
-#define LOGi2_USE_LOG4CPLUS
-#cmakedefine CARL_LOGGING
+#cmakedefine LOGGING
+#cmakedefine LOGGING_CARL
 #cmakedefine VARIABLE_PASS_BY_VALUE
 #define CARL_USE_FRIENDLY_VARNAMES

@@ -11,6 +11,32 @@
 namespace carl {
 namespace cad {
 
+/**
+ * Defines possible orderings for sample points.
+ */
+enum class SampleOrdering : unsigned {
+	IntRatRoot,
+	IntRatSize,
+	RatRoot,
+	Interval,
+	Root,
+	NonRoot,
+	Default = SampleOrdering::IntRatRoot
+};
+
+/**
+ * Streaming operator for SampleOrdering.
+ * @param os Output stream.
+ * @param so SampleOrdering.
+ * @return Resulting output stream.
+ */
+inline std::ostream& operator<<(std::ostream& os, SampleOrdering so) {
+	switch (so) {
+		case SampleOrdering::IntRatRoot: return os << "Integer-Rational-Root";
+		case SampleOrdering::RatRoot: return os << "Rational-Root";
+		default: return os << "Unknown ordering";
+	}
+}
 
 template<typename Coeff>
 using MPolynomial = carl::MultivariatePolynomial<Coeff>;
@@ -50,12 +76,8 @@ static const std::string DEFAULT_CAD_OUTPUTFILE = "cad_constraints.smt2";
 
 struct CADSettings {
 public:
-	/// flag indicating that the construction of new samples (by taking a new polynomial for lifting) is preferred to the choice of IR samples (PreferNRSamples excludes the use of PreferSamplesByIsRoot and vice versa)
-	bool preferNRSamples;
-	/// flag indicating that the choice of samples is guided by either being a root or not (PreferSamplesByIsRoot excludes the use of PreferNRSamples and vice versa)
-	bool preferSamplesByIsRoot;
-	/// flag indicating that the construction of new samples (by taking a new polynomial for lifting) is preferred to take root samples, if and only if mPreferSamplesByIsRoot is on
-	bool preferNonrootSamples;
+	/// Ordering used for samples.
+	SampleOrdering sampleOrdering;
 	/// flag indicating that Groebner bases are used to simplify the input polynomials corresponding to equations
 	bool simplifyByGroebner;
 	/// flag indicating that the elimination uses real root counting to simplify the bottom-most level
@@ -80,8 +102,6 @@ public:
 	bool computeConflictGraph;
 	/// number of points to be used for the premise of the deduction computed after determining satisfiability of a set of constraints via CAD::check (0: give constraints for the whole CAD cell so that the resulting implication can be quantified universally, k>0: take at most k points for existential quantification)
 	unsigned numberOfDeductions;
-	/// use the precomputed and maintained sample trace mTrace for the check of a new set of constraints whenever possible
-	bool warmRestart;
 	/// given bounds to the check method, these bounds are used to solve the constraints just by interval arithmetic
 	bool preSolveByBounds;
 	/// given bounds to the check method, these bounds are used wherever possible to reduce the sample sets during the lifting and to reduce the elimination polynomials if simplifyEliminationByBounds is set
@@ -110,13 +130,13 @@ public:
 		cadSettings.splittingStrategy = isolationStrategy;
 		if (setting & RATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
-			cadSettings.preferNRSamples = true;
+			cadSettings.sampleOrdering = SampleOrdering::RatRoot;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessOddCB;
 		}
 		if (setting & IRRATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
-			cadSettings.preferNRSamples       = false;
+			cadSettings.sampleOrdering = SampleOrdering::Interval;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessEvenCB;
 		}
@@ -137,7 +157,6 @@ public:
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = true;
 			cadSettings.trimVariables               = false;
-			cadSettings.warmRestart                 = true;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
@@ -153,26 +172,21 @@ public:
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = false;
 			cadSettings.trimVariables               = false;
-			cadSettings.warmRestart                 = true;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & EQUATIONSONLY) {
 			cadSettings.autoSeparateEquations = false;
-			cadSettings.preferNRSamples       = false;
+			cadSettings.sampleOrdering = SampleOrdering::Root;
 			cadSettings.equationsOnly         = true;
 			cadSettings.inequalitiesOnly      = false;
-			cadSettings.preferSamplesByIsRoot = true;
-			cadSettings.preferNonrootSamples  = false;    // this has only effect if there are still samples in the cad which belong to inequalities
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & INEQUALITIESONLY) {
-			cadSettings.preferNRSamples       = false;
+			cadSettings.sampleOrdering		  = SampleOrdering::NonRoot;
 			cadSettings.equationsOnly         = false;
 			cadSettings.inequalitiesOnly      = true;
-			cadSettings.preferSamplesByIsRoot = true;
-			cadSettings.preferNonrootSamples  = true;    // this has only effect if there are still samples in the cad which belong to equations
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
@@ -194,12 +208,6 @@ public:
 			settingStrs.push_back( "Simplify the elimination by factorization of polynomials in every level (using GiNaC::factor)." );
 		if (settings.simplifyFor3D)
 			settingStrs.push_back( "Simplify the elimination of trivariate polynomials (currently disabled)." );
-		if (settings.preferNRSamples)
-			settingStrs.push_back( "Prefer numerics to interval representations for sample choice." );
-		if (settings.preferSamplesByIsRoot && settings.preferNonrootSamples)
-			settingStrs.push_back( "Prefer non-root to root samples for sample choice." );
-		if (settings.preferSamplesByIsRoot &&!settings.preferNonrootSamples)
-			settingStrs.push_back( "Prefer root to non-root samples for sample choice." );
 		if (settings.equationsOnly)
 			settingStrs.push_back( "Simplify elimination for equation-only use (currently disabled) + do not use intermediate points for lifting." );
 		if (settings.inequalitiesOnly)
@@ -212,8 +220,6 @@ public:
 			settingStrs.push_back( "Treat equations separately by tuning the cad object to equations." );
 		if (settings.computeConflictGraph)
 			settingStrs.push_back( "Compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check." );
-		if (settings.warmRestart)
-			settingStrs.push_back( "Use the precomputed and maintained sample trace CAD::mTrace for the check of a new set of constraints whenever possible." );
 		if (settings.preSolveByBounds)
 			settingStrs.push_back( "Given bounds to the check method, these bounds are used to solve the constraints just by interval arithmetic." );
 		if (settings.earlyLiftingPruningByBounds)
@@ -248,9 +254,7 @@ private:
 	 * Constructor initiating a standard settings object.
 	 */
 	CADSettings():
-		preferNRSamples( false ),
-		preferSamplesByIsRoot( false ),
-		preferNonrootSamples( false ),
+		sampleOrdering( SampleOrdering::Default ),
 		simplifyByGroebner( false ),
 		simplifyByRootcounting( false ),
 		simplifyByFactorization( true ),
@@ -262,7 +266,6 @@ private:
 		autoSeparateEquations( false ),
 		computeConflictGraph( true ),
 		numberOfDeductions( 1 ),
-		warmRestart( false ),
 		preSolveByBounds( false ),
 		earlyLiftingPruningByBounds( true ),
 		simplifyEliminationByBounds( true ),
@@ -277,9 +280,7 @@ public:
 	 * Copy constructor.
 	 */
 	CADSettings( const CADSettings& s ):
-		preferNRSamples( s.preferNRSamples ),
-		preferSamplesByIsRoot( s.preferSamplesByIsRoot ),
-		preferNonrootSamples( s.preferNonrootSamples ),
+		sampleOrdering( s.sampleOrdering ),
 		simplifyByGroebner( s.simplifyByGroebner ),
 		simplifyByRootcounting( s.simplifyByRootcounting ),
 		simplifyByFactorization( s.simplifyByFactorization ),
@@ -291,7 +292,6 @@ public:
 		autoSeparateEquations( s.autoSeparateEquations ),
 		computeConflictGraph( s.computeConflictGraph ),
 		numberOfDeductions( s.numberOfDeductions ),
-		warmRestart( s.warmRestart ),
 		preSolveByBounds( s.preSolveByBounds ),
 		earlyLiftingPruningByBounds( s.earlyLiftingPruningByBounds ),
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),

@@ -50,7 +50,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 	for(unsigned i = 0; i < m.nrVariables(); ++i)
 	{
 		// We expect every variable to be in the map.
-		LOG_ASSERT(map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
+		LOG_ASSERT("carl.interval", map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
 		result *= map.at(m[i].var).power(m[i].exp);
 	}
 	return result;

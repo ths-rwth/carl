@@ -60,7 +60,6 @@ public:
 	typedef carl::cad::MPolynomial<Number> MPolynomial;
 
 	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
-	typedef std::vector<sampleIterator> CADTrace;
 	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
 	typedef std::list<std::pair<std::list<cad::Constraint<Number>>, std::list<cad::Constraint<Number>>>> Deductions;
 private:
@@ -79,12 +78,7 @@ private:
 	 * These samples are not considered for satisfiability checking already, but are postponed.
 	 */
 	carl::tree<RealAlgebraicNumberPtr<Number>> residueSampleTree;
-	
-	/**
-	 * The trace of the last construction phase or empty.
-	 */
-	CADTrace trace;
-	
+
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)
 	 */
@@ -206,7 +200,11 @@ public:
 	const std::vector<cad::EliminationSet<Number>>& getEliminationSets() const {
 		return this->eliminationSets;
 	}
-	
+
+	const cad::EliminationSet<Number>& getEliminationSet(std::size_t n) const {
+		return this->eliminationSets[n];
+	}
+
 	/**
 	 * @return true if the cad is computed completely, false if there are still samples to compute
 	 */
@@ -340,7 +338,6 @@ public:
 	 * If the result is false, the list contains bounds for some variables. The box spanned by these bounds form a domain where no point satisfies the constraints.
 	 * @param next If set to true the method tries to compute a sample which was not found in previous runs before (if earlyLiftingPruning is on). If set to false, all
 	 * previously computed samples are traversed first and then lifting is continued.
-	 * @param checkTraceFirst If set to true, the trace of a previous computation is checked first before the actual checking starts. In combination with the flag next, this flag demands to check the trace first, then start with lifting immediately.
 	 * @param checkBounds
 	 * @return true if the constraints are satisfied by a cell in the cad or no constraint is given and the bounds are not conflicting, false otherwise
 	 */
@@ -350,72 +347,19 @@ public:
 				BoundMap& bounds,
 				Deductions& deductions,
 				bool next = false,
-				bool checkTraceFirst = false,
 				bool checkBounds = true );
 
 	/// Reduced-parameter version of CAD::check.
 	bool check(	std::vector<cad::Constraint<Number>>& constraints,
 				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
 				BoundMap& bounds,
 				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		Deductions d;
-		return this->check(constraints, r, conflictGraph, bounds, d, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				BoundMap& bounds,
-				bool next = false,
-				bool checkTraceFirst = false,
 				bool checkBounds = true)
 	{
 		cad::ConflictGraph cg;
 		Deductions d;
-		return this->check(constraints, r, cg, bounds, d, next, checkTraceFirst, checkBounds);
+		return this->check(constraints, r, cg, bounds, d, next, checkBounds);
 	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
-				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		BoundMap bm;
-		Deductions d;
-		return this->check(constraints, r, conflictGraph, bm, d, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
-				Deductions& deductions,
-				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		BoundMap bm;
-		return this->check(constraints, r, conflictGraph, bm, deductions, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		cad::ConflictGraph cg;
-		return this->check(constraints, r, cg, next, checkTraceFirst, checkBounds);
-	}
-	
 
 	/**
 	 * Insert the given polynomial into the cad.
@@ -561,8 +505,6 @@ private:
 	 */
 	std::list<RealAlgebraicNumberPtr<Number>> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
 
-	CADTrace constructTraceAt(sampleIterator node, const sampleIterator& root ) const;
-	
 	/**
 	 * Helper method for mainCheck() routine.
 	 * 
@@ -572,7 +514,6 @@ private:
      * @param node
      * @param fullRestart
      * @param excludePrevious
-     * @param updateTrace
 	 * @param constraints
 	 * @param bounds
 	 * @param r
@@ -586,7 +527,6 @@ private:
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
-		bool updateTrace,
 		std::vector<cad::Constraint<Number>>& constraints,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
@@ -609,7 +549,6 @@ private:
 	 * @param conflictGraph
 	 * @param deductions
 	 * @param next
-	 * @param checkTraceFirst
 	 * @param boundsNontrivial true if there are non-trivial bounds defined
 	 * @param checkBounds
 	 * @return
@@ -622,7 +561,6 @@ public:
 			cad::ConflictGraph& conflictGraph,
 			Deductions& deductions,
 			bool next,
-			bool checkTraceFirst,
 			bool boundsNontrivial,
 			bool checkBounds
 	);

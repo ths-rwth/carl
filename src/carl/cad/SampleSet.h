@@ -6,151 +6,286 @@
 
 #pragma once
 
+#include <algorithm>
+#include <iostream>
 #include <list>
+#include <queue>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
+#include "../core/logging.h"
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicNumberIR.h"
 #include "../core/RealAlgebraicNumberNR.h"
+
+#include "CADSettings.h"
 
 namespace carl {
 namespace cad {
 
 template<typename Number>
 class SampleSet {
-	
+public:
+	typedef typename std::set<RealAlgebraicNumberPtr<Number>>::iterator Iterator;
+	typedef std::unordered_map<RealAlgebraicNumberIRPtr<Number>, RealAlgebraicNumberNRPtr<Number>> SampleSimplification;
 private:
-	std::list<RealAlgebraicNumberPtr<Number>> samples;
+	/**
+	 * A functor compatible to std::less<RealAlgebraicNumberPtr<Number>> that compares two samples according to a given order.
+	 */
+	struct SampleComparator {
+	private:
+		/// Ordering used by this functor.
+		SampleOrdering mOrdering;
+	public:
+		/**
+		 * Constructor from a given ordering.
+         * @param ordering Ordering to be used by the resulting functor.
+         */
+		explicit SampleComparator(SampleOrdering ordering) : mOrdering(ordering) {}
 
-	/// Queue containing all samples in the order of their insertion
-	std::list<RealAlgebraicNumberPtr<Number>> queue;
-	
-	/// Queue containing all samples in numerical representation in the order of their insertion
-	std::list<RealAlgebraicNumberNRPtr<Number>> NRqueue;
-	
-	/// Queue containing all samples in interval representation in the order of their insertion
-	std::list<RealAlgebraicNumberIRPtr<Number>> IRqueue;
+		/**
+		 * Comparison function implemented by this functor.
+		 * Checks if lhs is less than rhs according to the ordering.
+         * @param lhs Left sample.
+         * @param rhs Right sample.
+         * @return True if lhs < rhs.
+         */
+		bool operator()(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const;
 
-	/// Queue containing all non-root samples in the order of their insertion
-	std::list<RealAlgebraicNumberPtr<Number>> nonRootQueue;
+		/**
+		 * Checks if the given sample is optimal with respect to the ordering.
+		 * @param s Sample.
+		 * @return True if s is optimal.
+		 */
+		bool isOptimal(const RealAlgebraicNumberPtr<Number>& s) const;
+
+		/**
+		 * Returns the current ordering.
+		 * @return Ordering.
+		 */
+		SampleOrdering ordering() const {
+			return this->mOrdering;
+		}
+	private:
+		/**
+		 * Creates a comparison result from the information if a certain property holds for two objects.
+		 * a is less than b if the property does not hold for a, but does for b.
+		 * @param l Property of a.
+		 * @param r Property of b.
+		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
+		 */
+		inline std::pair<bool, bool> compare(bool l, bool r) const {
+			if (l xor r) return std::make_pair(true, l);
+			return std::make_pair(false, false);
+		}
+		/**
+		 * Creates a comparison result from the rankings for a certain property of two objects.
+		 * a is less than b if the ranking of a is less than the one of b.
+		 * @param l Ranking of a.
+		 * @param r Ranking of b.
+		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
+		 */
+		template<typename T>
+		inline std::pair<bool, bool> compare(T l, T r) const {
+			if (l != r) return std::make_pair(true, l < r);
+			return std::make_pair(false, false);
+		}
+
+		/**
+		 * Compares two samples checking if they are integers.
+         * @param lhs First Sample.
+         * @param rhs Second Sample.
+         * @return Comparison result.
+         */
+		inline std::pair<bool, bool> compareInt(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+			return compare(lhs->isNumericRepresentation() && carl::isInteger(lhs->value()), rhs->isNumericRepresentation() && carl::isInteger(rhs->value()));
+		}
+		/**
+		 * Compares two samples checking if they are rationals.
+         * @param lhs First Sample.
+         * @param rhs Second Sample.
+         * @return Comparison result.
+         */
+		inline std::pair<bool, bool> compareRat(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+			return compare(lhs->isNumericRepresentation(), rhs->isNumericRepresentation());
+		}
+		/**
+		 * Compares two samples with respect to their representation size.
+		 * Requires that both samples have a numeric value.
+		 * @param lhs First Sample.
+		 * @param rhs Second Sample.
+		 * @return Comparison result.
+		 */
+		inline std::pair<bool, bool> compareSize(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+			assert(lhs->isNumeric() && rhs->isNumeric());
+			return compare(carl::bitsize(lhs->value()), carl::bitsize(lhs->value()));
+		}
+		/**
+		 * Compares two samples checking if they are roots.
+         * @param lhs First Sample.
+         * @param rhs Second Sample.
+         * @return Comparison result.
+         */
+		inline std::pair<bool, bool> compareRoot(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+			return compare(lhs->isRoot(), rhs->isRoot());
+		}
+	};
 	
-	/// Queue containing all root samples in the order of their insertion
-	std::list<RealAlgebraicNumberPtr<Number>> rootQueue;
+	/// Contains all samples in the order of their value.
+	std::set<RealAlgebraicNumberPtr<Number>, carl::Less<Number>> mSamples;
+
+	SampleComparator mComp;
+	std::vector<RealAlgebraicNumberPtr<Number>> mHeap;
+	
+	/**
+	 * Restore the ordering.
+     */
+	void restoreOrdering() {
+		std::make_heap(mHeap.begin(), mHeap.end(), mComp);
+	}
+	/**
+	 * Reset the ordering.
+	 * @param ordering The new ordering.
+     */
+	void restoreOrdering(SampleOrdering ordering) {
+		mComp = SampleComparator(ordering);
+		restoreOrdering();
+	}
 	
 public:
-	typedef typename std::list<RealAlgebraicNumberPtr<Number>>::iterator iterator;
-	typedef typename std::list<RealAlgebraicNumberIRPtr<Number>>::iterator iteratorIR;
-	typedef typename std::list<RealAlgebraicNumberNRPtr<Number>>::iterator iteratorNR;
-	typedef std::unordered_map<RealAlgebraicNumberIRPtr<Number>, RealAlgebraicNumberNRPtr<Number>> SampleSimplification;
-	
+	SampleSet(SampleOrdering ordering = SampleOrdering::Default):
+		mComp(ordering)
+	{
+		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
+	}
+
 	/**
-	 * Inserts an element into the sorted list at the correct position according to the order.
-	 * @param r RealAlgebraicNumberPtr to be inserted
-	 * @return a pair, with its member <code>pair::first</code> set to an iterator pointing to either the newly inserted element or to the element that already had its same value in the set.
-	 * The <code>pair::second</code> element in the pair is set to <code>true</code> if a new element was inserted or <code>false</code> if an element with the same value existed.
-	 * If a numeric representation is inserted, the method replaces a possibly existing interval representation.
-	 * @complexity at most logarithmic in the size of the list
+	 * Returns the current ordering.
+	 * @return Ordering.
 	 */
-	std::pair<iterator, bool> insert(RealAlgebraicNumberPtr<Number> r);
+	SampleOrdering ordering() const {
+		return mComp.ordering();
+	}
+
+	/**
+	 * Insert a new sample into this sample set.
+     * @param r Sample to insert.
+     * @return An iterator to the inserted sample and a flag that indicates if the inserted value was new or already present.
+     */
+	std::pair<Iterator, bool> insert(RealAlgebraicNumberPtr<Number> r) {
+		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
+		assert(this->isConsistent());
+		auto res = this->mSamples.insert(r);
+		if (!res.second) {
+			// There is an equivalent sample.
+			// Check if new sample is better (i.e. smaller) than the previous sample.
+			if (mComp(r, *res.first)) {
+				LOGMSG_TRACE("carl.cad.sampleset", "\tsample already exists, replace in queue and update in samples");
+				carl::Equal<Number> eq;
+				bool found = false;
+				for (auto n: mHeap) {
+					if (eq(n, r)) {
+						*n = *r;
+						found = true;
+						break;
+					}
+				}
+				assert(found);
+				restoreOrdering();
+			}
+		} else {
+			mHeap.push_back(r);
+			std::push_heap(mHeap.begin(), mHeap.end(), mComp);
+		}
+		assert(this->isConsistent());
+		return res;
+	}
 	
 	/**
-	 * Inserts a range of elements into the sorted list.
-	 * @param first defining the first position to be inserted
-	 * @param last defining the last position up to which all elements, but *last, are inserted
-	 * @complexity at most logarithmic in the size of the list
+	 * Inserts a range of samples. Actually calls insert(s) for each sample s in the range.
+	 * @param first Start of range.
+	 * @param last End of range.
 	 */
 	template<class InputIterator>
 	void insert(InputIterator first, InputIterator last) {
-		assert(this->isConsistent());
 		for (InputIterator i = first; i != last; i++) {
 			this->insert(*i);
 		}
 	}
 	
 	/**
-	 * Inserts another sampleList.
-	 * @param l other sampleList
-	 * @complexity at most logarithmic in the size of this list and linear in the size of l
+	 * Inserts another SampleSet.
+	 * @param l Other SampleSet.
 	 */
 	void insert(const SampleSet& l) {
-		this->insert(l.samples.begin(), l.samples.end());
+		this->insert(l.begin(), l.end());
 	}
 	
 	/**
-	 * Safely remove the element at position.
-	 * @param position
-	 * @return the iterator to the next position in the container
+	 * Remove the sample at this position.
+	 * @param position Valid iterator to a sample.
+	 * @return Iterator to the next position in the container.
 	 */
-	SampleSet::iterator remove(SampleSet::iterator position);
-	
-	SampleSet::iterator begin() {
-		return this->samples.begin();
-	}
-	const SampleSet::iterator& begin() const {
-		return this->samples.begin();
-	}
-
-	SampleSet::iterator end() {
-		return this->samples.end();
-	}
-	const SampleSet::iterator& end() const {
-		return this->samples.end();
+	SampleSet::Iterator remove(SampleSet::Iterator position) {
+		assert(position != mSamples.end());
+		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
+		auto it = std::find(mHeap.begin(), mHeap.end(), *position);
+		std::swap(*it, mHeap.back());
+		mHeap.pop_back();
+		restoreOrdering();
+		auto res = mSamples.erase(position);
+		assert(this->isConsistent());
+		return res;
 	}
 
+	SampleSet::Iterator begin() {
+		return this->mSamples.begin();
+	}
+	const SampleSet::Iterator begin() const {
+		return this->mSamples.begin();
+	}
+
+	SampleSet::Iterator end() {
+		return this->mSamples.end();
+	}
+	const SampleSet::Iterator end() const {
+		return this->mSamples.end();
+	}
+
 	/**
-	 * Determines the next sample in the order of insertion with no particular preference.
-	 *
-	 * @return next sample in the order of insertion
+	 * Retrieves the next sample according to the configured ordering.
+	 * @return Next sample.
 	 */
-	inline RealAlgebraicNumberPtr<Number> next() const;
-	
+	inline RealAlgebraicNumberPtr<Number> next() const {
+		assert(!mHeap.empty());
+		return mHeap.front();
+	}
+
 	/**
-	 * Determines the next sample in the order of insertion, preferring the numerically represented samples.
-	 *
-	 * Before returning an interval-represented sample, the method tries to simplify the sample.
-	 *
-	 * @return next sample in the order of insertion, preferring the numerically represented samples
+	 * Checks if the best sample remaining is optimal with respect to the configured ordering.
+	 * @return True, if next sample is optimal.
 	 */
-	inline RealAlgebraicNumberPtr<Number> nextNR() const;
-	
+	inline bool hasOptimal() const {
+		if (mHeap.empty()) return false;
+		return mComp.isOptimal(next());
+	}
+
 	/**
-	 * Determines the next sample in the order of insertion, preferring the non-root samples.
-	 *
-	 * @return next sample in the order of insertion, preferring the non-root samples
-	 */
-	inline RealAlgebraicNumberPtr<Number> nextNonRoot() const;
-	
-	/**
-	 * Determines the next sample in the order of insertion, preferring the non-root samples.
-	 *
-	 * @return next sample in the order of insertion, preferring the non-root samples
-	 */
-	inline RealAlgebraicNumberPtr<Number> nextRoot() const;
+	 * Changes the ordering and retrieves the next sample according to this ordering.
+     * @param ordering New ordering.
+     * @return Next sample.
+     */
+	inline RealAlgebraicNumberPtr<Number> next(SampleOrdering ordering) {
+		this->restoreOrdering(ordering);
+		return this->next();
+	}
 
 	/**
 	 * Removes the element returned by next() from the list.
 	 * @complexity at most linear in the size of the list
 	 */
 	void pop();
-	
-	/**
-	 * Removes the element returned by nextNR() from the list.
-	 * @complexity at most logarithmic in the size of the list and linear in the number of roots in the list
-	 */
-	void popNR();
-	
-	/**
-	 * Removes the element returned by nextNonroot() from the list. The method does nothing if there is no non-root.
-	 * @complexity at most linear in the size of the list
-	 */
-	void popNonroot();
-	
-	/**
-	 * Removes the element returned by nextRoot() from the list. The method does nothing if there is no root.
-	 * @complexity at most linear in the size of the list
-	 */
-	void popRoot();
 	
 	/**
 	 * Replaces the interval-represented element from (if existing) by the numeric element to while maintaining the internal data structures.
@@ -163,65 +298,29 @@ public:
 	bool simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to);
 	
 	/**
-	 * Replaces the interval-represented element from, whose iterator in mNRsIRs is given by fromIt, by the numeric element to while maintaining the internal data structures.
-	 * It is assumed that from->isRoot() == to->isRoot().
-	 * @param from
-	 * @param to
-	 * @param fromIt iterator to from in mNRsIRs.second, is updated if a replacement was done
-	 * @return true if the element was replaced, false otherwise
-	 * @complexity logarithmic in the elements stored
-	 */
-	bool simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to, iteratorIR& fromIt);
-	
-	/**
 	 * Traverse all interval-represented samples and determine whether they could be simplified by numeric representations.
 	 * If so, move these samples to the NRs.
+	 * @param fast If fast is set to true, no refined is performed. Only samples that have already been refined are simplified.
 	 * @return pair whose first component is a map from unsimplified real algebraic number pointers to real algebraic number pointers
 	 * which were simplified; the second component is true if there were samples found which could be simplified.
 	 * @complexity logarithmic in the number
 	 */
-	std::pair<SampleSimplification, bool> simplify();
+	std::pair<SampleSimplification, bool> simplify(bool fast = false);
 	
 	/**
 	 * Determines containment of r in the list.
 	 * @return true if r is contained in the list, false otherwise
 	 */
-	bool contains(const RealAlgebraicNumberPtr<Number> r) const;
+	bool contains(const RealAlgebraicNumberPtr<Number> r) const {
+		return mSamples.find(r) != mSamples.end();
+	}
 
+	/**
+	 * Checks if there are any samples left.
+     * @return True, if no sample is left.
+     */
 	bool empty() const {
-		return this->samples.empty();
-	}
-
-	/**
-	 * Answers whether there are numerically represented samples left.
-	 * @return true if there is no NR sample left in the list, false otherwise
-	 */
-	bool emptyNR() const {
-		return this->NRqueue.empty();
-	}
-	
-	/**
-	 * Answers whether there are interval-represented samples left.
-	 * @return true if there is no IR sample left in the list, false otherwise
-	 */
-	bool emptyIR() const {
-		return this->IRqueue.empty();
-	}
-	
-	/**
-	 * Answers whether there are non-root represented samples left.
-	 * @return true if there is no non-root sample left in the list, false otherwise
-	 */
-	bool emptyNonroot() const {
-		return this->nonRootQueue.empty();
-	}
-
-	/**
-	 * Answers whether there are root samples left.
-	 * @return true if there is no root sample left in the list, false otherwise
-	 */
-	bool emptyRoot() const {
-		return this->rootQueue.empty();
+		return mHeap.empty();
 	}
 	
 	/**
@@ -240,16 +339,14 @@ public:
 	friend void std::swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
 
 private:
-	///////////////////////
-	// AUXILIARY METHODS //
-	///////////////////////
-	
-	void removeFromNonrootRoot(const RealAlgebraicNumberPtr<Number> r);
-	
-	void removeFromQueue(const RealAlgebraicNumberPtr<Number> r);
-	
-	void removeFromNRIR(const RealAlgebraicNumberPtr<Number> r);
-
+	/**
+	 * Checks if this sample set fulfills the following conditions:
+	 * <ul>
+	 * <li>mSamples and mQueue contain the same samples.</li>
+	 * <li>The samples in mSamples are ordered by their value.</li>
+	 * </ul>
+	 * @return True, if this SampleSet is consistent.
+	 */
 	bool isConsistent() const;
 };
 
@@ -257,6 +354,11 @@ private:
 }
 
 namespace std {
+/**
+ * Swaps the contents of two SampleSet objects.
+ * @param lhs First SampleSet.
+ * @param rhs Second SampleSet.
+ */
 template<typename Num>
 void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs);
 }

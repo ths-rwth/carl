@@ -21,7 +21,6 @@ TEST(SampleSet, BasicOperations)
 
 	ASSERT_NO_THROW(s.remove(pos.first));
 	ASSERT_FALSE(s.empty());
-	ASSERT_TRUE(s.emptyIR());
 	ASSERT_NO_THROW(s.pop());
 	ASSERT_NO_THROW(s.pop());
 	ASSERT_TRUE(s.empty());

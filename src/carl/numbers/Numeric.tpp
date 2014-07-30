@@ -65,7 +65,7 @@ namespace carl
 
     /**
      * Constructing from a Rational.
-     * @param The Rational.
+     * @param _value The Rational.
      */
     template<typename T>
     Numeric<T>::Numeric( const T& _value ):
@@ -75,6 +75,7 @@ namespace carl
     /**
      * Constructing from an integer.
      * @param _value The integer.
+	 * @param is_definitely_int
      */
     template<typename T>
     Numeric<T>::Numeric( ContentType _value, bool is_definitely_int ):

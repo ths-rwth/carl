@@ -12,326 +12,157 @@
 
 #include "../core/RealAlgebraicNumber.h"
 #include "../util/debug.h"
+#include "../numbers/operations.h"
 
 namespace carl {
 namespace cad {
 
 template<typename Number>
-std::pair<typename SampleSet<Number>::iterator, bool> SampleSet<Number>::insert(RealAlgebraicNumberPtr<Number> r) {
-	assert(this->isConsistent());
-	if (r->isNumeric()) {
-		// Make sure that r gets inserted as NR. It may still be an IR...
-		RealAlgebraicNumberNRPtr<Number> rNR = RealAlgebraicNumberNR<Number>::create(r->value(), r->isRoot());
-		iterator position = this->samples.begin();
-		if (! this->samples.empty()) {
-			position = std::lower_bound(position, this->samples.end(), rNR, Less<Number>());
-			if (position != this->samples.end() && carl::Equal<Number>()(*position, rNR)) { // already contained in the list
-				return std::pair<iterator, bool>(position, false);    // return iterator to the already contained element
-			}
-			// else: append r to the end of the list
-		}
-		this->NRqueue.push_back(rNR);
-		if (rNR->isRoot()) {
-			this->rootQueue.push_back(rNR);
-		} else {
-			this->nonRootQueue.push_back(rNR);
-		}
-		this->queue.push_back(rNR);
-		return std::make_pair(this->samples.insert(position,rNR), true);    // insert safely and return iterator to the new element
+bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+#define CHECK(expr) res = (expr); if (res.first) return res.second;
+	std::pair<bool, bool> res;
+	switch (mOrdering) {
+		case SampleOrdering::IntRatRoot:
+			CHECK(compareInt(lhs, rhs));
+			CHECK(compareRat(lhs, rhs));
+			CHECK(compareRoot(lhs, rhs));
+			break;
+		case SampleOrdering::IntRatSize:
+			CHECK(compareInt(lhs, rhs));
+			CHECK(compareRat(lhs, rhs));
+			CHECK(compareSize(lhs, rhs));
+			break;
+		case SampleOrdering::Interval:
+			CHECK(compareRat(rhs, lhs));
+			break;
+		case SampleOrdering::NonRoot:
+			CHECK(compareRoot(rhs, lhs));
+			break;
+		case SampleOrdering::RatRoot:
+			CHECK(compareRat(lhs, rhs));
+			CHECK(compareRoot(lhs, rhs));
+			break;
+		case SampleOrdering::Root:
+			CHECK(compareRoot(lhs, rhs));
+			break;
+		default:
+			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
+			assert(false);
+			return false;
 	}
-	auto position = this->samples.begin();
-	if (!this->samples.empty()) {
-		position = std::lower_bound(position, this->samples.end(), r, Less<Number>());
-		if (position != this->samples.end() && Equal<Number>()(*position, r)) {
-			// already contained in the list
-			// return iterator to the already contained element
-			return std::make_pair(position, false);
-		}
-		// else: append r to the end of the list
+	return carl::Less<Number>()(lhs, rhs);
+}
+
+template<typename Number>
+bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr<Number>& s) const {
+	switch (mOrdering) {
+		case SampleOrdering::IntRatRoot:
+			return s->isNumericRepresentation() && carl::isInteger(s->value());
+		case SampleOrdering::IntRatSize:
+			return s->isNumericRepresentation() && carl::isInteger(s->value());
+		case SampleOrdering::Interval:
+			return !s->isNumericRepresentation();
+		case SampleOrdering::NonRoot:
+			return !s->isRoot();
+		case SampleOrdering::RatRoot:
+			return s->isNumericRepresentation();
+		case SampleOrdering::Root:
+			return s->isRoot();
+		default:
+			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
+			assert(false);
+			return false;
 	}
-	this->IRqueue.push_back(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(r));
-	if (r->isRoot()) {
-		this->rootQueue.push_back(r);
-	} else {
-		this->nonRootQueue.push_back(r);
-	}
-	this->queue.push_back(r);
-	//LOGMSG_TRACE("carl.cad", "Inserted " << r << " into " << *this);
-	return std::make_pair(this->samples.insert(position, r), true);
-}
-
-template<typename Number>
-typename SampleSet<Number>::iterator SampleSet<Number>::remove(typename SampleSet<Number>::iterator position) {
-	assert(position != this->samples.end());
-	assert(this->isConsistent());
-	this->removeFromQueue(*position);
-	this->removeFromNRIR(*position);
-	this->removeFromNonrootRoot(*position);
-	assert(this->isConsistent());
-	return this->samples.erase(position);
-}
-
-template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::next() const {
-	if (this->samples.empty()) assert(false);
-	return this->queue.front();
-}
-
-template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextNR() const {
-	if (this->samples.empty()) assert(false);
-	if (this->NRqueue.empty()) return this->IRqueue.front();
-	return this->NRqueue.front();
-}
-
-template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextNonRoot() const {
-	if (this->samples.empty()) assert(false);
-	if (this->nonRootQueue.empty()) return this->rootQueue.front();
-	return this->nonRootQueue.front();
-}
-
-template<typename Number>
-inline RealAlgebraicNumberPtr<Number> SampleSet<Number>::nextRoot() const {
-	if (this->samples.empty()) assert(false);
-	if (this->rootQueue.empty()) return this->nonRootQueue.front();
-	return this->rootQueue.front();
 }
 
 template<typename Number>
 void SampleSet<Number>::pop() {
-	if (this->samples.empty()) return;
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
+	if (this->mHeap.empty()) return;
+	this->mSamples.erase(mHeap.front());
+	std::pop_heap(mHeap.begin(), mHeap.end(), mComp);
+	mHeap.pop_back();
 	assert(this->isConsistent());
-	
-	const RealAlgebraicNumberPtr<Number> r = this->next();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::Less<Number>());
-	
-	assert(position != this->samples.end()); // r should be in this list
-	this->samples.erase(position); // remove next()
-
-	this->queue.pop_front();
-	this->removeFromNRIR(r);
-	this->removeFromNonrootRoot(r);
-	assert(this->isConsistent());
-}
-
-template<typename Number>
-void SampleSet<Number>::popNR() {
-	if (this->samples.empty()) return;
-	
-	RealAlgebraicNumberPtr<Number> r = this->nextNR();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, Less<Number>());
-	
-	assert(position != this->samples.end());
-	this->samples.erase(position); // remove nextNR()
-	
-	// remove next also from its bucket
-	if (this->NRqueue.empty()) {
-		this->IRqueue.pop_front();
-	} else {
-		this->NRqueue.pop_front();
-	}
-	
-	this->removeFromQueue(r);
-	this->removeFromNonrootRoot(r);
-	assert(this->isConsistent());
-}
-
-template<typename Number>
-void SampleSet<Number>::popNonroot() {
-	if (this->samples.empty()) return;
-	
-	RealAlgebraicNumberPtr<Number> r = this->nextNonRoot();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, Less<Number>());
-	
-	assert(position != this->samples.end());
-	this->samples.erase(position); // remove nextNonRoot()
-	
-	// remove next from its bucket
-	if (this->nonRootQueue.empty()) {
-		this->rootQueue.pop_front();
-	} else {
-		this->nonRootQueue.pop_front();
-	}
-	
-	this->removeFromNRIR(r);
-	this->removeFromQueue(r);
-}
-
-template<typename Number>
-void SampleSet<Number>::popRoot() {
-	if (this->samples.empty()) return;
-	
-	RealAlgebraicNumberPtr<Number> r = this->nextRoot();
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), r, Less<Number>());
-
-	assert(position != this->samples.end());
-	this->samples.erase(position); // remove nextRoot()
-	
-	// remove next from its bucket
-	if (this->rootQueue.empty()) {
-		this->nonRootQueue.pop_front();
-	} else {
-		this->rootQueue.pop_front();
-	}
-	
-	this->removeFromNRIR(r);
-	this->removeFromQueue(r);
 }
 
 template<typename Number>
 bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to) {
-	iteratorIR position = std::find(this->IRqueue.begin(), this->IRqueue.end(), from);
-	if (position != this->IRqueue.end()) {
-		return this->simplify(from, to, position);
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << from << " -> " << to << " )");
+	assert(this->isConsistent());
+	if (mSamples.count(from) > 0) {
+		mSamples.erase(from);
+		mSamples.insert(to);
+		auto it = std::find(mHeap.begin(), mHeap.end(), from);
+		*it = to;
+		assert(this->isConsistent());
+		return true;
 	}
 	return false;
 }
 
 template<typename Number>
-bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to, SampleSet<Number>::iteratorIR& fromIt ) {
-	assert(from->isRoot() == to->isRoot());
-	assert(from->getInterval().contains(to->value()));
-
-	// replace in basic list
-	iterator position = std::lower_bound(this->samples.begin(), this->samples.end(), from, Less<Number>());
-	if (position == this->samples.end()) return false;
-	*position = to; // replace ir by nr
-	
-	// add to NRs
-	this->NRqueue.push_back(to);
-	// erase in IRs
-	fromIt = this->IRqueue.erase(fromIt);
-	// replace in root/non-root lists
-	if (from->isRoot()) {
-		iterator position = std::find(this->rootQueue.begin(), this->rootQueue.end(), from);
-		// there must be an occurrence in the sample list or there was an error inserting the number
-		assert(position != this->rootQueue.end());
-		*position = to;
-	} else {
-		iterator position = std::find(this->nonRootQueue.begin(), this->nonRootQueue.end(), from);
-		assert(position != this->nonRootQueue.end());    // there must be an occurrence in the sample list or there was an error inserting the number
-		*position = to;
-	}
-	// replace in queue
-	iterator queuePosition = std::find(this->queue.begin(), this->queue.end(), from);
-	assert(queuePosition != this->queue.end());    // there must be an occurrence in the sample list or there was an error inserting the number
-	*queuePosition = to;
-	return true;
-}
-
-template<typename Number>
-std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify() {
+std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify(bool fast) {
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	std::pair<SampleSimplification, bool> simplification;
 	if (this->empty()) return simplification;
 	simplification.second = false;
-	for (iteratorIR irIter = this->IRqueue.begin(); irIter != this->IRqueue.end(); ) {
-		if (!(*irIter)->isNumeric() && (*irIter)->getRefinementCount() == 0) {// try at least one refinement
-			(*irIter)->refine();
+	for (auto n: this->mSamples) {
+		if (n->isNumericRepresentation()) continue;
+		auto nIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(n);
+		if (!fast && !nIR->isNumeric() && nIR->getRefinementCount() == 0) {
+			// Try at least one refinement.
+			nIR->refine();
 		}
-		if ((*irIter)->isNumeric()) {
-			RealAlgebraicNumberNRPtr<Number> nr = RealAlgebraicNumberNR<Number>::create((*irIter)->value(), (*irIter)->isRoot());
-			auto ir = *irIter;
-			if (this->simplify(*irIter, nr, irIter)) { // store simplification result
-				simplification.first[ir] = nr;
-				simplification.second = true;
-			} else {
-				assert(false);
-			}
-		} else { // try to maximally coarsen the interval
-			irIter++;
+		if (nIR->isNumeric()) {
+			auto nNR = RealAlgebraicNumberNR<Number>::create(nIR->value(), nIR->isRoot());
+			simplification.first[nIR] = nNR;
 		}
 	}
+	for (auto it: simplification.first) {
+		if (this->simplify(it.first, it.second)) {
+			simplification.second = true;
+		} else {
+			assert(false);
+		}
+	}
+	assert(this->isConsistent());
 	return simplification;
 }
 
 template<typename Number>
-bool SampleSet<Number>::contains(const RealAlgebraicNumberPtr<Number> r) const {
-	auto pos = std::lower_bound(this->samples.begin(), this->samples.end(), r, carl::less);
-	return pos != this->samples.end();
-}
-
-template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
-	os << "SampleSet " << &s << std::endl;
-	os << "samples: " << s.samples << std::endl;
-	os << "queue: " << s.queue << std::endl;
-	os << "NRqueue: " << s.NRqueue << std::endl;
-	os << "IRqueue: " << s.IRqueue << std::endl;
-	os << "Rootqueue: " << s.rootQueue << std::endl;
-	os << "Nonrootqueue: " << s.nonRootQueue << std::endl;
+	os << "SampleSet " << &s << " with ordering " << s.mQueue.key_comp().ordering() << std::endl;
+	os << "samples: " << s.mSamples << std::endl;
+	os << "heap: " << s.mHeap << std::endl;
 	return os;
 }
 
 template<typename Number>
-void SampleSet<Number>::removeFromNonrootRoot(const RealAlgebraicNumberPtr<Number> r) {
-	if (r->isRoot()) {
-		iterator pos = std::find(this->rootQueue.begin(), this->rootQueue.end(), r); // find in roots non-root list
-		assert(pos != this->rootQueue.end());
-		this->rootQueue.erase(pos);
-	} else {
-		iterator pos = std::find(this->nonRootQueue.begin(), this->nonRootQueue.end(), r); // find in roots non-root list
-		assert(pos != this->nonRootQueue.end());
-		this->nonRootQueue.erase(pos);
-	}
-}
-
-template<typename Number>
-void SampleSet<Number>::removeFromQueue(const RealAlgebraicNumberPtr<Number> r) {
-	iterator pos = std::find(this->queue.begin(), this->queue.end(), r); // find in roots non-root list
-	assert(pos != this->queue.end());
-	this->queue.erase(pos);
-}
-
-template<typename Number>
-void SampleSet<Number>::removeFromNRIR(const RealAlgebraicNumberPtr<Number> r) {
-	if (r->isNumericRepresentation()) {
-		RealAlgebraicNumberNRPtr<Number> rNR = std::static_pointer_cast<RealAlgebraicNumberNR<Number>>(r); // needs to be a dynamic cast here in order to determine the correct type always
-		iteratorNR pos = std::find(this->NRqueue.begin(), this->NRqueue.end(), rNR);
-		assert(pos != this->NRqueue.end()); // r should be in this list, otherwise it was maybe simplified and moved to the other list
-		this->NRqueue.erase(pos);
-	} else {
-		RealAlgebraicNumberIRPtr<Number> rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(r); // needs to be a dynamic cast here in order to determine the correct type always
-		iteratorIR pos = std::find(this->IRqueue.begin(), this->IRqueue.end(), rIR);
-		assert(pos != this->IRqueue.end()); // r should be in this list
-		this->IRqueue.erase(pos);
-	}
-}
-
-template<typename Number>
 bool SampleSet<Number>::isConsistent() const {
-	std::list<RealAlgebraicNumberPtr<Number>> NRIR(this->queue);
-	std::list<RealAlgebraicNumberPtr<Number>> RR(this->queue);
-
-	for (auto n: this->rootQueue) {
-		assert(n->isRoot());
-		RR.remove(n);
-	}
-	for (auto n: this->nonRootQueue) {
-		REGISTERED_ASSERT(!n->isRoot());
-		RR.remove(n);
-	}
-	assert(RR.empty());
-
-	for (auto n: this->IRqueue) {
-		assert(!n->isNumericRepresentation());
-		NRIR.remove(n);
-	}
-	for (auto n: this->NRqueue) {
-		assert(n->isNumericRepresentation());
-		NRIR.remove(n);
-	}
-	assert(NRIR.empty());
-
-	RealAlgebraicNumberPtr<Number> last = nullptr;
-	for (auto cur: this->samples) {
-		if (last != nullptr) {
-			if (!Less<Number>()(last, cur)) {
-				LOGMSG_TRACE("carl.cad", "Not: " << last << " < " << cur);
-			}
-			assert(Less<Number>()(last, cur));
+	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
+	LOGMSG_TRACE("carl.cad.sampleset", "samples: " << mSamples);
+	LOGMSG_TRACE("carl.cad.sampleset", "heap:    " << mHeap);
+	std::set<RealAlgebraicNumberPtr<Number>> queue(mHeap.begin(), mHeap.end());
+	for (auto n: this->mSamples) {
+		auto it = queue.find(n);
+		if (it == queue.end()) {
+			LOGMSG_ERROR("carl.cad.sampleset", "Sample " << n << " is not in queue.");
+			assert(queue.find(n) != queue.end());
 		}
-		last = cur;
+		queue.erase(it);
+	}
+	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
+	for (auto n: this->mSamples) {
+		if (lastSample != nullptr && !carl::Less<Number>()(lastSample, n)) {
+			LOGMSG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
+			LOGMSG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
+			assert(carl::Less<Number>()(lastSample, n));
+		}
+		lastSample = n;
+	}
+	if (!queue.empty()) {
+		LOGMSG_ERROR("carl.cad.sampleset", "Additional samples in queue: " << queue);
+		assert(queue.empty());
 	}
 	return true;
 }
@@ -343,11 +174,8 @@ namespace std {
 
 template<typename Num>
 void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
-	std::swap(lhs.samples, rhs.samples);
-	std::swap(lhs.NRqueue, rhs.NRqueue);
-	std::swap(lhs.IRqueue, rhs.IRqueue);
-	std::swap(lhs.nonRootQueue, rhs.nonRootQueue);
-	std::swap(lhs.rootQueue, rhs.rootQueue);
+	std::swap(lhs.mSamples, rhs.mSamples);
+	std::swap(lhs.mHeap, rhs.mHeap);
 }
 
 }

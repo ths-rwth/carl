@@ -95,6 +95,10 @@ public:
 		return res;
 	}
 
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
+	}
+
 	/**
 	 * Destructor.
 	 */
@@ -171,11 +175,6 @@ public:
 	///////////////
 	// Operators //
 	///////////////
-
-	/**
-	 * This number gets all values of the other.
-	 */
-	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);
@@ -258,6 +257,7 @@ using RealAlgebraicNumberIRPtr = std::shared_ptr<RealAlgebraicNumberIR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
+	if (n == nullptr) return os << "nullptr";
 	if (n->isNumeric()) {
 		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << ")";
 	}

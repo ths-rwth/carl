@@ -40,7 +40,8 @@ include(FindPackageHandleStandardArgs)
 # options
 option( DEVELOPER "Compile with extra warnings" ON )
 option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
-option( CARL_LOGGING "Compile with the logging facility of the carl library" ON )
+option( LOGGING "Enable logging within the carl library" ON )
+option( LOGGING_CARL "Compile with the logging facility of the carl library" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
@@ -193,8 +194,6 @@ endif()
 
 # we only search for this libraries in the system, if we do not force using the shipped resources.
 if(NOT FORCE_SHIPPED_RESOURCES)
-	# find log4cplus
-	find_package(Log4cplus)
 	# find googletest
 	find_package(GTest)
 	# find eigen

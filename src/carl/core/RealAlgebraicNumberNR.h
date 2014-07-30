@@ -37,6 +37,10 @@ public:
 		res->pThis = res;
 		return res;
 	}
+
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumberNR<Number>::create(this->value(), this->isRoot());
+	}
 	
 	bool equal(const RealAlgebraicNumberNR<Number>* n) {
 		return this->value() == n->value();
@@ -54,6 +58,7 @@ using RealAlgebraicNumberNRPtr = std::shared_ptr<RealAlgebraicNumberNR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>* n) {
+	if (n == nullptr) return os << "nullptr";
 	return os << "(NR " << n->value() << ")";
 }
 

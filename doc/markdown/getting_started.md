@@ -12,7 +12,6 @@ OPTIONAL:
 - cln
 - gmp
 
-- log4cplus +
 - googletest +
 - doxygen
 
