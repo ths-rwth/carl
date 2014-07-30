@@ -245,14 +245,14 @@ std::shared_ptr<const Monomial> MultivariatePolynomial<Coeff,Ordering,Policies>:
 template<typename Coeff, typename Ordering, typename Policies>
 std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
 {
-    LOG_ASSERT(!isZero(), "Leading term undefined on zero polynomials.");
+    LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
 	return mTerms.back();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
 {
-    LOG_ASSERT(!isZero(), "Trailing term undefined on zero polynomials.");
+    LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
 	return mTerms.front();
 }
 

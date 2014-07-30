@@ -200,7 +200,11 @@ public:
 	const std::vector<cad::EliminationSet<Number>>& getEliminationSets() const {
 		return this->eliminationSets;
 	}
-	
+
+	const cad::EliminationSet<Number>& getEliminationSet(std::size_t n) const {
+		return this->eliminationSets[n];
+	}
+
 	/**
 	 * @return true if the cad is computed completely, false if there are still samples to compute
 	 */

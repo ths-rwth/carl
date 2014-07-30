@@ -17,6 +17,7 @@
 #include <utility>
 
 #include "../util/Singleton.h"
+#include "carlLoggingHelper.h"
 
 namespace carl {
 namespace logging {
@@ -150,7 +151,7 @@ struct Formatter {
 		os << level << " ";
 		os << std::left << std::setw((int)channelwidth) << channel << " ";
 		os << std::right << std::setw(25) << basename(info.filename.c_str()) << ":" << std::left << std::setw(4) << info.line << " ";
-		os << info.func << "() ";
+		if (!info.func.empty()) os << info.func << " ";
 	}
 	virtual void suffix(std::ostream& os) {
 		os << std::endl;
@@ -215,12 +216,25 @@ inline Logger& logger() {
 }
 
 #define __CARLLOG_RECORD carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
+#define __CARLLOG_RECORD_NOFUNC carl::logging::RecordInfo(__FILE__, "", __LINE__)
 #define __CARLLOG(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD); }
+#define __CARLLOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD_NOFUNC); }
+
+#define MACRO_dispatcher(func, ...) MACRO_dispatcher_(func, VA_NUM_ARGS(__VA_ARGS__))
+#define MACRO_dispatcher_(func, nargs) func ## nargs
+
+#define CARLLOG_FUNC_2(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::TRACE, channel, __func__ << "(" << args << ")");
+#define CARLLOG_FUNC_3(channel, args, expr) __CARLLOG_NOFUNC(carl::logging::LogLevel::TRACE, channel, __func__ << "(" << args << ") " << expr);
+#define CARLLOG_FUNC( ... ) MACRO_dispatcher(CARLLOG_FUNC_, __VA_ARGS__)(__VA_ARGS__)
+
 #define CARLLOG_TRACE(channel, expr) __CARLLOG(carl::logging::LogLevel::TRACE, channel, expr)
+#define CARLLOG_DEBUG(channel, expr) __CARLLOG(carl::logging::LogLevel::TRACE, channel, expr)
 #define CARLLOG_INFO(channel, expr) __CARLLOG(carl::logging::LogLevel::INFO, channel, expr)
 #define CARLLOG_WARN(channel, expr) __CARLLOG(carl::logging::LogLevel::WARN, channel, expr)
 #define CARLLOG_ERROR(channel, expr) __CARLLOG(carl::logging::LogLevel::ERROR, channel, expr)
 #define CARLLOG_FATAL(channel, expr) __CARLLOG(carl::logging::LogLevel::FATAL, channel, expr)
+
+#define CARLLOG_ASSERT(channel, condition, expr) if (!condition) { CARLLOG_FATAL(channel, expr); assert(condition); }
 
 }
 }
