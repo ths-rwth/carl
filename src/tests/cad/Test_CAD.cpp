@@ -4,7 +4,6 @@
 #include <list>
 #include <vector>
 #include <cln/cln.h>
-#include <c++/4.9.1/bits/unordered_map.h>
 
 #include "carl/core/logging.h"
 #include "carl/cad/CAD.h"
