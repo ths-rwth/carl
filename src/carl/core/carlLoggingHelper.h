@@ -155,4 +155,13 @@ std::string binary(const T& a, const bool& spacing = true)
 	return ss.str();
 }
 
+/**
+ * Returns the basename of a given filename.
+ * @param s Filename.
+ * @return Basename of s.
+ */
+inline std::string basename(const std::string& s) {
+	return s.substr(s.rfind('/') + 1);
+}
+
 }

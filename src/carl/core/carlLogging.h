@@ -151,7 +151,7 @@ struct Formatter {
 		os << "[" << std::right << std::setw(4) << timer << "] ";
 		os << level << " ";
 		os << std::left << std::setw((int)channelwidth) << channel << " ";
-		os << std::right << std::setw(25) << basename(info.filename.c_str()) << ":" << std::left << std::setw(4) << info.line << " ";
+		os << std::right << std::setw(25) << carl::basename(info.filename) << ":" << std::left << std::setw(4) << info.line << " ";
 		if (!info.func.empty()) os << info.func << " ";
 	}
 	virtual void suffix(std::ostream& os) {
