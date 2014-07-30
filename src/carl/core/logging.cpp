@@ -33,6 +33,7 @@ void setInitialLogLevel()
 	carl::logging::logger().filter("stdout")
 		("carl", carl::logging::LogLevel::WARN)
 	;
+	carl::logging::logger().resetFormatter();
 #endif
 }
 }
