@@ -1,16 +1,14 @@
 /**
  * @file:   logging.h
- * @author: Sebastian Junges
+ * @author: Gereon Kremer
  *
- * A small wrapper which sends messages to LOG4CPLUS if LOG4CPLUS is available,
- * otherwise the messages are just printed to std::cout.
- *
- * Important Macros:
- * DISABLE_LOGGING (disable any logging)
- * CARL_LOGGING (use our logging library)
+ * A small wrapper for any logging library we might want to use.
+ * If DISABLE_LOGGING is set, all logging is disabled.
+ * Otherwise, if CARL_LOGGING is set, we log using our own logging machinery.
+ * If neither is set, important messages are sent to std::cerr.
  *
  * Created: 21/11/2012
- * @version: 2013-10-28
+ * @version: 2014-07-30
  */
 
 #pragma once

@@ -193,8 +193,6 @@ endif()
 
 # we only search for this libraries in the system, if we do not force using the shipped resources.
 if(NOT FORCE_SHIPPED_RESOURCES)
-	# find log4cplus
-	find_package(Log4cplus)
 	# find googletest
 	find_package(GTest)
 	# find eigen
