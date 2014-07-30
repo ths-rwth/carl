@@ -23,6 +23,8 @@ Where the arguments mean the following:
 - `args`: A description of the function arguments as an expression like `msg`.
 - `condition`: A boolean expression that can be passed to `assert()`.
 
+Logging is enabled (or disabled) by the `LOGGING` macro in CMake.
+
 ## Logging configuration
 
 As of now, there is no frontend interface to configure logging.
@@ -35,6 +37,7 @@ As of now, only two logging backends exist.
 ### CArL logging
 
 CArL provides a custom logging mechanism defined in [carlLogging.h](@ref carlLogging.h).
+It is enabled, if `LOGGING_CARL` is set.
 
 ### Fallback logging
 
