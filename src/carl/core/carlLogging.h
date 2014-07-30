@@ -194,6 +194,11 @@ public:
 		assert(it != data.end());
 		return std::get<2>(it->second);
 	}
+	void resetFormatter() {
+		for (auto& t: data) {
+			std::get<2>(t.second).configure(std::get<1>(t.second));
+		}
+	}
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mutex);
 		for (auto t: data) {
