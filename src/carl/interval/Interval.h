@@ -499,7 +499,7 @@ namespace carl
 
         /**
          * The setter for the lower boundary of the interval.
-         * @param lower boundary
+         * @param n lower boundary
          */
         inline void setLower(const Number& n)
         {
@@ -508,7 +508,7 @@ namespace carl
 
         /**
          * The setter for the upper boundary of the interval.
-         * @param upper boundary
+         * @param n upper boundary
          */
         inline void setUpper(const Number& n)
         {
@@ -517,7 +517,7 @@ namespace carl
 
         /**
          * The setter for the lower bound type of the interval.
-         * @param lower bound type
+         * @param b lower bound type
          */
         inline void setLowerBoundType(BoundType b)
         {
@@ -536,7 +536,7 @@ namespace carl
 
         /**
          * The setter for the upper bound type of the interval.
-         * @param upper bound type
+         * @param b upper bound type
          */
         inline void setUpperBoundType(BoundType b)
         {
@@ -555,7 +555,7 @@ namespace carl
 
         /**
          * The assignment operator.
-         * @param source interval
+         * @param rhs source interval
          * @return
          */
         Interval<Number>& operator =(const Interval<Number>& rhs)
@@ -572,8 +572,8 @@ namespace carl
 
         /**
          * Advanced setter to modify both boundaries at once.
-         * @param lower boundary
-         * @param upper boundary
+         * @param lower lower boundary
+         * @param upper upper boundary
          */
         inline void set(const Number& lower, const Number& upper)
         {
@@ -671,7 +671,7 @@ namespace carl
 
         /**
          * Returns the ratio of the diameters of the given intervals.
-         * @param interval
+         * @param rhs interval
          * @return ratio
          */
         Number diameterRatio(const Interval<Number>& rhs) const;
@@ -700,60 +700,60 @@ namespace carl
 
         /**
          * Checks if the interval contains the given value.
-         * @param value
+         * @param val value
          * @return
          */
         bool contains(const Number& val) const;
 
         /**
          * Checks if the interval contains the given interval.
-         * @param interval
+         * @param rhs interval
          * @return
          */
         bool contains(const Interval<Number>& rhs) const;
 
         /**
          * Checks if the interval meets the given value, that is if the given value is contained in the <b>closed</b> interval defined by the bounds.
-         * @param value
+         * @param val value
          * @return
          */
         bool meets(const Number& val) const;
 
         /**
          * Checks if the given interval is a subset of the calling interval.
-         * @param interval
+         * @param rhs interval
          * @return
          */
         bool isSubset(const Interval<Number>& rhs) const;
 
         /**
          * Checks if the given interval is a proper subset of the calling interval.
-         * @param interval
+         * @param rhs interval
          * @return
          */
         bool isProperSubset(const Interval<Number>& rhs) const;
 
         /**
          * Bloats the interval by the given value.
-         * @param width
+         * @param width width
          */
         void bloat_by(const Number& width);
 
         /**
          * Bloats the interval times the factor (multiplies the overall width).
-         * @param factor
+         * @param factor factor
          */
         void bloat_times(const Number& factor);
 
         /**
          * Shrinks the interval by the given value.
-         * @param width
+         * @param width width
          */
         void shrink_by(const Number& width);
 
         /**
          * Shrinks the interval by a multiple of its width.
-         * @param factor
+         * @param factor factor
          */
         void shrink_times(const Number& factor);
 
@@ -808,7 +808,7 @@ namespace carl
 
         /**
          * Adds two intervals according to natural interval arithmetic.
-         * @param interval
+         * @param rhs interval
          * @return result
          */
         Interval<Number> add(const Interval<Number>& rhs) const;
@@ -816,7 +816,7 @@ namespace carl
 
         /**
          * Subtracts two intervals according to natural interval arithmetic.
-         * @param interval
+         * @param rhs interval
          * @return result
          */
         Interval<Number> sub(const Interval<Number>& rhs) const;
@@ -824,7 +824,7 @@ namespace carl
 
         /**
          * Multiplies two intervals according to natural interval arithmetic.
-         * @param interval
+         * @param rhs interval
          * @return result
          */
         Interval<Number> mul(const Interval<Number>& rhs) const;
@@ -832,7 +832,7 @@ namespace carl
 
         /**
          * Divides two intervals according to natural interval arithmetic.
-         * @param interval
+         * @param rhs interval
          * @return result
          */
         Interval<Number> div(const Interval<Number>& rhs) const;
@@ -840,9 +840,9 @@ namespace carl
 
         /**
          * Implements extended interval division with intervals containting zero.
-         * @param interval
-         * @param result a
-         * @param result b
+         * @param rhs interval
+         * @param a result a
+         * @param b result b
          * @return split occured
          */
         bool div_ext(const Interval<Number>& rhs, Interval<Number>& a, Interval<Number>& b) const;
@@ -856,15 +856,15 @@ namespace carl
 
         /**
          * Calculates the multiplicative inverse of an interval with respect to natural interval arithmetic.
-         * @param result a
-         * @param result b
+         * @param a result a
+         * @param b result b
          * @return split occured
          */
         bool reciprocal(Interval<Number>& a, Interval<Number>& b) const;
 
         /**
          * Calculates the power of the interval with respect to natural interval arithmetic.
-         * @param exponent
+         * @param exp exponent
          * @return result
          */
         Interval<Number> power(unsigned exp) const;
@@ -879,7 +879,7 @@ namespace carl
 
         /**
          * Calculates the nth root of the interval with respect to natural interval arithmetic.
-         * @param degree
+         * @param deg degree
          * @return result
          */
         Interval<Number> root(unsigned deg) const;

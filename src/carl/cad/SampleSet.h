@@ -139,12 +139,15 @@ private:
 	std::vector<RealAlgebraicNumberPtr<Number>> mHeap;
 	
 	/**
-	 * Change the ordering of mQueue.
-     * @param ordering New ordering.
+	 * Restore the ordering.
      */
 	void restoreOrdering() {
 		std::make_heap(mHeap.begin(), mHeap.end(), mComp);
 	}
+	/**
+	 * Reset the ordering.
+	 * @param ordering The new ordering.
+     */
 	void restoreOrdering(SampleOrdering ordering) {
 		mComp = SampleComparator(ordering);
 		restoreOrdering();
@@ -201,8 +204,8 @@ public:
 	
 	/**
 	 * Inserts a range of samples. Actually calls insert(s) for each sample s in the range.
-	 * @param Start of range.
-	 * @param End of range.
+	 * @param first Start of range.
+	 * @param last End of range.
 	 */
 	template<class InputIterator>
 	void insert(InputIterator first, InputIterator last) {
