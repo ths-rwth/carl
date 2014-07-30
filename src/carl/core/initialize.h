@@ -25,7 +25,7 @@ namespace carl
     inline int init()
     {
         // initializing the logging library.
-        configureLogging();
+        logging::configureLogging();
         // initialize anything else here!
 		
         return 0;

@@ -23,15 +23,16 @@ namespace carl {
 namespace logging {
 
 enum class LogLevel : unsigned {
-	TRACE, INFO, WARN, ERROR, FATAL
+	LVL_TRACE, LVL_DEBUG, LVL_INFO, LVL_WARN, LVL_ERROR, LVL_FATAL
 };
 inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 	switch (level) {
-		case LogLevel::TRACE: return os << "TRACE";
-		case LogLevel::INFO:  return os << "INFO ";
-		case LogLevel::WARN:  return os << "WARN ";
-		case LogLevel::ERROR: return os << "ERROR";
-		case LogLevel::FATAL: return os << "FATAL";
+		case LogLevel::LVL_TRACE: return os << "TRACE";
+		case LogLevel::LVL_DEBUG: return os << "DEBUG";
+		case LogLevel::LVL_INFO:  return os << "INFO ";
+		case LogLevel::LVL_WARN:  return os << "WARN ";
+		case LogLevel::LVL_ERROR: return os << "ERROR";
+		case LogLevel::LVL_FATAL: return os << "FATAL";
 		default: return os << "???";
 	}
 }
@@ -84,7 +85,7 @@ struct FileSink: public Sink {
  */
 struct Filter {
 	std::map<std::string, LogLevel> data;
-	Filter(LogLevel level = LogLevel::WARN) {
+	Filter(LogLevel level = LogLevel::LVL_WARN) {
 		(*this)("", level);
 	}
 	/**
@@ -223,16 +224,16 @@ inline Logger& logger() {
 #define MACRO_dispatcher(func, ...) MACRO_dispatcher_(func, VA_NUM_ARGS(__VA_ARGS__))
 #define MACRO_dispatcher_(func, nargs) func ## nargs
 
-#define CARLLOG_FUNC_2(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::TRACE, channel, __func__ << "(" << args << ")");
-#define CARLLOG_FUNC_3(channel, args, expr) __CARLLOG_NOFUNC(carl::logging::LogLevel::TRACE, channel, __func__ << "(" << args << ") " << expr);
+#define CARLLOG_FUNC_2(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << ")");
+#define CARLLOG_FUNC_3(channel, args, expr) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << ") " << expr);
 #define CARLLOG_FUNC( ... ) MACRO_dispatcher(CARLLOG_FUNC_, __VA_ARGS__)(__VA_ARGS__)
 
-#define CARLLOG_TRACE(channel, expr) __CARLLOG(carl::logging::LogLevel::TRACE, channel, expr)
-#define CARLLOG_DEBUG(channel, expr) __CARLLOG(carl::logging::LogLevel::TRACE, channel, expr)
-#define CARLLOG_INFO(channel, expr) __CARLLOG(carl::logging::LogLevel::INFO, channel, expr)
-#define CARLLOG_WARN(channel, expr) __CARLLOG(carl::logging::LogLevel::WARN, channel, expr)
-#define CARLLOG_ERROR(channel, expr) __CARLLOG(carl::logging::LogLevel::ERROR, channel, expr)
-#define CARLLOG_FATAL(channel, expr) __CARLLOG(carl::logging::LogLevel::FATAL, channel, expr)
+#define CARLLOG_TRACE(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_TRACE, channel, expr)
+#define CARLLOG_DEBUG(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_DEBUG, channel, expr)
+#define CARLLOG_INFO(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_INFO, channel, expr)
+#define CARLLOG_WARN(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_WARN, channel, expr)
+#define CARLLOG_ERROR(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_ERROR, channel, expr)
+#define CARLLOG_FATAL(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_FATAL, channel, expr)
 
 #define CARLLOG_ASSERT(channel, condition, expr) if (!condition) { CARLLOG_FATAL(channel, expr); assert(condition); }
 
