@@ -99,6 +99,9 @@ template<typename Number>
 	Number Interval<Number>::center() const
 	{
 		assert(this->isConsistent());
+		if (this->isUnbounded()) return 0;
+		if (this->mLowerBoundType == BoundType::INFTY) return carl::floor(this->mContent.upper()) - 1;
+		if (this->mUpperBoundType == BoundType::INFTY) return carl::ceil(this->mContent.lower()) + 1;
 		return boost::numeric::median(mContent);
 	}
 
@@ -112,6 +115,8 @@ template<typename Number>
 	Number Interval<Number>::sample( bool _includingBounds ) const
 	{
 		assert(this->isConsistent());
+		assert(!this->isEmpty());
+		assert(_includingBounds || !this->isPointInterval());
 		Number mid = this->center();
 		// TODO: check if mid is an integer already.
 		Number midf = carl::floor(mid);

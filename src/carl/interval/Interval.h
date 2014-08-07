@@ -622,7 +622,7 @@ namespace carl
         inline bool isEmpty() const
         {
             assert(this->isConsistent());
-            return mContent.lower() == mContent.upper() && mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT;
+            return mContent.lower() == mContent.upper() && (mLowerBoundType == BoundType::STRICT || mUpperBoundType == BoundType::STRICT);
         }
 
         inline bool isPointInterval() const
