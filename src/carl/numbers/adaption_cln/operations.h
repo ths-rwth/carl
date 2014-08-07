@@ -101,13 +101,40 @@ template<typename T>
 inline T rationalize(double n) {
 	return cln::rationalize(cln::cl_R(n));
 }
+
+static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
+static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
+
 template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
 	switch (std::fpclassify(n)) {
 		case FP_NORMAL: // normalized are fully supported
 			return cln::rationalize(cln::cl_R(n));
-		case FP_SUBNORMAL: // subnormals result in underflows, hence we just return zero.
-			return 0;
+		case FP_SUBNORMAL: // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
+            switch( sizeof( n ) )
+            {
+                case 4:
+                {
+                    unsigned signBits;
+                    memcpy(&signBits, &n, sizeof signBits);
+                    signBits = (signBits << 9) >> 9;
+                    if( n < 0 )
+                        signBits = -signBits;
+                    return cln::cl_RA( signBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23;
+                }
+                case 8:
+                {
+                    unsigned signBits;
+                    memcpy(&signBits, &n, sizeof signBits);
+                    signBits = (signBits << 12) >> 12;
+                    if( n < 0 )
+                        signBits = -signBits;
+                    return cln::cl_RA( signBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52;
+                }
+                default:
+                    assert( false );
+                    return 0;
+            }
 		case FP_ZERO:
 			return 0;
 		case FP_NAN: // NaN and infinite are not supported
