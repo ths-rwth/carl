@@ -100,8 +100,10 @@ template<typename Number>
 	{
 		assert(this->isConsistent());
 		if (this->isUnbounded()) return 0;
-		if (this->mLowerBoundType == BoundType::INFTY) return carl::floor(this->mContent.upper()) - 1;
-		if (this->mUpperBoundType == BoundType::INFTY) return carl::ceil(this->mContent.lower()) + 1;
+		if (this->mLowerBoundType == BoundType::INFTY)
+            return ((Number)carl::floor(this->mContent.upper()) - (Number)1);
+		if (this->mUpperBoundType == BoundType::INFTY)
+            return ((Number)carl::ceil(this->mContent.lower()) + (Number)1);
 		return boost::numeric::median(mContent);
 	}
 
