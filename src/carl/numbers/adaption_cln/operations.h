@@ -115,7 +115,7 @@ inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
             {
                 case 4:
                 {
-                    unsigned signBits;
+                    int signBits;
                     memcpy(&signBits, &n, sizeof signBits);
                     signBits = (signBits << 9) >> 9;
                     if( n < 0 )
@@ -124,7 +124,7 @@ inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
                 }
                 case 8:
                 {
-                    unsigned signBits;
+                    int signBits;
                     memcpy(&signBits, &n, sizeof signBits);
                     signBits = (signBits << 12) >> 12;
                     if( n < 0 )
