@@ -161,6 +161,7 @@ inline cln::cl_RA abs(const cln::cl_RA& n) {
 inline cln::cl_I floor(const cln::cl_RA& n) {
 	return cln::floor1(n);
 }
+
 inline cln::cl_I floor(const cln::cl_I& n) {
 	return n;
 }
@@ -168,6 +169,7 @@ inline cln::cl_I floor(const cln::cl_I& n) {
 inline cln::cl_I ceil(const cln::cl_RA& n) {
 	return cln::ceiling1(n);
 }
+
 inline cln::cl_I ceil(const cln::cl_I& n) {
 	return n;
 }

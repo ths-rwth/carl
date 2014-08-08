@@ -46,13 +46,13 @@ inline double toDouble(const double& n) {
  * 
  * The following functions implement simple operations on the given numbers.
  */
-inline unsigned floor(const double& n) {
-	return (unsigned)std::floor(n);
+inline double floor(double n) {
+	return std::floor(n);
 }
-inline unsigned ceil(const double& n) {
-	return (unsigned)std::ceil(n);
+inline double ceil(double n) {
+	return std::ceil(n);
 }
-inline double abs(const double& n) {
+inline double abs(double n) {
 	return std::abs(n);
 }
 
