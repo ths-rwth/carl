@@ -203,7 +203,7 @@ add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
 set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
-set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
+#set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
 
 set(libraries ${libraries} ${EIGEN3_LIBRARY} pthread)
 set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
