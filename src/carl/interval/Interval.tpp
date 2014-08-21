@@ -2,7 +2,7 @@
  * The implementation for the templated interval class.
  *
  * @file Interval.tpp
- * @autor Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
+ * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  * 
  * @since	2013-12-20
  * @version 2014-01-30
