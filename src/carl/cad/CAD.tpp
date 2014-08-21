@@ -400,6 +400,7 @@ bool CAD<Number>::check(
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << " (" << this->eliminationSets[i].size() << "): " << this->eliminationSets[i]);
 	}
+	this->isSampleTreeConsistent();
 
 #ifdef CAD_CHECK_REDIRECT
 	CAD<Number>::checkCallCount++;
@@ -1347,6 +1348,7 @@ bool CAD<Number>::mainCheck(
 
 template<typename Number>
 typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node) {
+	LOG_FUNC("carl.cad", newSample << ", " << *node);
 	sampleIterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, Less<Number>());
 	if (newNode == this->sampleTree.end(node)) {
 		newNode = this->sampleTree.append_child(node, newSample);
@@ -1443,6 +1445,7 @@ bool CAD<Number>::liftCheck(
 	std::forward_list<RealAlgebraicNumberPtr<Number>> replacedSamples;
 	
 	// fill in a standard sample to ensure termination in the main loop
+	LOGMSG_TRACE("carl.cad", "Calling samples() for " << this->variables[(std::size_t)this->sampleTree.depth(node)]);
 	if (boundActive) {
 		// add the bounds as roots and appropriate intermediate samples and start the lifting with this initial list
 		std::list<RealAlgebraicNumberPtr<Number>> boundRoots;
@@ -1479,6 +1482,7 @@ bool CAD<Number>::liftCheck(
 				break;
 			}
 			
+			LOGMSG_TRACE("carl.cad", "Calling samples() for " << this->variables[(std::size_t)this->sampleTree.depth(node)]);
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
 				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, bound->second, this->setting));
@@ -1565,7 +1569,7 @@ bool CAD<Number>::liftCheck(
 
 template<typename Number>
 int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsActive) {
-	LOGMSG_TRACE("carl.cad", __func__ << "( " << level << ", " << bounds << " )");
+	LOG_FUNC("carl.cad.elimination", level << ", " << bounds);
 	while (true) {
 		if (!this->eliminationSets[level].emptyLiftingQueue()) return (int)level;
 		unsigned l = level;
