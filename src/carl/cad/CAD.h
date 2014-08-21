@@ -61,7 +61,6 @@ public:
 
 	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
-	typedef std::list<std::pair<std::list<cad::Constraint<Number>>, std::list<cad::Constraint<Number>>>> Deductions;
 private:
 	/**
 	 * Fix list of variables for all computations.
@@ -72,12 +71,6 @@ private:
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
 	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
-	
-	/**
-	 * Sample components built during the CAD lifting arranged in a tree.
-	 * These samples are not considered for satisfiability checking already, but are postponed.
-	 */
-	carl::tree<RealAlgebraicNumberPtr<Number>> residueSampleTree;
 
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)
@@ -324,15 +317,7 @@ public:
 	 * the vertices are represented by their indices in the input vector.
 	 *
 	 * If true is returned, the value of conflictGraph is undefined.
-	 * @param deductions contains a conjunction of implications of constraints if the input problem was satisfiable.
-	 * The deductions are always satisfiable. Depending on the setting for numberOfDeductions, the size of the deduction formula can be controlled.
-	 *
-	 * If true is returned, the value of deductions is undefined.
-	 * <ul>
-	 * <li>If 0 is given, no deductions are computed at all.</li>
-	 * <li>Given 1 as the number of deductions, the solution point currently found is used to construct the implication "input constraints => constraints on the variables describing the solution".</li>
-	 * <li>Given k>1, several implications of the above form are constructed connecting the subsets of the input constraint with the respective conditions for the variables so that the subset of constraints is fulfilled. Here, k is the minimum of numberOfDeductions and the solution points satisfying the last constraint found so far.</li>
-	 * </ul>
+	 * 
 	 * @param bounds initial bounds for the variables represented by their index.
 	 * The list is re-assigned by the method: if the result is true, the list contains a refined initial assignment.
 	 * If the result is false, the list contains bounds for some variables. The box spanned by these bounds form a domain where no point satisfies the constraints.
@@ -345,7 +330,6 @@ public:
 				RealAlgebraicPoint<Number>& r,
 				cad::ConflictGraph& conflictGraph,
 				BoundMap& bounds,
-				Deductions& deductions,
 				bool next = false,
 				bool checkBounds = true );
 
@@ -357,8 +341,7 @@ public:
 				bool checkBounds = true)
 	{
 		cad::ConflictGraph cg;
-		Deductions d;
-		return this->check(constraints, r, cg, bounds, d, next, checkBounds);
+		return this->check(constraints, r, cg, bounds, next, checkBounds);
 	}
 
 	/**
@@ -547,7 +530,6 @@ private:
 	 * @param bounds
 	 * @param r
 	 * @param conflictGraph
-	 * @param deductions
 	 * @param next
 	 * @param boundsNontrivial true if there are non-trivial bounds defined
 	 * @param checkBounds
@@ -559,7 +541,6 @@ public:
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
 			cad::ConflictGraph& conflictGraph,
-			Deductions& deductions,
 			bool next,
 			bool boundsNontrivial,
 			bool checkBounds
