@@ -304,7 +304,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		if (p->isNumber())
 		//if( GiNaC::is_exactly_a<numeric>( *p )) /* discard numerics completely */
 		{
-			DOT_NODE(("elimination", p, "shape=box");
+			DOT_NODE("elimination", p, "shape=box");
 			this->erase(p);
 			return {};
 		}
