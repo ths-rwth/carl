@@ -12,7 +12,12 @@ void setInitialLogLevel()
 	carl::logging::logger().filter("logfile")
 		("carl", carl::logging::LogLevel::LVL_INFO)
 		("carl.cad", carl::logging::LogLevel::LVL_TRACE)
+		("carl.cad.dot.elimination", carl::logging::LogLevel::LVL_INFO)
+		("carl.cad.elimination", carl::logging::LogLevel::LVL_INFO)
+		("carl.cad.eliminationset", carl::logging::LogLevel::LVL_INFO)
 		("carl.cad.sampleset", carl::logging::LogLevel::LVL_INFO)
+		("carl.core.resultant", carl::logging::LogLevel::LVL_INFO)
+		("carl.core.rootfinder", carl::logging::LogLevel::LVL_INFO)
 	;
 
 	carl::logging::logger().configure("stdout", std::cout);

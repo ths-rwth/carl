@@ -34,7 +34,7 @@ namespace logging {
 	#define LOGMSG_DEBUG(channel, msg) CARLLOG_DEBUG(channel, msg)	
 	#define LOGMSG_TRACE(channel, msg) CARLLOG_TRACE(channel, msg)
 
-	#define LOG_FUNC( ... ) CARLLOG_FUNC(__VA_ARGS__)
+	#define LOG_FUNC(channel, args) CARLLOG_FUNC(channel, args)
 	#define LOG_ASSERT(channel, condition, msg) CARLLOG_ASSERT(channel, condition, msg)
 	#define LOG_NOTIMPLEMENTED() CARLLOG_ERROR("", "Not implemented method-stub called.")
 	#define LOG_INEFFICIENT() CARLLOG_WARN("", "Inefficient method called.")
@@ -47,7 +47,7 @@ namespace logging {
 	#define LOGMSG_DEBUG(channel, msg)
 	#define LOGMSG_TRACE(channel, msg)
 
-	#define LOG_FUNC( ... )
+	#define LOG_FUNC(channel, args)
 	#define LOG_ASSERT(channel, condition, msg) assert(condition)
 	#define LOG_NOTIMPLEMENTED() std::cerr << "Not implemented method-stub called: " << __func__ << std::endl
 	#define LOG_INEFFICIENT() std::cerr << "Inefficient method called: " << __func__ << std::endl
@@ -59,7 +59,7 @@ namespace logging {
 	#define LOGMSG_DEBUG(channel, msg)
 	#define LOGMSG_TRACE(channel, msg)
 
-	#define LOG_FUNC( ... )
+	#define LOG_FUNC(channel, args)
 	#define LOG_ASSERT(channel, condition, msg) assert(condition)
 	#define LOG_NOTIMPLEMENTED()
 	#define LOG_INEFFICIENT()
