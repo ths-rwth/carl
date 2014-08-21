@@ -6,6 +6,10 @@
 
 #pragma once
 
+#include <algorithm>
+
+#include "../core/logging.h"
+#include "../core/carlLogging.h"
 #include "../core/rootfinder/RootFinder.h"
 
 namespace carl {
@@ -21,6 +25,7 @@ enum class SampleOrdering : unsigned {
 	Interval,
 	Root,
 	NonRoot,
+	Value,
 	Default = SampleOrdering::IntRatRoot
 };
 
@@ -100,8 +105,6 @@ public:
 	bool zeroDimEquations;
 	/// compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check
 	bool computeConflictGraph;
-	/// number of points to be used for the premise of the deduction computed after determining satisfiability of a set of constraints via CAD::check (0: give constraints for the whole CAD cell so that the resulting implication can be quantified universally, k>0: take at most k points for existential quantification)
-	unsigned numberOfDeductions;
 	/// given bounds to the check method, these bounds are used to solve the constraints just by interval arithmetic
 	bool preSolveByBounds;
 	/// given bounds to the check method, these bounds are used wherever possible to reduce the sample sets during the lifting and to reduce the elimination polynomials if simplifyEliminationByBounds is set
@@ -148,7 +151,6 @@ public:
 		if (setting & BOUNDED) {
 			cadSettings.autoSeparateEquations       = true;
 			cadSettings.computeConflictGraph        = false;
-			cadSettings.numberOfDeductions          = 0;
 			cadSettings.earlyLiftingPruningByBounds = true;
 			cadSettings.improveBounds               = true;
 			cadSettings.preSolveByBounds            = false;
@@ -163,7 +165,6 @@ public:
 		if (setting & NOTBOUNDED) {
 			cadSettings.autoSeparateEquations       = true;
 			cadSettings.computeConflictGraph        = false;
-			cadSettings.numberOfDeductions          = 0;
 			cadSettings.earlyLiftingPruningByBounds = false;
 			cadSettings.improveBounds               = false;
 			cadSettings.preSolveByBounds            = false;
@@ -265,7 +266,6 @@ private:
 		trimVariables( false ),
 		autoSeparateEquations( false ),
 		computeConflictGraph( true ),
-		numberOfDeductions( 1 ),
 		preSolveByBounds( false ),
 		earlyLiftingPruningByBounds( true ),
 		simplifyEliminationByBounds( true ),
@@ -291,7 +291,6 @@ public:
 		trimVariables( s.trimVariables ),
 		autoSeparateEquations( s.autoSeparateEquations ),
 		computeConflictGraph( s.computeConflictGraph ),
-		numberOfDeductions( s.numberOfDeductions ),
 		preSolveByBounds( s.preSolveByBounds ),
 		earlyLiftingPruningByBounds( s.earlyLiftingPruningByBounds ),
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),
