@@ -79,6 +79,9 @@ enum CADSettingsType {
 
 static const std::string DEFAULT_CAD_OUTPUTFILE = "cad_constraints.smt2";
 
+/**
+ * Central storage component for CAD strategies and options.
+ */
 struct CADSettings {
 public:
 	/// Ordering used for samples.

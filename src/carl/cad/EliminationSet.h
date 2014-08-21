@@ -23,10 +23,10 @@
 namespace carl {
 namespace cad {
 	
-/** Reminder
- * - SingleEliminationQueue p -> PairedEliminationQueue mit p und p'
- * - UnivariatePolynomial* sind Multivariat!
- * - Ein EliminiationSet pro Variable
+/**
+ * This class stores the polynomials that are still to be eliminated in the CAD.
+ * 
+ * It organizes multiple queues (for single and paired elimination) as well as the relationship between polynomials.
  */
 template<typename Coefficient>
 class EliminationSet {
@@ -88,14 +88,23 @@ private:
 	 */
 	typedef std::map<const UPolynomial*, PolynomialSet> PolynomialBucketMap;
 	
-	/// set of elimination parents
+	/**
+	 * A set of PolynomialPair objects.
+	 */
 	typedef std::set<PolynomialPair, PolynomialPairIsLess> parentbucket;
-	/// mapping one polynomial pointer to a set of elimination parents
+	
+	/**
+	 * Maps a polynomial to a parentbucket.
+	 * The parentbucket contains all pairs of polynomials that produce the stored polynomial when eliminated.
+	 */
 	typedef std::map<const UPolynomial*, parentbucket> parentbucket_map;
 
 	
 // public types
 public:
+	/**
+	 * The comparator used for polynomials here.
+	 */
 	typedef UnivariatePolynomialComparator<typename UPolynomial::CoefficientType> PolynomialComparator;
 
 // private members
@@ -216,14 +225,26 @@ public:
 		this->liftingOrder = order;
 	}
 
+	/**
+	 * Returns the number of polynomials stored in this elimination set.
+     * @return Number of polynomials.
+     */
 	long unsigned size() const {
 		return this->polynomials.size();
 	}
 
+	/**
+	 * Checks if there polynomials in this elimination set.
+     * @return If no polynomials are present.
+     */
 	bool empty() const {
 		return this->polynomials.empty();
 	}
 
+	/**
+	 * Checks if this elimination set fulfills certain consistency constraints.
+     * @return If this set is consistent.
+     */
 	bool isConsistent() const;
 
 	////////////////////
@@ -646,6 +667,11 @@ public:
 }
 
 namespace std {
+/**
+ * Swaps two elimination sets.
+ * @param lhs First set.
+ * @param rhs Second set.
+ */
 template<typename Coeff>
 void swap(carl::cad::EliminationSet<Coeff>& lhs, carl::cad::EliminationSet<Coeff>& rhs);
 }

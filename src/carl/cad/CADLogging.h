@@ -10,6 +10,9 @@
 namespace carl {
 namespace cad {
 
+/**
+ * This class is used to create a dot file representing the elimination phase of the CAD.
+ */
 class DotGenerator: public carl::Singleton<DotGenerator> {
 	struct DotFormatter: public carl::logging::Formatter {
 		virtual void prefix(std::ostream&, const carl::logging::Timer&, const std::string&, carl::logging::LogLevel, const carl::logging::RecordInfo&) {
