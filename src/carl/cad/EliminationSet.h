@@ -199,6 +199,10 @@ public:
      */
 	bool hasParents(const UPolynomial* p) const;
 	
+	const PolynomialSet& getPolynomials() const {
+		return this->polynomials;
+	}
+
 	/*
 	 * Set a new order for the elimination queue.
 	 * @param order New order function.
@@ -389,6 +393,8 @@ public:
 	// ELIMINATION POSITION MANAGEMENT //
 	/////////////////////////////////////
 	
+	const UPolynomial* nextSingleEliminationPosition();
+
 	/**
 	 * Return the next position in the single-elimination queue and remove it from the queue.
 	 *
@@ -468,7 +474,7 @@ public:
 			EliminationSet<Coefficient>& destination,
 			const Variable& variable,
 			const CADSettings& setting,
-			bool synchronous = true
+			bool synchronous = false
 			);
 
 

@@ -277,6 +277,11 @@ void EliminationSet<Coefficient>::resetLiftingPositionsFully() {
 }
 
 template<typename Coefficient>
+const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coefficient>::nextSingleEliminationPosition() {
+	return mSingleEliminationQueue.front();
+}
+
+template<typename Coefficient>
 const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coefficient>::popNextSingleEliminationPosition() {
 	const UPolynomial* p = mSingleEliminationQueue.front();
 	mSingleEliminationQueue.pop_front();
