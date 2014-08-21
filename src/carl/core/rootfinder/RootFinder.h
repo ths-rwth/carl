@@ -14,6 +14,7 @@
 #include "../UnivariatePolynomial.h"
 #include "../../interval/Interval.h"
 #include "../Sign.h"
+#include "../logging.h"
 #include "IncrementalRootFinder.h"
 
 namespace carl {
@@ -36,7 +37,10 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
-	return Finder(polynomial, interval, pivoting).getAllRoots();
+	LOG_FUNC("carl.core.rootfinder", polynomial << ", " << interval);
+	auto r = Finder(polynomial, interval, pivoting).getAllRoots();
+	LOGMSG_TRACE("carl.core.rootfinder", "RealRoots of " << polynomial << " in " << interval << ":" << std::endl << r);
+	return r;
 }
 
 /**
@@ -53,6 +57,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 ) {
+	LOG_FUNC("carl.core.rootfinder", polynomial << ", " << interval);
 	assert(polynomial.isUnivariate());
 	return realRoots(polynomial.convert(std::function<Number(const Coeff&)>([](const Coeff& c){ return c.constantPart(); })), interval, pivoting);
 }
