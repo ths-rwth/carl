@@ -610,7 +610,7 @@ void EliminationSet<Coeff>::elimination(
 	assert(p->mainVar() == q->mainVar());
 	std::list<const UPolynomial*> parents({p, q});
 	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
-	DOT_HYPEREDGE("elimination", {p, q}, p->resultant(*q).switchVariable(variable));
+	DOT_HYPEREDGE("elimination", ({p, q}), p->resultant(*q).switchVariable(variable));
 }
 
 }
