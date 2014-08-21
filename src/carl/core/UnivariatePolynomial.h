@@ -39,7 +39,7 @@ namespace carl
 {
 
 enum class PolynomialComparisonOrder : unsigned {
-	CauchyBound, LowDegree, Memory, Default = Memory
+	CauchyBound, LowDegree, Memory, Default = LowDegree
 };
 enum class SubresultantStrategy : unsigned {
 	Generic, Lazard, Ducos, Default = Lazard
