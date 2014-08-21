@@ -168,6 +168,10 @@ public:
 		return mComp.ordering();
 	}
 
+	const std::set<RealAlgebraicNumberPtr<Number>, carl::Less<Number>>& samples() const {
+		return this->mSamples;
+	}
+
 	/**
 	 * Insert a new sample into this sample set.
      * @param r Sample to insert.
@@ -177,24 +181,8 @@ public:
 		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
 		assert(this->isConsistent());
 		auto res = this->mSamples.insert(r);
-		if (!res.second) {
-			// There is an equivalent sample.
-			// Check if new sample is better (i.e. smaller) than the previous sample.
-			if (mComp(r, *res.first)) {
-				LOGMSG_TRACE("carl.cad.sampleset", "\tsample already exists, replace in queue and update in samples");
-				carl::Equal<Number> eq;
-				bool found = false;
-				for (auto n: mHeap) {
-					if (eq(n, r)) {
-						*n = *r;
-						found = true;
-						break;
-					}
-				}
-				assert(found);
-				restoreOrdering();
-			}
-		} else {
+		LOGMSG_TRACE("carl.cad.sampleset", "\tinsert(): " << *res.first << ", " << res.second);
+		if (res.second) {
 			mHeap.push_back(r);
 			std::push_heap(mHeap.begin(), mHeap.end(), mComp);
 		}

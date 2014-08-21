@@ -45,6 +45,9 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 		case SampleOrdering::Root:
 			CHECK(compareRoot(lhs, rhs));
 			break;
+		case SampleOrdering::Value:
+			return carl::Less<Number>()(lhs, rhs);
+			break;
 		default:
 			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
@@ -68,6 +71,8 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 			return s->isNumericRepresentation();
 		case SampleOrdering::Root:
 			return s->isRoot();
+		case SampleOrdering::Value:
+			return true;
 		default:
 			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
@@ -131,7 +136,7 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
-	os << "SampleSet " << &s << " with ordering " << s.mQueue.key_comp().ordering() << std::endl;
+	os << "SampleSet " << &s << " with ordering " << s.ordering() << std::endl;
 	os << "samples: " << s.mSamples << std::endl;
 	os << "heap: " << s.mHeap << std::endl;
 	return os;
