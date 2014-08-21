@@ -563,6 +563,12 @@ namespace carl
             return !(lhs == rhs);
         }
 
+		friend bool operator<(const Monomial& lhs, const Monomial& rhs)
+		{
+			CompareResult cr = compareGradedLexical(lhs, rhs);
+			return cr == CompareResult::LESS;
+		}
+
         Monomial& operator*=(Variable::Arg v)
         {
             ++mTotalDegree;
