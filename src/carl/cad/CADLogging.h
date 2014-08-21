@@ -10,8 +10,7 @@
 namespace carl {
 namespace cad {
 
-template<typename Coeff>
-class DotGenerator: public carl::Singleton<DotGenerator<Coeff>> {
+class DotGenerator: public carl::Singleton<DotGenerator> {
 	struct DotFormatter: public carl::logging::Formatter {
 		virtual void prefix(std::ostream&, const carl::logging::Timer&, const std::string&, carl::logging::LogLevel, const carl::logging::RecordInfo&) {
 		}
@@ -37,7 +36,7 @@ class DotGenerator: public carl::Singleton<DotGenerator<Coeff>> {
 	}
 	
 public:
-	DotGenerator(): carl::Singleton<DotGenerator<Coeff>>() {
+	DotGenerator(): carl::Singleton<DotGenerator>() {
 		this->configure("lifting");
 		this->configure("elimination");
 	}
@@ -49,24 +48,30 @@ public:
 	void node(const std::string& id, const std::string& name, const std::string& options) {
 		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name << "\" [" << options << "];");
 	}
+	template<typename Coeff>
 	void node(const std::string& id, const carl::cad::UPolynomial<Coeff>* name, const std::string& options) {
 		if (name->isZero()) return;
 		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name->mainVar() << ":" << *name << "\" [" << options << "];");
 	}
 
+	template<typename Coeff>
 	void edge(const std::string& id, const carl::cad::UPolynomial<Coeff>* from, const carl::cad::UPolynomial<Coeff>* to, const std::string& options = "") {
 		edge(id, *from, *to, options);
 	}
+	template<typename Coeff>
 	void edge(const std::string& id, const carl::cad::UPolynomial<Coeff>* from, const carl::cad::UPolynomial<Coeff>& to, const std::string& options = "") {
 		edge(id, *from, to, options);
 	}
+	template<typename Coeff>
 	void edge(const std::string& id, const carl::cad::UPolynomial<Coeff>& from, const carl::cad::UPolynomial<Coeff>& to, const std::string& options = "") {
 		if (to.isZero()) return;
 		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << from.mainVar() << ":" << from << "\" -> \"" << to.mainVar() << ":" << to << "\" [" << options << "];");
 	}
+	template<typename Coeff>
 	void hyperedge(const std::string& id, const std::initializer_list<const carl::cad::UPolynomial<Coeff>*>& from, const carl::cad::UPolynomial<Coeff>* to) {
 		hyperedge(id, from, *to);
 	}
+	template<typename Coeff>
 	void hyperedge(const std::string& id, const std::initializer_list<const carl::cad::UPolynomial<Coeff>*>& from, const carl::cad::UPolynomial<Coeff>& to) {
 		if (to.isZero()) return;
 		assert(from.size() > 0);
@@ -87,7 +92,8 @@ public:
 			LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name.str() << "\" -> \"" << to.mainVar() << ":" << to << "\";");
 		}
 	}
-	
+
+	template<typename Coeff>
 	void sample(const std::string& id, const carl::RealAlgebraicNumberPtr<Coeff>& s, const carl::RealAlgebraicNumberPtr<Coeff>& p) {
 		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << p << "\" -> \"" << s << "\";");
 	}
@@ -95,9 +101,9 @@ public:
 
 #ifdef LOGGING_CARL
 
-#define DOT_NODE(id, name, options) carl::cad::DotGenerator<Coefficient>::getInstance().node(id, name, options)
-#define DOT_EDGE(id, from, to, options) carl::cad::DotGenerator<Coefficient>::getInstance().edge(id, from, to, options)
-#define DOT_HYPEREDGE(id, from, to) carl::cad::DotGenerator<Coefficient>::getInstance().hyperedge(id, from, to)
+#define DOT_NODE(id, name, options) carl::cad::DotGenerator::getInstance().node(id, name, options)
+#define DOT_EDGE(id, from, to, options) carl::cad::DotGenerator::getInstance().edge(id, from, to, options)
+#define DOT_HYPEREDGE(id, from, to) carl::cad::DotGenerator::getInstance().hyperedge(id, from, to)
 
 #else
 
