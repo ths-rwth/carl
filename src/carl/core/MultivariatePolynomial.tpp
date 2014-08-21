@@ -1323,6 +1323,20 @@ bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
     return !(lhs == rhs);
 }
 
+template<typename C, typename O, typename P>
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
+{
+	for (unsigned i = 0; i < lhs.mTerms.size(); i++) {
+		if (i >= rhs.mTerms.size()) return false;
+		if (lhs.mTerms[i] == rhs.mTerms[i]) continue;
+		if (lhs.mTerms[i] == nullptr) return true;
+		if (rhs.mTerms[i] == nullptr) return false;
+		if (*(lhs.mTerms[i]) < *(rhs.mTerms[i])) return true;
+		if (*(rhs.mTerms[i]) < *(lhs.mTerms[i])) return false;
+	}
+	return (rhs.mTerms.size() > lhs.mTerms.size());
+}
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
