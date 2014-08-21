@@ -661,6 +661,23 @@ public:
 		}
 		return false;
 	}
+
+	template<typename It>
+	bool isSampleConsistent(It node) const {
+		bool lastRoot = false;
+		for (auto cur = node.begin(); cur != node.end(); cur++) {
+			if ((*cur)->isRoot() && lastRoot) return false;
+			lastRoot = (*cur)->isRoot();
+			if (!isSampleConsistent(cur)) return false;
+		}
+		return true;
+	}
+
+	void isSampleTreeConsistent() const {
+		bool isOk = isSampleConsistent(this->sampleTree.begin());
+		if (!isOk) LOGMSG_ERROR("carl.cad", "SampleTree: " << this->sampleTree)
+		assert(isOk);
+	}
 };
 
 }
