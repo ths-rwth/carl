@@ -24,6 +24,9 @@
 namespace carl {
 namespace cad {
 
+/**
+ * Representation of a constraint of the form \f$p \sim 0\f$ where \f$p\f$ is some polynomial and \f$\sim \in \{ <, \leq, =, > \geq, > \}\f$.
+ */
 template<typename Number>
 class Constraint {
 private:
