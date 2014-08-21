@@ -23,17 +23,19 @@ namespace carl {
 namespace logging {
 
 enum class LogLevel : unsigned {
-	LVL_TRACE, LVL_DEBUG, LVL_INFO, LVL_WARN, LVL_ERROR, LVL_FATAL
+	LVL_ALL, LVL_TRACE, LVL_DEBUG, LVL_INFO, LVL_WARN, LVL_ERROR, LVL_FATAL, LVL_OFF
 };
 inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
 	switch (level) {
-		case LogLevel::LVL_TRACE: return os << "TRACE";
-		case LogLevel::LVL_DEBUG: return os << "DEBUG";
-		case LogLevel::LVL_INFO:  return os << "INFO ";
-		case LogLevel::LVL_WARN:  return os << "WARN ";
-		case LogLevel::LVL_ERROR: return os << "ERROR";
-		case LogLevel::LVL_FATAL: return os << "FATAL";
-		default: return os << "???";
+		case LogLevel::LVL_ALL:		return os << "ALL  ";
+		case LogLevel::LVL_TRACE:	return os << "TRACE";
+		case LogLevel::LVL_DEBUG:	return os << "DEBUG";
+		case LogLevel::LVL_INFO:	return os << "INFO ";
+		case LogLevel::LVL_WARN:	return os << "WARN ";
+		case LogLevel::LVL_ERROR:	return os << "ERROR";
+		case LogLevel::LVL_FATAL:	return os << "FATAL";
+		case LogLevel::LVL_OFF:		return os << "OFF  ";
+		default:					return os << "???  ";
 	}
 }
 
@@ -148,10 +150,11 @@ struct Formatter {
 	}
 	virtual void prefix(std::ostream& os, const Timer& timer, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		os.fill(' ');
-		os << "[" << std::right << std::setw(4) << timer << "] ";
-		os << level << " ";
-		os << std::left << std::setw((int)channelwidth) << channel << " ";
-		os << std::right << std::setw(25) << carl::basename(info.filename) << ":" << std::left << std::setw(4) << info.line << " ";
+		os << "[" << std::right << std::setw(4) << timer << "] " << level << " ";
+		std::string filename(carl::basename(info.filename));
+		unsigned long spacing = 1;
+		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
+		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
 		if (!info.func.empty()) os << info.func << "(): ";
 	}
 	virtual void suffix(std::ostream& os) {
@@ -164,7 +167,7 @@ struct Formatter {
  */
 class Logger: public carl::Singleton<Logger> {
 	friend carl::Singleton<Logger>;
-	std::map<std::string, std::tuple<Sink*, Filter, Formatter>> data;
+	std::map<std::string, std::tuple<std::shared_ptr<Sink>, Filter, std::shared_ptr<Formatter>>> data;
 	std::mutex mutex;
 	Timer timer;
 
@@ -172,42 +175,50 @@ class Logger: public carl::Singleton<Logger> {
 	}
 public:
 	~Logger() {
-		for (auto t: data) delete std::get<0>(t.second);
 		data.clear();
 	}
-	void configure(const std::string& id, Sink* sink, const Filter& fl = Filter()) {
-		Formatter fm;
-		fm.configure(fl);
+	bool has(const std::string& id) const {
+		return data.find(id) != data.end();
+	}
+	void configure(const std::string& id, std::shared_ptr<Sink> sink, const Filter& fl = Filter()) {
+		std::shared_ptr<Formatter> fm = std::make_shared<Formatter>();
+		fm->configure(fl);
 		this->data[id] = std::make_tuple(sink, fl, fm);
 	}
 	void configure(const std::string& id, const std::string& filename) {
-		configure(id, new FileSink(filename));
+		configure(id, std::make_shared<FileSink>(filename));
 	}
 	void configure(const std::string& id, std::ostream& os) {
-		configure(id, new StreamSink(os));
+		configure(id, std::make_shared<StreamSink>(os));
 	}
 	Filter& filter(const std::string& id) {
 		auto it = data.find(id);
 		assert(it != data.end());
 		return std::get<1>(it->second);
 	}
-	Formatter& formatter(const std::string& id) {
+	std::shared_ptr<Formatter> formatter(const std::string& id) {
 		auto it = data.find(id);
 		assert(it != data.end());
 		return std::get<2>(it->second);
 	}
+	void formatter(const std::string& id, std::shared_ptr<Formatter> fmt) {
+		auto it = data.find(id);
+		assert(it != data.end());
+		std::get<2>(it->second) = fmt;
+		std::get<2>(it->second)->configure(std::get<1>(it->second));
+	}
 	void resetFormatter() {
 		for (auto& t: data) {
-			std::get<2>(t.second).configure(std::get<1>(t.second));
+			std::get<2>(t.second)->configure(std::get<1>(t.second));
 		}
 	}
 	void log(LogLevel level, const std::string& channel, const std::stringstream& ss, const RecordInfo& info) {
 		std::lock_guard<std::mutex> lock(mutex);
 		for (auto t: data) {
 			if (!std::get<1>(t.second).check(channel, level)) continue;
-			std::get<2>(t.second).prefix(std::get<0>(t.second)->log(), timer, channel, level, info);
+			std::get<2>(t.second)->prefix(std::get<0>(t.second)->log(), timer, channel, level, info);
 			std::get<0>(t.second)->log() << ss.str();
-			std::get<2>(t.second).suffix(std::get<0>(t.second)->log());
+			std::get<2>(t.second)->suffix(std::get<0>(t.second)->log());
 		}
 	}
 };
@@ -221,12 +232,7 @@ inline Logger& logger() {
 #define __CARLLOG(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD); }
 #define __CARLLOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD_NOFUNC); }
 
-#define MACRO_dispatcher(func, ...) MACRO_dispatcher_(func, VA_NUM_ARGS(__VA_ARGS__))
-#define MACRO_dispatcher_(func, nargs) func ## nargs
-
-#define CARLLOG_FUNC_2(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << ")");
-#define CARLLOG_FUNC_3(channel, args, expr) __CARLLOG_NOFUNC(carl::logging::LogLevel::_TRACE, channel, __func__ << "(" << args << "): " << expr);
-#define CARLLOG_FUNC( ... ) MACRO_dispatcher(CARLLOG_FUNC_, __VA_ARGS__)(__VA_ARGS__)
+#define CARLLOG_FUNC(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");
 
 #define CARLLOG_TRACE(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_TRACE, channel, expr)
 #define CARLLOG_DEBUG(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_DEBUG, channel, expr)
