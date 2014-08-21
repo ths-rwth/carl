@@ -2008,11 +2008,11 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 			C a = this->cauchyBound();
 			C b = rhs.cauchyBound();
 			if (a < b) return true;
-			return (a == b) && this->less(rhs);
+			return *this < rhs;
 		}*/
 		case PolynomialComparisonOrder::LowDegree:
 			if (this->degree() < rhs.degree()) return true;
-			return (this->degree() == rhs.degree()) && this->less(rhs);
+			return *this < rhs;
 		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
 	}
