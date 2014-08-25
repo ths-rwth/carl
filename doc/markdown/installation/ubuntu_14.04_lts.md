@@ -2,16 +2,16 @@ Ubuntu 14.04 LTS 64Bit {#ubuntu_1404_lts}
 ==========
 
 This is an example how the installation on Ubuntu 14.04 LTS 64Bit looks like.
-We assume that start with a fresh installation and know how to install software packages.
+We assume that you start with a fresh installation and know how to install software packages.
 
 - Install the following packages:
- - `git` to checkout the git repository.
- - `cmake` and `cmake-curses-gui` to generate the make files.
- - `libcln6` and `libgmp-dev` for calculations with large numbers.
- - `libeigen3-dev` for numerical computations.
- - `g++` or `clang` to compile.
- - `libboost-dev` for several additional libraries.
- - `doxygen` to build the documentation. 
+ - `git`
+ - `cmake` and `cmake-curses-gui`
+ - `libcln6` and `libgmp-dev`
+ - `libeigen3-dev`
+ - `g++` or `clang`
+ - `libboost-dev`
+ - `doxygen`
 
 - Checkout CArL:
 @code
