@@ -1,5 +1,5 @@
 /**
- * @file Numeric.cpp
+ * @file Numeric.tpp
  * @author Florian Corzilius <corzilius@cs.rwth-aachen.de>
  *
  * @version 2014-03-11
