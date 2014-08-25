@@ -32,14 +32,13 @@
 #include "BoundType.h"
 #include "checking.h"
 #include "rounding.h"
-#include "../numbers/typetraits.h"
+#include "../numbers/numbers.h"
 #include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 CLANG_WARNING_RESET
-#include "../numbers/operations.h"
 #include <cmath>
 
 #include "../core/Variable.h"

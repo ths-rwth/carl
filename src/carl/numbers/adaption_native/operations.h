@@ -10,8 +10,6 @@
 #include <cmath>
 #include <limits>
 
-#include "typetraits.h"
-
 namespace carl {
 
 /**
@@ -26,6 +24,10 @@ inline bool isNumber(const double& d) {
 
 inline std::size_t bitsize(unsigned) {
 	return sizeof(unsigned) * 8;
+}
+
+template<typename C>
+inline void reserve(size_t) {
 }
 
 /**

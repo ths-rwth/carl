@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <functional>
 #include "../../util/platform.h"
 CLANG_WARNING_DISABLE("-Wmismatched-tags")
 #include <cln/cln.h>
@@ -16,11 +15,16 @@ namespace std
 {
 	
 template<>
-struct hash<cln::cl_RA>
-{
-	size_t operator()(const cln::cl_RA& cln_rational) const
-	{
-		return cln::equal_hashcode(cln_rational);
+struct hash<cln::cl_RA> {
+	size_t operator()(const cln::cl_RA& n) const {
+		return cln::equal_hashcode(n);
+	}
+};
+
+template<>
+struct hash<cln::cl_I> {
+	size_t operator()(const cln::cl_I& n) const {
+		return cln::equal_hashcode(n);
 	}
 };
 

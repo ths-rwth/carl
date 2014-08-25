@@ -9,7 +9,7 @@
  */
 #pragma once
 #include "Interval.h"
-#include "../numbers/operations.h"
+#include "../numbers/numbers.h"
 #include <iostream>
 
 namespace carl

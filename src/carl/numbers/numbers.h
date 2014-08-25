@@ -6,12 +6,18 @@
  */
 
 #pragma once
-#include <climits>
-#include <array>
-#include <map>
 
 #include "typetraits.h"
-#include "operations.h"
+
 #include "adaption_cln/hash.h"
+#include "adaption_cln/operations.h"
+#include "adaption_cln/typetraits.h"
+
 #include "adaption_gmpxx/hash.h"
+#include "adaption_gmpxx/operations.h"
+#include "adaption_gmpxx/typetraits.h"
+
+#include "adaption_native/operations.h"
+#include "adaption_native/typetraits.h"
+
 #include "Numeric.h"

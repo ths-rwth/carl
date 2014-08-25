@@ -16,7 +16,7 @@
 #include "VarExpPair.h"
 #include "VariablesInformation.h"
 #include "logging.h"
-#include "../numbers/operations.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {   

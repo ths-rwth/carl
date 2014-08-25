@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "util.h"
 #include "numbers.h"
 #include "GaloisField.h"
 

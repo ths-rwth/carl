@@ -12,7 +12,7 @@
 
 #include "../core/RealAlgebraicNumber.h"
 #include "../util/debug.h"
-#include "../numbers/operations.h"
+#include "../numbers/numbers.h"
 
 namespace carl {
 namespace cad {

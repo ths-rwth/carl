@@ -6,7 +6,9 @@
  */
 
 #pragma once
-#include "numbers.h"
+
+#include <cassert>
+#include <utility>
 
 namespace carl
 {

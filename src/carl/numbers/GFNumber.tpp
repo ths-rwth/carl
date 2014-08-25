@@ -8,7 +8,7 @@
 #pragma once
 
 #include "GFNumber.h"
-#include "EEA.h"
+#include "adaption_native/EEA.h"
 
 namespace carl
 {
