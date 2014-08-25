@@ -20,6 +20,7 @@
 #include "typetraits.h"
 #include "../util/SFINAE.h"
 #include "../core/logging.h"
+#include "adaption_cln/operations.h"
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
@@ -42,6 +43,12 @@ namespace carl
         }
     };
 
+    template<typename F>
+    struct IntegralT<carl::FLOAT_T<F>>
+    {
+        typedef cln::cl_I type;
+    };
+    
     template<typename FloatType>
     class FLOAT_T
     {
@@ -648,6 +655,11 @@ namespace carl
         {
             return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
         }
+        
+        friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs)
+        {
+            return FLOAT_T<FloatType>(-_lhs);
+        }
 
         friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
@@ -757,6 +769,14 @@ namespace carl
     };
     
     template<typename FloatType>
+    static FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& in)
+    {
+        FLOAT_T<FloatType> result;
+        in.abs(result);
+        return result;
+    }
+    
+    template<typename FloatType>
     static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& in)
     {
         FLOAT_T<FloatType> result;
@@ -778,6 +798,18 @@ namespace carl
         FLOAT_T<FloatType> result;
         in.ceil(result);
         return result;
+    }
+    
+    template<typename FloatType>
+    static cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
+    {
+        return carl::getDenom(carl::rationalize<cln::cl_RA>(in.toDouble()));
+    }
+    
+    template<typename FloatType>
+    static cln::cl_I getNum(const FLOAT_T<FloatType>& in)
+    {
+        return carl::getNum(carl::rationalize<cln::cl_RA>(in.toDouble()));
     }
     
 #ifdef USE_MPFR_FLOAT

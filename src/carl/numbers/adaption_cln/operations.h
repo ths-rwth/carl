@@ -13,6 +13,7 @@
 #include <cassert>
 #include <limits>
 #include <cmath>
+#include "typetraits.h"
 
 namespace carl {
 
