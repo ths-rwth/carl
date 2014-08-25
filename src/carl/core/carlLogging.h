@@ -317,9 +317,7 @@ public:
      * @param sink Sink.
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
-		std::shared_ptr<Formatter> fm = std::make_shared<Formatter>();
-		std::shared_ptr<Filter> fl = std::make_shared<Filter>();
-		this->data[id] = std::make_tuple(sink, fl, fm);
+		this->data[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
 	}
 	/**
 	 * Installs a FileSink.
