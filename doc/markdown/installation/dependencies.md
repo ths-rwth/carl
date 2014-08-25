@@ -9,6 +9,9 @@ To build and use CArL, you need the following other software:
 - `Eigen3` for numerical computations.
 - `g++` or `clang` to compile.
 - `boost` for several additional libraries.
+
+Optional dependencies
+- `ccmake` to set cmake flags.
 - `doxygen` to build the documentation.
 - `gtest` to build the test cases.
 

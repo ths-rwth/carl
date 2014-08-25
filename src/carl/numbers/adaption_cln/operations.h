@@ -160,9 +160,9 @@ inline cln::cl_LF toLF(const cln::cl_RA& n) {
 }
 
 template<typename T>
-inline T rationalize(double n) {
-	return cln::rationalize(cln::cl_R(n));
-}
+inline T rationalize(double n);
+template<typename T>
+inline T rationalize(float n);
 
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
@@ -172,30 +172,36 @@ inline cln::cl_RA rationalize<cln::cl_RA>(double n) {
 	switch (std::fpclassify(n)) {
 		case FP_NORMAL: // normalized are fully supported
 			return cln::rationalize(cln::cl_R(n));
-		case FP_SUBNORMAL: // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
-            switch( sizeof( n ) )
-            {
-                case 4:
-                {
-                    int signBits;
-                    memcpy(&signBits, &n, sizeof signBits);
-                    signBits = (signBits << 9) >> 9;
-                    if( n < 0 )
-                        signBits = -signBits;
-                    return cln::cl_RA( signBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23;
-                }
-                case 8:
-                {
-                    int signBits;
-                    memcpy(&signBits, &n, sizeof signBits);
-                    signBits = (signBits << 12) >> 12;
-                    if( n < 0 )
-                        signBits = -signBits;
-                    return cln::cl_RA( signBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52;
-                }
-                default:
-                    assert( false );
-                    return 0;
+		case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
+				assert(sizeof(n) == 8);
+				long int significandBits = reinterpret_cast<long int>(&n);
+				significandBits = (significandBits << 12) >> 12;
+				if( n < 0 )
+					significandBits = -significandBits;
+				return cln::cl_RA( significandBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52;
+            }
+		case FP_ZERO:
+			return 0;
+		case FP_NAN: // NaN and infinite are not supported
+		case FP_INFINITE:
+			assert(false);
+			break;
+	}
+	return 0;
+}
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(float n) {
+	switch (std::fpclassify(n)) {
+		case FP_NORMAL: // normalized are fully supported
+			return cln::rationalize(cln::cl_R(n));
+		case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
+				assert(sizeof(n) == 4);
+				long int significandBits = reinterpret_cast<long int>(&n);
+				significandBits = (significandBits << 9) >> 9;
+				if( n < 0 )
+					significandBits = -significandBits;
+				return cln::cl_RA( significandBits ) * ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23;
             }
 		case FP_ZERO:
 			return 0;
