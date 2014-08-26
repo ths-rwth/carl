@@ -658,7 +658,7 @@ namespace carl
         
         friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs)
         {
-            return FLOAT_T<FloatType>(-_lhs);
+            return FLOAT_T<FloatType>(-1*_lhs);
         }
 
         friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
