@@ -201,8 +201,8 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	}
 	os << "Sample tree:" << std::endl;
 	os << cad.sampleTree << std::endl;
-	os << "Number of samples computed: " << cad.samples().size() << endl;
-	os << "CAD complete: " << cad.isComplete() << endl;
+	os << "Number of samples computed: " << cad.samples().size() << std::endl;
+	os << "CAD complete: " << cad.isComplete() << std::endl;
 	return os;
 }
 
