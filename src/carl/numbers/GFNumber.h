@@ -169,5 +169,15 @@ GFNumber<IntegerT> quotient(const GFNumber<IntegerT>& lhs, const GFNumber<Intege
 	return lhs / rhs;
 }
 
+/**
+ * @todo Implement this
+ * @param 
+ * @return 
+ */
+template<typename IntegerT>
+inline bool isInteger(const GFNumber<IntegerT>&) {
+	return false;
+}
+
 }
 #include "GFNumber.tpp"
