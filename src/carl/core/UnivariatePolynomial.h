@@ -472,7 +472,7 @@ public:
 	/**
 	 * Checks whether the polynomial is unit normal
 	 * @see @cite GCL92, page 39
-	 * @return 
+	 * @return If polynomial is normal.
 	 */
 	bool isNormal() const;
 	/**
