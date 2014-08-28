@@ -21,6 +21,7 @@ CLANG_WARNING_DISABLE("-Wsign-conversion")
 CLANG_WARNING_RESET
 
 #include "../util/SFINAE.h"
+#include "floatTypes/mpfr_float.tpp"
 
 namespace carl {
 
@@ -45,6 +46,8 @@ struct is_real
 	static const bool value = false;
 };
 
+
+
 /**
  * Type trait is_rational. 
  * Default is false, but certain types which encode rationals should be set to true. 
@@ -53,6 +56,12 @@ template<typename type>
 struct is_rational
 {
 	static const bool value = false;
+};
+
+template<typename C>
+struct is_rational<FLOAT_T<C>>
+{
+        static const bool value = true;
 };
 
 

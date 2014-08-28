@@ -5,7 +5,7 @@
  * @file FLOAT_T.h
  * @author  Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  * @since   2013-10-14
- * @version 2014-01-30
+ * @version 2014-07-30
  */
 
 #pragma once
@@ -44,7 +44,7 @@ namespace carl
     };
 
     template<typename F>
-    struct IntegralT<carl::FLOAT_T<F>>
+    struct IntegralT<carl::FLOAT_T<F> >
     {
         typedef cln::cl_I type;
     };
@@ -83,6 +83,12 @@ namespace carl
         {
             assert(is_float<FloatType>::value);
             mValue = _int;
+        }
+        
+        FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
+        {
+            assert(is_float<FloatType>::value);
+            mValue = _long;
         }
 
         FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
@@ -781,6 +787,14 @@ namespace carl
     {
         FLOAT_T<FloatType> result;
         in.log(result);
+        return result;
+    }
+    
+    template<typename FloatType>
+    static FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& in)
+    {
+        FLOAT_T<FloatType> result;
+        in.sqrt(result);
         return result;
     }
     
