@@ -16,7 +16,7 @@ namespace carl
 {
 
 /**
- * A coefficient times a monomial.
+ * Represents a single term, that is a numeric coefficient and a monomial.
  * @ingroup multirp
  */
 template<typename Coefficient>

@@ -5,11 +5,21 @@
  */
 
 #pragma once
+
 #include <functional>
 #include <list>
 #include <map>
 #include <memory>
 #include <vector>
+
+#include "Polynomial.h"
+#include "Sign.h"
+#include "Variable.h"
+#include "VariableInformation.h"
+
+#include "../interval/Interval.h"
+#include "../numbers/numbers.h"
+#include "../util/SFINAE.h"
 
 namespace carl {
 //
@@ -22,18 +32,10 @@ using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient
 
 }
 
-#include "Variable.h"
-#include "VariableInformation.h"
-#include "Polynomial.h"
-#include "Sign.h"
 #include "DivisionResult.h"
 #include "MultivariatePolynomial.h"
-#include "../numbers/numbers.h"
-#include "../numbers/GFNumber.h"
-#include "../interval/Interval.h"
 
 #include "logging.h"
-#include "../util/SFINAE.h"
 
 namespace carl
 {

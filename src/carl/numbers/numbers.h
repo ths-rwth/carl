@@ -22,4 +22,6 @@
 #include "adaption_native/operations.h"
 #include "adaption_native/typetraits.h"
 
+#include "GaloisField.h"
+
 #include "Numeric.h"

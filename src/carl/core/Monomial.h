@@ -23,6 +23,7 @@ namespace carl
 
 	template<typename Coefficient>
 	class Term;
+
 	/**
 	 * The general-purpose monomials. Notice that we aim to keep this object as small as possbible,
 	 * while also limiting the use of expensive language features such as RTTI, exceptions and even
@@ -50,11 +51,8 @@ namespace carl
 		 */
 		Monomial() = default;
 	public:
-		//
-		// Constructors
-		//
 		/**
-		 * Generate a monomial from a variable, with constant 1 (one).
+		 * Generate a monomial from a variable and an exponent.
 		 * @param v The variable.
 		 * @param e The exponent.
 		 */
@@ -65,6 +63,10 @@ namespace carl
 			assert(isConsistent());
 		}
 
+		/**
+		 * Copy constructor.
+		 * @param rhs Monomial to copy.
+		 */
 		Monomial(const Monomial& rhs) :
 			mExponents(rhs.mExponents),
 			mTotalDegree(rhs.mTotalDegree)
@@ -557,16 +559,15 @@ namespace carl
 		
 		friend bool operator==(const Monomial& lhs, const Monomial& rhs)
 		{
-			if(lhs.mTotalDegree != rhs.mTotalDegree) return false;
-			else return lhs.mExponents == rhs.mExponents;
+			if (lhs.mTotalDegree != rhs.mTotalDegree) return false;
+			return lhs.mExponents == rhs.mExponents;
 		}
 
 		friend bool operator==(const Monomial& lhs, Variable::Arg rhs)
 		{
-			// TODO think about reordering based on what is most probable.
-			if(lhs.mTotalDegree != 1) return false;
-			if(lhs.mExponents[0].var == rhs) return true;
-			else return false;
+			if (lhs.mTotalDegree != 1) return false;
+			if (lhs.mExponents[0].var == rhs) return true;
+			return false;
 		}
 
 		friend bool operator==(const Variable& lhs, const Monomial& rhs)
@@ -585,7 +586,7 @@ namespace carl
 		}
 		friend bool operator!=(const Variable& lhs, const Monomial& rhs)
 		{
-			return !(lhs == rhs);
+			return !(rhs == lhs);
 		}
 
 		friend bool operator<(const Monomial& lhs, const Monomial& rhs)
@@ -659,7 +660,7 @@ namespace carl
 			return *this;
 		}
 
-		friend const Monomial operator*(const Monomial& lhs, Variable::Arg rhs )
+		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs)
 		{
 			// Note that this implementation is not optimized yet!
 			Monomial result(lhs);
@@ -667,20 +668,14 @@ namespace carl
 			return result;
 		}
 
-		friend const Monomial operator*(Variable::Arg lhs, const Monomial& rhs)
+		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs)
 		{
 			return rhs * lhs;
 		}
 		
-		friend const Monomial operator*(const Variable& lhs, const Variable& rhs)
-		{
-			// Note that this implementation is not optimized yet!
-			Monomial result(lhs);
-			result *= rhs;
-			return result;
-		}
+		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
 
-		friend const Monomial operator*(const Monomial& lhs, const Monomial& rhs )
+		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs )
 		{
 			// Note that this implementation is not optimized yet!
 			Monomial result(lhs);
@@ -858,6 +853,14 @@ namespace carl
 			return CompareResult::LESS;
 		}
 	};
+	
+	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs)
+		{
+			// Note that this implementation is not optimized yet!
+			Monomial result(lhs);
+			result *= rhs;
+			return result;
+		}
 } // namespace carl
 
 namespace std
