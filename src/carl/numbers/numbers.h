@@ -13,6 +13,8 @@
 #include "adaption_cln/operations.h"
 #include "adaption_cln/typetraits.h"
 
+#include "adaption_float/typetraits.h"
+
 #include "adaption_gmpxx/hash.h"
 #include "adaption_gmpxx/operations.h"
 #include "adaption_gmpxx/typetraits.h"

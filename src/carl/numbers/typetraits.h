@@ -13,15 +13,11 @@
 #include "../util/platform.h"
 #include "config.h"
 #include <type_traits>
-#ifdef USE_MPFR_FLOAT
-#include <mpfr.h>
-#endif
-CLANG_WARNING_DISABLE("-Wsign-conversion")
-#include <gmpxx.h>
-CLANG_WARNING_RESET
+//CLANG_WARNING_DISABLE("-Wsign-conversion")
+//#include <gmpxx.h>
+//CLANG_WARNING_RESET
 
 #include "../util/SFINAE.h"
-#include "floatTypes/mpfr_float.tpp"
 
 namespace carl {
 
@@ -56,12 +52,6 @@ template<typename type>
 struct is_rational
 {
 	static const bool value = false;
-};
-
-template<typename C>
-struct is_rational<FLOAT_T<C>>
-{
-        static const bool value = true;
 };
 
 
@@ -190,14 +180,6 @@ struct is_float
 {
     static const bool value = false;
 };
-
-#ifdef USE_MPFR_FLOAT
-template<>
-struct is_float<mpfr_t>
-{
-    static const bool value = true;
-};
-#endif
 
 /**
  * Type trait is_primitive required for BoostIntervals to use the preimlpemented default rounding and checking policies.

@@ -13,18 +13,21 @@
 #include <string>
 #include <iostream>
 #include <assert.h>
-
-#include "config.h"
 #include <math.h>
-#include "roundingConversion.h"
-#include "typetraits.h"
-#include "../util/SFINAE.h"
-#include "../core/logging.h"
-#include "adaption_cln/operations.h"
+#include <cmath>
+#include <cln/cln.h>
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
-#include <cmath>
+
+#include "typetraits.h"
+#include "adaption_cln/typetraits.h"
+#include "adaption_cln/operations.h"
+#include "config.h"
+#include "roundingConversion.h"
+#include "../util/SFINAE.h"
+#include "../core/logging.h"
+
 
 namespace carl
 {
@@ -41,12 +44,6 @@ namespace carl
         {
             return FLOAT_T<T1>(_op2.toDouble());
         }
-    };
-
-    template<typename F>
-    struct IntegralT<carl::FLOAT_T<F> >
-    {
-        typedef cln::cl_I type;
     };
     
     template<typename FloatType>
@@ -827,6 +824,6 @@ namespace carl
     }
     
 #ifdef USE_MPFR_FLOAT
-#include "floatTypes/mpfr_float.tpp"
+#include "adaption_float/mpfr_float.tpp"
 #endif
 }

@@ -1,5 +1,6 @@
 #include "../FLOAT_T.h"
 #ifdef USE_MPFR_FLOAT
+
 template<>
 class FLOAT_T<mpfr_t>
 {
