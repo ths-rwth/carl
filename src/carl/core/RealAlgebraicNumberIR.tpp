@@ -58,15 +58,16 @@ template<typename Number>
 RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() || n->isZero()) return n;
 
-	Variable va = this->getPolynomial().mainVar();
+	Variable x=  this->getPolynomial().mainVar();
 	Variable y = VariablePool::getInstance().getFreshVariable();
 
 	MultivariatePolynomial<Number> tmp1(this->getPolynomial());
-	tmp1 = tmp1.substitute(va, MultivariatePolynomial<Number>({Term<Number>(va), -Term<Number>(y)}));
+	tmp1 = tmp1.substitute(x, MultivariatePolynomial<Number>({Term<Number>(x), -Term<Number>(y)}));
 	MultivariatePolynomial<Number> tmp2(n->getPolynomial().replaceVariable(y));
-	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).switchVariable(va).toNumberCoefficients());
+	UnivariatePolynomial<Number> res(tmp1.toUnivariatePolynomial(y).resultant(tmp2.toUnivariatePolynomial(y)).switchVariable(x).toNumberCoefficients());
 	
-	auto p = res.switchVariable(va).coprimeCoefficients().primitivePart().template convert<Number>();
+	// Make coefficients integral, calculate primitive part and convert back to fractions (for type compatibility).
+	auto p = res.coprimeCoefficients().primitivePart().template convert<Number>();
 	auto seq = p.standardSturmSequence();
 
 	Interval<Number> i = this->getInterval() + n->getInterval();
