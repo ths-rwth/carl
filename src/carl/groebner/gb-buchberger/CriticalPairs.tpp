@@ -30,8 +30,7 @@ namespace carl
     
     /**
      * 
-     * @param lt
-     * @param ind
+     * @param lm
      * @param newpairs
      */
     template<template <class> class Datastructure, class Configuration>

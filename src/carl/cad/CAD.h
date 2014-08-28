@@ -41,7 +41,6 @@
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicPoint.h"
 #include "../core/Variable.h"
-#include "../interval/ExactInterval.h"
 #include "../util/tree.h"
 
 #include "CADTypes.h"

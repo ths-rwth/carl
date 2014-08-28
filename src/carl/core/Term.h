@@ -27,19 +27,59 @@ class Term
         std::shared_ptr<const Monomial> mMonomial;
     
     public:
+		/**
+		 * Default constructor. Constructs a term of value zero.
+		 */
         Term();
+		/**
+		 * Constructs a term of value \f$ c \f$.
+		 * @param c Coefficient.
+		 */
         explicit Term(const Coefficient& c);
+		/**
+		 * Constructs a term of value \f$ v \f$.
+		 * @param v Variable.
+		 */
         explicit Term(Variable::Arg v);
+		/**
+		 * Constructs a term of value \f$ m \f$.
+		 * @param m Monomial.
+		 */
         explicit Term(const Monomial& m);
+		/**
+		 * Constructs a term of value \f$ m \f$.
+		 * @param m Monomial pointer.
+		 */
         explicit Term(const std::shared_ptr<const Monomial>& m);
+		/**
+		 * Constructs a term of value \f$ c \cdot m \f$.
+		 * @param c Coefficient.
+		 * @param m Monomial.
+		 */
         Term(const Coefficient& c, const Monomial& m);
+		/**
+		 * Constructs a term of value \f$ c \cdot m \f$.
+		 * @param c Coefficient.
+		 * @param m Monomial pointer.
+		 */
         Term(const Coefficient& c, const Monomial* m);
+		/**
+		 * Constructs a term of value \f$ c \cdot m \f$.
+		 * @param c Coefficient.
+		 * @param m Monomial pointer.
+		 */
         Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
-        Term(const Coefficient& c, Variable::Arg v, unsigned exponent);
+		/**
+		 * Constructs a term of value \f$ c \cdot v^e \f$.
+		 * @param c Coefficient.
+		 * @param v Variable.
+		 * @param e Exponent.
+		 */
+        Term(const Coefficient& c, Variable::Arg v, unsigned e);
         
 		/**
          * Get the coefficient.
-         * @return 
+         * @return Coefficient.
          */
         const Coefficient& coeff() const
         {
@@ -47,8 +87,8 @@ class Term
         }
         
         /**
-         * 
-         * @return 
+         * Get the monomial.
+         * @return Monomial.
          */
         std::shared_ptr<const Monomial> monomial() const
         {
@@ -56,7 +96,7 @@ class Term
         }
         /**
          * Gives the total degree, i.e. the sum of all exponents.
-         * @return 
+         * @return Total degree.
          */
         exponent tdeg() const
         {

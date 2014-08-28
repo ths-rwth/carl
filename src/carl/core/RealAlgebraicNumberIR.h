@@ -179,6 +179,12 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);
 
+	/**
+	 * Creates a new real algebraic number that is the sum of this and n.
+	 * Implemented following \cite Mishra93 page 332.
+	 * @param n Other number.
+	 * @return this + n.
+	 */
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(const std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
 
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus() const;

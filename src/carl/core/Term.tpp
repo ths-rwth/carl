@@ -55,8 +55,8 @@ Term<Coefficient>::Term(const Coefficient& c, const Monomial* m) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned exponent) :
-mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, exponent)))
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e) :
+mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, e)))
 {
     assert(this->isConsistent());
 }

@@ -262,7 +262,7 @@ namespace carl
         FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
         {
             //assert(*this >= 0);
-            /// @TODO implement root_assign for FLOAT_T
+            /// @todo implement root_assign for FLOAT_T
             LOG_NOTIMPLEMENTED();
             return *this;
         }
@@ -271,7 +271,7 @@ namespace carl
         {
             //assert(*this >= 0);
             LOG_NOTIMPLEMENTED();
-            /// @TODO implement root for FLOAT_T
+            /// @todo implement root for FLOAT_T
         }
 
         FLOAT_T<FloatType>& pow_assign(unsigned long int _exp, CARL_RND = CARL_RND::N)
