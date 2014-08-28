@@ -177,3 +177,27 @@ TEST_F(CADTest, Check6)
 	ASSERT_TRUE(cad.check(cons, r, this->bounds));
 	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r));
 }
+
+template<typename T>
+inline std::shared_ptr<carl::RealAlgebraicNumberNR<cln::cl_RA>> NR(T t, bool b) {
+	return carl::RealAlgebraicNumberNR<cln::cl_RA>::create(t, b);
+}
+
+TEST(CAD, Samples)
+{
+	std::list<carl::RealAlgebraicNumberPtr<cln::cl_RA>> roots({ NR(-1, true), NR(1, true) });
+	
+	carl::cad::SampleSet<cln::cl_RA> currentSamples;
+	currentSamples.insert(NR(-1, false));
+	currentSamples.insert(NR(0, true));
+	currentSamples.insert(NR(1, false));
+	
+	std::forward_list<carl::RealAlgebraicNumberPtr<cln::cl_RA>> replacedSamples;
+	
+	carl::Interval<cln::cl_RA> bounds(0, carl::BoundType::STRICT, 1, carl::BoundType::INFTY);
+	
+	carl::cad::SampleSet<cln::cl_RA> res = carl::CAD<cln::cl_RA>::samples(roots, currentSamples, replacedSamples, bounds);
+
+	std::cout << res << std::endl;
+	ASSERT_TRUE(!res.empty());
+}

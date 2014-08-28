@@ -344,11 +344,13 @@ TEST(UnivariatePolynomial, primitivePart)
 	EXPECT_EQ(UnivariatePolynomial<cln::cl_I>(x, {5,9,1}),UnivariatePolynomial<cln::cl_I>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
 }
 
-TEST(UnivariatePolynomial, pseudoRem)
+TEST(UnivariatePolynomial, switchVariable)
 {
-//	Variable x = VariablePool::getInstance().getFreshVariable();
-	
-	
+	Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable y = VariablePool::getInstance().getFreshVariable();
+	UnivariatePolynomial<cln::cl_I> p(x, {1,2,3});
+	auto q = p.switchVariable(y);
+	std::cout << p << " -> " << q << std::endl;
 }
 
 TEST(UnivariatePolynomial, resultant)
@@ -394,5 +396,24 @@ TEST(UnivariatePolynomial, resultant2)
 	//std::cout << "resultant[" << p << ", " << q << "] = " << p.resultant(q) << std::endl;
 	
 	EXPECT_EQ(r, p.resultant(q));
+}
+
+TEST(UnivariatePolynomial, resultant3)
+{
+	Variable b = VariablePool::getInstance().getFreshVariable("b");
+	Variable a = VariablePool::getInstance().getFreshVariable("a");
+	Variable t = VariablePool::getInstance().getFreshVariable("t");
+	
+	MultivariatePolynomial<cln::cl_RA> ma(a);
+	MultivariatePolynomial<cln::cl_RA> mt(t);
+	MultivariatePolynomial<cln::cl_RA> one((cln::cl_RA)1);
+	
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(a, {mt.pow(10) + mt.pow(8), mt.pow(8) + mt.pow(6), mt.pow(4)});
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(a, {mt.pow(4), mt.pow(2), mt.pow(2), one});
+	//UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r(b, MultivariatePolynomial<cln::cl_RA>(Term<cln::cl_RA>(t)*t*t*t));
+	
+	std::cout << "resultant[" << p << ", " << q << "] =\n\t" << p.resultant(q) << std::endl;
+	
+	//EXPECT_EQ(r, p.resultant(q));
 }
 

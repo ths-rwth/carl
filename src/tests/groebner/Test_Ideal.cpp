@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/groebner/Reductor.h"
 
+#include "carl/core/Monomial.h"
 #include "carl/core/MultivariatePolynomial.h"
 
 #include "carl/groebner/Ideal.h"
