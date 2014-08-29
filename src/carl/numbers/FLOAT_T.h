@@ -72,10 +72,6 @@ namespace carl
     public:
 
         /**
-         * Constructors & Destructors
-         */
-
-        /**
          * Default empty constructor, which initializes to zero.
          */
         FLOAT_T<FloatType>()
@@ -88,7 +84,7 @@ namespace carl
          * Constructor, which takes a double as input and optional rounding, which
          * can be used, if the underlying fp implementation allows this.
          * @param _double Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
         {
@@ -100,7 +96,7 @@ namespace carl
          * Constructor, which takes a float as input and optional rounding, which
          * can be used, if the underlying fp implementation allows this.
          * @param _float Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         FLOAT_T<FloatType>(const float _float, const CARL_RND=CARL_RND::N)
         {
@@ -112,7 +108,7 @@ namespace carl
          * Constructor, which takes an integer as input and optional rounding, which
          * can be used, if the underlying fp implementation allows this.
          * @param _int Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
         {
@@ -124,7 +120,7 @@ namespace carl
          * Constructor, which takes a long as input and optional rounding, which
          * can be used, if the underlying fp implementation allows this.
          * @param _long Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
         {
@@ -137,7 +133,7 @@ namespace carl
          * as input, which can be used, if the underlying fp implementation 
          * allows this.
          * @param _float Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
         {
@@ -148,7 +144,7 @@ namespace carl
          * Constructor, which takes an arbitrary fp type as input and optional rounding, which
          * can be used, if the underlying fp implementation allows this.
          * @param val Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         template<typename F = FloatType, DisableIf< std::is_same<F, double> > = dummy>
         FLOAT_T<FloatType>(const FloatType& val, const CARL_RND=CARL_RND::N)
@@ -161,7 +157,7 @@ namespace carl
          * as input and optional rounding, which can be used, if the underlying 
          * fp implementation allows this.
          * @param _float Value to be initialized.
-         * @param N
+         * @param N Possible rounding direction.
          */
         template<typename F, DisableIf< std::is_same<F, FloatType> > = dummy>
         FLOAT_T<FloatType>(const FLOAT_T<F>& _float, const CARL_RND=CARL_RND::N)
@@ -175,13 +171,9 @@ namespace carl
          */
         ~FLOAT_T() { }
 
-        /*******************
-         * Getter & Setter *
-         *******************/
-
         /**
          * Getter for the raw value contained.
-         * @return raw value.
+         * @return Raw value.
          */
         const FloatType& value() const
         {
@@ -191,7 +183,7 @@ namespace carl
         /**
          * If precision is used, this getter returns the acutal precision (default:
          * 53 bit).
-         * @return precision.
+         * @return Precision.
          */
         precision_t precision() const
         {
@@ -202,21 +194,17 @@ namespace carl
          * Allows to set the desired precision. Note: If the value is already 
          * initialized this can change the internal value.
          * @param Precision in bits.
-         * @return reference to this.
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& setPrecision(const precision_t&)
         {
             return *this;
         }
 
-        /*************
-         * Operators *
-         *************/
-
         /**
          * Assignment operator.
          * @param _rhs Righthand side of the assignment.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& operator =(const FLOAT_T<FloatType>& _rhs)
         {
@@ -225,13 +213,9 @@ namespace carl
         }
 
         /**
-         * Boolean operators 
-         */
-
-        /**
          * Comparison operator for equality.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _rhs equals this.
          */
         bool operator ==(const FLOAT_T<FloatType>& _rhs) const
         {
@@ -241,7 +225,7 @@ namespace carl
         /**
          * Comparison operator for inequality.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _rhs is unequal to this.
          */
         bool operator !=(const FLOAT_T<FloatType> & _rhs) const
         {
@@ -251,7 +235,7 @@ namespace carl
         /**
          * Comparison operator for larger than.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _rhs is larger than this.
          */
         bool operator>(const FLOAT_T<FloatType> & _rhs) const
         {
@@ -261,7 +245,7 @@ namespace carl
         /**
          * Comparison operator for less than.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return  True if _rhs is smaller than this.
          */
         bool operator<(const FLOAT_T<FloatType> & _rhs) const
         {
@@ -271,7 +255,7 @@ namespace carl
         /**
          * Comparison operator for less or equal than.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _rhs is larger or equal than this.
          */
         bool operator <=(const FLOAT_T<FloatType> & _rhs) const
         {
@@ -281,7 +265,7 @@ namespace carl
         /**
          * Comparison operator for larger or equal than.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _rhs is smaller or equal than this.
          */
         bool operator >=(const FLOAT_T<FloatType> & _rhs) const
         {
@@ -289,15 +273,11 @@ namespace carl
         }
 
         /**
-         * arithmetic operations
-         */
-
-        /**
          * Function for addition of two numbers, which assigns the result to the 
          * calling number.
          * @param _op2 Righthand side of the operation
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& add_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
@@ -310,7 +290,7 @@ namespace carl
          * @param _result Result of the operation.
          * @param _op2 Righthand side of the operation.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& add(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
@@ -323,7 +303,7 @@ namespace carl
          * calling number.
          * @param _op2 Righthand side of the operation
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& sub_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
@@ -337,7 +317,7 @@ namespace carl
          * @param _result Result of the operation.
          * @param _op2 Righthand side of the operation.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& sub(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
@@ -350,7 +330,7 @@ namespace carl
          * calling number.
          * @param _op2 Righthand side of the operation
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& mul_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
@@ -364,7 +344,7 @@ namespace carl
          * @param _result Result of the operation.
          * @param _op2 Righthand side of the operation.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& mul(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
@@ -377,7 +357,7 @@ namespace carl
          * calling number.
          * @param _op2 Righthand side of the operation
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
@@ -392,7 +372,7 @@ namespace carl
          * @param _result Result of the operation.
          * @param _op2 Righthand side of the operation.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
@@ -402,14 +382,10 @@ namespace carl
         }
 
         /**
-         * special operators
-         */
-
-        /**
          * Function for the square root of the number, which assigns the result to the 
          * calling number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& sqrt_assign(CARL_RND = CARL_RND::N)
         {
@@ -423,7 +399,7 @@ namespace carl
          * parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -436,7 +412,7 @@ namespace carl
          * Function for the cubic root of the number, which assigns the result to the 
          * calling number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& cbrt_assign(CARL_RND = CARL_RND::N)
         {
@@ -450,7 +426,7 @@ namespace carl
          * parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -464,7 +440,7 @@ namespace carl
          * calling number.
          * @param Degree of the root.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
         {
@@ -480,7 +456,7 @@ namespace carl
          * @param Result.
          * @param Degree of the root.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
         {
@@ -494,7 +470,7 @@ namespace carl
          * calling number.
          * @param _exp Degree.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& pow_assign(unsigned long int _exp, CARL_RND = CARL_RND::N)
         {
@@ -508,7 +484,7 @@ namespace carl
          * @param _result Result.
          * @param _deg Degree.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, unsigned long int _exp, CARL_RND = CARL_RND::N) const
         {
@@ -519,7 +495,7 @@ namespace carl
         /**
          * Assigns the number the absolute value of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& abs_assign(CARL_RND = CARL_RND::N)
         {
@@ -532,7 +508,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& abs(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -543,7 +519,7 @@ namespace carl
         /**
          * Assigns the number the exponential of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& exp_assign(CARL_RND = CARL_RND::N)
         {
@@ -556,7 +532,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& exp(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -567,7 +543,7 @@ namespace carl
         /**
          * Assigns the number the sine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& sin_assign(CARL_RND = CARL_RND::N)
         {
@@ -580,7 +556,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& sin(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -591,7 +567,7 @@ namespace carl
         /**
          * Assigns the number the cosine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& cos_assign(CARL_RND = CARL_RND::N)
         {
@@ -604,7 +580,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& cos(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -615,7 +591,7 @@ namespace carl
         /**
          * Assigns the number the logarithm of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& log_assign(CARL_RND = CARL_RND::N)
         {
@@ -628,7 +604,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& log(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -639,7 +615,7 @@ namespace carl
         /**
          * Assigns the number the tangent of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& tan_assign(CARL_RND = CARL_RND::N)
         {
@@ -652,7 +628,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& tan(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -663,7 +639,7 @@ namespace carl
         /**
          * Assigns the number the arcus sine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& asin_assign(CARL_RND = CARL_RND::N)
         {
@@ -676,7 +652,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& asin(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -687,7 +663,7 @@ namespace carl
         /**
          * Assigns the number the arcus cosine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& acos_assign(CARL_RND = CARL_RND::N)
         {
@@ -700,7 +676,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& acos(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -711,7 +687,7 @@ namespace carl
         /**
          * Assigns the number the arcus tangent of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& atan_assign(CARL_RND = CARL_RND::N)
         {
@@ -724,7 +700,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& atan(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -735,7 +711,7 @@ namespace carl
         /**
          * Assigns the number the hyperbolic sine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& sinh_assign(CARL_RND = CARL_RND::N)
         {
@@ -748,7 +724,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& sinh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -759,7 +735,7 @@ namespace carl
         /**
          * Assigns the number the hyperbolic cosine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& cosh_assign(CARL_RND = CARL_RND::N)
         {
@@ -772,7 +748,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& cosh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -783,7 +759,7 @@ namespace carl
         /**
          * Assigns the number the hyperbolic tangent of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& tanh_assign(CARL_RND = CARL_RND::N)
         {
@@ -796,7 +772,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& tanh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -807,7 +783,7 @@ namespace carl
         /**
          * Assigns the number the hyperbolic arcus sine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& asinh_assign(CARL_RND = CARL_RND::N)
         {
@@ -820,7 +796,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& asinh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -831,7 +807,7 @@ namespace carl
         /**
          * Assigns the number the hyperbolic arcus cosine of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& acosh_assign(CARL_RND = CARL_RND::N)
         {
@@ -844,7 +820,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& acosh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -855,7 +831,7 @@ namespace carl
         /**
          * Assigns the number the hyperbolic arcus tangent of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& atanh_assign(CARL_RND = CARL_RND::N)
         {
@@ -868,7 +844,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& atanh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -881,7 +857,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -892,7 +868,7 @@ namespace carl
         /**
          * Assigns the number the floor of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& floor_assign(CARL_RND = CARL_RND::N)
         {
@@ -905,7 +881,7 @@ namespace carl
          * it into a passed result parameter.
          * @param _result Result.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to the result.
          */
         FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
@@ -916,7 +892,7 @@ namespace carl
         /**
          * Assigns the number the ceiling of this number.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Reference to this.
          */
         FLOAT_T<FloatType>& ceil_assign(CARL_RND = CARL_RND::N)
         {
@@ -924,27 +900,21 @@ namespace carl
             return *this;
         }
 
-        /**
-         * conversion operators
-         */
         
         /**
          * Function which converts the number to a double value.
          * @param N Possible rounding direction.
-         * @return 
+         * @return Double representation of this
          */
         double toDouble(CARL_RND = CARL_RND::N) const
         {
             return (double) mValue;
         }
 
-        /**
-         * Typecast operators
-         */
         
         /**
          * Explicit typecast operator to integer.
-         * @return 
+         * @return Integer representation of this.
          */
         explicit operator int() const
         {
@@ -953,7 +923,7 @@ namespace carl
         
         /**
          * Explicit typecast operator to long.
-         * @return 
+         * @return Long representation of this.
          */
         explicit operator long() const
         {
@@ -962,7 +932,7 @@ namespace carl
         
         /**
          * Explicit typecast operator to double.
-         * @return 
+         * @return Double representation of this.
          */
         explicit operator double() const
         {
@@ -973,9 +943,9 @@ namespace carl
          * Output stream operator for numbers of type FLOAT_T.
          * @param ostr Output stream.
          * @param p Number.
-         * @return 
+         * @return Reference to the ostream.
          */
-        friend std::ostream & operator<<(std::ostream& ostr, const FLOAT_T<FloatType>& p)
+        friend std::ostream& operator<<(std::ostream& ostr, const FLOAT_T<FloatType>& p)
         {
             ostr << p.toString();
             return ostr;
@@ -985,7 +955,7 @@ namespace carl
          * Comparison operator which tests for equality of two numbers.
          * @param _lhs Lefthand side of the comparison.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _lhs equals _rhs.
          */
         friend bool operator==(const FLOAT_T<FloatType>& _lhs, const int _rhs)
         {
@@ -996,7 +966,7 @@ namespace carl
          * Comparison operator which tests for equality of two numbers.
          * @param _lhs Lefthand side of the comparison.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _lhs equals _rhs.
          */
         friend bool operator==(const int _lhs, const FLOAT_T<FloatType>& _rhs)
         {
@@ -1007,7 +977,7 @@ namespace carl
          * Comparison operator which tests for equality of two numbers.
          * @param _lhs Lefthand side of the comparison.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _lhs equals _rhs.
          */
         friend bool operator==(const FLOAT_T<FloatType>& _lhs, const double _rhs)
         {
@@ -1018,7 +988,7 @@ namespace carl
          * Comparison operator which tests for equality of two numbers.
          * @param _lhs Lefthand side of the comparison.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _lhs equals _rhs.
          */
         friend bool operator==(const double _lhs, const FLOAT_T<FloatType>& _rhs)
         {
@@ -1029,7 +999,7 @@ namespace carl
          * Comparison operator which tests for equality of two numbers.
          * @param _lhs Lefthand side of the comparison.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _lhs equals _rhs.
          */
         friend bool operator==(const FLOAT_T<FloatType>& _lhs, const float _rhs)
         {
@@ -1040,7 +1010,7 @@ namespace carl
          * Comparison operator which tests for equality of two numbers.
          * @param _lhs Lefthand side of the comparison.
          * @param _rhs Righthand side of the comparison.
-         * @return 
+         * @return True if _lhs equals _rhs.
          */
         friend bool operator==(const float _lhs, const FLOAT_T<FloatType>& _rhs)
         {
@@ -1048,14 +1018,10 @@ namespace carl
         }
 
         /**
-         * operations required for the usage of Eigen3
-         */
-
-        /**
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the complex conjugate.
          * @param x The passed number.
-         * @return 
+         * @return Reference to x.
          */
         inline const FLOAT_T<FloatType>& ei_conj(const FLOAT_T<FloatType>& x)
         {
@@ -1066,7 +1032,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the real part.
          * @param x The passed number.
-         * @return 
+         * @return Reference to x.
          */
         inline const FLOAT_T<FloatType>& ei_real(const FLOAT_T<FloatType>& x)
         {
@@ -1077,7 +1043,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the imaginary part.
          * @param x The passed number.
-         * @return 
+         * @return Zero.
          */
         inline FLOAT_T<FloatType> ei_imag(const FLOAT_T<FloatType>&)
         {
@@ -1088,7 +1054,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the absolute value.
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the absolute value of x.
          */
         inline FLOAT_T<FloatType> ei_abs(const FLOAT_T<FloatType>& x)
         {
@@ -1102,7 +1068,7 @@ namespace carl
          * a custom type which calculates the absolute value (special Eigen3
          * version).
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the absolute value of x according to abs2 of Eigen3.
          */
         inline FLOAT_T<FloatType> ei_abs2(const FLOAT_T<FloatType>& x)
         {
@@ -1115,7 +1081,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the square root.
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the square root of x.
          */
         inline FLOAT_T<FloatType> ei_sqrt(const FLOAT_T<FloatType>& x)
         {
@@ -1128,7 +1094,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the exponential.
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the exponential of x.
          */
         inline FLOAT_T<FloatType> ei_exp(const FLOAT_T<FloatType>& x)
         {
@@ -1141,7 +1107,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the logarithm.
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the logarithm of x.
          */
         inline FLOAT_T<FloatType> ei_log(const FLOAT_T<FloatType>& x)
         {
@@ -1154,7 +1120,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the sine.
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the sine of x.
          */
         inline FLOAT_T<FloatType> ei_sin(const FLOAT_T<FloatType>& x)
         {
@@ -1167,7 +1133,7 @@ namespace carl
          * Function required for extension of Eigen3 with FLOAT_T as 
          * a custom type which calculates the cosine.
          * @param x The passed number.
-         * @return 
+         * @return Number which holds the cosine of x.
          */
         inline FLOAT_T<FloatType> ei_cos(const FLOAT_T<FloatType>& x)
         {
@@ -1181,7 +1147,7 @@ namespace carl
          * a custom type which calculates the power.
          * @param x The passed number.
          * @param y Degree.
-         * @return 
+         * @return Number which holds the power of x of degree y.
          */
         inline FLOAT_T<FloatType> ei_pow(const FLOAT_T<FloatType>& x, FLOAT_T<FloatType> y)
         {
@@ -1191,110 +1157,225 @@ namespace carl
         }
 
         /**
-         * Operators
+         * Operator for addition of two numbers
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
          */
-
         friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue + _rhs.mValue);
         }
 
+        /**
+         * Operator for addition of two numbers, the righthand side type is the
+         * underlying type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue + _rhs);
         }
 
+        /**
+         * Operator for addition of two numbers, the lefthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator +(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return _rhs + _lhs;
         }
 
+        /**
+         * Operator for subtraction of two numbers
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue - _rhs.mValue);
         }
 
+        /**
+         * Operator for addition of two numbers, the righthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue - _rhs);
         }
 
+        /**
+         * Operator for subtraction of two numbers, the lefthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator -(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
         }
         
+        /**
+         * Operator for unary negation of a number.
+         * @param _lhs Lefthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs)
         {
             return FLOAT_T<FloatType>(-1*_lhs);
         }
 
+        /**
+         * Operator for addition of two numbers.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue * _rhs.mValue);
         }
-
+        
+        /**
+         * Operator for multiplication of two numbers, the righthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
+        friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+        {
+            return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
+        }
+        
+        /**
+         * Operator for addition of two numbers, the lefthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator *(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
         }
 
-        friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
-        {
-            return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
-        }
-
+        /**
+         * Operator for addition of two numbers.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue / _rhs.mValue);
         }
 
+        /**
+         * Operator for division of two numbers, the righthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs.mValue / _rhs);
         }
 
+        /**
+         * Operator for division of two numbers, the lefthand side is the underlying
+         * type.
+         * @param _lhs Lefthand side.
+         * @param _rhs Righthand side.
+         * @return Number which holds the result.
+         */
         friend FLOAT_T<FloatType> operator /(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
             return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
         }
 
+        /**
+         * Operator which increments this number by one.
+         * @param _num 
+         * @return Reference to _num.
+         */
         friend FLOAT_T<FloatType>& operator ++(FLOAT_T<FloatType>& _num)
         {
             _num.mValue += 1;
             return _num;
         }
 
+        /**
+         * Operator which decrements this number by one.
+         * @param _num 
+         * @return Reference to _num.
+         */
         friend FLOAT_T<FloatType>& operator --(FLOAT_T<FloatType>& _num)
         {
             _num.mValue -= 1;
             return _num;
         }
 
+        /**
+         * Operator which adds the righthand side to this.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator +=(const FLOAT_T<FloatType>& _rhs)
         {
             mValue = mValue + _rhs.mValue;
             return *this;
         }
 
+        /**
+         * Operator which adds the righthand side of the underlying type to this.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator +=(const FloatType& _rhs)
         {
             mValue = mValue + _rhs;
             return *this;
         }
 
+        /**
+         * Operator which subtracts the righthand side from this.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator -=(const FLOAT_T<FloatType>& _rhs)
         {
             mValue = mValue - _rhs.mValue;
             return *this;
         }
 
+        /**
+         * Operator which subtracts the righthand side of the underlying type from this.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator -=(const FloatType& _rhs)
         {
             mValue = mValue - _rhs;
             return *this;
         }
         
+        /**
+         * Operator for unary negation of this number.
+         * @return Number which holds the negated original number.
+         */
         FLOAT_T<FloatType> operator-()
         {
             FLOAT_T<FloatType> result = FLOAT_T<FloatType>(*this);
@@ -1302,24 +1383,46 @@ namespace carl
             return result;
         }
 
+        /**
+         * Operator which multiplicates this number by the righthand side.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator *=(const FLOAT_T<FloatType>& _rhs)
         {
             mValue = mValue * _rhs.mValue;
             return *this;
         }
 
+        /**
+         * Operator which multiplicates this number by the righthand side of the
+         * underlying type.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator *=(const FloatType& _rhs)
         {
             mValue = mValue * _rhs;
             return *this;
         }
 
+        /**
+         * Operator which divides this number by the righthand side.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator /=(const FLOAT_T<FloatType>& _rhs)
         {
             mValue = mValue / _rhs.mValue;
             return *this;
         }
 
+        /**
+         * Operator which divides this number by the righthand side of the underlying
+         * type.
+         * @param _rhs
+         * @return Reference to this.
+         */
         FLOAT_T<FloatType>& operator /=(const FloatType& _rhs)
         {
             mValue = mValue / _rhs;
@@ -1327,15 +1430,20 @@ namespace carl
         }
         
         /**
-         * Auxiliary Functions
+         * Method which converts this number to a string.
+         * @return String representation of this number.
          */
-
         std::string toString() const
         {
             return std::to_string(mValue);
         }
     };
     
+    /**
+     * Method which returns the absolute value of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
     template<typename FloatType>
     static FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& in)
     {
@@ -1344,6 +1452,11 @@ namespace carl
         return result;
     }
     
+    /**
+     * Method which returns the logarithm of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
     template<typename FloatType>
     static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& in)
     {
@@ -1352,6 +1465,11 @@ namespace carl
         return result;
     }
     
+    /**
+     * Method which returns the square root of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
     template<typename FloatType>
     static FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& in)
     {
@@ -1360,6 +1478,12 @@ namespace carl
         return result;
     }
     
+    /**
+     * Method which returns the next smaller integer of this number or the number
+     * itself, if it is already an integer.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
     template<typename FloatType>
     static FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& in)
     {
@@ -1368,6 +1492,12 @@ namespace carl
         return result;
     }
     
+    /**
+     * Method which returns the next larger integer of the passed number or the
+     * number itself, if it is already an integer.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
     template<typename FloatType>
     static FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& in)
     {
@@ -1376,12 +1506,22 @@ namespace carl
         return result;
     }
     
+    /**
+     * Implicitly converts the number to a rational and returns the denominator.
+     * @param in Number.
+     * @return Cln interger which holds the result.
+     */
     template<typename FloatType>
     static cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
     {
         return carl::getDenom(carl::rationalize<cln::cl_RA>(in.toDouble()));
     }
     
+    /**
+     * Implicitly converts the number to a rational and returns the nominator.
+     * @param in Number.
+     * @return Cln interger which holds the result.
+     */
     template<typename FloatType>
     static cln::cl_I getNum(const FLOAT_T<FloatType>& in)
     {
