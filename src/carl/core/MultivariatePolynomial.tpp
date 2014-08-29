@@ -714,8 +714,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         if(term->monomial())
         {
             const Monomial& m = *(term->monomial());
+			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
             for(unsigned i = 0; i < m.nrVariables(); ++i)
             {
+				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
                 if(m[i].exp > 1 && substitutions.find(m[i].var) != substitutions.end())
                 {
                     expResults[m[i]] = MultivariatePolynomial((Coeff) 1);
@@ -769,8 +771,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         if(term->monomial())
         {   
             const Monomial& m = *(term->monomial());
+			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
             for(unsigned i = 0; i < m.nrVariables(); ++i)
             {
+				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
                 if(m[i].exp == 1)
                 {
                     auto iter = substitutions.find(m[i].var);
