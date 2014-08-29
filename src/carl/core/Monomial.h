@@ -339,10 +339,11 @@ namespace carl
 		 */
 		Monomial* dividedBy(const Monomial& m) const
 		{
+			LOG_FUNC("carl.core.monomial", *this << ", " << m);
 			if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
 			{
 				// Division will fail.
-				
+				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 				return nullptr;
 			}
 			Monomial* result = new Monomial();
@@ -358,6 +359,7 @@ namespace carl
 					// Insert remaining part
 					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
 					assert(result->isConsistent());
+					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 					return result;
 				}
 				// Variable is present in both monomials.
@@ -368,6 +370,7 @@ namespace carl
 					{
 						// Underflow, itright->exp was larger than itleft->exp.
 						delete result;
+						LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 						return nullptr;
 					}
 					else if(newExp > 0)
@@ -380,6 +383,7 @@ namespace carl
 				else if(itleft->var > itright->var) 
 				{
 					delete result;
+					LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 					return nullptr;
 				}
 				else
@@ -392,9 +396,11 @@ namespace carl
 			if(itright != m.mExponents.end())
 			{
 				delete result;
+				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 				return nullptr;
 			}
 			assert(result->isConsistent());
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 			return result;
 			
 		}
@@ -621,6 +627,7 @@ namespace carl
 
 		Monomial& operator*=(const Monomial& rhs)
 		{
+			LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
 			if(rhs.mTotalDegree == 0) return *this;
 			mTotalDegree += rhs.mTotalDegree;
 
@@ -632,6 +639,7 @@ namespace carl
 				// Everything is inserted.
 				if(itright == rhs.mExponents.end())
 				{
+					LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
 					return *this;
 				}
 				// Variable is present in both monomials.
@@ -657,12 +665,13 @@ namespace carl
 			// Insert remainder of rhs.
 			mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
 			assert(isConsistent());
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
 			return *this;
 		}
 
 		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs)
 		{
-			// Note that this implementation is not optimized yet!
+			// Note that thisope implementation is not optimized yet!
 			Monomial result(lhs);
 			result *= rhs;
 			return result;
@@ -756,6 +765,7 @@ namespace carl
 		
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
 		{
+			LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
 			assert(lhs.isConsistent());
 			assert(rhs.isConsistent());
 			Monomial result;
@@ -769,6 +779,7 @@ namespace carl
 				{
 					// Insert remaining part
 					result.mExponents.insert(result.mExponents.end(), itleft, lhs.mExponents.end());
+					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 					return result;
 				}
 				// Variable is present in both monomials.
@@ -797,6 +808,7 @@ namespace carl
 			 // Insert remaining part
 			result.mExponents.insert(result.mExponents.end(), itright, rhs.mExponents.end());
 			assert(result.isConsistent());
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 			return result;
 			
 		}
