@@ -1506,6 +1506,18 @@ namespace carl
         return result;
     }
     
+    template<>
+    inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double in)
+    {
+        return FLOAT_T<double>(in);
+    }
+    
+    template<>
+    inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float in)
+    {
+        return FLOAT_T<float>(in);
+    }
+    
     /**
      * Implicitly converts the number to a rational and returns the denominator.
      * @param in Number.

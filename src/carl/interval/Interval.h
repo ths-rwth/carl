@@ -32,7 +32,8 @@
 #include "BoundType.h"
 #include "checking.h"
 #include "rounding.h"
-#include "../numbers/numbers.h"
+#include "../numbers/adaption_cln/operations.h"
+#include "../numbers/adaption_native/operations.h"
 #include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
@@ -532,7 +533,7 @@ namespace carl
          * @param upper The desired upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<is_float<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<is_float<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy, DisableIf<is_float<Num >> = dummy>
         Interval(Float lower, BoundType lowerBoundType, Float upper, BoundType upperBoundType)
         {
             mLowerBoundType = lowerBoundType;
