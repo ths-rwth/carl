@@ -183,15 +183,15 @@ namespace carl
         void collect(const Variable& v, const typename CoeffType::CoeffType& termCoeff, const typename CoeffType::MonomType& monomial)
         {
             exponent e = 0;
-            std::vector<VarExpPair> exps = std::vector<VarExpPair>();
+            std::vector<std::pair<Variable, exponent>> exps;
             exps.reserve(monomial.nrVariables()-1);
             exponent totalDegree = monomial.tdeg();
             for(unsigned i = 0; i<monomial.nrVariables(); ++i)
             {
-                if(monomial[i].var == v)
+                if(monomial[i].first == v)
                 {
-                    totalDegree -= monomial[i].exp;
-                    e = monomial[i].exp;
+                    totalDegree -= monomial[i].second;
+                    e = monomial[i].second;
                 }
                 else
                 {

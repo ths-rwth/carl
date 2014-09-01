@@ -62,37 +62,37 @@ public:
 	 * @param monomial The monomial part of t.
      */
 	template<typename TermCoeff>
-	void variableInTerm(const VarExpPair& ve, const TermCoeff& termCoeff, const typename CoeffType::MonomType& monomial)
+	void variableInTerm(const std::pair<Variable, exponent>& ve, const TermCoeff& termCoeff, const typename CoeffType::MonomType& monomial)
 	{
-		auto it = mVariableInfo.find(ve.var);
+		auto it = mVariableInfo.find(ve.first);
 		// Variable did not occur before.
 		if(it == mVariableInfo.end())
 		{
 			// TODO GCC 4.7 does not support the (faster) emplace on maps
-			//it = mVariableInfo.emplace(ve.var, VariableInformation<collectCoeff, CoeffType>(ve.exp)).first;
-			it = mVariableInfo.insert(std::make_pair(ve.var, VariableInformation<collectCoeff, CoeffType>(ve.exp))).first;
+			//it = mVariableInfo.emplace(ve.first, VariableInformation<collectCoeff, CoeffType>(ve.second)).first;
+			it = mVariableInfo.insert(std::make_pair(ve.first, VariableInformation<collectCoeff, CoeffType>(ve.second))).first;
 		}
 		else
 		{
 			// One more term in which the variable occurs.
 			it->second.increaseOccurence();
 			// Update minimal/maximal degree.
-			if(!it->second.raiseMaxDegree(ve.exp))
+			if(!it->second.raiseMaxDegree(ve.second))
 			{
 				// Only if raising failed, lowering can be successful.
-				it->second.lowerMinDegree(ve.exp);
+				it->second.lowerMinDegree(ve.second);
 			}
 		}
 		if(collectCoeff)
 		{
-			typename CoeffType::MonomType* m = monomial.dropVariable(ve.var);
+			typename CoeffType::MonomType* m = monomial.dropVariable(ve.first);
 			if(m == nullptr)
 			{
-				it->second.updateCoeff(ve.exp, typename CoeffType::TermType(termCoeff));
+				it->second.updateCoeff(ve.second, typename CoeffType::TermType(termCoeff));
 			}
 			else
 			{
-				it->second.updateCoeff(ve.exp, typename CoeffType::TermType(termCoeff, m));
+				it->second.updateCoeff(ve.second, typename CoeffType::TermType(termCoeff, m));
 			}
 		}
 	}

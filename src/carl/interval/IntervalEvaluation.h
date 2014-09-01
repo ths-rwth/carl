@@ -50,10 +50,10 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 	LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
 	for(unsigned i = 0; i < m.nrVariables(); ++i)
 	{
-		LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
+		LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 		// We expect every variable to be in the map.
-		LOG_ASSERT("carl.interval", map.count(m[i].var) > (size_t)0, "Every variable is expected to be in the map.");
-		result *= map.at(m[i].var).power(m[i].exp);
+		LOG_ASSERT("carl.interval", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
+		result *= map.at(m[i].first).power(m[i].second);
 	}
 	return result;
 }
@@ -67,10 +67,10 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 		// TODO use iterator.
 		LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
 		for (unsigned i = 0; i < m.nrVariables(); ++i) {
-			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
+			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 			// We expect every variable to be in the map.
-			assert(map.count(m[i].var) > 0);
-			result *= map.at(m[i].var).power(m[i].exp);
+			assert(map.count(m[i].first) > 0);
+			result *= map.at(m[i].first).power(m[i].second);
 		}
 	}
 	return result;
@@ -85,10 +85,10 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 		// TODO use iterator.
 		LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
 		for (unsigned i = 0; i < m.nrVariables(); ++i) {
-			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
+			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 			// We expect every variable to be in the map.
-			assert(map.count(m[i].var) > 0);
-			result *= map.at(m[i].var).power(m[i].exp);
+			assert(map.count(m[i].first) > 0);
+			result *= map.at(m[i].first).power(m[i].second);
 		}
 	}
 	return result;

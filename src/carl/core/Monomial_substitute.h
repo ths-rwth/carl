@@ -18,17 +18,17 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,SubstitutionType
 	LOG_FUNC("carl.core.monomial", *this << ", " << substitutions << ", " << factor);
 	Monomial* m = new Monomial();
 	m->mTotalDegree = mTotalDegree;
-	for(const VarExpPair& ve : mExponents) 
+	for (auto ve : mExponents) 
 	{
-		typename std::map<Variable,SubstitutionType>::const_iterator it = substitutions.find(ve.var);
+		auto it = substitutions.find(ve.first);
 		if(it == substitutions.end())
 		{
 			m->mExponents.push_back(ve);
 		}
 		else
 		{
-			factor *= carl::pow(it->second, ve.exp);
-			m->mTotalDegree -= ve.exp;
+			factor *= carl::pow(it->second, ve.second);
+			m->mTotalDegree -= ve.second;
 		}
 	}
 	if(m->mTotalDegree == 0)
@@ -49,19 +49,19 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient
 	Monomial m;
 	m.mTotalDegree = mTotalDegree;
 	Term<Coefficient> factor(1);
-	for(const VarExpPair& ve : mExponents) 
+	for(auto ve : mExponents) 
 	{
-		typename std::map<Variable,Term<Coefficient>>::const_iterator it = substitutions.find(ve.var);
+		auto it = substitutions.find(ve.first);
 		if(it == substitutions.end())
 		{
 			m.mExponents.push_back(ve);
 		}
 		else
 		{
-			Term<Coefficient>* power = it->second.pow(ve.exp);
+			Term<Coefficient>* power = it->second.pow(ve.second);
 			factor *= *power;
 			delete power;
-			m.mTotalDegree -= ve.exp;
+			m.mTotalDegree -= ve.second;
 		}
 	}
 	if(m.mTotalDegree == 0)

@@ -708,7 +708,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         }
     }
     // Find and sort all exponents occurring for all variables to substitute as basis.
-    std::map<VarExpPair, MultivariatePolynomial> expResults;
+    std::map<std::pair<Variable, exponent>, MultivariatePolynomial> expResults;
 	for(auto term : result.mTerms)
 	{
         if(term->monomial())
@@ -717,8 +717,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
             for(unsigned i = 0; i < m.nrVariables(); ++i)
             {
-				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
-                if(m[i].exp > 1 && substitutions.find(m[i].var) != substitutions.end())
+				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+                if(m[i].second > 1 && substitutions.find(m[i].first) != substitutions.end())
                 {
                     expResults[m[i]] = MultivariatePolynomial((Coeff) 1);
                 }
@@ -737,12 +737,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
             assert(sub != substitutions.end());
             ++sub;
         }
-        assert(sub->first == expResultB->first.var);
-        expResultB->second = sub->second.pow(expResultB->first.exp);
+        assert(sub->first == expResultB->first.first);
+        expResultB->second = sub->second.pow(expResultB->first.second);
         ++expResultB;
         while(expResultB != expResults.end())
         {
-            if(expResultA->first.var != expResultB->first.var)
+            if(expResultA->first.first != expResultB->first.first)
             {
                 ++sub;
                 assert(sub != substitutions.end());
@@ -752,12 +752,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
                     assert(sub != substitutions.end());
                     ++sub;
                 }
-                assert(sub->first == expResultB->first.var);
-                expResultB->second = sub->second.pow(expResultB->first.exp);
+                assert(sub->first == expResultB->first.first);
+                expResultB->second = sub->second.pow(expResultB->first.second);
             }
             else
             {
-                expResultB->second = expResultA->second * sub->second.pow(expResultB->first.exp-expResultA->first.exp);
+                expResultB->second = expResultA->second * sub->second.pow(expResultB->first.second-expResultA->first.second);
             }
             ++expResultA;
             ++expResultB;
@@ -774,17 +774,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
             for(unsigned i = 0; i < m.nrVariables(); ++i)
             {
-				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].var);
-                if(m[i].exp == 1)
+				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+                if(m[i].second == 1)
                 {
-                    auto iter = substitutions.find(m[i].var);
+                    auto iter = substitutions.find(m[i].first);
                     if(iter != substitutions.end())
                     {
                         termResult *= iter->second;
                     }
                     else
                     {
-                        termResult *= m[i].var;
+                        termResult *= m[i].first;
                     }
                 }
                 else
@@ -796,7 +796,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
                     }
                     else
                     {
-                        termResult *= Term<Coeff>((Coeff)1, m[i].var, m[i].exp);
+                        termResult *= Term<Coeff>((Coeff)1, m[i].first, m[i].second);
                     }
                 }
             }

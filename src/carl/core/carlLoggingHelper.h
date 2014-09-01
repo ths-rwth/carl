@@ -12,6 +12,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace std {
@@ -110,6 +111,13 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value>&
 	}
 	return os << "}";
 }
+
+
+template<typename U, typename V>
+std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p) {
+	return os << "(" << p.first << ", " << p.second << ")";
+}
+
 
 /**
  * Output a std::vector with arbitrary content.
