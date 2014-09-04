@@ -117,16 +117,19 @@ inline std::ostream& operator<<(std::ostream& os, LogLevel level) {
  * This classes provides an easy way to obtain the current number of milliseconds that the program has been running.
  */
 struct Timer {
-	typedef std::chrono::high_resolution_clock hrc;
+	/// The clock type used jere.
+	typedef std::chrono::high_resolution_clock clock;
+	/// The duration type used here.
 	typedef std::chrono::duration<unsigned,std::milli> duration;
-	hrc::time_point start;
-	Timer(): start(hrc::now()) {}
+	/// Start of this timer.
+	clock::time_point start;
+	Timer(): start(clock::now()) {}
 	/**
 	 * Calculated the number of milliseconds since this object has been created.
      * @return Milliseconds passed.
      */
 	unsigned passed() const {
-		hrc::duration d(hrc::now() - start);
+		clock::duration d(clock::now() - start);
 		return std::chrono::duration_cast<duration>(d).count();
 	}
 	/**
@@ -161,6 +164,7 @@ struct Sink {
  * It is meant to be used for streams like `std::cout` or `std::cerr`.
  */
 struct StreamSink: public Sink {
+	/// Output stream.
 	std::ostream os;
 	/**
 	 * Create a StreamSink from some output stream.
@@ -174,6 +178,7 @@ struct StreamSink: public Sink {
  * Logging sink for file output.
  */
 struct FileSink: public Sink {
+	/// File output stream.
 	std::ofstream os;
 	/**
 	 * Create a FileSink that logs to the specified file.
@@ -189,7 +194,13 @@ struct FileSink: public Sink {
  * This class checks if some log message shall be forwarded to some sink.
  */
 struct Filter {
+	/// Mapping from channels to (minimal) log levels.
 	std::map<std::string, LogLevel> data;
+	
+	/**
+	 * Constructor.
+	 * @param level Default minimal log level.
+	 */
 	Filter(LogLevel level = LogLevel::LVL_DEFAULT) {
 		(*this)("", level);
 	}
@@ -239,9 +250,18 @@ struct Filter {
  * Additional information about a log message.
  */
 struct RecordInfo {
+	/// File name.
 	std::string filename;
+	/// Function name.
 	std::string func;
+	/// Line number.
 	unsigned line;
+	/**
+	 * Constructor.
+     * @param filename File name.
+     * @param func Function name.
+     * @param line Line number.
+     */
 	RecordInfo(const std::string& filename, const std::string& func, unsigned line): 
 		filename(filename), func(func), line(line) {}
 };
@@ -250,6 +270,7 @@ struct RecordInfo {
  * Formats a log messages.
  */
 struct Formatter {
+	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
@@ -292,13 +313,21 @@ struct Formatter {
  */
 class Logger: public carl::Singleton<Logger> {
 	friend carl::Singleton<Logger>;
+	/// Mapping from channels to associated logging classes.
 	std::map<std::string, std::tuple<std::shared_ptr<Sink>, Filter, std::shared_ptr<Formatter>>> data;
+	/// Logging mutex to ensure thread-safe logging.
 	std::mutex mutex;
+	/// Timer to track program runtime.
 	Timer timer;
 
-	Logger() {
-	}
+	/**
+	 * Default constructor.
+     */
+	Logger() {}
 public:
+	/**
+	 * Desctructor.
+     */
 	~Logger() {
 		data.clear();
 	}
@@ -403,20 +432,32 @@ inline Logger& logger() {
 	return Logger::getInstance();
 }
 
+/// Create a record info.
 #define __CARLLOG_RECORD carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
+/// Create a record info without function name.
 #define __CARLLOG_RECORD_NOFUNC carl::logging::RecordInfo(__FILE__, "", __LINE__)
+/// Basic logging macro.
 #define __CARLLOG(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD); }
+/// Basic logging macro without function name.
 #define __CARLLOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARLLOG_RECORD_NOFUNC); }
 
+/// Intended to be called when entering a function. Format: `<function name>(<args>)`.
 #define CARLLOG_FUNC(channel, args) __CARLLOG_NOFUNC(carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");
 
+/// Log with level LVL_TRACE.
 #define CARLLOG_TRACE(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_TRACE, channel, expr)
+/// Log with level LVL_DEBUG.
 #define CARLLOG_DEBUG(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_DEBUG, channel, expr)
+/// Log with level LVL_INFO.
 #define CARLLOG_INFO(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_INFO, channel, expr)
+/// Log with level LVL_WARN.
 #define CARLLOG_WARN(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_WARN, channel, expr)
+/// Log with level LVL_ERROR.
 #define CARLLOG_ERROR(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_ERROR, channel, expr)
+/// Log with level LVL_FATAL.
 #define CARLLOG_FATAL(channel, expr) __CARLLOG(carl::logging::LogLevel::LVL_FATAL, channel, expr)
 
+/// Log and assert the given condition, if the condition evaluates to false.
 #define CARLLOG_ASSERT(channel, condition, expr) if (!condition) { CARLLOG_FATAL(channel, expr); assert(condition); }
 
 }
