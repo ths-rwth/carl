@@ -58,7 +58,7 @@ namespace carl
                 }
 
                 const Monomial & psLcm( ps->mLcm );
-                if( psLcm.dividableBy( lm ) && psLcm != spp1->second.mLcm && psLcm != spp2->second.mLcm )
+                if( psLcm.dividable( lm ) && psLcm != spp1->second.mLcm && psLcm != spp2->second.mLcm )
                 {
                     ps = it.get( )->erase( ps );
                 }

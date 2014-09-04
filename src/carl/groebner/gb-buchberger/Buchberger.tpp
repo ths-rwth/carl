@@ -192,7 +192,7 @@ void Buchberger<Polynomial, AddingPolicy>::removeBuchbergerTriples(std::unordere
 			bool elim = false;
 			for(std::unordered_map<size_t, SPolPair>::const_iterator jt = spairs.begin(); jt != it; ++jt)
 			{
-				if(it->second.mLcm.dividableBy(jt->second.mLcm))
+				if(it->second.mLcm.dividable(jt->second.mLcm))
 				{
 					it = spairs.erase(it);
 					elim = true;
@@ -205,7 +205,7 @@ void Buchberger<Polynomial, AddingPolicy>::removeBuchbergerTriples(std::unordere
 			std::unordered_map<size_t, SPolPair>::const_iterator jt = it;
 			for(++jt; jt != spairs.end(); ++jt)
 			{
-				if(it->second.mLcm.dividableBy(jt->second.mLcm))
+				if(it->second.mLcm.dividable(jt->second.mLcm))
 				{
 					it = spairs.erase(it);
 					elim = true;
@@ -224,7 +224,7 @@ void Buchberger<Polynomial, AddingPolicy>::removeBuchbergerTriples(std::unordere
 		bool elim = false; //critPair.print(std::cout);
 		for(std::unordered_map<size_t, SPolPair>::const_iterator jt = spairs.begin(); jt != it; ++jt)
 		{
-			if(it->second.mLcm.dividableBy(jt->second.mLcm))
+			if(it->second.mLcm.dividable(jt->second.mLcm))
 			{
 				it = spairs.erase(it);
 				elim = true;
@@ -236,7 +236,7 @@ void Buchberger<Polynomial, AddingPolicy>::removeBuchbergerTriples(std::unordere
 		std::unordered_map<size_t, SPolPair>::const_iterator jt = it;
 		for(++jt; jt != spairs.end(); ++jt)
 		{
-			if(it->second.mLcm.dividableBy(jt->second.mLcm))
+			if(it->second.mLcm.dividable(jt->second.mLcm))
 			{
 				it = spairs.erase(it);
 				elim = true;

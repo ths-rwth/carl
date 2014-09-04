@@ -90,7 +90,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->dividedBy(v);
+        Monomial* div = mMonomial->divide(v);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -108,7 +108,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->dividedBy(m);
+        Monomial* div = mMonomial->divide(m);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -132,7 +132,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
             // Term is just a constant.
             return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
         }
-        Monomial* div = mMonomial->dividedBy(*(t.mMonomial));
+        Monomial* div = mMonomial->divide(*(t.mMonomial));
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {

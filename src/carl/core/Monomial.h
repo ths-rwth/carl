@@ -33,6 +33,16 @@ namespace carl
 	 * The general-purpose monomials. Notice that we aim to keep this object as small as possbible,
 	 * while also limiting the use of expensive language features such as RTTI, exceptions and even
 	 * polymorphism.
+	 * 
+	 * Although a Monomial can conceptually be seen as a map from variables to exponents,
+	 * this implementation uses a vector of pairs of variables and exponents.
+	 * Due to the fact that monomials usually contain only a small number of variables,
+	 * the overhead introduced by `std::map` makes up for the asymptotically slower `std::find` on 
+	 * the `std::vector` that is used.
+	 * 
+	 * Besides, many operations like multiplication, division or substitution do not rely
+	 * on finding some variable, but must iterate over all entries anyway.
+	 * 
 	 * @ingroup multirp
 	 */
 	class Monomial
@@ -91,6 +101,11 @@ namespace carl
 			assert(isConsistent());
 		}
 
+		/**
+		 * Assignment operator.
+         * @param rhs Other monomial.
+         * @return this.
+         */
 		Monomial& operator=(const Monomial& rhs)
 		{
 			// Check for self-assignment.
@@ -100,15 +115,31 @@ namespace carl
 			return *this;
 		}
 		
+		/**
+		 * Returns iterator on first pair of variable and exponent.
+		 * @return Iterator on begin.
+		 */
 		exponents_it begin() {
 			return mExponents.begin();
 		}
+		/**
+		 * Returns constant iterator on first pair of variable and exponent.
+		 * @return Iterator on begin.
+		 */
 		exponents_cIt begin() const {
 			return mExponents.begin();
 		}
+		/**
+		 * Returns past-the-end iterator.
+		 * @return Iterator on end.
+		 */
 		exponents_it end() {
 			return mExponents.end();
 		}
+		/**
+		 * Returns past-the-end iterator.
+		 * @return Iterator on end.
+		 */
 		exponents_cIt end() const {
 			return mExponents.end();
 		}
@@ -237,12 +268,6 @@ namespace carl
 		{
 			return (std::find(mExponents.cbegin(), mExponents.cend(), v) != mExponents.cend());
 		}
-
-		exponent highestExponent(Variable::Arg) const
-		{
-			LOG_NOTIMPLEMENTED();
-			return 0;
-		}
 		
 		/**
 		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
@@ -263,29 +288,20 @@ namespace carl
 			return new Monomial(std::move(newExps), tDeg);
 		}
 
-		Monomial* dividedBy(Variable::Arg v) const
+		Monomial* divide(Variable::Arg v) const
 		{
-			 // Linear implementation, as we expect very small monomials.
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
-			if(it == mExponents.cend())
-			{
-				return nullptr;
-			}
-			else
-			{
+			if(it == mExponents.cend())	return nullptr;
+			else {
 				Monomial* m = new Monomial();
 				// If the exponent is one, the variable does not occur in the new monomial.
-				if(it->second == 1)
-				{
-					if(it != mExponents.begin())
-					{
+				if(it->second == 1) {
+					if(it != mExponents.begin()) {
 						m->mExponents.assign(mExponents.begin(), it);
 					}
 					m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
-				}
-				// We have to decrease the exponent of the variable by one.
-				else
-				{
+				} else {
+					// We have to decrease the exponent of the variable by one.
 					m->mExponents.assign(mExponents.begin(), mExponents.end());
 					m->mExponents[(unsigned)(it - mExponents.begin())].second -= 1;
 				}
@@ -295,7 +311,7 @@ namespace carl
 		}
 
 		
-		bool dividableBy(const Monomial& m) const
+		bool dividable(const Monomial& m) const
 		{
 			assert(isConsistent());
 			if(m.mTotalDegree > mTotalDegree) return false;
@@ -343,7 +359,7 @@ namespace carl
 		 * @param m Recommended to be non-constant as this yields unnecessary copying.
 		 * @return 
 		 */
-		Monomial* dividedBy(const Monomial& m) const
+		Monomial* divide(const Monomial& m) const
 		{
 			LOG_FUNC("carl.core.monomial", *this << ", " << m);
 			if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
@@ -485,13 +501,9 @@ namespace carl
 		 */
 		Monomial* seperablePart() const
 		{
-			Monomial* m = new Monomial();
-			m->mExponents.reserve(mExponents.size());
-			m->mTotalDegree = (unsigned)mExponents.size();
-			for (auto it: mExponents)
-			{
-				m->mExponents.emplace_back(it.first, 1);
-			}
+			Monomial* m = new Monomial(*this);
+			m->mTotalDegree = (exponent)mExponents.size();
+			for (auto& it: m->mExponents) it.seconds = 1;
 			return m;
 		}
 
@@ -500,7 +512,7 @@ namespace carl
 				return nullptr;
 			}
 			Monomial* res = new Monomial(*this);
-			unsigned expsum = 0;
+			exponent expsum = 0;
 			for (auto& it: res->mExponents) {
 				it.second = (exponent)(it.second * exp);
 				expsum += it.second;
@@ -516,8 +528,7 @@ namespace carl
 		 */
 		void gatherVariables(std::set<Variable>& variables) const
 		{
-			for (auto it: mExponents)
-			{
+			for (auto it: mExponents) {
 				variables.insert(it.first);
 			}
 		}
@@ -701,40 +712,28 @@ namespace carl
 		std::string toString(bool infix = true, bool friendlyVarNames = true) const
 		{
 			if(mExponents.empty()) return "1";
-			if(infix)
-			{
-				std::string result = "";
-				for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
-				{
-					std::stringstream s;
-					s << vp->second;
-					if(vp != mExponents.begin())
-						result += "*";
-					result += varToString(vp->first, friendlyVarNames) + (vp->second > 1 ? ("^" + s.str()) : "");
+			std::stringstream ss;
+			if (infix) {
+				for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
+					if (vp != mExponents.begin()) ss << "*";
+					ss << vp->first;
+					if (vp->second > 1) ss << "^" << vp->second;
 				}
-				return result;
-			}
-			else
-			{
-				std::string result = (mExponents.size() > 1 ? "(* " : "");
-				for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
-				{
-					if(vp != mExponents.begin()) result += " ";
-					std::stringstream s;
-					s << vp->second;
-					std::string varName = varToString(vp->first, friendlyVarNames);
-					if(vp->second == 1) result += varName;
-					else if(vp->second > 1) // Is it necessary to check vp->exp > 1?
-					{
-						result += "(*";
-						for(unsigned i = 0; i<vp->second; ++i)
-							result += " " + varName;
-						result += ")";
+			} else {
+				if (mExponents.size() > 1) ss << "(* ";
+				for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
+					if (vp != mExponents.begin()) ss << " ";
+					if (vp->second == 1) ss << vp->first;
+					else {
+						std::string varName = varToString(vp->first, friendlyVarNames);
+						ss << "(*";
+						for (unsigned i = 0; i < vp->second; i++) ss << " " << varName;
+						ss << ")";
 					}
 				}
-				result += (mExponents.size() > 1 ? ")" : "");
-				return result;
+				if (mExponents.size() > 1) ss << ")";
 			}
+			return ss.str();
 		}
 
 		friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
