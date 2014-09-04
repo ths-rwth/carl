@@ -250,49 +250,17 @@ namespace carl
 		 */
 		Monomial* dropVariable(Variable::Arg v) const
 		{
-			/*LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
+			LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 			
-			if (it == mExponents.cend()) {
-				LOGMSG_TRACE("carl.core.monomial", "Result: (not found)");
-				return new Monomial(*this);
-			}
-			if (mExponents.size() == 1) {
-				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return nullptr;
-			}
+			if (it == mExponents.cend()) return new Monomial(*this);
+			if (mExponents.size() == 1) return nullptr;
 			
 			exponent tDeg = mTotalDegree - it->second;
 			std::vector<std::pair<Variable, exponent>> newExps(mExponents.begin(), it);
 			it++;
 			newExps.insert(newExps.end(), it, mExponents.end());
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << newExps);
 			return new Monomial(std::move(newExps), tDeg);
-			*/
-			if (!this->has(v)) {
-				return new Monomial(*this);
-			}
-			Monomial* m = new Monomial();
-			m->mExponents.reserve(mExponents.size()-1);
-			m->mTotalDegree = mTotalDegree;
-			
-			for (auto it: mExponents)
-			{
-				if(it.first == v)
-				{
-					m->mTotalDegree -= it.second;
-				}
-				else
-				{
-					m->mExponents.emplace_back(it);
-				}
-			}
-			if(m->mTotalDegree == 0) 
-			{
-				delete m;
-				return nullptr;
-			}
-			return m;
 		}
 
 		Monomial* dividedBy(Variable::Arg v) const
