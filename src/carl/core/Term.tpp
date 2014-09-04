@@ -227,7 +227,7 @@ void Term<Coefficient>::gatherVarInfo(const Variable& var, VariableInformation<g
 {
 	if(mMonomial)
 	{
-		mMonomial->gatherVarInfo(var, varinfo, coeff());
+		varinfo.collect(var, coeff(), *mMonomial);
 	}
     else
     {

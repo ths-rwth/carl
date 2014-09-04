@@ -12,8 +12,8 @@
 
 namespace carl
 {
-template<typename Coefficient, typename SubstitutionType>
-Term<Coefficient>* Monomial::substitute(const std::map<Variable,SubstitutionType>& substitutions, Coefficient factor) const
+template<typename Coefficient>
+Term<Coefficient>* Monomial::substitute(const std::map<Variable,Coefficient>& substitutions, Coefficient factor) const
 {
 	LOG_FUNC("carl.core.monomial", *this << ", " << substitutions << ", " << factor);
 	Monomial* m = new Monomial();
@@ -48,7 +48,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient
 	LOG_FUNC("carl.core.monomial", *this << ", " << substitutions << ", " << coeff);
 	Monomial m;
 	m.mTotalDegree = mTotalDegree;
-	Term<Coefficient> factor(1);
+	Term<Coefficient> factor(coeff);
 	for(auto ve : mExponents) 
 	{
 		auto it = substitutions.find(ve.first);
@@ -68,18 +68,18 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient
 	{
 		assert(m.mExponents.size() == 0);
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff());
-		return new Term<Coefficient>(coeff * factor.coeff());
+		return new Term<Coefficient>(factor.coeff());
 	}
 	
 	if(factor.monomial())
 	{
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff() << "*" << m* *factor.monomial());
-		return new Term<Coefficient>(coeff * factor.coeff(),m * *factor.monomial());	
+		return new Term<Coefficient>(factor.coeff(),m * *factor.monomial());	
 	}
 	else
 	{
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff() << "*" << m);
-		return new Term<Coefficient>(coeff * factor.coeff(),m);	
+		return new Term<Coefficient>(factor.coeff(),m);	
 	}
 }
 

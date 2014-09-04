@@ -24,7 +24,16 @@ namespace carl
 	template<typename Coefficient>
 	class Term;
 	
+	/// Type of an exponent.
 	typedef unsigned exponent;
+	
+	/**
+	 * Compare a pair of variable and exponent with a variable.
+	 * Returns true, if both variables are the same.
+	 * @param p Pair of variable and exponent.
+	 * @param v Variable.
+	 * @return `p.first == v`
+	 */
 	inline bool operator==(const std::pair<Variable, exponent>& p, const Variable& v) {
 		return p.first == v;
 	}
@@ -47,14 +56,8 @@ namespace carl
 	 */
 	class Monomial
 	{
-	private:
-		/**
-		 * Set if we want to use binary search instead of linear search.
-		 */
-		static const bool PREFERBINARYSEARCH = false;
-
 	protected:
-		/// A vector of variable-exponent vars (v_i^e_i) with nonzero exponents. 
+		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
 		std::vector<std::pair<Variable, exponent>> mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
@@ -63,6 +66,7 @@ namespace carl
 		typedef std::vector<std::pair<Variable, exponent>>::const_iterator exponents_cIt;
 
 		/**
+		 * Default constructor.
 		 */
 		Monomial() = default;
 	public:
@@ -288,6 +292,12 @@ namespace carl
 			return new Monomial(std::move(newExps), tDeg);
 		}
 
+		/**
+		 * Divides the monomial by a variable v.
+		 * If the division is impossible (because v does not occur in the monomial), nullptr is returned.
+         * @param v Variable
+         * @return This divided by v.
+         */
 		Monomial* divide(Variable::Arg v) const
 		{
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
@@ -310,8 +320,12 @@ namespace carl
 			}
 		}
 
-		
-		bool dividable(const Monomial& m) const
+		/**
+		 * Checks if this monomial is divisible by the given monomial m.
+         * @param m Monomial.
+         * @return If this is divisible by m.
+         */
+		bool divisible(const Monomial& m) const
 		{
 			assert(isConsistent());
 			if(m.mTotalDegree > mTotalDegree) return false;
@@ -355,9 +369,10 @@ namespace carl
 			
 		}
 		/**
-		 * 
-		 * @param m Recommended to be non-constant as this yields unnecessary copying.
-		 * @return 
+		 * Returns a new monomial that is this monomial divided by m.
+		 * If this is not divisible by m, nullptr is returned.
+		 * @param m Monomial.
+		 * @return this divided by m.
 		 */
 		Monomial* divide(const Monomial& m) const
 		{
@@ -481,12 +496,6 @@ namespace carl
 		}
 		
 		template<typename Coeff, bool gatherCoeff, typename CoeffType>
-		void gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
-		{
-			varinfo.collect(var, coeffFromTerm, *this);
-		}
-		
-		template<typename Coeff, bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
 		{
 			for (auto ve : mExponents )
@@ -496,17 +505,23 @@ namespace carl
 		}
 		
 		/**
-		 * For a monomial \\prod_i x_i^e_i with e_i != 0, returns \\prod_i x_i^1.
-		 * @return 
+		 * Calculates the separable part of this monomial.
+		 * For a monomial \f$ \\prod_i x_i^e_i with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
+		 * @return Separable part.
 		 */
-		Monomial* seperablePart() const
+		Monomial* separablePart() const
 		{
 			Monomial* m = new Monomial(*this);
 			m->mTotalDegree = (exponent)mExponents.size();
-			for (auto& it: m->mExponents) it.seconds = 1;
+			for (auto& it: m->mExponents) it.second = 1;
 			return m;
 		}
 
+		/**
+		 * Calculates the given power of this monomial.
+		 * @param exp Exponent.
+		 * @return this to the power of exp.
+		 */
 		Monomial* pow(unsigned exp) const {
 			if (exp == 0) {
 				return nullptr;
@@ -524,7 +539,7 @@ namespace carl
 		
 		/**
 		 * Fill the set of variables with the variables from this monomial.
-		 * @param variables
+		 * @param variables Variables.
 		 */
 		void gatherVariables(std::set<Variable>& variables) const
 		{
@@ -533,11 +548,30 @@ namespace carl
 			}
 		}
 		
+		/**
+		 * Computes the (partial) derivative of this monomial with respect to the given variable.
+		 * @param v Variable.
+		 * @return Partial derivative.
+		 */
 		template<typename Coefficient>
 		Term<Coefficient>* derivative(Variable::Arg v) const;
 		
-		template<typename Coefficient, typename SubstitutionType>
-		Term<Coefficient>* substitute(const std::map<Variable, SubstitutionType>& substitutions, Coefficient factor) const;
+		/**
+		 * Applies the given substitutions to this monomial.
+		 * Every variable may be substituted by some number. Additionally, a constant factor may be given that is multiplied with the result.
+		 * @param substitutions Maps variables to numbers.
+		 * @param factor A constant factor.
+		 * @return \f$ factor \cdot this[<substitutions>] \f$
+		 */
+		template<typename Coefficient>
+		Term<Coefficient>* substitute(const std::map<Variable, Coefficient>& substitutions, Coefficient factor) const;
+		/**
+		 * Applies the given substitutions to this monomial.
+		 * Every variable may be substituted by some term. Additionally, a constant factor may be given that is multiplied with the result.
+		 * @param substitutions Maps variables to terms.
+		 * @param factor A constant factor.
+		 * @return \f$ factor \cdot this[<substitutions>] \f$
+		 */
 		template<typename Coefficient>
 		Term<Coefficient>* substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
 		///////////////////////////
@@ -549,13 +583,13 @@ namespace carl
 			return lexicalCompare(lhs,rhs);
 		}
 		
-		static CompareResult compareLexical(const Monomial& lhs, Variable::Arg rhs)
+		/*static CompareResult compareLexical(const Monomial& lhs, Variable::Arg rhs)
 		{
 			if(lhs.mExponents.front().first < rhs) return CompareResult::LESS;
 			if(lhs.mExponents.front().first > rhs) return CompareResult::GREATER;
 			if(lhs.mExponents.front().second > 1) return CompareResult::GREATER;
 			else return CompareResult::LESS;
-		}
+		}*/
 
 
 		static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs)
@@ -566,7 +600,7 @@ namespace carl
 			return lexicalCompare(lhs, rhs);
 		}
 		
-		static CompareResult compareGradedLexical(const Monomial& lhs, Variable::Arg rhs)
+		/*static CompareResult compareGradedLexical(const Monomial& lhs, Variable::Arg rhs)
 		{
 			if(lhs.mTotalDegree < 1) return CompareResult::LESS;
 			if(lhs.mTotalDegree > 1) return CompareResult::GREATER;
@@ -574,7 +608,7 @@ namespace carl
 			if(lhs.mExponents.front().first > rhs) return CompareResult::LESS;
 			else return CompareResult::EQUAL;
 			
-		}
+		}*/
 
 		// 
 		// Operators
@@ -618,6 +652,11 @@ namespace carl
 			return cr == CompareResult::LESS;
 		}
 
+		/**
+		 * Multiplies this monomial with a variable.
+         * @param v Variable.
+         * @return This multiplied with v.
+         */
 		Monomial& operator*=(Variable::Arg v)
 		{
 			++mTotalDegree;
@@ -642,6 +681,11 @@ namespace carl
 			return *this;
 		}
 
+		/**
+		 * Multiplies this monomial with another monomial.
+         * @param rhs Monomial.
+         * @return This multiplied with rhs.
+         */
 		Monomial& operator*=(const Monomial& rhs)
 		{
 			LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
@@ -709,6 +753,12 @@ namespace carl
 			return result;
 		}
 		
+		/**
+		 * Returns the string representation of this monomial.
+         * @param infix Flag if prefix or infix notation should be used.
+         * @param friendlyVarNames Flag if friendly variable names should be used.
+         * @return String representation.
+         */
 		std::string toString(bool infix = true, bool friendlyVarNames = true) const
 		{
 			if(mExponents.empty()) return "1";
@@ -741,33 +791,30 @@ namespace carl
 			return (os << rhs.toString(true, true));
 		}
 		
+		/**
+		 * Calculates the least common multiple of two monomial pointers.
+		 * If both are valid objects, the lcm of both is calculated.
+		 * If only one is a valid object, this one is returned.
+		 * If both are invalid objects, an empty monomial is returned.
+         * @param lhs First monomial.
+         * @param rhs Second monomial.
+         * @return lcm of lhs and rhs.
+         */
 		static Monomial lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
 		{
-			if(!lhs)
-			{
-				if(!rhs)
-				{
-					return Monomial();
-				}
-				else
-				{
-					return *rhs;
-				}
-			}
-			else
-			{
-				if(!rhs)
-				{
-					return *lhs;
-				}
-				else
-				{
-					return lcm(*lhs, *rhs);
-				}
-			}
+			if (!lhs && !rhs) return Monomial();
+			if (!lhs) return *rhs;
+			if (!rhs) return *lhs;
+			return lcm(*lhs, *rhs);
 				
 		}
-		
+
+		/**
+		 * Calculates the least common multiple of two monomials.
+		 * @param lhs First monomial.
+		 * @param rhs Second monomial.
+		 * @return lcm of lhs and rhs.
+		 */
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
 		{
 			LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
@@ -821,8 +868,8 @@ namespace carl
 	private:
 		
 		/**
-		 * Asserts that the data is valid.
-		 * @return 
+		 * Checks if the monomial is consistent.
+		 * @return If this is consistent.
 		 */
 		bool isConsistent() const {
 			LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree);
@@ -872,17 +919,28 @@ namespace carl
 		}
 	};
 	
+	/**
+	 * Multiplies two variables which results in a monomial.
+     * @param lhs First variable.
+     * @param rhs Second variable.
+     * @return `lhs \cdot rhs`
+     */
 	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs)
-		{
-			// Note that this implementation is not optimized yet!
-			Monomial result(lhs);
-			result *= rhs;
-			return result;
-		}
+	{
+		// Note that this implementation is not optimized yet!
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
 } // namespace carl
 
 namespace std
 {
+	/**
+	 * The template specialization of `std::hash` for `carl::Monomial`.
+     * @param monomial Monomial.
+     * @return Hash of monomial.
+     */
 	template<>
 	struct hash<carl::Monomial>
 	{
