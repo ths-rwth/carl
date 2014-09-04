@@ -536,7 +536,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& exp(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            _result.mValue = std::exp(mValue);
+            _result.mValue = std::exp(this->mValue);
             return _result;
         }
 
