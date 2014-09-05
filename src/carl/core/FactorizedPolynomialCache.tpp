@@ -125,7 +125,7 @@ namespace carl
     {
         assert( _refStoragePos < mCacheRefs.size() );
         typename CacheType::iterator cacheRef = mCacheRefs[_refStoragePos];
-        assert( cacheRef != mCacheRefs.end() );
+        assert( cacheRef != mCache.end() );
         assert( cacheRef->second.usageCount > 0 );
         --cacheRef->second.usageCount;
     }

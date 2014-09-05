@@ -64,7 +64,6 @@ namespace carl
     template<typename P>
     const FactorizedPolynomial<P> commonDivisor(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
-        assert( _fpolyA.mrCache == _fpolyB.mrCache );
         Factorization<P> cdFactorization;
         const Factorization<P>& factorizationA = _fpolyA.mrCache.get(_fpolyA.mCacheRef).factorization();
         const Factorization<P>& factorizationB = _fpolyB.mrCache.get(_fpolyB.mCacheRef).factorization();
