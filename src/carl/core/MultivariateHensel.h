@@ -140,7 +140,7 @@ class DiophantineEquations
 		Polynomial g(x);
 		g = Polynomial::extended_gcd(amodp,bmodp,s,t);
 		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: g=" << g << ", s=" << s << ", t=" << t );
-		LOG_ASSERT(g.isOne(), "g expected to be one");
+		LOG_ASSERT("carl.core.hensel", g.isOne(), "g expected to be one");
 		Polynomial smodp = s;
 		Polynomial tmodp = t;
 		assert( mGf_p->p() == mGf_pk->p());

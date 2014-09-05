@@ -415,7 +415,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::primitivePart() const
 }
 
 /**
- * See Algorithm 2.2 in GZL92.
+ * See Algorithm 2.2 in @cite GCL92.
  * @param a
  * @param b
  * @param s
@@ -540,11 +540,12 @@ UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const C
 
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients() const {
+UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients(bool check) const {
 	std::vector<NumberType> coeffs;
-	coeffs.resize(this->mCoefficients.size());
-	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
-		coeffs[i] = this->mCoefficients[i].constantPart();
+	coeffs.reserve(this->mCoefficients.size());
+	for (auto c: this->mCoefficients) {
+		assert(check && c.isConstant());
+		coeffs.push_back(c.constantPart());
 	}
 	return UnivariatePolynomial<NumberType>(this->mMainVar, coeffs);
 }
@@ -805,7 +806,7 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 	res.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& c : mCoefficients)
 	{
-		assert(isInteger(c));
+		assert(carl::isInteger(c));
 		res.mCoefficients.push_back(c.representingInteger());
 	}
 	res.stripLeadingZeroes();
@@ -820,7 +821,7 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 	res.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& c : mCoefficients)
 	{
-		assert(isInteger(c));
+		assert(carl::isInteger(c));
 		res.mCoefficients.push_back(getNum(c));
 	}
 	res.stripLeadingZeroes();
@@ -835,7 +836,7 @@ UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolyno
 	res.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& c : mCoefficients)
 	{
-		assert(isInteger(c));
+		assert(carl::isInteger(c));
 		res.mCoefficients.push_back(GFNumber<typename IntegralT<Coeff>::type>(c,galoisField));
 	}
 	res.stripLeadingZeroes();
@@ -1448,7 +1449,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	}
 	subresultants.push_front(q);
 	
-	// SPECIAL CASE: both, a and b, are constant
+	// SPECIAL CASE: both, p and q, are constant
 	if (q.isConstant()) {
 		LOGMSG_TRACE("carl.core.resultant", "q is constant.");
 		return subresultants;
@@ -2008,11 +2009,11 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 			C a = this->cauchyBound();
 			C b = rhs.cauchyBound();
 			if (a < b) return true;
-			return (a == b) && this->less(rhs);
+			return *this < rhs;
 		}*/
 		case PolynomialComparisonOrder::LowDegree:
 			if (this->degree() < rhs.degree()) return true;
-			return (this->degree() == rhs.degree()) && this->less(rhs);
+			return *this < rhs;
 		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
 	}

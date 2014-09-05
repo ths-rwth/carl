@@ -75,7 +75,7 @@ public:
 		else if(p.nrTerms() == 1)
 		{
 			assert(!p.isConstant());
-			Polynomial q(std::shared_ptr<Monomial>(p.lmon()->seperablePart()));
+			Polynomial q(std::shared_ptr<Monomial>(p.lmon()->separablePart()));
 #ifdef BUCHBERGER_STATISTICS
 			if(q.lterm().tdeg() != p.lterm().tdeg()) mStats->SingleTermSFP();
 #endif
@@ -104,7 +104,7 @@ public:
 				Polynomial remainder(p);
 				while(!remainder.isZero())
 				{
-					Polynomial r1(std::shared_ptr<Monomial>(remainder.lmon()->seperablePart()));
+					Polynomial r1(std::shared_ptr<Monomial>(remainder.lmon()->separablePart()));
 #ifdef BUCHBERGER_STATISTICS
 					if(remainder.lterm().tdeg() != r1.lterm().tdeg()) mStats->SingleTermSFP();
 #endif

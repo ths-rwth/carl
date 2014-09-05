@@ -2,14 +2,14 @@
  * The implementation for the templated interval class.
  *
  * @file Interval.tpp
- * @autor Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
+ * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  * 
  * @since	2013-12-20
  * @version 2014-01-30
  */
 #pragma once
 #include "Interval.h"
-#include "../numbers/operations.h"
+#include "../numbers/numbers.h"
 #include <iostream>
 
 namespace carl
@@ -99,6 +99,11 @@ template<typename Number>
 	Number Interval<Number>::center() const
 	{
 		assert(this->isConsistent());
+		if (this->isUnbounded()) return 0;
+		if (this->mLowerBoundType == BoundType::INFTY)
+            return (Number)carl::floor(this->mContent.upper()) - (Number)1;
+		if (this->mUpperBoundType == BoundType::INFTY)
+            return (Number)carl::ceil(this->mContent.lower()) + (Number)1;
 		return boost::numeric::median(mContent);
 	}
 
@@ -109,15 +114,19 @@ template<typename Number>
 	}
 
 template<typename Number>
-	Number Interval<Number>::sample() const
+	Number Interval<Number>::sample( bool _includingBounds ) const
 	{
 		assert(this->isConsistent());
+		assert(!this->isEmpty());
+		assert(_includingBounds || !this->isPointInterval());
 		Number mid = this->center();
 		// TODO: check if mid is an integer already.
 		Number midf = carl::floor(mid);
-		if (this->contains(midf)) return midf;
+		if (this->contains(midf) && (_includingBounds || this->lowerBoundType() == BoundType::INFTY || this->lower() < midf ))
+            return midf;
 		Number midc = carl::ceil(mid);
-		if (this->contains(midc)) return midc;
+		if (this->contains(midc) && (_includingBounds || this->upperBoundType() == BoundType::INFTY || this->upper() > midc ))
+            return midc;
 		return mid;
 	}
 
@@ -633,6 +642,19 @@ template<typename Number>
 Interval<Number> Interval<Number>::sqrt() const
 	{
 		assert(this->isConsistent());
+        if( mUpperBoundType != BoundType::INFTY &&  mContent.upper() < 0 )
+            return Interval<Number>::emptyInterval();
+        if( mLowerBoundType == BoundType::INFTY || mContent.lower() < 0 )
+        {
+            if( mUpperBoundType == BoundType::INFTY )
+            {
+                return Interval<Number>(BoostInterval(Number(0)), mLowerBoundType, mUpperBoundType);
+            }
+            else
+            {
+                return Interval<Number>(boost::numeric::sqrt(BoostInterval(0,mContent.upper())), mLowerBoundType, mUpperBoundType);
+            }
+        }
 		return Interval<Number>(boost::numeric::sqrt(mContent), mLowerBoundType, mUpperBoundType);
 	}
 

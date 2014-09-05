@@ -2,8 +2,6 @@ add_executable( runIntervalTests
 				Test_DoubleInterval.cpp
                                 Test_clRA_Interval.cpp
                                 Test_MpqInterval.cpp
-                                #Test_FloatInterval.cpp
-                                Test_ExactInterval.cpp
                                 Test_IntervalEvaluation.cpp
                                 Test_Contraction.cpp
 			  )

@@ -55,8 +55,8 @@ Term<Coefficient>::Term(const Coefficient& c, const Monomial* m) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned exponent) :
-mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, exponent)))
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e) :
+mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, e)))
 {
     assert(this->isConsistent());
 }
@@ -90,7 +90,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->dividedBy(v);
+        Monomial* div = mMonomial->divide(v);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -108,7 +108,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->dividedBy(m);
+        Monomial* div = mMonomial->divide(m);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -132,7 +132,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
             // Term is just a constant.
             return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
         }
-        Monomial* div = mMonomial->dividedBy(*(t.mMonomial));
+        Monomial* div = mMonomial->divide(*(t.mMonomial));
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -233,7 +233,7 @@ void Term<Coefficient>::gatherVarInfo(const Variable& var, VariableInformation<g
 {
 	if(mMonomial)
 	{
-		mMonomial->gatherVarInfo(var, varinfo, coeff());
+		varinfo.collect(var, coeff(), *mMonomial);
 	}
     else
     {
@@ -326,6 +326,18 @@ template<typename Coeff>
 bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs)
 {
     return !(lhs == rhs);
+}
+
+template<typename Coeff>
+bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
+{
+	if (lhs.mMonomial == rhs.mMonomial) return false;
+	if (lhs.tdeg() < rhs.tdeg()) return true;
+	if (lhs.mMonomial && rhs.mMonomial) {
+		if (*(lhs.mMonomial) < *(rhs.mMonomial)) return true;
+		if (*(rhs.mMonomial) < *(lhs.mMonomial)) return false;
+	}
+	return lhs.mCoeff < rhs.mCoeff;
 }
 
 template<typename Coefficient>

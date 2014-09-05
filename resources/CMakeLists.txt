@@ -7,33 +7,6 @@ INCLUDE(ExternalProject)
 # Set default ExternalProject root directory
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
-# Adding log4cplus.
-if(LOG4CPLUS_FOUND)
-	message("-- Use system version of Log4CPlus")	
-else()
-# Add log4cplus (local build)
-	message("-- Use shipped version of Log4CPlus")
-	ExternalProject_Add(
-		log4cplus
-		DOWNLOAD_COMMAND ""
-		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1"
-		# Force separate output paths for debug and release builds to allow easy
-		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-		# CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
-		#           -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build
-				   -DBUILD_SHARED_LIBS:BOOL=0
-		INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build
-		# Wrap download, configure and build steps in a script to log output
-		LOG_CONFIGURE ON
-		LOG_BUILD ON)
-
-
-	set( LOG4CPLUS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build/include" PARENT_SCOPE )
-	set( LOG4CPLUS_LIBRARY "${CMAKE_SOURCE_DIR}/resources/log4cplus-1.1.1/build/lib/liblog4cplusS.a" PARENT_SCOPE )
-	add_dependencies(resources log4cplus)
-endif()
-
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
 	message("-- Use system version of GTest")

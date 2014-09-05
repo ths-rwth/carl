@@ -13,7 +13,7 @@ namespace carl
 	class UnivariatePolynomial;
 /**
  * Algorithm to compute the GCD in Unique factorization domains.
- * @see @ref GCL92, Algorithm 2.3 
+ * @see @cite GCL92, Algorithm 2.3 
  */
 struct PrimitiveEuclidean
 {

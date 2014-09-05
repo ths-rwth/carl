@@ -95,6 +95,10 @@ public:
 		return res;
 	}
 
+	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
+		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
+	}
+
 	/**
 	 * Destructor.
 	 */
@@ -111,6 +115,14 @@ public:
 
 	virtual bool isNumericRepresentation() const {
 		return false;
+	}
+
+	virtual Number branchingPoint() const {
+		Number m = this->interval.sample();
+		while (isInteger(m)) {
+			m = Interval<Number>(this->interval.lower(), m).sample();
+		}
+		return m;
 	}
 
 	/**
@@ -163,15 +175,16 @@ public:
 	///////////////
 	// Operators //
 	///////////////
-
-	/**
-	 * This number gets all values of the other.
-	 */
-	const RealAlgebraicNumberIR& operator=(const RealAlgebraicNumberIR& obj);
 	
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);
 
+	/**
+	 * Creates a new real algebraic number that is the sum of this and n.
+	 * Implemented following \cite Mishra93 page 332.
+	 * @param n Other number.
+	 * @return this + n.
+	 */
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(const std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
 
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus() const;
@@ -250,6 +263,7 @@ using RealAlgebraicNumberIRPtr = std::shared_ptr<RealAlgebraicNumberIR<Number>>;
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
+	if (n == nullptr) return os << "nullptr";
 	if (n->isNumeric()) {
 		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << ")";
 	}

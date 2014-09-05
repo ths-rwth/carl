@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "util.h"
 #include "numbers.h"
 #include "GaloisField.h"
 
@@ -168,6 +167,16 @@ class GFNumber
 template<typename IntegerT>
 GFNumber<IntegerT> quotient(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs) {
 	return lhs / rhs;
+}
+
+/**
+ * @todo Implement this
+ * @param 
+ * @return 
+ */
+template<typename IntegerT>
+inline bool isInteger(const GFNumber<IntegerT>&) {
+	return false;
 }
 
 }

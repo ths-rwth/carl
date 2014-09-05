@@ -38,19 +38,29 @@ private:
 	std::list<const UPolynomial<Coeff>*> ownedPolynomials;
 
 	/**
-	 * 
-	 * @param p
-	 * @return 
+	 * The parent PolynomialOwner.
+	 * If set, all polynomials are delegated to the parent.
 	 */
 	PolynomialOwner<Coeff>* parentOwner;
 public:
+	/**
+	 * Constructs a PolynomialOwner.
+     */
 	PolynomialOwner() {
 		this->parentOwner = nullptr;
 	}
+	/**
+	 * Constructs a delegating PolynomialOwner.
+	 * All polynomials are delegated to the given parent.
+     * @param parent Parent PolynomialOwner.
+     */
 	PolynomialOwner(PolynomialOwner<Coeff>* parent) {
 		this->parentOwner = parent;
 	}
 
+	/**
+	 * Destroys all owned polynomials.
+     */
 	virtual ~PolynomialOwner() {
 		if (this->ownedPolynomials.size() > 0) {
 			LOGMSG_DEBUG("carl.cad", "Deleting " << this->ownedPolynomials.size() << " polynomials.");
@@ -60,11 +70,21 @@ public:
 		}
 	}
 	
+	/**
+	 * Takes ownership of the given polynomial and returns it.
+     * @param p Polynomial.
+     * @return p.
+     */
 	const UPolynomial<Coeff>* take(const UPolynomial<Coeff>* p) {
 		if (this->parentOwner != nullptr) return this->parentOwner->take(p);
 		this->ownedPolynomials.push_back(p);
 		return p;
 	}
+	/**
+	 * Takes ownership of the given polynomial and returns it.
+     * @param p Polynomial.
+     * @return p.
+     */
 	UPolynomial<Coeff>* take(UPolynomial<Coeff>* p) {
 		if (this->parentOwner != nullptr) return this->parentOwner->take(p);
 		this->ownedPolynomials.push_back(p);

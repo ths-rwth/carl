@@ -29,8 +29,8 @@ namespace carl
 
     public:
         
-        static std::vector<T>       mRationalPool;
-        static std::vector<size_t>  mFreeRationalIds;
+        static std::vector<T>           mRationalPool;
+        static std::vector<ContentType> mFreeRationalIds;
         
         // Constructors/Destructor:
         

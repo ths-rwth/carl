@@ -10,6 +10,8 @@
 #       TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (" ").
 
+CITE_BIB_FILES = @CMAKE_SOURCE_DIR@/doc/literature.bib
+
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
@@ -297,7 +299,7 @@ TYPEDEF_HIDES_STRUCT   = NO
 # Private class members and static file members will be hidden unless
 # the EXTRACT_PRIVATE and EXTRACT_STATIC tags are set to YES
 
-EXTRACT_ALL            = YES
+EXTRACT_ALL            = NO
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class
 # will be included in the documentation.
@@ -1266,18 +1268,6 @@ GENERATE_XML           = $(GENERATE_XML)
 # put in front of it. If left blank `xml' will be used as the default path.
 
 XML_OUTPUT             = xml
-
-# The XML_SCHEMA tag can be used to specify an XML schema,
-# which can be used by a validating XML parser to check the
-# syntax of the XML files.
-
-XML_SCHEMA             =
-
-# The XML_DTD tag can be used to specify an XML DTD,
-# which can be used by a validating XML parser to check the
-# syntax of the XML files.
-
-XML_DTD                =
 
 # If the XML_PROGRAMLISTING tag is set to YES Doxygen will
 # dump the program listings (including syntax highlighting

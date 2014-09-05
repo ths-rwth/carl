@@ -2793,7 +2793,7 @@ typename tree<T, tree_node_allocator>::leaf_iterator& tree<T, tree_node_allocato
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const tree<T>& t) {
 	for (typename tree<T>::pre_order_iterator it = t.begin(); it != t.end(); it++) {
-		os << std::string(t.depth(it), '\t') << *it << std::endl;
+		os << std::string((size_t)t.depth(it), '\t') << *it << std::endl;
 	}
 	return os;
 }

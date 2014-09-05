@@ -11,20 +11,21 @@
 namespace carl
 {
 
+/**
+ * Base class that implements a singleton.
+ * 
+ * A class that shall be a singleton can inherit from this class (the template argument being the class itself, see CRTP for this).
+ * It takes care of
+ * <ul>
+ * <li>deleting the copy constructor and the assignment operator,</li>
+ * <li>providing a protected default constructor and a virtual destructor and</li>
+ * <li>providing getInstance() that returns the one single object of this type.</li>
+ * </ul>
+ */
 template<typename T>
 class Singleton
 {
 private:
-	/**
-	 * The unique instance of T.
-	 */
-	static std::unique_ptr<T>  instance;
-
-	/**
-	 * Mutex for the creation of the singleton instance.
-	 */
-	static std::mutex singletonMutex;
-
 	/**
 	 * There shall be no copy constructor.
 	 */
@@ -42,27 +43,18 @@ protected:
 	Singleton() {};
 
 public:
-        virtual ~Singleton() {};
+	/**
+	 * Virtual destructor.
+     */
+	virtual ~Singleton() {};
 	/**
 	 * Returns the single instance of this class by reference.
 	 * If there is no instance yet, a new one is created.
-	 * This method is thread-safe.
 	 */
-	static T& getInstance()
-	{
-		if (!Singleton<T>::instance) {
-			std::lock_guard<std::mutex> lock(Singleton<T>::singletonMutex);
-			if (!Singleton<T>::instance) {
-				Singleton<T>::instance.reset(new T());
-			}
-		}
-		return *Singleton<T>::instance;
+	static T& getInstance() {
+		static T t;
+		return t;
 	}
 };
-
-template<typename T>
-std::unique_ptr<T> Singleton<T>::instance = nullptr;
-template<typename T>
-std::mutex Singleton<T>::singletonMutex;
 
 }

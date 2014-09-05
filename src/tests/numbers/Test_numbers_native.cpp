@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "carl/numbers/typetraits.h"
-#include "carl/numbers/operations.h"
+#include "../../carl/numbers/numbers.h"
 
 using namespace carl;
 

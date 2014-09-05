@@ -5,11 +5,21 @@
  */
 
 #pragma once
+
 #include <functional>
 #include <list>
 #include <map>
 #include <memory>
 #include <vector>
+
+#include "Polynomial.h"
+#include "Sign.h"
+#include "Variable.h"
+#include "VariableInformation.h"
+
+#include "../interval/Interval.h"
+#include "../numbers/numbers.h"
+#include "../util/SFINAE.h"
 
 namespace carl {
 //
@@ -22,24 +32,16 @@ using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient
 
 }
 
-#include "Variable.h"
-#include "VariableInformation.h"
-#include "Polynomial.h"
-#include "Sign.h"
 #include "DivisionResult.h"
 #include "MultivariatePolynomial.h"
-#include "../numbers/numbers.h"
-#include "../numbers/GFNumber.h"
-#include "../interval/Interval.h"
 
 #include "logging.h"
-#include "../util/SFINAE.h"
 
 namespace carl
 {
 
 enum class PolynomialComparisonOrder : unsigned {
-	CauchyBound, LowDegree, Memory, Default = Memory
+	CauchyBound, LowDegree, Memory, Default = LowDegree
 };
 enum class SubresultantStrategy : unsigned {
 	Generic, Lazard, Ducos, Default = Lazard
@@ -58,9 +60,17 @@ private:
 	std::vector<Coefficient> mCoefficients;
 
 public:
-
+	/**
+	 * The number type that is ultimately used for the coefficients.
+	 */
 	typedef typename UnderlyingNumberType<Coefficient>::type NumberType;
+	/**
+	 * The integral type that belongs to the number type.
+	 */
 	typedef typename IntegralT<NumberType>::type IntNumberType;
+	/**
+	 * The type of the coefficients.
+	 */
 	typedef Coefficient CoefficientType;
 
 	// Rule of five
@@ -85,24 +95,64 @@ public:
 	 */
 	UnivariatePolynomial& operator=(UnivariatePolynomial&& p);
 
+	/**
+	 * Construct a zero polynomial with the given main variable.
+	 * @param mainVar New main variable.
+	 */
 	UnivariatePolynomial(Variable::Arg mainVar);
+	/**
+	 * Construct \f$ coeff \cdot mainVar^{degree} \f$.
+	 * @param mainVar New main variable.
+	 * @param coeff Leading coefficient.
+	 * @param degree Degree.
+	 */
 	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
+
+	/**
+	 * Construct polynomial with the given coefficients.
+	 * @param mainVar New main variable.
+	 * @param coefficients List of coefficients.
+	 */
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<Coefficient> coefficients);
 
+	/**
+	 * Construct polynomial with the given coefficients from the underlying number type of the coefficient type.
+	 * @param mainVar New main variable.
+	 * @param coefficients List of coefficients.
+	 */
 	template<typename C = Coefficient, DisableIf<std::is_same<C, typename UnderlyingNumberType<C>::type>> = dummy>
 	UnivariatePolynomial(Variable::Arg mainVar, std::initializer_list<typename UnderlyingNumberType<C>::type> coefficients);
-	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
-	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
-	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
-//	UnivariatePolynomial(Variable::Arg mainVar, const VariableInformation<true, Coefficient>& varinfoWithCoefficients);
 
+	/**
+	 * Construct polynomial with the given coefficients.
+	 * @param mainVar New main variable.
+	 * @param coefficients Vector of coefficients.
+	 */
+	UnivariatePolynomial(Variable::Arg mainVar, const std::vector<Coefficient>& coefficients);
+	/**
+	 * Construct polynomial with the given coefficients, moving the coefficients.
+	 * @param mainVar New main variable.
+	 * @param coefficients Vector of coefficients.
+	 */
+	UnivariatePolynomial(Variable::Arg mainVar, std::vector<Coefficient>&& coefficients);
+	/**
+	 * Construct polynomial with the given coefficients.
+	 * @param mainVar New main variable.
+	 * @param coefficients Assignment of degree to coefficients.
+	 */
+	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~UnivariatePolynomial();
 
 	//Polynomial interface implementations.
 
 	/**
-	 * @see class Polynomial
-	 * @return 
+	 * Checks if the polynomial is represented univariately.
+	 * @see Polynomial#isUnivariateRepresented
+	 * @return true.
 	 */
 	virtual bool isUnivariateRepresented() const override
 	{
@@ -110,29 +160,48 @@ public:
 	}
 
 	/**
-	 * @see class Polynomial
-	 * @return 
+	 * Checks if the polynomial is represented multivariately.
+	 * @see Polynomial#isMultivariateRepresented
+	 * @return false.
 	 */
 	virtual bool isMultivariateRepresented() const override
 	{
 		return false;
 	}
 
+	/**
+	 * Checks if the polynomial is equal to zero.
+	 * @return If polynomial is zero.
+	 */
 	bool isZero() const
 	{
 		return mCoefficients.size() == 0;
 	}
 	
+	/**
+	 * Checks if the polynomial is equal to one.
+	 * @return If polynomial is one.
+	 */
 	bool isOne() const
 	{
 		return mCoefficients.size() == 1 && mCoefficients.back() == (Coefficient)1;
 	}
 	
+	/**
+	 * Creates a polynomial of value one with the same main variable.
+	 * Applies if the Coefficient are GFNumber values.
+	 * @return One.
+	 */
 	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
 	UnivariatePolynomial one() const
 	{
 		return UnivariatePolynomial(mMainVar, C(1, lcoeff().gf()));
 	}
+	/**
+	 * Creates a polynomial of value one with the same main variable.
+	 * Applies if the Coefficient are not GFNumber values.
+	 * @return One.
+	 */
 	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
 	UnivariatePolynomial one() const
 	{
@@ -141,8 +210,8 @@ public:
 	
 	/**
 	 * Returns the leading coefficient.
-	 * If the polynomial is empty, the return value is undefined.
-	 * @return 
+	 * Asserts, that the polynomial is not empty.
+	 * @return The leading coefficient.
 	 */
 	const Coefficient& lcoeff() const
 	{
@@ -151,8 +220,8 @@ public:
 	}
 	/**
 	 * Returns the trailing coefficient.
-	 * If the polynomial is empty, the return value is undefined.
-	 * @return 
+	 * Asserts, that the polynomial is not empty.
+	 * @return The trailing coefficient.
 	 */
 	const Coefficient& tcoeff() const {
 		assert(this->mCoefficients.size() > 0);
@@ -161,7 +230,7 @@ public:
 
 	/**
 	 * Checks whether the polynomial is constant with respect to the main variable.
-	 * @return 
+	 * @return If polynomial is constant.
 	 */
 	bool isConstant() const
 	{
@@ -172,7 +241,7 @@ public:
 	/**
 	 * Checks whether the polynomial is only a number.
 	 * Applies if the coefficients are numbers.
-	 * @return
+	 * @return If polynomial is a number.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool isNumber() const
@@ -183,7 +252,7 @@ public:
 	 * Checks whether the polynomial is only a number.
 	 * Applies if the coefficients are not numbers.
 	 * Calls isNumber() on the constant coefficient recursively.
-	 * @return
+	 * @return If polynomial is a number.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isNumber() const
@@ -195,7 +264,7 @@ public:
 	/**
 	 * Returns the constant part of this polynomial.
 	 * Applies, if the coefficients are numbers.
-	 * @return 
+	 * @return Constant part.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
@@ -207,7 +276,7 @@ public:
 	 * Returns the constant part of this polynomial.
 	 * Applies, if the coefficients are not numbers.
 	 * Calls constantPart() on the trailing coefficient recursively.
-	 * @return 
+	 * @return Constant part.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
@@ -216,10 +285,20 @@ public:
 		return this->tcoeff().constantPart();
 	}
 
+	/**
+	 * Checks if the polynomial is univariate, that means if only one variable occurs.
+	 * Applies, if the coefficients are numbers.
+	 * @return true.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool isUnivariate() const {
 		return true;
 	}
+	/**
+	 * Checks if the polynomial is univariate, that means if only one variable occurs.
+	 * Applies, if the coefficients are not numbers.
+	 * @return If polynomial is univariate.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isUnivariate() const {
 		for (auto c: this->coefficients()) {
@@ -230,17 +309,27 @@ public:
 
 	/**
 	 * Get the maximal exponent of the main variable.
-	 * @return 
+	 * @return Degree.
 	 */
-	unsigned degree() const
-	{
+	unsigned degree() const {
 		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
 	}
 	
+	/**
+	 * Returns the total degree of the polynomial, that is the maximum degree of any monomial.
+	 * Applies, if the coefficients are numbers. In this case, the total degree is the degree.
+	 * @return Total degree.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	unsigned totalDegree() const {
 		return this->degree();
 	}
+	/**
+	 * Returns the total degree of the polynomial, that is the maximum degree of any monomial.
+	 * Applies, if the coefficients are not numbers.
+	 * In this case, the total degree of all coefficients must be considered.
+	 * @return Total degree.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	unsigned totalDegree() const {
 		unsigned max = 0;
@@ -262,39 +351,82 @@ public:
 		this->stripLeadingZeroes();
 	}
 
-	const std::vector<Coefficient>& coefficients() const
-	{
+	/**
+	 * Retrieves the coefficients defining this polynomial.
+	 * @return Coefficients.
+	 */
+	const std::vector<Coefficient>& coefficients() const {
 		return mCoefficients;
 	}
 
-	const Variable& mainVar() const
-	{
+	/**
+	 * Retrieves the main variable of this polynomial.
+	 * @return Main variable.
+	 */
+	const Variable& mainVar() const {
 		return mMainVar;
 	}
 
+	/**
+	 * Switches the main variable using a purely syntactical restructuring.
+	 * The resulting polynomial will be algebraicly identical, but have the given variable as its main variable.
+	 * Applies, if the coefficients are numbers.
+	 * @param newVar New main variable.
+	 * @return Restructured polynomial.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(const Variable& newVar) const {
 		assert(this->isConsistent());
-		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar).toNumberCoefficients();
+		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
+	/**
+	 * Switches the main variable using a purely syntactical restructuring.
+	 * The resulting polynomial will be algebraicly identical, but have the given variable as its main variable.
+	 * Applies, if the coefficients are not numbers.
+	 * @param newVar New main variable.
+	 * @return Restructured polynomial.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial switchVariable(const Variable& newVar) const {
 		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
+	
+	/**
+	 * Replaces the main variable.
+	 * Applies, if the coefficients are numbers.
+	 * @param newVar New main variable.
+	 * @return New polynomial.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
 		return UnivariatePolynomial<Coefficient>(newVar, this->mCoefficients);
 	}
+	/**
+	 * Replaces the main variable.
+	 * Applies, if the coefficients are not numbers.
+	 * @param newVar New main variable.
+	 * @return New polynomial.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
 		return MultivariatePolynomial<NumberType>(*this).substitute(this->mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
 	}
 
+	/**
+	 * Gathers all variables that occur in the polynomial.
+	 * Applies, if the coefficients are numbers.
+	 * @return Set of variables.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	std::set<Variable> gatherVariables() const {
 		return std::set<Variable>({this->mainVar()});
 	}
+	/**
+	 * Gathers all variables that occur in the polynomial.
+	 * Applies, if the coefficients are not numbers.
+	 * @return Set of variables.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	std::set<Variable> gatherVariables() const {
 		std::set<Variable> res({this->mainVar()});
@@ -305,10 +437,22 @@ public:
 		return res;
 	}
 
+	/**
+	 * Checks if the given variable occurs in the polynomial.
+	 * Applies, if the coefficients are numbers.
+	 * @param v Variable.
+	 * @return If v occurs in the polynomial.
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	unsigned has(Variable::Arg v) const {
 		return v == this->mainVar();
 	}
+	/**
+	 * Checks if the given variable occurs in the polynomial.
+	 * Applies, if the coefficients are not numbers.
+	 * @param v Variable.
+	 * @return If v occurs in the polynomial.
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	unsigned has(Variable::Arg v) const {
 		bool hasVar = v == this->mainVar();
@@ -329,31 +473,31 @@ public:
 
 	/**
 	 * Checks whether the polynomial is unit normal
-	 * @see @ref GCL92, page 39
-     * @return 
-     */
+	 * @see @cite GCL92, page 39
+	 * @return If polynomial is normal.
+	 */
 	bool isNormal() const;
 	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
-	 * @see @ref GCL92, page 42.
-     * @return 
-     */
+	 * @see @cite GCL92, page 42.
+	 * @return 
+	 */
 	UnivariatePolynomial normalized() const;
 	
 	/**
 	 * The unit part of a polynomial over a field is its leading coefficient for nonzero polynomials, 
 	 * and one for zero polynomials.
-	 * @see @ref GCL92, page 42.
-     * @return The unit part of the polynomial.
-     */
+	 * @see @cite GCL92, page 42.
+	 * @return The unit part of the polynomial.
+	 */
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	const Coefficient& unitPart() const;
 	/**
 	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
 	 * and one for zero polynomials.
-	 * @see @ref GCL92, page 42.
-     * @return 
-     */
+	 * @see @cite GCL92, page 42.
+	 * @return The unit part of the polynomial.
+	 */
 	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
 	
@@ -364,24 +508,24 @@ public:
 	/**
 	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
 	 * The content of zero is zero.
-	 * @see @ref GCL92, page 52
-     * @return 
-     */
+	 * @see @cite GCL92, page 52
+	 * @return The content of the polynomial.
+	 */
 	Coefficient content() const;
 	
 	/**
 	 * The primitive part of p is the normal part of p divided by the content of p.
 	 * The primitive part of zero is zero.
-	 * @see @ref GCL92, page 53
-     * @return 
-     */
+	 * @see @cite GCL92, page 53
+	 * @return The primitive part of the polynomial.
+	 */
 	UnivariatePolynomial primitivePart() const;
 	
 	/**
 	 * The n'th derivative of the polynomial in its main variable.
-     * @param nth how many times the derivative should be applied.
-     * @return A polynomial (d/dx)^n p(x) where p(x) is the input polynomial.
-     */
+	 * @param nth how many times the derivative should be applied.
+	 * @return A polynomial (d/dx)^n p(x) where p(x) is the input polynomial.
+	 */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
 	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
@@ -401,8 +545,8 @@ public:
 	/**
 	 * Divides the polynomial by another polynomial.
 	 * Applies if the polynomial both have integer coefficients.
-	 * @param divisor
-	 * @return 
+	 * @param divisor Divisor.
+	 * @return this / divisor.
 	 */
 	template<typename C = Coefficient, EnableIf<is_integer<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
@@ -410,8 +554,8 @@ public:
 	/**
 	 * Divides the polynomial by another polynomial.
 	 * Applies if the polynomial both have coefficients over a field.
-	 * @param divisor
-	 * @return 
+	 * @param divisor Divisor.
+	 * @return this / divisor.
 	 */
 	template<typename C = Coefficient, DisableIf<is_integer<C>> = dummy, EnableIf<is_field<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divideBy(const UnivariatePolynomial& divisor) const;
@@ -419,8 +563,8 @@ public:
 	/**
 	 * Divides the polynomial by a coefficient.
 	 * Applies if the polynomial has coefficients from a field.
-	 * @param divisor
-	 * @return 
+	 * @param divisor Divisor.
+	 * @return this / divisor.
 	 */
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	DivisionResult<UnivariatePolynomial> divideBy(const Coefficient& divisor) const;
@@ -430,9 +574,9 @@ public:
 	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
 	 * Otherwise, false is returned and the content of quotient is undefined.
 	 * Applies if the polynomial has coefficients that are neither numeric nor from a field.
-	 * @param divisor
-	 * @param quotient
-	 * @return 
+	 * @param divisor Divisor.
+	 * @param quotient Resulting quotient.
+	 * @return If remainder was zero.
 	 */
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy>
 	bool divideBy(const Coefficient& divisor, UnivariatePolynomial& quotient) const;
@@ -440,8 +584,8 @@ public:
 	/**
 	 * Divides the polynomial by a number.
 	 * Applies if the polynomial has coefficients that are polynomials with coefficients from a field.
-	 * @param divisor
-	 * @return 
+	 * @param divisor Divisor.
+	 * @return Quotient and remainder.
 	 */
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy, EnableIf<is_field<typename UnderlyingNumberType<C>::type>> = dummy>
 	DivisionResult<UnivariatePolynomial> divideBy(const NumberType& divisor) const;
@@ -472,10 +616,10 @@ public:
 	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
 
 	/**
-	 * 
-     * @param value
-     * @return 
-     */
+	 * Calculates the sign of the polynomial at some point.
+	 * @param value Point to evaluate.
+	 * @return Sign at value.
+	 */
 	carl::Sign sgn(const Coefficient& value) const {
 		return carl::sgn(this->evaluate(value));
 	}
@@ -524,7 +668,7 @@ public:
 	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
 
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial<NumberType> toNumberCoefficients() const;
+	UnivariatePolynomial<NumberType> toNumberCoefficients(bool check = true) const;
 
 	template<typename NewCoeff>
 	UnivariatePolynomial<NewCoeff> convert() const;
@@ -540,7 +684,8 @@ public:
 	Coefficient cauchyBound() const;
 	Coefficient modifiedCauchyBound() const;
 
-	/** The maximum norm of a polynomial is the maximum absolute value of the coefficients of
+	/**
+	 * The maximum norm of a polynomial is the maximum absolute value of the coefficients of
 	 * the corresponding integral polynomial (as calculated by coprimeCoefficients()).
 	 * @return Maximum-norm of the polynomial in case it has numeric coefficients.
 	 */
@@ -669,22 +814,21 @@ public:
 	int countRealRoots(const Interval<Coefficient>& interval) const;
 
 	/**
-	 * Calculated the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
-	 * @param seq
-	 * @param interval
-	 * @return
+	 * Calculate the number of real roots of a polynomial within a given interval based on a sturm sequence of this polynomial.
+	 * @param seq Sturm sequence.
+	 * @param interval Interval.
+	 * @return Number of real roots in the interval.
 	 */
 	template<typename C = Coefficient, typename Number = typename UnderlyingNumberType<C>::type>
 	static int countRealRoots(const std::list<UnivariatePolynomial<Coefficient>>& seq, const Interval<Number>& interval);
 
 
 	/**
-	 * Implements subresultants algorithm with optimizations described in
-	 * http://dx.doi.org/10.1016/S0022-4049(98)00081-4
-	 * @param p
-	 * @param q
-	 * @param strategy
-	 * @return 
+	 * Implements subresultants algorithm with optimizations described in @cite Ducos00.
+	 * @param p First polynomial.
+	 * @param q First polynomial.
+	 * @param strategy Strategy.
+	 * @return Subresultants of p and q.
 	 */
 	static const std::list<UnivariatePolynomial> subresultants(
 			const UnivariatePolynomial& p,
@@ -801,7 +945,7 @@ public:
 	 * <ul>
 	 * <li>The leading term is not zero.</li>
 	 * </ul>
-     */
+	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	bool isConsistent() const;
 
@@ -812,28 +956,28 @@ public:
 	 * <li>The leading term is not zero.</li>
 	 * <li>The main variable does not occur in any coefficient.</li>
 	 * </ul>
-     */
+	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	bool isConsistent() const;
 private:
 	
-	/*!
+	/**
 	 * Reverses the order of the coefficients of this polynomial.
 	 * This method is meant to be called by signVariations only.
 	 * @complexity O(n)
 	 */
 	void reverse();
 
-	/*!
-	 * Scale the variable, i.e. apply <code>x -> factor * x</code>.
+	/**
+	 * Scale the variable, i.e. apply \f$ x \rightarrow factor * x \f$
 	 * This method is meant to be called by signVariations only.
 	 * @param factor Factor to scale x.
 	 * @complexity O(n)
 	 */
 	void scale(const Coefficient& factor);
 
-	/*!
-	 * Shift the variable by a, i.e. apply <code>x -> x + a</code>
+	/**
+	 * Shift the variable by a, i.e. apply \f$ x \rightarrow x + a \f$
 	 * This method is meant to be called by signVariations only.
 	 * @param a Offset to shift x.
 	 * @complexity O(n^2)

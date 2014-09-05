@@ -4,6 +4,7 @@
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 #include "EliminationSet.h"
+#include "CADLogging.h"
 
 namespace carl {
 namespace cad {
@@ -54,6 +55,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
+	LOG_FUNC("carl.cad.elimination", *r << ", " << avoidSingle);
 	assert(r->isConsistent());
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
@@ -121,6 +123,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		}
 	}
 	assert(this->isConsistent());
+	LOGMSG_TRACE("carl.cad.elimination", "Now: " << *this);
 	return insertValue;
 }
 
@@ -277,6 +280,11 @@ void EliminationSet<Coefficient>::resetLiftingPositionsFully() {
 }
 
 template<typename Coefficient>
+const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coefficient>::nextSingleEliminationPosition() {
+	return mSingleEliminationQueue.front();
+}
+
+template<typename Coefficient>
 const typename EliminationSet<Coefficient>::UPolynomial* EliminationSet<Coefficient>::popNextSingleEliminationPosition() {
 	const UPolynomial* p = mSingleEliminationQueue.front();
 	mSingleEliminationQueue.pop_front();
@@ -296,6 +304,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		if (p->isNumber())
 		//if( GiNaC::is_exactly_a<numeric>( *p )) /* discard numerics completely */
 		{
+			DOT_NODE("elimination", p, "shape=box");
 			this->erase(p);
 			return {};
 		}
@@ -311,6 +320,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 			if( queuePosition != mPairedEliminationQueue.end() && *queuePosition == p )
 				mPairedEliminationQueue.erase( queuePosition );
 		}
+		DOT_EDGE("elimination", p, pNewVar, "label=\"constant\"");
 		return { pNewVar };
 	}
 
@@ -369,21 +379,23 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		)
 {
 	if (p->isNumber()) { /* discard numerics completely */
+		DOT_NODE("elimination", p, "shape=box");
 		this->erase(p);
 		return {};
 	}
 	const UPolynomial* pNewVar = new UPolynomial(p->switchVariable(variable));
 	destination.insert(pNewVar, this->getParentsOf(p), avoidSingle);
-	if( setting.removeConstants ) /* remove constant from this level */
+	if( setting.removeConstants ) { /* remove constant from this level */
+		DOT_NODE("elimination", p, "shape=box");
 		this->erase(p);
-	else
-	{
+	} else {
 		if (!queue.empty())
 			queue.pop_front();
 		auto queuePosition = std::lower_bound(otherqueue.begin(), otherqueue.end(), p, this->eliminationOrder);
 		if (queuePosition != otherqueue.end())
 			otherqueue.erase(queuePosition);
 	}
+	DOT_EDGE("elimination", p, pNewVar, "label=\"constant\"");
 	return { pNewVar };
 }
 
@@ -463,8 +475,12 @@ void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to,
 		assert(p->isConsistent());
 		if(p->isConstant()) {
 			if (!p->isNumber()) { // discard numerics completely
+				DOT_EDGE("elimination", p, p->switchVariable(variable), "label=\"constant\"");
 				to.insert(p->switchVariable(variable), this->getParentsOf(p));
-			}	
+			} else {
+				DOT_NODE("elimination", p, "shape=box");
+				DOT_EDGE("elimination", p, p, "label=\"number\"");
+			}
 			toDelete.push_front(p);
 		}
 	}
@@ -479,6 +495,8 @@ void EliminationSet<Coefficient>::removeConstants() {
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		if (p->isConstant()) {   // found candidate for removal
+			DOT_NODE("elimination", p, "shape=box");
+			DOT_EDGE("elimination", p, p, "label=\"constant\"");
 			toDelete.push_front(p);
 		}
 	}
@@ -496,6 +514,8 @@ void EliminationSet<Coefficient>::removePolynomialsWithoutRealRoots() {
 		if (p->degree() % 2 == 0 && p->isUnivariate())
 		{    // this is a good candidate for having no real roots
 			if (rootfinder::countRealRoots(*p) == 0) {
+				DOT_NODE("elimination", p, "shape=box");
+				DOT_EDGE("elimination", p, p, "label=\"no roots\"");
 				toDelete.push_front(p);
 			}
 		}
@@ -510,6 +530,7 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::makeSquarefree() {
 	EliminationSet<Coefficient> squarefreeSet(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
+		DOT_EDGE("elimination", p, p->squareFreePart(), "label=\"squarefree\"");
 		squarefreeSet.insert(p->squareFreePart(), this->getParentsOf(p));
 	}
 	std::swap(*this, squarefreeSet);
@@ -519,8 +540,12 @@ template<typename Coefficient>
 void EliminationSet<Coefficient>::makePrimitive() {
 	EliminationSet<Coefficient> primitiveSet(this->polynomialOwner, this->liftingOrder, this->eliminationOrder);
 	for (auto p: this->polynomials) {
-		if (p->isNumber()) continue; // numbers are discarded
-		
+		if (p->isNumber()) {
+			DOT_NODE("elimination", p, "shape=box");
+			DOT_EDGE("elimination", p, p, "label=\"number\"");
+			continue; // numbers are discarded
+		}
+		DOT_EDGE("elimination", p, p->pseudoPrimpart(), "label=\"primitive\"");
 		primitiveSet.insert(p->pseudoPrimpart(), this->getParentsOf(p));
 	}
 	std::swap(*this, primitiveSet);
@@ -561,14 +586,17 @@ void EliminationSet<Coeff>::elimination(
 			EliminationSet<Coeff>& eliminated,
 			bool avoidSingle
 ) {
+	LOG_FUNC("carl.cad.eliminationset", *p << ", " << variable << ", " << avoidSingle);
 	std::list<const UPolynomial*> parents({p});
 	// add all coefficients of p
 	for (auto coeff: p->coefficients()) {
 		if (coeff.isNumber()) continue;
 		eliminated.insert(coeff.toUnivariatePolynomial(variable), parents, avoidSingle);
+		DOT_EDGE("elimination", p, coeff.toUnivariatePolynomial(variable), "label=\"coefficient\"");
 	}
 	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
 	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);
+	DOT_EDGE("elimination", p, p->discriminant().switchVariable(variable), "label=\"discriminant\"");
 }
 
 template<typename Coeff>
@@ -582,6 +610,7 @@ void EliminationSet<Coeff>::elimination(
 	assert(p->mainVar() == q->mainVar());
 	std::list<const UPolynomial*> parents({p, q});
 	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
+	DOT_HYPEREDGE("elimination", std::initializer_list<const UPolynomial*>({p, q}), p->resultant(*q).switchVariable(variable));
 }
 
 }

@@ -13,12 +13,9 @@
 #include "../util/platform.h"
 #include "config.h"
 #include <type_traits>
-#ifdef USE_MPFR_FLOAT
-#include <mpfr.h>
-#endif
-CLANG_WARNING_DISABLE("-Wsign-conversion")
-#include <gmpxx.h>
-CLANG_WARNING_RESET
+//CLANG_WARNING_DISABLE("-Wsign-conversion")
+//#include <gmpxx.h>
+//CLANG_WARNING_RESET
 
 #include "../util/SFINAE.h"
 
@@ -44,6 +41,8 @@ struct is_real
 {
 	static const bool value = false;
 };
+
+
 
 /**
  * Type trait is_rational. 
@@ -85,20 +84,6 @@ template<typename T>
 struct is_integer {
 	static const bool value = false;
 };
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_integer<long> {
-	static const bool value = true;
-};
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_integer<int> {
-	static const bool value = true;
-};
 
 /**
  * @ingroup typetraits
@@ -109,21 +94,6 @@ struct is_natural
 	static constexpr bool value = false;
 };
 
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_natural<unsigned> {
-	static constexpr bool value = false;
-};
-
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_natural<unsigned long> {
-	static constexpr bool value = false;
-};
 
 
 /**
@@ -211,26 +181,6 @@ struct is_float
     static const bool value = false;
 };
 
-#ifdef USE_MPFR_FLOAT
-template<>
-struct is_float<mpfr_t>
-{
-    static const bool value = true;
-};
-#endif
-
-template<>
-struct is_float<double>
-{
-    static const bool value = true;
-};
-
-template<>
-struct is_float<float>
-{
-    static const bool value = true;
-};
-
 /**
  * Type trait is_primitive required for BoostIntervals to use the preimlpemented default rounding and checking policies.
  */
@@ -251,36 +201,6 @@ struct is_number<GFNumber<C>>
 {
 	static constexpr bool value = true;
 };
-
-template<>
-struct is_primitive<double>
-{
-	static const bool value = true;
-};
-
-	template<>
-struct is_primitive<long double>
-{
-	static const bool value = true;
-};
-	
-template<>
-struct is_primitive<int>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_primitive<float>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_primitive<unsigned>
-{
-	static const bool value = true;
-};
 /**
  * Gives the corresponding integral type.
  * Default is int.
@@ -289,15 +209,6 @@ template<typename RationalType>
 struct IntegralT
 {
 	typedef int type;
-};
-
-/**
- * @todo Fix this?
- */
-template<>
-struct IntegralT<double>
-{
-	typedef unsigned type;
 };
 
 template<typename C>
@@ -350,6 +261,3 @@ struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>
 	typedef typename UnderlyingNumberType<C>::type type;
 };
 }
-
-#include "adaption_cln/typetraits.h"
-#include "adaption_gmpxx/typetraits.h"

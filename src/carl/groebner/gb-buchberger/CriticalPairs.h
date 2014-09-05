@@ -83,7 +83,7 @@ public:
     }
 
     SPolPair pop( );
-    void elimMultiples( const Monomial& lm, size_t ind, const std::unordered_map<size_t, SPolPair>& newpairs );
+    void elimMultiples( const Monomial& lm, const std::unordered_map<size_t, SPolPair>& newpairs );
     
     bool empty( ) const
     {

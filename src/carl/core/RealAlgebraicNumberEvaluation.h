@@ -11,7 +11,7 @@
 #include "../util/SFINAE.h"
 
 #include "../interval/IntervalEvaluation.h"
-#include "UnivariatePolynomial.h"
+#include "MultivariatePolynomial.h"
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicPoint.h"
@@ -28,7 +28,7 @@ using RANIRMap = std::map<Variable, RealAlgebraicNumberIRPtr<Number>>;
  * Evaluates the given polynomial at the given point based on the variable order.
  * Asserts that the number of variables matches the dimension of the point, all variables of p have an assignment in m and that m has no additional assignments.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
- * All assignments of interval representations are passed on to <code>evaluate(UnivariatePolynomial, RANIRMap)</code>.
+ * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
  * 
  * @param p Polynomial to be evaluated
  * @param point Values for variables
@@ -36,22 +36,22 @@ using RANIRMap = std::map<Variable, RealAlgebraicNumberIRPtr<Number>>;
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
+RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
 
 /**
  * Evaluates the given polynomial with the given values for the variables.
  * Asserts that all variables of p have an assignment in m and that m has no additional assignments.
  * If a variable is assigned a numeric representation, the corresponding value is directly plugged in.
- * All assignments of interval representations are passed on to <code>evaluate(UnivariatePolynomial, RANIRMap)</code>.
+ * All assignments of interval representations are passed on to <code>evaluate(MultivariatePolynomial, RANIRMap)</code>.
  * 
  * @param p Polynomial to be evaluated
  * @param m Variable assignment
  * @return Evaluation result
  */
-template<typename Number, typename Coeff>
-RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANMap<Number>& m);
-template<typename Number, typename Coeff>
-RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m);
+template<typename Number>
+RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANMap<Number>& m);
+template<typename Number>
+RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANIRMap<Number>& m);
 
 
 /**
@@ -95,16 +95,16 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 // Implementation
 
 template<typename Number, typename Coeff>
-RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
+RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
 	assert(point.dim() == variables.size());
 	RANIRMap<Number> IRs;
-	UnivariatePolynomial<Coeff> pol(p);
+	MultivariatePolynomial<Coeff> pol(p);
 	for (unsigned i = 0; i < point.dim(); i++) {
 		if (!pol.has(variables[i])) continue;
 		assert(pol.has(variables[i]));
 		if (point[i]->isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(variables[i], Coeff(point[i]->value()));
+			pol.substituteIn(variables[i], MultivariatePolynomial<Coeff>(point[i]->value()));
 		} else {
 			// Defer interval representations
 			IRs[variables[i]] = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(point[i]);
@@ -116,16 +116,16 @@ RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, Re
 	return evaluate(pol, IRs);
 }
 
-template<typename Number, typename Coeff>
-RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RANMap<Number>& m) {
+template<typename Number>
+RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
 	RANIRMap<Number> IRs;
-	UnivariatePolynomial<Coeff> pol(p);
+	MultivariatePolynomial<Number> pol(p);
 	
 	for (auto it: m) {
 		assert(pol.has(it.first));
 		if (it.second->isNumeric()) {
 			// Plug in numeric representations
-			pol.substituteIn(it.first, Coeff(it.second->value()));
+			pol.substituteIn(it.first, Number(it.second->value()));
 		} else {
 			// Defer interval representations
 			IRs[it.first] = std::static_pointer_cast<const RealAlgebraicNumberIRPtr<Number>>(it.second);
@@ -145,17 +145,17 @@ RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, RA
  * @param m Variable assignment
  * @return Evaluation result
  */
-template<typename Number, typename Coeff>
-RealAlgebraicNumberPtr<Number> evaluate(const UnivariatePolynomial<Coeff>& p, const RANIRMap<Number>& m) {
+template<typename Number>
+RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Number>& p, const RANIRMap<Number>& m) {
 	assert(m.size() > 0);
-	auto poly = p.switchVariable(m.begin()->first);
+	auto poly = p.toUnivariatePolynomial(m.begin()->first);
 	if (m.size() == 1 && m.begin()->second->sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
 		return RealAlgebraicNumberIR<Number>::create(poly.mainVar());
 	}
 	Variable v = VariablePool::getInstance().getFreshVariable();
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
-	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<Coeff>(v, {-Coeff(p), Coeff(1)}), m, varToInterval);
+	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
 	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
 
 	// the interval should include at least one root.

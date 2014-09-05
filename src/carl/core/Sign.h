@@ -12,10 +12,16 @@
 
 namespace carl {
 /**
- * This class represents the sign of a number.
- * It can be either negative, zero or positive.
+ * This class represents the sign of a number \f$n\f$.
  */
-enum class Sign : int { NEGATIVE = -1, ZERO = 0, POSITIVE = 1 };
+enum class Sign : int {
+	/// Indicates that \f$n < 0\f$.
+	NEGATIVE = -1,
+	/// Indicates that \f$n = 0\f$.
+	ZERO = 0,
+	/// Indicates that \f$n > 0\f$.
+	POSITIVE = 1
+};
 
 std::ostream& operator<<(std::ostream& os, const Sign& sign);
 

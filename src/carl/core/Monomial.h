@@ -13,149 +13,219 @@
 
 #include "Variable.h"
 #include "CompareResult.h"
-#include "VarExpPair.h"
 #include "VariablesInformation.h"
 #include "logging.h"
-#include "../numbers/operations.h"
+#include "carlLoggingHelper.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {   
-    
-    template<typename Coefficient> 
-    class Term;
-    /**
-     *  The general-purpose monomials. Notice that we aim to keep this object as small as possbible, 
-     * while also limiting the use of expensive language features such as RTTI, exceptions and even 
-     * polymorphism.
+
+	template<typename Coefficient>
+	class Term;
+	
+	/// Type of an exponent.
+	typedef unsigned exponent;
+	
+	/**
+	 * Compare a pair of variable and exponent with a variable.
+	 * Returns true, if both variables are the same.
+	 * @param p Pair of variable and exponent.
+	 * @param v Variable.
+	 * @return `p.first == v`
+	 */
+	inline bool operator==(const std::pair<Variable, exponent>& p, const Variable& v) {
+		return p.first == v;
+	}
+
+	/**
+	 * The general-purpose monomials. Notice that we aim to keep this object as small as possbible,
+	 * while also limiting the use of expensive language features such as RTTI, exceptions and even
+	 * polymorphism.
+	 * 
+	 * Although a Monomial can conceptually be seen as a map from variables to exponents,
+	 * this implementation uses a vector of pairs of variables and exponents.
+	 * Due to the fact that monomials usually contain only a small number of variables,
+	 * the overhead introduced by `std::map` makes up for the asymptotically slower `std::find` on 
+	 * the `std::vector` that is used.
+	 * 
+	 * Besides, many operations like multiplication, division or substitution do not rely
+	 * on finding some variable, but must iterate over all entries anyway.
+	 * 
 	 * @ingroup multirp
-     */
-    class Monomial
-    {
-    private:
-        /**
-         * Set if we want to use binary search instead of linear search.
-         */
-        static const bool PREFERBINARYSEARCH = false;
+	 */
+	class Monomial
+	{
+	protected:
+		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
+		std::vector<std::pair<Variable, exponent>> mExponents;
+		/// Some applications performance depends on getting the degree of monomials very fast
+		exponent mTotalDegree = 0;
 
-    protected:
-        /// A vector of variable-exponent vars (v_i^e_i) with nonzero exponents. 
-        std::vector<VarExpPair> mExponents;
-        /// Some applications performance depends on getting the degree of monomials very fast
-        exponent mTotalDegree = 0;
-        
-        typedef std::vector<VarExpPair>::iterator exponents_it;
-        typedef std::vector<VarExpPair>::const_iterator exponents_cIt;
+		typedef std::vector<std::pair<Variable, exponent>>::iterator exponents_it;
+		typedef std::vector<std::pair<Variable, exponent>>::const_iterator exponents_cIt;
 
-        /**
-         */
-        Monomial() = default;
-    public:
-        //
-        // Constructors
-        //
-        /**
-         * Generate a monomial from a variable, with constant 1 (one).
-         * @param v The variable.
-         * @param e The exponent.
-         */
-        Monomial(Variable::Arg v, exponent e = 1) :
-            mExponents(1, VarExpPair(v,e)),
-            mTotalDegree(e)
-        {
+		/**
+		 * Default constructor.
+		 */
+		Monomial() = default;
+	public:
+		/**
+		 * Generate a monomial from a variable and an exponent.
+		 * @param v The variable.
+		 * @param e The exponent.
+		 */
+		Monomial(Variable::Arg v, exponent e = 1) :
+			mExponents(1, std::make_pair(v,e)),
+			mTotalDegree(e)
+		{
 			assert(isConsistent());
-        }
-        
-        Monomial(const Monomial& rhs) :
+		}
+
+		/**
+		 * Copy constructor.
+		 * @param rhs Monomial to copy.
+		 */
+		Monomial(const Monomial& rhs) :
 			mExponents(rhs.mExponents),
 			mTotalDegree(rhs.mTotalDegree)
 		{
 			assert(isConsistent());
 		}
-        
-		
-		explicit Monomial(const std::vector<VarExpPair>& exponents)
-		: mExponents(exponents), mTotalDegree(0)
+
+		/**
+		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
+		 * @param exponents The variables and their exponents.
+		 * @param totalDegree The total degree of the monomial to generate.
+		 */
+		Monomial(std::vector<std::pair<Variable, exponent>>&& exponents, exponent totalDegree) :
+			mExponents(exponents),
+			mTotalDegree(totalDegree)
 		{
-			for(const VarExpPair&  ve : exponents)
-			{
-				mTotalDegree += ve.exp;
-			}
 			assert(isConsistent());
 		}
-        /**
-         * Generate a monomial from a vector of variable-exponent pairs and a total degree.
-         * @param exponents The variables and their exponents.
-         * @param totalDegree The total degree of the monomial to generate.
-         */
-        Monomial(std::vector<VarExpPair>&& exponents, exponent totalDegree) :
-            mExponents(exponents),
-            mTotalDegree(totalDegree)
-        {
-            assert(isConsistent());
-        }
 
-        Monomial& operator=(const Monomial& rhs)
-        {
-            // Check for self-assignment.
-            if(this == &rhs) return *this;
-            mExponents = rhs.mExponents;
-            mTotalDegree = rhs.mTotalDegree;
-            return *this;
-        }
-        /**
-         * Gives the total degree, i.e. the sum of all exponents.
-         * @return 
+		/**
+		 * Assignment operator.
+         * @param rhs Other monomial.
+         * @return this.
          */
-        exponent tdeg() const
-        {
-            return mTotalDegree;
-        }
-        /**
-         * Checks whether the monomial is a constant.
-         * @return 
-         */
-        bool isConstant() const
-        {
-            return mTotalDegree == 0;
-        }
-        /**
-         * Checks whether the monomial has exactly the degree one.
-         * @return 
-         */
-        bool isLinear() const
-        {
-            return mTotalDegree == 1;
-        }
-        bool isAtMostLinear() const
-        {
-            return mTotalDegree <= 1;
-        }
+		Monomial& operator=(const Monomial& rhs)
+		{
+			// Check for self-assignment.
+			if(this == &rhs) return *this;
+			mExponents = rhs.mExponents;
+			mTotalDegree = rhs.mTotalDegree;
+			return *this;
+		}
 		
+		/**
+		 * Returns iterator on first pair of variable and exponent.
+		 * @return Iterator on begin.
+		 */
+		exponents_it begin() {
+			return mExponents.begin();
+		}
+		/**
+		 * Returns constant iterator on first pair of variable and exponent.
+		 * @return Iterator on begin.
+		 */
+		exponents_cIt begin() const {
+			return mExponents.begin();
+		}
+		/**
+		 * Returns past-the-end iterator.
+		 * @return Iterator on end.
+		 */
+		exponents_it end() {
+			return mExponents.end();
+		}
+		/**
+		 * Returns past-the-end iterator.
+		 * @return Iterator on end.
+		 */
+		exponents_cIt end() const {
+			return mExponents.end();
+		}
+		
+		/**
+		 * Gives the total degree, i.e. the sum of all exponents.
+		 * @return Total degree.
+		 */
+		exponent tdeg() const
+		{
+			return mTotalDegree;
+		}
+		/**
+		 * Checks whether the monomial is a constant.
+		 * @return If monomial is constant.
+		 */
+		bool isConstant() const
+		{
+			return mTotalDegree == 0;
+		}
+		/**
+		 * Checks whether the monomial has exactly degree one.
+		 * @return If monomial is linear.
+		 */
+		bool isLinear() const
+		{
+			return mTotalDegree == 1;
+		}
+		
+		/**
+		 * Checks whether the monomial has at most degree one.
+		 * @return If monomial is linear or constant.
+		 */
+		bool isAtMostLinear() const
+		{
+			return mTotalDegree <= 1;
+		}
+		
+		/**
+		 * Checks whether the monomial is a square, i.e. whether all exponents are even.
+		 * @return If monomial is a square.
+		 */
 		bool isSquare() const
 		{
-			if(mTotalDegree % 2 == 1) return false;
-			for(const VarExpPair& ve : mExponents)
+			if (mTotalDegree % 2 == 1) return false;
+			for (auto it: mExponents)
 			{
-				if(ve.exp % 2 == 1) return false;
+				if (it.second % 2 == 1) return false;
 			}
 			return true;
 		}
-        size_t nrVariables() const
-        {
-            return mExponents.size();
-        }
+		
+		/**
+		 * Returns the number of variables that occur in the monomial.
+		 * @return Number of variables.
+		 */
+		size_t nrVariables() const
+		{
+			return mExponents.size();
+		}
 
+		/**
+		 * Retrieves the single variable of the monomial.
+		 * Asserts that there is in fact only a single variable.
+		 * @return Variable.
+		 */
 		Variable::Arg getSingleVariable() const
 		{
 			assert(mExponents.size() == 1);
-			return mExponents.front().var;
+			return mExponents.front().first;
 		}
 		
+		/**
+		 * Checks that there is no other variable than the given one.
+		 * @param v Variable.
+		 * @return If there is only v.
+		 */
 		bool hasNoOtherVariable(Variable::Arg v) const
 		{
 			if(mExponents.size() == 1)
 			{
-				if(mExponents.front().var == v) return true;
+				if(mExponents.front().first == v) return true;
 				return false;
 			}
 			else if(mExponents.size() == 0) 
@@ -168,696 +238,726 @@ namespace carl
 			}
 		}
 		
-		const VarExpPair& operator[](unsigned index) const
+		/**
+		 * Retrieves the given VarExpPair.
+		 * @param index Index.
+		 * @return VarExpPair.
+		 */
+		const std::pair<Variable, exponent>& operator[](unsigned index) const
 		{
 			assert(index < mExponents.size());
 			return mExponents[index];
 		}
-        /**
-         * TODO: write code if binary search is preferred.
-         * @param v
-         * @return 
-         */
-        exponent exponentOfVariable(Variable::Arg v) const
-        {
-            // Linear implementation, as we expect very small monomials.
-            exponents_cIt it;
-            if((it = std::find(mExponents.cbegin(), mExponents.cend(), v)) == mExponents.cend())
-            {
-                return 0;
-            }
-            else
-            {
-                return it->exp;
-            }
-        }
-        
-        /**
-         * TODO: write code if binary search is preferred.
-         * @param v The variable to check for its occurrence.
-         * @return true, if the variable occurs in this term.
-         */
-        bool has(Variable::Arg v) const
-        {
-            return (std::find(mExponents.cbegin(), mExponents.cend(), v) != mExponents.cend());
-        }
-
-        exponent highestExponent(Variable::Arg) const
-        {
-            LOG_NOTIMPLEMENTED();
-			return 0;
-        }
+		/**
+		 * Retrieves the exponent of the given variable.
+		 * @param v Variable.
+		 * @return Exponent of v.
+		 */
+		exponent exponentOfVariable(Variable::Arg v) const
+		{
+			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
+			if(it == mExponents.cend()) {
+				return 0;
+			} else {
+				return it->second;
+			}
+		}
+		
+		/**
+		 * TODO: write code if binary search is preferred.
+		 * @param v The variable to check for its occurrence.
+		 * @return true, if the variable occurs in this term.
+		 */
+		bool has(Variable::Arg v) const
+		{
+			return (std::find(mExponents.cbegin(), mExponents.cend(), v) != mExponents.cend());
+		}
 		
 		/**
 		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
-         * @return nullptr if result is 1, otherwise m/v^e.
-         */
+		 * @return nullptr if result is 1, otherwise m/v^e.
+		 */
 		Monomial* dropVariable(Variable::Arg v) const
 		{
-			if (!this->has(v)) {
-				return new Monomial(*this);
-			}
-			Monomial* m = new Monomial();
-			m->mExponents.reserve(mExponents.size()-1);
-			m->mTotalDegree = mTotalDegree;
+			LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
+			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 			
-			for(const VarExpPair& ve : mExponents)
-			{
-				if(ve.var == v)
-				{
-					m->mTotalDegree -= ve.exp;
-				}
-				else
-				{
-					m->mExponents.emplace_back(ve);
-				}
-			}
-			if(m->mTotalDegree == 0) 
-			{
-				delete m;
-				return nullptr;
-			}
-			return m;
+			if (it == mExponents.cend()) return new Monomial(*this);
+			if (mExponents.size() == 1) return nullptr;
+			
+			exponent tDeg = mTotalDegree - it->second;
+			std::vector<std::pair<Variable, exponent>> newExps(mExponents.begin(), it);
+			it++;
+			newExps.insert(newExps.end(), it, mExponents.end());
+			return new Monomial(std::move(newExps), tDeg);
 		}
 
-        Monomial* dividedBy(Variable::Arg v) const
-        {
-             // Linear implementation, as we expect very small monomials.
-            exponents_cIt it;
-            if((it = std::find(mExponents.cbegin(), mExponents.cend(), v)) == mExponents.cend())
-            {
-                return nullptr;
-            }
-            else
-            {
-                Monomial* m = new Monomial();
-                // If the exponent is one, the variable does not occur in the new monomial.
-                if(it->exp == 1)
-                {
-                    if(it != mExponents.begin())
-                    {
-                        m->mExponents.assign(mExponents.begin(), it);
-                    }
-                    m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
-                }
-                // We have to decrease the exponent of the variable by one.
-                else
-                {
-                    m->mExponents.assign(mExponents.begin(), mExponents.end());
-                    m->mExponents[(unsigned)(it - mExponents.begin())].exp -= 1;
-                }
-                m->mTotalDegree = mTotalDegree - 1;
-                return m;
-            }
-        }
+		/**
+		 * Divides the monomial by a variable v.
+		 * If the division is impossible (because v does not occur in the monomial), nullptr is returned.
+         * @param v Variable
+         * @return This divided by v.
+         */
+		Monomial* divide(Variable::Arg v) const
+		{
+			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
+			if(it == mExponents.cend())	return nullptr;
+			else {
+				Monomial* m = new Monomial();
+				// If the exponent is one, the variable does not occur in the new monomial.
+				if(it->second == 1) {
+					if(it != mExponents.begin()) {
+						m->mExponents.assign(mExponents.begin(), it);
+					}
+					m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
+				} else {
+					// We have to decrease the exponent of the variable by one.
+					m->mExponents.assign(mExponents.begin(), mExponents.end());
+					m->mExponents[(unsigned)(it - mExponents.begin())].second -= 1;
+				}
+				m->mTotalDegree = mTotalDegree - 1;
+				return m;
+			}
+		}
 
-		
-		bool dividableBy(const Monomial& m) const
+		/**
+		 * Checks if this monomial is divisible by the given monomial m.
+         * @param m Monomial.
+         * @return If this is divisible by m.
+         */
+		bool divisible(const Monomial& m) const
 		{
 			assert(isConsistent());
 			if(m.mTotalDegree > mTotalDegree) return false;
 			if(m.nrVariables() > nrVariables()) return false;
 			// Linear, as we expect small monomials.
-            exponents_cIt itright = m.mExponents.begin();
-            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
-            {
-                // Done with division
-                if(itright == m.mExponents.end())
-                {
-			        return true;
-                }
-                // Variable is present in both monomials.
-                if(itleft->var == itright->var)
-                {
-                    if(itright->exp > itleft->exp)
-                    {
-                        // Underflow, itright->exp was larger than itleft->exp.
-			            return false;
-                    }
-                    itright++;
-                }
-                // Variable is not present in lhs, division fails.
-                else if(itleft->var > itright->var) 
-                {
-			        return false;
-                }
+			auto itright = m.mExponents.begin();
+			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+			{
+				// Done with division
+				if(itright == m.mExponents.end())
+				{
+					return true;
+				}
+				// Variable is present in both monomials.
+				if(itleft->first == itright->first)
+				{
+					if(itright->second > itleft->second)
+					{
+						// Underflow, itright->exp was larger than itleft->exp.
+						return false;
+					}
+					itright++;
+				}
+				// Variable is not present in lhs, division fails.
+				else if(itleft->first > itright->first) 
+				{
+					return false;
+				}
 				else
 				{
-					assert(itright->var > itleft->var);
+					assert(itright->first > itleft->first);
 				}
-            }
-            // If there remain variables in the m, it fails.
-            if(itright != m.mExponents.end()) 
+			}
+			// If there remain variables in the m, it fails.
+			if(itright != m.mExponents.end()) 
 			{
 				return false;
 			}
 			return true;
-            
+			
 			
 		}
-        /**
-         * 
-         * @param m Recommended to be non-constant as this yields unnecessary copying.
-         * @return 
-         */
-        Monomial* dividedBy(const Monomial& m) const
-        {
-            if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
-            {
-                // Division will fail.
-				
-                return nullptr;
-            }
-            Monomial* result = new Monomial();
-            result->mTotalDegree =  mTotalDegree - m.mTotalDegree;
+		/**
+		 * Returns a new monomial that is this monomial divided by m.
+		 * If this is not divisible by m, nullptr is returned.
+		 * @param m Monomial.
+		 * @return this divided by m.
+		 */
+		Monomial* divide(const Monomial& m) const
+		{
+			LOG_FUNC("carl.core.monomial", *this << ", " << m);
+			if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
+			{
+				// Division will fail.
+				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+				return nullptr;
+			}
+			Monomial* result = new Monomial();
+			result->mTotalDegree =  mTotalDegree - m.mTotalDegree;
 
-            // Linear, as we expect small monomials.
-            exponents_cIt itright = m.mExponents.begin();
-            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
-            {
-                // Done with division
-                if(itright == m.mExponents.end())
-                {
-                    // Insert remaining part
-                    result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
+			// Linear, as we expect small monomials.
+			auto itright = m.mExponents.begin();
+			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+			{
+				// Done with division
+				if(itright == m.mExponents.end())
+				{
+					// Insert remaining part
+					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
 					assert(result->isConsistent());
-                    return result;
-                }
-                // Variable is present in both monomials.
-                if(itleft->var == itright->var)
-                {
-                    exponent newExp = itleft->exp - itright->exp;
-                    if(newExp > itleft->exp)
-                    {
-                        // Underflow, itright->exp was larger than itleft->exp.
+					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+					return result;
+				}
+				// Variable is present in both monomials.
+				if(itleft->first == itright->first)
+				{
+					exponent newExp = itleft->second - itright->second;
+					if(newExp > itleft->second)
+					{
+						// Underflow, itright->exp was larger than itleft->exp.
 						delete result;
-                        return nullptr;
-                    }
-                    else if(newExp > 0)
-                    {
-                        result->mExponents.push_back(VarExpPair(itleft->var, newExp));
-                    }
-                    itright++;
-                }
-                // Variable is not present in lhs, division fails.
-                else if(itleft->var > itright->var) 
-                {
+						LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+						return nullptr;
+					}
+					else if(newExp > 0)
+					{
+						result->mExponents.push_back(std::make_pair(itleft->first, newExp));
+					}
+					itright++;
+				}
+				// Variable is not present in lhs, division fails.
+				else if(itleft->first > itright->first) 
+				{
 					delete result;
-                    return nullptr;
-                }
+					LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+					return nullptr;
+				}
 				else
 				{
-					assert(itright->var > itleft->var);
+					assert(itright->first > itleft->first);
 					result->mExponents.push_back(*itleft);
 				}
-            }
-            // If there remain variables in the m, it fails.
-            if(itright != m.mExponents.end())
+			}
+			// If there remain variables in the m, it fails.
+			if(itright != m.mExponents.end())
 			{
 				delete result;
+				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 				return nullptr;
 			}
 			assert(result->isConsistent());
-            return result;
-            
-        }
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+			return result;
+			
+		}
 		
 		/**
 		 * 
-         * @param m
-         * @return 
-         */
+		 * @param m
+		 * @return 
+		 */
 		Monomial* calcLcmAndDivideBy(const Monomial& m) const
 		{
 			Monomial* result = new Monomial();
-            result->mTotalDegree = mTotalDegree;
-            // Linear, as we expect small monomials.
-            exponents_cIt itright = m.mExponents.begin();
-            for(exponents_cIt itleft = mExponents.begin(); itleft != mExponents.end();)
-            {
-                // Done with division
-                if(itright == m.mExponents.end())
-                {
-                    // Insert remaining part
-                    result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
-                    return result;
-                }
-                // Variable is present in both monomials.
-                if(itleft->var == itright->var)
-                {
-                    exponent newExp = std::max(itleft->exp, itright->exp) - itright->exp;
-                    if(newExp != 0)
-                    {
-                        result->mExponents.push_back(VarExpPair(itleft->var, newExp));
-						result->mTotalDegree -= itright->exp;
-                    }
+			result->mTotalDegree = mTotalDegree;
+			// Linear, as we expect small monomials.
+			auto itright = m.mExponents.begin();
+			for(auto itleft = mExponents.begin(); itleft != mExponents.end();)
+			{
+				// Done with division
+				if(itright == m.mExponents.end())
+				{
+					// Insert remaining part
+					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
+					return result;
+				}
+				// Variable is present in both monomials.
+				if(itleft->first == itright->first)
+				{
+					exponent newExp = std::max(itleft->second, itright->second) - itright->second;
+					if(newExp != 0)
+					{
+						result->mExponents.push_back(std::make_pair(itleft->first, newExp));
+						result->mTotalDegree -= itright->second;
+					}
 					else
 					{
-						result->mTotalDegree -= itleft->exp;
+						result->mTotalDegree -= itleft->second;
 					}
-                    ++itright;
-					++itleft;
-                }
-                // Variable is not present in lhs, dividing lcm yields variable will not occur in result
-                
-				else if(itleft->var > itright->var) 
-                {
 					++itright;
-                }
+					++itleft;
+				}
+				// Variable is not present in lhs, dividing lcm yields variable will not occur in result
+				
+				else if(itleft->first > itright->first) 
+				{
+					++itright;
+				}
 				else
 				{
-					assert(itright->var > itleft->var);
+					assert(itright->first > itleft->first);
 					result->mExponents.push_back(*itleft);
 					++itleft;
 				}
-            }
+			}
 			assert(result->isConsistent());
 			return result;
 		}
 		
 		template<typename Coeff, bool gatherCoeff, typename CoeffType>
-		void gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
-		{
-            varinfo.collect(var, coeffFromTerm, *this);
-		}
-		
-		template<typename Coeff, bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
 		{
-			for( const VarExpPair& ve : mExponents )
+			for (auto ve : mExponents )
 			{
 				varinfo.variableInTerm(ve, coeffFromTerm, *this);
 			}
 		}
 		
 		/**
-		 * For a monomial \\prod_i x_i^e_i with e_i != 0, returns \\prod_i x_i^1.
-         * @return 
-         */
-		Monomial* seperablePart() const
+		 * Calculates the separable part of this monomial.
+		 * For a monomial \f$ \\prod_i x_i^e_i with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
+		 * @return Separable part.
+		 */
+		Monomial* separablePart() const
 		{
-			Monomial* m = new Monomial();
-			m->mExponents.reserve(mExponents.size());
-			m->mTotalDegree = (unsigned)mExponents.size();
-			for(const VarExpPair& ve : mExponents)
-			{
-				m->mExponents.emplace_back(ve.var, 1);
-			}
+			Monomial* m = new Monomial(*this);
+			m->mTotalDegree = (exponent)mExponents.size();
+			for (auto& it: m->mExponents) it.second = 1;
 			return m;
 		}
 
+		/**
+		 * Calculates the given power of this monomial.
+		 * @param exp Exponent.
+		 * @return this to the power of exp.
+		 */
 		Monomial* pow(unsigned exp) const {
 			if (exp == 0) {
 				return nullptr;
 			}
 			Monomial* res = new Monomial(*this);
-			unsigned expsum = 0;
+			exponent expsum = 0;
 			for (auto& it: res->mExponents) {
-				it.exp = (exponent)(it.exp * exp);
-				expsum += it.exp;
+				it.second = (exponent)(it.second * exp);
+				expsum += it.second;
 			}
 			res->mTotalDegree = expsum;
 			assert(res->isConsistent());
 			return res;
 		}
-        
+		
 		/**
 		 * Fill the set of variables with the variables from this monomial.
-         * @param variables
-         */
+		 * @param variables Variables.
+		 */
 		void gatherVariables(std::set<Variable>& variables) const
 		{
-			for(const VarExpPair& ve : mExponents)
-			{
-				variables.insert(ve.var);
+			for (auto it: mExponents) {
+				variables.insert(it.first);
 			}
 		}
 		
-        template<typename Coefficient>
-        Term<Coefficient>* derivative(Variable::Arg v) const;
-        
-		template<typename Coefficient, typename SubstitutionType>
-		Term<Coefficient>* substitute(const std::map<Variable, SubstitutionType>& substitutions, Coefficient factor) const;
+		/**
+		 * Computes the (partial) derivative of this monomial with respect to the given variable.
+		 * @param v Variable.
+		 * @return Partial derivative.
+		 */
+		template<typename Coefficient>
+		Term<Coefficient>* derivative(Variable::Arg v) const;
+		
+		/**
+		 * Applies the given substitutions to this monomial.
+		 * Every variable may be substituted by some number. Additionally, a constant factor may be given that is multiplied with the result.
+		 * @param substitutions Maps variables to numbers.
+		 * @param factor A constant factor.
+		 * @return \f$ factor \cdot this[<substitutions>] \f$
+		 */
+		template<typename Coefficient>
+		Term<Coefficient>* substitute(const std::map<Variable, Coefficient>& substitutions, Coefficient factor) const;
+		/**
+		 * Applies the given substitutions to this monomial.
+		 * Every variable may be substituted by some term. Additionally, a constant factor may be given that is multiplied with the result.
+		 * @param substitutions Maps variables to terms.
+		 * @param factor A constant factor.
+		 * @return \f$ factor \cdot this[<substitutions>] \f$
+		 */
 		template<typename Coefficient>
 		Term<Coefficient>* substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
-        ///////////////////////////
-        // Orderings
-        ///////////////////////////
+		///////////////////////////
+		// Orderings
+		///////////////////////////
 
-        static CompareResult compareLexical(const Monomial& lhs, const Monomial& rhs)
-        {
-            return lexicalCompare(lhs,rhs);
-        }
-        
-        static CompareResult compareLexical(const Monomial& lhs, Variable::Arg rhs)
-        {
-            if(lhs.mExponents.front().var < rhs) return CompareResult::LESS;
-            if(lhs.mExponents.front().var > rhs) return CompareResult::GREATER;
-            if(lhs.mExponents.front().exp > 1) return CompareResult::GREATER;
-            else return CompareResult::LESS;
-        }
-
-
-        static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs)
-        {
-            
-            if(lhs.mTotalDegree < rhs.mTotalDegree) return CompareResult::LESS;
-            if(lhs.mTotalDegree > rhs.mTotalDegree) return CompareResult::GREATER;
-            return lexicalCompare(lhs, rhs);
-        }
-        
-        static CompareResult compareGradedLexical(const Monomial& lhs, Variable::Arg rhs)
-        {
-            if(lhs.mTotalDegree < 1) return CompareResult::LESS;
-            if(lhs.mTotalDegree > 1) return CompareResult::GREATER;
-            if(lhs.mExponents.front().var < rhs) return CompareResult::GREATER;
-            if(lhs.mExponents.front().var > rhs) return CompareResult::LESS;
-            else return CompareResult::EQUAL;
-            
-        }
-
-        // 
-        // Operators
-        //
-        
-        friend bool operator==(const Monomial& lhs, const Monomial& rhs)
-        {
-            if(lhs.mTotalDegree != rhs.mTotalDegree) return false;
-            else return lhs.mExponents == rhs.mExponents;
-        }
-
-        friend bool operator==(const Monomial& lhs, Variable::Arg rhs)
-        {
-            // TODO think about reordering based on what is most probable.
-            if(lhs.mTotalDegree != 1) return false;
-            if(lhs.mExponents[0].var == rhs) return true;
-            else return false;
-        }
-
-        friend bool operator==(const Variable& lhs, const Monomial& rhs)
-        {
-            return rhs == lhs;
-        }
-
-        friend bool operator!=(const Monomial& lhs, const Monomial& rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        friend bool operator!=(const Monomial& lhs, const Variable& rhs)
-        {
-            return !(lhs == rhs);
-        }
-        friend bool operator!=(const Variable& lhs, const Monomial& rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        Monomial& operator*=(Variable::Arg v)
-        {
-            ++mTotalDegree;
-            // Linear, as we expect small monomials.
-            for(exponents_it it = mExponents.begin(); it != mExponents.end(); ++it)
-            {
-                // Variable is present
-                if(*it == v)
-                {
-                    ++(it->exp);
-                    return *this;
-                }
-                // Variable is not present, we have to insert v.
-                if(*it > v)
-                {
-                    mExponents.emplace(it,v);
-                    return *this;
-                }
-            }
-            // Variable was not inserted, insert at end.
-            mExponents.emplace_back(v);
-            return *this;
-        }
-
-        Monomial& operator*=(const Monomial& rhs)
-        {
-            if(rhs.mTotalDegree == 0) return *this;
-            mTotalDegree += rhs.mTotalDegree;
-
-            // Linear, as we expect small monomials.
-            exponents_cIt itright = rhs.mExponents.begin();
-			assert(itright != rhs.mExponents.end());
-            for(exponents_it itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
-            {
-                // Everything is inserted.
-                if(itright == rhs.mExponents.end())
-                {
-                    return *this;
-                }
-                // Variable is present in both monomials.
-                if(itleft->var == itright->var)
-                {
-                    itleft->exp += itright->exp;
-                    ++itright;
-                }
-                // Variable is not present in lhs, we have to insert var-exp pair from rhs.
-                else if(itleft->var > itright->var) 
-                {
-					assert(itright != rhs.mExponents.end());
-                    itleft = mExponents.insert(itleft,*itright);
-                    ++itright;
-				
-                }        
-				else 
-				{
-					assert(itleft->var < itright->var);
-				}
-
-            }
-            // Insert remainder of rhs.
-            mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
-			assert(isConsistent());
-            return *this;
-        }
-
-        friend const Monomial operator*(const Monomial& lhs, Variable::Arg rhs )
-        {
-            // Note that this implementation is not optimized yet!
-            Monomial result(lhs);
-            result *= rhs;
-            return result;
-        }
-
-        friend const Monomial operator*(Variable::Arg lhs, const Monomial& rhs)
-        {
-            return rhs * lhs;
-        }
-        
-        friend const Monomial operator*(const Variable& lhs, const Variable& rhs)
-        {
-            // Note that this implementation is not optimized yet!
-            Monomial result(lhs);
-            result *= rhs;
-            return result;
-        }
-
-        friend const Monomial operator*(const Monomial& lhs, const Monomial& rhs )
-        {
-            // Note that this implementation is not optimized yet!
-            Monomial result(lhs);
-            result *= rhs;
-            return result;
-        }
-        
-        std::string toString(bool infix = true, bool friendlyVarNames = true) const
-        {
-            if(mExponents.empty()) return "1";
-            if(infix)
-            {
-                std::string result = "";
-                for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
-                {
-                    std::stringstream s;
-                    s << vp->exp;
-                    if(vp != mExponents.begin())
-                        result += "*";
-                    result += varToString(vp->var, friendlyVarNames) + (vp->exp > 1 ? ("^" + s.str()) : "");
-                }
-                return result;
-            }
-            else
-            {
-                std::string result = (mExponents.size() > 1 ? "(* " : "");
-                for(auto vp = mExponents.begin(); vp != mExponents.end(); ++vp)
-                {
-                    if(vp != mExponents.begin()) result += " ";
-                    std::stringstream s;
-                    s << vp->exp;
-                    std::string varName = varToString(vp->var, friendlyVarNames);
-                    if(vp->exp == 1) result += varName;
-                    else if(vp->exp > 1) // Is it necessary to check vp->exp > 1?
-                    {
-                        result += "(*";
-                        for(unsigned i = 0; i<vp->exp; ++i)
-                            result += " " + varName;
-                        result += ")";
-                    }
-                }
-                result += (mExponents.size() > 1 ? ")" : "");
-                return result;
-            }
-        }
-
-        friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
-        {
-            return (os << rhs.toString(true, true));
-        }
-		
-		static Monomial lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+		static CompareResult compareLexical(const Monomial& lhs, const Monomial& rhs)
 		{
-			if(!lhs)
-			{
-				if(!rhs)
-				{
-					return Monomial();
-				}
-				else
-				{
-					return *rhs;
-				}
-			}
-			else
-			{
-				if(!rhs)
-				{
-					return *lhs;
-				}
-				else
-				{
-					return lcm(*lhs, *rhs);
-				}
-			}
-				
+			return lexicalCompare(lhs,rhs);
 		}
 		
+		/*static CompareResult compareLexical(const Monomial& lhs, Variable::Arg rhs)
+		{
+			if(lhs.mExponents.front().first < rhs) return CompareResult::LESS;
+			if(lhs.mExponents.front().first > rhs) return CompareResult::GREATER;
+			if(lhs.mExponents.front().second > 1) return CompareResult::GREATER;
+			else return CompareResult::LESS;
+		}*/
+
+
+		static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs)
+		{
+			
+			if(lhs.mTotalDegree < rhs.mTotalDegree) return CompareResult::LESS;
+			if(lhs.mTotalDegree > rhs.mTotalDegree) return CompareResult::GREATER;
+			return lexicalCompare(lhs, rhs);
+		}
+		
+		/*static CompareResult compareGradedLexical(const Monomial& lhs, Variable::Arg rhs)
+		{
+			if(lhs.mTotalDegree < 1) return CompareResult::LESS;
+			if(lhs.mTotalDegree > 1) return CompareResult::GREATER;
+			if(lhs.mExponents.front().first < rhs) return CompareResult::GREATER;
+			if(lhs.mExponents.front().first > rhs) return CompareResult::LESS;
+			else return CompareResult::EQUAL;
+			
+		}*/
+
+		// 
+		// Operators
+		//
+		
+		friend bool operator==(const Monomial& lhs, const Monomial& rhs)
+		{
+			if (lhs.mTotalDegree != rhs.mTotalDegree) return false;
+			return lhs.mExponents == rhs.mExponents;
+		}
+
+		friend bool operator==(const Monomial& lhs, Variable::Arg rhs)
+		{
+			if (lhs.mTotalDegree != 1) return false;
+			if (lhs.mExponents[0].first == rhs) return true;
+			return false;
+		}
+
+		friend bool operator==(const Variable& lhs, const Monomial& rhs)
+		{
+			return rhs == lhs;
+		}
+
+		friend bool operator!=(const Monomial& lhs, const Monomial& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		friend bool operator!=(const Monomial& lhs, const Variable& rhs)
+		{
+			return !(lhs == rhs);
+		}
+		friend bool operator!=(const Variable& lhs, const Monomial& rhs)
+		{
+			return !(rhs == lhs);
+		}
+
+		friend bool operator<(const Monomial& lhs, const Monomial& rhs)
+		{
+			CompareResult cr = compareGradedLexical(lhs, rhs);
+			return cr == CompareResult::LESS;
+		}
+
+		/**
+		 * Multiplies this monomial with a variable.
+         * @param v Variable.
+         * @return This multiplied with v.
+         */
+		Monomial& operator*=(Variable::Arg v)
+		{
+			++mTotalDegree;
+			// Linear, as we expect small monomials.
+			for(auto it = mExponents.begin(); it != mExponents.end(); ++it)
+			{
+				// Variable is present
+				if(it->first == v)
+				{
+					++(it->second);
+					return *this;
+				}
+				// Variable is not present, we have to insert v.
+				if(it->first > v)
+				{
+					mExponents.emplace(it,v,1);
+					return *this;
+				}
+			}
+			// Variable was not inserted, insert at end.
+			mExponents.emplace_back(v,1);
+			return *this;
+		}
+
+		/**
+		 * Multiplies this monomial with another monomial.
+         * @param rhs Monomial.
+         * @return This multiplied with rhs.
+         */
+		Monomial& operator*=(const Monomial& rhs)
+		{
+			LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
+			if(rhs.mTotalDegree == 0) return *this;
+			mTotalDegree += rhs.mTotalDegree;
+
+			// Linear, as we expect small monomials.
+			auto itright = rhs.mExponents.begin();
+			assert(itright != rhs.mExponents.end());
+			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
+			{
+				// Everything is inserted.
+				if(itright == rhs.mExponents.end())
+				{
+					LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
+					return *this;
+				}
+				// Variable is present in both monomials.
+				if(itleft->first == itright->first)
+				{
+					itleft->second += itright->second;
+					++itright;
+				}
+				// Variable is not present in lhs, we have to insert var-exp pair from rhs.
+				else if(itleft->first > itright->first) 
+				{
+					assert(itright != rhs.mExponents.end());
+					itleft = mExponents.insert(itleft,*itright);
+					++itright;
+				
+				}		
+				else 
+				{
+					assert(itleft->first < itright->first);
+				}
+
+			}
+			// Insert remainder of rhs.
+			mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
+			assert(isConsistent());
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
+			return *this;
+		}
+
+		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs)
+		{
+			// Note that thisope implementation is not optimized yet!
+			Monomial result(lhs);
+			result *= rhs;
+			return result;
+		}
+
+		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs)
+		{
+			return rhs * lhs;
+		}
+		
+		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
+
+		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs )
+		{
+			// Note that this implementation is not optimized yet!
+			Monomial result(lhs);
+			result *= rhs;
+			return result;
+		}
+		
+		/**
+		 * Returns the string representation of this monomial.
+         * @param infix Flag if prefix or infix notation should be used.
+         * @param friendlyVarNames Flag if friendly variable names should be used.
+         * @return String representation.
+         */
+		std::string toString(bool infix = true, bool friendlyVarNames = true) const
+		{
+			if(mExponents.empty()) return "1";
+			std::stringstream ss;
+			if (infix) {
+				for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
+					if (vp != mExponents.begin()) ss << "*";
+					ss << vp->first;
+					if (vp->second > 1) ss << "^" << vp->second;
+				}
+			} else {
+				if (mExponents.size() > 1) ss << "(* ";
+				for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
+					if (vp != mExponents.begin()) ss << " ";
+					if (vp->second == 1) ss << vp->first;
+					else {
+						std::string varName = varToString(vp->first, friendlyVarNames);
+						ss << "(*";
+						for (unsigned i = 0; i < vp->second; i++) ss << " " << varName;
+						ss << ")";
+					}
+				}
+				if (mExponents.size() > 1) ss << ")";
+			}
+			return ss.str();
+		}
+
+		friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
+		{
+			return (os << rhs.toString(true, true));
+		}
+		
+		/**
+		 * Calculates the least common multiple of two monomial pointers.
+		 * If both are valid objects, the lcm of both is calculated.
+		 * If only one is a valid object, this one is returned.
+		 * If both are invalid objects, an empty monomial is returned.
+         * @param lhs First monomial.
+         * @param rhs Second monomial.
+         * @return lcm of lhs and rhs.
+         */
+		static Monomial lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+		{
+			if (!lhs && !rhs) return Monomial();
+			if (!lhs) return *rhs;
+			if (!rhs) return *lhs;
+			return lcm(*lhs, *rhs);
+				
+		}
+
+		/**
+		 * Calculates the least common multiple of two monomials.
+		 * @param lhs First monomial.
+		 * @param rhs Second monomial.
+		 * @return lcm of lhs and rhs.
+		 */
 		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
 		{
+			LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
 			assert(lhs.isConsistent());
 			assert(rhs.isConsistent());
 			Monomial result;
 			result.mTotalDegree = lhs.tdeg() + rhs.tdeg();
-            // Linear, as we expect small monomials.
-            exponents_cIt itright = rhs.mExponents.begin();
-            for(exponents_cIt itleft = lhs.mExponents.begin(); itleft != lhs.mExponents.end();)
-            {
-                // Done on right
-                if(itright == rhs.mExponents.end())
-                {
-                    // Insert remaining part
-                    result.mExponents.insert(result.mExponents.end(), itleft, lhs.mExponents.end());
-                    return result;
-                }
-                // Variable is present in both monomials.
-                if(itleft->var == itright->var)
-                {
-                    exponent newExp = std::max(itleft->exp, itright->exp);
-					result.mExponents.push_back(VarExpPair(itleft->var, newExp));
-					result.mTotalDegree -= std::min(itleft->exp, itright->exp);
-                    ++itright;
+			// Linear, as we expect small monomials.
+			auto itright = rhs.mExponents.begin();
+			for(auto itleft = lhs.mExponents.begin(); itleft != lhs.mExponents.end();)
+			{
+				// Done on right
+				if(itright == rhs.mExponents.end())
+				{
+					// Insert remaining part
+					result.mExponents.insert(result.mExponents.end(), itleft, lhs.mExponents.end());
+					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+					return result;
+				}
+				// Variable is present in both monomials.
+				if(itleft->first == itright->first)
+				{
+					exponent newExp = std::max(itleft->second, itright->second);
+					result.mExponents.push_back(std::make_pair(itleft->first, newExp));
+					result.mTotalDegree -= std::min(itleft->second, itright->second);
+					++itright;
 					++itleft;
-                }
-                // Variable is not present in lhs, dividing lcm yields variable will not occur in result
-                
-				else if(itleft->var > itright->var) 
-                {
+				}
+				// Variable is not present in lhs, dividing lcm yields variable will not occur in result
+				
+				else if(itleft->first > itright->first) 
+				{
 					result.mExponents.push_back(*itright);
 					++itright;
-                }
+				}
 				else
 				{
-					assert(itright->var > itleft->var);
+					assert(itright->first > itleft->first);
 					result.mExponents.push_back(*itleft);
 					++itleft;
 				}
-            }
+			}
 			 // Insert remaining part
 			result.mExponents.insert(result.mExponents.end(), itright, rhs.mExponents.end());
 			assert(result.isConsistent());
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 			return result;
 			
 		}
 
-    private:
-        
+	private:
+		
 		/**
-		 * Asserts that the data is valid.
-         * @return 
-         */
+		 * Checks if the monomial is consistent.
+		 * @return If this is consistent.
+		 */
 		bool isConsistent() const {
+			LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree);
 			unsigned tdeg = 0;
 			unsigned lastVarIndex = 0;
-			for(VarExpPair ve : mExponents)
+			for(auto ve : mExponents)
 			{
-				if (ve.exp <= 0) return false;
-				if (ve.var.getId() < lastVarIndex) return false;
-				tdeg += ve.exp;
-				lastVarIndex = ve.var.getId();
+				if (ve.second <= 0) return false;
+				if (ve.first.getId() < lastVarIndex) return false;
+				tdeg += ve.second;
+				lastVarIndex = ve.first.getId();
 			}
 			if (tdeg != mTotalDegree) return false;
 			return true;
 		}
 		
-        static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
-        {
-            exponents_cIt lhsit = lhs.mExponents.begin( );
-            exponents_cIt rhsit = rhs.mExponents.begin( );
-            exponents_cIt lhsend = lhs.mExponents.end( );
-            exponents_cIt rhsend = rhs.mExponents.end( );
+		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
+		{
+			auto lhsit = lhs.mExponents.begin( );
+			auto rhsit = rhs.mExponents.begin( );
+			auto lhsend = lhs.mExponents.end( );
+			auto rhsend = rhs.mExponents.end( );
 
-            while( lhsit != lhsend )
-            {
-                if( rhsit == rhsend )
-                    return CompareResult::GREATER;
-                //which variable occurs first
-                if( lhsit->var == rhsit->var )
-                {
-                    //equal variables
-                    if( lhsit->exp < rhsit->exp )
-                        return CompareResult::LESS;
-                    if( lhsit->exp > rhsit->exp )
-                        return CompareResult::GREATER;
-                }
-                else
-                {
-                    return (lhsit->var < rhsit->var ) ? CompareResult::GREATER : CompareResult::LESS;
-                }
-                ++lhsit;
-                ++rhsit;
-            }
-            if( rhsit == rhsend )
-                return CompareResult::EQUAL;
-            return CompareResult::LESS;
-        }
-    };
+			while( lhsit != lhsend )
+			{
+				if( rhsit == rhsend )
+					return CompareResult::GREATER;
+				//which variable occurs first
+				if( lhsit->first == rhsit->first )
+				{
+					//equal variables
+					if( lhsit->second < rhsit->second )
+						return CompareResult::LESS;
+					if( lhsit->second > rhsit->second )
+						return CompareResult::GREATER;
+				}
+				else
+				{
+					return (lhsit->first < rhsit->first ) ? CompareResult::GREATER : CompareResult::LESS;
+				}
+				++lhsit;
+				++rhsit;
+			}
+			if( rhsit == rhsend )
+				return CompareResult::EQUAL;
+			return CompareResult::LESS;
+		}
+	};
+	
+	/**
+	 * Multiplies two variables which results in a monomial.
+     * @param lhs First variable.
+     * @param rhs Second variable.
+     * @return `lhs \cdot rhs`
+     */
+	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs)
+	{
+		// Note that this implementation is not optimized yet!
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
 } // namespace carl
 
 namespace std
 {
-    template<>
-    struct hash<carl::Monomial>
-    {
-        size_t operator()(const carl::Monomial& monomial) const 
-        {
+	/**
+	 * The template specialization of `std::hash` for `carl::Monomial`.
+     * @param monomial Monomial.
+     * @return Hash of monomial.
+     */
+	template<>
+	struct hash<carl::Monomial>
+	{
+		size_t operator()(const carl::Monomial& monomial) const 
+		{
 			std::hash<carl::Variable> h;
-            size_t result = 0;
-            for(unsigned i = 0; i < monomial.nrVariables(); ++i)
-            {
+			size_t result = 0;
+			for(unsigned i = 0; i < monomial.nrVariables(); ++i)
+			{
 				// perform a circular shift by 5 bits.
 				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-                result ^= h( monomial[i].var );
+				result ^= h( monomial[i].first );
 				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-                result ^= monomial[i].exp;
-            }
-            return result;
-        }
-    };
+				result ^= monomial[i].second;
+			}
+			return result;
+		}
+	};
 } // namespace std
 

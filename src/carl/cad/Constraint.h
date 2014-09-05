@@ -24,10 +24,13 @@
 namespace carl {
 namespace cad {
 
+/**
+ * Representation of a constraint of the form \f$p \sim 0\f$ where \f$p\f$ is some polynomial and \f$\sim \in \{ <, \leq, =, >, \geq, > \}\f$.
+ */
 template<typename Number>
 class Constraint {
 private:
-	cad::UPolynomial<Number> polynomial;
+	cad::MPolynomial<Number> polynomial;
 	Sign sign;
 	std::vector<Variable> variables;
 	bool negated;
@@ -54,13 +57,13 @@ public:
 	 * @param v the variables of the polynomial
 	 * @param negated if set to <code>true</code>, <code>satisfiedBy</code> checks the negation of the specified sign condition. If otherwise <code>false</code> is specified (standard value), <code>satisfiedBy</code> checks the sign condition as specified.
 	 */
-	Constraint(const cad::UPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool negated = false):
+	Constraint(const cad::MPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool negated = false):
 		polynomial(p),
 		sign(s),
 		variables(checkVariables(p, v)),
 		negated(negated)
 	{
-		assert(this->polynomial.isConsistent());
+		this->polynomial.checkConsistency();
 	}
 
 	///////////////
@@ -70,7 +73,7 @@ public:
 	/**
 	 * @return the polynomial of the constraint
 	 */
-	const cad::UPolynomial<Number>& getPolynomial() const {
+	const cad::MPolynomial<Number>& getPolynomial() const {
 		return this->polynomial;
 	}
 
@@ -145,7 +148,7 @@ private:
 	 * @param v list of variables
 	 * @return v if the check was successful
 	 */
-	const std::vector<Variable> checkVariables(const cad::UPolynomial<Number>& p, const std::vector<Variable>& v) const {
+	const std::vector<Variable> checkVariables(const cad::MPolynomial<Number>& p, const std::vector<Variable>& v) const {
 		std::set<Variable> occuring = p.gatherVariables();
 		for (Variable var: v) {
 			occuring.erase(var);

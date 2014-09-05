@@ -64,7 +64,7 @@ class EZGCD
 		// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
 		// gcd(p, ay + b) is either ay + b or 1.
 		
-		// Here, we follow notation from GZL92. We also add the notation from MY73.
+		// Here, we follow notation from @cite GCL92. We also add the notation from MY73.
 		Variable x = getMainVar(mp1, mp2);
 		UnivReprPol A = mp1.toUnivariatePolynomial(x);
 		UnivReprPol B = mp2.toUnivariatePolynomial(x);
@@ -77,7 +77,7 @@ class EZGCD
 		b = b.divideBy(g).quotient;
 		
 		Integer p = getPrime(A,B);
-		std::map<Variable, Integer> eval_b = findEval(A,B,p); // bold b in GZL92.
+		std::map<Variable, Integer> eval_b = findEval(A,B,p); // bold b in @cite GCL92.
 		UnivPol A_I = A.evaluateCoefficient(eval_b).mod(p); // F_b
 		UnivPol B_I = B.evaluateCoefficient(eval_b).mod(p); // G_b
 		UnivPol C_I = UnivPol::gcd(A_I, B_I); // In MY73, D_b

@@ -41,7 +41,6 @@
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicPoint.h"
 #include "../core/Variable.h"
-#include "../interval/ExactInterval.h"
 #include "../util/tree.h"
 
 #include "CADTypes.h"
@@ -60,9 +59,7 @@ public:
 	typedef carl::cad::MPolynomial<Number> MPolynomial;
 
 	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
-	typedef std::vector<sampleIterator> CADTrace;
 	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
-	typedef std::list<std::pair<std::list<cad::Constraint<Number>>, std::list<cad::Constraint<Number>>>> Deductions;
 private:
 	/**
 	 * Fix list of variables for all computations.
@@ -73,18 +70,7 @@ private:
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
 	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
-	
-	/**
-	 * Sample components built during the CAD lifting arranged in a tree.
-	 * These samples are not considered for satisfiability checking already, but are postponed.
-	 */
-	carl::tree<RealAlgebraicNumberPtr<Number>> residueSampleTree;
-	
-	/**
-	 * The trace of the last construction phase or empty.
-	 */
-	CADTrace trace;
-	
+
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)
 	 */
@@ -94,6 +80,8 @@ private:
 	 * list of all polynomials for elimination
 	 */
 	std::list<const UPolynomial*> polynomials;
+
+	std::unordered_map<const MPolynomial, const UPolynomial*, std::hash<MPolynomial>> polynomialMap;
 
 	/**
 	 * list of polynomials scheduled for elimination
@@ -204,7 +192,11 @@ public:
 	const std::vector<cad::EliminationSet<Number>>& getEliminationSets() const {
 		return this->eliminationSets;
 	}
-	
+
+	const cad::EliminationSet<Number>& getEliminationSet(std::size_t n) const {
+		return this->eliminationSets[n];
+	}
+
 	/**
 	 * @return true if the cad is computed completely, false if there are still samples to compute
 	 */
@@ -324,21 +316,12 @@ public:
 	 * the vertices are represented by their indices in the input vector.
 	 *
 	 * If true is returned, the value of conflictGraph is undefined.
-	 * @param deductions contains a conjunction of implications of constraints if the input problem was satisfiable.
-	 * The deductions are always satisfiable. Depending on the setting for numberOfDeductions, the size of the deduction formula can be controlled.
-	 *
-	 * If true is returned, the value of deductions is undefined.
-	 * <ul>
-	 * <li>If 0 is given, no deductions are computed at all.</li>
-	 * <li>Given 1 as the number of deductions, the solution point currently found is used to construct the implication "input constraints => constraints on the variables describing the solution".</li>
-	 * <li>Given k>1, several implications of the above form are constructed connecting the subsets of the input constraint with the respective conditions for the variables so that the subset of constraints is fulfilled. Here, k is the minimum of numberOfDeductions and the solution points satisfying the last constraint found so far.</li>
-	 * </ul>
+	 * 
 	 * @param bounds initial bounds for the variables represented by their index.
 	 * The list is re-assigned by the method: if the result is true, the list contains a refined initial assignment.
 	 * If the result is false, the list contains bounds for some variables. The box spanned by these bounds form a domain where no point satisfies the constraints.
 	 * @param next If set to true the method tries to compute a sample which was not found in previous runs before (if earlyLiftingPruning is on). If set to false, all
 	 * previously computed samples are traversed first and then lifting is continued.
-	 * @param checkTraceFirst If set to true, the trace of a previous computation is checked first before the actual checking starts. In combination with the flag next, this flag demands to check the trace first, then start with lifting immediately.
 	 * @param checkBounds
 	 * @return true if the constraints are satisfied by a cell in the cad or no constraint is given and the bounds are not conflicting, false otherwise
 	 */
@@ -346,85 +329,18 @@ public:
 				RealAlgebraicPoint<Number>& r,
 				cad::ConflictGraph& conflictGraph,
 				BoundMap& bounds,
-				Deductions& deductions,
 				bool next = false,
-				bool checkTraceFirst = false,
 				bool checkBounds = true );
 
 	/// Reduced-parameter version of CAD::check.
 	bool check(	std::vector<cad::Constraint<Number>>& constraints,
 				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
 				BoundMap& bounds,
 				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		Deductions d;
-		return this->check(constraints, r, conflictGraph, bounds, d, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				BoundMap& bounds,
-				bool next = false,
-				bool checkTraceFirst = false,
 				bool checkBounds = true)
 	{
 		cad::ConflictGraph cg;
-		Deductions d;
-		return this->check(constraints, r, cg, bounds, d, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
-				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		BoundMap bm;
-		Deductions d;
-		return this->check(constraints, r, conflictGraph, bm, d, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
-				Deductions& deductions,
-				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		BoundMap bm;
-		return this->check(constraints, r, conflictGraph, bm, deductions, next, checkTraceFirst, checkBounds);
-	}
-
-	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
-				RealAlgebraicPoint<Number>& r,
-				bool next = false,
-				bool checkTraceFirst = false,
-				bool checkBounds = true)
-	{
-		cad::ConflictGraph cg;
-		return this->check(constraints, r, cg, next, checkTraceFirst, checkBounds);
-	}
-	
-	/**
-	 * Insert the given polynomial into the cad.
-	 *
-	 * @param p polynomial to be added
-	 * @param v the polynomial's variables (parameters and main variable)
-	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
-	 */
-	void addPolynomial(MPolynomial* p, const std::vector<Variable>& v) {
-		std::list<MPolynomial*> l;
-		l.push_back(p);
-		this->addPolynomials(l.begin(), l.end(), v);
+		return this->check(constraints, r, cg, bounds, next, checkBounds);
 	}
 
 	/**
@@ -435,43 +351,7 @@ public:
 	 * @param v the polynomial's variables (parameters and main variable)
 	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
 	 */
-	void addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
-		this->addPolynomial(new MPolynomial(p), v);
-	}
-
-	/**
-	 * Insert the given polynomial into the cad. This method calls addPolynomial with the CAD's list of variables.
-	 *
-	 * @param p polynomial to be added
-	 * @complexity quadratic in the number of the variables and linear in the number of polynomials
-	 */
-	void addPolynomial(MPolynomial* p) {
-		assert(!this->variables.empty());
-		this->addPolynomial(p, this->variables);
-	}
-
-	/**
-	 * Insert the polynomials starting at first ending the point before last.
-	 *
-	 * @param first iterator marking the beginning of the elements to insert
-	 * @param last iterator marking the end of the elements to insert (not inserted!)
-	 * @param v the polynomials' variables (parameters and main variable)
-	 * @complexity quadratic in the number of the variables and quadratic in the number of polynomials
-	 */
-	template<typename InputIterator>
-	void addPolynomials(InputIterator first, InputIterator last, const std::vector<Variable>& v);
-
-	/**
-	 * Insert the polynomials starting at first ending the point before last. This method calls addPolynomials with the CAD's list of variables.
-	 *
-	 * @param first iterator marking the beginning of the elements to insert
-	 * @param last iterator marking the end of the elements to insert (not inserted!)
-	 * @complexity quadratic in the number of the variables and quadratic in the number of polynomials
-	 */
-	template<typename InputIterator>
-	void addPolynomials(InputIterator first, InputIterator last) {
-		this->addPolynomials(first, last, this->variables);
-	}
+	void addPolynomial(const MPolynomial& p, const std::vector<Variable>& v);
 	
 	/**
 	 * Removes a polynomial from the first elimination level where it occurs and possibly from the list of scheduled polynomials.
@@ -479,6 +359,7 @@ public:
 	 * @param polynomial
 	 */
 	void removePolynomial(const UPolynomial& polynomial);
+	void removePolynomial(const MPolynomial& polynomial);
 
 	/**
 	 * Removes a polynomial by its pointer pPtr from the input polynomials of the CAD (elimination level 0) or the specified level.
@@ -488,19 +369,6 @@ public:
 	 * @param childrenOnly only remove the children of pPtr (recursively)
 	 */
 	void removePolynomial(const UPolynomial* p, unsigned level = 0, bool childrenOnly = false);
-
-	/**
-	 * Removes a range of polynomials from the input polynomials of the CAD if they exist.
-	 * Moreover, all elimination levels are safely cleaned of all elimination polynomials stemming from the given range of polynomials.
-	 * @param first
-	 * @param last
-	 */
-	template<typename InputIterator>
-	void removePolynomials(InputIterator first, InputIterator last) {
-		for (auto i = first; i != last; i++) {
-			this->removePolynomial(*i);
-		}
-	}
 	
 	/**
 	 * Get the boundaries of the cad cell intervals in each level for the solution point r.
@@ -619,8 +487,6 @@ private:
 	 */
 	std::list<RealAlgebraicNumberPtr<Number>> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
 
-	CADTrace constructTraceAt(sampleIterator node, const sampleIterator& root ) const;
-	
 	/**
 	 * Helper method for mainCheck() routine.
 	 * 
@@ -630,7 +496,6 @@ private:
      * @param node
      * @param fullRestart
      * @param excludePrevious
-     * @param updateTrace
 	 * @param constraints
 	 * @param bounds
 	 * @param r
@@ -644,7 +509,6 @@ private:
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
-		bool updateTrace,
 		std::vector<cad::Constraint<Number>>& constraints,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
@@ -665,9 +529,7 @@ private:
 	 * @param bounds
 	 * @param r
 	 * @param conflictGraph
-	 * @param deductions
 	 * @param next
-	 * @param checkTraceFirst
 	 * @param boundsNontrivial true if there are non-trivial bounds defined
 	 * @param checkBounds
 	 * @return
@@ -678,9 +540,7 @@ public:
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
 			cad::ConflictGraph& conflictGraph,
-			Deductions& deductions,
 			bool next,
-			bool checkTraceFirst,
 			bool boundsNontrivial,
 			bool checkBounds
 	);
@@ -799,6 +659,24 @@ public:
 			if (iter->load()) return true;
 		}
 		return false;
+	}
+
+	template<typename It>
+	bool isSampleConsistent(It node) const {
+		bool lastRoot = false;
+		for (auto cur = node.begin(); cur != node.end(); cur++) {
+			if ((*cur)->isRoot() && lastRoot) return false;
+			lastRoot = (*cur)->isRoot();
+			if (!isSampleConsistent(cur)) return false;
+		}
+		return true;
+	}
+
+	bool isSampleTreeConsistent() const {
+		bool isOk = isSampleConsistent(this->sampleTree.begin());
+		if (!isOk) LOGMSG_ERROR("carl.cad", "SampleTree: " << this->sampleTree)
+		assert(isOk);
+		return isOk;
 	}
 };
 

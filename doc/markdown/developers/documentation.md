@@ -14,18 +14,30 @@ We define those groups in `/doc/markdown/codedocs/groups.dox`.
 Please make sure to put new files and classes in the appropriate groups.
 
 ### Literature references
-Although doxygen provides the `cite` command, we use `see` to provide a reference,
-as this is more flexible (it allows to add some additional information, like the correct page, as well.
+Literature references should be provided when appropriate.
 
-New references should be added in `/doc/markdown/references.md`, where a full specification of authors and title should be found,
-along with an anchor to provide hyperlinks.
+We use a bibtex database located at `/doc/literature.bib` with the following conventions:
+
+- Label for one author: `LastnameYY`, for example `Ducos00` for @cite Ducos00.
+- Label for multiple authors: `ABCYY` where `ABC` are the first letters of the authors last names. For example `GCL92` for @cite GCL92.
+- Order the bibtex entrys by label.
+
+These references can be used with `@cite label`, for example like this:
+@code
+/*/** */*
+ * Checks whether the polynomial is unit normal
+ * @see @cite GCL92, page 39
+ * @return If polynomial is normal.
+ */
+bool isNormal() const;
+@endcode 
 
 ### Code comments
 
 
 - File headers
-\verbatim
-/**
+@code
+/*/** */*
  * @file <filename>
  * @ingroup <groupid1>
  * @ingroup <groupid2>
@@ -34,7 +46,7 @@ along with an anchor to provide hyperlinks.
  * 
  * [ Short description ]
  */
-\endverbatim
+@endcode
 
 Descriptions may be omitted when the file contains a single class, either implementation or declaration.
 
@@ -42,18 +54,18 @@ Descriptions may be omitted when the file contains a single class, either implem
 - Namespaces are documented in a separate file, found at '/doc/markdown/codedocs/namespaces.dox'
 
 - Class headers
-\verbatim
-/**
+@code
+/*/** */*
 * @ingroup <groupid>
 * [ Description ]
 * @see <reference>
 * @see <OtherClass>
 */
-\endverbatim
+@endcode
 
 - Method headers
-\verbatim
-/**
+@code
+/*/** */*
 * [ Usage Description ]
 * @param <p1> [ Short description for first parameter ] 
 * @param <p2> [ Short description for second parameter ]
@@ -61,7 +73,7 @@ Descriptions may be omitted when the file contains a single class, either implem
 * @see <reference>
 * @see <otherMethod>
 */
-\endverbatim
+@endcode
 
 These method headers are written directly above the method declaration. 
 Comments about the implementation are written above the or inside the implementation. 
