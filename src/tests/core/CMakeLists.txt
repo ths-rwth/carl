@@ -11,6 +11,7 @@ add_executable(runCoreTests
         Test_RealAlgebraicNumber.cpp
         Test_RootFinder.cpp
         Test_Sign.cpp
+        Test_FactorizedPolynomial.cpp
 )
 cotire(runCoreTests)
 if(COMPARE_WITH_GINAC)
