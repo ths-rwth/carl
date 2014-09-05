@@ -5,56 +5,13 @@
  * Created on September 4, 2014, 11:24 AM
  */
 
+#pragma once
+
 #include "FactorizedPolynomialCache.h"
 
 
-#pragma once
-
-#include "FactorizedPolynomial.h"
-
 namespace carl
 {   
-    template<typename P>
-    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( P* _polynomial, Factorization<P>&& _factorization ):
-        mpPolynomial( _polynomial ),
-        mFactorization( std::move( _factorization ) )
-    {}
-    
-    template<typename P>
-    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( P* _polynomial ):
-        mpPolynomial( _polynomial ),
-        mFactorization()
-    {
-        mFactorization[_polynomial] = 1;
-    }
-    
-    template<typename P>
-    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization ):
-        mpPolynomial( nullptr ),
-        mFactorization( std::move( _factorization ) )
-    {}
-    
-    template<typename P>
-    bool operator==( const PolynomialFactorizationPair<P>& _polyFactA, const PolynomialFactorizationPair<P>& _polyFactB )
-    {
-        if( _polyFactA.mpPolynomial != nullptr && _polyFactB.mpPolynomial != nullptr )
-        {
-            return *_polyFactA.mpPolynomial == *_polyFactB.mpPolynomial;
-        }
-        else
-        {
-            auto iterA = _polyFactA.mFactorization.begin();
-            auto iterB = _polyFactB.mFactorization.begin();
-            while( iterA != _polyFactA.mFactorization.end() && iterB != _polyFactB.mFactorization.end() )
-            {
-                if( (*iterA->first) != (*iterB->first) || iterA->second != iterB->second )
-                    break;
-                ++iterA; ++iterB;
-            }
-            return iterA == _polyFactA.mFactorization.end() && iterB == _polyFactB.mFactorization.end();
-        }
-    }
-    
     template<typename P>
     FactorizedPolynomialCache<P>::FactorizedPolynomialCache( size_t _maxCacheSize, double _cacheReductionAmount ):
         mMaxCacheSize( _maxCacheSize ),
@@ -68,24 +25,6 @@ namespace carl
         mCache.reserve( _maxCacheSize );
         mCacheRefs.reserve( _maxCacheSize );
         mCacheRefs.push_back( mCache.end() ); // reserve the first entry with index 0 as default
-    }
-    
-    template<typename P>
-    typename FactorizedPolynomialCache<P>::Ref FactorizedPolynomialCache<P>::createFactorizedPolynomial( P* _polynomial )
-    {
-        return cache( new PolynomialFactorizationPair<P>( _polynomial ) );
-    }
-    
-    template<typename P>
-    typename FactorizedPolynomialCache<P>::Ref FactorizedPolynomialCache<P>::createFactorizedPolynomial( P* _polynomial, Factorization<P>&& _factorization )
-    {
-        return cache( new PolynomialFactorizationPair<P>( _polynomial, std::move( _factorization ) ) );
-    }
-    
-    template<typename P>
-    typename FactorizedPolynomialCache<P>::Ref FactorizedPolynomialCache<P>::createFactorizedPolynomial( Factorization<P>&& _factorization )
-    {
-        return cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ) );
     }
     
     template<typename P>
@@ -121,7 +60,16 @@ namespace carl
     }
     
     template<typename P>
-    void FactorizedPolynomialCache<P>::remove( typename FactorizedPolynomialCache<P>::Ref _refStoragePos )
+    void FactorizedPolynomialCache<P>::reg( typename FactorizedPolynomialCache<P>::Ref _refStoragePos )
+    {
+        assert( _refStoragePos < mCacheRefs.size() );
+        typename CacheType::iterator cacheRef = mCacheRefs[_refStoragePos];
+        assert( cacheRef != mCache.end() );
+        ++cacheRef->second.usageCount;
+    }
+    
+    template<typename P>
+    void FactorizedPolynomialCache<P>::dereg( typename FactorizedPolynomialCache<P>::Ref _refStoragePos )
     {
         assert( _refStoragePos < mCacheRefs.size() );
         typename CacheType::iterator cacheRef = mCacheRefs[_refStoragePos];

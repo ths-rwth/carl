@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <iostream>
 #include "FactorizedPolynomialCache.h"
 
 namespace carl
@@ -20,17 +21,24 @@ namespace carl
     private:
         // Members
         typename FactorizedPolynomialCache<P>::Ref mCacheRef;
-        FactorizedPolynomialCache<P>&     mrCache;
+        FactorizedPolynomialCache<P>&              mrCache;
         
     public:
             
         FactorizedPolynomial(); // no implementation
-        FactorizedPolynomial( typename FactorizedPolynomialCache<P>::Ref, FactorizedPolynomialCache<P>& );
+        FactorizedPolynomial( const P& _polynomial, FactorizedPolynomialCache<P>& );
+        FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, FactorizedPolynomialCache<P>& );
+        FactorizedPolynomial( Factorization<P>&& _factorization, FactorizedPolynomialCache<P>& );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         ~FactorizedPolynomial();
         
+        FactorizedPolynomial<P>& operator=( const FactorizedPolynomial<P>& );
+        
         template<typename P1>
         friend bool operator==(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        
+        template<typename P1>
+        friend bool operator<(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
         
         template<typename P1>
         friend const FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
@@ -64,10 +72,26 @@ namespace carl
          */
         template <typename P1>
         friend std::ostream& operator<<(std::ostream& _out, const FactorizedPolynomial<P1>& _fpoly);
+        
+        size_t getHash() const
+        {
+            return mrCache.get( mCacheRef ).getHash();
+        }
     };
     
 } // namespace carl
 
+namespace std
+{
+    template<typename P>
+    struct hash<carl::FactorizedPolynomial<P>>
+    {
+        size_t operator()( const carl::FactorizedPolynomial<P>& _factPoly ) const 
+        {
+            return _factPoly.getHash();
+        }
+    };
+} // namespace std
 
 #include "FactorizedPolynomial.tpp"
 

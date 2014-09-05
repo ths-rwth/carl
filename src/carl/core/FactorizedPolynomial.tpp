@@ -12,58 +12,98 @@
 namespace carl
 {
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( typename FactorizedPolynomialCache<P>::Ref _ref, FactorizedPolynomialCache<P>& _cache ):
-        mCacheRef( _ref ),
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, FactorizedPolynomialCache<P>& _cache ):
+        mCacheRef( 0 ),
         mrCache( _cache )
     {
-        
+        Factorization<P> factorization;
+        factorization[*this] = 1;
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial ) ) );
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, FactorizedPolynomialCache<P>& _cache ):
+        mCacheRef( 0 ),
+        mrCache( _cache )
+    {
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), new P( _polynomial ) ) );
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, FactorizedPolynomialCache<P>& _cache ):
+        mCacheRef( 0 ),
+        mrCache( _cache )
+    {
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ) );
     }
     
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const FactorizedPolynomial<P>& _toCopy ):
         mCacheRef( _toCopy.mCacheRef ),
         mrCache( _toCopy.mrCache )
-    {}
+    {
+        mrCache.reg( mCacheRef );
+    }
     
     template<typename P>
     FactorizedPolynomial<P>::~FactorizedPolynomial()
     {
-        mrCache.remove( mCacheRef );
+        mrCache.dereg( mCacheRef );
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        assert( &mrCache == &_fpoly.mrCache );
+        mCacheRef = _fpoly.mCacheRef;
+        return *this;
     }
         
     template<typename P>
     bool operator==(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
-        return (*_fpolyA.mCacheRef->first) == (*_fpolyB.mCacheRef->first);
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
+        return _fpolyA.mrCache.get( _fpolyA.mCacheRef ) == _fpolyB.mrCache.get( _fpolyB.mCacheRef );
+    }
+        
+    template<typename P>
+    bool operator<(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    {
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
+        return _fpolyA.mrCache.get( _fpolyA.mCacheRef ) < _fpolyB.mrCache.get( _fpolyB.mCacheRef );
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator+(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
 
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator-(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
 
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator*(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
 
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator/(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
-
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
     }
 
     template<typename P>
     const FactorizedPolynomial<P> commonDivisor(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
     {
+        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
         Factorization<P> cdFactorization;
         const Factorization<P>& factorizationA = _fpolyA.mrCache.get(_fpolyA.mCacheRef).factorization();
         const Factorization<P>& factorizationB = _fpolyB.mrCache.get(_fpolyB.mCacheRef).factorization();
@@ -71,14 +111,14 @@ namespace carl
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
         {
-            if( *factorA->first == *factorB->first )
-                cdFactorization.insert( cdFactorization.end(), std::make_pair( factorA->first, factorA->second < factorB->second ? factorA->second : factorB->second ) );
-            else if( *factorA->first < *factorB->first )
+            if( factorA->first == factorB->first )
+                cdFactorization.insert( cdFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second < factorB->second ? factorA->second : factorB->second ) );
+            else if( factorA->first < factorB->first )
                 factorA++;
             else
                 factorB++;
         }
-        return FactorizedPolynomial<P>( _fpolyA.mrCache.createFactorizedPolynomial( std::move( cdFactorization ) ), _fpolyA.mrCache );
+        return FactorizedPolynomial<P>( std::move( cdFactorization ), _fpolyA.mrCache );
     }
 
     template<typename P>
@@ -99,7 +139,7 @@ namespace carl
         const Factorization<P>& factorization = _fpoly.mrCache.get(_fpoly.mCacheRef).factorization();
         if( factorization.size() == 1 )
         {
-            _out << (*factorization.begin()->first);
+            _out << factorization.begin()->first;
             assert( factorization.begin()->second != 0 );
             if( factorization.begin()->second > 1 )
             {
@@ -114,7 +154,7 @@ namespace carl
                     _out << ") * (";
                 else
                     _out << "(";
-                _out << (*polyExpPair->first);
+                _out << polyExpPair->first;
                 assert( polyExpPair->second != 0 );
                 if( polyExpPair->second > 1 )
                 {
