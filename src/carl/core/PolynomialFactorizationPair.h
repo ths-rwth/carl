@@ -15,16 +15,11 @@ namespace carl
     class FactorizedPolynomial;
     
     template<typename P>
-    class FactorizedPolynomialCache;
-    
-    template<typename P>
     using Factorization = std::map<FactorizedPolynomial<P>, size_t>;
     
     template<typename P>
     class PolynomialFactorizationPair
     {
-        template<typename P1>
-        friend class FactorizedPolynomialCache;
         
     private:
         // Members
@@ -59,11 +54,20 @@ namespace carl
             return mHash;
         }
         
-        template<typename P2>
-        friend bool operator==(const PolynomialFactorizationPair<P2>& _polyFactA, const PolynomialFactorizationPair<P2>& _polyFactB);
+        template<typename P1>
+        friend bool operator==(const PolynomialFactorizationPair<P1>& _polyFactA, const PolynomialFactorizationPair<P1>& _polyFactB);
         
-        template<typename P2>
-        friend bool operator<(const PolynomialFactorizationPair<P2>& _polyFactA, const PolynomialFactorizationPair<P2>& _polyFactB);
+        template<typename P1>
+        friend bool operator<(const PolynomialFactorizationPair<P1>& _polyFactA, const PolynomialFactorizationPair<P1>& _polyFactB);
+        
+        /**
+         * Prints the given polynomial-factorization pair on the given output stream.
+         * @param _out The stream to print on.
+         * @param _pfPair The polynomial-factorization pair to print.
+         * @return The output stream after inserting the output.
+         */
+        template <typename P1>
+        friend std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P1>& _pfPair);
         
     private:
         const P* pPolynomial() const

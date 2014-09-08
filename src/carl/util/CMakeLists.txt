@@ -5,6 +5,7 @@ set(carl_lib_util_headers
 	Heap.h
 	SFINAE.h
 	tree.h
+	Cache.h
 ) 
 # Source files in here
 set(carl_lib_util_sources 

@@ -8,7 +8,6 @@
 #pragma once
 
 #include "PolynomialFactorizationPair.h"
-#include "FactorizedPolynomial.h"
 
 namespace carl
 {   
@@ -90,6 +89,38 @@ namespace carl
             }
             return false;
         }
+    }
+    
+    template <typename P>
+    std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
+    {
+        if( _pfPair.factorization().size() == 1 )
+        {
+            _out << _pfPair.factorization().begin()->first;
+            assert( _pfPair.factorization().begin()->second != 0 );
+            if( _pfPair.factorization().begin()->second > 1 )
+            {
+                _out << "^" << _pfPair.factorization().begin()->second;
+            }
+        }
+        else
+        {
+            for( auto polyExpPair = _pfPair.factorization().begin(); polyExpPair != _pfPair.factorization().end(); ++polyExpPair )
+            {
+                if( polyExpPair != _pfPair.factorization().begin() )
+                    _out << ") * (";
+                else
+                    _out << "(";
+                _out << polyExpPair->first;
+                assert( polyExpPair->second != 0 );
+                if( polyExpPair->second > 1 )
+                {
+                    _out << "^" << polyExpPair->second;
+                }
+            }
+            _out << ")";
+        }
+        return _out;
     }
     
 } // namespace carl

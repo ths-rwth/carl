@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include "carl/core/FactorizedPolynomialCache.h"
 #include "carl/core/FactorizedPolynomial.h"
 
 #include <cln/cln.h>
@@ -21,11 +20,15 @@ TEST(FactorizedPolynomial, Construction)
     P fxy({(cln::cl_RA)1*x*y});
     P fxyz({(cln::cl_RA)1*x*y*z});
     
-    FactorizedPolynomialCache<P> fpCache;
+    Cache<PolynomialFactorizationPair<P>> fpCache;
+    fpCache.print();
     FactorizedPolynomial<P> fpA( fxy, fpCache );
+    fpCache.print();
     FactorizedPolynomial<P> fpB( fxyz, fpCache );
+    fpCache.print();
     
     FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB ) );
+    fpCache.print();
     
     std::cout << fpA << std::endl;
 }

@@ -12,17 +12,18 @@
 namespace carl
 {
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, FactorizedPolynomialCache<P>& _cache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
         mrCache( _cache )
     {
         Factorization<P> factorization;
-        factorization[*this] = 1;
-        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial ) ) );
+        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial ) );
+        mCacheRef = mrCache.cache( pfPair );
+        pfPair->rFactorization().insert( std::make_pair( *this, 1 ) );
     }
     
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, FactorizedPolynomialCache<P>& _cache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
         mrCache( _cache )
     {
@@ -30,7 +31,7 @@ namespace carl
     }
     
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, FactorizedPolynomialCache<P>& _cache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
         mrCache( _cache )
     {
@@ -42,7 +43,7 @@ namespace carl
         mCacheRef( _toCopy.mCacheRef ),
         mrCache( _toCopy.mrCache )
     {
-        mrCache.reg( mCacheRef );
+        mrCache.reg( _toCopy.mCacheRef );
     }
     
     template<typename P>
