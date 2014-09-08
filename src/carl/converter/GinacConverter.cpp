@@ -15,11 +15,10 @@ namespace carl
             GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( (*term)->coeff() ) );
             if((*term)->monomial())
             {
-                for(unsigned i = 0; i < (*term)->monomial()->nrVariables(); ++i)
-                {
-                    auto carlToGinacVar = vars.find((*(*term)->monomial())[i].var);
+                for (auto it: *((*term)->monomial())) {
+                    auto carlToGinacVar = vars.find(it.first);
                     assert(carlToGinacVar != vars.end());
-                    factor *= GiNaC::pow(carlToGinacVar->second, (*(*term)->monomial())[i].exp);
+                    factor *= GiNaC::pow(carlToGinacVar->second, it.second);
                 }
             }
             result += factor;
