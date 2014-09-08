@@ -103,7 +103,7 @@ Policies()
 		*this += p.coefficients()[0];
 	}
 	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
-		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
+		*this += p.coefficients()[deg] * Term<Coeff>(Coeff(1), p.mainVar(), deg);
 	}
 	this->checkConsistency();
 }
