@@ -158,17 +158,24 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
-	if (this->isZero()) return;
-	if (var == this->mainVar()) {
-		this->mCoefficients[0] = this->evaluate(value);
-		this->mCoefficients.resize(1);
-	} else {
-		for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
-			this->mCoefficients[i].substituteIn(var, value);
-		}
-	}
-	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+    if (this->isZero()) return;
+    if (var == this->mainVar()) {
+        this->mCoefficients[0] = this->evaluate(value);
+        this->mCoefficients.resize(1);
+    } else {
+        if (value.has(var)) {
+            // Fall back to multivariate substitution.
+            MultivariatePolynomial<NumberType> tmp(*this);
+            tmp.substituteIn(var, value);
+            *this = tmp.toUnivariatePolynomial(this->mMainVar);
+        } else {
+            for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
+                this->mCoefficients[i].substituteIn(var, value);
+            }
+        }
+    }
+    this->stripLeadingZeroes();
+    assert(this->isConsistent());
 }
 
 template<typename Coeff>
@@ -191,6 +198,12 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variab
 		LOGMSG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << res);
 		return res;
 	} else {
+            if (value.has(var)) {
+                // Fall back to multivariate substitution.
+                MultivariatePolynomial<NumberType> tmp(*this);
+                tmp.substituteIn(var, value);
+                return tmp.toUnivariatePolynomial(this->mMainVar);
+            } else {
 		std::vector<Coeff> res(this->mCoefficients.size());
 		for (unsigned i = 0; i < res.size(); i++) {
 			res[i] = this->mCoefficients[i].substitute(var, value);
@@ -199,6 +212,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variab
 		resp.stripLeadingZeroes();
 		LOGMSG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << resp);
 		return resp;
+            }
 	}
 }
 
