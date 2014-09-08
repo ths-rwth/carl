@@ -995,27 +995,18 @@ private:
 	}
 };
 
-template<typename Coeff>
-struct UnivariatePolynomialPtrHasher : public std::hash<UnivariatePolynomial<Coeff>*>{
-	size_t operator()(const UnivariatePolynomial<Coeff>* p) const {
-		if (p == nullptr) return 0;
-		size_t result = 0;
-		std::hash<Coeff> h;
-		for(auto c: p->coefficients()) {
+}
+
+template<typename Coefficient>
+struct std::hash<carl::UnivariatePolynomial<Coefficient>> {
+	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
+		std::size_t result = 0;
+		std::hash<Coefficient> h;
+		for(auto c: p.coefficients()) {
 			result ^= h(c);
 		}
 		return result;
 	}
 };
-
-template<typename Coeff>
-struct UnivariatePolynomialPtrEquals : public std::equal_to<UnivariatePolynomial<Coeff>*>{
-	size_t operator()(const UnivariatePolynomial<Coeff>* lhs, const UnivariatePolynomial<Coeff>* rhs) const {
-		if (lhs == nullptr && rhs == nullptr) return true;
-		if (lhs == nullptr || rhs == nullptr) return false;
-		return *lhs == *rhs;
-	}
-};
-}
 
 #include "UnivariatePolynomial.tpp"
