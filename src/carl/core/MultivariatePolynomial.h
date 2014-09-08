@@ -317,8 +317,6 @@ public:
      */
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
-	unsigned hash() const;
-	
 	MultivariatePolynomial pow(unsigned exp) const;
     
 	MultivariatePolynomial naive_pow(unsigned exp) const;
