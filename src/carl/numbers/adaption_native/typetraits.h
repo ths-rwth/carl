@@ -11,89 +11,113 @@ namespace carl {
 
 
 /**
+ * States that `long` is an integer type.
  * @ingroup typetraits
  */
 template<>
 struct is_integer<long> {
+	/// Value of this trait.
 	static const bool value = true;
 };
 /**
+ * States that `int` is an integer type.
  * @ingroup typetraits
  */
 template<>
 struct is_integer<int> {
+	/// Value of this trait.
 	static const bool value = true;
 };
 
 /**
+ * States that `unsigned` is not a natural number type.
  * @ingroup typetraits
  */
 template<>
 struct is_natural<unsigned> {
+	/// Value of this trait.
 	static constexpr bool value = false;
 };
 
 /**
+ * States that `unsigned long ` is not a natural number type.
  * @ingroup typetraits
  */
 template<>
 struct is_natural<unsigned long> {
+	/// Value of this trait.
 	static constexpr bool value = false;
 };
 
+/**
+ * States that `double` is a float type.
+ * @ingroup typetraits
+ */
 template<>
-struct is_float<double>
-{
+struct is_float<double> {
+	/// Value of this trait.
     static const bool value = true;
 };
 
+/**
+ * States that `float` is a float type.
+ * @ingroup typetraits
+ */
 template<>
-struct is_float<float>
-{
+struct is_float<float> {
+	/// Value of this trait.
     static const bool value = true;
 };
-
-template<>
-struct is_primitive<double>
-{
-	static const bool value = true;
-};
-
-	template<>
-struct is_primitive<long double>
-{
-	static const bool value = true;
-};
-	
-template<>
-struct is_primitive<int>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_primitive<float>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_primitive<unsigned>
-{
-	static const bool value = true;
-};
-
 
 
 /**
- * @todo Fix this?
+ * States that `double` is a primitive type.
+ * @ingroup typetraits
  */
 template<>
-struct IntegralT<double>
-{
-	typedef unsigned type;
+struct is_primitive<double> {
+	/// Value of this trait.
+	static const bool value = true;
 };
 
+/**
+ * States that `long double` is a primitive type.
+ * @ingroup typetraits
+ */
+template<>
+struct is_primitive<long double> {
+	/// Value of this trait.
+	static const bool value = true;
+};
 
+/**
+ * States that `int` is a primitive type.
+ * @ingroup typetraits
+ */
+template<>
+struct is_primitive<int> {
+	/// Value of this trait.
+	static const bool value = true;
+};
+
+/**
+ * States that `float` is a primitive type.
+ * @ingroup typetraits
+ */
+template<>
+struct is_primitive<float> {
+	/// Value of this trait.
+	static const bool value = true;
+};
+
+/**
+ * States that `unsigned` is a primitive type.
+ * @ingroup typetraits
+ */
+template<>
+struct is_primitive<unsigned> {
+	/// Value of this trait.
+	static const bool value = true;
+};
 
 }
