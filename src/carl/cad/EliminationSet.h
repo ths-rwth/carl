@@ -59,12 +59,24 @@ private:
 		}
 	};
 	
+	/**
+	 * Functor that checks if a given PolynomialPair contains some polynomial.
+	 */
 	struct PolynomialPairContains {
 	private:
 		const UPolynomial* p;
 	public:
+		/**
+		 * Constructor.
+         * @param p Polynomial to search for.
+         */
 		PolynomialPairContains(const UPolynomial* p) : p(p) {
 		}
+		/**
+		 * Checks if the PolynomialPair contains the polynomial that was passed to the constructor.
+         * @param pp PolynomialPair.
+         * @return If pp contains the polynomial.
+         */
 		bool operator()(const PolynomialPair& pp) {
 			if (p == nullptr) {
 				return (pp.first == nullptr) || (pp.second == nullptr);
@@ -207,7 +219,11 @@ public:
      * @return true, if the given polynomial has non-trivial parents.
      */
 	bool hasParents(const UPolynomial* p) const;
-	
+
+	/**
+	 * Retrieves the list of polynomials.
+     * @return List of polynomials.
+     */
 	const PolynomialSet& getPolynomials() const {
 		return this->polynomials;
 	}
