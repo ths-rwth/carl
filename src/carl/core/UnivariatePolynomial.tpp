@@ -338,7 +338,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const Univariate
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	static_assert(is_field<Coeff>::value, "Reduce must be called with a prefactor if the Coeffients are not from a field.");
+	static_assert(is_field<Coeff>::value, "Reduce must be called with a prefactor if the Coefficients are not from a field.");
 	return this->reduce_helper(divisor);
 }
 
