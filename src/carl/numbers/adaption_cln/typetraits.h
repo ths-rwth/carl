@@ -18,44 +18,15 @@ CLANG_WARNING_RESET
 
 namespace carl {
 
-/**
- * @ingroup typetraits
- * @ingroup cln
- */
-template<>
-struct is_rational<cln::cl_RA>
-{
-	static constexpr bool value = true;
-};
+TRAIT_TRUE(is_integer, cln::cl_I, cln);
+TRAIT_TRUE(is_rational, cln::cl_RA, cln);
+TRAIT_TYPE(IntegralType, cln::cl_I, cln::cl_I, cln);
+TRAIT_TYPE(IntegralType, cln::cl_RA, cln::cl_I, cln);
 
+}
 
-/**
- * @ingroup typetraits
- * @ingroup cln
- */
-template<>
-struct is_integer<cln::cl_I> {
-	static constexpr bool value = true;
-};
+namespace std {
 
+//TRAIT_TRUE(is_integral, cln::cl_I, "cln");
 
-/**
- * @ingroup typetraits
- * @ingroup cln
- */
-template<>
-struct IntegralType<cln::cl_RA>
-{
-	typedef cln::cl_I type;
-};
-
-/**
- * @ingroup typetraits
- * @ingroup cln
- */
-template<>
-struct IntegralType<cln::cl_I>
-{
-	typedef cln::cl_I type;
-};
 }

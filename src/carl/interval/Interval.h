@@ -439,7 +439,7 @@ namespace carl
          * rational number.
          * @param n The passed double.
          */
-        template<typename Num = Number, typename Rational, EnableIf<is_float<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        template<typename Num = Number, typename Rational, EnableIf<std::is_floating_point<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
         explicit Interval(Rational n)
         {
             *this = Interval<double>(n, n);
@@ -451,7 +451,7 @@ namespace carl
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
          */
-        template<typename Num = Number, typename Rational, EnableIf<is_float<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        template<typename Num = Number, typename Rational, EnableIf<std::is_floating_point<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
         Interval(Rational lower, Rational upper)
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
@@ -467,7 +467,7 @@ namespace carl
          * @param upper The desired upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        template<typename Num = Number, typename Rational, EnableIf<is_float<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        template<typename Num = Number, typename Rational, EnableIf<std::is_floating_point<Num >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
         Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType)
         {
             mLowerBoundType = lowerBoundType;
@@ -505,7 +505,7 @@ namespace carl
          * float number (e.g. FLOAT_T).
          * @param n The passed double.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<is_float<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
         explicit Interval(Float n)
         {
             *this = Interval<double>(n, n);
@@ -517,7 +517,7 @@ namespace carl
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<is_float<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy>
         Interval(Float lower, Float upper)
         {
             *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
@@ -533,7 +533,7 @@ namespace carl
          * @param upper The desired upper bound.
          * @param upperBoundType The desired upper bound type.
          */
-        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<is_float<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy, DisableIf<is_float<Num >> = dummy>
+        template<typename Num = Number, typename Float, EnableIf<is_rational<Num >> = dummy, EnableIf<std::is_floating_point<Float >> = dummy, DisableIf<std::is_same<Num, Float >> = dummy, DisableIf<std::is_floating_point<Num >> = dummy>
         Interval(Float lower, BoundType lowerBoundType, Float upper, BoundType upperBoundType)
         {
             mLowerBoundType = lowerBoundType;

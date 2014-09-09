@@ -11,14 +11,6 @@
 
 namespace carl
 {
-    #ifdef USE_MPFR_FLOAT
-    template<>
-    struct is_float<mpfr_t>
-    {
-        static const bool value = true;
-    };
-    #endif
-
     template<typename F>
     struct IntegralType<carl::FLOAT_T<F> >
     {
@@ -32,3 +24,13 @@ namespace carl
     };
 }
 
+namespace std
+{
+    #ifdef USE_MPFR_FLOAT
+    template<>
+    struct is_floating_point<mpfr_t>
+    {
+        static const bool value = true;
+    };
+    #endif
+}

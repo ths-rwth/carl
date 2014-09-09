@@ -76,7 +76,7 @@ namespace carl
          */
         FLOAT_T<FloatType>()
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = FloatType(0);
         }
 
@@ -88,7 +88,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _double;
         }
 
@@ -100,7 +100,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const float _float, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _float;
         }
 
@@ -112,7 +112,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _int;
         }
         
@@ -124,7 +124,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _long;
         }
 
@@ -137,7 +137,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
         }
 
         /**

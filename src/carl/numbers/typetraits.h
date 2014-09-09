@@ -4,7 +4,7 @@
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
  *
- * @defgroup typetraits Type Traits
+ * @addtogroup typetraits Type Traits
  * We define custom type traits for number types we use.
  * We use the notation conventions of the STL, being lower cases with underscores.
  *
@@ -14,10 +14,12 @@
  * - `is_subset_of_rational`: Types that may represent some rational numbers.
  * - `is_subset_of_integer`: Types that may represent some integral numbers.
  * - `is_field`: Types that represent elements from a field.
- * - `is_fundamental`: Types that are fundamental types like `int`, `float` or `double`.
- * - `is_float`: Types that use a floating point representation.
  * - `is_finite`: Types that represent only a finite domain.
  * - `is_number`: Types that represent numbers.
+ *
+ * We extend the following type traits from std:
+ * - `is_floating_point`: Types that use a floating point representation.
+ * - `is_integral`: Types that can only represent integers.
  *
  * Additionally, we define related types in a type traits like manner:
  *
@@ -31,21 +33,43 @@
 #include "config.h"
 #include <type_traits>
 
-#include "../util/SFINAE.h"
 
-#define TRAIT_TRUE(name,type) \
-/** States that type has the trait name. @ingroup typetraits_ ## name */ \
-template<> struct name<type> { \
-	/** Value is true. */ \
-	static constexpr bool value = true; \
+namespace carl {
+
+/**
+ * This template is designed to provide types that are related to other types.
+ * It works very much like std::integral_constant, except that it provides a type instead of a constant.
+ * We use it as an extension to type traits, meaning that types may have traits that are boolean or other types.
+ *
+ * The class can be used as follows.
+ * Assume that you have a class `A` with an associated type `B`.
+ * @code
+ * template<T> struct Associated {};
+ * template<> struct Associated<A>: has_subtype<B> {};
+ * @endcode
+ * Now you can obtain the associated type with `Associated<A>::type`.
+ *
+ * @ingroup typetraits
+ */
+template<typename T>
+struct has_subtype {
+	/// A type associated with the type
+	typedef T type;
+};
+
 }
 
-#define TRAIT_FALSE(name,type) \
-/** States that type does not have the trait name. @ingroup typetraits */ \
-template<> struct name<type> { \
-	/** Value is false. */ \
-	static constexpr bool value = false; \
-}
+#define TRAIT_TRUE(name,type,groups) \
+/** States that type has the trait name. @ingroup typetraits_ ## name groups */ \
+template<> struct name<type>: std::true_type {};
+
+#define TRAIT_FALSE(name,type,groups) \
+/** States that type does not have the trait name. @ingroup typetraits_ ## name groups */ \
+template<> struct name<type>: std::false_type {};
+
+#define TRAIT_TYPE(name,_type,value,groups) \
+/** States that name of type is value. @ingroup typetraits_ ## name groups */ \
+template<> struct name<_type>: carl::has_subtype<typename value> {};
 
 namespace carl {
 
@@ -68,36 +92,36 @@ class MultivariatePolynomial;
  * Default is false.
  */
 template<typename type>
-struct is_rational
-{
-	/// Default value of this trait.
-	static constexpr bool value = false;
-};
+struct is_rational: std::false_type {};
 
+/**
+ * @addtogroup typetraits_is_integer is_integer
+ * All integral types that can (in theory) represent all integers are marked with `is_integer`.
+ *
+ * We consider a type integral, if it represents only integers.
+ */
 /**
  * States if a type is an integer type.
  *
- * We consider a type an integer type, if it can (in theory) represent all integers and no other values.
  * Default is false.
- * @ingroup typetraits
+ * @ingroup typetraits_is_integer
  */
 template<typename T>
-struct is_integer {
-	/// Default value of this trait.
-	static constexpr bool value = false;
-};
+struct is_integer: std::false_type {};
 
-
+/**
+ * @addtogroup typetraits_is_subset_of_integers is_subset_of_integers
+ * All integral types that can represent only a subset of all integers are marked with `is_subset_of_integers`.
+ *
+ * We consider a type integral, if it represents only integers.
+ */
 /**
  * States if a type represents a subset of all integers.
  * Default is true for integer types, false otherwise.
- * @ingroup typetraits
+ * @ingroup typetraits_is_subset_of_integers
  */
 template<typename Type>
-struct is_subset_of_integers {
-	/// Default value of this trait.
-	static constexpr bool value = is_integer<Type>::value;
-};
+struct is_subset_of_integers: std::integral_constant<bool, is_integer<Type>::value> {};
 
 /**
  * States if a type represents a subset of all rationals and the representation is similar to a rational.
@@ -113,23 +137,17 @@ struct is_subset_of_rationals {
 /**
  * States if a type is a field.
  * Default is true for rationals, false otherwise.
- * @ingroup typetraits
+ * @ingroup typetraits_is_field
  * @see UnivariatePolynomial - CauchyBound for example.
  */
 template<typename T>
-struct is_field {
-	/// Default value of this trait.
-	static constexpr bool value = is_rational<T>::value;
-};
+struct is_field: std::integral_constant<bool, is_rational<T>::value> {};
 /**
  * States that a Gallois field is a field.
- * @ingroup typetraits
+ * @ingroup typetraits_is_field
  */
 template<typename C>
-struct is_field<GFNumber<C>> {
-	/// Value of this trait.
-	static constexpr bool value = true;
-};
+struct is_field<GFNumber<C>>: std::true_type {};
 
 
 
@@ -139,59 +157,29 @@ struct is_field<GFNumber<C>> {
  * @see UnivariatePolynomial - squareFreeFactorization for example.
  */
 template<typename type>
-struct characteristic {
-	static constexpr unsigned value = 0;
-};
-
+struct characteristic: std::integral_constant<unsigned, 0> {};
 
 /**
+ * @addtogroup typetraits_is_finite is_finite
+ * All types that can represent only numbers from a finite domain are marked with `is_finite`.
+ *
+ * All fundamental types are also finite.
+ */
+/**
  * States if a type represents only a finite domain.
- * Default is false for rationals and integers, true otherwise.
- * @ingroup typetraits
+ * Default is true for fundamental types, false otherwise.
+ * @ingroup typetraits_is_finite
  */
 template<typename C>
-struct is_finite
-{
-	static constexpr bool value = !(is_rational<C>::value || is_integer<C>::value);
-};
+struct is_finite: std::integral_constant<bool, std::is_fundamental<C>::value> {};
 
 /**
  * Type trait is_finite_domain.
  * Default is false.
- * @ingroup typetraits
+ * @ingroup typetraits_is_finite
  */
 template<typename C>
-struct is_finite<GFNumber<C>> {
-	/// Default value of this trait.
-	static constexpr bool value = true;
-};
-
-/**
- * States if a type is a float type.
- * Default is false.
- * @ingroup typetraits
- */
-template<typename type>
-struct is_float {
-	/// Default value of this trait.
-    static constexpr bool value = false;
-};
-
-/**
- * States if a type is a fundamental number type.
- * Default is false.
- * @ingroup typetraits_is_fundamental
- * 
- * @defgroup typetraits_is_fundamental is_fundamental
- * All primitive types are marked with `is_fundamental`.
- *
- * We consider a type funcamental, if the C++ standard @cite C++Standard (3.9.1) defines it as `fundamental`.
- */
-template<typename type>
-struct is_fundamental {
-	/// Default value of this trait.
-	static constexpr bool value = false;
-};
+struct is_finite<GFNumber<C>>: std::false_type {};
 
 /**
  * States if a type is a number type.
@@ -201,7 +189,7 @@ struct is_fundamental {
 template<typename T>
 struct is_number {
 	/// Default value of this trait.
-	static constexpr bool value = is_rational<T>::value || is_integer<T>::value || is_float<T>::value;
+	static constexpr bool value = is_subset_of_rationals<T>::value || is_subset_of_integers<T>::value || std::is_floating_point<T>::value;
 };
 
 /**
@@ -209,13 +197,12 @@ struct is_number {
  * @see GFNumber
  */
 template<typename C>
-struct is_number<GFNumber<C>> {
-	/// Default value of this trait.
-	static constexpr bool value = true;
-};
+struct is_number<GFNumber<C>>: std::true_type {};
+
 /**
  * Gives the corresponding integral type.
  * Default is int.
+ * @ingroup typetraits_IntegralType
  */
 template<typename RationalType>
 struct IntegralType {
@@ -230,30 +217,24 @@ struct IntegralType<GFNumber<C>> {
 /**
  * Gives the underlying number type of a complex object.
  * Default is the type itself.
+ * @ingroup typetraits_UnderlyingNumberType
  */
 template<typename C>
-struct UnderlyingNumberType
-{
-	typedef C type;
-};
+struct UnderlyingNumberType: has_subtype<C> {};
 
 /**
  * Gives the underlying number type of univariate polynomials.
  * This is the underlying number type of the polynomials coefficients.
+ * @ingroup typetraits_UnderlyingNumberType
  */
 template<typename C>
-struct UnderlyingNumberType<UnivariatePolynomial<C>>
-{
-	typedef typename UnderlyingNumberType<C>::type type;
-};
+struct UnderlyingNumberType<UnivariatePolynomial<C>>: has_subtype<typename UnderlyingNumberType<C>::type> {};
 
 /**
  * Gives the underlying number type of multivariate polynomials.
  * This is the underlying number type of the polynomials coefficients.
+ * @ingroup typetraits_UnderlyingNumberType
  */
 template<typename C, typename O, typename P>
-struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>
-{
-	typedef typename UnderlyingNumberType<C>::type type;
-};
+struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>: has_subtype<typename UnderlyingNumberType<C>::type> {};
 }

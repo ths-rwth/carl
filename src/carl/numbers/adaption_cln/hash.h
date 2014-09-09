@@ -8,9 +8,9 @@
 
 #pragma once
 #include "../../util/platform.h"
-CLANG_WARNING_DISABLE("-Wmismatched-tags")
+//CLANG_WARNING_DISABLE("-Wmismatched-tags")
 #include <cln/cln.h>
-CLANG_WARNING_RESET
+//CLANG_WARNING_RESET
 namespace std
 {
 	
