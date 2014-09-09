@@ -361,7 +361,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
-            //assert(_op2 != 0);
+            assert(_op2 != 0);
             mValue = mValue / _op2.mValue;
             return *this;
         }
@@ -376,7 +376,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
-            //assert(_op2 != 0);
+            assert(_op2 != 0);
             _result.mValue = mValue / _op2.mValue;
             return _result;
         }
@@ -389,7 +389,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& sqrt_assign(CARL_RND = CARL_RND::N)
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             mValue = std::sqrt(mValue);
             return *this;
         }
@@ -403,7 +403,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             _result.mValue = std::sqrt(mValue);
             return _result;
         }
@@ -416,7 +416,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& cbrt_assign(CARL_RND = CARL_RND::N)
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             mValue = std::cbrt(mValue);
             return *this;
         }
@@ -430,7 +430,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             _result.mValue = std::cbrt(mValue);
             return _result;
         }
@@ -444,7 +444,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             /// @todo implement root_assign for FLOAT_T
             LOG_NOTIMPLEMENTED();
             return *this;
@@ -460,7 +460,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             LOG_NOTIMPLEMENTED();
             /// @todo implement root for FLOAT_T
         }
@@ -1279,6 +1279,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
+            assert(_rhs != 0);
             return FLOAT_T<FloatType>(_lhs.mValue / _rhs.mValue);
         }
 
@@ -1291,6 +1292,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
         {
+            assert(_rhs != 0);
             return FLOAT_T<FloatType>(_lhs.mValue / _rhs);
         }
 
@@ -1303,6 +1305,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator /(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
+            assert(_rhs != 0);
             return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
         }
 
