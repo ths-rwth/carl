@@ -14,6 +14,10 @@
 
 namespace carl
 {
+
+/// Type of an exponent.
+typedef unsigned exponent;	
+	
 /**
  * Several types of variables are supported.
  * REAL: the reals RR

@@ -40,8 +40,17 @@ namespace io
 	{
 		std::set<carl::Variable> mVars;
 		unsigned level = 0;
+		
+		// Options.
+		
+		/// In the smt2 standard, constants are actually functions. Many solvers support also the
+		/// declare-const keyword, which is more intuitive to read, but not standardconforming.
+		bool mConstantsAsParameterlessFunctions = true;
+		/// To support readability, line breaks will be automatically added.
 		bool mAutoLineBreaks = false;
+
 		smt2logic logic = smt2logic::QF_NRA;
+		
 		
 		std::vector<std::unique_ptr<NamedAssertion>> mAssertions = {};
 		std::vector<std::vector<smt2flag>> mCommands = {};
@@ -72,9 +81,17 @@ namespace io
 			}
 		}
 		
-		static std::string tosmt2string(const carl::Variable& v)
+		std::string tosmt2string(const carl::Variable& v)
 		{
-			return "(declare-const " + varToString(v, true) + " " + tosmt2string(v.getType()) + ")";
+			if(mConstantsAsParameterlessFunctions)
+			{
+				return "(declare-fun " + varToString(v, true) + " () " + tosmt2string(v.getType()) + ")";
+			}
+			else
+			{		
+				return "(declare-const " + varToString(v, true) + " " + tosmt2string(v.getType()) + ")";
+			}
+			
 		}
 		
 		
@@ -171,7 +188,7 @@ namespace io
 			os << "(set-logic " << tosmt2string(smt2stream.logic) << ")\n";
 			for(carl::Variable v : smt2stream.mVars)
 			{
-				os << tosmt2string(v) << std::endl;
+				os << smt2stream.tosmt2string(v) << std::endl;
 			}
 			for(unsigned i = 0; i < smt2stream.mAssertions.size(); ++i)
 			{

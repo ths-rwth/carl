@@ -15,11 +15,12 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include "../core/logging.h"
 
 #include "../core/VariablePool.h"
 #include "../core/Term.h"
 #include "../core/MultivariatePolynomial.h"
-#include "../core/logging.h"
+
 #include "../core/RationalFunction.h"
 
 
@@ -109,7 +110,7 @@ namespace carl
          */
 		void setSumOfTermsForm(bool to)
 		{
-			LOG_ASSERT(to, "Extended parser not supported");
+			LOG_ASSERT("carl.stringparser", to, "Extended parser not supported");
 			mSumOfTermsForm = to;
 		}
 		
@@ -175,7 +176,7 @@ namespace carl
 		Term<C> parseTerm(const std::string& inputStr) const
 		{
 			C coeff = 1;
-			std::vector<VarExpPair> varExpPairs;
+			std::vector<std::pair<Variable, exponent>> varExpPairs;
 			if(!mImplicitMultiplicationMode)
 			{
 				std::vector<std::string> varExpPairStrings;
@@ -228,26 +229,25 @@ namespace carl
 			}
 			else
 			{
-				LOG_ASSERT(mSingleSymbVariables, "The implicit mode can only be set with single symbol variables");				
+				LOG_ASSERT("carl.stringparser", mSingleSymbVariables, "The implicit mode can only be set with single symbol variables");				
 			}
 			
-			std::sort(varExpPairs.begin(), varExpPairs.end(), CompareByVariable());
+			std::sort(varExpPairs.begin(), varExpPairs.end());
 			size_t nrVariables = varExpPairs.size();
-			std::unique(varExpPairs.begin(), varExpPairs.end(), CompareByVariable());
+			std::unique(varExpPairs.begin(), varExpPairs.end());
 			if(nrVariables != varExpPairs.size())
 			{
 				throw InvalidInputStringException("Variable occurs twice", inputStr);
 			}
-			Term<C> result;
 			if(varExpPairs.empty())
 			{
-				result = Term<C>(coeff);
+				return Term<C>(coeff);
 			}
 			else
 			{
-				result = Term<C>(coeff, Monomial(varExpPairs));
+				return Term<C>(coeff, Monomial(std::move(varExpPairs)));
 			}
-			return result;
+		
 		}
 		
 	protected:

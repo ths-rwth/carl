@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
-#include "carl/core/MultivariatePolynomial.h"
+
+#include "carl/core/VariablePool.h"
 
 using namespace carl;
 
@@ -24,8 +25,5 @@ TEST(VariablePool, variablePool)
 	std::stringstream o;
 	o << x;
 	ASSERT_EQ(name, o.str());
-	MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x});
-	std::stringstream op;
-	op << p;
-	ASSERT_EQ(name, op.str());
+	
 }

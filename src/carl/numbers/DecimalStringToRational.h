@@ -8,8 +8,7 @@
 #pragma once
 #include <vector>
 #include "boost/algorithm/string.hpp"
-
-#include "operations.h"
+#include "adaption_gmpxx/operations.h"
 
 namespace carl
 {

@@ -9,7 +9,9 @@
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumber.h"
+#include "VariablePool.h"
 #include "rootfinder/RootFinder.h"
+
 
 namespace carl {
 

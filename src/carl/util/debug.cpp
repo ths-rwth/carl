@@ -35,7 +35,7 @@ void handle_signal(int signal) {
  */
 bool install_signal_handler() {
 	//LOGMSG_INFO("carl.util", "Installing signal handler for SIGABRT");
-	std::signal(SIGABRT, handle_signal);
+	//std::signal(SIGABRT, handle_signal);
 	return true;
 }
 /**
