@@ -32,7 +32,15 @@
 
 @defgroup typetraits Type Traits
 @{
-@defgroup typetraits_is_fundamental is_fundamental
+@defgroup typetraits_is_field is_field
+@defgroup typetraits_is_finite is_finite
+@defgroup typetraits_is_floating_point is_floating_point
+@defgroup typetraits_is_integer is_integer
+@{
+@defgroup typetraits_is_subset_of_integers is_subset_of_integers
+@}
+@defgroup typetraits_IntegralType IntegralType
+@defgroup typetraits_UnderlyingNumberType UnderlyingNumberType
 @}
 
 */
