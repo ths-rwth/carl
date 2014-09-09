@@ -993,8 +993,9 @@ private:
 
 }
 
+namespace std {
 template<typename Coefficient>
-struct std::hash<carl::UnivariatePolynomial<Coefficient>> {
+struct hash<carl::UnivariatePolynomial<Coefficient>> {
 	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
 		std::size_t result = 0;
 		std::hash<Coefficient> h;
@@ -1004,5 +1005,6 @@ struct std::hash<carl::UnivariatePolynomial<Coefficient>> {
 		return result;
 	}
 };
+}
 
 #include "UnivariatePolynomial.tpp"

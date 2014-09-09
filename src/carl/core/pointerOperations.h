@@ -10,6 +10,8 @@
 
 #include <functional>
 
+namespace std {
+
 /**
  * Specialization of std::equal_to for pointer types.
  *
@@ -17,7 +19,7 @@
  * Note that the memory location may also be zero.
  */
 template<typename T>
-struct std::equal_to<T*> {
+struct equal_to<T*> {
 	/**
 	 * Checks if two pointers are equal.
 	 * @param lhs First pointer.
@@ -31,6 +33,8 @@ struct std::equal_to<T*> {
 		return std::equal_to<T>()(*lhs, *rhs);
 	}
 };
+
+}
 
 namespace carl {
 
