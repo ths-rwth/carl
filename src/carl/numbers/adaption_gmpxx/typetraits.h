@@ -43,7 +43,7 @@ struct is_rational<mpz_class>
  * @ingroup gmpxx
  */
 template<>
-struct IntegralT<mpq_class>
+struct IntegralType<mpq_class>
 {
 	typedef mpz_class type;
 };
@@ -53,7 +53,7 @@ struct IntegralT<mpq_class>
  * @ingroup gmpxx
  */
 template<>
-struct IntegralT<mpz_class>
+struct IntegralType<mpz_class>
 {
 	typedef mpz_class type;
 };

@@ -667,8 +667,8 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
-	typename IntegralT<Coeff>::type num = getNum(*it);
-	typename IntegralT<Coeff>::type den = getDenom(*it);
+	typename IntegralType<Coeff>::type num = getNum(*it);
+	typename IntegralType<Coeff>::type den = getDenom(*it);
 	for(++it; it != mCoefficients.end(); ++it)
 	{
 		num = carl::gcd(num, getNum(*it));
@@ -679,12 +679,12 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
-UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
 	LOGMSG_TRACE("carl.core", *this << " .coprimeCoefficients()");
 	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	// Notice that even if factor is 1, we create a new polynomial
-	UnivariatePolynomial<typename IntegralT<Coeff>::type> result(mMainVar);
+	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
 	if (this->isZero()) {
 		return result;
 	}
@@ -814,9 +814,9 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 
 template<typename Coeff>
 template<typename C, EnableIf<is_instantiation_of<GFNumber, C>>>
-UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
 {
-	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
+	UnivariatePolynomial<typename IntegralType<Coeff>::type> res(mMainVar);
 	res.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& c : mCoefficients)
 	{
@@ -829,9 +829,9 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 
 template<typename Coeff>
 template<typename C, DisableIf<is_instantiation_of<GFNumber, C>>>
-UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
+UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::toIntegerDomain() const
 {
-	UnivariatePolynomial<typename IntegralT<Coeff>::type> res(mMainVar);
+	UnivariatePolynomial<typename IntegralType<Coeff>::type> res(mMainVar);
 	res.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& c : mCoefficients)
 	{
@@ -843,15 +843,15 @@ UnivariatePolynomial<typename IntegralT<Coeff>::type> UnivariatePolynomial<Coeff
 }
 
 template<typename Coeff>
-//template<typename T = Coeff, EnableIf<!std::is_same<IntegralT<Coeff>, bool>::value>>
-UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> UnivariatePolynomial<Coeff>::toFiniteDomain(const GaloisField<typename IntegralT<Coeff>::type>* galoisField) const
+//template<typename T = Coeff, EnableIf<!std::is_same<IntegralType<Coeff>, bool>::value>>
+UnivariatePolynomial<GFNumber<typename IntegralType<Coeff>::type>> UnivariatePolynomial<Coeff>::toFiniteDomain(const GaloisField<typename IntegralType<Coeff>::type>* galoisField) const
 {
-	UnivariatePolynomial<GFNumber<typename IntegralT<Coeff>::type>> res(mMainVar);
+	UnivariatePolynomial<GFNumber<typename IntegralType<Coeff>::type>> res(mMainVar);
 	res.mCoefficients.reserve(mCoefficients.size());
 	for(const Coeff& c : mCoefficients)
 	{
 		assert(carl::isInteger(c));
-		res.mCoefficients.push_back(GFNumber<typename IntegralT<Coeff>::type>(c,galoisField));
+		res.mCoefficients.push_back(GFNumber<typename IntegralType<Coeff>::type>(c,galoisField));
 	}
 	res.stripLeadingZeroes();
 	return res;
@@ -1010,8 +1010,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
     {
         // Exclude the factor (x-r)^i, with r rational and r!=0, from result.
         assert(result.coefficients().size() > 1);
-        typename IntegralT<Coeff>::type lc = carl::abs(getNum(result.lcoeff()));
-        typename IntegralT<Coeff>::type tc = carl::abs(getNum(result.coefficients().front()));
+        typename IntegralType<Coeff>::type lc = carl::abs(getNum(result.lcoeff()));
+        typename IntegralType<Coeff>::type tc = carl::abs(getNum(result.coefficients().front()));
         if( maxInt != 0 && (tc > maxInt || lc > maxInt) )
         {
             return result;
@@ -1089,7 +1089,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
                 {
                     // Add a zero-preserving shift.
                     assert(isInteger(image));
-                    typename IntegralT<Coeff>::type imageInt = carl::abs(getNum(image));
+                    typename IntegralType<Coeff>::type imageInt = carl::abs(getNum(image));
                     if( imageInt <= maxInt )
                     {
                         LOGMSG_TRACE("carl.core", "UnivELF: new shift with " << getNum(posRatZero) << " to " << carl::abs(getNum(image)));
@@ -1258,7 +1258,7 @@ CLANG_WARNING_RESET
         UnivariatePolynomial<Coeff> s(mainVar());
         UnivariatePolynomial<Coeff> t(mainVar());
         UnivariatePolynomial<Coeff> c = extended_gcd((*this), b, s, t); // TODO: use gcd instead
-        typename IntegralT<Coeff>::type numOfCpf = getNum(c.coprimeFactor());
+        typename IntegralType<Coeff>::type numOfCpf = getNum(c.coprimeFactor());
         if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
         {
             c *= (Coeff) numOfCpf;
@@ -1830,7 +1830,7 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=
 		c *= rhs;
 	}
 	
-	if(is_finite_domain<Coefficient>::value)
+	if(is_finite<Coefficient>::value)
 	{
 		stripLeadingZeroes();
 	}
@@ -1841,7 +1841,7 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=
 
 template<typename Coeff>
 template<typename I, DisableIf<std::is_same<Coeff, I>>...>
-UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const typename IntegralT<Coeff>::type& rhs)
+UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const typename IntegralType<Coeff>::type& rhs)
 {
 	static_assert(std::is_same<Coeff, I>::value, "Do not provide template parameters");
 	if(rhs == (I)0)
@@ -1908,7 +1908,7 @@ UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& r
 }
 
 template<typename C>
-UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs)
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralType<C>::type& rhs)
 {
 	UnivariatePolynomial<C> res(lhs);
 	res *= rhs;
@@ -1916,7 +1916,7 @@ UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const type
 }
 
 template<typename C>
-UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs)
+UnivariatePolynomial<C> operator*(const typename IntegralType<C>::type& lhs, const UnivariatePolynomial<C>& rhs)
 {
 	return rhs * lhs;
 }

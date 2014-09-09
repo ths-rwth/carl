@@ -14,6 +14,8 @@ CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <cln/cln.h>
 CLANG_WARNING_RESET
 
+#include "../typetraits.h"
+
 namespace carl {
 
 /**
@@ -23,7 +25,7 @@ namespace carl {
 template<>
 struct is_rational<cln::cl_RA>
 {
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 
@@ -33,7 +35,7 @@ struct is_rational<cln::cl_RA>
  */
 template<>
 struct is_integer<cln::cl_I> {
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 
@@ -42,7 +44,7 @@ struct is_integer<cln::cl_I> {
  * @ingroup cln
  */
 template<>
-struct IntegralT<cln::cl_RA>
+struct IntegralType<cln::cl_RA>
 {
 	typedef cln::cl_I type;
 };
@@ -52,7 +54,7 @@ struct IntegralT<cln::cl_RA>
  * @ingroup cln
  */
 template<>
-struct IntegralT<cln::cl_I>
+struct IntegralType<cln::cl_I>
 {
 	typedef cln::cl_I type;
 };

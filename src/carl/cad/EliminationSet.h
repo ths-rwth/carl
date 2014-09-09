@@ -118,7 +118,7 @@ public:
 	/**
 	 * The comparator used for polynomials here.
 	 */
-	typedef UnivariatePolynomialComparator<typename UPolynomial::CoefficientType> PolynomialComparator;
+	typedef UnivariatePolynomialComparator<cad::MPolynomial<Coefficient>> PolynomialComparator;
 
 // private members
 private:	

@@ -112,10 +112,10 @@ namespace carl
             return this->toRational();
         }
         
-        operator typename IntegralT<T>::type () const
+        operator typename IntegralType<T>::type () const
         {
             if( std::abs( this->mContent ) < HIGHTEST_INTEGER_VALUE )
-                return typename IntegralT<T>::type( this->mContent );
+                return typename IntegralType<T>::type( this->mContent );
             else
             {
                 T& rat = mRationalPool[(size_t)this->mContent-(size_t)HIGHTEST_INTEGER_VALUE];

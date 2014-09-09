@@ -392,7 +392,7 @@ namespace carl
         {
             T& rat = _valueA.rRational();
             if( IS_INT( _valueB.mContent ) )
-                rat = carl::div( carl::getNum( rat ), typename IntegralT<T>::type( _valueB.mContent ) );
+                rat = carl::div( carl::getNum( rat ), typename IntegralType<T>::type( _valueB.mContent ) );
             else
                 rat = carl::div( carl::getNum( rat ), carl::getNum( _valueB.rational() ) );
             if( carl::getNum( rat ) > -HIGHTEST_INTEGER_VALUE && carl::getNum( rat ) < HIGHTEST_INTEGER_VALUE )
@@ -437,7 +437,7 @@ namespace carl
             }
             else
             {
-                typename IntegralT<T>::type a = carl::abs( carl::getNum( _valueB.rational() ) );
+                typename IntegralType<T>::type a = carl::abs( carl::getNum( _valueB.rational() ) );
                 a = carl::mod( a, _valueA.mContent );
                 if( a != 0 )
                     Numeric<T>::gcd_( _valueA.mContent, carl::toInt<ContentType>( a ) );
@@ -447,7 +447,7 @@ namespace carl
         {
             if( IS_INT( _valueB.mContent ) )
             {
-                typename IntegralT<T>::type a = carl::abs( carl::getNum( _valueA.rational() ) );
+                typename IntegralType<T>::type a = carl::abs( carl::getNum( _valueA.rational() ) );
                 Numeric<T>::mFreeRationalIds.push_back( _valueA.mContent );
                 _valueA.mContent = std::abs( _valueB.mContent );
                 a = carl::mod( a, _valueA.mContent );
@@ -482,7 +482,7 @@ namespace carl
         {
             if( IS_INT( _valueB.content() ) )
             {
-                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), typename IntegralT<T>::type( _valueB.content() ) ) );
+                return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), typename IntegralType<T>::type( _valueB.content() ) ) );
             }
             else
                 return Numeric<T>( carl::div( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
@@ -528,12 +528,12 @@ namespace carl
                 return Numeric<T>( (std::abs(_valueA.content()*_valueB.content())/g) );
             }
             else
-                return Numeric<T>( carl::lcm( typename IntegralT<T>::type( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
+                return Numeric<T>( carl::lcm( typename IntegralType<T>::type( _valueA.content() ), carl::getNum( _valueB.rational() ) ) );
         }
         else
         {
             if( IS_INT( _valueB.content() ) )
-                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), typename IntegralT<T>::type( _valueB.content() ) ) );
+                return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), typename IntegralType<T>::type( _valueB.content() ) ) );
             else
                 return Numeric<T>( carl::lcm( carl::getNum( _valueA.rational() ), carl::getNum( _valueB.rational() ) ) );
         }

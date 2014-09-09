@@ -24,7 +24,7 @@ class EZGCD
 	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
 	typedef GCDResult<Coeff,Ordering,Policies> Result;
 	typedef	typename Polynomial::TermType Term; 
-	typedef typename IntegralT<Coeff>::type Integer;
+	typedef typename IntegralType<Coeff>::type Integer;
 	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
 	typedef UnivariatePolynomial<Coeff> UnivPol;
 	

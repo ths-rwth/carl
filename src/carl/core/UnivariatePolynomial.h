@@ -67,11 +67,7 @@ public:
 	/**
 	 * The integral type that belongs to the number type.
 	 */
-	typedef typename IntegralT<NumberType>::type IntNumberType;
-	/**
-	 * The type of the coefficients.
-	 */
-	typedef Coefficient CoefficientType;
+	typedef typename IntegralType<NumberType>::type IntNumberType;
 
 	// Rule of five
 	/**
@@ -469,7 +465,7 @@ public:
 	Coefficient coprimeFactor() const;
 	
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficients() const;
 
 	/**
 	 * Checks whether the polynomial is unit normal
@@ -628,7 +624,7 @@ public:
 	}
 	
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
-	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
+	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
 	{
 		LOG_NOTIMPLEMENTED();
 	}
@@ -661,11 +657,11 @@ public:
 	 * @return 
 	 */
 	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> toIntegerDomain() const;
 	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> toIntegerDomain() const;
 	
-	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
+	UnivariatePolynomial<GFNumber<typename IntegralType<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralType<Coefficient>::type>* galoisField) const;
 
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial<NumberType> toNumberCoefficients(bool check = true) const;
@@ -903,7 +899,7 @@ public:
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
 	// TODO: does this make any sense?
 	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
-	UnivariatePolynomial& operator*=(const typename IntegralT<Coefficient>::type& rhs);
+	UnivariatePolynomial& operator*=(const typename IntegralType<Coefficient>::type& rhs);
 	/**
 	 * @param rhs A univariate polynomial over the same variable.
 	 * @return 
@@ -917,9 +913,9 @@ public:
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
+	friend UnivariatePolynomial<C> operator*(const typename IntegralType<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs);
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralType<C>::type& rhs);
 	template<typename C, typename O, typename P>
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
 	template<typename C, typename O, typename P>

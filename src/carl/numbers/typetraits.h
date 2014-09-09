@@ -4,8 +4,27 @@
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
  *
- * This file contains all type traits for our types.
+ * This file contains all generic type trait definitions for our types.
  * We use the notation conventions of the STL, being lower cases with underscores.
+ *
+ * We define the following type traits:
+ * <ul>
+ * <li>`is_rational`: Types that may represent any rational number.</li>
+ * <li>`is_integer`: Types that may represent any integral number.</li>
+ * <li>`is_subset_of_rational`: Types that may represent some rational numbers.</li>
+ * <li>`is_subset_of_integer`: Types that may represent some integral numbers.</li>
+ * <li>`is_field`: Types that represent elements from a field.</li>
+ * <li>`is_primitive`: Types that are primitive number types like `int`, `float` or `double`.</li>
+ * <li>`is_float`: Types that use a floating point representation.</li>
+ * <li>`is_finite`: Types that represent only a finite domain.</li>
+ * <li>`is_number`: Types that represent numbers.</li>
+ * </ul>
+ *
+ * Additionally, we define related types in a type traits like manner:
+ * <ul>
+ * <li>`IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.</li>
+ * <li>`UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.</li>
+ * </ul>
  */
 
 #pragma once
@@ -13,9 +32,6 @@
 #include "../util/platform.h"
 #include "config.h"
 #include <type_traits>
-//CLANG_WARNING_DISABLE("-Wsign-conversion")
-//#include <gmpxx.h>
-//CLANG_WARNING_RESET
 
 #include "../util/SFINAE.h"
 
@@ -34,94 +50,75 @@ template<typename C, typename O, typename P>
 class MultivariatePolynomial;
 
 /**
- * @ingroup typetraits
- */
-template<typename type>
-struct is_real
-{
-	static const bool value = false;
-};
-
-
-
-/**
- * Type trait is_rational. 
- * Default is false, but certain types which encode rationals should be set to true. 
+ * States if a type is a rational type.
+ *
+ * We consider a type to be rational, if it can (in theory) represent any rational number.
+ * Default is false.
  */
 template<typename type>
 struct is_rational
 {
-	static const bool value = false;
-};
-
-
-/**
- * Type trait  is_field. 
- * Default, we set rationals and reals to true and others to false, but additional types which encode algebraic fields should be set to true. 
- * @ingroup typetraits
- * @see UnivariatePolynomial - CauchyBound for example.
- */
-template<typename T>
-struct is_field
-{
-	static const bool value = is_rational<T>::value || is_real<T>::value;
-};
-/**
- * @ingroup typetraits
- */
-template<typename C>
-struct is_field<GFNumber<C>>
-{
-	static const bool value = true;
+	/// Default value of this trait.
+	static constexpr bool value = false;
 };
 
 /**
- * Type trait is_integer.
- * Default is false, but certain types which encode integral types should be set to true. 
+ * States if a type is an integer type.
+ *
+ * We consider a type an integer type, if it can (in theory) represent all integers and no other values.
+ * Default is false.
  * @ingroup typetraits
  */
 template<typename T>
 struct is_integer {
-	static const bool value = false;
-};
-
-/**
- * @ingroup typetraits
- */
-template<typename T>
-struct is_natural
-{
+	/// Default value of this trait.
 	static constexpr bool value = false;
 };
 
 
-
 /**
+ * States if a type represents a subset of all integers.
+ * Default is true for integer types, false otherwise.
  * @ingroup typetraits
  */
 template<typename Type>
-struct is_subset_of_integers
-{
-	static constexpr bool value = is_integer<Type>::value || is_natural<Type>::value;
+struct is_subset_of_integers {
+	/// Default value of this trait.
+	static constexpr bool value = is_integer<Type>::value;
 };
 
 /**
+ * States if a type represents a subset of all rationals and the representation is similar to a rational.
+ * Default is true for rationals and subsets of integers, false otherwise.
  * @ingroup typetraits
  */
 template<typename Type>
-struct is_subset_of_rationals
-{
+struct is_subset_of_rationals {
+	/// Default value of this trait.
 	static constexpr bool value = is_rational<Type>::value || is_subset_of_integers<Type>::value;
 };
 
 /**
+ * States if a type is a field.
+ * Default is true for rationals, false otherwise.
+ * @ingroup typetraits
+ * @see UnivariatePolynomial - CauchyBound for example.
+ */
+template<typename T>
+struct is_field {
+	/// Default value of this trait.
+	static constexpr bool value = is_rational<T>::value;
+};
+/**
+ * States that a Gallois field is a field.
  * @ingroup typetraits
  */
-template<typename Type>
-struct is_subset_of_reals
-{
-	static constexpr bool value = is_real<Type>::value || is_subset_of_rationals<Type>::value;
+template<typename C>
+struct is_field<GFNumber<C>> {
+	/// Value of this trait.
+	static constexpr bool value = true;
 };
+
 
 
 
@@ -130,11 +127,21 @@ struct is_subset_of_reals
  * @see UnivariatePolynomial - squareFreeFactorization for example.
  */
 template<typename type>
-struct characteristic
-{
-	static const unsigned value = 0;
+struct characteristic {
+	static constexpr unsigned value = 0;
 };
 
+
+/**
+ * States if a type represents only a finite domain.
+ * Default is false for rationals and integers, true otherwise.
+ * @ingroup typetraits
+ */
+template<typename C>
+struct is_finite
+{
+	static constexpr bool value = !(is_rational<C>::value || is_integer<C>::value);
+};
 
 /**
  * Type trait is_finite_domain.
@@ -142,63 +149,51 @@ struct characteristic
  * @ingroup typetraits
  */
 template<typename C>
-struct is_finite_domain
-{
+struct is_finite<GFNumber<C>> {
+	/// Default value of this trait.
+	static constexpr bool value = true;
+};
+
+/**
+ * States if a type is a float type.
+ * Default is false.
+ * @ingroup typetraits
+ */
+template<typename type>
+struct is_float {
+	/// Default value of this trait.
+    static constexpr bool value = false;
+};
+
+/**
+ * States if a type is a primitive number type.
+ * Default is false.
+ * @ingroup typetraits
+ */
+template<typename type>
+struct is_primitive {
+	/// Default value of this trait.
 	static constexpr bool value = false;
 };
 
 /**
- * Type trait is_finite_domain.
- * Default is false.
- * @ingroup typetraits
- */
-template<typename C>
-struct is_finite_domain<GFNumber<C>>
-{
-	static constexpr bool value = true;
-};
-
-
-/**
- * Type trait is_number.
- * Default is that subsets of reals are true. Should be set to true for all number types to distinguish them from Polynomials for example.
+ * States if a type is a number type.
+ * Default is true for rationals, integers and floats, false otherwise.
  * @ingroup typetraits
  */
 template<typename T>
-struct is_number
-{
-	static constexpr bool value = is_subset_of_reals<T>::value;
+struct is_number {
+	/// Default value of this trait.
+	static constexpr bool value = is_rational<T>::value || is_integer<T>::value || is_float<T>::value;
 };
 
-/**
- * Type trait is float
- * Default is false. Should be set to true for all floating point numbers to enable floating point arithmetic, e.g. in the interval class.
- */
-
-template<typename type>
-struct is_float
-{
-    static const bool value = false;
-};
-
-/**
- * Type trait is_primitive required for BoostIntervals to use the preimlpemented default rounding and checking policies.
- */
-	
-template<typename type>
-struct is_primitive
-{
-	static const bool value = false;
-};
-	
-	
 /**
  * @ingroup typetraits
  * @see GFNumber
  */
 template<typename C>
-struct is_number<GFNumber<C>>
-{
+struct is_number<GFNumber<C>> {
+	/// Default value of this trait.
 	static constexpr bool value = true;
 };
 /**
@@ -206,42 +201,18 @@ struct is_number<GFNumber<C>>
  * Default is int.
  */
 template<typename RationalType>
-struct IntegralT
-{
+struct IntegralType {
 	typedef int type;
 };
 
 template<typename C>
-struct IntegralT<GFNumber<C>>
-{
+struct IntegralType<GFNumber<C>> {
 	typedef C type;
 };
-
 
 /**
- * Coefficient ring of numbers is just the type of the number. (TODO limit this to numbers)
- */
-template<typename C>
-struct CoefficientRing
-{
-	typedef C type;
-};
-
-template<typename C>
-struct CoefficientRing<UnivariatePolynomial<C>>
-{
-	typedef C type;
-};
-
-template<typename C, typename O, typename P>
-struct CoefficientRing<MultivariatePolynomial<C, O, P>>
-{
-	typedef C type;
-};
-
-
-/**
- * Obtains the underlying number type of a polynomial type.
+ * Gives the underlying number type of a complex object.
+ * Default is the type itself.
  */
 template<typename C>
 struct UnderlyingNumberType
@@ -249,12 +220,20 @@ struct UnderlyingNumberType
 	typedef C type;
 };
 
+/**
+ * Gives the underlying number type of univariate polynomials.
+ * This is the underlying number type of the polynomials coefficients.
+ */
 template<typename C>
 struct UnderlyingNumberType<UnivariatePolynomial<C>>
 {
 	typedef typename UnderlyingNumberType<C>::type type;
 };
 
+/**
+ * Gives the underlying number type of multivariate polynomials.
+ * This is the underlying number type of the polynomials coefficients.
+ */
 template<typename C, typename O, typename P>
 struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>
 {

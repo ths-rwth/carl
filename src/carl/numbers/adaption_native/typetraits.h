@@ -17,7 +17,7 @@ namespace carl {
 template<>
 struct is_integer<long> {
 	/// Value of this trait.
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 /**
  * States that `int` is an integer type.
@@ -26,27 +26,7 @@ struct is_integer<long> {
 template<>
 struct is_integer<int> {
 	/// Value of this trait.
-	static const bool value = true;
-};
-
-/**
- * States that `unsigned` is not a natural number type.
- * @ingroup typetraits
- */
-template<>
-struct is_natural<unsigned> {
-	/// Value of this trait.
-	static constexpr bool value = false;
-};
-
-/**
- * States that `unsigned long ` is not a natural number type.
- * @ingroup typetraits
- */
-template<>
-struct is_natural<unsigned long> {
-	/// Value of this trait.
-	static constexpr bool value = false;
+	static constexpr bool value = true;
 };
 
 /**
@@ -56,7 +36,7 @@ struct is_natural<unsigned long> {
 template<>
 struct is_float<double> {
 	/// Value of this trait.
-    static const bool value = true;
+    static constexpr bool value = true;
 };
 
 /**
@@ -66,7 +46,7 @@ struct is_float<double> {
 template<>
 struct is_float<float> {
 	/// Value of this trait.
-    static const bool value = true;
+    static constexpr bool value = true;
 };
 
 
@@ -77,7 +57,7 @@ struct is_float<float> {
 template<>
 struct is_primitive<double> {
 	/// Value of this trait.
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 /**
@@ -87,7 +67,7 @@ struct is_primitive<double> {
 template<>
 struct is_primitive<long double> {
 	/// Value of this trait.
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 /**
@@ -97,7 +77,7 @@ struct is_primitive<long double> {
 template<>
 struct is_primitive<int> {
 	/// Value of this trait.
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 /**
@@ -107,7 +87,7 @@ struct is_primitive<int> {
 template<>
 struct is_primitive<float> {
 	/// Value of this trait.
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 /**
@@ -117,7 +97,7 @@ struct is_primitive<float> {
 template<>
 struct is_primitive<unsigned> {
 	/// Value of this trait.
-	static const bool value = true;
+	static constexpr bool value = true;
 };
 
 }

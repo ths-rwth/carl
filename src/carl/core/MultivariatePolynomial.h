@@ -37,7 +37,7 @@ public:
 	typedef Coeff CoeffType;
 	typedef Policies Policy;
 	typedef typename UnderlyingNumberType<Coeff>::type NumberType;
-	typedef typename IntegralT<NumberType>::type IntNumberType;
+	typedef typename IntegralType<NumberType>::type IntNumberType;
 protected:
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
 	
@@ -323,14 +323,14 @@ public:
 	
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 	
-	MultivariatePolynomial<typename IntegralT<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
+	MultivariatePolynomial<typename IntegralType<Coeff>::type, Ordering, Policies> toIntegerDomain() const;
 	
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
 	const std::shared_ptr<const Term<Coeff>>& operator[](unsigned) const;
 
-	MultivariatePolynomial mod(const typename IntegralT<Coeff>::type& modulo) const;
+	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
 	
 	template<bool gatherCoeff>
 	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(const Variable& v) const;

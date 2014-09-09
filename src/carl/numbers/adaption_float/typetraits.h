@@ -20,7 +20,7 @@ namespace carl
     #endif
 
     template<typename F>
-    struct IntegralT<carl::FLOAT_T<F> >
+    struct IntegralType<carl::FLOAT_T<F> >
     {
         typedef cln::cl_I type;
     };
