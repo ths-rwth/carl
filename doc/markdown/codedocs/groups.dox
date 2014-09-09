@@ -31,6 +31,7 @@
 @}
 
 @defgroup typetraits Type Traits
+@{
 We define custom type traits for number types we use.
 We use the notation conventions of the STL, being lower cases with underscores.
 
@@ -51,6 +52,9 @@ Additionally, we define related types in a type traits like manner:
 - `IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.
 - `UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.
 
+@defgroup typetraits_is_primitive is_primitive
+All primitive types are marked with `is_primitive`.
+@}
 
 */
  // end of a group

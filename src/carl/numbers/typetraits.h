@@ -13,6 +13,20 @@
 
 #include "../util/SFINAE.h"
 
+#define TRAIT_TRUE(name,type) \
+/** States that type has the trait name. @ingroup typetraits_ ## name */ \
+template<> struct name<type> { \
+	/** Value is true. */ \
+	static constexpr bool value = true; \
+}
+
+#define TRAIT_FALSE(name,type) \
+/** States that type does not have the trait name. @ingroup typetraits */ \
+template<> struct name<type> { \
+	/** Value is false. */ \
+	static constexpr bool value = false; \
+}
+
 namespace carl {
 
 // 
@@ -146,7 +160,7 @@ struct is_float {
 /**
  * States if a type is a primitive number type.
  * Default is false.
- * @ingroup typetraits
+ * @ingroup typetraits_is_primitive
  */
 template<typename type>
 struct is_primitive {

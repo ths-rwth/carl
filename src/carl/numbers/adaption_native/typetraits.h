@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../../util/SFINAE.h"
+#include "../typetraits.h"
 
 namespace carl {
 
@@ -49,55 +50,26 @@ struct is_float<float> {
     static constexpr bool value = true;
 };
 
+TRAIT_TRUE(is_primitive, bool);
 
-/**
- * States that `double` is a primitive type.
- * @ingroup typetraits
- */
-template<>
-struct is_primitive<double> {
-	/// Value of this trait.
-	static constexpr bool value = true;
-};
+TRAIT_TRUE(is_primitive, char);
+TRAIT_TRUE(is_primitive, signed char);
+TRAIT_TRUE(is_primitive, unsigned char);
+TRAIT_TRUE(is_primitive, wchar_t);
+TRAIT_TRUE(is_primitive, char16_t);
+TRAIT_TRUE(is_primitive, char32_t);
 
-/**
- * States that `long double` is a primitive type.
- * @ingroup typetraits
- */
-template<>
-struct is_primitive<long double> {
-	/// Value of this trait.
-	static constexpr bool value = true;
-};
+TRAIT_TRUE(is_primitive, short);
+TRAIT_TRUE(is_primitive, unsigned short);
+TRAIT_TRUE(is_primitive, int);
+TRAIT_TRUE(is_primitive, unsigned);
+TRAIT_TRUE(is_primitive, long);
+TRAIT_TRUE(is_primitive, unsigned long);
+TRAIT_TRUE(is_primitive, long long);
+TRAIT_TRUE(is_primitive, unsigned long long);
 
-/**
- * States that `int` is a primitive type.
- * @ingroup typetraits
- */
-template<>
-struct is_primitive<int> {
-	/// Value of this trait.
-	static constexpr bool value = true;
-};
-
-/**
- * States that `float` is a primitive type.
- * @ingroup typetraits
- */
-template<>
-struct is_primitive<float> {
-	/// Value of this trait.
-	static constexpr bool value = true;
-};
-
-/**
- * States that `unsigned` is a primitive type.
- * @ingroup typetraits
- */
-template<>
-struct is_primitive<unsigned> {
-	/// Value of this trait.
-	static constexpr bool value = true;
-};
+TRAIT_TRUE(is_primitive, float);
+TRAIT_TRUE(is_primitive, double);
+TRAIT_TRUE(is_primitive, long double);
 
 }
