@@ -8,9 +8,9 @@ using namespace carl;
 
 TEST(NumbersCLN, constructors)
 {
-    cln::cl_RA b = cln::cl_RA(2)/3;
-    EXPECT_EQ(2, cln::numerator(b));
-    EXPECT_EQ(3, cln::denominator(b));
+	cln::cl_RA b = cln::cl_RA(2)/3;
+	EXPECT_EQ(2, cln::numerator(b));
+	EXPECT_EQ(3, cln::denominator(b));
 }
 
 TEST(NumbersCLN, operations)
@@ -23,17 +23,55 @@ TEST(NumbersCLN, operations)
 
 TEST(NumbersCLN, squareroot)
 {
-    // CLN
-    cln::cl_RA b = cln::cl_I(2)/cln::cl_I(3);
-    std::pair<cln::cl_RA, cln::cl_RA> resultB;
-    resultB = carl::sqrt(b);
-    resultB.first.debug_print();
-    resultB.second.debug_print();
+	// CLN
+	cln::cl_RA b = cln::cl_I(2)/cln::cl_I(3);
+	std::pair<cln::cl_RA, cln::cl_RA> resultB;
+	resultB = carl::sqrt(b);
+	resultB.first.debug_print();
+	resultB.second.debug_print();
 }
 
 TEST(NumbersCLN, quotient)
 {
-	EXPECT_EQ(-1, quotient(cln::cl_I(-6),cln::cl_I(7)));
+	EXPECT_EQ(1, quotient(cln::cl_I(1),cln::cl_I(1)));
+	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(3)));
+	EXPECT_EQ(2, quotient(cln::cl_I(2),cln::cl_I(1)));
+	EXPECT_EQ(1, quotient(cln::cl_I(2),cln::cl_I(2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(2),cln::cl_I(3)));
+	EXPECT_EQ(3, quotient(cln::cl_I(3),cln::cl_I(1)));
+	EXPECT_EQ(1, quotient(cln::cl_I(3),cln::cl_I(2)));
+	EXPECT_EQ(1, quotient(cln::cl_I(3),cln::cl_I(3)));
+	
+	EXPECT_EQ(-1, quotient(cln::cl_I(-1),cln::cl_I(1)));
+	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(3)));
+	EXPECT_EQ(-2, quotient(cln::cl_I(-2),cln::cl_I(1)));
+	EXPECT_EQ(-1, quotient(cln::cl_I(-2),cln::cl_I(2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(-2),cln::cl_I(3)));
+	EXPECT_EQ(-3, quotient(cln::cl_I(-3),cln::cl_I(1)));
+	EXPECT_EQ(-1, quotient(cln::cl_I(-3),cln::cl_I(2)));
+	EXPECT_EQ(-1, quotient(cln::cl_I(-3),cln::cl_I(3)));
+
+	EXPECT_EQ(-1, quotient(cln::cl_I(1),cln::cl_I(-1)));
+	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(-2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(-3)));
+	EXPECT_EQ(-2, quotient(cln::cl_I(2),cln::cl_I(-1)));
+	EXPECT_EQ(-1, quotient(cln::cl_I(2),cln::cl_I(-2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(2),cln::cl_I(-3)));
+	EXPECT_EQ(-3, quotient(cln::cl_I(3),cln::cl_I(-1)));
+	EXPECT_EQ(-1, quotient(cln::cl_I(3),cln::cl_I(-2)));
+	EXPECT_EQ(-1, quotient(cln::cl_I(3),cln::cl_I(-3)));
+
+	EXPECT_EQ(1, quotient(cln::cl_I(-1),cln::cl_I(-1)));
+	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(-2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(-3)));
+	EXPECT_EQ(2, quotient(cln::cl_I(-2),cln::cl_I(-1)));
+	EXPECT_EQ(1, quotient(cln::cl_I(-2),cln::cl_I(-2)));
+	EXPECT_EQ(0, quotient(cln::cl_I(-2),cln::cl_I(-3)));
+	EXPECT_EQ(3, quotient(cln::cl_I(-3),cln::cl_I(-1)));
+	EXPECT_EQ(1, quotient(cln::cl_I(-3),cln::cl_I(-2)));
+	EXPECT_EQ(1, quotient(cln::cl_I(-3),cln::cl_I(-3)));
 }
 
 TEST(NumbersCLN, sqrt_fast)
