@@ -3,28 +3,6 @@
  * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
- *
- * This file contains all generic type trait definitions for our types.
- * We use the notation conventions of the STL, being lower cases with underscores.
- *
- * We define the following type traits:
- * <ul>
- * <li>`is_rational`: Types that may represent any rational number.</li>
- * <li>`is_integer`: Types that may represent any integral number.</li>
- * <li>`is_subset_of_rational`: Types that may represent some rational numbers.</li>
- * <li>`is_subset_of_integer`: Types that may represent some integral numbers.</li>
- * <li>`is_field`: Types that represent elements from a field.</li>
- * <li>`is_primitive`: Types that are primitive number types like `int`, `float` or `double`.</li>
- * <li>`is_float`: Types that use a floating point representation.</li>
- * <li>`is_finite`: Types that represent only a finite domain.</li>
- * <li>`is_number`: Types that represent numbers.</li>
- * </ul>
- *
- * Additionally, we define related types in a type traits like manner:
- * <ul>
- * <li>`IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.</li>
- * <li>`UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.</li>
- * </ul>
  */
 
 #pragma once

@@ -29,7 +29,27 @@
 @defgroup cln CLN Usage
 @{ @}
 @}
+
 @defgroup typetraits Type Traits
+We define custom type traits for number types we use.
+We use the notation conventions of the STL, being lower cases with underscores.
+
+We define the following type traits:
+
+- `is_rational`: Types that may represent any rational number.
+- `is_integer`: Types that may represent any integral number.
+- `is_subset_of_rational`: Types that may represent some rational numbers.
+- `is_subset_of_integer`: Types that may represent some integral numbers.
+- `is_field`: Types that represent elements from a field.
+- `is_primitive`: Types that are primitive number types like `int`, `float` or `double`.
+- `is_float`: Types that use a floating point representation.
+- `is_finite`: Types that represent only a finite domain.
+- `is_number`: Types that represent numbers.
+
+Additionally, we define related types in a type traits like manner:
+
+- `IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.
+- `UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.
 
 
 */
