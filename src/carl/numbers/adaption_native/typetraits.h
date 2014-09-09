@@ -50,26 +50,27 @@ struct is_float<float> {
     static constexpr bool value = true;
 };
 
-TRAIT_TRUE(is_primitive, bool);
+TRAIT_TRUE(is_fundamental, bool);
 
-TRAIT_TRUE(is_primitive, char);
-TRAIT_TRUE(is_primitive, signed char);
-TRAIT_TRUE(is_primitive, unsigned char);
-TRAIT_TRUE(is_primitive, wchar_t);
-TRAIT_TRUE(is_primitive, char16_t);
-TRAIT_TRUE(is_primitive, char32_t);
+TRAIT_TRUE(is_fundamental, char);
+TRAIT_TRUE(is_fundamental, wchar_t);
+TRAIT_TRUE(is_fundamental, char16_t);
+TRAIT_TRUE(is_fundamental, char32_t);
 
-TRAIT_TRUE(is_primitive, short);
-TRAIT_TRUE(is_primitive, unsigned short);
-TRAIT_TRUE(is_primitive, int);
-TRAIT_TRUE(is_primitive, unsigned);
-TRAIT_TRUE(is_primitive, long);
-TRAIT_TRUE(is_primitive, unsigned long);
-TRAIT_TRUE(is_primitive, long long);
-TRAIT_TRUE(is_primitive, unsigned long long);
+TRAIT_TRUE(is_fundamental, signed char);
+TRAIT_TRUE(is_fundamental, short int);
+TRAIT_TRUE(is_fundamental, int);
+TRAIT_TRUE(is_fundamental, long int);
+TRAIT_TRUE(is_fundamental, long long int);
 
-TRAIT_TRUE(is_primitive, float);
-TRAIT_TRUE(is_primitive, double);
-TRAIT_TRUE(is_primitive, long double);
+TRAIT_TRUE(is_fundamental, unsigned char);
+TRAIT_TRUE(is_fundamental, unsigned short int);
+TRAIT_TRUE(is_fundamental, unsigned int);
+TRAIT_TRUE(is_fundamental, unsigned long int);
+TRAIT_TRUE(is_fundamental, unsigned long long int);
+
+TRAIT_TRUE(is_fundamental, float);
+TRAIT_TRUE(is_fundamental, double);
+TRAIT_TRUE(is_fundamental, long double);
 
 }

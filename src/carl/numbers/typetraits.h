@@ -3,6 +3,26 @@
  * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
+ *
+ * @defgroup typetraits Type Traits
+ * We define custom type traits for number types we use.
+ * We use the notation conventions of the STL, being lower cases with underscores.
+ *
+ * We define the following type traits:
+ * - `is_rational`: Types that may represent any rational number.
+ * - `is_integer`: Types that may represent any integral number.
+ * - `is_subset_of_rational`: Types that may represent some rational numbers.
+ * - `is_subset_of_integer`: Types that may represent some integral numbers.
+ * - `is_field`: Types that represent elements from a field.
+ * - `is_fundamental`: Types that are fundamental types like `int`, `float` or `double`.
+ * - `is_float`: Types that use a floating point representation.
+ * - `is_finite`: Types that represent only a finite domain.
+ * - `is_number`: Types that represent numbers.
+ *
+ * Additionally, we define related types in a type traits like manner:
+ *
+ * - `IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.
+ * - `UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.
  */
 
 #pragma once
@@ -158,12 +178,17 @@ struct is_float {
 };
 
 /**
- * States if a type is a primitive number type.
+ * States if a type is a fundamental number type.
  * Default is false.
- * @ingroup typetraits_is_primitive
+ * @ingroup typetraits_is_fundamental
+ * 
+ * @defgroup typetraits_is_fundamental is_fundamental
+ * All primitive types are marked with `is_fundamental`.
+ *
+ * We consider a type funcamental, if the C++ standard @cite C++Standard (3.9.1) defines it as `fundamental`.
  */
 template<typename type>
-struct is_primitive {
+struct is_fundamental {
 	/// Default value of this trait.
 	static constexpr bool value = false;
 };
