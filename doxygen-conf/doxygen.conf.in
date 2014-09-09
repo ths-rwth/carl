@@ -1384,7 +1384,8 @@ EXPAND_AS_DEFINED      = EASY_TYPE \
                          EASY_DESTRUCTOR \
                          EASY_METHOD \
                          TRAIT_TRUE \
-                         TRAIT_FALSE
+                         TRAIT_FALSE \
+                         TRAIT_TYPE
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then
 # doxygen's preprocessor will remove all references to function-like macros
