@@ -20,6 +20,7 @@ namespace carl {
 
 TRAIT_TRUE(is_integer, cln::cl_I, cln);
 TRAIT_TRUE(is_rational, cln::cl_RA, cln);
+
 TRAIT_TYPE(IntegralType, cln::cl_I, cln::cl_I, cln);
 TRAIT_TYPE(IntegralType, cln::cl_RA, cln::cl_I, cln);
 
@@ -27,6 +28,8 @@ TRAIT_TYPE(IntegralType, cln::cl_RA, cln::cl_I, cln);
 
 namespace std {
 
-//TRAIT_TRUE(is_integral, cln::cl_I, "cln");
+TRAIT_TRUE(is_integral, cln::cl_I, cln);
+TRAIT_FALSE(is_fundamental, cln::cl_I, cln);
+TRAIT_FALSE(is_fundamental, cln::cl_RA, cln);
 
 }

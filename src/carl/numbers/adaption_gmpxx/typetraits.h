@@ -16,13 +16,20 @@ CLANG_WARNING_RESET
 
 #include "../typetraits.h"
 
-namespace carl 
-{
+namespace carl {
 	
-TRAIT_TRUE(is_integer, mpq_class, gmpxx);
-TRAIT_TRUE(is_rational, mpz_class, gmpxx);
+TRAIT_TRUE(is_integer, mpz_class, gmpxx);
+TRAIT_TRUE(is_rational, mpq_class, gmpxx);
 
 TRAIT_TYPE(IntegralType, mpq_class, mpz_class, gmpxx);
 TRAIT_TYPE(IntegralType, mpz_class, mpz_class, gmpxx);
+
+}
+
+namespace std {
+
+TRAIT_TRUE(is_integral, mpz_class, gmpxx);
+TRAIT_FALSE(is_fundamental, mpz_class, gmpxx);
+TRAIT_FALSE(is_fundamental, mpq_class, gmpxx);
 
 }
