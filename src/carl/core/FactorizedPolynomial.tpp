@@ -19,7 +19,7 @@ namespace carl
         Factorization<P> factorization;
         PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial ) );
         mCacheRef = mrCache.cache( pfPair );
-        pfPair->rFactorization().insert( std::make_pair( *this, 1 ) );
+        factorization.insert( std::make_pair( *this, 1 ) );
     }
     
     template<typename P>
@@ -55,59 +55,59 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
     {
-        assert( &mrCache == &_fpoly.mrCache );
-        mCacheRef = _fpoly.mCacheRef;
+        assert( &mrCache == &_fpoly.cache() );
+        mCacheRef = _fpoly.cacheRef();
         return *this;
     }
         
     template<typename P>
-    bool operator==(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    bool operator==( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
-        return _fpolyA.mrCache.get( _fpolyA.mCacheRef ) == _fpolyB.mrCache.get( _fpolyB.mCacheRef );
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
+        return _fpolyA.content() == _fpolyB.content();
     }
         
     template<typename P>
-    bool operator<(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    bool operator<( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
-        return _fpolyA.mrCache.get( _fpolyA.mCacheRef ) < _fpolyB.mrCache.get( _fpolyB.mCacheRef );
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
+        return _fpolyA.content() < _fpolyB.content();
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator+(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    const FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
-
-    }
-
-    template<typename P>
-    const FactorizedPolynomial<P> operator-(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
-    {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
 
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator*(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
 
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator/(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
+
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonDivisor(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    const FactorizedPolynomial<P> operator/( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        assert( &_fpolyA.mrCache == &_fpolyB.mrCache );
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
+    }
+
+    template<typename P>
+    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    {
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> cdFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.mrCache.get(_fpolyA.mCacheRef).factorization();
-        const Factorization<P>& factorizationB = _fpolyB.mrCache.get(_fpolyB.mCacheRef).factorization();
+        const Factorization<P>& factorizationA = _fpolyA.content().factorization();
+        const Factorization<P>& factorizationB = _fpolyB.content().factorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
@@ -123,21 +123,28 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonMultiple(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    const FactorizedPolynomial<P> commonMultiple( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> gcd(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB)
+    const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        
+        bool rehashFPolyA = false;
+        bool rehashFPolyB = false;
+        Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), rehashFPolyA, rehashFPolyB ) );
+        if( rehashFPolyA )
+            _fpolyA.rehash();
+        if( rehashFPolyB )
+            _fpolyB.rehash();
+        return FactorizedPolynomial<P>( std::move( gcdFactorization ), _fpolyA.mrCache );
     }
     
     template <typename P>
-    std::ostream& operator<<(std::ostream& _out, const FactorizedPolynomial<P>& _fpoly)
+    std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly )
     {
-        const Factorization<P>& factorization = _fpoly.mrCache.get(_fpoly.mCacheRef).factorization();
+        const Factorization<P>& factorization = _fpoly.content().factorization();
         if( factorization.size() == 1 )
         {
             _out << factorization.begin()->first;
