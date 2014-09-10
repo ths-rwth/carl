@@ -105,7 +105,7 @@ class Term
         }
 		
 		/**
-		 * @todo check validity.
+		 * Checks wether the monomial is zero.
          * @return 
          */
 		bool isZero() const

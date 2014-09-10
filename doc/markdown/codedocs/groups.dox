@@ -40,7 +40,7 @@
 @{
 	@defgroup typetraits_is_subset_of_integers is_subset_of_integers
 @}
-@defgroup typetraits_is_integral is_integral
+@defgroup typetraits_is_integral std::is_integral
 @defgroup typetraits_is_number is_number
 @defgroup typetraits_is_rational is_rational
 @{

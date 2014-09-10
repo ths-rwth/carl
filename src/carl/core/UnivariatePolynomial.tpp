@@ -276,15 +276,15 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const Uni
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
-		///@todo enable assert once carl::remainder exists.
-		//assert(carl::remainder(*prefactor * lcoeff(), divisor.lcoeff()) == Coeff(0));
 		factor = carl::quotient(*prefactor * lcoeff(), divisor.lcoeff());
+		// There should be no remainder.
+		assert(factor * divisor.lcoeff() == *prefactor * lcoeff());
 	}
 	else
 	{
-		///@todo enable assert once carl::remainder exists.
-		//assert(carl::remainder(lcoeff(), divisor.lcoeff()) == Coeff(0));
 		factor = carl::quotient(lcoeff(), divisor.lcoeff());
+		// There should be no remainder.
+		assert(factor * divisor.lcoeff() == lcoeff());
 	}
 
 	UnivariatePolynomial<Coeff> result(mMainVar);

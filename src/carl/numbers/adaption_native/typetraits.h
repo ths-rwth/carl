@@ -1,5 +1,6 @@
 /**
  * @file adaption_native/typetraits.h
+ * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
