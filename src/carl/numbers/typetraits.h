@@ -68,8 +68,8 @@ template<> struct name<type>: std::true_type {};
 template<> struct name<type>: std::false_type {};
 
 #define TRAIT_TYPE(name,_type,value,groups) \
-/** States that name of type is value. @ingroup typetraits_ ## name groups */ \
-template<> struct name<_type>: carl::has_subtype<typename value> {};
+/** States that name of _type is value. @ingroup typetraits_ ## name groups */ \
+template<> struct name<_type>: carl::has_subtype<value> {};
 
 namespace carl {
 
@@ -200,12 +200,20 @@ template<typename C>
 struct is_number<GFNumber<C>>: std::true_type {};
 
 /**
+ * @addtogroup typetraits_IntegralType
+ * The associated integral type of any type can be defined with `IntegralType`.
+ *
+ * Any function that operates on the type and naturally returns an integer, regardless whether the input was actually integral, uses the associated integral type as result type.
+ * Simple examples for this are getNum() and getDenom() which return the numerator and denominator respectively of a fraction.
+ */
+/**
  * Gives the corresponding integral type.
  * Default is int.
  * @ingroup typetraits_IntegralType
  */
 template<typename RationalType>
 struct IntegralType {
+	/// @todo Should *any* type have an integral type?
 	typedef int type;
 };
 
@@ -219,20 +227,18 @@ struct IntegralType<GFNumber<C>> {
  * Default is the type itself.
  * @ingroup typetraits_UnderlyingNumberType
  */
-template<typename C>
-struct UnderlyingNumberType: has_subtype<C> {};
+template<typename T>
+struct UnderlyingNumberType: has_subtype<T> {};
 
 /**
- * Gives the underlying number type of univariate polynomials.
- * This is the underlying number type of the polynomials coefficients.
+ * States that UnderlyingNumberType of UnivariatePolynomial<T> is UnderlyingNumberType<C>::type.
  * @ingroup typetraits_UnderlyingNumberType
  */
 template<typename C>
 struct UnderlyingNumberType<UnivariatePolynomial<C>>: has_subtype<typename UnderlyingNumberType<C>::type> {};
 
 /**
- * Gives the underlying number type of multivariate polynomials.
- * This is the underlying number type of the polynomials coefficients.
+ * States that UnderlyingNumberType of MultivariatePolynomial<C,O,P> is UnderlyingNumberType<C>::type.
  * @ingroup typetraits_UnderlyingNumberType
  */
 template<typename C, typename O, typename P>

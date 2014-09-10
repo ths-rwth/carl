@@ -10,52 +10,19 @@
 #pragma once
 
 #include "../../util/platform.h"
-#include <type_traits>
 CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <gmpxx.h>
 CLANG_WARNING_RESET
 
+#include "../typetraits.h"
 
 namespace carl 
 {
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct is_integer<mpq_class>
-{
-	static const bool value = true;
-};
+	
+TRAIT_TRUE(is_integer, mpq_class, gmpxx);
+TRAIT_TRUE(is_rational, mpz_class, gmpxx);
 
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct is_rational<mpz_class>
-{
-	static const bool value = true;
-};
-
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct IntegralType<mpq_class>
-{
-	typedef mpz_class type;
-};
-
-/**
- * @ingroup typetraits
- * @ingroup gmpxx
- */
-template<>
-struct IntegralType<mpz_class>
-{
-	typedef mpz_class type;
-};
+TRAIT_TYPE(IntegralType, mpq_class, mpz_class, gmpxx);
+TRAIT_TYPE(IntegralType, mpz_class, mpz_class, gmpxx);
 
 }
