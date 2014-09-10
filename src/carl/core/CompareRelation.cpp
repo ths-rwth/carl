@@ -28,6 +28,8 @@ std::string toString(const CompareRelation& cr)
     case CompareRelation::NEQ:
         return "!=";
     }
+    assert(false);
+    return "??";
 }
 
 std::ostream& operator<<(std::ostream& os, CompareRelation cr)
