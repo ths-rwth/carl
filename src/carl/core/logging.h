@@ -1,11 +1,11 @@
 /**
- * @file   logging.h
- * @author Gereon Kremer
+ * @file logging.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  *
  * A small wrapper for any logging library we might want to use.
- * If LOGGING is npt set, all logging is disabled.
+ * If LOGGING is not set, all logging is disabled.
  * Otherwise, if LOGGING_CARL is set, we log using our own logging machinery.
- * If neither is set, important messages are sent to std::cerr.
+ * If neither is set, important messages are sent to `std::cerr`.
  *
  * Created: 21/11/2012
  * @version: 2014-07-30
@@ -62,6 +62,11 @@ namespace logging {
 	#define LOG_FUNC(channel, args)
 	#define LOG_ASSERT(channel, condition, msg) assert(condition)
 	#define LOG_NOTIMPLEMENTED()
+	#define LOG_INEFFICIENT()
+#endif
+
+#ifdef LOGGING_DISABLE_INEFFICIENT
+	#undef LOG_INEFFICIENT
 	#define LOG_INEFFICIENT()
 #endif
 

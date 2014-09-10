@@ -702,7 +702,6 @@ template<typename Coeff>
 template<typename C, EnableIf<is_integer<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	/// @todo is this pseudodivision?
 	assert(!divisor.isZero());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
 	assert(*this == divisor * result.quotient + result.remainder);
@@ -711,7 +710,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 
 	unsigned int degdiff = this->degree() - divisor.degree();
 	for (unsigned int offset = 0; offset <= degdiff; offset++) {
-		Coeff factor = carl::div(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
+		Coeff factor = carl::quotient(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
 		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
 		result.quotient.mCoefficients[degdiff-offset] += factor;
 	}
