@@ -378,7 +378,7 @@ namespace carl
      * @result The quotient of this integer and the given integer.
      */
     template<typename T>
-    Numeric<T>& div_here( Numeric<T>& _valueA, const Numeric<T>& _valueB )
+    Numeric<T>& div_assign( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         assert( isInteger( _valueA ) );
         assert( isInteger( _valueB ) );
@@ -418,7 +418,7 @@ namespace carl
     }
   
     template<typename T>
-    Numeric<T>& gcd_here( Numeric<T>& _valueA, const Numeric<T>& _valueB )
+    Numeric<T>& gcd_assign( Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         assert( isInteger( _valueA ) );
         assert( isInteger( _valueB ) );
@@ -550,7 +550,7 @@ namespace carl
     Numeric<T> gcd( const Numeric<T>& _valueA, const Numeric<T>& _valueB )
     {
         Numeric<T> result( _valueA );
-        return gcd_here( result, _valueB );
+        return gcd_assign( result, _valueB );
     }
     
     /**
