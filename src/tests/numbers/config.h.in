@@ -3,3 +3,7 @@
  */
 
 #cmakedefine USE_MPFR_FLOAT
+
+typedef testing::Types<int, cln::cl_I> IntegerTypes;
+typedef testing::Types<cln::cl_RA> RationalTypes;
+typedef testing::Types<int, cln::cl_I, cln::cl_RA> NumberTypes;

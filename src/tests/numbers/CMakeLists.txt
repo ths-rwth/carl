@@ -15,6 +15,9 @@ add_executable( runNumbersTests
     Test_DoubleFloat.cpp
     Test_MpfrFloat.cpp
     Test_typetraits.cpp
+	Test_operations_division.cpp
+	Test_operations_properties.cpp
+	Test_operations_rounding.cpp
 )
 cotire(runNumbersTests)
 target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libraries})
