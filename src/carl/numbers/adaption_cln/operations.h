@@ -469,7 +469,7 @@ inline cln::cl_I div(const cln::cl_I& a, const cln::cl_I& b) {
  * @param b Second argument.
  * @return \f$ a / b \f$.
  */
-inline cln::cl_RA& div_here(cln::cl_RA& a, const cln::cl_RA& b) {
+inline cln::cl_RA& div_assign(cln::cl_RA& a, const cln::cl_RA& b) {
     a /= b;
 	return a;
 }
@@ -482,7 +482,7 @@ inline cln::cl_RA& div_here(cln::cl_RA& a, const cln::cl_RA& b) {
  * @param b Second argument.
  * @return \f$ a / b \f$.
  */
-inline cln::cl_I& div_here(cln::cl_I& a, const cln::cl_I& b) {
+inline cln::cl_I& div_assign(cln::cl_I& a, const cln::cl_I& b) {
 	assert(cln::mod(a,b) == 0);
 	a = cln::exquo(a, b);
     return a;

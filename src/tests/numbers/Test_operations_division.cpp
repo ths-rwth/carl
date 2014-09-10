@@ -43,6 +43,7 @@ TYPED_TEST(IntegerDivision, Remainder) {
 		for (int b = -10; b < 11; b++) {
 			if (b == 0) continue;
 			EXPECT_EQ(TypeParam(a % b), carl::remainder(TypeParam(a), TypeParam(b)));
+			EXPECT_EQ(TypeParam(a % b), carl::mod(TypeParam(a), TypeParam(b)));
 		}
 	}
 }
