@@ -15,6 +15,7 @@
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicPoint.h"
+#include "VariablePool.h"
 
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {

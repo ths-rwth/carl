@@ -524,11 +524,14 @@ public:
 	MultivariatePolynomial& operator/=(const Monomial& rhs);
 	MultivariatePolynomial& operator/=(const Variable::Arg);
 	MultivariatePolynomial& operator/=(const Coeff& c);
+	
+	
 
 	
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs);
 	
 	template <typename C, typename O, typename P>
 	friend std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs);

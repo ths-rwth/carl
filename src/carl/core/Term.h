@@ -193,6 +193,7 @@ class Term
 			mCoeff = -mCoeff;
 		}
         
+		void quotient(unsigned long i);
         /**
          * 
          * @param c a non-zero coefficient.
@@ -315,7 +316,9 @@ class Term
         friend const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs);
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs);
-        
+        template<typename Coeff>
+        friend const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs);
+		
         template<typename Coeff>
         friend std::ostream& operator<<(std::ostream& lhs, const Term<Coeff>& rhs);
         

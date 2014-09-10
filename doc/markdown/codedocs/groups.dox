@@ -9,7 +9,15 @@
 @{ @}
 
 @}
+
+@defgroup constraints Constraints
+@{ @}
+
+
  
+@defgroup constraints Constraints
+@{ @}
+
 @defgroup algorithm Algorithms
 @{
 @defgroup gcd Greatest Common Divisor
@@ -50,6 +58,8 @@
 @defgroup typetraits_IntegralType IntegralType
 @defgroup typetraits_UnderlyingNumberType UnderlyingNumberType
 @}
+
+
 
 */
  // end of a group

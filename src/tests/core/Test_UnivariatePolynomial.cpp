@@ -400,7 +400,6 @@ TEST(UnivariatePolynomial, resultant2)
 
 TEST(UnivariatePolynomial, resultant3)
 {
-	Variable b = VariablePool::getInstance().getFreshVariable("b");
 	Variable a = VariablePool::getInstance().getFreshVariable("a");
 	Variable t = VariablePool::getInstance().getFreshVariable("t");
 	

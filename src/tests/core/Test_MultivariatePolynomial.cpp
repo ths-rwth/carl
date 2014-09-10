@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
+#include "carl/core/VariablePool.h"
 #include "carl/converter/GinacConverter.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
