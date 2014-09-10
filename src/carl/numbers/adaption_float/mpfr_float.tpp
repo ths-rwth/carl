@@ -201,7 +201,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void sqrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void sqrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             assert( *this >= 0);
             mpfr_sqrt(_result.mValue, mValue, mpfr_rnd_t(_rnd));
@@ -214,7 +214,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void cbrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void cbrt(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             assert( *this >= 0);
             mpfr_cbrt(_result.mValue, mValue, mpfr_rnd_t(_rnd));
@@ -227,7 +227,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void root(FLOAT_T<mpfr_t>& _result, unsigned long int _k, CARL_RND _rnd = CARL_RND::N)
+        void root(FLOAT_T<mpfr_t>& _result, unsigned long int _k, CARL_RND _rnd = CARL_RND::N) const
         {
             assert( *this >= 0);
             mpfr_root(_result.mValue, mValue, _k, mpfr_rnd_t(_rnd));
@@ -239,7 +239,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void pow(FLOAT_T<mpfr_t>& _result, unsigned long int _exp, CARL_RND _rnd = CARL_RND::N)
+        void pow(FLOAT_T<mpfr_t>& _result, unsigned long int _exp, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_pow_ui(_result.mValue, mValue, _exp, mpfr_rnd_t(_rnd));
         }
@@ -250,7 +250,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void abs(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void abs(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_abs(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -261,7 +261,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void exp(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void exp(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_exp(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -272,7 +272,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void sin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void sin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_sin(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -283,7 +283,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void cos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void cos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_cos(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -294,7 +294,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void log(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void log(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_log(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -305,7 +305,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void tan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void tan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_tan(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -316,7 +316,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void asin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void asin(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_asin(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -327,7 +327,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void acos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void acos(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_acos(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -338,7 +338,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void atan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void atan(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_atan(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -349,7 +349,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void sinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void sinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_sinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -360,7 +360,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void cosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void cosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_cosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -371,7 +371,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void tanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void tanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_tanh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -382,7 +382,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void asinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void asinh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_asinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -393,7 +393,7 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void acosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void acosh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_acosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
@@ -404,19 +404,18 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void atanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N)
+        void atanh(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
             mpfr_atanh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
         }
 
-        void floor(int& _result, CARL_RND _rnd = CARL_RND::N)
+        void floor(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
-            mpfr_t result;
-            mpfr_init(result);
-            mpfr_set_zero(result, 1);
-            mpfr_rint_floor(result, mValue, mpfr_rnd_t(_rnd));
-            _result = mpfr_integer_p(result);
-            mpfr_clear(result);
+            mpfr_init(_result.mValue);
+            mpfr_set_zero(_result.mValue, 1);
+            mpfr_rint_floor(_result.mValue, mValue, mpfr_rnd_t(_rnd));
+            //_result = mpfr_integer_p(result);
+            //mpfr_clear(result);
         }
 
         FLOAT_T& floor_assign(CARL_RND _rnd = CARL_RND::N)
@@ -425,14 +424,13 @@ class FLOAT_T<mpfr_t>
             return *this;
         }
 
-        void ceil(int& _result, CARL_RND _rnd = CARL_RND::N)
+        void ceil(FLOAT_T<mpfr_t>& _result, CARL_RND _rnd = CARL_RND::N) const
         {
-            mpfr_t result;
-            mpfr_init(result);
-            mpfr_set_zero(result, 1);
-            mpfr_rint_ceil(result, mValue, mpfr_rnd_t(_rnd));
-            _result = mpfr_integer_p(result);
-            mpfr_clear(result);
+            mpfr_init(_result.mValue);
+            mpfr_set_zero(_result.mValue, 1);
+            mpfr_rint_ceil(_result.mValue, mValue, mpfr_rnd_t(_rnd));
+            //_result = mpfr_integer_p(result);
+            //mpfr_clear(result);
         }
 
         FLOAT_T& ceil_assign(CARL_RND _rnd = CARL_RND::N)
@@ -449,6 +447,34 @@ class FLOAT_T<mpfr_t>
         {
             return mpfr_get_d(mValue, mpfr_rnd_t(_rnd));
         }
+        
+        /**
+         * Explicit typecast operator to integer.
+         * @return Integer representation of this.
+         */
+        explicit operator int() const
+        {
+            return (int)this->toDouble();
+        }
+        
+        /**
+         * Explicit typecast operator to long.
+         * @return Long representation of this.
+         */
+        explicit operator long() const
+        {
+            return (long)(this->toDouble());
+        }
+        
+        /**
+         * Explicit typecast operator to double.
+         * @return Double representation of this.
+         */
+        explicit operator double() const
+        {
+            return this->toDouble();
+        }
+        
         
         friend std::ostream & operator<< (std::ostream& ostr, const FLOAT_T<mpfr_t> & p) {
             ostr << p.toString();
@@ -578,4 +604,141 @@ class FLOAT_T<mpfr_t>
             return _prec;
         }
 };
+
+    template<>
+    inline bool isInteger(const FLOAT_T<mpfr_t>&) {
+	return false;
+    }
+    
+    /**
+     * Implements the division which assumes that there is no remainder.
+     * @param _lhs 
+     * @param _rhs
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> div(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+    {
+        FLOAT_T<mpfr_t> result;
+        result = _lhs / _rhs;
+        return result;
+    }
+    
+    /**
+     * Implements the division with remainder.
+     * @param _lhs
+     * @param _rhs
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> quotient(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+    {
+        FLOAT_T<mpfr_t> result;
+        result = _lhs / _rhs;
+        return result;
+    }
+    
+    /**
+     * Casts the FLOAT_T to an arbitrary integer type which has a constructor for
+     * a native int.
+     * @param _float
+     * @return Integer type which holds floor(_float).
+     */
+    template<typename Integer>
+    inline Integer toInt(const FLOAT_T<mpfr_t>& _float)
+    {
+        Integer result = (int)_float;
+        return result;
+    }
+    
+    /**
+     * Method which returns the absolute value of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> abs(const FLOAT_T<mpfr_t>& _in)
+    {
+        FLOAT_T<mpfr_t> result;
+        _in.abs(result);
+        return result;
+    }
+    
+    /**
+     * Method which returns the logarithm of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> log(const FLOAT_T<mpfr_t>& _in)
+    {
+        FLOAT_T<mpfr_t> result;
+        _in.log(result);
+        return result;
+    }
+    
+    /**
+     * Method which returns the square root of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> sqrt(const FLOAT_T<mpfr_t>& _in)
+    {
+        FLOAT_T<mpfr_t> result;
+        _in.sqrt(result);
+        return result;
+    }
+    
+    /**
+     * Method which returns the next smaller integer of this number or the number
+     * itself, if it is already an integer.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> floor(const FLOAT_T<mpfr_t>& _in)
+    {
+        FLOAT_T<mpfr_t> result;
+        _in.floor(result);
+        return result;
+    }
+    
+    /**
+     * Method which returns the next larger integer of the passed number or the
+     * number itself, if it is already an integer.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<>
+    static FLOAT_T<mpfr_t> ceil(const FLOAT_T<mpfr_t>& _in)
+    {
+        FLOAT_T<mpfr_t> result;
+        _in.ceil(result);
+        return result;
+    }
+    
+    /**
+     * Implicitly converts the number to a rational and returns the denominator.
+     * @param in Number.
+     * @return Cln interger which holds the result.
+     */
+    template<>
+    static cln::cl_I getDenom(const FLOAT_T<mpfr_t>& in)
+    {
+        return carl::getDenom(carl::rationalize<cln::cl_RA>(in.toDouble()));
+    }
+    
+    /**
+     * Implicitly converts the number to a rational and returns the nominator.
+     * @param in Number.
+     * @return Cln interger which holds the result.
+     */
+    template<>
+    static cln::cl_I getNum(const FLOAT_T<mpfr_t>& _in)
+    {
+        return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
+    }
+
+
 #endif

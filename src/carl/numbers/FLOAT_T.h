@@ -66,6 +66,7 @@ namespace carl
     template<typename FloatType>
     class FLOAT_T
     {
+        static_assert(std::is_integral<FloatType>::value == false, "FLOAT_T may not be used with integers.");
     private:
         FloatType mValue;
 
@@ -1442,16 +1443,64 @@ namespace carl
         }
     };
     
+    template<typename FloatType>
+    inline bool isInteger(const FLOAT_T<FloatType>&) {
+	return false;
+    }
+    
+    /**
+     * Implements the division which assumes that there is no remainder.
+     * @param _lhs 
+     * @param _rhs
+     * @return Number which holds the result.
+     */
+    template<typename FloatType>
+    static FLOAT_T<FloatType> div(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
+    {
+        // TODO
+        FLOAT_T<FloatType> result;
+        result = _lhs / _rhs;
+        return result;
+    }
+    
+    /**
+     * Implements the division with remainder.
+     * @param _lhs
+     * @param _rhs
+     * @return Number which holds the result.
+     */
+    template<typename FloatType>
+    static FLOAT_T<FloatType> quotient(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
+    {
+        // TODO
+        FLOAT_T<FloatType> result;
+        result = _lhs / _rhs;
+        return result;
+    }
+    
+    /**
+     * Casts the FLOAT_T to an arbitrary integer type which has a constructor for
+     * a native int.
+     * @param _float
+     * @return Integer type which holds floor(_float).
+     */
+    template<typename Integer, typename FloatType>
+    inline Integer toInt(const FLOAT_T<FloatType>& _float)
+    {
+        Integer result = (int)_float;
+        return result;
+    }
+    
     /**
      * Method which returns the absolute value of the passed number.
      * @param in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& in)
+    static FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.abs(result);
+        _in.abs(result);
         return result;
     }
     
@@ -1461,10 +1510,10 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& in)
+    static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.log(result);
+        _in.log(result);
         return result;
     }
     
@@ -1474,10 +1523,10 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& in)
+    static FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.sqrt(result);
+        _in.sqrt(result);
         return result;
     }
     
@@ -1488,10 +1537,10 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& in)
+    static FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.floor(result);
+        _in.floor(result);
         return result;
     }
     
@@ -1502,23 +1551,23 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& in)
+    static FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.ceil(result);
+        _in.ceil(result);
         return result;
     }
     
     template<>
-    inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double in)
+    inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double _in)
     {
-        return FLOAT_T<double>(in);
+        return FLOAT_T<double>(_in);
     }
     
     template<>
-    inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float in)
+    inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float _in)
     {
-        return FLOAT_T<float>(in);
+        return FLOAT_T<float>(_in);
     }
     
     /**
@@ -1538,9 +1587,9 @@ namespace carl
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
-    static cln::cl_I getNum(const FLOAT_T<FloatType>& in)
+    static cln::cl_I getNum(const FLOAT_T<FloatType>& _in)
     {
-        return carl::getNum(carl::rationalize<cln::cl_RA>(in.toDouble()));
+        return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
     }
     
 #ifdef USE_MPFR_FLOAT
