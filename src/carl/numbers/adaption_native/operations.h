@@ -22,6 +22,10 @@ inline bool isNumber(const double& d) {
 	return (d == d) && !std::isinf(d);
 }
 
+inline bool isInteger(const int&) {
+	return true;
+}
+
 inline std::size_t bitsize(unsigned) {
 	return sizeof(unsigned) * 8;
 }
@@ -122,6 +126,17 @@ inline unsigned mod(const unsigned& n, const unsigned& m) {
 }
 inline int mod(const int& n, const int& m) {
 	return n % m;
+}
+
+inline int remainder(const int& n, const int& m) {
+	return n % m;
+}
+inline int div(const int& n, const int& m) {
+	assert(n % m == 0);
+	return n / m;
+}
+inline int quotient(const int& n, const int& m) {
+	return n / m;
 }
 
 /**
