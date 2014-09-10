@@ -19,7 +19,12 @@ namespace carl
         Factorization<P> factorization;
         PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial ) );
         mCacheRef = mrCache.cache( pfPair );
-        factorization.insert( std::make_pair( *this, 1 ) );
+        /*
+         * The following is not very nice, but we know, that the hash won't change, once the polynomial 
+         * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
+         * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
+         */
+        pfPair->mFactorization.insert( std::make_pair( *this, 1 ) ); 
     }
     
     template<typename P>
@@ -77,33 +82,44 @@ namespace carl
     template<typename P>
     const FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-
+        // TODO: implementation
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-
+        // TODO: implementation
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-
+        // TODO: implementation
     }
 
     template<typename P>
     const FactorizedPolynomial<P> operator/( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
+        // TODO: implementation
     }
 
     template<typename P>
     const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> cdFactorization;
         const Factorization<P>& factorizationA = _fpolyA.content().factorization();
@@ -125,12 +141,16 @@ namespace carl
     template<typename P>
     const FactorizedPolynomial<P> commonMultiple( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
+        // TODO: implementation
     }
 
     template<typename P>
     const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
         Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), rehashFPolyA, rehashFPolyB ) );
@@ -144,33 +164,6 @@ namespace carl
     template <typename P>
     std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly )
     {
-        const Factorization<P>& factorization = _fpoly.content().factorization();
-        if( factorization.size() == 1 )
-        {
-            _out << factorization.begin()->first;
-            assert( factorization.begin()->second != 0 );
-            if( factorization.begin()->second > 1 )
-            {
-                _out << "^" << factorization.begin()->second;
-            }
-        }
-        else
-        {
-            for( auto polyExpPair = factorization.begin(); polyExpPair != factorization.end(); ++polyExpPair )
-            {
-                if( polyExpPair != factorization.begin() )
-                    _out << ") * (";
-                else
-                    _out << "(";
-                _out << polyExpPair->first;
-                assert( polyExpPair->second != 0 );
-                if( polyExpPair->second > 1 )
-                {
-                    _out << "^" << polyExpPair->second;
-                }
-            }
-            _out << ")";
-        }
-        return _out;
+        return (_out << _fpoly.content());
     }
 } // namespace carl

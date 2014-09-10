@@ -29,6 +29,4 @@ TEST(FactorizedPolynomial, Construction)
     
     FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB ) );
     fpCache.print();
-    
-    std::cout << fpA << std::endl;
 }

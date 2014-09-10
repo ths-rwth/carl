@@ -11,6 +11,7 @@
 #include <stack>
 #include <unordered_map>
 #include <cassert>
+#include <mutex>
 
 
 namespace carl
@@ -49,12 +50,20 @@ namespace carl
         
         struct Info
         {
-            /// Store the number of usages of the entry in the cache for which this information hold by external objects.
+            /**
+             * Store the number of usages of the entry in the cache for which this information hold by external objects.
+             */
             size_t usageCount;
-            /// Stores the reference of the entry in the cache for which this information hold.
-            Ref    refStoragePos;
-            /// Stores the activity of the entry in the cache for which this information hold. The activity states how often the entry
-            /// is involved in computations in the recent past.
+            
+            /**
+             * Stores the reference of the entry in the cache for which this information hold.
+             */
+            Ref refStoragePos;
+            
+            /**
+             * Stores the activity of the entry in the cache for which this information hold. The activity states how often the entry
+             * is involved in computations in the recent past.
+             */
             double activity;
 
             Info( double _activity ):
@@ -68,27 +77,64 @@ namespace carl
         
     private:
         // Members
-        /// The threshold for the cache's size which should not be exceeded, except more of the cache entries are still in use.
-        size_t                                    mMaxCacheSize;
-        /// The current number of entries in the cache, which are not used.
-        size_t                                    mNumOfUnusedEntries;
-        /// The percentage of the cache, which shall be removed at best, if the cache size exceeds the threshold. (NOT YET USED)
-        double                                    mCacheReductionAmount;
-        /// The threshold for the maximum activity. In case it is exceeded, all activities are rescaled.
-        double                                    mMaxActivity;
-        /// The reciprocal of the factor to multiply an activity with in order to increase it. This member can increased by a user interface.
-        double                                    mActivityIncrement;
-        /// The decay (between 0.9 and 1.0) of the given increments on activities. 
-        /// It is applied by increasing the increment by multiplying this members reciprocal to it.
-        double                                    mDecay;
-        /// The threshold limiting the maximum activity. If this threshold is exceeded, all activities are rescaled.
-        double                                    mActivityThreshold;
-        /// The factor multiplied to all activities in order to rescale (decrease) them.
-        double                                    mActivityDecrementFactor;
-        /// The container storing all cached entries. It maps the objects to store to cache information, which cover a usage counter, 
-        /// the position in mCacheRefs, being the entries reference, and the activity of this entry.
-        Container                                 mCache;
-        /// Stores at the reference of an entry in the cache an iterator to this entry. This reference can be used to access the entry outside this class.
+        
+        /**
+         * The threshold for the cache's size which should not be exceeded, except more of the cache entries are still in use.
+         */
+        size_t mMaxCacheSize;
+        
+        /**
+         * The current number of entries in the cache, which are not used.
+         */
+        size_t mNumOfUnusedEntries;
+        
+        /**
+         * The percentage of the cache, which shall be removed at best, if the cache size exceeds the threshold. (NOT YET USED)
+         */
+        double mCacheReductionAmount;
+        
+        /**
+         * The threshold for the maximum activity. In case it is exceeded, all activities are rescaled.
+         */
+        double mMaxActivity;
+        
+        /**
+         * The reciprocal of the factor to multiply an activity with in order to increase it. 
+         * This member can increased by a user interface.
+         */
+        double mActivityIncrement;
+        
+        /**
+         * The decay (between 0.9 and 1.0) of the given increments on activities. 
+         * It is applied by increasing the increment by multiplying this members reciprocal to it.
+         */
+        double mDecay;
+        
+        /**
+         * The threshold limiting the maximum activity. If this threshold is exceeded, all activities are rescaled.
+         */
+        double mActivityThreshold;
+        
+        /**
+         * The factor multiplied to all activities in order to rescale (decrease) them.
+         */
+        double mActivityDecrementFactor;
+        
+        /**
+         * A mutex for situation where any member is changed. TODO: Refine the locking-situations. 
+         */
+        std::mutex mMutex;
+        
+        /**
+         *  The container storing all cached entries. It maps the objects to store to cache information, which cover a usage counter, 
+         *  the position in mCacheRefs, being the entries reference, and the activity of this entry.
+         */
+        Container mCache;
+        
+        /**
+         * Stores at the reference of an entry in the cache an iterator to this entry. 
+         * This reference can be used to access the entry outside this class.
+         */
         std::vector<typename Container::iterator> mCacheRefs;
         /// A stack containing free references, which have been used before but freed now.
         std::stack<Ref>                           mUnusedPositionsInCacheRefs;
@@ -153,6 +199,7 @@ namespace carl
         {
             assert( _refStoragePos < mCacheRefs.size() );
             assert( mCacheRefs[_refStoragePos] != mCache.end() );
+            assert( mCacheRefs[_refStoragePos]->second.usageCount > 0 );
             return *mCacheRefs[_refStoragePos]->first;
         }
         
@@ -170,6 +217,7 @@ namespace carl
          */
         typename Container::iterator erase( typename Container::iterator _toRemove )
         {
+            std::lock_guard<std::mutex> lock( mMutex );
             assert( _toRemove->second.usageCount == 0 );
             mCacheRefs[_toRemove->second.refStoragePos] = mCache.end();
             mUnusedPositionsInCacheRefs.push( _toRemove->second.refStoragePos );

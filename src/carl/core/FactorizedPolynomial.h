@@ -32,6 +32,11 @@ namespace carl
             mrCache.rehash( mCacheRef );
         }
         
+        void strengthenActivity() const
+        {
+            mrCache.strengthenActivity( mCacheRef );
+        }
+        
     public:
            
         // Constructors.

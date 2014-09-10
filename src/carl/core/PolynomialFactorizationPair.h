@@ -8,6 +8,7 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 
 namespace carl
 {
@@ -17,6 +18,9 @@ namespace carl
     template<typename P>
     using Factorization = std::map<FactorizedPolynomial<P>, size_t>;
     
+    template <typename P>
+    std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization );
+    
     template<typename P>
     bool factorizationsEqual( const Factorization<P>& _factorizationA, const Factorization<P>& _factorizationB );
     
@@ -24,13 +28,30 @@ namespace carl
     class PolynomialFactorizationPair
     {
         
+        template<typename P1>
+        friend class FactorizedPolynomial;
+        
     private:
         // Members
-        /// The hash of this polynomial factorization pair.
-        size_t                   mHash;
-        /// A pointer to a polynomial. This pointer might be set to nullptr, if the factorization has not yet been expanded.
-        mutable P*               mpPolynomial;
-        /// A factorization (not necessarily the prime factorization) of the polynomial.
+        
+        /**
+         * The hash of this polynomial factorization pair.
+         */
+        size_t mHash;
+        
+        /**
+         * A mutex for situation where any member is changed.
+         */
+        mutable std::recursive_mutex mMutex;
+        
+        /**
+         * A pointer to a polynomial. This pointer might be set to nullptr, if the factorization has not yet been expanded.
+         */
+        mutable P* mpPolynomial;
+        
+        /**
+         * A factorization (not necessarily the prime factorization) of the polynomial.
+         */
         mutable Factorization<P> mFactorization;
         
     public:
@@ -97,7 +118,7 @@ namespace carl
          * @return The factorization of the gcd of the polynomial represented by the two given polynomial factorization pairs. 
          */
         template<typename P1>
-        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _factA, const PolynomialFactorizationPair<P1>& _factB, bool& _factARefined, bool& _factBRefined );
+        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         /**
          * Prints the given polynomial-factorization pair on the given output stream.
