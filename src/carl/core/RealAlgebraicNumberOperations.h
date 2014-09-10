@@ -1,7 +1,7 @@
-/* 
- * File:   RealAlgebraicNumberOperations.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
+/**
+ * @file:   RealAlgebraicNumberOperations.h
+ * @author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ *
  * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 

@@ -1130,10 +1130,10 @@ bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePol
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
+bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    LOG_NOTIMPLEMENTED();
-    return false;
+	LOG_INEFFICIENT();
+    return MultivariatePolynomial<C,O,P>(lhs) == rhs;
 }
 
 template<typename C, typename O, typename P>
@@ -1143,10 +1143,10 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
+bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    LOG_NOTIMPLEMENTED();
-    return false;
+	LOG_INEFFICIENT();
+    return MultivariatePolynomial<C>(lhs) == rhs;
 }
 
 template<typename C, typename O, typename P>

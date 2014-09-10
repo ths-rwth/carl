@@ -1,6 +1,6 @@
-/*
- * File:   RealAlgebraicNumberIR.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RealAlgebraicNumberIR.tpp
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once

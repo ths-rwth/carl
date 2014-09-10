@@ -1,6 +1,6 @@
-/* 
- * File:   RealAlgebraicNumber.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RealAlgebraicNumber.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
