@@ -1,5 +1,5 @@
 /**
- * @file Constraint.h
+ * @file cad/Constraint.h
  * @ingroup cad
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * 

@@ -1,5 +1,5 @@
 /** 
- * @file   Relation.h
+ * @file CompareRelation.h
  * @ingroup constraints
  * @author Sebastian Junges
  *

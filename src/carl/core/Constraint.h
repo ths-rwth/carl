@@ -1,5 +1,5 @@
 /** 
- * @file   Constraint.h
+ * @file core/Constraint.h
  * @author Sebastian Junges
  * @ingroup constraints
  * @since April 4, 2014
