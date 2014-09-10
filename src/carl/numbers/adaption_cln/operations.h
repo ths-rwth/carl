@@ -437,7 +437,7 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a) {
  * @return \f$a \% b\f$.
  */
 inline cln::cl_I mod(const cln::cl_I& a, const cln::cl_I& b) {
-	return cln::mod(a, b);
+	return cln::rem(a, b);
 }
 
 /**
@@ -509,6 +509,18 @@ inline cln::cl_I quotient(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return cln::exquo(a - cln::rem(a, b), b);
 }
+
+
+/**
+ * Calculate the remainder of the integer division.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return \f$a \% b\f$.
+ */
+inline cln::cl_I remainder(const cln::cl_I& a, const cln::cl_I& b) {
+	return cln::rem(a, b);
+}
+
 
 /**
  * Divide two integers.
