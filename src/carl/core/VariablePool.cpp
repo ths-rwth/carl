@@ -37,6 +37,18 @@ Variable VariablePool::getFreshVariable(const std::string& name, VariableType ty
 	return tmp;
 }
 
+Variable VariablePool::findVariableWithName(const std::string& name) const
+{
+    for(auto v : mFriendlyNames)
+    {
+        if(v.second == name)
+        {
+            return v.first;
+        }
+    }
+    return Variable();
+}
+
 const std::string VariablePool::getName(Variable::Arg v, bool friendly) const {
 	if (v == Variable::NO_VARIABLE) return "NO_VARIABLE";
 	if (friendly) {

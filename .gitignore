@@ -6,7 +6,7 @@ CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
 Makefile
-/src/carl/core/config.h
-/src/carl/numbers/config.h
 */config.h
+*/*/config.h
+*/*/*/config.h
 nbproject/

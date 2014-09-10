@@ -9,9 +9,7 @@
 #include <map>
 #include <algorithm>
 
-
-#include "VarExpPair.h"
-
+#include "Variable.h"
 namespace carl
 {
 
