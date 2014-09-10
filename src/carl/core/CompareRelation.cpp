@@ -4,6 +4,8 @@
  */
 #include "CompareRelation.h"
 
+#include <cassert>
+
 namespace carl
 {
 bool relationIsStrict(CompareRelation r)
