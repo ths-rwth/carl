@@ -34,7 +34,7 @@ namespace carl
 	 * @param v Variable.
 	 * @return `p.first == v`
 	 */
-	inline bool operator==(const std::pair<Variable, exponent>& p, const Variable& v) {
+	inline bool operator==(const std::pair<Variable, exponent>& p, Variable::Arg v) {
 		return p.first == v;
 	}
 
@@ -642,7 +642,7 @@ namespace carl
 			return false;
 		}
 
-		friend bool operator==(const Variable& lhs, const Monomial& rhs)
+		friend bool operator==(Variable::Arg lhs, const Monomial& rhs)
 		{
 			return rhs == lhs;
 		}
@@ -652,11 +652,11 @@ namespace carl
 			return !(lhs == rhs);
 		}
 
-		friend bool operator!=(const Monomial& lhs, const Variable& rhs)
+		friend bool operator!=(const Monomial& lhs, Variable::Arg rhs)
 		{
 			return !(lhs == rhs);
 		}
-		friend bool operator!=(const Variable& lhs, const Monomial& rhs)
+		friend bool operator!=(Variable::Arg lhs, const Monomial& rhs)
 		{
 			return !(rhs == lhs);
 		}

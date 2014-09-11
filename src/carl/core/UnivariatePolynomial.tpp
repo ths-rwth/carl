@@ -145,7 +145,7 @@ Coeff UnivariatePolynomial<Coeff>::evaluate(const Coeff& value) const
 
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
-void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& value) {
 	if (this->isZero()) return;
 	if (var == this->mainVar()) {
 		this->mCoefficients[0] = this->evaluate(value);
@@ -157,7 +157,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
-void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff& value) {
+void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& value) {
     if (this->isZero()) return;
     if (var == this->mainVar()) {
         this->mCoefficients[0] = this->evaluate(value);
@@ -180,7 +180,7 @@ void UnivariatePolynomial<Coeff>::substituteIn(const Variable& var, const Coeff&
 
 template<typename Coeff>
 template<typename C, EnableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variable& var, const Coeff& value) const {
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Arg var, const Coeff& value) const {
 	if (var == this->mainVar()) {
 		return UnivariatePolynomial<Coeff>(this->mainVar(), this->evaluate(value));
 	}
@@ -189,7 +189,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variab
 
 template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(const Variable& var, const Coeff& value) const {
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Arg var, const Coeff& value) const {
 	if (var == this->mainVar()) {
 		UnivariatePolynomial<Coeff> res(this->mainVar());
 		for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
@@ -444,7 +444,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	assert(a.mMainVar == t.mMainVar);
 	
 	LOGMSG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
-	const Variable& x = a.mMainVar;
+	Variable::Arg x = a.mMainVar;
 	UnivariatePolynomial<Coeff> c(a);
 	UnivariatePolynomial<Coeff> d(b);
 	c.normalizeCoefficients();

@@ -471,7 +471,7 @@ public:
 	std::list<const UPolynomial*> eliminateInto(
 			const UPolynomial* p,
 			EliminationSet<Coefficient>& destination,
-			const Variable& variable,
+			Variable::Arg variable,
 			const CADSettings& setting
 			);
 	
@@ -483,7 +483,7 @@ public:
 			std::list<const UPolynomial*>& otherqueue,
 			bool avoidSingle,
 			EliminationSet<Coefficient>& destination,
-			const Variable& variable,
+			Variable::Arg variable,
 			const CADSettings& setting
 			);
 	
@@ -510,7 +510,7 @@ public:
 	 */
 	std::list<const UPolynomial*> eliminateNextInto(
 			EliminationSet<Coefficient>& destination,
-			const Variable& variable,
+			Variable::Arg variable,
 			const CADSettings& setting,
 			bool synchronous = false
 			);
@@ -526,7 +526,7 @@ public:
 	 * @param to
 	 * @param variable
 	 */
-	void moveConstants(EliminationSet<Coefficient>& to, const Variable& variable);
+	void moveConstants(EliminationSet<Coefficient>& to, Variable::Arg variable);
 
 	/**
 	 * Removes all constant elements.
@@ -593,7 +593,7 @@ public:
 	 */
 	static void elimination(
 			const UPolynomial* p,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
 			);
@@ -620,7 +620,7 @@ public:
 	static void elimination(
 			const UPolynomial* p,
 			const UPolynomial* q,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle 
 			);
@@ -643,7 +643,7 @@ public:
 	 */
 	static void eliminationEq(
 			const UPolynomial* p,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
 			)
@@ -671,7 +671,7 @@ public:
 	static void eliminationEq(
 			const UPolynomial* p,
 			const UPolynomial* q,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
 			)

@@ -102,7 +102,7 @@ CAD<Number>::CAD(const CAD<Number>& cad):
 }
 
 template<typename Number>
-unsigned CAD<Number>::indexOf(const Variable& v) const {
+unsigned CAD<Number>::indexOf(Variable::Arg v) const {
 	for(unsigned int i = 0; i < this->variables.size(); ++i) {
 		if (v == this->variables[i]) return i;
 	}

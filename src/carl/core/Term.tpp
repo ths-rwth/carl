@@ -71,7 +71,7 @@ Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomi
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, const Variable& v, unsigned e)
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e)
 : mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, e)))
 {
     assert(this->isConsistent());
@@ -228,7 +228,7 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 
 template<typename Coefficient>
 template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
+void Term<Coefficient>::gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
 {
 	if(mMonomial)
 	{
