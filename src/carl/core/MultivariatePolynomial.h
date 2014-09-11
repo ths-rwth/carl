@@ -273,13 +273,13 @@ public:
 	/**
 	 * Replace the given variable by the given polynomial within this multivariate polynomial.
      */
-	void substituteIn(const Variable::Arg var, const MultivariatePolynomial& value);
+	void substituteIn(Variable::Arg var, const MultivariatePolynomial& value);
 	
 	/**
 	 * Replace the given variable by the given value.
      * @return A new polynomial without resulting from this substitution.
      */
-	MultivariatePolynomial substitute(const Variable::Arg var, const MultivariatePolynomial& value) const;
+	MultivariatePolynomial substitute(Variable::Arg var, const MultivariatePolynomial& value) const;
 	
 	/**
 	 * Replace all variables by a value given in their map.
@@ -333,7 +333,7 @@ public:
 	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
 	
 	template<bool gatherCoeff>
-	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(const Variable& v) const;
+	VariableInformation<gatherCoeff, MultivariatePolynomial> getVarInfo(Variable::Arg v) const;
 
 	template<bool gatherCoeff>
 	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
@@ -428,7 +428,7 @@ public:
 	MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator+=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator+=(const Monomial& rhs);
-	MultivariatePolynomial& operator+=(const Variable::Arg);
+	MultivariatePolynomial& operator+=(Variable::Arg);
 	MultivariatePolynomial& operator+=(const Coeff& c);
 
 
@@ -464,7 +464,7 @@ public:
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator-=(const Monomial& rhs);
-	MultivariatePolynomial& operator-=(const Variable::Arg);
+	MultivariatePolynomial& operator-=(Variable::Arg);
 	MultivariatePolynomial& operator-=(const Coeff& c);
 
 
@@ -492,7 +492,7 @@ public:
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator*=(const Monomial& rhs);
-	MultivariatePolynomial& operator*=(const Variable::Arg);
+	MultivariatePolynomial& operator*=(Variable::Arg);
 	MultivariatePolynomial& operator*=(const Coeff& c);
 
 	template<typename C, typename O, typename P>
@@ -522,7 +522,7 @@ public:
 	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator/=(const Monomial& rhs);
-	MultivariatePolynomial& operator/=(const Variable::Arg);
+	MultivariatePolynomial& operator/=(Variable::Arg);
 	MultivariatePolynomial& operator/=(const Coeff& c);
 	
 	

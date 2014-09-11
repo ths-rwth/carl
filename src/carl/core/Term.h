@@ -75,7 +75,7 @@ class Term
 		 * @param v Variable.
 		 * @param e Exponent.
 		 */
-        Term(const Coefficient& c, const Variable& v, unsigned e);
+        Term(const Coefficient& c, Variable::Arg v, unsigned e);
         
 		/**
          * Get the coefficient.
@@ -164,7 +164,7 @@ class Term
 		 * For terms with exactly one variable, get this variable.
          * @return The only variable occuring in the term.
          */
-		const Variable& getSingleVariable() const
+		Variable::Arg getSingleVariable() const
 		{
 			assert(getNrVariables() == 1);
 			return mMonomial->getSingleVariable();
@@ -226,7 +226,7 @@ class Term
 		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
 		
 		template<bool gatherCoeff, typename CoeffType>
-		void gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
+		void gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
 		
 		template<bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;

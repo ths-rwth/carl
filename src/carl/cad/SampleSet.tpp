@@ -46,14 +46,14 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 			CHECK(compareRoot(lhs, rhs));
 			break;
 		case SampleOrdering::Value:
-			return carl::Less<Number>()(lhs, rhs);
+			return std::less<RealAlgebraicNumberPtr<Number>>()(lhs, rhs);
 			break;
 		default:
 			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
 			return false;
 	}
-	return carl::Less<Number>()(lhs, rhs);
+	return std::less<RealAlgebraicNumberPtr<Number>>()(lhs, rhs);
 }
 
 template<typename Number>
@@ -158,10 +158,10 @@ bool SampleSet<Number>::isConsistent() const {
 	}
 	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
 	for (auto n: this->mSamples) {
-		if (lastSample != nullptr && !carl::Less<Number>()(lastSample, n)) {
+		if (lastSample != nullptr && !std::less<RealAlgebraicNumberPtr<Number>>()(lastSample, n)) {
 			LOGMSG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
 			LOGMSG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
-			assert(carl::Less<Number>()(lastSample, n));
+			assert(std::less<RealAlgebraicNumberPtr<Number>>()(lastSample, n));
 		}
 		lastSample = n;
 	}

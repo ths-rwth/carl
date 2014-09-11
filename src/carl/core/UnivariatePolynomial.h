@@ -359,7 +359,7 @@ public:
 	 * Retrieves the main variable of this polynomial.
 	 * @return Main variable.
 	 */
-	const Variable& mainVar() const {
+	Variable::Arg mainVar() const {
 		return mMainVar;
 	}
 
@@ -371,7 +371,7 @@ public:
 	 * @return Restructured polynomial.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(const Variable& newVar) const {
+	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(Variable::Arg newVar) const {
 		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
@@ -383,7 +383,7 @@ public:
 	 * @return Restructured polynomial.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+	UnivariatePolynomial switchVariable(Variable::Arg newVar) const {
 		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
@@ -395,7 +395,7 @@ public:
 	 * @return New polynomial.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+	UnivariatePolynomial replaceVariable(Variable::Arg newVar) const {
 		return UnivariatePolynomial<Coefficient>(newVar, this->mCoefficients);
 	}
 	/**
@@ -405,7 +405,7 @@ public:
 	 * @return New polynomial.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+	UnivariatePolynomial replaceVariable(Variable::Arg newVar) const {
 		return MultivariatePolynomial<NumberType>(*this).substitute(this->mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
 	}
 
@@ -602,14 +602,14 @@ public:
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void substituteIn(const Variable& var, const Coefficient& value);
+	void substituteIn(Variable::Arg var, const Coefficient& value);
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	void substituteIn(const Variable& var, const Coefficient& value);
+	void substituteIn(Variable::Arg var, const Coefficient& value);
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+	UnivariatePolynomial substitute(Variable::Arg var, const Coefficient& value) const;
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+	UnivariatePolynomial substitute(Variable::Arg var, const Coefficient& value) const;
 
 	/**
 	 * Calculates the sign of the polynomial at some point.

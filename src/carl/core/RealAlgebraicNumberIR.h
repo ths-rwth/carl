@@ -52,7 +52,7 @@ private:
 	//////////////////////////
 
 
-	RealAlgebraicNumberIR(const Variable& var);
+	RealAlgebraicNumberIR(Variable::Arg var);
 	
 	/**
 	 * Constructs a real algebraic number in interval and order representation (p, l, r, o) with a normalized interval w.r.t. normalizeInterval.
@@ -76,7 +76,7 @@ private:
 			const bool isRoot = true );
 
 public:
-	static std::shared_ptr<RealAlgebraicNumberIR> create(const Variable& var) {
+	static std::shared_ptr<RealAlgebraicNumberIR> create(Variable::Arg var) {
 		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(var));
 		res->pThis = res;
 		return res;

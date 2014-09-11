@@ -217,7 +217,7 @@ public:
 	 * @return index of the variable in the list of variables or the number of variables if no such index was found
 	 * @complexity linear in the number of variables
 	 */
-	unsigned indexOf(const Variable& v) const;
+	unsigned indexOf(Variable::Arg v) const;
 	
 	/**
 	 * Collects all samples which were constructed for this sample tree node.

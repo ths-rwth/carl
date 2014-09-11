@@ -16,7 +16,7 @@
 namespace carl {
 
 template<typename Number>
-RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
+RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(Variable::Arg var) :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(var),
 		interval(Interval<Number>::zeroInterval()),

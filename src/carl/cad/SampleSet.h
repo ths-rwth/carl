@@ -133,7 +133,7 @@ private:
 	};
 	
 	/// Contains all samples in the order of their value.
-	std::set<RealAlgebraicNumberPtr<Number>, carl::Less<Number>> mSamples;
+	std::set<RealAlgebraicNumberPtr<Number>, std::less<RealAlgebraicNumberPtr<Number>>> mSamples;
 
 	SampleComparator mComp;
 	std::vector<RealAlgebraicNumberPtr<Number>> mHeap;
@@ -168,7 +168,7 @@ public:
 		return mComp.ordering();
 	}
 
-	const std::set<RealAlgebraicNumberPtr<Number>, carl::Less<Number>>& samples() const {
+	const std::set<RealAlgebraicNumberPtr<Number>, std::less<RealAlgebraicNumberPtr<Number>>>& samples() const {
 		return this->mSamples;
 	}
 
