@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-namespace std {
+namespace carl {
 
 /**
  * Output a std::forward_list with arbitrary content.
