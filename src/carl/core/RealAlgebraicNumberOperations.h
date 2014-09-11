@@ -12,6 +12,12 @@
 
 namespace std {
 
+/**
+ * Specialization of `std::equal_to` for RealAlgebraicNumberPtr.
+ * @param lhs First number.
+ * @param rhs Second number.
+ * @return `lhs == rhs`.
+ */
 template<typename Number>
 struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
 	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
@@ -40,6 +46,12 @@ struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
 	}
 };
 
+/**
+ * Specialization of `std::not_equal_to` for RealAlgebraicNumberPtr.
+ * @param lhs First number.
+ * @param rhs Second number.
+ * @return `lhs != rhs`.
+ */
 template<typename Number>
 struct not_equal_to<carl::RealAlgebraicNumberPtr<Number>> {
 	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
@@ -48,6 +60,12 @@ struct not_equal_to<carl::RealAlgebraicNumberPtr<Number>> {
 	}
 };
 
+/**
+ * Specialization of `std::less` for RealAlgebraicNumberPtr.
+ * @param lhs First number.
+ * @param rhs Second number.
+ * @return `lhs < rhs`.
+ */
 template<typename Number>
 struct less<carl::RealAlgebraicNumberPtr<Number>> {
 	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
@@ -86,6 +104,12 @@ struct less<carl::RealAlgebraicNumberPtr<Number>> {
 	}
 };
 
+/**
+ * Specialization of `std::greater` for RealAlgebraicNumberPtr.
+ * @param lhs First number.
+ * @param rhs Second number.
+ * @return `lhs > rhs`.
+ */
 template<typename Number>
 struct greater<carl::RealAlgebraicNumberPtr<Number>> {
 	std::less<carl::RealAlgebraicNumberPtr<Number>> less;
