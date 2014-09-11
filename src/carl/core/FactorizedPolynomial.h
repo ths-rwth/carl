@@ -27,7 +27,7 @@ namespace carl
          * Updates the hash of the entry in the cache corresponding to this factorized 
          * polynomial, which is also its hash.
          */
-        void rehash()
+        void rehash() const
         {
             mrCache.rehash( mCacheRef );
         }

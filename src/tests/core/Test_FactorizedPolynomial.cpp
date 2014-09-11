@@ -28,5 +28,7 @@ TEST(FactorizedPolynomial, Construction)
     fpCache.print();
     
     FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB ) );
+    
+    FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB ) );
     fpCache.print();
 }

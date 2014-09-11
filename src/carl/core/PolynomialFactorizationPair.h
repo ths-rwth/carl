@@ -129,8 +129,6 @@ namespace carl
         template <typename P1>
         friend std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P1>& _pfPair);
         
-    private:
-        
         /**
          * Updates the hash.
          */

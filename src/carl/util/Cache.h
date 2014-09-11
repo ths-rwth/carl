@@ -172,7 +172,6 @@ namespace carl
          * Removes and reinserts the entry with the given reference, after its hash value is recalculated.
          * @param _refStoragePos The reference of the entry to apply the given function to.
          */
-        template<typename ArgType>
         void rehash( Ref _refStoragePos );
         
         /**

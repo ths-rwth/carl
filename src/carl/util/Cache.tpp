@@ -110,7 +110,6 @@ namespace carl
     }
     
     template<typename T>
-    template<typename ArgType>
     void Cache<T>::rehash( Ref _refStoragePos )
     {
         std::lock_guard<std::mutex> lock( mMutex );
@@ -119,7 +118,7 @@ namespace carl
         assert( cacheRef != mCache.end() );
         std::pair<T*,Info> element = *cacheRef;
         mCache.erase( cacheRef );
-        element->first->rehash();
+        element.first->rehash();
         auto ret = mCache.insert( element );
         assert( ret.second );
         mCacheRefs[_refStoragePos] = ret.first;

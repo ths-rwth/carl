@@ -171,7 +171,7 @@ namespace carl
     }
     
     template<typename P>
-    Factorization<P> gcd( PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, bool& _pfPairARefined, bool& _pfPairBRefined )
+    Factorization<P> gcd( const PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, bool& _pfPairARefined, bool& _pfPairBRefined )
     {
         if( &_pfPairA == &_pfPairB )
             return _pfPairA.mFactorization;
