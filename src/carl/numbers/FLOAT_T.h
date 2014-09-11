@@ -1455,7 +1455,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> div(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
+    inline FLOAT_T<FloatType> div(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
     {
         // TODO
         FLOAT_T<FloatType> result;
@@ -1470,7 +1470,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> quotient(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
+    inline FLOAT_T<FloatType> quotient(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
     {
         // TODO
         FLOAT_T<FloatType> result;
@@ -1497,7 +1497,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& _in)
+    inline FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
         _in.abs(result);
@@ -1510,7 +1510,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& _in)
+    inline FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
         _in.log(result);
@@ -1523,7 +1523,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& _in)
+    inline FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
         _in.sqrt(result);
@@ -1537,7 +1537,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& _in)
+    inline FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
         _in.floor(result);
@@ -1551,7 +1551,7 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& _in)
+    inline FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
         _in.ceil(result);
@@ -1576,7 +1576,7 @@ namespace carl
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
-    static cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
+    inline cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
     {
         return carl::getDenom(carl::rationalize<cln::cl_RA>(in.toDouble()));
     }
@@ -1587,7 +1587,7 @@ namespace carl
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
-    static cln::cl_I getNum(const FLOAT_T<FloatType>& _in)
+    inline cln::cl_I getNum(const FLOAT_T<FloatType>& _in)
     {
         return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
     }

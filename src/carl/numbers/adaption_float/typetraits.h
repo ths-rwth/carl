@@ -20,12 +20,18 @@ namespace carl
     template<typename C>
     struct is_rational<FLOAT_T<C>>
     {
-            static const bool value = true;
+            static const bool value = is_rational<C>().value();
     };
 }
 
 namespace std
 {
+    template<typename C>
+    struct is_floating_point<carl::FLOAT_T<C>>
+    {
+        static const bool value = true;
+    };
+    
     #ifdef USE_MPFR_FLOAT
     template<>
     struct is_floating_point<mpfr_t>
