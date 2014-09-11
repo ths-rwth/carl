@@ -29,50 +29,6 @@ TEST(NumbersCLN, squareroot)
 
 }
 
-TEST(NumbersCLN, quotient)
-{
-	EXPECT_EQ(1, quotient(cln::cl_I(1),cln::cl_I(1)));
-	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(3)));
-	EXPECT_EQ(2, quotient(cln::cl_I(2),cln::cl_I(1)));
-	EXPECT_EQ(1, quotient(cln::cl_I(2),cln::cl_I(2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(2),cln::cl_I(3)));
-	EXPECT_EQ(3, quotient(cln::cl_I(3),cln::cl_I(1)));
-	EXPECT_EQ(1, quotient(cln::cl_I(3),cln::cl_I(2)));
-	EXPECT_EQ(1, quotient(cln::cl_I(3),cln::cl_I(3)));
-	
-	EXPECT_EQ(-1, quotient(cln::cl_I(-1),cln::cl_I(1)));
-	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(3)));
-	EXPECT_EQ(-2, quotient(cln::cl_I(-2),cln::cl_I(1)));
-	EXPECT_EQ(-1, quotient(cln::cl_I(-2),cln::cl_I(2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(-2),cln::cl_I(3)));
-	EXPECT_EQ(-3, quotient(cln::cl_I(-3),cln::cl_I(1)));
-	EXPECT_EQ(-1, quotient(cln::cl_I(-3),cln::cl_I(2)));
-	EXPECT_EQ(-1, quotient(cln::cl_I(-3),cln::cl_I(3)));
-
-	EXPECT_EQ(-1, quotient(cln::cl_I(1),cln::cl_I(-1)));
-	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(-2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(1),cln::cl_I(-3)));
-	EXPECT_EQ(-2, quotient(cln::cl_I(2),cln::cl_I(-1)));
-	EXPECT_EQ(-1, quotient(cln::cl_I(2),cln::cl_I(-2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(2),cln::cl_I(-3)));
-	EXPECT_EQ(-3, quotient(cln::cl_I(3),cln::cl_I(-1)));
-	EXPECT_EQ(-1, quotient(cln::cl_I(3),cln::cl_I(-2)));
-	EXPECT_EQ(-1, quotient(cln::cl_I(3),cln::cl_I(-3)));
-
-	EXPECT_EQ(1, quotient(cln::cl_I(-1),cln::cl_I(-1)));
-	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(-2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(-1),cln::cl_I(-3)));
-	EXPECT_EQ(2, quotient(cln::cl_I(-2),cln::cl_I(-1)));
-	EXPECT_EQ(1, quotient(cln::cl_I(-2),cln::cl_I(-2)));
-	EXPECT_EQ(0, quotient(cln::cl_I(-2),cln::cl_I(-3)));
-	EXPECT_EQ(3, quotient(cln::cl_I(-3),cln::cl_I(-1)));
-	EXPECT_EQ(1, quotient(cln::cl_I(-3),cln::cl_I(-2)));
-	EXPECT_EQ(1, quotient(cln::cl_I(-3),cln::cl_I(-3)));
-
-}
-
 TEST(NumbersCLN, sqrt_fast)
 {
 	{
