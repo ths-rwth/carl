@@ -88,9 +88,9 @@ public:
 
 	bool operator==(RealAlgebraicPoint<Number>& r) {
 		if (this->dim() != r.dim()) return false;
-		carl::Inequal<Number> ne;
+		std::not_equal_to<Number> neq;
 		for (unsigned i = 0; i < this->numbers.size(); i++) {
-			if (ne(this->numbers[i], r.numbers[i])) return false;
+			if (neq(this->numbers[i], r.numbers[i])) return false;
 		}
 		return true;
 	}

@@ -10,28 +10,28 @@
 
 #pragma once
 
-namespace carl {
+namespace std {
 
 template<typename Number>
-struct Equal {
-	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) const {
+struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
+	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
 		if (lhs == rhs) return true;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
 				return lhs->value() == rhs->value();
 			} else {
-				if (!std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->refineAvoiding(lhs->value())) {
+				if (!std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs)->refineAvoiding(lhs->value())) {
 					return false;
 				}
 			}
 		} else {
-			auto lhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(lhs);
+			auto lhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhs);
 			if (rhs->isNumeric()) {
 				if (!lhsIR->refineAvoiding(rhs->value())) {
 					return false;
 				}
 			} else {
-				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
+				auto rhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs);
 				return lhsIR->equal(rhsIR);
 			}
 		}
@@ -39,41 +39,37 @@ struct Equal {
 		return true;
 	}
 };
+
 template<typename Number>
-struct Inequal {
-private:
-	Equal<Number> e;
-public:
-	bool operator()(RealAlgebraicNumberPtr<Number>& lhs, RealAlgebraicNumberPtr<Number>& rhs) const {
-		return !e(lhs, rhs);
+struct not_equal_to<carl::RealAlgebraicNumberPtr<Number>> {
+	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
+	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
+		return !eq(lhs, rhs);
 	}
 };
 
-
 template<typename Number>
-struct Less {
-private:
-	Equal<Number> e;
-public:
-	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) const {
+struct less<carl::RealAlgebraicNumberPtr<Number>> {
+	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
+	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
 		assert(lhs != nullptr);
 		assert(rhs != nullptr);
 		if (lhs == rhs) return false;
-		if (this->e(lhs,rhs)) return false;
+		if (eq(lhs,rhs)) return false;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
 				return lhs->value() < rhs->value();
 			} else {
-				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
+				auto rhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs);
 				rhsIR->refineAvoiding(lhs->value());
 				if (rhs->isNumeric()) {
 					return lhs->value() < rhs->value();
 				} else {
-					return lhs->value() <= std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs)->lower();
+					return lhs->value() <= std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs)->lower();
 				}
 			}
 		} else {
-			auto lhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(lhs);
+			auto lhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhs);
 			if (rhs->isNumeric()) {
 				lhsIR->refineAvoiding(rhs->value());
 				if (lhs->isNumeric()) {
@@ -82,35 +78,19 @@ public:
 					return lhsIR->upper() <= rhs->value();
 				}
 			} else {
-				auto rhsIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(rhs);
+				auto rhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs);
 				if (lhsIR->equal(rhsIR)) return false;
-				return std::const_pointer_cast<RealAlgebraicNumberIR<Number>>(lhsIR)->lessWhileUnequal(rhsIR);
+				return std::const_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhsIR)->lessWhileUnequal(rhsIR);
 			}
 		}
 	}
 };
 
 template<typename Number>
-struct Greater {
-private:
-	Less<Number> l;
-public:
-	bool operator()(RealAlgebraicNumberPtr<Number> lhs, RealAlgebraicNumberPtr<Number> rhs) const {
-		return l(rhs, lhs);
-	}
-};
-
-}
-
-namespace std {
-
-template<typename Number>
-struct less<carl::RealAlgebraicNumberPtr<Number>> {
-private:
-	carl::Less<Number> l;
-public:
+struct greater<carl::RealAlgebraicNumberPtr<Number>> {
+	std::less<carl::RealAlgebraicNumberPtr<Number>> less;
 	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
-		return l(lhs, rhs);
+		return less(rhs, lhs);
 	}
 };
 
