@@ -167,9 +167,7 @@ namespace carl
 			typename std::map<unsigned, CoeffType>::iterator it = mCoeffs.find(exponent);
 			if(it == mCoeffs.end())
 			{
-				// TODO no support for map emplace in GCC 4.7. 
-				// coeffs.emplace(exponent, CoeffType(t));
-				mCoeffs.insert(std::make_pair(exponent, CoeffType(t)));
+				mCoeffs.emplace(exponent, CoeffType(t));
 				
 			}
 			else

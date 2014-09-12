@@ -66,7 +66,7 @@ namespace carl
     template<typename FloatType>
     class FLOAT_T
     {
-        static_assert(std::is_integral<FloatType>::value == false, "FLOAT_T may not be used with integers.");
+        static_assert(carl::is_subset_of_integers<FloatType>::value == false, "FLOAT_T may not be used with integers.");
     private:
         FloatType mValue;
 

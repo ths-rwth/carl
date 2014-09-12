@@ -28,16 +28,16 @@ TEST(typetraits, is_finite)
 	EXPECT_FALSE(carl::is_finite<mpq_class>::value);
 }
 
-TEST(typetraits, is_floating_point)
+TEST(typetraits, is_float)
 {
-	EXPECT_FALSE(std::is_floating_point<bool>::value);
-	EXPECT_FALSE(std::is_floating_point<int>::value);
-	EXPECT_TRUE(std::is_floating_point<double>::value);
-	EXPECT_FALSE(std::is_floating_point<std::string>::value);
-	EXPECT_FALSE(std::is_floating_point<cln::cl_I>::value);
-	EXPECT_FALSE(std::is_floating_point<cln::cl_RA>::value);
-	EXPECT_FALSE(std::is_floating_point<mpz_class>::value);
-	EXPECT_FALSE(std::is_floating_point<mpq_class>::value);
+	EXPECT_FALSE(carl::is_float<bool>::value);
+	EXPECT_FALSE(carl::is_float<int>::value);
+	EXPECT_TRUE(carl::is_float<double>::value);
+	EXPECT_FALSE(carl::is_float<std::string>::value);
+	EXPECT_FALSE(carl::is_float<cln::cl_I>::value);
+	EXPECT_FALSE(carl::is_float<cln::cl_RA>::value);
+	EXPECT_FALSE(carl::is_float<mpz_class>::value);
+	EXPECT_FALSE(carl::is_float<mpq_class>::value);
 }
 
 TEST(typetraits, is_fundamental)
@@ -74,18 +74,6 @@ TEST(typetraits, is_subset_of_integers)
 	EXPECT_FALSE(carl::is_subset_of_integers<cln::cl_RA>::value);
 	EXPECT_TRUE(carl::is_subset_of_integers<mpz_class>::value);
 	EXPECT_FALSE(carl::is_subset_of_integers<mpq_class>::value);
-}
-
-TEST(typetraits, is_integral)
-{
-	EXPECT_TRUE(std::is_integral<bool>::value);
-	EXPECT_TRUE(std::is_integral<int>::value);
-	EXPECT_FALSE(std::is_integral<double>::value);
-	EXPECT_FALSE(std::is_integral<std::string>::value);
-	EXPECT_TRUE(std::is_integral<cln::cl_I>::value);
-	EXPECT_FALSE(std::is_integral<cln::cl_RA>::value);
-	EXPECT_TRUE(std::is_integral<mpz_class>::value);
-	EXPECT_FALSE(std::is_integral<mpq_class>::value);
 }
 
 TEST(typetraits, is_number)

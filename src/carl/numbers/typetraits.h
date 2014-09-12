@@ -11,20 +11,20 @@
  * We define the following type traits:
  * - `is_field`: Types that represent elements from a field.
  * - `is_finite`: Types that represent only a finite domain.
- * - `is_integer`: Types that may represent any integral number.
- * - `is_subset_of_integer`: Types that may represent some integral numbers.
+ * - `is_float`: Types that represent real numbers using a floating point representation.
+ * - `is_integer`: Types that represent the set of integral numbers.
+ * - `is_subset_of_integers`: Types that may represent some integral numbers.
  * - `is_number`: Types that represent numbers.
  * - `is_rational`: Types that may represent any rational number.
- * - `is_subset_of_rational`: Types that may represent some rational numbers.
+ * - `is_subset_of_rationals`: Types that may represent some rational numbers.
  *
- * We extend the following type traits from the STL:
- * - `std::is_floating_point`: Types that use a floating point representation.
- * - `std::is_fundamental`: Types that fundamental as of @cite C++Standard (3.9.1).
- * - `std::is_integral`: Types that can only represent integers.
+ * A more exact definition for each of these type traits can be found in their own documentation.
  *
  * Additionally, we define related types in a type traits like manner:
  * - `IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.
  * - `UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.
+ *
+ * Note that we keep away from similar type traits defined in the STL (like `std::is_integral` or `std::is_floating_point`, as they are not meant to be specialized for custom types.
  */
 
 #pragma once
@@ -92,6 +92,13 @@ template<typename T> struct is_subset_of_rationals;
  * @addtogroup typetraits_is_field
  * All types that represent a field are marked with `is_field`.
  *
+ * To be a field, the type must satisfy the common axioms for fields (and their technical interpretation):
+ * - It represents some (not empty) set of numbers.
+ * - It defines the basic operators \f$+,-,\cdot,/\f$, implemented as `operator+()`, `operator-()`, `operator*()`, `operator/()`. The result of these operators is of the same type, i.e. the type is closed under the given operations.
+ * - It's operations are *associative* and *commutative*. Multiplication and addition are *distributive*.
+ * - There are *identity elements* for addition and multiplication.
+ * - For every element of the type, there are *inverse elements* for addition and multiplication.
+ *
  * All types that are marked with `is_rational` represent a field.
  */
 /**
@@ -122,8 +129,8 @@ struct is_field<GFNumber<C>>: std::true_type {};
  * Default is true for fundamental types, false otherwise.
  * @ingroup typetraits_is_finite
  */
-template<typename C>
-struct is_finite: std::integral_constant<bool, std::is_fundamental<C>::value> {};
+template<typename T>
+struct is_finite: std::integral_constant<bool, std::is_fundamental<T>::value> {};
 
 /**
  * Type trait is_finite_domain.
@@ -134,22 +141,37 @@ template<typename C>
 struct is_finite<GFNumber<C>>: std::false_type {};
 
 /**
- * @addtogroup typetraits_is_floating_point std::is_floating_point
- * All types that use a floating point representation are marked with `std::is_floating_point`.
- */
-
-/**
- * @addtogroup typetraits_is_fundamental std::is_fundamental
- * All types that are fundamental types as of @cite C++Standard (3.9.1) are marked with `std::is_fundamental`.
+ * @addtogroup typetraits_is_float is_float
+ * All types that represent floating point numbers are marked with `is_float`.
  *
- * We regard only primitive types like `bool`, `int` or `double` fundamental, not all number types.
+ * A floating point type is used to approximate real number and in general behaves like a field.
+ * However, it does not guarantee exact computation and may be subject to rounding errors or overflows.
  */
+/**
+ * States if a type is a floating point type.
+ * 
+ * Default is true if `std::is_floating_point` is true for this type.
+ * @ingroup typetraits_is_float
+ */
+template<typename T>
+struct is_float: std::integral_constant<bool, std::is_floating_point<T>::value> {};
 
 /**
  * @addtogroup typetraits_is_integer is_integer
  * All integral types that can (in theory) represent all integers are marked with `is_integer`.
  *
- * We consider a type integral, if it represents only integers.
+ * To be an integer type, the type must satisfy the following conditions:
+ * - It represents exactly all integer numbers.
+ * - It defines the basic operators \f$+, -, \cdot\f$ by implementing `operator+()`, `operator-()` and `operator*()` which are closed.
+ * - It's operations are *associative* and *commutative*. Multiplication and addition are *distributive*.
+ * - There are *identity elements* for addition and multiplication.
+ * - For every element of the type, there is an *inverse element* for addition.
+ * - Additionally, it defines the following operations:
+ *   - `div()`: Performs an integer division, asserting that the remainder is zero.
+ *   - `quotient()`: Calculates the quotient of an integer division.
+ *   - `remainder()`: Calculates the remainder of an integer division.
+ *   - `mod()`: Calculated the modulus of an integer.
+ *   - `operator/()` shall be an alias for `quotient()`.
  */
 /**
  * States if a type is an integer type.
@@ -162,9 +184,11 @@ struct is_integer: std::false_type {};
 
 /**
  * @addtogroup typetraits_is_subset_of_integers is_subset_of_integers
- * All integral types that can represent only a subset of all integers are marked with `is_subset_of_integers`.
+ * All integral types are marked with `is_subset_of_integers`.
  *
- * We consider a type integral, if it represents only integers.
+ * They must satisfy the same conditions as for `is_integer`, except that they may represent only a subset of all integer numbers.
+ * If this is the case, `std::numeric_limits` must be specialized.
+ * If the limits are exceeded, the type may behave arbitrarily and the type is not obliged to check for this.
  */
 /**
  * States if a type represents a subset of all integers.
@@ -174,15 +198,15 @@ struct is_integer: std::false_type {};
 template<typename Type>
 struct is_subset_of_integers: std::integral_constant<bool, is_integer<Type>::value> {};
 
-
-/**
- * @addtogroup typetraits_is_integral std::is_integral
- * All types that use a integral representation are marked with `std::is_integral`.
- */
-
 /**
  * @addtogroup typetraits_is_number
  * All types that represent any kind of number are marked with `is_number`.
+ *
+ * All number types are required to implement the following methods:
+ * - `abs()`: Returns the absolute value.
+ * - `floor()`: Returns the nearest integer below.
+ * - `ceil()`: Returns the nearest integer above.
+ * - `pow()`: Returns the power.
  */
 /**
  * States if a type is a number type.
@@ -192,7 +216,7 @@ struct is_subset_of_integers: std::integral_constant<bool, is_integer<Type>::val
 template<typename T>
 struct is_number {
 	/// Default value of this trait.
-	static constexpr bool value = is_subset_of_rationals<T>::value || is_subset_of_integers<T>::value || std::is_floating_point<T>::value;
+	static constexpr bool value = is_subset_of_rationals<T>::value || is_subset_of_integers<T>::value || is_float<T>::value;
 };
 
 /**
@@ -206,7 +230,12 @@ struct is_number<GFNumber<C>>: std::true_type {};
  * @addtogroup typetraits_is_rational is_rational
  * All integral types that can (in theory) represent all rationals are marked with `is_rational`.
  *
- * This guarantees that function like carl::getDenom() or carl::getNum() work on such types.
+ * It is assumed that a fractional representation is used.
+ * A type that is rational must satisfy all requirements of `is_field`.
+ * Additionally, it must implement the following methods:
+ * - `getNum()`: Returns the numerator of a fraction.
+ * - `getDenom()`: Return the denominator of a fraction.
+ * - `rationalize()`: Converts a native floating point number to the rational type.
  */
 /**
  * States if a type is a rational type.
@@ -219,7 +248,9 @@ struct is_rational: std::false_type {};
 
 /**
  * @addtogroup typetraits_is_subset_of_rationals is_subset_of_rationals
- * All rational types that can represent only a subset of all rationals are marked with `is_subset_of_rationals`.
+ * All rational types that can represent a subset of all rationals are marked with `is_subset_of_rationals`.
+ *
+ * It is assumed that a fractional representation is used and the restriction to a subset of all rationals is due to the type of the numerator and the denominator.
  */
 /**
  * States if a type represents a subset of all rationals and the representation is similar to a rational.
@@ -231,9 +262,6 @@ struct is_subset_of_rationals {
 	/// Default value of this trait.
 	static constexpr bool value = is_rational<Type>::value;
 };
-
-
-
 
 /**
  * Type trait for the characteristic of the given field (template argument).

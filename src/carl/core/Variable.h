@@ -27,6 +27,12 @@ typedef unsigned exponent;
  */
 enum class VariableType : unsigned { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4 };
 
+/**
+ * Streaming operator for VariableType.
+ * @param os Output Stream.
+ * @param t VariableType.
+ * @return os.
+ */
 inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 	switch (t) {
 		case VariableType::VT_BOOL: return os << "Bool";
@@ -39,7 +45,9 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 }
 
 /**
- * Variables are bitvectors with  [ ordering | id | type]
+ * A Variable represents an algebraic variable that can be used throughout carl.
+ *
+ * Variables are basically bitvectors with  [ ordering | id | type]
  * 
  * Although not templated, we keep the whole class inlined for efficiency purposes.
  * Note that this way, any decent compiler removes the overhead introduced, while
@@ -51,16 +59,25 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 class Variable
 {	
 private:
+	/// Type if a variable is passed by reference.
 	typedef const Variable& ByRef;
+	/// Type if a variable is passed by value.
 	typedef Variable ByValue;
 public:
 #ifdef VARIABLE_PASS_BY_VALUE
+	/// Argument type for variables being function arguments.
 	typedef VariableByValue Arg;
 #else
+	/// Argument type for variables being function arguments.
 	typedef ByRef Arg;
 #endif
  
 private:
+	/**
+	 * The id of the variable.
+	 * In order to keep a variable object small, this is the only data member.
+	 * All other data (like names or alike) are stored in the VariablePool.
+     */
 	unsigned mVariable;
 
 public:
