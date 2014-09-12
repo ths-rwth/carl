@@ -248,25 +248,42 @@ private:
 	// Helper functions for lessWhileUnequal
 	
 	/**
-	 * Checks if *this < *n.
+	 * Checks if `this < n`.
 	 * If the method could not decide the order, it returns (false, false)
 	 * Otherwise, it returns (true, X), X being the value of *this < *n
 	 * @param n Another RealAlgebraicNumberIR
 	 * @return 
 	 */
 	std::pair<bool,bool> checkOrder(std::shared_ptr<RealAlgebraicNumberIR> n);
-	std::pair<bool,bool> intervalContained(std::shared_ptr<RealAlgebraicNumberIR> n, bool twisted);
-	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
 	
+	/**
+	 * Checks if the interval of the given number is contained in the interval of this.
+	 * Also checks, if the interval of n can be used to refinde this number.
+	 * @param n RealAlgebraicNumberIR.
+	 * @param twisted Flag whether this is larger or smaller than n.
+	 * @return 
+	 */
+	std::pair<bool,bool> intervalContained(std::shared_ptr<RealAlgebraicNumberIR> n, bool twisted);
+	
+	/**
+	 * Check if the intersection i of this and n can be used for refinements.
+	 * @param n RealAlgebraicNumberIR.
+	 * @param i Intersection.
+	 * @return If a refinement was done.
+	 */
+	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
 
 public:	
+	/**
+	 * Checks if the represented number is less than the given one, assuming that they are not equal.
+	 * While checking, both numbers are refined until the intervals of the numbers are disjoint.
+	 * @param n RealAlgebraicNumberIR.
+	 * @return `this < n`.
+	 */
 	bool lessWhileUnequal(std::shared_ptr<RealAlgebraicNumberIR> n);
-	
-	////////////////
-	// Operations //
-	////////////////
 
-	/** Normalizes the interval of an real algebraic number to not contain zero, in case the number is non-zero.
+	/**
+	 * Normalizes the interval of an real algebraic number to not contain zero, in case the number is non-zero.
 	 */
 	void normalizeInterval();
 
@@ -301,8 +318,17 @@ public:
 	 */
 	bool refineAvoiding(const Number& n);
 
+	/**
+	 * Retrieves the sign of the represented number.
+	 * @return Sign of this number.
+	 */
 	Sign sgn() const;
 
+	/**
+	 * Given a univariate polynomial, calculates the sign of the evaluation of this polynomial at the point represented by this number.
+	 * @param p UnivariatePolynomial.
+	 * @return `sgn(p(this))`.
+	 */
 	Sign sgn(const UnivariatePolynomial<Number>& p) const;
 
 };
