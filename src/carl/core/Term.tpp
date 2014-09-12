@@ -150,12 +150,6 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
 }
 
 template<typename Coefficient>
-void Term<Coefficient>::quotient(unsigned long i)
-{
-	mCoeff /= i;
-}
-
-template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 {
 	if(!mMonomial)

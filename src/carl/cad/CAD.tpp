@@ -188,6 +188,12 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 	}
 }
 
+/**
+ * Print the CAD object information to the output stream.
+ * @param os Output stream.
+ * @param cad CAD object.
+ * @return os.
+ */
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;

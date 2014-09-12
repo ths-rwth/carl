@@ -1,4 +1,4 @@
-/**
+/*
  * @file Term.h
  * @ingroup multirp
  * @author Sebastian Junges
@@ -171,9 +171,9 @@ class Term
 		}
 		
 		/**
-		 * Is square.
-         * @return 
-         */
+		 * Checks if the term is a square.
+		 * @return If this is square.
+		 */
 		bool isSquare() const
 		{
 			return (mCoeff >= Coefficient(0)) && ((!mMonomial) || mMonomial->isSquare());
@@ -187,13 +187,15 @@ class Term
             mCoeff = Coefficient(0);
             mMonomial.reset();
         }
-		
+
+		/**
+		 * Negates the term by negating the coefficient.
+		 */
 		void negate()
 		{
 			mCoeff = -mCoeff;
 		}
-        
-		void quotient(unsigned long i);
+
         /**
          * 
          * @param c a non-zero coefficient.
@@ -256,6 +258,8 @@ class Term
 
 		bool isConsistent() const;
         
+		/** @name Comparison operators */
+		// @{
         template<typename Coeff>
         friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
@@ -270,7 +274,7 @@ class Term
         friend bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
         template<typename Coeff>
         friend bool operator==(const Monomial& lhs, const Term<Coeff>& rhs);
-        
+
         template<typename Coeff>
         friend bool operator!=(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
@@ -288,6 +292,7 @@ class Term
 
 		template<typename Coeff>
 		friend bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+		// @}
         
         const Term<Coefficient> operator-() const;
         
@@ -296,6 +301,8 @@ class Term
         Term& operator *=(const Monomial& rhs);
         Term& operator *=(const Term& rhs);
         
+		/** @name Multiplication operators */
+		// @{
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
         template<typename Coeff>
@@ -316,6 +323,7 @@ class Term
         friend const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs);
         template<typename Coeff>
         friend const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs);
+		// @}
         template<typename Coeff>
         friend const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs);
 		
@@ -334,9 +342,17 @@ class Term
 
 namespace std
 {
+	/**
+	 * Specialization of `std::hash` for a Term.
+	 */
     template<typename Coefficient>
     struct hash<carl::Term<Coefficient>>
     {
+		/**
+		 * Calculates the hash of a Term.
+		 * @param term Term.
+		 * @return Hash of term.
+		 */
         size_t operator()(const carl::Term<Coefficient>& term) const 
         {
             if(term.isConstant())

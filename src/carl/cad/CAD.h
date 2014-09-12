@@ -55,10 +55,14 @@ namespace carl {
 template<typename Number>
 class CAD : public carl::cad::PolynomialOwner<Number> {
 public:
+	/// Type of univariate polynomials.
 	typedef carl::cad::UPolynomial<Number> UPolynomial;
+	/// Type of multivariate polynomials.
 	typedef carl::cad::MPolynomial<Number> MPolynomial;
 
+	/// Type of an iterator over the samples.
 	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
+	/// Type of a map of variable bounds.
 	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
 private:
 	/**
@@ -77,10 +81,13 @@ private:
 	std::vector<cad::EliminationSet<Number>> eliminationSets;
 	
 	/**
-	 * list of all polynomials for elimination
+	 * List of all polynomials for elimination.
 	 */
 	std::list<const UPolynomial*> polynomials;
 
+	/**
+	 * Maps multivariate polynomials given as input to the univariate polynomials that are used internally.
+	 */
 	std::unordered_map<const MPolynomial, const UPolynomial*, std::hash<MPolynomial>> polynomialMap;
 
 	/**
@@ -248,13 +255,7 @@ public:
 	 * @param filename
 	 */
 	void printConstraints(const std::vector<cad::Constraint<Number>>& constraints, const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
-	
-	/**
-	 * Print the CAD object information to the output stream os.
-	 * @param os
-	 * @param cad
-	 * @return os containing the information about the CAD object cad
-	 */
+
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const CAD<Num>& cad);
 
