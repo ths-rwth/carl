@@ -348,8 +348,8 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
 {
     if(nrTerms() == 0) return false;
-	else
-	{
+	else {
+		// A term may not be zero...
 		return trailingTerm()->isConstant();
 	}
 }

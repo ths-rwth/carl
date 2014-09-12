@@ -168,7 +168,11 @@ public:
 		return mComp.ordering();
 	}
 
-	const std::set<RealAlgebraicNumberPtr<Number>, std::less<RealAlgebraicNumberPtr<Number>>>& samples() const {
+	/**
+	 * Retrieves the set of samples stored.
+     * @return Sample set.
+     */
+	const std::set<RealAlgebraicNumberPtr<Number>>& samples() const {
 		return this->mSamples;
 	}
 
@@ -227,16 +231,32 @@ public:
 		return res;
 	}
 
+	/**
+	 * Returns an iterator to the first sample in this sample set.
+	 * @return Iterator to first sample.
+	 */
 	SampleSet::Iterator begin() {
 		return this->mSamples.begin();
 	}
+	/**
+	 * Returns an iterator to the first sample in this sample set.
+	 * @return Iterator to first sample.
+	 */
 	const SampleSet::Iterator begin() const {
 		return this->mSamples.begin();
 	}
 
+	/**
+	 * Returns an iterator to the element after the last sample in this sample set.
+	 * @return Iterator to end.
+	 */
 	SampleSet::Iterator end() {
 		return this->mSamples.end();
 	}
+	/**
+	 * Returns an iterator to the element after the last sample in this sample set.
+	 * @return Iterator to end.
+	 */
 	const SampleSet::Iterator end() const {
 		return this->mSamples.end();
 	}

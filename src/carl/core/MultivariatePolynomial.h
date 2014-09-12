@@ -23,7 +23,9 @@ template<typename Coeff>
 class UnivariatePolynomial;
 
 /**
- *  The general-purpose multivariate polynomial class.
+ * The general-purpose multivariate polynomial class.
+ *
+ * It is represented as a sum of terms, being a coefficient and a monomial.
  * @ingroup multirp
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
@@ -32,21 +34,32 @@ class MultivariatePolynomial : public Polynomial, public Policies
 public:
 	/// The ordering of the terms.
 	typedef Ordering OrderedBy;
+	/// Type of the terms.
 	typedef Term<Coeff> TermType;
+	/// Type of the monomials within the terms.
 	typedef Monomial MonomType;
+	/// Type of the coefficients.
 	typedef Coeff CoeffType;
+	/// Policies for this monomial.
 	typedef Policies Policy;
+	/// Number type within the coefficients.
 	typedef typename UnderlyingNumberType<Coeff>::type NumberType;
+	/// Integer type associated with the number type.
 	typedef typename IntegralType<NumberType>::type IntNumberType;
 protected:
+	/// Type our terms vector.
 	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
 	
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
-	/// A vector of all monomials
+	/// A vector of all terms.
 	TermsType mTerms;
 public:
+	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
+	
+	/// @name Constructors
+	/// @{
 	MultivariatePolynomial() = default;
 	explicit MultivariatePolynomial(int c);
 	explicit MultivariatePolynomial(unsigned c);
@@ -61,12 +74,11 @@ public:
 	template<class OtherPolicy>
 	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicy>&);
 	template<typename InputIterator>
-	MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
-	MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
-	MultivariatePolynomial(const std::initializer_list<Variable>& terms);
-	
-	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
+	explicit MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
+	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
+	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
+	/// @}
 	
     virtual ~MultivariatePolynomial() {}
     
@@ -110,15 +122,35 @@ public:
 	 */
 	exponent totalDegree() const;
 
+	/**
+	 * Checks if the polynomial is zero.
+     * @return If this is zero.
+     */
 	bool isZero() const;
+	/**
+	 * Checks if the polynomial is constant.
+     * @return If this is constant.
+     */
 	bool isConstant() const;
+	/**
+	 * Checks if the polynomial is linear.
+     * @return If this is linear.
+     */
 	bool isLinear() const;
-
+	/**
+	 * Checks if the polynomial is a number.
+	 * This is basically the same as being a constant.
+     * @return If this is a number.
+     */
 	bool isNumber() const
 	{
 		return this->isConstant();
 	}
     
+	/**
+	 * Retrieves information about the definiteness of the polynomial.
+     * @return Definiteness of this.
+     */
     Definiteness definiteness() const;
 
 	/**
@@ -135,10 +167,14 @@ public:
      */
 	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
 	/**
-	 * 
-     * @return 
+	 * Checks if the polynomial has a constant term that is not zero.
+     * @return If there is a constant term unequal to zero.
      */
 	bool hasConstantTerm() const;
+	/**
+	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
+     * @return Constant term.
+     */
 	Coeff constantPart() const;
 	
 	typename TermsType::const_iterator begin() const
@@ -346,6 +382,8 @@ public:
 	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
+	/// @name Comparison operators
+	/// @{
 	template<typename C, typename O, typename P>
 	friend bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
@@ -419,7 +457,8 @@ public:
 //	friend bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 //	template<typename C, typename O, typename P>
 //	friend bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-
+	/// @}
+	
 	/**
 	 * Notice that when adding a polynomial which consists of just one term, it will be faster to just add the pointer to this term! 
 	 * @param rhs
@@ -431,17 +470,18 @@ public:
 	MultivariatePolynomial& operator+=(Variable::Arg);
 	MultivariatePolynomial& operator+=(const Coeff& c);
 
-
+	/// @name Addition operators
+	/// @{
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	friend const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C >> &rhs);
+	template<typename C, typename O, typename P>
+	friend const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C >> &lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
@@ -458,8 +498,7 @@ public:
 	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, Variable::Arg rhs);
+	/// @}
 
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
