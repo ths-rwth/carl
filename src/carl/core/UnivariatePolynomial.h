@@ -860,12 +860,6 @@ public:
 	
 	bool less(const UnivariatePolynomial<Coefficient>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default) const;
 	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order);
-	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, const PolynomialComparisonOrder&);
-	template<typename C>
-	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, const PolynomialComparisonOrder&);
-	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 
 	UnivariatePolynomial operator-() const;
@@ -994,8 +988,16 @@ private:
 }
 
 namespace std {
+/**
+ * Specialization of `std::hash` for univariate polynomials.
+ */
 template<typename Coefficient>
 struct hash<carl::UnivariatePolynomial<Coefficient>> {
+	/**
+	 * Calculates the hash of univariate polynomial.
+     * @param p UnivariatePolynomial.
+     * @return Hash of p.
+     */
 	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
 		std::size_t result = 0;
 		std::hash<Coefficient> h;
@@ -1006,19 +1008,39 @@ struct hash<carl::UnivariatePolynomial<Coefficient>> {
 	}
 };
 
+/**
+ * Specialization of `std::less` for univariate polynomials.
+ */
 template<typename Coefficient>
 struct less<carl::UnivariatePolynomial<Coefficient>> {
 	carl::PolynomialComparisonOrder order;
 	less(carl::PolynomialComparisonOrder order = carl::PolynomialComparisonOrder::Default) : order(order) {};
-	
+	/**
+	 * Compares two univariate polynomials.
+	 * @param lhs First polynomial.
+	 * @param rhs Second polynomial
+	 * @return `lhs < rhs`.
+	 */
 	bool operator()(const carl::UnivariatePolynomial<Coefficient>& lhs, const carl::UnivariatePolynomial<Coefficient>& rhs) {
 		return lhs.less(rhs, order);
 	}
+	/**
+	 * Compares two pointers to univariate polynomials.
+	 * @param lhs First polynomial.
+	 * @param rhs Second polynomial
+	 * @return `lhs < rhs`.
+	 */
 	bool operator()(const carl::UnivariatePolynomial<Coefficient>* lhs, const carl::UnivariatePolynomial<Coefficient>* rhs) {
 		if (lhs == nullptr) return rhs != nullptr;
 		if (rhs == nullptr) return true;
 		return lhs->less(*rhs, order);
 	}
+	/**
+	 * Compares two shared pointers to univariate polynomials.
+	 * @param lhs First polynomial.
+	 * @param rhs Second polynomial
+	 * @return `lhs < rhs`.
+	 */
 	bool operator()(const carl::UnivariatePolynomialPtr<Coefficient>& lhs, const carl::UnivariatePolynomialPtr<Coefficient>& rhs) {
 		return (*this)(lhs.get(), rhs.get());
 	}
