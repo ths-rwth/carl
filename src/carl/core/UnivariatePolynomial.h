@@ -1005,6 +1005,25 @@ struct hash<carl::UnivariatePolynomial<Coefficient>> {
 		return result;
 	}
 };
+
+template<typename Coefficient>
+struct less<carl::UnivariatePolynomial<Coefficient>> {
+	carl::PolynomialComparisonOrder order;
+	less(carl::PolynomialComparisonOrder order = carl::PolynomialComparisonOrder::Default) : order(order) {};
+	
+	bool operator()(const carl::UnivariatePolynomial<Coefficient>& lhs, const carl::UnivariatePolynomial<Coefficient>& rhs) {
+		return lhs.less(rhs, order);
+	}
+	bool operator()(const carl::UnivariatePolynomial<Coefficient>* lhs, const carl::UnivariatePolynomial<Coefficient>* rhs) {
+		if (lhs == nullptr) return rhs != nullptr;
+		if (rhs == nullptr) return true;
+		return lhs->less(*rhs, order);
+	}
+	bool operator()(const carl::UnivariatePolynomialPtr<Coefficient>& lhs, const carl::UnivariatePolynomialPtr<Coefficient>& rhs) {
+		return (*this)(lhs.get(), rhs.get());
+	}
+};
+
 }
 
 #include "UnivariatePolynomial.tpp"

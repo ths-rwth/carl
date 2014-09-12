@@ -746,7 +746,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 			std::forward_list<const UPolynomial*> curParents = this->eliminationSets[l].removeByParent(parent);
 			newParents.insert_after(newParents.before_begin(), curParents.begin(), curParents.end());
 		}
-		newParents.sort(UnivariatePolynomialComparator<MPolynomial>(this->setting.order));
+		newParents.sort(std::less<UPolynomial>(this->setting.order));
 		newParents.unique();
 		std::swap(parents, newParents);
 	}

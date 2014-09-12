@@ -45,6 +45,7 @@ private:
 	 * Functor that compares two PolynomialPair objects.
      */
 	struct PolynomialPairIsLess {
+		std::less<UPolynomial> less;
 		unsigned int length(const PolynomialPair& p) {
 			if (p.first == nullptr && p.second == nullptr) return 0;
 			if (p.first == nullptr || p.second == nullptr) return 1;
@@ -118,7 +119,7 @@ public:
 	/**
 	 * The comparator used for polynomials here.
 	 */
-	typedef UnivariatePolynomialComparator<cad::MPolynomial<Coefficient>> PolynomialComparator;
+	typedef std::less<cad::UPolynomial<Coefficient>> PolynomialComparator;
 
 // private members
 private:	
@@ -187,8 +188,8 @@ public:
 	 */
 	EliminationSet(
 			PolynomialOwner<Coefficient>* owner,
-			PolynomialComparator f = UnivariatePolynomialComparator<MPolynomial<Coefficient>>(),
-			PolynomialComparator g = UnivariatePolynomialComparator<MPolynomial<Coefficient>>()
+			PolynomialComparator f = std::less<UPolynomial>(),
+			PolynomialComparator g = std::less<UPolynomial>()
 			):
 		polynomials(),
 		eliminationOrder(g),

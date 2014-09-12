@@ -2032,43 +2032,6 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 	}
 	return false;
 }
-template<typename C>
-bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
-{
-	return lhs.less(rhs, order);
-}
-template<typename C>
-bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
-{
-	if (lhs == nullptr) return rhs != nullptr;
-	if (rhs == nullptr) return true;
-	return lhs->less(*rhs, order);
-}
-template<typename C>
-bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default)
-{
-	return less(lhs.get(), rhs.get(), order);
-}
-
-template<typename C>
-class UnivariatePolynomialComparator
-{
-private:
-	PolynomialComparisonOrder order;
-public:
-	UnivariatePolynomialComparator(PolynomialComparisonOrder cmporder = PolynomialComparisonOrder::Default)
-				: order(cmporder)
-	{}
-
-	bool operator()(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs) const
-	{
-		return less(lhs, rhs, order);
-	}
-	bool operator()(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs) const
-	{
-		return less(lhs, rhs, order);
-	}
-};
 
 template<typename C>
 bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs)
