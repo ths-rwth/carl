@@ -102,7 +102,7 @@ public:
 	 * @param coeff Leading coefficient.
 	 * @param degree Degree.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree = 0);
 
 	/**
 	 * Construct polynomial with the given coefficients.
@@ -265,7 +265,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
-		if (this->isZero()) return 0;
+		if (this->isZero()) return NumberType(0);
 		return this->tcoeff();
 	}
 	/**
@@ -277,7 +277,7 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
-		if (this->isZero()) return 0;
+		if (this->isZero()) return NumberType(0);
 		return this->tcoeff().constantPart();
 	}
 
@@ -717,7 +717,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType numericUnit() const
 	{
-		return (this->lcoeff() >= 0 ? 1 : -1);
+		return (this->lcoeff() >= Coefficient(0) ? NumberType(1) : NumberType(-1));
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	NumberType numericUnit() const
@@ -746,7 +746,7 @@ public:
 	 */
 	UnivariatePolynomial pseudoPrimpart() const {
 		auto c = this->numericContent();
-		if ((c == 0) || (c == 1)) return *this;
+		if ((c == NumberType(0)) || (c == NumberType(1))) return *this;
 		return this->divideBy(this->numericContent()).quotient;
 	}
 

@@ -6,6 +6,7 @@
 #include "carl/numbers/GFNumber.h"
 #include "carl/numbers/GaloisField.h"
 #include "carl/util/debug.h"
+#include "carl/interval/Interval.h"
 
 #include <cln/cln.h>
 #include <gmpxx.h>
@@ -416,3 +417,10 @@ TEST(UnivariatePolynomial, resultant3)
 	//EXPECT_EQ(r, p.resultant(q));
 }
 
+TEST(UnivariatePolynomial, intervalCoeffs)
+{
+	Variable a = VariablePool::getInstance().getFreshVariable("a");
+	UnivariatePolynomial<carl::Interval<double>> p(a);
+	p *= p;
+	p += p;
+}

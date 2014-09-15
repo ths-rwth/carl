@@ -61,7 +61,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const C
 mMainVar(mainVar),
 mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
 {
-	if(c != 0)
+	if(c != Coeff(0))
 	{
 		mCoefficients[e] = c;
 	}
@@ -118,7 +118,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const s
 	{
 		if(expAndCoeff.first != mCoefficients.size() + 1)
 		{
-			mCoefficients.resize(expAndCoeff.first, (Coeff)0);
+			mCoefficients.resize(expAndCoeff.first, Coeff(0));
 		}
 		mCoefficients.push_back(expAndCoeff.second);
 	}
@@ -304,14 +304,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const Uni
 	// By construction, the leading coefficient will be zero.
 	if(prefactor != nullptr)
 	{
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		for(unsigned i = 0; i < mCoefficients.size() - degdiff -1; ++i)
 		{
 			result.mCoefficients.push_back(mCoefficients[i + degdiff] * *prefactor - factor * divisor.mCoefficients[i]);
 		}
 	}
 	else
 	{
-		for(unsigned i=0; i < mCoefficients.size() - degdiff -1; ++i)
+		for(unsigned i = 0; i < mCoefficients.size() - degdiff -1; ++i)
 		{
 			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
 		}
@@ -403,8 +403,8 @@ Coeff UnivariatePolynomial<Coeff>::content() const
 	Coeff gcd = *it;
 	for(++it; it != mCoefficients.rend(); ++it)
 	{
-		if(gcd == 1) break;
-		if(*it == 0) continue;
+		if(gcd == Coeff(1)) break;
+		if(*it == Coeff(0)) continue;
 		gcd = carl::gcd(gcd, *it);
 	}
 	return gcd;
@@ -632,7 +632,7 @@ template<typename Coeff>
 template<typename C, EnableIf<Not<is_number<C>>>>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(isZero() || lcoeff().isZero() || lcoeff().lcoeff() > 0)
+	if(isZero() || lcoeff().isZero() || lcoeff().lcoeff() > NumberType(0))
 	{
 		return Coeff(1);
 	}	
@@ -647,7 +647,7 @@ template<typename Coeff>
 template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
-	if(isZero() || lcoeff() > 0)
+	if(isZero() || lcoeff() > Coeff(0))
 	{
 		return Coeff(1);
 	}	
@@ -706,7 +706,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
 	assert(*this == divisor * result.quotient + result.remainder);
 
-	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
+	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
 
 	unsigned int degdiff = this->degree() - divisor.degree();
 	for (unsigned int offset = 0; offset <= degdiff; offset++) {
@@ -730,7 +730,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 	{
 		return result;
 	}
-	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(),(Coeff)0);
+	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
 	
 	do
 	{
@@ -861,7 +861,7 @@ template<typename Coeff>
 template<typename N, EnableIf<is_subset_of_rationals<N>>>
 typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::numericContent() const
 {
-	if (this->isZero()) return 0;
+	if (this->isZero()) return NumberType(0);
 	// Obtain main denominator for all coefficients.
 	IntNumberType mainDenom = this->mainDenom();
 	
@@ -977,10 +977,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
     UnivariatePolynomial<Coeff> result(poly.mainVar());
     // Exclude the factor x^i from result.
     auto cf = poly.coefficients().begin();
-    if(*cf == 0) // result is of the form a_n * x^n + ... + a_k * x^k (a>k, k>0)
+    if(*cf == Coeff(0)) // result is of the form a_n * x^n + ... + a_k * x^k (a>k, k>0)
     {
         unsigned k = 0;
-        while(*cf == 0)
+        while(*cf == Coeff(0))
         {
             assert(cf != poly.coefficients().end());
             ++cf;
@@ -1322,7 +1322,7 @@ template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 	assert(this->isRoot(root));
 	if (this->isZero()) return;
-	if (root == 0) {
+	if (root == Coeff(0)) {
 		this->eliminateZeroRoots();
 		return;
 	}
@@ -1333,7 +1333,7 @@ void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 			this->mCoefficients[i-1] += this->mCoefficients[i] * root;
 		}
 		this->mCoefficients = tmp;
-	} while ((this->evaluate(root) == 0) && (this->mCoefficients.size() > 0));
+	} while ((this->evaluate(root) == Coeff(0)) && (this->mCoefficients.size() > 0));
 }
 
 template<typename Coeff>
@@ -1709,7 +1709,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::operator -() const
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator+=(const Coefficient& rhs)
 {
-	if(rhs == 0) return *this;
+	if(rhs == Coefficient(0)) return *this;
 	if(mCoefficients.empty())
 	{
 		// Adding non-zero rhs to zero.
@@ -1718,7 +1718,7 @@ UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator+=
 	else
 	{
 		mCoefficients.front() += rhs;
-		if(mCoefficients.size() == 1 && mCoefficients.front() == (Coefficient)0) 
+		if(mCoefficients.size() == 1 && mCoefficients.front() == Coefficient(0)) 
 		{
 			// Result is zero.
 			mCoefficients.clear();
@@ -1819,7 +1819,7 @@ UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& r
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(const Coefficient& rhs)
 {
-	if(rhs == 0)
+	if(rhs == Coefficient(0))
 	{
 		mCoefficients.clear();
 		return *this;
@@ -1843,7 +1843,7 @@ template<typename I, DisableIf<std::is_same<Coeff, I>>...>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const typename IntegralType<Coeff>::type& rhs)
 {
 	static_assert(std::is_same<Coeff, I>::value, "Do not provide template parameters");
-	if(rhs == (I)0)
+	if(rhs == I(0))
 	{
 		mCoefficients.clear();
 		return *this;
@@ -1869,7 +1869,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Univa
 	newCoeffs.reserve(mCoefficients.size() + rhs.mCoefficients.size());
 	for(unsigned e = 0; e < mCoefficients.size() + rhs.degree(); ++e)
 	{
-		newCoeffs.push_back((Coeff)0);
+		newCoeffs.push_back(Coeff(0));
 		for(unsigned i = 0; i < mCoefficients.size() && i <= e; ++i)
 		{
 			if(e - i < rhs.mCoefficients.size())
@@ -1926,7 +1926,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_field<C>>>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
 {
-	assert(rhs != 0);
+	assert(rhs != Coeff(0));
 	for(Coeff& c : mCoefficients)
 	{
 		c /= rhs;
@@ -1938,7 +1938,7 @@ template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff& rhs)
 {
-	assert(rhs != 0);
+	assert(rhs != Coeff(0));
 	for(Coeff& c : mCoefficients)
 	{
 		c = quotient(c, rhs);
@@ -1953,7 +1953,7 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator/=(const Coeff
 template<typename C>
 UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {
-	assert(rhs != 0);
+	assert(rhs != C(0));
 	if(lhs.isZero()) return lhs;
 	UnivariatePolynomial<C> res(lhs);
 	return res /= rhs;
@@ -1989,7 +1989,7 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {	
 	if(lhs.isZero())
 	{
-		return rhs == 0;
+		return rhs == C(0);
 	}
 	if(lhs.isConstant() && lhs.lcoeff() == rhs) return true;
 	return false;
@@ -2068,7 +2068,7 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
-		if(c != 0)
+		if(c != C(0))
 		{
 			if (c != 1) os << "(" << c << ")*";
 			os << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
