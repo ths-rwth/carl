@@ -47,7 +47,7 @@ CLANG_WARNING_RESET
 #include "../util/SFINAE.h"
 
 // Todo: Check if here is the appropriate place to be for the FLOAT_T include
-#include "../numbers/FLOAT_T.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {
@@ -1339,6 +1339,9 @@ namespace carl
             return this->lower() <= this->upper();
         }
     };
+
+	template<typename T>
+	struct is_number<Interval<T>> : std::true_type {};
 
     /*
      * Overloaded arithmetics operators
