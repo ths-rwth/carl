@@ -978,7 +978,7 @@ private:
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{
-		while(!isZero() && lcoeff() == 0)
+		while(!isZero() && lcoeff() == Coefficient(0))
 		{
 			mCoefficients.pop_back();
 		}
