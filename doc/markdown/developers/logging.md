@@ -1,4 +1,5 @@
-# Logging {#logging}
+Logging {#logging}
+==================
 
 ## Logging frontend
 

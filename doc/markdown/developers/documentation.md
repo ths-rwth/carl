@@ -3,8 +3,7 @@ Documentation {#documentation}
 
 On this page, we refer to some internal documentation rules.
 We use doxygen to generate our documentation and code reference.
-
-## Code reference 
+The most important conventions for documentation in CArL are collected here.
 
 ### Modules
 In order to structure the reference, we use the concept of
@@ -56,23 +55,23 @@ Descriptions may be omitted when the file contains a single class, either implem
 - Class headers
 @code
 /*/** */*
-* @ingroup <groupid>
-* [ Description ]
-* @see <reference>
-* @see <OtherClass>
-*/
+ * @ingroup <groupid>
+ * [ Description ]
+ * @see <reference>
+ * @see <OtherClass>
+ */
 @endcode
 
 - Method headers
 @code
 /*/** */*
-* [ Usage Description ]
-* @param <p1> [ Short description for first parameter ] 
-* @param <p2> [ Short description for second parameter ]
-* @return [ Short description of return value ]
-* @see <reference>
-* @see <otherMethod>
-*/
+ * [ Usage Description ]
+ * @param <p1> [ Short description for first parameter ] 
+ * @param <p2> [ Short description for second parameter ]
+ * @return [ Short description of return value ]
+ * @see <reference>
+ * @see <otherMethod>
+ */
 @endcode
 
 These method headers are written directly above the method declaration. 
@@ -80,7 +79,7 @@ Comments about the implementation are written above the or inside the implementa
 
 The `see` command is used likewise as for classes.
 
-## Writing out-of-source documentation
+### Writing out-of-source documentation
 
 Documentation not directly related to the source code is written in Markdown format, and is located in
 '/doc/markdown/'.
