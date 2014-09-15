@@ -179,6 +179,68 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lockB( _pfPairB.mMutex );
         Factorization<P> result;
         // TODO: implementation
+        Factorization<P> factorizationA = _pfPairA.getFactorization();
+        Factorization<P> factorizationB = _pfPairB.getFactorization();
+        auto factorA = factorizationA.begin();
+        auto factorB = factorizationB.begin();
+
+        while( factorA != factorizationA.end() && factorB != factorizationB.end() )
+        {
+            if( factorA->first == factorB->first )
+            {
+                //Common factor found
+                size_t exponent = factorA->second < factorB->second ? factorA->second : factorB->second;
+                result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, exponent ) );
+            }
+            else
+            {
+                //TODO irreducible?
+                //Compute GCD of factors
+                P first = *factorA->first.content().mpPolynomial;
+                P second = *factorB->first.content().mpPolynomial;
+                P gcdPoly( gcd( first, second ) );
+                std::cout << "GCD of " << first << " and " << second << ": " << gcdPoly << std::endl;
+                Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
+                FactorizedPolynomial<P> gcdResult( gcdPoly, cache );
+                if ( !gcdResult.isOne() )
+                {
+                    //New common factor
+                    P remainA, remainB;
+                    bool correct = first.divideBy( gcdPoly, remainA );
+                    assert( correct );
+                    correct = second.divideBy( gcdPoly, remainB );
+                    assert( correct );
+                    std::cout << "Remainder A: " << remainA << std::endl;
+                    std::cout << "Remainder B: " << remainB << std::endl;
+                    size_t exponent = factorA->second < factorB->second ? factorA->second : factorB->second;
+                    result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult,  exponent ) );
+
+                    //Set new factorizations
+                    if (remainA != 1)
+                    {
+                        Factorization<P> factorsA = factorA->first.content().mFactorization;
+                        assert( factorsA.size() == 1 );
+                        _pfPairARefined = true;
+                        factorsA.clear();
+                        factorsA.insert ( factorsA.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, 1 ) );
+                        factorsA.insert ( factorsA.end(), std::pair<FactorizedPolynomial<P>, size_t>( FactorizedPolynomial<P>( remainA, cache ), 1 ) );
+                        std::cout << factorA->first << std::endl;
+                    }
+                    if (remainB != 1)
+                    {
+                        Factorization<P> factorsB = factorB->first.content().mFactorization;
+                        assert( factorsB.size() == 1 );
+                        _pfPairBRefined = true;
+                        factorsB.clear();
+                        factorsB.insert ( factorsB.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, 1));
+                        factorsB.insert ( factorsB.end(), std::pair<FactorizedPolynomial<P>, size_t>( FactorizedPolynomial<P>( remainB, cache ), 1));
+                        std::cout << factorB->first << std::endl;
+                    }
+                }
+            }
+            factorA++;
+        }
+        std::cout << "Ended" << std::endl;
         return result;
     }
     

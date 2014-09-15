@@ -16,6 +16,9 @@ namespace carl
     template<typename P>
     class FactorizedPolynomial
     {
+        template<typename P1>
+        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, bool& _pfPairARefined, bool& _pfPairBRefined );
+
     private:
         // Members
         /// The reference of the entry in the cache corresponding to this factorized polynomial.
@@ -94,6 +97,15 @@ namespace carl
         Factorization<P>& rFactorization() const
         {
             return content().getFactorization();
+        }
+
+        /**
+         * @return true, if the factorized polynomial is one.
+         */
+        bool isOne() const
+        {
+            FactorizedPolynomial<P> one(P(1), mrCache);
+            return *this == one;
         }
 
         /**
