@@ -185,15 +185,16 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second )
+        //TODO flatten factorization first?
+        if( _pfPair.mFactorization.size() == 1 && _pfPair.mFactorization.begin()->second )
         {
-            assert( _pfPair.factorization().begin()->second == 1 );
+            assert( _pfPair.mFactorization.begin()->second == 1 );
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;
         }
         else
         {   
-            _out << _pfPair.factorization();
+            _out << _pfPair.mFactorization;
         }
         return _out;
     }

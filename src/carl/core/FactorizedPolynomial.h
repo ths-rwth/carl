@@ -87,6 +87,15 @@ namespace carl
         {
             return mrCache.get( mCacheRef ).getHash();
         }
+        
+        /**
+         * @return The factorization of this polynomial factorization pair.
+         */
+        Factorization<P>& rFactorization() const
+        {
+            //TODO flatten factorization first
+            return content().mFactorization;
+        }
 
         /**
          * @param _fpolyA The first summand.

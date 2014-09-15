@@ -122,8 +122,8 @@ namespace carl
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> cdFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.content().factorization();
-        const Factorization<P>& factorizationB = _fpolyB.content().factorization();
+        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
+        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )

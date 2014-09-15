@@ -27,10 +27,11 @@ namespace carl
     template<typename P>
     class PolynomialFactorizationPair
     {
-        
-        template<typename P1>
-        friend class FactorizedPolynomial;
-        
+        friend Factorization<P>& FactorizedPolynomial<P>::rFactorization() const;
+        //TODO friend needed?
+        friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
+    
+
     private:
         // Members
         
@@ -59,14 +60,6 @@ namespace carl
         PolynomialFactorizationPair(); // no implementation
         PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
         PolynomialFactorizationPair( const PolynomialFactorizationPair& ); // no implementation
-        
-        /**
-         * @return The factorization of this polynomial factorization pair.
-         */
-        const Factorization<P>& factorization() const
-        {
-            return mFactorization;
-        }
         
         /**
          * @return The hash of this polynomial factorization pair.
