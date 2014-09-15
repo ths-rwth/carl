@@ -55,6 +55,15 @@ namespace carl
          */
         mutable Factorization<P> mFactorization;
         
+        /**
+         * @return The factorization of this polynomial factorization pair
+         */
+        Factorization<P>& getFactorization() const
+        {
+            //TODO flatten factorization first
+            return mFactorization;
+        }
+        
     public:
         // Constructor.
         PolynomialFactorizationPair(); // no implementation

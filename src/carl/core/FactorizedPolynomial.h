@@ -89,12 +89,11 @@ namespace carl
         }
         
         /**
-         * @return The factorization of this polynomial factorization pair.
+         * @return The factorization of this polynomial.
          */
         Factorization<P>& rFactorization() const
         {
-            //TODO flatten factorization first
-            return content().mFactorization;
+            return content().getFactorization();
         }
 
         /**
