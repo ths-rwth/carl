@@ -1032,7 +1032,7 @@ struct less<carl::UnivariatePolynomial<Coefficient>> {
 	 * @param rhs Second polynomial
 	 * @return `lhs < rhs`.
 	 */
-	bool operator()(const carl::UnivariatePolynomial<Coefficient>& lhs, const carl::UnivariatePolynomial<Coefficient>& rhs) {
+	bool operator()(const carl::UnivariatePolynomial<Coefficient>& lhs, const carl::UnivariatePolynomial<Coefficient>& rhs) const {
 		return lhs.less(rhs, order);
 	}
 	/**
@@ -1041,7 +1041,7 @@ struct less<carl::UnivariatePolynomial<Coefficient>> {
 	 * @param rhs Second polynomial
 	 * @return `lhs < rhs`.
 	 */
-	bool operator()(const carl::UnivariatePolynomial<Coefficient>* lhs, const carl::UnivariatePolynomial<Coefficient>* rhs) {
+	bool operator()(const carl::UnivariatePolynomial<Coefficient>* lhs, const carl::UnivariatePolynomial<Coefficient>* rhs) const {
 		if (lhs == nullptr) return rhs != nullptr;
 		if (rhs == nullptr) return true;
 		return lhs->less(*rhs, order);
@@ -1052,7 +1052,7 @@ struct less<carl::UnivariatePolynomial<Coefficient>> {
 	 * @param rhs Second polynomial
 	 * @return `lhs < rhs`.
 	 */
-	bool operator()(const carl::UnivariatePolynomialPtr<Coefficient>& lhs, const carl::UnivariatePolynomialPtr<Coefficient>& rhs) {
+	bool operator()(const carl::UnivariatePolynomialPtr<Coefficient>& lhs, const carl::UnivariatePolynomialPtr<Coefficient>& rhs) const {
 		return (*this)(lhs.get(), rhs.get());
 	}
 };
