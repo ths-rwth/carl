@@ -48,15 +48,26 @@ enum class SubresultantStrategy : unsigned {
 };
 	
 /**
+ * This class represents a univariate polynomial with coefficients of an arbitrary type.
+ *
+ * A univariate polynomial is defined by a variable (the _main variable_) and the coefficients.
+ * The coefficients may be of any type. The intention is to use a numbers or polynomials as coefficients.
+ * If polynomials are used as coefficients, this can be seen as a multivariate polynomial with a distinguished main variable.
+ *
+ * Most methods are specifically adapted for polynomial coefficients, if necessary.
  * @ingroup unirp
  */
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
-	
+	/**
+	 * Declare all instantiations of univariate polynomials as friends.
+	 */
 	template<class T> friend class UnivariatePolynomial; 
 private:
+	/// The main variable.
 	Variable mMainVar;
+	/// The coefficients.
 	std::vector<Coefficient> mCoefficients;
 
 public:
