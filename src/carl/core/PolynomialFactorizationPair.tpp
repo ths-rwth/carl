@@ -191,27 +191,29 @@ namespace carl
                 //Common factor found
                 size_t exponent = factorA->second < factorB->second ? factorA->second : factorB->second;
                 result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, exponent ) );
+                factorA++;
+                factorB++;
             }
             else
             {
                 //TODO irreducible?
                 //Compute GCD of factors
-                P first = *factorA->first.content().mpPolynomial;
-                P second = *factorB->first.content().mpPolynomial;
-                P gcdPoly( gcd( first, second ) );
-                std::cout << "GCD of " << first << " and " << second << ": " << gcdPoly << std::endl;
+                P polA = *factorA->first.content().mpPolynomial;
+                P polB = *factorB->first.content().mpPolynomial;
+                P polGCD( gcd( polA, polB ) );
+                std::cout << "GCD of " << polA << " and " << polB << ": " << polGCD << std::endl;
                 Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
-                FactorizedPolynomial<P> gcdResult( gcdPoly, cache );
+                FactorizedPolynomial<P> gcdResult( polGCD, cache );
                 if ( !gcdResult.isOne() )
                 {
                     //New common factor
+                    //Compute remainders
                     P remainA, remainB;
-                    bool correct = first.divideBy( gcdPoly, remainA );
+                    bool correct = polA.divideBy( polGCD, remainA );
                     assert( correct );
-                    correct = second.divideBy( gcdPoly, remainB );
+                    correct = polB.divideBy( polGCD, remainB );
                     assert( correct );
-                    std::cout << "Remainder A: " << remainA << std::endl;
-                    std::cout << "Remainder B: " << remainB << std::endl;
+                    std::cout << "Remainders: " << remainA << " and " << remainB << std::endl;
                     size_t exponent = factorA->second < factorB->second ? factorA->second : factorB->second;
                     result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult,  exponent ) );
 
@@ -224,7 +226,7 @@ namespace carl
                         factorsA.clear();
                         factorsA.insert ( factorsA.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, 1 ) );
                         factorsA.insert ( factorsA.end(), std::pair<FactorizedPolynomial<P>, size_t>( FactorizedPolynomial<P>( remainA, cache ), 1 ) );
-                        std::cout << factorA->first << std::endl;
+                        std::cout << "New factorization: " << factorA->first << std::endl;
                     }
                     if (remainB != 1)
                     {
@@ -234,13 +236,16 @@ namespace carl
                         factorsB.clear();
                         factorsB.insert ( factorsB.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, 1));
                         factorsB.insert ( factorsB.end(), std::pair<FactorizedPolynomial<P>, size_t>( FactorizedPolynomial<P>( remainB, cache ), 1));
-                        std::cout << factorB->first << std::endl;
+                        std::cout << "New factorization: " << factorB->first << std::endl;
                     }
                 }
+                if (factorA->first < factorB->first)
+                    factorA++;
+                else
+                    factorB++;
             }
-            factorA++;
         }
-        std::cout << "Ended" << std::endl;
+        std::cout << "General GCD of " << _pfPairA << " and " << _pfPairB << ": " << result << std::endl;
         return result;
     }
     
