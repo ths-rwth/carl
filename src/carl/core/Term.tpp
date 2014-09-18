@@ -58,7 +58,7 @@ template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const Monomial& m)
 : mCoeff(c)
 {
-    if (c != 0) mMonomial = std::make_shared<const Monomial>(m);
+    if (c != Coefficient(0)) mMonomial = std::make_shared<const Monomial>(m);
 	assert(this->isConsistent());
 }
 
@@ -66,7 +66,7 @@ template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m)
 : mCoeff(c)
 {
-    if(c != 0) mMonomial = m;
+    if(c != Coefficient(0)) mMonomial = m;
 	assert(this->isConsistent());
 }
 
@@ -80,7 +80,7 @@ Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e)
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Coefficient& c) const
 {
-    assert(c != 0);
+    assert(c != Coefficient(0));
     return new Term(mCoeff / c, mMonomial);
 }
 
