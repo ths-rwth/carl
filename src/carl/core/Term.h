@@ -110,7 +110,7 @@ class Term
          */
 		bool isZero() const
 		{
-			return mCoeff == 0;
+			return mCoeff == Coefficient(0);
 		}
         /**
          * Checks whether the monomial is a constant.
