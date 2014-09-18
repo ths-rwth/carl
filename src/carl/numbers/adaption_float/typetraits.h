@@ -18,25 +18,16 @@ namespace carl
     };
 
     template<typename C>
-    struct is_rational<FLOAT_T<C>>
-    {
-            static const bool value = is_rational<C>().value();
-    };
-}
-
-namespace std
-{
+    struct is_rational<FLOAT_T<C>>: std::integral_constant<bool, is_rational<C>::value>
+    {};
+    
     template<typename C>
-    struct is_floating_point<carl::FLOAT_T<C>>
-    {
-        static const bool value = true;
-    };
+    struct is_float<carl::FLOAT_T<C>> : std::true_type
+    {};
     
     #ifdef USE_MPFR_FLOAT
     template<>
-    struct is_floating_point<mpfr_t>
-    {
-        static const bool value = true;
-    };
+    struct is_float<mpfr_t> : std::true_type
+    {};
     #endif
 }
