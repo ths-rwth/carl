@@ -1558,9 +1558,7 @@ namespace carl
     template<typename Number>
     inline Interval<Number> abs(const Interval<Number>& _in)
     {
-        Interval<Number> result;
-        _in.abs(result);
-        return result;
+        return _in.abs();
     }
 }
 
