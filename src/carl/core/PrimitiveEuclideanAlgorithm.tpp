@@ -20,23 +20,15 @@ namespace carl
 		assert(!b.isZero());
 		assert(a.isNormal());
 		assert(b.isNormal());
-		std::cout << "a = " << a << std::endl;
-		std::cout << "b = " << b << std::endl;
 		UnivariatePolynomial<Coeff> c = a.primitivePart();
 		UnivariatePolynomial<Coeff> d = b.primitivePart();
 		
-		std::cout << "c = " << c << std::endl;
-		std::cout << "d = " << d << std::endl;
 		/// @todo Using pointers may speed up the code here.
 		while(!d.isZero())
 		{
 			UnivariatePolynomial<Coeff> r = c.prem(d);
 			c = d;
-			std::cout << "r = " << r << std::endl;
 			d = r.normalized().primitivePart();
-			std::cout << "c = " << c << std::endl;
-			std::cout << "d = " << d << std::endl;
-		
 		}
 		Coeff gamma = gcd(a.content(), b.content());
 		return gamma * c;
