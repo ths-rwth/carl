@@ -14,15 +14,9 @@ namespace carl
     template <typename P>
     std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization )
     {
-        assert( _factorization.size() != 1 || _factorization.begin()->second > 1 );
         if( _factorization.empty() )
         {
             _out << "1";
-        }
-        else if( _factorization.size() == 1 )
-        {
-            _out << _factorization.begin()->first;
-            _out << "^" << _factorization.begin()->second;
         }
         else
         {
@@ -200,7 +194,7 @@ namespace carl
                 //Compute GCD of factors
                 P polA = *factorA->first.content().mpPolynomial;
                 P polB = *factorB->first.content().mpPolynomial;
-                P polGCD( gcd( polA, polB ) );
+                P polGCD( carl::gcd( polA, polB ) );
                 std::cout << "GCD of " << polA << " and " << polB << ": " << polGCD << std::endl;
                 Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
                 FactorizedPolynomial<P> gcdResult( polGCD, cache );
@@ -220,6 +214,7 @@ namespace carl
                     //Set new factorizations
                     if (remainA != 1)
                     {
+                        //TODO encapsulate + rehash
                         Factorization<P> factorsA = factorA->first.content().mFactorization;
                         assert( factorsA.size() == 1 );
                         _pfPairARefined = true;
