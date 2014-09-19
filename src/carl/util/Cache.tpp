@@ -127,7 +127,7 @@ namespace carl
     template<typename T>
     void Cache<T>::clean()
     {
-        if( mNumOfUnusedEntries < (mCache.size()*mCacheReductionAmount) )
+        if( mNumOfUnusedEntries < ((double) mCache.size() * mCacheReductionAmount) )
         {
             if( mNumOfUnusedEntries > 0 )
             {
@@ -155,7 +155,7 @@ namespace carl
                     limit += iter->second.activity;
                 }
             }
-            limit = limit / noUsageEntries.size();
+            limit = limit / (double) noUsageEntries.size();
             // Remove all entries in the cache with no usage, which have an activity below the calculated median.
             for( auto iterIter = noUsageEntries.begin(); iterIter != noUsageEntries.end(); ++iterIter )
             {
