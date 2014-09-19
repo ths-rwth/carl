@@ -24,7 +24,7 @@
  * - `IntegralType`: Integral type, that the given type is based on. For fractions, this would be the type of the numerator and denominator.
  * - `UnderlyingNumberType`: Number type that is used within a more complex type. For polynomials, this would be the number type of the coefficients.
  *
- * Note that we keep away from similar type traits defined in the STL (like `std::is_integral` or `std::is_floating_point`, as they are not meant to be specialized for custom types.
+ * Note that we keep away from similar type traits defined in the standard @cite C++Standard (20.9) (like `std::is_integral` or `std::is_floating_point`, as they are not meant to be specialized for custom types.
  */
 
 #pragma once
