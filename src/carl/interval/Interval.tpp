@@ -502,12 +502,12 @@ void Interval<Number>::inverse_assign()
             if(this->contains(Number(0)))
             {
                 Number max = mContent.upper() > mContent.lower() ? mContent.upper() : mContent.lower();
-                BoundType bt = mContent.upper() > mContent.lower() ? mContent.upperBoundType() : mContent.lowerBoundType();
+                BoundType bt = mContent.upper() > mContent.lower() ? mUpperBoundType : mLowerBoundType;
                 return Interval<Number>( Number(0), BoundType::WEAK, max, bt );
             }
             else if( mContent.upper() < Number(0)) // interval is fully negative
             {
-                return Interval<Number>(-mContent.lower(), mContent.lowerBoundType(), -mContent.upper(), mContent.upperBoundType());
+                return Interval<Number>(-mContent.lower(), mLowerBoundType, -mContent.upper(), mUpperBoundType);
             }
             // otherwise inteval is already fully positive
             return *this;

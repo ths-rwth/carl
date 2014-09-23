@@ -1555,11 +1555,104 @@ namespace carl
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     
+        template<typename Number>
+    inline bool isInteger(const Interval<Number>&) {
+	return false;
+    }
+    
+    /**
+     * Implements the division which assumes that there is no remainder.
+     * @param _lhs 
+     * @param _rhs
+     * @return Interval which holds the result.
+     */
+    template<typename Number>
+    inline Interval<Number> div(const Interval<Number>& _lhs, const Interval<Number>& _rhs)
+    {
+        return _lhs / _rhs;
+    }
+    
+    /**
+     * Implements the division with remainder.
+     * @param _lhs
+     * @param _rhs
+     * @return Interval which holds the result.
+     */
+    template<typename Number>
+    inline Interval<Number> quotient(const Interval<Number>& _lhs, const Interval<Number>& _rhs)
+    {
+        return _lhs / _rhs;
+    }
+    
+    /**
+     * Casts the Interval to an arbitrary integer type which has a constructor for
+     * a native int.
+     * @param _floatinterval
+     * @return Integer type which holds floor(_float).
+     */
+    template<typename Integer, typename Number>
+    inline Integer toInt(const Interval<Number>& _floatInterval)
+    {
+        return Interval<Integer>(_floatInterval.lower(), _floatInterval.lowerBoundType(), _floatInterval.upper(), _floatInterval.upperBoundType());
+    }
+    
+    /**
+     * Method which returns the absolute value of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
     template<typename Number>
     inline Interval<Number> abs(const Interval<Number>& _in)
     {
         return _in.abs();
     }
+    
+    /**
+     * Method which returns the logarithm of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<typename Number>
+    inline Interval<Number> log(const Interval<Number>& _in)
+    {
+        return _in.log();
+    }
+    
+    /**
+     * Method which returns the square root of the passed number.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<typename Number>
+    inline Interval<Number> sqrt(const Interval<Number>& _in)
+    {
+        return _in.sqrt();
+    }
+    
+    /**
+     * Method which returns the next smaller integer of this number or the number
+     * itself, if it is already an integer.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<typename Number>
+    inline Interval<Number> floor(const Interval<Number>& _in)
+    {
+        return Interval<Number>(floor(_in.lower()), _in.lowerBoundType(), floor(_in.upper()), _in.upperBoundType());
+    }
+    
+    /**
+     * Method which returns the next larger integer of the passed number or the
+     * number itself, if it is already an integer.
+     * @param in Number.
+     * @return Number which holds the result.
+     */
+    template<typename Number>
+    inline Interval<Number> ceil(const Interval<Number>& _in)
+    {
+        return Interval<Number>(ceil(_in.lower()), _in.lowerBoundType(), ceil(_in.upper()), _in.upperBoundType());
+    }
+    
 }
 
 #include "Interval.tpp"
