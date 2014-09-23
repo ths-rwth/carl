@@ -34,6 +34,28 @@ struct equal_to<T*> {
 	}
 };
 
+/**
+ * Specialization of std::equal_to for shared pointers.
+ *
+ * We consider two shared pointers equal, if they point to the same memory location or the objects they point to are equal.
+ * Note that the memory location may also be zero.
+ */
+template<typename T>
+struct equal_to<std::shared_ptr<T>> {
+	/**
+	 * Checks if two shared pointers are equal.
+	 * @param lhs First shared pointer.
+	 * @param rhs Second shared pointer.
+	 * @return If lhs and rhs are equal.
+	 */
+	bool operator()(const std::shared_ptr<T> lhs, const std::shared_ptr<T> rhs) const {
+		if (lhs == nullptr && rhs == nullptr) return true;
+		if (lhs == nullptr || rhs == nullptr) return false;
+		if (lhs == rhs) return true;
+		return std::equal_to<T>()(*lhs, *rhs);
+	}
+};
+
 }
 
 namespace carl {

@@ -12,8 +12,7 @@
 #include "config.h"
 
 
-namespace carl
-{
+namespace carl {
 
 /// Type of an exponent.
 typedef unsigned exponent;	
@@ -151,28 +150,22 @@ public:
 	 * @param rhs Second variable.
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 	 */
-	friend bool operator==(Variable::Arg lhs, Variable::Arg rhs)
-	{
+	friend bool operator==(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent == rhs.mContent;
 	}
-	friend bool operator!=(Variable::Arg lhs, Variable::Arg rhs)
-	{
+	friend bool operator!=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent != rhs.mContent;
 	}
-	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs)
-	{
+	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent > rhs.mContent;
 	}
-	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs)
-	{
+	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent < rhs.mContent;
 	}
-	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs)
-	{
+	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent <= rhs.mContent;
 	}
-	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs)
-	{
+	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent >= rhs.mContent;
 	}
 	/// @}
@@ -195,21 +188,18 @@ public:
 
 } // namespace carl
 
-namespace std
-{
+namespace std {
 	/**
 	 * Specialization of `std::hash` for Variable.
 	 */
 	template<>
-	struct hash<carl::Variable>
-	{
+	struct hash<carl::Variable> {
 		/**
 		 * Calculates the hash of a Variable.
 		 * @param variable Variable.
 		 * @return Hash of variable
 		 */
-		size_t operator()(const carl::Variable& variable) const 
-		{
+		size_t operator()(const carl::Variable& variable) const {
 			return variable.getId();
 		}
 	};
