@@ -496,6 +496,29 @@ void Interval<Number>::inverse_assign()
 		*this = this->inverse();
 	}
 
+        template<typename Number>
+        Interval<Number> Interval<Number>::abs() const
+        {
+            if(this->contains(Number(0)))
+            {
+                Number max = mContent.upper() > mContent.lower() ? mContent.upper() : mContent.lower();
+                BoundType bt = mContent.upper() > mContent.lower() ? mContent.upperBoundType() : mContent.lowerBoundType();
+                return Interval<Number>( Number(0), BoundType::WEAK, max, bt );
+            }
+            else if( mContent.upper() < Number(0)) // interval is fully negative
+            {
+                return Interval<Number>(-mContent.lower(), mContent.lowerBoundType(), -mContent.upper(), mContent.upperBoundType());
+            }
+            // otherwise inteval is already fully positive
+            return *this;
+        }
+        
+        template<typename Number>
+        void Interval<Number>::abs_assign()
+        {
+            *this = abs(*this);
+        }
+
 template<typename Number>
 bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const
 	{

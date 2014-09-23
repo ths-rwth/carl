@@ -39,6 +39,7 @@ public:
     ReductorEntry(std::shared_ptr<const Term<Coeff>>  multiple, const Polynomial& pol) :
     mTail(pol.tail()), mLead(std::make_shared<const Term<Coeff>>(*multiple * *pol.lterm())), mMultiple(multiple)
     {
+		assert(multiple);
     }
 
     /**
@@ -82,6 +83,7 @@ public:
     void removeLeadingTerm()
     {
         assert(mTail.nrTerms() != 0);
+		assert(mMultiple);
 		mLead = std::make_shared<const Term<Coeff>>(*mMultiple * *mTail.lterm());
         mTail.stripLT();
     }
@@ -118,6 +120,7 @@ public:
      */
     bool empty() const
     {
+		assert(mLead || mTail.isZero());
         return !mLead;
     }
 
@@ -127,8 +130,15 @@ public:
      */
     void print(std::ostream& os = std::cout)
     {
-        if(empty()) os << " ";
-        os << *mLead << " +(" << *mMultiple << " * " << mTail << ")";
+		assert(mMultiple);
+        if(empty())
+		{
+			os << " ";
+		}
+		else
+		{
+			os << *mLead << " +(" << *mMultiple << " * " << mTail << ")";
+		}
     }
 
     template<class C>
@@ -139,7 +149,8 @@ public:
 template<class C>
 std::ostream& operator <<(std::ostream& os, const ReductorEntry<C> rhs)
 {
-    return(os << rhs.mLead << " + " << rhs.mMultiple << " * " << rhs.mTail);
+	rhs.print(os);
+	return os;
 }
 }
 

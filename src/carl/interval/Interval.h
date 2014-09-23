@@ -1076,6 +1076,9 @@ namespace carl
          */
         Interval<Number> inverse() const;
         
+        Interval<Number> abs() const;
+        void abs_assign();
+        
         /**
          * Calculates and assigns the additive inverse of an interval with respect 
          * to natural interval arithmetic.
@@ -1551,6 +1554,12 @@ namespace carl
     template<typename Number>
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
+    
+    template<typename Number>
+    inline Interval<Number> abs(const Interval<Number>& _in)
+    {
+        return _in.abs();
+    }
 }
 
 #include "Interval.tpp"
