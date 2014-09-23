@@ -107,7 +107,7 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator/( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    const FactorizedPolynomial<P> lazyDiv( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
@@ -116,12 +116,12 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )
     {
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        Factorization<P> cdFactorization;
+        Factorization<P> cdFactorization, restAFactorization, restBFactorization;
         const Factorization<P>& factorizationA = _fpolyA.rFactorization();
         const Factorization<P>& factorizationB = _fpolyB.rFactorization();
         auto factorA = factorizationA.begin();
@@ -129,12 +129,22 @@ namespace carl
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
         {
             if( factorA->first == factorB->first )
+            {
                 cdFactorization.insert( cdFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second < factorB->second ? factorA->second : factorB->second ) );
+            }
             else if( factorA->first < factorB->first )
+            {
+                restAFactorization.insert( restAFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second ) );
                 factorA++;
+            }
             else
+            {
+                restBFactorization.insert( restBFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB->first, factorB->second ) );
                 factorB++;
+            }
         }
+        _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), _fpolyRestA.mrCache);
+        _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), _fpolyRestB.mrCache);
         return FactorizedPolynomial<P>( std::move( cdFactorization ), _fpolyA.mrCache );
     }
 

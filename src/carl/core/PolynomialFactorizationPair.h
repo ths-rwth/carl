@@ -55,6 +55,8 @@ namespace carl
          */
         mutable Factorization<P> mFactorization;
         
+        mutable CoefficientRing<P> mCoefficient;
+
         /**
          * @return The factorization of this polynomial factorization pair
          */

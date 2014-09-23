@@ -58,6 +58,11 @@ namespace carl
         mpPolynomial( _polynomial ),
         mFactorization( std::move( _factorization ) )
     {
+        if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
+        {
+            mpPolynomial =  mFactorization.begin()->first.content().mpPolynomial;
+            assert( mpPolynomial != nullptr );
+        }
         rehash();
     }
     
@@ -67,7 +72,7 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mpPolynomial == nullptr )
         {
-            assert( getFactorization().empty() );
+            assert( getFactorization().empty() || getFactorization().size() > 1 );
             mHash = 0;
             for( auto polyExpPair = getFactorization().begin(); polyExpPair != getFactorization().end(); ++polyExpPair )
             {

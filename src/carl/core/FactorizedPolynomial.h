@@ -143,10 +143,12 @@ namespace carl
         /**
          * @param _fpolyA The first factorized polynomial to compute the common divisor for.
          * @param _fpolyB The second factorized polynomial to compute the common divisor for.
+         * @param _fpolyRestA Returns the remaining part of the first factorized polynomial without the common divisor
+         * @param _fpolyRestB Returns the remaining part of the second factorized polynomial without the common divisor
          * @return A common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> commonDivisor( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend const FactorizedPolynomial<P1> commonDivisor( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB, FactorizedPolynomial<P1>& _fpolyRestA, FactorizedPolynomial<P1>& _fpolyRestB);
 
         /**
          * @param _fpolyA The first factorized polynomial to compute the common multiple for.
