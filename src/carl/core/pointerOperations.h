@@ -1,6 +1,6 @@
 /* 
- * File:   pointerOperations.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @file pointerOperations.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * 
  * This file contains generic operations on pointers.
  * Most are specializations of standard routines like std::equal_to or std::hash.
@@ -9,6 +9,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 namespace std {
 
@@ -48,7 +49,7 @@ struct equal_to<std::shared_ptr<T>> {
 	 * @param rhs Second shared pointer.
 	 * @return If lhs and rhs are equal.
 	 */
-	bool operator()(const std::shared_ptr<T> lhs, const std::shared_ptr<T> rhs) const {
+	bool operator()(const std::shared_ptr<const T>& lhs, const std::shared_ptr<const T>& rhs) const {
 		if (lhs == nullptr && rhs == nullptr) return true;
 		if (lhs == nullptr || rhs == nullptr) return false;
 		if (lhs == rhs) return true;

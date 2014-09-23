@@ -6,7 +6,7 @@
  */
 
 #include "RealAlgebraicNumberIR.h"
-
+#include "pointerOperations.h"
 
 #pragma once
 
@@ -20,7 +20,7 @@ namespace std {
  */
 template<typename Number>
 struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
-	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
+	bool operator()(const carl::RealAlgebraicNumberPtr<Number>& lhs, const carl::RealAlgebraicNumberPtr<Number>& rhs) const {
 		if (lhs == rhs) return true;
 		if (lhs->isNumeric()) {
 			if (rhs->isNumeric()) {
@@ -43,6 +43,22 @@ struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
 		}
 		// nrA must be the exact numeric representation of irB OR nrB must be the exact numeric representation of irA
 		return true;
+	}
+};
+
+template<typename Number>
+struct equal_to<carl::RealAlgebraicNumberIRPtr<Number>> {
+	equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
+	bool operator()(const carl::RealAlgebraicNumberIRPtr<Number>& lhs, const carl::RealAlgebraicNumberIRPtr<Number>& rhs) const {
+		return eq(lhs, rhs);
+	}
+};
+
+template<typename Number>
+struct equal_to<carl::RealAlgebraicNumberNRPtr<Number>> {
+	equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
+	bool operator()(const carl::RealAlgebraicNumberNRPtr<Number>& lhs, const carl::RealAlgebraicNumberNRPtr<Number>& rhs) const {
+		return eq(lhs, rhs);
 	}
 };
 

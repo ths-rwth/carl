@@ -12,6 +12,7 @@
 #include "VariablesInformation.h"
 #include "Definiteness.h"
 #include "../interval/Interval.h"
+#include "pointerOperations.h"
 
 namespace carl
 {
@@ -389,8 +390,7 @@ class Term
          */
 		static bool EqualMonomial(const Term& lhs, const Term& rhs)
 		{
-			static std::equal_to<std::shared_ptr<Monomial>> eq;
-			return eq(lhs.mMonomial, rhs.mMonomial);
+			return std::equal_to<std::shared_ptr<Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
 };
 
