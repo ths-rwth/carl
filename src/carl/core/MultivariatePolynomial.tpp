@@ -864,6 +864,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<V
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);

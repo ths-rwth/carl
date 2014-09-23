@@ -292,6 +292,7 @@ public:
 	 * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
 	 *		 of the coefficients in p.
 	 */
+	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coeff coprimeFactor() const;
 	
 	/**
