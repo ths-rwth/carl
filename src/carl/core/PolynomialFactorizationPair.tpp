@@ -53,19 +53,28 @@ namespace carl
     }
     
     template<typename P>
-    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial ):
+    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, CoefficientRing<P>& _coefficient, P* _polynomial ):
         mHash( 0 ),
-        mpPolynomial( _polynomial ),
-        mFactorization( std::move( _factorization ) )
+        mFactorization( std::move( _factorization ) ),
+        mCoefficient( _coefficient ),
+        mpPolynomial( new P(_polynomial->coprimeCoefficients() ) )
     {
         if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
         {
-            mpPolynomial =  mFactorization.begin()->first.content().mpPolynomial;
+            //mpPolynomial =  mFactorization.begin()->first.content().mpPolynomial * coefficient;
             assert( mpPolynomial != nullptr );
+            assert(computePolynomial() == *mpPolynomial);
         }
         rehash();
     }
     
+    template<typename P>
+    PolynomialFactorizationPair<P>::~PolynomialFactorizationPair()
+    {
+        delete mpPolynomial;
+        //TODO implement further
+    }
+
     template<typename P>
     void PolynomialFactorizationPair<P>::rehash()
     {
@@ -87,6 +96,20 @@ namespace carl
         }
     }
     
+    template<typename P>
+    P& PolynomialFactorizationPair<P>::computePolynomial()
+    {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
+        P result = P( getCoefficient() );
+        auto factor = getFactorization().begin();
+
+        while( factor != getFactorization().end() )
+        {
+            result *= factor->first.content().mPolynomial->pow(factor->second);
+        }
+        return result;
+    }
+
     template<typename P>
     bool operator==( const PolynomialFactorizationPair<P>& _polyFactA, const PolynomialFactorizationPair<P>& _polyFactB )
     {

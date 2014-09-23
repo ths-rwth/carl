@@ -45,8 +45,8 @@ namespace carl
         // Constructors.
         FactorizedPolynomial(); // no implementation
         FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& );
-        FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, Cache<PolynomialFactorizationPair<P>>& );
-        FactorizedPolynomial( Factorization<P>&& _factorization, Cache<PolynomialFactorizationPair<P>>& );
+        FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CoefficientRing<P>&, Cache<PolynomialFactorizationPair<P>>& );
+        FactorizedPolynomial( Factorization<P>&& _factorization, CoefficientRing<P>&, Cache<PolynomialFactorizationPair<P>>& );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -100,12 +100,19 @@ namespace carl
         }
 
         /**
+         * @return The coefficient of this polynomial.
+         */
+        CoefficientRing<P>& rCoefficient() const
+        {
+            return content().getCoefficient();
+        }
+
+        /**
          * @return true, if the factorized polynomial is one.
          */
         bool isOne() const
         {
-            FactorizedPolynomial<P> one(P(1), mrCache);
-            return *this == one;
+            return rFactorization.empty();
         }
 
         /**

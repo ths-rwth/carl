@@ -55,7 +55,16 @@ namespace carl
          */
         mutable Factorization<P> mFactorization;
         
+        /**
+         * Co-prime coefficient of the factorization
+         */
         mutable CoefficientRing<P> mCoefficient;
+
+        /**
+         * Compute the polynomial from factorization and coefficient.
+         * @return Polynomial
+         */
+        P& computePolynomial();
 
         /**
          * @return The factorization of this polynomial factorization pair
@@ -66,11 +75,22 @@ namespace carl
             return mFactorization;
         }
         
+        CoefficientRing<P>& getCoefficient() const
+        {
+            return mCoefficient;
+        }
+
     public:
         // Constructor.
         PolynomialFactorizationPair(); // no implementation
-        PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
+        /*
+         * @param _factorization The factorization. Every factor must be not constant.
+         * @param _coefficient Common coefficient which is not part of the factorization
+         * @param _polynomial Polynomial with Polynomial = Factorization * Coefficient
+         */
+        PolynomialFactorizationPair( Factorization<P>&& _factorization, CoefficientRing<P>& _coefficient, P* _polynomial = nullptr );
         PolynomialFactorizationPair( const PolynomialFactorizationPair& ); // no implementation
+        ~PolynomialFactorizationPair();
         
         /**
          * @return The hash of this polynomial factorization pair.
