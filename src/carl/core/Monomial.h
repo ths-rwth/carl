@@ -310,9 +310,9 @@ namespace carl
 		/**
 		 * Divides the monomial by a variable v.
 		 * If the division is impossible (because v does not occur in the monomial), nullptr is returned.
- * @param v Variable
- * @return This divided by v.
- */
+		 * @param v Variable
+		 * @return This divided by v.
+		 */
 		Monomial* divide(Variable::Arg v) const
 		{
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
@@ -337,9 +337,9 @@ namespace carl
 
 		/**
 		 * Checks if this monomial is divisible by the given monomial m.
- * @param m Monomial.
- * @return If this is divisible by m.
- */
+		 * @param m Monomial.
+		 * @return If this is divisible by m.
+		 */
 		bool divisible(const Monomial& m) const
 		{
 			assert(isConsistent());
@@ -764,27 +764,10 @@ namespace carl
 		 * @param rhs Right hand side.
 		 * @return `lhs * rhs`
 		 */
-		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
-			Monomial result(lhs);
-			result *= rhs;
-			return result;
-		}
-		
-		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
-			Monomial result(lhs);
-			result *= rhs;
-			return result;
-		}
-
-		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs) {
-			return rhs * lhs;
-		}
-
-		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
-			Monomial result(lhs);
-			result *= rhs;
-			return result;
-		}
+		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
+		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs);
+		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs);
+		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs);
 		/// @}
 		
 		/**
@@ -958,6 +941,29 @@ namespace carl
 			return CompareResult::LESS;
 		}
 	};
+
+	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
+
+	inline Monomial operator*(Variable::Arg lhs, const Monomial& rhs) {
+		return rhs * lhs;
+	}
+
+	inline Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
+
+	inline Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
+
 } // namespace carl
 
 namespace std
