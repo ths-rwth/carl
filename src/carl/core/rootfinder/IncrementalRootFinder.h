@@ -85,21 +85,21 @@ public:
 	virtual const UnivariatePolynomial<Number>& getPolynomial() const = 0;
 	/**
 	 * Adds a new interval together with a splitting strategy to the queue of intervals that must be processed.
-     * @param interval Interval.
-     * @param strategy Strategy.
-     */
+	 * @param interval Interval.
+	 * @param strategy Strategy.
+	 */
 	virtual void addQueue(const Interval<Number>& interval, SplittingStrategy strategy) = 0;
 	/**
 	 * Add a root to the list of found roots.
 	 * If the root was calculated exactly, the polynomial can be divided by \f$(x - r)\f$ where \f$x\f$ is the main variable of the polynomial and \f$r\f$ is the root.
-     * @param root Real root.
-     * @param reducePolynomial Flag if polynomial should be reduced.
-     */
+	 * @param root Real root.
+	 * @param reducePolynomial Flag if polynomial should be reduced.
+	 */
 	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) = 0;
 	/**
 	 * Add a root to the list of found roots.
-     * @param interval Interval that contains the real root.
-     */
+	 * @param interval Interval that contains the real root.
+	 */
 	virtual void addRoot(const Interval<Number>& interval) = 0;
 };
 
@@ -175,9 +175,9 @@ struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, N
 	 * In theory, the eigenvalues of the companion matrix of a polynomial are equal to the (complex) roots of a univariate polynomial.
 	 * However, due to numerical instability, we use them only for splitting.
 	 * Given the eigenvalues \f$e_1, ..., e_k\f$ and the interval \f$(a,b)\f$, the resulting intervals are \f$(a, e_1), [e_1], ..., [e_k], (e_k, b)\f$.
-     * @param interval Interval.
-     * @param finder Finder object.
-     */
+	 * @param interval Interval.
+	 * @param finder Finder object.
+	 */
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
 
@@ -196,10 +196,19 @@ struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> 
 
 }
 
+/**
+ * This class implements an AbstractRootFinder that has an interface to calculate the real roots incrementally.
+ *
+ * Using the method next(), the next real root can be obtained.
+ * The root finder uses a bisection approach internally and implements multiple strategies how the bisection is performed.
+ */
 template<typename Number, typename Comparator>
 class IncrementalRootFinder : public AbstractRootFinder<Number>, RootFinder<Number> {
 
 public:
+	/**
+	 * Type of a queue item, consisting of an interval to be searched and the strategy to be used.
+	 */
 	typedef std::tuple<Interval<Number>, SplittingStrategy> QueueItem;
 
 private:
@@ -223,6 +232,13 @@ private:
 
 public:
 
+	/**
+	 * Constructor for a root finder that searches for the real roots of a polynomial in an interval using a strategy.
+	 * @param polynomial Polynomial.
+	 * @param interval Interval, unbounded if none is given.
+	 * @param splittingStrategy Strategy.
+	 * @param tryTrivialSolver Flag is the trivial solver shall be used.
+	 */
 	IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
 			const Interval<Number>& interval = Interval<Number>::unboundedExactInterval(),
@@ -230,6 +246,9 @@ public:
 			bool tryTrivialSolver = true
 			);
 
+	/**
+	 * Desctructor.
+	 */
 	virtual ~IncrementalRootFinder() {
 	}
 
@@ -267,7 +286,7 @@ protected:
 
 	/**
 	 * Overrides method from AbstractRootFinder.
-     */
+	 */
 	virtual void findRoots();
 
 	/**

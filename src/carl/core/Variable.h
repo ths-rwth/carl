@@ -120,6 +120,12 @@ public:
 		return (VariableType)(mVariable % (1 << VARIABLE_BITS_RESERVED_FOR_TYPE));
 	}
 	
+	/**
+	 * Streaming operator for Variable.
+	 * @param os Output stream.
+	 * @param rhs Variable.
+	 * @return `os`
+	 */
 	friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs);
 	
 	/**

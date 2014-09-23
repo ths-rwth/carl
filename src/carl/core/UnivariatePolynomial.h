@@ -483,8 +483,8 @@ public:
 	 * Constructs a new polynomial that is scaled such that the coefficients are coprime.
 	 * It is calculated by multiplying it with the coprime factor.
 	 * By definition, this results in a polynomial with integral coefficients.
-     * @return This polynomial multiplied with the coprime factor.
-     */
+	 * @return This polynomial multiplied with the coprime factor.
+	 */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficients() const;
 
@@ -619,9 +619,9 @@ public:
 
 	/**
 	 * Checks if this polynomial is divisible by the given divisor, that is if the remainder is zero.
-     * @param divisor Polynomial.
-     * @return If divisor divides this polynomial.
-     */
+	 * @param divisor Polynomial.
+	 * @return If divisor divides this polynomial.
+	 */
 	bool divides(const UnivariatePolynomial& divisor) const;
 	
 	/**
@@ -908,6 +908,14 @@ public:
 
 	UnivariatePolynomial<Coefficient> discriminant(const SubresultantStrategy strategy = SubresultantStrategy::Default) const;
 
+	/// @name Equality comparison operators
+	/// @{
+	/**
+	 * Checks if the two arguments are equal.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs == rhs`
+	 */
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -916,53 +924,103 @@ public:
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	/// @}
+
+	/// @name Inequality comparison operators
+	/// @{
+	/**
+	 * Checks if the two arguments are not equal.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs != rhs`
+	 */
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	/// @}
 	
 	bool less(const UnivariatePolynomial<Coefficient>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default) const;
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 
 	UnivariatePolynomial operator-() const;
-	UnivariatePolynomial& operator+=(const Coefficient& rhs);
+	
+	/// @name In-place addition operators
+	/// @{
 	/**
-	 * @param rhs A univariate polynomial over the same variable.
-	 * @return 
+	 * Add something to this polynomial and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
 	 */
+	UnivariatePolynomial& operator+=(const Coefficient& rhs);
 	UnivariatePolynomial& operator+=(const UnivariatePolynomial& rhs);
+	/// @}
+	
+	/// @name Addition operators
+	/// @{
+	/**
+	 * Performs an addition involving a polynomial.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs + rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	/// @}
 	
-	UnivariatePolynomial& operator-=(const Coefficient& rhs);
+	/// @name In-place subtraction operators
+	/// @{
 	/**
-	 * @param rhs A univariate polynomial over the same variable.
-	 * @return 
+	 * Subtract something from this polynomial and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
 	 */
+	UnivariatePolynomial& operator-=(const Coefficient& rhs);
 	UnivariatePolynomial& operator-=(const UnivariatePolynomial& rhs);
+	/// @}
+	
+	/// @name Subtraction operators
+	/// @{
+	/**
+	 * Performs a subtraction involving a polynomial.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs - rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	/// @}
 	
-	
+	/// @name In-place multiplication operators
+	/// @{
+	/**
+	 * Multiply this polynomial with something and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
+	 */
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
-	// TODO: does this make any sense?
 	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
 	UnivariatePolynomial& operator*=(const typename IntegralType<Coefficient>::type& rhs);
-	/**
-	 * @param rhs A univariate polynomial over the same variable.
-	 * @return 
-	 */
 	UnivariatePolynomial& operator*=(const UnivariatePolynomial& rhs);
+	/// @}
 	
+	/// @name Multiplication operators
+	/// @{
+	/**
+	 * Perform a multiplication involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs * rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -977,18 +1035,39 @@ public:
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
 	template<typename C, typename O, typename P>
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const C& lhs, const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& rhs);
-	
-	
+	/// @}
 
+	/// @name In-place division operators
+	/// @{
+	/**
+	 * Divide this polynomial by something and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
+	 */
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
+	/// @}
 	
-	
+	/// @name Division operators
+	/// @{
+	/**
+	 * Perform a division involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs / rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	/// @}
 	
+	/**
+	 * Streaming operator for univariate polynomials.
+	 * @param os Output stream.
+	 * @param rhs Polynomial.
+     * @return `os`
+     */
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
 
@@ -1065,9 +1144,9 @@ template<typename Coefficient>
 struct hash<carl::UnivariatePolynomial<Coefficient>> {
 	/**
 	 * Calculates the hash of univariate polynomial.
-     * @param p UnivariatePolynomial.
-     * @return Hash of p.
-     */
+	 * @param p UnivariatePolynomial.
+	 * @return Hash of p.
+	 */
 	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
 		std::size_t result = 0;
 		std::hash<Coefficient> h;
