@@ -11,6 +11,7 @@
 #include "Monomial.h"
 #include "VariablesInformation.h"
 #include "Definiteness.h"
+#include "../interval/Interval.h"
 
 namespace carl
 {
@@ -253,7 +254,11 @@ class Term
 			}
 			
 		}
+                
+        template<typename C = Coefficient, DisableIf<is_interval<C>> = dummy>
+        std::string toString(bool infix=true, bool friendlyVarNames=true) const;
         
+        template<typename C = Coefficient, EnableIf<is_interval<C>> = dummy>
         std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 
 		bool isConsistent() const;

@@ -481,6 +481,7 @@ std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 }
 
 template<typename Coefficient>
+template<typename C, DisableIf<is_interval<C>>>
 std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
     if(mMonomial)
@@ -524,6 +525,33 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
         }
         if(negative)
             s << ")";
+        return s.str();
+    }
+}
+
+template<typename Coefficient>
+template<typename C, EnableIf<is_interval<C>>>
+std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
+{ 
+    if(mMonomial)
+    {
+        if(mCoeff != C(1))
+        {
+            std::stringstream s;
+            s << mCoeff;
+            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+        }
+        else
+        {
+            if(infix) return mMonomial->toString(true, friendlyVarNames);
+            else return mMonomial->toString(infix, friendlyVarNames);
+        }
+    }
+    else 
+    {
+        std::stringstream s;
+        s << mCoeff;
         return s.str();
     }
 }
