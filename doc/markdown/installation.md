@@ -6,15 +6,15 @@ Quick installation guide
 - Make sure all @subpage dependencies "dependencies" are available.
 - Clone the git repository from https://srv-i2.informatik.rwth-aachen.de:8443/git/carl.git
 - Prepare the build.
-@code
+@code{.sh}
 $ mkdir build && cd build && cmake ../
 @endcode
 - Build shipped dependencies if necessary.
-@code
+@code{.sh}
 $ make resources
 @endcode
 - Build carl (with tests and documentation).
-@code
+@code{.sh}
 $ make
 $ make test doc
 @endcode

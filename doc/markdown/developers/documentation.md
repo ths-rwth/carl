@@ -5,14 +5,14 @@ On this page, we refer to some internal documentation rules.
 We use doxygen to generate our documentation and code reference.
 The most important conventions for documentation in CArL are collected here.
 
-### Modules
+## Modules
 In order to structure the reference, we use the concept of
 [Doxygen modules](http://www.stack.nl/~dimitri/doxygen/manual/grouping.html#modules).
 Such modules are best thought of as a hierarchical set of tags, called groups. 
 We define those groups in `/doc/markdown/codedocs/groups.dox`.
 Please make sure to put new files and classes in the appropriate groups.
 
-### Literature references
+## Literature references
 Literature references should be provided when appropriate.
 
 We use a bibtex database located at `/doc/literature.bib` with the following conventions:
@@ -23,7 +23,7 @@ We use a bibtex database located at `/doc/literature.bib` with the following con
 
 These references can be used with `@cite label`, for example like this:
 @code
-/*/** */*
+/**
  * Checks whether the polynomial is unit normal
  * @see @cite GCL92, page 39
  * @return If polynomial is normal.
@@ -31,12 +31,13 @@ These references can be used with `@cite label`, for example like this:
 bool isNormal() const;
 @endcode 
 
-### Code comments
+## Code comments
 
 
-- File headers
+### File headers
+
 @code
-/*/** */*
+/**
  * @file <filename>
  * @ingroup <groupid1>
  * @ingroup <groupid2>
@@ -50,11 +51,13 @@ bool isNormal() const;
 Descriptions may be omitted when the file contains a single class, either implementation or declaration.
 
 
-- Namespaces are documented in a separate file, found at '/doc/markdown/codedocs/namespaces.dox'
+### Namespaces
+Namespaces are documented in a separate file, found at '/doc/markdown/codedocs/namespaces.dox'
 
-- Class headers
+### Class headers
+
 @code
-/*/** */*
+/**
  * @ingroup <groupid>
  * [ Description ]
  * @see <reference>
@@ -62,9 +65,10 @@ Descriptions may be omitted when the file contains a single class, either implem
  */
 @endcode
 
-- Method headers
+### Method headers
+
 @code
-/*/** */*
+/**
  * [ Usage Description ]
  * @param <p1> [ Short description for first parameter ] 
  * @param <p2> [ Short description for second parameter ]
@@ -79,7 +83,30 @@ Comments about the implementation are written above the or inside the implementa
 
 The `see` command is used likewise as for classes.
 
-### Writing out-of-source documentation
+### Method groups
+
+There are some cases when documenting each method is tedious and meaningless, for example operators.
+In this case, we use doxygen method groups.
+
+For member operators (for example `operator+=`), this works as follows:
+@code
+/// @name In-place addition operators
+/// @{
+/**
+ * Add something to this polynomial and return the changed polynomial.
+ * @param rhs Right hand side.
+ * @return Changed polynomial.
+ */
+MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
+MultivariatePolynomial& operator+=(const Term<Coeff>& rhs);
+MultivariatePolynomial& operator+=(const Monomial& rhs);
+MultivariatePolynomial& operator+=(Variable::Arg rhs);
+MultivariatePolynomial& operator+=(const Coeff& rhs);
+/// @}
+
+@endcode
+
+## Writing out-of-source documentation
 
 Documentation not directly related to the source code is written in Markdown format, and is located in
 '/doc/markdown/'.

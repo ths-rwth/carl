@@ -470,16 +470,27 @@ public:
 	}
 
 	/**
-	 * 
-	 * @return copr
+	 * Calculates a factor that would make the coefficients of this polynomial coprime integers.
+	 *
+	 * We consider a set of integers coprime, if they share no common factor.
+	 * Technically, the coprime factor is \f$ lcm(N) / gcd(D) \f$ where `N` is the set of the numerators and `D` is the set of the denominators of all coefficients.
+	 * @return Coprime factor of this polynomial.
 	 */
+	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coefficient coprimeFactor() const;
 	
+	/**
+	 * Constructs a new polynomial that is scaled such that the coefficients are coprime.
+	 * It is calculated by multiplying it with the coprime factor.
+	 * By definition, this results in a polynomial with integral coefficients.
+     * @return This polynomial multiplied with the coprime factor.
+     */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficients() const;
 
 	/**
-	 * Checks whether the polynomial is unit normal
+	 * Checks whether the polynomial is unit normal.
+	 * A polynomial is unit normal, if the leading coefficient is unit normal, that is if it is either one or minus one.
 	 * @see @cite GCL92, page 39
 	 * @return If polynomial is normal.
 	 */
@@ -487,7 +498,7 @@ public:
 	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
 	 * @see @cite GCL92, page 42.
-	 * @return 
+	 * @return This polynomial divided by the unit part.
 	 */
 	UnivariatePolynomial normalized() const;
 	
@@ -507,7 +518,12 @@ public:
 	 */
 	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
-	
+	/**
+	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
+	 * and one for zero polynomials.
+	 * @see @cite GCL92, page 42.
+	 * @return The unit part of the polynomial.
+	 */
 	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
 	Coefficient unitPart() const;
 	
@@ -531,15 +547,19 @@ public:
 	/**
 	 * The n'th derivative of the polynomial in its main variable.
 	 * @param nth how many times the derivative should be applied.
-	 * @return A polynomial (d/dx)^n p(x) where p(x) is the input polynomial.
+	 * @return A polynomial \f$(d/dx)^n p(x)\f$ where \f$p(x)\f$ is the input polynomial.
 	 */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
+	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
+	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
+	/**
+	 * Constructs a new polynomial `q` such that \f$ q(x) = p(-x) \f$ where `p` is this polynomial.
+	 * @return New polynomial with negated variable.
+	 */
 	UnivariatePolynomial negateVariable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		for (unsigned int deg = 0; deg < res.coefficients().size(); deg++) {
@@ -597,11 +617,43 @@ public:
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy, EnableIf<is_field<typename UnderlyingNumberType<C>::type>> = dummy>
 	DivisionResult<UnivariatePolynomial> divideBy(const NumberType& divisor) const;
 
-	bool divides(const UnivariatePolynomial&) const;
+	/**
+	 * Checks if this polynomial is divisible by the given divisor, that is if the remainder is zero.
+     * @param divisor Polynomial.
+     * @return If divisor divides this polynomial.
+     */
+	bool divides(const UnivariatePolynomial& divisor) const;
 	
+	/**
+	 * Replaces every coefficient `c` by `c mod modulus`.
+	 * @param modulus Modulus.
+	 * @return This.
+	 */
 	UnivariatePolynomial& mod(const Coefficient& modulus);
+	/**
+	 * Constructs a new polynomial where every coefficient `c` is replaced by `c mod modulus`.
+	 * @param modulus Modulus.
+	 * @return New polynomial.
+	 */
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
+
+	/**
+	 * Calculates the greatest common divisor of two polynomials.
+	 * @param a First polynomial.
+	 * @param b Second polynomial.
+	 * @return `gcd(a,b)`
+	 */
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
+	/**
+	 * Calculates the extended greatest common divisor `g` of two polynomials.
+	 * The output polynomials `s` and `t` are computed such that \f$g = s \cdot a + t \cdot b\f$.
+	 * @param a First polynomial.
+	 * @param b Second polynomial.
+	 * @param s First output polynomial.
+	 * @param t Second output polynomial.
+	 * @see @cite GCL92, Algorithm 2.2
+	 * @return `gcd(a,b)`
+	 */
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
@@ -984,8 +1036,15 @@ private:
 	 * @complexity O(n^2)
 	 */
 	void shift(const Coefficient& a);	
-		
-	UnivariatePolynomial reduce_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	
+	/**
+	 * Calculates the remainder of polynomial division.
+	 * @param divisor
+	 * @param prefactor
+	 * @see @cite GCL92, page 55, Pseudo-Division Property
+	 * @return 
+	 */
+	UnivariatePolynomial remainder_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{

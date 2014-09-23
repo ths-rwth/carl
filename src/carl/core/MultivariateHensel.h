@@ -85,7 +85,7 @@ class DiophantineEquations
 			std::vector<Polynomial> res;
 			for(unsigned j = 0; j < s.size(); ++j)
 			{
-				res.push_back( (xm * s.at(j)).reduce(a.at(j)).normalizeCoefficients());
+				res.push_back( (xm * s.at(j)).remainder(a.at(j)).normalizeCoefficients());
 			}
 			return res;
 		}

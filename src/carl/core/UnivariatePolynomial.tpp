@@ -258,21 +258,19 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
 	if (this->degree() < divisor.degree()) return *this;
 	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
-	if(is_field<Coeff>::value && divisor.isConstant())
-	{
+	// Remainder in a field is zero by definition.
+	if (is_field<Coeff>::value && divisor.isConstant()) {
 		return UnivariatePolynomial<Coeff>(mMainVar);
 	}
-	if(isZero())
-	{
+	if (isZero()) {
 		return UnivariatePolynomial<Coeff>(mMainVar);
 	}
-	
-	unsigned degdiff = degree() - divisor.degree();
+
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
@@ -289,6 +287,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const Uni
 
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-1);
+	unsigned degdiff = degree() - divisor.degree();
 	if(degdiff > 0)
 	{
 		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
@@ -325,21 +324,21 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce_helper(const Uni
 	}
 	else 
 	{	
-		return result.reduce_helper(divisor, nullptr);
+		return result.remainder_helper(divisor, nullptr);
 	}
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor, const Coeff& prefactor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder(const UnivariatePolynomial<Coeff>& divisor, const Coeff& prefactor) const
 {
-	return this->reduce_helper(divisor, &prefactor);
+	return this->remainder_helper(divisor, &prefactor);
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::reduce(const UnivariatePolynomial<Coeff>& divisor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	static_assert(is_field<Coeff>::value, "Reduce must be called with a prefactor if the Coefficients are not from a field.");
-	return this->reduce_helper(divisor);
+	return this->remainder_helper(divisor);
 }
 
 /**
@@ -357,7 +356,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
 	Coeff prefactor = carl::pow(b,d);
-	return reduce(divisor, prefactor);
+	return remainder(divisor, prefactor);
 }
 
 
@@ -376,7 +375,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariateP
 	unsigned d = degree() - divisor.degree() + 1;
 	if(d%2) ++d;
 	Coeff prefactor = pow(b,d);
-	return reduce(divisor, &prefactor);
+	return remainder(divisor, &prefactor);
 }
 
 template<typename Coeff>
@@ -510,7 +509,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const Uni
 //	{
 //		if(b.isConstant()) return b;
 //	}
-	else return gcd_recursive(b, a.reduce(b));
+	else return gcd_recursive(b, a.remainder(b));
 }
 
 template<typename Coeff>
@@ -527,7 +526,6 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 //	LOG_NOTIMPLEMENTED();
 	return *this;
 }
-
 
 template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::mod(const Coefficient& modulus)
@@ -663,18 +661,17 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 
 	
 template<typename Coeff>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
-	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
-	typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
-	typename IntegralType<Coeff>::type num = getNum(*it);
-	typename IntegralType<Coeff>::type den = getDenom(*it);
-	for(++it; it != mCoefficients.end(); ++it)
-	{
+	auto it = mCoefficients.begin();
+	IntNumberType num = getNum(*it);
+	IntNumberType den = getDenom(*it);
+	for (++it; it != mCoefficients.end(); ++it) {
 		num = carl::gcd(num, getNum(*it));
 		den = carl::lcm(den, getDenom(*it));
 	}
-	return Coeff(den)/num;
+	return Coeff(den)/Coeff(num);
 }
 
 template<typename Coeff>
@@ -682,7 +679,6 @@ template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Coeff>::coprimeCoefficients() const
 {
 	LOGMSG_TRACE("carl.core", *this << " .coprimeCoefficients()");
-	static_assert(is_number<Coeff>::value, "We can only make integer coefficients if we have a number type before.");
 	// Notice that even if factor is 1, we create a new polynomial
 	UnivariatePolynomial<typename IntegralType<Coeff>::type> result(mMainVar);
 	if (this->isZero()) {
@@ -690,9 +686,8 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 	}
 	result.mCoefficients.reserve(mCoefficients.size());
 	Coeff factor = this->coprimeFactor();
-	for(const Coeff& coeff : mCoefficients)
-	{
-		assert(getDenom(coeff*factor) == 1);
+	for (const Coeff& coeff: mCoefficients) {
+		assert(getDenom(coeff * factor) == 1);
 		result.mCoefficients.push_back(getNum(coeff * factor));
 	}
 	return result;
@@ -778,10 +773,10 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 }
 
 template<typename Coeff>
-bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& dividant) const
+bool UnivariatePolynomial<Coeff>::divides(const UnivariatePolynomial& divisor) const
 {
 	///@todo Is this correct?
-	return dividant.divideBy(*this).remainder.isZero();
+	return divisor.divideBy(*this).remainder.isZero();
 }
 
 template<typename Coeff>
@@ -1353,7 +1348,7 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 	seq.push_back(p);
 	while (! q.isZero()) {
 		seq.push_back(q);
-		q = - p.reduce(q);
+		q = - p.remainder(q);
 		p = seq.back();
 	}
 	return seq;

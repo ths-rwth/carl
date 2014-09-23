@@ -625,27 +625,11 @@ namespace carl
 			
 		}*/
 
-		// 
-		// Operators
-		//
-		
-		friend bool operator==(const Monomial& lhs, const Monomial& rhs)
-		{
-			if (lhs.mTotalDegree != rhs.mTotalDegree) return false;
-			return lhs.mExponents == rhs.mExponents;
-		}
+		friend bool operator==(const Monomial& lhs, const Monomial& rhs);
 
-		friend bool operator==(const Monomial& lhs, Variable::Arg rhs)
-		{
-			if (lhs.mTotalDegree != 1) return false;
-			if (lhs.mExponents[0].first == rhs) return true;
-			return false;
-		}
+		friend bool operator==(const Monomial& lhs, Variable::Arg rhs);
 
-		friend bool operator==(Variable::Arg lhs, const Monomial& rhs)
-		{
-			return rhs == lhs;
-		}
+		friend bool operator==(Variable::Arg lhs, const Monomial& rhs);
 
 		friend bool operator!=(const Monomial& lhs, const Monomial& rhs)
 		{
@@ -947,6 +931,28 @@ namespace carl
 		result *= rhs;
 		return result;
 	}
+	
+	/** @{ */
+	/** Comparison operator */
+
+	bool operator==(const Monomial& lhs, const Monomial& rhs)
+	{
+		if (lhs.mTotalDegree != rhs.mTotalDegree) return false;
+		return lhs.mExponents == rhs.mExponents;
+	}
+
+	bool operator==(const Monomial& lhs, Variable::Arg rhs)
+	{
+		if (lhs.mTotalDegree != 1) return false;
+		if (lhs.mExponents[0].first == rhs) return true;
+		return false;
+	}
+
+	bool operator==(Variable::Arg lhs, const Monomial& rhs)
+	{
+		return rhs == lhs;
+	}
+	/** @} */
 } // namespace carl
 
 namespace std

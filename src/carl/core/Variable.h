@@ -169,9 +169,17 @@ std::string varToString(carl::Variable::Arg rhs, bool friendlyVarName = true);
 
 namespace std
 {
+	/**
+	 * Specialization of `std::hash` for Variable.
+	 */
 	template<>
 	struct hash<carl::Variable>
 	{
+		/**
+		 * Calculates the hash of a Variable.
+		 * @param variable Variable.
+		 * @return Hash of variable
+		 */
 		size_t operator()(const carl::Variable& variable) const 
 		{
 			return variable.getId();
