@@ -17,6 +17,7 @@
 #include "logging.h"
 #include "carlLoggingHelper.h"
 #include "../numbers/numbers.h"
+#include "VariablePool.h"
 
 namespace carl
 {   
@@ -709,9 +710,9 @@ namespace carl
 
 		/**
 		 * Multiplies this monomial with another monomial.
- * @param rhs Monomial.
- * @return This multiplied with rhs.
- */
+		 * @param rhs Monomial.
+		 * @return This multiplied with rhs.
+		 */
 		Monomial& operator*=(const Monomial& rhs)
 		{
 			LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
@@ -759,15 +760,15 @@ namespace carl
 		/// @name Multiplication operators
 		/// @{
 		/**
-		 * Perform a multiplication involving a polynomial.
+		 * Perform a multiplication involving a monomial.
 		 * @param lhs Left hand side.
 		 * @param rhs Right hand side.
 		 * @return `lhs * rhs`
 		 */
-		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
-		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs);
-		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs);
 		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs);
+		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs);
+		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs);
+		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
 		/// @}
 		
 		/**
@@ -792,7 +793,7 @@ namespace carl
 					if (vp != mExponents.begin()) ss << " ";
 					if (vp->second == 1) ss << vp->first;
 					else {
-						std::string varName = varToString(vp->first, friendlyVarNames);
+						std::string varName = VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 						ss << "(*";
 						for (unsigned i = 0; i < vp->second; i++) ss << " " << varName;
 						ss << ")";
@@ -942,7 +943,13 @@ namespace carl
 		}
 	};
 
-	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
+	inline Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
+
+	inline Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
 		Monomial result(lhs);
 		result *= rhs;
 		return result;
@@ -952,13 +959,7 @@ namespace carl
 		return rhs * lhs;
 	}
 
-	inline Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
-
-	inline Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
+	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
 		Monomial result(lhs);
 		result *= rhs;
 		return result;

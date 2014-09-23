@@ -80,21 +80,21 @@ public:
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
 	/// @}
 	
-    virtual ~MultivariatePolynomial() {}
-    
+	virtual ~MultivariatePolynomial() {}
+	
 	//Polynomial interface implementations.
 	/**
 	 * @see class Polynomial
-     * @return 
-     */
+	 * @return 
+	 */
 	virtual bool isUnivariateRepresented() const override
 	{
 		return false;
 	}
 	/**
 	 * @see class Polynomial
-     * @return 
-     */
+	 * @return 
+	 */
 	virtual bool isMultivariateRepresented() const override
 	{
 		return true;
@@ -124,34 +124,34 @@ public:
 
 	/**
 	 * Checks if the polynomial is zero.
-     * @return If this is zero.
-     */
+	 * @return If this is zero.
+	 */
 	bool isZero() const;
 	/**
 	 * Checks if the polynomial is constant.
-     * @return If this is constant.
-     */
+	 * @return If this is constant.
+	 */
 	bool isConstant() const;
 	/**
 	 * Checks if the polynomial is linear.
-     * @return If this is linear.
-     */
+	 * @return If this is linear.
+	 */
 	bool isLinear() const;
 	/**
 	 * Checks if the polynomial is a number.
 	 * This is basically the same as being a constant.
-     * @return If this is a number.
-     */
+	 * @return If this is a number.
+	 */
 	bool isNumber() const
 	{
 		return this->isConstant();
 	}
-    
+	
 	/**
 	 * Retrieves information about the definiteness of the polynomial.
-     * @return Definiteness of this.
-     */
-    Definiteness definiteness() const;
+	 * @return Definiteness of this.
+	 */
+	Definiteness definiteness() const;
 
 	/**
 	 * Calculates the number of terms.
@@ -163,18 +163,18 @@ public:
 	}
 	/**
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
-     * @return 
-     */
+	 * @return 
+	 */
 	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
 	/**
 	 * Checks if the polynomial has a constant term that is not zero.
-     * @return If there is a constant term unequal to zero.
-     */
+	 * @return If there is a constant term unequal to zero.
+	 */
 	bool hasConstantTerm() const;
 	/**
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
-     * @return Constant term.
-     */
+	 * @return Constant term.
+	 */
 	Coeff constantPart() const;
 	
 	typename TermsType::const_iterator begin() const
@@ -186,7 +186,7 @@ public:
 	{
 		return mTerms.end();
 	}
-    
+	
 	typename TermsType::const_reverse_iterator rbegin() const
 	{
 		return mTerms.rbegin();
@@ -212,9 +212,9 @@ public:
 	
 	/**
 	 * Checks whether only one variable occurs.
-     * @return 
+	 * @return 
 	 * Notice that it might be better to use the variable information if several pieces of information are requested.
-     */
+	 */
 	bool isUnivariate() const;
 
 	/**
@@ -225,25 +225,25 @@ public:
 	
 	/**
 	 * Iterates through all terms to find variables occuring in this polynomial.
-     * @param vars Holds the variables occuring in the polynomial at return.
-     */
+	 * @param vars Holds the variables occuring in the polynomial at return.
+	 */
 	void gatherVariables(std::set<Variable>& vars) const;
 	std::set<Variable> gatherVariables() const;
-    
-    /**
-     * @param v The variable to check for its occurrence.
-     * @return true, if the variable occurs in this term.
-     */
-    bool has(Variable::Arg v) const;
+	
+	/**
+	 * @param v The variable to check for its occurrence.
+	 * @return true, if the variable occurs in this term.
+	 */
+	bool has(Variable::Arg v) const;
 	
 	bool isReducibleIdentity() const;
 
 	/**
 	 * Divides the polynomial by the given coefficient.
 	 * Applies if the coefficients are from a field.
-     * @param divisor
-     * @return 
-     */
+	 * @param divisor
+	 * @return 
+	 */
 	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
 	MultivariatePolynomial divideBy(const Coeff& divisor) const;
 
@@ -253,35 +253,35 @@ public:
 	 * Otherwise, false is returned and the content of quotient remains unchanged.
 	 * Applies if the coefficients are from a field.
 	 * Note that the quotient must not be *this.
-     * @param divisor
-     * @param quotient
-     * @return 
-     */
+	 * @param divisor
+	 * @param quotient
+	 * @return 
+	 */
 	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
 	bool divideBy(const MultivariatePolynomial& divisor, MultivariatePolynomial& quotient) const;
 	
 	/**
 	 * Calculating the quotient and the remainder, such that for a given polynomial p we have
 	 * p = divisor * quotient + remainder.
-     * @param divisor Another polynomial
-     * @return A divisionresult, holding the quotient and the remainder.
+	 * @param divisor Another polynomial
+	 * @return A divisionresult, holding the quotient and the remainder.
 	 * @see
 	 * @note Division is only defined on fields
-     */
+	 */
 	DivisionResult<MultivariatePolynomial> divideBy(const MultivariatePolynomial& divisor) const;
 	/**
 	 * Calculates the quotient
-     * @param divisor
-     * @return 
+	 * @param divisor
+	 * @return 
 	 * @see MultivariatePolynomial::divideBy
-     */
+	 */
 	MultivariatePolynomial quotient(const MultivariatePolynomial& divisor) const;
 	/**
 	 * Calculates the remainder
-     * @param divisor
-     * @return 
+	 * @param divisor
+	 * @return 
 	 * @see MultivariatePolynomial::divideBy
-     */
+	 */
 	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
 	MultivariatePolynomial prem(const MultivariatePolynomial& divisor) const;
 	
@@ -289,72 +289,72 @@ public:
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
 	
 	/**
-     * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
-     *         of the coefficients in p.
-     */
+	 * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
+	 *		 of the coefficients in p.
+	 */
 	Coeff coprimeFactor() const;
 	
 	/**
-     * @return p * p.coprimeFactor()
-     * @see coprimeFactor()
-     */
+	 * @return p * p.coprimeFactor()
+	 * @see coprimeFactor()
+	 */
 	MultivariatePolynomial coprimeCoefficients() const;
 	
 	/**
 	 * For a polynomial p, returns p/lc(p)
-     * @return 
-     */
+	 * @return 
+	 */
 	MultivariatePolynomial normalize() const;
 	
 	/**
 	 * Replace the given variable by the given polynomial within this multivariate polynomial.
-     */
+	 */
 	void substituteIn(Variable::Arg var, const MultivariatePolynomial& value);
 	
 	/**
 	 * Replace the given variable by the given value.
-     * @return A new polynomial without resulting from this substitution.
-     */
+	 * @return A new polynomial without resulting from this substitution.
+	 */
 	MultivariatePolynomial substitute(Variable::Arg var, const MultivariatePolynomial& value) const;
 	
 	/**
 	 * Replace all variables by a value given in their map.
-     * @return A new polynomial without the variables in map.
-     */
+	 * @return A new polynomial without the variables in map.
+	 */
 	MultivariatePolynomial substitute(const std::map<Variable, MultivariatePolynomial>& substitutions) const;
-    
+	
 	/**
 	 * Replace all variables by a value given in their map.
-     * @return A new polynomial without the variables in map.
-     */
+	 * @return A new polynomial without the variables in map.
+	 */
 	template<typename SubstitutionType = Coeff>
 	MultivariatePolynomial substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
-    
+	
 	/**
 	 * Replace all variables by a Term in which the variable does not occur.
-     * @param substitutions
-     * @return 
-     */
+	 * @param substitutions
+	 * @return 
+	 */
 	MultivariatePolynomial substitute(const std::map<Variable, Term<Coeff>>& substitutions) const;
 	
 	/**
 	 * Like substitute, but expects substitutions for all variables.
-     * @return For a polynomial p, the function value p(x_1,...,x_n).
-     */
-    template<typename SubstitutionType = Coeff>
+	 * @return For a polynomial p, the function value p(x_1,...,x_n).
+	 */
+	template<typename SubstitutionType = Coeff>
 	Coeff evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
 	
 	bool divides(const MultivariatePolynomial& b) const;
 	/**
 	 * Calculates the S-Polynomial.
-     * @param p
-     * @param q
-     * @return 
-     */
+	 * @param p
+	 * @param q
+	 * @return 
+	 */
 	static MultivariatePolynomial SPolynomial(const MultivariatePolynomial& p, const MultivariatePolynomial& q);
 
 	MultivariatePolynomial pow(unsigned exp) const;
-    
+	
 	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
 	std::string toString(bool infix=true, bool friendlyVarNames=true) const;
@@ -491,8 +491,8 @@ public:
 	/**
 	 * Performs an addition involving a polynomial.
 	 * @param lhs First argument.
-     * @param rhs Second argument.
-     * @return `lhs + rhs`
+	 * @param rhs Second argument.
+	 * @return `lhs + rhs`
 	 */
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
@@ -544,9 +544,9 @@ public:
 	/**
 	 * Performs a subtraction involving a polynomial.
 	 * @param lhs First argument.
-     * @param rhs Second argument.
-     * @return `lhs - rhs`
-     */
+	 * @param rhs Second argument.
+	 * @return `lhs - rhs`
+	 */
 	template<typename C, typename O, typename P>
 	friend const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
@@ -643,10 +643,10 @@ public:
 	
 	/**
 	 * Streaming operator for multivariate polynomials.
-     * @param os Output stream.
-     * @param rhs Polynomial.
-     * @return `os`.
-     */
+	 * @param os Output stream.
+	 * @param rhs Polynomial.
+	 * @return `os`.
+	 */
 	template <typename C, typename O, typename P>
 	friend std::ostream& operator<<(std::ostream& os, const MultivariatePolynomial<C,O,P>& rhs);
 
@@ -668,7 +668,7 @@ private:
 	 * Takes care of trailing zero terms.
 	 * @param newTerms
 	 */
-    void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
+	void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
 public:
 	/**
@@ -678,7 +678,7 @@ public:
 	 * <li>All terms are actually valid and not nullptr or alike</li>
 	 * <li>Only the trailing term may be constant.</li>
 	 * </ul>
-     */
+	 */
 	void checkConsistency() const;
 };
 	template<typename C, typename O, typename P>
@@ -702,23 +702,23 @@ namespace std
 	/**
 	 * Specialization of `std::hash` for MultivariatePolynomial.
 	 */
-    template<typename C, typename O, typename P>
-    struct hash<carl::MultivariatePolynomial<C,O,P>>
-    {
+	template<typename C, typename O, typename P>
+	struct hash<carl::MultivariatePolynomial<C,O,P>>
+	{
 		/**
 		 * Calculates the hash of a MultivariatePolynomial.
 		 * @param mpoly MultivariatePolynomial.
 		 * @return Hash of mpoly.
 		 */
-        size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
-        {
-            size_t result = 0;
+		size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
+		{
+			size_t result = 0;
 			std::hash<carl::Term<C>> h;
-            for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
-                result ^= h(**iter);
-            return result;
-        }
-    };
+			for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
+				result ^= h(**iter);
+			return result;
+		}
+	};
 } // namespace std
 
 #include "MultivariatePolynomial.tpp"

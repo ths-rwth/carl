@@ -76,9 +76,9 @@ public:
 
 	/**
 	 * Searches in the friendly names list for a variable with the given name.
-     * @param name The friendly variable name to look for.
-     * @return The first variable with that friendly name.
-     */
+	 * @param name The friendly variable name to look for.
+	 * @return The first variable with that friendly name.
+	 */
 	Variable findVariableWithName(const std::string& name) const;
 	/**
 	 * Get a human-readable name for the given variable.
