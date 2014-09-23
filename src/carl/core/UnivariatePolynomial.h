@@ -1066,8 +1066,8 @@ public:
 	 * Streaming operator for univariate polynomials.
 	 * @param os Output stream.
 	 * @param rhs Polynomial.
-     * @return `os`
-     */
+	 * @return `os`
+	 */
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
 

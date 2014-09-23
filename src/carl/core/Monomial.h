@@ -122,9 +122,9 @@ namespace carl
 		}
 		/**
 		 * Assignment operator.
-         * @param rhs Other monomial.
-         * @return this.
-         */
+ * @param rhs Other monomial.
+ * @return this.
+ */
 		Monomial& operator=(const Monomial& rhs)
 		{
 			// Check for self-assignment.
@@ -310,9 +310,9 @@ namespace carl
 		/**
 		 * Divides the monomial by a variable v.
 		 * If the division is impossible (because v does not occur in the monomial), nullptr is returned.
-         * @param v Variable
-         * @return This divided by v.
-         */
+ * @param v Variable
+ * @return This divided by v.
+ */
 		Monomial* divide(Variable::Arg v) const
 		{
 			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
@@ -337,9 +337,9 @@ namespace carl
 
 		/**
 		 * Checks if this monomial is divisible by the given monomial m.
-         * @param m Monomial.
-         * @return If this is divisible by m.
-         */
+ * @param m Monomial.
+ * @return If this is divisible by m.
+ */
 		bool divisible(const Monomial& m) const
 		{
 			assert(isConsistent());
@@ -625,6 +625,14 @@ namespace carl
 			
 		}*/
 
+		/// @name Equality comparison operators
+		/// @{
+		/**
+		 * Checks if the two arguments are equal.
+		 * @param lhs First argument.
+		 * @param rhs Second argument.
+		 * @return `lhs == rhs`
+		 */
 		friend bool operator==(const Monomial& lhs, const Monomial& rhs) {
 			if (lhs.mTotalDegree != rhs.mTotalDegree) return false;
 			return lhs.mExponents == rhs.mExponents;
@@ -639,7 +647,16 @@ namespace carl
 		friend bool operator==(Variable::Arg lhs, const Monomial& rhs) {
 			return rhs == lhs;
 		}
+		/// @}
 
+		/// @name Inequality comparison operators
+		/// @{
+		/**
+		 * Checks if the two arguments are not equal.
+		 * @param lhs First argument.
+		 * @param rhs Second argument.
+		 * @return `lhs != rhs`
+		 */
 		friend bool operator!=(const Monomial& lhs, const Monomial& rhs)
 		{
 			return !(lhs == rhs);
@@ -653,6 +670,7 @@ namespace carl
 		{
 			return !(rhs == lhs);
 		}
+		/// @}
 
 		friend bool operator<(const Monomial& lhs, const Monomial& rhs)
 		{
@@ -662,9 +680,9 @@ namespace carl
 
 		/**
 		 * Multiplies this monomial with a variable.
-         * @param v Variable.
-         * @return This multiplied with v.
-         */
+		 * @param v Variable.
+		 * @return This multiplied with v.
+		 */
 		Monomial& operator*=(Variable::Arg v)
 		{
 			++mTotalDegree;
@@ -691,9 +709,9 @@ namespace carl
 
 		/**
 		 * Multiplies this monomial with another monomial.
-         * @param rhs Monomial.
-         * @return This multiplied with rhs.
-         */
+ * @param rhs Monomial.
+ * @return This multiplied with rhs.
+ */
 		Monomial& operator*=(const Monomial& rhs)
 		{
 			LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
@@ -738,35 +756,43 @@ namespace carl
 			return *this;
 		}
 
-		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs)
-		{
-			// Note that thisope implementation is not optimized yet!
+		/// @name Multiplication operators
+		/// @{
+		/**
+		 * Perform a multiplication involving a polynomial.
+		 * @param lhs Left hand side.
+		 * @param rhs Right hand side.
+		 * @return `lhs * rhs`
+		 */
+		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
 			Monomial result(lhs);
 			result *= rhs;
 			return result;
-		}
-
-		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs)
-		{
-			return rhs * lhs;
 		}
 		
-		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
-
-		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs )
-		{
-			// Note that this implementation is not optimized yet!
+		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
 			Monomial result(lhs);
 			result *= rhs;
 			return result;
 		}
+
+		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs) {
+			return rhs * lhs;
+		}
+
+		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
+			Monomial result(lhs);
+			result *= rhs;
+			return result;
+		}
+		/// @}
 		
 		/**
 		 * Returns the string representation of this monomial.
-         * @param infix Flag if prefix or infix notation should be used.
-         * @param friendlyVarNames Flag if friendly variable names should be used.
-         * @return String representation.
-         */
+		 * @param infix Flag if prefix or infix notation should be used.
+		 * @param friendlyVarNames Flag if friendly variable names should be used.
+		 * @return String representation.
+		 */
 		std::string toString(bool infix = true, bool friendlyVarNames = true) const
 		{
 			if(mExponents.empty()) return "1";
@@ -794,6 +820,12 @@ namespace carl
 			return ss.str();
 		}
 
+		/**
+		 * Streaming operator for Monomial.
+		 * @param os Output stream. 
+		 * @param rhs Monomial.
+		 * @return `os`
+		 */
 		friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
 		{
 			return (os << rhs.toString(true, true));
@@ -804,10 +836,10 @@ namespace carl
 		 * If both are valid objects, the lcm of both is calculated.
 		 * If only one is a valid object, this one is returned.
 		 * If both are invalid objects, an empty monomial is returned.
-         * @param lhs First monomial.
-         * @param rhs Second monomial.
-         * @return lcm of lhs and rhs.
-         */
+		 * @param lhs First monomial.
+		 * @param rhs Second monomial.
+		 * @return lcm of lhs and rhs.
+		 */
 		static Monomial lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
 		{
 			if (!lhs && !rhs) return Monomial();
@@ -926,29 +958,15 @@ namespace carl
 			return CompareResult::LESS;
 		}
 	};
-	
-	/**
-	 * Multiplies two variables which results in a monomial.
-     * @param lhs First variable.
-     * @param rhs Second variable.
-     * @return `lhs \cdot rhs`
-     */
-	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs)
-	{
-		// Note that this implementation is not optimized yet!
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
 } // namespace carl
 
 namespace std
 {
 	/**
 	 * The template specialization of `std::hash` for `carl::Monomial`.
-     * @param monomial Monomial.
-     * @return Hash of monomial.
-     */
+	 * @param monomial Monomial.
+	 * @return Hash of monomial.
+	 */
 	template<>
 	struct hash<carl::Monomial>
 	{
