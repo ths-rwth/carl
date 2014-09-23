@@ -123,7 +123,7 @@ namespace carl
         /**
          * A mutex for situation where any member is changed. TODO: Refine the locking-situations. 
          */
-        std::mutex mMutex;
+        std::recursive_mutex mMutex;
         
         /**
          *  The container storing all cached entries. It maps the objects to store to cache information, which cover a usage counter, 
@@ -216,7 +216,7 @@ namespace carl
          */
         typename Container::iterator erase( typename Container::iterator _toRemove )
         {
-            std::lock_guard<std::mutex> lock( mMutex );
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( _toRemove->second.usageCount == 0 );
             mCacheRefs[_toRemove->second.refStoragePos] = mCache.end();
             mUnusedPositionsInCacheRefs.push( _toRemove->second.refStoragePos );

@@ -36,7 +36,7 @@ namespace carl
     template<typename T>
     typename Cache<T>::Ref Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
-        std::lock_guard<std::mutex> lock( mMutex );
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         auto ret = mCache.insert( std::make_pair( _toCache, Info( mMaxActivity ) ) );
         
         if( !ret.second ) // There is already an equal object in the cache.
@@ -80,7 +80,7 @@ namespace carl
     template<typename T>
     void Cache<T>::reg( Ref _refStoragePos )
     {
-        std::lock_guard<std::mutex> lock( mMutex );
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
         assert( cacheRef != mCache.end() );
@@ -92,7 +92,7 @@ namespace carl
     template<typename T>
     void Cache<T>::dereg( Ref _refStoragePos )
     {
-        std::lock_guard<std::mutex> lock( mMutex );
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
         assert( cacheRef != mCache.end() );
@@ -112,7 +112,7 @@ namespace carl
     template<typename T>
     void Cache<T>::rehash( Ref _refStoragePos )
     {
-        std::lock_guard<std::mutex> lock( mMutex );
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
         assert( cacheRef != mCache.end() );
@@ -170,7 +170,7 @@ namespace carl
     template<typename T>
     void Cache<T>::decayActivity()
     {
-        std::lock_guard<std::mutex> lock( mMutex );
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         mActivityIncrement *= (1 / mDecay);
     }
     
@@ -183,7 +183,7 @@ namespace carl
         // update the activity of the cache entry at the given position
         if( (cacheRef->second.activity += mActivityIncrement) > mActivityThreshold )
         {
-            std::lock_guard<std::mutex> lock( mMutex );
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
             // rescale if the threshold for the maximum activity has been exceeded
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
                 iter->second.activity *= mActivityDecrementFactor;
@@ -191,7 +191,7 @@ namespace carl
             mMaxActivity *= mActivityDecrementFactor;
         }
         // update the maximum activity
-        std::lock_guard<std::mutex> lock( mMutex );
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mMaxActivity < cacheRef->second.activity )
             mMaxActivity = cacheRef->second.activity;
     }
