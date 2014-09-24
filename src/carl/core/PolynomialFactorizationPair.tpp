@@ -62,7 +62,7 @@ namespace carl
         if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
         {
             //TODO fix
-            //mpPolynomial =  mFactorization.begin()->first.content().mpPolynomial * coefficient;
+            mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );// * mCoefficient;
             assert( mpPolynomial != nullptr );
             P result;
             computePolynomial(result);
@@ -105,11 +105,13 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         //TODO fix
         //result = P( getCoefficient() );
+        result = P( 1 );
         auto factor = getFactorization().begin();
 
         while( factor != getFactorization().end() )
         {
             result *= factor->first.content().mpPolynomial->pow(factor->second);
+            factor++;
         }
     }
 
