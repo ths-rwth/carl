@@ -19,7 +19,7 @@ namespace carl
         Factorization<P> factorization;
         //TODO fix
         CoefficientRing<P> coefficient;// = _polynomial.coprimeFactor();
-        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), coefficient, new P( _polynomial.coprimeCoefficients() ) );
+        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), coefficient, new P( _polynomial ) );
         mCacheRef = mrCache.cache( pfPair );
         /*
          * The following is not very nice, but we know, that the hash won't change, once the polynomial 
