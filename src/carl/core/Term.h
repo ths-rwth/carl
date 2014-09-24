@@ -12,6 +12,7 @@
 #include "VariablesInformation.h"
 #include "Definiteness.h"
 #include "../interval/Interval.h"
+#include "pointerOperations.h"
 
 namespace carl
 {
