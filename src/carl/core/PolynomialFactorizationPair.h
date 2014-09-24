@@ -46,11 +46,6 @@ namespace carl
         mutable std::recursive_mutex mMutex;
         
         /**
-         * A pointer to a polynomial. This pointer might be set to nullptr, if the factorization has not yet been expanded.
-         */
-        mutable P* mpPolynomial;
-        
-        /**
          * A factorization (not necessarily the prime factorization) of the polynomial.
          */
         mutable Factorization<P> mFactorization;
@@ -61,10 +56,15 @@ namespace carl
         mutable CoefficientRing<P> mCoefficient;
 
         /**
-         * Compute the polynomial from factorization and coefficient.
-         * @return Polynomial
+         * A pointer to a polynomial. This pointer might be set to nullptr, if the factorization has not yet been expanded.
          */
-        P& computePolynomial();
+        mutable P* mpPolynomial;
+
+        /**
+         * Compute the polynomial from factorization and coefficient.
+         * @param result The polynomial.
+         */
+        void computePolynomial(P& result) const;
 
         /**
          * @return The factorization of this polynomial factorization pair

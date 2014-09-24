@@ -63,7 +63,9 @@ namespace carl
         {
             //mpPolynomial =  mFactorization.begin()->first.content().mpPolynomial * coefficient;
             assert( mpPolynomial != nullptr );
-            assert(computePolynomial() == *mpPolynomial);
+            P result;
+            computePolynomial(result);
+            assert(result == *mpPolynomial);
         }
         rehash();
     }
@@ -97,17 +99,16 @@ namespace carl
     }
     
     template<typename P>
-    P& PolynomialFactorizationPair<P>::computePolynomial()
+    void PolynomialFactorizationPair<P>::computePolynomial(P& result) const
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        P result = P( getCoefficient() );
+        //result = P( getCoefficient() );
         auto factor = getFactorization().begin();
 
         while( factor != getFactorization().end() )
         {
-            result *= factor->first.content().mPolynomial->pow(factor->second);
+            result *= factor->first.content().mpPolynomial->pow(factor->second);
         }
-        return result;
     }
 
     template<typename P>
