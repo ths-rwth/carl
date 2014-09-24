@@ -57,10 +57,11 @@ namespace carl
         mHash( 0 ),
         mFactorization( std::move( _factorization ) ),
         mCoefficient( _coefficient ),
-        mpPolynomial( new P(_polynomial->coprimeCoefficients() ) )
+        mpPolynomial( _polynomial )
     {
         if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
         {
+            //TODO fix
             //mpPolynomial =  mFactorization.begin()->first.content().mpPolynomial * coefficient;
             assert( mpPolynomial != nullptr );
             P result;
@@ -102,6 +103,7 @@ namespace carl
     void PolynomialFactorizationPair<P>::computePolynomial(P& result) const
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
+        //TODO fix
         //result = P( getCoefficient() );
         auto factor = getFactorization().begin();
 
