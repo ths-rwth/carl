@@ -15,7 +15,7 @@ namespace carl
 
 template<typename Coefficient>
 Term<Coefficient>::Term() :
-    mCoeff((Coefficient)0), mMonomial()
+    mCoeff(Coefficient(0)), mMonomial()
 {
     assert(this->isConsistent());
 }
@@ -55,17 +55,10 @@ Term<Coefficient>::Term(const Coefficient& c, const Monomial* m) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e) :
-mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, e)))
-{
-    assert(this->isConsistent());
-}
-
-template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const Monomial& m)
 : mCoeff(c)
 {
-    if (c != 0) mMonomial = std::make_shared<const Monomial>(m);
+    if (c != Coefficient(0)) mMonomial = std::make_shared<const Monomial>(m);
 	assert(this->isConsistent());
 }
 
@@ -73,15 +66,21 @@ template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m)
 : mCoeff(c)
 {
-    if(c != 0) mMonomial = m;
+    if(c != Coefficient(0)) mMonomial = m;
 	assert(this->isConsistent());
 }
 
+template<typename Coefficient>
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e)
+: mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, e)))
+{
+    assert(this->isConsistent());
+}
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Coefficient& c) const
 {
-    assert(c != 0);
+    assert(c != Coefficient(0));
     return new Term(mCoeff / c, mMonomial);
 }
 
@@ -90,7 +89,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->dividedBy(v);
+        Monomial* div = mMonomial->divide(v);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -108,7 +107,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->dividedBy(m);
+        Monomial* div = mMonomial->divide(m);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -124,7 +123,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
 {
-    assert(t.mCoeff != 0);
+    assert(t.mCoeff != Coefficient(0));
     if(mMonomial)
     {
         if(!t.mMonomial)
@@ -132,7 +131,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
             // Term is just a constant.
             return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
         }
-        Monomial* div = mMonomial->dividedBy(*(t.mMonomial));
+        Monomial* div = mMonomial->divide(*(t.mMonomial));
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
@@ -156,7 +155,7 @@ Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 	if(!mMonomial)
 	{
 		// Derivatives of constants are zero.
-		return new Term<Coefficient>((Coefficient)0);
+		return new Term<Coefficient>(Coefficient(0));
 	}
     Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
     *t *= mCoeff;
@@ -169,10 +168,10 @@ Definiteness Term<Coefficient>::definiteness() const
     if(mMonomial)
     {
         if(mMonomial->isSquare())
-            return (mCoeff < (Coefficient)0 ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
+            return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
     }
-    else if(mCoeff != (Coefficient)0)
-        return (mCoeff < (Coefficient)0 ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
+    else if(mCoeff != Coefficient(0))
+        return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
     return Definiteness::NON;
 }
 
@@ -223,11 +222,11 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 
 template<typename Coefficient>
 template<bool gatherCoeff, typename CoeffType>
-void Term<Coefficient>::gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
+void Term<Coefficient>::gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
 {
 	if(mMonomial)
 	{
-		mMonomial->gatherVarInfo(var, varinfo, coeff());
+		varinfo.collect(var, coeff(), *mMonomial);
 	}
     else
     {
@@ -343,19 +342,19 @@ const Term<Coefficient> Term<Coefficient>::operator-() const
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 {
-    if(rhs == 0) 
+    if(rhs == Coefficient(0)) 
     {
         clear();
         return *this;
     }
-    assert(mCoeff == 0 || mCoeff * rhs != 0);
+    assert(mCoeff == Coefficient(0) || mCoeff * rhs != Coefficient(0));
     mCoeff *= rhs;
     return *this;
 }
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 {
-    if(mCoeff == 0)
+    if(mCoeff == Coefficient(0))
     {
         return *this;
     }
@@ -373,7 +372,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial& rhs)
 {
-    if(mCoeff == 0) return *this;
+    if(mCoeff == Coefficient(0)) return *this;
     
     if(mMonomial)
     {
@@ -391,8 +390,8 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial& rhs)
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 {
-    if(mCoeff == 0) return *this;
-    if(rhs.mCoeff == 0) 
+    if(mCoeff == Coefficient(0)) return *this;
+    if(rhs.mCoeff == Coefficient(0)) 
     {
         clear();
         return *this;
@@ -468,6 +467,13 @@ const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs)
     return rhs * lhs;
 }
 
+
+template<typename Coeff>
+const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs)
+{
+	return Term<Coeff>(lhs.coeff()/rhs, lhs.monomial());
+}
+
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 {
@@ -475,6 +481,7 @@ std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 }
 
 template<typename Coefficient>
+template<typename C, DisableIf<is_interval<C>>>
 std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
     if(mMonomial)
@@ -483,13 +490,13 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
         {
             std::stringstream s;
             if(!infix) s << " ";
-            bool negative = (mCoeff < 0);
+            bool negative = (mCoeff < Coefficient(0));
             if(negative) s << "(-" << (infix ? "" : " ");
             if(infix) s << carl::abs(mCoeff);
             else
             {
-                typename IntegralT<Coefficient>::type d = getDenom(mCoeff);
-                if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << carl::abs(getNum(mCoeff)) << " " << carl::abs(d) << ")";
+                typename IntegralType<Coefficient>::type d = getDenom(mCoeff);
+                if(d != typename IntegralType<Coefficient>::type(1)) s << "(/ " << carl::abs(getNum(mCoeff)) << " " << carl::abs(d) << ")";
                 else s << carl::abs(mCoeff);
             }
             if(negative) 
@@ -506,18 +513,45 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
     else 
     {
         std::stringstream s;
-        bool negative = (mCoeff < 0);
+        bool negative = (mCoeff < Coefficient(0));
         if(negative)
             s << "(-" << (infix ? "" : " ");
         if(infix) s << carl::abs(mCoeff);
         else
         {
-            typename IntegralT<Coefficient>::type d = getDenom(mCoeff);
-            if(d != typename IntegralT<Coefficient>::type(1)) s << "(/ " << carl::abs(getNum(mCoeff)) << " " << carl::abs(d) << ")";
+            typename IntegralType<Coefficient>::type d = getDenom(mCoeff);
+            if(d != typename IntegralType<Coefficient>::type(1)) s << "(/ " << carl::abs(getNum(mCoeff)) << " " << carl::abs(d) << ")";
             else s << carl::abs(mCoeff);
         }
         if(negative)
             s << ")";
+        return s.str();
+    }
+}
+
+template<typename Coefficient>
+template<typename C, EnableIf<is_interval<C>>>
+std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
+{ 
+    if(mMonomial)
+    {
+        if(mCoeff != C(1))
+        {
+            std::stringstream s;
+            s << mCoeff;
+            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+        }
+        else
+        {
+            if(infix) return mMonomial->toString(true, friendlyVarNames);
+            else return mMonomial->toString(infix, friendlyVarNames);
+        }
+    }
+    else 
+    {
+        std::stringstream s;
+        s << mCoeff;
         return s.str();
     }
 }

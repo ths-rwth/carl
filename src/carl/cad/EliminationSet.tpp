@@ -295,7 +295,7 @@ template<typename Coefficient>
 std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::eliminateInto(
 		const UPolynomial* p,
 		EliminationSet<Coefficient>& destination,
-		const Variable& variable,
+		Variable::Arg variable,
 		const CADSettings& setting
 		)
 {
@@ -374,7 +374,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		std::list<const UPolynomial*>& otherqueue,
 		bool avoidSingle,
 		EliminationSet<Coefficient>& destination,
-		const Variable& variable,
+		Variable::Arg variable,
 		const CADSettings& setting
 		)
 {
@@ -402,7 +402,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 template<typename Coefficient>
 std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationSet<Coefficient>::eliminateNextInto(
 		EliminationSet<Coefficient>& destination,
-		const Variable& variable,
+		Variable::Arg variable,
 		const CADSettings& setting,
 		bool synchronous
 		)
@@ -469,7 +469,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 }
 
 template<typename Coefficient>
-void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to, const Variable& variable ) {
+void EliminationSet<Coefficient>::moveConstants(EliminationSet<Coefficient>& to, Variable::Arg variable ) {
 	std::forward_list<const UPolynomial*> toDelete;
 	for (auto p: this->polynomials) {
 		assert(p->isConsistent());
@@ -582,7 +582,7 @@ std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff
 template<typename Coeff>
 void EliminationSet<Coeff>::elimination(
 			const UPolynomial* p,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coeff>& eliminated,
 			bool avoidSingle
 ) {
@@ -603,7 +603,7 @@ template<typename Coeff>
 void EliminationSet<Coeff>::elimination(
 		const UPolynomial* p,
 		const UPolynomial* q,
-		const Variable& variable,
+		Variable::Arg variable,
 		EliminationSet<Coeff>& eliminated,
 		bool avoidSingle
 ) {

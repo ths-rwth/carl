@@ -103,7 +103,7 @@ Policies()
 		*this += p.coefficients()[0];
 	}
 	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
-		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
+		*this += p.coefficients()[deg] * Term<Coeff>(Coeff(1), p.mainVar(), deg);
 	}
 	this->checkConsistency();
 }
@@ -348,8 +348,8 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
 {
     if(nrTerms() == 0) return false;
-	else
-	{
+	else {
+		// A term may not be zero...
 		return trailingTerm()->isConstant();
 	}
 }
@@ -565,7 +565,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 
 
 template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
+void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
 	this->checkConsistency();
 	value.checkConsistency();
@@ -679,7 +679,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(const Variabl
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value) const
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value) const
 {
     MultivariatePolynomial result(*this);
     result.substituteIn(var, value);
@@ -708,15 +708,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         }
     }
     // Find and sort all exponents occurring for all variables to substitute as basis.
-    std::map<VarExpPair, MultivariatePolynomial> expResults;
+    std::map<std::pair<Variable, exponent>, MultivariatePolynomial> expResults;
 	for(auto term : result.mTerms)
 	{
         if(term->monomial())
         {
             const Monomial& m = *(term->monomial());
+			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
             for(unsigned i = 0; i < m.nrVariables(); ++i)
             {
-                if(m[i].exp > 1 && substitutions.find(m[i].var) != substitutions.end())
+				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+                if(m[i].second > 1 && substitutions.find(m[i].first) != substitutions.end())
                 {
                     expResults[m[i]] = MultivariatePolynomial((Coeff) 1);
                 }
@@ -735,12 +737,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
             assert(sub != substitutions.end());
             ++sub;
         }
-        assert(sub->first == expResultB->first.var);
-        expResultB->second = sub->second.pow(expResultB->first.exp);
+        assert(sub->first == expResultB->first.first);
+        expResultB->second = sub->second.pow(expResultB->first.second);
         ++expResultB;
         while(expResultB != expResults.end())
         {
-            if(expResultA->first.var != expResultB->first.var)
+            if(expResultA->first.first != expResultB->first.first)
             {
                 ++sub;
                 assert(sub != substitutions.end());
@@ -750,12 +752,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
                     assert(sub != substitutions.end());
                     ++sub;
                 }
-                assert(sub->first == expResultB->first.var);
-                expResultB->second = sub->second.pow(expResultB->first.exp);
+                assert(sub->first == expResultB->first.first);
+                expResultB->second = sub->second.pow(expResultB->first.second);
             }
             else
             {
-                expResultB->second = expResultA->second * sub->second.pow(expResultB->first.exp-expResultA->first.exp);
+                expResultB->second = expResultA->second * sub->second.pow(expResultB->first.second-expResultA->first.second);
             }
             ++expResultA;
             ++expResultB;
@@ -769,18 +771,20 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         if(term->monomial())
         {   
             const Monomial& m = *(term->monomial());
+			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
             for(unsigned i = 0; i < m.nrVariables(); ++i)
             {
-                if(m[i].exp == 1)
+				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+                if(m[i].second == 1)
                 {
-                    auto iter = substitutions.find(m[i].var);
+                    auto iter = substitutions.find(m[i].first);
                     if(iter != substitutions.end())
                     {
                         termResult *= iter->second;
                     }
                     else
                     {
-                        termResult *= m[i].var;
+                        termResult *= m[i].first;
                     }
                 }
                 else
@@ -792,7 +796,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
                     }
                     else
                     {
-                        termResult *= Term<Coeff>((Coeff)1, m[i].var, m[i].exp);
+                        termResult *= Term<Coeff>((Coeff)1, m[i].first, m[i].second);
                     }
                 }
             }
@@ -860,12 +864,13 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<V
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);
 	typename TermsType::const_iterator it = mTerms.begin();
-	typename IntegralT<Coeff>::type num = getNum((*it)->coeff());
-	typename IntegralT<Coeff>::type den = getDenom((*it)->coeff());
+	typename IntegralType<Coeff>::type num = getNum((*it)->coeff());
+	typename IntegralType<Coeff>::type den = getDenom((*it)->coeff());
 	for(++it; it != mTerms.end(); ++it)
 	{
 		num = carl::gcd(num, getNum((*it)->coeff()));
@@ -1001,15 +1006,8 @@ std::set<Variable> MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariab
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-unsigned MultivariatePolynomial<Coeff,Ordering,Policies>::hash() const
-{
-    // TODO: make this compilable 
-    return mTerms.size() << 16 || (std::hash<Coeff>()(lcoeff()) ^ lterm()->getNrVariables());
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 template<bool gatherCoeff>
-VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo(const Variable& var) const
+VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::getVarInfo(Variable::Arg var) const
 {
 	VariableInformation<gatherCoeff, MultivariatePolynomial> varinfomap;
 	// We iterate over all terms.
@@ -1133,10 +1131,10 @@ bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePol
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
+bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    LOG_NOTIMPLEMENTED();
-    return false;
+	LOG_INEFFICIENT();
+    return MultivariatePolynomial<C,O,P>(lhs) == rhs;
 }
 
 template<typename C, typename O, typename P>
@@ -1146,10 +1144,10 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
+bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
-    LOG_NOTIMPLEMENTED();
-    return false;
+	LOG_INEFFICIENT();
+    return MultivariatePolynomial<C>(lhs) == rhs;
 }
 
 template<typename C, typename O, typename P>
@@ -1470,7 +1468,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const Variable::Arg rhs)
+MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(Variable::Arg rhs)
 {
     if(Policies::searchLinear) 
     {
@@ -1789,7 +1787,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const Variable::Arg rhs)
+MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(Variable::Arg rhs)
 {
     if(Policies::searchLinear) 
     {
@@ -1977,7 +1975,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
     return *this;
 }
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const Variable::Arg rhs)
+MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(Variable::Arg rhs)
 {
     TermsType newTerms;
     newTerms.reserve(mTerms.size());
@@ -2097,6 +2095,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
     }
     mTerms = std::move(newTerms);
     return *this;
+}
+
+template<typename C, typename O, typename P>
+const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs)
+{
+    MultivariatePolynomial<C,O,P> result(lhs);
+	for(auto& t : result.mTerms)
+	{
+		t = std::shared_ptr<const Term<C>>(new Term<C>(*t/rhs));
+	}
+	return result;
 }
 
 template<typename C, typename O, typename P>

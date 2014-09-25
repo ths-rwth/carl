@@ -102,7 +102,7 @@ CAD<Number>::CAD(const CAD<Number>& cad):
 }
 
 template<typename Number>
-unsigned CAD<Number>::indexOf(const Variable& v) const {
+unsigned CAD<Number>::indexOf(Variable::Arg v) const {
 	for(unsigned int i = 0; i < this->variables.size(); ++i) {
 		if (v == this->variables[i]) return i;
 	}
@@ -188,6 +188,12 @@ void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& c
 	}
 }
 
+/**
+ * Print the CAD object information to the output stream.
+ * @param os Output stream.
+ * @param cad CAD object.
+ * @return os.
+ */
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;
@@ -746,7 +752,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 			std::forward_list<const UPolynomial*> curParents = this->eliminationSets[l].removeByParent(parent);
 			newParents.insert_after(newParents.before_begin(), curParents.begin(), curParents.end());
 		}
-		newParents.sort(UnivariatePolynomialComparator<MPolynomial>(this->setting.order));
+		newParents.sort(std::less<UPolynomial>(this->setting.order));
 		newParents.unique();
 		std::swap(parents, newParents);
 	}
@@ -801,7 +807,7 @@ std::vector<Interval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoint<Nu
 		}
 		// search for the left and right boundaries in the first variable eliminated
 		// does not compare less than r
-		auto node = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), sample, Less<Number>());
+		auto node = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), sample, std::less<RealAlgebraicNumberPtr<Number>>());
 		
 		bounds[index] = this->getBounds(node, sample);
 		parent = node;
@@ -861,7 +867,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			if (!(*insertValue.first)->isRoot()) {
 				// the new root is already contained, but only as sample value => switch to root and start sample construction from scratch
 				assert(i->isRoot());
-				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, Less<Number>());
+				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, std::less<RealAlgebraicNumberPtr<Number>>());
 				if (pos != newSampleSet.end()) {
 					newSampleSet.remove(pos);
 				}
@@ -876,7 +882,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 				currentSamples.remove(insertValue.first);
 				insertValue = currentSamples.insert(RealAlgebraicNumberNR<Number>::create(i->value(), true));
 				// this value might have been added to newSamples already, so switch the root status there as well
-				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, Less<Number>());
+				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, std::less<RealAlgebraicNumberPtr<Number>>());
 				if (pos != newSampleSet.end()) {
 					newSampleSet.remove(pos);
 					newSampleSet.insert(*insertValue.first);
@@ -1349,10 +1355,10 @@ bool CAD<Number>::mainCheck(
 template<typename Number>
 typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node) {
 	LOG_FUNC("carl.cad", newSample << ", " << *node);
-	sampleIterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, Less<Number>());
+	sampleIterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, std::less<RealAlgebraicNumberPtr<Number>>());
 	if (newNode == this->sampleTree.end(node)) {
 		newNode = this->sampleTree.append_child(node, newSample);
-	} else if (Equal<Number>()(*newNode, newSample)) {
+	} else if (std::equal_to<RealAlgebraicNumberPtr<Number>>()(*newNode, newSample)) {
 		newNode = this->sampleTree.replace(newNode, newSample);
 	} else {
 		newNode = this->sampleTree.insert(newNode, newSample);
@@ -1652,7 +1658,7 @@ Interval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleIterat
 		return Interval<Number>::unboundedExactInterval();
 	}
 	// search for the left and right boundaries in the first variable eliminated
-	auto node = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), sample, Less<Number>());
+	auto node = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), sample, std::less<RealAlgebraicNumberPtr<Number>>());
 	auto neighbor = node;
 	
 	if (node == this->sampleTree.end(parent)) {
@@ -1802,7 +1808,7 @@ void CAD<Number>::trimVariables() {
 					auto node = toDelete.front();
 					auto parent = this->sampleTree.parent(node);
 					for (auto child = this->sampleTree.begin(node); child != this->sampleTree.end(node); child++) {
-						auto newNode = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), *child, Less<Number>());
+						auto newNode = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), *child, std::less<RealAlgebraicNumberPtr<Number>>());
 						if (newNode == this->sampleTree.end(parent)) {
 							// the child is not contained in the siblings nor any child is greater than it
 							this->sampleTree.append_child(parent, child);

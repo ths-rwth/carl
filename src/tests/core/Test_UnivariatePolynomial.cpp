@@ -6,6 +6,7 @@
 #include "carl/numbers/GFNumber.h"
 #include "carl/numbers/GaloisField.h"
 #include "carl/util/debug.h"
+#include "carl/interval/Interval.h"
 
 #include <cln/cln.h>
 #include <gmpxx.h>
@@ -45,14 +46,14 @@ TEST(UnivariatePolynomial, Reduction)
 	{
 		UnivariatePolynomial<cln::cl_RA> p(x, {(cln::cl_RA)1, (cln::cl_RA)1,(cln::cl_RA)0, (cln::cl_RA)0,(cln::cl_RA)1});
 		UnivariatePolynomial<cln::cl_RA> q(x, {(cln::cl_RA)1,(cln::cl_RA)1});
-		auto res = p.reduce(q);
+		auto res = p.remainder(q);
 		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), 1);
 	}
 	{
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1),MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
 		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(x, {MultivariatePolynomial<cln::cl_RA>(1), MultivariatePolynomial<cln::cl_RA>(1)});
-		auto res = p.reduce(q, MultivariatePolynomial<cln::cl_RA>(1));
+		auto res = p.remainder(q, MultivariatePolynomial<cln::cl_RA>(1));
 		ASSERT_EQ(res.degree(), (unsigned)0);
 		ASSERT_EQ(res.lcoeff(), MultivariatePolynomial<cln::cl_RA>(1));
 	}
@@ -400,7 +401,6 @@ TEST(UnivariatePolynomial, resultant2)
 
 TEST(UnivariatePolynomial, resultant3)
 {
-	Variable b = VariablePool::getInstance().getFreshVariable("b");
 	Variable a = VariablePool::getInstance().getFreshVariable("a");
 	Variable t = VariablePool::getInstance().getFreshVariable("t");
 	
@@ -417,3 +417,10 @@ TEST(UnivariatePolynomial, resultant3)
 	//EXPECT_EQ(r, p.resultant(q));
 }
 
+TEST(UnivariatePolynomial, intervalCoeffs)
+{
+	Variable a = VariablePool::getInstance().getFreshVariable("a");
+	UnivariatePolynomial<carl::Interval<double>> p(a);
+	p *= p;
+	p += p;
+}

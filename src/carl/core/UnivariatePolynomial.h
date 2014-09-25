@@ -48,15 +48,26 @@ enum class SubresultantStrategy : unsigned {
 };
 	
 /**
+ * This class represents a univariate polynomial with coefficients of an arbitrary type.
+ *
+ * A univariate polynomial is defined by a variable (the _main variable_) and the coefficients.
+ * The coefficients may be of any type. The intention is to use a numbers or polynomials as coefficients.
+ * If polynomials are used as coefficients, this can be seen as a multivariate polynomial with a distinguished main variable.
+ *
+ * Most methods are specifically adapted for polynomial coefficients, if necessary.
  * @ingroup unirp
  */
 template<typename Coefficient>
 class UnivariatePolynomial : public Polynomial
 {
-	
+	/**
+	 * Declare all instantiations of univariate polynomials as friends.
+	 */
 	template<class T> friend class UnivariatePolynomial; 
 private:
+	/// The main variable.
 	Variable mMainVar;
+	/// The coefficients.
 	std::vector<Coefficient> mCoefficients;
 
 public:
@@ -67,11 +78,7 @@ public:
 	/**
 	 * The integral type that belongs to the number type.
 	 */
-	typedef typename IntegralT<NumberType>::type IntNumberType;
-	/**
-	 * The type of the coefficients.
-	 */
-	typedef Coefficient CoefficientType;
+	typedef typename IntegralType<NumberType>::type IntNumberType;
 
 	// Rule of five
 	/**
@@ -106,7 +113,7 @@ public:
 	 * @param coeff Leading coefficient.
 	 * @param degree Degree.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree=0);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree = 0);
 
 	/**
 	 * Construct polynomial with the given coefficients.
@@ -269,7 +276,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
-		if (this->isZero()) return 0;
+		if (this->isZero()) return NumberType(0);
 		return this->tcoeff();
 	}
 	/**
@@ -281,7 +288,7 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	NumberType constantPart() const
 	{
-		if (this->isZero()) return 0;
+		if (this->isZero()) return NumberType(0);
 		return this->tcoeff().constantPart();
 	}
 
@@ -363,7 +370,7 @@ public:
 	 * Retrieves the main variable of this polynomial.
 	 * @return Main variable.
 	 */
-	const Variable& mainVar() const {
+	Variable::Arg mainVar() const {
 		return mMainVar;
 	}
 
@@ -375,7 +382,7 @@ public:
 	 * @return Restructured polynomial.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(const Variable& newVar) const {
+	UnivariatePolynomial<MultivariatePolynomial<NumberType>> switchVariable(Variable::Arg newVar) const {
 		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
@@ -387,7 +394,7 @@ public:
 	 * @return Restructured polynomial.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial switchVariable(const Variable& newVar) const {
+	UnivariatePolynomial switchVariable(Variable::Arg newVar) const {
 		assert(this->isConsistent());
 		return MultivariatePolynomial<NumberType>(*this).toUnivariatePolynomial(newVar);
 	}
@@ -399,7 +406,7 @@ public:
 	 * @return New polynomial.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+	UnivariatePolynomial replaceVariable(Variable::Arg newVar) const {
 		return UnivariatePolynomial<Coefficient>(newVar, this->mCoefficients);
 	}
 	/**
@@ -409,7 +416,7 @@ public:
 	 * @return New polynomial.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial replaceVariable(const Variable& newVar) const {
+	UnivariatePolynomial replaceVariable(Variable::Arg newVar) const {
 		return MultivariatePolynomial<NumberType>(*this).substitute(this->mainVar(), MultivariatePolynomial<NumberType>(newVar)).toUnivariatePolynomial(newVar);
 	}
 
@@ -463,16 +470,27 @@ public:
 	}
 
 	/**
-	 * 
-	 * @return copr
+	 * Calculates a factor that would make the coefficients of this polynomial coprime integers.
+	 *
+	 * We consider a set of integers coprime, if they share no common factor.
+	 * Technically, the coprime factor is \f$ lcm(N) / gcd(D) \f$ where `N` is the set of the numerators and `D` is the set of the denominators of all coefficients.
+	 * @return Coprime factor of this polynomial.
 	 */
+	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coefficient coprimeFactor() const;
 	
+	/**
+	 * Constructs a new polynomial that is scaled such that the coefficients are coprime.
+	 * It is calculated by multiplying it with the coprime factor.
+	 * By definition, this results in a polynomial with integral coefficients.
+	 * @return This polynomial multiplied with the coprime factor.
+	 */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> coprimeCoefficients() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficients() const;
 
 	/**
-	 * Checks whether the polynomial is unit normal
+	 * Checks whether the polynomial is unit normal.
+	 * A polynomial is unit normal, if the leading coefficient is unit normal, that is if it is either one or minus one.
 	 * @see @cite GCL92, page 39
 	 * @return If polynomial is normal.
 	 */
@@ -480,7 +498,7 @@ public:
 	/**
 	 * The normal part of a polynomial is the polynomial divided by the unit part.
 	 * @see @cite GCL92, page 42.
-	 * @return 
+	 * @return This polynomial divided by the unit part.
 	 */
 	UnivariatePolynomial normalized() const;
 	
@@ -500,7 +518,12 @@ public:
 	 */
 	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
-	
+	/**
+	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
+	 * and one for zero polynomials.
+	 * @see @cite GCL92, page 42.
+	 * @return The unit part of the polynomial.
+	 */
 	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
 	Coefficient unitPart() const;
 	
@@ -524,15 +547,19 @@ public:
 	/**
 	 * The n'th derivative of the polynomial in its main variable.
 	 * @param nth how many times the derivative should be applied.
-	 * @return A polynomial (d/dx)^n p(x) where p(x) is the input polynomial.
+	 * @return A polynomial \f$(d/dx)^n p(x)\f$ where \f$p(x)\f$ is the input polynomial.
 	 */
 	UnivariatePolynomial derivative(unsigned nth = 1) const;
 
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
-	UnivariatePolynomial reduce(const UnivariatePolynomial& divisor) const;
+	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
+	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
+	/**
+	 * Constructs a new polynomial `q` such that \f$ q(x) = p(-x) \f$ where `p` is this polynomial.
+	 * @return New polynomial with negated variable.
+	 */
 	UnivariatePolynomial negateVariable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
 		for (unsigned int deg = 0; deg < res.coefficients().size(); deg++) {
@@ -590,11 +617,43 @@ public:
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy, DisableIf<is_number<C>> = dummy, EnableIf<is_field<typename UnderlyingNumberType<C>::type>> = dummy>
 	DivisionResult<UnivariatePolynomial> divideBy(const NumberType& divisor) const;
 
-	bool divides(const UnivariatePolynomial&) const;
+	/**
+	 * Checks if this polynomial is divisible by the given divisor, that is if the remainder is zero.
+	 * @param divisor Polynomial.
+	 * @return If divisor divides this polynomial.
+	 */
+	bool divides(const UnivariatePolynomial& divisor) const;
 	
+	/**
+	 * Replaces every coefficient `c` by `c mod modulus`.
+	 * @param modulus Modulus.
+	 * @return This.
+	 */
 	UnivariatePolynomial& mod(const Coefficient& modulus);
+	/**
+	 * Constructs a new polynomial where every coefficient `c` is replaced by `c mod modulus`.
+	 * @param modulus Modulus.
+	 * @return New polynomial.
+	 */
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
+
+	/**
+	 * Calculates the greatest common divisor of two polynomials.
+	 * @param a First polynomial.
+	 * @param b Second polynomial.
+	 * @return `gcd(a,b)`
+	 */
 	static UnivariatePolynomial gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b);
+	/**
+	 * Calculates the extended greatest common divisor `g` of two polynomials.
+	 * The output polynomials `s` and `t` are computed such that \f$g = s \cdot a + t \cdot b\f$.
+	 * @param a First polynomial.
+	 * @param b Second polynomial.
+	 * @param s First output polynomial.
+	 * @param t Second output polynomial.
+	 * @see @cite GCL92, Algorithm 2.2
+	 * @return `gcd(a,b)`
+	 */
 	static UnivariatePolynomial extended_gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b,
 											 UnivariatePolynomial& s, UnivariatePolynomial& t);
 
@@ -606,14 +665,14 @@ public:
 	Coefficient evaluate(const Coefficient& value) const;
 	
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	void substituteIn(const Variable& var, const Coefficient& value);
+	void substituteIn(Variable::Arg var, const Coefficient& value);
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	void substituteIn(const Variable& var, const Coefficient& value);
+	void substituteIn(Variable::Arg var, const Coefficient& value);
 
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+	UnivariatePolynomial substitute(Variable::Arg var, const Coefficient& value) const;
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	UnivariatePolynomial substitute(const Variable& var, const Coefficient& value) const;
+	UnivariatePolynomial substitute(Variable::Arg var, const Coefficient& value) const;
 
 	/**
 	 * Calculates the sign of the polynomial at some point.
@@ -628,7 +687,7 @@ public:
 	}
 	
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
-	UnivariatePolynomial<typename CoefficientRing<Coefficient>::type> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
+	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
 	{
 		LOG_NOTIMPLEMENTED();
 	}
@@ -661,11 +720,11 @@ public:
 	 * @return 
 	 */
 	template<typename C=Coefficient, EnableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> toIntegerDomain() const;
 	template<typename C=Coefficient, DisableIf<is_instantiation_of<GFNumber, C>> = dummy>
-	UnivariatePolynomial<typename IntegralT<Coefficient>::type> toIntegerDomain() const;
+	UnivariatePolynomial<typename IntegralType<Coefficient>::type> toIntegerDomain() const;
 	
-	UnivariatePolynomial<GFNumber<typename IntegralT<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralT<Coefficient>::type>* galoisField) const;
+	UnivariatePolynomial<GFNumber<typename IntegralType<Coefficient>::type>> toFiniteDomain(const GaloisField<typename IntegralType<Coefficient>::type>* galoisField) const;
 
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	UnivariatePolynomial<NumberType> toNumberCoefficients(bool check = true) const;
@@ -721,7 +780,7 @@ public:
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
 	NumberType numericUnit() const
 	{
-		return (this->lcoeff() >= 0 ? 1 : -1);
+		return (this->lcoeff() >= Coefficient(0) ? NumberType(1) : NumberType(-1));
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	NumberType numericUnit() const
@@ -750,7 +809,7 @@ public:
 	 */
 	UnivariatePolynomial pseudoPrimpart() const {
 		auto c = this->numericContent();
-		if ((c == 0) || (c == 1)) return *this;
+		if ((c == NumberType(0)) || (c == NumberType(1))) return *this;
 		return this->divideBy(this->numericContent()).quotient;
 	}
 
@@ -849,6 +908,14 @@ public:
 
 	UnivariatePolynomial<Coefficient> discriminant(const SubresultantStrategy strategy = SubresultantStrategy::Default) const;
 
+	/// @name Equality comparison operators
+	/// @{
+	/**
+	 * Checks if the two arguments are equal.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs == rhs`
+	 */
 	template<typename C>
 	friend bool operator==(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -857,59 +924,103 @@ public:
 	friend bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator==(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	/// @}
+
+	/// @name Inequality comparison operators
+	/// @{
+	/**
+	 * Checks if the two arguments are not equal.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs != rhs`
+	 */
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend bool operator!=(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs);
+	/// @}
 	
 	bool less(const UnivariatePolynomial<Coefficient>& rhs, const PolynomialComparisonOrder& order = PolynomialComparisonOrder::Default) const;
-	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs, const PolynomialComparisonOrder& order);
-	template<typename C>
-	friend bool less(const UnivariatePolynomial<C>* lhs, const UnivariatePolynomial<C>* rhs, const PolynomialComparisonOrder&);
-	template<typename C>
-	friend bool less(const UnivariatePolynomialPtr<C>& lhs, const UnivariatePolynomialPtr<C>& rhs, const PolynomialComparisonOrder&);
 	template<typename C>
 	friend bool operator<(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 
 	UnivariatePolynomial operator-() const;
-	UnivariatePolynomial& operator+=(const Coefficient& rhs);
+	
+	/// @name In-place addition operators
+	/// @{
 	/**
-	 * @param rhs A univariate polynomial over the same variable.
-	 * @return 
+	 * Add something to this polynomial and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
 	 */
+	UnivariatePolynomial& operator+=(const Coefficient& rhs);
 	UnivariatePolynomial& operator+=(const UnivariatePolynomial& rhs);
+	/// @}
+	
+	/// @name Addition operators
+	/// @{
+	/**
+	 * Performs an addition involving a polynomial.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs + rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator+(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator+(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	/// @}
 	
-	UnivariatePolynomial& operator-=(const Coefficient& rhs);
+	/// @name In-place subtraction operators
+	/// @{
 	/**
-	 * @param rhs A univariate polynomial over the same variable.
-	 * @return 
+	 * Subtract something from this polynomial and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
 	 */
+	UnivariatePolynomial& operator-=(const Coefficient& rhs);
 	UnivariatePolynomial& operator-=(const UnivariatePolynomial& rhs);
+	/// @}
+	
+	/// @name Subtraction operators
+	/// @{
+	/**
+	 * Performs a subtraction involving a polynomial.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs - rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator-(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	/// @}
 	
-	
-	UnivariatePolynomial& operator*=(const Coefficient& rhs);
-	// TODO: does this make any sense?
-	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
-	UnivariatePolynomial& operator*=(const typename IntegralT<Coefficient>::type& rhs);
+	/// @name In-place multiplication operators
+	/// @{
 	/**
-	 * @param rhs A univariate polynomial over the same variable.
-	 * @return 
+	 * Multiply this polynomial with something and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
 	 */
+	UnivariatePolynomial& operator*=(const Coefficient& rhs);
+	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
+	UnivariatePolynomial& operator*=(const typename IntegralType<Coefficient>::type& rhs);
 	UnivariatePolynomial& operator*=(const UnivariatePolynomial& rhs);
+	/// @}
 	
+	/// @name Multiplication operators
+	/// @{
+	/**
+	 * Perform a multiplication involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs * rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -917,25 +1028,46 @@ public:
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const typename IntegralT<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
+	friend UnivariatePolynomial<C> operator*(const typename IntegralType<C>::type& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralT<C>::type& rhs);
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const typename IntegralType<C>::type& rhs);
 	template<typename C, typename O, typename P>
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& lhs, const C& rhs);
 	template<typename C, typename O, typename P>
 	friend UnivariatePolynomial<MultivariatePolynomial<C,O,P>> operator*(const C& lhs, const UnivariatePolynomial<MultivariatePolynomial<C,O,P>>& rhs);
-	
-	
+	/// @}
 
+	/// @name In-place division operators
+	/// @{
+	/**
+	 * Divide this polynomial by something and return the changed polynomial.
+	 * @param rhs Right hand side.
+	 * @return Changed polynomial.
+	 */
 	template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
 	template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 	UnivariatePolynomial& operator/=(const Coefficient& rhs);
+	/// @}
 	
-	
+	/// @name Division operators
+	/// @{
+	/**
+	 * Perform a division involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs / rhs`
+	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator/(const UnivariatePolynomial<C>& lhs, const C& rhs);
+	/// @}
 	
+	/**
+	 * Streaming operator for univariate polynomials.
+	 * @param os Output stream.
+	 * @param rhs Polynomial.
+	 * @return `os`
+	 */
 	template <typename C>
 	friend std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs);
 
@@ -983,39 +1115,86 @@ private:
 	 * @complexity O(n^2)
 	 */
 	void shift(const Coefficient& a);	
-		
-	UnivariatePolynomial reduce_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
+	
+	/**
+	 * Calculates the remainder of polynomial division.
+	 * @param divisor
+	 * @param prefactor
+	 * @see @cite GCL92, page 55, Pseudo-Division Property
+	 * @return 
+	 */
+	UnivariatePolynomial remainder_helper(const UnivariatePolynomial& divisor, const Coefficient* prefactor = nullptr) const;
 	static UnivariatePolynomial gcd_recursive(const UnivariatePolynomial& p, const UnivariatePolynomial& q);
 	void stripLeadingZeroes() 
 	{
-		while(!isZero() && lcoeff() == 0)
+		while(!isZero() && lcoeff() == Coefficient(0))
 		{
 			mCoefficients.pop_back();
 		}
 	}
 };
 
-template<typename Coeff>
-struct UnivariatePolynomialPtrHasher : public std::hash<UnivariatePolynomial<Coeff>*>{
-	size_t operator()(const UnivariatePolynomial<Coeff>* p) const {
-		if (p == nullptr) return 0;
-		size_t result = 0;
-		std::hash<Coeff> h;
-		for(auto c: p->coefficients()) {
+}
+
+namespace std {
+/**
+ * Specialization of `std::hash` for univariate polynomials.
+ */
+template<typename Coefficient>
+struct hash<carl::UnivariatePolynomial<Coefficient>> {
+	/**
+	 * Calculates the hash of univariate polynomial.
+	 * @param p UnivariatePolynomial.
+	 * @return Hash of p.
+	 */
+	std::size_t operator()(const carl::UnivariatePolynomial<Coefficient>& p) const {
+		std::size_t result = 0;
+		std::hash<Coefficient> h;
+		for(auto c: p.coefficients()) {
 			result ^= h(c);
 		}
 		return result;
 	}
 };
 
-template<typename Coeff>
-struct UnivariatePolynomialPtrEquals : public std::equal_to<UnivariatePolynomial<Coeff>*>{
-	size_t operator()(const UnivariatePolynomial<Coeff>* lhs, const UnivariatePolynomial<Coeff>* rhs) const {
-		if (lhs == nullptr && rhs == nullptr) return true;
-		if (lhs == nullptr || rhs == nullptr) return false;
-		return *lhs == *rhs;
+/**
+ * Specialization of `std::less` for univariate polynomials.
+ */
+template<typename Coefficient>
+struct less<carl::UnivariatePolynomial<Coefficient>> {
+	carl::PolynomialComparisonOrder order;
+	less(carl::PolynomialComparisonOrder order = carl::PolynomialComparisonOrder::Default) : order(order) {};
+	/**
+	 * Compares two univariate polynomials.
+	 * @param lhs First polynomial.
+	 * @param rhs Second polynomial
+	 * @return `lhs < rhs`.
+	 */
+	bool operator()(const carl::UnivariatePolynomial<Coefficient>& lhs, const carl::UnivariatePolynomial<Coefficient>& rhs) const {
+		return lhs.less(rhs, order);
+	}
+	/**
+	 * Compares two pointers to univariate polynomials.
+	 * @param lhs First polynomial.
+	 * @param rhs Second polynomial
+	 * @return `lhs < rhs`.
+	 */
+	bool operator()(const carl::UnivariatePolynomial<Coefficient>* lhs, const carl::UnivariatePolynomial<Coefficient>* rhs) const {
+		if (lhs == nullptr) return rhs != nullptr;
+		if (rhs == nullptr) return true;
+		return lhs->less(*rhs, order);
+	}
+	/**
+	 * Compares two shared pointers to univariate polynomials.
+	 * @param lhs First polynomial.
+	 * @param rhs Second polynomial
+	 * @return `lhs < rhs`.
+	 */
+	bool operator()(const carl::UnivariatePolynomialPtr<Coefficient>& lhs, const carl::UnivariatePolynomialPtr<Coefficient>& rhs) const {
+		return (*this)(lhs.get(), rhs.get());
 	}
 };
+
 }
 
 #include "UnivariatePolynomial.tpp"

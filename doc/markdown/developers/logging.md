@@ -1,4 +1,5 @@
-# Logging {#logging}
+Logging {#logging}
+==================
 
 ## Logging frontend
 
@@ -22,6 +23,16 @@ Where the arguments mean the following:
 - `msg`: The actual message as an expression that can be sent to a std::stringstream. For example `"foo: " << foo`.
 - `args`: A description of the function arguments as an expression like `msg`.
 - `condition`: A boolean expression that can be passed to `assert()`.
+
+Typically, logging looks like this:
+@code{.cpp}
+bool checkStuff(Object o, bool flag) {
+	LOG_FUNC("carl", o << ", " << flag);
+	bool result = o.property(flag);
+	LOGMSG_TRACE("carl", "Result: " << result);
+	return result;
+}
+@endcode
 
 Logging is enabled (or disabled) by the `LOGGING` macro in CMake.
 

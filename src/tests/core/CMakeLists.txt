@@ -12,13 +12,12 @@ add_executable(runCoreTests
         Test_RootFinder.cpp
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
+	Test_RationalFunction.cpp
 )
 cotire(runCoreTests)
-if(COMPARE_WITH_GINAC)
-    target_link_libraries(runCoreTests ${GTEST_LIBRARIES} ginac lib_carl ${libraries})
-else()
-    target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libraries})
-endif()
+
+target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
+
 cotire(runCoreTests)
 
 add_test( NAME core COMMAND runCoreTests )

@@ -1,6 +1,6 @@
-/*
- * File:   RealAlgebraicNumberIR.tpp
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RealAlgebraicNumberIR.tpp
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -9,12 +9,14 @@
 #include "UnivariatePolynomial.h"
 #include "RealAlgebraicNumberIR.h"
 #include "RealAlgebraicNumber.h"
+#include "VariablePool.h"
 #include "rootfinder/RootFinder.h"
+
 
 namespace carl {
 
 template<typename Number>
-RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(const Variable& var) :
+RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(Variable::Arg var) :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(var),
 		interval(Interval<Number>::zeroInterval()),

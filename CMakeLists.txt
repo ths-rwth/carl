@@ -39,12 +39,13 @@ include(FindPackageHandleStandardArgs)
 
 # options
 option( DEVELOPER "Compile with extra warnings" ON )
-option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 option( LOGGING "Enable logging within the carl library" ON )
 option( LOGGING_CARL "Compile with the logging facility of the carl library" ON )
+option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
+option( BUILD_STATIC "Build the static library as well" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -110,6 +111,22 @@ message("-- CXX Debug Flags: ${CMAKE_CXX_DEBUG_FLAGS}")
 message("-- CXX Release Flags: ${CMAKE_CXX_RELEASE_FLAGS}")
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
+set(DYNAMIC_EXT "so")
+set(STATIC_EXT "a")
+if(APPLE)
+	set(DYNAMIC_EXT "dylib")
+	set(STATIC_EXT "a")
+endif()
+message("-- Assuming extension for shared libraries: .${DYNAMIC_EXT}")
+message("-- Assuming extension for static libraries: .${STATIC_EXT}")
+
+if(BUILD_STATIC)
+	message("-- Building static: yes")
+else()
+	message("-- Building static: no")
+endif()
+
+
 if(USE_COTIRE)
 	# We use cotire, simply include it
 	message("-- using cotire")
@@ -134,58 +151,56 @@ endif()
 # C.1. Required libraries for core.
 # # # # # # # # # # # # # # # # # # # # # #
 
-# We start by using CLN as numeric library. 
-include( FindCLN )
-# Default numeric library is GMP. 
-include( FindGMP )
-include( FindGMPXX )
+# Boost
+set(Boost_COMPONENTS )
+set(Boost_USE_STATIC_LIBS OFF)
+find_package(Boost REQUIRED COMPONENTS ${Boost_COMPONENTS})
+set(Boost_DYNAMIC ${Boost_LIBRARIES})
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost REQUIRED COMPONENTS ${Boost_COMPONENTS})
+set(Boost_STATIC ${Boost_LIBRARIES})
 
-set( libraries ${CLN_LIBRARY} ${GMPXX_LIBRARIES} ${GMP_LIBRARY} pthread )
-set(include_dirs ${include_dirs} ${CLN_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
+# CLN
+find_package(CLN REQUIRED)
+find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
+find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
+
+# Eigen
+find_package(Eigen3 REQUIRED)
+
+# GMP
+find_package(GMP REQUIRED)
+find_library(GMP_DYNAMIC NAMES libgmp.${DYNAMIC_EXT})
+find_library(GMP_STATIC NAMES libgmp.${STATIC_EXT})
+find_package(GMPXX REQUIRED)
+find_library(GMPXX_DYNAMIC NAMES libgmpxx.${DYNAMIC_EXT})
+find_library(GMPXX_STATIC NAMES libgmpxx.${STATIC_EXT})
+
+set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIRS} ${CLN_INCLUDE_DIR} ${Eigen3_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
+set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC} ${CLN_DYNAMIC} ${GMP_DYNAMIC} ${GMPXX_DYNAMIC})
+set(libs_static ${libs_static} ${Boost_STATIC} ${CLN_STATIC} ${GMP_STATIC} ${GMPXX_STATIC})
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
 # # # # # # # # # # # # # # # # # # # # # #
 
-# We use boost intervals for the interval arithmetic
-
-#OPTION( BOOST_LOCAL "Use resources version of boost" OFF)
-## If Boost was found, the Boost include directory will be saved in the variable
-## Boost_INCLUDE_DIR.
-#if(BOOST)
-#SET(BOOST_NO_BOOST_CMAKE ON)
-#SET(BOOST_NO_SYSTEM_PATHS ON)
-#message(ERROR "No local version of boost exists")
-##SET(BOOST_INCLUDEDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
-##SET(BOOST_LIBRARYDIR "${PROJECT_SOURCE_DIR}/../resources/boost_1_55_0")
-#endif()
-#FIND_PACKAGE(Boost COMPONENTS REQUIRED)
-
-OPTION( OBTAIN_BOOST "Downloads and installs Boost in the resources folder." OFF )
-if( NOT OBTAIN_BOOST )
-find_package(Boost REQUIRED)
-set( libraries ${libraries} ${Boost_LIBRARIES} )
-set( include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
-else()
-set( BOOST_REQUESTED_LIBRARIES interval)
-endif()
-
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
 	find_package(MPFR REQUIRED)
+	find_library(MPFR_DYNAMIC NAMES libmpfr.${DYNAMIC_EXT})
+	find_library(MPFR_STATIC NAMES libmpfr.${STATIC_EXT})
+	
 	set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
-	set(libraries ${libraries} ${MPFR_LIBRARY})
+	set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
+	set(libs_static ${libs_static} ${MPFR_STATIC})
 endif()
-
-set(libraries  ${libraries} )
-set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIR} )
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.3. Development and debug libraries.
 # # # # # # # # # # # # # # # # # # # # # #
 
 # if doxygen is installed, create the make doc target
-include(FindDoxygen)
+find_package(Doxygen)
 if(DOXYGEN)
 	add_subdirectory(doxygen-conf)
 else()
@@ -196,26 +211,23 @@ endif()
 if(NOT FORCE_SHIPPED_RESOURCES)
 	# find googletest
 	find_package(GTest)
-	# find eigen
-	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-set(libraries ${libraries} ${LOG4CPLUS_LIBRARY} pthread)
-#set(include_dirs ${include_dirs} ${LOG4CPLUS_INCLUDE_DIR} )
-
-set(libraries ${libraries} ${EIGEN3_LIBRARY} pthread)
-set(include_dirs ${include_dirs} ${EIGEN3_INCLUDE_DIR} )
-
 
 if(COMPARE_WITH_GINAC)
 	find_package( GiNaC 1.5.8 REQUIRED )
-	set(libraries ${libraries} ${GINAC_LIBRARY} )
+	find_library(GiNaC_DYNAMIC NAMES libginac.${DYNAMIC_EXT})
+	find_library(GiNaC_STATIC NAMES libginac.${STATIC_EXT})
+	set(include_dirs ${include_dirs} ${GINAC_INCLUDE_DIRS})
+	set(libs_dynamic ${libs_dynamic} ${GiNaC_DYNAMIC})
+	set(libs_static ${libs_static} ${GiNaC_STATIC})
 endif()
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
-set(libraries ${libraries} dl)
+set(libs_dynamic ${libs_dynamic} pthread dl)
+set(libs_static ${libs_static} pthread dl)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files
@@ -236,7 +248,7 @@ add_subdirectory(src)
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Add all targets to the build-tree export set
-export(TARGETS lib_carl  FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
+export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
  
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)

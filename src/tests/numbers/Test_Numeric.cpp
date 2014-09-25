@@ -151,13 +151,13 @@ TEST(Numeric, operations)
     EXPECT_EQ( carl::div( c9, c10 ), (c9 / c10) );
     EXPECT_EQ( carl::div( c9, c3 ), (c9 / c3) );
     Numeric<cln::cl_RA> d1( c2 );
-    EXPECT_EQ( carl::div( c2, c2 ), carl::div_here( d1, c2 ) );
+    EXPECT_EQ( carl::div( c2, c2 ), carl::div_assign( d1, c2 ) );
     Numeric<cln::cl_RA> d2( c8 );
-    EXPECT_EQ( carl::div( c8, c2 ), carl::div_here( d2, c2 ) );
+    EXPECT_EQ( carl::div( c8, c2 ), carl::div_assign( d2, c2 ) );
     Numeric<cln::cl_RA> d3( c9 );
-    EXPECT_EQ( carl::div( c9, c10 ), carl::div_here( d3, c10 ) );
+    EXPECT_EQ( carl::div( c9, c10 ), carl::div_assign( d3, c10 ) );
     Numeric<cln::cl_RA> d4( c9 );
-    EXPECT_EQ( carl::div( c9, c3 ), carl::div_here( d4, c3 ) );
+    EXPECT_EQ( carl::div( c9, c3 ), carl::div_assign( d4, c3 ) );
 }
 
 TEST(Numeric, gcd)

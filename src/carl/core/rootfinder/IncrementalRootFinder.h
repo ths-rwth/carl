@@ -35,7 +35,7 @@ class IncrementalRootFinder;
 namespace carl {
 namespace rootfinder {
 
-/*!
+/**
  * Enum of all strategies for splitting some interval.
  */
 enum class SplittingStrategy : unsigned int {
@@ -55,6 +55,12 @@ enum class SplittingStrategy : unsigned int {
 	DEFAULT = EIGENVALUES
 };
 
+/**
+ * Streaming operator for a splitting strategy.
+ * @param os Output stream.
+ * @param s Splitting strategy.
+ * @return os.
+ */
 inline std::ostream& operator<<(std::ostream& os, const SplittingStrategy& s) {
 	switch (s) {
 		case SplittingStrategy::GENERIC: return os << "Generic";
@@ -68,44 +74,116 @@ inline std::ostream& operator<<(std::ostream& os, const SplittingStrategy& s) {
 
 /**
  * Interface of a RootFinder such that the Strategies can access the IncrementalRootFinder.
- * @return
  */
 template<typename Number>
 class RootFinder {
 public:
+	/**
+	 * Retrieves the polynomial that is processed.
+	 * @return Polynomial.
+	 */
 	virtual const UnivariatePolynomial<Number>& getPolynomial() const = 0;
+	/**
+	 * Adds a new interval together with a splitting strategy to the queue of intervals that must be processed.
+	 * @param interval Interval.
+	 * @param strategy Strategy.
+	 */
 	virtual void addQueue(const Interval<Number>& interval, SplittingStrategy strategy) = 0;
+	/**
+	 * Add a root to the list of found roots.
+	 * If the root was calculated exactly, the polynomial can be divided by \f$(x - r)\f$ where \f$x\f$ is the main variable of the polynomial and \f$r\f$ is the root.
+	 * @param root Real root.
+	 * @param reducePolynomial Flag if polynomial should be reduced.
+	 */
 	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) = 0;
+	/**
+	 * Add a root to the list of found roots.
+	 * @param interval Interval that contains the real root.
+	 */
 	virtual void addRoot(const Interval<Number>& interval) = 0;
 };
 
 namespace splittingStrategies {
 
+/**
+ * Abstract base class for all splitting strategies.
+ */
 template<typename Strategy, typename Number>
 struct AbstractStrategy: Singleton<Strategy> {
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder) = 0;
 };
 
+/**
+ * Implements a generic splitting strategy.
+ */
 template<typename Number>
 struct GenericStrategy : public AbstractStrategy<GenericStrategy<Number>, Number> {
+	/**
+	 * Given an interval \f$(a,b)\f$, it uses the center \f$p = (a+b)/2\f$ as pivot.
+	 * The resulting intervals are \f$(a,p),[p],(p,b)\f$.
+	 * @param interval Interval.
+	 * @param finder Finder object.
+	 */
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
+
+/**
+ * Implements a binary sample splitting strategy.
+ */
 template<typename Number>
 struct BinarySampleStrategy : public AbstractStrategy<BinarySampleStrategy<Number>, Number> {
+	/**
+	 * Given an interval \f$(a,b)\f$, it uses some sample point \f$p \in (a,b)\f$ as pivot.
+	 * We try to select an easy (i.e. integer or small fraction) point as sample point.
+	 * The resulting intervals are \f$(a,p),[p],(p,b)\f$.
+	 * @param interval Interval.
+	 * @param finder Finder object.
+	 */
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
+
+/**
+ * Implements a binary splitting strategy using newton.
+ */
 template<typename Number>
 struct BinaryNewtonStrategy : public AbstractStrategy<BinaryNewtonStrategy<Number>, Number> {
+	/**
+	 * Given an interval \f$(a,b)\f$, it uses some point \f$p \in (a,b)\f$ as pivot.
+	 * The pivot is determined using Newtons method starting from the center of the interval.
+	 * The resulting intervals are \f$(a,p),[p],(p,b)\f$.
+	 * @param interval Interval.
+	 * @param finder Finder object.
+	 */
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
+
+/**
+ * Implements a n-ary splitting strategy using a grid.
+ */
 template<typename Number>
 struct GridStrategy : public AbstractStrategy<GridStrategy<Number>, Number> {
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
+
+/**
+ * Implements a n-ary splitting strategy based on the eigenvalues of the companion matrix.
+ */
 template<typename Number>
 struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, Number> {
+	/**
+	 * Given an interval \f$(a,b)\f$, it uses several pivot points \f$p_i \in (a,b)\f$ as pivots.
+	 * In theory, the eigenvalues of the companion matrix of a polynomial are equal to the (complex) roots of a univariate polynomial.
+	 * However, due to numerical instability, we use them only for splitting.
+	 * Given the eigenvalues \f$e_1, ..., e_k\f$ and the interval \f$(a,b)\f$, the resulting intervals are \f$(a, e_1), [e_1], ..., [e_k], (e_k, b)\f$.
+	 * @param interval Interval.
+	 * @param finder Finder object.
+	 */
 	virtual void operator()(const Interval<Number>& interval, RootFinder<Number>& finder);
 };
+
+/**
+ * Implements a n-ary splitting strategy based on Aberths method.
+ */
 template<typename Number>
 struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> {
 	std::vector<double> teruiSasaki(const UnivariatePolynomial<Number>& p, const unsigned int rootCount);
@@ -118,30 +196,49 @@ struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> 
 
 }
 
+/**
+ * This class implements an AbstractRootFinder that has an interface to calculate the real roots incrementally.
+ *
+ * Using the method next(), the next real root can be obtained.
+ * The root finder uses a bisection approach internally and implements multiple strategies how the bisection is performed.
+ */
 template<typename Number, typename Comparator>
 class IncrementalRootFinder : public AbstractRootFinder<Number>, RootFinder<Number> {
 
 public:
+	/**
+	 * Type of a queue item, consisting of an interval to be searched and the strategy to be used.
+	 */
 	typedef std::tuple<Interval<Number>, SplittingStrategy> QueueItem;
 
 private:
+	/**
+	 * Caches the sturm sequence of the polynomial
+	 */
 	std::list<UnivariatePolynomial<Number>> sturmSequence;
 
-	/*!
+	/**
 	 * The current default strategy.
 	 */
 	SplittingStrategy splittingStrategy;
-	/*!
+	/**
 	 * Interval queue containing all items that must still be processed.
 	 */
 	std::priority_queue<QueueItem, std::vector<QueueItem>, IntervalSizeComparator> queue;
-	/*!
+	/**
 	 * Iterator pointing to the next root within the root list that should be returned.
 	 */
 	typename std::list<RealAlgebraicNumberPtr<Number>>::iterator nextRoot;
 
 public:
 
+	/**
+	 * Constructor for a root finder that searches for the real roots of a polynomial in an interval using a strategy.
+	 * @param polynomial Polynomial.
+	 * @param interval Interval, unbounded if none is given.
+	 * @param splittingStrategy Strategy.
+	 * @param tryTrivialSolver Flag is the trivial solver shall be used.
+	 */
 	IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
 			const Interval<Number>& interval = Interval<Number>::unboundedExactInterval(),
@@ -149,6 +246,9 @@ public:
 			bool tryTrivialSolver = true
 			);
 
+	/**
+	 * Desctructor.
+	 */
 	virtual ~IncrementalRootFinder() {
 	}
 
@@ -186,7 +286,7 @@ protected:
 
 	/**
 	 * Overrides method from AbstractRootFinder.
-     */
+	 */
 	virtual void findRoots();
 
 	/**

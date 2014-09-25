@@ -270,7 +270,7 @@ IDL_PROPERTY_SUPPORT   = YES
 # member in the group (if any) for the other members of the group. By default
 # all members of a group must be documented explicitly.
 
-DISTRIBUTE_GROUP_DOC   = NO
+DISTRIBUTE_GROUP_DOC   = YES
 
 # Set the SUBGROUPING tag to YES (the default) to allow class member groups of
 # the same type (for instance a group of public functions) to be put as a
@@ -482,7 +482,7 @@ ENABLED_SECTIONS       =
 # documentation can be controlled using \showinitializer or \hideinitializer
 # command in the documentation regardless of this setting.
 
-MAX_INITIALIZER_LINES  = 0
+MAX_INITIALIZER_LINES  = 1
 
 # Set the SHOW_USED_FILES tag to NO to disable the list of files generated
 # at the bottom of the documentation of classes and structs. If set to YES the
@@ -1382,7 +1382,10 @@ PREDEFINED			   = DEBUG
 
 EXPAND_AS_DEFINED      = EASY_TYPE \
                          EASY_DESTRUCTOR \
-                         EASY_METHOD
+                         EASY_METHOD \
+                         TRAIT_TRUE \
+                         TRAIT_FALSE \
+                         TRAIT_TYPE
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then
 # doxygen's preprocessor will remove all references to function-like macros

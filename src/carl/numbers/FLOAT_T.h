@@ -66,6 +66,7 @@ namespace carl
     template<typename FloatType>
     class FLOAT_T
     {
+        static_assert(carl::is_subset_of_integers<FloatType>::value == false, "FLOAT_T may not be used with integers.");
     private:
         FloatType mValue;
 
@@ -76,7 +77,7 @@ namespace carl
          */
         FLOAT_T<FloatType>()
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = FloatType(0);
         }
 
@@ -88,7 +89,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _double;
         }
 
@@ -100,7 +101,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const float _float, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _float;
         }
 
@@ -112,7 +113,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _int;
         }
         
@@ -124,7 +125,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
             mValue = _long;
         }
 
@@ -137,7 +138,7 @@ namespace carl
          */
         FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
         {
-            assert(is_float<FloatType>::value);
+            assert(std::is_floating_point<FloatType>::value);
         }
 
         /**
@@ -361,7 +362,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
         {
-            //assert(_op2 != 0);
+            assert(_op2 != 0);
             mValue = mValue / _op2.mValue;
             return *this;
         }
@@ -376,7 +377,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
         {
-            //assert(_op2 != 0);
+            assert(_op2 != 0);
             _result.mValue = mValue / _op2.mValue;
             return _result;
         }
@@ -389,7 +390,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& sqrt_assign(CARL_RND = CARL_RND::N)
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             mValue = std::sqrt(mValue);
             return *this;
         }
@@ -403,7 +404,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             _result.mValue = std::sqrt(mValue);
             return _result;
         }
@@ -416,7 +417,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& cbrt_assign(CARL_RND = CARL_RND::N)
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             mValue = std::cbrt(mValue);
             return *this;
         }
@@ -430,7 +431,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             _result.mValue = std::cbrt(mValue);
             return _result;
         }
@@ -444,7 +445,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             /// @todo implement root_assign for FLOAT_T
             LOG_NOTIMPLEMENTED();
             return *this;
@@ -460,7 +461,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
         {
-            //assert(*this >= 0);
+            assert(*this >= 0);
             LOG_NOTIMPLEMENTED();
             /// @todo implement root for FLOAT_T
         }
@@ -536,7 +537,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& exp(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            _result.mValue = std::exp(mValue);
+            _result.mValue = std::exp(this->mValue);
             return _result;
         }
 
@@ -1279,6 +1280,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
+            assert(_rhs != 0);
             return FLOAT_T<FloatType>(_lhs.mValue / _rhs.mValue);
         }
 
@@ -1291,6 +1293,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
         {
+            assert(_rhs != 0);
             return FLOAT_T<FloatType>(_lhs.mValue / _rhs);
         }
 
@@ -1303,6 +1306,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator /(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
         {
+            assert(_rhs != 0);
             return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
         }
 
@@ -1439,16 +1443,64 @@ namespace carl
         }
     };
     
+    template<typename FloatType>
+    inline bool isInteger(const FLOAT_T<FloatType>&) {
+	return false;
+    }
+    
+    /**
+     * Implements the division which assumes that there is no remainder.
+     * @param _lhs 
+     * @param _rhs
+     * @return Number which holds the result.
+     */
+    template<typename FloatType>
+    inline FLOAT_T<FloatType> div(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
+    {
+        // TODO
+        FLOAT_T<FloatType> result;
+        result = _lhs / _rhs;
+        return result;
+    }
+    
+    /**
+     * Implements the division with remainder.
+     * @param _lhs
+     * @param _rhs
+     * @return Number which holds the result.
+     */
+    template<typename FloatType>
+    inline FLOAT_T<FloatType> quotient(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
+    {
+        // TODO
+        FLOAT_T<FloatType> result;
+        result = _lhs / _rhs;
+        return result;
+    }
+    
+    /**
+     * Casts the FLOAT_T to an arbitrary integer type which has a constructor for
+     * a native int.
+     * @param _float
+     * @return Integer type which holds floor(_float).
+     */
+    template<typename Integer, typename FloatType>
+    inline Integer toInt(const FLOAT_T<FloatType>& _float)
+    {
+        Integer result = (int)_float;
+        return result;
+    }
+    
     /**
      * Method which returns the absolute value of the passed number.
      * @param in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& in)
+    inline FLOAT_T<FloatType> abs(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.abs(result);
+        _in.abs(result);
         return result;
     }
     
@@ -1458,10 +1510,10 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& in)
+    inline FLOAT_T<FloatType> log(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.log(result);
+        _in.log(result);
         return result;
     }
     
@@ -1471,10 +1523,10 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& in)
+    inline FLOAT_T<FloatType> sqrt(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.sqrt(result);
+        _in.sqrt(result);
         return result;
     }
     
@@ -1485,10 +1537,10 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& in)
+    inline FLOAT_T<FloatType> floor(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.floor(result);
+        _in.floor(result);
         return result;
     }
     
@@ -1499,23 +1551,23 @@ namespace carl
      * @return Number which holds the result.
      */
     template<typename FloatType>
-    static FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& in)
+    inline FLOAT_T<FloatType> ceil(const FLOAT_T<FloatType>& _in)
     {
         FLOAT_T<FloatType> result;
-        in.ceil(result);
+        _in.ceil(result);
         return result;
     }
     
     template<>
-    inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double in)
+    inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double _in)
     {
-        return FLOAT_T<double>(in);
+        return FLOAT_T<double>(_in);
     }
     
     template<>
-    inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float in)
+    inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float _in)
     {
-        return FLOAT_T<float>(in);
+        return FLOAT_T<float>(_in);
     }
     
     /**
@@ -1524,7 +1576,7 @@ namespace carl
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
-    static cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
+    inline cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
     {
         return carl::getDenom(carl::rationalize<cln::cl_RA>(in.toDouble()));
     }
@@ -1535,9 +1587,9 @@ namespace carl
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
-    static cln::cl_I getNum(const FLOAT_T<FloatType>& in)
+    inline cln::cl_I getNum(const FLOAT_T<FloatType>& _in)
     {
-        return carl::getNum(carl::rationalize<cln::cl_RA>(in.toDouble()));
+        return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
     }
     
 #ifdef USE_MPFR_FLOAT

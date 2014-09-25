@@ -16,7 +16,7 @@ namespace carl
 
 VariablePool::VariablePool():
 	Singleton(),
-	mNextVarId (1 << Variable::VARIABLE_BITS_RESERVED_FOR_TYPE)
+	mNextVarId(1)
 {
 	LOGMSG_INFO("carl.varpool", "Constructor called");
 }
@@ -35,6 +35,18 @@ Variable VariablePool::getFreshVariable(const std::string& name, VariableType ty
 	Variable tmp = this->getFreshVariable(type);
 	this->setName(tmp, name);
 	return tmp;
+}
+
+Variable VariablePool::findVariableWithName(const std::string& name) const
+{
+	for(auto v : mFriendlyNames)
+	{
+		if(v.second == name)
+		{
+			return v.first;
+		}
+	}
+	return Variable();
 }
 
 const std::string VariablePool::getName(Variable::Arg v, bool friendly) const {

@@ -1,6 +1,6 @@
 /* 
- * File:   RealAlgebraicPoint.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ * @file RealAlgebraicPoint.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -12,9 +12,15 @@
 
 namespace carl {
 
+/**
+ * A RealAlgebraicPoint represents a multidimensional point that consists of real algebraic numbers.
+ */
 template<typename Number>
 class RealAlgebraicPoint {
 private:
+	/**
+	 * Numbers of this RealAlgebraicPoint.
+	 */
 	std::vector<RealAlgebraicNumberPtr<Number>> numbers;
 
 public:
@@ -78,6 +84,11 @@ public:
 		return res;
 	}
 	
+	/**
+	 * Retrieves the number of this point at the given index.
+	 * @param index Index.
+	 * @return Value of this point at the given index.
+	 */
 	RealAlgebraicNumberPtr<Number> operator[](unsigned int index) const {
 		assert(index < this->numbers.size());
 		return this->numbers[index];
@@ -86,16 +97,27 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
 
+	/**
+	 * Checks if two RealAlgebraicPoints are equal.
+     * @param r RealAlgebraicPoint.
+     * @return `this == r`.
+     */
 	bool operator==(RealAlgebraicPoint<Number>& r) {
 		if (this->dim() != r.dim()) return false;
-		carl::Inequal<Number> ne;
+		std::not_equal_to<Number> neq;
 		for (unsigned i = 0; i < this->numbers.size(); i++) {
-			if (ne(this->numbers[i], r.numbers[i])) return false;
+			if (neq(this->numbers[i], r.numbers[i])) return false;
 		}
 		return true;
 	}
 };
 
+/**
+ * Streaming operator for a RealAlgebraicPoint.
+ * @param os Output stream.
+ * @param r RealAlgebraicPoint.
+ * @return os.
+ */
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
 	os << "(";

@@ -5,6 +5,6 @@ add_executable( runGroebnerTests
 				Test_GB_Buchberger.cpp
 			  )
 cotire(runGroebnerTests)
-target_link_libraries(runGroebnerTests ${GTEST_LIBRARIES} lib_carl ${libraries})
+target_link_libraries(runGroebnerTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
 
 add_test( NAME groebner COMMAND runGroebnerTests )

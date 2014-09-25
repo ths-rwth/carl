@@ -9,9 +9,7 @@
 #include <map>
 #include <algorithm>
 
-
-#include "VarExpPair.h"
-
+#include "Variable.h"
 namespace carl
 {
 
@@ -119,7 +117,7 @@ namespace carl
 			// TODO there might be a better solution to this.
 		}
         
-        void collect(const Variable& var, const typename CoeffType::CoeffType&, const typename CoeffType::MonomType& monomial)
+        void collect(Variable::Arg var, const typename CoeffType::CoeffType&, const typename CoeffType::MonomType& monomial)
         {
             exponent e = monomial.exponentOfVariable(var);
             if(e > 0)
@@ -169,9 +167,7 @@ namespace carl
 			typename std::map<unsigned, CoeffType>::iterator it = mCoeffs.find(exponent);
 			if(it == mCoeffs.end())
 			{
-				// TODO no support for map emplace in GCC 4.7. 
-				// coeffs.emplace(exponent, CoeffType(t));
-				mCoeffs.insert(std::make_pair(exponent, CoeffType(t)));
+				mCoeffs.emplace(exponent, CoeffType(t));
 				
 			}
 			else
@@ -180,18 +176,18 @@ namespace carl
 			}
 		}
         
-        void collect(const Variable& v, const typename CoeffType::CoeffType& termCoeff, const typename CoeffType::MonomType& monomial)
+        void collect(Variable::Arg v, const typename CoeffType::CoeffType& termCoeff, const typename CoeffType::MonomType& monomial)
         {
             exponent e = 0;
-            std::vector<VarExpPair> exps = std::vector<VarExpPair>();
+            std::vector<std::pair<Variable, exponent>> exps;
             exps.reserve(monomial.nrVariables()-1);
             exponent totalDegree = monomial.tdeg();
             for(unsigned i = 0; i<monomial.nrVariables(); ++i)
             {
-                if(monomial[i].var == v)
+                if(monomial[i].first == v)
                 {
-                    totalDegree -= monomial[i].exp;
-                    e = monomial[i].exp;
+                    totalDegree -= monomial[i].second;
+                    e = monomial[i].second;
                 }
                 else
                 {

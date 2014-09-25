@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "../../carl/core/MultivariateHensel.h"
+#include "../../carl/core/VariablePool.h"
 #include <gmpxx.h>
 
 using namespace carl;

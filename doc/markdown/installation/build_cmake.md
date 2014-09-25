@@ -10,6 +10,7 @@ This keeps the source directory free from files created during the building proc
 
 CMake Options for building CArL.
 ------------
+
 Run `ccmake` to obtain a list of all available options or change them.
 @code
 $ cd build/
@@ -20,6 +21,9 @@ Using `[t]`, you can enable the _advanced mode_ that shows all options. Most of 
 
 ### General 
 
+- *BUILD_STATIC* [ON, OFF] <br>
+  If set to *ON*, carl is built as shared and static library, otherwise only as shared library.
+
 - *CMAKE_BUILD_TYPE* [Release, Debug]
   - *Release*
   - *Debug*
@@ -28,10 +32,6 @@ Using `[t]`, you can enable the _advanced mode_ that shows all options. Most of 
   - `/usr/bin/c++`: Default for most linux distributions, will probably be an alias for `g++`.
   - `/usr/bin/g++`: Uses `g++`.
   - `/usr/bin/clang++`: Uses `clang`.
-
-- *STATICLIB_SWITCH* [ON, OFF] <br>
-  If set to *ON*, CArL is linked statically and a static library is produced instead of a shared library.
-  On linux, this means you get `lib_carl.a` instead of `lib_carl.so`.
 
 - *USE_COTIRE* [ON, OFF] <br>
   If set to *ON*, `cotire` is used to produce precompiled headers. This can reduce the compile time significantly.
@@ -49,3 +49,14 @@ Using `[t]`, you can enable the _advanced mode_ that shows all options. Most of 
 - *LOGGING_CARL* [ON, OFF] <br>
   Switches between the CArL logging library (*ON*) and simply logging to `std::cout` and `std::cerr` (*OFF*).
 
+
+CMake Targets
+------------
+
+There are a few important targets in the CArL CMakeLists:
+
+- `doc`: Builds the doxygen documentation.
+- `lib_carl`: Builds the shared library.
+- `lib_carl_static`: Builds the static library.
+- `runXTests`: Builds the tests for the `X` module.
+- `test`: Build and run all tests.

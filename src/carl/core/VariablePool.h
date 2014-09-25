@@ -75,6 +75,12 @@ public:
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
 	/**
+	 * Searches in the friendly names list for a variable with the given name.
+	 * @param name The friendly variable name to look for.
+	 * @return The first variable with that friendly name.
+	 */
+	Variable findVariableWithName(const std::string& name) const;
+	/**
 	 * Get a human-readable name for the given variable.
 	 * If the given Variable is Variable::NO_VARIABLE, "NO_VARIABLE" is returned.
 	 * If friendlyVarName is true, the name that was set via setVariableName() for this Variable, if there is any, is returned.
@@ -83,7 +89,6 @@ public:
 	 * @param friendlyVarName Flag, if a name set via setVariableName shall be considered.
 	 * @return Some name for the Variable.
 	 */
-
 	const std::string getName(Variable::Arg v, bool friendlyVarName = true) const;
 	/**
 	 * Add a name for a given Variable.

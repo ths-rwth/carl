@@ -136,7 +136,7 @@ inline long int toInt<long int>(const cln::cl_I& n) {
  * @return An integer.
  */
 template<>
-inline cln::cl_I toInt(const cln::cl_RA& n) {
+inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
 	assert(isInteger(n));
 	return getNum(n);
 }
@@ -147,7 +147,7 @@ inline cln::cl_I toInt(const cln::cl_RA& n) {
  * @return n as unsigned.
  */
 template<>
-inline unsigned toInt(const cln::cl_RA& n) {
+inline unsigned toInt<unsigned>(const cln::cl_RA& n) {
 	return toInt<unsigned>(toInt<cln::cl_I>(n));
 }
 
@@ -285,7 +285,7 @@ inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b) {
  * @param b Second argument.
  * @return Updated a.
  */
-inline cln::cl_I& gcd_here(cln::cl_I& a, const cln::cl_I& b) {
+inline cln::cl_I& gcd_assign(cln::cl_I& a, const cln::cl_I& b) {
     a = cln::gcd(a,b);
 	return a;
 }
@@ -298,7 +298,7 @@ inline cln::cl_I& gcd_here(cln::cl_I& a, const cln::cl_I& b) {
  * @param b Second argument.
  * @return Updated a.
  */
-inline cln::cl_RA& gcd_here(cln::cl_RA& a, const cln::cl_RA& b) {
+inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
     assert( carl::isInteger( a ) );
     assert( carl::isInteger( b ) );
 	a = cln::gcd(carl::getNum(a),carl::getNum(b));
@@ -437,7 +437,7 @@ inline std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a) {
  * @return \f$a \% b\f$.
  */
 inline cln::cl_I mod(const cln::cl_I& a, const cln::cl_I& b) {
-	return cln::mod(a, b);
+	return cln::rem(a, b);
 }
 
 /**
@@ -469,7 +469,7 @@ inline cln::cl_I div(const cln::cl_I& a, const cln::cl_I& b) {
  * @param b Second argument.
  * @return \f$ a / b \f$.
  */
-inline cln::cl_RA& div_here(cln::cl_RA& a, const cln::cl_RA& b) {
+inline cln::cl_RA& div_assign(cln::cl_RA& a, const cln::cl_RA& b) {
     a /= b;
 	return a;
 }
@@ -482,7 +482,8 @@ inline cln::cl_RA& div_here(cln::cl_RA& a, const cln::cl_RA& b) {
  * @param b Second argument.
  * @return \f$ a / b \f$.
  */
-inline cln::cl_I& div_here(cln::cl_I& a, const cln::cl_I& b) {
+inline cln::cl_I& div_assign(cln::cl_I& a, const cln::cl_I& b) {
+	assert(cln::mod(a,b) == 0);
 	a = cln::exquo(a, b);
     return a;
 }
@@ -506,8 +507,20 @@ inline cln::cl_RA quotient(const cln::cl_RA& a, const cln::cl_RA& b)
  */
 inline cln::cl_I quotient(const cln::cl_I& a, const cln::cl_I& b)
 {
-	return div(a,b);
+	return cln::exquo(a - cln::rem(a, b), b);
 }
+
+
+/**
+ * Calculate the remainder of the integer division.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return \f$a \% b\f$.
+ */
+inline cln::cl_I remainder(const cln::cl_I& a, const cln::cl_I& b) {
+	return cln::rem(a, b);
+}
+
 
 /**
  * Divide two integers.

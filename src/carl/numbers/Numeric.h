@@ -62,9 +62,9 @@ namespace carl
         bool operator>=( const Numeric<T>& ) const;
         
         template<typename T1>
-        friend Numeric<T1>& div_here( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& div_assign( Numeric<T1>&, const Numeric<T1>& );
         template<typename T1>
-        friend Numeric<T1>& gcd_here( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& gcd_assign( Numeric<T1>&, const Numeric<T1>& );
         
         template<typename T1>
         friend Numeric<T1>& operator+=( Numeric<T1>&, const Numeric<T1>& );
@@ -112,10 +112,10 @@ namespace carl
             return this->toRational();
         }
         
-        operator typename IntegralT<T>::type () const
+        operator typename IntegralType<T>::type () const
         {
             if( std::abs( this->mContent ) < HIGHTEST_INTEGER_VALUE )
-                return typename IntegralT<T>::type( this->mContent );
+                return typename IntegralType<T>::type( this->mContent );
             else
             {
                 T& rat = mRationalPool[(size_t)this->mContent-(size_t)HIGHTEST_INTEGER_VALUE];
@@ -181,9 +181,9 @@ namespace carl
     };
 
     template<typename T>
-    Numeric<T>& div_here( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& div_assign( Numeric<T>&, const Numeric<T>& );
     template<typename T>
-    Numeric<T>& gcd_here( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& gcd_assign( Numeric<T>&, const Numeric<T>& );
     template<typename T>
     Numeric<T> div( const Numeric<T>&, const Numeric<T>& );
     template<typename T>

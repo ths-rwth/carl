@@ -1,6 +1,6 @@
-/* 
- * File:   RealAlgebraicNumberIR.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RealAlgebraicNumberIR.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -52,7 +52,7 @@ private:
 	//////////////////////////
 
 
-	RealAlgebraicNumberIR(const Variable& var);
+	RealAlgebraicNumberIR(Variable::Arg var);
 	
 	/**
 	 * Constructs a real algebraic number in interval and order representation (p, l, r, o) with a normalized interval w.r.t. normalizeInterval.
@@ -76,7 +76,12 @@ private:
 			const bool isRoot = true );
 
 public:
-	static std::shared_ptr<RealAlgebraicNumberIR> create(const Variable& var) {
+	/**
+	 * Creates a new RealAlgebraicNumberIR with value zero.
+	 * @param var Variable.
+	 * @return New RealAlgebraicNumberIR of value zero.
+	 */
+	static std::shared_ptr<RealAlgebraicNumberIR> create(Variable::Arg var) {
 		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(var));
 		res->pThis = res;
 		return res;
@@ -95,6 +100,10 @@ public:
 		return res;
 	}
 
+	/**
+	 * Creates a copy of this RealAlgebraicNumberIR.
+	 * @return Copy of this.
+	 */
 	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
 		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
 	}
@@ -104,15 +113,19 @@ public:
 	 */
 	virtual ~RealAlgebraicNumberIR() {
 	}
-	
-	///////////////
-	// Selectors //
-	///////////////
 
+	/**
+	 * Checks if the value of this RealAlgebraicNumberIR is zero.
+	 * @return If this is zero.
+	 */
 	bool isZero() const {
 		return this->isNumeric() ? this->value() == 0 : (this->interval.lower() == 0 && this->interval.upper() == 0);
 	}
 
+	/**
+	 * Checks if this RealAlgebraicNumberIR is in numeric representation.
+	 * @return false.
+	 */
 	virtual bool isNumericRepresentation() const {
 		return false;
 	}
@@ -142,16 +155,32 @@ public:
 		return this->interval;
 	}
 	
+	/**
+	 * Retrieves the lower bound of the interval.
+	 * @return Lower bound.
+	 */
 	const Number& lower() const {
 		return this->getInterval().lower();
 	}
+	/**
+	 * Retrieves the upper bound of the interval.
+	 * @return Upper bound.
+	 */
 	const Number& upper() const {
 		return this->getInterval().upper();
 	}
-	
+
+	/**
+	 * Sets the lower bound of the interval.
+	 * @param n Lower bound.
+	 */
 	void setLower(const Number& n) const {
 		this->interval.setLower(n);
 	}
+	/**
+	 * Sets the upper bound of the interval.
+	 * @param n Upper bound.
+	 */
 	void setUpper(const Number& n) const {
 		this->interval.setUpper(n);
 	}
@@ -176,6 +205,12 @@ public:
 	// Operators //
 	///////////////
 	
+	/**
+	 * Streaming operator for a RealAlgebraicNumberIR.
+	 * @param os Output stream.
+	 * @param n Number.
+	 * @return os.
+	 */
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberIR<Num>* n);
 
@@ -187,37 +222,68 @@ public:
 	 */
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(const std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
 
+	/**
+	 * Creates the negation of this RealAlgebraicNumberIR.
+	 * @return `-this`.
+	 */
 	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus() const;
 
+	/**
+	 * Checks if the interval that defines this number is contained in the given interval.
+	 * @param i Interval.
+	 * @return If the interval of this number is contained in i.
+	 */
 	virtual bool containedIn(const Interval<Number>& i) const {
 		return i.contains(this->getInterval());
 	}
 
+	/**
+	 * Checks if this RealAlgebraicNumberIR is equal to the given RealAlgebraicNumberIR.
+	 * @param n RealAlgebraicNumberIR.
+	 * @return this == n.
+	 */
 	bool equal(std::shared_ptr<RealAlgebraicNumberIR>& n);
 	
 private:
 	// Helper functions for lessWhileUnequal
 	
 	/**
-	 * Checks if *this < *n.
+	 * Checks if `this < n`.
 	 * If the method could not decide the order, it returns (false, false)
 	 * Otherwise, it returns (true, X), X being the value of *this < *n
-     * @param n Another RealAlgebraicNumberIR
-     * @return 
-     */
+	 * @param n Another RealAlgebraicNumberIR
+	 * @return 
+	 */
 	std::pair<bool,bool> checkOrder(std::shared_ptr<RealAlgebraicNumberIR> n);
-	std::pair<bool,bool> intervalContained(std::shared_ptr<RealAlgebraicNumberIR> n, bool twisted);
-	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
 	
+	/**
+	 * Checks if the interval of the given number is contained in the interval of this.
+	 * Also checks, if the interval of n can be used to refinde this number.
+	 * @param n RealAlgebraicNumberIR.
+	 * @param twisted Flag whether this is larger or smaller than n.
+	 * @return 
+	 */
+	std::pair<bool,bool> intervalContained(std::shared_ptr<RealAlgebraicNumberIR> n, bool twisted);
+	
+	/**
+	 * Check if the intersection i of this and n can be used for refinements.
+	 * @param n RealAlgebraicNumberIR.
+	 * @param i Intersection.
+	 * @return If a refinement was done.
+	 */
+	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
 
 public:	
+	/**
+	 * Checks if the represented number is less than the given one, assuming that they are not equal.
+	 * While checking, both numbers are refined until the intervals of the numbers are disjoint.
+	 * @param n RealAlgebraicNumberIR.
+	 * @return `this < n`.
+	 */
 	bool lessWhileUnequal(std::shared_ptr<RealAlgebraicNumberIR> n);
-	
-	////////////////
-	// Operations //
-	////////////////
 
-	/** Normalizes the interval of an real algebraic number to not contain zero, in case the number is non-zero.
+	/**
+	 * Normalizes the interval of an real algebraic number to not contain zero, in case the number is non-zero.
 	 */
 	void normalizeInterval();
 
@@ -252,8 +318,17 @@ public:
 	 */
 	bool refineAvoiding(const Number& n);
 
+	/**
+	 * Retrieves the sign of the represented number.
+	 * @return Sign of this number.
+	 */
 	Sign sgn() const;
 
+	/**
+	 * Given a univariate polynomial, calculates the sign of the evaluation of this polynomial at the point represented by this number.
+	 * @param p UnivariatePolynomial.
+	 * @return `sgn(p(this))`.
+	 */
 	Sign sgn(const UnivariatePolynomial<Number>& p) const;
 
 };

@@ -1,99 +1,30 @@
 /**
  * @file adaption_native/typetraits.h
+ * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
 
-#include "../../util/SFINAE.h"
+#include "../typetraits.h"
 
 namespace carl {
 
+TRAIT_TRUE(is_subset_of_integers, signed char, );
+TRAIT_TRUE(is_subset_of_integers, short int, );
+TRAIT_TRUE(is_subset_of_integers, int, );
+TRAIT_TRUE(is_subset_of_integers, long int, );
+TRAIT_TRUE(is_subset_of_integers, long long int, );
 
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_integer<long> {
-	static const bool value = true;
-};
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_integer<int> {
-	static const bool value = true;
-};
-
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_natural<unsigned> {
-	static constexpr bool value = false;
-};
-
-/**
- * @ingroup typetraits
- */
-template<>
-struct is_natural<unsigned long> {
-	static constexpr bool value = false;
-};
-
-template<>
-struct is_float<double>
-{
-    static const bool value = true;
-};
-
-template<>
-struct is_float<float>
-{
-    static const bool value = true;
-};
-
-template<>
-struct is_primitive<double>
-{
-	static const bool value = true;
-};
-
-	template<>
-struct is_primitive<long double>
-{
-	static const bool value = true;
-};
-	
-template<>
-struct is_primitive<int>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_primitive<float>
-{
-	static const bool value = true;
-};
-
-template<>
-struct is_primitive<unsigned>
-{
-	static const bool value = true;
-};
+TRAIT_TRUE(is_subset_of_integers, unsigned char, );
+TRAIT_TRUE(is_subset_of_integers, unsigned short int, );
+TRAIT_TRUE(is_subset_of_integers, unsigned int, );
+TRAIT_TRUE(is_subset_of_integers, unsigned long int, );
+TRAIT_TRUE(is_subset_of_integers, unsigned long long int, );
 
 
-
-/**
- * @todo Fix this?
- */
-template<>
-struct IntegralT<double>
-{
-	typedef unsigned type;
-};
-
-
+TRAIT_TYPE(IntegralType, float, int, );
+TRAIT_TYPE(IntegralType, double, long int, );
+TRAIT_TYPE(IntegralType, long double, long long int, );
 
 }

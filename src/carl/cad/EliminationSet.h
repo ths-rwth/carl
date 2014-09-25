@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "../core/pointerOperations.h"
 #include "../core/UnivariatePolynomial.h"
 #include "../core/logging.h"
 
@@ -44,6 +45,7 @@ private:
 	 * Functor that compares two PolynomialPair objects.
      */
 	struct PolynomialPairIsLess {
+		std::less<UPolynomial> less;
 		unsigned int length(const PolynomialPair& p) {
 			if (p.first == nullptr && p.second == nullptr) return 0;
 			if (p.first == nullptr || p.second == nullptr) return 1;
@@ -59,12 +61,24 @@ private:
 		}
 	};
 	
+	/**
+	 * Functor that checks if a given PolynomialPair contains some polynomial.
+	 */
 	struct PolynomialPairContains {
 	private:
 		const UPolynomial* p;
 	public:
+		/**
+		 * Constructor.
+         * @param p Polynomial to search for.
+         */
 		PolynomialPairContains(const UPolynomial* p) : p(p) {
 		}
+		/**
+		 * Checks if the PolynomialPair contains the polynomial that was passed to the constructor.
+         * @param pp PolynomialPair.
+         * @return If pp contains the polynomial.
+         */
 		bool operator()(const PolynomialPair& pp) {
 			if (p == nullptr) {
 				return (pp.first == nullptr) || (pp.second == nullptr);
@@ -80,7 +94,7 @@ private:
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::unordered_set<const UPolynomial*, UnivariatePolynomialPtrHasher<cad::MPolynomial<Coefficient>>, UnivariatePolynomialPtrEquals<cad::MPolynomial<Coefficient>>> PolynomialSet;
+	typedef std::unordered_set<const UPolynomial*, carl::ptr_hash<UPolynomial>, std::equal_to<UPolynomial*>> PolynomialSet;
 	//typedef std::set<const UPolynomial*> PolynomialSet;
 
 	/**
@@ -105,7 +119,7 @@ public:
 	/**
 	 * The comparator used for polynomials here.
 	 */
-	typedef UnivariatePolynomialComparator<typename UPolynomial::CoefficientType> PolynomialComparator;
+	typedef std::less<cad::UPolynomial<Coefficient>> PolynomialComparator;
 
 // private members
 private:	
@@ -174,8 +188,8 @@ public:
 	 */
 	EliminationSet(
 			PolynomialOwner<Coefficient>* owner,
-			PolynomialComparator f = UnivariatePolynomialComparator<MPolynomial<Coefficient>>(),
-			PolynomialComparator g = UnivariatePolynomialComparator<MPolynomial<Coefficient>>()
+			PolynomialComparator f = std::less<UPolynomial>(),
+			PolynomialComparator g = std::less<UPolynomial>()
 			):
 		polynomials(),
 		eliminationOrder(g),
@@ -207,7 +221,11 @@ public:
      * @return true, if the given polynomial has non-trivial parents.
      */
 	bool hasParents(const UPolynomial* p) const;
-	
+
+	/**
+	 * Retrieves the list of polynomials.
+     * @return List of polynomials.
+     */
 	const PolynomialSet& getPolynomials() const {
 		return this->polynomials;
 	}
@@ -454,7 +472,7 @@ public:
 	std::list<const UPolynomial*> eliminateInto(
 			const UPolynomial* p,
 			EliminationSet<Coefficient>& destination,
-			const Variable& variable,
+			Variable::Arg variable,
 			const CADSettings& setting
 			);
 	
@@ -466,7 +484,7 @@ public:
 			std::list<const UPolynomial*>& otherqueue,
 			bool avoidSingle,
 			EliminationSet<Coefficient>& destination,
-			const Variable& variable,
+			Variable::Arg variable,
 			const CADSettings& setting
 			);
 	
@@ -493,7 +511,7 @@ public:
 	 */
 	std::list<const UPolynomial*> eliminateNextInto(
 			EliminationSet<Coefficient>& destination,
-			const Variable& variable,
+			Variable::Arg variable,
 			const CADSettings& setting,
 			bool synchronous = false
 			);
@@ -509,7 +527,7 @@ public:
 	 * @param to
 	 * @param variable
 	 */
-	void moveConstants(EliminationSet<Coefficient>& to, const Variable& variable);
+	void moveConstants(EliminationSet<Coefficient>& to, Variable::Arg variable);
 
 	/**
 	 * Removes all constant elements.
@@ -576,7 +594,7 @@ public:
 	 */
 	static void elimination(
 			const UPolynomial* p,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
 			);
@@ -603,7 +621,7 @@ public:
 	static void elimination(
 			const UPolynomial* p,
 			const UPolynomial* q,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle 
 			);
@@ -626,7 +644,7 @@ public:
 	 */
 	static void eliminationEq(
 			const UPolynomial* p,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
 			)
@@ -654,7 +672,7 @@ public:
 	static void eliminationEq(
 			const UPolynomial* p,
 			const UPolynomial* q,
-			const Variable& variable,
+			Variable::Arg variable,
 			EliminationSet<Coefficient>& eliminated,
 			bool avoidSingle
 			)

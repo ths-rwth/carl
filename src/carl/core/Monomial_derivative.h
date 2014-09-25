@@ -12,22 +12,25 @@ namespace carl
 template<typename Coefficient>
 Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
 {
+	LOG_FUNC("carl.core.monomial", *this << ", " << v);
     // TODO code is very similar to divideBy(variable)...
     
      // Linear implementation, as we expect very small monomials.
-    exponents_cIt it;
-    if((it = std::find(mExponents.cbegin(), mExponents.cend(), v)) == mExponents.cend())
+    auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
+    if(it == mExponents.cend())
     {
+		LOGMSG_TRACE("carl.core.monomial", "Result: 0");
         return new Term<Coefficient>();
     }
     else
     {
 		// If the exponent is one, the variable does not occur in the new monomial.
-        if(it->exp == 1)
+        if(it->second == 1)
         {
 			// If it was the only variable, we get the one-term.
 			if(mExponents.size() == 1) 
 			{
+				LOGMSG_TRACE("carl.core.monomial", "Result: 1");
 				return new Term<Coefficient>((Coefficient)1);
 			}
 
@@ -38,6 +41,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
             }
             m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
             m->mTotalDegree = mTotalDegree - 1;
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << *m);
             return new Term<Coefficient>(1, m);
         }
         // We have to decrease the exponent of the variable by one.
@@ -45,9 +49,10 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
         {
             Monomial* m = new Monomial();
             m->mExponents.assign(mExponents.begin(), mExponents.end());
-            m->mExponents[(unsigned)(it - mExponents.begin())].exp -= (unsigned)1;
+            m->mExponents[(unsigned)(it - mExponents.begin())].second -= (unsigned)1;
             m->mTotalDegree = mTotalDegree - 1;
-            return new Term<Coefficient>((int)it->exp, m);
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << it->second << "*" << *m);
+            return new Term<Coefficient>((int)it->second, m);
         }
     }
 }

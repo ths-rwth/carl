@@ -8,7 +8,7 @@
 
 using namespace carl;
 
-TEST(Numbers, IntegralT)
+TEST(Numbers, IntegralType)
 {
 	static_assert(is_instantiation_of<GFNumber,GFNumber<mpz_class>>::value, "Check whether the is_instantiaton works correctly");	
 }

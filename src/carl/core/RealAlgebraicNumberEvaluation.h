@@ -1,6 +1,6 @@
-/* 
- * File:   RealAlgebraicNumberEvaluation.h
- * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+/**
+ * @file RealAlgebraicNumberEvaluation.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
 #pragma once
@@ -15,6 +15,7 @@
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicNumberNR.h"
 #include "RealAlgebraicPoint.h"
+#include "VariablePool.h"
 
 namespace carl {
 namespace RealAlgebraicNumberEvaluation {

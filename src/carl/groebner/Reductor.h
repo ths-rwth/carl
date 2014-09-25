@@ -53,7 +53,7 @@ public:
 	 */
 	static bool deduplicate(Entry e1, Entry e2)
 	{
-		assert(Polynomial::Ordering::compare(e1->getLead(), e2->getLead()) == CompareResult::EQUAL);
+		assert( *(e1->getLead()) ==  *(e2->getLead()));
 		return e1->addCoefficient(e2->getLead().getCoeff());
 	}
 
@@ -116,17 +116,16 @@ public:
 				LOGMSG_TRACE("carl.gb.reductor", "Intermediate leading term: " << *leadingTerm);
 				assert(!leadingTerm->isZero());
 				// update the data structure.
-				// only insert non-emty polynomials.
+				// only insert non-empty polynomials.
 				if(!updateDatastruct(entry)) break;
 				typename Configuration<InputPolynomial>::Entry newentry = mDatastruct.top();
-				while(entry != newentry && Order::equal(leadingTerm, newentry->getLead()))
+				while(entry != newentry && Term<Coeff>::EqualMonomial(*leadingTerm, *(newentry->getLead())))
 				{
-					entry->addCoefficient(newentry->getLead()->coeff());
+					assert(!newentry->empty());
+					leadingTerm = std::make_shared<const Term<Coeff>>(leadingTerm->coeff() + newentry->getLead()->coeff(), leadingTerm->monomial());
 					if(!updateDatastruct(newentry)) break;
-
 					newentry = mDatastruct.top();
 				}
-				//                mDatastruct.print();
 			}
 			while(leadingTerm->isZero() && !mDatastruct.empty());
 			// Done finding leading term.
@@ -209,6 +208,7 @@ private:
 	 */
 	inline bool updateDatastruct(EntryType* entry)
 	{
+		
 		if(entry->getTail().isZero())
 		{
 			mDatastruct.pop();
@@ -218,6 +218,7 @@ private:
 		else
 		{
 			entry->removeLeadingTerm();
+			assert(!entry->empty());
 			mDatastruct.decreaseTop(entry);
 		}
 		return true;

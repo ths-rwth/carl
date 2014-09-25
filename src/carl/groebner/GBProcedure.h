@@ -193,18 +193,18 @@ private:
 	{
 		for(size_t i = 0; i < mGb->nrGenerators(); ++i)
 		{
-			bool dividable = false;
+			bool divisible = false;
 
 			LOGMSG_TRACE("carl.gb.gbproc", "Check " << mGb->getGenerator(i));
-			for(size_t j = 0; !dividable && j != mGb->nrGenerators(); ++j)
+			for(size_t j = 0; !divisible && j != mGb->nrGenerators(); ++j)
 			{
 				if(j == i) continue;
 
-				dividable = mGb->getGenerator(i).lmon()->dividableBy(*mGb->getGenerator(j).lmon());
-				LOGMSG_TRACE("carl.gb.gbproc", "" << (dividable ? "" : "not ") << "dividable by " << mGb->getGenerator(j));
+				divisible = mGb->getGenerator(i).lmon()->divisible(*mGb->getGenerator(j).lmon());
+				LOGMSG_TRACE("carl.gb.gbproc", "" << (divisible ? "" : "not ") << "divisible by " << mGb->getGenerator(j));
 			}
 
-			if(dividable)
+			if(divisible)
 			{
 				LOGMSG_TRACE("carl.gb.gbproc", "Eliminate " << mGb->getGenerator(i));
 				mGb->eliminateGenerator(i);

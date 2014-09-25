@@ -1,4 +1,4 @@
-/**
+/*
  * @file Term.h
  * @ingroup multirp
  * @author Sebastian Junges
@@ -11,6 +11,8 @@
 #include "Monomial.h"
 #include "VariablesInformation.h"
 #include "Definiteness.h"
+#include "../interval/Interval.h"
+#include "pointerOperations.h"
 
 namespace carl
 {
@@ -22,138 +24,138 @@ namespace carl
 template<typename Coefficient>
 class Term
 {
-    private:
-        Coefficient mCoeff = Coefficient(0);
-        std::shared_ptr<const Monomial> mMonomial;
-    
-    public:
+	private:
+		Coefficient mCoeff = Coefficient(0);
+		std::shared_ptr<const Monomial> mMonomial;
+
+	public:
 		/**
 		 * Default constructor. Constructs a term of value zero.
 		 */
-        Term();
+		Term();
 		/**
 		 * Constructs a term of value \f$ c \f$.
 		 * @param c Coefficient.
 		 */
-        explicit Term(const Coefficient& c);
+		explicit Term(const Coefficient& c);
 		/**
 		 * Constructs a term of value \f$ v \f$.
 		 * @param v Variable.
 		 */
-        explicit Term(Variable::Arg v);
+		explicit Term(Variable::Arg v);
 		/**
 		 * Constructs a term of value \f$ m \f$.
 		 * @param m Monomial.
 		 */
-        explicit Term(const Monomial& m);
+		explicit Term(const Monomial& m);
 		/**
 		 * Constructs a term of value \f$ m \f$.
 		 * @param m Monomial pointer.
 		 */
-        explicit Term(const std::shared_ptr<const Monomial>& m);
+		explicit Term(const std::shared_ptr<const Monomial>& m);
 		/**
 		 * Constructs a term of value \f$ c \cdot m \f$.
 		 * @param c Coefficient.
 		 * @param m Monomial.
 		 */
-        Term(const Coefficient& c, const Monomial& m);
+		Term(const Coefficient& c, const Monomial& m);
 		/**
 		 * Constructs a term of value \f$ c \cdot m \f$.
 		 * @param c Coefficient.
 		 * @param m Monomial pointer.
 		 */
-        Term(const Coefficient& c, const Monomial* m);
+		Term(const Coefficient& c, const Monomial* m);
 		/**
 		 * Constructs a term of value \f$ c \cdot m \f$.
 		 * @param c Coefficient.
 		 * @param m Monomial pointer.
 		 */
-        Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
+		Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
 		/**
 		 * Constructs a term of value \f$ c \cdot v^e \f$.
 		 * @param c Coefficient.
 		 * @param v Variable.
 		 * @param e Exponent.
 		 */
-        Term(const Coefficient& c, Variable::Arg v, unsigned e);
-        
-		/**
-         * Get the coefficient.
-         * @return Coefficient.
-         */
-        const Coefficient& coeff() const
-        {
-            return mCoeff;
-        }
-        
-        /**
-         * Get the monomial.
-         * @return Monomial.
-         */
-        std::shared_ptr<const Monomial> monomial() const
-        {
-            return mMonomial;
-        }
-        /**
-         * Gives the total degree, i.e. the sum of all exponents.
-         * @return Total degree.
-         */
-        exponent tdeg() const
-        {
-            if(!mMonomial) return 0;
-            return mMonomial->tdeg();
-        }
+		Term(const Coefficient& c, Variable::Arg v, unsigned e);
 		
 		/**
-		 * @todo check validity.
-         * @return 
-         */
+		 * Get the coefficient.
+		 * @return Coefficient.
+		 */
+		const Coefficient& coeff() const
+		{
+			return mCoeff;
+		}
+		
+		/**
+		 * Get the monomial.
+		 * @return Monomial.
+		 */
+		std::shared_ptr<const Monomial> monomial() const
+		{
+			return mMonomial;
+		}
+		/**
+		 * Gives the total degree, i.e. the sum of all exponents.
+		 * @return Total degree.
+		 */
+		exponent tdeg() const
+		{
+			if(!mMonomial) return 0;
+			return mMonomial->tdeg();
+		}
+		
+		/**
+		 * Checks wether the monomial is zero.
+		 * @return 
+		 */
 		bool isZero() const
 		{
-			return mCoeff == 0;
+			return mCoeff == Coefficient(0);
 		}
-        /**
-         * Checks whether the monomial is a constant.
-         * @return 
-         */
-        bool isConstant() const
-        {
-            return !mMonomial;
-        }
-        /**
-         * Checks whether the monomial has exactly the degree one.
-         * @return 
-         */
-        bool isLinear() const
-        {
-            if(!mMonomial) return true;
-            return mMonomial->isLinear();
-        }
+		/**
+		 * Checks whether the monomial is a constant.
+		 * @return 
+		 */
+		bool isConstant() const
+		{
+			return !mMonomial;
+		}
+		/**
+		 * Checks whether the monomial has exactly the degree one.
+		 * @return 
+		 */
+		bool isLinear() const
+		{
+			if(!mMonomial) return true;
+			return mMonomial->isLinear();
+		}
 		/**
 		 * 
-         * @return 
-         */
-        size_t getNrVariables() const
-        {
-            if(!mMonomial) return 0;
-            return mMonomial->nrVariables();
-        }
-        
-        /**
-         * @param v The variable to check for its occurrence.
-         * @return true, if the variable occurs in this term.
-         */
-        bool has(Variable::Arg v) const
-        {
+		 * @return 
+		 */
+		size_t getNrVariables() const
+		{
+			if(!mMonomial) return 0;
+			return mMonomial->nrVariables();
+		}
+		
+		/**
+		 * @param v The variable to check for its occurrence.
+		 * @return true, if the variable occurs in this term.
+		 */
+		bool has(Variable::Arg v) const
+		{
 			if (!mMonomial) return false;
-            return mMonomial->has(v);
-        }
+			return mMonomial->has(v);
+		}
 		
 		/**
 		 * Checks if the monomial is either a constant or the only variable occuring is the variable v.
-         * @param v The variable which may occur.
-         * @return true if no variable occurs, or just v occurs. 
-         */
+		 * @param v The variable which may occur.
+		 * @return true if no variable occurs, or just v occurs. 
+		 */
 		bool hasNoOtherVariable(Variable::Arg v) const
 		{
 			if(!mMonomial) return true;
@@ -162,70 +164,73 @@ class Term
 		
 		/**
 		 * For terms with exactly one variable, get this variable.
-         * @return The only variable occuring in the term.
-         */
-		const Variable& getSingleVariable() const
+		 * @return The only variable occuring in the term.
+		 */
+		Variable::Arg getSingleVariable() const
 		{
 			assert(getNrVariables() == 1);
 			return mMonomial->getSingleVariable();
 		}
 		
 		/**
-		 * Is square.
-         * @return 
-         */
+		 * Checks if the term is a square.
+		 * @return If this is square.
+		 */
 		bool isSquare() const
 		{
 			return (mCoeff >= Coefficient(0)) && ((!mMonomial) || mMonomial->isSquare());
 		}
-        
-        /**
-         * Set the term to zero with the canonical representation.
-         */
-        void clear()
-        {
-            mCoeff = Coefficient(0);
-            mMonomial.reset();
-        }
 		
+		/**
+		 * Set the term to zero with the canonical representation.
+		 */
+		void clear()
+		{
+			mCoeff = Coefficient(0);
+			mMonomial.reset();
+		}
+
+		/**
+		 * Negates the term by negating the coefficient.
+		 */
 		void negate()
 		{
 			mCoeff = -mCoeff;
 		}
-        
-        /**
-         * 
-         * @param c a non-zero coefficient.
-         * @return 
-         */
-        Term* divideBy(const Coefficient& c) const;
-        /**
-         * 
-         * @param v
-         * @return 
-         */
-        Term* divideBy(Variable::Arg v) const;
-        /**
-         * 
-         * @param m
-         * @return 
-         */
-        Term* divideBy(const Monomial& m) const;
-        
-        Term* divideBy(const Term&) const;
+
+		/**
+		 * 
+		 * @param c a non-zero coefficient.
+		 * @return 
+		 */
+		Term* divideBy(const Coefficient& c) const;
+		/**
+		 * 
+		 * @param v
+		 * @return 
+		 */
+		Term* divideBy(Variable::Arg v) const;
+		/**
+		 * 
+		 * @param m
+		 * @return 
+		 */
+		Term* divideBy(const Monomial& m) const;
+		
+		Term* divideBy(const Term&) const;
 		
 		Term calcLcmAndDivideBy( const Monomial&) const;
-        
-        Term* derivative(Variable::Arg) const;
-        
-        Definiteness definiteness() const;
+		
+		Term* derivative(Variable::Arg) const;
+		
+		Definiteness definiteness() const;
 		
 		template<typename SubstitutionType=Coefficient>
 		Term* substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
 		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
 		
 		template<bool gatherCoeff, typename CoeffType>
-		void gatherVarInfo(const Variable& var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
+		void gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
 		
 		template<bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo) const;
@@ -250,98 +255,166 @@ class Term
 			}
 			
 		}
+
+	    template<typename C = Coefficient, DisableIf<is_interval<C>> = dummy>
+	    std::string toString(bool infix=true, bool friendlyVarNames=true) const;
         
-        std::string toString(bool infix=true, bool friendlyVarNames=true) const;
+	    template<typename C = Coefficient, EnableIf<is_interval<C>> = dummy>
+	    std::string toString(bool infix=true, bool friendlyVarNames=true) const;
 
 		bool isConsistent() const;
-        
-        template<typename Coeff>
-        friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend bool operator==(const Term<Coeff>& lhs, const Coeff& rhs);
-        template<typename Coeff>
-        friend bool operator==(const Coeff& lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
-        template<typename Coeff>
-        friend bool operator==(Variable::Arg lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
-        template<typename Coeff>
-        friend bool operator==(const Monomial& lhs, const Term<Coeff>& rhs);
-        
-        template<typename Coeff>
-        friend bool operator!=(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend bool operator!=(const Term<Coeff>& lhs, const Coeff& rhs);
-        template<typename Coeff>
-        friend bool operator!=(const Coeff& lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend bool operator!=(const Term<Coeff>& lhs, Variable::Arg rhs);
-        template<typename Coeff>
-        friend bool operator!=(Variable::Arg lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs);
-        template<typename Coeff>
-        friend bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs);
+		
+		/// @name Equality comparison operators
+		/// @{
+		/**
+		 * Checks if the two arguments are equal.
+		 * @param lhs First argument.
+		 * @param rhs Second argument.
+		 * @return `lhs == rhs`
+		 */
+		template<typename Coeff>
+		friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend bool operator==(const Term<Coeff>& lhs, const Coeff& rhs);
+		template<typename Coeff>
+		friend bool operator==(const Coeff& lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
+		template<typename Coeff>
+		friend bool operator==(Variable::Arg lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
+		template<typename Coeff>
+		friend bool operator==(const Monomial& lhs, const Term<Coeff>& rhs);
+		/// @}
+
+		/// @name Inequality comparison operators
+		/// @{
+		/**
+		 * Checks if the two arguments are not equal.
+		 * @param lhs First argument.
+		 * @param rhs Second argument.
+		 * @return `lhs != rhs`
+		 */
+		template<typename Coeff>
+		friend bool operator!=(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend bool operator!=(const Term<Coeff>& lhs, const Coeff& rhs);
+		template<typename Coeff>
+		friend bool operator!=(const Coeff& lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend bool operator!=(const Term<Coeff>& lhs, Variable::Arg rhs);
+		template<typename Coeff>
+		friend bool operator!=(Variable::Arg lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs);
+		template<typename Coeff>
+		friend bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs);
+		/// @}
 
 		template<typename Coeff>
 		friend bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-        
-        const Term<Coefficient> operator-() const;
-        
-        Term& operator *=(const Coefficient& rhs);
-        Term& operator *=(Variable::Arg rhs);
-        Term& operator *=(const Monomial& rhs);
-        Term& operator *=(const Term& rhs);
-        
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs);
+		// @}
+		
+		const Term<Coefficient> operator-() const;
+		
+		/// @name In-place multiplication operators
+		/// @{
+		/**
+		 * Multiply this term with something and return the changed term.
+		 * @param rhs Right hand side.
+		 * @return Changed term.
+		 */
+		Term& operator *=(const Coefficient& rhs);
+		Term& operator *=(Variable::Arg rhs);
+		Term& operator *=(const Monomial& rhs);
+		Term& operator *=(const Term& rhs);
+		/// @}
+
+		/// @name Multiplication operators
+		/// @{
+		/**
+		 * Perform a multiplication involving a term.
+		 * @param lhs Left hand side.
+		 * @param rhs Right hand side.
+		 * @return `lhs * rhs`
+		 */
 		template<typename Coeff>
-        friend const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(Variable::Arg, const Term<Coeff>& rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs);
-        template<typename Coeff>
-        friend const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs);
-        
-        template<typename Coeff>
-        friend std::ostream& operator<<(std::ostream& lhs, const Term<Coeff>& rhs);
-        
-        static bool EqualMonomial(const Term& lhs, const Term& rhs)
+		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(Variable::Arg, const Term<Coeff>& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs);
+		template<typename Coeff>
+		friend const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs);
+		/// @}
+
+		/// @name Division operators
+		/// @{
+		/**
+		 * Perform a division involving a term.
+		 * @param lhs Left hand side.
+		 * @param rhs Right hand side.
+		 * @return `lhs / rhs`
+		 */
+		template<typename Coeff>
+		friend const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs);
+		/// @}
+		
+		/**
+		 * Streaming operator for Term.
+		 * @param os Output stream.
+		 * @param rhs Term.
+		 * @return `os`
+		 */
+		template<typename Coeff>
+		friend std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs);
+		
+		/**
+		 * Checks if two terms have the same monomial.
+         * @param lhs First term.
+         * @param rhs Second term.
+         * @return If both terms have the same monomial.
+         */
+		static bool EqualMonomial(const Term& lhs, const Term& rhs)
 		{
-			return	(!lhs.mMonomial && !rhs.mMonomial) || // both no monomial 
-					(lhs.mMonomial && rhs.mMonomial && *lhs.mMonomial == *rhs.mMonomial);
+			return std::equal_to<std::shared_ptr<Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
 };
 
 		
 } // namespace carl
 
-namespace std
-{
-    template<typename Coefficient>
-    struct hash<carl::Term<Coefficient>>
-    {
-        size_t operator()(const carl::Term<Coefficient>& term) const 
-        {
-            if(term.isConstant())
-                return hash<Coefficient>()(term.coeff());
-            else
-                return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
-        }
-    };
+namespace std {
+	/**
+	 * Specialization of `std::hash` for a Term.
+	 */
+	template<typename Coefficient>
+	struct hash<carl::Term<Coefficient>> {
+		/**
+		 * Calculates the hash of a Term.
+		 * @param term Term.
+		 * @return Hash of term.
+		 */
+		size_t operator()(const carl::Term<Coefficient>& term) const {
+			if(term.isConstant())
+				return hash<Coefficient>()(term.coeff());
+			else
+				return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
+		}
+	};
 } // namespace std
 
 #include "Term.tpp"
