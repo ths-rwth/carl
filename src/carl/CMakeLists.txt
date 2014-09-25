@@ -59,9 +59,9 @@ if(BUILD_STATIC)
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
 	target_link_libraries( lib_carl_static ${libs_static} )
-	set(CARL_TARGETS lib_carl lib_carl_static)
+	set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
 else()
-	set(CARL_TARGETS lib_carl)
+	set(CARL_TARGETS lib_carl CACHE STRING INTERNAL FORCE)
 endif()
 
 cotire(carl)
@@ -69,6 +69,7 @@ cotire(carl)
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
  
+message("-- Installing ${CARL_TARGETS}")
 install( TARGETS ${CARL_TARGETS}
 	EXPORT carlTargets
 	LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
