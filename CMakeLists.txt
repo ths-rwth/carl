@@ -39,7 +39,6 @@ include(FindPackageHandleStandardArgs)
 
 # options
 option( DEVELOPER "Compile with extra warnings" ON )
-option( STATICLIB_SWITCH "Compile a statically linked version of the library." OFF )
 option( LOGGING "Enable logging within the carl library" ON )
 option( LOGGING_CARL "Compile with the logging facility of the carl library" ON )
 option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" ON )
