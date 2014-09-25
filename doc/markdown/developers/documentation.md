@@ -5,6 +5,11 @@ On this page, we refer to some internal documentation rules.
 We use doxygen to generate our documentation and code reference.
 The most important conventions for documentation in CArL are collected here.
 
+Note that some of the documentation may be incomplete or rendered incorrectly, especially if you use an old version of doxygen. Here is a list of known problems:
+- Comments in code blocks (see below) may not work correctly (e.g. with doxygen 1.8.1.2). See [here](http://doxygen.10944.n7.nabble.com/Including-doc-comments-in-code-blocks-in-markdown-td5592.html) for a workaround. This will however look ugly for newer doxygen versions, hence we do not use it.
+- Files with `static_assert` statements will be incomplete. A [patch](https://bugzilla.gnome.org/show_bug.cgi?id=737172) is pending and will hopefully make it into doxygen 1.8.9.
+- Member groups (usually used to group operators) may or may not work. There still seem to be a few cases where doxygen [messes up](https://bugzilla.gnome.org/show_bug.cgi?id=737112).
+
 ## Modules
 In order to structure the reference, we use the concept of
 [Doxygen modules](http://www.stack.nl/~dimitri/doxygen/manual/grouping.html#modules).

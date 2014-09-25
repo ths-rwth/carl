@@ -77,6 +77,18 @@ std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
 }
 
 /**
+ * Output a std::pair with arbitrary content.
+ * The format is `(<first>, <second>)`
+ * @param os Output stream.
+ * @param p pair to be printed.
+ * @return Output stream.
+ */
+template<typename U, typename V>
+std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p) {
+	return os << "(" << p.first << ", " << p.second << ")";
+}
+
+/**
  * Output a std::set with arbitrary content.
  * The format is `{<length>: <item>, <item>, ...}`
  * @param os Output stream.
@@ -132,19 +144,6 @@ std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>&
 	}
 	return os << "}";
 }
-
-/**
- * Output a std::pair with arbitrary content.
- * The format is `(<first>, <second>)`
- * @param os Output stream.
- * @param p pair to be printed.
- * @return Output stream.
- */
-template<typename U, typename V>
-std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p) {
-	return os << "(" << p.first << ", " << p.second << ")";
-}
-
 
 /**
  * Output a std::vector with arbitrary content.
