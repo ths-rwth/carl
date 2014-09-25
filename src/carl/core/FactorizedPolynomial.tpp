@@ -17,8 +17,7 @@ namespace carl
         mrCache( _cache )
     {
         Factorization<P> factorization;
-        //TODO fix
-        CoefficientRing<P> coefficient;// = _polynomial.coprimeFactor();
+        Coeff<P> coefficient = _polynomial.coprimeFactor();
         PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), coefficient, new P( _polynomial ) );
         mCacheRef = mrCache.cache( pfPair );
         /*
@@ -30,7 +29,7 @@ namespace carl
     }
     
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CoefficientRing<P>& _coefficient, Cache<PolynomialFactorizationPair<P>>& _cache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, Coeff<P>& _coefficient, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
         mrCache( _cache )
     {
@@ -38,7 +37,7 @@ namespace carl
     }
     
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, CoefficientRing<P>& _coefficient, Cache<PolynomialFactorizationPair<P>>& _cache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, Coeff<P>& _coefficient, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
         mrCache( _cache )
     {
@@ -145,7 +144,7 @@ namespace carl
                 factorB++;
             }
         }
-        CoefficientRing<P> coefficientCommon, coefficientRestA, coefficientRestB;
+        Coeff<P> coefficientCommon, coefficientRestA, coefficientRestB;
         //TODO implement for coefficient
         //coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyRestA.mrCache);

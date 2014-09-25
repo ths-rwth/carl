@@ -53,7 +53,7 @@ namespace carl
     }
     
     template<typename P>
-    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, CoefficientRing<P>& _coefficient, P* _polynomial ):
+    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, Coeff<P>& _coefficient, P* _polynomial ):
         mHash( 0 ),
         mFactorization( std::move( _factorization ) ),
         mCoefficient( _coefficient ),
@@ -61,8 +61,7 @@ namespace carl
     {
         if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
         {
-            //TODO fix
-            mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );// * mCoefficient;
+            mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) * mCoefficient );
             assert( mpPolynomial != nullptr );
             P result;
             computePolynomial(result);
@@ -103,9 +102,7 @@ namespace carl
     void PolynomialFactorizationPair<P>::computePolynomial(P& result) const
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        //TODO fix
-        //result = P( getCoefficient() );
-        result = P( 1 );
+        result = P( getCoefficient() );
         auto factor = getFactorization().begin();
 
         while( factor != getFactorization().end() )

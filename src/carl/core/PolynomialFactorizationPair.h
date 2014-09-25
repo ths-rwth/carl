@@ -24,13 +24,15 @@ namespace carl
     template<typename P>
     bool factorizationsEqual( const Factorization<P>& _factorizationA, const Factorization<P>& _factorizationB );
     
+    template <typename P>
+    using Coeff = typename UnderlyingNumberType<P>::type;
+
     template<typename P>
     class PolynomialFactorizationPair
     {
         friend Factorization<P>& FactorizedPolynomial<P>::rFactorization() const;
         //TODO friend needed?
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
-    
 
     private:
         // Members
@@ -53,7 +55,7 @@ namespace carl
         /**
          * Co-prime coefficient of the factorization
          */
-        mutable CoefficientRing<P> mCoefficient;
+        mutable Coeff<P> mCoefficient;
 
         /**
          * A pointer to a polynomial. This pointer might be set to nullptr, if the factorization has not yet been expanded.
@@ -75,7 +77,7 @@ namespace carl
             return mFactorization;
         }
         
-        CoefficientRing<P>& getCoefficient() const
+        Coeff<P>& getCoefficient() const
         {
             return mCoefficient;
         }
@@ -88,7 +90,7 @@ namespace carl
          * @param _coefficient Common coefficient which is not part of the factorization
          * @param _polynomial Polynomial with Polynomial = Factorization * Coefficient
          */
-        PolynomialFactorizationPair( Factorization<P>&& _factorization, CoefficientRing<P>& _coefficient, P* _polynomial = nullptr );
+        PolynomialFactorizationPair( Factorization<P>&& _factorization, Coeff<P>& _coefficient, P* _polynomial = nullptr );
         PolynomialFactorizationPair( const PolynomialFactorizationPair& ); // no implementation
         ~PolynomialFactorizationPair();
         

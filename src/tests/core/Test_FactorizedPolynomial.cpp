@@ -26,9 +26,11 @@ TEST(FactorizedPolynomial, Construction)
     fpCache.print();
     FactorizedPolynomial<P> fpB( fxyz, fpCache );
     fpCache.print();
+    FactorizedPolynomial<P> restA( P( 2 ), fpCache );
+    FactorizedPolynomial<P> restB( P( 2 ), fpCache );
     
-    FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB ) );
+    FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB, restA, restB ) );
     
-    FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB ) );
+    //FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB ) );
     fpCache.print();
 }
