@@ -225,7 +225,6 @@ namespace carl
                 P polA = *factorA->first.content().mpPolynomial;
                 P polB = *factorB->first.content().mpPolynomial;
                 P polGCD( carl::gcd( polA, polB ) );
-                std::cout << "GCD of " << polA << " and " << polB << ": " << polGCD << std::endl;
                 Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
                 FactorizedPolynomial<P> gcdResult( polGCD, cache );
                 if ( !gcdResult.isOne() )
@@ -237,7 +236,6 @@ namespace carl
                     assert( correct );
                     correct = polB.divideBy( polGCD, remainB );
                     assert( correct );
-                    std::cout << "Remainders: " << remainA << " and " << remainB << std::endl;
                     size_t exponent = factorA->second < factorB->second ? factorA->second : factorB->second;
                     result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult,  exponent ) );
 
@@ -251,7 +249,6 @@ namespace carl
                         factorsA.clear();
                         factorsA.insert ( factorsA.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, 1 ) );
                         factorsA.insert ( factorsA.end(), std::pair<FactorizedPolynomial<P>, size_t>( FactorizedPolynomial<P>( remainA, cache ), 1 ) );
-                        std::cout << "New factorization: " << factorA->first << std::endl;
                     }
                     if (remainB != 1)
                     {
@@ -261,7 +258,6 @@ namespace carl
                         factorsB.clear();
                         factorsB.insert ( factorsB.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, 1));
                         factorsB.insert ( factorsB.end(), std::pair<FactorizedPolynomial<P>, size_t>( FactorizedPolynomial<P>( remainB, cache ), 1));
-                        std::cout << "New factorization: " << factorB->first << std::endl;
                     }
                 }
                 if (factorA->first < factorB->first)
@@ -270,7 +266,6 @@ namespace carl
                     factorB++;
             }
         }
-        std::cout << "General GCD of " << _pfPairA << " and " << _pfPairB << ": " << result << std::endl;
         return result;
     }
     

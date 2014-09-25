@@ -26,11 +26,16 @@ TEST(FactorizedPolynomial, Construction)
     fpCache.print();
     FactorizedPolynomial<P> fpB( fxyz, fpCache );
     fpCache.print();
+
+    //Common divisor
     FactorizedPolynomial<P> restA( P( 2 ), fpCache );
     FactorizedPolynomial<P> restB( P( 2 ), fpCache );
-    
     FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB, restA, restB ) );
+    std::cout << "Common divisor of " << fpA << " and " << fpB << ": " << fpC << " with rest " << restA << " and " << restB << std::endl;
+    fpCache.print();
     
-    //FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB ) );
+    //GCD
+    FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB, restA, restB ) );
+    std::cout << "GCD of " << fpA << " and " << fpB << ": " << fpGCD << " with rest " << restA << " and " << restB << std::endl;
     fpCache.print();
 }
