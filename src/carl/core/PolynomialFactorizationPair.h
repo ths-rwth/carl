@@ -31,6 +31,7 @@ namespace carl
     class PolynomialFactorizationPair
     {
         friend Factorization<P>& FactorizedPolynomial<P>::rFactorization() const;
+        friend Coeff<P>& FactorizedPolynomial<P>::rCoefficient() const;
         //TODO friend needed?
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
 

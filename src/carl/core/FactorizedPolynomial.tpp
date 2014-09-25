@@ -144,9 +144,10 @@ namespace carl
                 factorB++;
             }
         }
-        Coeff<P> coefficientCommon, coefficientRestA, coefficientRestB;
-        //TODO implement for coefficient
-        //coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
+
+        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
+        Coeff<P> coefficientRestA = _fpolyA.rCoefficient() / coefficientCommon;
+        Coeff<P> coefficientRestB = _fpolyB.rCoefficient() / coefficientCommon; 
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyRestA.mrCache);
         _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyRestB.mrCache);
         return FactorizedPolynomial<P>( std::move( cdFactorization ), coefficientCommon, _fpolyA.mrCache );
