@@ -247,7 +247,6 @@ add_subdirectory(src)
 # F. Export Compile Information
 # # # # # # # # # # # # # # # # # # # # # #
 
-message("-- Exporting ${CARL_TARGETS}")
 # Add all targets to the build-tree export set
 export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
  

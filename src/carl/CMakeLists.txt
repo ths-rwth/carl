@@ -68,8 +68,7 @@ cotire(carl)
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
- 
-message("-- Installing ${CARL_TARGETS}")
+
 install( TARGETS ${CARL_TARGETS}
 	EXPORT carlTargets
 	LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
