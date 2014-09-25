@@ -112,7 +112,7 @@ namespace carl
          */
         bool isOne() const
         {
-            return rFactorization.empty();
+            return rFactorization().empty();
         }
 
         /**
@@ -170,10 +170,12 @@ namespace carl
          * stored in the arguments and refines it. (c.f. Accelerating Parametric Probabilistic Verification, Section 4)
          * @param _fpolyA The first factorized polynomial to compute the greatest common divisor for.
          * @param _fpolyB The second factorized polynomial to compute the greatest common divisor for.
+         * @param _fpolyRestA Returns the remaining part of the first factorized polynomial without the gcd.
+         * @param _fpolyRestB Returns the remaining part of the second factorized polynomial without the gcd.
          * @return The greatest common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        friend const FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB, FactorizedPolynomial<P1>& _fpolyRestA, FactorizedPolynomial<P1>& _fpolyRestB);
     };
     
     /**
