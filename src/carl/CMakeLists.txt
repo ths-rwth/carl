@@ -30,8 +30,6 @@ set(carl_lib_sources
 )
 
 add_library(lib_carl SHARED ${carl_lib_sources})
-add_library(lib_carl_static STATIC ${carl_lib_sources})
-
 set_target_properties( lib_carl PROPERTIES
 		# create *nix style library versions + symbolic links
 		VERSION "${PROJECT_VERSION}"
@@ -44,8 +42,11 @@ set_target_properties( lib_carl PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 )
+target_link_libraries( lib_carl ${libs_dynamic} )
 
-set_target_properties( lib_carl_static PROPERTIES
+if(BUILD_STATIC)
+	add_library(lib_carl_static STATIC ${carl_lib_sources})
+	set_target_properties( lib_carl_static PROPERTIES
 		# create *nix style library versions + symbolic links
 		VERSION "${PROJECT_VERSION}"
 		SOVERSION "${PROJECT_VERSION}"
@@ -56,16 +57,19 @@ set_target_properties( lib_carl_static PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
-)
+	)
+	target_link_libraries( lib_carl_static ${libs_static} )
+	set(CARL_TARGETS lib_carl lib_carl_static)
+else()
+	set(CARL_TARGETS lib_carl)
+endif()
 
-target_link_libraries( lib_carl ${libs_dynamic} ) # libraries definied in top-level CMakeLists.txt
-target_link_libraries( lib_carl_static ${libs_static} ) # libraries definied in top-level CMakeLists.txt
 cotire(carl)
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
  
-install( TARGETS lib_carl lib_carl_static
+install( TARGETS ${CARL_TARGETS}
 	EXPORT carlTargets
 	LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"

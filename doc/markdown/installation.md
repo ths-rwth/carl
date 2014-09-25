@@ -26,7 +26,7 @@ Using CArL
 --------------------------------------------
 CArL registers itself in the CMake system, hence to include CArL in any other CMake project, just use `find_package(carl)`.
 
-To use CArL in other projects, link against the shared library created in `build/`.
+To use CArL in other projects, link against the shared or static library created in `build/`.
 
 Supported platforms
 --------------------------------------------

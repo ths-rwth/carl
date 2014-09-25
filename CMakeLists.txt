@@ -45,6 +45,7 @@ option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient meth
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
+option( BUILD_STATIC "Build the static library as well" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -118,6 +119,12 @@ if(APPLE)
 endif()
 message("-- Assuming extension for shared libraries: .${DYNAMIC_EXT}")
 message("-- Assuming extension for static libraries: .${STATIC_EXT}")
+
+if(BUILD_STATIC)
+	message("-- Building static: yes")
+else()
+	message("-- Building static: no")
+endif()
 
 
 if(USE_COTIRE)
@@ -241,7 +248,7 @@ add_subdirectory(src)
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Add all targets to the build-tree export set
-export(TARGETS lib_carl lib_carl_static FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
+export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
  
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
