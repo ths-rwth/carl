@@ -62,7 +62,9 @@ namespace carl
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
     {
         assert( &mrCache == &_fpoly.cache() );
+        mrCache.dereg( mCacheRef );
         mCacheRef = _fpoly.cacheRef();
+        mrCache.reg( mCacheRef );
         return *this;
     }
         
@@ -143,6 +145,16 @@ namespace carl
                 restBFactorization.insert( restBFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB->first, factorB->second ) );
                 factorB++;
             }
+        }
+        while ( factorA != factorizationA.end() )
+        {
+            restAFactorization.insert( restAFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second ) );
+            factorA++;
+        }
+        while ( factorB != factorizationB.end() )
+        {
+            restBFactorization.insert( restBFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB->first, factorB->second ) );
+            factorB++;
         }
 
         Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
