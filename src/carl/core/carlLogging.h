@@ -17,6 +17,7 @@
 #include <utility>
 
 #include "../util/Singleton.h"
+#include "../io/streamingOperators.h"
 #include "carlLoggingHelper.h"
 
 namespace carl {
