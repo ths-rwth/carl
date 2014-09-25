@@ -133,27 +133,27 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                cdFactorization.insert( cdFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second < factorB->second ? factorA->second : factorB->second ) );
+                cdFactorization.insert( cdFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
             }
             else if( factorA->first < factorB->first )
             {
-                restAFactorization.insert( restAFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second ) );
+                restAFactorization.insert( restAFactorization.end(), *factorA );
                 factorA++;
             }
             else
             {
-                restBFactorization.insert( restBFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB->first, factorB->second ) );
+                restBFactorization.insert( restBFactorization.end(), *factorB );
                 factorB++;
             }
         }
         while ( factorA != factorizationA.end() )
         {
-            restAFactorization.insert( restAFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, factorA->second ) );
+            restAFactorization.insert( restAFactorization.end(), *factorA );
             factorA++;
         }
         while ( factorB != factorizationB.end() )
         {
-            restBFactorization.insert( restBFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB->first, factorB->second ) );
+            restBFactorization.insert( restBFactorization.end(), *factorB );
             factorB++;
         }
 
