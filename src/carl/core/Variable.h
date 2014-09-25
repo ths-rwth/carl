@@ -103,7 +103,7 @@ public:
 	explicit Variable(unsigned id, VariableType type = VariableType::VT_REAL, unsigned rank = 0):
 		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | (unsigned)type)
 	{
-		assert(0 <= rank && rank < (1 << RESERVED_FOR_RANK));
+		assert(rank < (1 << RESERVED_FOR_RANK));
 		assert(0 < id && id < (1 << AVAILABLE));
 		assert(VariableType::MIN_TYPE <= type && type <= VariableType::MAX_TYPE);
 	}
