@@ -110,6 +110,16 @@ message("-- CXX Debug Flags: ${CMAKE_CXX_DEBUG_FLAGS}")
 message("-- CXX Release Flags: ${CMAKE_CXX_RELEASE_FLAGS}")
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
+set(DYNAMIC_EXT "so")
+set(STATIC_EXT "a")
+if(APPLE)
+	set(DYNAMIC_EXT "dylib")
+	set(STATIC_EXT "a")
+endif()
+message("-- Assuming extension for shared libraries: .${DYNAMIC_EXT}")
+message("-- Assuming extension for static libraries: .${STATIC_EXT}")
+
+
 if(USE_COTIRE)
 	# We use cotire, simply include it
 	message("-- using cotire")
@@ -145,19 +155,19 @@ set(Boost_STATIC ${Boost_LIBRARIES})
 
 # CLN
 find_package(CLN REQUIRED)
-find_library(CLN_DYNAMIC NAMES libcln.so)
-find_library(CLN_STATIC NAMES libcln.a)
+find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
+find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
 
 # Eigen
 find_package(Eigen3 REQUIRED)
 
 # GMP
 find_package(GMP REQUIRED)
-find_library(GMP_DYNAMIC NAMES libgmp.so)
-find_library(GMP_STATIC NAMES libgmp.a)
+find_library(GMP_DYNAMIC NAMES libgmp.${DYNAMIC_EXT})
+find_library(GMP_STATIC NAMES libgmp.${STATIC_EXT})
 find_package(GMPXX REQUIRED)
-find_library(GMPXX_DYNAMIC NAMES libgmpxx.so)
-find_library(GMPXX_STATIC NAMES libgmpxx.a)
+find_library(GMPXX_DYNAMIC NAMES libgmpxx.${DYNAMIC_EXT})
+find_library(GMPXX_STATIC NAMES libgmpxx.${STATIC_EXT})
 
 set(include_dirs ${include_dirs} ${Boost_INCLUDE_DIRS} ${CLN_INCLUDE_DIR} ${Eigen3_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
 set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC} ${CLN_DYNAMIC} ${GMP_DYNAMIC} ${GMPXX_DYNAMIC})
@@ -170,8 +180,8 @@ set(libs_static ${libs_static} ${Boost_STATIC} ${CLN_STATIC} ${GMP_STATIC} ${GMP
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
 	find_package(MPFR REQUIRED)
-	find_library(MPFR_DYNAMIC NAMES libmpfr.so)
-	find_library(MPFR_STATIC NAMES libmpfr.a)
+	find_library(MPFR_DYNAMIC NAMES libmpfr.${DYNAMIC_EXT})
+	find_library(MPFR_STATIC NAMES libmpfr.${STATIC_EXT})
 	
 	set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
 	set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
@@ -201,8 +211,8 @@ enable_testing()
 
 if(COMPARE_WITH_GINAC)
 	find_package( GiNaC 1.5.8 REQUIRED )
-	find_library(GiNaC_DYNAMIC NAMES libginac.so)
-	find_library(GiNaC_STATIC NAMES libginac.a)
+	find_library(GiNaC_DYNAMIC NAMES libginac.${DYNAMIC_EXT})
+	find_library(GiNaC_STATIC NAMES libginac.${STATIC_EXT})
 	set(include_dirs ${include_dirs} ${GINAC_INCLUDE_DIRS})
 	set(libs_dynamic ${libs_dynamic} ${GiNaC_DYNAMIC})
 	set(libs_static ${libs_static} ${GiNaC_STATIC})
