@@ -51,7 +51,23 @@ CLANG_WARNING_RESET
 
 namespace carl
 {
-
+    template<typename Number>
+    class Interval;
+    
+    /**
+    * States whether a given type is an `Interval`.
+    * By default, a type is not.
+    */
+   template <class Number> struct is_interval : std::false_type {};
+   /**
+    * States that `boost::variant` is indeed a `boost::variant`.
+    */
+   template <class Number> struct is_interval<carl::Interval<Number>> : std::true_type {};
+   /**
+    * States that `const boost::variant` is indeed a `boost::variant`.
+    */
+   template <class Number> struct is_interval<const carl::Interval<Number>> : std::true_type {};
+    
     /**
      * Struct which holds the rounding and checking policies required for boost 
      * interval.
