@@ -13,6 +13,9 @@
 
 namespace carl
 {   
+    template <typename P>
+    using Coeff = typename UnderlyingNumberType<P>::type;
+
     template<typename P>
     class FactorizedPolynomial
     {
@@ -21,10 +24,21 @@ namespace carl
 
     private:
         // Members
-        /// The reference of the entry in the cache corresponding to this factorized polynomial.
+
+        /**
+         * The reference of the entry in the cache corresponding to this factorized polynomial.
+         */
         typename Cache<PolynomialFactorizationPair<P>>::Ref mCacheRef;
-        /// The cache in which the actual content of this factorized polynomial is stored.
-        Cache<PolynomialFactorizationPair<P>>&              mrCache;
+
+        /**
+         * The cache in which the actual content of this factorized polynomial is stored.
+         */
+        Cache<PolynomialFactorizationPair<P>>& mrCache;
+
+        /**
+         * Co-prime coefficient of the factorization
+         */
+        mutable Coeff<P> mCoefficient;
         
         /**
          * Updates the hash of the entry in the cache corresponding to this factorized 
@@ -40,6 +54,15 @@ namespace carl
             mrCache.strengthenActivity( mCacheRef );
         }
         
+        /**
+         * Getter
+         * @return Coefficient of the polynomial.
+         */
+        Coeff<P>& getCoefficient() const
+        {
+            return mCoefficient;
+        }
+
     public:
            
         // Constructors.
@@ -104,7 +127,7 @@ namespace carl
          */
         Coeff<P>& rCoefficient() const
         {
-            return content().getCoefficient();
+            return mCoefficient;
         }
 
         /**

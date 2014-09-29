@@ -14,11 +14,11 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
-        mrCache( _cache )
+        mrCache( _cache ),
+        mCoefficient( _polynomial.coprimeFactor() )
     {
         Factorization<P> factorization;
-        Coeff<P> coefficient = _polynomial.coprimeFactor();
-        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), coefficient, new P( _polynomial ) );
+        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial.coprimeCoefficients() ) );
         mCacheRef = mrCache.cache( pfPair );
         /*
          * The following is not very nice, but we know, that the hash won't change, once the polynomial 
@@ -31,17 +31,20 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, Coeff<P>& _coefficient, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
-        mrCache( _cache )
+        mrCache( _cache ),
+        mCoefficient( _coefficient )
     {
-        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), _coefficient, new P( _polynomial ) ) );
+        assert( mCoefficient == _polynomial.coprimeFactor() );
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), new P( _polynomial ) ) );
     }
     
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, Coeff<P>& _coefficient, Cache<PolynomialFactorizationPair<P>>& _cache ):
         mCacheRef( 0 ),
-        mrCache( _cache )
+        mrCache( _cache ),
+        mCoefficient( _coefficient )
     {
-        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), _coefficient ) );
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ) );
     }
     
     template<typename P>

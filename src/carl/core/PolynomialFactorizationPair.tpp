@@ -53,20 +53,31 @@ namespace carl
     }
     
     template<typename P>
-    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, Coeff<P>& _coefficient, P* _polynomial ):
+    PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial ):
         mHash( 0 ),
         mFactorization( std::move( _factorization ) ),
-        mCoefficient( _coefficient ),
         mpPolynomial( _polynomial )
     {
         if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
         {
-            mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) * mCoefficient );
+            // No factorization -> set polynomial
+            mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );
             assert( mpPolynomial != nullptr );
-            P result;
-            computePolynomial(result);
-            assert(result == *mpPolynomial);
         }
+
+        // Check validity
+        // TODO only in debugging
+        if ( mpPolynomial != nullptr )
+        {
+            assert( mpPolynomial->coprimeFactor() == 1);
+            if ( !mFactorization.empty() )
+            {
+                P result;
+                computePolynomial(result);
+                assert(result == *mpPolynomial);
+            }
+        }
+
         rehash();
     }
     
@@ -102,7 +113,7 @@ namespace carl
     void PolynomialFactorizationPair<P>::computePolynomial(P& result) const
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        result = P( getCoefficient() );
+        result = P( 1 );
         auto factor = getFactorization().begin();
 
         while( factor != getFactorization().end() )

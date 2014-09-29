@@ -24,14 +24,10 @@ namespace carl
     template<typename P>
     bool factorizationsEqual( const Factorization<P>& _factorizationA, const Factorization<P>& _factorizationB );
     
-    template <typename P>
-    using Coeff = typename UnderlyingNumberType<P>::type;
-
     template<typename P>
     class PolynomialFactorizationPair
     {
         friend Factorization<P>& FactorizedPolynomial<P>::rFactorization() const;
-        friend Coeff<P>& FactorizedPolynomial<P>::rCoefficient() const;
         //TODO friend needed?
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
 
@@ -54,11 +50,6 @@ namespace carl
         mutable Factorization<P> mFactorization;
         
         /**
-         * Co-prime coefficient of the factorization
-         */
-        mutable Coeff<P> mCoefficient;
-
-        /**
          * A pointer to a polynomial. This pointer might be set to nullptr, if the factorization has not yet been expanded.
          */
         mutable P* mpPolynomial;
@@ -77,21 +68,15 @@ namespace carl
             //TODO flatten factorization first
             return mFactorization;
         }
-        
-        Coeff<P>& getCoefficient() const
-        {
-            return mCoefficient;
-        }
 
     public:
         // Constructor.
         PolynomialFactorizationPair(); // no implementation
         /*
          * @param _factorization The factorization. Every factor must be not constant.
-         * @param _coefficient Common coefficient which is not part of the factorization
          * @param _polynomial Polynomial with Polynomial = Factorization * Coefficient
          */
-        PolynomialFactorizationPair( Factorization<P>&& _factorization, Coeff<P>& _coefficient, P* _polynomial = nullptr );
+        PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
         PolynomialFactorizationPair( const PolynomialFactorizationPair& ); // no implementation
         ~PolynomialFactorizationPair();
         
