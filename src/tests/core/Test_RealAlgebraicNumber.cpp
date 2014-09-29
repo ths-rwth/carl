@@ -38,14 +38,14 @@ TEST(RealAlgebraicNumber, Evaluation)
 	
 	//UnivariatePolynomial<cln::cl_RA> px(y, {-3528000, 0, 882000, 0, -74760, 0, 3444, 0, -84, 0, 1});
 	UnivariatePolynomial<cln::cl_RA> px(y, {-3528000, 0, 882000, 0, -74760, 0, 3444, 0, -84, 0, 1});
-	Interval<cln::cl_RA> ix(cln::cl_RA(2927288666429)/1099511627776, cln::cl_RA(1463644333215)/549755813888);
+	Interval<cln::cl_RA> ix(cln::cl_RA(2927288666429)/1099511627776, BoundType::STRICT, cln::cl_RA(1463644333215)/549755813888, BoundType::STRICT);
 	UnivariatePolynomial<cln::cl_RA> py(y, {-18289152000, 0, 4572288000, 0, -387555840, 0, 18156096, 0, -556416, 0, 11232, 0, -144, 0, 1});
-	Interval<cln::cl_RA> iy(cln::cl_RA(-147580509)/24822226, cln::cl_RA(-73113831)/12411113);
+	Interval<cln::cl_RA> iy(cln::cl_RA(-147580509)/24822226, BoundType::STRICT, cln::cl_RA(-73113831)/12411113, BoundType::STRICT);
 	
 	std::vector<Variable> vars({y, x});
 	RealAlgebraicPoint<cln::cl_RA> point({RealAlgebraicNumberIR<cln::cl_RA>::create(py, iy), RealAlgebraicNumberIR<cln::cl_RA>::create(px, ix)});
 	
-	RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<cln::cl_RA>(p), point, vars);
+	//RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<cln::cl_RA>(p), point, vars);
 	
 	/* m = {
 	 * skoY : (IR ]-147580509/24822226, -73113831/12411113[, (1)*skoY^14 + (-144)*skoY^12 + (11232)*skoY^10 + (-556416)*skoY^8 + (18156096)*skoY^6 + (-387555840)*skoY^4 + (4572288000)*skoY^2 + -18289152000), 
