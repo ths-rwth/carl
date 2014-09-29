@@ -107,12 +107,21 @@ class Term
 		}
 		
 		/**
-		 * Checks wether the monomial is zero.
+		 * Checks whether the term is zero.
 		 * @return 
 		 */
 		bool isZero() const
 		{
 			return mCoeff == Coefficient(0);
+		}
+		
+		/**
+		 * Checks whether the term equals one.
+         * @return 
+         */
+		bool isOne() const
+		{
+			return (isConstant() && mCoeff == Coefficient(1));
 		}
 		/**
 		 * Checks whether the monomial is a constant.

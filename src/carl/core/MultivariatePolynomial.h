@@ -128,6 +128,11 @@ public:
 	 */
 	bool isZero() const;
 	/**
+	 * 
+     * @return 
+     */
+	bool isOne() const;
+	/**
 	 * Checks if the polynomial is constant.
 	 * @return If this is constant.
 	 */

@@ -280,6 +280,13 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isZero() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::isOne() const
+{
+    return (mTerms.size() == 1) && mTerms.front()->isOne();
+}
+
+
+template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
 {
     return (mTerms.size() == 0) || (mTerms.size() == 1 && mTerms.front()->isConstant());
