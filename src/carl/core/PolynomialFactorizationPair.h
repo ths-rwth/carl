@@ -37,7 +37,7 @@ namespace carl
         /**
          * The hash of this polynomial factorization pair.
          */
-        size_t mHash;
+        mutable size_t mHash;
         
         /**
          * A mutex for situation where any member is changed.
@@ -55,7 +55,7 @@ namespace carl
         mutable P* mpPolynomial;
 
         /**
-         * Compute the polynomial from factorization and coefficient.
+         * Compute the polynomial from the factorization.
          * @return The polynomial.
          */
         //TODO (matthias) return reference?
@@ -156,7 +156,7 @@ namespace carl
         /**
          * Updates the hash.
          */
-        void rehash();
+        void rehash() const;
         
     };
 } // namespace carl

@@ -86,7 +86,7 @@ namespace carl
     }
 
     template<typename P>
-    void PolynomialFactorizationPair<P>::rehash()
+    void PolynomialFactorizationPair<P>::rehash() const
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mpPolynomial == nullptr )
@@ -212,8 +212,7 @@ namespace carl
         factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
         factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
         assert( computePolynomial() == *mpPolynomial );
-        //TODO (matthias) enable rehash
-        //rehash();
+        rehash();
     }
 
     template<typename P>
