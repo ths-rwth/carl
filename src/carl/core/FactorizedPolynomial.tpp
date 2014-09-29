@@ -136,6 +136,7 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
+                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 cdFactorization.insert( cdFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
             }
             else if( factorA->first < factorB->first )
@@ -183,8 +184,8 @@ namespace carl
         _fpolyB.strengthenActivity();
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
-        Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), rehashFPolyA, rehashFPolyB ) );
         Factorization<P> restAFactorization, restBFactorization;
+        Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, rehashFPolyA, rehashFPolyB ) );
 
         if( rehashFPolyA )
             _fpolyA.rehash();

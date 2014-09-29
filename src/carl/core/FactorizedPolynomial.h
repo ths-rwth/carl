@@ -20,7 +20,7 @@ namespace carl
     class FactorizedPolynomial
     {
         template<typename P1>
-        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, bool& _pfPairARefined, bool& _pfPairBRefined );
+        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
 
     private:
         // Members

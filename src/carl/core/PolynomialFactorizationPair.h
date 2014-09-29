@@ -70,6 +70,15 @@ namespace carl
             return mFactorization;
         }
 
+        /**
+         * Set new factorization for polynomial as two factors
+         * @param _fpolyA First polynomial.
+         * @param exponentA Exponent of first polynomial.
+         * @param _fpolyB Second polynomial.
+         * @param exponentB Exponent of second polynomial.
+         */
+        void setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const;
+
     public:
         // Constructor.
         PolynomialFactorizationPair(); // no implementation
@@ -95,7 +104,7 @@ namespace carl
          * @return true, if the two given polynomial factorization pairs are equal.
          */
         template<typename P1>
-        friend bool operator==(const PolynomialFactorizationPair<P1>& _polyFactA, const PolynomialFactorizationPair<P1>& _polyFactB);
+        friend bool operator==( const PolynomialFactorizationPair<P1>& _polyFactA, const PolynomialFactorizationPair<P1>& _polyFactB );
         
         /**
          * @param _polyFactA The first polynomial factorization pair to compare.
@@ -103,7 +112,7 @@ namespace carl
          * @return true, if the first given polynomial factorization pair is less than the second given polynomial factorization pair.
          */
         template<typename P1>
-        friend bool operator<(const PolynomialFactorizationPair<P1>& _polyFactA, const PolynomialFactorizationPair<P1>& _polyFactB);
+        friend bool operator<( const PolynomialFactorizationPair<P1>& _polyFactA, const PolynomialFactorizationPair<P1>& _polyFactB );
     
         /**
          * @param _toUpdate The polynomial factorization pair to be checked for the possibility to be updated.
@@ -125,13 +134,15 @@ namespace carl
          * Calculates the factorization of the gcd of the polynomial represented by the two given polynomial factorization pairs. 
          * As a side effect the factorizations of these pairs can be refined. (c.f. Accelerating Parametric Probabilistic Verification, Algorithm 2)
          * @param _factA The first polynomial factorization pair to calculate the gcd with.
-         * @param _factA The second polynomial factorization pair to calculate the gcd with.
+         * @param _factB The second polynomial factorization pair to calculate the gcd with.
+         * @param _restA The remaining factorization of the first polynomial without the gcd.
+         * @param _restB The remaining factorization of the second polynomial without the gcd.
          * @param _factARefined A bool which is set to true, if the factorization of the first given polynomial factorization pair has been refined.
-         * @param _factARefined A bool which is set to true, if the factorization of the second given polynomial factorization pair has been refined.
+         * @param _factBRefined A bool which is set to true, if the factorization of the second given polynomial factorization pair has been refined.
          * @return The factorization of the gcd of the polynomial represented by the two given polynomial factorization pairs. 
          */
         template<typename P1>
-        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, bool& _pfPairARefined, bool& _pfPairBRefined );
+        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         /**
          * Prints the given polynomial-factorization pair on the given output stream.
@@ -140,7 +151,7 @@ namespace carl
          * @return The output stream after inserting the output.
          */
         template <typename P1>
-        friend std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P1>& _pfPair);
+        friend std::ostream& operator<<( std::ostream& _out, const PolynomialFactorizationPair<P1>& _pfPair );
         
         /**
          * Updates the hash.
