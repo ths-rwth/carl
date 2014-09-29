@@ -56,10 +56,12 @@ namespace carl
 
         /**
          * Compute the polynomial from the factorization.
+         * @param _fFactorization The factorization.
          * @return The polynomial.
          */
         //TODO (matthias) return reference?
-        P computePolynomial() const;
+        template<typename P1>
+        friend P1 computePolynomial( const Factorization<P1>& _fFactorization );
 
         /**
          * @return The factorization of this polynomial factorization pair

@@ -65,13 +65,13 @@ namespace carl
             assert( mpPolynomial != nullptr );
         }
 
-        // Check validity
+        // Check correctness
         if ( mpPolynomial != nullptr )
         {
             assert( mpPolynomial->coprimeFactor() == 1);
             if ( !mFactorization.empty() )
             {
-                assert(computePolynomial() == *mpPolynomial);
+                assert(computePolynomial( getFactorization() ) == *mpPolynomial);
             }
         }
 
@@ -107,16 +107,12 @@ namespace carl
     }
     
     template<typename P>
-    P PolynomialFactorizationPair<P>::computePolynomial() const
+    P computePolynomial( const Factorization<P>& _fFactorization )
     {
-        std::lock_guard<std::recursive_mutex> lock( mMutex );
         P result( 1 );
-        auto factor = getFactorization().begin();
-
-        while( factor != getFactorization().end() )
+        for (auto factor = _fFactorization.begin(); factor != _fFactorization.end(); factor++ )
         {
             result *= factor->first.content().mpPolynomial->pow(factor->second);
-            factor++;
         }
         return result;
     }
@@ -211,7 +207,7 @@ namespace carl
         factorization.clear();
         factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
         factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
-        assert( computePolynomial() == *mpPolynomial );
+        assert( computePolynomial( factorization ) == *mpPolynomial );
         rehash();
     }
 
@@ -294,6 +290,11 @@ namespace carl
                 }
             }
         }
+
+        // Check correctness
+        assert( computePolynomial( result ) * computePolynomial( _restA ) == *_pfPairA.mpPolynomial);
+        assert( computePolynomial( result ) * computePolynomial( _restB ) == *_pfPairB.mpPolynomial);
+
         return result;
     }
     
