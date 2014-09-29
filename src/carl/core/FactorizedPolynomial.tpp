@@ -91,7 +91,7 @@ namespace carl
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO: implementation
+        // TODO (matthias) implementation
     }
 
     template<typename P>
@@ -100,7 +100,7 @@ namespace carl
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO: implementation
+        // TODO (matthias) implementation
     }
 
     template<typename P>
@@ -109,7 +109,7 @@ namespace carl
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO: implementation
+        // TODO (matthias) implementation
     }
 
     template<typename P>
@@ -118,7 +118,7 @@ namespace carl
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO: implementation
+        // TODO (matthias) implementation
     }
 
     template<typename P>
@@ -173,7 +173,7 @@ namespace carl
     {
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
-        // TODO: implementation
+        // TODO (matthias) implementation
     }
 
     template<typename P>

@@ -28,7 +28,7 @@ namespace carl
     class PolynomialFactorizationPair
     {
         friend Factorization<P>& FactorizedPolynomial<P>::rFactorization() const;
-        //TODO friend needed?
+        //TODO (matthias) friend needed?
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
 
     private:
@@ -56,16 +56,17 @@ namespace carl
 
         /**
          * Compute the polynomial from factorization and coefficient.
-         * @param result The polynomial.
+         * @return The polynomial.
          */
-        void computePolynomial(P& result) const;
+        //TODO (matthias) return reference?
+        P computePolynomial() const;
 
         /**
          * @return The factorization of this polynomial factorization pair
          */
         Factorization<P>& getFactorization() const
         {
-            //TODO flatten factorization first
+            //TODO (matthias) flatten factorization first
             return mFactorization;
         }
 

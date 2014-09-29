@@ -66,15 +66,12 @@ namespace carl
         }
 
         // Check validity
-        // TODO only in debugging
         if ( mpPolynomial != nullptr )
         {
             assert( mpPolynomial->coprimeFactor() == 1);
             if ( !mFactorization.empty() )
             {
-                P result;
-                computePolynomial(result);
-                assert(result == *mpPolynomial);
+                assert(computePolynomial() == *mpPolynomial);
             }
         }
 
@@ -85,7 +82,7 @@ namespace carl
     PolynomialFactorizationPair<P>::~PolynomialFactorizationPair()
     {
         delete mpPolynomial;
-        //TODO implement further
+        //TODO (matthias) implement further
     }
 
     template<typename P>
@@ -110,10 +107,10 @@ namespace carl
     }
     
     template<typename P>
-    void PolynomialFactorizationPair<P>::computePolynomial(P& result) const
+    P PolynomialFactorizationPair<P>::computePolynomial() const
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        result = P( 1 );
+        P result( 1 );
         auto factor = getFactorization().begin();
 
         while( factor != getFactorization().end() )
@@ -121,6 +118,7 @@ namespace carl
             result *= factor->first.content().mpPolynomial->pow(factor->second);
             factor++;
         }
+        return result;
     }
 
     template<typename P>
@@ -213,7 +211,7 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lockA( _pfPairA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _pfPairB.mMutex );
         Factorization<P> result;
-        // TODO: implementation
+        // TODO (matthias) implementation
         Factorization<P> factorizationA = _pfPairA.getFactorization();
         Factorization<P> factorizationB = _pfPairB.getFactorization();
         auto factorA = factorizationA.begin();
@@ -231,7 +229,7 @@ namespace carl
             }
             else
             {
-                //TODO irreducible?
+                //TODO (matthias) irreducible?
                 //Compute GCD of factors
                 P polA = *factorA->first.content().mpPolynomial;
                 P polB = *factorB->first.content().mpPolynomial;
@@ -253,7 +251,7 @@ namespace carl
                     //Set new factorizations
                     if (remainA != 1)
                     {
-                        //TODO encapsulate + rehash
+                        //TODO (matthias) encapsulate + rehash
                         Factorization<P> factorsA = factorA->first.content().mFactorization;
                         assert( factorsA.size() == 1 );
                         _pfPairARefined = true;
