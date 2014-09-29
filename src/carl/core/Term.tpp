@@ -564,4 +564,27 @@ bool Term<Coefficient>::isConsistent() const {
 	return true;
 }
 
+
+
+template<typename Coefficient>
+Term<Coefficient> Term<Coefficient>::gcd(std::shared_ptr<const Term<Coefficient>> t1, std::shared_ptr<const Term<Coefficient>> t2)
+{
+	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
+	assert(t1);
+	assert(t2);
+	return gcd(*t1, *t2);
+	
+}
+
+template<typename Coefficient>
+Term<Coefficient> Term<Coefficient>::gcd(const Term<Coefficient>& t1, const Term<Coefficient>& t2)
+{
+	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
+	assert(!t1.isZero());
+	assert(!t2.isZero());
+	if(t1.isConstant() || t2.isConstant()) return Term(Coefficient(1));
+	return Term(Coefficient(1), Monomial::gcd(t1.monomial(), t2.monomial()));
+}
+
+
 }
