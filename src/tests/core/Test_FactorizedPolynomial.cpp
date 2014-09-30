@@ -53,4 +53,9 @@ TEST(FactorizedPolynomial, Construction)
     FactorizedPolynomial<P> fpMul( fpA * fpB );
     std::cout << fpA << " * " << fpB << ": " << fpMul << std::endl;
     fpCache.print();
+
+    //Subtraction
+    FactorizedPolynomial<P> fpSub( fpA - fpB );
+    std::cout << fpA << " - " << fpB << ": " << fpSub << std::endl;
+    fpCache.print();
 }

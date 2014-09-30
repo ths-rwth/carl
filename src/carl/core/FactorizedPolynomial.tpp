@@ -97,10 +97,9 @@ namespace carl
     template<typename P>
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        _fpolyA.strengthenActivity();
-        _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO (matthias) implementation
+        Coeff<P> coefficient = -_fpolyB.rCoefficient();
+        return _fpolyA + FactorizedPolynomial<P>( std::move( _fpolyB.rFactorization() ), coefficient, _fpolyB.mrCache );
     }
 
     template<typename P>
