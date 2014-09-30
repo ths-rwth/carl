@@ -23,17 +23,12 @@ namespace carl
             for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )
             {
                 if( polyExpPair != _factorization.begin() )
-                    _out << ") * (";
-                else
-                    _out << "(";
-                _out << polyExpPair->first;
+                    _out << " * ";
                 assert( polyExpPair->second != 0 );
+                _out << "(" << polyExpPair->first << ")";
                 if( polyExpPair->second > 1 )
-                {
                     _out << "^" << polyExpPair->second;
-                }
             }
-            _out << ")";
         }
         return _out;
     }
