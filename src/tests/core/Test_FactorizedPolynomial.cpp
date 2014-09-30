@@ -38,4 +38,9 @@ TEST(FactorizedPolynomial, Construction)
     FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB, restA, restB ) );
     std::cout << "GCD of " << fpA << " and " << fpB << ": " << fpGCD << " with rest " << restA << " and " << restB << std::endl;
     fpCache.print();
+
+    //Common Multiple
+    FactorizedPolynomial<P> fpCM( commonMultiple( fpA, fpB ) );
+    std::cout << "Common multiple of " << fpA << " and " << fpB << ": " << fpCM << std::endl;
+    fpCache.print();
 }

@@ -206,7 +206,6 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
         {
-            std::cout << factor->first << "^" << factor->second << std::endl;
             if (factor->first.rFactorization().size() > 1){
                 //Update factorization
                 Factorization<P> partFactorization = factor->first.rFactorization();

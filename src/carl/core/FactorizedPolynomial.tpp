@@ -174,7 +174,43 @@ namespace carl
     {
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
-        // TODO (matthias) implementation
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
+        Factorization<P> cmFactorization;
+        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
+        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
+        auto factorA = factorizationA.begin();
+        auto factorB = factorizationB.begin();
+        while( factorA != factorizationA.end() && factorB != factorizationB.end() )
+        {
+            if( factorA->first == factorB->first )
+            {
+                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
+                cmFactorization.insert( cmFactorization.end(), factorA->second > factorB->second ? *factorA : *factorB );
+            }
+            else if( factorA->first < factorB->first )
+            {
+                cmFactorization.insert( cmFactorization.end(), *factorA );
+                factorA++;
+            }
+            else
+            {
+                cmFactorization.insert( cmFactorization.end(), *factorB );
+                factorB++;
+            }
+        }
+        while ( factorA != factorizationA.end() )
+        {
+            cmFactorization.insert( cmFactorization.end(), *factorA );
+            factorA++;
+        }
+        while ( factorB != factorizationB.end() )
+        {
+            cmFactorization.insert( cmFactorization.end(), *factorB );
+            factorB++;
+        }
+
+        Coeff<P> coefficientCommon = carl::lcm( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
+        return FactorizedPolynomial<P>( std::move( cmFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
 
     template<typename P>
