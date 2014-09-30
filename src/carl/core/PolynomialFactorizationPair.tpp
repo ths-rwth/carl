@@ -70,9 +70,7 @@ namespace carl
         {
             assert( mpPolynomial->coprimeFactor() == 1);
             if ( !mFactorization.empty() )
-            {
-                assert(computePolynomial( getFactorization() ) == *mpPolynomial);
-            }
+                assertFactorization();
         }
 
         rehash();
@@ -82,7 +80,6 @@ namespace carl
     PolynomialFactorizationPair<P>::~PolynomialFactorizationPair()
     {
         delete mpPolynomial;
-        //TODO (matthias) implement further
     }
 
     template<typename P>
@@ -104,17 +101,6 @@ namespace carl
         {
             mHash = std::hash<P>()( *mpPolynomial );
         }
-    }
-    
-    template<typename P>
-    P computePolynomial( const Factorization<P>& _fFactorization )
-    {
-        P result( 1 );
-        for (auto factor = _fFactorization.begin(); factor != _fFactorization.end(); factor++ )
-        {
-            result *= factor->first.content().mpPolynomial->pow(factor->second);
-        }
-        return result;
     }
 
     template<typename P>
@@ -198,6 +184,42 @@ namespace carl
         }
         _toUpdate.rehash();
     }
+
+    template<typename P>
+    P computePolynomial( const Factorization<P>& _fFactorization )
+    {
+        P result( 1 );
+        for (auto factor = _fFactorization.begin(); factor != _fFactorization.end(); factor++ )
+        {
+            result *= factor->first.content().mpPolynomial->pow(factor->second);
+        }
+        return result;
+    }
+
+    template<typename P>
+    void PolynomialFactorizationPair<P>::flattenFactorization() const
+    {
+        if ( mFactorization.size() == 1 && mFactorization.begin()->second == 1 )
+        {
+            return;
+        }
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
+        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
+        {
+            std::cout << factor->first << "^" << factor->second << std::endl;
+            if (factor->first.rFactorization().size() > 1){
+                //Update factorization
+                Factorization<P> partFactorization = factor->first.rFactorization();
+                size_t exponent = factor->second;
+                factor = mFactorization.erase(factor);
+                for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
+                {
+                    mFactorization.insert( factor, std::pair<FactorizedPolynomial<P>, size_t>( partFactor->first, partFactor->second * exponent ) );
+                }
+            }
+        }
+        assertFactorization();
+    }
     
     template<typename P>
     void PolynomialFactorizationPair<P>::setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const
@@ -207,7 +229,7 @@ namespace carl
         factorization.clear();
         factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
         factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
-        assert( computePolynomial( factorization ) == *mpPolynomial );
+        assertFactorization();
         rehash();
     }
 
@@ -292,6 +314,8 @@ namespace carl
         }
 
         // Check correctness
+        _pfPairA.assertFactorization();
+        _pfPairB.assertFactorization();
         assert( computePolynomial( result ) * computePolynomial( _restA ) == *_pfPairA.mpPolynomial);
         assert( computePolynomial( result ) * computePolynomial( _restB ) == *_pfPairB.mpPolynomial);
 

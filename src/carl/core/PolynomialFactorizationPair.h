@@ -64,11 +64,22 @@ namespace carl
         friend P1 computePolynomial( const Factorization<P1>& _fFactorization );
 
         /**
+         * Turn (possible) tree structure of factorization into linear list of factors.
+         */
+        void flattenFactorization() const;
+
+        inline void assertFactorization() const
+        {
+            assert( mpPolynomial == nullptr || computePolynomial( mFactorization ) == *mpPolynomial );
+        }
+
+        /**
+         * Get the flattened factorization.
          * @return The factorization of this polynomial factorization pair
          */
         Factorization<P>& getFactorization() const
         {
-            //TODO (matthias) flatten factorization first
+            flattenFactorization();
             return mFactorization;
         }
 
