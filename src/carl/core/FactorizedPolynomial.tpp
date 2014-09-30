@@ -113,7 +113,9 @@ namespace carl
     {
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Coeff<P> coefficient = -_fpolyB.rCoefficient();
-        return _fpolyA + FactorizedPolynomial<P>( std::move( _fpolyB.rFactorization() ), coefficient, _fpolyB.mrCache );
+        //TODO (matthias) make better
+        Factorization<P> test = _fpolyB.rFactorization();
+        return _fpolyA + FactorizedPolynomial<P>( std::move( test ), coefficient, _fpolyB.mrCache );
     }
 
     template<typename P>
