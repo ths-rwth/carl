@@ -48,4 +48,9 @@ TEST(FactorizedPolynomial, Construction)
     FactorizedPolynomial<P> fpLD( lazyDiv( fpB, fpA ) );
     std::cout << fpB << " / " << fpA << ": " << fpLD << std::endl;
     fpCache.print();
+
+    //Multiplication
+    FactorizedPolynomial<P> fpMul( fpA * fpB );
+    std::cout << fpA << " * " << fpB << ": " << fpMul << std::endl;
+    fpCache.print();
 }

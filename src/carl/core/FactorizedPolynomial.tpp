@@ -109,7 +109,44 @@ namespace carl
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO (matthias) implementation
+        Factorization<P> resultFactorization;
+        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
+        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
+        auto factorA = factorizationA.begin();
+        auto factorB = factorizationB.begin();
+        while( factorA != factorizationA.end() && factorB != factorizationB.end() )
+        {
+            if( factorA->first == factorB->first )
+            {
+                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
+                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>(factorA->first, factorA->second + factorB->second ) );
+                factorA++;
+                factorB++;
+            }
+            else if( factorA->first < factorB->first )
+            {
+                resultFactorization.insert( resultFactorization.end(), *factorA );
+                factorA++;
+            }
+            else
+            {
+                resultFactorization.insert( resultFactorization.end(), *factorB );
+                factorB++;
+            }
+        }
+        while ( factorA != factorizationA.end() )
+        {
+            resultFactorization.insert( resultFactorization.end(), *factorA );
+            factorA++;
+        }
+        while ( factorB != factorizationB.end() )
+        {
+            resultFactorization.insert( resultFactorization.end(), *factorB );
+            factorB++;
+        }
+
+        Coeff<P> coefficientResult = _fpolyA.rCoefficient() * _fpolyB.rCoefficient();
+        return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, _fpolyA.mrCache );
     }
 
     template<typename P>
