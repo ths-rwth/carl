@@ -28,34 +28,39 @@ TEST(FactorizedPolynomial, Construction)
     fpCache.print();
 
     //Common divisor
-    FactorizedPolynomial<P> restA( P( 2 ), fpCache );
-    FactorizedPolynomial<P> restB( P( 2 ), fpCache );
-    FactorizedPolynomial<P> fpC( commonDivisor( fpA, fpB, restA, restB ) );
-    std::cout << "Common divisor of " << fpA << " and " << fpB << ": " << fpC << " with rest " << restA << " and " << restB << std::endl;
+    FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
+    std::cout << "Common divisor of " << fpA << " and " << fpB << ": " << fpC << std::endl;
     fpCache.print();
     
     //GCD
-    FactorizedPolynomial<P> fpGCD( gcd( fpA, fpB, restA, restB ) );
+    FactorizedPolynomial<P> restA( P( 2 ), fpCache );
+    FactorizedPolynomial<P> restB( P( 2 ), fpCache );
+    FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
     std::cout << "GCD of " << fpA << " and " << fpB << ": " << fpGCD << " with rest " << restA << " and " << restB << std::endl;
     fpCache.print();
 
     //Common Multiple
-    FactorizedPolynomial<P> fpCM( commonMultiple( fpA, fpB ) );
+    FactorizedPolynomial<P> fpCM = commonMultiple( fpA, fpB );
     std::cout << "Common multiple of " << fpA << " and " << fpB << ": " << fpCM << std::endl;
     fpCache.print();
 
     //Lazy div
-    FactorizedPolynomial<P> fpLD( lazyDiv( fpB, fpA ) );
+    FactorizedPolynomial<P> fpLD = lazyDiv( fpB, fpA );
     std::cout << fpB << " / " << fpA << ": " << fpLD << std::endl;
     fpCache.print();
 
     //Multiplication
-    FactorizedPolynomial<P> fpMul( fpA * fpB );
+    FactorizedPolynomial<P> fpMul = fpA * fpB;
     std::cout << fpA << " * " << fpB << ": " << fpMul << std::endl;
     fpCache.print();
 
+    //Addition
+    FactorizedPolynomial<P> fpAdd = fpA + fpB;
+    std::cout << fpA << " + " << fpB << ": " << fpAdd << std::endl;
+    fpCache.print();
+
     //Subtraction
-    FactorizedPolynomial<P> fpSub( fpA - fpB );
+    FactorizedPolynomial<P> fpSub = fpA - fpB;
     std::cout << fpA << " - " << fpB << ": " << fpSub << std::endl;
     fpCache.print();
 }

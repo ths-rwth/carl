@@ -188,12 +188,12 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )
+    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        Factorization<P> cdFactorization, restAFactorization, restBFactorization;
+        Factorization<P> cdFactorization;
         const Factorization<P>& factorizationA = _fpolyA.rFactorization();
         const Factorization<P>& factorizationB = _fpolyB.rFactorization();
         auto factorA = factorizationA.begin();
@@ -208,32 +208,12 @@ namespace carl
                 factorB++;
             }
             else if( factorA->first < factorB->first )
-            {
-                restAFactorization.insert( restAFactorization.end(), *factorA );
                 factorA++;
-            }
             else
-            {
-                restBFactorization.insert( restBFactorization.end(), *factorB );
                 factorB++;
-            }
-        }
-        while ( factorA != factorizationA.end() )
-        {
-            restAFactorization.insert( restAFactorization.end(), *factorA );
-            factorA++;
-        }
-        while ( factorB != factorizationB.end() )
-        {
-            restBFactorization.insert( restBFactorization.end(), *factorB );
-            factorB++;
         }
 
         Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
-        Coeff<P> coefficientRestA = _fpolyA.rCoefficient() / coefficientCommon;
-        Coeff<P> coefficientRestB = _fpolyB.rCoefficient() / coefficientCommon; 
-        _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyRestA.mrCache);
-        _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyRestB.mrCache);
         return FactorizedPolynomial<P>( std::move( cdFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
 
@@ -282,6 +262,49 @@ namespace carl
         Coeff<P> coefficientCommon = carl::lcm( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
         return FactorizedPolynomial<P>( std::move( cmFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
+
+    template<typename P>
+    const Factorization<P> commonDivisor( const Factorization<P>& _fFactorizationA, const Factorization<P>& _fFactorizationB, Factorization<P>& _fFactorizationRestA, Factorization<P>& _fFactorizationRestB)
+    {
+        Factorization<P> resultFactorization;
+        _fFactorizationRestA.clear();
+        _fFactorizationRestB.clear();
+        auto factorA = _fFactorizationA.begin();
+        auto factorB = _fFactorizationB.begin();
+        while( factorA != _fFactorizationA.end() && factorB != _fFactorizationB.end() )
+        {
+            if( factorA->first == factorB->first )
+            {
+                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
+                resultFactorization.insert( resultFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
+                factorA++;
+                factorB++;
+            }
+            else if( factorA->first < factorB->first )
+            {
+                _fFactorizationRestA.insert( _fFactorizationRestA.end(), *factorA );
+                factorA++;
+            }
+            else
+            {
+                _fFactorizationRestB.insert( _fFactorizationRestB.end(), *factorB );
+                factorB++;
+            }
+        }
+        while ( factorA != _fFactorizationA.end() )
+        {
+            _fFactorizationRestA.insert( _fFactorizationRestA.end(), *factorA );
+            factorA++;
+        }
+        while ( factorB != _fFactorizationB.end() )
+        {
+            _fFactorizationRestB.insert( _fFactorizationRestB.end(), *factorB );
+            factorB++;
+        }
+
+        return resultFactorization;
+    }
+
 
     template<typename P>
     const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )

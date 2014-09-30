@@ -173,12 +173,10 @@ namespace carl
         /**
          * @param _fpolyA The first factorized polynomial to compute the common divisor for.
          * @param _fpolyB The second factorized polynomial to compute the common divisor for.
-         * @param _fpolyRestA Returns the remaining part of the first factorized polynomial without the common divisor
-         * @param _fpolyRestB Returns the remaining part of the second factorized polynomial without the common divisor
          * @return A common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> commonDivisor( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB, FactorizedPolynomial<P1>& _fpolyRestA, FactorizedPolynomial<P1>& _fpolyRestB);
+        friend const FactorizedPolynomial<P1> commonDivisor( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * @param _fpolyA The first factorized polynomial to compute the common multiple for.
@@ -187,6 +185,17 @@ namespace carl
          */
         template<typename P1>
         friend const FactorizedPolynomial<P1> commonMultiple( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+
+        /**
+         * Computes the common divisor with rest of two factorizations.
+         * @param _fFactorizationA The factorization of the first polynomial.
+         * @param _fFactorizationB The factorization of the second polynomial.
+         * @param _fFactorizationRestA Returns the remaining factorization of the first polynomial without the common divisor
+         * @param _fFactorizationRestB Returns the remaining factorization of the second polynomial without the common divisor
+         * @return The factorization of a common divisor of the two given factorized polynomials.
+         */
+        template<typename P1>
+        friend const Factorization<P1> commonDivisor( const FactorizedPolynomial<P1>& _fFactorizationA, const FactorizedPolynomial<P1>& _fFactorizationB, Factorization<P1>& _fFactorizationRestA, Factorization<P1>& _fFactorizationRestB);
 
         /**
          * Determines the greatest common divisor of the two given factorized polynomials. The method exploits the partial factorization
