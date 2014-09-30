@@ -91,7 +91,21 @@ namespace carl
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        // TODO (matthias) implementation
+
+        //Compute common divisor as factor of result
+        Factorization<P> factorizationRestA, factorizationRestB;
+        Factorization<P> resultFactorization = commonDivisor(_fpolyA.rFactorization(), _fpolyB.rFactorization(), factorizationRestA, factorizationRestB );
+
+        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
+        Coeff<P> coefficientRestA = _fpolyA.rCoefficient() / coefficientCommon;
+        Coeff<P> coefficientRestB = _fpolyB.rCoefficient() / coefficientCommon;
+
+        //Compute remaining sum
+        P sum = computePolynomial( factorizationRestA ) * coefficientRestA;
+        sum += computePolynomial( factorizationRestB ) * coefficientRestB;
+        FactorizedPolynomial<P> fpolySum( sum, _fpolyA.mrCache );
+        resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+        return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
 
     template<typename P>
