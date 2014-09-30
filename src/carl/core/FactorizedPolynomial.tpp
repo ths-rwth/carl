@@ -134,6 +134,7 @@ namespace carl
             }
             else if( factorA->first < factorB->first )
             {
+                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 resultFactorization.insert( resultFactorization.end(), *factorA );
                 factorA++;
             }
@@ -167,6 +168,8 @@ namespace carl
             {
                 // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 cdFactorization.insert( cdFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
+                factorA++;
+                factorB++;
             }
             else if( factorA->first < factorB->first )
             {
@@ -215,6 +218,8 @@ namespace carl
             {
                 // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 cmFactorization.insert( cmFactorization.end(), factorA->second > factorB->second ? *factorA : *factorB );
+                factorA++;
+                factorB++;
             }
             else if( factorA->first < factorB->first )
             {
