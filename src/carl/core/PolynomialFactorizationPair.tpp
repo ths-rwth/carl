@@ -218,11 +218,12 @@ namespace carl
     template<typename P>
     void PolynomialFactorizationPair<P>::setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const
     {
-        Factorization<P> factorization = getFactorization();
-        assert( factorization.size() == 1 );
-        factorization.clear();
-        factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
-        factorization.insert ( factorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
+        assert( mFactorization.size() == 1 );
+        assert( !_fpolyA.isOne() );
+        assert( !_fpolyB.isOne() );
+        mFactorization.clear();
+        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
+        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
         assertFactorization();
         rehash();
     }
@@ -261,11 +262,9 @@ namespace carl
                     P polA = *factorA->first.content().mpPolynomial;
                     P polB = *factorB->first.content().mpPolynomial;
                     P polGCD( carl::gcd( polA, polB ) );
-                    Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
-                    FactorizedPolynomial<P> gcdResult( polGCD, cache );
 
                     //New common factor
-                    if ( !gcdResult.isOne() )
+                    if ( polGCD != 1 )
                     {
                         //Compute remainders
                         P remainA, remainB;
@@ -276,6 +275,9 @@ namespace carl
                         size_t exponentA = factorA->second;
                         size_t exponentB = factorB->second;
                         size_t exponentCommon = exponentA < exponentB ? exponentA : exponentB;
+                        Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
+                        //Set new part of GCD
+                        FactorizedPolynomial<P> gcdResult( polGCD, cache );
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult,  exponentCommon ) );
 
                         if (remainA != 1)
