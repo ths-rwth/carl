@@ -25,7 +25,7 @@ namespace carl
          * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
          * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
          */
-        pfPair->mFactorization.insert( std::make_pair( *this, 1 ) ); 
+        pfPair->mFactorization.insert( std::make_pair( *this, 1 ) );
     }
     
     template<typename P>

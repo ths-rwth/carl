@@ -21,21 +21,19 @@ TEST(FactorizedPolynomial, Construction)
     P fxyz({(cln::cl_RA)1*x*y*z});
     
     Cache<PolynomialFactorizationPair<P>> fpCache;
-    //fpCache.print();
+    fpCache.print();
     FactorizedPolynomial<P> fpA( fxy, fpCache );
-    //fpCache.print();
+    fpCache.print();
     FactorizedPolynomial<P> fpB( fxyz, fpCache );
-    //fpCache.print();
+    fpCache.print();
 
     //Common divisor
     FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
     std::cout << "Common divisor of " << fpA << " and " << fpB << ": " << fpC << std::endl;
-    //fpCache.print();
+    fpCache.print();
     
     //GCD
-    fpCache.print();
     FactorizedPolynomial<P> restA( P( 2 ), fpCache );
-    //fpCache.print();
     FactorizedPolynomial<P> restB( P( 2 ), fpCache );
     FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
     std::cout << "GCD of " << fpA << " and " << fpB << ": " << fpGCD << " with rest " << restA << " and " << restB << std::endl;

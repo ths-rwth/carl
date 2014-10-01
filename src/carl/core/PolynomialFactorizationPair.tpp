@@ -54,11 +54,22 @@ namespace carl
         mpPolynomial( _polynomial ),
         mIrreducible( -1 )
     {
-        if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
+        if ( mpPolynomial == nullptr )
         {
-            // No factorization -> set polynomial
-            mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );
-            assert( mpPolynomial != nullptr );
+            if ( mFactorization.size() == 1 )
+            {
+                // No factorization -> set polynomial
+                mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );
+                assert( mpPolynomial != nullptr );
+            }
+        }
+        else
+        {
+            if ( *mpPolynomial == 1 )
+            {
+                assert( mFactorization.size() == 0);
+                mpPolynomial = nullptr;
+            }
         }
 
         // Check correctness
