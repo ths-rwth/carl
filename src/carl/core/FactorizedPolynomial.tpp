@@ -96,9 +96,9 @@ namespace carl
         Factorization<P> factorizationRestA, factorizationRestB;
         Factorization<P> resultFactorization = commonDivisor(_fpolyA.factorization(), _fpolyB.factorization(), factorizationRestA, factorizationRestB );
 
-        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
-        Coeff<P> coefficientRestA = _fpolyA.rCoefficient() / coefficientCommon;
-        Coeff<P> coefficientRestB = _fpolyB.rCoefficient() / coefficientCommon;
+        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
+        Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
 
         //Compute remaining sum
         P sum = computePolynomial( factorizationRestA ) * coefficientRestA;
@@ -112,7 +112,7 @@ namespace carl
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        Coeff<P> coefficient = -_fpolyB.rCoefficient();
+        Coeff<P> coefficient = -_fpolyB.coefficient();
         //TODO (matthias) make better
         Factorization<P> test(_fpolyB.factorization());
         return _fpolyA + FactorizedPolynomial<P>( std::move( test ), coefficient, _fpolyB.mrCache );
@@ -160,7 +160,7 @@ namespace carl
             factorB++;
         }
 
-        Coeff<P> coefficientResult = _fpolyA.rCoefficient() * _fpolyB.rCoefficient();
+        Coeff<P> coefficientResult = _fpolyA.coefficient() * _fpolyB.coefficient();
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, _fpolyA.mrCache );
     }
 
@@ -199,7 +199,7 @@ namespace carl
             factorA++;
         }
 
-        Coeff<P> coefficientResult = _fpolyA.rCoefficient() / _fpolyB.rCoefficient();
+        Coeff<P> coefficientResult = _fpolyA.coefficient() / _fpolyB.coefficient();
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, _fpolyA.mrCache );
     }
 
@@ -229,7 +229,7 @@ namespace carl
                 factorB++;
         }
 
-        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
+        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
         return FactorizedPolynomial<P>( std::move( cdFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
 
@@ -275,7 +275,7 @@ namespace carl
             factorB++;
         }
 
-        Coeff<P> coefficientCommon = carl::lcm( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
+        Coeff<P> coefficientCommon = carl::lcm( _fpolyA.coefficient(), _fpolyB.coefficient() );
         return FactorizedPolynomial<P>( std::move( cmFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
 
@@ -337,9 +337,9 @@ namespace carl
         if( rehashFPolyB )
             _fpolyB.rehash();
 
-        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
-        Coeff<P> coefficientRestA = _fpolyA.rCoefficient() / coefficientCommon;
-        Coeff<P> coefficientRestB = _fpolyB.rCoefficient() / coefficientCommon; 
+        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
+        Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon; 
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyRestA.mrCache);
         _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyRestB.mrCache);
         return FactorizedPolynomial<P>( std::move( gcdFactorization ), coefficientCommon, _fpolyA.mrCache );
