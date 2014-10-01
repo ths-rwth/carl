@@ -117,9 +117,9 @@ namespace carl
         /**
          * @return The factorization of this polynomial.
          */
-        Factorization<P>& rFactorization() const
+        const Factorization<P>& factorization() const
         {
-            return content().getFactorization();
+            return content().factorization();
         }
 
         /**
@@ -135,7 +135,7 @@ namespace carl
          */
         bool isOne() const
         {
-            return rFactorization().empty();
+            return factorization().empty();
         }
 
         /**

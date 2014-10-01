@@ -27,7 +27,7 @@ namespace carl
     template<typename P>
     class PolynomialFactorizationPair
     {
-        friend Factorization<P>& FactorizedPolynomial<P>::rFactorization() const;
+        friend const Factorization<P>& FactorizedPolynomial<P>::factorization() const;
         //TODO (matthias) friend needed?
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
 
@@ -77,7 +77,7 @@ namespace carl
          * Get the flattened factorization.
          * @return The factorization of this polynomial factorization pair
          */
-        Factorization<P>& getFactorization() const
+        const Factorization<P>& factorization() const
         {
             flattenFactorization();
             return mFactorization;

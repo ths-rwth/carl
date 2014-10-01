@@ -94,7 +94,7 @@ namespace carl
 
         //Compute common divisor as factor of result
         Factorization<P> factorizationRestA, factorizationRestB;
-        Factorization<P> resultFactorization = commonDivisor(_fpolyA.rFactorization(), _fpolyB.rFactorization(), factorizationRestA, factorizationRestB );
+        Factorization<P> resultFactorization = commonDivisor(_fpolyA.factorization(), _fpolyB.factorization(), factorizationRestA, factorizationRestB );
 
         Coeff<P> coefficientCommon = carl::gcd( _fpolyA.rCoefficient(), _fpolyB.rCoefficient() );
         Coeff<P> coefficientRestA = _fpolyA.rCoefficient() / coefficientCommon;
@@ -114,7 +114,7 @@ namespace carl
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Coeff<P> coefficient = -_fpolyB.rCoefficient();
         //TODO (matthias) make better
-        Factorization<P> test = _fpolyB.rFactorization();
+        Factorization<P> test(_fpolyB.factorization());
         return _fpolyA + FactorizedPolynomial<P>( std::move( test ), coefficient, _fpolyB.mrCache );
     }
 
@@ -125,8 +125,8 @@ namespace carl
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> resultFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
-        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
+        const Factorization<P>& factorizationA = _fpolyA.factorization();
+        const Factorization<P>& factorizationB = _fpolyB.factorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
@@ -171,8 +171,8 @@ namespace carl
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> resultFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
-        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
+        const Factorization<P>& factorizationA = _fpolyA.factorization();
+        const Factorization<P>& factorizationB = _fpolyB.factorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
@@ -210,8 +210,8 @@ namespace carl
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> cdFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
-        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
+        const Factorization<P>& factorizationA = _fpolyA.factorization();
+        const Factorization<P>& factorizationB = _fpolyB.factorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
@@ -240,8 +240,8 @@ namespace carl
         _fpolyB.strengthenActivity();
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Factorization<P> cmFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.rFactorization();
-        const Factorization<P>& factorizationB = _fpolyB.rFactorization();
+        const Factorization<P>& factorizationA = _fpolyA.factorization();
+        const Factorization<P>& factorizationB = _fpolyB.factorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )

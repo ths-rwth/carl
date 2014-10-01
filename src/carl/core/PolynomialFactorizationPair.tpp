@@ -83,9 +83,9 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mpPolynomial == nullptr )
         {
-            assert( getFactorization().empty() || getFactorization().size() > 1 );
+            assert( factorization().empty() || factorization().size() > 1 );
             mHash = 0;
-            for( auto polyExpPair = getFactorization().begin(); polyExpPair != getFactorization().end(); ++polyExpPair )
+            for( auto polyExpPair = factorization().begin(); polyExpPair != factorization().end(); ++polyExpPair )
             {
                 mHash = (mHash << 5) | (mHash >> (sizeof(size_t)*8 - 5));
                 mHash ^= std::hash<FactorizedPolynomial<P>>()( polyExpPair->first );
@@ -111,7 +111,7 @@ namespace carl
         }
         else
         {
-            return factorizationsEqual( _polyFactA.getFactorization(), _polyFactB.getFactorization() );
+            return factorizationsEqual( _polyFactA.factorization(), _polyFactB.factorization() );
         }
     }
     
@@ -128,9 +128,9 @@ namespace carl
         }
         else
         {
-            auto iterA = _polyFactA.getFactorization().begin();
-            auto iterB = _polyFactB.getFactorization().begin();
-            while( iterA != _polyFactA.getFactorization().end() && iterB != _polyFactB.getFactorization().end() )
+            auto iterA = _polyFactA.factorization().begin();
+            auto iterB = _polyFactB.factorization().begin();
+            while( iterA != _polyFactA.factorization().end() && iterB != _polyFactB.factorization().end() )
             {
                 if( iterA->first < iterB->first )
                     return true;
@@ -160,7 +160,7 @@ namespace carl
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             return true;
         assert( _updateWith.mpPolynomial == nullptr || (*_toUpdate.mpPolynomial) == (*_updateWith.mpPolynomial) );
-        return !factorizationsEqual( _toUpdate.getFactorization(), _updateWith.getFactorization() );
+        return !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() );
     }
 
     template<typename P>
@@ -172,7 +172,7 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lockB( _updateWith.mMutex );
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             _toUpdate.mpPolynomial = _updateWith.mpPolynomial;
-        if( !factorizationsEqual( _toUpdate.getFactorization(), _updateWith.getFactorization() ) )
+        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
         {
             // Calculating the gcd refines both factorizations to the same factorization
             gcd( _toUpdate, _updateWith );
@@ -201,9 +201,9 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
         {
-            if (factor->first.rFactorization().size() > 1){
+            if (factor->first.factorization().size() > 1){
                 //Update factorization
-                Factorization<P> partFactorization = factor->first.rFactorization();
+                Factorization<P> partFactorization = factor->first.factorization();
                 size_t exponent = factor->second;
                 factor = mFactorization.erase(factor);
                 for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
@@ -232,7 +232,7 @@ namespace carl
     Factorization<P> gcd( const PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, Factorization<P>& _restA, Factorization<P>& _restB, bool& _pfPairARefined, bool& _pfPairBRefined )
     {
         if( &_pfPairA == &_pfPairB )
-            return _pfPairA.getFactorization();
+            return _pfPairA.factorization();
 
         std::lock_guard<std::recursive_mutex> lockA( _pfPairA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _pfPairB.mMutex );
@@ -240,8 +240,8 @@ namespace carl
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
-        Factorization<P> factorizationA = _pfPairA.getFactorization();
-        Factorization<P> factorizationB = _pfPairB.getFactorization();
+        Factorization<P> factorizationA = _pfPairA.factorization();
+        Factorization<P> factorizationB = _pfPairB.factorization();
 
         for ( auto factorA = factorizationA.begin(); factorA != factorizationA.end(); factorA++ )
         {
@@ -321,15 +321,15 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        if( _pfPair.getFactorization().size() == 1 && _pfPair.getFactorization().begin()->second )
+        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second )
         {
-            assert( _pfPair.getFactorization().begin()->second == 1 );
+            assert( _pfPair.factorization().begin()->second == 1 );
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;
         }
         else
         {   
-            _out << _pfPair.getFactorization();
+            _out << _pfPair.factorization();
         }
         return _out;
     }
