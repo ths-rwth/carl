@@ -95,9 +95,9 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mpPolynomial == nullptr )
         {
-            assert( factorization().empty() || factorization().size() > 1 );
+            assert( mFactorization.empty() || mFactorization.size() > 1 );
             mHash = 0;
-            for( auto polyExpPair = factorization().begin(); polyExpPair != factorization().end(); ++polyExpPair )
+            for( auto polyExpPair = mFactorization.begin(); polyExpPair != mFactorization.end(); ++polyExpPair )
             {
                 mHash = (mHash << 5) | (mHash >> (sizeof(size_t)*8 - 5));
                 mHash ^= std::hash<FactorizedPolynomial<P>>()( polyExpPair->first );
@@ -225,6 +225,7 @@ namespace carl
             }
         }
         assertFactorization();
+        rehash();
     }
     
     template<typename P>
