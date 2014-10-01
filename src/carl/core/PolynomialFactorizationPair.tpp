@@ -51,7 +51,8 @@ namespace carl
     PolynomialFactorizationPair<P>::PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial ):
         mHash( 0 ),
         mFactorization( std::move( _factorization ) ),
-        mpPolynomial( _polynomial )
+        mpPolynomial( _polynomial ),
+        mIrreducible( -1 )
     {
         if ( mFactorization.size() == 1 && mpPolynomial == nullptr )
         {
@@ -216,6 +217,28 @@ namespace carl
     }
     
     template<typename P>
+    bool PolynomialFactorizationPair<P>::isIrreducible() const
+    {
+        if ( mIrreducible != -1 )
+            return mIrreducible;
+
+        assert( mpPolynomial != nullptr );
+        if ( mpPolynomial->isLinear() )
+        {
+            mIrreducible = 1;
+            return true;
+        }
+        Definiteness definiteness =  mpPolynomial->definiteness();
+        if ( definiteness == Definiteness::POSITIVE || definiteness == Definiteness::NEGATIVE )
+        {
+            mIrreducible = 1;
+            return true;
+        }
+        mIrreducible = 0;
+        return false;
+    }
+
+    template<typename P>
     void PolynomialFactorizationPair<P>::setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const
     {
         assert( mFactorization.size() == 1 );
@@ -255,7 +278,9 @@ namespace carl
                 }
                 else
                 {
-                    //TODO (matthias) irreducible?
+                    if (factorA->first.content().isIrreducible() || factorB->first.content().isIrreducible() )
+                        continue;
+
                     //Compute GCD of factors
                     assert( factorA->first.content().mpPolynomial != nullptr );
                     assert( factorB->first.content().mpPolynomial != nullptr );

@@ -113,9 +113,7 @@ namespace carl
     {
         assert( &_fpolyA.cache() == &_fpolyB.cache() );
         Coeff<P> coefficient = -_fpolyB.coefficient();
-        //TODO (matthias) make better
-        Factorization<P> test(_fpolyB.factorization());
-        return _fpolyA + FactorizedPolynomial<P>( std::move( test ), coefficient, _fpolyB.mrCache );
+        return _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.mrCache );
     }
 
     template<typename P>
@@ -133,7 +131,6 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>(factorA->first, factorA->second + factorB->second ) );
                 factorA++;
                 factorB++;
@@ -186,7 +183,6 @@ namespace carl
             }
             else if( factorA->first < factorB->first )
             {
-                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 resultFactorization.insert( resultFactorization.end(), *factorA );
                 factorA++;
             }
@@ -218,7 +214,6 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 cdFactorization.insert( cdFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
                 factorA++;
                 factorB++;
@@ -248,7 +243,6 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 cmFactorization.insert( cmFactorization.end(), factorA->second > factorB->second ? *factorA : *factorB );
                 factorA++;
                 factorB++;
@@ -291,7 +285,6 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                // TODO (matthias) okay? or std::pair<FactorizedPolynomial<P>, size_t>( ... )
                 resultFactorization.insert( resultFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
                 factorA++;
                 factorB++;
@@ -339,7 +332,7 @@ namespace carl
 
         Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
-        Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon; 
+        Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyRestA.mrCache);
         _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyRestB.mrCache);
         return FactorizedPolynomial<P>( std::move( gcdFactorization ), coefficientCommon, _fpolyA.mrCache );

@@ -28,7 +28,6 @@ namespace carl
     class PolynomialFactorizationPair
     {
         friend const Factorization<P>& FactorizedPolynomial<P>::factorization() const;
-        //TODO (matthias) friend needed?
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
 
     private:
@@ -55,11 +54,15 @@ namespace carl
         mutable P* mpPolynomial;
 
         /**
+         * Indicates, if the polynomial is irreducible
+         */
+        mutable int mIrreducible;
+
+        /**
          * Compute the polynomial from the factorization.
          * @param _fFactorization The factorization.
          * @return The polynomial.
          */
-        //TODO (matthias) return reference?
         template<typename P1>
         friend P1 computePolynomial( const Factorization<P1>& _fFactorization );
 
@@ -91,6 +94,8 @@ namespace carl
          * @param exponentB Exponent of second polynomial.
          */
         void setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const;
+
+        bool isIrreducible() const;
 
     public:
         // Constructor.
