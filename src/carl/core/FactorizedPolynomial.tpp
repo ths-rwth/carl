@@ -18,14 +18,18 @@ namespace carl
         mCoefficient( _polynomial.coprimeFactor() )
     {
         Factorization<P> factorization;
-        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial.coprimeCoefficients() ) );
+        P poly = _polynomial.coprimeCoefficients();
+        PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( poly ) );
         mCacheRef = mrCache.cache( pfPair, &carl::canBeUpdated, &carl::update );
         /*
          * The following is not very nice, but we know, that the hash won't change, once the polynomial 
          * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
          * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
          */
-        pfPair->mFactorization.insert( std::make_pair( *this, 1 ) );
+        if ( poly != 1)
+            pfPair->mFactorization.insert( std::make_pair( *this, 1 ) );
+
+        pfPair->assertFactorization();
     }
     
     template<typename P>

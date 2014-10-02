@@ -180,6 +180,7 @@ namespace carl
     {
         assert( canBeUpdated( _toUpdate, _updateWith ) ); // This assertion only ensures efficient use this method.
         assert( &_toUpdate != &_updateWith );
+        assert( _toUpdate.mpPolynomial != nullptr && _updateWith.mpPolynomial != nullptr && *_toUpdate.mpPolynomial == *_updateWith.mpPolynomial );
         std::lock_guard<std::recursive_mutex> lockA( _toUpdate.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _updateWith.mMutex );
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
