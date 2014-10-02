@@ -23,7 +23,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	assert(!mp1.isZero());
 	assert(!mp2.isZero());
 	// We start with some trivial cases.
-	if(mp1.isOne() || mp2.isOne() ) return Polynomial(1);
+	if(mp1.isOne() || mp2.isOne()) return Polynomial(1);
 	if(is_field<C>::value && (mp1.isConstant() || mp2.isConstant()))
 	{
 		return Polynomial(1);
