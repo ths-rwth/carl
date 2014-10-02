@@ -142,6 +142,15 @@ namespace carl
         }
 
         /**
+         * @return true, if the factorized polynomial is zero.
+         */
+        bool isZero() const
+        {
+            assert( factorization().empty() );
+            return mCoefficient == 0;
+        }
+
+        /**
          * @param _fpolyA The first summand.
          * @param _fpolyB The second summand.
          * @return The sum of the two given factorized polynomials.
