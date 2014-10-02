@@ -172,10 +172,22 @@ protected:
 	 */
 	void eliminateCommonFactor()
 	{
+		if(mNominator.isZero())
+		{
+			mDenominator = Pol(1);
+			return;
+		}
+		
+		if(mDenominator.isOne())
+		{
+			return;
+		}
+		
 		if(mNominator == mDenominator)
 		{
 			mNominator = Pol(1);
 			mDenominator = Pol(1);
+			return;
 		}
 		
 		if(mDenominator.isConstant())
