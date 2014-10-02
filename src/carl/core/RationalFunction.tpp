@@ -12,146 +12,313 @@
 
 namespace carl
 {
-	template<typename Pol>
-	bool operator==(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{
 		return lhs.nominator() == rhs.nominator() && lhs.denominator() == rhs.denominator();
 	}
 	
-	template<typename Pol>
-	bool operator!=(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	bool operator!=(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{
 		return !(lhs == rhs);
 	}
 	
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator+=(const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const RationalFunction<Pol, AS>& rhs)
 	{
 		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
 		mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) + rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
 		mDenominator = leastCommonMultiple;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
-
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator+=(const Pol& rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const Pol& rhs)
 	{
 		mNominator += rhs * mDenominator;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}	
+
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(Variable::Arg rhs)
+	{
+		mNominator += rhs * mDenominator;
+		if(AS) eliminateCommonFactor();
+		return *this;
+	}
 	
-	//template<typename Pol>
-	//RationalFunction<Pol>& RationalFunction<Pol>::operator+=(const Te)
-	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator-=(const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const RationalFunction<Pol, AS>& rhs)
 	{
 		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
 		mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) - rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
 		mDenominator = leastCommonMultiple;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator-=(Variable::Arg rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const Pol& rhs)
+	{
+		mNominator = this->mNominator + rhs.mNominator * this->mDenominator;
+		if(AS) eliminateCommonFactor();
+		return *this;
+	}	
+
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(Variable::Arg rhs)
 	{
 		mNominator -= rhs * mDenominator;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator*=(const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const RationalFunction<Pol, AS>& rhs)
 	{
 		mNominator *= rhs.mNominator;
 		mDenominator *= rhs.mDenominator;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator*=(Variable::Arg rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const Pol& rhs)
 	{
 		mNominator *= rhs;
+		if(AS) eliminateCommonFactor();
+		return *this;
+	}	
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(Variable::Arg rhs)
+	{
+		mNominator *= rhs;
+		if(AS) eliminateCommonFactor();
+		return *this;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const typename Pol::CoeffType& rhs)
+	{
+		mNominator *= rhs;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
 	
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator/=(const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const RationalFunction<Pol, AS>& rhs)
 	{
+		if(mDenominator.isOne()) 
+		{
+			return *this /= rhs.mNominator;
+		}
+		
 		mNominator *= rhs.mDenominator;
 		mDenominator *= rhs.mNominator;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator/=(const Pol& rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const Pol& rhs)
+	{
+		if(rhs.isConstant()) 
+		{ 
+			mNominator /= rhs.constantPart();
+		}
+		else
+		{
+			mDenominator *= rhs;
+			if(AS) eliminateCommonFactor();
+		}
+		return *this;
+	}
+	
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(Variable::Arg rhs)
 	{
 		mDenominator *= rhs;
+		if(AS) eliminateCommonFactor();
 		return *this;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol>& RationalFunction<Pol>::operator/=(unsigned long rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(unsigned long rhs)
 	{
-		mDenominator *= rhs;
+		mNominator /= rhs;
 		return *this;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol> operator+(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs)
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{
-		RationalFunction<Pol> res(lhs);
+		RationalFunction<Pol, AS> res(lhs);
 		return res += rhs;
 	}
-	template<typename Pol>
-	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs)
+	
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
 	{
-		RationalFunction<Pol> res(lhs);
+		RationalFunction<Pol, AS> res(lhs);
+		return res += rhs;
+	}
+	
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res += rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res += rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res += rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
 		return res -= rhs;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs, Variable::Arg rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
 	{
-		RationalFunction<Pol> res(lhs);
+		RationalFunction<Pol, AS> res(lhs);
 		return res -= rhs;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol> operator*(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
 	{
-		RationalFunction<Pol> res(lhs);
+		RationalFunction<Pol, AS> res(lhs);
+		return res -= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res -= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res -= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
 		return res *= rhs;
 	}
-	template<typename Pol>
-	RationalFunction<Pol> operator*(const RationalFunction<Pol>& lhs, Variable::Arg rhs)
+	
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
 	{
-		RationalFunction<Pol> res(lhs);
+		RationalFunction<Pol, AS> res(lhs);
 		return res *= rhs;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol> operator/(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
 	{
-		RationalFunction<Pol> res(lhs);
-		return res /= rhs;
+		RationalFunction<Pol, AS> res(lhs);
+		return res *= rhs;
 	}
-	template<typename Pol>
-	RationalFunction<Pol> operator/(const RationalFunction<Pol>& lhs, unsigned long rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
 	{
-		RationalFunction<Pol> res(lhs);
+		RationalFunction<Pol, AS> res(lhs);
+		return res *= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res *= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
 		return res /= rhs;
 	}
 	
-	template<typename Pol>
-	RationalFunction<Pol> operator-(const RationalFunction<Pol>& rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
 	{
-		return RationalFunction<Pol>(-rhs.nominator(), rhs.denominator());
+		RationalFunction<Pol, AS> res(lhs);
+		return res /= rhs;
 	}
 	
-	template<typename Pol>
-	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol>& rhs)
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res /= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res /= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res /= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, unsigned long rhs)
+	{
+		RationalFunction<Pol, AS> res(lhs);
+		return res /= rhs;
+	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& rhs)
+	{
+		return RationalFunction<Pol, AS>(-rhs.nominator(), rhs.denominator());
+	}
+	
+	template<typename Pol, bool AS>
+	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs)
 	{
 		return os << rhs.nominator() << "/" << rhs.denominator();
 	}

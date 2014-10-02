@@ -336,6 +336,7 @@ namespace carl
 			}
 		}
 
+		
 		/**
 		 * Checks if this monomial is divisible by the given monomial m.
 		 * @param m Monomial.
@@ -815,6 +816,70 @@ namespace carl
 			return (os << rhs.toString(true, true));
 		}
 		
+		
+		/**
+		 * Calculates the least common multiple of two monomial pointers.
+		 * If both are valid objects, the gcd of both is calculated.
+		 * If only one is a valid object, this one is returned.
+		 * If both are invalid objects, an empty monomial is returned.
+		 * @param lhs First monomial.
+		 * @param rhs Second monomial.
+		 * @return gcd of lhs and rhs.
+		 */
+		static Monomial gcd(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+		{
+			if(!lhs && !rhs) return Monomial();
+			if(!lhs) return *rhs;
+			if(!rhs) return *lhs;
+			return gcd(*lhs, *rhs);
+		}
+		
+		/**
+		 * Calculates the greatest common divisor of two monomials.
+		 * @param lhs First monomial.
+		 * @param rhs Second monomial.
+		 * @return lcm of lhs and rhs.
+		 */
+		static Monomial gcd(const Monomial& rhs, const Monomial& lhs)
+		{
+			LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
+			assert(lhs.isConsistent());
+			assert(rhs.isConsistent());
+			
+			Monomial result;
+			// Linear, as we expect small monomials.
+			auto itright = rhs.mExponents.cbegin();
+			auto leftEnd = lhs.mExponents.cend();
+			auto rightEnd = rhs.mExponents.cend();
+			for(auto itleft = lhs.mExponents.cbegin(); (itleft != leftEnd && itright != rightEnd);)
+			{
+				// Variable is present in both monomials.
+				if(itleft->first == itright->first)
+				{
+					exponent newExp = std::min(itleft->second, itright->second);
+					result.mExponents.push_back(std::make_pair(itleft->first, newExp));
+					result.mTotalDegree += newExp;
+					++itright;
+					++itleft;
+				}
+				
+				else if(itleft->first > itright->first) 
+				{
+					++itright;
+				}
+				else
+				{
+					assert(itright->first > itleft->first);
+					++itleft;
+				}
+			}
+			 // Insert remaining part
+			assert(result.isConsistent());
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+			return result;
+			
+		}
+		
 		/**
 		 * Calculates the least common multiple of two monomial pointers.
 		 * If both are valid objects, the lcm of both is calculated.
@@ -847,11 +912,13 @@ namespace carl
 			Monomial result;
 			result.mTotalDegree = lhs.tdeg() + rhs.tdeg();
 			// Linear, as we expect small monomials.
-			auto itright = rhs.mExponents.begin();
-			for(auto itleft = lhs.mExponents.begin(); itleft != lhs.mExponents.end();)
+			auto itright = rhs.mExponents.cbegin();
+			auto leftEnd = lhs.mExponents.cend();
+			auto rightEnd = rhs.mExponents.cend();
+			for(auto itleft = lhs.mExponents.cbegin(); itleft != leftEnd;)
 			{
 				// Done on right
-				if(itright == rhs.mExponents.end())
+				if(itright == rightEnd)
 				{
 					// Insert remaining part
 					result.mExponents.insert(result.mExponents.end(), itleft, lhs.mExponents.end());
