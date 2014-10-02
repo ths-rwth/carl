@@ -94,6 +94,11 @@ public:
 		return mNominator.isZero();
 	}
 	
+	bool isOne() const 
+	{
+		assert(!mDenominator.isZero());
+		return mNominator == mDenominator;
+	}
 	/**
 	 * Collect all occuring variables
      * @param vars
