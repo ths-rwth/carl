@@ -44,9 +44,9 @@ TEST(FactorizedPolynomial, Construction)
     std::cout << "Common multiple of " << fpA << " and " << fpB << ": " << fpCM << std::endl;
     fpCache.print();
 
-    //Lazy div
-    FactorizedPolynomial<P> fpLD = lazyDiv( fpB, fpA );
-    std::cout << fpB << " / " << fpA << ": " << fpLD << std::endl;
+    //Quotient
+    FactorizedPolynomial<P> fpQuo = quotient( fpB, fpA );
+    std::cout << "Quotient: " << fpB << " / " << fpA << ": " << fpQuo << std::endl;
     fpCache.print();
 
     //Multiplication

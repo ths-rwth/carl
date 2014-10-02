@@ -162,6 +162,14 @@ namespace carl
     }
 
     template<typename P>
+    const FactorizedPolynomial<P> FactorizedPolynomial<P>::quotient(const FactorizedPolynomial<P>& _fdivisor) const
+    {
+        FactorizedPolynomial<P> result = lazyDiv( *this, _fdivisor );
+        assert( _fdivisor * result == *this );
+        return result;
+    }
+
+    template<typename P>
     const FactorizedPolynomial<P> lazyDiv( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         _fpolyA.strengthenActivity();

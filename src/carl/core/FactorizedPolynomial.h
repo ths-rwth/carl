@@ -175,6 +175,25 @@ namespace carl
         friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
+	 * Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
+	 * @param _fdivisor The divisor
+	 * @return The quotient
+	 */
+        const FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fdivisor ) const;
+
+        /**
+	 * Calculates the quotient of the polynomials. Notice: the second polynomial has to be a factor of the first polynomial.
+	 * @param _fpolyA The dividend.
+         * @param _fpolyB The divisor.
+	 * @return The quotient
+	 */
+        template<typename P1>
+	friend const FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB )
+	{
+		return _fpolyA.quotient( _fpolyB );
+	}
+
+        /**
          * @param _fpolyA The factorized polynomial to divide by the common factors of the two given factorized polynomials.
          * @param _fpolyB The factorized polynomial, whose common factors with the first given factorized polynomial are divided from it.
          * @return The quotient of the first given factorized polynomial and the common factors of both given factorized polynomials.
