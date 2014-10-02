@@ -74,6 +74,14 @@ namespace carl
         template<typename P1>
         friend const Factorization<P1> commonDivisor( const FactorizedPolynomial<P1>& _fFactorizationA, const FactorizedPolynomial<P1>& _fFactorizationB, Factorization<P1>& _fFactorizationRestA, Factorization<P1>& _fFactorizationRestB);
 
+        /**
+         * @param _fpolyA The factorized polynomial to divide by the common factors of the two given factorized polynomials.
+         * @param _fpolyB The factorized polynomial, whose common factors with the first given factorized polynomial are divided from it.
+         * @return The quotient of the first given factorized polynomial and the common factors of both given factorized polynomials.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> lazyDiv( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+
     public:
            
         // Constructors.
@@ -193,13 +201,13 @@ namespace carl
 		return _fpolyA.quotient( _fpolyB );
 	}
 
-        /**
-         * @param _fpolyA The factorized polynomial to divide by the common factors of the two given factorized polynomials.
-         * @param _fpolyB The factorized polynomial, whose common factors with the first given factorized polynomial are divided from it.
-         * @return The quotient of the first given factorized polynomial and the common factors of both given factorized polynomials.
+        /**Computes the least common multiple of two given polynomials. The method refines the factorization.
+         * @param _fpolyA The first factorized polynomial to compute the lcm for.
+         * @param _fpolyB The second factorized polynomial to compute the lcm for.
+         * @return The lcm of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> lazyDiv( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend const FactorizedPolynomial<P1> lcm( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * @param _fpolyA The first factorized polynomial to compute the common divisor for.

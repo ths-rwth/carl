@@ -208,32 +208,24 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    const FactorizedPolynomial<P> lcm( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
-        assert( &_fpolyA.cache() == &_fpolyB.cache() );
-        Factorization<P> cdFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.factorization();
-        const Factorization<P>& factorizationB = _fpolyB.factorization();
-        auto factorA = factorizationA.begin();
-        auto factorB = factorizationB.begin();
-        while( factorA != factorizationA.end() && factorB != factorizationB.end() )
-        {
-            if( factorA->first == factorB->first )
-            {
-                cdFactorization.insert( cdFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
-                factorA++;
-                factorB++;
-            }
-            else if( factorA->first < factorB->first )
-                factorA++;
-            else
-                factorB++;
-        }
+        bool rehashFPolyA = false;
+        bool rehashFPolyB = false;
+        Factorization<P> restAFactorization, restBFactorization;
+        gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, rehashFPolyA, rehashFPolyB );
 
-        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
-        return FactorizedPolynomial<P>( std::move( cdFactorization ), coefficientCommon, _fpolyA.mrCache );
+        if( rehashFPolyA )
+            _fpolyA.rehash();
+        if( rehashFPolyB )
+            _fpolyB.rehash();
+
+        Coeff<P> coefficientLCM = carl::lcm( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Factorization<P> lcmFactorization = _fpolyA.factorization();
+        lcmFactorization.insert( restBFactorization.begin(), restBFactorization.end() );
+        return FactorizedPolynomial<P>( std::move( lcmFactorization ), coefficientLCM, _fpolyA.mrCache );
     }
 
     template<typename P>
@@ -279,6 +271,35 @@ namespace carl
 
         Coeff<P> coefficientCommon = carl::lcm( _fpolyA.coefficient(), _fpolyB.coefficient() );
         return FactorizedPolynomial<P>( std::move( cmFactorization ), coefficientCommon, _fpolyA.mrCache );
+    }
+
+    template<typename P>
+    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    {
+        _fpolyA.strengthenActivity();
+        _fpolyB.strengthenActivity();
+        assert( &_fpolyA.cache() == &_fpolyB.cache() );
+        Factorization<P> cdFactorization;
+        const Factorization<P>& factorizationA = _fpolyA.factorization();
+        const Factorization<P>& factorizationB = _fpolyB.factorization();
+        auto factorA = factorizationA.begin();
+        auto factorB = factorizationB.begin();
+        while( factorA != factorizationA.end() && factorB != factorizationB.end() )
+        {
+            if( factorA->first == factorB->first )
+            {
+                cdFactorization.insert( cdFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
+                factorA++;
+                factorB++;
+            }
+            else if( factorA->first < factorB->first )
+                factorA++;
+            else
+                factorB++;
+        }
+
+        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        return FactorizedPolynomial<P>( std::move( cdFactorization ), coefficientCommon, _fpolyA.mrCache );
     }
 
     template<typename P>
