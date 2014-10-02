@@ -49,6 +49,11 @@ TEST(FactorizedPolynomial, Construction)
     std::cout << "Quotient: " << fpB << " / " << fpA << ": " << fpQuo << std::endl;
     fpCache.print();
 
+    //LCM
+    FactorizedPolynomial<P> fpLCM = lcm( fpA, fpB );
+    std::cout << "LCM of " << fpA << " and " << fpB << ": " << fpLCM << std::endl;
+    fpCache.print();
+
     //Multiplication
     FactorizedPolynomial<P> fpMul = fpA * fpB;
     std::cout << fpA << " * " << fpB << ": " << fpMul << std::endl;

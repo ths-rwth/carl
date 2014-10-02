@@ -82,7 +82,6 @@ namespace carl
          */
         const Factorization<P>& factorization() const
         {
-            flattenFactorization();
             return mFactorization;
         }
 
@@ -146,7 +145,7 @@ namespace carl
          * @param _updateWith The polynomial factorization pair used to update the first given one.
          */
         template<typename P1>
-        friend void update( const PolynomialFactorizationPair<P1>& _toUpdate, const PolynomialFactorizationPair<P1>& _updateWith );
+        friend void update( PolynomialFactorizationPair<P1>& _toUpdate, PolynomialFactorizationPair<P1>& _updateWith );
     
         /**
          * Calculates the factorization of the gcd of the polynomial represented by the two given polynomial factorization pairs. 

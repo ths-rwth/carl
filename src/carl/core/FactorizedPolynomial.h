@@ -138,6 +138,8 @@ namespace carl
          */
         const Factorization<P>& factorization() const
         {
+            //TODO (matthias) activate?
+            //content().flattenFactorization();
             return content().factorization();
         }
 

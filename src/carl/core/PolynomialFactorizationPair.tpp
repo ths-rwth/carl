@@ -187,7 +187,10 @@ namespace carl
         if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
         {
             // Calculating the gcd refines both factorizations to the same factorization
-            gcd( _toUpdate, _updateWith );
+            bool refineA = false;
+            bool refineB = false;
+            Factorization<P> restA, restB;
+            gcd( _toUpdate, _updateWith, restA, restB, refineA, refineB );
         }
         _toUpdate.rehash();
     }
@@ -225,7 +228,6 @@ namespace carl
             }
         }
         assertFactorization();
-        rehash();
     }
     
     template<typename P>
@@ -260,7 +262,6 @@ namespace carl
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
         assertFactorization();
-        rehash();
     }
 
     template<typename P>
@@ -345,6 +346,9 @@ namespace carl
                 }
             }
         }
+
+        _pfPairA.flattenFactorization();
+        _pfPairB.flattenFactorization();
 
         // Check correctness
         _pfPairA.assertFactorization();

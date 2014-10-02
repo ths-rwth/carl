@@ -19,7 +19,7 @@ namespace carl
     {
         Factorization<P> factorization;
         PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( _polynomial.coprimeCoefficients() ) );
-        mCacheRef = mrCache.cache( pfPair );
+        mCacheRef = mrCache.cache( pfPair, &carl::canBeUpdated, &carl::update );
         /*
          * The following is not very nice, but we know, that the hash won't change, once the polynomial 
          * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
@@ -35,7 +35,7 @@ namespace carl
         mCoefficient( _coefficient )
     {
         assert( mCoefficient == _polynomial.coprimeFactor() );
-        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), new P( _polynomial ) ) );
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), new P( _polynomial ) ), &carl::canBeUpdated, &carl::update );
     }
     
     template<typename P>
@@ -44,7 +44,7 @@ namespace carl
         mrCache( _cache ),
         mCoefficient( _coefficient )
     {
-        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ) );
+        mCacheRef = mrCache.cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
     }
     
     template<typename P>
