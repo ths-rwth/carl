@@ -43,3 +43,12 @@ TEST(NumbersCLN, sqrt_fast)
 	}
 
 }
+
+TEST(NumbersCLN, rationalize)
+{
+	EXPECT_EQ(cln::cl_RA(0), rationalize<cln::cl_RA>("0"));
+	EXPECT_EQ(cln::cl_RA(1)/cln::cl_RA(10), rationalize<cln::cl_RA>("0.1"));
+	EXPECT_EQ(cln::cl_RA(1)/cln::cl_RA(10), rationalize<cln::cl_RA>(".1"));
+	EXPECT_EQ(cln::cl_RA(3)/cln::cl_RA(2), rationalize<cln::cl_RA>("1.5"));
+	EXPECT_EQ(cln::cl_RA(1234567890), rationalize<cln::cl_RA>("1234567890"));
+}

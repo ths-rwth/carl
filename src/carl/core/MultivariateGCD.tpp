@@ -13,6 +13,7 @@
 
 #include "MultivariatePolynomial.h"
 #include "VariablesInformation.h"
+#include "../converter/GinacConverter.h"
 
 namespace carl
 {
@@ -42,7 +43,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	// gcd(p, ay + b) is either ay + b or 1.
     
     #ifdef COMPARE_WITH_GINAC
-    return ginacGCD( mp1, mp2 );
+    return ginacGcd( mp1, mp2 );
     #else 
 	Variable x = getMainVar(mp1, mp2);
 	if(x == Variable::NO_VARIABLE)

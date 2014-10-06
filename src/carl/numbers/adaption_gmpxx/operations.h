@@ -13,6 +13,7 @@ CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <gmpxx.h>
 CLANG_WARNING_RESET
 #include <limits.h>
+#include "boost/algorithm/string.hpp"
 
 namespace carl {
 
@@ -72,6 +73,7 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
 
 template<typename T>
 inline T rationalize(double n);
+
 template<>
 inline mpq_class rationalize<mpq_class>(double d) {
 	return mpq_class(d);
@@ -192,6 +194,32 @@ inline mpq_class operator /(const mpq_class& lhs, const mpq_class& rhs)
 	mpq_div(res, lhs.get_mpq_t(), rhs.get_mpq_t());
 	return mpq_class(res);
 }
+
+template<typename T>
+inline T rationalize(const std::string& n);
+
+template<>
+inline mpq_class rationalize<mpq_class>(const std::string& inputstring) {
+	std::vector<std::string> strs;
+    boost::split(strs, inputstring, boost::is_any_of("."));
+
+    if(strs.size() > 2)
+    {
+        throw std::invalid_argument("More than one delimiter in the string.");
+    }
+    mpq_class result;
+    if(!strs.front().empty())
+    {
+        result += mpq_class(strs.front());
+    }
+    if(strs.size() > 1)
+    {
+        //if(strs.back().size() > )
+        result += (mpq_class(strs.back())/carl::pow(mpz_class(10),static_cast<unsigned>(strs.back().size())));
+    }
+    return result;
+}
+
 
 }
 

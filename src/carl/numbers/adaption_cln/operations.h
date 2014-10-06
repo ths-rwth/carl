@@ -14,6 +14,7 @@
 #include <limits>
 #include <cmath>
 #include "typetraits.h"
+#include "boost/algorithm/string.hpp"
 
 namespace carl {
 
@@ -532,6 +533,30 @@ inline cln::cl_I remainder(const cln::cl_I& a, const cln::cl_I& b) {
 inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return quotient(a,b);
+}
+
+template<typename T>
+inline T rationalize(const std::string& n);
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring) {
+	std::vector<std::string> strs;
+    boost::split(strs, inputstring, boost::is_any_of("."));
+
+    if(strs.size() > 2)
+    {
+        throw std::invalid_argument("More than one delimiter in the string.");
+    }
+    cln::cl_RA result(0);
+    if(!strs.front().empty())
+    {
+        result += cln::cl_RA(strs.front().c_str());
+    }
+    if(strs.size() > 1)
+    {
+        result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_I(10),static_cast<unsigned>(strs.back().size())));
+    }
+    return result;
 }
 
 }
