@@ -202,6 +202,13 @@ public:
 		return mTerms.rend();
 	}
 
+	typename TermsType::iterator eraseTerm(typename TermsType::iterator pos) {
+		return mTerms.erase(pos);
+	}
+	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
+		return mTerms.erase(pos);
+	}
+
 	/**
 	 * For the polynomial p, the function calculates a polynomial p - lt(p).
 	 * The function assumes the polynomial to be nonzero, otherwise, lt(p) is not defined.

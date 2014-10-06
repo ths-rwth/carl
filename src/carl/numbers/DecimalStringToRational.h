@@ -31,7 +31,8 @@ struct DecimalStringToRational
 		}
 		if(strs.size() > 1)
 		{
-			result += (RationalType(strs.back())/carl::pow(typename IntegralType<RationalType>::type(10),strs.back().size()));
+			//if(strs.back().size() > )
+			result += (RationalType(strs.back())/carl::pow(typename IntegralType<RationalType>::type(10),static_cast<unsigned>(strs.back().size())));
 		}
 		return result;
 	}

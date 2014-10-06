@@ -25,7 +25,6 @@ set(carl_lib_core_headers
 # Source files in here
 set(carl_lib_core_sources
     core/logging.cpp
-	core/CompareRelation.cpp
     core/Sign.cpp
     core/VariablePool.cpp
     core/Variable.cpp

@@ -9,7 +9,7 @@
 namespace carl
 {
 	
-template<typename Pol>
+template<typename Pol, bool AutoSimplify=false>
 class RationalFunction
 {
 	Pol mNominator;
@@ -54,11 +54,19 @@ public:
 		assert(!denom.isZero());
 	}
 	
+	/**
+	 * 
+     * @return The nominator
+     */
 	const Pol& nominator() const
 	{
 		return mNominator;
 	}
 	
+	/**
+	 * 
+     * @return  The denominator
+     */
 	const Pol& denominator() const
 	{
 		return mDenominator;
@@ -66,6 +74,122 @@ public:
 	
 	void simplify() 
 	{
+		if(!AutoSimplify)
+		{
+			eliminateCommonFactor();
+		}
+		else
+		{
+			LOGMSG_WARN("carl.core","Calling simplify on rational function with AutoSimplify");
+		}
+	}
+	
+	/**
+	 * Check whether the rational function is zero
+     * @return true if it is
+     */
+	bool isZero() const
+	{
+		assert(!mDenominator.isZero());
+		return mNominator.isZero();
+	}
+	
+	bool isOne() const 
+	{
+		assert(!mDenominator.isZero());
+		return mNominator == mDenominator;
+	}
+	/**
+	 * Collect all occuring variables
+     * @param vars
+     */
+	void gatherVariables(std::set<Variable>& vars) const
+	{
+		mNominator.gatherVariables(vars);
+		mDenominator.gatherVariables(vars);
+	}
+	
+	/// @name In-place addition operators
+	/// @{
+	/**
+	 * Add something to this rational function and return the changed rational function.
+	 * @param rhs Right hand side.
+	 * @return Changed rational function.
+	 */
+	RationalFunction& operator+=(const RationalFunction& rhs);
+	RationalFunction& operator+=(const Pol& rhs);
+	RationalFunction& operator+=(const Term<CoeffType>& rhs);
+	RationalFunction& operator+=(Variable::Arg rhs);
+	RationalFunction& operator+=(const CoeffType& rhs);
+	/// @}
+	
+	
+	/// @name In-place subtraction operators
+	/// @{
+	/**
+	 * Subtract something from this rational function and return the changed rational function.
+	 * @param rhs Right hand side.
+	 * @return Changed rational function.
+	 */
+	RationalFunction& operator-=(const RationalFunction& rhs);
+	RationalFunction& operator-=(const Pol& rhs);
+	RationalFunction& operator-=(const Term<CoeffType>& rhs);
+	RationalFunction& operator-=(Variable::Arg rhs);
+	RationalFunction& operator-=(const CoeffType& rhs);
+	/// @}
+	
+	/// @name In-place multiplication operators
+	/// @{
+	/**
+	 * Multiply something with this rational function and return the changed rational function.
+	 * @param rhs Right hand side.
+	 * @return Changed rational function.
+	 */
+	RationalFunction& operator*=(const RationalFunction& rhs);
+	RationalFunction& operator*=(const Pol& rhs);
+	RationalFunction& operator*=(const Term<CoeffType>& rhs);
+	RationalFunction& operator*=(Variable::Arg rhs);
+	RationalFunction& operator*=(const CoeffType& rhs);
+	/// @}
+	
+	/**
+	 * Divide this rational function by something and return the changed rational function.
+	 * @param rhs Right hand side.
+	 * @return Changed rational function.
+	 */
+	RationalFunction& operator/=(const RationalFunction& rhs);
+	RationalFunction& operator/=(const Pol& rhs);
+	RationalFunction& operator/=(const Term<CoeffType>& rhs);
+	RationalFunction& operator/=(Variable::Arg rhs);
+	RationalFunction& operator/=(const CoeffType& rhs);
+	RationalFunction& operator/=(unsigned long rhs);
+	/// @}
+	
+	
+protected:
+	/**
+	 * Helper function for simplify which eliminates the common factor.
+	 */
+	void eliminateCommonFactor()
+	{
+		if(mNominator.isZero())
+		{
+			mDenominator = Pol(1);
+			return;
+		}
+		
+		if(mDenominator.isOne())
+		{
+			return;
+		}
+		
+		if(mNominator == mDenominator)
+		{
+			mNominator = Pol(1);
+			mDenominator = Pol(1);
+			return;
+		}
+		
 		if(mDenominator.isConstant())
 		{
 			mNominator /= mDenominator.constantPart();
@@ -79,59 +203,65 @@ public:
 		}
 	}
 	
-	bool isZero() const
-	{
-		assert(!mDenominator.isZero());
-		return mNominator.isZero();
-	}
-	
-	void gatherVariables(std::set<Variable>& vars) const
-	{
-		mNominator.gatherVariables(vars);
-		mDenominator.gatherVariables(vars);
-	}
-	
-	
-	RationalFunction& operator+=(const RationalFunction& rhs);
-	RationalFunction& operator+=(const Pol& rhs);
-	RationalFunction& operator+=(const Term<CoeffType>& rhs);
-	
-	RationalFunction& operator-=(const RationalFunction& rhs);
-	RationalFunction& operator-=(Variable::Arg rhs);
-	
-	RationalFunction& operator*=(const RationalFunction& rhs);
-	RationalFunction& operator*=(Variable::Arg rhs);
-	
-	RationalFunction& operator/=(const RationalFunction& rhs);
-	RationalFunction& operator/=(const Pol& rhs);
-	RationalFunction& operator/=(unsigned long);
-	
 };
 
-	template<typename Pol>
-	bool operator==(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
-	template<typename Pol>
-	bool operator!=(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
+	template<typename Pol, bool AS>
+	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
+	template<typename Pol, bool AS>
+	bool operator!=(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 
-	template<typename Pol>
-	RationalFunction<Pol> operator+(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
-	template<typename Pol>
-	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
-	template<typename Pol>
-	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs, Variable::Arg rhs);
-	template<typename Pol>
-	RationalFunction<Pol> operator*(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
-	template<typename Pol>
-	RationalFunction<Pol> operator*(const RationalFunction<Pol>& lhs, Variable::Arg rhs);
-	template<typename Pol>
-	RationalFunction<Pol> operator/(const RationalFunction<Pol>& lhs, const RationalFunction<Pol>& rhs);
-	template<typename Pol>
-	RationalFunction<Pol> operator/(const RationalFunction<Pol>& lhs, unsigned long);
-	template<typename Pol>
-	RationalFunction<Pol> operator-(const RationalFunction<Pol>& lhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
 	
-	template<typename Pol>
-	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, unsigned long);
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs);
+	
+	template<typename Pol, bool AS>
+	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs);
+	
 }
 
 #include "RationalFunction.tpp"

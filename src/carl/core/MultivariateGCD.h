@@ -36,6 +36,25 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> lcm(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
 
+template<typename C, typename O, typename P>
+Term<C> gcd(const MultivariatePolynomial<C,O,P>& a, const Term<C>& b);
+
+template<typename C, typename O, typename P>
+Term<C> gcd(const Term<C>& a, const MultivariatePolynomial<C,O,P>& b)
+{
+	return gcd(b, a);
+}
+
+template<typename C, typename O, typename P>
+Monomial gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial& b);
+
+template<typename C, typename O, typename P>
+Monomial gcd(const Monomial& a, const MultivariatePolynomial<C,O,P>& b)
+{
+	return gcd(b, a);
+}
+
+
 /**
  * The result of a gcd calculation, as with the extended gcd.
  * @ingroup gcd
