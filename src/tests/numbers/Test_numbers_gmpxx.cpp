@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
 #include "../../carl/numbers/numbers.h"
-#include "../../carl/numbers/DecimalStringToRational.h"
 
 #include <gmpxx.h>
 
