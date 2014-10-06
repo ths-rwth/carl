@@ -20,7 +20,8 @@ namespace carl
         Factorization<P> factorization;
         P poly = _polynomial.coprimeCoefficients();
         PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( poly ) );
-        mCacheRef = mrCache.cache( pfPair, &carl::canBeUpdated, &carl::update );
+        //TODO (matthias) factorization is not set yet; find better solution
+        mCacheRef = mrCache.cache( pfPair );//, &carl::canBeUpdated, &carl::update );
         /*
          * The following is not very nice, but we know, that the hash won't change, once the polynomial 
          * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
@@ -29,7 +30,8 @@ namespace carl
         if ( poly != 1)
             pfPair->mFactorization.insert( std::make_pair( *this, 1 ) );
 
-        pfPair->assertFactorization();
+        //TODO (matthias) as above, the factorization is not good yet
+        //pfPair->assertFactorization();
     }
     
     template<typename P>
