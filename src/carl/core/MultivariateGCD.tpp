@@ -13,7 +13,6 @@
 
 #include "MultivariatePolynomial.h"
 #include "VariablesInformation.h"
-#include "../converter/GinacConverter.h"
 
 namespace carl
 {

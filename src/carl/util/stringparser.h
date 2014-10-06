@@ -256,7 +256,7 @@ namespace carl
 		{
 			try
 			{
-				return C(inputString);
+				return rationalize<C>(inputString);
 			}
 			catch(std::exception& e)
 			{

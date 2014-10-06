@@ -10,6 +10,7 @@
 
 #include "MonomialOrdering.h"
 #include "MultivariatePolynomialPolicy.h"
+#include "../converter/GinacConverter.h"
 
 namespace carl
 {
