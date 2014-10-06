@@ -153,6 +153,6 @@ namespace carl
 	template<typename Pol>
 	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol>& rhs)
 	{
-		return os << rhs.nominator() << "/" << rhs.denominator();
+		return os << "(" << rhs.nominator() << ")/(" << rhs.denominator() << ")";
 	}
 }
