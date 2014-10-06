@@ -265,7 +265,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 template<typename Coeff, typename Ordering, typename Policies>
 exponent MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
-	if (mTerms.size() == 0) return 0;
+	assert(mTerms.size() != 0);
 	if (Ordering::degreeOrder) {
 		return this->lterm()->tdeg();
 	} else {
