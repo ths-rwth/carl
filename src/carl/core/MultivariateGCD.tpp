@@ -40,7 +40,10 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 
 	// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
 	// gcd(p, ay + b) is either ay + b or 1.
-
+    
+    #ifdef COMPARE_WITH_GINAC
+    return ginacGCD( mp1, mp2 );
+    #else 
 	Variable x = getMainVar(mp1, mp2);
 	if(x == Variable::NO_VARIABLE)
 	{
@@ -53,6 +56,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	return Polynomial(GCD);
 	//return Result()
 //		return Result(GCD, A/GCD, B/GCD);
+    #endif
 
 }	
 
