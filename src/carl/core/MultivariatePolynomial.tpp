@@ -523,6 +523,15 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const MultivariatePolynomial& divisor) const
 {
+	assert(!divisor.isZero());
+	if(*this == divisor)
+	{
+		return MultivariatePolynomial<C,O,P>(1);
+	}
+	if(divisor.isOne())
+	{
+		return *this;
+	}
 	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial<C,O,P> result;
 	MultivariatePolynomial p = *this;
