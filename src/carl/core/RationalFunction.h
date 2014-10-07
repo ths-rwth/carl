@@ -14,42 +14,43 @@ class RationalFunction
 {
 	Pol mNominator;
 	Pol mDenominator;
+	bool mIsSimplified;
 	
 	
 public:
 	typedef typename Pol::CoeffType CoeffType;
 	RationalFunction()
-	: mNominator(0), mDenominator(1)
+	: mNominator(0), mDenominator(1), mIsSimplified(true)
 	{
 		
 	}
 	
 	explicit RationalFunction(int v)
-	: mNominator(v), mDenominator(1)
+	: mNominator(v), mDenominator(1), mIsSimplified(true)
 	{
 		
 	}
 	
 	explicit RationalFunction(const CoeffType& c)
-	: mNominator(c), mDenominator(1)
+	: mNominator(c), mDenominator(1), mIsSimplified(true)
 	{
 		
 	}
 	
 	explicit RationalFunction(Variable::Arg v)
-	: mNominator(v), mDenominator(1)
+	: mNominator(v), mDenominator(1), mIsSimplified(true)
 	{
 		
 	}
 	
 	explicit RationalFunction(const Pol& p)
-	: mNominator(p), mDenominator(1)
+	: mNominator(p), mDenominator(1), mIsSimplified(true)
 	{
 		
 	}
 	
 	RationalFunction(const Pol& nom, const Pol& denom)
-	: mNominator(nom), mDenominator(denom)
+	: mNominator(nom), mDenominator(denom), mIsSimplified(false)
 	{
 		assert(!denom.isZero());
 	}
@@ -70,6 +71,15 @@ public:
 	const Pol& denominator() const
 	{
 		return mDenominator;
+	}
+	
+	/**
+	 * Checks if this rational function has been simplified since it's last modification.
+	 * Note that if AutoSimplify is true, this should always return true.
+     * @return If this is simplified.
+     */
+	bool isSimplified() const {
+		return mIsSimplified;
 	}
 	
 	void simplify() 
@@ -172,14 +182,17 @@ protected:
 	 */
 	void eliminateCommonFactor()
 	{
+		if (mIsSimplified) return;
 		if(mNominator.isZero())
 		{
 			mDenominator = Pol(1);
+			mIsSimplified = true;
 			return;
 		}
 		
 		if(mDenominator.isOne())
 		{
+			mIsSimplified = true;
 			return;
 		}
 		
@@ -187,6 +200,7 @@ protected:
 		{
 			mNominator = Pol(1);
 			mDenominator = Pol(1);
+			mIsSimplified = true;
 			return;
 		}
 		
@@ -194,12 +208,14 @@ protected:
 		{
 			mNominator /= mDenominator.constantPart();
 			mDenominator = Pol(1);
+			mIsSimplified = true;
 		}
 		else
 		{
 			Pol gcd = carl::gcd(mNominator, mDenominator);
 			mNominator = mNominator.quotient(gcd);
 			mDenominator = mDenominator.quotient(gcd);
+			mIsSimplified = true;
 		}
 	}
 	
