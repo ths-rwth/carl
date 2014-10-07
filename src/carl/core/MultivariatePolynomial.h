@@ -208,6 +208,9 @@ public:
 	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
 		return mTerms.erase(pos);
 	}
+	TermsType& getTerms() {
+		return mTerms;
+	}
 
 	/**
 	 * For the polynomial p, the function calculates a polynomial p - lt(p).
