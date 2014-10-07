@@ -102,6 +102,8 @@ MultivariatePolynomial<C,O,P> lcm(const MultivariatePolynomial<C,O,P>& a, const 
 	if(is_field<C>::value && a.isConstant() && b.isConstant()) return MultivariatePolynomial<C,O,P>(1);
 	if(is_field<C>::value && a.isConstant()) return b;
 	if(is_field<C>::value && b.isConstant()) return a;
+	
+	
 	return quotient((a*b),gcd(a,b));
 }
 
