@@ -1645,6 +1645,13 @@ namespace carl
         return _in.sqrt();
     }
     
+    
+    template<typename Number>
+    inline Interval<Number> abs(const Interval<Number>& _in, unsigned _exponent)
+    {
+        return _in.power(_exponent);
+    }
+    
     /**
      * Method which returns the next smaller integer of this number or the number
      * itself, if it is already an integer.
