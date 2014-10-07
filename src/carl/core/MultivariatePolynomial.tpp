@@ -1491,7 +1491,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         typename TermsType::iterator it(mTerms.begin());
         while(it != mTerms.end())
         {
-            CompareResult cmpres(Ordering::compare(*(**it).monomial(), rhs));
+            CompareResult cmpres(Ordering::compare(**it, rhs));
             if( cmpres == CompareResult::GREATER ) break;
             if( cmpres == CompareResult::EQUAL )
             {

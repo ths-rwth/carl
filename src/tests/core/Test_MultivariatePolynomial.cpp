@@ -3,6 +3,7 @@
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/converter/GinacConverter.h"
+#include "carl/interval/Interval.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
 
@@ -29,6 +30,21 @@ TEST(MultivariatePolynomial, Operators)
     EXPECT_EQ(p0a, p0b);
     
     EXPECT_TRUE(p0a.isUnivariate());
+}
+
+TEST(MultivariatePolynomial, getTerms)
+{
+    Variable v0(1);
+	MultivariatePolynomial<cln::cl_RA> p;
+	p += cln::cl_RA(1);
+	p += v0;
+	p *= v0;
+	MultivariatePolynomial<cln::cl_RA> p2 = p + cln::cl_RA(1);
+	
+	auto& t = p2.getTerms();
+	t.erase(t.begin());
+	
+	EXPECT_EQ(p, p2);
 }
 
 TEST(MultivariatePolynomial, toUnivariatePolynomial)
