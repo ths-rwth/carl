@@ -317,8 +317,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	}
 	// strip zeros from the end as we might have pushed zeros.
 	result.stripLeadingZeroes();
-	assert(!result.isZero());
-	if(result.degree() < divisor.degree())
+	
+	if(result.isZero() || result.degree() < divisor.degree())
 	{
 		return result;
 	}
