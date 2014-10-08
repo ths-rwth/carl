@@ -1262,10 +1262,12 @@ CLANG_WARNING_RESET
 	}
 	else
 	{
+		assert(!isConstant()); // Othewise, the derivative is zero and the next assertion is thrown.
 		UnivariatePolynomial<Coeff> b = this->derivative();
 		LOGMSG_TRACE("carl.core", "UnivSSF: b = " << b);
 		UnivariatePolynomial<Coeff> s(mainVar());
 		UnivariatePolynomial<Coeff> t(mainVar());
+		assert(!b.isZero());
 		UnivariatePolynomial<Coeff> c = extended_gcd((*this), b, s, t); // TODO: use gcd instead
 		typename IntegralType<Coeff>::type numOfCpf = getNum(c.coprimeFactor());
 		if(numOfCpf != 1) // TODO: is this maybe only necessary because the extended_gcd returns a polynomial with non-integer coefficients but it shouldn't?
