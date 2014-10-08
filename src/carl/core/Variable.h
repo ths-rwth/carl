@@ -140,6 +140,12 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs);
 	
+	/**
+	 * Print the friendly name of the variable to the stream
+     * @param os The stream where the variable name should be printed
+     */
+	void printFriendlyName(std::ostream& os = std::cout) const;
+	
 	/// @name Comparison operators
 	/// @{
 	/**
@@ -175,7 +181,7 @@ public:
 	/// Number of bits reserved for the type.
 	static constexpr unsigned RESERVED_FOR_TYPE = 4;
 	/// Number of bits reserved for the rank.
-	static constexpr unsigned RESERVED_FOR_RANK = 8;
+	static constexpr unsigned RESERVED_FOR_RANK = 4;
 	/// Overall number of bits reserved.
 	static constexpr unsigned RESERVED = RESERVED_FOR_RANK + RESERVED_FOR_TYPE;
 	static_assert(RESERVED < BITSIZE, "Too many bits reserved for special use.");

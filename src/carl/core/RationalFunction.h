@@ -109,8 +109,19 @@ public:
 		assert(!mDenominator.isZero());
 		return mNominator == mDenominator;
 	}
+	
 	/**
-	 * Collect all occuring variables
+	 * Collect all occurring variables
+     * @return All occcurring variables
+     */
+	std::set<Variable> gatherVariables() const {
+		std::set<Variable> vars;
+		gatherVariables(vars);
+		return vars;
+	}
+	
+	/**
+	 * Add all occurring variables to the set vars
      * @param vars
      */
 	void gatherVariables(std::set<Variable>& vars) const
