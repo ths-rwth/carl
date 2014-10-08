@@ -40,7 +40,7 @@ namespace std {
 
 template<>
 struct hash<carl::CompareRelation> {
-	std::size_t operator()(const carl::CompareRelation& rel) {
+	std::size_t operator()(const carl::CompareRelation& rel) const {
 		return std::size_t(rel);
 	}
 };

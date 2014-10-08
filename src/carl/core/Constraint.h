@@ -51,7 +51,7 @@ namespace std {
 template<typename LhsType>
 struct hash<carl::Constraint<LhsType>> 
 {
-	std::size_t operator()(const carl::Constraint<LhsType>& c) {
+	std::size_t operator()(const carl::Constraint<LhsType>& c) const {
 		std::hash<LhsType> h1;
 		std::hash<carl::CompareRelation> h2;
 		return h1(c.lhs()) << 2 | h2(c.rel());
