@@ -220,7 +220,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
-	if (this->degree() == 0) {
+	if (this->isConstant() == 0) {
 		return result;
 	}
 	result.mCoefficients.reserve(mCoefficients.size()-nth);
@@ -260,14 +260,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const UnivariatePolynomial<Coeff>& divisor, const Coeff* prefactor) const
 {
-	if (this->degree() < divisor.degree()) return *this;
-	assert(degree() >= divisor.degree());
 	assert(!divisor.isZero());
+	if(this->isZero()) {
+		return *this;
+	}
+	if(this->degree() < divisor.degree()) return *this;
+	assert(degree() >= divisor.degree());
 	// Remainder in a field is zero by definition.
 	if (is_field<Coeff>::value && divisor.isConstant()) {
-		return UnivariatePolynomial<Coeff>(mMainVar);
-	}
-	if (isZero()) {
 		return UnivariatePolynomial<Coeff>(mMainVar);
 	}
 
@@ -317,7 +317,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	}
 	// strip zeros from the end as we might have pushed zeros.
 	result.stripLeadingZeroes();
-	
+	assert(!result.isZero());
 	if(result.degree() < divisor.degree())
 	{
 		return result;
@@ -348,7 +348,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!divisor.isZero());
-	if(degree() < divisor.degree())
+	if(isZero() || degree() < divisor.degree())
 	{
 		// According to definition.
 		return *this;
@@ -370,7 +370,11 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariatePolynomial<Coeff>& divisor) const
 {
-	assert(degree() >= divisor.degree());
+	if(isZero() || degree() < divisor.degree())
+	{
+		// According to definition.
+		return *this;
+	}
 	Coeff b = divisor.lcoeff();
 	unsigned d = degree() - divisor.degree() + 1;
 	if(d%2) ++d;
@@ -495,6 +499,8 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
 	// We want degree(b) <= degree(a).
+	assert(!a.isZero());
+	assert(!b.isZero());
 	if(a.degree() < b.degree()) return gcd_recursive(b.normalized(),a.normalized()).normalized();
 	else return gcd_recursive(a.normalized(),b.normalized()).normalized();
 }
@@ -503,6 +509,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd(const UnivariatePol
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
+	assert(!a.isZero());
+	assert(!b.isZero());
 	assert(b.degree() <= a.degree());
 	if(b.isZero()) return a;
 //	if(is_field<Coeff>::value)
@@ -523,7 +531,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const 
 template<typename Coeff>
 template<typename C, DisableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
-//	LOG_NOTIMPLEMENTED();
+//
+	LOG_NOTIMPLEMENTED();
 	return *this;
 }
 
@@ -699,6 +708,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 {
 	assert(!divisor.isZero());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	if(isZero()) return result;
 	assert(*this == divisor * result.quotient + result.remainder);
 
 	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
@@ -720,6 +730,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 	assert(!divisor.isZero());
 	assert(this->mainVar() == divisor.mainVar());
 	DivisionResult<UnivariatePolynomial<Coeff>> result(UnivariatePolynomial<Coeff>(mMainVar), *this);
+	if(isZero()) return result;
 	assert(*this == divisor * result.quotient + result.remainder);
 	if(divisor.degree() > degree())
 	{
@@ -734,7 +745,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff) * divisor;
 		result.quotient.mCoefficients[degdiff] += factor;
 	}
-	while(divisor.degree() <= result.remainder.degree() && !result.remainder.isZero());
+	while(!result.remainder.isZero() && divisor.degree() <= result.remainder.degree());
 	
 	assert(*this == divisor * result.quotient + result.remainder);
 	return result;
@@ -1000,7 +1011,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 		result = poly;
 	}
 	// Check whether the polynomial is already a linear factor.
-	if(result.degree() > 1)
+	if(!result.isLinearInMainVar())
 	{
 		// Exclude the factor (x-r)^i, with r rational and r!=0, from result.
 		assert(result.coefficients().size() > 1);
@@ -1072,7 +1083,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 							++retVal.first->second;
 						}
 						// Check whether result is a linear factor now.
-						if(result.degree() <= 1)
+						if(result.isLinearInMainVar() <= 1)
 						{
 							goto LinearFactorRemains;
 						}
@@ -1237,6 +1248,7 @@ std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squ
 	LOGMSG_TRACE("carl.core", "UnivSSF: " << *this);
 	std::map<unsigned,UnivariatePolynomial<Coeff>> result;
 CLANG_WARNING_DISABLE("-Wtautological-compare")
+	assert(!isZero()); // TODO what if zero?
 	// degree() >= characteristic<Coeff>::value throws a warning in clang...
 	if(characteristic<Coeff>::value != 0 && degree() >= characteristic<Coeff>::value)
 CLANG_WARNING_RESET
@@ -1440,6 +1452,8 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	std::list<UnivariatePolynomial<Coeff>> subresultants;
 	Variable variable = pol1.mainVar();
 	
+	assert(!pol1.isZero());
+	assert(!pol2.isZero());
 	// We initialize p and q with pol1 and pol2.
 	UnivariatePolynomial<Coeff> p(pol1), q(pol2);
 	
@@ -1518,6 +1532,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 					bool res = reductionCoeff.divideBy(dividant, c);
 					if (res) {
 						subresultants.push_front(c);
+						assert(!c.isZero());
 						qDeg = c.degree();
 					} else {
 						c = q;
@@ -1559,6 +1574,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 					bool res = reductionCoeff.divideBy(subresLcoeff, c);
 					if (res) {
 						subresultants.push_front(c);
+						assert(!c.isZero());
 						qDeg = c.degree();
 						LOGMSG_TRACE("carl.core.resultant", "qDeg = " << qDeg);
 					} else {
@@ -1610,7 +1626,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 					Coeff t = h[d-1] * variable;
 					UnivariatePolynomial<Coeff> reducedNewB = t.toUnivariatePolynomial(variable).coefficients()[qDeg] * q;
 					bool res = reducedNewB.divideBy(lcoeffQ, reducedNewB);
-					assert(res || reducedNewB.degree() == 0);
+					assert(res || reducedNewB.isConstant());
 					h[d] = Coeff(t - reducedNewB);
 				}
 				
@@ -1620,7 +1636,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				}
 				UnivariatePolynomial<Coeff> normalizedSum(p.mainVar());
 				bool res = sum.divideBy(p.lcoeff(), normalizedSum);
-				assert(res || sum.degree() == 0);
+				assert(res || sum.isConstant());
 				
 				UnivariatePolynomial<Coeff> t(variable, {0, h.back()});
 				UnivariatePolynomial<Coeff> reducedNewB = ((t + normalizedSum) * lcoeffQ - t.coefficients()[qDeg].toUnivariatePolynomial(variable));
@@ -1648,6 +1664,7 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs(subres.size());
 	unsigned i = 0;
 	for (auto s: subres) {
+		assert(!s.isZero());
 		if (s.degree() < i) {
 			// this and all further subresultants won't have a non-zero i-th coefficient
 			break;
@@ -1677,13 +1694,12 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::discriminant(const SubresultantStrategy strategy) const {
 	UnivariatePolynomial<Coeff> resultant = this->resultant(this->derivative(), strategy);
+	if(isLinearInMainVar()) return resultant;
 	unsigned d = this->degree();
-	if (d >= 2) {
-		Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
-		Coeff redCoeff = sign * this->lcoeff();
-		bool res = resultant.divideBy(redCoeff, resultant);
-		assert(res);
-	}
+	Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
+	Coeff redCoeff = sign * this->lcoeff();
+	bool res = resultant.divideBy(redCoeff, resultant);
+	assert(res);
 	LOGMSG_TRACE("carl.cad", "discriminant(" << *this << ") = " << resultant);
 	return resultant;
 }
@@ -2020,7 +2036,8 @@ bool UnivariatePolynomial<C>::less(const UnivariatePolynomial<C>& rhs, const Pol
 			return *this < rhs;
 		}*/
 		case PolynomialComparisonOrder::LowDegree:
-			if (this->degree() < rhs.degree()) return true;
+			if (rhs.isZero()) return false;
+			if (isZero() || this->degree() < rhs.degree()) return true;
 			return *this < rhs;
 		case PolynomialComparisonOrder::Memory:
 			return this < &rhs;
