@@ -1649,7 +1649,7 @@ namespace carl
     template<typename Number>
     inline Interval<Number> pow(const Interval<Number>& _in, unsigned _exponent)
     {
-        return _in.power(_exponent);
+        return _in.pow(_exponent);
     }
     
     /**

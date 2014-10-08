@@ -833,7 +833,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
-		if(t->coeff() != 0)
+		if(t->coeff() != (Coeff)0)
 		{
 			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
@@ -854,7 +854,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
-		if(t->coeff() != 0)
+		if(t->coeff() != (Coeff)0)
 		{
 			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
@@ -1525,14 +1525,14 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const Coeff& c)
 {
-    if(c == 0) return *this;
+    if(c == (Coeff)0) return *this;
     if(Ordering::degreeOrder)
     {
         if(mTerms.size() > 0 && mTerms.front()->isConstant())
         {
             Coeff newConstantPart(mTerms.front()->coeff() + c);
             
-            if(newConstantPart != 0)
+            if(newConstantPart != (Coeff)0)
             {
                 mTerms.front() = (std::make_shared<Term<Coeff>>(newConstantPart));
             }
@@ -1842,14 +1842,14 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const Coeff& c)
 {
-    if(c == 0) return *this;
+    if(c == (Coeff)0) return *this;
     if(Ordering::degreeOrder)
     {
         if(mTerms.size() > 0 && mTerms.front()->isConstant())
         {
             Coeff newConstantPart(mTerms.front()->coeff() - c);
             
-            if(newConstantPart != 0)
+            if(newConstantPart != (Coeff)0)
             {
                 mTerms.front() = (std::make_shared<Term<Coeff>>(newConstantPart));
             }
@@ -2102,7 +2102,7 @@ const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const Multivari
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator/=(const Coeff& c)
 {
-	assert(c != 0);
+	assert(c != (Coeff)0);
     if(c == 1) return *this;
 	TermsType newTerms;
     newTerms.reserve(mTerms.size());
@@ -2190,12 +2190,12 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
         }
         else
         {
-			if (frontCoeff != 0) {
+			if (frontCoeff != (Coeff)0) {
 				if(frontCoeff == frontTerm->coeff())
 				{
 					mTerms.push_back(frontTerm);
 				}
-				else if(frontCoeff != 0)
+				else if(frontCoeff != (Coeff)0)
 				{
 					mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
 				}
@@ -2207,10 +2207,10 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
     
     if(frontCoeff == frontTerm->coeff())
     {
-		assert(frontCoeff != 0);
+		assert(frontCoeff != (Coeff)0);
         mTerms.push_back(frontTerm);
     }
-    else if (frontCoeff != 0)
+    else if (frontCoeff != (Coeff)0)
     {
         mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
     }
