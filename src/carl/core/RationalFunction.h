@@ -110,6 +110,7 @@ public:
 		return mNominator == mDenominator;
 	}
 	
+	
 	/**
 	 * Collect all occurring variables
      * @return All occcurring variables
@@ -289,6 +290,19 @@ protected:
 	template<typename Pol, bool AS>
 	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs);
 	
+}
+
+namespace std
+{
+	template<typename Pol, bool AS>
+	struct hash<carl::RationalFunction<Pol, AS>> 
+	{
+		std::size_t operator()(const carl::RationalFunction<Pol, AS>& r) const {
+			std::hash<Pol> h;
+			
+			return (h(r.nominator()) << 8) ^ (h(r.denominator()) >> 8);
+		}
+	};
 }
 
 #include "RationalFunction.tpp"
