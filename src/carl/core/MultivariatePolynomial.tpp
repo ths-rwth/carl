@@ -31,7 +31,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(unsigned
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Coeff& c) :
 Policies(),
-mTerms(c == 0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
+mTerms(c == (Coeff)0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
 {
 	this->checkConsistency();
 }
@@ -295,11 +295,11 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
 template<typename Coeff, typename Ordering, typename Policies>
 Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 {
-	if(isZero()) return 0;
+	if(isZero()) return (Coeff)0;
 	if(trailingTerm()->isConstant()) {
 		return trailingTerm()->coeff();
 	}
-    return 0;
+    return (Coeff)0;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1175,7 +1175,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
-    if(lhs.mTerms.empty() && rhs.coeff() == 0) return true;
+    if(lhs.mTerms.empty() && rhs.coeff() == (Coeff)0) return true;
     if(lhs.mTerms.size() > 1) return false;
     return *(lhs.mTerms.front()) == rhs;
 }
@@ -1203,7 +1203,7 @@ template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
 {
     if (lhs.mTerms.empty()) {
-		return rhs == 0;
+		return rhs == (C)0;
 	}
     if (lhs.mTerms.size() > 1) return false;
 	if (lhs.lmon()) return false;
@@ -1405,7 +1405,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const Term<Coeff>& rhs)
 {
-    if(rhs.coeff() == 0) return *this;
+    if(rhs.coeff() == (Coeff)0) return *this;
     if(Policies::searchLinear) 
     {
         typename TermsType::iterator it(mTerms.begin());
@@ -1728,7 +1728,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const Term<Coeff>& rhs)
 {
-    if(rhs.coeff() == 0) return *this;
+    if(rhs.coeff() == (Coeff)0) return *this;
     if(Policies::searchLinear) 
     {
         typename TermsType::iterator it(mTerms.begin());
@@ -2005,8 +2005,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const Coeff& c)
 {
-    if(c == 1) return *this;
-    if(c == 0) 
+    if(c == (Coeff)1) return *this;
+    if(c == (Coeff)0) 
     {
         mTerms.clear();
         return *this;
