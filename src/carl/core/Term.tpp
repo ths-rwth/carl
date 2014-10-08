@@ -58,7 +58,7 @@ template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, const Monomial& m)
 : mCoeff(c)
 {
-    if (c != Coefficient(0)) mMonomial = std::make_shared<const Monomial>(m);
+    if (c != Coefficient(0) && !m.isConstant()) mMonomial = std::make_shared<const Monomial>(m);
 	assert(this->isConsistent());
 }
 
