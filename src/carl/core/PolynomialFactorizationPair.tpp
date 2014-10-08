@@ -277,76 +277,119 @@ namespace carl
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
+        _pfPairA.flattenFactorization();
+        _pfPairB.flattenFactorization();
         Factorization<P> factorizationA = _pfPairA.factorization();
         Factorization<P> factorizationB = _pfPairB.factorization();
+        bool rest = true;
+        std::cout << "Begin GCD: " << _pfPairA << " and " << _pfPairB << std::endl;
 
-        for ( auto factorA = factorizationA.begin(); factorA != factorizationA.end(); factorA++ )
+        while ( !factorizationA.empty() )
         {
-            for ( auto factorB = factorizationB.begin(); factorB != factorizationB.end(); factorB++ )
+            //Consider first factor in currently not checked factorization of A
+            FactorizedPolynomial<P> factorA = factorizationA.begin()->first;
+            size_t exponentA = factorizationA.begin()->second;
+            std::cout << "FactorA: " << factorA << " ^" << exponentA << std::endl;
+            factorizationA.erase( factorizationA.begin() );
+            rest = true;
+
+            while ( !factorA.isOne() && !factorizationB.empty() )
             {
-                if( factorA->first == factorB->first )
+                FactorizedPolynomial<P> factorB = factorizationB.begin()->first;
+                size_t exponentB = factorizationB.begin()->second;
+                std::cout << "FactorB: " << factorB << " ^" << exponentB << std::endl;
+                factorizationB.erase( factorizationB.begin() );
+
+                if( factorA == factorB )
                 {
                     //Common factor found
-                    size_t exponent = factorA->second < factorB->second ? factorA->second : factorB->second;
-                    result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA->first, exponent ) );
+                    size_t exponentCommon = exponentA < exponentB ? exponentA : exponentB;
+                    result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA, exponentCommon ) );
+                    std::cout << "Common factor: " << factorA << " ^" << exponentCommon << std::endl;
+                    if (exponentA > exponentCommon)
+                        factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA, exponentA-exponentCommon ) );
+                    if (exponentB > exponentCommon)
+                        factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB, exponentB-exponentCommon ) );
+                    //No rest is remaining
+                    rest = false;
+                    break;
                 }
                 else
                 {
-                    if (factorA->first.content().isIrreducible() || factorB->first.content().isIrreducible() )
-                        continue;
-
-                    //Compute GCD of factors
-                    assert( factorA->first.content().mpPolynomial != nullptr );
-                    assert( factorB->first.content().mpPolynomial != nullptr );
-                    P polA = *factorA->first.content().mpPolynomial;
-                    P polB = *factorB->first.content().mpPolynomial;
-                    P polGCD( carl::gcd( polA, polB ) );
-
-                    //New common factor
-                    if ( polGCD != 1 )
+                    P polGCD, polA, polB;
+                    if ( factorA.content().isIrreducible() && factorB.content().isIrreducible() )
+                        polGCD = P( 1 );
+                    else
                     {
-                        //Compute remainders
+                        //Compute GCD of factors
+                        assert( factorA.content().mpPolynomial != nullptr );
+                        assert( factorB.content().mpPolynomial != nullptr );
+                        polA = *factorA.content().mpPolynomial;
+                        polB = *factorB.content().mpPolynomial;
+                        polGCD = carl::gcd( polA, polB );
+                    }
+
+                    if (polGCD == 1)
+                    {
+                        //No common factor
+                        _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB, exponentB ) );
+                        std::cout << "No common factor, insert restB: " << factorB << " ^" << exponentB << std::endl;
+                    }
+                    else
+                    {
+                        //New common factor
                         P remainA, remainB;
                         bool correct = polA.divideBy( polGCD, remainA );
                         assert( correct );
                         correct = polB.divideBy( polGCD, remainB );
                         assert( correct );
-                        size_t exponentA = factorA->second;
-                        size_t exponentB = factorB->second;
                         size_t exponentCommon = exponentA < exponentB ? exponentA : exponentB;
-                        Cache<PolynomialFactorizationPair<P>>& cache = factorA->first.mrCache;
+                        Cache<PolynomialFactorizationPair<P>>& cache = factorA.mrCache;
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult,  exponentCommon ) );
+                        std::cout << "New common factor: " << gcdResult << " ^" << exponentCommon << std::endl;
 
                         if (remainA != 1)
                         {
+                            std::cout << "a" << remainA << std::endl;
                             //Set new factorization
                             FactorizedPolynomial<P> polRemainA( remainA, cache );
-                            factorA->first.content().setNewFactors( gcdResult, exponentA, polRemainA, exponentA );
+                            factorA.content().setNewFactors( gcdResult, exponentA, polRemainA, exponentA );
                             _pfPairARefined = true;
+                            factorA = polRemainA;
 
                             //Add remaining factorization
                             if (exponentA > exponentCommon)
-                                _restA.insert( _restA.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, exponentA-exponentCommon ) );
-                            _restA.insert( _restA.end(), std::pair<FactorizedPolynomial<P>, size_t>( polRemainA, exponentA) );
+                                factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, exponentA-exponentCommon ) );
                         }
+                        else
+                            rest = false;
                         if (remainB != 1)
                         {
+                            std::cout << "b" << remainB << std::endl;
                             //Set new factorization
                             FactorizedPolynomial<P> polRemainB( remainB, cache );
-                            factorB->first.content().setNewFactors( gcdResult, exponentB, polRemainB, exponentB );
+                            factorB.content().setNewFactors( gcdResult, exponentB, polRemainB, exponentB );
                             _pfPairBRefined = true;
 
                             //Add remaining factorization
                             if (exponentB > exponentCommon)
-                                _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, exponentB-exponentCommon ) );
+                                factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, exponentB-exponentCommon ) );
                             _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, size_t>( polRemainB, exponentB) );
                         }
                     }
                 }
-            }
-        }
+            } //End of inner while
+            //Insert remaining factorA into rest
+            if ( !factorA.isOne() && rest )
+                _restA.insert( _restA.begin(), std::pair<FactorizedPolynomial<P>, size_t>( factorA, exponentA ) );
+            //Reset factorizationB
+            for ( auto itFactor = _restB.begin(); itFactor != _restB.end(); itFactor++ )
+                factorizationB.insert( factorizationB.end(), *itFactor );
+            _restB.clear();
+        } //End of outer while
+        _restB = factorizationB;
 
         _pfPairA.flattenFactorization();
         _pfPairB.flattenFactorization();
@@ -354,6 +397,7 @@ namespace carl
         // Check correctness
         _pfPairA.assertFactorization();
         _pfPairB.assertFactorization();
+        std::cout << "GCD (internal) of " << _pfPairA << " and " << _pfPairB << ": " << result << " with rests " << _restA << " and " << _restB << std::endl;
         assert( computePolynomial( result ) * computePolynomial( _restA ) == *_pfPairA.mpPolynomial);
         assert( computePolynomial( result ) * computePolynomial( _restB ) == *_pfPairB.mpPolynomial);
 
