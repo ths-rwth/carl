@@ -55,6 +55,15 @@ namespace carl
 	}
 	
 	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const typename Pol::CoeffType& rhs)
+	{
+		mIsSimplified = false;
+		mNominator += rhs * mDenominator;
+		if(AS) eliminateCommonFactor();
+		return *this;
+	}
+	
+	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const RationalFunction<Pol, AS>& rhs)
 	{
 		mIsSimplified = false;
@@ -82,6 +91,16 @@ namespace carl
 		if(AS) eliminateCommonFactor();
 		return *this;
 	}
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const typename Pol::CoeffType& rhs)
+	{
+		mIsSimplified = false;
+		mNominator -= rhs * mDenominator;
+		if(AS) eliminateCommonFactor();
+		return *this;
+	}
+	
 	
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const RationalFunction<Pol, AS>& rhs)
