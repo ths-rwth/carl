@@ -110,6 +110,10 @@ public:
 		return mNominator == mDenominator;
 	}
 	
+	bool isConstant() const 
+	{
+		return mNominator.isConstant() && mDenominator.isConstant();
+	}
 	
 	/**
 	 * Collect all occurring variables
