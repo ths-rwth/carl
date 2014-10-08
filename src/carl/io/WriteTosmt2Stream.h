@@ -85,11 +85,11 @@ namespace io
 		{
 			if(mConstantsAsParameterlessFunctions)
 			{
-				return "(declare-fun " + varToString(v, true) + " () " + tosmt2string(v.getType()) + ")";
+				return "(declare-fun " + carl::VariablePool::getInstance().getName(v, true) + " () " + tosmt2string(v.getType()) + ")";
 			}
 			else
 			{		
-				return "(declare-const " + varToString(v, true) + " " + tosmt2string(v.getType()) + ")";
+				return "(declare-const " + carl::VariablePool::getInstance().getName(v, true) + " " + tosmt2string(v.getType()) + ")";
 			}
 			
 		}

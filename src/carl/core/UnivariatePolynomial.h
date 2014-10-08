@@ -319,7 +319,8 @@ public:
 	 * @return Degree.
 	 */
 	unsigned degree() const {
-		return mCoefficients.size() == 0 ? 0 : (unsigned)mCoefficients.size()-1;
+		assert(!this->isZero());
+		return (unsigned)mCoefficients.size()-1;
 	}
 	
 	/**

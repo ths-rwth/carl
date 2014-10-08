@@ -53,7 +53,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 		LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 		// We expect every variable to be in the map.
 		LOG_ASSERT("carl.interval", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
-		result *= map.at(m[i].first).power(m[i].second);
+		result *= map.at(m[i].first).pow(m[i].second);
 	}
 	return result;
 }
@@ -70,7 +70,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].first) > 0);
-			result *= map.at(m[i].first).power(m[i].second);
+			result *= map.at(m[i].first).pow(m[i].second);
 		}
 	}
 	return result;
@@ -88,7 +88,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].first) > 0);
-			result *= map.at(m[i].first).power(m[i].second);
+			result *= map.at(m[i].first).pow(m[i].second);
 		}
 	}
 	return result;

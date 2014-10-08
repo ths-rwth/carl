@@ -114,4 +114,4 @@ MultivariatePolynomial& operator+=(const Coeff& rhs);
 ## Writing out-of-source documentation
 
 Documentation not directly related to the source code is written in Markdown format, and is located in
-'/doc/markdown/'.
+`/doc/markdown/`.

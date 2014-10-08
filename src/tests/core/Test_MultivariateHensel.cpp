@@ -4,7 +4,7 @@
 #include <gmpxx.h>
 
 using namespace carl;
-
+/*
 TEST(Diophantine, Constructor)
 {
 	VariablePool& vpool = VariablePool::getInstance();
@@ -22,3 +22,4 @@ TEST(Diophantine, Constructor)
 	std::cout << result.front() << std::endl;
 	std::cout << result.back() << std::endl;
 }
+*/

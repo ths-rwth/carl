@@ -1114,13 +1114,13 @@ namespace carl
          * @param exp Exponent.
          * @return Result.
          */
-        Interval<Number> power(unsigned exp) const;
+        Interval<Number> pow(unsigned exp) const;
         
         /**
          * Calculates and assigns the power of the interval with respect to natural interval arithmetic.
          * @param exp Exponent.
          */
-        void power_assign(unsigned exp);
+        void pow_assign(unsigned exp);
 
         /**
          * Calculates the square root of the interval with respect to natural interval arithmetic.
@@ -1643,6 +1643,13 @@ namespace carl
     inline Interval<Number> sqrt(const Interval<Number>& _in)
     {
         return _in.sqrt();
+    }
+    
+    
+    template<typename Number>
+    inline Interval<Number> pow(const Interval<Number>& _in, unsigned _exponent)
+    {
+        return _in.pow(_exponent);
     }
     
     /**

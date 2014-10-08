@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
 #include "../../carl/numbers/numbers.h"
-#include "../../carl/numbers/DecimalStringToRational.h"
 
 #include <gmpxx.h>
 
@@ -26,17 +25,16 @@ TEST(NumbersGMPxx, squareroot)
 	EXPECT_EQ(resultA.second.get_num(), 2);
 }
 
-TEST(NumbersGMPxx, stringToRational)
-{
-    
-    DecimalStringToRational<mpq_class> dec2rat;
-    EXPECT_EQ(mpq_class(3),dec2rat("3"));
-    EXPECT_EQ(mpq_class(3,10),dec2rat("0.3"));
-    std::cout << dec2rat("3.4") << std::endl;
-    
-}
-
 TEST(NumbersGMPxx, quotient)
 {
 	EXPECT_EQ(-1, quotient(mpz_class(-6),mpz_class(7)));
+}
+
+TEST(NumbersGMPxx, rationalize)
+{
+	EXPECT_EQ(mpq_class(0), rationalize<mpq_class>("0"));
+	EXPECT_EQ(mpq_class(1,10), rationalize<mpq_class>("0.1"));
+	EXPECT_EQ(mpq_class(1,10), rationalize<mpq_class>(".1"));
+	EXPECT_EQ(mpq_class(3,2), rationalize<mpq_class>("1.5"));
+	EXPECT_EQ(mpq_class(1234567890), rationalize<mpq_class>("1234567890"));
 }

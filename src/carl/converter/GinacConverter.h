@@ -37,7 +37,7 @@ namespace carl
         poly.gatherVariables(carlVars);
         for(auto var = carlVars.begin(); var != carlVars.end(); ++var)
         {
-            GiNaC::symbol vg(varToString(*var));
+            GiNaC::symbol vg(VariablePool::getInstance().getName(*var));
             if( carlToGinacVarMap.insert(std::pair<Variable, GiNaC::ex>(*var, vg)).second )
             {
                 ginacToCarlVarMap.insert(std::pair<GiNaC::ex, Variable>(vg, *var));

@@ -47,7 +47,7 @@ As of now, only two logging backends exist.
 
 ### CArL logging
 
-CArL provides a custom logging mechanism defined in [carlLogging.h](@ref carlLogging.h).
+CArL provides a custom logging mechanism defined in carl::logging.
 It is enabled, if `LOGGING_CARL` is set.
 
 ### Fallback logging

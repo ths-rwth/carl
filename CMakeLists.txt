@@ -165,9 +165,6 @@ find_package(CLN REQUIRED)
 find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
 find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
 
-# Eigen
-find_package(Eigen3 REQUIRED)
-
 # GMP
 find_package(GMP REQUIRED)
 find_library(GMP_DYNAMIC NAMES libgmp.${DYNAMIC_EXT})
@@ -211,8 +208,11 @@ endif()
 if(NOT FORCE_SHIPPED_RESOURCES)
 	# find googletest
 	find_package(GTest)
+	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
+set(include_dirs ${include_dirs} ${Eigen3_INCLUDE_DIR})
+
 
 enable_testing()
 

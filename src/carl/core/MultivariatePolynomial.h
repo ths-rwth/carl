@@ -128,6 +128,11 @@ public:
 	 */
 	bool isZero() const;
 	/**
+	 * 
+     * @return 
+     */
+	bool isOne() const;
+	/**
 	 * Checks if the polynomial is constant.
 	 * @return If this is constant.
 	 */
@@ -195,6 +200,16 @@ public:
 	typename TermsType::const_reverse_iterator rend() const
 	{
 		return mTerms.rend();
+	}
+
+	typename TermsType::iterator eraseTerm(typename TermsType::iterator pos) {
+		return mTerms.erase(pos);
+	}
+	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
+		return mTerms.erase(pos);
+	}
+	TermsType& getTerms() {
+		return mTerms;
 	}
 
 	/**

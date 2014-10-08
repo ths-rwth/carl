@@ -88,6 +88,8 @@ class Term
 			return mCoeff;
 		}
 		
+		
+		
 		/**
 		 * Get the monomial.
 		 * @return Monomial.
@@ -107,12 +109,21 @@ class Term
 		}
 		
 		/**
-		 * Checks wether the monomial is zero.
+		 * Checks whether the term is zero.
 		 * @return 
 		 */
 		bool isZero() const
 		{
 			return mCoeff == Coefficient(0);
+		}
+		
+		/**
+		 * Checks whether the term equals one.
+         * @return 
+         */
+		bool isOne() const
+		{
+			return (isConstant() && mCoeff == Coefficient(1));
 		}
 		/**
 		 * Checks whether the monomial is a constant.
@@ -228,6 +239,7 @@ class Term
 		template<typename SubstitutionType=Coefficient>
 		Term* substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
 		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
+		
 		
 		template<bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const;
@@ -392,6 +404,23 @@ class Term
 		{
 			return std::equal_to<std::shared_ptr<Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
+		/**
+		 * Calculates the gcd of (t1, t2).
+		 * If t1 or t2 are not set, undefined.
+		 * If t1 or t2 is zero, undefined.
+         * @param t1 first term
+         * @param t2 second term
+         * @return gcd(t1,t2);
+         */
+		static Term gcd(std::shared_ptr<const Term> t1, std::shared_ptr<const Term> t2);
+		/**
+		 * Calculates the gcd of (t1, t2).
+		 * If t1 or t2 is zero, undefined.
+         * @param t1 first term
+         * @param t2 second term
+         * @return gcd(t1,t2)
+         */
+		static Term gcd(const Term& t1, const Term& t2);
 };
 
 		
