@@ -18,6 +18,7 @@ void setInitialLogLevel()
 		("carl.cad.sampleset", carl::logging::LogLevel::LVL_INFO)
 		("carl.core.resultant", carl::logging::LogLevel::LVL_INFO)
 		("carl.core.rootfinder", carl::logging::LogLevel::LVL_INFO)
+		("carl.core.factorizedpolynomial", carl::logging::LogLevel::LVL_ALL)
 	;
 
 	carl::logging::logger().configure("stdout", std::cout);
