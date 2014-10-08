@@ -1175,7 +1175,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
 {
-    if(lhs.mTerms.empty() && rhs.coeff() == (Coeff)0) return true;
+    if(lhs.mTerms.empty() && rhs.coeff() == (C)0) return true;
     if(lhs.mTerms.size() > 1) return false;
     return *(lhs.mTerms.front()) == rhs;
 }
@@ -1779,7 +1779,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
-                if((**it).coeff() == 1)
+                if((**it).coeff() == (Coeff)1)
                 {
                     mTerms.erase(it);
                 }
@@ -1815,7 +1815,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
             if( cmpres == CompareResult::EQUAL )
             {
                 // new coefficient would be zero, simply removing is enough.
-                if((**it).coeff() == 1)
+                if((**it).coeff() == (Coeff)1)
                 {
                     mTerms.erase(it);
                 }
