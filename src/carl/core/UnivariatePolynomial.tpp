@@ -445,6 +445,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 	assert(a.mMainVar == b.mMainVar);
 	assert(a.mMainVar == s.mMainVar);
 	assert(a.mMainVar == t.mMainVar);
+	assert(!a.isZero());
+	assert(!b.isZero());
 	
 	LOGMSG_DEBUG("carl.core", "UnivEEA: a=" << a << ", b=" << b );
 	Variable::Arg x = a.mMainVar;
@@ -483,6 +485,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::extended_gcd(const Univ
 		LOGMSG_TRACE("carl.core", "UnivEEA: c1=" << c1 << ", c2=" << c2 );
 		LOGMSG_TRACE("carl.core", "UnivEEA: d1=" << d1 << ", d2=" << d2 );
 	}
+	assert(!c.isZero());
 	s = c1 / (a.lcoeff() * c.lcoeff());
 	t = c2 / (b.lcoeff() * c.lcoeff());
 	c = c.normalized();
@@ -510,8 +513,8 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::gcd_recursive(const UnivariatePolynomial& a, const UnivariatePolynomial& b)
 {
 	assert(!a.isZero());
-	assert(!b.isZero());
-	assert(b.degree() <= a.degree());
+	assert(b.isZero() || b.degree() <= a.degree());
+	
 	if(b.isZero()) return a;
 //	if(is_field<Coeff>::value)
 //	{
