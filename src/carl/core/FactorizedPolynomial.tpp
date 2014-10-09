@@ -132,7 +132,6 @@ namespace carl
     {
         assertCacheEqual( _fpolyA.cache(), _fpolyB.cache() );
         //TODO how to handle constants?
-        std::cout << "ccc" << std::endl;
         return _fpolyA.content() < _fpolyB.content();
     }
 
