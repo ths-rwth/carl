@@ -97,4 +97,19 @@ TEST(RationalFunction, Addition)
     RFunc r3 = r1 + r2;
     Pol q2 = sp.parseMultivariatePolynomial<Rational>("5*x*y");
     EXPECT_EQ(p4, r3.denominator());
+    
+    Cache<PolynomialFactorizationPair<Pol>> fpCache;
+    
+    FPol fp1(p1, fpCache);
+    FPol fp2(p2, fpCache);
+    
+    FPol fp3(p3, fpCache);
+    FPol fp4(p4, fpCache);
+    
+    RFactFunc rf1(fp1, fp2);
+    RFactFunc rf2(fp3, fp4);
+    
+    RFactFunc rf3 = rf1 + rf2;
+    FPol qf2(q2, fpCache);
+    EXPECT_EQ(fp4, rf3.denominator());
 }
