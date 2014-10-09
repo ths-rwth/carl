@@ -29,6 +29,7 @@ namespace carl
     {
         friend const Factorization<P>& FactorizedPolynomial<P>::factorization() const;
         friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
+        friend class FactorizedPolynomial<P>;
 
     private:
         // Members

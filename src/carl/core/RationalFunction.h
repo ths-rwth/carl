@@ -201,7 +201,7 @@ protected:
 		if (mIsSimplified) return;
 		if(mNominator.isZero())
 		{
-			mDenominator = Pol(1);
+			mDenominator = Pol(CoeffType(1));
 			mIsSimplified = true;
 			return;
 		}
@@ -214,8 +214,8 @@ protected:
 		
 		if(mNominator == mDenominator)
 		{
-			mNominator = Pol(1);
-			mDenominator = Pol(1);
+			mNominator = Pol(CoeffType(1));
+			mDenominator = Pol(CoeffType(1));
 			mIsSimplified = true;
 			return;
 		}
@@ -223,7 +223,7 @@ protected:
 		if(mDenominator.isConstant())
 		{
 			mNominator /= mDenominator.constantPart();
-			mDenominator = Pol(1);
+			mDenominator = Pol(CoeffType(1));
 			mIsSimplified = true;
 		}
 		else
