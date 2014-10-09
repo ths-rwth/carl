@@ -97,7 +97,7 @@ namespace carl
             for( auto const& factor : mFactorization )
             {
                 typename P::CoeffType factorCP( factor.first.constantPart() );
-                if( factorCP.isZero() )
+                if( factorCP == 0 )
                     return factorCP;
                 result *= carl::pow( factorCP, factor.second );
             }
