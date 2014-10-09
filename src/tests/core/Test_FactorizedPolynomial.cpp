@@ -1,11 +1,15 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/FactorizedPolynomial.h"
+#include "carl/util/stringparser.h"
 
 #include <cln/cln.h>
 
 
 using namespace carl;
+
+typedef cln::cl_RA Rational;
+typedef MultivariatePolynomial<Rational> P;
 
 TEST(FactorizedPolynomial, Construction)
 {
@@ -16,7 +20,6 @@ TEST(FactorizedPolynomial, Construction)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    typedef MultivariatePolynomial<cln::cl_RA> P;
     P fxy({(cln::cl_RA)1*x*y});
     P fxyz({(cln::cl_RA)1*x*y*z});
     P f1({(cln::cl_RA)-1*x, (cln::cl_RA)3*y});
@@ -84,4 +87,21 @@ TEST(FactorizedPolynomial, Construction)
     FactorizedPolynomial<P> fpSub = fpA - fpB;
     std::cout << std::endl << fpA << " - " << fpB << ": " << fpSub << std::endl << std::endl;
     fpCache.print();
+}
+
+TEST(FactorizedPolynomial, CommonDivisor)
+{
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+    
+    P fxy = sp.parseMultivariatePolynomial<Rational>("x*y");
+    P fxyz = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+    
+    Cache<PolynomialFactorizationPair<P>> fpCache;
+    FactorizedPolynomial<P> fpA( fxy, fpCache );
+    FactorizedPolynomial<P> fpB( fxyz, fpCache );
+    
+    std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
+    FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
+    std::cout << fpC << std::endl << std::endl;
 }
