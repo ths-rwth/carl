@@ -170,14 +170,12 @@ namespace carl
             return factorization().empty();
         }
         
-//        CoeffType constantPart() const
-//        {
-//            CoeffType result = mCoefficient;
-//            for (auto const& factor : factorization()) {
-//                result *= factor.constantPart();
-//            }
-//            return result;
-//        }
+        CoeffType constantPart() const
+        {
+            CoeffType result( mCoefficient );
+            result *= content().constantPart();
+            return result;
+        }
         
         /**
          * @param _fpolyA The first summand.
@@ -202,25 +200,31 @@ namespace carl
          */
         template<typename P1>
         friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        
+        /**
+         * @param _fpoly The factor to multiply this factorized polynomial with.
+         * @return This factorized polynomial after multiplying it with the given factor.
+         */
+        FactorizedPolynomial<P>& operator*=( const FactorizedPolynomial<P>& _fpoly );
 
         /**
-	 * Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
-	 * @param _fdivisor The divisor
-	 * @return The quotient
-	 */
+         * Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
+         * @param _fdivisor The divisor
+         * @return The quotient
+         */
         const FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fdivisor ) const;
 
         /**
-	 * Calculates the quotient of the polynomials. Notice: the second polynomial has to be a factor of the first polynomial.
-	 * @param _fpolyA The dividend.
+         * Calculates the quotient of the polynomials. Notice: the second polynomial has to be a factor of the first polynomial.
+         * @param _fpolyA The dividend.
          * @param _fpolyB The divisor.
-	 * @return The quotient
-	 */
+         * @return The quotient
+         */
         template<typename P1>
-	friend const FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB )
-	{
-		return _fpolyA.quotient( _fpolyB );
-	}
+        friend const FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB )
+        {
+            return _fpolyA.quotient( _fpolyB );
+        }
 
         /**Computes the least common multiple of two given polynomials. The method refines the factorization.
          * @param _fpolyA The first factorized polynomial to compute the lcm for.

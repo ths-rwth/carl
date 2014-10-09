@@ -166,6 +166,13 @@ namespace carl
         Coeff<P> coefficientResult = _fpolyA.coefficient() * _fpolyB.coefficient();
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, _fpolyA.mrCache );
     }
+    
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result = *this * _fpoly;
+        return *this = result;
+    }
 
     template<typename P>
     const FactorizedPolynomial<P> FactorizedPolynomial<P>::quotient(const FactorizedPolynomial<P>& _fdivisor) const

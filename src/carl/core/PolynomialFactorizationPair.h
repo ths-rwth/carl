@@ -86,6 +86,23 @@ namespace carl
         {
             return mFactorization;
         }
+        
+        typename P::CoeffType constantPart() const
+        {   
+            if( mFactorization.size() == 1 && mFactorization.begin()->second == 1 )
+            {
+                mpPolynomial->constantPart();
+            }
+            typename P::CoeffType result( 1 );
+            for( auto const& factor : mFactorization )
+            {
+                typename P::CoeffType factorCP( factor.first.constantPart() );
+                if( factorCP.isZero() )
+                    return factorCP;
+                result *= carl::pow( factorCP, factor.second );
+            }
+            return result;
+        }
 
         /**
          * Set new factorization for polynomial as two factors
