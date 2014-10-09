@@ -140,7 +140,9 @@ namespace carl
         std::stack<Ref>                           mUnusedPositionsInCacheRefs;
         
     public:
-        
+
+        static const Ref NO_REF;
+
         // The constructor.
         Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
         Cache( const Cache& ); // no implementation

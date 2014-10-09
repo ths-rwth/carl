@@ -13,6 +13,9 @@
 namespace carl
 {   
     template<typename T>
+    const typename Cache<T>::Ref Cache<T>::NO_REF = 0;
+
+    template<typename T>
     Cache<T>::Cache( size_t _maxCacheSize, double _cacheReductionAmount, double _decay ):
         mMaxCacheSize( _maxCacheSize ),
         mNumOfUnusedEntries( 0 ),
