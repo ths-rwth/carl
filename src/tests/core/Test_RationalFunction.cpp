@@ -74,8 +74,8 @@ TEST(RationalFunction, Multiplication)
     RFactFunc rf2(fp3, fp4);
     
     RFactFunc rf3 = rf1 * rf2;
-    FPol qf1(q1, fpCache);
-    FPol qf2(q2, fpCache);
+    FPol qf1(q1, &fpCache);
+    FPol qf2(q2, &fpCache);
     EXPECT_EQ(qf1, rf3.nominator());
     EXPECT_EQ(qf2, rf3.denominator());
 }
@@ -110,6 +110,6 @@ TEST(RationalFunction, Addition)
     RFactFunc rf2(fp3, fp4);
     
     RFactFunc rf3 = rf1 + rf2;
-    FPol qf2(q2, fpCache);
+    FPol qf2(q2, &fpCache);
     EXPECT_EQ(fp4, rf3.denominator());
 }
