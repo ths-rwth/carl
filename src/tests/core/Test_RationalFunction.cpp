@@ -33,8 +33,8 @@ TEST(RationalFunction, Construction)
     
     Cache<PolynomialFactorizationPair<Pol>> fpCache;
     
-    FPol fp1(p1, fpCache);
-    FPol fp2(p2, fpCache);
+    FPol fp1(p1, &fpCache);
+    FPol fp2(p2, &fpCache);
     
     RFactFunc rf1(fp1, fp2);
     EXPECT_EQ(fp1, rf1.nominator());
@@ -64,11 +64,11 @@ TEST(RationalFunction, Multiplication)
     
     Cache<PolynomialFactorizationPair<Pol>> fpCache;
     
-    FPol fp1(p1, fpCache);
-    FPol fp2(p2, fpCache);
+    FPol fp1(p1, &fpCache);
+    FPol fp2(p2, &fpCache);
     
-    FPol fp3(p3, fpCache);
-    FPol fp4(p4, fpCache);
+    FPol fp3(p3, &fpCache);
+    FPol fp4(p4, &fpCache);
     
     RFactFunc rf1(fp1, fp2);
     RFactFunc rf2(fp3, fp4);
@@ -100,11 +100,11 @@ TEST(RationalFunction, Addition)
     
     Cache<PolynomialFactorizationPair<Pol>> fpCache;
     
-    FPol fp1(p1, fpCache);
-    FPol fp2(p2, fpCache);
+    FPol fp1(p1, &fpCache);
+    FPol fp2(p2, &fpCache);
     
-    FPol fp3(p3, fpCache);
-    FPol fp4(p4, fpCache);
+    FPol fp3(p3, &fpCache);
+    FPol fp4(p4, &fpCache);
     
     RFactFunc rf1(fp1, fp2);
     RFactFunc rf2(fp3, fp4);

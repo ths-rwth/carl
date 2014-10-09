@@ -345,7 +345,7 @@ namespace carl
                         correct = polB.divideBy( polGCD, remainB );
                         assert( correct );
                         carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
-                        Cache<PolynomialFactorizationPair<P>>& cache = factorA.mrCache;
+                        Cache<PolynomialFactorizationPair<P>>* cache = factorA.cache();
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );

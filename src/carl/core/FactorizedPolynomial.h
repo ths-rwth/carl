@@ -24,6 +24,7 @@ namespace carl
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         typedef Coeff<P> CoeffType;
+        typedef Cache<PolynomialFactorizationPair<P>> CACHE;
 
     private:
         // Members
@@ -31,12 +32,12 @@ namespace carl
         /**
          * The reference of the entry in the cache corresponding to this factorized polynomial.
          */
-        typename Cache<PolynomialFactorizationPair<P>>::Ref mCacheRef;
+        typename CACHE::Ref mCacheRef;
 
         /**
          * The cache in which the actual content of this factorized polynomial is stored.
          */
-        Cache<PolynomialFactorizationPair<P>>& mrCache;
+        CACHE* mpCache;
 
         /**
          * Co-prime coefficient of the factorization
@@ -49,12 +50,12 @@ namespace carl
          */
         void rehash() const
         {
-            mrCache.rehash( mCacheRef );
+            mpCache->rehash( mCacheRef );
         }
         
         void strengthenActivity() const
         {
-            mrCache.strengthenActivity( mCacheRef );
+            mpCache->strengthenActivity( mCacheRef );
         }
         
         /**
@@ -64,6 +65,12 @@ namespace carl
         const Coeff<P>& coefficient() const
         {
             return mCoefficient;
+        }
+
+        template<typename P1>
+        friend void assertCacheEqual( const Cache<PolynomialFactorizationPair<P1>>* pCacheA, const Cache<PolynomialFactorizationPair<P1>>* pCacheB)
+        {
+            assert( pCacheA == nullptr || pCacheB == nullptr || pCacheA == pCacheB );
         }
 
         /**
@@ -89,9 +96,10 @@ namespace carl
            
         // Constructors.
         FactorizedPolynomial(); // no implementation
-        FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& );
-        FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, Coeff<P>&, Cache<PolynomialFactorizationPair<P>>& );
-        FactorizedPolynomial( Factorization<P>&& _factorization, Coeff<P>&, Cache<PolynomialFactorizationPair<P>>& );
+        FactorizedPolynomial( const Coeff<P>& );
+        FactorizedPolynomial( const P& _polynomial, CACHE* );
+        FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, const Coeff<P>&, CACHE* );
+        FactorizedPolynomial( Factorization<P>&& _factorization, const Coeff<P>&, CACHE* );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -107,7 +115,7 @@ namespace carl
         /**
          * @return The reference of the entry in the cache corresponding to this factorized polynomial.
          */
-        typename Cache<PolynomialFactorizationPair<P>>::Ref cacheRef() const
+        typename CACHE::Ref cacheRef() const
         {
             return mCacheRef;
         }
@@ -115,9 +123,9 @@ namespace carl
         /**
          * @return The cache used by this factorized polynomial.
          */
-        const Cache<PolynomialFactorizationPair<P>>& cache() const
+        CACHE* cache() const
         {
-            return mrCache;
+            return mpCache;
         }
         
         /**
@@ -125,7 +133,7 @@ namespace carl
          */
         const PolynomialFactorizationPair<P>& content() const
         {
-            return mrCache.get( mCacheRef );
+            return mpCache->get( mCacheRef );
         }
         
         /**
@@ -133,7 +141,7 @@ namespace carl
          */
         size_t getHash() const
         {
-            return mrCache.get( mCacheRef ).getHash();
+            return mpCache->get( mCacheRef ).getHash();
         }
         
         /**

@@ -29,13 +29,13 @@ TEST(FactorizedPolynomial, Construction)
     
     Cache<PolynomialFactorizationPair<P>> fpCache;
     fpCache.print();
-    FactorizedPolynomial<P> fpA( fxy, fpCache );
+    FactorizedPolynomial<P> fpA( fxy, &fpCache );
     fpCache.print();
-    FactorizedPolynomial<P> fpB( fxyz, fpCache );
+    FactorizedPolynomial<P> fpB( fxyz, &fpCache );
     fpCache.print();
-    FactorizedPolynomial<P> fpC( f3, fpCache );
+    FactorizedPolynomial<P> fpC( f3, &fpCache );
     fpCache.print();
-    FactorizedPolynomial<P> fpD( f4, fpCache );
+    FactorizedPolynomial<P> fpD( f4, &fpCache );
     fpCache.print();
 
     //Common divisor
@@ -44,15 +44,15 @@ TEST(FactorizedPolynomial, Construction)
     fpCache.print();
     
     //GCD
-    FactorizedPolynomial<P> restA( P( 2 ), fpCache );
-    FactorizedPolynomial<P> restB( P( 2 ), fpCache );
+    FactorizedPolynomial<P> restA( P( 2 ), &fpCache );
+    FactorizedPolynomial<P> restB( P( 2 ), &fpCache );
     std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": ";
     FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
     std::cout << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
     fpCache.print();
     
-    FactorizedPolynomial<P> restC( P( 2 ), fpCache );
-    FactorizedPolynomial<P> restD( P( 2 ), fpCache );
+    FactorizedPolynomial<P> restC( P( 2 ), &fpCache );
+    FactorizedPolynomial<P> restD( P( 2 ), &fpCache );
     std::cout << std::endl << "GCD of " << fpC << " and " << fpD << ": ";
     FactorizedPolynomial<P> fpGCDB = gcd( fpC, fpD, restC, restD );
     std::cout << fpGCDB << " with rest " << restC << " and " << restD << std::endl << std::endl;
@@ -98,8 +98,8 @@ TEST(FactorizedPolynomial, CommonDivisor)
     P fxyz = sp.parseMultivariatePolynomial<Rational>("x*y*z");
     
     Cache<PolynomialFactorizationPair<P>> fpCache;
-    FactorizedPolynomial<P> fpA( fxy, fpCache );
-    FactorizedPolynomial<P> fpB( fxyz, fpCache );
+    FactorizedPolynomial<P> fpA( fxy, &fpCache );
+    FactorizedPolynomial<P> fpB( fxyz, &fpCache );
     
     std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
     FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
