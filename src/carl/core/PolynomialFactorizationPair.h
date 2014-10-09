@@ -10,13 +10,15 @@
 #include <map>
 #include <mutex>
 
+#include "Monomial.h"
+
 namespace carl
 {
     template<typename P>
     class FactorizedPolynomial;
     
     template<typename P>
-    using Factorization = std::map<FactorizedPolynomial<P>, size_t>;
+    using Factorization = std::map<FactorizedPolynomial<P>, carl::exponent>;
     
     template <typename P>
     std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization );
@@ -28,7 +30,7 @@ namespace carl
     class PolynomialFactorizationPair
     {
         friend const Factorization<P>& FactorizedPolynomial<P>::factorization() const;
-        friend FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Cache<PolynomialFactorizationPair<P>>& _cache );
+        friend class FactorizedPolynomial<P>;
 
     private:
         // Members
@@ -92,7 +94,7 @@ namespace carl
          * @param _fpolyB Second polynomial.
          * @param exponentB Exponent of second polynomial.
          */
-        void setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const;
+        void setNewFactors( const FactorizedPolynomial<P>& _fpolyA, carl::exponent exponentA, const FactorizedPolynomial<P>& _fpolyB, carl::exponent exponentB ) const;
 
         bool isIrreducible() const;
 

@@ -221,11 +221,11 @@ namespace carl
             if (factor->first.factorization().size() > 1){
                 //Update factorization
                 Factorization<P> partFactorization = factor->first.factorization();
-                size_t exponent = factor->second;
+                carl::exponent e = factor->second;
                 factor = mFactorization.erase(factor);
                 for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
-                    mFactorization.insert( factor, std::pair<FactorizedPolynomial<P>, size_t>( partFactor->first, partFactor->second * exponent ) );
+                    mFactorization.insert( factor, std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
                 }
             }
         }
@@ -255,14 +255,14 @@ namespace carl
     }
 
     template<typename P>
-    void PolynomialFactorizationPair<P>::setNewFactors( const FactorizedPolynomial<P>& _fpolyA, size_t exponentA, const FactorizedPolynomial<P>& _fpolyB, size_t exponentB ) const
+    void PolynomialFactorizationPair<P>::setNewFactors( const FactorizedPolynomial<P>& _fpolyA, carl::exponent exponentA, const FactorizedPolynomial<P>& _fpolyB, carl::exponent exponentB ) const
     {
         assert( mFactorization.size() == 1 );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
         mFactorization.clear();
-        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyA, exponentA ) );
-        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( _fpolyB, exponentB ) );
+        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
+        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
         assertFactorization();
     }
 
@@ -289,7 +289,7 @@ namespace carl
         {
             //Consider first factor in currently not checked factorization of A
             FactorizedPolynomial<P> factorA = factorizationA.begin()->first;
-            size_t exponentA = factorizationA.begin()->second;
+            carl::exponent exponentA = factorizationA.begin()->second;
             LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorA: " << factorA << "^" << exponentA );
             factorizationA.erase( factorizationA.begin() );
             rest = true;
@@ -297,20 +297,20 @@ namespace carl
             while ( !factorA.isOne() && !factorizationB.empty() )
             {
                 FactorizedPolynomial<P> factorB = factorizationB.begin()->first;
-                size_t exponentB = factorizationB.begin()->second;
+                carl::exponent exponentB = factorizationB.begin()->second;
                 LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorB: " << factorB << "^" << exponentB );
                 factorizationB.erase( factorizationB.begin() );
 
                 if( factorA == factorB )
                 {
                     //Common factor found
-                    size_t exponentCommon = exponentA < exponentB ? exponentA : exponentB;
-                    result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA, exponentCommon ) );
+                    carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
+                    result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentCommon ) );
                     LOGMSG_TRACE( "carl.core.factorizedpolynomial", "Existing common factor: " << factorA << "^" << exponentCommon );
                     if (exponentA > exponentCommon)
-                        factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorA, exponentA-exponentCommon ) );
+                        factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentA-exponentCommon ) );
                     if (exponentB > exponentCommon)
-                        factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB, exponentB-exponentCommon ) );
+                        factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB-exponentCommon ) );
                     //No rest is remaining
                     rest = false;
                     break;
@@ -333,7 +333,7 @@ namespace carl
                     if (polGCD == 1)
                     {
                         //No common factor
-                        _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, size_t>( factorB, exponentB ) );
+                        _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB ) );
                         LOGMSG_TRACE( "carl.core.factorizedpolynomial", "No common factor, insert in restB: " << factorB << "^" << exponentB );
                     }
                     else
@@ -344,11 +344,11 @@ namespace carl
                         assert( correct );
                         correct = polB.divideBy( polGCD, remainB );
                         assert( correct );
-                        size_t exponentCommon = exponentA < exponentB ? exponentA : exponentB;
+                        carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
                         Cache<PolynomialFactorizationPair<P>>& cache = factorA.mrCache;
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
-                        result.insert( result.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult,  exponentCommon ) );
+                        result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
                         LOGMSG_TRACE( "carl.core.factorizedpolynomial", "New common factor: " << gcdResult << "^" << exponentCommon );
 
                         if (remainA != 1)
@@ -362,7 +362,7 @@ namespace carl
 
                             //Add remaining factorization
                             if (exponentA > exponentCommon)
-                                factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, exponentA-exponentCommon ) );
+                                factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentA-exponentCommon ) );
                         }
                         else
                             rest = false;
@@ -376,15 +376,15 @@ namespace carl
 
                             //Add remaining factorization
                             if (exponentB > exponentCommon)
-                                factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, size_t>( gcdResult, exponentB-exponentCommon ) );
-                            _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, size_t>( polRemainB, exponentB) );
+                                factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon ) );
+                            _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
                         }
                     }
                 }
             } //End of inner while
             //Insert remaining factorA into rest
             if ( !factorA.isOne() && rest )
-                _restA.insert( _restA.begin(), std::pair<FactorizedPolynomial<P>, size_t>( factorA, exponentA ) );
+                _restA.insert( _restA.begin(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentA ) );
             //Reset factorizationB
             for ( auto itFactor = _restB.begin(); itFactor != _restB.end(); itFactor++ )
                 factorizationB.insert( factorizationB.end(), *itFactor );

@@ -19,6 +19,10 @@ TEST(FactorizedPolynomial, Construction)
     typedef MultivariatePolynomial<cln::cl_RA> P;
     P fxy({(cln::cl_RA)1*x*y});
     P fxyz({(cln::cl_RA)1*x*y*z});
+    P f1({(cln::cl_RA)-1*x, (cln::cl_RA)3*y});
+    P f2({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+    P f3 = f1*f1*f2;
+    P f4 = f1*f2*f2;
     
     Cache<PolynomialFactorizationPair<P>> fpCache;
     fpCache.print();
@@ -26,17 +30,29 @@ TEST(FactorizedPolynomial, Construction)
     fpCache.print();
     FactorizedPolynomial<P> fpB( fxyz, fpCache );
     fpCache.print();
+    FactorizedPolynomial<P> fpC( f3, fpCache );
+    fpCache.print();
+    FactorizedPolynomial<P> fpD( f4, fpCache );
+    fpCache.print();
 
     //Common divisor
-    FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
-    std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": " << fpC << std::endl << std::endl;
+    FactorizedPolynomial<P> fpE = commonDivisor( fpA, fpB );
+    std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": " << fpE << std::endl << std::endl;
     fpCache.print();
     
     //GCD
     FactorizedPolynomial<P> restA( P( 2 ), fpCache );
     FactorizedPolynomial<P> restB( P( 2 ), fpCache );
+    std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": ";
     FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
-    std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": " << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
+    std::cout << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
+    fpCache.print();
+    
+    FactorizedPolynomial<P> restC( P( 2 ), fpCache );
+    FactorizedPolynomial<P> restD( P( 2 ), fpCache );
+    std::cout << std::endl << "GCD of " << fpC << " and " << fpD << ": ";
+    FactorizedPolynomial<P> fpGCDB = gcd( fpC, fpD, restC, restD );
+    std::cout << fpGCDB << " with rest " << restC << " and " << restD << std::endl << std::endl;
     fpCache.print();
 
     //Common Multiple
