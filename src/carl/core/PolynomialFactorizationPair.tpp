@@ -60,6 +60,7 @@ namespace carl
             if ( mFactorization.size() == 1 )
             {
                 // No factorization -> set polynomial
+                assert( existsFactorization( mFactorization.begin()->first ) );
                 mpPolynomial = new P( mFactorization.begin()->first.content().mpPolynomial->pow( mFactorization.begin()->second ) );
                 assert( mpPolynomial != nullptr );
             }
@@ -203,6 +204,7 @@ namespace carl
         P result( 1 );
         for (auto factor = _fFactorization.begin(); factor != _fFactorization.end(); factor++ )
         {
+            assert( existsFactorization( factor->first ) );
             result *= factor->first.content().mpPolynomial->pow(factor->second);
         }
         return result;
@@ -318,6 +320,8 @@ namespace carl
                 else
                 {
                     P polGCD, polA, polB;
+                    assert( existsFactorization( factorA ) );
+                    assert( existsFactorization( factorB ) );
                     if ( factorA.content().isIrreducible() && factorB.content().isIrreducible() )
                         polGCD = P( 1 );
                     else

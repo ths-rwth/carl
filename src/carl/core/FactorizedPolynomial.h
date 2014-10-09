@@ -57,20 +57,40 @@ namespace carl
         {
             mpCache->strengthenActivity( mCacheRef );
         }
-        
-        /**
-         * Getter
-         * @return Coefficient of the polynomial.
-         */
-        const Coeff<P>& coefficient() const
-        {
-            return mCoefficient;
-        }
 
         template<typename P1>
-        friend void assertCacheEqual( const Cache<PolynomialFactorizationPair<P1>>* pCacheA, const Cache<PolynomialFactorizationPair<P1>>* pCacheB)
+        friend bool existsFactorization( const FactorizedPolynomial<P1>& fpoly )
+        {
+            return fpoly.mpCache != nullptr && fpoly.mCacheRef != Cache<PolynomialFactorizationPair<P1>>::NO_REF;
+        }
+
+        /**
+         * Checks, that two caches are equal or at least one of them is a nullptr.
+         * @param pCacheA First cache.
+         * @param pCacheB Second cache.
+         */
+        template<typename P1>
+        friend void assertCacheEqual( const Cache<PolynomialFactorizationPair<P1>>* pCacheA, const Cache<PolynomialFactorizationPair<P1>>* pCacheB )
         {
             assert( pCacheA == nullptr || pCacheB == nullptr || pCacheA == pCacheB );
+        }
+
+        /**
+         * Choose a non-null cache from two caches.
+         * @param pCacheA First cache.
+         * @param pCacheB Second cache.
+         * @return A non-null cache.
+         */
+        template<typename P1>
+        friend Cache<PolynomialFactorizationPair<P1>>* chooseCache( Cache<PolynomialFactorizationPair<P1>>* pCacheA, Cache<PolynomialFactorizationPair<P1>>* pCacheB )
+        {
+            if ( pCacheA != nullptr )
+                return pCacheA;
+            else
+            {
+                assert( pCacheB != nullptr );
+                return pCacheB;
+            }
         }
 
         /**
@@ -133,6 +153,7 @@ namespace carl
          */
         const PolynomialFactorizationPair<P>& content() const
         {
+            assert( existsFactorization( *this ) );
             return mpCache->get( mCacheRef );
         }
         
@@ -141,6 +162,7 @@ namespace carl
          */
         size_t getHash() const
         {
+            assert( existsFactorization( *this ) );
             return mpCache->get( mCacheRef ).getHash();
         }
         
@@ -151,7 +173,23 @@ namespace carl
         {
             //TODO (matthias) activate?
             //content().flattenFactorization();
-            return content().factorization();
+            if ( existsFactorization( *this ) )
+                return content().factorization();
+            else
+            {
+                //TODO do not return reference to local variable
+                Factorization<P> factorization;
+                return factorization;
+            }
+        }
+
+        /**
+         * Getter
+         * @return Coefficient of the polynomial.
+         */
+        const Coeff<P>& coefficient() const
+        {
+            return mCoefficient;
         }
 
         /**
@@ -181,7 +219,8 @@ namespace carl
         CoeffType constantPart() const
         {
             CoeffType result( mCoefficient );
-            result *= content().constantPart();
+            if ( existsFactorization( *this ) )
+                result *= content().constantPart();
             return result;
         }
         
