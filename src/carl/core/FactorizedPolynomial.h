@@ -19,8 +19,11 @@ namespace carl
     template<typename P>
     class FactorizedPolynomial
     {
+    public:
         template<typename P1>
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
+        
+        typedef Coeff<P> CoeffType;
 
     private:
         // Members
@@ -148,7 +151,7 @@ namespace carl
          */
         bool isOne() const
         {
-            return factorization().empty();
+            return factorization().empty() && mCoefficient == 1;
         }
 
         /**
@@ -156,10 +159,26 @@ namespace carl
          */
         bool isZero() const
         {
-            assert( factorization().empty() );
-            return mCoefficient == 0;
+            return factorization().empty() && mCoefficient == 0;
         }
 
+        /**
+         * @return true, if the factorized polynomial is constant.
+         */
+        bool isConstant() const
+        {
+            return factorization().empty();
+        }
+        
+//        CoeffType constantPart() const
+//        {
+//            CoeffType result = mCoefficient;
+//            for (auto const& factor : factorization()) {
+//                result *= factor.constantPart();
+//            }
+//            return result;
+//        }
+        
         /**
          * @param _fpolyA The first summand.
          * @param _fpolyB The second summand.
