@@ -34,6 +34,8 @@ CompareRelation inverse(CompareRelation c)
 		case CompareRelation::GT:	return CompareRelation::LEQ;
 		case CompareRelation::GEQ:	return CompareRelation::LT;
 	}
+	assert(false);
+	return CompareRelation::EQ;
 }
 
 inline std::string toString(CompareRelation r) {
