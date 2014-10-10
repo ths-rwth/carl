@@ -141,6 +141,21 @@ namespace carl
     }
     
     template<typename P>
+    bool operator!=( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    {
+        ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
+        if( _fpolyA.pCache() == nullptr && _fpolyB.pCache() == nullptr )
+        {
+            return _fpolyA.coefficient() != _fpolyB.coefficient();
+        }
+        else if( _fpolyA.pCache() != nullptr && _fpolyB.pCache() != nullptr )
+        {
+            return !(_fpolyA.content() == _fpolyB.content());
+        }
+        return true;
+    }
+    
+    template<typename P>
     const P computePolynomial( const FactorizedPolynomial<P>& _fpoly )
     {
         if( _fpoly.pCache() == nullptr )

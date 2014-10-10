@@ -349,6 +349,14 @@ namespace carl
     bool operator<(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB);
     
     /**
+     * @param _fpolyA The first factorized polynomial to compare.
+     * @param _fpolyB The second factorized polynomial to compare.
+     * @return true, if the two given factorized polynomials are not equal.
+     */
+    template<typename P>
+    bool operator!=(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB);
+    
+    /**
      * Obtains the polynomial (representation) of this factorized polynomial. Note, that the result won't be stored
      * in the factorized polynomial, hence, this method should only be called for debug purpose.
      * @param _fpoly The factorized polynomial to get its polynomial (representation) for.
