@@ -233,6 +233,13 @@ namespace carl
         friend const P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
         
         /**
+         * @param _fpoly The operand.
+         * @return The given factorized polynomial times -1.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpoly);
+        
+        /**
          * @param _fpolyA The first summand.
          * @param _fpolyB The second summand.
          * @return The sum of the two given factorized polynomials.

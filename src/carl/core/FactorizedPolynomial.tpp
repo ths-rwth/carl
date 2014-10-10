@@ -147,6 +147,14 @@ namespace carl
             return P( _fpoly.coefficient() );
         return computePolynomial( _fpoly.content() );
     }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= Coeff<P>( -1 );
+        return result;
+    }
 
     template<typename P>
     const FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )

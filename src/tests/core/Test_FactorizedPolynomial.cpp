@@ -87,6 +87,11 @@ TEST(FactorizedPolynomial, Construction)
     FactorizedPolynomial<P> fpSub = fpA - fpB;
     std::cout << std::endl << fpA << " - " << fpB << ": " << fpSub << std::endl << std::endl;
     fpCache.print();
+    
+    //Unary minus
+    std::cout << std::endl << "-(" << fpA << ") = " << (-fpA) << std::endl << std::endl;
+    std::cout << std::endl << "-(" << fpB << ") = " << (-fpB) << std::endl << std::endl;
+    fpCache.print();
 }
 
 TEST(FactorizedPolynomial, CommonDivisor)
