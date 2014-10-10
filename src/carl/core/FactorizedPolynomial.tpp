@@ -474,14 +474,14 @@ namespace carl
             {
                 _fpolyRestA = FactorizedPolynomial<P>( coefficientRestA );
                 _fpolyRestB = FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficientRestB, _fpolyB.cache() );
-                return FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficientCommon, _fpolyB.cache() );
+                return FactorizedPolynomial<P>( coefficientCommon );
             }
         }
         else if ( !existsFactorization( _fpolyB ) )
         {
             _fpolyRestA = FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyA.factorization() ) ), coefficientRestA, _fpolyA.cache());
             _fpolyRestB = FactorizedPolynomial<P>( coefficientRestB );
-            return FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficientCommon, _fpolyA.cache() );
+            return FactorizedPolynomial<P>( coefficientCommon );
         }
 
         //Both polynomials are not constant
