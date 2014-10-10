@@ -24,6 +24,18 @@ inline std::ostream& operator<<(std::ostream& os, const CompareRelation& r) {
 	return os;
 }
 
+CompareRelation inverse(CompareRelation c)
+{
+	switch (c) {
+		case CompareRelation::EQ:	return CompareRelation::NEQ;
+		case CompareRelation::NEQ:	return CompareRelation::EQ;
+		case CompareRelation::LT:	return CompareRelation::GEQ;
+		case CompareRelation::LEQ:	return CompareRelation::GT;
+		case CompareRelation::GT:	return CompareRelation::LEQ;
+		case CompareRelation::GEQ:	return CompareRelation::LT;
+	}
+}
+
 inline std::string toString(CompareRelation r) {
 	std::stringstream ss;
 	ss << r;
