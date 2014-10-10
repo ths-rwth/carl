@@ -237,7 +237,8 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const FactorizedPolynomial<P>& _fpoly )
     {
-        return this->quotient( _fpoly );
+        FactorizedPolynomial<P> result = this->quotient( _fpoly );
+        return *this = result;
     }
 
     template<typename P>
@@ -441,6 +442,12 @@ namespace carl
         return resultFactorization;
     }
 
+    template<typename P>
+    const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    {
+        FactorizedPolynomial<P> restA, restB;
+        return gcd( _fpolyA, _fpolyB, restA, restB );
+    }
 
     template<typename P>
     const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )
