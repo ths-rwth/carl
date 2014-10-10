@@ -37,8 +37,8 @@ TEST(RationalFunction, Construction)
     FPol fp2(p2, &fpCache);
     
     RFactFunc rf1(fp1, fp2);
-    EXPECT_EQ(fp1, rf1.nominator());
-    EXPECT_EQ(fp2, rf1.denominator());
+    EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
+    EXPECT_EQ(computePolynomial(fp2), computePolynomial(rf1.denominator()));
     EXPECT_FALSE(rf1.isZero());
 }
 
@@ -76,8 +76,8 @@ TEST(RationalFunction, Multiplication)
     RFactFunc rf3 = rf1 * rf2;
     FPol qf1(q1, &fpCache);
     FPol qf2(q2, &fpCache);
-    EXPECT_EQ(qf1, rf3.nominator());
-    EXPECT_EQ(qf2, rf3.denominator());
+    EXPECT_EQ(computePolynomial(qf1), computePolynomial(rf3.nominator()));
+    EXPECT_EQ(computePolynomial(qf2), computePolynomial(rf3.denominator()));
 }
 
 TEST(RationalFunction, Addition)
@@ -111,5 +111,5 @@ TEST(RationalFunction, Addition)
     
     RFactFunc rf3 = rf1 + rf2;
     FPol qf2(q2, &fpCache);
-    EXPECT_EQ(fp4, rf3.denominator());
+    EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
 }

@@ -60,13 +60,11 @@ namespace carl
          */
         mutable int mIrreducible;
 
-        /**
-         * Compute the polynomial from the factorization.
-         * @param _fFactorization The factorization.
-         * @return The polynomial.
-         */
         template<typename P1>
-        friend P1 computePolynomial( const Factorization<P1>& _fFactorization );
+        friend P1 computePolynomial( const Factorization<P1>& );
+
+        template<typename P1>
+        friend P1 computePolynomial( const PolynomialFactorizationPair<P1>& );
 
         /**
          * Turn (possible) tree structure of factorization into linear list of factors.
@@ -75,7 +73,7 @@ namespace carl
 
         inline void assertFactorization() const
         {
-            assert( mpPolynomial == nullptr || computePolynomial( mFactorization ) == *mpPolynomial );
+            assert( mpPolynomial == nullptr || computePolynomial( *this ) == *mpPolynomial );
         }
 
         /**
@@ -195,6 +193,14 @@ namespace carl
         void rehash() const;
         
     };
+    
+    /**
+    * Compute the polynomial from the given polynomial-factorization pair.
+    * @param _fpPair A polynomial-factorization pair.
+    * @return The polynomial.
+    */
+   template<typename P>
+   P computePolynomial( const PolynomialFactorizationPair<P>& _fpPair );
 } // namespace carl
 
 namespace std

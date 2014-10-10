@@ -42,7 +42,7 @@ namespace carl
         /**
          * Co-prime coefficient of the factorization
          */
-        mutable Coeff<P> mCoefficient;
+        mutable CoeffType mCoefficient;
         
         /**
          * Updates the hash of the entry in the cache corresponding to this factorized 
@@ -50,12 +50,14 @@ namespace carl
          */
         void rehash() const
         {
-            mpCache->rehash( mCacheRef );
+            if( mpCache != nullptr )
+                mpCache->rehash( mCacheRef );
         }
         
         void strengthenActivity() const
         {
-            mpCache->strengthenActivity( mCacheRef );
+            if( mpCache != nullptr )
+                mpCache->strengthenActivity( mCacheRef );
         }
 
         template<typename P1>
@@ -63,35 +65,8 @@ namespace carl
         {
             return fpoly.mpCache != nullptr && fpoly.mCacheRef != Cache<PolynomialFactorizationPair<P1>>::NO_REF;
         }
-
-        /**
-         * Checks, that two caches are equal or at least one of them is a nullptr.
-         * @param pCacheA First cache.
-         * @param pCacheB Second cache.
-         */
-        template<typename P1>
-        friend void assertCacheEqual( const Cache<PolynomialFactorizationPair<P1>>* pCacheA, const Cache<PolynomialFactorizationPair<P1>>* pCacheB )
-        {
-            assert( pCacheA == nullptr || pCacheB == nullptr || pCacheA == pCacheB );
-        }
-
-        /**
-         * Choose a non-null cache from two caches.
-         * @param pCacheA First cache.
-         * @param pCacheB Second cache.
-         * @return A non-null cache.
-         */
-        template<typename P1>
-        friend Cache<PolynomialFactorizationPair<P1>>* chooseCache( Cache<PolynomialFactorizationPair<P1>>* pCacheA, Cache<PolynomialFactorizationPair<P1>>* pCacheB )
-        {
-            if ( pCacheA != nullptr )
-                return pCacheA;
-            else
-            {
-                assert( pCacheB != nullptr );
-                return pCacheB;
-            }
-        }
+        
+        #define ASSERT_CACHE_EQUAL( _cacheA, _cacheB ) assert( _cacheA == nullptr || _cacheB == nullptr || _cacheA == _cacheB )
 
         /**
          * Computes the common divisor with rest of two factorizations.
@@ -128,10 +103,10 @@ namespace carl
            
         // Constructors.
         FactorizedPolynomial(); // no implementation
-        FactorizedPolynomial( const Coeff<P>& );
+        FactorizedPolynomial( const CoeffType& );
         FactorizedPolynomial( const P& _polynomial, CACHE* );
-        FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, const Coeff<P>&, CACHE* );
-        FactorizedPolynomial( Factorization<P>&& _factorization, const Coeff<P>&, CACHE* );
+        //FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
+        FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, CACHE* );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -155,9 +130,17 @@ namespace carl
         /**
          * @return The cache used by this factorized polynomial.
          */
-        CACHE* cache() const
+        CACHE* pCache() const
         {
             return mpCache;
+        }
+        
+        /**
+         * @return The cache used by this factorized polynomial.
+         */
+        CACHE& cache() const
+        {
+            return *mpCache;
         }
         
         /**
@@ -185,21 +168,14 @@ namespace carl
         {
             //TODO (matthias) activate?
             //content().flattenFactorization();
-            if ( existsFactorization( *this ) )
-                return content().factorization();
-            else
-            {
-                //TODO do not return reference to local variable
-                Factorization<P> factorization;
-                return factorization;
-            }
+            assert( existsFactorization( *this ) );
+            return content().factorization();
         }
 
         /**
-         * Getter
          * @return Coefficient of the polynomial.
          */
-        const Coeff<P>& coefficient() const
+        const CoeffType& coefficient() const
         {
             return mCoefficient;
         }
@@ -234,7 +210,27 @@ namespace carl
             if ( existsFactorization( *this ) )
                 result *= content().constantPart();
             return result;
+        } 
+
+        /**
+         * Choose a non-null cache from two caches.
+         * @param _pCacheA First cache.
+         * @param _pCacheB Second cache.
+         * @return A non-null cache.
+         */
+        static CACHE* chooseCache( CACHE* _pCacheA, CACHE* _pCacheB )
+        {
+            if ( _pCacheA != nullptr )
+                return _pCacheA;
+            else
+            {
+                assert( _pCacheB != nullptr );
+                return _pCacheB;
+            }
         }
+        
+        template<typename P1>
+        friend const P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
         
         /**
          * @param _fpolyA The first summand.
@@ -344,6 +340,15 @@ namespace carl
      */
     template<typename P>
     bool operator<(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB);
+    
+    /**
+     * Obtains the polynomial (representation) of this factorized polynomial. Note, that the result won't be stored
+     * in the factorized polynomial, hence, this method should only be called for debug purpose.
+     * @param _fpoly The factorized polynomial to get its polynomial (representation) for.
+     * @return The polynomial (representation) of this factorized polynomial
+     */
+    template<typename P>
+    const P computePolynomial(const FactorizedPolynomial<P>& _fpoly );
 
     /**
      * Prints the factorization representation of the given factorized polynomial on the given output stream.

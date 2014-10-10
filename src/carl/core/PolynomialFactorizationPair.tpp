@@ -199,15 +199,23 @@ namespace carl
     }
 
     template<typename P>
-    P computePolynomial( const Factorization<P>& _fFactorization )
+    P computePolynomial( const Factorization<P>& _factorization )
     {
         P result( 1 );
-        for (auto factor = _fFactorization.begin(); factor != _fFactorization.end(); factor++ )
+        for (auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
         {
             assert( existsFactorization( factor->first ) );
-            result *= factor->first.content().mpPolynomial->pow(factor->second);
+            result *= computePolynomial( factor->first.content() ).pow( factor->second );
         }
         return result;
+    }
+
+    template<typename P>
+    P computePolynomial( const PolynomialFactorizationPair<P>& _pfPair )
+    {
+        if( _pfPair.mpPolynomial != nullptr )
+            return *_pfPair.mpPolynomial;
+        return computePolynomial( _pfPair.factorization() );
     }
 
     template<typename P>
@@ -349,7 +357,7 @@ namespace carl
                         correct = polB.divideBy( polGCD, remainB );
                         assert( correct );
                         carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
-                        Cache<PolynomialFactorizationPair<P>>* cache = factorA.cache();
+                        Cache<PolynomialFactorizationPair<P>>* cache = factorA.pCache();
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
@@ -412,9 +420,8 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second )
+        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1 )
         {
-            assert( _pfPair.factorization().begin()->second == 1 );
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;
         }
