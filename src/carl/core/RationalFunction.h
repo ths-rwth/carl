@@ -5,6 +5,7 @@
 
 #pragma once
 #include "MultivariateGCD.h"
+#include "FactorizedPolynomial.h"
 
 namespace carl
 {
