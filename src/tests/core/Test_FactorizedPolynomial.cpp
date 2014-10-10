@@ -105,3 +105,22 @@ TEST(FactorizedPolynomial, CommonDivisor)
     FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
     std::cout << fpC << std::endl << std::endl;
 }
+
+TEST(FactorizedPolynomial, GCD)
+{
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+
+    P fxy = sp.parseMultivariatePolynomial<Rational>("x*y");
+    P fxyz = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+
+    Cache<PolynomialFactorizationPair<P>> fpCache;
+    FactorizedPolynomial<P> fpA( fxy, &fpCache );
+    FactorizedPolynomial<P> fpB( fxyz, &fpCache );
+    FactorizedPolynomial<P> restA( P( 3 ), &fpCache );
+    FactorizedPolynomial<P> restB( P( 3 ), &fpCache );
+    std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": ";
+    FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
+    std::cout << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
+    fpCache.print();
+}
