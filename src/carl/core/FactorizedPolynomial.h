@@ -233,6 +233,12 @@ namespace carl
         friend const FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
 
         /**
+         * @param _fpoly The summand to add this factorized polynomial with.
+         * @return This factorized polynomial after adding the given factor.
+         */
+        FactorizedPolynomial<P>& operator+=( const FactorizedPolynomial<P>& _fpoly );
+
+        /**
          * @param _fpolyA The minuend.
          * @param _fpolyB The subtrahend.
          * @return The difference between the two given factorized polynomials.
@@ -254,6 +260,12 @@ namespace carl
          */
         FactorizedPolynomial<P>& operator*=( const FactorizedPolynomial<P>& _fpoly );
 
+        /** Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
+         * @param _fpoly The divisor to divide this factorized polynomial with.
+         * @return This factorized polynomial after dividing it with the given divisor.
+         */
+        FactorizedPolynomial<P>& operator/=( const FactorizedPolynomial<P>& _fpoly );
+
         /**
          * Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
          * @param _fdivisor The divisor
@@ -268,10 +280,7 @@ namespace carl
          * @return The quotient
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB )
-        {
-            return _fpolyA.quotient( _fpolyB );
-        }
+        friend const FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**Computes the least common multiple of two given polynomials. The method refines the factorization.
          * @param _fpolyA The first factorized polynomial to compute the lcm for.

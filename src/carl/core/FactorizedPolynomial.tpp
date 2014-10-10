@@ -165,6 +165,13 @@ namespace carl
     }
 
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator+=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result = *this + _fpoly;
+        return *this = result;
+    }
+
+    template<typename P>
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assertCacheEqual( _fpolyA.cache(), _fpolyB.cache() );
@@ -228,11 +235,23 @@ namespace carl
     }
 
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        return this->quotient( _fpoly );
+    }
+
+    template<typename P>
     const FactorizedPolynomial<P> FactorizedPolynomial<P>::quotient(const FactorizedPolynomial<P>& _fdivisor) const
     {
         FactorizedPolynomial<P> result = lazyDiv( *this, _fdivisor );
         assert( _fdivisor * result == *this );
         return result;
+    }
+
+    template<typename P>
+    const FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    {
+        return _fpolyA.quotient( _fpolyB );
     }
 
     template<typename P>
