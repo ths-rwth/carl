@@ -12,7 +12,8 @@ add_executable(runCoreTests
         Test_RootFinder.cpp
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
-	Test_RationalFunction.cpp
+		Test_RationalFunction.cpp
+		Test_Constraint.cpp
 )
 cotire(runCoreTests)
 
