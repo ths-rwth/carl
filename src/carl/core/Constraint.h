@@ -21,7 +21,7 @@ class Constraint
 		const LhsType& lhs() const {return mLhs;}
 		const CompareRelation& rel() const {return mRelation;}
 		
-		bool isTrivialTrue() {
+		bool isTrivialTrue() const  {
 			if(mLhs.isConstant())
 			{
 				auto cp = mLhs.constantPart();
@@ -37,7 +37,7 @@ class Constraint
 			return false;
 		}
 		
-		bool isTrivialFalse() {
+		bool isTrivialFalse() const {
 			if(mLhs.isConstant())
 			{
 				auto cp = mLhs.constantPart();

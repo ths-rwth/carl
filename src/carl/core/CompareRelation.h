@@ -24,7 +24,7 @@ inline std::ostream& operator<<(std::ostream& os, const CompareRelation& r) {
 	return os;
 }
 
-CompareRelation inverse(CompareRelation c)
+inline CompareRelation inverse(CompareRelation c)
 {
 	switch (c) {
 		case CompareRelation::EQ:	return CompareRelation::NEQ;
