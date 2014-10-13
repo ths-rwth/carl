@@ -15,6 +15,7 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
 TEST(FactorizedPolynomial, Construction)
 {
+    carl::VariablePool::getInstance().clear();
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setName(x, "x");
@@ -22,78 +23,75 @@ TEST(FactorizedPolynomial, Construction)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    Pol fxy({(cln::cl_RA)1*x*y});
-    Pol fxyz({(cln::cl_RA)1*x*y*z});
+    Pol fA({(cln::cl_RA)1*x*y});
+    Pol fB({(cln::cl_RA)1*x*y*z});
     Pol f1({(cln::cl_RA)-1*x, (cln::cl_RA)3*y});
     Pol f2({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
     Pol f3 = f1*f1*f2;
     Pol f4 = f1*f2*f2;
     
     CachePol fpCache;
-    fpCache.print();
-    FPol fpA( fxy, &fpCache );
-    fpCache.print();
-    FPol fpB( fxyz, &fpCache );
-    fpCache.print();
-    FPol fpC( f3, &fpCache );
-    fpCache.print();
-    FPol fpD( f4, &fpCache );
-    fpCache.print();
+    FPol fpA( fA, &fpCache );
+    FPol fpB( fB, &fpCache );
+    FPol fp3( f3, &fpCache );
+    FPol fp4( f4, &fpCache );
 
     //Common divisor
-    FPol fpE = commonDivisor( fpA, fpB );
-    std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": " << fpE << std::endl << std::endl;
-    fpCache.print();
+    FPol fpCD = commonDivisor( fpA, fpB );
+    std::cout << "Common divisor of " << fpA << " and " << fpB << ": " << fpCD << std::endl;
     
     //GCD
-    FPol restA( Pol( 2 ), &fpCache );
-    FPol restB( Pol( 2 ), &fpCache );
-    std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": ";
-    FPol fpGCD = gcd( fpA, fpB, restA, restB );
-    std::cout << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
-    fpCache.print();
+    FPol fpRestA;
+    FPol fpRestB;
+    std::cout << "GCD of " << fpA << " and " << fpB << ": ";
+    FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
+    std::cout << fpGCD << " with rest " << fpRestA << " and " << fpRestB << std::endl;
+    EXPECT_EQ( fpA, fpRestA * fpGCD );
+    EXPECT_EQ( fpB, fpRestB * fpGCD );
     
-    FPol restC( Pol( 2 ), &fpCache );
-    FPol restD( Pol( 2 ), &fpCache );
-    std::cout << std::endl << "GCD of " << fpC << " and " << fpD << ": ";
-    FPol fpGCDB = gcd( fpC, fpD, restC, restD );
-    std::cout << fpGCDB << " with rest " << restC << " and " << restD << std::endl << std::endl;
-    fpCache.print();
+    FPol fpRest3;
+    FPol fpRest4;
+    std::cout << "GCD of " << fp3 << " and " << fp4 << ": ";
+    FPol fpGCDB = gcd( fp3, fp4, fpRest3, fpRest4 );
+    std::cout << fpGCDB << " with rest " << fpRest3 << " and " << fpRest4 << std::endl;
+    EXPECT_EQ( fp3, fpRest3 * fpGCDB );
+    EXPECT_EQ( fp4, fpRest4 * fpGCDB );
 
     //Common Multiple
     FPol fpCM = commonMultiple( fpA, fpB );
-    std::cout << std::endl << "Common multiple of " << fpA << " and " << fpB << ": " << fpCM << std::endl << std::endl;
-    fpCache.print();
+    std::cout << "Common multiple of " << fpA << " and " << fpB << ": " << fpCM  << std::endl;
 
     //Quotient
     FPol fpQuo = quotient( fpB, fpA );
-    std::cout << std::endl << "Quotient: " << fpB << " / " << fpA << ": " << fpQuo << std::endl << std::endl;
-    fpCache.print();
+    std::cout<< "Quotient: " << fpB << " / " << fpA << ": " << fpQuo << std::endl;
 
     //LCM
+    Pol fLCM = lcm( fA, fB );
     FPol fpLCM = lcm( fpA, fpB );
-    std::cout << std::endl << "LCM of " << fpA << " and " << fpB << ": " << fpLCM << std::endl << std::endl;
-    fpCache.print();
+    std::cout<< "LCM of " << fpA << " and " << fpB << ": " << fpLCM << std::endl;
+    EXPECT_EQ( fLCM, computePolynomial( fpLCM ) );
 
     //Multiplication
+    Pol fMul = fA * fB;
     FPol fpMul = fpA * fpB;
-    std::cout << std::endl << fpA << " * " << fpB << ": " << fpMul << std::endl << std::endl;
-    fpCache.print();
+    std::cout<< fpA << " * " << fpB << ": " << fpMul << std::endl;
+    EXPECT_EQ( fMul, computePolynomial( fpMul ) );
 
     //Addition
+    Pol fAdd = fA + fB;
     FPol fpAdd = fpA + fpB;
-    std::cout << std::endl << fpA << " + " << fpB << ": " << fpAdd << std::endl << std::endl;
-    fpCache.print();
+    std::cout<< fpA << " + " << fpB << ": " << fpAdd << std::endl;
+    EXPECT_EQ( fAdd, computePolynomial( fpAdd ) );
 
     //Subtraction
+    Pol fSub = fA - fB;
     FPol fpSub = fpA - fpB;
-    std::cout << std::endl << fpA << " - " << fpB << ": " << fpSub << std::endl << std::endl;
-    fpCache.print();
-    
+    std::cout<< fpA << " - " << fpB << ": " << fpSub << std::endl;
+    EXPECT_EQ( fSub, computePolynomial( fpSub ) );
+
     //Unary minus
-    std::cout << std::endl << "-(" << fpA << ") = " << (-fpA) << std::endl << std::endl;
-    std::cout << std::endl << "-(" << fpB << ") = " << (-fpB) << std::endl << std::endl;
-    fpCache.print();
+    std::cout<< "-(" << fpA << ") = " << (-fpA) << std::endl;
+    std::cout << "-(" << fpB << ") = " << (-fpB) << std::endl;
 }
 
 TEST(FactorizedPolynomial, CommonDivisor)
