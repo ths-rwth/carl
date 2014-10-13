@@ -417,10 +417,10 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const FactorizedPolynomial<P>& _fpoly);
     
+
+    template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
     
 } // namespace carl
-
-template<typename P> struct needs_cache<carl::FactorizedPolynomial<P>>: std::true_type {};
 
 namespace std
 {
