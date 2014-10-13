@@ -837,10 +837,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		{
 			newTerms.push_back(std::shared_ptr<const Term<Coeff>>(t));
 		}
-//        else
-//        {
-//            delete t;
-//        }
+        else
+        {
+            delete t;
+        }
 	}   
 	result.setTerms(newTerms);
 	return result;
