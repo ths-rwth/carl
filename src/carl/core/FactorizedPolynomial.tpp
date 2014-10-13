@@ -201,6 +201,13 @@ namespace carl
     }
 
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator+=( const CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result = *this + FactorizedPolynomial<P>( _coef );
+        return *this = result;
+    }
+
+    template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator+=( const FactorizedPolynomial<P>& _fpoly )
     {
         FactorizedPolynomial<P> result = *this + _fpoly;
@@ -276,12 +283,26 @@ namespace carl
     }
     
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const CoeffType& _coef )
+    {
+        this->mCoefficient *= _coef;
+        return *this;
+    }
+    
+    template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const FactorizedPolynomial<P>& _fpoly )
     {
         FactorizedPolynomial<P> result = *this * _fpoly;
         return *this = result;
     }
 
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const CoeffType& _coef )
+    {
+        this->mCoefficient /= _coef;
+        return *this;
+    }
+    
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const FactorizedPolynomial<P>& _fpoly )
     {
@@ -347,7 +368,7 @@ namespace carl
         _fpolyB.strengthenActivity();
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
-        Coeff<P> coefficientLCM = carl::lcm( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Coeff<P> coefficientLCM = carl::lcm( carl::getNum(_fpolyA.coefficient()), carl::getNum(_fpolyB.coefficient()) )/carl::gcd( carl::getDenom(_fpolyA.coefficient()), carl::getDenom(_fpolyB.coefficient()) );
 
         //Handle cases where one or both are constant
         if ( !existsFactorization( _fpolyA ) )

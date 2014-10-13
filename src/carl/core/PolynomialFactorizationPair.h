@@ -101,6 +101,16 @@ namespace carl
             }
             return result;
         }
+        
+        void gatherVariables( std::set<carl::Variable>& _vars ) const
+        {
+            if( mpPolynomial != nullptr )
+                mpPolynomial->gatherVariable( _vars );
+            for( auto const& factor : mFactorization )
+            {
+                factor.first.gatherVariables( _vars );
+            }
+        }
 
         /**
          * Set new factorization for polynomial as two factors

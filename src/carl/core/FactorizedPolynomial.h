@@ -8,11 +8,12 @@
 #pragma once
 
 #include <iostream>
+#include "../numbers/typetraits.h"
 #include "carl/util/Cache.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl
-{   
+{
     template <typename P>
     using Coeff = typename UnderlyingNumberType<P>::type;
 
@@ -24,6 +25,7 @@ namespace carl
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         typedef Coeff<P> CoeffType;
+        typedef P PolyType;
         typedef Cache<PolynomialFactorizationPair<P>> CACHE;
 
     private:
@@ -103,10 +105,10 @@ namespace carl
            
         // Constructors.
         FactorizedPolynomial(); // no implementation
-        FactorizedPolynomial( const CoeffType& );
-        FactorizedPolynomial( const P& _polynomial, CACHE* );
-        //FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
-        FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, CACHE* );
+        explicit FactorizedPolynomial( const CoeffType& );
+        explicit FactorizedPolynomial( const P& _polynomial, CACHE* );
+        //explicit FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
+        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, CACHE* );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -210,7 +212,14 @@ namespace carl
             if ( existsFactorization( *this ) )
                 result *= content().constantPart();
             return result;
-        } 
+        }
+        
+        void gatherVariables( std::set<carl::Variable>& _vars ) const
+        {
+            if( mpCache == nullptr )
+                return;
+            content().gatherVariables( _vars );
+        }
 
         /**
          * Choose a non-null cache from two caches.
@@ -248,6 +257,12 @@ namespace carl
         friend const FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
 
         /**
+         * @param _coef The summand to add this factorized polynomial with.
+         * @return This factorized polynomial after adding the given factor.
+         */
+        FactorizedPolynomial<P>& operator+=( const CoeffType& _coef );
+
+        /**
          * @param _fpoly The summand to add this factorized polynomial with.
          * @return This factorized polynomial after adding the given factor.
          */
@@ -268,12 +283,24 @@ namespace carl
          */
         template<typename P1>
         friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+
+        /**
+         * @param _coef The factor to multiply this factorized polynomial with.
+         * @return This factorized polynomial after multiplying it with the given factor.
+         */
+        FactorizedPolynomial<P>& operator*=( const CoeffType& _coef );
         
         /**
          * @param _fpoly The factor to multiply this factorized polynomial with.
          * @return This factorized polynomial after multiplying it with the given factor.
          */
         FactorizedPolynomial<P>& operator*=( const FactorizedPolynomial<P>& _fpoly );
+
+        /** Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
+         * @param _coef The divisor to divide this factorized polynomial with.
+         * @return This factorized polynomial after dividing it with the given divisor.
+         */
+        FactorizedPolynomial<P>& operator/=( const CoeffType& _coef );
 
         /** Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
          * @param _fpoly The divisor to divide this factorized polynomial with.
@@ -376,6 +403,8 @@ namespace carl
     
     
 } // namespace carl
+
+template<typename P> struct needs_cache<carl::FactorizedPolynomial<P>>: std::true_type {};
 
 namespace std
 {

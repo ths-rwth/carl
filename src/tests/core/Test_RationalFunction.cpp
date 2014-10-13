@@ -44,6 +44,7 @@ TEST(RationalFunction, Construction)
 
 TEST(RationalFunction, Multiplication)
 {
+    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
     
@@ -61,6 +62,12 @@ TEST(RationalFunction, Multiplication)
     Pol q2 = sp.parseMultivariatePolynomial<Rational>("20*y^2");
     EXPECT_EQ(q1, r3.nominator());
     EXPECT_EQ(q2, r3.denominator());
+    
+    Variable x = carl::VariablePool::getInstance().findVariableWithName("x");
+    RFunc r4( x );
+    r4 *= x;
+    EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
+    EXPECT_FALSE(needs_cache<Pol>::value);
     
     Cache<PolynomialFactorizationPair<Pol>> fpCache;
     
@@ -82,6 +89,7 @@ TEST(RationalFunction, Multiplication)
 
 TEST(RationalFunction, Addition)
 {
+    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
     
