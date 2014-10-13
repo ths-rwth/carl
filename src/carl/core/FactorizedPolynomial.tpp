@@ -570,7 +570,11 @@ namespace carl
     std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly )
     {
         if ( existsFactorization( _fpoly ) )
+        {
+            if ( _fpoly.coefficient() != 1 )
+                _out << _fpoly.coefficient() << " * ";
             return ( _out << _fpoly.content() );
+        }
         else
             return ( _out << _fpoly.coefficient() );
     }
