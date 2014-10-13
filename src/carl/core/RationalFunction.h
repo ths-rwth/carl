@@ -43,7 +43,6 @@ public:
 	explicit RationalFunction(Variable::Arg v)
 	: mNominator(v), mDenominator(1), mIsSimplified(true)
 	{
-		std::cout << "test" << std::endl;
 	}
 	
 	explicit RationalFunction(const Pol& p)
