@@ -20,6 +20,8 @@ class RationalFunction
 	
 	
 public:
+    typedef Pol PolyType;
+    
 	typedef typename Pol::CoeffType CoeffType;
 	RationalFunction()
 	: mNominator(0), mDenominator(1), mIsSimplified(true)
