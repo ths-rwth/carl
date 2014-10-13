@@ -258,15 +258,27 @@ namespace carl
 
         /**
          * @param _coef The summand to add this factorized polynomial with.
-         * @return This factorized polynomial after adding the given factor.
+         * @return This factorized polynomial after adding the given summand.
          */
         FactorizedPolynomial<P>& operator+=( const CoeffType& _coef );
 
         /**
          * @param _fpoly The summand to add this factorized polynomial with.
-         * @return This factorized polynomial after adding the given factor.
+         * @return This factorized polynomial after adding the given summand.
          */
         FactorizedPolynomial<P>& operator+=( const FactorizedPolynomial<P>& _fpoly );
+
+        /**
+         * @param _coef The number to subtract from this factorized polynomial.
+         * @return This factorized polynomial after subtracting the given number.
+         */
+        FactorizedPolynomial<P>& operator-=( const CoeffType& _coef );
+
+        /**
+         * @param _fpoly The factorized polynomial to subtract from this factorized polynomial.
+         * @return This factorized polynomial after adding the given factorized polynomial.
+         */
+        FactorizedPolynomial<P>& operator-=( const FactorizedPolynomial<P>& _fpoly );
 
         /**
          * @param _fpolyA The minuend.

@@ -215,6 +215,20 @@ namespace carl
     }
 
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator-=( const CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result = *this + FactorizedPolynomial<P>( CoeffType( -1 ) * _coef );
+        return *this = result;
+    }
+
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator-=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result = *this - _fpoly;
+        return *this = result;
+    }
+
+    template<typename P>
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
