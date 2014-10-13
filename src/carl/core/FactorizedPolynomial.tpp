@@ -108,6 +108,9 @@ namespace carl
         }
         else
             mCacheRef = _fpoly.cacheRef();
+        if ( _fpoly.mpCache != nullptr )
+            mpCache = _fpoly.mpCache;
+        mCoefficient = _fpoly.mCoefficient;
         return *this;
     }
         
@@ -561,8 +564,8 @@ namespace carl
         if( rehashFPolyB )
             _fpolyB.rehash();
 
-        _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyA.pCache());
-        _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyA.pCache());
+        _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyA.pCache() );
+        _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyA.pCache() );
         return FactorizedPolynomial<P>( std::move( gcdFactorization ), coefficientCommon, _fpolyA.pCache() );
     }
     
