@@ -20,6 +20,8 @@ class RationalFunction
 	
 	
 public:
+    typedef Pol PolyType;
+    
 	typedef typename Pol::CoeffType CoeffType;
 	RationalFunction()
 	: mNominator(0), mDenominator(1), mIsSimplified(true)
@@ -43,7 +45,6 @@ public:
 	explicit RationalFunction(Variable::Arg v)
 	: mNominator(v), mDenominator(1), mIsSimplified(true)
 	{
-		std::cout << "test" << std::endl;
 	}
 	
 	explicit RationalFunction(const Pol& p)
