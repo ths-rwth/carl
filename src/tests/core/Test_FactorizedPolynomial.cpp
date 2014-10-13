@@ -9,7 +9,9 @@
 using namespace carl;
 
 typedef cln::cl_RA Rational;
-typedef MultivariatePolynomial<Rational> P;
+typedef MultivariatePolynomial<Rational> Pol;
+typedef FactorizedPolynomial<Pol> FPol;
+typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
 TEST(FactorizedPolynomial, Construction)
 {
@@ -20,71 +22,71 @@ TEST(FactorizedPolynomial, Construction)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    P fxy({(cln::cl_RA)1*x*y});
-    P fxyz({(cln::cl_RA)1*x*y*z});
-    P f1({(cln::cl_RA)-1*x, (cln::cl_RA)3*y});
-    P f2({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
-    P f3 = f1*f1*f2;
-    P f4 = f1*f2*f2;
+    Pol fxy({(cln::cl_RA)1*x*y});
+    Pol fxyz({(cln::cl_RA)1*x*y*z});
+    Pol f1({(cln::cl_RA)-1*x, (cln::cl_RA)3*y});
+    Pol f2({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+    Pol f3 = f1*f1*f2;
+    Pol f4 = f1*f2*f2;
     
-    Cache<PolynomialFactorizationPair<P>> fpCache;
+    CachePol fpCache;
     fpCache.print();
-    FactorizedPolynomial<P> fpA( fxy, &fpCache );
+    FPol fpA( fxy, &fpCache );
     fpCache.print();
-    FactorizedPolynomial<P> fpB( fxyz, &fpCache );
+    FPol fpB( fxyz, &fpCache );
     fpCache.print();
-    FactorizedPolynomial<P> fpC( f3, &fpCache );
+    FPol fpC( f3, &fpCache );
     fpCache.print();
-    FactorizedPolynomial<P> fpD( f4, &fpCache );
+    FPol fpD( f4, &fpCache );
     fpCache.print();
 
     //Common divisor
-    FactorizedPolynomial<P> fpE = commonDivisor( fpA, fpB );
+    FPol fpE = commonDivisor( fpA, fpB );
     std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": " << fpE << std::endl << std::endl;
     fpCache.print();
     
     //GCD
-    FactorizedPolynomial<P> restA( P( 2 ), &fpCache );
-    FactorizedPolynomial<P> restB( P( 2 ), &fpCache );
+    FPol restA( Pol( 2 ), &fpCache );
+    FPol restB( Pol( 2 ), &fpCache );
     std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": ";
-    FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
+    FPol fpGCD = gcd( fpA, fpB, restA, restB );
     std::cout << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
     fpCache.print();
     
-    FactorizedPolynomial<P> restC( P( 2 ), &fpCache );
-    FactorizedPolynomial<P> restD( P( 2 ), &fpCache );
+    FPol restC( Pol( 2 ), &fpCache );
+    FPol restD( Pol( 2 ), &fpCache );
     std::cout << std::endl << "GCD of " << fpC << " and " << fpD << ": ";
-    FactorizedPolynomial<P> fpGCDB = gcd( fpC, fpD, restC, restD );
+    FPol fpGCDB = gcd( fpC, fpD, restC, restD );
     std::cout << fpGCDB << " with rest " << restC << " and " << restD << std::endl << std::endl;
     fpCache.print();
 
     //Common Multiple
-    FactorizedPolynomial<P> fpCM = commonMultiple( fpA, fpB );
+    FPol fpCM = commonMultiple( fpA, fpB );
     std::cout << std::endl << "Common multiple of " << fpA << " and " << fpB << ": " << fpCM << std::endl << std::endl;
     fpCache.print();
 
     //Quotient
-    FactorizedPolynomial<P> fpQuo = quotient( fpB, fpA );
+    FPol fpQuo = quotient( fpB, fpA );
     std::cout << std::endl << "Quotient: " << fpB << " / " << fpA << ": " << fpQuo << std::endl << std::endl;
     fpCache.print();
 
     //LCM
-    FactorizedPolynomial<P> fpLCM = lcm( fpA, fpB );
+    FPol fpLCM = lcm( fpA, fpB );
     std::cout << std::endl << "LCM of " << fpA << " and " << fpB << ": " << fpLCM << std::endl << std::endl;
     fpCache.print();
 
     //Multiplication
-    FactorizedPolynomial<P> fpMul = fpA * fpB;
+    FPol fpMul = fpA * fpB;
     std::cout << std::endl << fpA << " * " << fpB << ": " << fpMul << std::endl << std::endl;
     fpCache.print();
 
     //Addition
-    FactorizedPolynomial<P> fpAdd = fpA + fpB;
+    FPol fpAdd = fpA + fpB;
     std::cout << std::endl << fpA << " + " << fpB << ": " << fpAdd << std::endl << std::endl;
     fpCache.print();
 
     //Subtraction
-    FactorizedPolynomial<P> fpSub = fpA - fpB;
+    FPol fpSub = fpA - fpB;
     std::cout << std::endl << fpA << " - " << fpB << ": " << fpSub << std::endl << std::endl;
     fpCache.print();
     
@@ -96,36 +98,61 @@ TEST(FactorizedPolynomial, Construction)
 
 TEST(FactorizedPolynomial, CommonDivisor)
 {
+    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
     
-    P fxy = sp.parseMultivariatePolynomial<Rational>("x*y");
-    P fxyz = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+    Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
+    Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
     
-    Cache<PolynomialFactorizationPair<P>> fpCache;
-    FactorizedPolynomial<P> fpA( fxy, &fpCache );
-    FactorizedPolynomial<P> fpB( fxyz, &fpCache );
+    CachePol fpCache;
+    FPol fpA( fA, &fpCache );
+    FPol fpB( fB, &fpCache );
     
     std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
-    FactorizedPolynomial<P> fpC = commonDivisor( fpA, fpB );
+    FPol fpC = commonDivisor( fpA, fpB );
     std::cout << fpC << std::endl << std::endl;
 }
 
 TEST(FactorizedPolynomial, GCD)
 {
+    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
-    P fxy = sp.parseMultivariatePolynomial<Rational>("x*y");
-    P fxyz = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+    Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
+    Pol pB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
 
-    Cache<PolynomialFactorizationPair<P>> fpCache;
-    FactorizedPolynomial<P> fpA( fxy, &fpCache );
-    FactorizedPolynomial<P> fpB( fxyz, &fpCache );
-    FactorizedPolynomial<P> restA( P( 3 ), &fpCache );
-    FactorizedPolynomial<P> restB( P( 3 ), &fpCache );
-    std::cout << std::endl << "GCD of " << fpA << " and " << fpB << ": ";
-    FactorizedPolynomial<P> fpGCD = gcd( fpA, fpB, restA, restB );
-    std::cout << fpGCD << " with rest " << restA << " and " << restB << std::endl << std::endl;
-    fpCache.print();
+    CachePol fpCache;
+    FPol fpA( pA, &fpCache );
+    FPol fpB( pB, &fpCache );
+    FPol fpRestA( Pol( 3 ), &fpCache );
+    FPol fpRestB( Pol( 3 ), &fpCache );
+
+    Pol pGCD = gcd( pA, pB );
+    Pol pRestA = pA.quotient( pGCD );
+    Pol pRestB = pB.quotient( pGCD );
+    FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
+
+    EXPECT_EQ( pGCD, computePolynomial( fpGCD ) );
+    EXPECT_EQ( pRestA, computePolynomial( fpRestA ) );
+    EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
+}
+
+TEST(FactorizedPolynomial, LCM)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+
+    Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
+    Pol pB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+
+    CachePol fpCache;
+    FPol fpA( pA, &fpCache );
+    FPol fpB( pB, &fpCache );
+
+    Pol pLCM = lcm( pA, pB );
+    FPol fpLCM = lcm( fpA, fpB );
+    EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
 }

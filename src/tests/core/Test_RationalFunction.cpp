@@ -18,6 +18,7 @@ typedef MultivariatePolynomial<Rational> Pol;
 typedef FactorizedPolynomial<Pol> FPol;
 typedef RationalFunction<Pol> RFunc;
 typedef RationalFunction<FPol> RFactFunc;
+typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
 TEST(RationalFunction, Construction)
 {
@@ -31,7 +32,7 @@ TEST(RationalFunction, Construction)
     EXPECT_EQ(p2, r1.denominator());
     EXPECT_FALSE(r1.isZero());
     
-    Cache<PolynomialFactorizationPair<Pol>> fpCache;
+    CachePol fpCache;
     
     FPol fp1(p1, &fpCache);
     FPol fp2(p2, &fpCache);
@@ -69,7 +70,7 @@ TEST(RationalFunction, Multiplication)
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
     EXPECT_FALSE(needs_cache<Pol>::value);
     
-    Cache<PolynomialFactorizationPair<Pol>> fpCache;
+    CachePol fpCache;
     
     FPol fp1(p1, &fpCache);
     FPol fp2(p2, &fpCache);
@@ -106,7 +107,7 @@ TEST(RationalFunction, Addition)
     Pol q2 = sp.parseMultivariatePolynomial<Rational>("5*x*y");
     EXPECT_EQ(p4, r3.denominator());
     
-    Cache<PolynomialFactorizationPair<Pol>> fpCache;
+    CachePol fpCache;
     
     FPol fp1(p1, &fpCache);
     FPol fp2(p2, &fpCache);
