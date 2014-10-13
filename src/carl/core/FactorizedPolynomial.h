@@ -104,7 +104,7 @@ namespace carl
     public:
            
         // Constructors.
-        FactorizedPolynomial(); // no implementation
+        FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
         explicit FactorizedPolynomial( const P& _polynomial, CACHE* );
         //explicit FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
@@ -258,15 +258,27 @@ namespace carl
 
         /**
          * @param _coef The summand to add this factorized polynomial with.
-         * @return This factorized polynomial after adding the given factor.
+         * @return This factorized polynomial after adding the given summand.
          */
         FactorizedPolynomial<P>& operator+=( const CoeffType& _coef );
 
         /**
          * @param _fpoly The summand to add this factorized polynomial with.
-         * @return This factorized polynomial after adding the given factor.
+         * @return This factorized polynomial after adding the given summand.
          */
         FactorizedPolynomial<P>& operator+=( const FactorizedPolynomial<P>& _fpoly );
+
+        /**
+         * @param _coef The number to subtract from this factorized polynomial.
+         * @return This factorized polynomial after subtracting the given number.
+         */
+        FactorizedPolynomial<P>& operator-=( const CoeffType& _coef );
+
+        /**
+         * @param _fpoly The factorized polynomial to subtract from this factorized polynomial.
+         * @return This factorized polynomial after adding the given factorized polynomial.
+         */
+        FactorizedPolynomial<P>& operator-=( const FactorizedPolynomial<P>& _fpoly );
 
         /**
          * @param _fpolyA The minuend.
@@ -275,6 +287,22 @@ namespace carl
          */
         template<typename P1>
         friend const FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        
+        /**
+         * @param _coeff The first factor.
+         * @param _fpoly The second factor.
+         * @return The product of a coefficient type and a factorized polynomials.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator*( const Coeff<P1>& _coeff, const FactorizedPolynomial<P1>& _fpoly );
+        
+        /**
+         * @param _fpoly The first factor.
+         * @param _coeff The second factor.
+         * @return The product of a factorized polynomials and a coefficient type.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpoly, const Coeff<P1>& _coeff );
         
         /**
          * @param _fpolyA The first factor.
@@ -401,10 +429,10 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const FactorizedPolynomial<P>& _fpoly);
     
+
+    template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
     
 } // namespace carl
-
-template<typename P> struct needs_cache<carl::FactorizedPolynomial<P>>: std::true_type {};
 
 namespace std
 {

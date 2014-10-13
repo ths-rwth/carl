@@ -12,6 +12,14 @@
 namespace carl
 {
     template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial():
+        mCacheRef( CACHE::NO_REF ),
+        mpCache( nullptr ),
+        mCoefficient( 0 )
+    {
+    }
+    
+    template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const CoeffType& _coefficient ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( nullptr ),
@@ -218,6 +226,20 @@ namespace carl
     }
 
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator-=( const CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result = *this + FactorizedPolynomial<P>( CoeffType( -1 ) * _coef );
+        return *this = result;
+    }
+
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator-=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result = *this - _fpoly;
+        return *this = result;
+    }
+
+    template<typename P>
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
@@ -226,6 +248,22 @@ namespace carl
             return _fpolyA + FactorizedPolynomial<P>( coefficient );
         else
             return _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.pCache() );
+    }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator*( const Coeff<P>& _coeff, const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= _coeff;
+        return result;
+    }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const Coeff<P>& _coeff )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= _coeff;
+        return result;
     }
 
     template<typename P>
