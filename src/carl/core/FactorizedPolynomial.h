@@ -277,6 +277,22 @@ namespace carl
         friend const FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
         
         /**
+         * @param _coeff The first factor.
+         * @param _fpoly The second factor.
+         * @return The product of a coefficient type and a factorized polynomials.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator*( const Coeff<P1>& _coeff, const FactorizedPolynomial<P1>& _fpoly );
+        
+        /**
+         * @param _fpoly The first factor.
+         * @param _coeff The second factor.
+         * @return The product of a factorized polynomials and a coefficient type.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpoly, const Coeff<P1>& _coeff );
+        
+        /**
          * @param _fpolyA The first factor.
          * @param _fpolyB The second factor.
          * @return The product of the two given factorized polynomials.

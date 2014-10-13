@@ -224,6 +224,22 @@ namespace carl
         else
             return _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.pCache() );
     }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator*( const Coeff<P>& _coeff, const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= _coeff;
+        return result;
+    }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const Coeff<P>& _coeff )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= _coeff;
+        return result;
+    }
 
     template<typename P>
     const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
