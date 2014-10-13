@@ -12,6 +12,14 @@
 namespace carl
 {
     template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial():
+        mCacheRef( CACHE::NO_REF ),
+        mpCache( nullptr ),
+        mCoefficient( 0 )
+    {
+    }
+    
+    template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const CoeffType& _coefficient ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( nullptr ),
@@ -83,7 +91,9 @@ namespace carl
         mCoefficient( _toCopy.mCoefficient )
     {
         if ( mpCache != nullptr )
-            mpCache->reg( _toCopy.mCacheRef );
+        {
+            mpCache->reg( mCacheRef );
+        }
     }
     
     template<typename P>
@@ -100,14 +110,19 @@ namespace carl
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
     {
         ASSERT_CACHE_EQUAL( mpCache, _fpoly.pCache() );
+        mCoefficient = _fpoly.mCoefficient;
         if ( mpCache != nullptr )
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = _fpoly.cacheRef();
             mpCache->reg( mCacheRef );
         }
-        else
+        else if( _fpoly.mpCache != nullptr )
+        {
+            mpCache = _fpoly.mpCache;
             mCacheRef = _fpoly.cacheRef();
+            mpCache->reg( mCacheRef );
+        }
         return *this;
     }
         
@@ -201,9 +216,30 @@ namespace carl
     }
 
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator+=( const CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result = *this + FactorizedPolynomial<P>( _coef );
+        return *this = result;
+    }
+
+    template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator+=( const FactorizedPolynomial<P>& _fpoly )
     {
         FactorizedPolynomial<P> result = *this + _fpoly;
+        return *this = result;
+    }
+
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator-=( const CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result = *this + FactorizedPolynomial<P>( CoeffType( -1 ) * _coef );
+        return *this = result;
+    }
+
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator-=( const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result = *this - _fpoly;
         return *this = result;
     }
 
@@ -216,6 +252,22 @@ namespace carl
             return _fpolyA + FactorizedPolynomial<P>( coefficient );
         else
             return _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.pCache() );
+    }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator*( const Coeff<P>& _coeff, const FactorizedPolynomial<P>& _fpoly )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= _coeff;
+        return result;
+    }
+    
+    template<typename P>
+    const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const Coeff<P>& _coeff )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        result.mCoefficient *= _coeff;
+        return result;
     }
 
     template<typename P>
@@ -276,12 +328,26 @@ namespace carl
     }
     
     template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const CoeffType& _coef )
+    {
+        this->mCoefficient *= _coef;
+        return *this;
+    }
+    
+    template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const FactorizedPolynomial<P>& _fpoly )
     {
         FactorizedPolynomial<P> result = *this * _fpoly;
         return *this = result;
     }
 
+    template<typename P>
+    FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const CoeffType& _coef )
+    {
+        this->mCoefficient /= _coef;
+        return *this;
+    }
+    
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const FactorizedPolynomial<P>& _fpoly )
     {
@@ -347,7 +413,7 @@ namespace carl
         _fpolyB.strengthenActivity();
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
-        Coeff<P> coefficientLCM = carl::lcm( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Coeff<P> coefficientLCM = carl::lcm( carl::getNum(_fpolyA.coefficient()), carl::getNum(_fpolyB.coefficient()) )/carl::gcd( carl::getDenom(_fpolyA.coefficient()), carl::getDenom(_fpolyB.coefficient()) );
 
         //Handle cases where one or both are constant
         if ( !existsFactorization( _fpolyA ) )
@@ -504,10 +570,10 @@ namespace carl
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
 
-        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Coeff<P> coefficientCommon = carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )/carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) );
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
-
+        
          //Handle cases where one or both are constant
         if ( !existsFactorization( _fpolyA ) )
         {
@@ -542,6 +608,7 @@ namespace carl
 
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyA.pCache());
         _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyA.pCache());
+        
         return FactorizedPolynomial<P>( std::move( gcdFactorization ), coefficientCommon, _fpolyA.pCache() );
     }
     
@@ -549,7 +616,11 @@ namespace carl
     std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly )
     {
         if ( existsFactorization( _fpoly ) )
+        {
+            if ( _fpoly.coefficient() != 1 )
+                _out << _fpoly.coefficient() << " * ";
             return ( _out << _fpoly.content() );
+        }
         else
             return ( _out << _fpoly.coefficient() );
     }

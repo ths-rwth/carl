@@ -71,9 +71,9 @@ namespace carl
          */
         void flattenFactorization() const;
 
-        inline void assertFactorization() const
+        inline bool assertFactorization() const
         {
-            assert( mpPolynomial == nullptr || computePolynomial( *this ) == *mpPolynomial );
+            return (mpPolynomial == nullptr || computePolynomial( *this ) == *mpPolynomial );
         }
 
         /**
@@ -100,6 +100,16 @@ namespace carl
                 result *= carl::pow( factorCP, factor.second );
             }
             return result;
+        }
+        
+        void gatherVariables( std::set<carl::Variable>& _vars ) const
+        {
+            if( mpPolynomial != nullptr )
+                mpPolynomial->gatherVariables( _vars );
+            for( auto const& factor : mFactorization )
+            {
+                factor.first.gatherVariables( _vars );
+            }
         }
 
         /**

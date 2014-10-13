@@ -75,12 +75,8 @@ namespace carl
         }
 
         // Check correctness
-        if ( mpPolynomial != nullptr )
-        {
-            assert( mpPolynomial->coprimeFactor() == 1);
-            if ( !mFactorization.empty() )
-                assertFactorization();
-        }
+        assert( mpPolynomial == nullptr || mpPolynomial->coprimeFactor() == 1);
+        assert( mpPolynomial == nullptr || mFactorization.empty() || assertFactorization() );
 
         rehash();
     }
@@ -239,7 +235,7 @@ namespace carl
                 }
             }
         }
-        assertFactorization();
+        assert( assertFactorization() );
     }
     
     template<typename P>
@@ -273,7 +269,7 @@ namespace carl
         mFactorization.clear();
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
-        assertFactorization();
+        assert( assertFactorization() );
     }
 
     template<typename P>
@@ -408,8 +404,8 @@ namespace carl
         _pfPairB.flattenFactorization();
 
         // Check correctness
-        _pfPairA.assertFactorization();
-        _pfPairB.assertFactorization();
+        assert( _pfPairA.assertFactorization() );
+        assert( _pfPairB.assertFactorization() );
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "GCD (internal) of " << _pfPairA << " and " << _pfPairB << ": " << result << " with rests " << _restA << " and " << _restB );
         assert( computePolynomial( result ) * computePolynomial( _restA ) == *_pfPairA.mpPolynomial);
         assert( computePolynomial( result ) * computePolynomial( _restB ) == *_pfPairB.mpPolynomial);

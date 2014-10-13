@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "../numbers/typetraits.h"
 #include "MultivariateGCD.h"
 #include "FactorizedPolynomial.h"
 
@@ -19,6 +20,8 @@ class RationalFunction
 	
 	
 public:
+    typedef Pol PolyType;
+    
 	typedef typename Pol::CoeffType CoeffType;
 	RationalFunction()
 	: mNominator(0), mDenominator(1), mIsSimplified(true)
@@ -38,10 +41,10 @@ public:
 		
 	}
 	
+    template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
 	explicit RationalFunction(Variable::Arg v)
 	: mNominator(v), mDenominator(1), mIsSimplified(true)
 	{
-		
 	}
 	
 	explicit RationalFunction(const Pol& p)
@@ -150,7 +153,7 @@ public:
 	 */
 	RationalFunction& operator+=(const RationalFunction& rhs);
 	RationalFunction& operator+=(const Pol& rhs);
-	RationalFunction& operator+=(const Term<CoeffType>& rhs);
+    template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
 	RationalFunction& operator+=(Variable::Arg rhs);
 	RationalFunction& operator+=(const CoeffType& rhs);
 	/// @}
@@ -165,7 +168,7 @@ public:
 	 */
 	RationalFunction& operator-=(const RationalFunction& rhs);
 	RationalFunction& operator-=(const Pol& rhs);
-	RationalFunction& operator-=(const Term<CoeffType>& rhs);
+    template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
 	RationalFunction& operator-=(Variable::Arg rhs);
 	RationalFunction& operator-=(const CoeffType& rhs);
 	/// @}
@@ -179,7 +182,7 @@ public:
 	 */
 	RationalFunction& operator*=(const RationalFunction& rhs);
 	RationalFunction& operator*=(const Pol& rhs);
-	RationalFunction& operator*=(const Term<CoeffType>& rhs);
+    template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
 	RationalFunction& operator*=(Variable::Arg rhs);
 	RationalFunction& operator*=(const CoeffType& rhs);
 	/// @}
@@ -191,7 +194,7 @@ public:
 	 */
 	RationalFunction& operator/=(const RationalFunction& rhs);
 	RationalFunction& operator/=(const Pol& rhs);
-	RationalFunction& operator/=(const Term<CoeffType>& rhs);
+    template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
 	RationalFunction& operator/=(Variable::Arg rhs);
 	RationalFunction& operator/=(const CoeffType& rhs);
 	RationalFunction& operator/=(unsigned long rhs);
@@ -252,9 +255,9 @@ protected:
 	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
@@ -263,9 +266,9 @@ protected:
 	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
@@ -274,9 +277,9 @@ protected:
 	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);
@@ -285,9 +288,9 @@ protected:
 	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Pol& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs);
-	template<typename Pol, bool AS>
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs);
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs);

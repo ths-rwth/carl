@@ -58,6 +58,15 @@ protected:
 public:
 
 	/**
+	 * Clears everything already created in this pool.
+	 */
+	void clear()
+    {
+        mFriendlyNames.clear();
+        mNextVarId = 1;
+    }
+
+	/**
 	 * Get a variable which was not used before.
 	 * This method is thread-safe.
 	 * @param type Type for the new variable.

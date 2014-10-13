@@ -8,11 +8,12 @@
 #pragma once
 
 #include <iostream>
+#include "../numbers/typetraits.h"
 #include "carl/util/Cache.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl
-{   
+{
     template <typename P>
     using Coeff = typename UnderlyingNumberType<P>::type;
 
@@ -24,6 +25,7 @@ namespace carl
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         typedef Coeff<P> CoeffType;
+        typedef P PolyType;
         typedef Cache<PolynomialFactorizationPair<P>> CACHE;
 
     private:
@@ -102,11 +104,11 @@ namespace carl
     public:
            
         // Constructors.
-        FactorizedPolynomial(); // no implementation
-        FactorizedPolynomial( const CoeffType& );
-        FactorizedPolynomial( const P& _polynomial, CACHE* );
-        //FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
-        FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, CACHE* );
+        FactorizedPolynomial();
+        explicit FactorizedPolynomial( const CoeffType& );
+        explicit FactorizedPolynomial( const P& _polynomial, CACHE* );
+        //explicit FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
+        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, CACHE* );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -210,7 +212,14 @@ namespace carl
             if ( existsFactorization( *this ) )
                 result *= content().constantPart();
             return result;
-        } 
+        }
+        
+        void gatherVariables( std::set<carl::Variable>& _vars ) const
+        {
+            if( mpCache == nullptr )
+                return;
+            content().gatherVariables( _vars );
+        }
 
         /**
          * Choose a non-null cache from two caches.
@@ -232,6 +241,12 @@ namespace carl
         template<typename P1>
         friend const P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
         
+        template<typename P1>
+        friend const P1 computeCoeffPolynomial( const FactorizedPolynomial<P1>& _fpoly )
+        {
+            return _fpoly.coefficient() * computePolynomial( _fpoly );
+        }
+
         /**
          * @param _fpoly The operand.
          * @return The given factorized polynomial times -1.
@@ -248,10 +263,28 @@ namespace carl
         friend const FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
 
         /**
+         * @param _coef The summand to add this factorized polynomial with.
+         * @return This factorized polynomial after adding the given summand.
+         */
+        FactorizedPolynomial<P>& operator+=( const CoeffType& _coef );
+
+        /**
          * @param _fpoly The summand to add this factorized polynomial with.
-         * @return This factorized polynomial after adding the given factor.
+         * @return This factorized polynomial after adding the given summand.
          */
         FactorizedPolynomial<P>& operator+=( const FactorizedPolynomial<P>& _fpoly );
+
+        /**
+         * @param _coef The number to subtract from this factorized polynomial.
+         * @return This factorized polynomial after subtracting the given number.
+         */
+        FactorizedPolynomial<P>& operator-=( const CoeffType& _coef );
+
+        /**
+         * @param _fpoly The factorized polynomial to subtract from this factorized polynomial.
+         * @return This factorized polynomial after adding the given factorized polynomial.
+         */
+        FactorizedPolynomial<P>& operator-=( const FactorizedPolynomial<P>& _fpoly );
 
         /**
          * @param _fpolyA The minuend.
@@ -262,18 +295,46 @@ namespace carl
         friend const FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
         
         /**
+         * @param _coeff The first factor.
+         * @param _fpoly The second factor.
+         * @return The product of a coefficient type and a factorized polynomials.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator*( const Coeff<P1>& _coeff, const FactorizedPolynomial<P1>& _fpoly );
+        
+        /**
+         * @param _fpoly The first factor.
+         * @param _coeff The second factor.
+         * @return The product of a factorized polynomials and a coefficient type.
+         */
+        template<typename P1>
+        friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpoly, const Coeff<P1>& _coeff );
+        
+        /**
          * @param _fpolyA The first factor.
          * @param _fpolyB The second factor.
          * @return The product of the two given factorized polynomials.
          */
         template<typename P1>
         friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+
+        /**
+         * @param _coef The factor to multiply this factorized polynomial with.
+         * @return This factorized polynomial after multiplying it with the given factor.
+         */
+        FactorizedPolynomial<P>& operator*=( const CoeffType& _coef );
         
         /**
          * @param _fpoly The factor to multiply this factorized polynomial with.
          * @return This factorized polynomial after multiplying it with the given factor.
          */
         FactorizedPolynomial<P>& operator*=( const FactorizedPolynomial<P>& _fpoly );
+
+        /** Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
+         * @param _coef The divisor to divide this factorized polynomial with.
+         * @return This factorized polynomial after dividing it with the given divisor.
+         */
+        FactorizedPolynomial<P>& operator/=( const CoeffType& _coef );
 
         /** Calculates the quotient. Notice: the divisor has to be a factor of the polynomial.
          * @param _fpoly The divisor to divide this factorized polynomial with.
@@ -374,6 +435,8 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const FactorizedPolynomial<P>& _fpoly);
     
+
+    template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
     
 } // namespace carl
 
