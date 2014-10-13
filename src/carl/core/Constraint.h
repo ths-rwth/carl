@@ -14,12 +14,45 @@ template<typename LhsType>
 class Constraint
 {
 	public:
+		Constraint(bool v) : mLhs(v ? 0 : 1), mRelation(CompareRelation::EQ) {}
 		Constraint(const LhsType& lhs, CompareRelation rel) : mLhs(lhs), mRelation(rel)
 		{}
 	
 		const LhsType& lhs() const {return mLhs;}
 		const CompareRelation& rel() const {return mRelation;}
 		
+		bool isTrivialTrue() const  {
+			if(mLhs.isConstant())
+			{
+				auto cp = mLhs.constantPart();
+				if(cp == 0) {
+					return !relationIsStrict(mRelation);
+				} else if(cp > 0) {
+					return mRelation == CompareRelation::GEQ || mRelation == CompareRelation::GT || mRelation == CompareRelation::NEQ;
+				} else {
+					assert(cp < 0);
+					return mRelation == CompareRelation::LEQ || mRelation == CompareRelation::LT || mRelation == CompareRelation::NEQ;
+				}
+			}
+			return false;
+		}
+		
+		bool isTrivialFalse() const {
+			if(mLhs.isConstant())
+			{
+				auto cp = mLhs.constantPart();
+				if(cp == 0) {
+					return relationIsStrict(mRelation);
+				} else if(cp > 0) {
+					return mRelation == CompareRelation::LEQ || mRelation == CompareRelation::LT || mRelation == CompareRelation::EQ;
+				} else {
+					assert(cp < 0);
+					return mRelation == CompareRelation::GEQ || mRelation == CompareRelation::GT || mRelation == CompareRelation::EQ;
+				}
+			}
+			return false;
+		}
+				
 	private:
 		LhsType mLhs;
 		CompareRelation mRelation;
@@ -42,6 +75,7 @@ std::ostream& operator<<(std::ostream& os, const Constraint<LhsT>& rhs)
 {
 	return os << rhs.lhs() << " " << rhs.rel() << " 0";
 }
+
 
 }
 

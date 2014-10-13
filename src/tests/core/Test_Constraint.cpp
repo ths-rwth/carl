@@ -1,81 +1,62 @@
 #include "gtest/gtest.h"
-#include "carl/core/Variable.h"
-#include "carl/core/Monomial.h"
-#include "carl/core/Monomial_derivative.h"
+#include "carl/core/ConstraintOperations.h"
+#include "carl/util/stringparser.h"
 
-using namespace carl;
+#include "carl/core/MultivariatePolynomial.h"
 
-TEST(Monomial, Operators)
+#include <unordered_set>
+
+typedef mpq_class Rational;
+
+
+typedef carl::MultivariatePolynomial<Rational> Pol;
+typedef carl::Constraint<Pol> PolCon;
+typedef carl::RationalFunction<Pol> RFunc;
+typedef carl::Constraint<RFunc> RFuncCon;
+
+
+
+TEST(Constraint, Operations)
 {
-    Variable v0 = Variable((unsigned)1);
-    Variable v1 = Variable((unsigned)2);
-    Variable v2 = Variable((unsigned)3);
+    using carl::CompareRelation;
+    carl::StringParser sp;
+    sp.setVariables({"x", "y", "z"});
     
-    Monomial m0(v0);
-    m0 *= v1;
-    EXPECT_EQ((unsigned)1,m0.exponentOfVariable(v1));
-    m0 *= v1;
-    EXPECT_EQ((unsigned)2,m0.exponentOfVariable(v1));
-    EXPECT_EQ((unsigned)3,m0.tdeg());
-    EXPECT_EQ((unsigned)0,m0.exponentOfVariable(v2));
-    m0 *= v2;
-    EXPECT_EQ((unsigned)4,m0.tdeg());
-    EXPECT_EQ((unsigned)3,m0.nrVariables());
+    std::vector<RFuncCon> v1;
     
-    Monomial m2(v1);
-    Monomial m3(v1);
-    m2 *= v1;
-    m3 *= v1;
-    EXPECT_EQ(m2, m3);
-}
-
-TEST(Monomial, multiplication)
-{
-    Variable v0((unsigned)1);
-    Variable v1((unsigned)2);
-    Variable v2((unsigned)3);
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("1");
+    RFunc r1(p1,p2);
+    v1.push_back(RFuncCon(r1, CompareRelation::GEQ));
+    std::unordered_set<PolCon> s1;
+    carl::constraints::toPolynomialConstraints<Pol, false>(v1.begin(), v1.end(), inserter(s1, s1.end()));
+    EXPECT_EQ(1, s1.size());
+    v1.clear();
+    s1.clear();
     
-    Monomial m0(v0);
-    Monomial m1(v1);
-    Monomial m01(v0);
-    m01 *= v1;
-    m0 *= m1;
-    EXPECT_EQ(m01, m0);
-    m01 *= m01;
-    m0 *= v0;
-    m0 *= v1;
-    //m0 *= m0;
-    EXPECT_EQ(m01, m0);
-    Monomial m = v0 * v0;
     
-}
-
-TEST(Monomial, derivative)
-{
-    Variable v0((unsigned)1);
-    Variable v1((unsigned)2);
-    Monomial m0 = v0 * v1;
-    Term<int>* t = m0.derivative<int>(v0);
-    EXPECT_EQ((unsigned)1, t->getNrVariables());
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("z");
+    RFunc r2(p1,p3);
+    v1.push_back(RFuncCon(r2, CompareRelation::GEQ));
+    carl::constraints::toPolynomialConstraints<Pol, false>(v1.begin(), v1.end(), inserter(s1, s1.end()));
+    EXPECT_EQ(2, s1.size());
+    v1.clear();
+    s1.clear();
     
-}
-
-TEST(Monomial, division)
-{
-    Variable v0((unsigned)1);
-    Variable v1((unsigned)2);
-    Variable v2((unsigned)3);
+    Pol p4 = sp.parseMultivariatePolynomial<Rational>("-2");
+    RFunc r3(p4);
+    v1.push_back(RFuncCon(r3, CompareRelation::GEQ));
+    carl::constraints::toPolynomialConstraints<Pol, false>(v1.begin(), v1.end(), inserter(s1, s1.end()));
+    EXPECT_EQ(1, s1.size());
+    v1.clear();
+    s1.clear();
     
-    Monomial m0 = v0 * v0 * v1 * v1 * v2;
-    Monomial m1 = v0 * v0 * v0;
-    Monomial m2 = v0 * v0 * v1 * v2;
-    Monomial m0x = v0 * v0 * v1 * v2;
-    Monomial m0y = v0 * v0 * v1 * v1;
-    EXPECT_EQ(nullptr, m0.divide(m1));
-    EXPECT_EQ(nullptr, m1.divide(m0));
-    EXPECT_EQ(m0x, *m0.divide(v1));
-    EXPECT_EQ(m0y, *m0.divide(v2));
-    EXPECT_EQ(Monomial(v1), *m0.divide(m2));
+    
+    
+    
+    
+    
+   
 }
 
 

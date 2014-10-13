@@ -118,6 +118,11 @@ public:
 		return mNominator.isConstant() && mDenominator.isConstant();
 	}
 	
+	CoeffType constantPart() const 
+	{
+		return mNominator.constantPart() / mDenominator.constantPart();
+	}
+	
 	/**
 	 * Collect all occurring variables
      * @return All occcurring variables
