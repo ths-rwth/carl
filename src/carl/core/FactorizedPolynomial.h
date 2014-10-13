@@ -104,7 +104,7 @@ namespace carl
     public:
            
         // Constructors.
-        FactorizedPolynomial(); // no implementation
+        FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
         explicit FactorizedPolynomial( const P& _polynomial, CACHE* );
         //explicit FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );

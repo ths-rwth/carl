@@ -12,6 +12,14 @@
 namespace carl
 {
     template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial():
+        mCacheRef( CACHE::NO_REF ),
+        mpCache( nullptr ),
+        mCoefficient( 0 )
+    {
+    }
+    
+    template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const CoeffType& _coefficient ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( nullptr ),
