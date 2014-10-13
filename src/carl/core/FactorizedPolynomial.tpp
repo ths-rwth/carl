@@ -91,7 +91,9 @@ namespace carl
         mCoefficient( _toCopy.mCoefficient )
     {
         if ( mpCache != nullptr )
-            mpCache->reg( _toCopy.mCacheRef );
+        {
+            mpCache->reg( mCacheRef );
+        }
     }
     
     template<typename P>
@@ -108,14 +110,19 @@ namespace carl
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator=( const FactorizedPolynomial<P>& _fpoly )
     {
         ASSERT_CACHE_EQUAL( mpCache, _fpoly.pCache() );
+        mCoefficient = _fpoly.mCoefficient;
         if ( mpCache != nullptr )
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = _fpoly.cacheRef();
             mpCache->reg( mCacheRef );
         }
-        else
+        else if( _fpoly.mpCache != nullptr )
+        {
+            mpCache = _fpoly.mpCache;
             mCacheRef = _fpoly.cacheRef();
+            mpCache->reg( mCacheRef );
+        }
         return *this;
     }
         
@@ -563,10 +570,10 @@ namespace carl
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
 
-        Coeff<P> coefficientCommon = carl::gcd( _fpolyA.coefficient(), _fpolyB.coefficient() );
+        Coeff<P> coefficientCommon = carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )/carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) );
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
-
+        
          //Handle cases where one or both are constant
         if ( !existsFactorization( _fpolyA ) )
         {
@@ -601,6 +608,7 @@ namespace carl
 
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyA.pCache());
         _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyA.pCache());
+        
         return FactorizedPolynomial<P>( std::move( gcdFactorization ), coefficientCommon, _fpolyA.pCache() );
     }
     

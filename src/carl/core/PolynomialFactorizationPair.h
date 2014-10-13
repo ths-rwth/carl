@@ -71,9 +71,9 @@ namespace carl
          */
         void flattenFactorization() const;
 
-        inline void assertFactorization() const
+        inline bool assertFactorization() const
         {
-            assert( mpPolynomial == nullptr || computePolynomial( *this ) == *mpPolynomial );
+            return (mpPolynomial == nullptr || computePolynomial( *this ) == *mpPolynomial );
         }
 
         /**
