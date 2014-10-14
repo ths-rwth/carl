@@ -254,12 +254,6 @@ namespace carl
         template<typename P1>
         friend const P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
         
-        template<typename P1>
-        friend const P1 computeCoeffPolynomial( const FactorizedPolynomial<P1>& _fpoly )
-        {
-            return _fpoly.coefficient() * computePolynomial( _fpoly );
-        }
-
         /**
          * @param _fpoly The operand.
          * @return The given factorized polynomial times -1.
