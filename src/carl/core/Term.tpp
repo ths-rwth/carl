@@ -583,7 +583,7 @@ Term<Coefficient> Term<Coefficient>::gcd(const Term<Coefficient>& t1, const Term
 	assert(!t1.isZero());
 	assert(!t2.isZero());
 	if(t1.isConstant() || t2.isConstant()) return Term(Coefficient(1));
-	return Term(Coefficient(1), Monomial::gcd(t1.monomial(), t2.monomial()));
+	return Term(Coefficient(carl::gcd(t1.coeff(), t2.coeff())), Monomial::gcd(t1.monomial(), t2.monomial()));
 }
 
 

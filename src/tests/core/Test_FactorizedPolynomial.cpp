@@ -16,33 +16,29 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 TEST(FactorizedPolynomial, Construction)
 {
     carl::VariablePool::getInstance().clear();
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
-    Pol c1( (cln::cl_RA) 1 );
-    Pol c2( (cln::cl_RA) 42 );
-    Pol c3( (cln::cl_RA) -2 );
-    Pol c4( (cln::cl_RA) 0 );
-    Pol fA({(cln::cl_RA)1*x*y});
-    Pol fB({(cln::cl_RA)1*x*y*z});
-    Pol f1({(cln::cl_RA)-1*x, (cln::cl_RA)3*y});
-    Pol f2({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+
+    Pol c1 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol c2 = sp.parseMultivariatePolynomial<Rational>("42");
+    Pol c3 = sp.parseMultivariatePolynomial<Rational>("-2");
+    Pol c4 = sp.parseMultivariatePolynomial<Rational>("0");
+    Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
+    Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+    Pol f1 = sp.parseMultivariatePolynomial<Rational>("-1*x + 3*y");
+    Pol f2 = sp.parseMultivariatePolynomial<Rational>("x + -1*x^2 + 3*x^3");
     Pol f3 = f1*f1*f2;
     Pol f4 = f1*f2*f2;
     
-    CachePol fpCache;
+    std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fc1( (cln::cl_RA) 1 );
     FPol fc2( (cln::cl_RA) 42 );
     FPol fc3( (cln::cl_RA) -2 );
     FPol fc4( (cln::cl_RA) 0 );
-    FPol fpA( fA, &fpCache );
-    FPol fpB( fB, &fpCache );
-    FPol fp3( f3, &fpCache );
-    FPol fp4( f4, &fpCache );
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
+    FPol fp3( f3, pCache );
+    FPol fp4( f4, pCache );
 
     //Common divisor
     std::cout << "Common divisor of " << fpA << " and " << fpB;
@@ -154,9 +150,9 @@ TEST(FactorizedPolynomial, CommonDivisor)
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
     
-    CachePol fpCache;
-    FPol fpA( fA, &fpCache );
-    FPol fpB( fB, &fpCache );
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
     
     std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
     FPol fpC = commonDivisor( fpA, fpB );
@@ -169,14 +165,14 @@ TEST(FactorizedPolynomial, GCD)
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
 
-    Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
-    Pol pB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
+    Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
+    Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
 
-    CachePol fpCache;
-    FPol fpA( pA, &fpCache );
-    FPol fpB( pB, &fpCache );
-    FPol fpRestA( Pol( 3 ), &fpCache );
-    FPol fpRestB( Pol( 3 ), &fpCache );
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( pA, pCache );
+    FPol fpB( pB, pCache );
+    FPol fpRestA;
+    FPol fpRestB;
 
     Pol pGCD = gcd( pA, pB );
     Pol pRestA = pA.quotient( pGCD );
@@ -197,9 +193,9 @@ TEST(FactorizedPolynomial, LCM)
     Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
 
-    CachePol fpCache;
-    FPol fpA( pA, &fpCache );
-    FPol fpB( pB, &fpCache );
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( pA, pCache );
+    FPol fpB( pB, pCache );
 
     Pol pLCM = lcm( pA, pB );
     FPol fpLCM = lcm( fpA, fpB );
