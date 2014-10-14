@@ -233,3 +233,21 @@ TEST(FactorizedPolynomial, Subtraction)
     FPol fpSub4 = fpB - fpA;
     EXPECT_EQ( pSub4, computePolynomial( fpSub4 ) );
 }
+
+TEST(FactorizedPolynomial, Addition)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x"});
+
+    Pol fA = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol fB = sp.parseMultivariatePolynomial<Rational>("-1*x+1");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
+
+    Pol pAdd = fA + fB;
+    FPol fpAdd = fpA + fpB;
+    EXPECT_EQ( pAdd, computePolynomial( fpAdd ) );
+}

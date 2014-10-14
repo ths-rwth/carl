@@ -31,16 +31,22 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache ):
         mCacheRef( CACHE::NO_REF ),
-        mpCache( _pCache ),
-        mCoefficient( CoeffType(1)/_polynomial.coprimeFactor() )
+        mpCache( _polynomial.isZero() ? nullptr : _pCache ),
+        mCoefficient( _polynomial.isZero() ? CoeffType(0) : CoeffType(1)/_polynomial.coprimeFactor() )
     {
-        P poly = _polynomial.coprimeCoefficients();
-        if ( poly.isConstant() )
+        if ( _polynomial.isConstant() )
         {
             mpCache = nullptr;
         }
         else
         {
+            P poly = _polynomial * (CoeffType(1) / mCoefficient);
+            if ( poly.lcoeff() < 0 )
+            {
+                poly *= CoeffType(-1);
+                mCoefficient *= CoeffType(-1);
+            }
+
             assert( mpCache != nullptr );
             Factorization<P> factorization;
             PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( poly ) );
@@ -116,7 +122,8 @@ namespace carl
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = _fpoly.cacheRef();
-            if( mpCache != nullptr )
+            assert( _fpoly.pCache() == nullptr || mCacheRef != CACHE::NO_REF );
+            if( _fpoly.pCache() != nullptr )
                 mpCache->reg( mCacheRef );
         }
         else if( _fpoly.mpCache != nullptr )
@@ -230,8 +237,15 @@ namespace carl
         //Compute remaining sum
         P sum = computePolynomial( factorizationRestA ) * coefficientRestA;
         sum += computePolynomial( factorizationRestB ) * coefficientRestB;
-        FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
-        resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+        if ( sum.isConstant() )
+        {
+            coefficientCommon *= sum.constantPart();
+        }
+        else
+        {
+            FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
+            resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+        }
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
     }
 
@@ -706,7 +720,7 @@ namespace carl
         {
             if ( _fpoly.coefficient() != 1 )
                 _out << _fpoly.coefficient() << " * ";
-            return ( _out << _fpoly.content() );
+            return ( _out << "(" << _fpoly.content() << ")" );
         }
         else
             return ( _out << _fpoly.coefficient() );
