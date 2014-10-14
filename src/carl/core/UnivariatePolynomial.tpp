@@ -220,7 +220,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
-	if (this->isConstant() == 0) {
+	if (this->isConstant()) {
 		return result;
 	}
 	result.mCoefficients.reserve(mCoefficients.size()-nth);
@@ -1197,9 +1197,12 @@ LinearFactorRemains:
 		result /= factor;
 		LOGMSG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(result.mainVar(), factor) << ")^" << 1 );
 		// Add the constant factor to the factors.
-		if( linearFactors.begin()->first.isConstant() )
+		if( !linearFactors.empty() && linearFactors.begin()->first.isConstant() )
 		{
-			factor *= linearFactors.begin()->first.lcoeff();
+            if( linearFactors.begin()->first.isZero() )
+                factor = Coeff( 0 );
+            else
+                factor *= linearFactors.begin()->first.lcoeff();
 			linearFactors.erase(linearFactors.begin());
 		}
 		linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), factor), 1));
