@@ -238,9 +238,9 @@ TEST(UnivariatePolynomial, factorization)
     
     for(UnivariatePolynomial<cln::cl_RA> pol : polys)
     {
+//        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
         std::map<UnivariatePolynomial<cln::cl_RA>, unsigned> factors = pol.factorization();
         UnivariatePolynomial<cln::cl_RA> productOfFactors = UnivariatePolynomial<cln::cl_RA>(x, (cln::cl_RA)1);
-//        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
         for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {
 //            std::cout << "           ";
