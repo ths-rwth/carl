@@ -68,8 +68,10 @@ namespace carl
 
         /**
          * Turn (possible) tree structure of factorization into linear list of factors.
+         * @return true, if the factorization has been changed;
+         *         false, otherwise.
          */
-        void flattenFactorization() const;
+        bool flattenFactorization() const;
 
         inline bool assertFactorization() const
         {
@@ -205,12 +207,12 @@ namespace carl
     };
     
     /**
-    * Compute the polynomial from the given polynomial-factorization pair.
-    * @param _fpPair A polynomial-factorization pair.
-    * @return The polynomial.
-    */
-   template<typename P>
-   P computePolynomial( const PolynomialFactorizationPair<P>& _fpPair );
+     * Compute the polynomial from the given polynomial-factorization pair.
+     * @param _fpPair A polynomial-factorization pair.
+     * @return The polynomial.
+     */
+    template<typename P>
+    P computePolynomial( const PolynomialFactorizationPair<P>& _fpPair );
 } // namespace carl
 
 namespace std

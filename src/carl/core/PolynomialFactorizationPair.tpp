@@ -215,17 +215,19 @@ namespace carl
     }
 
     template<typename P>
-    void PolynomialFactorizationPair<P>::flattenFactorization() const
+    bool PolynomialFactorizationPair<P>::flattenFactorization() const
     {
         if ( mFactorization.size() == 1 && mFactorization.begin()->second == 1 )
         {
-            return;
+            return false;
         }
+        bool result = false;
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
         {
             if (factor->first.factorization().size() > 1){
                 //Update factorization
+                result = true;
                 Factorization<P> partFactorization = factor->first.factorization();
                 carl::exponent e = factor->second;
                 factor = mFactorization.erase(factor);
@@ -236,6 +238,7 @@ namespace carl
             }
         }
         assert( assertFactorization() );
+        return result;
     }
     
     template<typename P>
@@ -284,8 +287,10 @@ namespace carl
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
-        _pfPairA.flattenFactorization();
-        _pfPairB.flattenFactorization();
+        if( _pfPairA.flattenFactorization() )
+            _pfPairARefined = true;
+        if( _pfPairB.flattenFactorization() )
+            _pfPairBRefined = true;
         Factorization<P> factorizationA = _pfPairA.factorization();
         Factorization<P> factorizationB = _pfPairB.factorization();
         bool rest = true;
@@ -400,8 +405,10 @@ namespace carl
         } //End of outer while
         _restB = factorizationB;
 
-        _pfPairA.flattenFactorization();
-        _pfPairB.flattenFactorization();
+        if( _pfPairA.flattenFactorization() )
+            _pfPairARefined = true;
+        if( _pfPairB.flattenFactorization() )
+            _pfPairBRefined = true;
 
         // Check correctness
         assert( _pfPairA.assertFactorization() );

@@ -65,7 +65,8 @@ namespace carl
         template<typename P1>
         friend bool existsFactorization( const FactorizedPolynomial<P1>& fpoly )
         {
-            return fpoly.mpCache != nullptr && fpoly.mCacheRef != Cache<PolynomialFactorizationPair<P1>>::NO_REF;
+            assert( fpoly.mpCache == nullptr || fpoly.mCacheRef != Cache<PolynomialFactorizationPair<P1>>::NO_REF );
+            return fpoly.mpCache != nullptr;
         }
         
         #define ASSERT_CACHE_EQUAL( _cacheA, _cacheB ) assert( _cacheA == nullptr || _cacheB == nullptr || _cacheA == _cacheB )
@@ -168,10 +169,22 @@ namespace carl
          */
         const Factorization<P>& factorization() const
         {
+            assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
             //content().flattenFactorization();
-            assert( existsFactorization( *this ) );
             return content().factorization();
+        }
+        
+        
+        const P& polynomial() const
+        {
+            assert( existsFactorization( *this ) );
+            if( content().mpPolynomial == nullptr )
+            {
+                content().mpPolynomial = new P( computePolynomial( content().factorization() ) );
+                rehash();
+            }
+            return *content().mpPolynomial;
         }
 
         /**
@@ -183,11 +196,19 @@ namespace carl
         }
 
         /**
+         * @return true, if the factorized polynomial is constant.
+         */
+        bool isConstant() const
+        {
+            return mpCache == nullptr;
+        }
+
+        /**
          * @return true, if the factorized polynomial is one.
          */
         bool isOne() const
         {
-            return factorization().empty() && mCoefficient == 1;
+            return isConstant() && mCoefficient == 1;
         }
 
         /**
@@ -195,15 +216,7 @@ namespace carl
          */
         bool isZero() const
         {
-            return factorization().empty() && mCoefficient == 0;
-        }
-
-        /**
-         * @return true, if the factorized polynomial is constant.
-         */
-        bool isConstant() const
-        {
-            return factorization().empty();
+            return isConstant() && mCoefficient == 0;
         }
         
         CoeffType constantPart() const
