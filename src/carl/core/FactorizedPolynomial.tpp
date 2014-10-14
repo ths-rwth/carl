@@ -87,6 +87,11 @@ namespace carl
         else
         {
             assert( mpCache != nullptr );
+            for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
+            {
+                mCoefficient *= carl::pow( factor->first.coefficient(), factor->second );
+                factor->first.mCoefficient = 1;
+            }
             mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
         }
     }
@@ -244,6 +249,8 @@ namespace carl
         else
         {
             FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
+            coefficientCommon *= fpolySum.coefficient();
+            fpolySum.mCoefficient = Coeff<P>(1);
             resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
         }
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
