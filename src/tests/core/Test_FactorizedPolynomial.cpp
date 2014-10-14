@@ -201,3 +201,35 @@ TEST(FactorizedPolynomial, LCM)
     FPol fpLCM = lcm( fpA, fpB );
     EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
 }
+
+TEST(FactorizedPolynomial, Subtraction)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+
+    Pol c1 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
+    Pol fB = sp.parseMultivariatePolynomial<Rational>("z");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fc1( c1, pCache );
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
+
+    Pol pSub = c1 - fA;
+    FPol fpSub = fc1 - fpA;
+    EXPECT_EQ( pSub, computePolynomial( fpSub ) );
+
+    Pol pSub2 = fA - c1;
+    FPol fpSub2 = fpA - fc1;
+    EXPECT_EQ( pSub2, computePolynomial( fpSub2 ) );
+
+    Pol pSub3 = fA - fB;
+    FPol fpSub3 = fpA - fpB;
+    EXPECT_EQ( pSub3, computePolynomial( fpSub3 ) );
+
+    Pol pSub4 = fB - fA;
+    FPol fpSub4 = fpB - fpA;
+    EXPECT_EQ( pSub4, computePolynomial( fpSub4 ) );
+}
