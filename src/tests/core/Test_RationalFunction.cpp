@@ -32,10 +32,10 @@ TEST(RationalFunction, Construction)
     EXPECT_EQ(p2, r1.denominator());
     EXPECT_FALSE(r1.isZero());
     
-    CachePol fpCache;
+    std::shared_ptr<CachePol> pCache( new CachePol );
     
-    FPol fp1(p1, &fpCache);
-    FPol fp2(p2, &fpCache);
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
     
     RFactFunc rf1(fp1, fp2);
     EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
@@ -70,20 +70,20 @@ TEST(RationalFunction, Multiplication)
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
     EXPECT_FALSE(needs_cache<Pol>::value);
     
-    CachePol fpCache;
+    std::shared_ptr<CachePol> pCache( new CachePol );
     
-    FPol fp1(p1, &fpCache);
-    FPol fp2(p2, &fpCache);
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
     
-    FPol fp3(p3, &fpCache);
-    FPol fp4(p4, &fpCache);
+    FPol fp3(p3, pCache);
+    FPol fp4(p4, pCache);
     
     RFactFunc rf1(fp1, fp2);
     RFactFunc rf2(fp3, fp4);
     
     RFactFunc rf3 = rf1 * rf2;
-    FPol qf1(q1, &fpCache);
-    FPol qf2(q2, &fpCache);
+    FPol qf1(q1, pCache);
+    FPol qf2(q2, pCache);
     EXPECT_EQ(computePolynomial(qf1), computePolynomial(rf3.nominator()));
     EXPECT_EQ(computePolynomial(qf2), computePolynomial(rf3.denominator()));
 }
@@ -107,18 +107,18 @@ TEST(RationalFunction, Addition)
     Pol q2 = sp.parseMultivariatePolynomial<Rational>("5*x*y");
     EXPECT_EQ(p4, r3.denominator());
     
-    CachePol fpCache;
+    std::shared_ptr<CachePol> pCache( new CachePol );
     
-    FPol fp1(p1, &fpCache);
-    FPol fp2(p2, &fpCache);
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
     
-    FPol fp3(p3, &fpCache);
-    FPol fp4(p4, &fpCache);
+    FPol fp3(p3, pCache);
+    FPol fp4(p4, pCache);
     
     RFactFunc rf1(fp1, fp2);
     RFactFunc rf2(fp3, fp4);
     
     RFactFunc rf3 = rf1 + rf2;
-    FPol qf2(q2, &fpCache);
+    FPol qf2(q2, pCache);
     EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
 }

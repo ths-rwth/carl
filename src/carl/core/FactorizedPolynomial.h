@@ -39,7 +39,7 @@ namespace carl
         /**
          * The cache in which the actual content of this factorized polynomial is stored.
          */
-        CACHE* mpCache;
+        std::shared_ptr<CACHE> mpCache;
 
         /**
          * Co-prime coefficient of the factorization
@@ -107,9 +107,9 @@ namespace carl
         // Constructors.
         FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
-        explicit FactorizedPolynomial( const P& _polynomial, CACHE* );
+        explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& );
         //explicit FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
-        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, CACHE* );
+        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, const std::shared_ptr<CACHE>& );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -133,7 +133,7 @@ namespace carl
         /**
          * @return The cache used by this factorized polynomial.
          */
-        CACHE* pCache() const
+        std::shared_ptr<CACHE> pCache() const
         {
             return mpCache;
         }
@@ -240,7 +240,7 @@ namespace carl
          * @param _pCacheB Second cache.
          * @return A non-null cache.
          */
-        static CACHE* chooseCache( CACHE* _pCacheA, CACHE* _pCacheB )
+        static std::shared_ptr<CACHE> chooseCache( std::shared_ptr<CACHE> _pCacheA, std::shared_ptr<CACHE> _pCacheB )
         {
             if ( _pCacheA != nullptr )
                 return _pCacheA;

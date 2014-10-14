@@ -29,7 +29,7 @@ namespace carl
     }
 
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, CACHE* _pCache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( _pCache ),
         mCoefficient( CoeffType(1)/_polynomial.coprimeFactor() )
@@ -70,7 +70,7 @@ namespace carl
 //    }
     
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType& _coefficient, CACHE* _pCache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType& _coefficient, const std::shared_ptr<CACHE>& _pCache ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( _pCache ),
         mCoefficient( _coefficient )

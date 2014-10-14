@@ -30,15 +30,15 @@ TEST(FactorizedPolynomial, Construction)
     Pol f3 = f1*f1*f2;
     Pol f4 = f1*f2*f2;
     
-    CachePol fpCache;
+    std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fc1( (cln::cl_RA) 1 );
     FPol fc2( (cln::cl_RA) 42 );
     FPol fc3( (cln::cl_RA) -2 );
     FPol fc4( (cln::cl_RA) 0 );
-    FPol fpA( fA, &fpCache );
-    FPol fpB( fB, &fpCache );
-    FPol fp3( f3, &fpCache );
-    FPol fp4( f4, &fpCache );
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
+    FPol fp3( f3, pCache );
+    FPol fp4( f4, pCache );
 
     //Common divisor
     std::cout << "Common divisor of " << fpA << " and " << fpB;
@@ -150,9 +150,9 @@ TEST(FactorizedPolynomial, CommonDivisor)
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
     
-    CachePol fpCache;
-    FPol fpA( fA, &fpCache );
-    FPol fpB( fB, &fpCache );
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( fA, pCache );
+    FPol fpB( fB, pCache );
     
     std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
     FPol fpC = commonDivisor( fpA, fpB );
@@ -168,11 +168,11 @@ TEST(FactorizedPolynomial, GCD)
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
 
-    CachePol fpCache;
-    FPol fpA( pA, &fpCache );
-    FPol fpB( pB, &fpCache );
-    FPol fpRestA( Pol( 3 ), &fpCache );
-    FPol fpRestB( Pol( 3 ), &fpCache );
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( pA, pCache );
+    FPol fpB( pB, pCache );
+    FPol fpRestA;
+    FPol fpRestB;
 
     Pol pGCD = gcd( pA, pB );
     Pol pRestA = pA.quotient( pGCD );
@@ -193,9 +193,9 @@ TEST(FactorizedPolynomial, LCM)
     Pol pA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
 
-    CachePol fpCache;
-    FPol fpA( pA, &fpCache );
-    FPol fpB( pB, &fpCache );
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( pA, pCache );
+    FPol fpB( pB, pCache );
 
     Pol pLCM = lcm( pA, pB );
     FPol fpLCM = lcm( fpA, fpB );
