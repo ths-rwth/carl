@@ -87,11 +87,9 @@ namespace carl
         else
         {
             assert( mpCache != nullptr );
+            // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
-            {
-                mCoefficient *= carl::pow( factor->first.coefficient(), factor->second );
-                factor->first.mCoefficient = 1;
-            }
+                assert( factor->first.coefficient() == 1 );
             mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
         }
     }
@@ -194,6 +192,18 @@ namespace carl
         return result;
     }
     
+    template<typename P>
+    Coeff<P> distributeCoefficients( Factorization<P>& _factorization )
+    {
+        Coeff<P> result(1);
+        for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
+        {
+            result *= carl::pow( factor->first.coefficient(), factor->second );
+            factor->first.mCoefficient = 1;
+        }
+        return result;
+    }
+
     template<typename P>
     const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpoly )
     {
@@ -714,6 +724,9 @@ namespace carl
         if( rehashFPolyB )
             _fpolyB.rehash();
 
+        coefficientRestA *= distributeCoefficients( restAFactorization );
+        coefficientRestB *= distributeCoefficients( restBFactorization );
+        coefficientCommon *= distributeCoefficients( gcdFactorization );
         _fpolyRestA = FactorizedPolynomial<P>( std::move( restAFactorization ), coefficientRestA, _fpolyA.pCache());
         _fpolyRestB = FactorizedPolynomial<P>( std::move( restBFactorization ), coefficientRestB, _fpolyA.pCache());
         

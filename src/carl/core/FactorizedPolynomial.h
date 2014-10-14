@@ -72,6 +72,14 @@ namespace carl
         #define ASSERT_CACHE_EQUAL( _cacheA, _cacheB ) assert( _cacheA == nullptr || _cacheB == nullptr || _cacheA == _cacheB )
 
         /**
+         * Computes the coefficient of the factorization and sets the coefficients of all factors to 1.
+         * @param _factorization The factorization.
+         * @return The coefficients of the whole factorization.
+         */
+        template<typename P1>
+        friend Coeff<P1> distributeCoefficients( Factorization<P1>& _factorization );
+
+        /**
          * Computes the common divisor with rest of two factorizations.
          * @param _fFactorizationA The factorization of the first polynomial.
          * @param _fFactorizationB The factorization of the second polynomial.
