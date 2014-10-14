@@ -202,7 +202,7 @@ namespace carl
         {
             if ( existsFactorization( _fpolyB ) )
             {
-                return FactorizedPolynomial<P>( _fpolyB.polynomial() + _fpolyA.coefficient(), _fpolyB.pCache() );
+                return FactorizedPolynomial<P>( _fpolyB.polynomial() * _fpolyB.coefficient() + _fpolyA.coefficient(), _fpolyB.pCache() );
             }
             else
             {
@@ -211,7 +211,7 @@ namespace carl
         }
         else if ( !existsFactorization( _fpolyB ) )
         {
-            return FactorizedPolynomial<P>( _fpolyA.polynomial() + _fpolyB.coefficient(), _fpolyA.pCache() );
+            return FactorizedPolynomial<P>( _fpolyA.polynomial() * _fpolyA.coefficient() + _fpolyB.coefficient(), _fpolyA.pCache() );
         }
 
         Coeff<P> coefficientCommon = carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )/carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) );
