@@ -71,6 +71,8 @@ namespace carl
         
         #define ASSERT_CACHE_EQUAL( _cacheA, _cacheB ) assert( _cacheA == nullptr || _cacheB == nullptr || _cacheA == _cacheB )
 
+        #define ASSERT_CACHE_REF_LEGAL( _fp ) assert( (_fp.pCache() == nullptr) == (_fp.cacheRef() == CACHE::NO_REF) )
+
         /**
          * Computes the coefficient of the factorization and sets the coefficients of all factors to 1.
          * @param _factorization The factorization.
@@ -168,8 +170,11 @@ namespace carl
          */
         size_t getHash() const
         {
-            assert( existsFactorization( *this ) );
-            return mpCache->get( mCacheRef ).getHash();
+            if( existsFactorization( *this ) )
+            {
+                return mpCache->get( mCacheRef ).getHash();
+            }
+            return std::hash<CoeffType>()( mCoefficient );
         }
         
         /**

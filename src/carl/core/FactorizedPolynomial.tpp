@@ -18,6 +18,7 @@ namespace carl
         mpCache( nullptr ),
         mCoefficient( 0 )
     {
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
     }
     
     template<typename P>
@@ -40,16 +41,16 @@ namespace carl
         }
         else
         {
-            P poly = _polynomial * (CoeffType(1) / mCoefficient);
-            if ( poly.lcoeff() < 0 )
+            P* poly = new P(_polynomial * (CoeffType(1) / mCoefficient));
+            if ( poly->lcoeff() < 0 )
             {
-                poly *= CoeffType(-1);
+                (*poly) *= CoeffType(-1);
                 mCoefficient *= CoeffType(-1);
             }
 
             assert( mpCache != nullptr );
             Factorization<P> factorization;
-            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( poly ) );
+            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), poly );
             //Factorization is not set yet
             mCacheRef = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             /*
@@ -57,12 +58,12 @@ namespace carl
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            if ( poly != 1)
-                pfPair->mFactorization.insert( std::make_pair( *this, 1 ) );
+            content().mFactorization.insert( std::make_pair( *this, 1 ) );
 
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
         }
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
 //    template<typename P>
@@ -92,6 +93,7 @@ namespace carl
                 assert( factor->first.coefficient() == 1 );
             mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
         }
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
     template<typename P>
@@ -104,6 +106,7 @@ namespace carl
         {
             mpCache->reg( mCacheRef );
         }
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
     template<typename P>
@@ -121,20 +124,26 @@ namespace carl
     {
         ASSERT_CACHE_EQUAL( mpCache, _fpoly.pCache() );
         mCoefficient = _fpoly.mCoefficient;
-        if ( mpCache != nullptr )
+        if( mCacheRef != _fpoly.cacheRef() )
         {
-            mpCache->dereg( mCacheRef );
-            mCacheRef = _fpoly.cacheRef();
-            assert( _fpoly.pCache() == nullptr || mCacheRef != CACHE::NO_REF );
-            if( _fpoly.pCache() != nullptr )
+            if( mpCache != nullptr )
+            {
+                mpCache->dereg( mCacheRef );
+                mCacheRef = _fpoly.cacheRef();
+                assert( _fpoly.pCache() == nullptr || mCacheRef != CACHE::NO_REF );
+                if( _fpoly.pCache() != nullptr )
+                    mpCache->reg( mCacheRef );
+                else
+                    mpCache = nullptr;
+            }
+            else if( _fpoly.mpCache != nullptr )
+            {
+                mpCache = _fpoly.mpCache;
+                mCacheRef = _fpoly.cacheRef();
                 mpCache->reg( mCacheRef );
+            }
         }
-        else if( _fpoly.mpCache != nullptr )
-        {
-            mpCache = _fpoly.mpCache;
-            mCacheRef = _fpoly.cacheRef();
-            mpCache->reg( mCacheRef );
-        }
+        ASSERT_CACHE_REF_LEGAL( (*this) );
         return *this;
     }
         
@@ -398,6 +407,7 @@ namespace carl
             mpCache = nullptr;
         }
         mCoefficient *= _coef;
+        ASSERT_CACHE_REF_LEGAL( (*this) );
         return *this;
     }
     

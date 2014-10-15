@@ -249,6 +249,8 @@ protected:
 	template<typename Pol, bool AS>
 	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 	template<typename Pol, bool AS>
+	bool operator<(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
+	template<typename Pol, bool AS>
 	bool operator!=(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs);
 
 	template<typename Pol, bool AS>
