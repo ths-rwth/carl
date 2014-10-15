@@ -162,8 +162,11 @@ namespace carl
          */
         size_t getHash() const
         {
-            assert( existsFactorization( *this ) );
-            return mpCache->get( mCacheRef ).getHash();
+            if( existsFactorization( *this ) )
+            {
+                return mpCache->get( mCacheRef ).getHash();
+            }
+            return std::hash<CoeffType>()( mCoefficient );
         }
         
         /**
