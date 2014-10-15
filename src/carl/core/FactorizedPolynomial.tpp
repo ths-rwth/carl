@@ -66,16 +66,6 @@ namespace carl
         ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
-//    template<typename P>
-//    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* _pCache ):
-//        mCacheRef( CACHE::NO_REF ),
-//        mpCache( _pCache ),
-//        mCoefficient( CoeffType(1)/_polynomial.coprimeFactor() )
-//    {
-//        assert( mpCache != nullptr );
-//        mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ), new P( _polynomial ) ), &carl::canBeUpdated, &carl::update );
-//    }
-    
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType& _coefficient, const std::shared_ptr<CACHE>& _pCache ):
         mCacheRef( CACHE::NO_REF ),

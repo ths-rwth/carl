@@ -46,6 +46,8 @@ namespace carl
          */
         mutable CoeffType mCoefficient;
         
+        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, const std::shared_ptr<CACHE>& );
+
         /**
          * Updates the hash of the entry in the cache corresponding to this factorized 
          * polynomial, which is also its hash.
@@ -118,8 +120,6 @@ namespace carl
         FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
         explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& );
-        //explicit FactorizedPolynomial( const P& _polynomial, Factorization<P>&& _factorization, CACHE* );
-        explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, const std::shared_ptr<CACHE>& );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
