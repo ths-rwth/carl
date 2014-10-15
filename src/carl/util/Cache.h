@@ -173,8 +173,9 @@ namespace carl
         /**
          * Removes and reinserts the entry with the given reference, after its hash value is recalculated.
          * @param _refStoragePos The reference of the entry to apply the given function to.
+         * @return The new reference.
          */
-        void rehash( Ref _refStoragePos );
+        Ref rehash( Ref _refStoragePos );
         
         /**
          * Decays all activities by increasing the activity increment.

@@ -424,7 +424,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const CoeffType& _coef )
     {
-        if( _coef == 0 && mpCache != nullptr )
+        if( _coef == CoeffType( 0 ) && mpCache != nullptr )
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = CACHE::NO_REF;

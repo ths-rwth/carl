@@ -34,7 +34,7 @@ namespace carl
         /**
          * The reference of the entry in the cache corresponding to this factorized polynomial.
          */
-        typename CACHE::Ref mCacheRef;
+        mutable typename CACHE::Ref mCacheRef;
 
         /**
          * The cache in which the actual content of this factorized polynomial is stored.
@@ -55,7 +55,7 @@ namespace carl
         void rehash() const
         {
             if( mpCache != nullptr )
-                mpCache->rehash( mCacheRef );
+                mCacheRef = mpCache->rehash( mCacheRef );
         }
         
         void strengthenActivity() const
@@ -184,7 +184,8 @@ namespace carl
         {
             assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
-            content().flattenFactorization();
+            if( content().flattenFactorization() )
+                rehash();
             return content().factorization();
         }
         
