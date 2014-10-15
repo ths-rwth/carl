@@ -221,6 +221,23 @@ TEST(FactorizedPolynomial, Flattening)
     EXPECT_EQ( pRestC, computePolynomial( fpRestC ) );
 }
 
+TEST(FactorizedPolynomial, Flattening2)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x"});
+
+    Pol pA = sp.parseMultivariatePolynomial<Rational>("x");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( pA, pCache );
+    FPol fpB = fpA * fpA;
+    FPol fpC = fpB * fpB;
+    std::cout << fpA << ", " << fpB << ", " << fpC << std::endl;
+    fpC.factorization();
+    std::cout << fpC << std::endl;
+}
+
 TEST(FactorizedPolynomial, LCM)
 {
     carl::VariablePool::getInstance().clear();
@@ -331,6 +348,32 @@ TEST(FactorizedPolynomial, Quotient)
     FPol fp2( p2, pCache );
     FPol fp3 = fp1 * fp2;
     FPol fp4 = fp3 * fp2;
+
+    Pol pQuot = p4.quotient(p3);
+    FPol fpQuot = fp4.quotient(fp3);
+    EXPECT_EQ( pQuot, computePolynomial( fpQuot ) );
+}
+
+TEST(FactorizedPolynomial, Destructor)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("y");
+    Pol p3 = p1*p2;
+    Pol p4 = p3*p2;
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    FPol fp3 = fp1 * fp2;
+    FPol fp4 = fp3 * fp2;
+
+    FPol* pfp5 = new FPol( fp1 * fp1 );
+    std::cout << std::endl << *pfp5 << std::endl << std::endl;
+    delete pfp5;
 
     Pol pQuot = p4.quotient(p3);
     FPol fpQuot = fp4.quotient(fp3);
