@@ -175,7 +175,7 @@ namespace carl
          * @param _refStoragePos The reference of the entry to apply the given function to.
          * @return The new reference.
          */
-        Ref rehash( Ref _refStoragePos );
+        void rehash( Ref _refStoragePos );
         
         /**
          * Decays all activities by increasing the activity increment.

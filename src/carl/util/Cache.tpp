@@ -110,7 +110,7 @@ namespace carl
     }
     
     template<typename T>
-    typename Cache<T>::Ref Cache<T>::rehash( Ref _refStoragePos )
+    void Cache<T>::rehash( Ref _refStoragePos )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
@@ -120,20 +120,11 @@ namespace carl
         mCache.erase( cacheRef );
         element.first->rehash();
         auto ret = mCache.insert( element );
-        if( ret.second )
-        {
-            mCacheRefs[_refStoragePos] = ret.first;
-            return _refStoragePos;
-        }
-        else
+        if( !ret.second )
         {
             delete element.first;
-            element.first = nullptr;
-            mCacheRefs[_refStoragePos] = mCache.end();
-            mUnusedPositionsInCacheRefs.push( _refStoragePos );
-            ++mNumOfUnusedEntries;
-            return ret.first->second.refStoragePos;
         }
+        mCacheRefs[_refStoragePos] = ret.first;
     }
     
     template<typename T>

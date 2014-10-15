@@ -55,7 +55,7 @@ namespace carl
         void rehash() const
         {
             if( mpCache != nullptr )
-                mCacheRef = mpCache->rehash( mCacheRef );
+                mpCache->rehash( mCacheRef );
         }
         
         void strengthenActivity() const
