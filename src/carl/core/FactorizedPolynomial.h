@@ -71,6 +71,8 @@ namespace carl
         
         #define ASSERT_CACHE_EQUAL( _cacheA, _cacheB ) assert( _cacheA == nullptr || _cacheB == nullptr || _cacheA == _cacheB )
 
+        #define ASSERT_CACHE_REF_LEGAL( _fp ) assert( (_fp.pCache() == nullptr) == (_fp.cacheRef() == CACHE::NO_REF) )
+
         /**
          * Computes the common divisor with rest of two factorizations.
          * @param _fFactorizationA The factorization of the first polynomial.

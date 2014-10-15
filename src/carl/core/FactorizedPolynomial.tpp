@@ -63,7 +63,7 @@ namespace carl
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
         }
-        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
 //    template<typename P>
@@ -95,7 +95,7 @@ namespace carl
             }
             mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
         }
-        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
     template<typename P>
@@ -108,7 +108,7 @@ namespace carl
         {
             mpCache->reg( mCacheRef );
         }
-        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
     template<typename P>
@@ -126,21 +126,26 @@ namespace carl
     {
         ASSERT_CACHE_EQUAL( mpCache, _fpoly.pCache() );
         mCoefficient = _fpoly.mCoefficient;
-        if ( mpCache != nullptr )
+        if( mCacheRef != _fpoly.cacheRef() )
         {
-            mpCache->dereg( mCacheRef );
-            mCacheRef = _fpoly.cacheRef();
-            assert( _fpoly.pCache() == nullptr || mCacheRef != CACHE::NO_REF );
-            if( _fpoly.pCache() != nullptr )
+            if( mpCache != nullptr )
+            {
+                mpCache->dereg( mCacheRef );
+                mCacheRef = _fpoly.cacheRef();
+                assert( _fpoly.pCache() == nullptr || mCacheRef != CACHE::NO_REF );
+                if( _fpoly.pCache() != nullptr )
+                    mpCache->reg( mCacheRef );
+                else
+                    mpCache = nullptr;
+            }
+            else if( _fpoly.mpCache != nullptr )
+            {
+                mpCache = _fpoly.mpCache;
+                mCacheRef = _fpoly.cacheRef();
                 mpCache->reg( mCacheRef );
+            }
         }
-        else if( _fpoly.mpCache != nullptr )
-        {
-            mpCache = _fpoly.mpCache;
-            mCacheRef = _fpoly.cacheRef();
-            mpCache->reg( mCacheRef );
-        }
-        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
+        ASSERT_CACHE_REF_LEGAL( (*this) );
         return *this;
     }
         
@@ -388,7 +393,7 @@ namespace carl
             mpCache = nullptr;
         }
         mCoefficient *= _coef;
-        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
+        ASSERT_CACHE_REF_LEGAL( (*this) );
         return *this;
     }
     
