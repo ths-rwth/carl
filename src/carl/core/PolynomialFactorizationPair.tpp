@@ -223,7 +223,7 @@ namespace carl
         }
         bool result = false;
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
+        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
         {
             if (factor->first.factorization().size() > 1){
                 //Update factorization
@@ -241,6 +241,10 @@ namespace carl
                         insertResult.first->second += partFactor->second * e;
                     }
                 }
+            }
+            else
+            {
+                ++factor;
             }
         }
         assert( assertFactorization() );
@@ -411,6 +415,7 @@ namespace carl
         } //End of outer while
         _restB = factorizationB;
 
+        std::cout << _pfPairA << std::endl;
         if( _pfPairA.flattenFactorization() )
             _pfPairARefined = true;
         if( _pfPairB.flattenFactorization() )

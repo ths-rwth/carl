@@ -223,8 +223,12 @@ namespace carl
             assert( _toRemove->second.usageCount == 0 );
             mCacheRefs[_toRemove->second.refStoragePos] = mCache.end();
             mUnusedPositionsInCacheRefs.push( _toRemove->second.refStoragePos );
-            ++mNumOfUnusedEntries;
-            return mCache.erase( _toRemove );
+            assert( mNumOfUnusedEntries > 0 );
+            --mNumOfUnusedEntries;
+            T* toDel = _toRemove->first;
+            auto result = mCache.erase( _toRemove );
+            delete toDel;
+            return result;
         }
         
     };

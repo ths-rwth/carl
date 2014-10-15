@@ -69,6 +69,7 @@ namespace carl
                 ret.first->second.refStoragePos = mUnusedPositionsInCacheRefs.top();
                 mUnusedPositionsInCacheRefs.pop();
             }
+            ++mNumOfUnusedEntries;
             if( mCache.size() >= mMaxCacheSize ) // Clean, if the number of elements in the cache exceeds the threshold.
             {
                 clean();
@@ -85,7 +86,10 @@ namespace carl
         typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
         assert( cacheRef != mCache.end() );
         if( cacheRef->second.usageCount == 0 )
+        {
+            assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
+        }
         ++cacheRef->second.usageCount;
     }
     
