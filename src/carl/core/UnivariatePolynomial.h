@@ -244,6 +244,12 @@ public:
 		assert(this->isConsistent());
 		return mCoefficients.size() <= 1;
 	}
+	
+	bool isLinearInMainVar() const
+	{
+		assert(this->isConsistent());
+		return mCoefficients.size() <= 2;
+	}
 
 	/**
 	 * Checks whether the polynomial is only a number.

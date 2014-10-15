@@ -330,3 +330,8 @@ struct UnderlyingNumberType<UnivariatePolynomial<C>>: has_subtype<typename Under
 template<typename C, typename O, typename P>
 struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>: has_subtype<typename UnderlyingNumberType<C>::type> {};
 }
+
+namespace carl
+{
+template<typename T> struct needs_cache : std::false_type {};
+}

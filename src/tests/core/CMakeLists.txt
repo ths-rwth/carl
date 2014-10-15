@@ -7,11 +7,13 @@ add_executable(runCoreTests
         Test_MultivariatePolynomial.cpp
         Test_UnivariatePolynomial.cpp
         Test_MultivariateHensel.cpp
-        #Test_MultivariateGCD.cpp
+        Test_MultivariateGCD.cpp
         Test_RealAlgebraicNumber.cpp
         Test_RootFinder.cpp
         Test_Sign.cpp
+        Test_FactorizedPolynomial.cpp
 		Test_RationalFunction.cpp
+		Test_Constraint.cpp
 )
 cotire(runCoreTests)
 

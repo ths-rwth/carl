@@ -2,6 +2,7 @@
 #include "carl/core/RationalFunction.h"
 #include "carl/core/VariablePool.h"
 #include "carl/util/stringparser.h"
+#include "carl/core/FactorizedPolynomial.h"
 
 #ifdef COMPARE_WITH_GINAC
 #include <cln/cln.h>
@@ -13,8 +14,11 @@ typedef mpq_class Rational;
 
 using namespace carl;
 
-typedef RationalFunction<MultivariatePolynomial<Rational>>  RFunc;
 typedef MultivariatePolynomial<Rational> Pol;
+typedef FactorizedPolynomial<Pol> FPol;
+typedef RationalFunction<Pol> RFunc;
+typedef RationalFunction<FPol> RFactFunc;
+typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
 TEST(RationalFunction, Construction)
 {
@@ -27,10 +31,21 @@ TEST(RationalFunction, Construction)
     EXPECT_EQ(p1, r1.nominator());
     EXPECT_EQ(p2, r1.denominator());
     EXPECT_FALSE(r1.isZero());
+    
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+    
+    RFactFunc rf1(fp1, fp2);
+    EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
+    EXPECT_EQ(computePolynomial(fp2), computePolynomial(rf1.denominator()));
+    EXPECT_FALSE(rf1.isZero());
 }
 
 TEST(RationalFunction, Multiplication)
 {
+    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
     
@@ -48,10 +63,34 @@ TEST(RationalFunction, Multiplication)
     Pol q2 = sp.parseMultivariatePolynomial<Rational>("20*y^2");
     EXPECT_EQ(q1, r3.nominator());
     EXPECT_EQ(q2, r3.denominator());
+    
+    Variable x = carl::VariablePool::getInstance().findVariableWithName("x");
+    RFunc r4( x );
+    r4 *= x;
+    EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
+    EXPECT_FALSE(needs_cache<Pol>::value);
+    
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+    
+    FPol fp3(p3, pCache);
+    FPol fp4(p4, pCache);
+    
+    RFactFunc rf1(fp1, fp2);
+    RFactFunc rf2(fp3, fp4);
+    
+    RFactFunc rf3 = rf1 * rf2;
+    FPol qf1(q1, pCache);
+    FPol qf2(q2, pCache);
+    EXPECT_EQ(computePolynomial(qf1), computePolynomial(rf3.nominator()));
+    EXPECT_EQ(computePolynomial(qf2), computePolynomial(rf3.denominator()));
 }
 
 TEST(RationalFunction, Addition)
 {
+    carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
     
@@ -65,6 +104,53 @@ TEST(RationalFunction, Addition)
     RFunc r2(p3, p4);
     
     RFunc r3 = r1 + r2;
-    Pol q2 = sp.parseMultivariatePolynomial<Rational>("5*x*y");
     EXPECT_EQ(p4, r3.denominator());
+    
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+    
+    FPol fp3(p3, pCache);
+    FPol fp4(p4, pCache);
+    
+    RFactFunc rf1(fp1, fp2);
+    RFactFunc rf2(fp3, fp4);
+    
+    RFactFunc rf3 = rf1 + rf2;
+    EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
+}
+
+TEST(RationalFunction, Subtraction)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("1");
+
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("1+x");
+    Pol p4 = sp.parseMultivariatePolynomial<Rational>("1");
+
+    RFunc r1(p1, p2);
+    RFunc r2(p3, p4);
+
+    RFunc r3 = r1 - r2;
+    EXPECT_EQ(p4, r3.denominator());
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+
+    FPol fp3(p3, pCache);
+    FPol fp4(p4, pCache);
+
+    RFactFunc rf1(fp1, fp2);
+    RFactFunc rf2(fp3, fp4);
+
+    RFactFunc rf3 = rf1 - rf2;
+    FPol tmp = fp1 - fp3;
+    EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
 }

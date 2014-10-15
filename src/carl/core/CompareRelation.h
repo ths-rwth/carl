@@ -6,6 +6,7 @@
 
 #pragma once
 #include <iostream>
+#include <memory>
 
 namespace carl {
 
@@ -21,6 +22,20 @@ inline std::ostream& operator<<(std::ostream& os, const CompareRelation& r) {
 		case CompareRelation::GEQ:	os << ">="; break;
 	}
 	return os;
+}
+
+inline CompareRelation inverse(CompareRelation c)
+{
+	switch (c) {
+		case CompareRelation::EQ:	return CompareRelation::NEQ;
+		case CompareRelation::NEQ:	return CompareRelation::EQ;
+		case CompareRelation::LT:	return CompareRelation::GEQ;
+		case CompareRelation::LEQ:	return CompareRelation::GT;
+		case CompareRelation::GT:	return CompareRelation::LEQ;
+		case CompareRelation::GEQ:	return CompareRelation::LT;
+	}
+	assert(false);
+	return CompareRelation::EQ;
 }
 
 inline std::string toString(CompareRelation r) {
@@ -39,7 +54,7 @@ namespace std {
 
 template<>
 struct hash<carl::CompareRelation> {
-	std::size_t operator()(const carl::CompareRelation& rel) {
+	std::size_t operator()(const carl::CompareRelation& rel) const {
 		return std::size_t(rel);
 	}
 };

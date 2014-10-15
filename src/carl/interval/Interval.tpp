@@ -597,7 +597,7 @@ bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) cons
 	}
 
 template<typename Number>
-Interval<Number> Interval<Number>::power(unsigned exp) const
+Interval<Number> Interval<Number>::pow(unsigned exp) const
 	{
 		assert(this->isConsistent());
 		assert(exp <= INT_MAX );
@@ -656,7 +656,7 @@ Interval<Number> Interval<Number>::power(unsigned exp) const
 	}
 
 template<typename Number>
-void Interval<Number>::power_assign(unsigned exp)
+void Interval<Number>::pow_assign(unsigned exp)
 	{
 		*this = this->power(exp);
 	}
