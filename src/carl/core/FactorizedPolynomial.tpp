@@ -272,6 +272,9 @@ namespace carl
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
 
+        if (coefficientCommon == 0)
+            return FactorizedPolynomial<P>();
+
         Factorization<P> factorizationRestA, factorizationRestB;
         assert( existsFactorization( _fpolyA ) );
         const Factorization<P>& factorizationA = _fpolyA.factorization();
@@ -284,16 +287,19 @@ namespace carl
         //Compute remaining sum
         P sum = computePolynomial( factorizationRestA ) * coefficientRestA;
         sum += computePolynomial( factorizationRestB ) * coefficientRestB;
-        if ( sum.isConstant() )
-        {
-            coefficientCommon *= sum.constantPart();
-        }
+        if ( sum.isZero() )
+            return FactorizedPolynomial<P>();
         else
         {
-            FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
-            coefficientCommon *= fpolySum.coefficient();
-            fpolySum.mCoefficient = Coeff<P>(1);
-            resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+            if ( sum.isConstant() )
+                coefficientCommon *= sum.constantPart();
+            else
+            {
+                FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
+                coefficientCommon *= fpolySum.coefficient();
+                fpolySum.mCoefficient = Coeff<P>(1);
+                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+            }
         }
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
     }
