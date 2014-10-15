@@ -170,7 +170,7 @@ namespace carl
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             return true;
         assert( _updateWith.mpPolynomial == nullptr || (*_toUpdate.mpPolynomial) == (*_updateWith.mpPolynomial) );
-        return !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() );
+        return !_updateWith.factorization().empty() && !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() );
     }
 
     template<typename P>
@@ -184,7 +184,7 @@ namespace carl
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             _toUpdate.mpPolynomial = _updateWith.mpPolynomial;
         // The factorization of the PolynomialFactorizationPair to update with can be empty, if constructed freshly by a polynomial.
-        if( !_updateWith.factorization().empty() && !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
+        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
         {
             // Calculating the gcd refines both factorizations to the same factorization
             bool refineA = false;
@@ -192,7 +192,6 @@ namespace carl
             Factorization<P> restA, restB;
             gcd( _toUpdate, _updateWith, restA, restB, refineA, refineB );
         }
-        _toUpdate.rehash();
     }
 
     template<typename P>
