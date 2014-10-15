@@ -40,16 +40,16 @@ namespace carl
         }
         else
         {
-            P poly = _polynomial * (CoeffType(1) / mCoefficient);
-            if ( poly.lcoeff() < 0 )
+            P* poly = new P(_polynomial * (CoeffType(1) / mCoefficient));
+            if ( poly->lcoeff() < 0 )
             {
-                poly *= CoeffType(-1);
+                (*poly) *= CoeffType(-1);
                 mCoefficient *= CoeffType(-1);
             }
 
             assert( mpCache != nullptr );
             Factorization<P> factorization;
-            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P( poly ) );
+            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), poly );
             //Factorization is not set yet
             mCacheRef = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             /*
@@ -57,8 +57,7 @@ namespace carl
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            if ( poly != 1)
-                pfPair->mFactorization.insert( std::make_pair( *this, 1 ) );
+            content().mFactorization.insert( std::make_pair( *this, 1 ) );
 
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
