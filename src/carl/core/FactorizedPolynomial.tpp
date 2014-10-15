@@ -534,6 +534,8 @@ namespace carl
         if( existsFactorization( _fpolyA ) )
             lcmFactorization.insert( _fpolyA.factorization().begin(), _fpolyA.factorization().end() );
         lcmFactorization.insert( restBFactorization.begin(), restBFactorization.end() );
+
+        coefficientLCM *= distributeCoefficients( lcmFactorization );
         return FactorizedPolynomial<P>( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
     }
 
