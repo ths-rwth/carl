@@ -44,9 +44,6 @@ namespace carl
         
         if( !ret.second ) // There is already an equal object in the cache.
         {
-            if( ret.first->second.usageCount == 0 )
-                --mNumOfUnusedEntries;
-            ++ret.first->second.usageCount;
             // Try to update the entry in the cache by the information in the given object.
             if( (*_canBeUpdated)( *(ret.first->first), *_toCache ) )
             {
@@ -57,7 +54,6 @@ namespace carl
                 assert( ret.second );
                 mCacheRefs[element.second.refStoragePos] = ret.first;
             }
-            delete _toCache;
         }
         else // Create a new entry in the cache.
         {

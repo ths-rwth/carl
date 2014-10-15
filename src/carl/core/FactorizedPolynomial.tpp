@@ -63,11 +63,16 @@ namespace carl
                 //Factorization is not set yet
                 auto ret = mpCache->cache( pfPair, &carl::canBeUpdated, &carl::update );
                 mCacheRef = ret.first;
+                mpCache->reg( mCacheRef );
                 if( ret.second )
                 {
                     assert( content().mFactorization.empty() );
                     content().mFactorization.insert( std::make_pair( *this, 1 ) );
                 }
+                else
+                {
+                    delete pfPair;
+                } 
             }
             else
             {
@@ -97,9 +102,16 @@ namespace carl
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
                 assert( factor->first.coefficient() == 1 );
-            mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update ).first;
+            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( _factorization ) );
+            auto ret = mpCache->cache( pfPair, &carl::canBeUpdated, &carl::update );
+            mCacheRef = ret.first;
+            mpCache->reg( mCacheRef );
+            if( !ret.second )
+            {
+                delete pfPair;
+            }
         }
-        //ASSERT_CACHE_REF_LEGAL( (*this) );
+        ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
     template<typename P>

@@ -67,7 +67,7 @@ namespace carl
             double activity;
 
             Info( double _activity ):
-                usageCount( 1 ),
+                usageCount( 0 ),
                 refStoragePos( 0 ),
                 activity( _activity )
             {}
