@@ -243,7 +243,7 @@ struct is_number<GFNumber<C>>: std::true_type {};
  * We consider a type to be rational, if it can (in theory) represent any rational number.
  * Default is false.
  */
-template<typename type>
+template<typename T>
 struct is_rational: std::false_type {};
 
 /**
@@ -257,11 +257,18 @@ struct is_rational: std::false_type {};
  * Default is true for rationals, false otherwise.
  * @ingroup typetraits_is_subset_of_rationals
  */
-template<typename Type>
+template<typename T>
 struct is_subset_of_rationals {
 	/// Default value of this trait.
-	static constexpr bool value = is_rational<Type>::value;
+	static constexpr bool value = is_rational<T>::value;
 };
+
+template<typename T>
+struct is_polynomial: std::false_type {};
+template<typename T>
+struct is_polynomial<carl::UnivariatePolynomial<T>>: std::true_type {};
+template<typename T, typename O, typename P>
+struct is_polynomial<carl::MultivariatePolynomial<T, O, P>>: std::true_type {};
 
 /**
  * Type trait for the characteristic of the given field (template argument).
