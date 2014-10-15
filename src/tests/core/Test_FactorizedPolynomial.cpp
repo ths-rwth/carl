@@ -277,3 +277,25 @@ TEST(FactorizedPolynomial, Multiplication)
     FPol fpMul2 = fp2 * fp4;
     EXPECT_EQ( pMul2, computePolynomial( fpMul2 ) );
 }
+
+TEST(FactorizedPolynomial, Quotient)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("y");
+    Pol p3 = p1*p2;
+    Pol p4 = p3*p2;
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    FPol fp3 = fp1 * fp2;
+    FPol fp4 = fp3 * fp2;
+
+    Pol pQuot = p4.quotient(p3);
+    FPol fpQuot = fp4.quotient(fp3);
+    EXPECT_EQ( pQuot, computePolynomial( fpQuot ) );
+}

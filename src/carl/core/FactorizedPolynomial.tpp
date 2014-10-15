@@ -541,10 +541,19 @@ namespace carl
         if( rehashFPolyB )
             _fpolyB.rehash();
 
+        //Compute lcm as A*restB
         Factorization<P> lcmFactorization;
         if( existsFactorization( _fpolyA ) )
             lcmFactorization.insert( _fpolyA.factorization().begin(), _fpolyA.factorization().end() );
-        lcmFactorization.insert( restBFactorization.begin(), restBFactorization.end() );
+        for ( auto factor = restBFactorization.begin(); factor != restBFactorization.end(); factor++ )
+        {
+            auto result = lcmFactorization.insert( *factor );
+            if ( !result.second )
+            {
+                //Increment exponent for already existing factor
+                result.first->second += factor->second;
+            }
+        }
 
         coefficientLCM *= distributeCoefficients( lcmFactorization );
         return FactorizedPolynomial<P>( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
