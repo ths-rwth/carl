@@ -126,6 +126,7 @@ namespace carl
         auto ret = mCache.insert( element );
         if( !ret.second )
         {
+            ret.first->second.usageCount += element.second.usageCount;
             delete element.first;
         }
         mCacheRefs[_refStoragePos] = ret.first;
@@ -134,6 +135,7 @@ namespace carl
     template<typename T>
     void Cache<T>::clean()
     {
+        assert(false);
         if( mNumOfUnusedEntries < ((double) mCache.size() * mCacheReductionAmount) )
         {
             if( mNumOfUnusedEntries > 0 )
