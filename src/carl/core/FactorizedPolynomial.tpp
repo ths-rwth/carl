@@ -331,8 +331,10 @@ namespace carl
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
+
         if( _fpolyA.isZero() || _fpolyB.isZero() )
             return FactorizedPolynomial<P>();
+
         if( !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result( _fpolyA );
@@ -345,6 +347,7 @@ namespace carl
             result.mCoefficient *= _fpolyA.mCoefficient;
             return result;
         }
+
         Factorization<P> resultFactorization;
         const Factorization<P>& factorizationA = _fpolyA.factorization();
         const Factorization<P>& factorizationB = _fpolyB.factorization();
@@ -381,6 +384,7 @@ namespace carl
         }
 
         Coeff<P> coefficientResult = _fpolyA.coefficient() * _fpolyB.coefficient();
+        coefficientResult *= distributeCoefficients( resultFactorization );
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
     }
     
