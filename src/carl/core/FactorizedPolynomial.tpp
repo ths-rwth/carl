@@ -161,6 +161,10 @@ namespace carl
                 mpCache->reg( mCacheRef );
             }
         }
+        else if( mpCache != nullptr )
+        {
+            mpCache->reg( mCacheRef );
+        }
         ASSERT_CACHE_REF_LEGAL( (*this) );
         return *this;
     }
