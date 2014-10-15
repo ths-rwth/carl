@@ -232,9 +232,15 @@ namespace carl
                 Factorization<P> partFactorization = factor->first.factorization();
                 carl::exponent e = factor->second;
                 mFactorization.erase(factor);
+
                 for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
-                    mFactorization.insert( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
+                    auto insertResult = mFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
+                    if ( !insertResult.second )
+                    {
+                        //Increment exponent for already existing factor
+                        insertResult.first->second += partFactor->second * e;
+                    }
                 }
                 //Start from beginning as new inserted factors could not be flat
                 factor = mFactorization.begin();
@@ -426,13 +432,7 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        if( _pfPair.factorization().size() == 0 ) // Special case only during construction of a PolynomialFactorizationPair with a polynomial
-        {
-            assert( _pfPair.mpPolynomial != nullptr );
-            _out << *_pfPair.mpPolynomial;
-            return _out;
-        }
-        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1 )
+        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1)
         {
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;

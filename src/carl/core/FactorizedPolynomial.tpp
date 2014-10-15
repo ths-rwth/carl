@@ -778,7 +778,7 @@ namespace carl
         {
             if ( _fpoly.coefficient() != 1 )
                 _out << _fpoly.coefficient() << " * ";
-            return ( _out << "(" << _fpoly.content() << ")" );
+            return _out << _fpoly.content();
         }
         else
             return ( _out << _fpoly.coefficient() );

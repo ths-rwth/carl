@@ -184,7 +184,7 @@ namespace carl
         {
             assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
-            //content().flattenFactorization();
+            content().flattenFactorization();
             return content().factorization();
         }
         

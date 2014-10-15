@@ -190,7 +190,7 @@ namespace carl
         /**
          * Prints all information stored in this cache to std::cout.
          */
-        void print();
+        void print() const;
         
         /**
          * @param _refStoragePos The reference of the entry to obtain the object from. 

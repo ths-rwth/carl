@@ -199,7 +199,7 @@ namespace carl
     }
     
     template<typename T>
-    void Cache<T>::print()
+    void Cache<T>::print() const
     {
         std::cout << "General cache information:" << std::endl;
         std::cout << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
