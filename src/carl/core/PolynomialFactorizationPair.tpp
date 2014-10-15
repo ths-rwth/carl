@@ -414,8 +414,8 @@ namespace carl
         assert( _pfPairA.assertFactorization() );
         assert( _pfPairB.assertFactorization() );
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "GCD (internal) of " << _pfPairA << " and " << _pfPairB << ": " << result << " with rests " << _restA << " and " << _restB );
-        assert( computePolynomial( result ) * computePolynomial( _restA ) == *_pfPairA.mpPolynomial);
-        assert( computePolynomial( result ) * computePolynomial( _restB ) == *_pfPairB.mpPolynomial);
+        assert( computePolynomial( result ) * computePolynomial( _restA ) == computePolynomial( _pfPairA ) );
+        assert( computePolynomial( result ) * computePolynomial( _restB ) == computePolynomial( _pfPairB ) );
 
         return result;
     }
