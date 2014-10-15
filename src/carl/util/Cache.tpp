@@ -129,6 +129,9 @@ namespace carl
         {
             delete element.first;
             element.first = nullptr;
+            mCacheRefs[_refStoragePos] = mCache.end();
+            mUnusedPositionsInCacheRefs.push( _refStoragePos );
+            ++mNumOfUnusedEntries;
             return ret.first->second.refStoragePos;
         }
     }
