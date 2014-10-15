@@ -230,11 +230,13 @@ namespace carl
                 result = true;
                 Factorization<P> partFactorization = factor->first.factorization();
                 carl::exponent e = factor->second;
-                factor = mFactorization.erase(factor);
+                mFactorization.erase(factor);
                 for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
-                    mFactorization.insert( factor, std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
+                    mFactorization.insert( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
                 }
+                //Start from beginning as new inserted factors could not be flat
+                factor = mFactorization.begin();
             }
         }
         assert( assertFactorization() );
