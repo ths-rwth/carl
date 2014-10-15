@@ -440,7 +440,7 @@ namespace carl
         if( isZero() )
             return FactorizedPolynomial<P>();
         FactorizedPolynomial<P> result = lazyDiv( *this, _fdivisor );
-        assert( _fdivisor * result == *this );
+        assert( computePolynomial( _fdivisor ) * computePolynomial( result ) == computePolynomial( *this ) );
         return result;
     }
 
@@ -503,6 +503,7 @@ namespace carl
             factorA++;
         }
         Coeff<P> coefficientResult = _fpolyA.coefficient() / _fpolyB.coefficient();
+        assert( computePolynomial( _fpolyB ) * computePolynomial( resultFactorization ) * coefficientResult == computePolynomial( _fpolyA ) );
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
     }
 
