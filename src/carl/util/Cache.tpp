@@ -123,7 +123,6 @@ namespace carl
         mCache.erase( cacheRef );
         element.first->rehash();
         auto ret = mCache.insert( element );
-        assert( ret.second );
         mCacheRefs[_refStoragePos] = ret.first;
     }
     
