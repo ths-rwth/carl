@@ -228,9 +228,9 @@ namespace carl
             if (factor->first.factorization().size() > 1){
                 //Update factorization
                 result = true;
-                Factorization<P> partFactorization = factor->first.factorization();
+                const Factorization<P>& partFactorization = factor->first.factorization();
                 carl::exponent e = factor->second;
-                mFactorization.erase(factor);
+                factor = mFactorization.erase(factor);
 
                 for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
@@ -241,8 +241,6 @@ namespace carl
                         insertResult.first->second += partFactor->second * e;
                     }
                 }
-                //Start from beginning as new inserted factors could not be flat
-                factor = mFactorization.begin();
             }
         }
         assert( assertFactorization() );
