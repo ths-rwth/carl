@@ -388,7 +388,14 @@ namespace carl
                                 factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentA-exponentCommon ) );
                         }
                         else
-                            rest = false;
+                        {
+                            if ( exponentA > exponentCommon )
+                            {
+                                exponentA -= exponentCommon;
+                            }
+                            else
+                                rest = false;
+                        }
                         if (remainB != 1)
                         {
                             //Set new factorization
@@ -401,6 +408,10 @@ namespace carl
                             if (exponentB > exponentCommon)
                                 factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon ) );
                             _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
+                        }
+                        else if ( exponentB > exponentCommon )
+                        {
+                            _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon) );
                         }
                     }
                 }
@@ -415,7 +426,6 @@ namespace carl
         } //End of outer while
         _restB = factorizationB;
 
-        std::cout << _pfPairA << std::endl;
         if( _pfPairA.flattenFactorization() )
             _pfPairARefined = true;
         if( _pfPairB.flattenFactorization() )
