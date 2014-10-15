@@ -298,7 +298,7 @@ namespace carl
                 FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
                 coefficientCommon *= fpolySum.coefficient();
                 fpolySum.mCoefficient = Coeff<P>(1);
-                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
             }
         }
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
@@ -395,7 +395,7 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>(factorA->first, factorA->second + factorB->second ) );
+                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>(factorA->first, factorA->second + factorB->second ) );
                 factorA++;
                 factorB++;
             }
@@ -516,7 +516,7 @@ namespace carl
             if( factorA->first == factorB->first )
             {
                 if ( factorA->second > factorB->second )
-                    resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>(factorA->first, factorA->second - factorB->second ) );
+                    resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>(factorA->first, factorA->second - factorB->second ) );
                 factorA++;
                 factorB++;
             }

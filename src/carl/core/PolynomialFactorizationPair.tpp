@@ -97,7 +97,7 @@ namespace carl
             mHash = 0;
             for( auto polyExpPair = mFactorization.begin(); polyExpPair != mFactorization.end(); ++polyExpPair )
             {
-                mHash = (mHash << 5) | (mHash >> (sizeof(size_t)*8 - 5));
+                mHash = (mHash << 5) | (mHash >> (sizeof(carl::exponent)*8 - 5));
                 mHash ^= std::hash<FactorizedPolynomial<P>>()( polyExpPair->first );
                 mHash ^= polyExpPair->second;
             }
@@ -279,6 +279,8 @@ namespace carl
         assert( mFactorization.size() == 1 );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
+        assert( exponentA > 0 );
+        assert( exponentB > 0 );
         mFactorization.clear();
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
