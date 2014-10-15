@@ -50,9 +50,10 @@ namespace carl
                 std::pair<T*,Info> element = *ret.first;
                 mCache.erase( ret.first );
                 (*_update)( *element.first, *_toCache );
-                auto ret = mCache.insert( element );
-                assert( ret.second );
-                mCacheRefs[element.second.refStoragePos] = ret.first;
+                element.first->rehash();
+                auto retB = mCache.insert( element );
+                assert( retB.second );
+                mCacheRefs[element.second.refStoragePos] = retB.first;
             }
         }
         else // Create a new entry in the cache.
