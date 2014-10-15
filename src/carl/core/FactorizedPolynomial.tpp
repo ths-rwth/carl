@@ -58,8 +58,15 @@ namespace carl
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            content().mFactorization.insert( std::make_pair( *this, 1 ) );
-
+            if ( mCoefficient == 1 )
+                content().mFactorization.insert( std::make_pair( *this, 1 ) );
+            else
+            {
+                // Factor is polynomial without coefficient
+                FactorizedPolynomial factor( *this );
+                factor.mCoefficient = 1;
+                content().mFactorization.insert( std::make_pair( factor, 1 ) );
+            }
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
         }
@@ -383,6 +390,7 @@ namespace carl
         }
 
         Coeff<P> coefficientResult = _fpolyA.coefficient() * _fpolyB.coefficient();
+        //TODO needed?
         coefficientResult *= distributeCoefficients( resultFactorization );
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
     }

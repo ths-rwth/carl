@@ -251,3 +251,29 @@ TEST(FactorizedPolynomial, Addition)
     FPol fpAdd = fpA + fpB;
     EXPECT_EQ( pAdd, computePolynomial( fpAdd ) );
 }
+
+TEST(FactorizedPolynomial, Multiplication)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("5*y");
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("1*x");
+    Pol p4 = sp.parseMultivariatePolynomial<Rational>("4*y");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    FPol fp3( p3, pCache );
+    FPol fp4( p4, pCache );
+
+    Pol pMul = p1 * p3;
+    FPol fpMul = fp1 * fp3;
+    EXPECT_EQ( pMul, computePolynomial( fpMul ) );
+
+    Pol pMul2 = p2 * p4;
+    FPol fpMul2 = fp2 * fp4;
+    EXPECT_EQ( pMul2, computePolynomial( fpMul2 ) );
+}
