@@ -184,6 +184,43 @@ TEST(FactorizedPolynomial, GCD)
     EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
 }
 
+TEST(FactorizedPolynomial, Flattening)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+
+    Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y*z");
+    Pol pB = sp.parseMultivariatePolynomial<Rational>("x*y");
+    Pol pC = sp.parseMultivariatePolynomial<Rational>("x");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fpA( pA, pCache );
+    FPol fpB( pB, pCache );
+    FPol fpC( pC, pCache );
+    FPol fpRestA;
+    FPol fpRestB;
+    FPol fpRestC;
+
+    Pol pGCD = gcd( pA, pB );
+    Pol pRestA = pA.quotient( pGCD );
+    Pol pRestB = pB.quotient( pGCD );
+    FPol fpGCD = gcd( fpA, fpB, fpRestA, fpRestB );
+
+    EXPECT_EQ( pGCD, computePolynomial( fpGCD ) );
+    EXPECT_EQ( pRestA, computePolynomial( fpRestA ) );
+    EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
+
+    Pol pGCD2 = gcd( pA, pC );
+    pRestA = pA.quotient( pGCD2 );
+    Pol pRestC = pC.quotient( pGCD2 );
+    FPol fpGCD2 = gcd( fpA, fpC, fpRestA, fpRestC );
+
+    EXPECT_EQ( pGCD2, computePolynomial( fpGCD2 ) );
+    EXPECT_EQ( pRestA, computePolynomial( fpRestA ) );
+    EXPECT_EQ( pRestC, computePolynomial( fpRestC ) );
+}
+
 TEST(FactorizedPolynomial, LCM)
 {
     carl::VariablePool::getInstance().clear();
