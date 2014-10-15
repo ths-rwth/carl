@@ -37,7 +37,7 @@ namespace carl
     }
     
     template<typename T>
-    typename Cache<T>::Ref Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
+    std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         auto ret = mCache.insert( std::make_pair( _toCache, Info( mMaxActivity ) ) );
@@ -77,7 +77,7 @@ namespace carl
                 clean();
             }
         }
-        return ret.first->second.refStoragePos;
+        return std::make_pair( ret.first->second.refStoragePos, ret.second );
     }
     
     template<typename T>

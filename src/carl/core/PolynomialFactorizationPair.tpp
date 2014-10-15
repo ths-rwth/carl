@@ -178,12 +178,13 @@ namespace carl
     {
         assert( canBeUpdated( _toUpdate, _updateWith ) ); // This assertion only ensures efficient use this method.
         assert( &_toUpdate != &_updateWith );
-        assert( _toUpdate.mpPolynomial != nullptr && _updateWith.mpPolynomial != nullptr && *_toUpdate.mpPolynomial == *_updateWith.mpPolynomial );
+        assert( _toUpdate.mpPolynomial == nullptr || _updateWith.mpPolynomial == nullptr || *_toUpdate.mpPolynomial == *_updateWith.mpPolynomial );
         std::lock_guard<std::recursive_mutex> lockA( _toUpdate.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _updateWith.mMutex );
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             _toUpdate.mpPolynomial = _updateWith.mpPolynomial;
-        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
+        // The factorization of the PolynomialFactorizationPair to update with can be empty, if constructed freshly by a polynomial.
+        if( !_updateWith.factorization().empty() && !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
         {
             // Calculating the gcd refines both factorizations to the same factorization
             bool refineA = false;
@@ -425,13 +426,19 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
+        if( _pfPair.factorization().size() == 0 ) // Special case only during construction of a PolynomialFactorizationPair with a polynomial
+        {
+            assert( _pfPair.mpPolynomial != nullptr );
+            _out << *_pfPair.mpPolynomial;
+            return _out;
+        }
         if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1 )
         {
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;
         }
         else
-        {   
+        {
             _out << _pfPair.factorization();
         }
         return _out;

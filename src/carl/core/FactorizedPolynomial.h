@@ -119,7 +119,7 @@ namespace carl
         // Constructors.
         FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
-        explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& );
+        explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>&, bool = false );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.

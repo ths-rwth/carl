@@ -30,42 +30,51 @@ namespace carl
     }
 
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache, bool _polyNormalized ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( _polynomial.isZero() ? nullptr : _pCache ),
-        mCoefficient( _polynomial.isZero() ? CoeffType(0) : CoeffType(1)/_polynomial.coprimeFactor() )
+        mCoefficient( _polynomial.isZero() ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
     {
+        assert( !_polyNormalized || (_polynomial.coprimeFactor() == CoeffType(1)) );
         if ( _polynomial.isConstant() )
         {
             mpCache = nullptr;
         }
         else
         {
-            P* poly = new P(_polynomial * (CoeffType(1) / mCoefficient));
-            if ( poly->lcoeff() < 0 )
+            P poly = _polyNormalized ? _polynomial : P(_polynomial * (CoeffType(1) / mCoefficient));
+            if ( !_polyNormalized && poly.lcoeff() < 0 )
             {
-                (*poly) *= CoeffType(-1);
+                poly *= CoeffType(-1);
                 mCoefficient *= CoeffType(-1);
             }
+            
 
-            assert( mpCache != nullptr );
-            Factorization<P> factorization;
-            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), poly );
-            //Factorization is not set yet
-            mCacheRef = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             /*
              * The following is not very nice, but we know, that the hash won't change, once the polynomial 
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            if ( mCoefficient == 1 )
-                content().mFactorization.insert( std::make_pair( *this, 1 ) );
+            if ( _polyNormalized || mCoefficient == 1 )
+            {
+                assert( mpCache != nullptr );
+                Factorization<P> factorization;
+                PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P(poly) );
+                //Factorization is not set yet
+                auto ret = mpCache->cache( pfPair, &carl::canBeUpdated, &carl::update );
+                mCacheRef = ret.first;
+                if( ret.second )
+                {
+                    assert( content().mFactorization.empty() );
+                    content().mFactorization.insert( std::make_pair( *this, 1 ) );
+                }
+            }
             else
             {
                 // Factor is polynomial without coefficient
-                FactorizedPolynomial factor( *this );
-                factor.mCoefficient = 1;
-                content().mFactorization.insert( std::make_pair( factor, 1 ) );
+                FactorizedPolynomial factor( poly, mpCache, true );
+                mCacheRef = factor.mCacheRef;
+                mpCache->reg( mCacheRef );
             }
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
@@ -88,9 +97,9 @@ namespace carl
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
                 assert( factor->first.coefficient() == 1 );
-            mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
+            mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update ).first;
         }
-        ASSERT_CACHE_REF_LEGAL( (*this) );
+        //ASSERT_CACHE_REF_LEGAL( (*this) );
     }
     
     template<typename P>
