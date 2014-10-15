@@ -18,6 +18,7 @@ namespace carl
         mpCache( nullptr ),
         mCoefficient( 0 )
     {
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
     }
     
     template<typename P>
@@ -62,6 +63,7 @@ namespace carl
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
         }
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
     }
     
 //    template<typename P>
@@ -93,6 +95,7 @@ namespace carl
             }
             mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
         }
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
     }
     
     template<typename P>
@@ -105,6 +108,7 @@ namespace carl
         {
             mpCache->reg( mCacheRef );
         }
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
     }
     
     template<typename P>
@@ -136,6 +140,7 @@ namespace carl
             mCacheRef = _fpoly.cacheRef();
             mpCache->reg( mCacheRef );
         }
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
         return *this;
     }
         
@@ -383,6 +388,7 @@ namespace carl
             mpCache = nullptr;
         }
         mCoefficient *= _coef;
+        assert( mpCache == nullptr || mCacheRef != CACHE::NO_REF );
         return *this;
     }
     
