@@ -23,5 +23,6 @@
 #include "adaption_native/typetraits.h"
 
 #include "GaloisField.h"
+#include "GFNumber.h"
 
 #include "Numeric.h"

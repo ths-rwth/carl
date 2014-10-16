@@ -169,6 +169,11 @@ GFNumber<IntegerT> quotient(const GFNumber<IntegerT>& lhs, const GFNumber<Intege
 	return lhs / rhs;
 }
 
+template<typename IntegerT>
+GFNumber<IntegerT> abs(const GFNumber<IntegerT>& n) {
+	return n;
+}
+
 /**
  * @todo Implement this
  * @param 
