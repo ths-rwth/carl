@@ -63,12 +63,14 @@ namespace carl
         {
             if( mUnusedPositionsInCacheRefs.empty() ) // Get a brand new reference.
             {
+                assert( mCacheRefs.size() > 0);
                 (*ret.first)->second.refStoragePositions.push_back( mCacheRefs.size() );
                 mCacheRefs.push_back( newElement );
             }
             else // Try to take the reference from the stack of old ones.
             {
                 mCacheRefs[mUnusedPositionsInCacheRefs.top()] = newElement;
+                assert( mUnusedPositionsInCacheRefs.top() > 0);
                 newElement->second.refStoragePositions.push_back( mUnusedPositionsInCacheRefs.top() );
                 mUnusedPositionsInCacheRefs.pop();
             }
@@ -78,6 +80,8 @@ namespace carl
                 clean();
             }
         }
+        assert( (*ret.first)->second.refStoragePositions.size() > 0);
+        assert( (*ret.first)->second.refStoragePositions.front() > 0 );
         return std::make_pair( (*ret.first)->second.refStoragePositions.front(), ret.second );
     }
     
@@ -137,6 +141,7 @@ namespace carl
     template<typename T>
     void Cache<T>::clean()
     {
+        LOGMSG_TRACE( "carl.util.cache", "Cleaning cache..." );
         if( mNumOfUnusedEntries < ((double) mCache.size() * mCacheReductionAmount) )
         {
             if( mNumOfUnusedEntries > 0 )
