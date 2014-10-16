@@ -25,7 +25,7 @@ namespace carl
             {
                 if( polyExpPair != _factorization.begin() )
                     _out << " * ";
-                assert( polyExpPair->second != 0 );
+                assert( polyExpPair->second > 0 );
                 _out << "(" << polyExpPair->first << ")";
                 if( polyExpPair->second > 1 )
                     _out << "^" << polyExpPair->second;
@@ -209,9 +209,9 @@ namespace carl
     template<typename P>
     P computePolynomial( const PolynomialFactorizationPair<P>& _pfPair )
     {
-        if( _pfPair.mpPolynomial != nullptr )
-            return *_pfPair.mpPolynomial;
-        return computePolynomial( _pfPair.factorization() );
+        if( _pfPair.mpPolynomial == nullptr )
+            _pfPair.mpPolynomial = new P( computePolynomial( _pfPair.factorization() ) );
+        return *_pfPair.mpPolynomial;
     }
 
     template<typename P>

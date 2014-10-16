@@ -188,18 +188,6 @@ namespace carl
                 rehash();
             return content().factorization();
         }
-        
-        
-        const P& polynomial() const
-        {
-            assert( existsFactorization( *this ) );
-            if( content().mpPolynomial == nullptr )
-            {
-                content().mpPolynomial = new P( computePolynomial( content().factorization() ) );
-                rehash();
-            }
-            return *content().mpPolynomial;
-        }
 
         /**
          * @return Coefficient of the polynomial.
