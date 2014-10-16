@@ -36,6 +36,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 	if (this->polynomial.zeroIsRoot()) {
 		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
 	}
+	if (this->polynomial.isZero()) return;
 	if (tryTrivialSolver && this->solveTrivial()) {
 		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
 		this->setFinished();
@@ -109,12 +110,7 @@ void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
 template<typename Number>
 bool AbstractRootFinder<Number>::solveTrivial() {
 	switch (this->polynomial.degree()) {
-		case 0: {
-			if (this->polynomial.isZero()) {
-				this->addRoot(RealAlgebraicNumberNR<Number>::create(0), false);
-			}
-			break;
-		}
+		case 0: break;
 		case 1: {
 			Number a = this->polynomial.coefficients()[1], b = this->polynomial.coefficients()[0];
 			assert(a != Number(0));
