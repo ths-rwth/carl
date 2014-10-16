@@ -33,40 +33,42 @@ namespace carl
         mCache.reserve( _maxCacheSize ); // TODO: maybe no reservation of memory and let it grow dynamically
         mCacheRefs.reserve( _maxCacheSize ); // TODO: maybe no reservation of memory and let it grow dynamically
         // reserve the first entry with index 0 as default
-        mCacheRefs.push_back( mCache.end() ); 
+        mCacheRefs.push_back( nullptr ); 
     }
     
     template<typename T>
     std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        auto ret = mCache.insert( std::make_pair( _toCache, Info( mMaxActivity ) ) );
+        TypeInfoPair<T,Info>* newElement = new TypeInfoPair<T,Info>( _toCache, Info( mMaxActivity ) );
+        auto ret = mCache.insert( newElement );
         
         if( !ret.second ) // There is already an equal object in the cache.
         {
             // Try to update the entry in the cache by the information in the given object.
-            if( (*_canBeUpdated)( *(ret.first->first), *_toCache ) )
+            if( (*_canBeUpdated)( *((*ret.first)->first), *_toCache ) )
             {
-                std::pair<T*,Info> element = *ret.first;
-                mCache.erase( ret.first );
-                (*_update)( *element.first, *_toCache );
-                element.first->rehash();
+                TypeInfoPair<T,Info>* element = *ret.first;
+                mCache.erase( element );
+                (*_update)( *element->first, *_toCache );
+                element->first->rehash();
                 auto retB = mCache.insert( element );
                 assert( retB.second );
-                mCacheRefs[element.second.refStoragePos] = retB.first;
+                mCacheRefs[element->second.refStoragePos] = *retB.first;
             }
+            delete newElement;
         }
         else // Create a new entry in the cache.
         {
-            if( mUnusedPositionsInCacheRefs.empty() ) // Try to take the reference from the stack of old ones.
+            if( mUnusedPositionsInCacheRefs.empty() ) // Get a brand new reference.
             {
-                ret.first->second.refStoragePos = mCacheRefs.size();
-                mCacheRefs.push_back( ret.first );
+                (*ret.first)->second.refStoragePos = mCacheRefs.size();
+                mCacheRefs.push_back( newElement );
             }
-            else // Get a brand new reference.
+            else // Try to take the reference from the stack of old ones.
             {
-                mCacheRefs[mUnusedPositionsInCacheRefs.top()] = ret.first;
-                ret.first->second.refStoragePos = mUnusedPositionsInCacheRefs.top();
+                mCacheRefs[mUnusedPositionsInCacheRefs.top()] = newElement;
+                newElement->second.refStoragePos = mUnusedPositionsInCacheRefs.top();
                 mUnusedPositionsInCacheRefs.pop();
             }
             ++mNumOfUnusedEntries;
@@ -75,7 +77,7 @@ namespace carl
                 clean();
             }
         }
-        return std::make_pair( ret.first->second.refStoragePos, ret.second );
+        return std::make_pair( (*ret.first)->second.refStoragePos, ret.second );
     }
     
     template<typename T>
@@ -83,8 +85,8 @@ namespace carl
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
-        typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
-        assert( cacheRef != mCache.end() );
+        TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
+        assert( cacheRef != nullptr );
         if( cacheRef->second.usageCount == 0 )
         {
             assert( mNumOfUnusedEntries > 0 );
@@ -98,8 +100,8 @@ namespace carl
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
-        typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
-        assert( cacheRef != mCache.end() );
+        TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
+        assert( cacheRef != nullptr );
         assert( cacheRef->second.usageCount > 0 );
         --cacheRef->second.usageCount;
         if( cacheRef->second.usageCount == 0 ) // no more usage
@@ -118,24 +120,22 @@ namespace carl
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
-        typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
-        assert( cacheRef != mCache.end() );
-        std::pair<T*,Info> element = *cacheRef;
+        TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
+        assert( cacheRef != nullptr );
         mCache.erase( cacheRef );
-        element.first->rehash();
-        auto ret = mCache.insert( element );
+        cacheRef->first->rehash();
+        auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
-            ret.first->second.usageCount += element.second.usageCount;
-            delete element.first;
+            (*ret.first)->second.usageCount += cacheRef->second.usageCount;
+            delete cacheRef->first;
         }
-        mCacheRefs[_refStoragePos] = ret.first;
+        mCacheRefs[_refStoragePos] = *(ret.first);
     }
     
     template<typename T>
     void Cache<T>::clean()
     {
-        assert(false);
         if( mNumOfUnusedEntries < ((double) mCache.size() * mCacheReductionAmount) )
         {
             if( mNumOfUnusedEntries > 0 )
@@ -143,10 +143,14 @@ namespace carl
                 // There are less entries we can delete than we want to delete: just delete them all
                 for( auto iter = mCache.begin(); iter != mCache.end(); )
                 {
-                    if( iter->second.usageCount == 0 )
+                    if( (*iter)->second.usageCount == 0 )
+                    {
                         iter = erase( iter );
+                    }
                     else
+                    {
                         ++iter;
+                    }
                 }
             }
             assert( mNumOfUnusedEntries == 0 );
@@ -158,19 +162,19 @@ namespace carl
             double limit = 0.0;
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
             {
-                if( iter->second.usageCount == 0 )
+                if( (*iter)->second.usageCount == 0 )
                 {
                     noUsageEntries.push_back( iter );
-                    limit += iter->second.activity;
+                    limit += (*iter)->second.activity;
                 }
             }
             limit = limit / (double) noUsageEntries.size();
             // Remove all entries in the cache with no usage, which have an activity below the calculated median.
-            for( auto iterIter = noUsageEntries.begin(); iterIter != noUsageEntries.end(); ++iterIter )
+            for( auto iter = noUsageEntries.begin(); iter != noUsageEntries.end(); ++iter )
             {
-                if( (*iterIter)->second.activity <= limit )
+                if( (**iter)->second.activity <= limit )
                 {
-                    erase( *iterIter );
+                    erase( *iter );
                 }
             }
         }
@@ -187,15 +191,15 @@ namespace carl
     void Cache<T>::strengthenActivity( Ref _refStoragePos )
     {
         assert( _refStoragePos < mCacheRefs.size() );
-        typename Container::iterator cacheRef = mCacheRefs[_refStoragePos];
-        assert( cacheRef != mCache.end() );
+        TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
+        assert( cacheRef != nullptr );
         // update the activity of the cache entry at the given position
         if( (cacheRef->second.activity += mActivityIncrement) > mActivityThreshold )
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             // rescale if the threshold for the maximum activity has been exceeded
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
-                iter->second.activity *= mActivityDecrementFactor;
+                (*iter)->second.activity *= mActivityDecrementFactor;
             mActivityIncrement *= mActivityDecrementFactor;
             mMaxActivity *= mActivityDecrementFactor;
         }
@@ -223,8 +227,8 @@ namespace carl
         std::cout << "Cache contains:" << std::endl;
         for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
         {
-            assert( iter->first != nullptr );
-            std::cout << "   " << *iter->first << std::endl;
+            assert( (*iter)->first != nullptr );
+            std::cout << "   " << *(*iter)->first << std::endl;
             std::cout << "                       usage count: " << iter->second.usageCount << std::endl;
             std::cout << "        reference storage position: " << iter->second.refStoragePos << std::endl;
             std::cout << "                          activity: " << iter->second.activity << std::endl;
