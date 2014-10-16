@@ -323,6 +323,7 @@ public:
 	/**
 	 * Get the maximal exponent of the main variable.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
+	 * @see @cite GCL92, page 38
 	 * @return Degree.
 	 */
 	unsigned degree() const {
@@ -333,6 +334,8 @@ public:
 	/**
 	 * Returns the total degree of the polynomial, that is the maximum degree of any monomial.
 	 * Applies, if the coefficients are numbers. In this case, the total degree is the degree.
+	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
+	 * @see @cite GCL92, page 38
 	 * @return Total degree.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
@@ -343,10 +346,13 @@ public:
 	 * Returns the total degree of the polynomial, that is the maximum degree of any monomial.
 	 * Applies, if the coefficients are not numbers.
 	 * In this case, the total degree of all coefficients must be considered.
+	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
+	 * @see @cite GCL92, page 48
 	 * @return Total degree.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	unsigned totalDegree() const {
+		assert(!this->isZero());
 		unsigned max = 0;
 		for (unsigned deg = 0; deg < this->mCoefficients.size(); deg++) {
 			if (!this->mCoefficients[deg].isZero()) {

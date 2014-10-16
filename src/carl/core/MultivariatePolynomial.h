@@ -118,7 +118,9 @@ public:
 	Coeff lcoeff() const;
 	/**
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
-	 * @return 
+	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
+	 * @see @cite GCL92, page 48
+	 * @return Total degree.
 	 */
 	exponent totalDegree() const;
 
