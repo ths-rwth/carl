@@ -255,7 +255,7 @@ namespace carl
     bool PolynomialFactorizationPair<P>::isIrreducible() const
     {
         if ( mIrreducible != -1 )
-            return mIrreducible;
+            return mIrreducible == 1;
 
         assert( mpPolynomial != nullptr );
         if ( mpPolynomial->isLinear() )
