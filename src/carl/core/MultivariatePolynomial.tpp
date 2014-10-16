@@ -557,16 +557,39 @@ template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const MultivariatePolynomial& divisor) const
 {
 	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	MultivariatePolynomial<C,O,P> result;
+	assert(!divisor.isZero());
+	if(this == &divisor || divisor.isOne() || *this == divisor)
+	{
+		return MultivariatePolynomial<C,O,P>();
+	}
+	
+	MultivariatePolynomial<C,O,P> remainder;
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
 	{
-		if (!p.lterm()->divisible(*divisor.lterm())) {
-			result += p.lterm();
+		if(p.lterm()->tdeg() < divisor.lterm()->tdeg())
+		{
+			assert(p.lterm()->divideBy(*divisor.lterm()) == nullptr);
+			// TODO if p is degree ordered, then this is true for all subsequent calls.
+			remainder += p.lterm();
+			p.stripLT();
 		}
-		p.stripLT();
+		
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			p -= *factor * divisor;
+			delete factor;
+		}
+		else
+		{
+			remainder += p.lterm();
+			p.stripLT();
+		}
 	}
-	return result;
+	assert(*this == quotient(divisor) * divisor + remainder);
+	return remainder;
 }
 
 
@@ -1098,6 +1121,7 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		// TODO: gcd needed for fractions
 		//res = carl::gcd(res, this->mTerms[i]->coeff());
+		assert(false);
 	}
 	return res;
 }
