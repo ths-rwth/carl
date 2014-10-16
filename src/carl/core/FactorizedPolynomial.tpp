@@ -587,7 +587,10 @@ namespace carl
         }
 
         coefficientLCM *= distributeCoefficients( lcmFactorization );
-        return FactorizedPolynomial<P>( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
+        FactorizedPolynomial<P> result( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
+        assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
+        assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
+        return result;
     }
 
     template<typename P>
