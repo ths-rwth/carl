@@ -221,6 +221,23 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial& m) const
 }
 
 template<typename Coefficient>
+template<typename C, EnableIf<is_field<C>>>
+bool Term<Coefficient>::divisible(const Term& t) const {
+	if (this->monomial() == nullptr) return t.monomial() == nullptr;
+	if (t.monomial() == nullptr) return true;
+	return this->monomial()->divisible(*t.monomial());
+}
+
+template<typename Coefficient>
+template<typename C, DisableIf<is_field<C>>>
+bool Term<Coefficient>::divisible(const Term& t) const {
+	if (carl::remainder(this->coeff(), t.coeff()) != Coefficient(0)) return false;
+	if (this->monomial() == nullptr) return t.monomial() == nullptr;
+	if (t.monomial() == nullptr) return true;
+	return this->monomial()->divisible(*t.monomial());
+}
+
+template<typename Coefficient>
 template<bool gatherCoeff, typename CoeffType>
 void Term<Coefficient>::gatherVarInfo(Variable::Arg var, VariableInformation<gatherCoeff, CoeffType>& varinfo) const
 {
