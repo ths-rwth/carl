@@ -56,9 +56,14 @@ namespace carl
                 assert( retB.second );
                 for( Ref ref : element->second.refStoragePositions )
                     mCacheRefs[ref] = *retB.first;
+                delete newElement;
+                assert( (*retB.first)->second.refStoragePositions.size() > 0);
+                assert( (*retB.first)->second.refStoragePositions.front() > 0 );
+                return std::make_pair( (*retB.first)->second.refStoragePositions.front(), false );
             }
-            delete newElement;
-        }
+            else
+                delete newElement;
+    }
         else // Create a new entry in the cache.
         {
             if( mUnusedPositionsInCacheRefs.empty() ) // Get a brand new reference.
