@@ -25,7 +25,7 @@ namespace carl
             {
                 if( polyExpPair != _factorization.begin() )
                     _out << " * ";
-                assert( polyExpPair->second != 0 );
+                assert( polyExpPair->second > 0 );
                 _out << "(" << polyExpPair->first << ")";
                 if( polyExpPair->second > 1 )
                     _out << "^" << polyExpPair->second;
@@ -97,7 +97,7 @@ namespace carl
             mHash = 0;
             for( auto polyExpPair = mFactorization.begin(); polyExpPair != mFactorization.end(); ++polyExpPair )
             {
-                mHash = (mHash << 5) | (mHash >> (sizeof(size_t)*8 - 5));
+                mHash = (mHash << 5) | (mHash >> (sizeof(carl::exponent)*8 - 5));
                 mHash ^= std::hash<FactorizedPolynomial<P>>()( polyExpPair->first );
                 mHash ^= polyExpPair->second;
             }
@@ -209,9 +209,9 @@ namespace carl
     template<typename P>
     P computePolynomial( const PolynomialFactorizationPair<P>& _pfPair )
     {
-        if( _pfPair.mpPolynomial != nullptr )
-            return *_pfPair.mpPolynomial;
-        return computePolynomial( _pfPair.factorization() );
+        if( _pfPair.mpPolynomial == nullptr )
+            _pfPair.mpPolynomial = new P( computePolynomial( _pfPair.factorization() ) );
+        return *_pfPair.mpPolynomial;
     }
 
     template<typename P>
@@ -279,6 +279,8 @@ namespace carl
         assert( mFactorization.size() == 1 );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
+        assert( exponentA > 0 );
+        assert( exponentB > 0 );
         mFactorization.clear();
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
