@@ -1992,7 +1992,7 @@ bool operator==(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C
 		// in different variables, polynomials can still be equal if constant.
 		if(lhs.isZero() && rhs.isZero()) return true;
 		if(lhs.isConstant() && rhs.isConstant() && lhs.lcoeff() == rhs.lcoeff()) return true;
-		return MultivariatePolynomial<C>(lhs) == MultivariatePolynomial<C>(rhs);
+		return MultivariatePolynomial<typename carl::UnderlyingNumberType<C>::type>(lhs) == MultivariatePolynomial<typename carl::UnderlyingNumberType<C>::type>(rhs);
 	}
 }
 template<typename C>
