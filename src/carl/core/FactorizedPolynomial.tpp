@@ -30,42 +30,56 @@ namespace carl
     }
 
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache ):
+    FactorizedPolynomial<P>::FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& _pCache, bool _polyNormalized ):
         mCacheRef( CACHE::NO_REF ),
         mpCache( _polynomial.isZero() ? nullptr : _pCache ),
-        mCoefficient( _polynomial.isZero() ? CoeffType(0) : CoeffType(1)/_polynomial.coprimeFactor() )
+        mCoefficient( _polynomial.isZero() ? CoeffType(0) : (_polyNormalized ? CoeffType(1) : CoeffType(1)/_polynomial.coprimeFactor()) )
     {
+        assert( !_polyNormalized || (_polynomial.coprimeFactor() == CoeffType(1)) );
         if ( _polynomial.isConstant() )
         {
             mpCache = nullptr;
         }
         else
         {
-            P* poly = new P(_polynomial * (CoeffType(1) / mCoefficient));
-            if ( poly->lcoeff() < 0 )
+            P poly = _polyNormalized ? _polynomial : P(_polynomial * (CoeffType(1) / mCoefficient));
+            if ( !_polyNormalized && poly.lcoeff() < 0 )
             {
-                (*poly) *= CoeffType(-1);
+                poly *= CoeffType(-1);
                 mCoefficient *= CoeffType(-1);
             }
+            
 
-            assert( mpCache != nullptr );
-            Factorization<P> factorization;
-            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), poly );
-            //Factorization is not set yet
-            mCacheRef = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             /*
              * The following is not very nice, but we know, that the hash won't change, once the polynomial 
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            if ( mCoefficient == 1 )
-                content().mFactorization.insert( std::make_pair( *this, 1 ) );
+            if ( _polyNormalized || mCoefficient == 1 )
+            {
+                assert( mpCache != nullptr );
+                Factorization<P> factorization;
+                PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P(poly) );
+                //Factorization is not set yet
+                auto ret = mpCache->cache( pfPair, &carl::canBeUpdated, &carl::update );
+                mCacheRef = ret.first;
+                mpCache->reg( mCacheRef );
+                if( ret.second )
+                {
+                    assert( content().mFactorization.empty() );
+                    content().mFactorization.insert( std::make_pair( *this, 1 ) );
+                }
+                else
+                {
+                    delete pfPair;
+                } 
+            }
             else
             {
                 // Factor is polynomial without coefficient
-                FactorizedPolynomial factor( *this );
-                factor.mCoefficient = 1;
-                content().mFactorization.insert( std::make_pair( factor, 1 ) );
+                FactorizedPolynomial factor( poly, mpCache, true );
+                mCacheRef = factor.mCacheRef;
+                mpCache->reg( mCacheRef );
             }
             //We can not check the factorization yet, but as we have set it, it should be correct.
             //pfPair->assertFactorization();
@@ -88,7 +102,14 @@ namespace carl
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
                 assert( factor->first.coefficient() == 1 );
-            mCacheRef = mpCache->cache( new PolynomialFactorizationPair<P>( std::move( _factorization ) ), &carl::canBeUpdated, &carl::update );
+            PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( _factorization ) );
+            auto ret = mpCache->cache( pfPair, &carl::canBeUpdated, &carl::update );
+            mCacheRef = ret.first;
+            mpCache->reg( mCacheRef );
+            if( !ret.second )
+            {
+                delete pfPair;
+            }
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
     }
@@ -139,6 +160,10 @@ namespace carl
                 mCacheRef = _fpoly.cacheRef();
                 mpCache->reg( mCacheRef );
             }
+        }
+        else if( mpCache != nullptr )
+        {
+            mpCache->reg( mCacheRef );
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
         return *this;
@@ -247,6 +272,9 @@ namespace carl
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
 
+        if (coefficientCommon == 0)
+            return FactorizedPolynomial<P>();
+
         Factorization<P> factorizationRestA, factorizationRestB;
         assert( existsFactorization( _fpolyA ) );
         const Factorization<P>& factorizationA = _fpolyA.factorization();
@@ -259,16 +287,19 @@ namespace carl
         //Compute remaining sum
         P sum = computePolynomial( factorizationRestA ) * coefficientRestA;
         sum += computePolynomial( factorizationRestB ) * coefficientRestB;
-        if ( sum.isConstant() )
-        {
-            coefficientCommon *= sum.constantPart();
-        }
+        if ( sum.isZero() )
+            return FactorizedPolynomial<P>();
         else
         {
-            FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
-            coefficientCommon *= fpolySum.coefficient();
-            fpolySum.mCoefficient = Coeff<P>(1);
-            resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>( fpolySum, 1 ) );
+            if ( sum.isConstant() )
+                coefficientCommon *= sum.constantPart();
+            else
+            {
+                FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
+                coefficientCommon *= fpolySum.coefficient();
+                fpolySum.mCoefficient = Coeff<P>(1);
+                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
+            }
         }
         return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
     }
@@ -364,7 +395,7 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>(factorA->first, factorA->second + factorB->second ) );
+                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>(factorA->first, factorA->second + factorB->second ) );
                 factorA++;
                 factorB++;
             }
@@ -399,7 +430,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const CoeffType& _coef )
     {
-        if( _coef == 0 && mpCache != nullptr )
+        if( _coef == CoeffType( 0 ) && mpCache != nullptr )
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = CACHE::NO_REF;
@@ -485,7 +516,7 @@ namespace carl
             if( factorA->first == factorB->first )
             {
                 if ( factorA->second > factorB->second )
-                    resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, size_t>(factorA->first, factorA->second - factorB->second ) );
+                    resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>(factorA->first, factorA->second - factorB->second ) );
                 factorA++;
                 factorB++;
             }
@@ -769,7 +800,7 @@ namespace carl
         {
             if ( _fpoly.coefficient() != 1 )
                 _out << _fpoly.coefficient() << " * ";
-            return ( _out << "(" << _fpoly.content() << ")" );
+            return _out << _fpoly.content();
         }
         else
             return ( _out << _fpoly.coefficient() );

@@ -34,7 +34,7 @@ namespace carl
         /**
          * The reference of the entry in the cache corresponding to this factorized polynomial.
          */
-        typename CACHE::Ref mCacheRef;
+        mutable typename CACHE::Ref mCacheRef;
 
         /**
          * The cache in which the actual content of this factorized polynomial is stored.
@@ -119,7 +119,7 @@ namespace carl
         // Constructors.
         FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
-        explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>& );
+        explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>&, bool = false );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
         
         // Destructor.
@@ -184,11 +184,11 @@ namespace carl
         {
             assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
-            //content().flattenFactorization();
+            if( content().flattenFactorization() )
+                rehash();
             return content().factorization();
         }
-        
-        
+
         const P& polynomial() const
         {
             assert( existsFactorization( *this ) );

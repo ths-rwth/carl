@@ -107,10 +107,15 @@ namespace carl
         void gatherVariables( std::set<carl::Variable>& _vars ) const
         {
             if( mpPolynomial != nullptr )
-                mpPolynomial->gatherVariables( _vars );
-            for( auto const& factor : mFactorization )
             {
-                factor.first.gatherVariables( _vars );
+                mpPolynomial->gatherVariables( _vars );
+            }
+            else
+            {
+                for( auto const& factor : mFactorization )
+                {
+                    factor.first.gatherVariables( _vars );
+                }
             }
         }
 

@@ -15,7 +15,31 @@
 
 
 namespace carl
+{   
+    template<typename T, class I>
+    using TypeInfoPair = std::pair<T*,I>;
+    
+    template<typename T, class I>
+    bool operator==( const TypeInfoPair<T,I>& _tipA, const TypeInfoPair<T,I>& _tipB )
+    {
+        return *_tipA.first == *_tipB.first;
+    }
+}
+
+namespace std
 {
+    template<typename T, class I>
+    struct hash<carl::TypeInfoPair<T,I>>
+    {
+        size_t operator()( const carl::TypeInfoPair<T,I>& _tip ) const 
+        {
+            return _tip.first->getHash();
+        }
+    };
+}
+
+namespace carl
+{ 
     template<typename T>
     struct pointerEqual
     {
@@ -58,7 +82,7 @@ namespace carl
             /**
              * Stores the reference of the entry in the cache for which this information hold.
              */
-            Ref refStoragePos;
+            std::vector<Ref> refStoragePositions;
             
             /**
              * Stores the activity of the entry in the cache for which this information hold. The activity states how often the entry
@@ -67,13 +91,13 @@ namespace carl
             double activity;
 
             Info( double _activity ):
-                usageCount( 1 ),
-                refStoragePos( 0 ),
+                usageCount( 0 ),
+                refStoragePositions(),
                 activity( _activity )
             {}
         };
         
-        typedef std::unordered_map<T*, Info, pointerHash<T>, pointerEqual<T>> Container;
+        typedef std::unordered_set<TypeInfoPair<T,Info>*, pointerHash<TypeInfoPair<T,Info>>, pointerEqual<TypeInfoPair<T,Info>>> Container;
         
     private:
         // Members
@@ -135,9 +159,9 @@ namespace carl
          * Stores at the reference of an entry in the cache an iterator to this entry. 
          * This reference can be used to access the entry outside this class.
          */
-        std::vector<typename Container::iterator> mCacheRefs;
+        std::vector<TypeInfoPair<T,Info>*> mCacheRefs;
         /// A stack containing free references, which have been used before but freed now.
-        std::stack<Ref>                           mUnusedPositionsInCacheRefs;
+        std::stack<Ref> mUnusedPositionsInCacheRefs;
         
     public:
 
@@ -156,7 +180,7 @@ namespace carl
          *                After this function has been applied, the corresponding entry in the cache will be reinserted in it after been rehashed.
          * @return The reference of the entry, which can be used outside this class to access the entry.
          */
-        Ref cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ) = &returnFalse<T>, void (*_update)( T&, T& ) = &doNothing<T> );
+        std::pair<Ref,bool> cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ) = &returnFalse<T>, void (*_update)( T&, T& ) = &doNothing<T> );
         
         /**
          * Registers the entry to the given reference. It mainly increases the usage counter of this entry in the cache.
@@ -173,6 +197,7 @@ namespace carl
         /**
          * Removes and reinserts the entry with the given reference, after its hash value is recalculated.
          * @param _refStoragePos The reference of the entry to apply the given function to.
+         * @return The new reference.
          */
         void rehash( Ref _refStoragePos );
         
@@ -190,7 +215,7 @@ namespace carl
         /**
          * Prints all information stored in this cache to std::cout.
          */
-        void print();
+        void print() const;
         
         /**
          * @param _refStoragePos The reference of the entry to obtain the object from. 
@@ -199,7 +224,7 @@ namespace carl
         const T& get( Ref _refStoragePos ) const
         {
             assert( _refStoragePos < mCacheRefs.size() );
-            assert( mCacheRefs[_refStoragePos] != mCache.end() );
+            assert( mCacheRefs[_refStoragePos] != nullptr );
             assert( mCacheRefs[_refStoragePos]->second.usageCount > 0 );
             return *mCacheRefs[_refStoragePos]->first;
         }
@@ -214,16 +239,48 @@ namespace carl
         /**
          * Removes the entry at the given position in the cache.
          * @param _toRemove The position to the entry to remove from the cache.
+         * @return 
+         */
+        size_t erase( TypeInfoPair<T,Info>* _toRemove )
+        {
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
+            assert( _toRemove->second.usageCount == 0 );
+            for( Ref ref : _toRemove->second.refStoragePositions )
+            {
+                mCacheRefs[ref] = nullptr;
+                mUnusedPositionsInCacheRefs.push( ref );
+            }
+            assert( mNumOfUnusedEntries > 0 );
+            --mNumOfUnusedEntries;
+            auto result = mCache.erase( _toRemove );
+            T* toDel = _toRemove->first;
+            delete _toRemove;
+            delete toDel;
+            return result;
+        }
+        
+        /**
+         * Removes the entry at the given position in the cache.
+         * @param _toRemove The position to the entry to remove from the cache.
          * @return An iterator to the entry in the cache right after the entry which has to be removed.
          */
         typename Container::iterator erase( typename Container::iterator _toRemove )
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
-            assert( _toRemove->second.usageCount == 0 );
-            mCacheRefs[_toRemove->second.refStoragePos] = mCache.end();
-            mUnusedPositionsInCacheRefs.push( _toRemove->second.refStoragePos );
+            assert( (*_toRemove)->second.usageCount == 0 );
+            for( Ref ref : (*_toRemove)->second.refStoragePositions )
+            {
+                mCacheRefs[ref] = nullptr;
+                mUnusedPositionsInCacheRefs.push( ref );
+            }
+            assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
-            return mCache.erase( _toRemove );
+            T* toDel = (*_toRemove)->first;
+            TypeInfoPair<T,Info>* toDelB = *_toRemove;
+            auto result = mCache.erase( _toRemove );
+            delete toDelB;
+            delete toDel;
+            return result;
         }
         
     };

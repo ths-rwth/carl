@@ -25,7 +25,7 @@ namespace carl
             {
                 if( polyExpPair != _factorization.begin() )
                     _out << " * ";
-                assert( polyExpPair->second != 0 );
+                assert( polyExpPair->second > 0 );
                 _out << "(" << polyExpPair->first << ")";
                 if( polyExpPair->second > 1 )
                     _out << "^" << polyExpPair->second;
@@ -97,7 +97,7 @@ namespace carl
             mHash = 0;
             for( auto polyExpPair = mFactorization.begin(); polyExpPair != mFactorization.end(); ++polyExpPair )
             {
-                mHash = (mHash << 5) | (mHash >> (sizeof(size_t)*8 - 5));
+                mHash = (mHash << 5) | (mHash >> (sizeof(carl::exponent)*8 - 5));
                 mHash ^= std::hash<FactorizedPolynomial<P>>()( polyExpPair->first );
                 mHash ^= polyExpPair->second;
             }
@@ -170,7 +170,7 @@ namespace carl
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             return true;
         assert( _updateWith.mpPolynomial == nullptr || (*_toUpdate.mpPolynomial) == (*_updateWith.mpPolynomial) );
-        return !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() );
+        return !_updateWith.factorization().empty() && !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() );
     }
 
     template<typename P>
@@ -178,11 +178,12 @@ namespace carl
     {
         assert( canBeUpdated( _toUpdate, _updateWith ) ); // This assertion only ensures efficient use this method.
         assert( &_toUpdate != &_updateWith );
-        assert( _toUpdate.mpPolynomial != nullptr && _updateWith.mpPolynomial != nullptr && *_toUpdate.mpPolynomial == *_updateWith.mpPolynomial );
+        assert( _toUpdate.mpPolynomial == nullptr || _updateWith.mpPolynomial == nullptr || *_toUpdate.mpPolynomial == *_updateWith.mpPolynomial );
         std::lock_guard<std::recursive_mutex> lockA( _toUpdate.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _updateWith.mMutex );
         if( _toUpdate.mpPolynomial == nullptr && _updateWith.mpPolynomial != nullptr )
             _toUpdate.mpPolynomial = _updateWith.mpPolynomial;
+        // The factorization of the PolynomialFactorizationPair to update with can be empty, if constructed freshly by a polynomial.
         if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
         {
             // Calculating the gcd refines both factorizations to the same factorization
@@ -191,7 +192,6 @@ namespace carl
             Factorization<P> restA, restB;
             gcd( _toUpdate, _updateWith, restA, restB, refineA, refineB );
         }
-        _toUpdate.rehash();
     }
 
     template<typename P>
@@ -223,23 +223,35 @@ namespace carl
         }
         bool result = false;
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
+        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
         {
             if (factor->first.factorization().size() > 1){
                 //Update factorization
                 result = true;
-                Factorization<P> partFactorization = factor->first.factorization();
+                const Factorization<P>& partFactorization = factor->first.factorization();
                 carl::exponent e = factor->second;
-                mFactorization.erase(factor);
+                factor = mFactorization.erase(factor);
+
                 for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
-                    mFactorization.insert( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
+                    auto insertResult = mFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
+                    if ( !insertResult.second )
+                    {
+                        //Increment exponent for already existing factor
+                        insertResult.first->second += partFactor->second * e;
+                    }
                 }
-                //Start from beginning as new inserted factors could not be flat
-                factor = mFactorization.begin();
+            }
+            else
+            {
+                ++factor;
             }
         }
         assert( assertFactorization() );
+        //TODO expensive
+        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
+            assert( factor->first.factorization().size() == 1 );
+
         return result;
     }
     
@@ -247,7 +259,7 @@ namespace carl
     bool PolynomialFactorizationPair<P>::isIrreducible() const
     {
         if ( mIrreducible != -1 )
-            return mIrreducible;
+            return mIrreducible == 1;
 
         assert( mpPolynomial != nullptr );
         if ( mpPolynomial->isLinear() )
@@ -271,6 +283,8 @@ namespace carl
         assert( mFactorization.size() == 1 );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
+        assert( exponentA > 0 );
+        assert( exponentB > 0 );
         mFactorization.clear();
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
         mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
@@ -289,10 +303,10 @@ namespace carl
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
-        if( _pfPairA.flattenFactorization() )
-            _pfPairARefined = true;
-        if( _pfPairB.flattenFactorization() )
-            _pfPairBRefined = true;
+        //if( _pfPairA.flattenFactorization() )
+        //    _pfPairARefined = true;
+        //if( _pfPairB.flattenFactorization() )
+        //    _pfPairBRefined = true;
         Factorization<P> factorizationA = _pfPairA.factorization();
         Factorization<P> factorizationB = _pfPairB.factorization();
         bool rest = true;
@@ -303,23 +317,25 @@ namespace carl
             //Consider first factor in currently not checked factorization of A
             FactorizedPolynomial<P> factorA = factorizationA.begin()->first;
             carl::exponent exponentA = factorizationA.begin()->second;
-            LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorA: " << factorA << "^" << exponentA );
+            LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorA: (" << factorA << ")^" << exponentA );
             factorizationA.erase( factorizationA.begin() );
             rest = true;
+            assert( factorA.factorization().size() == 1);
 
             while ( !factorA.isOne() && !factorizationB.empty() )
             {
                 FactorizedPolynomial<P> factorB = factorizationB.begin()->first;
                 carl::exponent exponentB = factorizationB.begin()->second;
-                LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorB: " << factorB << "^" << exponentB );
+                LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorB: (" << factorB << ")^" << exponentB );
                 factorizationB.erase( factorizationB.begin() );
+                assert( factorB.factorization().size() == 1);
 
                 if( factorA == factorB )
                 {
                     //Common factor found
                     carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
                     result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentCommon ) );
-                    LOGMSG_TRACE( "carl.core.factorizedpolynomial", "Existing common factor: " << factorA << "^" << exponentCommon );
+                    LOGMSG_TRACE( "carl.core.factorizedpolynomial", "Existing common factor: (" << factorA << ")^" << exponentCommon );
                     if (exponentA > exponentCommon)
                         factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentA-exponentCommon ) );
                     if (exponentB > exponentCommon)
@@ -349,7 +365,7 @@ namespace carl
                     {
                         //No common factor
                         _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB ) );
-                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "No common factor, insert in restB: " << factorB << "^" << exponentB );
+                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "No common factor, insert in restB: (" << factorB << ")^" << exponentB );
                     }
                     else
                     {
@@ -364,7 +380,7 @@ namespace carl
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
-                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "New common factor: " << gcdResult << "^" << exponentCommon );
+                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "New common factor: (" << gcdResult << ")^" << exponentCommon );
 
                         if (remainA != 1)
                         {
@@ -380,7 +396,14 @@ namespace carl
                                 factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentA-exponentCommon ) );
                         }
                         else
-                            rest = false;
+                        {
+                            if ( exponentA > exponentCommon )
+                            {
+                                exponentA -= exponentCommon;
+                            }
+                            else
+                                rest = false;
+                        }
                         if (remainB != 1)
                         {
                             //Set new factorization
@@ -393,6 +416,10 @@ namespace carl
                             if (exponentB > exponentCommon)
                                 factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon ) );
                             _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
+                        }
+                        else if ( exponentB > exponentCommon )
+                        {
+                            _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon) );
                         }
                     }
                 }
@@ -425,13 +452,13 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1 )
+        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1)
         {
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;
         }
         else
-        {   
+        {
             _out << _pfPair.factorization();
         }
         return _out;
