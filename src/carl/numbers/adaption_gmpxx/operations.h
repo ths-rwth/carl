@@ -127,6 +127,22 @@ inline mpz_class lcm(const mpz_class& a, const mpz_class& b) {
 	return res;
 }
 
+inline mpz_class gcd(const mpq_class& a, const mpq_class& b) {
+    assert( isInteger(a) );
+    assert( isInteger(b) );
+	mpz_class res;
+	mpz_gcd(res.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+	return res;
+}
+
+inline mpz_class lcm(const mpq_class& a, const mpq_class& b) {
+    assert( isInteger(a) );
+    assert( isInteger(b) );
+	mpz_class res;
+	mpz_lcm(res.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+	return res;
+}
+
 inline mpz_class pow(const mpz_class& b, unsigned e) {
 	mpz_class res;
 	mpz_pow_ui(res.get_mpz_t(), b.get_mpz_t(), e);
