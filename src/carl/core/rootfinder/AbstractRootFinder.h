@@ -135,6 +135,7 @@ protected:
 	/**
 	 * Find roots for polynomials of degree at most two and adds them to roots.
 	 * The resulting roots will always be in sorted order.
+	 * Assumes that the polynomial is not zero.
 	 * @returns true, if polynomial has degree at most two.
 	 */
 	bool solveTrivial();
