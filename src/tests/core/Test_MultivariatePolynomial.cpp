@@ -47,6 +47,19 @@ TEST(MultivariatePolynomial, getTerms)
 	EXPECT_EQ(p, p2);
 }
 
+TEST(MultivariatePolynomial, remainder)
+{
+    Variable x(1);
+    Variable y(2);
+    MultivariatePolynomial<cln::cl_RA> px( x );
+    MultivariatePolynomial<cln::cl_RA> py( y );
+    MultivariatePolynomial<cln::cl_RA> p( px - cln::cl_RA(3) );
+    MultivariatePolynomial<cln::cl_RA> p4( p * p * p * p );
+    EXPECT_TRUE( p4.remainder( p ).isZero() );
+}
+
+
+
 TEST(MultivariatePolynomial, toUnivariatePolynomial)
 {
     VariablePool& vpool = VariablePool::getInstance();
