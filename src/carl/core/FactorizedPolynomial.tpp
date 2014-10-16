@@ -798,9 +798,11 @@ namespace carl
     {
         if ( existsFactorization( _fpoly ) )
         {
-            if ( _fpoly.coefficient() != 1 )
-                _out << _fpoly.coefficient() << " * ";
-            return _out << _fpoly.content();
+            if ( _fpoly.coefficient() != Coeff<P>( 1 ) )
+                _out << _fpoly.coefficient() << " * (";
+            _out << _fpoly.content();
+            if ( _fpoly.coefficient() != Coeff<P>( 1 ) )
+                _out << ")";
         }
         else
             return ( _out << _fpoly.coefficient() );
