@@ -305,15 +305,17 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lockA( _pfPairA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _pfPairB.mMutex );
 
+        _pfPairARefined = false;
+        _pfPairBRefined = false;
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
-        //if( _pfPairA.flattenFactorization() )
-        //    _pfPairARefined = true;
-        //if( _pfPairB.flattenFactorization() )
-        //    _pfPairBRefined = true;
-        Factorization<P> factorizationA = _pfPairA.factorization();
-        Factorization<P> factorizationB = _pfPairB.factorization();
+        if( _pfPairA.flattenFactorization() )
+            _pfPairARefined = true;
+        if( _pfPairB.flattenFactorization() )
+            _pfPairBRefined = true;
+        Factorization<P> factorizationA = _pfPairA.mFactorization;
+        Factorization<P> factorizationB = _pfPairB.mFactorization;
         bool rest = true;
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "Compute GCD (internal) of " << _pfPairA << " and " << _pfPairB );
 
