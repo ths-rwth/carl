@@ -474,3 +474,15 @@ TEST(MultivariatePolynomial, varInfo)
     EXPECT_EQ((cln::cl_RA)1, vi2.getVarInfo(z)->coeffs().at(1));
 }
 
+TEST(MultivariatePolynomial, Quotient)
+{
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable x = vpool.getFreshVariable();
+    vpool.setName(x, "x");
+	MultivariatePolynomial<cln::cl_RA> one(cln::cl_RA(1));
+    MultivariatePolynomial<cln::cl_RA> m1 = x*x - one;
+	MultivariatePolynomial<cln::cl_RA> m2 = x - one;
+	
+	auto res = m1.quotient(m2);
+	std::cout << m1 << " / " << m2 << " = " << res << std::endl;
+}
