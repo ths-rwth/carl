@@ -54,7 +54,8 @@ namespace carl
                 element->first->rehash();
                 auto retB = mCache.insert( element );
                 assert( retB.second );
-                mCacheRefs[element->second.refStoragePos] = *retB.first;
+                for( Ref ref : element->second.refStoragePositions )
+                    mCacheRefs[ref] = *retB.first;
             }
             delete newElement;
         }
@@ -62,13 +63,13 @@ namespace carl
         {
             if( mUnusedPositionsInCacheRefs.empty() ) // Get a brand new reference.
             {
-                (*ret.first)->second.refStoragePos = mCacheRefs.size();
+                (*ret.first)->second.refStoragePositions.push_back( mCacheRefs.size() );
                 mCacheRefs.push_back( newElement );
             }
             else // Try to take the reference from the stack of old ones.
             {
                 mCacheRefs[mUnusedPositionsInCacheRefs.top()] = newElement;
-                newElement->second.refStoragePos = mUnusedPositionsInCacheRefs.top();
+                newElement->second.refStoragePositions.push_back( mUnusedPositionsInCacheRefs.top() );
                 mUnusedPositionsInCacheRefs.pop();
             }
             ++mNumOfUnusedEntries;
@@ -77,7 +78,7 @@ namespace carl
                 clean();
             }
         }
-        return std::make_pair( (*ret.first)->second.refStoragePos, ret.second );
+        return std::make_pair( (*ret.first)->second.refStoragePositions.front(), ret.second );
     }
     
     template<typename T>
@@ -230,7 +231,9 @@ namespace carl
             assert( (*iter)->first != nullptr );
             std::cout << "   " << *(*iter)->first << std::endl;
             std::cout << "                       usage count: " << iter->second.usageCount << std::endl;
-            std::cout << "        reference storage position: " << iter->second.refStoragePos << std::endl;
+            std::cout << "        reference storage positions:";
+            for( Ref ref : iter->second.refStoragePos )
+                std::cout << "  " << ref;
             std::cout << "                          activity: " << iter->second.activity << std::endl;
         }
     }

@@ -82,7 +82,7 @@ namespace carl
             /**
              * Stores the reference of the entry in the cache for which this information hold.
              */
-            Ref refStoragePos;
+            std::vector<Ref> refStoragePositions;
             
             /**
              * Stores the activity of the entry in the cache for which this information hold. The activity states how often the entry
@@ -92,7 +92,7 @@ namespace carl
 
             Info( double _activity ):
                 usageCount( 0 ),
-                refStoragePos( 0 ),
+                refStoragePositions(),
                 activity( _activity )
             {}
         };
@@ -245,8 +245,11 @@ namespace carl
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( _toRemove->second.usageCount == 0 );
-            mCacheRefs[_toRemove->second.refStoragePos] = nullptr;
-            mUnusedPositionsInCacheRefs.push( _toRemove->second.refStoragePos );
+            for( Ref ref : _toRemove->second.refStoragePositions )
+            {
+                mCacheRefs[ref] = nullptr;
+                mUnusedPositionsInCacheRefs.push( ref );
+            }
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
             auto result = mCache.erase( _toRemove );
@@ -265,8 +268,11 @@ namespace carl
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( (*_toRemove)->second.usageCount == 0 );
-            mCacheRefs[(*_toRemove)->second.refStoragePos] = nullptr;
-            mUnusedPositionsInCacheRefs.push( (*_toRemove)->second.refStoragePos );
+            for( Ref ref : (*_toRemove)->second.refStoragePositions )
+            {
+                mCacheRefs[ref] = nullptr;
+                mUnusedPositionsInCacheRefs.push( ref );
+            }
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
             T* toDel = (*_toRemove)->first;
