@@ -248,6 +248,10 @@ namespace carl
             }
         }
         assert( assertFactorization() );
+        //TODO expensive
+        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
+            assert( factor->first.factorization().size() == 1 );
+
         return result;
     }
     
@@ -299,10 +303,10 @@ namespace carl
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
-        if( _pfPairA.flattenFactorization() )
-            _pfPairARefined = true;
-        if( _pfPairB.flattenFactorization() )
-            _pfPairBRefined = true;
+        //if( _pfPairA.flattenFactorization() )
+        //    _pfPairARefined = true;
+        //if( _pfPairB.flattenFactorization() )
+        //    _pfPairBRefined = true;
         Factorization<P> factorizationA = _pfPairA.factorization();
         Factorization<P> factorizationB = _pfPairB.factorization();
         bool rest = true;
@@ -313,23 +317,25 @@ namespace carl
             //Consider first factor in currently not checked factorization of A
             FactorizedPolynomial<P> factorA = factorizationA.begin()->first;
             carl::exponent exponentA = factorizationA.begin()->second;
-            LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorA: " << factorA << "^" << exponentA );
+            LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorA: (" << factorA << ")^" << exponentA );
             factorizationA.erase( factorizationA.begin() );
             rest = true;
+            assert( factorA.factorization().size() == 1);
 
             while ( !factorA.isOne() && !factorizationB.empty() )
             {
                 FactorizedPolynomial<P> factorB = factorizationB.begin()->first;
                 carl::exponent exponentB = factorizationB.begin()->second;
-                LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorB: " << factorB << "^" << exponentB );
+                LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorB: (" << factorB << ")^" << exponentB );
                 factorizationB.erase( factorizationB.begin() );
+                assert( factorB.factorization().size() == 1);
 
                 if( factorA == factorB )
                 {
                     //Common factor found
                     carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
                     result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentCommon ) );
-                    LOGMSG_TRACE( "carl.core.factorizedpolynomial", "Existing common factor: " << factorA << "^" << exponentCommon );
+                    LOGMSG_TRACE( "carl.core.factorizedpolynomial", "Existing common factor: (" << factorA << ")^" << exponentCommon );
                     if (exponentA > exponentCommon)
                         factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentA-exponentCommon ) );
                     if (exponentB > exponentCommon)
@@ -359,7 +365,7 @@ namespace carl
                     {
                         //No common factor
                         _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB ) );
-                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "No common factor, insert in restB: " << factorB << "^" << exponentB );
+                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "No common factor, insert in restB: (" << factorB << ")^" << exponentB );
                     }
                     else
                     {
@@ -374,7 +380,7 @@ namespace carl
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
-                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "New common factor: " << gcdResult << "^" << exponentCommon );
+                        LOGMSG_TRACE( "carl.core.factorizedpolynomial", "New common factor: (" << gcdResult << ")^" << exponentCommon );
 
                         if (remainA != 1)
                         {
