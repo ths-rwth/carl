@@ -21,7 +21,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	bool operator<(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{
-		return lhs.nominator() < rhs.nominator() || (lhs.nominator() == rhs.nominator() && lhs.denominator() < rhs.denominator());
+		return lhs.nominator()*rhs.denominator() < rhs.nominator()*lhs.denominator();
 	}
 	
 	template<typename Pol, bool AS>
