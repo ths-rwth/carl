@@ -1809,22 +1809,24 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         typename TermsType::iterator it(mTerms.begin());
         while(it != mTerms.end())
         {
-            CompareResult cmpres(Ordering::compare(*(**it).monomial(), rhs));
-            if( cmpres == CompareResult::GREATER ) break;
-            if( cmpres == CompareResult::EQUAL )
-            {
-                // new coefficient would be zero, simply removing is enough.
-                if((**it).coeff() == (Coeff)1)
-                {
-                    mTerms.erase(it);
-                }
-                // we have to create a new term object. 
-                else
-                {
-                    *it = std::make_shared<const Term<Coeff>>((**it).coeff()-1, (**it).monomial());
-                }
-                return *this;
-            }
+			if ((**it).monomial() != nullptr) {
+				CompareResult cmpres(Ordering::compare(*(**it).monomial(), rhs));
+				if( cmpres == CompareResult::GREATER ) break;
+				if( cmpres == CompareResult::EQUAL )
+				{
+					// new coefficient would be zero, simply removing is enough.
+					if((**it).coeff() == (Coeff)1)
+					{
+						mTerms.erase(it);
+					}
+					// we have to create a new term object. 
+					else
+					{
+						*it = std::make_shared<const Term<Coeff>>((**it).coeff()-1, (**it).monomial());
+					}
+					return *this;
+				}
+			}
             ++it;    
         }
         // no eq ual monomial does occur. We can simply insert.
