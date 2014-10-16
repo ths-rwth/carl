@@ -167,12 +167,21 @@ TEST(FactorizedPolynomial, GCD)
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
+    
+    VariablePool& vpool = VariablePool::getInstance();
+    Variable t = vpool.getFreshVariable();
+    vpool.setName(t, "t");
+    Pol one(Rational(1));
+    Pol g1 = t*t - one;
+    Pol g2 = t - one;
 
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fpA( pA, pCache );
     FPol fpB( pB, pCache );
     FPol fpRestA;
     FPol fpRestB;
+    FPol fg1( g1, pCache );
+    FPol fg2( g2, pCache );
 
     Pol pGCD = gcd( pA, pB );
     Pol pRestA = pA.quotient( pGCD );
@@ -182,6 +191,13 @@ TEST(FactorizedPolynomial, GCD)
     EXPECT_EQ( pGCD, computePolynomial( fpGCD ) );
     EXPECT_EQ( pRestA, computePolynomial( fpRestA ) );
     EXPECT_EQ( pRestB, computePolynomial( fpRestB ) );
+    FPol fgRestA;
+    FPol fgRestB;
+    std::cout << "GCD of " << fg1 << " and " << fg2 << ": ";
+    FPol fgGCD = gcd( fg1, fg2, fgRestA, fgRestB );
+    std::cout << fgGCD << " with rest " << fgRestA << " and " << fgRestB << std::endl;
+    EXPECT_EQ( g1, computePolynomial( fgRestA ) * computePolynomial( fgGCD ) );
+    EXPECT_EQ( g2, computePolynomial( fgRestB ) * computePolynomial( fgGCD ) );
 }
 
 TEST(FactorizedPolynomial, Flattening)

@@ -217,7 +217,7 @@ namespace carl
     template<typename P>
     bool PolynomialFactorizationPair<P>::flattenFactorization() const
     {
-        if ( mFactorization.size() == 1 && mFactorization.begin()->second == 1 )
+        if ( factorizedTrivially() )
         {
             return false;
         }
@@ -225,7 +225,12 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
         {
-            if (factor->first.factorization().size() > 1){
+            if( !existsFactorization( factor->first ) )
+            {
+                std::cout << mFactorization << std::endl;
+                std::cout << factor->first << std::endl;
+            }
+            if (factor->first.content().mFactorization.size() > 1){
                 //Update factorization
                 result = true;
                 const Factorization<P>& partFactorization = factor->first.factorization();
@@ -370,11 +375,8 @@ namespace carl
                     else
                     {
                         //New common factor
-                        P remainA, remainB;
-                        bool correct = polA.divideBy( polGCD, remainA );
-                        assert( correct );
-                        correct = polB.divideBy( polGCD, remainB );
-                        assert( correct );
+                        P remainA = polA.quotient( polGCD );
+                        P remainB = polB.quotient( polGCD );
                         carl::exponent exponentCommon = exponentA < exponentB ? exponentA : exponentB;
                         std::shared_ptr<Cache<PolynomialFactorizationPair<P>>> cache = factorA.pCache();
                         //Set new part of GCD
@@ -452,7 +454,7 @@ namespace carl
     template <typename P>
     std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
     {
-        if( _pfPair.factorization().size() == 1 && _pfPair.factorization().begin()->second == 1)
+        if( _pfPair.factorizedTrivially() )
         {
             assert( _pfPair.mpPolynomial != nullptr );
             _out << *_pfPair.mpPolynomial;

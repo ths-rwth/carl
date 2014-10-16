@@ -748,7 +748,7 @@ namespace carl
         bool rehashFPolyB = false;
 
         Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )) /
-                Coeff<P>(carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) ));
+        Coeff<P>(carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) ));
         Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
         
@@ -803,6 +803,7 @@ namespace carl
             _out << _fpoly.content();
             if ( _fpoly.coefficient() != Coeff<P>( 1 ) )
                 _out << ")";
+            return _out;
         }
         else
             return ( _out << _fpoly.coefficient() );

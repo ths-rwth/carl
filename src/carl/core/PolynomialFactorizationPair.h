@@ -87,6 +87,11 @@ namespace carl
             return mFactorization;
         }
         
+        inline bool factorizedTrivially() const
+        {
+            return this == &mFactorization.begin()->first.content();
+        }
+        
         typename P::CoeffType constantPart() const
         {   
             if( mFactorization.size() == 1 && mFactorization.begin()->second == 1 )

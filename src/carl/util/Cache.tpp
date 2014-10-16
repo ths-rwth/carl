@@ -230,11 +230,11 @@ namespace carl
         {
             assert( (*iter)->first != nullptr );
             std::cout << "   " << *(*iter)->first << std::endl;
-            std::cout << "                       usage count: " << iter->second.usageCount << std::endl;
+            std::cout << "                       usage count: " << (*iter)->second.usageCount << std::endl;
             std::cout << "        reference storage positions:";
-            for( Ref ref : iter->second.refStoragePos )
+            for( Ref ref : (*iter)->second.refStoragePositions )
                 std::cout << "  " << ref;
-            std::cout << "                          activity: " << iter->second.activity << std::endl;
+            std::cout << "                          activity: " << (*iter)->second.activity << std::endl;
         }
     }
     
