@@ -248,6 +248,10 @@ namespace carl
             }
         }
         assert( assertFactorization() );
+        //TODO expensive
+        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
+            assert( factor->first.factorization().size() == 1 );
+
         return result;
     }
     
@@ -316,6 +320,7 @@ namespace carl
             LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorA: " << factorA << "^" << exponentA );
             factorizationA.erase( factorizationA.begin() );
             rest = true;
+            assert( factorA.factorization().size() == 1);
 
             while ( !factorA.isOne() && !factorizationB.empty() )
             {
@@ -323,6 +328,7 @@ namespace carl
                 carl::exponent exponentB = factorizationB.begin()->second;
                 LOGMSG_TRACE( "carl.core.factorizedpolynomial", "FactorB: " << factorB << "^" << exponentB );
                 factorizationB.erase( factorizationB.begin() );
+                assert( factorB.factorization().size() == 1);
 
                 if( factorA == factorB )
                 {
