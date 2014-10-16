@@ -322,6 +322,7 @@ public:
 
 	/**
 	 * Get the maximal exponent of the main variable.
+	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
 	 * @return Degree.
 	 */
 	unsigned degree() const {

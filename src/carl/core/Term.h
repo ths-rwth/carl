@@ -232,6 +232,11 @@ class Term
 		
 		Term calcLcmAndDivideBy( const Monomial&) const;
 		
+		template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
+		bool divisible(const Term&) const;
+		template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
+		bool divisible(const Term&) const;
+		
 		Term* derivative(Variable::Arg) const;
 		
 		Definiteness definiteness() const;

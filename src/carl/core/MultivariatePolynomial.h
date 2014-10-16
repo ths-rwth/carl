@@ -496,7 +496,8 @@ public:
 	 * @return Changed polynomial.
 	 */
 	MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
-	MultivariatePolynomial& operator+=(const Term<Coeff>& rhs);
+	MultivariatePolynomial& operator+=(const TermType& rhs);
+	MultivariatePolynomial& operator+=(const std::shared_ptr<const TermType>& rhs);
 	MultivariatePolynomial& operator+=(const Monomial& rhs);
 	MultivariatePolynomial& operator+=(Variable::Arg rhs);
 	MultivariatePolynomial& operator+=(const Coeff& rhs);
