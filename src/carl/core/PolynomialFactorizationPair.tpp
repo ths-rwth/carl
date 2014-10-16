@@ -209,9 +209,9 @@ namespace carl
     template<typename P>
     P computePolynomial( const PolynomialFactorizationPair<P>& _pfPair )
     {
-        if( _pfPair.mpPolynomial == nullptr )
-            _pfPair.mpPolynomial = new P( computePolynomial( _pfPair.factorization() ) );
-        return *_pfPair.mpPolynomial;
+        if( _pfPair.mpPolynomial != nullptr )
+            return *_pfPair.mpPolynomial;
+        return computePolynomial( _pfPair.factorization() );
     }
 
     template<typename P>
