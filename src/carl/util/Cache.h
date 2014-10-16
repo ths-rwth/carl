@@ -248,6 +248,7 @@ namespace carl
             for( Ref ref : _toRemove->second.refStoragePositions )
             {
                 mCacheRefs[ref] = nullptr;
+                assert (ref > 0);
                 mUnusedPositionsInCacheRefs.push( ref );
             }
             assert( mNumOfUnusedEntries > 0 );
@@ -271,6 +272,7 @@ namespace carl
             for( Ref ref : (*_toRemove)->second.refStoragePositions )
             {
                 mCacheRefs[ref] = nullptr;
+                assert (ref > 0);
                 mUnusedPositionsInCacheRefs.push( ref );
             }
             assert( mNumOfUnusedEntries > 0 );
