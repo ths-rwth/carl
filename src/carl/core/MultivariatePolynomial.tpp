@@ -570,23 +570,30 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 		if(p.lterm()->tdeg() < divisor.lterm()->tdeg())
 		{
 			assert(p.lterm()->divideBy(*divisor.lterm()) == nullptr);
+            if( O::degreeOrder )
+            {
+                remainder += p;
+                return remainder;
+            }
 			// TODO if p is degree ordered, then this is true for all subsequent calls.
 			remainder += p.lterm();
 			p.stripLT();
 		}
-		
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
-		// nullptr if lt(divisor) does not divide lt(p).
-		if(factor != nullptr)
-		{
-			p -= *factor * divisor;
-			delete factor;
-		}
-		else
-		{
-			remainder += p.lterm();
-			p.stripLT();
-		}
+        else
+        {
+            Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+            // nullptr if lt(divisor) does not divide lt(p).
+            if(factor != nullptr)
+            {
+                p -= *factor * divisor;
+                delete factor;
+            }
+            else
+            {
+                remainder += p.lterm();
+                p.stripLT();
+            }
+        }
 	}
 	assert(*this == quotient(divisor) * divisor + remainder);
 	return remainder;
