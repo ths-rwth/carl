@@ -575,7 +575,6 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
                 remainder += p;
                 return remainder;
             }
-			// TODO if p is degree ordered, then this is true for all subsequent calls.
 			remainder += p.lterm();
 			p.stripLT();
 		}
