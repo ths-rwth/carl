@@ -85,6 +85,7 @@ namespace carl
             //pfPair->assertFactorization();
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
+        assert(computePolynomial(*this) == _polynomial);
     }
     
     template<typename P>
@@ -125,6 +126,7 @@ namespace carl
             mpCache->reg( mCacheRef );
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
+        assert(computePolynomial(*this) == computePolynomial(_toCopy));
     }
     
     template<typename P>
@@ -166,6 +168,7 @@ namespace carl
             mpCache->reg( mCacheRef );
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
+        assert(computePolynomial(*this) == computePolynomial(_fpoly));
         return *this;
     }
         
@@ -227,12 +230,14 @@ namespace carl
     template<typename P>
     Coeff<P> distributeCoefficients( Factorization<P>& _factorization )
     {
+        Factorization<P> tmp = _factorization;
         Coeff<P> result(1);
         for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
         {
             result *= carl::pow( factor->first.coefficient(), factor->second );
             factor->first.mCoefficient = 1;
         }
+        assert(computePolynomial(_factorization) * result == computePolynomial(tmp));
         return result;
     }
 
@@ -501,7 +506,9 @@ namespace carl
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const CoeffType& _coef )
     {
         assert( _coef != 0 );
+        FactorizedPolynomial<P> tmp = *this;
         this->mCoefficient /= _coef;
+        assert(computePolynomial(tmp) * (static_cast<CoeffType>(1)/_coef) == computePolynomial(*this));
         return *this;
     }
     

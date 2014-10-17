@@ -197,6 +197,7 @@ namespace carl
                 content().mpPolynomial = new P( computePolynomial( content().factorization() ) );
                 rehash();
             }
+
             return *content().mpPolynomial;
         }
 

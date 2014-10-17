@@ -234,6 +234,7 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
         {
+            assert(factor->first.coefficient() == 1);
             if (factor->first.content().mFactorization.size() > 1){
                 //Update factorization
                 result = true;
@@ -257,9 +258,6 @@ namespace carl
             }
         }
         assert( assertFactorization() );
-        //TODO expensive
-        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); factor++ )
-            assert( factor->first.factorization().size() == 1 );
 
         return result;
     }

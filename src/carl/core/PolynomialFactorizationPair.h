@@ -106,6 +106,7 @@ namespace carl
                     return factorCP;
                 result *= carl::pow( factorCP, factor.second );
             }
+            assert(computePolynomial(mFactorization).constantPart() == result);
             return result;
         }
         
