@@ -768,7 +768,20 @@ namespace carl
         {
             if( factorA->first == factorB->first )
             {
-                resultFactorization.insert( resultFactorization.end(), factorA->second < factorB->second ? *factorA : *factorB );
+                if( factorA->second < factorB->second )
+                {
+                    resultFactorization.insert( resultFactorization.end(), *factorA );
+                    _fFactorizationRestB.insert( _fFactorizationRestB.end(), std::make_pair( factorB->first, factorB->second - factorA->second ) );
+                }
+                else if( factorA->second > factorB->second )
+                {
+                    resultFactorization.insert( resultFactorization.end(), *factorB );
+                    _fFactorizationRestB.insert( _fFactorizationRestB.end(), std::make_pair( factorA->first, factorA->second - factorB->second ) );
+                }
+                else
+                {
+                    resultFactorization.insert( resultFactorization.end(), *factorA );
+                }
                 factorA++;
                 factorB++;
             }
