@@ -314,7 +314,11 @@ namespace carl
                 FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
                 coefficientCommon *= fpolySum.coefficient();
                 fpolySum.mCoefficient = Coeff<P>(1);
-                resultFactorization.insert( resultFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
+                auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
+                if( !ret.second )
+                {
+                    ++ret.first->second;
+                }
             }
         }
         FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
