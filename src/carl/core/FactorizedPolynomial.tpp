@@ -776,7 +776,7 @@ namespace carl
                 else if( factorA->second > factorB->second )
                 {
                     resultFactorization.insert( resultFactorization.end(), *factorB );
-                    _fFactorizationRestB.insert( _fFactorizationRestB.end(), std::make_pair( factorA->first, factorA->second - factorB->second ) );
+                    _fFactorizationRestA.insert( _fFactorizationRestB.end(), std::make_pair( factorA->first, factorA->second - factorB->second ) );
                 }
                 else
                 {
