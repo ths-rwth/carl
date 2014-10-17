@@ -134,28 +134,46 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lockB( _polyFactB.mMutex );
         if( _polyFactA.mpPolynomial != nullptr && _polyFactB.mpPolynomial != nullptr )
         {
-            return *_polyFactA.mpPolynomial < *_polyFactB.mpPolynomial;
+            std::cout << "a: " << *_polyFactA.mpPolynomial << std::endl;
+            std::cout << "b: " << *_polyFactB.mpPolynomial << std::endl;
+            bool result = *_polyFactA.mpPolynomial < *_polyFactB.mpPolynomial;
+            std::cout << "case 1 (2)" << result << std::endl;
+            return result;
         }
         else
         {
+            std::cout << "case 2 (2)" << std::endl;
             auto iterA = _polyFactA.factorization().begin();
             auto iterB = _polyFactB.factorization().begin();
             while( iterA != _polyFactA.factorization().end() && iterB != _polyFactB.factorization().end() )
             {
                 if( iterA->first < iterB->first )
+                {
+                    std::cout << "true (1) " << std::endl;
                     return true;
+                }
                 else if( iterA->first == iterB->first )
                 {
                     if( iterA->second < iterB->second )
+                    {
+                        std::cout << "true (2)" << std::endl;
                         return true;
+                    }
                     else if( iterA->second > iterB->second )
+                    {
+                        std::cout << "false (3)" << std::endl;
                         return false;
+                    }
                 }
                 else
+                {
+                    std::cout << "false (4)" << std::endl;
                     return false;
+                }
                 ++iterA; ++iterB;
             }
-            return false;
+            std::cout << "false (5)" << std::endl;
+            return iterA == _polyFactA.factorization().end();
         }
     }
     

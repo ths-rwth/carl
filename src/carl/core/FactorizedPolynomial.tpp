@@ -187,15 +187,21 @@ namespace carl
     bool operator<( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
+        
+        std::cout << "polyA: " << _fpolyA << " polyB: " << _fpolyB << std::endl;
         if( _fpolyA.pCache() == nullptr && _fpolyB.pCache() == nullptr )
         {
-            return _fpolyA.coefficient() < _fpolyB.coefficient();
+            bool result = _fpolyA.coefficient() < _fpolyB.coefficient();
+            std::cout << "case 1 (1) " << result << std::endl;
+            return result;
         }
         else if( _fpolyA.pCache() != nullptr && _fpolyB.pCache() != nullptr )
         {
-            return _fpolyA.content() < _fpolyB.content();
+            bool result = _fpolyA.content() < _fpolyB.content();
+            std::cout << "case 2 (1)" << result << std::endl;
+            return result;
         }
-        return true;
+        return _fpolyA.pCache() == nullptr;
     }
     
     template<typename P>
@@ -541,6 +547,9 @@ namespace carl
     template<typename P>
     const FactorizedPolynomial<P> lcm( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        std::cout << "arguments" << std::endl;
+        std::cout << "fpolyA " << _fpolyA << std::endl;
+        std::cout << "fpolyB " << _fpolyB << std::endl;
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
@@ -567,11 +576,20 @@ namespace carl
         //Both polynomials are not constant
         Factorization<P> restAFactorization, restBFactorization;
         gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, rehashFPolyA, rehashFPolyB );
+        std::cout << "after gcd" << std::endl;
+        std::cout << "fpolyA " << _fpolyA << std::endl;
+        std::cout << "fpolyB " << _fpolyB << std::endl;
+        std::cout << "restA: " << restAFactorization << std::endl;
+        std::cout << "restB: " << restBFactorization << std::endl;
 
         if( rehashFPolyA )
             _fpolyA.rehash();
         if( rehashFPolyB )
             _fpolyB.rehash();
+
+        std::cout << "after rehash" << std::endl;
+        std::cout << "fpolyA " << _fpolyA << std::endl;
+        std::cout << "fpolyB " << _fpolyB << std::endl;
 
         //Compute lcm as A*restB
         Factorization<P> lcmFactorization;
@@ -582,6 +600,7 @@ namespace carl
             auto result = lcmFactorization.insert( *factor );
             if ( !result.second )
             {
+                std::cout << factor->first << " and result " << result.first->first << " is equal? " << (result.first->first == factor->first) << " and is smaller(1)? " << (result.first->first < factor->first) << " and is smaller(2)? " << (factor->first < result.first->first) << std::endl;
                 //Increment exponent for already existing factor
                 result.first->second += factor->second;
             }
@@ -591,6 +610,8 @@ namespace carl
         FactorizedPolynomial<P> result( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "LCM of " << _fpolyA << " and " << _fpolyB << ": " << result);
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
+        std::cout << "result: " << computePolynomial(result) << " and result: " << result << std::endl;
+        std::cout << "polyA: " << _fpolyA << " polyB: " << _fpolyB << std::endl;
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
         return result;
     }
