@@ -341,12 +341,20 @@ bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs)
 template<typename Coeff>
 bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs)
 {
-	if (lhs.mMonomial == rhs.mMonomial) return false;
-	if (lhs.tdeg() < rhs.tdeg()) return true;
-	if (lhs.mMonomial && rhs.mMonomial) {
-		if (*(lhs.mMonomial) < *(rhs.mMonomial)) return true;
-		if (*(rhs.mMonomial) < *(lhs.mMonomial)) return false;
-	}
+    if (lhs.mMonomial == nullptr)
+    {
+        if (rhs.mMonomial == nullptr)
+        {
+            return lhs.mCoeff < rhs.mCoeff;
+        }
+        return true;
+    }
+    if (rhs.mMonomial == nullptr)
+    {
+        return false;
+    }
+	if (*(lhs.mMonomial) < *(rhs.mMonomial)) return true;
+    if (*(rhs.mMonomial) < *(lhs.mMonomial)) return false;
 	return lhs.mCoeff < rhs.mCoeff;
 }
 
