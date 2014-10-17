@@ -289,13 +289,14 @@ namespace carl
     void PolynomialFactorizationPair<P>::setNewFactors( const FactorizedPolynomial<P>& _fpolyA, carl::exponent exponentA, const FactorizedPolynomial<P>& _fpolyB, carl::exponent exponentB ) const
     {
         assert( mFactorization.size() == 1 );
+        assert( factorizedTrivially() );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
         assert( exponentA > 0 );
         assert( exponentB > 0 );
         mFactorization.clear();
-        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
-        mFactorization.insert ( mFactorization.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
+        mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
+        mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
         assert( assertFactorization() );
     }
 
