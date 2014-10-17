@@ -551,6 +551,7 @@ namespace carl
             FactorizedPolynomial<P> result( _fpolyA );
             assert( _fpolyB.mCoefficient != 0 );
             result.mCoefficient /= _fpolyB.mCoefficient;
+            assert( computePolynomial( _fpolyB ) * computePolynomial( result ) == computePolynomial( _fpolyA ) );
             return result;
         }
         else if( !existsFactorization( _fpolyA ) )
@@ -558,6 +559,7 @@ namespace carl
             FactorizedPolynomial<P> result( _fpolyB );
             assert( _fpolyA.mCoefficient != 0 );
             result.mCoefficient /= _fpolyA.mCoefficient;
+            assert( computePolynomial( _fpolyB ) * computePolynomial( result ) == computePolynomial( _fpolyA ) );
             return result;
         }
         Factorization<P> resultFactorization;
@@ -608,12 +610,16 @@ namespace carl
         {
             FactorizedPolynomial<P> result( _fpolyA );
             result.mCoefficient = coefficientLCM;
+            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
+            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
             return result;
         }
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> result( _fpolyB );
             result.mCoefficient = coefficientLCM;
+            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
+            assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
             return result;
         }
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "Compute LCM of " << _fpolyA << " and " << _fpolyB );
