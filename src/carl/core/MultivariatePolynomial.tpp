@@ -1363,14 +1363,54 @@ bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
 {
+    std::cout << lhs << " < " << rhs << std::endl;
 	for (unsigned i = 0; i < lhs.mTerms.size(); i++) {
-		if (i >= rhs.mTerms.size()) return false;
+		if (i >= rhs.mTerms.size())
+        {
+            std::cout << "   case 1: false" << std::endl;
+            return false;
+        }
+        if( lhs.mTerms[i] == nullptr )
+        {
+            std::cout << "   nullptr"; 
+        }
+        else
+        {
+            std::cout << "   " << *lhs.mTerms[i]; 
+        }
+        std::cout << "<";
+        if( rhs.mTerms[i] == nullptr )
+        {
+            std::cout << "   nullptr"; 
+        }
+        else
+        {
+            std::cout << "   " << *rhs.mTerms[i]; 
+        }
+        std::cout << std::endl;
 		if (lhs.mTerms[i] == rhs.mTerms[i]) continue;
-		if (lhs.mTerms[i] == nullptr) return true;
-		if (rhs.mTerms[i] == nullptr) return false;
-		if (*(lhs.mTerms[i]) < *(rhs.mTerms[i])) return true;
-		if (*(rhs.mTerms[i]) < *(lhs.mTerms[i])) return false;
+		if (lhs.mTerms[i] == nullptr) 
+        {
+            std::cout << "   case 2: true" << std::endl;
+            return true;
+        }
+		if (rhs.mTerms[i] == nullptr)
+        {
+            std::cout << "   case 3: false" << std::endl;
+            return false;
+        }
+		if (*(lhs.mTerms[i]) < *(rhs.mTerms[i]))
+        {
+            std::cout << "   case 4: true" << std::endl;
+            return true;
+        }
+		if (*(rhs.mTerms[i]) < *(lhs.mTerms[i]))
+        {
+            std::cout << "   case 5: false" << std::endl;
+            return false;
+        }
 	}
+    std::cout << "   case 6: " << ((rhs.mTerms.size() > lhs.mTerms.size()) ? true : false) << std::endl;
 	return (rhs.mTerms.size() > lhs.mTerms.size());
 }
 
