@@ -270,6 +270,23 @@ TEST(FactorizedPolynomial, LCM)
     Pol pLCM = lcm( pA, pB );
     FPol fpLCM = lcm( fpA, fpB );
     EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
+    
+    carl::VariablePool::getInstance().clear();
+    Variable y(1);
+    Variable x(2);
+    Pol px( x );
+    Pol py( y );
+    Pol p1( px*py-py+Rational(1) );
+    p1 *= Rational(3);
+    Pol p2( Rational(2)*px*py-Rational(2)*py+Rational(3) );
+    
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    EXPECT_FALSE( (p1<p2) == (p2<p1) );
+    EXPECT_FALSE( (fp2<fp1) == (fp1<fp2) );
+    Pol p12LCM = lcm( p1, p2 );
+    FPol fp12LCM = lcm( fp1, fp2 );
+    EXPECT_EQ( p12LCM, computePolynomial( fp12LCM ) );
 }
 
 TEST(FactorizedPolynomial, Subtraction)
