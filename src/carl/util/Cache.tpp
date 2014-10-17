@@ -40,6 +40,10 @@ namespace carl
     std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
+        if( mCache.size() >= mMaxCacheSize ) // Clean, if the number of elements in the cache exceeds the threshold.
+        {
+            clean();
+        }
         TypeInfoPair<T,Info>* newElement = new TypeInfoPair<T,Info>( _toCache, Info( mMaxActivity ) );
         auto ret = mCache.insert( newElement );
         
@@ -63,7 +67,7 @@ namespace carl
             }
             else
                 delete newElement;
-    }
+        }
         else // Create a new entry in the cache.
         {
             if( mUnusedPositionsInCacheRefs.empty() ) // Get a brand new reference.
@@ -80,10 +84,6 @@ namespace carl
                 mUnusedPositionsInCacheRefs.pop();
             }
             ++mNumOfUnusedEntries;
-            if( mCache.size() >= mMaxCacheSize ) // Clean, if the number of elements in the cache exceeds the threshold.
-            {
-                clean();
-            }
         }
         assert( (*ret.first)->second.refStoragePositions.size() > 0);
         assert( (*ret.first)->second.refStoragePositions.front() > 0 );
