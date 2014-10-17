@@ -9,6 +9,7 @@
 
 #include "PolynomialFactorizationPair.h"
 #include "logging.h"
+#include "FactorizedPolynomial.h"
 
 namespace carl
 {   
@@ -297,6 +298,8 @@ namespace carl
         mFactorization.clear();
         mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
         mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
+        assert( mpPolynomial != nullptr );
+        assert( *mpPolynomial == computePolynomial( mFactorization ) );
         assert( assertFactorization() );
     }
 
