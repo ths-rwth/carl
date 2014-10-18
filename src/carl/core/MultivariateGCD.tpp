@@ -92,16 +92,23 @@ template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
 {
 	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
+#ifdef COMPARE_WITH_GINAC
+	assert(checkConversion(a));
+	assert(checkConversion(b));
+	assert(ginacGcd(a,b) == gcd_calc.calculate());
+#endif 
 	return gcd_calc.calculate();
 }
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> lcm(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
 {
+	assert(!a.isZero());
+	assert(!b.isZero());
 	if(a == b) return a;
-	if(is_field<C>::value && a.isConstant() && b.isConstant()) return MultivariatePolynomial<C,O,P>(1);
-	if(is_field<C>::value && a.isConstant()) return b;
-	if(is_field<C>::value && b.isConstant()) return a;
+	//if(is_field<C>::value && a.isConstant() && b.isConstant()) return MultivariatePolynomial<C,O,P>(1);
+	//if(is_field<C>::value && a.isConstant()) return b;
+	//if(is_field<C>::value && b.isConstant()) return a;
 	
 	
 	return quotient((a*b),gcd(a,b));
