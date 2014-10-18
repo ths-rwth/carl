@@ -210,6 +210,14 @@ namespace carl
         }
 
         /**
+         * @return 
+         */
+        CoeffType coprimeFactor() const
+        {
+            return CoeffType(1)/mCoefficient;
+        }
+
+        /**
          * @return true, if the factorized polynomial is constant.
          */
         bool isConstant() const

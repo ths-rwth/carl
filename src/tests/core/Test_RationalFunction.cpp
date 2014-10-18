@@ -86,6 +86,21 @@ TEST(RationalFunction, Multiplication)
     FPol qf2(q2, pCache);
     EXPECT_EQ(computePolynomial(qf1), computePolynomial(rf3.nominator()));
     EXPECT_EQ(computePolynomial(qf2), computePolynomial(rf3.denominator()));
+    
+    //(1/4*PF)/((-1/4)*PF+1) * ((-1/4)*PF+1)/((-1/2)*PF+1)
+    carl::VariablePool::getInstance().clear();
+    Variable t(1);
+    Pol pf(t);
+    Pol nomA( Rational(1)/Rational(4)*pf );
+    Pol denA( Rational(-1)/Rational(4)*pf+Rational(1) );
+    Pol nomB( Rational(-1)/Rational(4)*pf+Rational(1) );
+    Pol denB( Rational(-1)/Rational(2)*pf+Rational(1) );
+    RFunc rfA(nomA, denA);
+    RFunc rfB(nomB, denB);
+    std::cout << rfA << "*" << rfB << " = ";
+    RFunc rfC = rfA * rfB;
+    std::cout << rfC << std::endl;
+    EXPECT_EQ( rfC.nominator()*rfC.denominator(), nomA*denA*nomB*denB );
 }
 
 TEST(RationalFunction, Addition)

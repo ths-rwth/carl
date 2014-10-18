@@ -237,6 +237,13 @@ protected:
 		}
 		else
 		{
+            CoeffType cpFactorNom = mNominator.coprimeFactor();
+            CoeffType cpFactorDen = mDenominator.coprimeFactor();
+            mNominator *= cpFactorNom;
+            mDenominator *= cpFactorDen;
+            CoeffType cpFactor = cpFactorDen/cpFactorNom;
+            mNominator *= carl::getNum( cpFactor );
+            mDenominator *= carl::getDenom( cpFactor );
 			Pol gcd = carl::gcd(mNominator, mDenominator);
 			assert(mNominator.quotient(gcd) * gcd == mNominator);
 			mNominator = mNominator.quotient(gcd);
