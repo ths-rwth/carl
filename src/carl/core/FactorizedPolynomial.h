@@ -184,8 +184,12 @@ namespace carl
         {
             assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
-            if( content().flattenFactorization() )
+            CoeffType c = content().flattenFactorization();
+            if( c != CoeffType( 0 ) )
+            {
+                mCoefficient *= c;
                 rehash();
+            }
             return content().factorization();
         }
 

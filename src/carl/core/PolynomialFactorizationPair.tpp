@@ -199,7 +199,9 @@ namespace carl
             bool refineA = false;
             bool refineB = false;
             Factorization<P> restA, restB;
-            gcd( _toUpdate, _updateWith, restA, restB, refineA, refineB );
+            typename P::CoeffType c( 0 );
+            gcd( _toUpdate, _updateWith, restA, restB, c, refineA, refineB );
+            assert( c == typename P::CoeffType( 0 ) || c == typename P::CoeffType( 1 ) );
         }
     }
 
@@ -224,25 +226,33 @@ namespace carl
     }
 
     template<typename P>
-    bool PolynomialFactorizationPair<P>::flattenFactorization() const
+    typename P::CoeffType PolynomialFactorizationPair<P>::flattenFactorization() const
     {
+        typename P::CoeffType result( 0 );
         if ( factorizedTrivially() )
         {
-            return false;
+            return result;
         }
-        bool result = false;
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        for ( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
+        for( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
         {
-            assert(factor->first.coefficient() == 1);
-            if (factor->first.content().mFactorization.size() > 1){
-                //Update factorization
-                result = true;
+            if( factor->first.content().factorizedTrivially() )
+            {
+                ++factor;
+            }
+            else
+            {
+                // Update factorization
+                if( result == typename P::CoeffType( 0 ) )
+                {
+                    result = typename P::CoeffType( 1 );
+                }
                 const Factorization<P>& partFactorization = factor->first.factorization();
                 carl::exponent e = factor->second;
+                result *= carl::pow( factor->first.coefficient(), e );
                 factor = mFactorization.erase(factor);
 
-                for ( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
+                for( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
                     auto insertResult = mFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
                     if ( !insertResult.second )
@@ -251,10 +261,6 @@ namespace carl
                         insertResult.first->second += partFactor->second * e;
                     }
                 }
-            }
-            else
-            {
-                ++factor;
             }
         }
         assert( assertFactorization() );
@@ -302,7 +308,7 @@ namespace carl
     }
 
     template<typename P>
-    Factorization<P> gcd( const PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, Factorization<P>& _restA, Factorization<P>& _restB, bool& _pfPairARefined, bool& _pfPairBRefined )
+    Factorization<P> gcd( const PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, Factorization<P>& _restA, Factorization<P>& _restB, typename P::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined )
     {
         if( &_pfPairA == &_pfPairB )
             return _pfPairA.factorization();
@@ -310,15 +316,24 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lockA( _pfPairA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _pfPairB.mMutex );
 
+        _coeff = typename P::CoeffType( 1 );
         _pfPairARefined = false;
         _pfPairBRefined = false;
         Factorization<P> result;
         _restA.clear();
         _restB.clear();
-        if( _pfPairA.flattenFactorization() )
+        typename P::CoeffType cA = _pfPairA.flattenFactorization();
+        if( cA != typename P::CoeffType( 0 ) )
+        {
             _pfPairARefined = true;
-        if( _pfPairB.flattenFactorization() )
+            _coeff *= cA;
+        }
+        typename P::CoeffType cB = _pfPairB.flattenFactorization();
+        if( cB != typename P::CoeffType( 0 ) )
+        {
             _pfPairBRefined = true;
+            _coeff *= cB;
+        }
         Factorization<P> factorizationA = _pfPairA.mFactorization;
         Factorization<P> factorizationB = _pfPairB.mFactorization;
         bool rest = true;
@@ -443,10 +458,18 @@ namespace carl
         } //End of outer while
         _restB = factorizationB;
 
-        if( _pfPairA.flattenFactorization() )
+        cA = _pfPairA.flattenFactorization();
+        if( cA != typename P::CoeffType( 0 ) )
+        {
             _pfPairARefined = true;
-        if( _pfPairB.flattenFactorization() )
+            _coeff *= cA;
+        }
+        cB = _pfPairB.flattenFactorization();
+        if( cB != typename P::CoeffType( 0 ) )
+        {
             _pfPairBRefined = true;
+            _coeff *= cB;
+        }
 
         // Check correctness
         assert( _pfPairA.assertFactorization() );

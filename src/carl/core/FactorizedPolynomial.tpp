@@ -230,14 +230,12 @@ namespace carl
     template<typename P>
     Coeff<P> distributeCoefficients( Factorization<P>& _factorization )
     {
-        Factorization<P> tmp = _factorization;
         Coeff<P> result(1);
         for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
         {
             result *= carl::pow( factor->first.coefficient(), factor->second );
             factor->first.mCoefficient = 1;
         }
-        assert(computePolynomial(_factorization) * result == computePolynomial(tmp));
         return result;
     }
 
@@ -633,7 +631,10 @@ namespace carl
 
         //Both polynomials are not constant
         Factorization<P> restAFactorization, restBFactorization;
-        gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, rehashFPolyA, rehashFPolyB );
+        Coeff<P> c( 0 );
+        gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, c, rehashFPolyA, rehashFPolyB );
+        if( c != Coeff<P>( 0 ) )
+            coefficientLCM *= c;
 
         if( rehashFPolyA )
             _fpolyA.rehash();
@@ -884,8 +885,11 @@ namespace carl
 
         //Both polynomials are not constant
         Factorization<P> restAFactorization, restBFactorization;
-        Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, rehashFPolyA, rehashFPolyB ) );
+        Coeff<P> c( 0 );
+        Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, c, rehashFPolyA, rehashFPolyB ) );
 
+        if( c != Coeff<P>( 0 ) )
+            coefficientCommon *= c;
         if( rehashFPolyA )
             _fpolyA.rehash();
         if( rehashFPolyB )
