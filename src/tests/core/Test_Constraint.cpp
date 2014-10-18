@@ -30,7 +30,7 @@ TEST(Constraint, Operations)
     v1.push_back(RFuncCon(r1, CompareRelation::GEQ));
     std::unordered_set<PolCon> s1;
     carl::constraints::toPolynomialConstraints<Pol, false>(v1.begin(), v1.end(), inserter(s1, s1.end()));
-    EXPECT_EQ(1, s1.size());
+    EXPECT_EQ((size_t)1, s1.size());
     v1.clear();
     s1.clear();
     
@@ -39,7 +39,7 @@ TEST(Constraint, Operations)
     RFunc r2(p1,p3);
     v1.push_back(RFuncCon(r2, CompareRelation::GEQ));
     carl::constraints::toPolynomialConstraints<Pol, false>(v1.begin(), v1.end(), inserter(s1, s1.end()));
-    EXPECT_EQ(2, s1.size());
+    EXPECT_EQ((size_t)2, s1.size());
     v1.clear();
     s1.clear();
     
@@ -47,7 +47,7 @@ TEST(Constraint, Operations)
     RFunc r3(p4);
     v1.push_back(RFuncCon(r3, CompareRelation::GEQ));
     carl::constraints::toPolynomialConstraints<Pol, false>(v1.begin(), v1.end(), inserter(s1, s1.end()));
-    EXPECT_EQ(1, s1.size());
+    EXPECT_EQ((size_t)1, s1.size());
     v1.clear();
     s1.clear();
     
