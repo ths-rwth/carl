@@ -56,6 +56,7 @@ public:
 	RationalFunction(const Pol& nom, const Pol& denom)
 	: mNominator(nom), mDenominator(denom), mIsSimplified(false)
 	{
+        if(AutoSimplify) eliminateCommonFactor();
 		assert(!denom.isZero());
 	}
 	
@@ -208,16 +209,10 @@ protected:
 	void eliminateCommonFactor()
 	{
 		if (mIsSimplified) return;
+        mIsSimplified = true;
 		if(mNominator.isZero())
 		{
 			mDenominator = Pol(CoeffType(1));
-			mIsSimplified = true;
-			return;
-		}
-		
-		if(mDenominator.isOne())
-		{
-			mIsSimplified = true;
 			return;
 		}
 		
@@ -225,32 +220,29 @@ protected:
 		{
 			mNominator = Pol(CoeffType(1));
 			mDenominator = Pol(CoeffType(1));
-			mIsSimplified = true;
 			return;
 		}
 		
-		if(mDenominator.isConstant())
+        CoeffType cpFactorNom = mNominator.coprimeFactor();
+        CoeffType cpFactorDen = mDenominator.coprimeFactor();
+        mNominator *= cpFactorNom;
+        mDenominator *= cpFactorDen;
+        CoeffType cpFactor = cpFactorDen/cpFactorNom;
+		if(!mDenominator.isConstant())
 		{
-			mNominator /= mDenominator.constantPart();
-			mDenominator = Pol(CoeffType(1));
-			mIsSimplified = true;
-		}
-		else
-		{
-            CoeffType cpFactorNom = mNominator.coprimeFactor();
-            CoeffType cpFactorDen = mDenominator.coprimeFactor();
-            mNominator *= cpFactorNom;
-            mDenominator *= cpFactorDen;
-            CoeffType cpFactor = cpFactorDen/cpFactorNom;
-            mNominator *= carl::getNum( cpFactor );
-            mDenominator *= carl::getDenom( cpFactor );
 			Pol gcd = carl::gcd(mNominator, mDenominator);
 			assert(mNominator.quotient(gcd) * gcd == mNominator);
 			mNominator = mNominator.quotient(gcd);
 			assert(mDenominator.quotient(gcd) * gcd == mDenominator);
 			mDenominator = mDenominator.quotient(gcd);
-			mIsSimplified = true;
+            CoeffType cpFactorNom = mNominator.coprimeFactor();
+            CoeffType cpFactorDen = mDenominator.coprimeFactor();
+            mNominator *= cpFactorNom;
+            mDenominator *= cpFactorDen;
+            cpFactor *= cpFactorDen/cpFactorNom;
 		}
+        mNominator *= carl::getNum( cpFactor );
+        mDenominator *= carl::getDenom( cpFactor );
 	}
 	
 };

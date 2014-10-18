@@ -142,6 +142,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const typename Pol::CoeffType& rhs)
 	{
+        mIsSimplified = false;
 		mNominator *= rhs;
 		if(AS) eliminateCommonFactor();
 		return *this;
@@ -151,11 +152,11 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const RationalFunction<Pol, AS>& rhs)
 	{
+		mIsSimplified = false;
 		if(rhs.mDenominator.isOne())
 		{
 			return *this /= rhs.mNominator;
 		}
-		mIsSimplified = false;
 		mNominator *= rhs.mDenominator;
 		mDenominator *= rhs.mNominator;
 		if(AS) eliminateCommonFactor();
@@ -165,6 +166,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const Pol& rhs)
 	{
+        mIsSimplified = false;
 		if(rhs.isConstant()) 
 		{ 
 			mNominator /= rhs.constantPart();
@@ -172,7 +174,6 @@ namespace carl
 		else
 		{
 			mDenominator *= rhs;
-			mIsSimplified = false;
 			if(AS) eliminateCommonFactor();
 		}
 		return *this;

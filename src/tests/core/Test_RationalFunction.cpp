@@ -16,7 +16,7 @@ using namespace carl;
 
 typedef MultivariatePolynomial<Rational> Pol;
 typedef FactorizedPolynomial<Pol> FPol;
-typedef RationalFunction<Pol> RFunc;
+typedef RationalFunction<Pol,true> RFunc;
 typedef RationalFunction<FPol> RFactFunc;
 typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
@@ -100,7 +100,7 @@ TEST(RationalFunction, Multiplication)
     std::cout << rfA << "*" << rfB << " = ";
     RFunc rfC = rfA * rfB;
     std::cout << rfC << std::endl;
-    EXPECT_EQ( rfC.nominator()*rfC.denominator(), nomA*denA*nomB*denB );
+    EXPECT_TRUE( Pol( nomA*denA*nomB*denB ).remainder( rfC.nominator()*rfC.denominator() ).isZero() );
 }
 
 TEST(RationalFunction, Addition)
