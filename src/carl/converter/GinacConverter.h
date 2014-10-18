@@ -50,6 +50,8 @@ namespace carl
     bool ginacDivide(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB, MultivariatePolynomial<cln::cl_RA>& result);
     
     std::unordered_map<const MultivariatePolynomial<cln::cl_RA>, unsigned, std::hash<MultivariatePolynomial<cln::cl_RA>>> ginacFactorization(const MultivariatePolynomial<cln::cl_RA>& poly);
+	
+	bool checkConversion(const MultivariatePolynomial<cln::cl_RA>& polyA);
 }
 
 #endif
