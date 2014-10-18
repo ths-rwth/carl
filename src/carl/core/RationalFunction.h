@@ -240,7 +240,7 @@ protected:
 			Pol gcd = carl::gcd(mNominator, mDenominator);
 			assert(mNominator.quotient(gcd) * gcd == mNominator);
 			mNominator = mNominator.quotient(gcd);
-			assert(mNominator.quotient(gcd) * gcd == mDenominator);
+			assert(mDenominator.quotient(gcd) * gcd == mDenominator);
 			mDenominator = mDenominator.quotient(gcd);
 			mIsSimplified = true;
 		}
