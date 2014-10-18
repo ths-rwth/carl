@@ -151,7 +151,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const RationalFunction<Pol, AS>& rhs)
 	{
-		if(mDenominator.isOne()) 
+		if(rhs.mDenominator.isOne())
 		{
 			return *this /= rhs.mNominator;
 		}
