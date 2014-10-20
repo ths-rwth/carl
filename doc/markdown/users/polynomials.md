@@ -11,5 +11,4 @@ In order to represent polynomials, we define the following hierarchy of classes:
 
 We will abbreviate these types as V, M, T, MP, UP.
 
-
 @subpage polynomials_operators
