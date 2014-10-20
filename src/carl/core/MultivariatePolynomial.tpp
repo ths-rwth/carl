@@ -1157,218 +1157,116 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 
 
 template<typename C, typename O, typename P>
-bool operator==( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    if(lhs.mTerms.size() != rhs.mTerms.size()) return false;
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+    if (lhs.mTerms.size() != rhs.mTerms.size()) return false;
     // Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
     return std::equal(lhs.mTerms.begin(), lhs.mTerms.end(), rhs.mTerms.begin(),
-                    [](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
-                    -> bool 
-                    {
-                        return lterm == rterm || *lterm == *rterm;
-                    });
+		[](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
+		-> bool 
+		{
+			return lterm == rterm || *lterm == *rterm;
+		});
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
+    if (lhs.mTerms.empty() && rhs.coeff() == C(0)) return true;
+    if (lhs.mTerms.size() > 1) return false;
+    return *(lhs.mTerms.front()) == rhs;
+}
+
+template<typename C, typename O, typename P>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs) {
+    if (lhs.mTerms.size() != 1) return false;
+	if (lhs.mTerms.front()->monomial() == nullptr) return false;
+    return *(lhs.mTerms.front()->monomial()) == rhs;
+}
+
+template<typename C, typename O, typename P>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
+    if (lhs.mTerms.empty()) return rhs == C(0);
+    if (lhs.mTerms.size() > 1) return false;
+	if (lhs.mTerms.front()->mMonomial != nullptr) return false;
+    return lhs.lcoeff() == rhs;
+}
+
+template<typename C, typename O, typename P>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
+    if (lhs.mTerms.size() != 1) return false;
+	if (lhs.mTerms.front()->monomial() == nullptr) return false;
+    return *(lhs.mTerms.front()->monomial()) == rhs;
+}
+
+template<typename C, typename O, typename P>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs) {
+	return lhs == C(rhs);
+}
+
+template<typename C, typename O, typename P>
+bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	LOG_INEFFICIENT();
     return MultivariatePolynomial<C,O,P>(lhs) == rhs;
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
-{
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs) {
     return rhs == lhs;
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
+bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	LOG_INEFFICIENT();
     return MultivariatePolynomial<C>(lhs) == rhs;
 }
 
 template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
-{
-    return rhs == lhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
-{
-    if(lhs.mTerms.empty() && rhs.coeff() == (C)0) return true;
-    if(lhs.mTerms.size() > 1) return false;
-    return *(lhs.mTerms.front()) == rhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs == lhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
-{
-    if(lhs.mTerms.size() != 1) return false;
-    return *(lhs.mTerms.front()->monomial) == rhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs == lhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
-{
-    if (lhs.mTerms.empty()) {
-		return rhs == (C)0;
-	}
-    if (lhs.mTerms.size() > 1) return false;
-	if (lhs.lmon()) return false;
-    return lhs.lcoeff() == rhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs == lhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
-{
-    if(lhs.mTerms.size() != 1) return false;
-    return *(lhs.mTerms.front()->monomial()) == rhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs == lhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
-{
-    if(lhs.mTerms.empty())
-	{
-		return rhs == 0;
-	}
-    if (lhs.mTerms.size() > 1) return false;
-	if (lhs.lmon()) return false;
-    return lhs.lcoeff() == rhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-	return rhs == lhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator!=( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs); // TODO: != could be much cheaper than ==
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<MultivariatePolynomial<C>>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, int rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator!=(int lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return !(lhs == rhs);
-}
-
-template<typename C, typename O, typename P>
-bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	for (unsigned i = 0; i < lhs.mTerms.size(); i++) {
 		if (i >= rhs.mTerms.size()) return false;
 		if (*(lhs.mTerms[i]) < *(rhs.mTerms[i])) return true;
-		if (*(rhs.mTerms[i]) < *(lhs.mTerms[i])) return false;
+		if (*(lhs.mTerms[i]) > *(rhs.mTerms[i])) return false;
 	}
-	return (rhs.mTerms.size() > lhs.mTerms.size());
+	return (lhs.mTerms.size() < rhs.mTerms.size());
+}
+template<typename C, typename O, typename P>
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
+	if (lhs.mTerms.size() == 0) return C(0) < rhs;
+	return *(lhs.mTerms.front()) < rhs;
+}
+template<typename C, typename O, typename P>
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs) {
+	if (lhs.mTerms.size() == 0) return true;
+	return *(lhs.mTerms.front()) < rhs;
+}
+template<typename C, typename O, typename P>
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
+	if (lhs.mTerms.size() == 0) return true;
+	return *(lhs.mTerms.front()) < rhs;
+}
+template<typename C, typename O, typename P>
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
+	if (lhs.mTerms.size() == 0) return C(0) < rhs;
+	return *(lhs.mTerms.front()) < rhs;
+}
+template<typename C, typename O, typename P>
+bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	if (rhs.mTerms.size() == 0) return lhs < C(0);
+	return lhs < *(rhs.mTerms.front());
+}
+template<typename C, typename O, typename P>
+bool operator<(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	if (rhs.mTerms.size() == 0) return false;
+	return lhs < *(rhs.mTerms.front());
+}
+template<typename C, typename O, typename P>
+bool operator<(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	if (rhs.mTerms.size() == 0) return false;
+	return lhs < *(rhs.mTerms.front());
+}
+template<typename C, typename O, typename P>
+bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	if (rhs.mTerms.size() == 0) return lhs < C(0);
+	return lhs < *(rhs.mTerms.front());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
