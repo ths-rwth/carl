@@ -162,14 +162,14 @@ public:
 	friend bool operator!=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent != rhs.mContent;
 	}
-	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) {
-		return lhs.mContent > rhs.mContent;
-	}
 	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent < rhs.mContent;
 	}
 	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent <= rhs.mContent;
+	}
+	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) {
+		return lhs.mContent > rhs.mContent;
 	}
 	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent >= rhs.mContent;
