@@ -12,6 +12,9 @@
 
 CITE_BIB_FILES = @CMAKE_SOURCE_DIR@/doc/literature.bib
 
+#CLANG_ASSISTED_PARSING = YES
+#CLANG_OPTIONS = -std=c++11
+
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
