@@ -331,15 +331,25 @@ class Term
 		friend bool operator<(const Monomial& lhs, const Term<Coeff>& rhs);
 
 		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+		friend bool operator<=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+			return !(rhs < lhs);
+		}
 		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, Variable::Arg rhs);
+		friend bool operator<=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+			return !(rhs < lhs);
+		}
 		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, const Monomial& rhs);
+		friend bool operator<=(const Term<Coeff>& lhs, const Monomial& rhs) {
+			return !(rhs < lhs);
+		}
 		template<typename Coeff>
-		friend bool operator<=(Variable::Arg lhs, const Term<Coeff>& rhs);
+		friend bool operator<=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+			return !(rhs < lhs);
+		}
 		template<typename Coeff>
-		friend bool operator<=(const Monomial& lhs, const Term<Coeff>& rhs);
+		friend bool operator<=(const Monomial& lhs, const Term<Coeff>& rhs) {
+			return !(rhs < lhs);
+		}
 
 		template<typename Coeff>
 		friend bool operator>(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {

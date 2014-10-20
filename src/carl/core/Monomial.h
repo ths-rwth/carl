@@ -627,49 +627,36 @@ namespace carl
 			
 		}*/
 
-		/// @name Equality comparison operators
+		/// @name Comparison operators
 		/// @{
 		/**
-		 * Checks if the two arguments are equal.
+		 * Compares two arguments where one is a Monomial and the other is either a monomial or a variable.
 		 * @param lhs First argument.
 		 * @param rhs Second argument.
-		 * @return `lhs == rhs`
+		 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 		 */
 		friend bool operator==(const Monomial& lhs, const Monomial& rhs) {
 			if (lhs.mTotalDegree != rhs.mTotalDegree) return false;
 			return lhs.mExponents == rhs.mExponents;
 		}
-
 		friend bool operator==(const Monomial& lhs, Variable::Arg rhs) {
 			if (lhs.mTotalDegree != 1) return false;
 			if (lhs.mExponents[0].first == rhs) return true;
 			return false;
 		}
-
 		friend bool operator==(Variable::Arg lhs, const Monomial& rhs) {
 			return rhs == lhs;
 		}
-		/// @}
-
-		/// @name Inequality comparison operators
-		/// @{
-		/**
-		 * Checks if the two arguments are not equal.
-		 * @param lhs First argument.
-		 * @param rhs Second argument.
-		 * @return `lhs != rhs`
-		 */
+		
 		friend bool operator!=(const Monomial& lhs, const Monomial& rhs) {
 			return !(lhs == rhs);
 		}
-
 		friend bool operator!=(const Monomial& lhs, Variable::Arg rhs) {
 			return !(lhs == rhs);
 		}
 		friend bool operator!=(Variable::Arg lhs, const Monomial& rhs) {
 			return !(rhs == lhs);
 		}
-		/// @}
 
 		friend bool operator<(const Monomial& lhs, const Monomial& rhs) {
 			CompareResult cr = compareGradedLexical(lhs, rhs);
@@ -686,18 +673,13 @@ namespace carl
 			return lhs < rhs.mExponents[0].first;
 		}
 		friend bool operator<=(const Monomial& lhs, const Monomial& rhs) {
-			CompareResult cr = compareGradedLexical(lhs, rhs);
-			return cr == CompareResult::LESS || cr == CompareResult::EQUAL;
+			return !(rhs < lhs);
 		}
 		friend bool operator<=(const Monomial& lhs, Variable::Arg rhs) {
-			if (lhs.mTotalDegree == 0) return true;
-			if (lhs.mTotalDegree > 1) return false;
-			return lhs.mExponents[0].first <= rhs;
+			return !(rhs < lhs);
 		}
 		friend bool operator<=(Variable::Arg lhs, const Monomial& rhs) {
-			if (rhs.mTotalDegree == 0) return false;
-			if (rhs.mTotalDegree > 1) return true;
-			return lhs <= rhs.mExponents[0].first;
+			return !(rhs < lhs);
 		}
 		friend bool operator>(const Monomial& lhs, const Monomial& rhs) {
 			return rhs < lhs;
