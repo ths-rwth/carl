@@ -659,25 +659,63 @@ namespace carl
 		 * @param rhs Second argument.
 		 * @return `lhs != rhs`
 		 */
-		friend bool operator!=(const Monomial& lhs, const Monomial& rhs)
-		{
+		friend bool operator!=(const Monomial& lhs, const Monomial& rhs) {
 			return !(lhs == rhs);
 		}
 
-		friend bool operator!=(const Monomial& lhs, Variable::Arg rhs)
-		{
+		friend bool operator!=(const Monomial& lhs, Variable::Arg rhs) {
 			return !(lhs == rhs);
 		}
-		friend bool operator!=(Variable::Arg lhs, const Monomial& rhs)
-		{
+		friend bool operator!=(Variable::Arg lhs, const Monomial& rhs) {
 			return !(rhs == lhs);
 		}
 		/// @}
 
-		friend bool operator<(const Monomial& lhs, const Monomial& rhs)
-		{
+		friend bool operator<(const Monomial& lhs, const Monomial& rhs) {
 			CompareResult cr = compareGradedLexical(lhs, rhs);
 			return cr == CompareResult::LESS;
+		}
+		friend bool operator<(const Monomial& lhs, Variable::Arg rhs) {
+			if (lhs.mTotalDegree == 0) return true;
+			if (lhs.mTotalDegree > 1) return false;
+			return lhs.mExponents[0].first < rhs;
+		}
+		friend bool operator<(Variable::Arg lhs, const Monomial& rhs) {
+			if (rhs.mTotalDegree == 0) return false;
+			if (rhs.mTotalDegree > 1) return true;
+			return lhs < rhs.mExponents[0].first;
+		}
+		friend bool operator<=(const Monomial& lhs, const Monomial& rhs) {
+			CompareResult cr = compareGradedLexical(lhs, rhs);
+			return cr == CompareResult::LESS || cr == CompareResult::EQUAL;
+		}
+		friend bool operator<=(const Monomial& lhs, Variable::Arg rhs) {
+			if (lhs.mTotalDegree == 0) return true;
+			if (lhs.mTotalDegree > 1) return false;
+			return lhs.mExponents[0].first <= rhs;
+		}
+		friend bool operator<=(Variable::Arg lhs, const Monomial& rhs) {
+			if (rhs.mTotalDegree == 0) return false;
+			if (rhs.mTotalDegree > 1) return true;
+			return lhs <= rhs.mExponents[0].first;
+		}
+		friend bool operator>(const Monomial& lhs, const Monomial& rhs) {
+			return rhs < lhs;
+		}
+		friend bool operator>(const Monomial& lhs, Variable::Arg rhs) {
+			return rhs < lhs;
+		}
+		friend bool operator>(Variable::Arg lhs, const Monomial& rhs) {
+			return rhs < lhs;
+		}
+		friend bool operator>=(const Monomial& lhs, const Monomial& rhs) {
+			return rhs <= lhs;
+		}
+		friend bool operator>=(const Monomial& lhs, Variable::Arg rhs) {
+			return rhs <= lhs;
+		}
+		friend bool operator>=(Variable::Arg lhs, const Monomial& rhs) {
+			return rhs <= lhs;
 		}
 
 		/**
@@ -964,6 +1002,7 @@ namespace carl
 		 */
 		bool isConsistent() const {
 			LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree);
+			if (mTotalDegree < 1) return false;
 			unsigned tdeg = 0;
 			unsigned lastVarIndex = 0;
 			for(auto ve : mExponents)
