@@ -206,7 +206,6 @@ TYPED_TEST(Operators, InplaceMultiplication)
 {
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Monomial, carl::Monomial>));
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Monomial, carl::Variable>));
-	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Monomial, TypeParam>));
 	
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, carl::Term<TypeParam>>));
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, carl::Monomial>));

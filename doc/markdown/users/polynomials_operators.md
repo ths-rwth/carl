@@ -1,4 +1,5 @@
-# Operators {#polynomials_operators}
+Operators {#polynomials_operators}
+=====
 
 The classes used to build polynomials are (almost) fully compatible with respect to the following operators, that means that any two objects of these types can be combined if there is a directed path between them within the class hierarchy.
 The exception are shown and explained below. All the operators have the usual meaning.
@@ -69,6 +70,9 @@ MP | MP | MP | MP | MP | MP
 -# A coefficient type is needed to construct the desired result type, but none can be extracted from the argument types.
 -# The type of the left hand side can not represent sums of these objects.
 -# The type of the left hand side can not represent products of these objects.
+
+## UnivariatePolynomial operators
+
 
 ## Implementation
 We follow a few rules when implementing these operators:
