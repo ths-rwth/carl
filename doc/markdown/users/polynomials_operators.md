@@ -63,7 +63,8 @@ We follow a few rules when implementing these operators:
 - Of all `operator==`, only those where `lhs` is the most general type contain a real implementation. The others are implemented like this:
   - `operator==(lhs, rhs)`: `rhs == lhs`
 - They are ordered like in the list above.
-- Operators belong to the most general type involved and are implemented as `friend` methods, whether they need this or not.
+- Operators are implemented in the file of the most general type involved (either an argument or the return type).
+- Operators are not implemented as friend methods. Those are usually only found by the compiler due to ADL, but as we need to declare `operator+(Term, Term) -> MultivariatePolynomial` next to the MultivariatePolynomial, this will not work. If a friend declaration is necessary, it will be done as a forward declaration.
 - Overloaded versions of the same operator are ordered in decreasing lexicographical order, like in this example:
   - `operator(Term,Term)`
   - `operator(Term,Monomial)`
@@ -72,7 +73,7 @@ We follow a few rules when implementing these operators:
   - `operator(Monomial,Term)`
   - `operator(Variable,Term)`
   - `operator(Coefficient,Term)`
-- Other versions, for example for comparisons with the coefficient type, are below those.
+- Other versions are below those.
 
 ## Testing the operators
 There are two stages for testing these operators: a syntactical check that these operators exist and have the correct signature and a semantical check that they actually work as expected.
@@ -82,7 +83,9 @@ The syntactical check for all operators specified here is done in `tests/core/Te
 We use `boost::concept_check` to check the existence of the operators. There are the following concepts:
 
 - `Comparison`: Checks for all comparison operators. (`==`, `!=`, `<`, `<=`, `>`, `>=`)
-- `Arithmetic`: Checks for all out-of-place arithmetic operators. (`+`, unary and binary `-`, `*`)
+- `Addition`: Checks for out-of-place addition operators. (`+`, `-`)
+- `UnaryMinus`: Checks for unary minus operators. (`-`)
+- `Multiplication`: Checks for out-of-place multiplication operators. (`*`)
 - `InplaceAddition`: Checks for all in-place addition operators. (`+=`, `-=`)
 - `InplaceMultiplication`: Checks for all in-place multiplication operators. (`*=`)
 

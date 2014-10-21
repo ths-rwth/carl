@@ -385,7 +385,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariateP
 template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::isNormal() const
 {
-	return unitPart() == 1;
+	return unitPart() == Coeff(1);
 }
 
 template<typename Coeff>
@@ -2090,7 +2090,7 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
 		if(c != C(0))
 		{
-			if (c != 1) os << "(" << c << ")*";
+			if (c != C(1)) os << "(" << c << ")*";
 			os << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
 		}
 	}

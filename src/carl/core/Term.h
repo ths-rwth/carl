@@ -281,167 +281,6 @@ class Term
 
 		bool isConsistent() const;
 		
-		/// @name Comparison operators
-		/// @{
-		/**
-		 * Compares two arguments where one is a term and the other is either a term, a monomial or a variable.
-		 * @param lhs First argument.
-		 * @param rhs Second argument.
-		 * @return `lhs ~ rhs`, `~` being the relation that is checked.
-		 */
-		template<typename Coeff>
-		friend bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
-		template<typename Coeff>
-		friend bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
-		template<typename Coeff>
-		friend bool operator==(const Term<Coeff>& lhs, const Coeff& rhs);
-		template<typename Coeff>
-		friend bool operator==(const Monomial& lhs, const Term<Coeff>& rhs) {
-			return rhs == lhs;
-		}
-		template<typename Coeff>
-		friend bool operator==(Variable::Arg lhs, const Term<Coeff>& rhs) {
-			return rhs == lhs;
-		}
-		template<typename Coeff>
-		friend bool operator==(const Coeff& lhs, const Term<Coeff>& rhs) {
-			return rhs == lhs;
-		}
-
-		template<typename Coeff>
-		friend bool operator!=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-			return !(lhs == rhs);
-		}
-		template<typename Coeff>
-		friend bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs) {
-			return !(lhs == rhs);
-		}
-		template<typename Coeff>
-		friend bool operator!=(const Term<Coeff>& lhs, Variable::Arg rhs) {
-			return !(lhs == rhs);
-		}
-		template<typename Coeff>
-		friend bool operator!=(const Term<Coeff>& lhs, const Coeff& rhs) {
-			return !(lhs == rhs);
-		}
-		template<typename Coeff>
-		friend bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs) {
-			return !(lhs == rhs);
-		}
-		template<typename Coeff>
-		friend bool operator!=(Variable::Arg lhs, const Term<Coeff>& rhs) {
-			return !(lhs == rhs);
-		}
-		template<typename Coeff>
-		friend bool operator!=(const Coeff& lhs, const Term<Coeff>& rhs) {
-			return !(lhs == rhs);
-		}
-
-		template<typename Coeff>
-		friend bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend bool operator<(const Term<Coeff>& lhs, const Monomial& rhs);
-		template<typename Coeff>
-		friend bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs);
-		template<typename Coeff>
-		friend bool operator<(const Term<Coeff>& lhs, const Coeff& rhs);
-		template<typename Coeff>
-		friend bool operator<(const Monomial& lhs, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend bool operator<(const Coeff& lhs, const Term<Coeff>& rhs);
-
-		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-			return !(rhs < lhs);
-		}
-		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, const Monomial& rhs) {
-			return !(rhs < lhs);
-		}
-		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, Variable::Arg rhs) {
-			return !(rhs < lhs);
-		}
-		template<typename Coeff>
-		friend bool operator<=(const Term<Coeff>& lhs, const Coeff& rhs) {
-			return !(rhs < lhs);
-		}
-		template<typename Coeff>
-		friend bool operator<=(const Monomial& lhs, const Term<Coeff>& rhs) {
-			return !(rhs < lhs);
-		}
-		template<typename Coeff>
-		friend bool operator<=(Variable::Arg lhs, const Term<Coeff>& rhs) {
-			return !(rhs < lhs);
-		}
-		template<typename Coeff>
-		friend bool operator<=(const Coeff& lhs, const Term<Coeff>& rhs) {
-			return !(rhs < lhs);
-		}
-
-		template<typename Coeff>
-		friend bool operator>(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-			return rhs < lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>(const Term<Coeff>& lhs, const Monomial& rhs) {
-			return rhs < lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>(const Term<Coeff>& lhs, Variable::Arg rhs) {
-			return rhs < lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>(const Term<Coeff>& lhs, const Coeff& rhs) {
-			return rhs < lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>(const Monomial& lhs, const Term<Coeff>& rhs) {
-			return rhs < lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>(Variable::Arg lhs, const Term<Coeff>& rhs) {
-			return rhs < lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>(const Coeff& lhs, const Term<Coeff>& rhs) {
-			return rhs < lhs;
-		}
-
-		template<typename Coeff>
-		friend bool operator>=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-			return rhs <= lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>=(const Term<Coeff>& lhs, const Monomial& rhs) {
-			return rhs <= lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>=(const Term<Coeff>& lhs, Variable::Arg rhs) {
-			return rhs <= lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>=(const Term<Coeff>& lhs, const Coeff& rhs) {
-			return rhs <= lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>=(const Monomial& lhs, const Term<Coeff>& rhs) {
-			return rhs <= lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>=(Variable::Arg lhs, const Term<Coeff>& rhs) {
-			return rhs <= lhs;
-		}
-		template<typename Coeff>
-		friend bool operator>=(const Coeff& lhs, const Term<Coeff>& rhs) {
-			return rhs <= lhs;
-		}
-		/// @}
-		
 		const Term<Coefficient> operator-() const;
 		
 		/// @name In-place multiplication operators
@@ -455,36 +294,6 @@ class Term
 		Term& operator *=(Variable::Arg rhs);
 		Term& operator *=(const Monomial& rhs);
 		Term& operator *=(const Term& rhs);
-		/// @}
-
-		/// @name Multiplication operators
-		/// @{
-		/**
-		 * Perform a multiplication involving a term.
-		 * @param lhs Left hand side.
-		 * @param rhs Right hand side.
-		 * @return `lhs * rhs`
-		 */
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, const int& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(Variable::Arg, const Term<Coeff>& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs);
-		template<typename Coeff>
-		friend const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs);
 		/// @}
 
 		/// @name Division operators
@@ -537,7 +346,225 @@ class Term
 		static Term gcd(const Term& t1, const Term& t2);
 };
 
-		
+	/// @name Comparison operators
+	/// @{
+	/**
+	 * Compares two arguments where one is a term and the other is either a term, a monomial or a variable.
+	 * @param lhs First argument.
+	 * @param rhs Second argument.
+	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
+	 */
+	template<typename Coeff>
+	inline bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+	template<typename Coeff>
+	inline bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
+	template<typename Coeff>
+	inline bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
+	template<typename Coeff>
+	inline bool operator==(const Term<Coeff>& lhs, const Coeff& rhs);
+	template<typename Coeff>
+	inline bool operator==(const Monomial& lhs, const Term<Coeff>& rhs) {
+		return rhs == lhs;
+	}
+	template<typename Coeff>
+	inline bool operator==(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return rhs == lhs;
+	}
+	template<typename Coeff>
+	inline bool operator==(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return rhs == lhs;
+	}
+
+	template<typename Coeff>
+	inline bool operator!=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+		return !(lhs == rhs);
+	}
+	template<typename Coeff>
+	inline bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs) {
+		return !(lhs == rhs);
+	}
+	template<typename Coeff>
+	inline bool operator!=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+		return !(lhs == rhs);
+	}
+	template<typename Coeff>
+	inline bool operator!=(const Term<Coeff>& lhs, const Coeff& rhs) {
+		return !(lhs == rhs);
+	}
+	template<typename Coeff>
+	inline bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs) {
+		return !(lhs == rhs);
+	}
+	template<typename Coeff>
+	inline bool operator!=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return !(lhs == rhs);
+	}
+	template<typename Coeff>
+	inline bool operator!=(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return !(lhs == rhs);
+	}
+
+	template<typename Coeff>
+	bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
+	template<typename Coeff>
+	bool operator<(const Term<Coeff>& lhs, const Monomial& rhs);
+	template<typename Coeff>
+	bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs);
+	template<typename Coeff>
+	bool operator<(const Term<Coeff>& lhs, const Coeff& rhs);
+	template<typename Coeff>
+	bool operator<(const Monomial& lhs, const Term<Coeff>& rhs);
+	template<typename Coeff>
+	bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs);
+	template<typename Coeff>
+	bool operator<(const Coeff& lhs, const Term<Coeff>& rhs);
+
+	template<typename Coeff>
+	inline bool operator<=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+		return !(rhs < lhs);
+	}
+	template<typename Coeff>
+	inline bool operator<=(const Term<Coeff>& lhs, const Monomial& rhs) {
+		return !(rhs < lhs);
+	}
+	template<typename Coeff>
+	inline bool operator<=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+		return !(rhs < lhs);
+	}
+	template<typename Coeff>
+	inline bool operator<=(const Term<Coeff>& lhs, const Coeff& rhs) {
+		return !(rhs < lhs);
+	}
+	template<typename Coeff>
+	inline bool operator<=(const Monomial& lhs, const Term<Coeff>& rhs) {
+		return !(rhs < lhs);
+	}
+	template<typename Coeff>
+	inline bool operator<=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return !(rhs < lhs);
+	}
+	template<typename Coeff>
+	inline bool operator<=(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return !(rhs < lhs);
+	}
+
+	template<typename Coeff>
+	inline bool operator>(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+		return rhs < lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>(const Term<Coeff>& lhs, const Monomial& rhs) {
+		return rhs < lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>(const Term<Coeff>& lhs, Variable::Arg rhs) {
+		return rhs < lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>(const Term<Coeff>& lhs, const Coeff& rhs) {
+		return rhs < lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>(const Monomial& lhs, const Term<Coeff>& rhs) {
+		return rhs < lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return rhs < lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return rhs < lhs;
+	}
+
+	template<typename Coeff>
+	inline bool operator>=(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+		return rhs <= lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>=(const Term<Coeff>& lhs, const Monomial& rhs) {
+		return rhs <= lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>=(const Term<Coeff>& lhs, Variable::Arg rhs) {
+		return rhs <= lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>=(const Term<Coeff>& lhs, const Coeff& rhs) {
+		return rhs <= lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>=(const Monomial& lhs, const Term<Coeff>& rhs) {
+		return rhs <= lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>=(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return rhs <= lhs;
+	}
+	template<typename Coeff>
+	inline bool operator>=(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return rhs <= lhs;
+	}
+	/// @}
+	
+	/// @name Multiplication operators
+	/// @{
+	/**
+	 * Perform a multiplication involving a term.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs * rhs`
+	 */
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+		Term<Coeff> res(lhs);
+		return res *= rhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Monomial& rhs) {
+		Term<Coeff> res(lhs);
+		return res *= rhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs) {
+		Term<Coeff> res(lhs);
+		return res *= rhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs) {
+		Term<Coeff> res(lhs);
+		return res *= rhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Monomial& lhs, const Term<Coeff>& rhs) {
+		return rhs * lhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs) {
+		return Term<Coeff>(rhs, lhs);
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return rhs * lhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs) {
+		return Term<Coeff>(rhs, lhs);
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return rhs * lhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs) {
+		return rhs * lhs;
+	}
+	template<typename Coeff>
+	inline const Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs) {
+		return rhs * lhs;
+	}
+	/// @}
+
 } // namespace carl
 
 namespace std {

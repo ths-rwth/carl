@@ -68,7 +68,7 @@ namespace carl
         }
         else
         {
-            if ( *mpPolynomial == 1 )
+            if ( mpPolynomial->isOne() )
             {
                 assert( mFactorization.size() == 0);
                 mpPolynomial = nullptr;
@@ -373,7 +373,7 @@ namespace carl
                         polGCD = carl::gcd( polA, polB );
                     }
 
-                    if (polGCD == 1)
+                    if (polGCD.isOne())
                     {
                         //No common factor
                         _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB ) );
@@ -391,7 +391,7 @@ namespace carl
                         result.insert( result.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
                         LOGMSG_TRACE( "carl.core.factorizedpolynomial", "New common factor: (" << gcdResult << ")^" << exponentCommon );
 
-                        if (remainA != 1)
+                        if (!remainA.isOne())
                         {
                             //Set new factorization
                             FactorizedPolynomial<P> polRemainA( remainA, cache );
@@ -413,7 +413,7 @@ namespace carl
                             else
                                 rest = false;
                         }
-                        if (remainB != 1)
+                        if (!remainB.isOne())
                         {
                             //Set new factorization
                             FactorizedPolynomial<P> polRemainB( remainB, cache );

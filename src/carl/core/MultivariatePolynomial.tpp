@@ -1158,9 +1158,9 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-    if (lhs.mTerms.size() != rhs.mTerms.size()) return false;
+    if (lhs.nrTerms() != rhs.nrTerms()) return false;
     // Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
-    return std::equal(lhs.mTerms.begin(), lhs.mTerms.end(), rhs.mTerms.begin(),
+    return std::equal(lhs.begin(), lhs.end(), rhs.begin(),
 		[](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
 		-> bool 
 		{
@@ -1170,36 +1170,31 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-    if (lhs.mTerms.empty() && rhs.coeff() == C(0)) return true;
-    if (lhs.mTerms.size() > 1) return false;
-    return *(lhs.mTerms.front()) == rhs;
+    if (lhs.isZero() && rhs.coeff() == C(0)) return true;
+    if (lhs.nrTerms() > 1) return false;
+    return *(lhs.lterm()) == rhs;
 }
 
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs) {
-    if (lhs.mTerms.size() != 1) return false;
-	if (lhs.mTerms.front()->monomial() == nullptr) return false;
-    return *(lhs.mTerms.front()->monomial()) == rhs;
+    if (lhs.nrTerms() != 1) return false;
+	if (lhs.lmon() == nullptr) return false;
+    return *(lhs.lmon()) == rhs;
 }
 
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-    if (lhs.mTerms.empty()) return rhs == C(0);
-    if (lhs.mTerms.size() > 1) return false;
-	if (lhs.mTerms.front()->mMonomial != nullptr) return false;
+    if (lhs.isZero()) return rhs == C(0);
+    if (lhs.nrTerms() > 1) return false;
+	if (lhs.lmon() != nullptr) return false;
     return lhs.lcoeff() == rhs;
 }
 
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-    if (lhs.mTerms.size() != 1) return false;
-	if (lhs.mTerms.front()->monomial() == nullptr) return false;
-    return *(lhs.mTerms.front()->monomial()) == rhs;
-}
-
-template<typename C, typename O, typename P>
-bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs) {
-	return lhs == C(rhs);
+    if (lhs.nrTerms() != 1) return false;
+	if (lhs.lmon() == nullptr) return false;
+    return *(lhs.lmon()) == rhs;
 }
 
 template<typename C, typename O, typename P>
@@ -1221,52 +1216,54 @@ bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, cons
 
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	for (unsigned i = 0; i < lhs.mTerms.size(); i++) {
-		if (i >= rhs.mTerms.size()) return false;
-		if (*(lhs.mTerms[i]) < *(rhs.mTerms[i])) return true;
-		if (*(lhs.mTerms[i]) > *(rhs.mTerms[i])) return false;
+	auto lit = lhs.begin();
+	auto rit = rhs.begin();
+	for (; lit != lhs.end(); lit++, rit++) {
+		if (rit == rhs.end()) return false;
+		if (**lit < **rit) return true;
+		if (**lit > **rit) return false;
 	}
-	return (lhs.mTerms.size() < rhs.mTerms.size());
+	return rit != rhs.end();
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-	if (lhs.mTerms.size() == 0) return C(0) < rhs;
-	return *(lhs.mTerms.front()) < rhs;
+	if (lhs.nrTerms() == 0) return C(0) < rhs;
+	return *(lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs) {
-	if (lhs.mTerms.size() == 0) return true;
-	return *(lhs.mTerms.front()) < rhs;
+	if (lhs.nrTerms() == 0) return true;
+	return *(lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-	if (lhs.mTerms.size() == 0) return true;
-	return *(lhs.mTerms.front()) < rhs;
+	if (lhs.nrTerms() == 0) return true;
+	return *(lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-	if (lhs.mTerms.size() == 0) return C(0) < rhs;
-	return *(lhs.mTerms.front()) < rhs;
+	if (lhs.nrTerms() == 0) return C(0) < rhs;
+	return *(lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.mTerms.size() == 0) return lhs < C(0);
-	return lhs < *(rhs.mTerms.front());
+	if (rhs.nrTerms() == 0) return lhs < C(0);
+	return lhs < *(rhs.lterm());
 }
 template<typename C, typename O, typename P>
 bool operator<(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.mTerms.size() == 0) return false;
-	return lhs < *(rhs.mTerms.front());
+	if (rhs.nrTerms() == 0) return false;
+	return lhs < *(rhs.lterm());
 }
 template<typename C, typename O, typename P>
 bool operator<(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.mTerms.size() == 0) return false;
-	return lhs < *(rhs.mTerms.front());
+	if (rhs.nrTerms() == 0) return false;
+	return lhs < *(rhs.lterm());
 }
 template<typename C, typename O, typename P>
 bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	if (rhs.mTerms.size() == 0) return lhs < C(0);
-	return lhs < *(rhs.mTerms.front());
+	if (rhs.nrTerms() == 0) return lhs < C(0);
+	return lhs < *(rhs.lterm());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1480,17 +1477,6 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result += rhs;
-	result.checkConsistency();
-	return result;
-}
-
-template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
@@ -1512,75 +1498,6 @@ template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<MultivariatePolynomial<C>>&)
 {
 	LOG_NOTIMPLEMENTED();
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result += rhs;
-	result.checkConsistency();
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs + lhs;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result += rhs;
-	result.checkConsistency();
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs + lhs;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result += rhs;
-	result.checkConsistency();
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs + lhs;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
-{
-	// TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result += rhs;
-	result.checkConsistency();
-	return result;
-	
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs + lhs;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1797,80 +1714,6 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         
     }
     return *this;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result -= rhs;
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result -= rhs;
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return -(rhs - lhs);
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result -= rhs;
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return -(rhs - lhs);
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result -= rhs;
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-	return -(rhs - lhs);
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
-{
-    // TODO write dedicated add
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result -= rhs;
-	return result;
-}
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator-(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return -(rhs - lhs);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
