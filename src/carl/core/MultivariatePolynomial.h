@@ -446,38 +446,6 @@ public:
 	MultivariatePolynomial& operator*=(const Coeff& c);
 	/// @}
 
-	/// @name Multiplication operators
-	/// @{
-	/**
-	 * Perform a multiplication involving a polynomial.
-	 * @param lhs Left hand side.
-	 * @param rhs Right hand side.
-	 * @return `lhs * rhs`
-	 */
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
-	template<typename C, typename O, typename P>
-	friend const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	/// @}
-
 	/// @name In-place division operators
 	/// @{
 	/**
@@ -1041,6 +1009,62 @@ public:
 	inline const MultivariatePolynomial<C> operator-(const C& lhs, Variable::Arg rhs) {
 		return -(rhs - lhs);
 	}
+	/// @}
+	
+	/// @name Multiplication operators
+	/// @{
+	/**
+	 * Perform a multiplication involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs * rhs`
+	 */
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+		MultivariatePolynomial<C,O,P> res(lhs);
+		return res *= rhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
+		MultivariatePolynomial<C,O,P> res(lhs);
+		return res *= rhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs) {
+		MultivariatePolynomial<C,O,P> res(lhs);
+		return res *= rhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
+		MultivariatePolynomial<C,O,P> res(lhs);
+		return res *= rhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
+		MultivariatePolynomial<C,O,P> res(lhs);
+		return res *= rhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+		return rhs * lhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+		return rhs * lhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+		return rhs * lhs;
+	}
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+		return rhs * lhs;
+	}
+
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	inline const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
 	/// @}
 	
 } // namespace carl

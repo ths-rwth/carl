@@ -1,57 +1,74 @@
 # Operators {#polynomials_operators}
 
-The classes used to build polynomials are fully compatible with respect to the following operators, that means that any two objects of these types can be combined if there is a directed path between them within the class hierarchy.
-All the operators have the usual meaning.
+The classes used to build polynomials are (almost) fully compatible with respect to the following operators, that means that any two objects of these types can be combined if there is a directed path between them within the class hierarchy.
+The exception are shown and explained below. All the operators have the usual meaning.
 
-- `operator==(lhs, rhs)`
-- `operator!=(lhs, rhs)`
-- `operator<(lhs, rhs)`
-- `operator<=(lhs, rhs)`
-- `operator>(lhs, rhs)`
-- `operator>=(lhs, rhs)`
-- `operator+(lhs, rhs)`
-- `operator+=(lhs, rhs)`
-- `operator-(lhs, rhs)`
-- `operator-(rhs)`
-- `operator-=(lhs, rhs)`
-- `operator*(lhs, rhs)`
-- `operator*=(lhs, rhs)`
+- Comparison operators
+  - `operator==(lhs, rhs)`
+  - `operator!=(lhs, rhs)`
+  - `operator<(lhs, rhs)`
+  - `operator<=(lhs, rhs)`
+  - `operator>(lhs, rhs)`
+  - `operator>=(lhs, rhs)`
+- Arithmetic operators
+  - `operator+(lhs, rhs)`
+  - `operator+=(lhs, rhs)`
+  - `operator-(lhs, rhs)`
+  - `operator-(rhs)`
+  - `operator-=(lhs, rhs)`
+  - `operator*(lhs, rhs)`
+  - `operator*=(lhs, rhs)`
 
-We now give the result type for any combination of these types for all supported operators.
+## Comparison operators
+All of these operators are defined for all combination of types.
 
-Note that some operators may throw an assertion when called with UnivariatePolynomial objects that have incompatible main variables.
+## Arithmetic operators
+We now give a table for all (classes of) operators with the result type or a reason why it is not implemented for any combination of these types.
 
-### operator-(lhs) (unary minus)
--  | V  | M  | T  | MP | UP
+### `operator+(lhs, rhs)`, `operator-(lhs, rhs)`
++  | C  | V  | M  | T  | MP
 -- | -- | -- | -- | -- | --
--  | T  | T  | T  | MP | UP
-
-### operator+(lhs, rhs)
-+  | V  | M  | T  | MP | UP
--- | -- | -- | -- | -- | --
-V  | MP | MP | MP | MP | UP
-M  | MP | MP | MP | MP | UP
-T  | MP | MP | MP | MP | UP
+C  | C  | MP | MP | MP | MP
+V  | MP | 1) | 1) | MP | MP
+M  | MP | 1) | 1) | MP | MP
+T  | MP | MP | MP | MP | MP
 MP | MP | MP | MP | MP | MP
-UP | UP | UP | UP | MP | UP
 
-### operator-(lhs, rhs)
--  | V  | M  | T  | MP | UP
+### `operator-(lhs)` (unary minus)
+-  | C  | V  | M  | T  | MP
 -- | -- | -- | -- | -- | --
-V  | MP | MP | MP | MP | UP
-M  | MP | MP | MP | MP | UP
-T  | MP | MP | MP | MP | UP
-MP | MP | MP | MP | MP | MP
-UP | UP | UP | UP | MP | UP
+-  | C  | 1) | 1) | T  | MP
 
 ### operator*(lhs, rhs)
-*  | V  | M  | T  | MP | UP
+*  | C  | V  | M  | T  | MP
 -- | -- | -- | -- | -- | --
-V  | M  | M  | T  | MP | UP
-M  | M  | MP | MP | MP | UP
-T  | MP | MP | MP | MP | UP
+C  | C  | T  | T  | T  | MP
+V  | T  | M  | M  | T  | MP
+M  | T  | M  | M  | T  | MP
+T  | T  | T  | T  | T  | MP
 MP | MP | MP | MP | MP | MP
-UP | UP | UP | UP | MP | UP
+
+### `operator+=(rhs)`, `operator-=(rhs)`
++= | C  | V  | M  | T  | MP
+-- | -- | -- | -- | -- | --
+C  | C  | 2) | 2) | 2) | 2)
+V  | 2) | 2) | 2) | 2) | 2)
+M  | 2) | 2) | 2) | 2) | 2)
+T  | 2) | 2) | 2) | 2) | 2)
+MP | MP | MP | MP | MP | MP
+
+### `operator*=(rhs)`
+*= | C  | V  | M  | T  | MP
+-- | -- | -- | -- | -- | --
+C  | C  | 3) | 3) | 3) | 3)
+V  | 3) | 3) | 3) | 3) | 3)
+M  | 3) | M  | M  | 3) | 3)
+T  | T  | T  | T  | T  | 3)
+MP | MP | MP | MP | MP | MP
+
+-# A coefficient type is needed to construct the desired result type, but none can be extracted from the argument types.
+-# The type of the left hand side can not represent sums of these objects.
+-# The type of the left hand side can not represent products of these objects.
 
 ## Implementation
 We follow a few rules when implementing these operators:

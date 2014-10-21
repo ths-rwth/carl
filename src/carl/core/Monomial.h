@@ -710,20 +710,6 @@ namespace carl
 			return *this;
 		}
 
-		/// @name Multiplication operators
-		/// @{
-		/**
-		 * Perform a multiplication involving a monomial.
-		 * @param lhs Left hand side.
-		 * @param rhs Right hand side.
-		 * @return `lhs * rhs`
-		 */
-		friend Monomial operator*(const Monomial& lhs, const Monomial& rhs);
-		friend Monomial operator*(const Monomial& lhs, Variable::Arg rhs);
-		friend Monomial operator*(Variable::Arg lhs, const Monomial& rhs);
-		friend Monomial operator*(Variable::Arg lhs, Variable::Arg rhs);
-		/// @}
-		
 		/**
 		 * Returns the string representation of this monomial.
 		 * @param infix Flag if prefix or infix notation should be used.
@@ -961,30 +947,7 @@ namespace carl
 				return CompareResult::EQUAL;
 			return CompareResult::LESS;
 		}
-	};
-
-	inline Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
-
-	inline Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
-
-	inline Monomial operator*(Variable::Arg lhs, const Monomial& rhs) {
-		return rhs * lhs;
-	}
-
-	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
-	
+	};	
 	
 	/// @name Comparison operators
 	/// @{
@@ -1055,6 +1018,34 @@ namespace carl
 	}
 	inline bool operator>=(Variable::Arg lhs, const Monomial& rhs) {
 		return rhs <= lhs;
+	}
+	/// @}
+
+	/// @name Multiplication operators
+	/// @{
+	/**
+	 * Perform a multiplication involving a monomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs * rhs`
+	 */
+	inline Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
+	inline Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
+	}
+	inline Monomial operator*(Variable::Arg lhs, const Monomial& rhs) {
+		return rhs * lhs;
+	}
+	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
+		Monomial result(lhs);
+		result *= rhs;
+		return result;
 	}
 	/// @}
 

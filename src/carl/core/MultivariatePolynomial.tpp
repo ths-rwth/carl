@@ -1793,15 +1793,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*( const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    // TODO write dedicated mult
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result *= rhs;
-	return result;
-}
-template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
     LOG_NOTIMPLEMENTED();
@@ -1811,65 +1802,6 @@ const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P
 {
     return rhs * lhs;
 }
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs)
-{
-    // TODO write dedicated mult
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result *= rhs;
-	return result;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs * lhs;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const Monomial& rhs)
-{
-    // TODO write dedicated mult
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result *= rhs;
-	return result;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs * lhs;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs)
-{
-    // TODO write dedicated mult
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result *= rhs;
-	return result;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-	return rhs * lhs;
-}
-
-
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs)
-{
-    // TODO write dedicated mult
-    LOG_INEFFICIENT();
-	MultivariatePolynomial<C,O,P> result(lhs);
-	result *= rhs;
-	return result;
-}
-template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator*(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs)
-{
-    return rhs * lhs;
-}
-
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator/=(const Coeff& c)
 {
