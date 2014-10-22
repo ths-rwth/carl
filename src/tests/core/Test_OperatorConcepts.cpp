@@ -97,7 +97,7 @@ TYPED_TEST(Operators, Comparison)
 {
 	BOOST_CONCEPT_ASSERT((Comparison<TypeParam, TypeParam>));
 	
-    BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::Variable>));
+        BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::Variable>));
 	
 	BOOST_CONCEPT_ASSERT((Comparison<carl::Monomial, carl::Monomial>));
 	BOOST_CONCEPT_ASSERT((Comparison<carl::Monomial, carl::Variable>));
