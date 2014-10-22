@@ -938,7 +938,7 @@ namespace carl
 				}
 				else
 				{
-					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
+					return (lhsit->first < rhsit->first ) ? CompareResult::GREATER : CompareResult::LESS;
 				}
 				++lhsit;
 				++rhsit;
