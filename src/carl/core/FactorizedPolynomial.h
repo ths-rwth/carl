@@ -24,6 +24,9 @@ namespace carl
         template<typename P1>
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
+        template<typename P1>
+        friend typename P1::CoeffType PolynomialFactorizationPair<P1>::flattenFactorization() const;
+
         typedef Coeff<P> CoeffType;
         typedef P PolyType;
         typedef Cache<PolynomialFactorizationPair<P>> CACHE;

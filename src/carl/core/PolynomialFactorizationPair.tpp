@@ -114,6 +114,8 @@ namespace carl
     {
         if( &_polyFactA == &_polyFactB )
             return true;
+        if ( _polyFactA.mHash == _polyFactB.mHash )
+            return true;
         std::lock_guard<std::recursive_mutex> lockA( _polyFactA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _polyFactB.mMutex );
         if( _polyFactA.mpPolynomial != nullptr && _polyFactB.mpPolynomial != nullptr )
@@ -238,17 +240,27 @@ namespace carl
         {
             if( factor->first.content().factorizedTrivially() )
             {
+                if ( factor->first.coefficient() != 1 )
+                {
+                    if( result == typename P::CoeffType( 0 ) )
+                        result = typename P::CoeffType( 1 );
+                    carl::exponent e = factor->second;
+                    assert( e != 0 );
+                    result *= carl::pow( factor->first.coefficient(), e );
+                    factor->first.mCoefficient = 1;
+                }
+                assert( factor->first.coefficient() == 1 );
                 ++factor;
             }
             else
             {
                 // Update factorization
                 if( result == typename P::CoeffType( 0 ) )
-                {
                     result = typename P::CoeffType( 1 );
-                }
                 const Factorization<P>& partFactorization = factor->first.factorization();
+                assert( factor->first.coefficient() > 0 );
                 carl::exponent e = factor->second;
+                assert( e != 0 );
                 result *= carl::pow( factor->first.coefficient(), e );
                 factor = mFactorization.erase(factor);
 
@@ -297,6 +309,8 @@ namespace carl
         assert( factorizedTrivially() );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
+        //assert( _fpolyA.coefficient() == 1);
+        //assert( _fpolyB.coefficient() == 1);
         assert( exponentA > 0 );
         assert( exponentB > 0 );
         mFactorization.clear();
@@ -471,6 +485,7 @@ namespace carl
             _coeff *= cB;
         }
 
+        assert( _coeff == 1 );
         // Check correctness
         assert( _pfPairA.assertFactorization() );
         assert( _pfPairB.assertFactorization() );
