@@ -412,3 +412,34 @@ TEST(FactorizedPolynomial, Destructor)
     FPol fpQuot = fp4.quotient(fp3);
     EXPECT_EQ( pQuot, computePolynomial( fpQuot ) );
 }
+
+TEST(FactorizedPolynomial, Equality)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("9*x");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("3*y");
+    Pol p4 = sp.parseMultivariatePolynomial<Rational>("y");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+    FPol fp3( p3, pCache );
+    FPol fp4( p4, pCache );
+
+    EXPECT_EQ( fp1 == fp2, false );
+    EXPECT_EQ( fp3 == fp4, false );
+    EXPECT_EQ( fp2 == fp4, false );
+
+    FPol fpEq1 = fp1 * fp3;
+    FPol fpEq2 = fp3 * fp1;
+    EXPECT_EQ( fpEq1 == fpEq2, true );
+
+    FPol fpEq3 = fp1 * fp4 * fp4;
+    FPol fpEq4 = fp2 * fp3 * fp3;
+    EXPECT_EQ( fpEq3 == fpEq4, true );
+
+}

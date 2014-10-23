@@ -181,7 +181,8 @@ namespace carl
         }
         else if( _fpolyA.pCache() != nullptr && _fpolyB.pCache() != nullptr )
         {
-            return _fpolyA.content() == _fpolyB.content();
+            if ( _fpolyA.coefficient() == _fpolyB.coefficient() )
+                return _fpolyA.content() == _fpolyB.content();
         }
         return false;
     }
