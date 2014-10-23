@@ -24,7 +24,7 @@ typedef unsigned exponent;
  * INT: the integers ZZ
  * NATURAL: nonnegative integers NN
  */
-enum class VariableType : unsigned { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4, MIN_TYPE = 0, MAX_TYPE = 4 };
+enum class VariableType : unsigned { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4, VT_UNINTERPRETED = 5, MIN_TYPE = 0, MAX_TYPE = VT_UNINTERPRETED };
 
 /**
  * Streaming operator for VariableType.
@@ -39,6 +39,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 		case VariableType::VT_NATURAL: return os << "Natural";
 		case VariableType::VT_RATIONAL: return os << "Rational";
 		case VariableType::VT_REAL: return os << "Real";
+		case VariableType::VT_UNINTERPRETED: return os << "Uninterpreted";
 	}
 	return os << "Unknown";
 }
