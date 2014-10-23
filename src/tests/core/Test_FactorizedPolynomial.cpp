@@ -13,6 +13,91 @@ typedef MultivariatePolynomial<Rational> Pol;
 typedef FactorizedPolynomial<Pol> FPol;
 typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
+/* General testing function for a specific binary operator.
+ * It is result = operator( pol1, pol2 ).
+ * @param sVars List of variables occuring in test.
+ * @param sPol1 String representation of first polynomial.
+ * @param sPol2 String representation of second polynomial.
+ * @param operatorPol Binary operator on Pol.
+ * @param operatorFPol Binary operator on FPol.
+ * @return true, if both results are equal, false otherwise.
+ */
+bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, std::function<Pol( Pol, Pol )> operatorPol, std::function<FPol( FPol, FPol )> operatorFPol )
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables(sVars);
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>(sPol2);
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+
+    Pol pResult = operatorPol( p1, p2 );
+    FPol fpResult = operatorFPol( fp1, fp2 );
+
+    return pResult == computePolynomial( fpResult );
+}
+
+
+/* General testing function for a specific binary function.
+ * It is result = operator( pol1, pol2 ).
+ * @param sVars List of variables occuring in test.
+ * @param sPol1 String representation of first polynomial.
+ * @param sPol2 String representation of second polynomial.
+ * @param functionPol Binary function on Pol.
+ * @param functionFPol Binary function on FPol.
+ * @return true, if both results are equal, false otherwise.
+ */
+bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, const Pol (*functionPol)( const Pol&, const Pol& ), const FPol (*functionFPol)( const FPol&, const FPol& ) )
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables(sVars);
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>(sPol2);
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+
+    Pol pResult = functionPol( p1, p2 );
+    FPol fpResult = functionFPol( fp1, fp2 );
+
+    return pResult == computePolynomial( fpResult );
+}
+
+/* General testing function for specific unary member function.
+ * It is result = pol1.function( pol2 ).
+ * @param sVars List of variables occuring in test.
+ * @param sPol1 String representation of first polynomial.
+ * @param sPol2 String representation of second polynomial.
+ * @param functionPol Unary member function on Pol.
+ * @param functionFPol Unary member function on FPol.
+ * @return true, if both results are equal, false otherwise.
+ */
+bool testOperation( const std::list<std::string>& sVars, const std::string& sPol1, const std::string& sPol2, const Pol (Pol::*functionPol)( const Pol& ), const FPol (FPol::*functionFPol)( const FPol& ) )
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables(sVars);
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>(sPol1);
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>(sPol2);
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+    FPol fp2( p2, pCache );
+
+    Pol pResult = (p1.*(functionPol))( p2 );
+    FPol fpResult = (fp1.*(functionFPol))( fp2 );
+
+    return pResult == computePolynomial( fpResult );
+}
+
 TEST(FactorizedPolynomial, Construction)
 {
     carl::VariablePool::getInstance().clear();
@@ -291,78 +376,32 @@ TEST(FactorizedPolynomial, LCM)
 
 TEST(FactorizedPolynomial, Subtraction)
 {
-    carl::VariablePool::getInstance().clear();
-    StringParser sp;
-    sp.setVariables({"x", "y", "z"});
+    bool expect = testOperation( {"x", "y"}, "1", "x*y", std::minus<Pol>(), std::minus<FPol>() );
+    EXPECT_TRUE( expect );
 
-    Pol c1 = sp.parseMultivariatePolynomial<Rational>("1");
-    Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
-    Pol fB = sp.parseMultivariatePolynomial<Rational>("z");
+    expect = testOperation( {"x", "y"}, "x*y", "1", std::minus<Pol>(), std::minus<FPol>() );
+    EXPECT_TRUE( expect );
 
-    std::shared_ptr<CachePol> pCache( new CachePol );
-    FPol fc1( c1, pCache );
-    FPol fpA( fA, pCache );
-    FPol fpB( fB, pCache );
+    expect = testOperation( {"x", "y", "z"}, "x*y", "z", std::minus<Pol>(), std::minus<FPol>() );
+    EXPECT_TRUE( expect );
 
-    Pol pSub = c1 - fA;
-    FPol fpSub = fc1 - fpA;
-    EXPECT_EQ( pSub, computePolynomial( fpSub ) );
-
-    Pol pSub2 = fA - c1;
-    FPol fpSub2 = fpA - fc1;
-    EXPECT_EQ( pSub2, computePolynomial( fpSub2 ) );
-
-    Pol pSub3 = fA - fB;
-    FPol fpSub3 = fpA - fpB;
-    EXPECT_EQ( pSub3, computePolynomial( fpSub3 ) );
-
-    Pol pSub4 = fB - fA;
-    FPol fpSub4 = fpB - fpA;
-    EXPECT_EQ( pSub4, computePolynomial( fpSub4 ) );
+    expect = testOperation( {"x", "y", "z"}, "z", "x*y", std::minus<Pol>(), std::minus<FPol>() );
+    EXPECT_TRUE( expect );
 }
 
 TEST(FactorizedPolynomial, Addition)
 {
-    carl::VariablePool::getInstance().clear();
-    StringParser sp;
-    sp.setVariables({"x"});
-
-    Pol fA = sp.parseMultivariatePolynomial<Rational>("x");
-    Pol fB = sp.parseMultivariatePolynomial<Rational>("-1*x+1");
-
-    std::shared_ptr<CachePol> pCache( new CachePol );
-    FPol fpA( fA, pCache );
-    FPol fpB( fB, pCache );
-
-    Pol pAdd = fA + fB;
-    FPol fpAdd = fpA + fpB;
-    EXPECT_EQ( pAdd, computePolynomial( fpAdd ) );
+    bool expect = testOperation( {"x"}, "x", "-1*x+1", std::plus<Pol>(), std::plus<FPol>() );
+    EXPECT_TRUE( expect );
 }
 
 TEST(FactorizedPolynomial, Multiplication)
 {
-    carl::VariablePool::getInstance().clear();
-    StringParser sp;
-    sp.setVariables({"x", "y"});
+    bool expect = testOperation( {"x", "y"}, "3*x*y + x", "x*y", std::multiplies<Pol>(), std::multiplies<FPol>() );
+    EXPECT_TRUE( expect );
 
-    Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
-    Pol p2 = sp.parseMultivariatePolynomial<Rational>("5*y");
-    Pol p3 = sp.parseMultivariatePolynomial<Rational>("1*x");
-    Pol p4 = sp.parseMultivariatePolynomial<Rational>("4*y");
-
-    std::shared_ptr<CachePol> pCache( new CachePol );
-    FPol fp1( p1, pCache );
-    FPol fp2( p2, pCache );
-    FPol fp3( p3, pCache );
-    FPol fp4( p4, pCache );
-
-    Pol pMul = p1 * p3;
-    FPol fpMul = fp1 * fp3;
-    EXPECT_EQ( pMul, computePolynomial( fpMul ) );
-
-    Pol pMul2 = p2 * p4;
-    FPol fpMul2 = fp2 * fp4;
-    EXPECT_EQ( pMul2, computePolynomial( fpMul2 ) );
+    expect = testOperation( {"x", "y"}, "5*y", "4*y", std::multiplies<Pol>(), std::multiplies<FPol>() );
+    EXPECT_TRUE( expect );
 }
 
 TEST(FactorizedPolynomial, Quotient)
@@ -441,5 +480,4 @@ TEST(FactorizedPolynomial, Equality)
     FPol fpEq3 = fp1 * fp4 * fp4;
     FPol fpEq4 = fp2 * fp3 * fp3;
     EXPECT_EQ( fpEq3 == fpEq4, true );
-
 }
