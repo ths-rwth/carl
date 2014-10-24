@@ -84,16 +84,16 @@ TEST(Monomial, Comparison)
     Variable v1(2);
     Variable v2(3);
 
-    Monomial m0 = v0 * v0 * v1; // 1.
+    Monomial m0 = v0 * v0 * v1; // 2.
     Monomial m1 = v0 * v0 * v0; // 3.
     Monomial m2 = v0 * v1 * v2; // 0.
-    Monomial m3 = v0 * v1 * v1; // 2.
+    Monomial m3 = v0 * v1 * v1; // 3.
 
     // lower than
     EXPECT_FALSE(m0 < m0);
     EXPECT_TRUE(m0 < m1);
     EXPECT_FALSE(m0 < m2);
-    EXPECT_TRUE(m0 < m3);
+    EXPECT_FALSE(m0 < m3);
 
     EXPECT_FALSE(m1 < m0);
     EXPECT_FALSE(m1 < m1);
@@ -105,7 +105,7 @@ TEST(Monomial, Comparison)
     EXPECT_FALSE(m2 < m2);
     EXPECT_TRUE(m2 < m3);
 
-    EXPECT_FALSE(m3 < m0);
+    EXPECT_TRUE(m3 < m0);
     EXPECT_TRUE(m3 < m1);
     EXPECT_FALSE(m3 < m2);
     EXPECT_FALSE(m3 < m3);
@@ -114,7 +114,7 @@ TEST(Monomial, Comparison)
     EXPECT_FALSE(m0 > m0);
     EXPECT_FALSE(m0 > m1);
     EXPECT_TRUE(m0 > m2);
-    EXPECT_FALSE(m0 > m3);
+    EXPECT_TRUE(m0 > m3);
 
     EXPECT_TRUE(m1 > m0);
     EXPECT_FALSE(m1 > m1);
@@ -126,7 +126,7 @@ TEST(Monomial, Comparison)
     EXPECT_FALSE(m2 > m2);
     EXPECT_FALSE(m2 > m3);
 
-    EXPECT_TRUE(m3 > m0);
+    EXPECT_FALSE(m3 > m0);
     EXPECT_FALSE(m3 > m1);
     EXPECT_TRUE(m3 > m2);
     EXPECT_FALSE(m3 > m3);
@@ -135,7 +135,7 @@ TEST(Monomial, Comparison)
     EXPECT_TRUE(m0 <= m0);
     EXPECT_TRUE(m0 <= m1);
     EXPECT_FALSE(m0 <= m2);
-    EXPECT_TRUE(m0 <= m3);
+    EXPECT_FALSE(m0 <= m3);
 
     EXPECT_FALSE(m1 <= m0);
     EXPECT_TRUE(m1 <= m1);
@@ -147,7 +147,7 @@ TEST(Monomial, Comparison)
     EXPECT_TRUE(m2 <= m2);
     EXPECT_TRUE(m2 <= m3);
 
-    EXPECT_FALSE(m3 <= m0);
+    EXPECT_TRUE(m3 <= m0);
     EXPECT_TRUE(m3 <= m1);
     EXPECT_FALSE(m3 <= m2);
     EXPECT_TRUE(m3 <= m3);
@@ -156,7 +156,7 @@ TEST(Monomial, Comparison)
     EXPECT_TRUE(m0 >= m0);
     EXPECT_FALSE(m0 >= m1);
     EXPECT_TRUE(m0 >= m2);
-    EXPECT_FALSE(m0 >= m3);
+    EXPECT_TRUE(m0 >= m3);
 
     EXPECT_TRUE(m1 >= m0);
     EXPECT_TRUE(m1 >= m1);
@@ -168,7 +168,7 @@ TEST(Monomial, Comparison)
     EXPECT_TRUE(m2 >= m2);
     EXPECT_FALSE(m2 >= m3);
 
-    EXPECT_TRUE(m3 >= m0);
+    EXPECT_FALSE(m3 >= m0);
     EXPECT_FALSE(m3 >= m1);
     EXPECT_TRUE(m3 >= m2);
     EXPECT_TRUE(m3 >= m3);
