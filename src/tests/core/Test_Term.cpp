@@ -3,13 +3,15 @@
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Term.h"
+#include "Util.cpp"
+#include <list>
 
 using namespace carl;
 
 template<typename T>
 class TermTest: public testing::Test {};
 
-TYPED_TEST_CASE(TermTest, RationalTypes); // should use NumberTypes
+TYPED_TEST_CASE(TermTest, RationalTypes); // TODO should use NumberTypes
 
 TYPED_TEST(TermTest, Constructor)
 {
@@ -78,108 +80,11 @@ TYPED_TEST(TermTest, Comparison)
     Term<TypeParam> t2(2, v0 * v1 * v2); // 0.
     Term<TypeParam> t3(9, v0 * v0 * v1); // 2.
 
-    // lower than
-    EXPECT_FALSE(t0 < t0);
-    EXPECT_TRUE(t0 < t1);
-    EXPECT_FALSE(t0 < t2);
-    EXPECT_TRUE(t0 < t3);
+    std::list<Term<TypeParam> > terms;
+    terms.push_back(t2);
+    terms.push_back(t0);
+    terms.push_back(t3);
+    terms.push_back(t1);
 
-    EXPECT_FALSE(t1 < t0);
-    EXPECT_FALSE(t1 < t1);
-    EXPECT_FALSE(t1 < t2);
-    EXPECT_FALSE(t1 < t3);
-
-    EXPECT_TRUE(t2 < t0);
-    EXPECT_TRUE(t2 < t1);
-    EXPECT_FALSE(t2 < t2);
-    EXPECT_TRUE(t2 < t3);
-
-    EXPECT_FALSE(t3 < t0);
-    EXPECT_TRUE(t3 < t1);
-    EXPECT_FALSE(t3 < t2);
-    EXPECT_FALSE(t3 < t3);
-
-    // greater than
-    EXPECT_FALSE(t0 > t0);
-    EXPECT_FALSE(t0 > t1);
-    EXPECT_TRUE(t0 > t2);
-    EXPECT_FALSE(t0 > t3);
-
-    EXPECT_TRUE(t1 > t0);
-    EXPECT_FALSE(t1 > t1);
-    EXPECT_TRUE(t1 > t2);
-    EXPECT_TRUE(t1 > t3);
-
-    EXPECT_FALSE(t2 > t0);
-    EXPECT_FALSE(t2 > t1);
-    EXPECT_FALSE(t2 > t2);
-    EXPECT_FALSE(t2 > t3);
-
-    EXPECT_TRUE(t3 > t0);
-    EXPECT_FALSE(t3 > t1);
-    EXPECT_TRUE(t3 > t2);
-    EXPECT_FALSE(t3 > t3);
-
-    // lower than or equal
-    EXPECT_TRUE(t0 <= t0);
-    EXPECT_TRUE(t0 <= t1);
-    EXPECT_FALSE(t0 <= t2);
-    EXPECT_TRUE(t0 <= t3);
-
-    EXPECT_FALSE(t1 <= t0);
-    EXPECT_TRUE(t1 <= t1);
-    EXPECT_FALSE(t1 <= t2);
-    EXPECT_FALSE(t1 <= t3);
-
-    EXPECT_TRUE(t2 <= t0);
-    EXPECT_TRUE(t2 <= t1);
-    EXPECT_TRUE(t2 <= t2);
-    EXPECT_TRUE(t2 <= t3);
-
-    EXPECT_FALSE(t3 <= t0);
-    EXPECT_TRUE(t3 <= t1);
-    EXPECT_FALSE(t3 <= t2);
-    EXPECT_TRUE(t3 <= t3);
-
-    // greather than or equal
-    EXPECT_TRUE(t0 >= t0);
-    EXPECT_FALSE(t0 >= t1);
-    EXPECT_TRUE(t0 >= t2);
-    EXPECT_FALSE(t0 >= t3);
-
-    EXPECT_TRUE(t1 >= t0);
-    EXPECT_TRUE(t1 >= t1);
-    EXPECT_TRUE(t1 >= t2);
-    EXPECT_TRUE(t1 >= t3);
-
-    EXPECT_FALSE(t2 >= t0);
-    EXPECT_FALSE(t2 >= t1);
-    EXPECT_TRUE(t2 >= t2);
-    EXPECT_FALSE(t2 >= t3);
-
-    EXPECT_TRUE(t3 >= t0);
-    EXPECT_FALSE(t3 >= t1);
-    EXPECT_TRUE(t3 >= t2);
-    EXPECT_TRUE(t3 >= t3);
-
-    // equal
-    EXPECT_TRUE(t0 == t0);
-    EXPECT_FALSE(t0 == t1);
-    EXPECT_FALSE(t0 == t2);
-    EXPECT_FALSE(t0 == t3);
-
-    EXPECT_FALSE(t1 == t0);
-    EXPECT_TRUE(t1 == t1);
-    EXPECT_FALSE(t1 == t2);
-    EXPECT_FALSE(t1 == t3);
-
-    EXPECT_FALSE(t2 == t0);
-    EXPECT_FALSE(t2 == t1);
-    EXPECT_TRUE(t2 == t2);
-    EXPECT_FALSE(t2 == t3);
-
-    EXPECT_FALSE(t3 == t0);
-    EXPECT_FALSE(t3 == t1);
-    EXPECT_FALSE(t3 == t2);
-    EXPECT_TRUE(t3 == t3);
+    expectRightOrder(terms);
 }

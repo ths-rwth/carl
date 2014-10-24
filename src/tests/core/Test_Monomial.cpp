@@ -2,6 +2,8 @@
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Monomial_derivative.h"
+#include "Util.cpp"
+#include <list>
 
 using namespace carl;
 
@@ -89,110 +91,13 @@ TEST(Monomial, Comparison)
     Monomial m2 = v0 * v1 * v2; // 0.
     Monomial m3 = v0 * v1 * v1; // 1.
 
-    // lower than
-    EXPECT_FALSE(m0 < m0);
-    EXPECT_TRUE(m0 < m1);
-    EXPECT_FALSE(m0 < m2);
-    EXPECT_FALSE(m0 < m3);
+    std::list<Monomial> monomials;
+    monomials.push_back(m2);
+    monomials.push_back(m3);
+    monomials.push_back(m0);
+    monomials.push_back(m1);
 
-    EXPECT_FALSE(m1 < m0);
-    EXPECT_FALSE(m1 < m1);
-    EXPECT_FALSE(m1 < m2);
-    EXPECT_FALSE(m1 < m3);
-
-    EXPECT_TRUE(m2 < m0);
-    EXPECT_TRUE(m2 < m1);
-    EXPECT_FALSE(m2 < m2);
-    EXPECT_TRUE(m2 < m3);
-
-    EXPECT_TRUE(m3 < m0);
-    EXPECT_TRUE(m3 < m1);
-    EXPECT_FALSE(m3 < m2);
-    EXPECT_FALSE(m3 < m3);
-
-    // greater than
-    EXPECT_FALSE(m0 > m0);
-    EXPECT_FALSE(m0 > m1);
-    EXPECT_TRUE(m0 > m2);
-    EXPECT_TRUE(m0 > m3);
-
-    EXPECT_TRUE(m1 > m0);
-    EXPECT_FALSE(m1 > m1);
-    EXPECT_TRUE(m1 > m2);
-    EXPECT_TRUE(m1 > m3);
-
-    EXPECT_FALSE(m2 > m0);
-    EXPECT_FALSE(m2 > m1);
-    EXPECT_FALSE(m2 > m2);
-    EXPECT_FALSE(m2 > m3);
-
-    EXPECT_FALSE(m3 > m0);
-    EXPECT_FALSE(m3 > m1);
-    EXPECT_TRUE(m3 > m2);
-    EXPECT_FALSE(m3 > m3);
-
-    // lower than or equal
-    EXPECT_TRUE(m0 <= m0);
-    EXPECT_TRUE(m0 <= m1);
-    EXPECT_FALSE(m0 <= m2);
-    EXPECT_FALSE(m0 <= m3);
-
-    EXPECT_FALSE(m1 <= m0);
-    EXPECT_TRUE(m1 <= m1);
-    EXPECT_FALSE(m1 <= m2);
-    EXPECT_FALSE(m1 <= m3);
-
-    EXPECT_TRUE(m2 <= m0);
-    EXPECT_TRUE(m2 <= m1);
-    EXPECT_TRUE(m2 <= m2);
-    EXPECT_TRUE(m2 <= m3);
-
-    EXPECT_TRUE(m3 <= m0);
-    EXPECT_TRUE(m3 <= m1);
-    EXPECT_FALSE(m3 <= m2);
-    EXPECT_TRUE(m3 <= m3);
-
-    // greater than or equal
-    EXPECT_TRUE(m0 >= m0);
-    EXPECT_FALSE(m0 >= m1);
-    EXPECT_TRUE(m0 >= m2);
-    EXPECT_TRUE(m0 >= m3);
-
-    EXPECT_TRUE(m1 >= m0);
-    EXPECT_TRUE(m1 >= m1);
-    EXPECT_TRUE(m1 >= m2);
-    EXPECT_TRUE(m1 >= m3);
-
-    EXPECT_FALSE(m2 >= m0);
-    EXPECT_FALSE(m2 >= m1);
-    EXPECT_TRUE(m2 >= m2);
-    EXPECT_FALSE(m2 >= m3);
-
-    EXPECT_FALSE(m3 >= m0);
-    EXPECT_FALSE(m3 >= m1);
-    EXPECT_TRUE(m3 >= m2);
-    EXPECT_TRUE(m3 >= m3);
-
-    // equal
-    EXPECT_TRUE(m0 == m0);
-    EXPECT_FALSE(m0 == m1);
-    EXPECT_FALSE(m0 == m2);
-    EXPECT_FALSE(m0 == m3);
-
-    EXPECT_FALSE(m1 == m0);
-    EXPECT_TRUE(m1 == m1);
-    EXPECT_FALSE(m1 == m2);
-    EXPECT_FALSE(m1 == m3);
-
-    EXPECT_FALSE(m2 == m0);
-    EXPECT_FALSE(m2 == m1);
-    EXPECT_TRUE(m2 == m2);
-    EXPECT_FALSE(m2 == m3);
-
-    EXPECT_FALSE(m3 == m0);
-    EXPECT_FALSE(m3 == m1);
-    EXPECT_FALSE(m3 == m2);
-    EXPECT_TRUE(m3 == m3);
+    expectRightOrder(monomials);
 }
 
 
