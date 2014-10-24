@@ -73,5 +73,113 @@ TYPED_TEST(TermTest, Comparison)
     Variable v1(2);
     Variable v2(3);
 
-    // TODO
+    Term<TypeParam> t0(3, v0 * v0 * v1); // 1.
+    Term<TypeParam> t1(7, v1 * v1 * v1 * v2); // 3.
+    Term<TypeParam> t2(2, v0 * v1 * v2); // 0.
+    Term<TypeParam> t3(9, v0 * v0 * v1); // 2.
+
+    // lower than
+    EXPECT_FALSE(t0 < t0);
+    EXPECT_TRUE(t0 < t1);
+    EXPECT_FALSE(t0 < t2);
+    EXPECT_TRUE(t0 < t3);
+
+    EXPECT_FALSE(t1 < t0);
+    EXPECT_FALSE(t1 < t1);
+    EXPECT_FALSE(t1 < t2);
+    EXPECT_FALSE(t1 < t3);
+
+    EXPECT_TRUE(t2 < t0);
+    EXPECT_TRUE(t2 < t1);
+    EXPECT_FALSE(t2 < t2);
+    EXPECT_TRUE(t2 < t3);
+
+    EXPECT_FALSE(t3 < t0);
+    EXPECT_TRUE(t3 < t1);
+    EXPECT_FALSE(t3 < t2);
+    EXPECT_FALSE(t3 < t3);
+
+    // greater than
+    EXPECT_FALSE(t0 > t0);
+    EXPECT_FALSE(t0 > t1);
+    EXPECT_TRUE(t0 > t2);
+    EXPECT_FALSE(t0 > t3);
+
+    EXPECT_TRUE(t1 > t0);
+    EXPECT_FALSE(t1 > t1);
+    EXPECT_TRUE(t1 > t2);
+    EXPECT_TRUE(t1 > t3);
+
+    EXPECT_FALSE(t2 > t0);
+    EXPECT_FALSE(t2 > t1);
+    EXPECT_FALSE(t2 > t2);
+    EXPECT_FALSE(t2 > t3);
+
+    EXPECT_TRUE(t3 > t0);
+    EXPECT_FALSE(t3 > t1);
+    EXPECT_TRUE(t3 > t2);
+    EXPECT_FALSE(t3 > t3);
+
+    // lower than or equal
+    EXPECT_TRUE(t0 <= t0);
+    EXPECT_TRUE(t0 <= t1);
+    EXPECT_FALSE(t0 <= t2);
+    EXPECT_TRUE(t0 <= t3);
+
+    EXPECT_FALSE(t1 <= t0);
+    EXPECT_TRUE(t1 <= t1);
+    EXPECT_FALSE(t1 <= t2);
+    EXPECT_FALSE(t1 <= t3);
+
+    EXPECT_TRUE(t2 <= t0);
+    EXPECT_TRUE(t2 <= t1);
+    EXPECT_TRUE(t2 <= t2);
+    EXPECT_TRUE(t2 <= t3);
+
+    EXPECT_FALSE(t3 <= t0);
+    EXPECT_TRUE(t3 <= t1);
+    EXPECT_FALSE(t3 <= t2);
+    EXPECT_TRUE(t3 <= t3);
+
+    // greather than or equal
+    EXPECT_TRUE(t0 >= t0);
+    EXPECT_FALSE(t0 >= t1);
+    EXPECT_TRUE(t0 >= t2);
+    EXPECT_FALSE(t0 >= t3);
+
+    EXPECT_TRUE(t1 >= t0);
+    EXPECT_TRUE(t1 >= t1);
+    EXPECT_TRUE(t1 >= t2);
+    EXPECT_TRUE(t1 >= t3);
+
+    EXPECT_FALSE(t2 >= t0);
+    EXPECT_FALSE(t2 >= t1);
+    EXPECT_TRUE(t2 >= t2);
+    EXPECT_FALSE(t2 >= t3);
+
+    EXPECT_TRUE(t3 >= t0);
+    EXPECT_FALSE(t3 >= t1);
+    EXPECT_TRUE(t3 >= t2);
+    EXPECT_TRUE(t3 >= t3);
+
+    // equal
+    EXPECT_TRUE(t0 == t0);
+    EXPECT_FALSE(t0 == t1);
+    EXPECT_FALSE(t0 == t2);
+    EXPECT_FALSE(t0 == t3);
+
+    EXPECT_FALSE(t1 == t0);
+    EXPECT_TRUE(t1 == t1);
+    EXPECT_FALSE(t1 == t2);
+    EXPECT_FALSE(t1 == t3);
+
+    EXPECT_FALSE(t2 == t0);
+    EXPECT_FALSE(t2 == t1);
+    EXPECT_TRUE(t2 == t2);
+    EXPECT_FALSE(t2 == t3);
+
+    EXPECT_FALSE(t3 == t0);
+    EXPECT_FALSE(t3 == t1);
+    EXPECT_FALSE(t3 == t2);
+    EXPECT_TRUE(t3 == t3);
 }

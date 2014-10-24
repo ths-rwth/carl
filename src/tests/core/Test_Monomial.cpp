@@ -87,7 +87,7 @@ TEST(Monomial, Comparison)
     Monomial m0 = v0 * v0 * v1; // 2.
     Monomial m1 = v0 * v0 * v0; // 3.
     Monomial m2 = v0 * v1 * v2; // 0.
-    Monomial m3 = v0 * v1 * v1; // 3.
+    Monomial m3 = v0 * v1 * v1; // 1.
 
     // lower than
     EXPECT_FALSE(m0 < m0);
@@ -131,7 +131,7 @@ TEST(Monomial, Comparison)
     EXPECT_TRUE(m3 > m2);
     EXPECT_FALSE(m3 > m3);
 
-    // lower than or equals
+    // lower than or equal
     EXPECT_TRUE(m0 <= m0);
     EXPECT_TRUE(m0 <= m1);
     EXPECT_FALSE(m0 <= m2);
@@ -152,7 +152,7 @@ TEST(Monomial, Comparison)
     EXPECT_FALSE(m3 <= m2);
     EXPECT_TRUE(m3 <= m3);
 
-    // greater than or equals
+    // greater than or equal
     EXPECT_TRUE(m0 >= m0);
     EXPECT_FALSE(m0 >= m1);
     EXPECT_TRUE(m0 >= m2);
@@ -173,7 +173,7 @@ TEST(Monomial, Comparison)
     EXPECT_TRUE(m3 >= m2);
     EXPECT_TRUE(m3 >= m3);
 
-    // equals
+    // equal
     EXPECT_TRUE(m0 == m0);
     EXPECT_FALSE(m0 == m1);
     EXPECT_FALSE(m0 == m2);
