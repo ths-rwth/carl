@@ -3,13 +3,15 @@
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Term.h"
+#include "Util.cpp"
+#include <list>
 
 using namespace carl;
 
 template<typename T>
 class TermTest: public testing::Test {};
 
-TYPED_TEST_CASE(TermTest, RationalTypes); // should use NumberTypes
+TYPED_TEST_CASE(TermTest, RationalTypes); // TODO should use NumberTypes
 
 TYPED_TEST(TermTest, Constructor)
 {
@@ -73,5 +75,16 @@ TYPED_TEST(TermTest, Comparison)
     Variable v1(2);
     Variable v2(3);
 
-    // TODO
+    Term<TypeParam> t0(3, v0 * v0 * v1); // 1.
+    Term<TypeParam> t1(7, v1 * v1 * v1 * v2); // 3.
+    Term<TypeParam> t2(2, v0 * v1 * v2); // 0.
+    Term<TypeParam> t3(9, v0 * v0 * v1); // 2.
+
+    std::list<Term<TypeParam> > terms;
+    terms.push_back(t2);
+    terms.push_back(t0);
+    terms.push_back(t3);
+    terms.push_back(t1);
+
+    expectRightOrder(terms);
 }
