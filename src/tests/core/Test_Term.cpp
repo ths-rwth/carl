@@ -75,16 +75,16 @@ TYPED_TEST(TermTest, Comparison)
     Variable v1(2);
     Variable v2(3);
 
-    Term<TypeParam> t0(3, v0 * v0 * v1); // 1.
-    Term<TypeParam> t1(7, v1 * v1 * v1 * v2); // 3.
-    Term<TypeParam> t2(2, v0 * v1 * v2); // 0.
-    Term<TypeParam> t3(9, v0 * v0 * v1); // 2.
+    Term<TypeParam> t0(2, v0 * v1 * v2);
+    Term<TypeParam> t1(3, v0 * v0 * v1);
+    Term<TypeParam> t2(9, v0 * v0 * v1);
+    Term<TypeParam> t3(7, v1 * v1 * v1 * v2);
 
     std::list<Term<TypeParam> > terms;
-    terms.push_back(t2);
     terms.push_back(t0);
-    terms.push_back(t3);
     terms.push_back(t1);
+    terms.push_back(t2);
+    terms.push_back(t3);
 
     expectRightOrder(terms);
 }

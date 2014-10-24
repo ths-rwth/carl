@@ -86,16 +86,14 @@ TEST(Monomial, Comparison)
     Variable v1(2);
     Variable v2(3);
 
-    Monomial m0 = v0 * v0 * v1; // 2.
-    Monomial m1 = v0 * v0 * v0; // 3.
-    Monomial m2 = v0 * v1 * v2; // 0.
-    Monomial m3 = v0 * v1 * v1; // 1.
-
     std::list<Monomial> monomials;
-    monomials.push_back(m2);
-    monomials.push_back(m3);
-    monomials.push_back(m0);
-    monomials.push_back(m1);
+    monomials.push_back(v1 * v1 * v1);
+    monomials.push_back(v0 * v1 * v2);
+    monomials.push_back(v0 * v1 * v1);
+    monomials.push_back(v0 * v0 * v1);
+    monomials.push_back(v0 * v0 * v0);
+    monomials.push_back(v1 * v2 * v0 * v1);
+    monomials.push_back(v0 * v2 * v0 * v2);
 
     expectRightOrder(monomials);
 }
