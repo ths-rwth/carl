@@ -1242,6 +1242,12 @@ inline const Interval<Number> operator +=(Interval<Number>& lhs, const Number& r
 	}
 
 template<typename Number>
+    inline const Interval<Number> operator -(const Interval<Number>& interval)
+    {
+        return interval.inverse();
+    }
+
+template<typename Number>
 inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.sub(rhs);

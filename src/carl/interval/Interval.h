@@ -1412,6 +1412,14 @@ namespace carl
     inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Number& rhs);
     
     /**
+     * Unary minus.
+     * @param interval The operand.
+     * @return Resulting interval.
+     */
+    template<typename Number>
+    inline const Interval<Number> operator -(const Interval<Number>& interval);
+    
+    /**
      * Operator for the subtraction of two intervals.
      * @param lhs Lefthand side.
      * @param rhs Righthand side.
