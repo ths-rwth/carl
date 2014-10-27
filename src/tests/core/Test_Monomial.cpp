@@ -4,6 +4,7 @@
 #include "carl/core/Monomial_derivative.h"
 #include "Util.cpp"
 #include <list>
+#include <boost/variant.hpp>
 
 using namespace carl;
 
@@ -86,7 +87,7 @@ TEST(Monomial, Comparison)
     Variable v1(2);
     Variable v2(3);
 
-    std::list<Monomial> monomials;
+    ComparisonList<Monomial> monomials;
     monomials.push_back(v1 * v1 * v1);
     monomials.push_back(v0 * v1 * v2);
     monomials.push_back(v0 * v1 * v1);
@@ -98,4 +99,17 @@ TEST(Monomial, Comparison)
     expectRightOrder(monomials);
 }
 
+
+TEST(Monomial, VariableComparison)
+{
+	ComparisonList<Variable,Monomial> list;
+	
+	Variable v0(1);
+    Variable v1(2);
+	
+	list.push_back(v0);
+	list.push_back(v1);
+	
+	expectRightOrder(list);
+}
 

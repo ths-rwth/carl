@@ -518,7 +518,7 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
     MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * v0 * v0 * v1 + (TypeParam)3 * v2; // 5x²y+3z
     MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * v0 * v0 * v2 * v2 * v2 + (TypeParam)6 * v1; // 4x²z³+6y
 
-    std::list<MultivariatePolynomial<TypeParam> > polynomials;
+    ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
     polynomials.push_back(p0);
     polynomials.push_back(p1);
     polynomials.push_back(p2);
