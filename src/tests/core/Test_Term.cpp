@@ -80,7 +80,7 @@ TYPED_TEST(TermTest, Comparison)
     Term<TypeParam> t2(9, v0 * v0 * v1);
     Term<TypeParam> t3(7, v1 * v1 * v1 * v2);
 
-    std::list<Term<TypeParam> > terms;
+    ComparisonList<Term<TypeParam> > terms;
     terms.push_back(t0);
     terms.push_back(t1);
     terms.push_back(t2);
