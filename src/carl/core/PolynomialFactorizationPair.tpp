@@ -240,15 +240,15 @@ namespace carl
         {
             if( factor->first.content().factorizedTrivially() )
             {
-                if ( factor->first.coefficient() != 1 )
-                {
-                    if( result == typename P::CoeffType( 0 ) )
-                        result = typename P::CoeffType( 1 );
-                    carl::exponent e = factor->second;
-                    assert( e != 0 );
-                    result *= carl::pow( factor->first.coefficient(), e );
-                    factor->first.mCoefficient = 1;
-                }
+//                if ( factor->first.coefficient() != 1 )
+//                {
+//                    if( result == typename P::CoeffType( 0 ) )
+//                        result = typename P::CoeffType( 1 );
+//                    carl::exponent e = factor->second;
+//                    assert( e != 0 );
+//                    result *= carl::pow( factor->first.coefficient(), e );
+//                    factor->first.mCoefficient = 1;
+//                }
                 assert( factor->first.coefficient() == 1 );
                 ++factor;
             }
