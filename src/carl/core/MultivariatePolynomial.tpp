@@ -1216,14 +1216,14 @@ bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, cons
 
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	auto lit = lhs.begin();
-	auto rit = rhs.begin();
-	for (; lit != lhs.end(); lit++, rit++) {
-		if (rit == rhs.end()) return false;
+	auto lit = lhs.rbegin();
+	auto rit = rhs.rbegin();
+	for (; lit != lhs.rend(); lit++, rit++) {
+		if (rit == rhs.rend()) return false;
 		if (**lit < **rit) return true;
 		if (**lit > **rit) return false;
 	}
-	return rit != rhs.end();
+	return rit != rhs.rend();
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {

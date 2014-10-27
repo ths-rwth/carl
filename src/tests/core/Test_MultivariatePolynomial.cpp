@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "../numbers/config.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
@@ -6,9 +7,16 @@
 #include "carl/interval/Interval.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
+#include "Util.cpp"
+#include <list>
 
 
 using namespace carl;
+
+template<typename T>
+class MultivariatePolynomialTest: public testing::Test {};
+
+TYPED_TEST_CASE(MultivariatePolynomialTest, RationalTypes); // TODO should use NumberTypes
 
 TEST(MultivariatePolynomial, Constructor)
 {
@@ -497,4 +505,24 @@ TEST(MultivariatePolynomial, Quotient)
 	MultivariatePolynomial<cln::cl_RA> m2 = x - one;
 	MultivariatePolynomial<cln::cl_RA> res = x + one;
 	EXPECT_EQ(res, m1.quotient(m2));
+}
+
+TYPED_TEST(MultivariatePolynomialTest, Comparison)
+{
+    Variable v0(1);
+    Variable v1(2);
+    Variable v2(3);
+
+    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * v0 * v0 * v1 + (TypeParam)7 * v1 * v2; // 3x²y+7yz
+    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * v0 * v0 * v1 + (TypeParam)2 * v0 * v0 * v2; // 3x²y+2x²z
+    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * v0 * v0 * v1 + (TypeParam)3 * v2; // 5x²y+3z
+    MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * v0 * v0 * v2 * v2 * v2 + (TypeParam)6 * v1; // 4x²z³+6y
+
+    std::list<MultivariatePolynomial<TypeParam> > polynomials;
+    polynomials.push_back(p0);
+    polynomials.push_back(p1);
+    polynomials.push_back(p2);
+    polynomials.push_back(p3);
+
+    expectRightOrder(polynomials);
 }

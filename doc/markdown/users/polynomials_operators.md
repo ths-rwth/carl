@@ -22,6 +22,19 @@ The exception are shown and explained below. All the operators have the usual me
 
 ## Comparison operators
 All of these operators are defined for all combination of types.
+We use the following ordering:
+- For two variables `x` and `y`, `x < y` if the id of `x` is smaller then the id of `y`. The id is generated automatically by the VariablePool.
+- For two monomials `a` and `b`, we use a lexicographical ordering with total degree, that is `a < b` if 
+  - the total degree of `a` is smaller than the total degree of `b`, or
+  - the total degrees are the same and
+    - the exponent of some variable `v` in `a` is smaller than in `b` and
+    - the exponents of all variables smaller than `v` are the same in `a` and in `b`.
+- For two terms `a` and `b`, `a < b` if
+  - the monomial of `a` is smaller than the monomial of `b`, or
+  - the monomials of `a` and `b` are the same and the coefficient of `a` is smaller than the coefficient of `b`.
+- For two polynomials `a` and `b`, we use a lexicographical ordering, that is `a < b` if
+  - `term(a,i) < term(b,i)` and
+  - `term(a,j) = term(b,j)` for all `j=0, ..., i-1`, where `term(a,0)` is the leading term of `a`, that is the largest term with respect to the term ordering.
 
 ## Arithmetic operators
 We now give a table for all (classes of) operators with the result type or a reason why it is not implemented for any combination of these types.
