@@ -415,6 +415,13 @@ std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
     return (os << rhs.toString(true, true));
 }
 
+template<typename Coeff>
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<const Term<Coeff>>& rhs)
+{
+	if (rhs) return os << *rhs;
+	else return os << "nullptr";
+}
+
 template<typename Coefficient>
 template<typename C, DisableIf<is_interval<C>>>
 std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const

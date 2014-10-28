@@ -323,9 +323,19 @@ class Term
          * @param rhs Second term.
          * @return If both terms have the same monomial.
          */
-		static bool EqualMonomial(const Term& lhs, const Term& rhs)
+		static bool monomialEqual(const Term& lhs, const Term& rhs)
 		{
 			return std::equal_to<std::shared_ptr<Monomial>>()(lhs.mMonomial, rhs.mMonomial);
+		}
+		static bool monomialLess(const Term& lhs, const Term& rhs)
+		{
+			return std::less<std::shared_ptr<const Monomial>>()(lhs.mMonomial, rhs.mMonomial);
+		}
+		static bool monomialLessPtr(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
+		{
+			if (lhs && rhs) return monomialLess(*lhs, *rhs);
+			if (lhs) return false;
+			return true;
 		}
 		/**
 		 * Calculates the gcd of (t1, t2).
@@ -568,6 +578,16 @@ class Term
 } // namespace carl
 
 namespace std {
+
+	template<typename Coefficient>
+	struct less<std::shared_ptr<const carl::Term<Coefficient>>> {
+		bool operator()(const std::shared_ptr<const carl::Term<Coefficient>>& lhs, const std::shared_ptr<const carl::Term<Coefficient>>& rhs) {
+			if (lhs && rhs) return *lhs < *rhs;
+			if (lhs) return true;
+			return false;
+		}
+	};
+
 	/**
 	 * Specialization of `std::hash` for a Term.
 	 */
