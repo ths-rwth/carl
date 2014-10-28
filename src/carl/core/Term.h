@@ -444,7 +444,7 @@ namespace std {
 		 */
 		size_t operator()(const carl::Term<Coefficient>& term) const {
 			if(term.isConstant())
-				return hash<Coefficient>()(term.coeff());
+				return hash<Coefficient>()(term.coeff()) | (size_t)1;
 			else
 				return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
 		}
