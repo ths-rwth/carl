@@ -90,10 +90,10 @@ TEST(Monomial, Comparison)
 
     ComparisonList<Monomial> monomials;
     monomials.push_back(x * x * x);
-    monomials.push_back(x * y * z);
-    monomials.push_back(x * y * y);
     monomials.push_back(x * x * y);
-    monomials.push_back(x * x * x);
+    monomials.push_back(x * y * y);
+    monomials.push_back(y * y * y);
+    monomials.push_back(x * y * z);
     monomials.push_back(x * y * y * z);
     monomials.push_back(x * x * z * z);
 
@@ -111,12 +111,12 @@ TEST(Monomial, OtherComparison)
 
     list.push_back(x);
     list.push_back(y);
-    list.push_back(y * y);
-    list.push_back(x * y);
     list.push_back(x * x);
-    list.push_back(x * x * y);
+    list.push_back(x * y);
+    list.push_back(y * y);
     list.push_back(x * x * x);
-    list.push_back(y * y * y * y);
+    list.push_back(x * x * y);
+    list.push_back(x * x * x * x);
 
     expectRightOrder(list);
 }
