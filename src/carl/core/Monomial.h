@@ -916,12 +916,20 @@ namespace carl
 			return true;
 		}
 		
+		/**
+		 * This method performs a lexical comparison as defined in @cite GCL92, page 47.
+		 * We define the exponent vectors to be in decreasing order, i.e. the exponents of the larger variables first.
+		 * @param lhs First monomial.
+		 * @param rhs Second monomial.
+		 * @return Comparison result.
+		 * @see @cite GCL92, page 47.
+		 */
 		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 		{
-			auto lhsit = lhs.mExponents.begin( );
-			auto rhsit = rhs.mExponents.begin( );
-			auto lhsend = lhs.mExponents.end( );
-			auto rhsend = rhs.mExponents.end( );
+			auto lhsit = lhs.mExponents.rbegin( );
+			auto rhsit = rhs.mExponents.rbegin( );
+			auto lhsend = lhs.mExponents.rend( );
+			auto rhsend = rhs.mExponents.rend( );
 
 			while( lhsit != lhsend )
 			{
@@ -938,7 +946,7 @@ namespace carl
 				}
 				else
 				{
-					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
+					return (lhsit->first < rhsit->first ) ? CompareResult::GREATER : CompareResult::LESS;
 				}
 				++lhsit;
 				++rhsit;
