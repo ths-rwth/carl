@@ -176,3 +176,20 @@ TEST(RationalFunction, Subtraction)
     FPol tmp = fp1 - fp3;
     EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
 }
+
+TEST(RationalFunction, Hash)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("1+x");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+
+    FPol tmp = fp2 - fp1;
+}

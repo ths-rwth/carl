@@ -488,4 +488,7 @@ TEST(FactorizedPolynomial, Equality)
 
     FPol fpEq5 = fp2 + fp6;
     EXPECT_EQ( fpEq5 == fp5, true );
+
+    FPol fpEq6 = fp5 - fp6;
+    EXPECT_EQ( fpEq6 == fp2, true );
 }
