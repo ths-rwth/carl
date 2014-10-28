@@ -21,6 +21,23 @@
 namespace carl {
 
 /**
+ * Output a range of iterators with arbitrary content.
+ * The format is `[<item>, <item>, ...]`
+ * @param os Output stream.
+ * @param range Pair of iterators defining half open range like `begin()` and `end()`.
+ * @return Output stream.
+ */
+template<typename Iterator>
+std::ostream& operator<<(std::ostream& os, const std::pair<Iterator, Iterator>& range) {
+	os << "[";
+	for (Iterator it = range.first; it != range.second; it++) {
+		if (it != range.first) os << ", ";
+		os << *it;
+	}
+	return os << "]";
+}
+
+/**
  * Output a std::forward_list with arbitrary content.
  * The format is `[<item>, <item>, ...]`
  * @param os Output stream.
