@@ -462,16 +462,21 @@ TEST(FactorizedPolynomial, Equality)
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("x");
     Pol p3 = sp.parseMultivariatePolynomial<Rational>("3*y");
     Pol p4 = sp.parseMultivariatePolynomial<Rational>("y");
+    Pol p5 = sp.parseMultivariatePolynomial<Rational>("x+1");
+    Pol p6 = sp.parseMultivariatePolynomial<Rational>("1");
 
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fp1( p1, pCache );
     FPol fp2( p2, pCache );
     FPol fp3( p3, pCache );
     FPol fp4( p4, pCache );
+    FPol fp5( p5, pCache );
+    FPol fp6( p6, pCache );
 
     EXPECT_EQ( fp1 == fp2, false );
     EXPECT_EQ( fp3 == fp4, false );
     EXPECT_EQ( fp2 == fp4, false );
+    EXPECT_EQ( fp2 == fp5, false );
 
     FPol fpEq1 = fp1 * fp3;
     FPol fpEq2 = fp3 * fp1;
@@ -480,4 +485,7 @@ TEST(FactorizedPolynomial, Equality)
     FPol fpEq3 = fp1 * fp4 * fp4;
     FPol fpEq4 = fp2 * fp3 * fp3;
     EXPECT_EQ( fpEq3 == fpEq4, true );
+
+    FPol fpEq5 = fp2 + fp6;
+    EXPECT_EQ( fpEq5 == fp5, true );
 }

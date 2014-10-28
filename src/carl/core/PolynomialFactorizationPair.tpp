@@ -100,6 +100,7 @@ namespace carl
             {
                 mHash = (mHash << 5) | (mHash >> (sizeof(carl::exponent)*8 - 5));
                 mHash ^= std::hash<FactorizedPolynomial<P>>()( polyExpPair->first );
+                mHash = (mHash << 5) | (mHash >> (sizeof(carl::exponent)*8 - 5));
                 mHash ^= polyExpPair->second;
             }
         }
@@ -115,7 +116,11 @@ namespace carl
         if( &_polyFactA == &_polyFactB )
             return true;
         if ( _polyFactA.mHash == _polyFactB.mHash )
+        {
+            assert( _polyFactA.mpPolynomial == nullptr || _polyFactB.mpPolynomial == nullptr || *_polyFactA.mpPolynomial == *_polyFactB.mpPolynomial );
+            assert( (_polyFactA.mpPolynomial != nullptr && _polyFactB.mpPolynomial != nullptr) || _polyFactA.factorization() == _polyFactB.factorization() );
             return true;
+        }
         std::lock_guard<std::recursive_mutex> lockA( _polyFactA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _polyFactB.mMutex );
         if( _polyFactA.mpPolynomial != nullptr && _polyFactB.mpPolynomial != nullptr )
