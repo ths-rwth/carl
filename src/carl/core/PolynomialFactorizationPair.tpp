@@ -115,8 +115,9 @@ namespace carl
     {
         if( &_polyFactA == &_polyFactB )
             return true;
-        if ( _polyFactA.mHash != _polyFactB.mHash )
-            return false;
+        //TODO fix
+        //if ( _polyFactA.mHash != _polyFactB.mHash )
+        //    return false;
         std::lock_guard<std::recursive_mutex> lockA( _polyFactA.mMutex );
         std::lock_guard<std::recursive_mutex> lockB( _polyFactB.mMutex );
         if( _polyFactA.mpPolynomial != nullptr && _polyFactB.mpPolynomial != nullptr )
