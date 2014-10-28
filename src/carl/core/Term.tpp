@@ -297,6 +297,13 @@ bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 }
 
 template<typename Coeff>
+bool operator<(const Term<Coeff>& lhs, const Monomial& rhs) {
+	if (lhs.monomial() == nullptr) return true;
+	if (*(lhs.monomial()) == rhs) return lhs.coeff() < Coeff(1);
+	return *(lhs.monomial()) < rhs;
+}
+
+template<typename Coeff>
 bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs) {
 	if (lhs.monomial() == nullptr) return true;
 	if (*(lhs.monomial()) == rhs) return lhs.coeff() < Coeff(1);
@@ -304,10 +311,16 @@ bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs) {
 }
 
 template<typename Coeff>
-bool operator<(const Term<Coeff>& lhs, const Monomial& rhs) {
-	if (lhs.monomial() == nullptr) return true;
-	if (*(lhs.monomial()) == rhs) return lhs.coeff() < Coeff(1);
-	return *(lhs.monomial()) < rhs;
+bool operator<(const Term<Coeff>& lhs, const Coeff& rhs) {
+	if (lhs.monomial() == nullptr) return lhs.coeff() < rhs;
+	return false;
+}
+
+template<typename Coeff>
+bool operator<(const Monomial& lhs, const Term<Coeff>& rhs) {
+	if (rhs.monomial() == nullptr) return false;
+	if (lhs == *(rhs.monomial())) return Coeff(1) < rhs.coeff();
+	return lhs < *(rhs.monomial());
 }
 
 template<typename Coeff>
@@ -318,10 +331,9 @@ bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(const Monomial& lhs, const Term<Coeff>& rhs) {
-	if (rhs.monomial() == nullptr) return false;
-	if (lhs == *(rhs.monomial())) return Coeff(1) < rhs.coeff();
-	return lhs < *(rhs.monomial());
+bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
+	if (rhs.monomial() == nullptr) return lhs < rhs.coeff();
+	return true;
 }
 
 template<typename Coefficient>
