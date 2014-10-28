@@ -83,33 +83,40 @@ TEST(Monomial, division)
 
 TEST(Monomial, Comparison)
 {
-    Variable v0(1);
-    Variable v1(2);
-    Variable v2(3);
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    Variable z = pool.getFreshVariable("z");
 
     ComparisonList<Monomial> monomials;
-    monomials.push_back(v1 * v1 * v1);
-    monomials.push_back(v0 * v1 * v2);
-    monomials.push_back(v0 * v1 * v1);
-    monomials.push_back(v0 * v0 * v1);
-    monomials.push_back(v0 * v0 * v0);
-    monomials.push_back(v1 * v2 * v0 * v1);
-    monomials.push_back(v0 * v2 * v0 * v2);
+    monomials.push_back(x * x * x);
+    monomials.push_back(x * y * z);
+    monomials.push_back(x * y * y);
+    monomials.push_back(x * x * y);
+    monomials.push_back(x * x * x);
+    monomials.push_back(x * y * y * z);
+    monomials.push_back(x * x * z * z);
 
     expectRightOrder(monomials);
 }
 
 
-TEST(Monomial, VariableComparison)
+TEST(Monomial, OtherComparison)
 {
-	ComparisonList<Variable,Monomial> list;
-	
-	Variable v0(1);
-    Variable v1(2);
-	
-	list.push_back(v0);
-	list.push_back(v1);
-	
-	expectRightOrder(list);
-}
+    ComparisonList<Variable,Monomial> list;
 
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    list.push_back(x);
+    list.push_back(y);
+    list.push_back(y * y);
+    list.push_back(x * y);
+    list.push_back(x * x);
+    list.push_back(x * x * y);
+    list.push_back(x * x * x);
+    list.push_back(y * y * y * y);
+
+    expectRightOrder(list);
+}

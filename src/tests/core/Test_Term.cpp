@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "../numbers/config.h"
 #include "carl/core/Variable.h"
+#include "carl/core/VariablePool.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Term.h"
 #include "Util.cpp"
@@ -71,20 +72,38 @@ TYPED_TEST(TermTest, Substitute)
 
 TYPED_TEST(TermTest, Comparison)
 {
-    Variable v0(1);
-    Variable v1(2);
-    Variable v2(3);
-
-    Term<TypeParam> t0(2, v0 * v1 * v2);
-    Term<TypeParam> t1(3, v0 * v0 * v1);
-    Term<TypeParam> t2(9, v0 * v0 * v1);
-    Term<TypeParam> t3(7, v1 * v1 * v1 * v2);
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    Variable z = pool.getFreshVariable("z");
 
     ComparisonList<Term<TypeParam> > terms;
-    terms.push_back(t0);
-    terms.push_back(t1);
-    terms.push_back(t2);
-    terms.push_back(t3);
+    terms.push_back((TypeParam)2 * x * y * z);
+    terms.push_back((TypeParam)3 * x * x * y);
+    terms.push_back((TypeParam)9 * x * x * y);
+    terms.push_back((TypeParam)7 * y * y * y * z);
 
     expectRightOrder(terms);
 }
+
+TYPED_TEST(TermTest, OtherComparison)
+{
+    ComparisonList<Variable, Monomial, Term<TypeParam> > list;
+
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    list.push_back(x);
+    list.push_back(y);
+    list.push_back((TypeParam)7 * y);
+    list.push_back((TypeParam)3 * x);
+    list.push_back(y * y);
+    list.push_back((TypeParam)3 * y * y);
+    list.push_back(x * x * y);
+    list.push_back((TypeParam)5 * x * x * y);
+    list.push_back((TypeParam)9 * x * y * y);
+
+    expectRightOrder(list);
+}
+
