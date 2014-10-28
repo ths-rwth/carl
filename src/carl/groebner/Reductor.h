@@ -119,7 +119,7 @@ public:
 				// only insert non-empty polynomials.
 				if(!updateDatastruct(entry)) break;
 				typename Configuration<InputPolynomial>::Entry newentry = mDatastruct.top();
-				while(entry != newentry && Term<Coeff>::EqualMonomial(*leadingTerm, *(newentry->getLead())))
+				while(entry != newentry && Term<Coeff>::monomialEqual(*leadingTerm, *(newentry->getLead())))
 				{
 					assert(!newentry->empty());
 					leadingTerm = std::make_shared<const Term<Coeff>>(leadingTerm->coeff() + newentry->getLead()->coeff(), leadingTerm->monomial());
