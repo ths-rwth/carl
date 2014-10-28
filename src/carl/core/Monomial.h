@@ -946,7 +946,7 @@ namespace carl
 				}
 				else
 				{
-					return (lhsit->first < rhsit->first ) ? CompareResult::GREATER : CompareResult::LESS;
+					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
 				}
 				++lhsit;
 				++rhsit;
@@ -1061,6 +1061,14 @@ namespace carl
 
 namespace std
 {
+	template<>
+	struct less<std::shared_ptr<const carl::Monomial>> {
+		bool operator()(const std::shared_ptr<const carl::Monomial>& lhs, const std::shared_ptr<const carl::Monomial>& rhs) const {
+			if (lhs && rhs) return *lhs < *rhs;
+			if (lhs) return false;
+			return true;
+		}
+	};
 	/**
 	 * The template specialization of `std::hash` for `carl::Monomial`.
 	 * @param monomial Monomial.
