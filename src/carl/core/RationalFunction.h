@@ -56,7 +56,7 @@ public:
 	RationalFunction(const Pol& nom, const Pol& denom)
 	: mNominator(nom), mDenominator(denom), mIsSimplified(false)
 	{
-        if(AutoSimplify) eliminateCommonFactor();
+        eliminateCommonFactor( !AutoSimplify );
 		assert(!denom.isZero());
 	}
 	
@@ -89,14 +89,11 @@ public:
 	
 	void simplify() 
 	{
-		if(!AutoSimplify)
-		{
-			eliminateCommonFactor();
-		}
-		else
+		if( AutoSimplify )
 		{
 			LOGMSG_WARN("carl.core","Calling simplify on rational function with AutoSimplify");
 		}
+		eliminateCommonFactor( false );
 	}
 	
 	/**
@@ -206,13 +203,13 @@ protected:
 	/**
 	 * Helper function for simplify which eliminates the common factor.
 	 */
-	void eliminateCommonFactor()
+	void eliminateCommonFactor( bool _justNormalize )
 	{
 		if (mIsSimplified) return;
-        mIsSimplified = true;
 		if(mNominator.isZero())
 		{
 			mDenominator = Pol(CoeffType(1));
+            mIsSimplified = true;
 			return;
 		}
 		
@@ -220,6 +217,7 @@ protected:
 		{
 			mNominator = Pol(CoeffType(1));
 			mDenominator = Pol(CoeffType(1));
+            mIsSimplified = true;
 			return;
 		}
 		
@@ -228,7 +226,7 @@ protected:
         mNominator *= cpFactorNom;
         mDenominator *= cpFactorDen;
         CoeffType cpFactor = cpFactorDen/cpFactorNom;
-		if(!mDenominator.isConstant())
+		if(!_justNormalize && !mDenominator.isConstant())
 		{
 			Pol gcd = carl::gcd(mNominator, mDenominator);
 			assert(mNominator.quotient(gcd) * gcd == mNominator);
@@ -240,6 +238,7 @@ protected:
             mNominator *= cpFactorNom;
             mDenominator *= cpFactorDen;
             cpFactor *= cpFactorDen/cpFactorNom;
+            mIsSimplified = true;
 		}
         mNominator *= carl::getNum( cpFactor );
         mDenominator *= carl::getDenom( cpFactor );

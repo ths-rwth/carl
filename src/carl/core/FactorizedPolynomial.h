@@ -178,14 +178,28 @@ namespace carl
         }
         
         /**
+         * Set coefficient
+         * @param coeff Coefficient
+         */
+        //TODO make private and fix friend declaration
+        void setCoefficient( CoeffType coeff ) const
+        {
+            mCoefficient = coeff;
+        }
+
+        /**
          * @return The factorization of this polynomial.
          */
         const Factorization<P>& factorization() const
         {
             assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
-            if( content().flattenFactorization() )
+            CoeffType c = content().flattenFactorization();
+            if( c != CoeffType( 0 ) )
+            {
+                mCoefficient *= c;
                 rehash();
+            }
             return content().factorization();
         }
 

@@ -1090,8 +1090,11 @@ namespace std
 			size_t result = 0;
 			std::hash<carl::Term<C>> h;
 			for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
-				result ^= h(**iter);
-			return result;
+                        {
+                            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+                            result ^= h(**iter);
+			}
+                        return result;
 		}
 	};
 } // namespace std

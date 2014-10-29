@@ -16,8 +16,9 @@ using namespace carl;
 
 typedef MultivariatePolynomial<Rational> Pol;
 typedef FactorizedPolynomial<Pol> FPol;
-typedef RationalFunction<Pol,true> RFunc;
-typedef RationalFunction<FPol> RFactFunc;
+const bool AutoSimplify = true;
+typedef RationalFunction<Pol,AutoSimplify> RFunc;
+typedef RationalFunction<FPol,AutoSimplify> RFactFunc;
 typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 
 TEST(RationalFunction, Construction)
@@ -95,12 +96,18 @@ TEST(RationalFunction, Multiplication)
     Pol denA( Rational(-1)/Rational(4)*pf+Rational(1) );
     Pol nomB( Rational(-1)/Rational(4)*pf+Rational(1) );
     Pol denB( Rational(-1)/Rational(2)*pf+Rational(1) );
-    RFunc rfA(nomA, denA);
-    RFunc rfB(nomB, denB);
+    FPol fpNomA(nomA, pCache);
+    FPol fpDenA(denA, pCache);
+    FPol fpNomB(nomB, pCache);
+    FPol fpDenB(denB, pCache);
+    RFactFunc rfA(fpNomA, fpDenA);
+    RFactFunc rfB(fpNomB, fpDenB);
     std::cout << rfA << "*" << rfB << " = ";
-    RFunc rfC = rfA * rfB;
+    RFactFunc rfC = rfA * rfB;
+    if( !AutoSimplify )
+        rfC.simplify();
     std::cout << rfC << std::endl;
-    EXPECT_TRUE( Pol( nomA*denA*nomB*denB ).remainder( rfC.nominator()*rfC.denominator() ).isZero() );
+    EXPECT_TRUE( computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ).remainder( computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) ).isZero() );
 }
 
 TEST(RationalFunction, Addition)
@@ -168,4 +175,21 @@ TEST(RationalFunction, Subtraction)
     RFactFunc rf3 = rf1 - rf2;
     FPol tmp = fp1 - fp3;
     EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
+}
+
+TEST(RationalFunction, Hash)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("1+x");
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+
+    FPol tmp = fp2 - fp1;
 }
