@@ -424,15 +424,15 @@ namespace carl
 				// Variable is present in both monomials.
 				if(itleft->first == itright->first)
 				{
-					exponent newExp = itleft->second - itright->second;
-					if(newExp > itleft->second)
+					if (itleft->second < itright->second)
 					{
 						// Underflow, itright->exp was larger than itleft->exp.
 						delete result;
 						LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 						return nullptr;
 					}
-					else if(newExp > 0)
+					exponent newExp = itleft->second - itright->second;
+					if(newExp > 0)
 					{
 						result->mExponents.push_back(std::make_pair(itleft->first, newExp));
 					}
@@ -453,6 +453,12 @@ namespace carl
 			}
 			// If there remain variables in the m, it fails.
 			if(itright != m.mExponents.end())
+			{
+				delete result;
+				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+				return nullptr;
+			}
+			if (result->mExponents.empty())
 			{
 				delete result;
 				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
