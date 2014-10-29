@@ -932,34 +932,80 @@ namespace carl
 		 */
 		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 		{
-			auto lhsit = lhs.mExponents.rbegin( );
-			auto rhsit = rhs.mExponents.rbegin( );
-			auto lhsend = lhs.mExponents.rend( );
-			auto rhsend = rhs.mExponents.rend( );
+            
+//        int sz1  = m1->size();
+//        int sz2  = m2->size();
+//        int idx1 = sz1 - 1;
+//        int idx2 = sz2 - 1;
+//        while (idx1 >= 0 && idx2 >= 0) {
+//            power const & pw1 = m1->get_power(idx1);
+//            power const & pw2 = m2->get_power(idx2);
+//            if (pw1.get_var() == pw2.get_var()) {
+//                if (pw1.degree() == pw2.degree()) {
+//                    idx1--;
+//                    idx2--;
+//                    continue;
+//                }
+//                return pw1.degree() < pw2.degree() ? -1 : 1;
+//            }
+//            return pw1.get_var() > pw2.get_var() ? 1 : -1;
+//        }
+//        SASSERT(idx1 >= 0 || idx2 >= 0);
+//        SASSERT(idx1 < 0  || idx2 < 0);
+//        return idx1 < 0 ? -1 : 1;
+            if( &lhs == &rhs )
+                return CompareResult::EQUAL;
+            size_t posLhs = lhs.mExponents.size();
+            size_t posRhs = rhs.mExponents.size();
+            
+            while( posLhs > 0 && posRhs > 0 )
+            {
+                --posLhs;
+                --posRhs;
+                auto& varExpPairLhs = lhs.mExponents.at( posLhs );
+                auto& varExpPairRhs = rhs.mExponents.at( posRhs );
+                if( varExpPairLhs.first == varExpPairRhs.first )
+                {
+                    if( varExpPairLhs.second == varExpPairRhs.second )
+                    {
+                        continue;
+                    }
+                    return varExpPairLhs.second < varExpPairRhs.second ? CompareResult::LESS : CompareResult::GREATER;
+                }
+                return varExpPairLhs.first < varExpPairRhs.first ? CompareResult::LESS : CompareResult::GREATER;
+            }
+            
+            if( posLhs == posRhs )
+                return CompareResult::EQUAL;
+            return posLhs == 0 ? CompareResult::LESS : CompareResult::GREATER;
 
-			while( lhsit != lhsend )
-			{
-				if( rhsit == rhsend )
-					return CompareResult::GREATER;
-				//which variable occurs first
-				if( lhsit->first == rhsit->first )
-				{
-					//equal variables
-					if( lhsit->second < rhsit->second )
-						return CompareResult::LESS;
-					if( lhsit->second > rhsit->second )
-						return CompareResult::GREATER;
-				}
-				else
-				{
-					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
-				}
-				++lhsit;
-				++rhsit;
-			}
-			if( rhsit == rhsend )
-				return CompareResult::EQUAL;
-			return CompareResult::LESS;
+//			auto lhsit = lhs.mExponents.rbegin( );
+//			auto rhsit = rhs.mExponents.rbegin( );
+//			auto lhsend = lhs.mExponents.rend( );
+//			auto rhsend = rhs.mExponents.rend( );
+//			while( lhsit != lhsend )
+//			{
+//				if( rhsit == rhsend )
+//					return CompareResult::GREATER;
+//				//which variable occurs first
+//				if( lhsit->first == rhsit->first )
+//				{
+//					//equal variables
+//					if( lhsit->second < rhsit->second )
+//						return CompareResult::LESS;
+//					if( lhsit->second > rhsit->second )
+//						return CompareResult::GREATER;
+//				}
+//				else
+//				{
+//					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
+//				}
+//				++lhsit;
+//				++rhsit;
+//			}
+//			if( rhsit == rhsend )
+//				return CompareResult::EQUAL;
+//			return CompareResult::LESS;
 		}
 	};	
 	
