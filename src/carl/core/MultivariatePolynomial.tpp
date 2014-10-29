@@ -442,55 +442,27 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
-	assert(this != &quotient);
-
-	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
-	assert(!b.isZero());
-	if (this->isZero()) {
-		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
-		return true;
-	}
-	if (a == b) {
-		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>(Coeff(1));
-		return true;
-	}
-	if (b.isConstant()) {
-		quotient = this->divideBy(b.lcoeff());
-		return true;
-	}
-
-	Variable x = *b.gatherVariables().begin();
-
-	auto ac = a.toUnivariatePolynomial(x);
-	auto bc = b.toUnivariatePolynomial(x);
-	bool leadisnum = bc.lcoeff().isNumber();
-	MultivariatePolynomial<Coeff,Ordering,Policies> res;
-
-	while (ac.degree() >= bc.degree()) {
-		MultivariatePolynomial<Coeff,Ordering,Policies> term;
-		if (leadisnum) {
-			term = ac.lcoeff().divideBy(bc.lcoeff().constantPart());
-		} else {
-			if (!ac.lcoeff().divideBy(bc.lcoeff(), term)) {
-				return false;
-			}
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			quotient += *factor;
+			p -= *factor * divisor;
+			delete factor;
 		}
-		assert(!term.isZero());
-		Monomial* mon = Monomial(x).pow(ac.degree() - bc.degree());
-		if (mon != nullptr) {
-			term *= Term<Coeff>(std::shared_ptr<Monomial>(mon));
+		else
+		{
+			return false;
 		}
-		res += term;
-		a = a - b * term;
-		if (a.isZero()) {
-			quotient = res;
-			return true;
-		}
-		ac = a.toUnivariatePolynomial(x);
+		
 	}
-	return false;
+	return true;
 }
 
 template<typename C, typename O, typename P>
