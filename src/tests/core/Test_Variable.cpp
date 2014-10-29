@@ -1,6 +1,7 @@
 
 #include "gtest/gtest.h"
 #include "carl/core/Variable.h"
+#include "Util.cpp"
 
 using namespace carl;
 
@@ -22,27 +23,13 @@ TEST(Variable, Equals)
 
 TEST(Variable, Comparison)
 {
+    ComparisonList<Variable> list;
+
+    Variable v0(321);
     Variable v1(123);
-    Variable v2(456);
+    Variable v2(132);
 
-    EXPECT_TRUE(v1 < v2);
-    EXPECT_FALSE(v2 < v1);
-    EXPECT_FALSE(v1 < v1);
-    EXPECT_FALSE(v2 < v2);
-
-    EXPECT_FALSE(v1 > v2);
-    EXPECT_TRUE(v2 > v1);
-    EXPECT_FALSE(v1 > v1);
-    EXPECT_FALSE(v2 > v2);
-
-
-    EXPECT_TRUE(v1 <= v2);
-    EXPECT_FALSE(v2 <= v1);
-    EXPECT_TRUE(v1 <= v1);
-    EXPECT_TRUE(v2 <= v2);
-
-    EXPECT_FALSE(v1 >= v2);
-    EXPECT_TRUE(v2 >= v1);
-    EXPECT_TRUE(v1 >= v1);
-    EXPECT_TRUE(v2 >= v2);
+    list.push_back(v0);
+    list.push_back(v1);
+    list.push_back(v2);
 }

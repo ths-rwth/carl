@@ -137,7 +137,7 @@ Policies()
 			Coeff c = (*it)->coeff();
 			for(++jt; jt != mTerms.end(); ++jt)
 			{
-				if(Term<Coeff>::EqualMonomial(**jt, **it)) 
+				if(Term<Coeff>::monomialEqual(**jt, **it)) 
 				{
 					c += (*jt)->coeff();
 					// We do not yet remove the term as this would cause multiple movements

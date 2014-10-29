@@ -17,12 +17,12 @@ struct ComparisonOperator {
 	}
 	template<typename T1, typename T2>
 	void operator()(const T1& t1, const T2& t2) {
-		EXPECT_EQ(t1 < t2, it1 < it2);
-        EXPECT_EQ(t1 > t2, it1 > it2);
-		EXPECT_EQ(t1 <= t2, it1 <= it2);
-		EXPECT_EQ(t1 >= t2, it1 >= it2);
-		EXPECT_EQ(t1 == t2, it1 == it2);
-		EXPECT_EQ(t1 != t2, it1 != it2);
+		EXPECT_EQ(it1 < it2, t1 < t2) << t1 << " < " << t2;
+		EXPECT_EQ(it1 > it2, t1 > t2) << t1 << " > " << t2;
+		EXPECT_EQ(it1 <= it2, t1 <= t2) << t1 << " <= " << t2;
+		EXPECT_EQ(it1 >= it2, t1 >= t2) << t1 << " >= " << t2;
+		EXPECT_EQ(it1 == it2, t1 == t2) << t1 << " == " << t2;
+		EXPECT_EQ(it1 != it2, t1 != t2) << t1 << " != " << t2;
 	}
 };
 
