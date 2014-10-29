@@ -107,14 +107,13 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Monomial& m) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->divide(m);
-        if(div != nullptr)
-        {
-			if (div->tdeg() == 0) {
-				delete div;
+		auto res = mMonomial->divide(m);
+        if (res.second) {
+			if (res.first != nullptr && res.first->tdeg() == 0) {
+				delete res.first;
 				return new Term<Coefficient>(mCoeff);
 			}
-            return new Term<Coefficient>(mCoeff, div);
+            return new Term<Coefficient>(mCoeff, res.first);
         }   
     }
     return nullptr;  
@@ -131,15 +130,17 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
             // Term is just a constant.
             return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
         }
-        Monomial* div = mMonomial->divide(*(t.mMonomial));
-        if(div != nullptr)
-        {
-			if (div->tdeg() == 0) {
-				delete div;
+		auto res = mMonomial->divide(*(t.mMonomial));
+		if (!res.second) return nullptr;
+		if (res.first != nullptr) {
+			if (res.first->tdeg() == 0) {
+				delete res.first;
 				return new Term<Coefficient>(mCoeff / t.mCoeff);
 			}
-            return new Term<Coefficient>(mCoeff / t.mCoeff, div);
-        }   
+            return new Term<Coefficient>(mCoeff / t.mCoeff, res.first);
+        } else {
+			return new Term<Coefficient>(mCoeff / t.mCoeff);
+		}
     } 
     else if(!t.mMonomial)
     {
