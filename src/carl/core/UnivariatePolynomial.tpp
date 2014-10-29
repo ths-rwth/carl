@@ -2088,9 +2088,9 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
-		if(c != C(0))
+		if(!(c == 0))
 		{
-			if (c != C(1)) os << "(" << c << ")*";
+			if (!(c == 1)) os << "(" << c << ")*";
 			os << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
 		}
 	}

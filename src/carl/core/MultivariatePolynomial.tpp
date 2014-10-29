@@ -1168,6 +1168,14 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
     return lhs.lcoeff() == rhs;
 }
 
+template<typename C, typename O, typename P, DisableIf<std::is_integral<C>>>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int i) {
+    if (lhs.isZero()) return i == 0;
+    if (lhs.nrTerms() > 1) return false;
+	if (lhs.lmon() != nullptr) return false;
+    return lhs.lcoeff() == i;
+}
+
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
     if (lhs.nrTerms() != 1) return false;

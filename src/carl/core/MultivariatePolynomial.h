@@ -544,6 +544,8 @@ public:
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
+	template<typename C, typename O, typename P, DisableIf<std::is_integral<C>> = dummy>
+	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int i);
 	template<typename C, typename O, typename P>
 	inline bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs == lhs;
