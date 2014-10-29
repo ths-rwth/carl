@@ -21,6 +21,8 @@ GFNumber<IntegerT> GFNumber<IntegerT>::inverse() const
 	
 }
 
+
+
 template<typename IntegerT>
 bool operator==(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs)
 {	

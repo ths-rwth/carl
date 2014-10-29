@@ -443,55 +443,27 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
-bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& b, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
-	assert(this != &quotient);
-
-	MultivariatePolynomial<Coeff,Ordering,Policies> a = *this;
-	assert(!b.isZero());
-	if (this->isZero()) {
-		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>();
-		return true;
-	}
-	if (a == b) {
-		quotient = MultivariatePolynomial<Coeff,Ordering,Policies>(Coeff(1));
-		return true;
-	}
-	if (b.isConstant()) {
-		quotient = this->divideBy(b.lcoeff());
-		return true;
-	}
-
-	Variable x = *b.gatherVariables().begin();
-
-	auto ac = a.toUnivariatePolynomial(x);
-	auto bc = b.toUnivariatePolynomial(x);
-	bool leadisnum = bc.lcoeff().isNumber();
-	MultivariatePolynomial<Coeff,Ordering,Policies> res;
-
-	while (ac.degree() >= bc.degree()) {
-		MultivariatePolynomial<Coeff,Ordering,Policies> term;
-		if (leadisnum) {
-			term = ac.lcoeff().divideBy(bc.lcoeff().constantPart());
-		} else {
-			if (!ac.lcoeff().divideBy(bc.lcoeff(), term)) {
-				return false;
-			}
+	static_assert(is_field<C>::value, "Division only defined for field coefficients");
+	MultivariatePolynomial p = *this;
+	while(!p.isZero())
+	{
+		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		// nullptr if lt(divisor) does not divide lt(p).
+		if(factor != nullptr)
+		{
+			quotient += *factor;
+			p -= *factor * divisor;
+			delete factor;
 		}
-		assert(!term.isZero());
-		Monomial* mon = Monomial(x).pow(ac.degree() - bc.degree());
-		if (mon != nullptr) {
-			term *= Term<Coeff>(std::shared_ptr<Monomial>(mon));
+		else
+		{
+			return false;
 		}
-		res += term;
-		a = a - b * term;
-		if (a.isZero()) {
-			quotient = res;
-			return true;
-		}
-		ac = a.toUnivariatePolynomial(x);
+		
 	}
-	return false;
+	return true;
 }
 
 template<typename C, typename O, typename P>
@@ -681,38 +653,44 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
         }
     }
     // Substitute the variable.
-    newTerms.reserve(expectedResultSize);
+//    newTerms.reserve(expectedResultSize);
+    MultivariatePolynomial result( Coeff( 0 ) );
     for(auto term : mTerms)
     {
 		if (term->monomial() == nullptr) {
-			newTerms.push_back(term);
+//			newTerms.push_back(term);
+            result += term->coeff();
 		} else {
 			exponent e = term->monomial()->exponentOfVariable(var);
+            Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
 			if(e > 1)
 			{
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
-				for(auto vterm : iter->second.first.mTerms)
-				{
-					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-				}
+//				for(auto vterm : iter->second.first.mTerms)
+//				{
+//					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+//					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+//				}
+                result += iter->second.first * t; 
 			}
 			else if(e == 1)
 			{
-				for(auto vterm : value.mTerms)
-				{
-					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-				}
+//				for(auto vterm : value.mTerms)
+//				{
+//					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+//					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+//                }
+                result += value * t; 
 			}
 			else
 			{
-				newTerms.push_back(term);
+//				newTerms.push_back(term);
+                result += *term;
 			}
 		}
 	}
-	setTerms(newTerms);
+//	setTerms(newTerms);
 	assert(mTerms.size() <= expectedResultSize);
 	this->checkConsistency();
 }
@@ -852,7 +830,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	static_assert(!std::is_same<SubstitutionType, Term<Coeff>>::value, "Terms are handled by a seperate method.");
     TermsType newTerms;
-	MultivariatePolynomial result;
+    MultivariatePolynomial result( Coeff( 0 ) );
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
@@ -873,7 +851,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, Ordering, Policies>::substitute(const std::map<Variable, Term<Coeff>>& substitutions) const
 {
 	TermsType newTerms;
-	MultivariatePolynomial result;
+    MultivariatePolynomial result( Coeff( 0 ) );
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
@@ -1189,6 +1167,14 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
     if (lhs.nrTerms() > 1) return false;
 	if (lhs.lmon() != nullptr) return false;
     return lhs.lcoeff() == rhs;
+}
+
+template<typename C, typename O, typename P, DisableIf<std::is_integral<C>>>
+bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int i) {
+    if (lhs.isZero()) return i == 0;
+    if (lhs.nrTerms() > 1) return false;
+	if (lhs.lmon() != nullptr) return false;
+    return lhs.lcoeff() == i;
 }
 
 template<typename C, typename O, typename P>
@@ -1754,16 +1740,22 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
         mTerms.clear();
         return *this;
     }
-    TermsType newTerms;
-    newTerms.reserve(mTerms.size() * rhs.mTerms.size());
+//    TermsType newTerms;
+//    newTerms.reserve(mTerms.size() * rhs.mTerms.size());
+//    for(auto termLhs : mTerms)
+//    {
+//        for(auto termRhs : rhs.mTerms)
+//        {
+//            newTerms.push_back(std::make_shared<Term<Coeff>>(*termLhs * *termRhs));
+//        }
+//    }
+//    setTerms(newTerms);
+    MultivariatePolynomial result( Coeff( 0 ) );
     for(auto termLhs : mTerms)
     {
-        for(auto termRhs : rhs.mTerms)
-        {
-            newTerms.push_back(std::make_shared<Term<Coeff>>(*termLhs * *termRhs));
-        }
+        result += rhs * (*termLhs);
     }
-    setTerms(newTerms);
+    *this = result;
     return *this;
     
 }
