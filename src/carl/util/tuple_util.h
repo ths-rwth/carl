@@ -15,7 +15,7 @@ template<std::size_t S, typename Tuple, typename First, typename... Tail>
 struct tail_impl {
 	tail_impl<S-1,Tuple,Tail...> tail;
 	std::tuple<Tail...> operator()(const Tuple& t) {
-		return std::tuple_cat(tail(t), std::make_tuple(std::get<S>(t)));
+		return std::tuple_cat(std::make_tuple(std::get<std::tuple_size<Tuple>::value-S>(t)), tail(t));
 	}
 };
 
@@ -26,7 +26,7 @@ struct tail_impl {
 template<typename Tuple, typename First, typename... Tail>
 struct tail_impl<1, Tuple, First, Tail...> {
 	std::tuple<Tail...> operator()(const Tuple& t) {
-		return std::make_tuple(std::get<1>(t));
+		return std::make_tuple(std::get<std::tuple_size<Tuple>::value-1>(t));
 	}
 };
 
