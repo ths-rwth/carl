@@ -392,18 +392,21 @@ namespace carl
 		}
 		/**
 		 * Returns a new monomial that is this monomial divided by m.
-		 * If this is not divisible by m, nullptr is returned.
+		 * Returns a pair of a monomial pointer and a bool.
+		 * The bool indicates if the division was possible.
+		 * The monomial pointer holds the result of the division.
+		 * If the division resulted in an empty monomial (i.e. the two monomials were equal), the pointer is nullptr.
 		 * @param m Monomial.
 		 * @return this divided by m.
 		 */
-		Monomial* divide(const Monomial& m) const
+		std::pair<Monomial*,bool> divide(const Monomial& m) const
 		{
 			LOG_FUNC("carl.core.monomial", *this << ", " << m);
 			if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
 			{
 				// Division will fail.
 				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return nullptr;
+				return std::make_pair(nullptr,false);
 			}
 			Monomial* result = new Monomial();
 			result->mTotalDegree =  mTotalDegree - m.mTotalDegree;
@@ -419,7 +422,7 @@ namespace carl
 					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
 					assert(result->isConsistent());
 					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-					return result;
+					return std::make_pair(result,true);;
 				}
 				// Variable is present in both monomials.
 				if(itleft->first == itright->first)
@@ -429,7 +432,7 @@ namespace carl
 						// Underflow, itright->exp was larger than itleft->exp.
 						delete result;
 						LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-						return nullptr;
+						return std::make_pair(nullptr,false);
 					}
 					exponent newExp = itleft->second - itright->second;
 					if(newExp > 0)
@@ -443,7 +446,7 @@ namespace carl
 				{
 					delete result;
 					LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-					return nullptr;
+					return std::make_pair(nullptr,false);
 				}
 				else
 				{
@@ -456,17 +459,17 @@ namespace carl
 			{
 				delete result;
 				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return nullptr;
+				return std::make_pair(nullptr,false);
 			}
 			if (result->mExponents.empty())
 			{
 				delete result;
 				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return nullptr;
+				return std::make_pair(nullptr,true);
 			}
 			assert(result->isConsistent());
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-			return result;
+			return std::make_pair(result,true);
 			
 		}
 		
