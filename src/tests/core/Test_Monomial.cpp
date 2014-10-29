@@ -74,11 +74,11 @@ TEST(Monomial, division)
     Monomial m2 = v0 * v0 * v1 * v2;
     Monomial m0x = v0 * v0 * v1 * v2;
     Monomial m0y = v0 * v0 * v1 * v1;
-    EXPECT_EQ(nullptr, m0.divide(m1));
-    EXPECT_EQ(nullptr, m1.divide(m0));
+    EXPECT_FALSE(m0.divide(m1).second);
+    EXPECT_FALSE(m1.divide(m0).second);
     EXPECT_EQ(m0x, *m0.divide(v1));
     EXPECT_EQ(m0y, *m0.divide(v2));
-    EXPECT_EQ(Monomial(v1), *m0.divide(m2));
+    EXPECT_EQ(Monomial(v1), *m0.divide(m2).first);
 }
 
 TEST(Monomial, Comparison)
