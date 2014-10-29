@@ -29,7 +29,6 @@ namespace carl
     template<typename P>
     class PolynomialFactorizationPair
     {
-        friend const Factorization<P>& FactorizedPolynomial<P>::factorization() const;
         friend class FactorizedPolynomial<P>;
 
     private:
