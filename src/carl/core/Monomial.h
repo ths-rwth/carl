@@ -62,6 +62,8 @@ namespace carl
 		std::vector<std::pair<Variable, exponent>> mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
+		/// Cached hash.
+		mutable std::size_t mHash = 0;
 
 		typedef std::vector<std::pair<Variable, exponent>>::iterator exponents_it;
 		typedef std::vector<std::pair<Variable, exponent>>::const_iterator exponents_cIt;
@@ -70,6 +72,22 @@ namespace carl
 		 * Default constructor.
 		 */
 		Monomial() = default;
+
+		/**
+		 * Calculates the hash and stores it to mHash.
+         */
+		void calcHash() {
+			std::hash<carl::Variable> h;
+			size_t result = 0;
+			for (auto& it: mExponents) {
+				// perform a circular shift by 5 bits.
+				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+				result ^= h( it.first );
+				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+				result ^= it.second;
+			}
+			mHash = result;
+		}
 	public:
 		/**
 		 * Generate a monomial from a variable and an exponent.
@@ -80,6 +98,7 @@ namespace carl
 			mExponents(1, std::make_pair(v,e)),
 			mTotalDegree(e)
 		{
+			calcHash();
 			assert(isConsistent());
 		}
 
@@ -91,6 +110,7 @@ namespace carl
 			mExponents(rhs.mExponents),
 			mTotalDegree(rhs.mTotalDegree)
 		{
+			calcHash();
 			assert(isConsistent());
 		}
 
@@ -103,6 +123,7 @@ namespace carl
 			mExponents(exponents),
 			mTotalDegree(totalDegree)
 		{
+			calcHash();
 			assert(isConsistent());
 		}
 		
@@ -119,6 +140,7 @@ namespace carl
 			{
 				mTotalDegree += ve.second;
 			}
+			calcHash();
 			assert(isConsistent());
 		}
 		/**
@@ -132,6 +154,7 @@ namespace carl
 			if(this == &rhs) return *this;
 			mExponents = rhs.mExponents;
 			mTotalDegree = rhs.mTotalDegree;
+			mHash = rhs.mHash;
 			return *this;
 		}
 		
@@ -162,6 +185,14 @@ namespace carl
 		 */
 		exponents_cIt end() const {
 			return mExponents.end();
+		}
+
+		/**
+		 * Returne the hash of this monomial
+         * @return Hash.
+         */
+		std::size_t hash() const {
+			return mHash;
 		}
 		
 		/**
@@ -667,6 +698,7 @@ namespace carl
 			}
 			// Variable was not inserted, insert at end.
 			mExponents.emplace_back(v,1);
+			calcHash();
 			return *this;
 		}
 
@@ -716,6 +748,7 @@ namespace carl
 			mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
 			assert(isConsistent());
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
+			calcHash();
 			return *this;
 		}
 
@@ -935,80 +968,36 @@ namespace carl
 		 */
 		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 		{
-            
-//        int sz1  = m1->size();
-//        int sz2  = m2->size();
-//        int idx1 = sz1 - 1;
-//        int idx2 = sz2 - 1;
-//        while (idx1 >= 0 && idx2 >= 0) {
-//            power const & pw1 = m1->get_power(idx1);
-//            power const & pw2 = m2->get_power(idx2);
-//            if (pw1.get_var() == pw2.get_var()) {
-//                if (pw1.degree() == pw2.degree()) {
-//                    idx1--;
-//                    idx2--;
-//                    continue;
-//                }
-//                return pw1.degree() < pw2.degree() ? -1 : 1;
-//            }
-//            return pw1.get_var() > pw2.get_var() ? 1 : -1;
-//        }
-//        SASSERT(idx1 >= 0 || idx2 >= 0);
-//        SASSERT(idx1 < 0  || idx2 < 0);
-//        return idx1 < 0 ? -1 : 1;
-            if( &lhs == &rhs )
-                return CompareResult::EQUAL;
-            size_t posLhs = lhs.mExponents.size();
-            size_t posRhs = rhs.mExponents.size();
-            
-            while( posLhs > 0 && posRhs > 0 )
-            {
-                --posLhs;
-                --posRhs;
-                auto& varExpPairLhs = lhs.mExponents.at( posLhs );
-                auto& varExpPairRhs = rhs.mExponents.at( posRhs );
-                if( varExpPairLhs.first == varExpPairRhs.first )
-                {
-                    if( varExpPairLhs.second == varExpPairRhs.second )
-                    {
-                        continue;
-                    }
-                    return varExpPairLhs.second < varExpPairRhs.second ? CompareResult::LESS : CompareResult::GREATER;
-                }
-                return varExpPairLhs.first < varExpPairRhs.first ? CompareResult::LESS : CompareResult::GREATER;
-            }
-            
-            if( posLhs == posRhs )
-                return CompareResult::EQUAL;
-            return posLhs == 0 ? CompareResult::LESS : CompareResult::GREATER;
-
-//			auto lhsit = lhs.mExponents.rbegin( );
-//			auto rhsit = rhs.mExponents.rbegin( );
-//			auto lhsend = lhs.mExponents.rend( );
-//			auto rhsend = rhs.mExponents.rend( );
-//			while( lhsit != lhsend )
-//			{
-//				if( rhsit == rhsend )
-//					return CompareResult::GREATER;
-//				//which variable occurs first
-//				if( lhsit->first == rhsit->first )
-//				{
-//					//equal variables
-//					if( lhsit->second < rhsit->second )
-//						return CompareResult::LESS;
-//					if( lhsit->second > rhsit->second )
-//						return CompareResult::GREATER;
-//				}
-//				else
-//				{
-//					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
-//				}
-//				++lhsit;
-//				++rhsit;
-//			}
-//			if( rhsit == rhsend )
-//				return CompareResult::EQUAL;
-//			return CompareResult::LESS;
+			if (&lhs == &rhs) {
+				return CompareResult::EQUAL;
+			}
+			auto lhsit = lhs.mExponents.rbegin( );
+			auto rhsit = rhs.mExponents.rbegin( );
+			auto lhsend = lhs.mExponents.rend( );
+			auto rhsend = rhs.mExponents.rend( );
+			while( lhsit != lhsend )
+			{
+				if( rhsit == rhsend )
+					return CompareResult::GREATER;
+				//which variable occurs first
+				if( lhsit->first == rhsit->first )
+				{
+					//equal variables
+					if( lhsit->second < rhsit->second )
+						return CompareResult::LESS;
+					if( lhsit->second > rhsit->second )
+						return CompareResult::GREATER;
+				}
+				else
+				{
+					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
+				}
+				++lhsit;
+				++rhsit;
+			}
+			if( rhsit == rhsend )
+				return CompareResult::EQUAL;
+			return CompareResult::LESS;
 		}
 	};	
 	
@@ -1134,17 +1123,7 @@ namespace std
 	{
 		size_t operator()(const carl::Monomial& monomial) const 
 		{
-			std::hash<carl::Variable> h;
-			size_t result = 0;
-			for(unsigned i = 0; i < monomial.nrVariables(); ++i)
-			{
-				// perform a circular shift by 5 bits.
-				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-				result ^= h( monomial[i].first );
-				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-				result ^= monomial[i].second;
-			}
-			return result;
+			return monomial.hash();
 		}
 	};
 } // namespace std
