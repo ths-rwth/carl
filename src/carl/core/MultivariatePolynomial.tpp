@@ -6,6 +6,7 @@
 
 #pragma once
 #include "MultivariatePolynomial.h"
+#include <algorithm>
 #include <memory>
 #include <list>
 
@@ -1282,18 +1283,47 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
     newTerms.reserve(mTerms.size() + rhs.mTerms.size());
     typename TermsType::const_iterator lhsIt(mTerms.begin());
     typename TermsType::const_iterator rhsIt(rhs.mTerms.begin());
+#define ADD_VERSION 3
     while(true)
     {
         CompareResult cmpres(Ordering::compare(**lhsIt, **rhsIt));
         if(cmpres == CompareResult::LESS)
         {
+#if ADD_VERSION==1
             newTerms.push_back(*lhsIt);
             if(++lhsIt == mTerms.end()) break;
+#elif ADD_VERSION==2
+			auto next = std::lower_bound(lhsIt, mTerms.cend(), *rhsIt, &TermType::monomialLessPtr);
+			newTerms.insert(newTerms.end(), lhsIt, next);
+			lhsIt = next;
+			if (lhsIt == mTerms.cend()) break;
+#elif ADD_VERSION==3
+			newTerms.push_back(*lhsIt);
+			lhsIt++;
+			auto next = std::lower_bound(lhsIt, mTerms.cend(), *rhsIt, &TermType::monomialLessPtr);
+			newTerms.insert(newTerms.end(), lhsIt, next);
+			lhsIt = next;
+			if (lhsIt == mTerms.cend()) break;
+#endif
         }
         else if(cmpres == CompareResult::GREATER)
         {
+#if ADD_VERSION==1
             newTerms.push_back(*rhsIt);
             if(++rhsIt == rhs.mTerms.end()) break;
+#elif ADD_VERSION==2
+			auto next = std::lower_bound(rhsIt, rhs.mTerms.cend(), *lhsIt, &TermType::monomialLessPtr);
+			newTerms.insert(newTerms.end(), rhsIt, next);
+			rhsIt = next;
+			if (rhsIt == rhs.mTerms.cend()) break;
+#elif ADD_VERSION==3
+			newTerms.push_back(*rhsIt);
+			rhsIt++;
+			auto next = std::lower_bound(rhsIt, rhs.mTerms.cend(), *lhsIt, &TermType::monomialLessPtr);
+			newTerms.insert(newTerms.end(), rhsIt, next);
+			rhsIt = next;
+			if (rhsIt == rhs.mTerms.cend()) break;
+#endif
         }
         else 
         {
