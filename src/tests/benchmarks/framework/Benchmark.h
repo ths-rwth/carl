@@ -1,0 +1,166 @@
+/**
+ * @file Benchmark.h
+ * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
+ */
+
+#pragma once
+
+#include <functional>
+#include <iterator>
+#include <random>
+#include <tuple>
+#include <vector>
+#include <utility>
+
+
+#include "../config.h"
+#include "carl/converter/GinacConverter.h"
+#include "carl/core/carlLogging.h"
+#include "carl/core/MultivariatePolynomial.h"
+
+#include "BenchmarkConversions.h"
+#include "BenchmarkGenerator.h"
+#include "BenchmarkOutput.h" 
+
+namespace carl {
+
+template<typename Generator>
+class BenchmarkGenerator {
+public:
+	typedef typename Generator::type Sample;
+	typedef std::vector<Sample> Samples;
+private:
+	Samples samples;
+	ObjectGenerator generator;
+	CIPtr ci;
+public:
+	BenchmarkGenerator(const BenchmarkInformation& bi, const CIPtr& ci): generator(bi), ci(ci) {
+		std::cout << "Generating " << bi.n << " examples ... ";
+		std::cout.flush();
+		Generator g(bi);
+		carl::logging::Timer timer;
+		for (std::size_t i = 0; i < bi.n; i++) {
+			samples.emplace_back(g());
+		}
+		std::cout << timer.passed() << " ms" << std::endl;
+	}
+	typename Samples::const_iterator begin() const {
+		return samples.begin();
+	}
+	typename Samples::const_iterator end() const {
+		return samples.end();
+	}
+	CIPtr getCI() const {
+		return ci;
+	}
+};
+
+template<typename Converter>
+class BenchmarkConverter {
+public:
+	typedef std::vector<typename Converter::type> Samples;
+private:
+	Samples samples;
+public:
+	template<typename Generator>
+	BenchmarkConverter(const BenchmarkGenerator<Generator>& bg) {
+		Converter conv(bg.getCI());
+		//std::cout << "Converting ... ";
+		//std::cout.flush();
+		carl::logging::Timer timer;
+		for (auto it: bg) {	
+			samples.emplace_back(conv(it));
+		}
+		//std::cout << timer.passed() << " ms" << std::endl;
+	}
+	typename Samples::const_iterator begin() const {
+		return samples.begin();
+	}
+	typename Samples::const_iterator end() const {
+		return samples.end();
+	}
+};
+
+template<typename T> 
+class BenchmarkResultComparator {
+private:
+	CIPtr ci;
+	std::vector<std::pair<T, T>> results;
+protected:
+	template<typename Coeff>
+	bool operator()(const CMP<Coeff>& lhs, const CMP<Coeff>& rhs) {
+		return lhs == rhs;
+	}
+	bool operator()(const GMP& lhs, const GMP& rhs) {
+		return lhs == rhs;
+	}
+	bool operator()(const ZMP& lhs, const ZMP& rhs) {
+		return eq(lhs, rhs);
+	}
+public:
+	BenchmarkResultComparator(const CIPtr& ci): ci(ci) {}
+	template<typename T2>
+	void put(const T& t, const T2& t2) {
+		results.emplace_back(t, Conversion::template convert<T>(t2, ci));
+	}
+	void check() {
+		for (auto it: results) {
+			if ((*this)(it.first, it.second)) {
+				continue;
+			}
+			std::cout << "Results differ:" << std::endl;
+			std::cout << "\t" << it.first << std::endl;
+			std::cout << "\t" << it.second << std::endl;
+		}
+	}
+};
+
+template<typename Generator, typename Executor, typename Result>
+class Benchmark {
+private:
+	CIPtr ci;
+	BenchmarkGenerator<Generator> reference;
+	BenchmarkInformation bi;
+	std::vector<Result> results;
+	Executor executor;
+	BenchmarkResult runtimes;
+public:
+	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi) {
+		std::cout << "Reference " << name << " ... ";
+		std::cout.flush();
+		carl::logging::Timer timer;
+		for (auto cur: reference) {
+			results.emplace_back(executor(cur));
+		}
+		unsigned time = timer.passed();
+		runtimes[name] = time;
+		std::cout << time << " ms" << std::endl;
+	}
+	template<typename R, typename Converter>
+	void compare(const std::string& name) {
+		std::vector<R> res;
+		BenchmarkConverter<Converter> benchmarks(reference);
+		std::cout << "Comparing " << name << " ... ";
+		std::cout.flush();
+		carl::logging::Timer timer;
+		for (auto cur: benchmarks) {
+			res.emplace_back(executor(cur));
+		}
+		unsigned time = timer.passed();
+		runtimes[name] = time;
+		std::cout << time << " ms" << std::endl;
+		
+		if (bi.compareResults) {
+			BenchmarkResultComparator<R> c(ci);
+			for (std::size_t i = 0; i < results.size(); i++) {
+				c.put(res[i], results[i]);
+			}
+			c.check();
+		}
+	}
+	BenchmarkResult result() const {
+		return runtimes;
+	}
+};
+
+}
