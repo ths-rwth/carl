@@ -509,14 +509,15 @@ TEST(MultivariatePolynomial, Quotient)
 
 TYPED_TEST(MultivariatePolynomialTest, Comparison)
 {
-    Variable v0(1);
-    Variable v1(2);
-    Variable v2(3);
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    Variable z = pool.getFreshVariable("z");
 
-    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * v0 * v0 * v1 + (TypeParam)7 * v1 * v2; // 3x²y+7yz
-    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * v0 * v0 * v1 + (TypeParam)2 * v0 * v0 * v2; // 3x²y+2x²z
-    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * v0 * v0 * v1 + (TypeParam)3 * v2; // 5x²y+3z
-    MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * v0 * v0 * v2 * v2 * v2 + (TypeParam)6 * v1; // 4x²z³+6y
+    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * x * y + (TypeParam)7 * y * z; // 3x²y+7yz
+    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * x * y + (TypeParam)2 * x * x * z; // 3x²y+2x²z
+    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * x * x * y + (TypeParam)3 * z; // 5x²y+3z
+    MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * x * x * z * z * z + (TypeParam)6 * y; // 4x²z³+6y
 
     ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
     polynomials.push_back(p0);
@@ -525,4 +526,20 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
     polynomials.push_back(p3);
 
     expectRightOrder(polynomials);
+}
+
+TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
+{
+    ComparisonList<Variable, Monomial, Term<TypeParam>, MultivariatePolynomial<TypeParam>> list;
+
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    list.push_back(x);
+    list.push_back(y);
+    list.push_back((TypeParam)3 * x * x + (TypeParam)2 * x * y);
+    list.push_back(x * x * y);
+
+    expectRightOrder(list);
 }
