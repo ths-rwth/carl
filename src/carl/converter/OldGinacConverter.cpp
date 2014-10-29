@@ -1,5 +1,5 @@
 
-#include "GinacConverter.h"
+#include "OldGinacConverter.h"
 
 #include "../core/MultivariatePolynomial.h"
 
