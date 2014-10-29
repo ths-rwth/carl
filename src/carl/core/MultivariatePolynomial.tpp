@@ -1696,16 +1696,22 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
         mTerms.clear();
         return *this;
     }
-    TermsType newTerms;
-    newTerms.reserve(mTerms.size() * rhs.mTerms.size());
+//    TermsType newTerms;
+//    newTerms.reserve(mTerms.size() * rhs.mTerms.size());
+//    for(auto termLhs : mTerms)
+//    {
+//        for(auto termRhs : rhs.mTerms)
+//        {
+//            newTerms.push_back(std::make_shared<Term<Coeff>>(*termLhs * *termRhs));
+//        }
+//    }
+//    setTerms(newTerms);
+    MultivariatePolynomial<Coeff,Ordering,Policies> result( Coeff( 0 ) );
     for(auto termLhs : mTerms)
     {
-        for(auto termRhs : rhs.mTerms)
-        {
-            newTerms.push_back(std::make_shared<Term<Coeff>>(*termLhs * *termRhs));
-        }
+        result += rhs * (*termLhs);
     }
-    setTerms(newTerms);
+    *this = result;
     return *this;
     
 }
