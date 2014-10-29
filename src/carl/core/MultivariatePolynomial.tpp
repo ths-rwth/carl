@@ -652,38 +652,44 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
         }
     }
     // Substitute the variable.
-    newTerms.reserve(expectedResultSize);
+//    newTerms.reserve(expectedResultSize);
+    MultivariatePolynomial result( Coeff( 0 ) );
     for(auto term : mTerms)
     {
 		if (term->monomial() == nullptr) {
-			newTerms.push_back(term);
+//			newTerms.push_back(term);
+            result += term->coeff();
 		} else {
 			exponent e = term->monomial()->exponentOfVariable(var);
+            Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
 			if(e > 1)
 			{
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
-				for(auto vterm : iter->second.first.mTerms)
-				{
-					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-				}
+//				for(auto vterm : iter->second.first.mTerms)
+//				{
+//					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+//					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+//				}
+                result += iter->second.first * t; 
 			}
 			else if(e == 1)
 			{
-				for(auto vterm : value.mTerms)
-				{
-					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-				}
+//				for(auto vterm : value.mTerms)
+//				{
+//					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
+//					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
+//                }
+                result += value * t; 
 			}
 			else
 			{
-				newTerms.push_back(term);
+//				newTerms.push_back(term);
+                result += *term;
 			}
 		}
 	}
-	setTerms(newTerms);
+//	setTerms(newTerms);
 	assert(mTerms.size() <= expectedResultSize);
 	this->checkConsistency();
 }
@@ -823,7 +829,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	static_assert(!std::is_same<SubstitutionType, Term<Coeff>>::value, "Terms are handled by a seperate method.");
     TermsType newTerms;
-	MultivariatePolynomial result;
+    MultivariatePolynomial result( Coeff( 0 ) );
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
@@ -844,7 +850,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, Ordering, Policies>::substitute(const std::map<Variable, Term<Coeff>>& substitutions) const
 {
 	TermsType newTerms;
-	MultivariatePolynomial result;
+    MultivariatePolynomial result( Coeff( 0 ) );
 	for(auto term : mTerms)
 	{
 		Term<Coeff>* t = term->substitute(substitutions);
@@ -1706,7 +1712,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 //        }
 //    }
 //    setTerms(newTerms);
-    MultivariatePolynomial<Coeff,Ordering,Policies> result( Coeff( 0 ) );
+    MultivariatePolynomial result( Coeff( 0 ) );
     for(auto termLhs : mTerms)
     {
         result += rhs * (*termLhs);
