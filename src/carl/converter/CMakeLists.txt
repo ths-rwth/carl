@@ -1,7 +1,10 @@
 # Header files in here (only headers from this directory!)
 set(carl_lib_converter_headers 
     GinacConverter.h
-) 
+	CArLConverter.h
+	GiNaCConverter.h
+	Z3Converter.h
+)
 # Source files in here
 set(carl_lib_converter_sources 
     converter/GinacConverter.cpp
