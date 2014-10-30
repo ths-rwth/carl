@@ -119,13 +119,16 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>& p) :
 Policies()
 {
-	///@todo is += needed here? take care of leading term
-	if (p.coefficients().size() > 0) {
-		*this += p.coefficients()[0];
+	std::size_t exp = 0;
+	mTerms.reserve(p.degree());
+	for (const auto& c: p.coefficients()) {
+		if (c != Coeff(0)) {
+			if (exp == 0) mTerms.emplace_back(new Term<Coeff>(c));
+			else mTerms.emplace_back(new Term<Coeff>(c, p.mainVar(), exp));
+		}
+		exp++;
 	}
-	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
-		*this += p.coefficients()[deg] * Term<Coeff>(Coeff(1), p.mainVar(), deg);
-	}
+	mOrdered = true;
 	this->checkConsistency();
 }
 
@@ -164,12 +167,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms)
 {
-	///@todo make this more efficient, ordering is not strictly necessary
-	for(Term<Coeff> term : terms)
-	{
-		mTerms.push_back(std::make_shared<const Term<Coeff>>(term));
+	for (const auto& t: terms) {
+		mTerms.push_back(std::make_shared<const Term<Coeff>>(t));
 	}
-	makeOrdered();
+	makeMinimallyOrdered();
 	this->checkConsistency();
 }
 
@@ -177,9 +178,9 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::initializer_list<Variable>& terms)
 {
 	///@todo make this more efficient, ordering is not strictly necessary
-	for(Variable term : terms)
+	for (const Variable& t: terms)
 	{
-		mTerms.push_back(std::make_shared<const Term<Coeff>>(term));
+		mTerms.push_back(std::make_shared<const Term<Coeff>>(t));
 	}
 	makeOrdered();
 	this->checkConsistency();
