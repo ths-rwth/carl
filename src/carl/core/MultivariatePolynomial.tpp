@@ -19,8 +19,7 @@ namespace carl
 {
     
 template<typename Coeff, typename Ordering, typename Policies>
-TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager
-    = TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>>();
+TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager;
 
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::resizeTermAdditionManager( size_t _newSize )
@@ -106,13 +105,21 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p) :
 Policies()
 {
-	///@todo is += needed here? take care of leading term
-	if (p.coefficients().size() > 0) {
-		*this += p.coefficients()[0];
+	std::size_t terms = 0;
+	for (const auto& c: p.coefficients()) terms += c.nrTerms();
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, terms);
+	exponent exp = 0;
+	for (const auto& c: p.coefficients()) {
+		if (exp == 0) {
+			for (const auto& term: c) mTermAdditionManager.addTerm(*this, id, term);
+		} else {
+			for (const auto& term: c * Term<Coeff>(1, p.mainVar(), exp)) {
+				mTermAdditionManager.addTerm(*this, id, term);
+			}
+		}
+		exp++;
 	}
-	for (unsigned deg = 1; deg < p.coefficients().size(); deg++) {
-		*this += p.coefficients()[deg] * Term<Coeff>(1, p.mainVar(), deg);
-	}
+	mTermAdditionManager.readTerms(*this, id, mTerms);
 	this->checkConsistency();
 }
 

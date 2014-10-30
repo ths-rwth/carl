@@ -71,27 +71,6 @@ class TermAdditionManager
             }
         }
             
-        TermAdditionManager( const TermAdditionManager& _tam )
-        {
-            *this = _tam;
-        }
-            
-        TermAdditionManager& operator=( const TermAdditionManager& _tam )
-        {
-            if( this == &_tam )
-                return *this;
-            assert( !_tam.inUse() );
-            std::lock_guard<std::mutex> lockA(_tam.mMutex);
-            assert( !inUse() );
-            std::lock_guard<std::mutex> lockB(mMutex);
-            mNextMapId = _tam.mNextMapId;
-            mUsers = _tam.mUsers;
-            mTermMaps = _tam.mTermMaps;
-            mLeadingTerms = _tam.mLeadingTerms;
-            mConstantTerms = _tam.mConstantTerms;
-            return *this;
-        }
-            
         /**
          * Set the number of equal-term-detection-maps this manager manages to the given value.
          * @param _newSize The value to set the number of equal-term-detection-maps this manager manages to.
