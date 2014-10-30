@@ -12,8 +12,8 @@
 #define uint64 unsigned long
 typedef unsigned digit_t;
 
-#include <z3/math/polynomial/polynomial.h>
-#include <z3/util/mpz.h>
+#include <z3/src/math/polynomial/polynomial.h>
+#include <z3/src/util/mpz.h>
 
 #include "carl/numbers/numbers.h"
 #include "carl/core/Variable.h"

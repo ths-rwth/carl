@@ -159,6 +159,15 @@ namespace carl
          * Constructor which constructs the pointinterval at n.
          * @param n Location of the pointinterval.
          */
+        explicit Interval(int n) :
+        mContent(n),
+        mLowerBoundType(BoundType::WEAK),
+        mUpperBoundType(BoundType::WEAK) { }
+
+        /**
+         * Constructor which constructs the pointinterval at n.
+         * @param n Location of the pointinterval.
+         */
         explicit Interval(const Number& n) :
         mContent(n),
         mLowerBoundType(BoundType::WEAK),
