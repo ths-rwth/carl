@@ -19,7 +19,8 @@ namespace carl
 {
     
 template<typename Coeff, typename Ordering, typename Policies>
-TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager = TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>>();
+TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager
+    = TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>>();
 
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::resizeTermAdditionManager( size_t _newSize )
@@ -119,7 +120,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<Coeff>& p) :
 Policies()
 {
-	std::size_t exp = 0;
+	exponent exp = 0;
 	mTerms.reserve(p.degree());
 	for (const auto& c: p.coefficients()) {
 		if (c != Coeff(0)) {
@@ -144,13 +145,16 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType&& terms, bool duplicates, bool ordered):
-	mTerms(terms),
+	mTerms(std::move(terms)),
 	mOrdered(ordered)
 {
-	///@todo search for duplicates
-	if (!ordered) {
-		makeMinimallyOrdered();
-	}
+	if( duplicates ) {
+        mTermAdditionManager.removeDuplicates( *this );
+    } else {
+        if (!ordered) {
+            makeMinimallyOrdered();
+        }
+    }
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -158,10 +162,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	mTerms(terms),
 	mOrdered(ordered)
 {
-	///@todo search for duplicates
-	if (!ordered) {
-		makeMinimallyOrdered();
-	}
+	if( duplicates ) {
+        mTermAdditionManager.removeDuplicates( *this );
+    } else {
+        if (!ordered) {
+            makeMinimallyOrdered();
+        }
+    }
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

@@ -77,7 +77,7 @@ class Term
 		 * @param v Variable.
 		 * @param e Exponent.
 		 */
-		Term(const Coefficient& c, Variable::Arg v, unsigned e);
+		Term(const Coefficient& c, Variable::Arg v, exponent e);
 		
 		/**
 		 * Get the coefficient.

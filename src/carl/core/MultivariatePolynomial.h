@@ -23,6 +23,9 @@ namespace carl
 template<typename Coeff>
 class UnivariatePolynomial;
 
+template<typename Polynomial>
+class TermAdditionManager;
+
 /**
  * The general-purpose multivariate polynomial class.
  *
@@ -38,6 +41,8 @@ class UnivariatePolynomial;
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariatePolynomial : public Polynomial, public Policies
 {
+    template<typename Polynomial>
+    friend class TermAdditionManager;
 public:
 	/// The ordering of the terms.
 	typedef Ordering OrderedBy;

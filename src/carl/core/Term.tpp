@@ -71,7 +71,7 @@ Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomi
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, unsigned e)
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e)
 : mCoeff(c), mMonomial(std::make_shared<Monomial>(Monomial(v, e)))
 {
     assert(this->isConsistent());

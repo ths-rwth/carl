@@ -23,7 +23,11 @@ class TermAdditionManager
     private:
         
         /// A hash map of shared pointer of monomials to shared pointer of terms. 
-        typedef std::unordered_map<std::shared_ptr<const Monomial>,std::shared_ptr<const Term<typename Polynomial::CoeffType>>, std::equal_to<std::shared_ptr<const Monomial>>> MapType;
+        typedef std::unordered_map<
+            std::shared_ptr<const Monomial>,
+            std::shared_ptr<const Term<typename Polynomial::CoeffType>>,
+            std::hash<std::shared_ptr<const Monomial>>,
+            std::equal_to<std::shared_ptr<const Monomial>>> MapType;
     
         /// Id of the next free map.
         size_t mNextMapId;
@@ -45,7 +49,7 @@ class TermAdditionManager
          */
         std::vector<typename MapType::iterator> mConstantTerms;
         /// Mutex for allocation of the map ids.
-        std::mutex mMutex;
+        mutable std::mutex mMutex;
         
     public:
             
@@ -57,9 +61,36 @@ class TermAdditionManager
             mNextMapId( 0 ),
             mUsers( _numberOfMaps, nullptr ),
             mTermMaps( _numberOfMaps, MapType() ),
-            mLeadingTerms( _numberOfMaps, mTermMaps.end() ),
-            mConstantTerms( _numberOfMaps, mTermMaps.end() )
-        {}
+            mLeadingTerms(),
+            mConstantTerms()
+        {
+            for( size_t i = 0; i < _numberOfMaps; ++i )
+            {
+                mLeadingTerms.push_back( mTermMaps[i].end() );
+                mConstantTerms.push_back( mTermMaps[i].end() );
+            }
+        }
+            
+        TermAdditionManager( const TermAdditionManager& _tam )
+        {
+            *this = _tam;
+        }
+            
+        TermAdditionManager& operator=( const TermAdditionManager& _tam )
+        {
+            if( this == &_tam )
+                return *this;
+            assert( !_tam.inUse() );
+            std::lock_guard<std::mutex> lockA(_tam.mMutex);
+            assert( !inUse() );
+            std::lock_guard<std::mutex> lockB(mMutex);
+            mNextMapId = _tam.mNextMapId;
+            mUsers = _tam.mUsers;
+            mTermMaps = _tam.mTermMaps;
+            mLeadingTerms = _tam.mLeadingTerms;
+            mConstantTerms = _tam.mConstantTerms;
+            return *this;
+        }
             
         /**
          * Set the number of equal-term-detection-maps this manager manages to the given value.
@@ -82,11 +113,11 @@ class TermAdditionManager
          */
         size_t getTermMapId( const Polynomial& _user, size_t _expectedSize )
         {
-            std::lock_guard<std::mutex> lock(this->freshVarMutex);
+            std::lock_guard<std::mutex> lock(mMutex);
             assert( mUsers.at( mNextMapId ) == nullptr );
             assert( mTermMaps.at( mNextMapId ).empty());
-            assert( mLeadingTerms.at( mNextMapId ) == mTermMaps.end() );
-            assert( mConstantTerms.at( mNextMapId ) == mTermMaps.end() );
+            assert( mLeadingTerms.at( mNextMapId ) == mTermMaps.at( mNextMapId ).end() );
+            assert( mConstantTerms.at( mNextMapId ) == mTermMaps.at( mNextMapId ).end() );
             mUsers[mNextMapId] = &_user;
             mTermMaps[mNextMapId].reserve( _expectedSize );
             size_t result = mNextMapId;
@@ -103,16 +134,17 @@ class TermAdditionManager
         void addTerm( const Polynomial& _user, size_t _id, std::shared_ptr<const Term<typename Polynomial::CoeffType>> _term )
         {
             assert( mUsers.at( _id ) == &_user );
-            assert( mTermMaps[_id].size() < mTermMaps[_id].capacity() );
-            auto res = mTermMaps[_id].emplace( _term->monomial(), _term );
+            MapType& mcMap = mTermMaps[_id];
+            assert( mcMap.size() < (mcMap.max_load_factor()*mcMap.bucket_count()) );
+            auto res = mcMap.emplace( _term->monomial(), _term );
             if( res.second )
             {
                 if( _term->monomial() == nullptr )
                 {
-                    assert( mConstantTerms.at( _id ) == mTermMaps.end() );
+                    assert( mConstantTerms.at( _id ) == mcMap.end() );
                     mConstantTerms[_id] = res.first;
                 }
-                else if( mLeadingTerms[_id] == mTermMaps.end() || *(mLeadingTerms[_id]->first) < *_term->monomial() )
+                else if( mLeadingTerms[_id] == mcMap.end() || *(mLeadingTerms[_id]->first) < *_term->monomial() )
                 {
                     mLeadingTerms[_id] = res.first;
                 }
@@ -122,7 +154,7 @@ class TermAdditionManager
                 typename Polynomial::CoeffType tmp = res.first->second->coeff() + _term->coeff();
                 if( tmp == 0 )
                 {
-                    mTermMaps[_id].erase( res.first );
+                    mcMap.erase( res.first );
                 }
                 else
                 {
@@ -146,29 +178,39 @@ class TermAdditionManager
             MapType& mcMap = mTermMaps[_id];
             _terms.clear();
             _terms.reserve( mcMap.size() );
-            if( mConstantTerms[_id] != mTermMaps.end() )
+            if( mConstantTerms[_id] != mcMap.end() )
             {
                 _terms.push_back( mConstantTerms[_id]->second );
-                mTermMaps.erase( mConstantTerms[_id] );
-                mConstantTerms[_id] = mTermMaps.end();
+                mcMap.erase( mConstantTerms[_id] );
+                mConstantTerms[_id] = mcMap.end();
             }
             std::shared_ptr<const Term<typename Polynomial::CoeffType>> lTerm = nullptr;
-            if( mLeadingTerms[_id] != mTermMaps.end() )
+            if( mLeadingTerms[_id] != mcMap.end() )
             {
                 lTerm = mLeadingTerms[_id]->second;
-                mTermMaps.erase( mLeadingTerms[_id] );
-                mLeadingTerms[_id] = mTermMaps.end();
+                mcMap.erase( mLeadingTerms[_id] );
+                mLeadingTerms[_id] = mcMap.end();
             }
-            for( auto iter = mTermMaps.begin(); iter != mTermMaps.end(); ++iter )
+            for( auto iter = mcMap.begin(); iter != mcMap.end(); ++iter )
             {
                 _terms.push_back( iter->second );
             }
-            mTermMaps.clear();
+            mcMap.clear();
             if( lTerm != nullptr )
             {
                 _terms.push_back( lTerm );
             }
             mUsers[_id] = nullptr;
+        }
+        
+        void removeDuplicates( const Polynomial& _poly )
+        {
+            size_t id = getTermMapId( _poly, _poly.nrTerms() );
+            for( std::shared_ptr<const Term<typename Polynomial::CoeffType>> term : _poly.mTerms )
+            {
+                addTerm( _poly, id, term );
+            }
+            readTerms( _poly, id, _poly.mTerms );
         }
         
      private:
@@ -178,12 +220,12 @@ class TermAdditionManager
          */
         bool inUse() const
         {
-            for( int i = 0; i < mTermMaps.size(); ++i )
+            for( size_t i = 0; i < mTermMaps.size(); ++i )
             {
                 if( mUsers.at( i ) != nullptr ) return true;
                 if( !mTermMaps.at( i ).empty() ) return true;
-                if( mLeadingTerms.at( i ) != mTermMaps.end() ) return true;
-                if( mConstantTerms.at( i ) != mTermMaps.end() ) return true;
+                if( mLeadingTerms.at( i ) != mTermMaps.at( i ).end() ) return true;
+                if( mConstantTerms.at( i ) != mTermMaps.at( i ).end() ) return true;
             }
             return false;
         }
