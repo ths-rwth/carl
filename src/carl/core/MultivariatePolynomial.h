@@ -26,6 +26,12 @@ class UnivariatePolynomial;
  * The general-purpose multivariate polynomial class.
  *
  * It is represented as a sum of terms, being a coefficient and a monomial.
+ *
+ * A polynomial is always *minimally ordered*.
+ * By that, we mean that the leading term and the constant term (if there is any) are at the correct positions.
+ * For some operations, the terms may be *fully ordered*.
+ * `isOrdered()` checks if the polynomial is *fully ordered* while `makeOrdered()` makes the polynomial *fully ordered*.
+ * 
  * @ingroup multirp
  */
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
@@ -54,7 +60,9 @@ protected:
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
 	/// A vector of all terms.
-	TermsType mTerms;
+	mutable TermsType mTerms;
+	/// Flag that indicates if the terms are ordered.
+	mutable bool mOrdered;
 public:
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 	
@@ -75,6 +83,7 @@ public:
 	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicy>&);
 	template<typename InputIterator>
 	explicit MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
+	explicit MultivariatePolynomial(TermsType&& terms, bool duplicates = true, bool ordered = false);
 	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
@@ -98,6 +107,22 @@ public:
 	virtual bool isMultivariateRepresented() const override
 	{
 		return true;
+	}
+	
+	/**
+	 * Check if the terms are ordered.
+     * @return If terms are ordered.
+     */
+	bool isOrdered() const {
+		return mOrdered;
+	}
+	/**
+	 * Ensure that the terms are ordered.
+     */
+	inline void makeOrdered() const {
+		if (isOrdered()) return;
+		std::sort(mTerms.begin(), mTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
+		mOrdered = true;
 	}
 	
 	/**
@@ -205,9 +230,11 @@ public:
 	}
 
 	typename TermsType::iterator eraseTerm(typename TermsType::iterator pos) {
+		///@todo find new lterm or constant term
 		return mTerms.erase(pos);
 	}
 	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
+		///@todo find new lterm or constant term
 		return mTerms.erase(pos);
 	}
 	TermsType& getTerms() {
@@ -225,6 +252,7 @@ public:
 	 * The function assumes the polynomial to be nonzero, otherwise the leading term is not defined.
 	 * @return  A reference to this.
 	 */
+	///@todo find new lterm
 	MultivariatePolynomial& stripLT();
 	
 	/**
@@ -327,6 +355,7 @@ public:
 	/**
 	 * Replace the given variable by the given polynomial within this multivariate polynomial.
 	 */
+	///@todo find new lterm
 	void substituteIn(Variable::Arg var, const MultivariatePolynomial& value);
 	
 	/**
@@ -407,6 +436,7 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
+	///@todo find new lterm
 	MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator+=(const TermType& rhs);
 	MultivariatePolynomial& operator+=(const std::shared_ptr<const TermType>& rhs);
@@ -422,6 +452,7 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
+	///@todo find new lterm
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator-=(const Monomial& rhs);
@@ -439,6 +470,7 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
+	///@todo find new lterm
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator*=(const Monomial& rhs);
@@ -453,6 +485,7 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
+	///@todo find new lterm
 	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator/=(const Monomial& rhs);
@@ -495,7 +528,7 @@ public:
 
 	
 private:
-	void sortTerms();
+	void makeMinimallyOrdered() const;
 	/**
 	 * Replaces the current terms by the given new terms.
 	 * Takes care of trailing zero terms.
