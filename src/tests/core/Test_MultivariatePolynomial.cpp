@@ -27,6 +27,12 @@ TEST(MultivariatePolynomial, Constructor)
     MultivariatePolynomial<mpz_class> p1(3);
     EXPECT_EQ((unsigned)1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
+    
+    Term<Interval<double>> ti(v0);
+    MultivariatePolynomial<Interval<double>> intervalPolyA(1);
+    MultivariatePolynomial<Interval<double>> intervalPolyB(ti);
+    EXPECT_EQ((unsigned)1, intervalPolyA.nrTerms());
+    EXPECT_TRUE(intervalPolyA.isLinear());
 }
 
 TEST(MultivariatePolynomial, Operators)

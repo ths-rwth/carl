@@ -1695,4 +1695,31 @@ namespace carl
     
 }
 
+namespace std
+{
+	/**
+	 * Specialization of `std::hash` for an interval.
+	 */
+	template<typename Number>
+	struct hash<carl::Interval<Number>> {
+		/**
+		 * Calculates the hash of an interval.
+		 * @param interval An interval.
+		 * @return Hash of an interval.
+		 */
+		size_t operator()(const carl::Interval<Number>& interval) const
+        {
+            size_t result = interval.lowerBoundType();
+            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+            result ^= interval.upperBoundType();
+            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+			std::hash<Number> h;
+			result ^= h( interval.lowerBound() );
+            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+			result ^= h( interval.upperBound() );
+            return result;
+		}
+	};
+} // namespace std
+
 #include "Interval.tpp"
