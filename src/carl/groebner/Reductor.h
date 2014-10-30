@@ -185,7 +185,7 @@ public:
 			// no operation.
 		}
 		// TODO check whether this is sorted.
-		InputPolynomial result(mRemainder.begin(), mRemainder.end(), false, false);
+		InputPolynomial result(mRemainder, false, false);
 		if(InputPolynomial::Policy::has_reasons)
 		{
 			result.setReasons(mReasons);

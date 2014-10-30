@@ -140,75 +140,18 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-template<typename InputIterator>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted) :
-Policies()
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType&& terms, bool duplicates, bool ordered):
+	mTerms(terms),
+	mOrdered(ordered)
 {
-	///@todo make this more efficient, ordering is not strictly necessary
-	mTerms.assign(begin, end);
-	if(!sorted)
-	{
-		makeOrdered();
+	///@todo search for duplicates
+	if (!ordered) {
+		makeMinimallyOrdered();
 	}
-	if(duplicates)
-	{
-		// We now iterate over the terms to find equal monomials.
-		for(typename TermsType::iterator it=mTerms.begin(); it != mTerms.end(); )
-		{
-			// look ahead for equal monomials
-			typename TermsType::iterator jt=it;
-			Coeff c = (*it)->coeff();
-			for(++jt; jt != mTerms.end(); ++jt)
-			{
-				if(Term<Coeff>::monomialEqual(**jt, **it)) 
-				{
-					c += (*jt)->coeff();
-					// We do not yet remove the term as this would cause multiple movements
-					// over the whole operation. Instead, we write a zero and clear these zeros later on.
-					// TODO make a global shared ptr for zero terms.
-					*jt = std::make_shared<const Term<Coeff>>((Coeff)0);
-				}
-				else
-				{
-					break;
-				}
-			}
-			if(c != (*it)->coeff())
-			{
-				if(c == (Coeff)0)
-				{
-					*it = std::make_shared<const Term<Coeff>>((Coeff)0);
-				}
-				else
-				{
-					*it = std::make_shared<const Term<Coeff>>(c, (**it).monomial());
-				}
-				// We need to update this iterator.
-			}
-			
-			// Go on where the look ahead stopped.
-			it = jt;
-		}
-		// Now we have to remove zeros.
-		for(typename TermsType::iterator it=mTerms.begin(); it != mTerms.end(); )
-		{
-			if(**it == (Coeff)0)
-			{
-				it = mTerms.erase(it);
-			}
-			else
-			{
-				++it;
-			}
-		}
-		
-	}
-	
-	this->checkConsistency();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType&& terms, bool duplicates, bool ordered):
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered):
 	mTerms(terms),
 	mOrdered(ordered)
 {
@@ -987,7 +930,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	for(const auto& t : mTerms) {
 		tmpTerms.emplace_back(t->derivative(v));
 	}
-	return MultivariatePolynomial(tmpTerms.begin(), tmpTerms.end(), true, false);
+	return MultivariatePolynomial(std::move(tmpTerms), true, false);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1955,24 +1898,29 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered() c
 	auto it = mTerms.begin();
 	auto lTerm = it;
 	auto constTerm = mTerms.end();
-	if (it->isConstant()) constTerm = it;
+	if ((*it)->isConstant()) constTerm = it;
 
 	for (it++; it != mTerms.end();) {
-		if (it->isConstant()) {
+		if ((*it)->isConstant()) {
 			assert(constTerm == mTerms.end());
 			constTerm = it;
-		} else if (Term<Coeff>::monomialLess(*lTerm, **it)) {
+		} else if (Term<Coeff>::monomialLess(**lTerm, **it)) {
 			lTerm = it;
 		}
-		assert(!Term<Coeff>::monomialEqual(*lTerm, **it));
+		assert(!Term<Coeff>::monomialEqual(**lTerm, **it));
 		it++;
 	}
-	if (constTerm != mTerms.end()) {
+	makeMinimallyOrdered(lTerm, constTerm);
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered(typename TermsType::iterator& lterm, typename TermsType::iterator& cterm) const {
+	if (cterm != mTerms.end()) {
 		// Prevent that the swaps cancel each other.
-		if (lTerm == mTerms.begin()) lTerm = constTerm;
-		std::swap(*constTerm, mTerms.begin());
+		if (lterm == mTerms.begin()) lterm = cterm;
+		std::swap(*cterm, mTerms.front());
 	}
-	std::swap(*lTerm, mTerms.rbegin());
+	std::swap(*lterm, mTerms.back());
 }
 
 

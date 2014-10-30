@@ -89,9 +89,8 @@ public:
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<class OtherPolicy>
 	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicy>&);
-	template<typename InputIterator>
-	explicit MultivariatePolynomial(InputIterator begin, InputIterator end, bool duplicates, bool sorted);
 	explicit MultivariatePolynomial(TermsType&& terms, bool duplicates = true, bool ordered = false);
+	explicit MultivariatePolynomial(const TermsType& terms, bool duplicates = true, bool ordered = false);
 	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
@@ -536,7 +535,17 @@ public:
 
 	
 private:
+	/**
+	 * Make sure that the terms are at least minimally ordered.
+	 */
 	void makeMinimallyOrdered() const;
+	/**
+	 * Make sure that the terms are at least minimally ordered.
+	 * Iterators to the important terms are given as arguments, so that we don't need to scan the whole vector.
+	 * @param lterm Iterator to leading term.
+	 * @param cterm Iterator to constant term.
+	 */
+	void makeMinimallyOrdered(typename TermsType::iterator& lterm, typename TermsType::iterator& cterm) const;
 	/**
 	 * Replaces the current terms by the given new terms.
 	 * Takes care of trailing zero terms.
