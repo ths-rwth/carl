@@ -15,6 +15,7 @@
 #include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
+#include "../util/TermAdditionManager.h"
 
 namespace carl
 {
@@ -53,9 +54,16 @@ protected:
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
+    /// A flag, which is true, if the terms of this multivariate polynomial are sorted.
+    bool mIsOrdered;
 	/// A vector of all terms.
 	TermsType mTerms;
 public:
+    ///
+    static TermAdditionManager<MultivariatePolynomial> mTermAdditionManager;
+    
+    static void resizeTermAdditionManager( size_t _newSize );
+    
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 	
 	/// @name Constructors

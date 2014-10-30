@@ -1113,6 +1113,7 @@ namespace std
 			return true;
 		}
 	};
+    
 	/**
 	 * The template specialization of `std::hash` for `carl::Monomial`.
 	 * @param monomial Monomial.
@@ -1124,6 +1125,20 @@ namespace std
 		size_t operator()(const carl::Monomial& monomial) const 
 		{
 			return monomial.hash();
+		}
+	};
+    
+	/**
+	 * The template specialization of `std::hash` for a shared pointer of a `carl::Monomial`.
+	 * @param monomial The shared pointer to a monomial.
+	 * @return Hash of monomial.
+	 */
+	template<>
+	struct hash<shared_ptr<const carl::Monomial>>
+	{
+		size_t operator()(const shared_ptr<const carl::Monomial> monomial) const 
+		{
+			return monomial->hash();
 		}
 	};
 } // namespace std
