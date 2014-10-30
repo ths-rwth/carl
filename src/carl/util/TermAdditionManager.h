@@ -146,27 +146,27 @@ class TermAdditionManager
             MapType& mcMap = mTermMaps[_id];
             _terms.clear();
             _terms.reserve( mcMap.size() );
-            if( mLeadingTerms[_id] != mTermMaps.end() )
-            {
-                _terms.push_back( mLeadingTerms[_id]->second );
-                mTermMaps.erase( mLeadingTerms[_id] );
-                mLeadingTerms[_id] = mTermMaps.end();
-            }
-            std::shared_ptr<const Term<typename Polynomial::CoeffType>> constantPart = nullptr;
             if( mConstantTerms[_id] != mTermMaps.end() )
             {
-                constantPart = mConstantTerms[_id]->second;
+                _terms.push_back( mConstantTerms[_id]->second );
                 mTermMaps.erase( mConstantTerms[_id] );
                 mConstantTerms[_id] = mTermMaps.end();
+            }
+            std::shared_ptr<const Term<typename Polynomial::CoeffType>> lTerm = nullptr;
+            if( mLeadingTerms[_id] != mTermMaps.end() )
+            {
+                lTerm = mLeadingTerms[_id]->second;
+                mTermMaps.erase( mLeadingTerms[_id] );
+                mLeadingTerms[_id] = mTermMaps.end();
             }
             for( auto iter = mTermMaps.begin(); iter != mTermMaps.end(); ++iter )
             {
                 _terms.push_back( iter->second );
             }
             mTermMaps.clear();
-            if( constantPart != nullptr )
+            if( lTerm != nullptr )
             {
-                _terms.push_back( constantPart );
+                _terms.push_back( lTerm );
             }
             mUsers[_id] = nullptr;
         }
