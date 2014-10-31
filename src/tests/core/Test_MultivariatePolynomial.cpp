@@ -569,7 +569,11 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 
 TYPED_TEST(MultivariatePolynomialTest, DifferentConstantTerm)
 {
-    Variable x(0);
+    
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
 
     EXPECT_TRUE(x + (TypeParam)1 > x);
+    EXPECT_TRUE(x + (TypeParam)1 < x);
+    EXPECT_TRUE(x + (TypeParam)1 == x);
 }

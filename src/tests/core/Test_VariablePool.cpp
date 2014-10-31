@@ -27,3 +27,15 @@ TEST(VariablePool, variablePool)
 	ASSERT_EQ(name, o.str());
 	
 }
+
+TEST(VariablePool, order)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    
+    EXPECT_TRUE(x < y);
+    EXPECT_TRUE(y > x);
+    EXPECT_FALSE(x > y);
+    EXPECT_FALSE(y < x);
+}
