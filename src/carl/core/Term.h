@@ -327,11 +327,17 @@ class Term
 		{
 			return std::equal_to<std::shared_ptr<Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
+		static bool monomialEqual(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
+		{
+			if (lhs == rhs) return true;
+			if (lhs && rhs) return monomialEqual(*lhs, *rhs);
+			return false;
+		}
 		static bool monomialLess(const Term& lhs, const Term& rhs)
 		{
 			return std::less<std::shared_ptr<const Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
-		static bool monomialLessPtr(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
+		static bool monomialLess(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
 		{
 			if (lhs && rhs) return monomialLess(*lhs, *rhs);
 			if (lhs) return false;
