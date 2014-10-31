@@ -7,6 +7,7 @@
 
 #pragma once 
 #include "../core/Term.h"
+#include "../core/pointerOperations.h"
 #include <vector>
 #include <unordered_map>
 #include <mutex>
@@ -39,11 +40,6 @@ class TermAdditionManager
         /// Stores the maps for the detection of equal terms.
         std::vector<MapType> mTermMaps;
         /** 
-         * Stores the leading term of the currently added terms for each map. It points to the end of its corresponding
-         * map, if no leading term has been found (a constant term will not be taken as a leading term).
-         */
-        std::vector<typename MapType::iterator> mLeadingTerms;
-        /** 
          * Stores the constant term of the currently added terms for each map. It points to the end of its corresponding
          * map, if the constant term is currently 0.
          */
@@ -61,12 +57,10 @@ class TermAdditionManager
             mNextMapId( 0 ),
             mUsers( _numberOfMaps, nullptr ),
             mTermMaps( _numberOfMaps, MapType() ),
-            mLeadingTerms(),
             mConstantTerms()
         {
             for( size_t i = 0; i < _numberOfMaps; ++i )
             {
-                mLeadingTerms.push_back( mTermMaps[i].end() );
                 mConstantTerms.push_back( mTermMaps[i].end() );
             }
         }
@@ -80,7 +74,6 @@ class TermAdditionManager
             assert( !inUse() );
             mUsers( _newSize, nullptr );
             mTermMaps( _newSize, MapType() );
-            mLeadingTerms( _newSize, mTermMaps.end() );
             mConstantTerms( _newSize, mTermMaps.end() );
         }
         
@@ -95,7 +88,6 @@ class TermAdditionManager
             std::lock_guard<std::mutex> lock(mMutex);
             assert( mUsers.at( mNextMapId ) == nullptr );
             assert( mTermMaps.at( mNextMapId ).empty());
-            assert( mLeadingTerms.at( mNextMapId ) == mTermMaps.at( mNextMapId ).end() );
             assert( mConstantTerms.at( mNextMapId ) == mTermMaps.at( mNextMapId ).end() );
             mUsers[mNextMapId] = &_user;
             mTermMaps[mNextMapId].reserve( _expectedSize );
@@ -123,17 +115,14 @@ class TermAdditionManager
                     assert( mConstantTerms.at( _id ) == mcMap.end() );
                     mConstantTerms[_id] = res.first;
                 }
-                else if( mLeadingTerms[_id] == mcMap.end() || *(mLeadingTerms[_id]->first) < *_term->monomial() )
-                {
-                    mLeadingTerms[_id] = res.first;
-                }
             }
             else
             {
                 typename Polynomial::CoeffType tmp = res.first->second->coeff() + _term->coeff();
-                if( tmp == 0 )
+                if( tmp == typename Polynomial::CoeffType(0) )
                 {
                     mcMap.erase( res.first );
+					if (res.first == mConstantTerms[_id]) mConstantTerms[_id] = mcMap.end();
                 }
                 else
                 {
@@ -163,22 +152,15 @@ class TermAdditionManager
                 mcMap.erase( mConstantTerms[_id] );
                 mConstantTerms[_id] = mcMap.end();
             }
-            std::shared_ptr<const Term<typename Polynomial::CoeffType>> lTerm = nullptr;
-            if( mLeadingTerms[_id] != mcMap.end() )
-            {
-                lTerm = mLeadingTerms[_id]->second;
-                mcMap.erase( mLeadingTerms[_id] );
-                mLeadingTerms[_id] = mcMap.end();
-            }
+			auto lTerm  = _terms.rend();
             for( auto iter = mcMap.begin(); iter != mcMap.end(); ++iter )
             {
                 _terms.push_back( iter->second );
+				if (lTerm == _terms.rend()) lTerm = _terms.rbegin();
+				else if (Term<typename Polynomial::CoeffType>::monomialLess(*lTerm, iter->second)) lTerm = _terms.rbegin();
             }
+			std::swap(*_terms.rbegin(), *lTerm);
             mcMap.clear();
-            if( lTerm != nullptr )
-            {
-                _terms.push_back( lTerm );
-            }
             mUsers[_id] = nullptr;
         }
         
@@ -203,7 +185,6 @@ class TermAdditionManager
             {
                 if( mUsers.at( i ) != nullptr ) return true;
                 if( !mTermMaps.at( i ).empty() ) return true;
-                if( mLeadingTerms.at( i ) != mTermMaps.at( i ).end() ) return true;
                 if( mConstantTerms.at( i ) != mTermMaps.at( i ).end() ) return true;
             }
             return false;
