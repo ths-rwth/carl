@@ -32,25 +32,28 @@ TEST(Monomial, Operators)
     EXPECT_EQ(m2, m3);
 }
 
-TEST(Monomial, multiplication)
+TEST(Monomial, VariableMultiplication)
 {
-    Variable v0((unsigned)1);
-    Variable v1((unsigned)2);
-    Variable v2((unsigned)3);
-    
-    Monomial m0(v0);
-    Monomial m1(v1);
-    Monomial m01(v0);
-    m01 *= v1;
-    m0 *= m1;
-    EXPECT_EQ(m01, m0);
-    m01 *= m01;
-    m0 *= v0;
-    m0 *= v1;
-    //m0 *= m0;
-    EXPECT_EQ(m01, m0);
-    Monomial m = v0 * v0;
-    
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    EXPECT_EQ(Monomial({std::make_pair(x, 1)}), x);
+    EXPECT_EQ(Monomial({std::make_pair(x, 1), std::make_pair(y, 1)}), x * y);
+    EXPECT_EQ(Monomial({std::make_pair(x, 2), std::make_pair(y, 1)}), x * x * y);
+    EXPECT_EQ(Monomial({std::make_pair(x, 1), std::make_pair(y, 2)}), y * x * y);
+    EXPECT_EQ(Monomial({std::make_pair(x, 3)}), x * x * x);
+}
+
+TEST(Monomial, MonomialMultiplication)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    EXPECT_EQ(Monomial({std::make_pair(x, 2), std::make_pair(y, 3)}), Monomial({std::make_pair(x, 1), std::make_pair(y, 2)}) * Monomial({std::make_pair(x, 1), std::make_pair(y, 1)}));
+    EXPECT_EQ(Monomial({std::make_pair(x, 2), std::make_pair(y, 3)}), Monomial({std::make_pair(x, 2)}) * Monomial({std::make_pair(y, 3)}));
+    EXPECT_EQ(Monomial({std::make_pair(x, 5), std::make_pair(y, 3)}), Monomial({std::make_pair(x, 2)}) * Monomial({std::make_pair(x, 3), std::make_pair(y, 3)}));
 }
 
 TEST(Monomial, derivative)
