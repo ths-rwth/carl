@@ -106,6 +106,7 @@ class TermAdditionManager
         {
             assert( mUsers.at( _id ) == &_user );
             MapType& mcMap = mTermMaps[_id];
+			///@todo what is this supposed to do?
             assert( mcMap.size() < (mcMap.max_load_factor()*mcMap.bucket_count()) );
             auto res = mcMap.emplace( _term->monomial(), _term );
             if( res.second )
