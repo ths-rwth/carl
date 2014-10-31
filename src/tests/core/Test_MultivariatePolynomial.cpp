@@ -528,9 +528,9 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
     Variable y = pool.getFreshVariable("y");
     Variable z = pool.getFreshVariable("z");
 
-    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * x * y + (TypeParam)7 * y * z; // 3x²y+7yz
-    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * x * y + (TypeParam)2 * x * x * z; // 3x²y+2x²z
-    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * x * x * y + (TypeParam)3 * z; // 5x²y+3z
+    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z; // 3x²y+7yz
+    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y; // 3x²y+2x²z
+    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * x * y * y + (TypeParam)3 * z; // 5x²y+3z
     MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * x * x * z * z * z + (TypeParam)6 * y; // 4x²z³+6y
 
     ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
