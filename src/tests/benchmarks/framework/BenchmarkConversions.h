@@ -70,7 +70,7 @@ ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
 }
 
 template<>
-unsigned Conversion::convert(const unsigned& n, const CIPtr& ci) {
+unsigned Conversion::convert(const unsigned& n, const CIPtr&) {
 	return n;
 }
 
