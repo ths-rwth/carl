@@ -137,6 +137,19 @@ namespace carl
 			calcHash();
 			assert(isConsistent());
 		}
+                
+                /**
+		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
+		 * @param exponents The variables and their exponents.
+		 * @param totalDegree The total degree of the monomial to generate.
+		 */
+		Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents, exponent totalDegree) :
+                        mExponents(exponents),
+                        mTotalDegree(totalDegree)
+                {
+                        calcHash();
+			assert(isConsistent());
+                }
 		
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
