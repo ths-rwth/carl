@@ -39,6 +39,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Coefficient>& su
 		return new Term<Coefficient>(factor);
 	}
 	LOGMSG_TRACE("carl.core.monomial", "Result: " << factor << "*" << *m);
+	m->calcHash();
 	return new Term<Coefficient>(factor, std::shared_ptr<const Monomial>(m));	
 }
 
@@ -70,6 +71,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff());
 		return new Term<Coefficient>(factor.coeff());
 	}
+	m.calcHash();
 	
 	if(factor.monomial())
 	{
