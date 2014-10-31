@@ -566,14 +566,3 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 
     expectRightOrder(list);
 }
-
-TYPED_TEST(MultivariatePolynomialTest, DifferentConstantTerm)
-{
-    
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-
-    EXPECT_TRUE(x + (TypeParam)1 > x);
-    EXPECT_TRUE(x + (TypeParam)1 < x);
-    EXPECT_TRUE(x + (TypeParam)1 == x);
-}

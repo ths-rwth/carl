@@ -16,7 +16,7 @@ TEST(VariablePool, singleton)
 	ASSERT_EQ(name, pool2.getName(x));
 }
 
-TEST(VariablePool, variablePool)
+TEST(VariablePool, variableName)
 {
 	VariablePool& vpool = VariablePool::getInstance();
 	Variable x = vpool.getFreshVariable( carl::VariableType::VT_INT );
