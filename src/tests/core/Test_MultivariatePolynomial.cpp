@@ -550,10 +550,26 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
+    list.push_back(Term<TypeParam>((TypeParam)0));
+    list.push_back(Term<TypeParam>((TypeParam)1));
+    list.push_back(Term<TypeParam>((TypeParam)5));
     list.push_back(x);
     list.push_back(y);
-    list.push_back((TypeParam)3 * x * x + (TypeParam)2 * x * y);
+    list.push_back((TypeParam)2 * x * x + y);
+    list.push_back((TypeParam)3 * x * x);
+    list.push_back((TypeParam)4 * x * y + (TypeParam)5 * x * x);
+    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
+    list.push_back((TypeParam)6 * x * x + y * y);
     list.push_back(x * x * y);
+    list.push_back((TypeParam)7 * x * x * y);
+    list.push_back((TypeParam)7 * x * x * y + (TypeParam)2);
 
     expectRightOrder(list);
+}
+
+TYPED_TEST(MultivariatePolynomialTest, DifferentConstantTerm)
+{
+    Variable x(0);
+
+    EXPECT_TRUE(x + (TypeParam)1 > x);
 }
