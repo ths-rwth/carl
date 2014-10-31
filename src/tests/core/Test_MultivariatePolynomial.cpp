@@ -223,10 +223,10 @@ TEST(MultivariatePolynomial, Normalize)
     mp2 += v1;
     EXPECT_EQ(mp2, mp.normalize());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
-    mp += (cln::cl_RA)4 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
-    mp2 += (cln::cl_RA)2 * v1;
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v1);
+    mp += (cln::cl_RA)4 * v0;
+    mp2 = MultivariatePolynomial<cln::cl_RA>(v1);
+    mp2 += (cln::cl_RA)2 * v0;
     EXPECT_EQ(mp2, mp.normalize());
 }
 
