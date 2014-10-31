@@ -46,6 +46,28 @@ TYPED_TEST(TermTest, Multiplication)
     
 }
 
+TYPED_TEST(TermTest, VariableMultiplication)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    EXPECT_EQ(Term<TypeParam>(3, x * y), (TypeParam)3 * x * y);
+    EXPECT_EQ(Term<TypeParam>(1, x * y), x * y);
+    EXPECT_EQ(Term<TypeParam>(-4, x * x * y), x * (TypeParam)-4 * x * y);
+}
+
+TYPED_TEST(TermTest, TermMultiplication)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    EXPECT_EQ(Term<TypeParam>(12, x * x * y), Term<TypeParam>(3, x * y) * Term<TypeParam>(4, x));
+    EXPECT_EQ(Term<TypeParam>(0, x * x * y * y * y), Term<TypeParam>(3, x * x) * Term<TypeParam>(0, y * y * y));
+    EXPECT_EQ(Term<TypeParam>(18, x * x * y * y * y), Term<TypeParam>(9, x * y) * Term<TypeParam>(2, x * y * y));
+}
+
 TYPED_TEST(TermTest, Derivative)
 {
     Variable v0(1);
