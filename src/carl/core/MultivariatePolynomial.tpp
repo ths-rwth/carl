@@ -1231,17 +1231,23 @@ bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
 template<typename C, typename O, typename P>
 bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return lhs < C(0);
-	return lhs < *(rhs.lterm());
+	if (lhs < *(rhs.lterm())) return true;
+	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	return false;
 }
 template<typename C, typename O, typename P>
 bool operator<(const Monomial& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return false;
-	return lhs < *(rhs.lterm());
+	if (lhs < *(rhs.lterm())) return true;
+	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	return false;
 }
 template<typename C, typename O, typename P>
 bool operator<(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return false;
-	return lhs < *(rhs.lterm());
+	if (lhs < *(rhs.lterm())) return true;
+	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	return false;
 }
 template<typename C, typename O, typename P>
 bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
@@ -1252,7 +1258,6 @@ bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
-	///@todo Check if this works with ordering.
 	this->checkConsistency();
 	rhs.checkConsistency();
     if(mTerms.size() == 0) 
