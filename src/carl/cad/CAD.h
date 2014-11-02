@@ -676,7 +676,7 @@ public:
 
 	bool isSampleTreeConsistent() const {
 		bool isOk = isSampleConsistent(this->sampleTree.begin());
-		if (!isOk) LOGMSG_ERROR("carl.cad", "SampleTree: " << this->sampleTree)
+		if (!isOk) LOGMSG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
 		assert(isOk);
 		return isOk;
 	}

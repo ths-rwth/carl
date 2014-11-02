@@ -46,19 +46,19 @@ public:
 		return geom(rand) + 1;
 	}
 	/// integers: [0, ..., mod-1]
-	unsigned uniDist(unsigned mod) const {
+	std::size_t uniDist(std::size_t mod) const {
 		return rand() % mod;
 	}
 	carl::Variable randomVariable() const {
 		return bi.variables[uniDist(bi.variables.size())];
 	}
-	carl::Monomial randomMonomial(unsigned degree) const {
+	carl::Monomial randomMonomial(std::size_t degree) const {
 		carl::Monomial m = randomVariable();
 		for (unsigned d = 1; d < degree; d++) m *= randomVariable();
 		return m;
 	}
 	template<typename C>
-	carl::Term<C> randomTerm(unsigned degree) const {
+	carl::Term<C> randomTerm(std::size_t degree) const {
 		return geomDist<C>() * randomMonomial(degree);
 	}
 	template<typename C>
@@ -66,13 +66,13 @@ public:
 		return newMP<C>(bi.degree);
 	}
 	template<typename C>
-	CMP<C> newMP(unsigned deg) const {
+	CMP<C> newMP(std::size_t deg) const {
 		carl::MultivariatePolynomial<C> res;
 		res += C(geomDist<C>());
 		for (std::size_t i = 1; i <= deg; i++) {
-			std::binomial_distribution<> bin((deg-i)*(deg-i), 0.5);
-			auto num = bin(rand) + 1;
-			for (unsigned j = 0; j < num; j++) {
+			std::binomial_distribution<> bin((int)((deg-i)*(deg-i)), 0.5);
+			std::size_t num = (std::size_t)bin(rand) + 1;
+			for (std::size_t j = 0; j < num; j++) {
 				res += randomTerm<C>(i);
 			}
 		}

@@ -79,7 +79,7 @@ namespace carl
 		void calcHash() {
 			std::hash<carl::Variable> h;
 			size_t result = 0;
-			for (auto& it: mExponents) {
+			for (const auto& it: mExponents) {
 				// perform a circular shift by 5 bits.
 				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
 				result ^= h( it.first );
@@ -108,9 +108,20 @@ namespace carl
 		 */
 		Monomial(const Monomial& rhs) :
 			mExponents(rhs.mExponents),
-			mTotalDegree(rhs.mTotalDegree)
+			mTotalDegree(rhs.mTotalDegree),
+			mHash(rhs.mHash)
 		{
-			calcHash();
+			assert(isConsistent());
+		}
+		/**
+		 * Move constructor.
+         * @param rhs Monomial to move.
+         */
+		Monomial(Monomial&& rhs) :
+			mExponents(rhs.mExponents),
+			mTotalDegree(rhs.mTotalDegree),
+			mHash(rhs.mHash)
+		{
 			assert(isConsistent());
 		}
 
@@ -126,6 +137,19 @@ namespace carl
 			calcHash();
 			assert(isConsistent());
 		}
+                
+                /**
+		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
+		 * @param exponents The variables and their exponents.
+		 * @param totalDegree The total degree of the monomial to generate.
+		 */
+		Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents, exponent totalDegree) :
+                        mExponents(exponents),
+                        mTotalDegree(totalDegree)
+                {
+                        calcHash();
+			assert(isConsistent());
+                }
 		
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
@@ -191,7 +215,7 @@ namespace carl
 		 * Returne the hash of this monomial
          * @return Hash.
          */
-		std::size_t hash() const {
+		inline std::size_t hash() const {
 			return mHash;
 		}
 		
@@ -451,6 +475,7 @@ namespace carl
 				{
 					// Insert remaining part
 					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
+					result->calcHash();
 					assert(result->isConsistent());
 					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 					return std::make_pair(result,true);;
@@ -498,6 +523,7 @@ namespace carl
 				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
 				return std::make_pair(nullptr,true);
 			}
+			result->calcHash();
 			assert(result->isConsistent());
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 			return std::make_pair(result,true);
@@ -687,12 +713,14 @@ namespace carl
 				if(it->first == v)
 				{
 					++(it->second);
+					calcHash();
 					return *this;
 				}
 				// Variable is not present, we have to insert v.
 				if(it->first > v)
 				{
 					mExponents.emplace(it,v,1);
+					calcHash();
 					return *this;
 				}
 			}
@@ -722,6 +750,7 @@ namespace carl
 				if(itright == rhs.mExponents.end())
 				{
 					LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
+					calcHash();
 					return *this;
 				}
 				// Variable is present in both monomials.
@@ -945,6 +974,7 @@ namespace carl
 		bool isConsistent() const {
 			LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree);
 			if (mTotalDegree < 1) return false;
+			if (mHash == 0) return false;
 			unsigned tdeg = 0;
 			unsigned lastVarIndex = 0;
 			for(auto ve : mExponents)
@@ -1138,6 +1168,7 @@ namespace std
 	{
 		size_t operator()(const shared_ptr<const carl::Monomial> monomial) const 
 		{
+			if (!monomial) return 0;
 			return monomial->hash();
 		}
 	};

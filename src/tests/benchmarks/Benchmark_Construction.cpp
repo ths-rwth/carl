@@ -206,7 +206,7 @@ protected:
 	}
 	virtual void TearDown() {
 	}
-	BenchmarkFile<unsigned> file;
+	BenchmarkFile<std::size_t> file;
 };
 /*
 TEST_F(BenchmarkTest, None)
@@ -238,6 +238,7 @@ TEST_F(BenchmarkTest, Multiplication)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
+	//bi.compareResults = true;
 	for (bi.degree = 5; bi.degree < 10; bi.degree++) {
 		Benchmark<AdditionGenerator<Coeff>, MultiplicationExecutor, CMP<Coeff>> bench(bi, "CArL");
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
@@ -296,9 +297,6 @@ TEST_F(BenchmarkTest, Resultant)
 
 TEST(Benchmark, BuildPDF)
 {
-	std::tuple<std::string, int, double, char> t("a",1,1.2,'b');
-	std::tuple<int, double, char> t2 = tuple_tail<std::string, int, double, char>()(t);
-	
 	std::ofstream out("benchmarks.tex");
 	out << "\\documentclass{article}" << std::endl;
 	out << "\\begin{document}" << std::endl;

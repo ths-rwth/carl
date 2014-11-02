@@ -50,9 +50,8 @@ struct equal_to<std::shared_ptr<T>> {
 	 * @return If lhs and rhs are equal.
 	 */
 	bool operator()(const std::shared_ptr<const T>& lhs, const std::shared_ptr<const T>& rhs) const {
-		if (lhs == nullptr && rhs == nullptr) return true;
-		if (lhs == nullptr || rhs == nullptr) return false;
 		if (lhs == rhs) return true;
+		if (lhs == nullptr || rhs == nullptr) return false;
 		return std::equal_to<T>()(*lhs, *rhs);
 	}
 };
