@@ -5,6 +5,7 @@ include_directories(
 
 # include core in library. 
 add_subdirectory(core)
+add_subdirectory(formula)
 add_subdirectory(util)
 add_subdirectory(converter)
 add_subdirectory(numbers)
@@ -22,6 +23,7 @@ set(carl_lib_sources
     ${carl_lib_cad_sources}
 	${carl_lib_converter_sources}
 	${carl_lib_core_sources}
+	${carl_lib_formula_sources}
 	${carl_lib_number_sources}
 	${carl_lib_util_sources}
 	${carl_lib_number_sources}

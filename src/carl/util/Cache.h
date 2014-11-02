@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <cassert>
 #include <mutex>
+#include "../formula/Common.h"
 
 
 namespace carl
@@ -39,25 +40,7 @@ namespace std
 }
 
 namespace carl
-{ 
-    template<typename T>
-    struct pointerEqual
-    {
-        bool operator()( const T* _argA, const T* _argB ) const
-        {
-            return (*_argA)==(*_argB);
-        }
-    };
-    
-    template<typename T> 
-    struct pointerHash
-    {
-        size_t operator()( const T* _arg ) const
-        {
-            return std::hash<T>()( *_arg );
-        }
-    };
-    
+{   
     template<typename T>
     bool returnFalse( const T&, const T& ) { return false; }
     
