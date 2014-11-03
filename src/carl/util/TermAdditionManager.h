@@ -28,7 +28,8 @@ class TermAdditionManager
             std::shared_ptr<const Monomial>,
             std::shared_ptr<const Term<typename Polynomial::CoeffType>>,
             std::hash<std::shared_ptr<const Monomial>>,
-            std::equal_to<std::shared_ptr<const Monomial>>> MapType;
+            //std::equal_to<std::shared_ptr<const Monomial>>> MapType;
+			hashEqual> MapType;
     
         /// Id of the next free map.
         size_t mNextMapId;
@@ -153,15 +154,12 @@ class TermAdditionManager
                 mcMap.erase( mConstantTerms[_id] );
                 mConstantTerms[_id] = mcMap.end();
             }
-			auto lTerm  = _terms.rend();
             for( auto iter = mcMap.begin(); iter != mcMap.end(); ++iter )
             {
                 _terms.push_back( iter->second );
-				if (lTerm == _terms.rend()) lTerm = _terms.rbegin();
-				else if (Term<typename Polynomial::CoeffType>::monomialLess(*lTerm, iter->second)) lTerm = _terms.rbegin();
             }
-			std::swap(*_terms.rbegin(), *lTerm);
-            mcMap.clear();
+			//printHashStats(mcMap);
+			mcMap.clear();
             mUsers[_id] = nullptr;
         }
         
@@ -174,6 +172,13 @@ class TermAdditionManager
             }
             readTerms( _poly, id, _poly.mTerms );
         }
+
+		void printHashStats(const MapType& m) const {
+			std::cout << m.size() << " in " << m.bucket_count() << " buckets" << std::endl;
+			for (std::size_t id = 0; id < m.bucket_count(); id++) {
+				std::cout << "\t" << id << " -> " << m.bucket_size(id) << std::endl;
+			}
+		}
         
      private:
          
