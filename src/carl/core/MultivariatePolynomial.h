@@ -65,8 +65,6 @@ protected:
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
-    /// A flag, which is true, if the terms of this multivariate polynomial are sorted.
-    bool mIsOrdered;
 	/// A vector of all terms.
 	mutable TermsType mTerms;
 	/// Flag that indicates if the terms are ordered.
@@ -81,7 +79,7 @@ public:
 	
 	/// @name Constructors
 	/// @{
-	MultivariatePolynomial() = default;
+	MultivariatePolynomial();
 	explicit MultivariatePolynomial(int c);
 	explicit MultivariatePolynomial(unsigned c);
 	explicit MultivariatePolynomial(const Coeff& c);
