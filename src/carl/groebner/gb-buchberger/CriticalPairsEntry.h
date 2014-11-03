@@ -35,6 +35,8 @@ namespace carl
 {
 
 /**
+ * A list of SPol pairs which have to be checked by the Buchberger algorithm. 
+ * We keep the list sorted according the compare ordering on SPol Pairs.
  * @ingroup gb
  */
 template<class Compare>
@@ -42,23 +44,35 @@ class CriticalPairsEntry
 {
 public:
 
+	/**
+	 * Saves the list of pairs and sorts them according the configured ordering.
+     * @param pairs
+     */
     CriticalPairsEntry( const std::list<SPolPair>& pairs ) : mPairs( pairs )
     {
         mPairs.sort( SPolPairCompare<Compare > ( ) );
     }
 
+	/**
+	 * Get the LCM of the first element.
+     * @return 
+     */
     const Monomial& getSortedFirstLCM( ) const
     {
         return mPairs.front( ).mLcm;
     }
 
+	/**
+	 * Get the front of the list.
+     * @return 
+     */
     const SPolPair getFirst( ) const
     {
         return mPairs.front( );
     }
 
     /**
-     * removes the first element.
+     * Removes the first element.
      * @return empty()
      */
     bool update( )
@@ -67,26 +81,47 @@ public:
         return mPairs.empty( );
     }
 
+	/**
+	 * The const iterator to the begin
+     * @return begin of list
+     */
     std::list<SPolPair>::const_iterator getPairsBegin( ) const
     {
         return mPairs.begin( );
     }
 
+	/**
+	 * The const iterator to the end()
+     * @return end of list
+     */
     std::list<SPolPair>::const_iterator getPairsEnd( ) const
     {
         return mPairs.end( );
     }
 
-    std::list<SPolPair>::iterator getPairsBegin( )
+    /**
+	 * The iterator to the end()
+     * @return begin of list
+     */
+	std::list<SPolPair>::iterator getPairsBegin( )
     {
         return mPairs.begin( );
     }
 
+	/**
+	 * The iterator to the end()
+     * @return end of list
+     */
     std::list<SPolPair>::iterator getPairsEnd( )
     {
         return mPairs.end( );
     }
 
+	/**
+	 * Removes the element at the iterator.
+     * @param it The iterator to the element to be erased.
+     * @return The next element.
+     */
     std::list<SPolPair>::iterator erase( std::list<SPolPair>::iterator it )
     {
         return mPairs.erase( it );

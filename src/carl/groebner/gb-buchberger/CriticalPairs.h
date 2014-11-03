@@ -62,6 +62,10 @@ public:
     static const bool fastIndex = true;
 };
 
+
+/**
+ * A data structure to store all the SPolynomial pairs which have to be checked.
+ */
 template<template <class> class Datastructure, class Configuration>
 class CriticalPairs
 {
@@ -82,19 +86,41 @@ public:
         mDatastruct.push( new CriticalPairsEntry<typename Configuration::Order > ( pairs ) );
     }
 
+	/**
+	 * Gets the first SPol from the data structure and removes it from the data structure. 
+     * @return 
+     */
     SPolPair pop( );
+	
+	/**
+	 * Eliminate multiples of the given monomial.
+     * @param lm
+     * @param newpairs
+     */
     void elimMultiples( const Monomial& lm, const std::unordered_map<size_t, SPolPair>& newpairs );
     
+	/**
+	 * Checks whether there are any pairs in the data structure.
+     * @return 
+     */
     bool empty( ) const
     {
         return mDatastruct.empty( );
     }
 
+	/**
+	 * Print the underlying data structure.
+     */
     void print( ) const
     {
         mDatastruct.print( );
     }
 
+	/**
+	 * Checks the size of the data structure.
+	 * Please notice that this is not necessarily the number of pairs in the data structure, as the underlying elements may be lists themselves.
+     * @return 
+     */
     unsigned size( ) const
     {
         return mDatastruct.size( );
