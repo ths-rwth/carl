@@ -1040,6 +1040,7 @@ namespace carl
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 	 */
 	inline bool operator==(const Monomial& lhs, const Monomial& rhs) {
+		if (lhs.hash() != rhs.hash()) return false;
 		if (lhs.tdeg() != rhs.tdeg()) return false;
 		return lhs.exponents() == rhs.exponents();
 	}
