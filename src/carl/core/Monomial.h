@@ -79,7 +79,7 @@ namespace carl
 		/**
 		 * Default constructor.
 		 */
-		Monomial() = default;
+		Monomial() = delete;
 
 		/**
 		 * Calculates the hash and stores it to mHash.
@@ -112,28 +112,7 @@ namespace carl
 			assert(isConsistent());
 		}
 
-		/**
-		 * Copy constructor.
-		 * @param rhs Monomial to copy.
-		 */
-		Monomial(const Monomial& rhs) :
-			mExponents(rhs.mExponents),
-			mTotalDegree(rhs.mTotalDegree),
-			mHash(rhs.mHash)
-		{
-			assert(isConsistent());
-		}
-		/**
-		 * Move constructor.
-         * @param rhs Monomial to move.
-         */
-		Monomial(Monomial&& rhs) :
-			mExponents(rhs.mExponents),
-			mTotalDegree(rhs.mTotalDegree),
-			mHash(rhs.mHash)
-		{
-			assert(isConsistent());
-		}
+		Monomial(const Monomial& rhs) = delete;
 
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
@@ -154,12 +133,12 @@ namespace carl
 		 * @param totalDegree The total degree of the monomial to generate.
 		 */
 		Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents, exponent totalDegree) :
-                        mExponents(exponents),
-                        mTotalDegree(totalDegree)
-                {
-                        calcHash();
+            mExponents(exponents),
+            mTotalDegree(totalDegree)
+        {
+            calcHash();
 			assert(isConsistent());
-                }
+        }
 		
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
@@ -177,11 +156,13 @@ namespace carl
 			calcHash();
 			assert(isConsistent());
 		}
+        
+        #ifndef USE_MONOMIAL_POOL
 		/**
 		 * Assignment operator.
- * @param rhs Other monomial.
- * @return this.
- */
+         * @param rhs Other monomial.
+         * @return this.
+         */
 		Monomial& operator=(const Monomial& rhs)
 		{
 			// Check for self-assignment.
@@ -191,6 +172,8 @@ namespace carl
 			mHash = rhs.mHash;
 			return *this;
 		}
+        #endif
+        
 #ifdef USE_MONOMIAL_POOL
 	public:
 #endif
@@ -366,7 +349,7 @@ namespace carl
 		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
 		 * @return nullptr if result is 1, otherwise m/v^e.
 		 */
-		Monomial* dropVariable(Variable::Arg v) const;
+		std::shared_ptr<const Monomial> dropVariable(Variable::Arg v) const;
 
 		/**
 		 * Divides the monomial by a variable v.
@@ -374,7 +357,7 @@ namespace carl
 		 * @param v Variable
 		 * @return This divided by v.
 		 */
-		Monomial* divide(Variable::Arg v) const;
+		std::shared_ptr<const Monomial> divide(Variable::Arg v) const;
 
 		
 		/**
@@ -382,17 +365,18 @@ namespace carl
 		 * @param m Monomial.
 		 * @return If this is divisible by m.
 		 */
-		bool divisible(const Monomial& m) const
+		bool divisible(std::shared_ptr<const Monomial> m) const
 		{
+            if(!m) return true;
 			assert(isConsistent());
-			if(m.mTotalDegree > mTotalDegree) return false;
-			if(m.nrVariables() > nrVariables()) return false;
+			if(m->mTotalDegree > mTotalDegree) return false;
+			if(m->nrVariables() > nrVariables()) return false;
 			// Linear, as we expect small monomials.
-			auto itright = m.mExponents.begin();
+			auto itright = m->mExponents.begin();
 			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
 			{
 				// Done with division
-				if(itright == m.mExponents.end())
+				if(itright == m->mExponents.end())
 				{
 					return true;
 				}
@@ -417,7 +401,7 @@ namespace carl
 				}
 			}
 			// If there remain variables in the m, it fails.
-			if(itright != m.mExponents.end()) 
+			if(itright != m->mExponents.end()) 
 			{
 				return false;
 			}
@@ -434,134 +418,14 @@ namespace carl
 		 * @param m Monomial.
 		 * @return this divided by m.
 		 */
-		std::pair<Monomial*,bool> divide(const Monomial& m) const
-		{
-			LOG_FUNC("carl.core.monomial", *this << ", " << m);
-			if(m.mTotalDegree > mTotalDegree || m.mExponents.size() > mExponents.size())
-			{
-				// Division will fail.
-				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return std::make_pair(nullptr,false);
-			}
-			Monomial* result = new Monomial();
-			result->mTotalDegree =  mTotalDegree - m.mTotalDegree;
-
-			// Linear, as we expect small monomials.
-			auto itright = m.mExponents.begin();
-			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
-			{
-				// Done with division
-				if(itright == m.mExponents.end())
-				{
-					// Insert remaining part
-					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
-					result->calcHash();
-					assert(result->isConsistent());
-					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-					return std::make_pair(result,true);;
-				}
-				// Variable is present in both monomials.
-				if(itleft->first == itright->first)
-				{
-					if (itleft->second < itright->second)
-					{
-						// Underflow, itright->exp was larger than itleft->exp.
-						delete result;
-						LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-						return std::make_pair(nullptr,false);
-					}
-					exponent newExp = itleft->second - itright->second;
-					if(newExp > 0)
-					{
-						result->mExponents.push_back(std::make_pair(itleft->first, newExp));
-					}
-					itright++;
-				}
-				// Variable is not present in lhs, division fails.
-				else if(itleft->first > itright->first) 
-				{
-					delete result;
-					LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-					return std::make_pair(nullptr,false);
-				}
-				else
-				{
-					assert(itright->first > itleft->first);
-					result->mExponents.push_back(*itleft);
-				}
-			}
-			// If there remain variables in the m, it fails.
-			if(itright != m.mExponents.end())
-			{
-				delete result;
-				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return std::make_pair(nullptr,false);
-			}
-			if (result->mExponents.empty())
-			{
-				delete result;
-				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return std::make_pair(nullptr,true);
-			}
-			result->calcHash();
-			assert(result->isConsistent());
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-			return std::make_pair(result,true);
-			
-		}
+		std::pair<std::shared_ptr<const Monomial>,bool> divide(std::shared_ptr<const Monomial> m) const;
 		
 		/**
 		 * 
 		 * @param m
 		 * @return 
 		 */
-		Monomial* calcLcmAndDivideBy(const Monomial& m) const
-		{
-			Monomial* result = new Monomial();
-			result->mTotalDegree = mTotalDegree;
-			// Linear, as we expect small monomials.
-			auto itright = m.mExponents.begin();
-			for(auto itleft = mExponents.begin(); itleft != mExponents.end();)
-			{
-				// Done with division
-				if(itright == m.mExponents.end())
-				{
-					// Insert remaining part
-					result->mExponents.insert(result->mExponents.end(), itleft, mExponents.end());
-					return result;
-				}
-				// Variable is present in both monomials.
-				if(itleft->first == itright->first)
-				{
-					exponent newExp = std::max(itleft->second, itright->second) - itright->second;
-					if(newExp != 0)
-					{
-						result->mExponents.push_back(std::make_pair(itleft->first, newExp));
-						result->mTotalDegree -= itright->second;
-					}
-					else
-					{
-						result->mTotalDegree -= itleft->second;
-					}
-					++itright;
-					++itleft;
-				}
-				// Variable is not present in lhs, dividing lcm yields variable will not occur in result
-				
-				else if(itleft->first > itright->first) 
-				{
-					++itright;
-				}
-				else
-				{
-					assert(itright->first > itleft->first);
-					result->mExponents.push_back(*itleft);
-					++itleft;
-				}
-			}
-			assert(result->isConsistent());
-			return result;
-		}
+		std::shared_ptr<const Monomial> calcLcmAndDivideBy(std::shared_ptr<const Monomial> m) const;
 		
 		template<typename Coeff, bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
@@ -577,33 +441,14 @@ namespace carl
 		 * For a monomial \f$ \\prod_i x_i^e_i with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
 		 * @return Separable part.
 		 */
-		Monomial* separablePart() const
-		{
-			Monomial* m = new Monomial(*this);
-			m->mTotalDegree = (exponent)mExponents.size();
-			for (auto& it: m->mExponents) it.second = 1;
-			return m;
-		}
+		std::shared_ptr<const Monomial> separablePart() const;
 
 		/**
 		 * Calculates the given power of this monomial.
 		 * @param exp Exponent.
 		 * @return this to the power of exp.
 		 */
-		Monomial* pow(unsigned exp) const {
-			if (exp == 0) {
-				return nullptr;
-			}
-			Monomial* res = new Monomial(*this);
-			exponent expsum = 0;
-			for (auto& it: res->mExponents) {
-				it.second = (exponent)(it.second * exp);
-				expsum += it.second;
-			}
-			res->mTotalDegree = expsum;
-			assert(res->isConsistent());
-			return res;
-		}
+		std::shared_ptr<const Monomial> pow(unsigned exp) const;
 		
 		/**
 		 * Fill the set of variables with the variables from this monomial.
@@ -646,119 +491,48 @@ namespace carl
 		// Orderings
 		///////////////////////////
 
-		static CompareResult compareLexical(const Monomial& lhs, const Monomial& rhs)
+		static CompareResult compareLexical(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
 		{
-			return lexicalCompare(lhs,rhs);
+            if( !lhs && !rhs )
+                return CompareResult::EQUAL;
+            if( !lhs )
+                return CompareResult::LESS;
+            if( !rhs )
+                return CompareResult::GREATER;
+            return lexicalCompare(*lhs, *rhs);
 		}
 		
-		/*static CompareResult compareLexical(const Monomial& lhs, Variable::Arg rhs)
+		static CompareResult compareLexical(std::shared_ptr<const Monomial> lhs, Variable::Arg rhs)
 		{
-			if(lhs.mExponents.front().first < rhs) return CompareResult::LESS;
-			if(lhs.mExponents.front().first > rhs) return CompareResult::GREATER;
-			if(lhs.mExponents.front().second > 1) return CompareResult::GREATER;
-			else return CompareResult::LESS;
-		}*/
+			if(!lhs) return CompareResult::LESS;
+			if(lhs->mExponents.front().first < rhs) return CompareResult::GREATER;
+			if(lhs->mExponents.front().first > rhs) return CompareResult::LESS;
+			if(lhs->mExponents.front().second > 1) return CompareResult::GREATER;
+			return CompareResult::EQUAL;
+		}
 
 
-		static CompareResult compareGradedLexical(const Monomial& lhs, const Monomial& rhs)
+		static CompareResult compareGradedLexical(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
 		{
-			
-			if(lhs.mTotalDegree < rhs.mTotalDegree) return CompareResult::LESS;
-			if(lhs.mTotalDegree > rhs.mTotalDegree) return CompareResult::GREATER;
-			return lexicalCompare(lhs, rhs);
+            if( !lhs && !rhs )
+                return CompareResult::EQUAL;
+            if( !lhs )
+                return CompareResult::LESS;
+            if( !rhs )
+                return CompareResult::GREATER;
+			if(lhs->mTotalDegree < rhs->mTotalDegree) return CompareResult::LESS;
+			if(lhs->mTotalDegree > rhs->mTotalDegree) return CompareResult::GREATER;
+			return lexicalCompare(*lhs, *rhs);
 		}
 		
-		/*static CompareResult compareGradedLexical(const Monomial& lhs, Variable::Arg rhs)
+		static CompareResult compareGradedLexical(std::shared_ptr<const Monomial> lhs, Variable::Arg rhs)
 		{
-			if(lhs.mTotalDegree < 1) return CompareResult::LESS;
-			if(lhs.mTotalDegree > 1) return CompareResult::GREATER;
-			if(lhs.mExponents.front().first < rhs) return CompareResult::GREATER;
-			if(lhs.mExponents.front().first > rhs) return CompareResult::LESS;
-			else return CompareResult::EQUAL;
-			
-		}*/
-
-		/**
-		 * Multiplies this monomial with a variable.
-		 * @param v Variable.
-		 * @return This multiplied with v.
-		 */
-		Monomial& operator*=(Variable::Arg v)
-		{
-			++mTotalDegree;
-			// Linear, as we expect small monomials.
-			for(auto it = mExponents.begin(); it != mExponents.end(); ++it)
-			{
-				// Variable is present
-				if(it->first == v)
-				{
-					++(it->second);
-					calcHash();
-					return *this;
-				}
-				// Variable is not present, we have to insert v.
-				if(it->first > v)
-				{
-					mExponents.emplace(it,v,1);
-					calcHash();
-					return *this;
-				}
-			}
-			// Variable was not inserted, insert at end.
-			mExponents.emplace_back(v,1);
-			calcHash();
-			return *this;
-		}
-
-		/**
-		 * Multiplies this monomial with another monomial.
-		 * @param rhs Monomial.
-		 * @return This multiplied with rhs.
-		 */
-		Monomial& operator*=(const Monomial& rhs)
-		{
-			LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
-			if(rhs.mTotalDegree == 0) return *this;
-			mTotalDegree += rhs.mTotalDegree;
-
-			// Linear, as we expect small monomials.
-			auto itright = rhs.mExponents.begin();
-			assert(itright != rhs.mExponents.end());
-			for(auto itleft = mExponents.begin(); itleft != mExponents.end(); ++itleft)
-			{
-				// Everything is inserted.
-				if(itright == rhs.mExponents.end())
-				{
-					LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
-					calcHash();
-					return *this;
-				}
-				// Variable is present in both monomials.
-				if(itleft->first == itright->first)
-				{
-					itleft->second += itright->second;
-					++itright;
-				}
-				// Variable is not present in lhs, we have to insert var-exp pair from rhs.
-				else if(itleft->first > itright->first) 
-				{
-					assert(itright != rhs.mExponents.end());
-					itleft = mExponents.insert(itleft,*itright);
-					++itright;
-				
-				}		
-				else 
-				{
-					assert(itleft->first < itright->first);
-				}
-
-			}
-			// Insert remainder of rhs.
-			mExponents.insert(mExponents.end(), itright, rhs.mExponents.end());
-			assert(isConsistent());
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << *this);
-			calcHash();
-			return *this;
+			if(!lhs) return CompareResult::LESS;
+			if(lhs->mTotalDegree > 1) return CompareResult::GREATER;
+			if(lhs->mExponents.front().first < rhs) return CompareResult::GREATER;
+			if(lhs->mExponents.front().first > rhs) return CompareResult::LESS;
+			if(lhs->mExponents.front().second > 1) return CompareResult::GREATER;
+			return CompareResult::EQUAL;
 		}
 
 		/**
@@ -767,32 +541,7 @@ namespace carl
 		 * @param friendlyVarNames Flag if friendly variable names should be used.
 		 * @return String representation.
 		 */
-		std::string toString(bool infix = true, bool friendlyVarNames = true) const
-		{
-			if(mExponents.empty()) return "1";
-			std::stringstream ss;
-			if (infix) {
-				for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
-					if (vp != mExponents.begin()) ss << "*";
-					ss << vp->first;
-					if (vp->second > 1) ss << "^" << vp->second;
-				}
-			} else {
-				if (mExponents.size() > 1) ss << "(* ";
-				for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
-					if (vp != mExponents.begin()) ss << " ";
-					if (vp->second == 1) ss << vp->first;
-					else {
-						std::string varName = VariablePool::getInstance().getName(vp->first, friendlyVarNames);
-						ss << "(*";
-						for (unsigned i = 0; i < vp->second; i++) ss << " " << varName;
-						ss << ")";
-					}
-				}
-				if (mExponents.size() > 1) ss << ")";
-			}
-			return ss.str();
-		}
+		std::string toString(bool infix = true, bool friendlyVarNames = true) const;
 
 		/**
 		 * Streaming operator for Monomial.
@@ -800,9 +549,9 @@ namespace carl
 		 * @param rhs Monomial.
 		 * @return `os`
 		 */
-		friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
+		friend std::ostream& operator<<( std::ostream& os, std::shared_ptr<const Monomial> rhs )
 		{
-			return (os << rhs.toString(true, true));
+			return (os << (rhs ? rhs->toString(true, true) : "1"));
 		}
 		
 		
@@ -815,59 +564,7 @@ namespace carl
 		 * @param rhs Second monomial.
 		 * @return gcd of lhs and rhs.
 		 */
-		static Monomial gcd(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
-		{
-			if(!lhs && !rhs) return Monomial();
-			if(!lhs) return *rhs;
-			if(!rhs) return *lhs;
-			return gcd(*lhs, *rhs);
-		}
-		
-		/**
-		 * Calculates the greatest common divisor of two monomials.
-		 * @param lhs First monomial.
-		 * @param rhs Second monomial.
-		 * @return lcm of lhs and rhs.
-		 */
-		static Monomial gcd(const Monomial& rhs, const Monomial& lhs)
-		{
-			LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
-			assert(lhs.isConsistent());
-			assert(rhs.isConsistent());
-			
-			Monomial result;
-			// Linear, as we expect small monomials.
-			auto itright = rhs.mExponents.cbegin();
-			auto leftEnd = lhs.mExponents.cend();
-			auto rightEnd = rhs.mExponents.cend();
-			for(auto itleft = lhs.mExponents.cbegin(); (itleft != leftEnd && itright != rightEnd);)
-			{
-				// Variable is present in both monomials.
-				if(itleft->first == itright->first)
-				{
-					exponent newExp = std::min(itleft->second, itright->second);
-					result.mExponents.push_back(std::make_pair(itleft->first, newExp));
-					result.mTotalDegree += newExp;
-					++itright;
-					++itleft;
-				}
-				
-				else if(itleft->first > itright->first) 
-				{
-					++itright;
-				}
-				else
-				{
-					assert(itright->first > itleft->first);
-					++itleft;
-				}
-			}
-			 // Insert remaining part
-			assert(result.isConsistent());
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-			return result;
-			
-		}
+		static std::shared_ptr<const carl::Monomial> gcd(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs);
 		
 		/**
 		 * Calculates the least common multiple of two monomial pointers.
@@ -878,95 +575,7 @@ namespace carl
 		 * @param rhs Second monomial.
 		 * @return lcm of lhs and rhs.
 		 */
-		static Monomial lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
-		{
-			if (!lhs && !rhs) return Monomial();
-			if (!lhs) return *rhs;
-			if (!rhs) return *lhs;
-			return lcm(*lhs, *rhs);
-				
-		}
-
-		/**
-		 * Calculates the least common multiple of two monomials.
-		 * @param lhs First monomial.
-		 * @param rhs Second monomial.
-		 * @return lcm of lhs and rhs.
-		 */
-		static Monomial lcm(const Monomial& lhs, const Monomial& rhs)
-		{
-			LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
-			assert(lhs.isConsistent());
-			assert(rhs.isConsistent());
-			Monomial result;
-			result.mTotalDegree = lhs.tdeg() + rhs.tdeg();
-			// Linear, as we expect small monomials.
-			auto itright = rhs.mExponents.cbegin();
-			auto leftEnd = lhs.mExponents.cend();
-			auto rightEnd = rhs.mExponents.cend();
-			for(auto itleft = lhs.mExponents.cbegin(); itleft != leftEnd;)
-			{
-				// Done on right
-				if(itright == rightEnd)
-				{
-					// Insert remaining part
-					result.mExponents.insert(result.mExponents.end(), itleft, lhs.mExponents.end());
-					LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-					return result;
-				}
-				// Variable is present in both monomials.
-				if(itleft->first == itright->first)
-				{
-					exponent newExp = std::max(itleft->second, itright->second);
-					result.mExponents.push_back(std::make_pair(itleft->first, newExp));
-					result.mTotalDegree -= std::min(itleft->second, itright->second);
-					++itright;
-					++itleft;
-				}
-				// Variable is not present in lhs, dividing lcm yields variable will not occur in result
-				
-				else if(itleft->first > itright->first) 
-				{
-					result.mExponents.push_back(*itright);
-					++itright;
-				}
-				else
-				{
-					assert(itright->first > itleft->first);
-					result.mExponents.push_back(*itleft);
-					++itleft;
-				}
-			}
-			 // Insert remaining part
-			result.mExponents.insert(result.mExponents.end(), itright, rhs.mExponents.end());
-			assert(result.isConsistent());
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-			return result;
-			
-		}
-
-	private:
-		
-		/**
-		 * Checks if the monomial is consistent.
-		 * @return If this is consistent.
-		 */
-		bool isConsistent() const {
-			LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree);
-			if (mTotalDegree < 1) return false;
-			if (mHash == 0) return false;
-			unsigned tdeg = 0;
-			unsigned lastVarIndex = 0;
-			for(auto ve : mExponents)
-			{
-				if (ve.second <= 0) return false;
-				if (ve.first.getId() < lastVarIndex) return false;
-				tdeg += ve.second;
-				lastVarIndex = ve.first.getId();
-			}
-			if (tdeg != mTotalDegree) return false;
-			return true;
-		}
+		static std::shared_ptr<const carl::Monomial> lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs);
 		
 		/**
 		 * This method performs a lexical comparison as defined in @cite GCL92, page 47.
@@ -976,40 +585,16 @@ namespace carl
 		 * @return Comparison result.
 		 * @see @cite GCL92, page 47.
 		 */
-		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs)
-		{
-			if (&lhs == &rhs) {
-				return CompareResult::EQUAL;
-			}
-			auto lhsit = lhs.mExponents.rbegin( );
-			auto rhsit = rhs.mExponents.rbegin( );
-			auto lhsend = lhs.mExponents.rend( );
-			auto rhsend = rhs.mExponents.rend( );
-			while( lhsit != lhsend )
-			{
-				if( rhsit == rhsend )
-					return CompareResult::GREATER;
-				//which variable occurs first
-				if( lhsit->first == rhsit->first )
-				{
-					//equal variables
-					if( lhsit->second < rhsit->second )
-						return CompareResult::LESS;
-					if( lhsit->second > rhsit->second )
-						return CompareResult::GREATER;
-				}
-				else
-				{
-					return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
-				}
-				++lhsit;
-				++rhsit;
-			}
-			if( rhsit == rhsend )
-				return CompareResult::EQUAL;
-			return CompareResult::LESS;
-		}
-	};	
+		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs);
+
+	private:
+		
+		/**
+		 * Checks if the monomial is consistent.
+		 * @return If this is consistent.
+		 */
+		bool isConsistent() const;
+	};
 	
 	/// @name Comparison operators
 	/// @{
@@ -1020,67 +605,91 @@ namespace carl
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 	 */
 	inline bool operator==(const Monomial& lhs, const Monomial& rhs) {
-		if (lhs.tdeg() != rhs.tdeg()) return false;
+        #ifdef USE_MONOMIAL_POOL
+        return lhs.mOrder == rhs.mOrder;
+        #else
+        if (lhs.tdeg() != rhs.tdeg()) return false;
 		return lhs.exponents() == rhs.exponents();
+        #endif
 	}
+    
 	inline bool operator==(const Monomial& lhs, Variable::Arg rhs) {
 		if (lhs.tdeg() != 1) return false;
 		if (lhs.begin()->first == rhs) return true;
 		return false;
 	}
+    
 	inline bool operator==(Variable::Arg lhs, const Monomial& rhs) {
 		return rhs == lhs;
 	}
+    
 	inline bool operator!=(const Monomial& lhs, const Monomial& rhs) {
 		return !(lhs == rhs);
 	}
+    
 	inline bool operator!=(const Monomial& lhs, Variable::Arg rhs) {
 		return !(lhs == rhs);
 	}
+    
 	inline bool operator!=(Variable::Arg lhs, const Monomial& rhs) {
 		return !(rhs == lhs);
 	}
+    
 	inline bool operator<(const Monomial& lhs, const Monomial& rhs) {
-		CompareResult cr = Monomial::compareGradedLexical(lhs, rhs);
+        if(lhs.tdeg() < rhs.tdeg()) return true;
+        if(lhs.tdeg() > rhs.tdeg()) return false;
+		CompareResult cr = Monomial::lexicalCompare(lhs, rhs);
 		return cr == CompareResult::LESS;
 	}
+    
 	inline bool operator<(const Monomial& lhs, Variable::Arg rhs) {
 		if (lhs.tdeg() == 0) return true;
 		if (lhs.tdeg() > 1) return false;
 		return lhs.begin()->first < rhs;
 	}
+    
 	inline bool operator<(Variable::Arg lhs, const Monomial& rhs) {
 		if (rhs.tdeg() == 0) return false;
 		if (rhs.tdeg() > 1) return true;
 		return lhs < rhs.begin()->first;
 	}
+    
 	inline bool operator<=(const Monomial& lhs, const Monomial& rhs) {
 		return !(rhs < lhs);
 	}
+    
 	inline bool operator<=(const Monomial& lhs, Variable::Arg rhs) {
 		return !(rhs < lhs);
 	}
+    
 	inline bool operator<=(Variable::Arg lhs, const Monomial& rhs) {
 		return !(rhs < lhs);
 	}
+    
 	inline bool operator>(const Monomial& lhs, const Monomial& rhs) {
 		return rhs < lhs;
 	}
+    
 	inline bool operator>(const Monomial& lhs, Variable::Arg rhs) {
 		return rhs < lhs;
 	}
+    
 	inline bool operator>(Variable::Arg lhs, const Monomial& rhs) {
 		return rhs < lhs;
 	}
+    
 	inline bool operator>=(const Monomial& lhs, const Monomial& rhs) {
 		return rhs <= lhs;
 	}
+    
 	inline bool operator>=(const Monomial& lhs, Variable::Arg rhs) {
 		return rhs <= lhs;
 	}
+    
 	inline bool operator>=(Variable::Arg lhs, const Monomial& rhs) {
 		return rhs <= lhs;
 	}
+    
 	/// @}
 
 	/// @name Multiplication operators
@@ -1091,24 +700,13 @@ namespace carl
 	 * @param rhs Right hand side.
 	 * @return `lhs * rhs`
 	 */
-	inline Monomial operator*(const Monomial& lhs, const Monomial& rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
-	inline Monomial operator*(const Monomial& lhs, Variable::Arg rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
-	inline Monomial operator*(Variable::Arg lhs, const Monomial& rhs) {
-		return rhs * lhs;
-	}
-	inline Monomial operator*(Variable::Arg lhs, Variable::Arg rhs) {
-		Monomial result(lhs);
-		result *= rhs;
-		return result;
-	}
+	std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs);
+    
+	std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const Monomial> lhs, Variable::Arg rhs);
+    
+	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, std::shared_ptr<const Monomial> rhs);
+    
+	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}
 
 	struct hashLess {

@@ -16,72 +16,78 @@ template<typename Coefficient>
 Term<Coefficient>* Monomial::substitute(const std::map<Variable,Coefficient>& substitutions, Coefficient factor) const
 {
 	LOG_FUNC("carl.core.monomial", *this << ", " << substitutions << ", " << factor);
-	Monomial* m = new Monomial();
-	m->mTotalDegree = mTotalDegree;
+    std::vector<std::pair<Variable, exponent>> newExps;
+    exponent tdegree = mTotalDegree;
 	for (auto ve : mExponents) 
 	{
 		auto it = substitutions.find(ve.first);
 		if(it == substitutions.end())
 		{
-			m->mExponents.push_back(ve);
+			newExps.push_back(ve);
 		}
 		else
 		{
 			factor *= carl::pow(it->second, ve.second);
-			m->mTotalDegree -= ve.second;
+			tdegree -= ve.second;
 		}
 	}
-	if(m->mTotalDegree == 0)
+	if(tdegree == 0)
 	{
-		assert(m->mExponents.size() == 0);
-		delete m;
+		assert(newExps.size() == 0);
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << factor);
 		return new Term<Coefficient>(factor);
 	}
-	LOGMSG_TRACE("carl.core.monomial", "Result: " << factor << "*" << *m);
-	m->calcHash();
-	return new Term<Coefficient>(factor, std::shared_ptr<const Monomial>(m));	
+    #ifdef USE_MONOMIAL_POOL
+    std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), tdegree );
+    #else
+    std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tdegree ) );
+    #endif
+	LOGMSG_TRACE("carl.core.monomial", "Result: " << factor << "*" << result);
+	return new Term<Coefficient>(factor, result);	
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient>>& substitutions, const Coefficient&  coeff) const
 {
 	LOG_FUNC("carl.core.monomial", *this << ", " << substitutions << ", " << coeff);
-	Monomial m;
-	m.mTotalDegree = mTotalDegree;
+    std::vector<std::pair<Variable, exponent>> newExps;
+    exponent tdegree = mTotalDegree;
 	Term<Coefficient> factor(coeff);
 	for(auto ve : mExponents) 
 	{
 		auto it = substitutions.find(ve.first);
 		if(it == substitutions.end())
 		{
-			m.mExponents.push_back(ve);
+			newExps.push_back(ve);
 		}
 		else
 		{
 			Term<Coefficient>* power = it->second.pow(ve.second);
 			factor *= *power;
 			delete power;
-			m.mTotalDegree -= ve.second;
+			tdegree -= ve.second;
 		}
 	}
-	if(m.mTotalDegree == 0)
+	if(tdegree == 0)
 	{
-		assert(m.mExponents.size() == 0);
+		assert(newExps.size() == 0);
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff());
 		return new Term<Coefficient>(factor.coeff());
 	}
-	m.calcHash();
-	
+	#ifdef USE_MONOMIAL_POOL
+    std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), tdegree );
+    #else
+    std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tdegree ) );
+    #endif
 	if(factor.monomial())
 	{
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff() << "*" << m* *factor.monomial());
-		return new Term<Coefficient>(factor.coeff(),m * *factor.monomial());	
+		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff() << "*" << (result * factor.monomial()));
+		return new Term<Coefficient>(factor.coeff(), (result * factor.monomial()));	
 	}
 	else
 	{
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff() << "*" << m);
-		return new Term<Coefficient>(factor.coeff(),m);	
+		LOGMSG_TRACE("carl.core.monomial", "Result: " << coeff*factor.coeff() << "*" << result);
+		return new Term<Coefficient>(factor.coeff(), result);	
 	}
 }
 
