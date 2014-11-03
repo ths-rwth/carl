@@ -52,30 +52,13 @@ class TermAdditionManager
             
         /**
          * Constructs a term addition manager.
-         * @param _numberOfMaps The number of equal-term-detection-maps this manager manages.
          */
-        TermAdditionManager( size_t _numberOfMaps = 1 ):
+        TermAdditionManager():
             mNextMapId( 0 ),
-            mUsers( _numberOfMaps, nullptr ),
-            mTermMaps( _numberOfMaps, MapType() ),
-            mConstantTerms()
+            mUsers( 1, nullptr ),
+            mTermMaps( 1, MapType() ),
+            mConstantTerms(1, mTermMaps.back().end())
         {
-            for( size_t i = 0; i < _numberOfMaps; ++i )
-            {
-                mConstantTerms.push_back( mTermMaps[i].end() );
-            }
-        }
-            
-        /**
-         * Set the number of equal-term-detection-maps this manager manages to the given value.
-         * @param _newSize The value to set the number of equal-term-detection-maps this manager manages to.
-         */
-        void resize( size_t _newSize )
-        {
-            assert( !inUse() );
-            mUsers( _newSize, nullptr );
-            mTermMaps( _newSize, MapType() );
-            mConstantTerms( _newSize, mTermMaps.end() );
         }
         
         /**
@@ -87,6 +70,14 @@ class TermAdditionManager
         size_t getTermMapId( const Polynomial& _user, size_t _expectedSize )
         {
             std::lock_guard<std::mutex> lock(mMutex);
+			while (mUsers.at( mNextMapId ) != nullptr) {
+				mNextMapId++;
+				if (mNextMapId == mTermMaps.size()) {
+					mUsers.push_back(nullptr);
+					mTermMaps.emplace_back();
+					mConstantTerms.push_back(mTermMaps.back().end());
+				}
+			}
             assert( mUsers.at( mNextMapId ) == nullptr );
             assert( mTermMaps.at( mNextMapId ).empty());
             assert( mConstantTerms.at( mNextMapId ) == mTermMaps.at( mNextMapId ).end() );
