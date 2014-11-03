@@ -441,22 +441,23 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 {
 	static_assert(is_field<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial p(*this);
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * divisor.nrTerms());
 	while(!p.isZero())
 	{
 		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
-			quotient += *factor;
+			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<TermType>(factor));
 			p -= *factor * divisor;
-			delete factor;
 		}
 		else
 		{
 			return false;
 		}
-		p.makeMinimallyOrdered();
 	}
+	mTermAdditionManager.readTerms(*this, id, quotient.mTerms);
+	quotient.makeMinimallyOrdered();
 	return true;
 }
 
@@ -475,7 +476,6 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 			result.quotient += *factor;
 			p -= *factor * divisor;
 			delete factor;
-		p.makeMinimallyOrdered();
 		}
 		else
 		{
@@ -500,31 +500,25 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 		return *this;
 	}
 	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	MultivariatePolynomial<C,O,P> result;
-	MultivariatePolynomial p = *this;
-	divisor.makeMinimallyOrdered();
+	MultivariatePolynomial p(*this);
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * divisor.nrTerms());
 	while(!p.isZero())
 	{
-		//std::cout << "Iterating: " << p << std::endl;
 		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
-		//std::cout << *p.lterm()  << " / " << *divisor.lterm() << " = " << *factor << std::endl;
-		//break;
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
-			result += *factor;
-			//std::cout << "p = " << p << std::endl;
-			//std::cout << "-= " << *factor * divisor << std::endl;
 			p -= *factor * divisor;
-			//std::cout << "p = " << p << std::endl;
-			delete factor;
-			//p.makeMinimallyOrdered();
+			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<TermType>(factor));
 		}
 		else
 		{
 			p.stripLT();
 		}
 	}
+	MultivariatePolynomial<C,O,P> result;
+	mTermAdditionManager.readTerms(*this, id, result.mTerms);
+	result.makeMinimallyOrdered();
 	return result;
 }
 
@@ -1269,7 +1263,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
     if(rhs.mTerms.size() == 0) return *this;
 #undef OPTIMIZE
-#define OPTIMIZE
+//#define OPTIMIZE
 #ifdef OPTIMIZE
 	std::shared_ptr<const TermType> newlterm;
 	bool ltermFromRHS = false;
