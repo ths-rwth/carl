@@ -1361,6 +1361,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		}
 		mTermAdditionManager.addTerm(*this, id, rhs);
 		mTermAdditionManager.readTerms(*this, id, mTerms);
+		makeMinimallyOrdered();
 		mOrdered = false;
 	}
 	this->checkConsistency();
@@ -1652,12 +1653,15 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	}
 	
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * rhs.mTerms.size());
-	for (const auto& t1: mTerms) {
-		for (const auto& t2: rhs.mTerms) {
-			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType((*t1)*(*t2))));
+	TermType* newlterm = nullptr;
+	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
+		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
+			if (newlterm != nullptr) mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType((**t1)*(**t2))));
+			else newlterm = new TermType(**t1 * **t2);
 		}
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
+	mTerms.emplace_back(newlterm);
 	mOrdered = false;
 	return *this;
     
