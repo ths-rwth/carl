@@ -97,7 +97,7 @@ TYPED_TEST(Operators, Comparison)
 {
 	BOOST_CONCEPT_ASSERT((Comparison<TypeParam, TypeParam>));
 	
-        BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::Variable>));
 	
 	BOOST_CONCEPT_ASSERT((Comparison<std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
 	BOOST_CONCEPT_ASSERT((Comparison<std::shared_ptr<const carl::Monomial>, carl::Variable>));
@@ -204,8 +204,8 @@ TYPED_TEST(Operators, InplaceAddition)
 
 TYPED_TEST(Operators, InplaceMultiplication)
 {
-	BOOST_CONCEPT_ASSERT((InplaceMultiplication<std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
-	BOOST_CONCEPT_ASSERT((InplaceMultiplication<std::shared_ptr<const carl::Monomial>, carl::Variable>));
+	//BOOST_CONCEPT_ASSERT((InplaceMultiplication<std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
+	//BOOST_CONCEPT_ASSERT((InplaceMultiplication<std::shared_ptr<const carl::Monomial>, carl::Variable>));
 	
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, carl::Term<TypeParam>>));
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, std::shared_ptr<const carl::Monomial>>));
