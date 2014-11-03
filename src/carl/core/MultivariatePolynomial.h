@@ -564,7 +564,7 @@ public:
 	 * <li>Only the trailing term may be constant.</li>
 	 * </ul>
 	 */
-	void checkConsistency() const;
+	bool isConsistent() const;
 };
 	template<typename C, typename O, typename P>
 	MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q)

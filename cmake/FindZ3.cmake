@@ -30,6 +30,10 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(z3 DEFAULT_MSG
                                   Z3_LIBRARY Z3_INCLUDE_DIR)
 
+IF (NOT Z3_FIND_QUIETLY)
+      MESSAGE(STATUS "Found Z3: ${Z3_LIBRARY}")
+ENDIF (NOT Z3_FIND_QUIETLY)
+
 # debug output to see if everything went well
 #message(${Z3_INCLUDE_DIR})
 #message(${Z3_LIBRARY})
