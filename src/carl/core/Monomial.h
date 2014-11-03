@@ -608,6 +608,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return lhs.mOrder == rhs.mOrder;
         #else
+        if (lhs.hash() != rhs.hash()) return false;
         if (lhs.tdeg() != rhs.tdeg()) return false;
 		return lhs.exponents() == rhs.exponents();
         #endif
