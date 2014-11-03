@@ -502,6 +502,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial<C,O,P> result;
 	MultivariatePolynomial p = *this;
+	divisor.makeMinimallyOrdered();
 	while(!p.isZero())
 	{
 		//std::cout << "Iterating: " << p << std::endl;
@@ -655,44 +656,39 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
         }
     }
     // Substitute the variable.
-//    newTerms.reserve(expectedResultSize);
-    MultivariatePolynomial result( Coeff( 0 ) );
-    for (const auto& term: mTerms)
-    {
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, expectedResultSize);
+	for (const auto& term: mTerms)
+	{
 		if (term->monomial() == nullptr) {
-//			newTerms.push_back(term);
-            result += term->coeff();
+			mTermAdditionManager.addTerm(*this, id, term);
 		} else {
 			exponent e = term->monomial()->exponentOfVariable(var);
-            Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-			if(e > 1)
-			{
+			std::shared_ptr<Monomial> mon;
+			if (e > 0) mon.reset(term->monomial()->dropVariable(var));
+			if (e == 1) {
+				for(auto vterm : value.mTerms)
+				{
+					if (mon == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
+					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
+					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), *vterm->monomial() * *mon));
+				}
+			} else if(e > 1) {
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
-//				for(auto vterm : iter->second.first.mTerms)
-//				{
-//					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-//					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-//				}
-                result += iter->second.first * t; 
-			}
-			else if(e == 1)
-			{
-//				for(auto vterm : value.mTerms)
-//				{
-//					Term<Coeff> t(term->coeff(), term->monomial()->dropVariable(var));
-//					newTerms.push_back(std::make_shared<Term<Coeff>>(*vterm * t));
-//                }
-                result += value * t; 
+				for(auto vterm : iter->second.first.mTerms)
+				{
+					if (mon == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
+					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
+					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), *vterm->monomial() * *mon));
+				}
 			}
 			else
 			{
-//				newTerms.push_back(term);
-                result += *term;
+				mTermAdditionManager.addTerm(*this, id, term);
 			}
 		}
 	}
-//	setTerms(newTerms);
+	mTermAdditionManager.readTerms(*this, id, mTerms);
 	assert(mTerms.size() <= expectedResultSize);
 	this->checkConsistency();
 }
@@ -1511,6 +1507,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 	mOrdered = false;
+	makeMinimallyOrdered();
 	return *this;
 }
 
