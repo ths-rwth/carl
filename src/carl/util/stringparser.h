@@ -245,7 +245,12 @@ namespace carl
 			}
 			else
 			{
-				return Term<C>(coeff, Monomial(std::move(varExpPairs)));
+                #ifdef USE_MONOMIAL_POOL
+                std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(varExpPairs) );
+                #else
+                std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(varExpPairs) ) );
+                #endif
+				return Term<C>(coeff, result);
 			}
 		
 		}

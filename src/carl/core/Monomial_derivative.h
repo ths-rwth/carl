@@ -34,25 +34,33 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
 				return new Term<Coefficient>((Coefficient)1);
 			}
 
-            Monomial* m = new Monomial();
+            std::vector<std::pair<Variable, exponent>> newExps;
             if(it != mExponents.begin())
             {
-                m->mExponents.assign(mExponents.begin(), it);
+                newExps.assign(mExponents.begin(), it);
             }
-            m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
-            m->mTotalDegree = mTotalDegree - 1;
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << *m);
-            return new Term<Coefficient>(1, m);
+            newExps.insert(newExps.end(), it+1, mExponents.end());
+            #ifdef USE_MONOMIAL_POOL
+            std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), mTotalDegree - 1 );
+            #else
+            std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), mTotalDegree - 1 ) );
+            #endif
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+            return new Term<Coefficient>(1, result);
         }
         // We have to decrease the exponent of the variable by one.
         else
         {
-            Monomial* m = new Monomial();
-            m->mExponents.assign(mExponents.begin(), mExponents.end());
-            m->mExponents[(unsigned)(it - mExponents.begin())].second -= (unsigned)1;
-            m->mTotalDegree = mTotalDegree - 1;
-			LOGMSG_TRACE("carl.core.monomial", "Result: " << it->second << "*" << *m);
-            return new Term<Coefficient>((int)it->second, m);
+            std::vector<std::pair<Variable, exponent>> newExps;
+            newExps.assign(mExponents.begin(), mExponents.end());
+            newExps[(unsigned)(it - mExponents.begin())].second -= (exponent)1;
+            #ifdef USE_MONOMIAL_POOL
+            std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), mTotalDegree - 1 );
+            #else
+            std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), mTotalDegree - 1 ) );
+            #endif
+			LOGMSG_TRACE("carl.core.monomial", "Result: " << it->second << "*" << result);
+            return new Term<Coefficient>((int)it->second, result);
         }
     }
 }

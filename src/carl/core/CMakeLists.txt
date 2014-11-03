@@ -1,6 +1,7 @@
 # Header files in here (only headers from this directory!)
 set(carl_lib_core_headers 
     Monomial.h
+    MonomialPool.h
     Polynomial.h Polynomial.tpp
     PolynomialPolicy.h
     RealAlgebraicNumber.h
@@ -25,6 +26,8 @@ set(carl_lib_core_headers
 # Source files in here
 set(carl_lib_core_sources
     core/logging.cpp
+    core/Monomial.cpp
+    core/MonomialPool.cpp
     core/Sign.cpp
     core/VariablePool.cpp
     core/Variable.cpp

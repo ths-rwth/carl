@@ -72,20 +72,25 @@ Term<C> gcd(const MultivariatePolynomial<C,O,P>& a, const Term<C>& b)
 
 
 template<typename C, typename O, typename P>
-Monomial gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial& b)
+std::shared_ptr<const Monomial> gcd(const MultivariatePolynomial<C,O,P>& a, std::shared_ptr<const Monomial> b)
 {
+    if( !b )
+        return nullptr;
 	assert(!a.isZero());
-	assert(!b.isConstant());
 	VariablesInformation<false, MultivariatePolynomial<C,O,P>> varinfo = a.getVarInfo();
 	std::vector<std::pair<Variable, exponent>> vepairs;
-	for(const auto& ve : b)
+	for(const auto& ve : *b)
 	{
 		if(varinfo.getVarInfo(ve.first)->occurence() == a.nrTerms())
 		{
 			vepairs.push_back(ve.first, std::min(varinfo.getVarInfo(ve.first)->minDegree(), ve.second));
 		}
 	}
-	return Monomial(std::move(vepairs));
+    #ifdef USE_MONOMIAL_POOL
+    return MonomialPool::getInstance().create( std::move(vepairs) );
+    #else
+    return std::shared_ptr<const Monomial>( new Monomial( std::move(vepairs) ) );
+    #endif
 }
 
 template<typename C, typename O, typename P>

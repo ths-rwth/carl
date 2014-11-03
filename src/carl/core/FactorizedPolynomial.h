@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include "../numbers/typetraits.h"
-#include "carl/util/Cache.h"
+#include "../util/Cache.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl

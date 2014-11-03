@@ -45,32 +45,16 @@ class Term
 		explicit Term(Variable::Arg v);
 		/**
 		 * Constructs a term of value \f$ m \f$.
-		 * @param m Monomial.
-		 */
-		explicit Term(const Monomial& m);
-		/**
-		 * Constructs a term of value \f$ m \f$.
 		 * @param m Monomial pointer.
 		 */
-		explicit Term(const std::shared_ptr<const Monomial>& m);
-		/**
-		 * Constructs a term of value \f$ c \cdot m \f$.
-		 * @param c Coefficient.
-		 * @param m Monomial.
-		 */
-		Term(const Coefficient& c, const Monomial& m);
+		explicit Term(std::shared_ptr<const Monomial> m);
+        
 		/**
 		 * Constructs a term of value \f$ c \cdot m \f$.
 		 * @param c Coefficient.
 		 * @param m Monomial pointer.
 		 */
-		Term(const Coefficient& c, const Monomial* m);
-		/**
-		 * Constructs a term of value \f$ c \cdot m \f$.
-		 * @param c Coefficient.
-		 * @param m Monomial pointer.
-		 */
-		Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
+		Term(const Coefficient& c, std::shared_ptr<const Monomial> m);
 		/**
 		 * Constructs a term of value \f$ c \cdot v^e \f$.
 		 * @param c Coefficient.
@@ -91,8 +75,6 @@ class Term
 			mCoeff += c;
 			return mCoeff != Coefficient(0);
 		}
-		
-		
 		
 		/**
 		 * Get the monomial.
@@ -202,7 +184,7 @@ class Term
 		void clear()
 		{
 			mCoeff = Coefficient(0);
-			mMonomial.reset();
+			mMonomial = nullptr;
 		}
 
 		/**
@@ -230,11 +212,11 @@ class Term
 		 * @param m
 		 * @return 
 		 */
-		Term* divideBy(const Monomial& m) const;
+		Term* divideBy(std::shared_ptr<const Monomial> m) const;
 		
 		Term* divideBy(const Term&) const;
 		
-		Term calcLcmAndDivideBy( const Monomial&) const;
+		Term calcLcmAndDivideBy(std::shared_ptr<const Monomial> m) const;
 		
 		template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 		bool divisible(const Term&) const;
@@ -296,7 +278,7 @@ class Term
 		 */
 		Term& operator *=(const Coefficient& rhs);
 		Term& operator *=(Variable::Arg rhs);
-		Term& operator *=(const Monomial& rhs);
+		Term& operator *=(std::shared_ptr<const Monomial> rhs);
 		Term& operator *=(const Term& rhs);
 		/// @}
 
@@ -331,7 +313,7 @@ class Term
 		{
 			return std::equal_to<std::shared_ptr<Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
-		static bool monomialEqual(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
+		static bool monomialEqual(std::shared_ptr<const Term> lhs, std::shared_ptr<const Term> rhs)
 		{
 			if (lhs == rhs) return true;
 			if (lhs && rhs) return monomialEqual(*lhs, *rhs);
@@ -341,7 +323,7 @@ class Term
 		{
 			return std::less<std::shared_ptr<const Monomial>>()(lhs.mMonomial, rhs.mMonomial);
 		}
-		static bool monomialLess(const std::shared_ptr<const Term>& lhs, const std::shared_ptr<const Term>& rhs)
+		static bool monomialLess(std::shared_ptr<const Term> lhs, std::shared_ptr<const Term> rhs)
 		{
 			if (lhs && rhs) return monomialLess(*lhs, *rhs);
 			if (lhs) return false;
@@ -377,13 +359,13 @@ class Term
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
-	inline bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
+	inline bool operator==(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs);
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, const Coeff& rhs);
 	template<typename Coeff>
-	inline bool operator==(const Monomial& lhs, const Term<Coeff>& rhs) {
+	inline bool operator==(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
 		return rhs == lhs;
 	}
 	template<typename Coeff>
@@ -400,7 +382,7 @@ class Term
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
-	inline bool operator!=(const Term<Coeff>& lhs, const Monomial& rhs) {
+	inline bool operator!=(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
@@ -412,7 +394,7 @@ class Term
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
-	inline bool operator!=(const Monomial& lhs, const Term<Coeff>& rhs) {
+	inline bool operator!=(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename Coeff>
@@ -427,13 +409,13 @@ class Term
 	template<typename Coeff>
 	bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
-	bool operator<(const Term<Coeff>& lhs, const Monomial& rhs);
+	bool operator<(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs);
 	template<typename Coeff>
 	bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs);
 	template<typename Coeff>
 	bool operator<(const Term<Coeff>& lhs, const Coeff& rhs);
 	template<typename Coeff>
-	bool operator<(const Monomial& lhs, const Term<Coeff>& rhs);
+	bool operator<(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
 	bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
@@ -444,7 +426,7 @@ class Term
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
-	inline bool operator<=(const Term<Coeff>& lhs, const Monomial& rhs) {
+	inline bool operator<=(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
@@ -456,7 +438,7 @@ class Term
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
-	inline bool operator<=(const Monomial& lhs, const Term<Coeff>& rhs) {
+	inline bool operator<=(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename Coeff>
@@ -473,7 +455,7 @@ class Term
 		return rhs < lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>(const Term<Coeff>& lhs, const Monomial& rhs) {
+	inline bool operator>(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs < lhs;
 	}
 	template<typename Coeff>
@@ -485,7 +467,7 @@ class Term
 		return rhs < lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>(const Monomial& lhs, const Term<Coeff>& rhs) {
+	inline bool operator>(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
 		return rhs < lhs;
 	}
 	template<typename Coeff>
@@ -502,7 +484,7 @@ class Term
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>=(const Term<Coeff>& lhs, const Monomial& rhs) {
+	inline bool operator>=(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
@@ -514,7 +496,7 @@ class Term
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
-	inline bool operator>=(const Monomial& lhs, const Term<Coeff>& rhs) {
+	inline bool operator>=(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
 		return rhs <= lhs;
 	}
 	template<typename Coeff>
@@ -541,7 +523,7 @@ class Term
 		return res *= rhs;
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Monomial& rhs) {
+	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, std::shared_ptr<const Monomial> rhs) {
 		Term<Coeff> res(lhs);
 		return res *= rhs;
 	}
@@ -556,11 +538,11 @@ class Term
 		return res *= rhs;
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Monomial& lhs, const Term<Coeff>& rhs) {
+	inline const Term<Coeff> operator*(std::shared_ptr<const Monomial> lhs, const Term<Coeff>& rhs) {
 		return rhs * lhs;
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Monomial& lhs, const Coeff& rhs) {
+	inline const Term<Coeff> operator*(std::shared_ptr<const Monomial> lhs, const Coeff& rhs) {
 		return Term<Coeff>(rhs, lhs);
 	}
 	template<typename Coeff>
@@ -576,7 +558,7 @@ class Term
 		return rhs * lhs;
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Coeff& lhs, const Monomial& rhs) {
+	inline const Term<Coeff> operator*(const Coeff& lhs, std::shared_ptr<const Monomial> rhs) {
 		return rhs * lhs;
 	}
 	template<typename Coeff>
@@ -612,7 +594,7 @@ namespace std {
 			if(term.isConstant())
 				return hash<Coefficient>()(term.coeff()) | (size_t)1;
 			else
-				return hash<Coefficient>()(term.coeff()) ^ hash<carl::Monomial>()(*term.monomial());
+				return hash<Coefficient>()(term.coeff()) ^ term.monomial()->hash();
 		}
 	};
 } // namespace std
