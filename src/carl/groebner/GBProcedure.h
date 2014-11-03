@@ -15,16 +15,29 @@ namespace carl
 {
 
 /**
- * A general class for Groebner Basis calculation
+ * A general class for Groebner Basis calculation. 
+ * It is parameterized not only in the type of polynomial to be used,
+ *  but also in the concrete procedure to be used,
+ *  and the way polynomials should be added to this procedure.
+ * 
+ * Please notice that this class is designed to support incremental calls. 
+ * Therefore, it holds a queue with the polynomials which are added. 
+ * Only upon calling the calculate method, these polynoimials are added to the actual groebner basis.
+ * 
+ * Moreover, we can 
  * @ingroup gb 
  */
 template<typename Polynomial, template<typename, template<typename> class > class Procedure, template<typename> class AddingPolynomialPolicy>
 class GBProcedure : private Procedure<Polynomial, AddingPolynomialPolicy>
 {
 private:
+	/// The ideal represented by the current elements of the Groebner basis.
 	std::shared_ptr<Ideal<Polynomial>> mGb;
+	/// The polynomials which are added during the next call for calculate.
 	std::list<Polynomial> mInputScheduled;
+	/// The input polynomials
 	std::vector<Polynomial> mOrigGenerators;
+	/// Indices of the input polynomials.
 	std::vector<size_t> mOrigGeneratorsIndices;
 
 public:
@@ -61,32 +74,56 @@ public:
 		return *this;
 	}
 	
+	/**
+	 * Check whether a polynomial is scheduled to be added to the Groebner basis.
+     * @return whether the input is empty.
+     */
 	bool inputEmpty() const
 	{
 		return mInputScheduled.empty();
 	}
 
+	/**
+	 * The number of polynomials which were originally added to the GB.
+     * @return number of polynomials added.
+     */
 	size_t nrOrigGenerators() const
 	{
 		return mOrigGenerators.size();
 	}
 
+	/**
+	 * Add a polynmomial which is added to the groebner basis during the next calculate call.
+     * @param p The polynomial to be added.
+     */
 	void addPolynomial(const Polynomial& p)
 	{
 		mInputScheduled.push_back(p);
 		mOrigGenerators.push_back(p);
 	}
 
+	/**
+	 * Checks whether the current representants of the GB contain a constant polynomial.
+     * @return 
+     */
 	bool basisIsConstant() const
 	{
 		return getIdeal().isConstant();
 	}
 	
+	/**
+	 * 
+     * @return 
+     */
 	std::list<Polynomial> listBasisPolynomials() const
 	{
 		return std::list<Polynomial>(getBasisPolynomials().begin(), getBasisPolynomials().end());
 	}
 	
+	/**
+	 * 
+     * @return 
+     */
 	const std::vector<Polynomial>& getBasisPolynomials() const
 	{
 		return getIdeal().getGenerators();
@@ -115,17 +152,28 @@ public:
 		}
 	}
 	
+	
+	/**
+	 * Remove all polynomials from the Groebner basis.
+     */
 	void reset() 
 	{
 		mGb.reset(new Ideal<Polynomial>());
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 	
+	/**
+	 * Get the ideal which encodes the GB.
+     * @return 
+     */
 	const Ideal<Polynomial>& getIdeal() const
 	{
 		return *mGb;
 	}
 
+	/**
+	 * Calculate the Groebner basis of the current GB union the scheduled polynomials.
+     */
 	void calculate()
 	{
 		LOGMSG_INFO("carl.gb.gbproc", "Calculate gb");
@@ -144,6 +192,10 @@ public:
 		reduceGB();
 	}
 
+	/**
+	 * Reduce the input polynomials using the other input polynomials and the current Groebner basis.
+     * @return 
+     */
 	std::list<std::pair<BitVector, BitVector> > reduceInput()
 	{
 		LOGMSG_TRACE("carl.gb.gbproc", "Reduce input");
