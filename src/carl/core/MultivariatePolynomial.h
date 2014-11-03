@@ -73,8 +73,6 @@ public:
     ///
     static TermAdditionManager<MultivariatePolynomial> mTermAdditionManager;
     
-    static void resizeTermAdditionManager( size_t _newSize );
-    
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 	
 	/// @name Constructors
