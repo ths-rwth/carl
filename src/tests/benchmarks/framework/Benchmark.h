@@ -85,6 +85,7 @@ class BenchmarkResultComparator {
 private:
 	CIPtr ci;
 	std::vector<std::pair<T, T>> results;
+	std::pair<std::string, std::string> names;
 protected:
 	template<typename Coeff>
 	bool operator()(const CMP<Coeff>& lhs, const CMP<Coeff>& rhs) {
@@ -97,7 +98,7 @@ protected:
 		return eq(lhs, rhs);
 	}
 public:
-	BenchmarkResultComparator(const CIPtr& ci): ci(ci) {}
+	BenchmarkResultComparator(const std::string& lname, const std::string& rname, const CIPtr& ci): ci(ci), names(lname, rname) {}
 	template<typename T2>
 	void put(const T& t, const T2& t2) {
 		results.emplace_back(t, Conversion::template convert<T>(t2, ci));
@@ -108,8 +109,9 @@ public:
 				continue;
 			}
 			std::cout << "Results differ:" << std::endl;
-			std::cout << "\t" << it.first << std::endl;
-			std::cout << "\t" << it.second << std::endl;
+			std::cout << names.first << "\t" << it.first << std::endl;
+			std::cout << names.second << "\t" << it.second << std::endl;
+			exit(0);
 		}
 	}
 };
@@ -123,8 +125,9 @@ private:
 	std::vector<Result> results;
 	Executor executor;
 	BenchmarkResult runtimes;
+	std::string name;
 public:
-	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi) {
+	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi), name(name) {
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
 		carl::logging::Timer timer;
@@ -150,7 +153,7 @@ public:
 		std::cout << time << " ms" << std::endl;
 		
 		if (bi.compareResults) {
-			BenchmarkResultComparator<R> c(ci);
+			BenchmarkResultComparator<R> c(name, this->name, ci);
 			for (std::size_t i = 0; i < results.size(); i++) {
 				c.put(res[i], results[i]);
 			}

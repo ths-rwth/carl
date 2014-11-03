@@ -18,7 +18,7 @@ struct BenchmarkInformation {
 	std::size_t n = 100;
 	std::size_t degree = 5;
 	std::vector<std::size_t> degrees;
-	bool compareResults = false;
+	bool compareResults = true;
 	std::vector<carl::Variable> variables;
 	
 	BenchmarkInformation(BenchmarkSelection bs, std::size_t variableCount)
