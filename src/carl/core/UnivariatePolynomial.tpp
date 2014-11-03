@@ -769,8 +769,11 @@ template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolynomial<Coeff>& quotient) const 
 {
+	assert(this->isConsistent());
+	assert(divisor.isConsistent());
 	Coeff quo;
 	bool res = Coeff(*this).divideBy(divisor, quo);
+	assert(quo.isConsistent());
 	if (res) quotient = quo.toUnivariatePolynomial(this->mainVar());
 	return res;
 }
@@ -2115,7 +2118,7 @@ bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 	}
 	for (auto c: this->mCoefficients) {
 		assert(!c.has(this->mainVar()));
-		c.checkConsistency();
+		assert(c.isConsistent());
 	}
 	return true;
 }
