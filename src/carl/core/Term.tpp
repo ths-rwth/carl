@@ -71,11 +71,10 @@ Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 {
     if(mMonomial)
     {
-        Monomial* div = mMonomial->divide(v);
+        std::shared_ptr<const Monomial> div = mMonomial->divide(v);
         if(div != nullptr)
         {
 			if (div->tdeg() == 0) {
-				delete div;
 				return new Term<Coefficient>(mCoeff);
 			}
             return new Term<Coefficient>(mCoeff, div);
@@ -92,7 +91,6 @@ Term<Coefficient>* Term<Coefficient>::divideBy(std::shared_ptr<const Monomial> m
 		auto res = mMonomial->divide(m);
         if (res.second) {
 			if (res.first != nullptr && res.first->tdeg() == 0) {
-				delete res.first;
 				return new Term<Coefficient>(mCoeff);
 			}
             return new Term<Coefficient>(mCoeff, res.first);
@@ -112,11 +110,10 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
             // Term is just a constant.
             return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
         }
-		auto res = mMonomial->divide(*(t.mMonomial));
+		auto res = mMonomial->divide(t.mMonomial);
 		if (!res.second) return nullptr;
 		if (res.first != nullptr) {
 			if (res.first->tdeg() == 0) {
-				delete res.first;
 				return new Term<Coefficient>(mCoeff / t.mCoeff);
 			}
             return new Term<Coefficient>(mCoeff / t.mCoeff, res.first);

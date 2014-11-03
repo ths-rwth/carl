@@ -549,9 +549,14 @@ namespace carl
 		 * @param rhs Monomial.
 		 * @return `os`
 		 */
+		friend std::ostream& operator<<( std::ostream& os, const Monomial& rhs )
+		{
+			return os << rhs.toString(true, true);
+		}
 		friend std::ostream& operator<<( std::ostream& os, std::shared_ptr<const Monomial> rhs )
 		{
-			return (os << (rhs ? rhs->toString(true, true) : "1"));
+			if (rhs) return os << rhs;
+			return os << "1";
 		}
 		
 		
