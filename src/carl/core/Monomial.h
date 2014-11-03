@@ -604,90 +604,90 @@ namespace carl
 	 * @param rhs Second argument.
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 	 */
-	inline bool operator==(const Monomial& lhs, const Monomial& rhs) {
+	inline bool operator==(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs) {
         #ifdef USE_MONOMIAL_POOL
-        return lhs.mOrder == rhs.mOrder;
+        return lhs->mOrder == rhs->mOrder;
         #else
-        if (lhs.hash() != rhs.hash()) return false;
-        if (lhs.tdeg() != rhs.tdeg()) return false;
-		return lhs.exponents() == rhs.exponents();
+        if (lhs->hash() != rhs->hash()) return false;
+        if (lhs->tdeg() != rhs->tdeg()) return false;
+		return lhs->exponents() == rhs->exponents();
         #endif
 	}
     
-	inline bool operator==(const Monomial& lhs, Variable::Arg rhs) {
-		if (lhs.tdeg() != 1) return false;
-		if (lhs.begin()->first == rhs) return true;
+	inline bool operator==(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs) {
+		if (lhs->tdeg() != 1) return false;
+		if (lhs->begin()->first == rhs) return true;
 		return false;
 	}
     
-	inline bool operator==(Variable::Arg lhs, const Monomial& rhs) {
+	inline bool operator==(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs == lhs;
 	}
     
-	inline bool operator!=(const Monomial& lhs, const Monomial& rhs) {
+	inline bool operator!=(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return !(lhs == rhs);
 	}
     
-	inline bool operator!=(const Monomial& lhs, Variable::Arg rhs) {
+	inline bool operator!=(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs) {
 		return !(lhs == rhs);
 	}
     
-	inline bool operator!=(Variable::Arg lhs, const Monomial& rhs) {
+	inline bool operator!=(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return !(rhs == lhs);
 	}
     
-	inline bool operator<(const Monomial& lhs, const Monomial& rhs) {
-        if(lhs.tdeg() < rhs.tdeg()) return true;
-        if(lhs.tdeg() > rhs.tdeg()) return false;
-		CompareResult cr = Monomial::lexicalCompare(lhs, rhs);
+	inline bool operator<(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs) {
+        if(lhs->tdeg() < rhs->tdeg()) return true;
+        if(lhs->tdeg() > rhs->tdeg()) return false;
+		CompareResult cr = Monomial::lexicalCompare(*lhs, *rhs);
 		return cr == CompareResult::LESS;
 	}
     
-	inline bool operator<(const Monomial& lhs, Variable::Arg rhs) {
-		if (lhs.tdeg() == 0) return true;
-		if (lhs.tdeg() > 1) return false;
-		return lhs.begin()->first < rhs;
+	inline bool operator<(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs) {
+		if (lhs->tdeg() == 0) return true;
+		if (lhs->tdeg() > 1) return false;
+		return lhs->begin()->first < rhs;
 	}
     
-	inline bool operator<(Variable::Arg lhs, const Monomial& rhs) {
-		if (rhs.tdeg() == 0) return false;
-		if (rhs.tdeg() > 1) return true;
-		return lhs < rhs.begin()->first;
+	inline bool operator<(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs) {
+		if (rhs->tdeg() == 0) return false;
+		if (rhs->tdeg() > 1) return true;
+		return lhs < rhs->begin()->first;
 	}
     
-	inline bool operator<=(const Monomial& lhs, const Monomial& rhs) {
+	inline bool operator<=(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return !(rhs < lhs);
 	}
     
-	inline bool operator<=(const Monomial& lhs, Variable::Arg rhs) {
+	inline bool operator<=(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs) {
 		return !(rhs < lhs);
 	}
     
-	inline bool operator<=(Variable::Arg lhs, const Monomial& rhs) {
+	inline bool operator<=(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return !(rhs < lhs);
 	}
     
-	inline bool operator>(const Monomial& lhs, const Monomial& rhs) {
+	inline bool operator>(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs < lhs;
 	}
     
-	inline bool operator>(const Monomial& lhs, Variable::Arg rhs) {
+	inline bool operator>(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs) {
 		return rhs < lhs;
 	}
     
-	inline bool operator>(Variable::Arg lhs, const Monomial& rhs) {
+	inline bool operator>(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs < lhs;
 	}
     
-	inline bool operator>=(const Monomial& lhs, const Monomial& rhs) {
+	inline bool operator>=(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs <= lhs;
 	}
     
-	inline bool operator>=(const Monomial& lhs, Variable::Arg rhs) {
+	inline bool operator>=(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs) {
 		return rhs <= lhs;
 	}
     
-	inline bool operator>=(Variable::Arg lhs, const Monomial& rhs) {
+	inline bool operator>=(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs) {
 		return rhs <= lhs;
 	}
     
@@ -739,7 +739,7 @@ namespace std
 	template<>
 	struct less<std::shared_ptr<const carl::Monomial>> {
 		bool operator()(const std::shared_ptr<const carl::Monomial>& lhs, const std::shared_ptr<const carl::Monomial>& rhs) const {
-			if (lhs && rhs) return *lhs < *rhs;
+			if (lhs && rhs) return lhs < rhs;
 			if (lhs) return false;
 			return true;
 		}
