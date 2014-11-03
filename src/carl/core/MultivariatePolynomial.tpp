@@ -31,21 +31,21 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial()
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
    
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(int c) : MultivariatePolynomial((Coeff)c)
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(unsigned c) : MultivariatePolynomial((Coeff)c)
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -54,7 +54,7 @@ Policies(),
 mTerms(c == (Coeff)0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -63,7 +63,7 @@ Policies(),
 mTerms(1,std::make_shared<const Term<Coeff>>(v))
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -72,7 +72,7 @@ Policies(),
 mTerms(1,std::make_shared<const Term<Coeff>>(m))
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -84,7 +84,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(t))
 		this->mTerms.clear();
 	}
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -93,7 +93,7 @@ Policies(),
 mTerms(1,std::make_shared<const Term<Coeff>>(m))
 {
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -105,7 +105,7 @@ mTerms(1,t)
 		this->mTerms.clear();
 	}
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -129,7 +129,7 @@ Policies()
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 	makeMinimallyOrdered();
 	mOrdered = false;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -146,7 +146,7 @@ Policies()
 		exp++;
 	}
 	mOrdered = true;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -156,7 +156,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 	mTerms(pol.begin(), pol.end()),
 	mOrdered(pol.isOrdered())
 {
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -171,7 +171,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
             makeMinimallyOrdered();
         }
     }
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -186,7 +186,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
             makeMinimallyOrdered();
         }
     }
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -197,7 +197,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	}
 	makeMinimallyOrdered();
 	mOrdered = false;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -208,7 +208,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	}
 	makeMinimallyOrdered();
 	mOrdered = false;
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -239,7 +239,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 			break;
 		}
 	}
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
     
 template<typename Coeff, typename Ordering, typename Policies>
@@ -470,6 +470,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		}
 	}
 	mTermAdditionManager.readTerms(*this, id, quotient.mTerms);
+	quotient.mOrdered = false;
 	quotient.makeMinimallyOrdered();
 	return true;
 }
@@ -531,7 +532,9 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	}
 	MultivariatePolynomial<C,O,P> result;
 	mTermAdditionManager.readTerms(*this, id, result.mTerms);
+	result.mOrdered = false;
 	result.makeMinimallyOrdered();
+	assert(result.isConsistent());
 	return result;
 }
 
@@ -588,8 +591,8 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
-	this->checkConsistency();
-	value.checkConsistency();
+	assert(this->isConsistent());
+	assert(value.isConsistent());
     if (!this->has(var)) {
         return;
     }
@@ -697,7 +700,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 	assert(mTerms.size() <= expectedResultSize);
-	this->checkConsistency();
+	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1065,6 +1068,7 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 template<typename C, typename O, typename P>
 UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial(Variable::Arg v) const
 {
+	assert(this->isConsistent());
 	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (const auto& term: this->mTerms) {
 		if (term->monomial() == nullptr) coeffs[0] += *term;
@@ -1129,14 +1133,14 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	// Try to avoid sorting
-    if (lhs.nrTerms() != rhs.nrTerms()) return false;
+	if (lhs.nrTerms() != rhs.nrTerms()) return false;
 	if (lhs.nrTerms() == 0) return true;
 	if (lhs.hasConstantTerm() ^ rhs.hasConstantTerm()) return false;
 	if (lhs.hasConstantTerm() && (lhs.constantPart() != rhs.constantPart())) return false;
 	if (*lhs.lterm() != *rhs.lterm()) return false;
 	lhs.makeOrdered();
 	rhs.makeOrdered();
-    // Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
+	// Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
     return std::equal(lhs.begin(), lhs.end(), rhs.begin(),
 		[](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
 		-> bool 
@@ -1267,8 +1271,8 @@ bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
-	this->checkConsistency();
-	rhs.checkConsistency();
+	assert(this->isConsistent());
+	assert(rhs.isConsistent());
     if(mTerms.size() == 0) 
 	{
 		mTerms = rhs.mTerms;
@@ -1367,7 +1371,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		makeMinimallyOrdered();
 		mOrdered = false;
 	}
-	this->checkConsistency();
+	assert(this->isConsistent());
 	return *this;
 }
 
@@ -1399,7 +1403,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		mTermAdditionManager.readTerms(*this, id, mTerms);
 		mOrdered = false;
 	}
-	this->checkConsistency();
+	assert(this->isConsistent());
 	return *this;
 }
 
@@ -1426,7 +1430,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
                 {
                     *it = std::make_shared<const Term<Coeff>>((**it).coeff()+1, (**it).monomial());
                 }
-				this->checkConsistency();
+				assert(this->isConsistent());
                 return *this;
             }
             ++it;    
@@ -1439,7 +1443,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
         LOG_NOTIMPLEMENTED();
         
     }
-	this->checkConsistency();
+	assert(this->isConsistent());
     return *this;
 }
 
@@ -1453,7 +1457,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	} else {
 		mTerms.emplace(mTerms.begin(), new TermType(c));
 	}
-	this->checkConsistency();
+	assert(this->isConsistent());
     return *this;
 }
 
@@ -1484,22 +1488,22 @@ const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P
 template<typename Coeff, typename Ordering, typename Policies>
 const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::operator -() const
 {
-	this->checkConsistency();
+	assert(this->isConsistent());
     MultivariatePolynomial<Coeff, Ordering, Policies> negation;
     negation.mTerms.reserve(mTerms.size());
     for (const auto& term: mTerms) {
         negation.mTerms.push_back(std::make_shared<const Term<Coeff>>(-*term));
     }
 	negation.mOrdered = this->mOrdered;
-	negation.checkConsistency();
+	assert(negation.isConsistent());
     return negation;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const MultivariatePolynomial& rhs)
 {
-	this->checkConsistency();
-	rhs.checkConsistency();
+	assert(this->isConsistent());
+	assert(rhs.isConsistent());
 	if(mTerms.size() == 0)
 	{
 		*this = -rhs;
@@ -1650,8 +1654,8 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const MultivariatePolynomial<Coeff,Ordering,Policies>& rhs)
 {
-	this->checkConsistency();
-	rhs.checkConsistency();
+	assert(this->isConsistent());
+	assert(rhs.isConsistent());
     if(mTerms.size() == 0) return *this;
     if(rhs.mTerms.size() == 0) {
 		mTerms.clear();
@@ -1887,7 +1891,7 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff, Ordering, Policies>::checkConsistency() const {
+bool MultivariatePolynomial<Coeff, Ordering, Policies>::isConsistent() const {
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		assert(this->mTerms[i]);
 		assert(!this->mTerms[i]->isZero());
@@ -1903,6 +1907,7 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::checkConsistency() const
 			assert(Ordering::less(mTerms[i-1], mTerms[i]));
 		}
 	}
+	return true;
 }
 
 }
