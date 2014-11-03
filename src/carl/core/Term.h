@@ -87,6 +87,10 @@ class Term
 		{
 			return mCoeff;
 		}
+		bool addToCoeff(const Coefficient& c) {
+			mCoeff += c;
+			return mCoeff != Coefficient(0);
+		}
 		
 		
 		
