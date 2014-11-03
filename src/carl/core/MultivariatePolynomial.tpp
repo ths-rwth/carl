@@ -22,12 +22,6 @@ template<typename Coeff, typename Ordering, typename Policies>
 TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager;
 
 template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff,Ordering,Policies>::resizeTermAdditionManager( size_t _newSize )
-{
-    mTermAdditionManager.resize( _newSize );
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial()
 {
 	mOrdered = true;
