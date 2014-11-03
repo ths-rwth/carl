@@ -1131,6 +1131,28 @@ namespace carl
 	}
 	/// @}
 
+	struct hashLess {
+		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+			return lhs.hash() < rhs.hash();
+		}
+		bool operator()(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs) const {
+			if (lhs == rhs) return false;
+			if (lhs && rhs) return (*this)(*lhs, *rhs);
+			return (bool)(rhs);
+		}
+	};
+
+	struct hashEqual {
+		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
+			return lhs.hash() == rhs.hash();
+		}
+		bool operator()(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs) const {
+			if (lhs == rhs) return true;
+			if (lhs && rhs) return (*this)(*lhs, *rhs);
+			return false;
+		}
+	};
+
 } // namespace carl
 
 namespace std
