@@ -416,7 +416,7 @@ namespace carl
     
     std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs)
     {
-        LOG_FUNC("carl.core.monomial", *this << ", " << rhs);
+        LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
         if(!lhs)
             return rhs;
         if(!rhs)
