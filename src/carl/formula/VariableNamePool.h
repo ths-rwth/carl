@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Common.h"
 #include "../util/Singleton.h"
+#include "../util/Common.h"
 #include <mutex>
 
 namespace carl

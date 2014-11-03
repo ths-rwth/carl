@@ -15,9 +15,9 @@
 #include <vector>
 
 #include "../util/Singleton.h"
+#include "../util/Common.h"
 #include <vector>
 #include <string.h>
-#include "Common.h"
 #include "Sort.h"
 #include "UFInstance.h"
 #include "UVariable.h"

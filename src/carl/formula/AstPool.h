@@ -101,7 +101,7 @@ namespace carl
                     return mpFalse;
                 if( _subast == mpFalse )
                     return mpTrue;
-				if (_subast->getType() == Type::NOT)
+				if (_subast->getType() == Ast<Pol>::Type::NOT)
 					return _subast->pSubast();
                 #endif
                 // TODO: Actually we know that this ast does not begin with NOT and is already in the pool. Use this for optimization purposes.
@@ -153,9 +153,9 @@ namespace carl
 			 * @param _term
 			 * @return
 			 */
-			const Ast<Pol>* newQuantifier(Type _type, const std::vector<Variable>&& _vars, const Ast<Pol>* _term)
+			const Ast<Pol>* newQuantifier(typename Ast<Pol>::Type _type, const std::vector<Variable>&& _vars, const Ast<Pol>* _term)
 			{
-				assert(_type == Type::EXISTS || _type == Type::FORALL);
+				assert(_type == typename Ast<Pol>::Type::EXISTS || _type == typename Ast<Pol>::Type::FORALL);
 				if (_vars.size() > 0) {
 					return addAstToPool(new Ast<Pol>(_type, std::move(_vars), _term));
 				} else {
@@ -169,7 +169,7 @@ namespace carl
              * @param _subastB The second sub-ast of the ast to create.
              * @return A ast with the given operator and sub-asts.
              */
-            const Ast<Pol>* newAst( Type _type, const Ast<Pol>* _subastA, const Ast<Pol>* _subastB )
+            const Ast<Pol>* newAst( typename Ast<Pol>::Type _type, const Ast<Pol>* _subastA, const Ast<Pol>* _subastB )
             {
                 PointerSet<Ast<Pol>> subasts;
                 subasts.insert( _subastA );
@@ -212,7 +212,7 @@ namespace carl
                 {
                     subasts.insert( subasts.end(), *lastSubAst );
                 }
-                return createAst( XOR, std::move( subasts ) );
+                return createAst( Ast<Pol>::XOR, std::move( subasts ) );
             }
             
             /**
@@ -220,7 +220,7 @@ namespace carl
              * @param _subasts The sub-asts of the ast to create.
              * @return A ast with the given operator and sub-asts.
              */
-            const Ast<Pol>* newAst( Type _type, const PointerSet<Ast<Pol>>& _subasts )
+            const Ast<Pol>* newAst( typename Ast<Pol>::Type _type, const PointerSet<Ast<Pol>>& _subasts )
             {
                 return createAst( _type, std::move( PointerSet<Ast<Pol>>( _subasts ) ) );
             }
@@ -234,7 +234,7 @@ namespace carl
              * sub-ast are condensed. You should only use it, if you can exlcude this 
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
-            const Ast<Pol>* newAst( Type _type, PointerSet<Ast<Pol>>&& _subasts )
+            const Ast<Pol>* newAst( typename Ast<Pol>::Type _type, PointerSet<Ast<Pol>>&& _subasts )
             {
                 assert( _type == AND || _type == OR || _type == IFF || _type == XOR  );
                 return createAst( _type, std::move( _subasts ) );
@@ -270,7 +270,7 @@ namespace carl
             
     private:
         
-            const Ast<Pol>* createAst( Type _type, PointerSet<Ast<Pol>>&& _subasts );
+            const Ast<Pol>* createAst( typename Ast<Pol>::Type _type, PointerSet<Ast<Pol>>&& _subasts );
         
             /**
              * Creates a ast of the given type but with only one sub-ast.
@@ -280,15 +280,15 @@ namespace carl
              *         False, if the given type is XOR;
              *         The given sub-ast if the type is AND or OR.
              */
-            const Ast<Pol>* newAstWithOneSubast( Type _type, const Ast<Pol>* _subast )
+            const Ast<Pol>* newAstWithOneSubast( typename Ast<Pol>::Type _type, const Ast<Pol>* _subast )
             {
-                assert( OR || AND || XOR || IFF );
+                assert( Ast<Pol>::OR || Ast<Pol>::AND || Ast<Pol>::XOR || Ast<Pol>::IFF );
                 // We expect that this only happens, if the intended sub-asts are all the same.
                 switch( _type )
                 {
-                    case XOR: // f xor f is false
+                    case Ast<Pol>::XOR: // f xor f is false
                         return mpFalse;
-                    case IFF: // f iff f is true
+                    case Ast<Pol>::IFF: // f iff f is true
                         return mpTrue;
                     default: // f or f = f; f and f = f
                         return _subast;
@@ -305,48 +305,6 @@ namespace carl
              */
             const Ast<Pol>* addAstToPool( Ast<Pol>* _ast );
     };
-    
-    template<typename Pol>
-    const Ast<Pol>* trueAst();
-    
-    template<typename Pol>
-    const Ast<Pol>* falseAst();
-    
-    template<typename Pol>
-    const Ast<Pol>* newBoolean( Variable::Arg _booleanVar );
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( const Constraint<Pol>* _constraint );
-    
-    template<typename Pol>
-    const Ast<Pol>* newNegation( const Ast<Pol>* _subast );
-    
-    template<typename Pol>
-    const Ast<Pol>* newImplication( const Ast<Pol>* _premise, const Ast<Pol>* _conclusion );
-    
-    template<typename Pol>
-    const Ast<Pol>* newIte( const Ast<Pol>* _condition, const Ast<Pol>* _else, const Ast<Pol>* _then );
-
-	template<typename Pol>
-    const Ast<Pol>* newQuantifier( Type _type, const std::vector<Variable>& _vars, const Ast<Pol>* _term );
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( Type _type, const Ast<Pol>* _subastA, const Ast<Pol>* _subastB );
-    
-    template<typename Pol>
-    const Ast<Pol>* newExclusiveDisjunction( const PointerMultiSet<Ast<Pol>>& _subasts );
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( Type _type, const PointerSet<Ast<Pol>>& _subasts );
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( Type _type, PointerSet<Ast<Pol>>&& _subasts );
-
-	template<typename Pol>
-    const Ast<Pol>* newEquality( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated );
-
-	template<typename Pol>
-    const Ast<Pol>* newAst( UEquality&& eq );
 }    // namespace carl
 
 #include "AstPool.tpp"

@@ -71,15 +71,15 @@ namespace carl
     }
     
     template<typename Pol>
-    const Ast<Pol>* AstPool<Pol>::createAst( Type _type, PointerSet<Ast<Pol>>&& _subasts )
+    const Ast<Pol>* AstPool<Pol>::createAst( typename Ast<Pol>::Type _type, PointerSet<Ast<Pol>>&& _subasts )
     {
-        assert( _type == AND || _type == OR || _type == XOR || _type == IFF );
+        assert( _type == Ast<Pol>::AND || _type == Ast<Pol>::OR || _type == Ast<Pol>::XOR || _type == Ast<Pol>::IFF );
 //        cout << "create new ast with type " << Ast<Pol>::AstTypeToString( _type ) << endl;
 //        for( auto f : _subasts )
 //            cout << *f << endl;
         for( auto iter = _subasts.begin(); iter != _subasts.end(); )
         {
-            if( (*iter)->getType() == _type && (_type == AND || _type == OR) )
+            if( (*iter)->getType() == _type && (_type == Ast<Pol>::AND || _type == Ast<Pol>::OR) )
             {
                 // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
                 // Note, that a1 to an are definitely created before b, as they were sub-asts
@@ -101,23 +101,23 @@ namespace carl
                 // itself and assign the next id to it.
                 if( iter != _subasts.end() )
                 {
-                    if( (*iterB == mpTrue && *iter == mpFalse) || ((*iter)->getType() == NOT && (*iter)->subast() == (**iterB)) )
+                    if( (*iterB == mpTrue && *iter == mpFalse) || ((*iter)->getType() == Ast<Pol>::NOT && (*iter)->subast() == (**iterB)) )
                     {
                         switch( _type )
                         {
-                            case AND:
+                            case Ast<Pol>::AND:
                             {
                                 return mpFalse;
                             }
-                            case OR:
+                            case Ast<Pol>::OR:
                             {
                                 return mpTrue;
                             }
-                            case IFF:
+                            case Ast<Pol>::IFF:
                             {
                                 return mpFalse;
                             }
-                            case XOR:
+                            case Ast<Pol>::XOR:
                             {
                                 _subasts.erase( iterB );
                                 iter = _subasts.erase( iter );
@@ -139,7 +139,7 @@ namespace carl
         else
         {
             #ifdef SIMPLIFY_AST
-            if( _type == AND ||  _type == OR || _type == IFF )
+            if( _type == Ast<Pol>::AND || _type == Ast<Pol>::OR || _type == Ast<Pol>::IFF )
             {
                 typename PointerSet<Ast<Pol>>::iterator iterToTrue = _subasts.begin();
                 typename PointerSet<Ast<Pol>>::iterator iterToFalse = _subasts.begin();
@@ -155,19 +155,19 @@ namespace carl
                     if( *iterToFalse != mpFalse )
                         iterToFalse = _subasts.end();
                 }
-                if( _type == AND )
+                if( _type == Ast<Pol>::AND )
                 {
                     if( iterToTrue != _subasts.end() ) _subasts.erase( iterToTrue );
                     if( iterToFalse != _subasts.end() ) return mpFalse;
                     else if( _subasts.empty() ) return mpTrue;
                 }
-                else if( _type == OR )
+                else if( _type == Ast<Pol>::OR )
                 {
                     if( iterToFalse != _subasts.end() ) _subasts.erase( iterToFalse );
                     if( iterToTrue != _subasts.end() ) return mpTrue;
                     else if( _subasts.empty() ) return mpFalse;
                 }
-                else // _type == IFF
+                else // _type == Ast<Pol>::IFF
                 {
                     if( iterToFalse != _subasts.end() && iterToTrue != _subasts.end() )
                     {
@@ -180,89 +180,5 @@ namespace carl
                 return newAstWithOneSubast( _type, *(_subasts.begin()) );
         }
         return addAstToPool( new Ast<Pol>( _type, std::move( _subasts ) ) );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* trueAst()
-    {
-        return AstPool<Pol>::getInstance().trueAst();
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* falseAst()
-    {
-        return AstPool<Pol>::getInstance().falseAst();
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newBoolean( Variable::Arg _booleanVar )
-    {
-        return AstPool<Pol>::getInstance().newBoolean( _booleanVar );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( const Constraint<Pol>* _constraint )
-    {
-        return AstPool<Pol>::getInstance().newConstraintAst( _constraint );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newNegation( const Ast<Pol>* _subast )
-    {
-        return AstPool<Pol>::getInstance().newNegation( _subast );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newImplication( const Ast<Pol>* _premise, const Ast<Pol>* _conclusion )
-    {
-        return AstPool<Pol>::getInstance().newImplication( _premise, _conclusion );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newIte( const Ast<Pol>* _condition, const Ast<Pol>* _else, const Ast<Pol>* _then )
-    {
-        return AstPool<Pol>::getInstance().newIte( _condition, _else, _then );
-    }
-
-    template<typename Pol>
-    const Ast<Pol>* newQuantifier(Type _type, const std::vector<Variable>& _vars, const Ast<Pol>* _term)
-    {
-        return AstPool<Pol>::getInstance().newQuantifier(_type, std::move(_vars), _term);
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( Type _type, const Ast<Pol>* _subastA, const Ast<Pol>* _subastB )
-    {
-        return AstPool<Pol>::getInstance().newAst( _type, _subastA, _subastB );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newExclusiveDisjunction( const PointerMultiSet<Ast<Pol>>& _subasts )
-    {
-        return AstPool<Pol>::getInstance().newExclusiveDisjunction( _subasts );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( Type _type, const PointerSet<Ast<Pol>>& _subasts )
-    {
-        return AstPool<Pol>::getInstance().newAst( _type, _subasts );
-    }
-    
-    template<typename Pol>
-    const Ast<Pol>* newAst( Type _type, PointerSet<Ast<Pol>>&& _subasts )
-    {
-        return AstPool<Pol>::getInstance().newAst( _type, move(_subasts) );
-    }
-	
-    template<typename Pol>
-    const Ast<Pol>* newEquality( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
-    {
-        return AstPool<Pol>::getInstance().newEquality( _lhs, _rhs, _negated );
-    }
-
-    template<typename Pol>
-    const Ast<Pol>* newAst( UEquality&& eq )
-    {
-        return AstPool<Pol>::getInstance().newAst( std::move( eq ) );
     }
 }    // namespace carl

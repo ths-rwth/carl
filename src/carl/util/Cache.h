@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <cassert>
 #include <mutex>
-#include "../formula/Common.h"
+#include "Common.h"
 
 
 namespace carl

@@ -18,6 +18,7 @@
 #include "carlLoggingHelper.h"
 #include "../numbers/numbers.h"
 #include "VariablePool.h"
+#include "MonomialPool.h"
 
 namespace carl
 {   
@@ -57,6 +58,9 @@ namespace carl
 	 */
 	class Monomial
 	{
+#ifdef USE_MONOMIAL_POOL
+        friend class MonomialPool;
+#endif
 	protected:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
 		std::vector<std::pair<Variable, exponent>> mExponents;
@@ -64,6 +68,10 @@ namespace carl
 		exponent mTotalDegree = 0;
 		/// Cached hash.
 		mutable std::size_t mHash = 0;
+#ifdef USE_MONOMIAL_POOL
+		/// Cached hash.
+		mutable std::size_t mOrder;
+#endif
 
 		typedef std::vector<std::pair<Variable, exponent>>::iterator exponents_it;
 		typedef std::vector<std::pair<Variable, exponent>>::const_iterator exponents_cIt;
@@ -88,7 +96,9 @@ namespace carl
 			}
 			mHash = result;
 		}
+#ifndef USE_MONOMIAL_POOL
 	public:
+#endif
 		/**
 		 * Generate a monomial from a variable and an exponent.
 		 * @param v The variable.
@@ -181,6 +191,9 @@ namespace carl
 			mHash = rhs.mHash;
 			return *this;
 		}
+#ifdef USE_MONOMIAL_POOL
+	public:
+#endif
 		
 		/**
 		 * Returns iterator on first pair of variable and exponent.
@@ -353,20 +366,7 @@ namespace carl
 		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
 		 * @return nullptr if result is 1, otherwise m/v^e.
 		 */
-		Monomial* dropVariable(Variable::Arg v) const
-		{
-			LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
-			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
-			
-			if (it == mExponents.cend()) return new Monomial(*this);
-			if (mExponents.size() == 1) return nullptr;
-			
-			exponent tDeg = mTotalDegree - it->second;
-			std::vector<std::pair<Variable, exponent>> newExps(mExponents.begin(), it);
-			it++;
-			newExps.insert(newExps.end(), it, mExponents.end());
-			return new Monomial(std::move(newExps), tDeg);
-		}
+		Monomial* dropVariable(Variable::Arg v) const;
 
 		/**
 		 * Divides the monomial by a variable v.
@@ -374,27 +374,7 @@ namespace carl
 		 * @param v Variable
 		 * @return This divided by v.
 		 */
-		Monomial* divide(Variable::Arg v) const
-		{
-			auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
-			if(it == mExponents.cend())	return nullptr;
-			else {
-				Monomial* m = new Monomial();
-				// If the exponent is one, the variable does not occur in the new monomial.
-				if(it->second == 1) {
-					if(it != mExponents.begin()) {
-						m->mExponents.assign(mExponents.begin(), it);
-					}
-					m->mExponents.insert(m->mExponents.end(), it+1,mExponents.end());
-				} else {
-					// We have to decrease the exponent of the variable by one.
-					m->mExponents.assign(mExponents.begin(), mExponents.end());
-					m->mExponents[(unsigned)(it - mExponents.begin())].second -= 1;
-				}
-				m->mTotalDegree = mTotalDegree - 1;
-				return m;
-			}
-		}
+		Monomial* divide(Variable::Arg v) const;
 
 		
 		/**

@@ -4,12 +4,12 @@ set(carl_lib_formula_headers
     Ast.tpp
     AstPool.h
     AstPool.tpp
-    Common.h
     Condition.h
     Constraint.h
     Constraint.tpp
     ConstraintPool.h
     ConstraintPool.tpp
+    Formula.h
     Relation.h
     Sort.h 
     SortManager.h 

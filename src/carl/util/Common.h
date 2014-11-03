@@ -29,16 +29,18 @@ namespace carl
     enum class Variable_Domain: unsigned { BOOLEAN = 0, REAL = 1, INTEGER = 2 };
     
     enum class Logic : unsigned { UNDEFINED, QF_NRA, QF_LRA, QF_NIA, QF_LIA };
-	inline std::ostream& operator<<(std::ostream& os, const Logic& l) {
-	switch (l) {
-		case Logic::UNDEFINED:	os << "undefined"; break;
-		case Logic::QF_NRA:		os << "QF_NRA"; break;
-		case Logic::QF_LRA:		os << "QF_LRA"; break;
-		case Logic::QF_NIA:		os << "QF_NIA"; break;
-		case Logic::QF_LIA:		os << "QF_LIA"; break;
-	}
-	return os;
-}
+    inline std::ostream& operator<<(std::ostream& os, const Logic& l)
+    {
+        switch (l) 
+        {
+            case Logic::UNDEFINED:	os << "undefined"; break;
+            case Logic::QF_NRA:		os << "QF_NRA"; break;
+            case Logic::QF_LRA:		os << "QF_LRA"; break;
+            case Logic::QF_NIA:		os << "QF_NIA"; break;
+            case Logic::QF_LIA:		os << "QF_LIA"; break;
+        }
+        return os;
+    }
     
     /// @todo Is this enumerations needed in carl or should we put them to smtrat?
     ///An enum with the possible answer a Module can give
@@ -60,7 +62,7 @@ namespace carl
     {
         bool operator()( const T* _argA, const T* _argB ) const
         {
-            if( _argA == NULL || _argB == NULL )
+            if( _argA == nullptr || _argB == nullptr )
                 return _argA == _argB;
             return (*_argA)==(*_argB);
         }
@@ -89,7 +91,56 @@ namespace carl
     {
         size_t operator()( const T* _arg ) const
         {
-            if( _arg == NULL )
+            if( _arg == nullptr )
+                return 0;
+            return std::hash<T>()( *_arg );
+        }
+    };
+    
+    template<typename T> 
+    struct sharedPointerEqual
+    {
+        bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+        {
+            return (*_argA)==(*_argB);
+        }
+    };
+    
+    template<typename T> 
+    struct sharedPointerEqualWithNull
+    {
+        bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+        {
+            if( _argA == nullptr || _argB == nullptr )
+                return _argA == _argB;
+            return (*_argA)==(*_argB);
+        }
+    };
+    
+    template<typename T> 
+    struct sharedPointerLess
+    {
+        bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+        {
+            return (*_argA)<(*_argB);
+        }
+    };
+
+    template<typename T> 
+    struct sharedPointerHash
+    {
+        size_t operator()( std::shared_ptr<const T> _arg ) const
+        {
+            return std::hash<T>()( *_arg );
+        }
+    };
+
+    template<typename T> 
+    struct sharedPointerHashWithNull
+    {
+        size_t operator()( std::shared_ptr<const T> _arg ) const
+        {
+            if( _arg == nullptr )
                 return 0;
             return std::hash<T>()( *_arg );
         }
@@ -119,6 +170,15 @@ namespace carl
     using PointerMap = std::map<const T1*, T2, pointerLess<T1>>;
     
     template<typename T> 
+    using SharedPointerSet = std::set<std::shared_ptr<const T>, sharedPointerLess<T>>;
+    
+    template<typename T> 
+    using SharedPointerMultiSet = std::multiset<std::shared_ptr<const T>, sharedPointerLess<T>>;
+    
+    template<typename T1,typename T2> 
+    using SharedPointerMap = std::map<std::shared_ptr<const T1>, T2, sharedPointerLess<T1>>;
+    
+    template<typename T> 
     using FastSet = std::unordered_set<const T, std::hash<T>>;
     
     template<typename T1,typename T2> 
@@ -131,10 +191,22 @@ namespace carl
     using FastPointerMap = std::unordered_map<const T1*, T2, pointerHash<T1>, pointerEqual<T1>>;
     
     template<typename T> 
+    using FastSharedPointerSet = std::unordered_set<std::shared_ptr<const T>, sharedPointerHash<T>, sharedPointerEqual<T>>;
+    
+    template<typename T1,typename T2> 
+    using FastSharedPointerMap = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHash<T1>, sharedPointerEqual<T1>>;
+    
+    template<typename T> 
     using FastPointerSetB = std::unordered_set<const T*, pointerHashWithNull<T>, pointerEqualWithNull<T>>;
     
     template<typename T1,typename T2> 
     using FastPointerMapB = std::unordered_map<const T1*, T2, pointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
+    
+    template<typename T> 
+    using FastSharedPointerSetB = std::unordered_set<std::shared_ptr<const T>, sharedPointerHashWithNull<T>, pointerEqualWithNull<T>>;
+    
+    template<typename T1,typename T2> 
+    using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
     template<typename Polynomial>
     using Factors = FastMap<Polynomial,unsigned>;

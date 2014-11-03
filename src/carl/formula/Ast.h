@@ -19,8 +19,6 @@
 
 namespace carl
 {
-    /// The possible types of a ast.
-    enum Type { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, TRUE, FALSE, EXISTS, FORALL, UEQ };
     
     // Forward declaration
     template<typename Pol>
@@ -35,6 +33,8 @@ namespace carl
         friend class AstPool<Pol>;
         
         public:
+            /// The possible types of a ast.
+            enum Type { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, TRUE, FALSE, EXISTS, FORALL, UEQ };
             /// A constant iterator to a sub-ast of a ast.
             typedef typename PointerSet<Ast>::const_iterator const_iterator;
             /// A constant reverse iterator to a sub-ast of a ast.

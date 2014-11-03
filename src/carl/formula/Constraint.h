@@ -17,7 +17,7 @@
 #include <sstream>
 #include <assert.h>
 #include "Relation.h"
-#include "Common.h"
+#include "../util/Common.h"
 #include "config.h"
 
 
