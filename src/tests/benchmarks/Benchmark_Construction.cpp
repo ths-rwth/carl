@@ -208,6 +208,14 @@ protected:
 	}
 	BenchmarkFile<std::size_t> file;
 };
+
+TEST_F(BenchmarkTest, ReleaseCheck)
+{
+#ifndef NDEBUG
+	std::cout << "Warning: You have compiled in DEBUG mode." << std::endl;
+#endif
+}
+
 /*
 TEST_F(BenchmarkTest, None)
 {
