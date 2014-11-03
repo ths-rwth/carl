@@ -1272,7 +1272,22 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		return *this;
 	}
     if(rhs.mTerms.size() == 0) return *this;
-	
+#undef OPTIMIZE
+#define OPTIMIZE
+#ifdef OPTIMIZE
+	std::shared_ptr<const TermType> newlterm;
+	bool ltermFromRHS = false;
+	if (Term<Coeff>::monomialLess(rhs.lterm(), lterm())) {
+		newlterm = lterm();
+		mTerms.pop_back();
+	} else if (Term<Coeff>::monomialLess(lterm(), rhs.lterm())) {
+		newlterm = rhs.lterm();
+		rhs.mTerms.pop_back();
+		ltermFromRHS = true;
+	} else {
+		//std::cout << "same lmon" << std::endl;
+	}
+#endif
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.addTerm(*this, id, term);
@@ -1281,6 +1296,17 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		mTermAdditionManager.addTerm(*this, id, term);
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
+#ifdef OPTIMIZE
+	if (newlterm != nullptr) {
+		mTerms.push_back(newlterm);
+		if (ltermFromRHS) rhs.mTerms.push_back(newlterm);
+	} else {
+		//std::cout << "ordering" << std::endl;
+		makeMinimallyOrdered();
+	}
+#else
+	makeMinimallyOrdered();
+#endif
 	mOrdered = false;
 	return *this;
 }
