@@ -34,14 +34,14 @@ Term<Coefficient>::Term(Variable::Arg v) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(std::shared_ptr<const Monomial> m) :
+Term<Coefficient>::Term(const std::shared_ptr<const Monomial>& m) :
     mCoeff(1), mMonomial(m)
 {
     assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, std::shared_ptr<const Monomial> m) :
+Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m) :
     mCoeff(c), mMonomial(m)
 {
     assert(this->isConsistent());
@@ -84,7 +84,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::divideBy(std::shared_ptr<const Monomial> m) const
+Term<Coefficient>* Term<Coefficient>::divideBy(const std::shared_ptr<const Monomial>& m) const
 {
     if(mMonomial)
     {
@@ -184,7 +184,7 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable, Term<C
 
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(std::shared_ptr<const Monomial> m) const
+Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
 {
 	Monomial* tmp = monomial()->calcLcmAndDivideBy(m);
 	if(tmp->tdeg() == 0)
@@ -249,7 +249,7 @@ void Term<Coefficient>::gatherVarInfo(VariablesInformation<gatherCoeff, CoeffTyp
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	if (lhs.coeff() != rhs.coeff()) return false;
-	return std::equal_to<std::shared_ptr<const Monomial>>()(lhs.monomial(), rhs.monomial());
+	return lhs.monomial() == rhs.monomial();
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
@@ -356,13 +356,13 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 }
 
 template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(std::shared_ptr<const Monomial> rhs)
+Term<Coefficient>& Term<Coefficient>::operator*=(const std::shared_ptr<const Monomial>& rhs)
 {
     if(mCoeff == Coefficient(0)) return *this;
     
     if(mMonomial)
     {
-        mMonomial = std::make_shared<const Monomial>((*mMonomial) * (rhs));
+        mMonomial = std::make_shared<const Monomial>(mMonomial * rhs);
         
     }
     else

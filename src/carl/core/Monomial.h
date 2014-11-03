@@ -365,7 +365,7 @@ namespace carl
 		 * @param m Monomial.
 		 * @return If this is divisible by m.
 		 */
-		bool divisible(std::shared_ptr<const Monomial> m) const
+		bool divisible(const std::shared_ptr<const Monomial>& m) const
 		{
             if(!m) return true;
 			assert(isConsistent());
@@ -418,14 +418,14 @@ namespace carl
 		 * @param m Monomial.
 		 * @return this divided by m.
 		 */
-		std::pair<std::shared_ptr<const Monomial>,bool> divide(std::shared_ptr<const Monomial> m) const;
+		std::pair<std::shared_ptr<const Monomial>,bool> divide(const std::shared_ptr<const Monomial>& m) const;
 		
 		/**
 		 * 
 		 * @param m
 		 * @return 
 		 */
-		std::shared_ptr<const Monomial> calcLcmAndDivideBy(std::shared_ptr<const Monomial> m) const;
+		std::shared_ptr<const Monomial> calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const;
 		
 		template<typename Coeff, bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
@@ -491,7 +491,7 @@ namespace carl
 		// Orderings
 		///////////////////////////
 
-		static CompareResult compareLexical(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+		static CompareResult compareLexical(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
 		{
             if( !lhs && !rhs )
                 return CompareResult::EQUAL;
@@ -502,7 +502,7 @@ namespace carl
             return lexicalCompare(*lhs, *rhs);
 		}
 		
-		static CompareResult compareLexical(std::shared_ptr<const Monomial> lhs, Variable::Arg rhs)
+		static CompareResult compareLexical(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs)
 		{
 			if(!lhs) return CompareResult::LESS;
 			if(lhs->mExponents.front().first < rhs) return CompareResult::GREATER;
@@ -512,7 +512,7 @@ namespace carl
 		}
 
 
-		static CompareResult compareGradedLexical(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+		static CompareResult compareGradedLexical(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
 		{
             if( !lhs && !rhs )
                 return CompareResult::EQUAL;
@@ -525,7 +525,7 @@ namespace carl
 			return lexicalCompare(*lhs, *rhs);
 		}
 		
-		static CompareResult compareGradedLexical(std::shared_ptr<const Monomial> lhs, Variable::Arg rhs)
+		static CompareResult compareGradedLexical(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs)
 		{
 			if(!lhs) return CompareResult::LESS;
 			if(lhs->mTotalDegree > 1) return CompareResult::GREATER;
@@ -553,7 +553,7 @@ namespace carl
 		{
 			return os << rhs.toString(true, true);
 		}
-		friend std::ostream& operator<<( std::ostream& os, std::shared_ptr<const Monomial> rhs )
+		friend std::ostream& operator<<( std::ostream& os, const std::shared_ptr<const Monomial>& rhs )
 		{
 			if (rhs) return os << rhs;
 			return os << "1";
@@ -569,7 +569,7 @@ namespace carl
 		 * @param rhs Second monomial.
 		 * @return gcd of lhs and rhs.
 		 */
-		static std::shared_ptr<const carl::Monomial> gcd(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs);
+		static std::shared_ptr<const carl::Monomial> gcd(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs);
 		
 		/**
 		 * Calculates the least common multiple of two monomial pointers.
@@ -580,7 +580,7 @@ namespace carl
 		 * @param rhs Second monomial.
 		 * @return lcm of lhs and rhs.
 		 */
-		static std::shared_ptr<const carl::Monomial> lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs);
+		static std::shared_ptr<const carl::Monomial> lcm(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs);
 		
 		/**
 		 * This method performs a lexical comparison as defined in @cite GCL92, page 47.
@@ -706,11 +706,11 @@ namespace carl
 	 * @param rhs Right hand side.
 	 * @return `lhs * rhs`
 	 */
-	std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs);
+	std::shared_ptr<const carl::Monomial> operator*(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs);
     
-	std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const Monomial> lhs, Variable::Arg rhs);
+	std::shared_ptr<const carl::Monomial> operator*(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs);
     
-	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, std::shared_ptr<const Monomial> rhs);
+	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const std::shared_ptr<const Monomial>& rhs);
     
 	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}

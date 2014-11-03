@@ -11,7 +11,7 @@
 namespace carl 
 {
 
-typedef CompareResult( *MonomialOrderingFc )(std::shared_ptr<const Monomial>, std::shared_ptr<const Monomial>);
+typedef CompareResult( *MonomialOrderingFc )(const std::shared_ptr<const Monomial>&, const std::shared_ptr<const Monomial>&);
 
 /**
  * A class for term orderings.
@@ -28,19 +28,18 @@ struct MonomialComparator
     }
     
     template<typename Coeff>
-    bool operator()(std::shared_ptr<const Term<Coeff>> t1, std::shared_ptr<const Term<Coeff>> t2)
+    bool operator()(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
     {
         return compare(t1, t2) == CompareResult::LESS;
     }
 	
 	
-    bool operator()(std::shared_ptr<const Monomial> m1, std::shared_ptr<const Monomial> m2)
+    bool operator()(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
     {
         return (compare(m1, m2) == CompareResult::LESS );
     }
 
-	template<typename Coeff>
-    static CompareResult compare(std::shared_ptr<const Monomial> m1, std::shared_ptr<const Monomial> m2)
+	static CompareResult compare(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
 	{
 		return compare(m1, m2);
 	}

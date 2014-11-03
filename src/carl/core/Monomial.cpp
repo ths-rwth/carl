@@ -55,7 +55,7 @@ namespace carl
         }
     }
     
-    std::pair<std::shared_ptr<const Monomial>,bool> Monomial::divide(std::shared_ptr<const Monomial> m) const
+    std::pair<std::shared_ptr<const Monomial>,bool> Monomial::divide(const std::shared_ptr<const Monomial>& m) const
     {
         LOG_FUNC("carl.core.monomial", *this << ", " << m);
         if( !m )
@@ -134,7 +134,7 @@ namespace carl
     }
     
     
-    std::shared_ptr<const Monomial> Monomial::calcLcmAndDivideBy(std::shared_ptr<const Monomial> m) const
+    std::shared_ptr<const Monomial> Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
     {
         std::vector<std::pair<Variable, exponent>> newExps;
         exponent tdegree = mTotalDegree;
@@ -250,7 +250,7 @@ namespace carl
         return ss.str();
     }
     
-    std::shared_ptr<const carl::Monomial> Monomial::gcd(std::shared_ptr<const Monomial> rhs, std::shared_ptr<const Monomial> lhs)
+    std::shared_ptr<const carl::Monomial> Monomial::gcd(const std::shared_ptr<const Monomial>& rhs, const std::shared_ptr<const Monomial>& lhs)
     {
         if(!lhs && !rhs) return nullptr;
         if(!lhs) return rhs;
@@ -298,7 +298,7 @@ namespace carl
         return result;
     }
     
-    std::shared_ptr<const carl::Monomial> Monomial::lcm(std::shared_ptr<const Monomial> lhs, std::shared_ptr<const Monomial> rhs)
+    std::shared_ptr<const carl::Monomial> Monomial::lcm(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
     {
         if (!lhs && !rhs) return nullptr;
         if (!lhs) return rhs;
@@ -463,7 +463,7 @@ namespace carl
         return result;
     }
 
-    std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const carl::Monomial> lhs, Variable::Arg rhs)
+    std::shared_ptr<const carl::Monomial> operator*(const std::shared_ptr<const carl::Monomial>& lhs, Variable::Arg rhs)
     {
         if( !lhs )
             return std::shared_ptr<const carl::Monomial>( new Monomial( rhs ) );
@@ -498,7 +498,7 @@ namespace carl
         #endif
     }
     
-    std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, std::shared_ptr<const carl::Monomial> rhs)
+    std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const std::shared_ptr<const carl::Monomial>& rhs)
     {
         return rhs * lhs;
     }
