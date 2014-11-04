@@ -26,7 +26,19 @@ struct DivisionLookupResult
         
     }
 	
-    DivisionLookupResult(const Polynomial* divisor, std::shared_ptr<const Term<typename Polynomial::CoeffType>> factor) :
+	DivisionLookupResult(const DivisionLookupResult& d) :
+	mDivisor(d.mDivisor), mFactor(d.mFactor)
+	{
+		
+		
+	}
+	
+	virtual ~DivisionLookupResult()
+	{
+		// intentionally left empty
+	}
+		
+    DivisionLookupResult(const Polynomial* divisor, const std::shared_ptr<const Term<typename Polynomial::CoeffType>>& factor) :
     mDivisor(divisor), mFactor(factor)
     {
         
