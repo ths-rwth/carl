@@ -375,7 +375,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 {
     assert(!isZero());
     mTerms.pop_back();
-	makeMinimallyOrdered();
+	if (!isOrdered()) makeMinimallyOrdered();
     return *this;
 }
 
