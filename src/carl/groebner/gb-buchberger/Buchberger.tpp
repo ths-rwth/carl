@@ -30,12 +30,10 @@
 //
 namespace carl
 {
-//
-///**
-// * Calculate the Groebner basis
-// * @return An ideal object with generators which equal the Groebner basis.
-// */
 
+/**
+ * Calculate the Groebner basis
+ */
 template<class Polynomial, template<typename> class AddingPolicy>
 void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>& scheduledForAdding)
 {
@@ -95,13 +93,15 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 		}
 	}
 	mGbElementsIndices.clear();
-
 	return;
 }
 
 
 //
-
+/**
+ * Updating the critical pairs based on the added generator.
+ * @param index
+ */
 template<class Polynomial, template<typename> class AddingPolicy>
 void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 {
