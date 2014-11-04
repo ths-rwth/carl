@@ -73,6 +73,10 @@ namespace carl
 		std::map<std::string, Variable> mVars;
 		
 	public:
+		const std::map<std::string, Variable>& variables() const {
+			return mVars;
+		}
+		
 		void setVariables(std::list<std::string> variables)
 		{
 			mSingleSymbVariables = true;
@@ -114,8 +118,8 @@ namespace carl
 			mSumOfTermsForm = to;
 		}
 		
-		template<typename C>
-		RationalFunction<MultivariatePolynomial<C,typename MultivariatePolynomial<C>::OrderedBy, typename MultivariatePolynomial<C>::Policy>> parseRationalFunction(const std::string& inputString) const
+		template<typename C, typename O = typename MultivariatePolynomial<C>::OrderedBy, typename P = typename MultivariatePolynomial<C>::Policy>
+		RationalFunction<MultivariatePolynomial<C,O,P>> parseRationalFunction(const std::string& inputString) const
 		{
 			std::vector<std::string> nomAndDenom;
 			boost::split(nomAndDenom, inputString, boost::is_any_of("/"));
@@ -142,10 +146,10 @@ namespace carl
 			}
 		}
 		
-		template<typename C>
-		MultivariatePolynomial<C, typename MultivariatePolynomial<C>::OrderedBy, typename MultivariatePolynomial<C>::Policy> parseMultivariatePolynomial(const std::string& inputString) const
+		template<typename C, typename O = typename MultivariatePolynomial<C>::OrderedBy, typename P = typename MultivariatePolynomial<C>::Policy>
+		MultivariatePolynomial<C, O, P> parseMultivariatePolynomial(const std::string& inputString) const
 		{
-			MultivariatePolynomial<C, typename MultivariatePolynomial<C>::OrderedBy, typename MultivariatePolynomial<C>::Policy> result;
+			MultivariatePolynomial<C, O, P> result;
 			std::vector<std::string> termStrings;
 			if(mSumOfTermsForm)
 			{
