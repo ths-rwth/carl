@@ -14,6 +14,18 @@
 namespace carl
 {
 
+template<typename Polynomial>
+class AbstractGBProcedure 
+{
+	public:
+	virtual void addPolynomial(const Polynomial& p) = 0;
+	virtual void reset()= 0;
+	virtual void calculate()= 0;
+	
+	virtual std::list<std::pair<BitVector, BitVector> > reduceInput()= 0;
+	virtual const Ideal<Polynomial>& getIdeal() const = 0;
+};
+	
 /**
  * A general class for Groebner Basis calculation. 
  * It is parameterized not only in the type of polynomial to be used,
@@ -28,7 +40,7 @@ namespace carl
  * @ingroup gb 
  */
 template<typename Polynomial, template<typename, template<typename> class > class Procedure, template<typename> class AddingPolynomialPolicy>
-class GBProcedure : private Procedure<Polynomial, AddingPolynomialPolicy>
+class GBProcedure : private Procedure<Polynomial, AddingPolynomialPolicy>, public AbstractGBProcedure<Polynomial>
 {
 private:
 	/// The ideal represented by the current elements of the Groebner basis.
