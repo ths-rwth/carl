@@ -1646,10 +1646,11 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const Term<Coeff>& rhs)
 {
+	assert(this->isConsistent());
 	///@todo more efficient.
     TermsType newTerms;
     newTerms.reserve(mTerms.size());
-    for(auto term : mTerms)
+    for(const auto& term : mTerms)
     {
         newTerms.push_back(std::make_shared<Term<Coeff>>(*term * rhs));
     }
@@ -1660,10 +1661,11 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const std::shared_ptr<const carl::Monomial>& rhs)
 {
+	assert(this->isConsistent());
 	///@todo more efficient.
     TermsType newTerms;
     newTerms.reserve(mTerms.size());
-    for(auto term : mTerms)
+    for(const auto& term : mTerms)
     {
         newTerms.push_back(std::make_shared<Term<Coeff>>(*term * rhs));
     }
@@ -1677,7 +1679,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	///@todo more efficient.
     TermsType newTerms;
     newTerms.reserve(mTerms.size());
-    for(auto term : mTerms)
+    for(const auto& term : mTerms)
     {
         newTerms.push_back(std::make_shared<Term<Coeff>>(*term * rhs));
     }
