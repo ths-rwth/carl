@@ -82,7 +82,7 @@ public:
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const InputPolynomial& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
 	{
-		insert(f, std::shared_ptr<const Term<Coeff>>(new Term<Coeff>(Coeff(1))));
+		insert(f, std::make_shared<const Term<Coeff>>(Coeff(1)));
 		if(InputPolynomial::Policy::has_reasons)
 		{
 			mReasons = f.getReasons();
@@ -130,7 +130,7 @@ public:
 			}
 			while(leadingTerm->isZero() && !mDatastruct.empty());
 			// Done finding leading term.
-			LOGMSG_DEBUG("carl.gb.reductor", "Leading term: " << *leadingTerm);
+			//std::cout <<  "Leading term: " << *leadingTerm << std::endl;
 			// We have found the leading term..
 			if(leadingTerm->isZero())
 			{
@@ -138,7 +138,8 @@ public:
 				//then the datastructure is empty, we are done.
 				return true;
 			}
-
+			//std::cout <<  "Look for divisor.." << std::endl;
+			
 			//find a suitable reductor and the corresponding factor.
 			DivisionLookupResult<PolynomialInIdeal> divres(mIdeal.getDivisor(*leadingTerm));
 			// check if the reduction succeeded.
@@ -151,7 +152,7 @@ public:
 				}
 				if(divres.mDivisor->nrTerms() > 1)
 				{
-					insert(divres.mDivisor->tail(), divres.mFactor);
+					insert(divres.mDivisor->tail(true), divres.mFactor);
 				}
 			}
 			else
@@ -179,19 +180,22 @@ public:
 	 */
 	InputPolynomial fullReduce()
 	{
+		//std::cout << "start full reduce" << std::endl;
 		// TODO:
 		// Do simple reductions first.
 		while(!reduce())
 		{
+		//	std::cout << "done reducing" << std::endl;
 			// no operation.
 		}
 		// TODO check whether this is sorted.
-		InputPolynomial result(mRemainder, false, false);
+		InputPolynomial result(std::move(mRemainder), true, false);
 		if(InputPolynomial::Policy::has_reasons)
 		{
 			result.setReasons(mReasons);
 			mReasons.clear();
 		}
+		//std::cout << "done full reduce" << std::endl;
 		return result;
 				
 	}
@@ -209,11 +213,11 @@ private:
 	 */
 	inline bool updateDatastruct(EntryType* entry)
 	{
-		
+		assert(!mDatastruct.empty());
 		if(entry->getTail().isZero())
 		{
 			mDatastruct.pop();
-			//delete entry;
+			delete entry;
 			if(mDatastruct.empty()) return false;
 		}
 		else
