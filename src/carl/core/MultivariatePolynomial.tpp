@@ -366,13 +366,21 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
     MultivariatePolynomial tail;
 	tail.mTerms.reserve(mTerms.size()-1);
     tail.mTerms.insert(tail.mTerms.begin(), mTerms.begin(), --mTerms.end());
-	tail.mOrdered = false;
-	if(makeFullOrdered && !isOrdered()) {
-		tail.makeOrdered();	
-	} 
-	else if(!isOrdered())
+	if(isOrdered())
 	{
-		tail.makeMinimallyOrdered();
+		assert(tail.mOrdered);
+	}
+	else
+	{
+		tail.mOrdered = false;
+		if(makeFullOrdered) 
+		{
+			tail.makeOrdered();	
+		}
+		else
+		{
+			tail.makeMinimallyOrdered();
+		}
 	}
 	assert(tail.isConsistent());
     return tail;
