@@ -18,9 +18,11 @@ template<typename Polynomial>
 class AbstractGBProcedure 
 {
 	public:
+	virtual ~AbstractGBProcedure() {};
 	virtual void addPolynomial(const Polynomial& p) = 0;
 	virtual void reset()= 0;
 	virtual void calculate()= 0;
+	
 	
 	virtual std::list<std::pair<BitVector, BitVector> > reduceInput()= 0;
 	virtual const Ideal<Polynomial>& getIdeal() const = 0;
