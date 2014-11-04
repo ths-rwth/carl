@@ -18,7 +18,7 @@ TYPED_TEST(TermTest, Constructor)
 {
     Term<TypeParam> t(1);
     Variable v0(1);
-    Monomial m0(v0);
+    Monomial::Arg m0 = std::make_shared<const Monomial>(v0);
     Term<TypeParam> t0(m0);
 }
 
@@ -26,7 +26,7 @@ TYPED_TEST(TermTest, Operators)
 {
     Term<TypeParam> t(1);
     Variable v0(1);
-    Monomial m0(v0);
+    Monomial::Arg m0 = std::make_shared<const Monomial>(v0);
     Term<TypeParam> t0(m0);
     EXPECT_TRUE(t0.isLinear());
     EXPECT_TRUE(t.isLinear());
@@ -41,7 +41,7 @@ TYPED_TEST(TermTest, Multiplication)
     Term<TypeParam> t0(v0);
     EXPECT_EQ(t0,t);
     t *= v0;
-    Term<TypeParam> t1(Monomial(v0,2));
+    Term<TypeParam> t1(1, v0,2);
     EXPECT_EQ(t1,t);
     
 }
@@ -63,7 +63,7 @@ TYPED_TEST(TermTest, TermMultiplication)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    EXPECT_EQ(Term<TypeParam>(12, x * x * y), Term<TypeParam>(3, x * y) * Term<TypeParam>(4, x));
+    EXPECT_EQ(Term<TypeParam>(12, x * x * y), Term<TypeParam>(3, x * y) * Term<TypeParam>(4, x, 1));
     EXPECT_EQ(Term<TypeParam>(0, x * x * y * y * y), Term<TypeParam>(3, x * x) * Term<TypeParam>(0, y * y * y));
     EXPECT_EQ(Term<TypeParam>(18, x * x * y * y * y), Term<TypeParam>(9, x * y) * Term<TypeParam>(2, x * y * y));
 }
@@ -111,7 +111,7 @@ TYPED_TEST(TermTest, Comparison)
 
 TYPED_TEST(TermTest, OtherComparison)
 {
-    ComparisonList<Variable, Monomial, Term<TypeParam> > list;
+    ComparisonList<Variable, Monomial::Arg, Term<TypeParam> > list;
 
     VariablePool& pool = VariablePool::getInstance();
     Variable x = pool.getFreshVariable("x");

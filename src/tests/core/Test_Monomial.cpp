@@ -38,11 +38,11 @@ TEST(Monomial, VariableMultiplication)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 1),}, 1), x);
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 1), std::make_pair(y, 1)}), x * y);
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 2), std::make_pair(y, 1)}), x * x * y);
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 1), std::make_pair(y, 2)}), y * x * y);
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 3)}), x * x * x);
+    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1)}, 1)), x);
+    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1), std::make_pair(y, 1)})), x * y);
+    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 2), std::make_pair(y, 1)})), x * x * y);
+    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1), std::make_pair(y, 2)})), y * x * y);
+    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 3)})), x * x * x);
 }
 
 TEST(Monomial, MonomialMultiplication)
@@ -51,9 +51,18 @@ TEST(Monomial, MonomialMultiplication)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 2), std::make_pair(y, 3)}), std::make_shared<Monomial>({std::make_pair(x, 1), std::make_pair(y, 2)}) * std::make_shared<Monomial>({std::make_pair(x, 1), std::make_pair(y, 1)}));
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 2), std::make_pair(y, 3)}), std::make_shared<Monomial>({std::make_pair(x, 2)}) * std::make_shared<Monomial>({std::make_pair(y, 3)}));
-    EXPECT_EQ(std::make_shared<Monomial>({std::make_pair(x, 5), std::make_pair(y, 3)}), std::make_shared<Monomial>({std::make_pair(x, 2)}) * std::make_shared<Monomial>({std::make_pair(x, 3), std::make_pair(y, 3)}));
+    EXPECT_EQ(
+		std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 2), std::make_pair(y, 3)})), 
+		std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1), std::make_pair(y, 2)})) * std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1), std::make_pair(y, 1)}))
+	);
+    EXPECT_EQ(
+		std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 2), std::make_pair(y, 3)})), 
+		std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 2)})) * std::shared_ptr<const Monomial>(new Monomial({std::make_pair(y, 3)}))
+	);
+    EXPECT_EQ(
+		std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 5), std::make_pair(y, 3)})), 
+		std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 2)})) * std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 3), std::make_pair(y, 3)}))
+	);
 }
 
 TEST(Monomial, derivative)
@@ -81,7 +90,7 @@ TEST(Monomial, division)
     EXPECT_FALSE(m1->divide(m0).second);
     EXPECT_EQ(m0x, m0->divide(v1));
     EXPECT_EQ(m0y, m0->divide(v2));
-    EXPECT_EQ(Monomial(v1), m0->divide(m2).first);
+    EXPECT_EQ(v1, m0->divide(m2).first);
 }
 
 TEST(Monomial, Comparison)
@@ -91,7 +100,7 @@ TEST(Monomial, Comparison)
     Variable y = pool.getFreshVariable("y");
     Variable z = pool.getFreshVariable("z");
 
-    ComparisonList<Monomial> monomials;
+    ComparisonList<Monomial::Arg> monomials;
     monomials.push_back(x * x * x);
     monomials.push_back(x * x * y);
     monomials.push_back(x * y * y);
@@ -106,7 +115,7 @@ TEST(Monomial, Comparison)
 
 TEST(Monomial, OtherComparison)
 {
-    ComparisonList<Variable,Monomial> list;
+    ComparisonList<Variable,Monomial::Arg> list;
 
     VariablePool& pool = VariablePool::getInstance();
     Variable x = pool.getFreshVariable("x");

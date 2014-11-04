@@ -119,11 +119,11 @@ TEST(MultivariatePolynomial, Addition)
     Variable v1((unsigned)2);
     Variable v2((unsigned)3);
     p0 += v1;
-    p0 += Monomial(v2);
+    p0 += std::make_shared<const Monomial>(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += Monomial(v2);
+    p0 += std::make_shared<const Monomial>(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += Term<mpz_class>(-2,v2);
+    p0 += Term<mpz_class>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     
     MultivariatePolynomial<mpz_class> p1(v0);
@@ -166,12 +166,12 @@ TEST(MultivariatePolynomial, Substraction)
     Variable v2((unsigned)3);
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
-    p0 -= Monomial(v2);
+    p0 -= std::make_shared<const Monomial>(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= Monomial(v2);
+    p0 -= std::make_shared<const Monomial>(v2);
     
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= Term<mpz_class>(-2,v2);
+    p0 -= Term<mpz_class>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     
     MultivariatePolynomial<mpz_class> p1(v0);
@@ -544,7 +544,7 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
 
 TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 {
-    ComparisonList<Variable, Monomial, Term<TypeParam>, MultivariatePolynomial<TypeParam>> list;
+    ComparisonList<Variable, Monomial::Arg, Term<TypeParam>, MultivariatePolynomial<TypeParam>> list;
 
     VariablePool& pool = VariablePool::getInstance();
     Variable x = pool.getFreshVariable("x");
