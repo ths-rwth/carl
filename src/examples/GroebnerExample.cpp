@@ -73,7 +73,6 @@ int execute(std::ostream& os = std::cout)
     std::vector<GbBenchmark<C, O, P>> benchmarksets = ExecuteBenchmarks<C, O, P>::loadBenchmarks();
     std::vector<AbstractGBProcedure<MultivariatePolynomial<C, O, P>>*> procedures = ExecuteBenchmarks<C, O, P>::loadGbProcedures();
     
-    
     for(const auto& b : benchmarksets)
     {
         os << "Running benchmark: " << b.name << std::endl;
@@ -104,6 +103,12 @@ int execute(std::ostream& os = std::cout)
             os << "\t\t Done .. \n";
         }
     }
+    
+    for(auto & p : procedures)
+    {
+        delete p;
+    }
+        
 }
 
 int main (int argc, char** argv) 
