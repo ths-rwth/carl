@@ -359,19 +359,20 @@ const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool fullOrdered) const
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullOrdered) const
 {
 	assert(mTerms.size() != 0);
 	if (mTerms.size() == 1) return MultivariatePolynomial();
     MultivariatePolynomial tail;
 	tail.mTerms.reserve(mTerms.size()-1);
     tail.mTerms.insert(tail.mTerms.begin(), mTerms.begin(), --mTerms.end());
-	if(fullOrdered && !isOrdered()) {
+	tail.mOrdered = false;
+	if(makeFullOrdered && !isOrdered()) {
 		tail.makeOrdered();	
 	} 
 	else if(!isOrdered())
 	{
-		tail.makeMinimallyOrdered();	
+		tail.makeMinimallyOrdered();
 	}
 	assert(tail.isConsistent());
     return tail;
