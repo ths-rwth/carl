@@ -41,7 +41,24 @@ struct MonomialComparator
 
 	static CompareResult compare(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
 	{
-		return compare(m1, m2);
+		if(m1 && m2)
+        {
+            if(m1 == m2) return CompareResult::EQUAL;
+            return f(m1, m2);
+        }
+        else if(!m1 && m2)
+        {
+            return CompareResult::LESS;
+        }
+        else if(m1)
+        {
+			assert(!m2);
+            return CompareResult::GREATER;
+        }
+        else
+        {
+            return CompareResult::EQUAL;
+        }
 	}
  
 	
@@ -57,23 +74,7 @@ struct MonomialComparator
     template<typename Coeff>
     static CompareResult compare(const Term<Coeff>& t1, const Term<Coeff>& t2)
     {
-        if(t1.monomial() && t2.monomial())
-        {
-            if(t1.monomial() == t2.monomial()) return CompareResult::EQUAL;
-            return f(t1.monomial(), t2.monomial());
-        }
-        else if(!t1.monomial() && t2.monomial())
-        {
-            return CompareResult::LESS;
-        }
-        else if(t1.monomial() && !t2.monomial())
-        {
-            return CompareResult::GREATER;
-        }
-        else
-        {
-            return CompareResult::EQUAL;
-        }
+        return compare(t1.monomial(), t2.monomial());
     }
     
     template<typename Coeff>
