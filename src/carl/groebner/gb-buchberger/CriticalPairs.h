@@ -30,6 +30,7 @@
 #include "CriticalPairsEntry.h"
 #include "../../util/Heap.h"
 #include "../../core/CompareResult.h"
+#include "../../core/MonomialOrdering.h"
 #include <unordered_map>
 
 namespace carl
