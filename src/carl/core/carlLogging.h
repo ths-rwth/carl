@@ -133,6 +133,13 @@ struct Timer {
 		clock::duration d(clock::now() - start);
 		return std::chrono::duration_cast<duration>(d).count();
 	}
+	
+	/**
+	 * Reset the start point to now.
+     */
+	void reset() {
+		start = clock::now();
+	}
 	/**
 	 * Streaming operator for a Timer.
 	 * Prints the result of `t.passed()`.
