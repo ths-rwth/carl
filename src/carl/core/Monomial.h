@@ -557,7 +557,7 @@ namespace carl
 		}
 		friend std::ostream& operator<<( std::ostream& os, const std::shared_ptr<const Monomial>& rhs )
 		{
-			if (rhs) return os << rhs;
+			if (rhs) return os << *rhs;
 			return os << "1";
 		}
 		
