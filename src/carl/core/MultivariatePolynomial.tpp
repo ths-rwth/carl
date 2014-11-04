@@ -1211,9 +1211,9 @@ bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
 	return *(lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
-bool operator<(const MultivariatePolynomial<C,O,P>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
+bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const carl::Monomial>& rhs) {
 	if (lhs.nrTerms() == 0) return true;
-	return *(lhs.lterm()) < *rhs;
+	return *(lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
@@ -1233,10 +1233,10 @@ bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	return false;
 }
 template<typename C, typename O, typename P>
-bool operator<(std::shared_ptr<const carl::Monomial> lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+bool operator<(const std::shared_ptr<const carl::Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return false;
-	if (*lhs < *(rhs.lterm())) return true;
-	if (*lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	if (lhs < *(rhs.lterm())) return true;
+	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>

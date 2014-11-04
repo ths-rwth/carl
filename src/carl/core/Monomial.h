@@ -61,6 +61,8 @@ namespace carl
 #ifdef USE_MONOMIAL_POOL
         friend class MonomialPool;
 #endif
+	public:
+		typedef std::shared_ptr<const Monomial> Arg;
 	protected:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
 		std::vector<std::pair<Variable, exponent>> mExponents;
