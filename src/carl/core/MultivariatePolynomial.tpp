@@ -166,11 +166,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 {
 	if( duplicates ) {
         mTermAdditionManager.removeDuplicates( *this );
-    } else {
-        if (!ordered) {
-            makeMinimallyOrdered();
-        }
-    }
+    } 
+	if (!ordered) {
+		makeMinimallyOrdered();
+	}
 	assert(this->isConsistent());
 }
 
