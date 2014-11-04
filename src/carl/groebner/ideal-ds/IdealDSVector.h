@@ -76,7 +76,7 @@ public:
             if(divres != nullptr)
             {
 				divres->negate();
-                return DivisionLookupResult<Polynomial>(&mGenerators[*it], std::shared_ptr<Term<typename Polynomial::CoeffType>>(divres));
+                return DivisionLookupResult<Polynomial>(&mGenerators[*it], std::shared_ptr<const Term<typename Polynomial::CoeffType>>(divres));
             }
             ++it;
         }
