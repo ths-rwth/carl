@@ -34,7 +34,7 @@ struct MonomialComparator
     }
 	
 	
-    bool operator()(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
+    bool operator()(const Monomial::Arg& m1, const Monomial::Arg& m2)
     {
         return (compare(m1, m2) == CompareResult::LESS );
     }
@@ -99,6 +99,11 @@ struct MonomialComparator
     {
         if(t1 == t2) return false;
         return (compare(t1, t2) == CompareResult::LESS );
+    }
+	
+	static bool less(const Monomial::Arg& m1, const Monomial::Arg& m2)
+    {
+        return (compare(m1, m2) == CompareResult::LESS );
     }
 	
 	template<typename Coeff>
