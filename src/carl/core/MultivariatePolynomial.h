@@ -238,10 +238,12 @@ public:
 
 	typename TermsType::iterator eraseTerm(typename TermsType::iterator pos) {
 		///@todo find new lterm or constant term
+		assert(false);
 		return mTerms.erase(pos);
 	}
 	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
 		///@todo find new lterm or constant term
+		assert(false);
 		return mTerms.erase(pos);
 	}
 	TermsType& getTerms() {

@@ -362,6 +362,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::tail(bool makeFullOrdered) const
 {
 	assert(mTerms.size() != 0);
+	assert(this->isConsistent());
 	if (mTerms.size() == 1) return MultivariatePolynomial();
     MultivariatePolynomial tail;
 	tail.mTerms.reserve(mTerms.size()-1);
@@ -540,6 +541,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	result.mOrdered = false;
 	result.makeMinimallyOrdered();
 	assert(result.isConsistent());
+	assert(this->isConsistent());
 	return result;
 }
 
@@ -935,6 +937,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		result.mTerms.emplace_back(it->divideBy(lcoeff()));
 	}
+	result.mOrdered = mOrdered;
+	assert(result.isConsistent());
 	return result;
 	
 }
@@ -963,6 +967,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	assert(p.nrTerms() != 0);
 	assert(q.nrTerms() != 0);
+	assert(p.isConsistent());
+	assert(q.isConsistent());
 
 	
 	if( p.nrTerms() == 1 && q.nrTerms() == 1 )
