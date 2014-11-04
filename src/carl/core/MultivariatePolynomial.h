@@ -253,7 +253,7 @@ public:
 	 * The function assumes the polynomial to be nonzero, otherwise, lt(p) is not defined.
 	 * @return A new polynomial p - lt(p).
 	 */
-	MultivariatePolynomial tail() const;
+	MultivariatePolynomial tail(bool fullOrdered = false) const;
 	/**
 	 * Drops the leading term.
 	 * The function assumes the polynomial to be nonzero, otherwise the leading term is not defined.
