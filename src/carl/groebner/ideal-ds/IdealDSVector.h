@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <vector>
 #include <unordered_set>
 
@@ -26,11 +27,11 @@ public:
     IdealDatastructureVector(const std::vector<Polynomial>& generators, const std::unordered_set<size_t>& eliminated, const sortByLeadingTerm<Polynomial>& order)
     : mGenerators(generators), mEliminated(eliminated), mOrder(order)
     {
-        mDivLists.resize(VariablePool::getInstance().nrVariables(), std::vector<size_t> ());
+        
     }
 
     IdealDatastructureVector(const IdealDatastructureVector& id)
-    : mGenerators(id.mGenerators), mEliminated(id.mEliminated), mOrder(id.mOrder), mDivList(id.mDivList), mDivLists(id.mDivLists)
+    : mGenerators(id.mGenerators), mEliminated(id.mEliminated), mOrder(id.mOrder), mDivList(id.mDivList)
     {
 
     }
@@ -106,7 +107,6 @@ private:
     // has to be mutable so we can remove zeroes found while looking for a divisor.
     // This is not strictly necessary, but may speed up the computation..
     mutable std::vector<size_t> mDivList;
-    std::vector< std::vector<size_t> > mDivLists;
 };
 
 
