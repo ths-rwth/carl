@@ -466,31 +466,23 @@ namespace carl
     std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
     {
         if( !lhs )
-            return std::shared_ptr<const carl::Monomial>( new Monomial( rhs ) );
+            return std::make_shared<const Monomial>( rhs );
         std::vector<std::pair<Variable, exponent>> newExps;
         // Linear, as we expect small monomials.
-        auto it = lhs->begin();
-        for(; it != lhs->end();)
-        {
-            // Variable is present
-            if(it->first == rhs)
-            {
-                newExps.emplace_back( rhs, it->second + 1 );
-                ++it;
-                break;
-            }
-            // Variable is not present, we have to insert v.
-            if(it->first > rhs)
-            {
-                newExps.emplace_back( rhs, 1 );
-                ++it;
-                break;
-            }
-            newExps.push_back( *it );
-            ++it;
-        }
-        if( it != lhs->end() )
-            newExps.insert( newExps.end(), it, lhs->end() );
+		bool inserted = false;
+		for (const auto& p: *lhs) {
+			if (inserted) newExps.push_back(p);
+			else if (p.first < rhs) newExps.push_back(p);
+			else if (p.first == rhs) {
+				newExps.emplace_back(rhs, p.second + 1);
+				inserted = true;
+			} else if (p.first > rhs) {
+				newExps.emplace_back(rhs, 1);
+				newExps.push_back(p);
+				inserted = true;
+			}
+		}
+		if (!inserted) newExps.emplace_back(rhs, 1);
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 );
         #else
