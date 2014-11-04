@@ -708,11 +708,11 @@ namespace carl
 	 * @param rhs Right hand side.
 	 * @return `lhs * rhs`
 	 */
-	std::shared_ptr<const carl::Monomial> operator*(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs);
+	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
     
-	std::shared_ptr<const carl::Monomial> operator*(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs);
+	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, Variable::Arg rhs);
     
-	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const std::shared_ptr<const Monomial>& rhs);
+	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const Monomial::Arg& rhs);
     
 	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}

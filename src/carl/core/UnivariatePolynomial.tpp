@@ -568,7 +568,7 @@ UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> Univariat
 	std::vector<NumberType> coeffs;
 	coeffs.reserve(this->mCoefficients.size());
 	for (auto c: this->mCoefficients) {
-		assert(check && c.isConstant());
+		if (check) assert(c.isConstant());
 		coeffs.push_back(c.constantPart());
 	}
 	return UnivariatePolynomial<NumberType>(this->mMainVar, coeffs);

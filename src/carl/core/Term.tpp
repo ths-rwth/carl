@@ -186,10 +186,9 @@ Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable, Term<C
 template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
 {
-	Monomial* tmp = monomial()->calcLcmAndDivideBy(m);
+	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
 	if(tmp->tdeg() == 0)
 	{
-		delete tmp;
 		return Term(1);
 	}
 	else
@@ -362,12 +361,12 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const std::shared_ptr<const Mon
     
     if(mMonomial)
     {
-        mMonomial = std::make_shared<const Monomial>(mMonomial * rhs);
+        mMonomial = mMonomial * rhs;
         
     }
     else
     {
-        mMonomial = std::make_shared<const Monomial>(rhs);
+        mMonomial = rhs;
     }
     return *this;   
 }

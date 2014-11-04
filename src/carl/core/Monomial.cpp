@@ -414,7 +414,7 @@ namespace carl
         return CompareResult::LESS;
     }
     
-    std::shared_ptr<const carl::Monomial> operator*(std::shared_ptr<const carl::Monomial> lhs, std::shared_ptr<const carl::Monomial> rhs)
+    std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
     {
         LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
         if(!lhs)
@@ -463,7 +463,7 @@ namespace carl
         return result;
     }
 
-    std::shared_ptr<const carl::Monomial> operator*(const std::shared_ptr<const carl::Monomial>& lhs, Variable::Arg rhs)
+    std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
     {
         if( !lhs )
             return std::shared_ptr<const carl::Monomial>( new Monomial( rhs ) );
@@ -498,7 +498,7 @@ namespace carl
         #endif
     }
     
-    std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const std::shared_ptr<const carl::Monomial>& rhs)
+    std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const Monomial::Arg& rhs)
     {
         return rhs * lhs;
     }

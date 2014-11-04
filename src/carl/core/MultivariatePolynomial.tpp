@@ -658,14 +658,14 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 			mTermAdditionManager.addTerm(*this, id, term);
 		} else {
 			exponent e = term->monomial()->exponentOfVariable(var);
-			std::shared_ptr<Monomial> mon;
-			if (e > 0) mon.reset(term->monomial()->dropVariable(var));
+			Monomial::Arg mon;
+			if (e > 0) mon = term->monomial()->dropVariable(var);
 			if (e == 1) {
 				for(auto vterm : value.mTerms)
 				{
 					if (mon == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
 					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), *vterm->monomial() * *mon));
+					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
 				}
 			} else if(e > 1) {
 				auto iter = expResults.find(e);
@@ -674,7 +674,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 				{
 					if (mon == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
 					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), *vterm->monomial() * *mon));
+					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
 				}
 			}
 			else
@@ -947,15 +947,15 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	}
 	else if( p.nrTerms() == 1 )
 	{
-		return -(p.lterm()->calcLcmAndDivideBy( *q.lmon() ) * q.tail());
+		return -(p.lterm()->calcLcmAndDivideBy( q.lmon() ) * q.tail());
 	}
 	else if( q.nrTerms() == 1 )
 	{
-		return (q.lterm()->calcLcmAndDivideBy( *p.lmon() ) * p.tail());
+		return (q.lterm()->calcLcmAndDivideBy( p.lmon() ) * p.tail());
 	}
 	else
 	{
-		return (p.tail() * q.lterm()->calcLcmAndDivideBy(*p.lmon())) - (q.tail() * p.lterm()->calcLcmAndDivideBy( *q.lmon() ));
+		return (p.tail() * q.lterm()->calcLcmAndDivideBy(p.lmon())) - (q.tail() * p.lterm()->calcLcmAndDivideBy( q.lmon() ));
 	}
 	
 }

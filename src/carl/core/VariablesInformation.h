@@ -10,7 +10,6 @@
 #include "Variable.h"
 #include "VariableInformation.h"
 
-
 namespace carl
 {
 
@@ -84,7 +83,7 @@ public:
 		}
 		if(collectCoeff)
 		{
-			typename CoeffType::MonomType* m = monomial.dropVariable(ve.first);
+			typename CoeffType::MonomType::Arg m = monomial.dropVariable(ve.first);
 			if(m == nullptr)
 			{
 				it->second.updateCoeff(ve.second, typename CoeffType::TermType(termCoeff));
