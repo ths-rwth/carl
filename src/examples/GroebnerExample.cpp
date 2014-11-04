@@ -7,7 +7,7 @@
 
 
 using namespace carl;
-const static int MAX_KATSURA = 2;
+const static int MAX_KATSURA = 5;
 const static int MAX_CYCLIC = 1;
 
 template <typename C, typename O, typename P>
@@ -82,32 +82,33 @@ int execute(std::ostream& os = std::cout)
         {
             pCount++;
             os << "\tProcedure: " << pCount << "/" << procedures.size() << std::endl;
-            os << "\t\t Adding .. ";
+            os << "\t\t Adding .. \n";
             os.flush();
-            carl::logging::Timer timer;
+            //carl::logging::Timer timer;
             for(const auto& pol : b.polynomials)
             {
                 //std::cout << pol << std::endl;
                 p->addPolynomial(pol);
             }
-            os << timer << std::endl;
-            os << "\t\t Reducing .. ";
+            //os << timer << std::endl;
+            os << "\t\t Reducing .. \n";
             os.flush();
-            timer.reset();
+            //timer.reset();
             p->reduceInput();
-            os << timer << std::endl;
-            os << "\t\t Calculating .. ";
+            //os << timer << std::endl;
+            os << "\t\t Calculating .. \n";
             os.flush();
-            timer.reset();
+            //timer.reset();
             p->calculate();
-            os << timer << std::endl;
+            //os << timer << std::endl;
+            os << "\t\t Done .. \n";
         }
     }
 }
 
 int main (int argc, char** argv) 
 {    
-    execute<mpq_class, GrLexOrdering, StdMultivariatePolynomialPolicies<NoReasons, NoAllocator>>();
+    //execute<mpq_class, GrLexOrdering, StdMultivariatePolynomialPolicies<NoReasons, NoAllocator>>();
     execute<cln::cl_RA, GrLexOrdering, StdMultivariatePolynomialPolicies<NoReasons, NoAllocator>>();
     
     
