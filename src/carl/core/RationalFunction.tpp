@@ -38,7 +38,7 @@ namespace carl
 		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
 		mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) + rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
 		mDenominator = leastCommonMultiple;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -47,7 +47,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator += rhs * mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}	
 
@@ -57,7 +57,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator += rhs * mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -66,7 +66,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator += rhs * mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -77,7 +77,7 @@ namespace carl
 		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
 		mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) - rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
 		mDenominator = leastCommonMultiple;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -86,7 +86,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator = this->mNominator + rhs.mNominator * this->mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}	
 
@@ -96,7 +96,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator -= rhs * mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -105,7 +105,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator -= rhs * mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -116,7 +116,7 @@ namespace carl
 		mIsSimplified = false;
 		mNominator *= rhs.mNominator;
 		mDenominator *= rhs.mDenominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -125,7 +125,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator *= rhs;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}	
 	
@@ -135,15 +135,16 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mNominator *= rhs;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const typename Pol::CoeffType& rhs)
 	{
+        mIsSimplified = false;
 		mNominator *= rhs;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
@@ -151,20 +152,21 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const RationalFunction<Pol, AS>& rhs)
 	{
-		if(mDenominator.isOne()) 
+		mIsSimplified = false;
+		if(rhs.mDenominator.isOne())
 		{
 			return *this /= rhs.mNominator;
 		}
-		mIsSimplified = false;
 		mNominator *= rhs.mDenominator;
 		mDenominator *= rhs.mNominator;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const Pol& rhs)
 	{
+        mIsSimplified = false;
 		if(rhs.isConstant()) 
 		{ 
 			mNominator /= rhs.constantPart();
@@ -172,8 +174,7 @@ namespace carl
 		else
 		{
 			mDenominator *= rhs;
-			mIsSimplified = false;
-			if(AS) eliminateCommonFactor();
+			eliminateCommonFactor( !AS );
 		}
 		return *this;
 	}
@@ -185,7 +186,7 @@ namespace carl
 	{
 		mIsSimplified = false;
 		mDenominator *= rhs;
-		if(AS) eliminateCommonFactor();
+		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	

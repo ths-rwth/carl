@@ -10,6 +10,8 @@
 namespace carl {
 namespace cad {
 
+#ifdef LOGGING_CARL
+
 /**
  * This class is used to create a dot file representing the elimination phase of the CAD.
  */
@@ -101,8 +103,6 @@ public:
 		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << p << "\" -> \"" << s << "\";");
 	}
 };
-
-#ifdef LOGGING_CARL
 
 #define DOT_NODE(id, name, options) carl::cad::DotGenerator::getInstance().node(id, name, options)
 #define DOT_EDGE(id, from, to, options) carl::cad::DotGenerator::getInstance().edge(id, from, to, options)

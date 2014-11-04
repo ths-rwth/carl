@@ -7,6 +7,7 @@
 
 #pragma once
 #include <map>
+#include <vector>
 #include <algorithm>
 
 #include "Variable.h"

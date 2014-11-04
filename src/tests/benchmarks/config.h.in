@@ -3,4 +3,4 @@
  */ 
 #pragma once
 
-/* #undef COMPARE_WITH_GINAC */
+#cmakedefine COMPARE_WITH_GINAC

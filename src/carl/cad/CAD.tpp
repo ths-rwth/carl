@@ -500,6 +500,7 @@ bool CAD<Number>::check(
 		if (!m.empty()) {
 			// there are bounds we can use
 			for (auto constraint: constraints) {
+				/// @todo A Constraint may be negated.
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list

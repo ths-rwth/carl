@@ -6,6 +6,8 @@ set(carl_lib_util_headers
 	SFINAE.h
 	tree.h
 	Cache.h
+        TermAdditionManager.h
+        Common.h
 ) 
 # Source files in here
 set(carl_lib_util_sources 

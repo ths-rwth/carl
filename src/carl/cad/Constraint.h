@@ -63,7 +63,7 @@ public:
 		variables(checkVariables(p, v)),
 		negated(negated)
 	{
-		this->polynomial.checkConsistency();
+		assert(this->polynomial.isConsistent());
 	}
 
 	///////////////

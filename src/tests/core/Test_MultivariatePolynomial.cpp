@@ -1,14 +1,28 @@
 #include "gtest/gtest.h"
+#include "../numbers/config.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/converter/GinacConverter.h"
+#include "carl/converter/OldGinacConverter.h"
 #include "carl/interval/Interval.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
+#include "Util.cpp"
+#include <list>
 
 
 using namespace carl;
+
+template<typename T>
+class MultivariatePolynomialTest: public testing::Test {};
+
+template<typename T>
+class Testtest
+{
+    typedef Interval<T> testtestInterval;
+};
+
+TYPED_TEST_CASE(MultivariatePolynomialTest, RationalTypes); // TODO should use NumberTypes
 
 TEST(MultivariatePolynomial, Constructor)
 {
@@ -19,6 +33,14 @@ TEST(MultivariatePolynomial, Constructor)
     MultivariatePolynomial<mpz_class> p1(3);
     EXPECT_EQ((unsigned)1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
+    
+    Term<Interval<double>> ti(v0);
+    MultivariatePolynomial<Interval<double>> intervalPolyA(1);
+    MultivariatePolynomial<Interval<double>> intervalPolyB(ti);
+    EXPECT_EQ((unsigned)1, intervalPolyA.nrTerms());
+    EXPECT_TRUE(intervalPolyA.isLinear());
+    
+    Testtest<double> tt;
 }
 
 TEST(MultivariatePolynomial, Operators)
@@ -97,11 +119,11 @@ TEST(MultivariatePolynomial, Addition)
     Variable v1((unsigned)2);
     Variable v2((unsigned)3);
     p0 += v1;
-    p0 += Monomial(v2);
+    p0 += std::make_shared<const Monomial>(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += Monomial(v2);
+    p0 += std::make_shared<const Monomial>(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += Term<mpz_class>(-2,v2);
+    p0 += Term<mpz_class>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     
     MultivariatePolynomial<mpz_class> p1(v0);
@@ -144,12 +166,12 @@ TEST(MultivariatePolynomial, Substraction)
     Variable v2((unsigned)3);
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
-    p0 -= Monomial(v2);
+    p0 -= std::make_shared<const Monomial>(v2);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= Monomial(v2);
+    p0 -= std::make_shared<const Monomial>(v2);
     
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= Term<mpz_class>(-2,v2);
+    p0 -= Term<mpz_class>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     
     MultivariatePolynomial<mpz_class> p1(v0);
@@ -201,10 +223,10 @@ TEST(MultivariatePolynomial, Normalize)
     mp2 += v1;
     EXPECT_EQ(mp2, mp.normalize());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
-    mp += (cln::cl_RA)4 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
-    mp2 += (cln::cl_RA)2 * v1;
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v1);
+    mp += (cln::cl_RA)4 * v0;
+    mp2 = MultivariatePolynomial<cln::cl_RA>(v1);
+    mp2 += (cln::cl_RA)2 * v0;
     EXPECT_EQ(mp2, mp.normalize());
 }
 
@@ -497,4 +519,50 @@ TEST(MultivariatePolynomial, Quotient)
 	MultivariatePolynomial<cln::cl_RA> m2 = x - one;
 	MultivariatePolynomial<cln::cl_RA> res = x + one;
 	EXPECT_EQ(res, m1.quotient(m2));
+}
+
+TYPED_TEST(MultivariatePolynomialTest, Comparison)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    Variable z = pool.getFreshVariable("z");
+
+    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z; // 3x²y+7yz
+    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y; // 3x²y+2x²z
+    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * x * y * y + (TypeParam)3 * z; // 5x²y+3z
+    MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * x * x * z * z * z + (TypeParam)6 * y; // 4x²z³+6y
+
+    ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
+    polynomials.push_back(p0);
+    polynomials.push_back(p1);
+    polynomials.push_back(p2);
+    polynomials.push_back(p3);
+
+    expectRightOrder(polynomials);
+}
+
+TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
+{
+    ComparisonList<Variable, Monomial::Arg, Term<TypeParam>, MultivariatePolynomial<TypeParam>> list;
+
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    list.push_back(Term<TypeParam>((TypeParam)0));
+    list.push_back(Term<TypeParam>((TypeParam)1));
+    list.push_back(Term<TypeParam>((TypeParam)5));
+    list.push_back(x);
+    list.push_back(y);
+    list.push_back((TypeParam)2 * x * x + y);
+    list.push_back((TypeParam)3 * x * x);
+    list.push_back((TypeParam)4 * x * y + (TypeParam)5 * x * x);
+    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
+    list.push_back((TypeParam)6 * x * x + y * y);
+    list.push_back(x * x * y);
+    list.push_back((TypeParam)7 * x * x * y);
+    list.push_back((TypeParam)7 * x * x * y + (TypeParam)2);
+
+    expectRightOrder(list);
 }

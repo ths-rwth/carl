@@ -385,7 +385,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariateP
 template<typename Coeff>
 bool UnivariatePolynomial<Coeff>::isNormal() const
 {
-	return unitPart() == 1;
+	return unitPart() == Coeff(1);
 }
 
 template<typename Coeff>
@@ -568,7 +568,7 @@ UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> Univariat
 	std::vector<NumberType> coeffs;
 	coeffs.reserve(this->mCoefficients.size());
 	for (auto c: this->mCoefficients) {
-		assert(check && c.isConstant());
+		if (check) assert(c.isConstant());
 		coeffs.push_back(c.constantPart());
 	}
 	return UnivariatePolynomial<NumberType>(this->mMainVar, coeffs);
@@ -769,8 +769,11 @@ template<typename Coeff>
 template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>>
 bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolynomial<Coeff>& quotient) const 
 {
+	assert(this->isConsistent());
+	assert(divisor.isConsistent());
 	Coeff quo;
 	bool res = Coeff(*this).divideBy(divisor, quo);
+	assert(quo.isConsistent());
 	if (res) quotient = quo.toUnivariatePolynomial(this->mainVar());
 	return res;
 }
@@ -2088,9 +2091,9 @@ std::ostream& operator<<(std::ostream& os, const UnivariatePolynomial<C>& rhs)
 	for(size_t i = 0; i < rhs.mCoefficients.size()-1; ++i )
 	{
 		const C& c = rhs.mCoefficients[rhs.mCoefficients.size()-i-1];
-		if(c != C(0))
+		if(!(c == 0))
 		{
-			if (c != 1) os << "(" << c << ")*";
+			if (!(c == 1)) os << "(" << c << ")*";
 			os << rhs.mMainVar << "^" << rhs.mCoefficients.size()-i-1 << " + ";
 		}
 	}
@@ -2115,7 +2118,7 @@ bool UnivariatePolynomial<Coefficient>::isConsistent() const {
 	}
 	for (auto c: this->mCoefficients) {
 		assert(!c.has(this->mainVar()));
-		c.checkConsistency();
+		assert(c.isConsistent());
 	}
 	return true;
 }

@@ -1,5 +1,6 @@
 # Add test cpp file
 add_executable(runCoreTests
+	Test_OperatorConcepts.cpp
         Test_Variable.cpp 
         Test_VariablePool.cpp 
         Test_Monomial.cpp
@@ -12,8 +13,8 @@ add_executable(runCoreTests
         Test_RootFinder.cpp
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
-		Test_RationalFunction.cpp
-		Test_Constraint.cpp
+	Test_RationalFunction.cpp
+        #Test_Constraint.cpp
 )
 cotire(runCoreTests)
 

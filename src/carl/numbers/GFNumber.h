@@ -57,6 +57,12 @@ class GFNumber
 	{
 		return mN == 0;
 	}
+    
+	bool isOne() const
+	{
+		return isUnit();
+	}
+    
 	bool isUnit() const
 	{
 		return mN == 1;

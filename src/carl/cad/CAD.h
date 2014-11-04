@@ -9,9 +9,8 @@
  *	Date:   Tue Dec 3 15:57:06 2013 +0100
  */
 
-/**
- * @todo Fix bug in CAD concerning CAD::removePolynomial().
- * 
+/// @todo Fix bug in CAD concerning CAD::removePolynomial().
+/*
  * beim Aufschreiben des CAD::removePolynomial-Algorithmus' ist mir aufgefallen, 
  * dass darin ein Teil zu Problemen führen kann, sobald ein Polynom entfernt 
  * wird, während die Elimination nicht vollständig durchgeführt worden war:
@@ -52,6 +51,9 @@
 
 namespace carl {
 
+/**
+ * This class implements the core of the CAD algorithm.
+ */
 template<typename Number>
 class CAD : public carl::cad::PolynomialOwner<Number> {
 public:
@@ -357,9 +359,8 @@ public:
 	/**
 	 * Removes a polynomial from the first elimination level where it occurs and possibly from the list of scheduled polynomials.
 	 * Moreover, all elimination levels are safely cleaned of all elimination polynomials stemming from p.
-	 * @param polynomial
+	 * @param polynomial Polynomial to be removed
 	 */
-	void removePolynomial(const UPolynomial& polynomial);
 	void removePolynomial(const MPolynomial& polynomial);
 
 	/**
@@ -675,7 +676,7 @@ public:
 
 	bool isSampleTreeConsistent() const {
 		bool isOk = isSampleConsistent(this->sampleTree.begin());
-		if (!isOk) LOGMSG_ERROR("carl.cad", "SampleTree: " << this->sampleTree)
+		if (!isOk) LOGMSG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
 		assert(isOk);
 		return isOk;
 	}

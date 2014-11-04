@@ -92,13 +92,12 @@ public:
      * @return 
      */
     SPolPair pop( );
-	
 	/**
 	 * Eliminate multiples of the given monomial.
      * @param lm
      * @param newpairs
      */
-    void elimMultiples( const Monomial& lm, const std::unordered_map<size_t, SPolPair>& newpairs );
+    void elimMultiples( const Monomial::Arg& lm, const std::unordered_map<size_t, SPolPair>& newpairs );
     
 	/**
 	 * Checks whether there are any pairs in the data structure.

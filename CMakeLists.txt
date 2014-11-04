@@ -44,6 +44,7 @@ option( LOGGING_CARL "Compile with the logging facility of the carl library" ON 
 option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
+option( COMPARE_WITH_Z3 "Compile with testing with the runtime and result comparisons of carl to z3" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 
@@ -190,6 +191,10 @@ IF(USE_MPFR_FLOAT)
 	set(include_dirs ${include_dirs} ${MPFR_INCLUDE_DIRS})
 	set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
 	set(libs_static ${libs_static} ${MPFR_STATIC})
+endif()
+
+if(COMPARE_WITH_Z3)
+    find_package(Z3)
 endif()
 
 # # # # # # # # # # # # # # # # # # # # # #

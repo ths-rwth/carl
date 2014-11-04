@@ -10,7 +10,7 @@
 
 #include "MonomialOrdering.h"
 #include "MultivariatePolynomialPolicy.h"
-#include "../converter/GinacConverter.h"
+#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
@@ -47,10 +47,10 @@ Term<C> gcd(const Term<C>& a, const MultivariatePolynomial<C,O,P>& b)
 }
 
 template<typename C, typename O, typename P>
-Monomial gcd(const MultivariatePolynomial<C,O,P>& a, const Monomial& b);
+std::shared_ptr<const Monomial> gcd(const MultivariatePolynomial<C,O,P>& a, std::shared_ptr<const Monomial> b);
 
 template<typename C, typename O, typename P>
-Monomial gcd(const Monomial& a, const MultivariatePolynomial<C,O,P>& b)
+std::shared_ptr<const Monomial> gcd(std::shared_ptr<const Monomial> a, const MultivariatePolynomial<C,O,P>& b)
 {
 	return gcd(b, a);
 }

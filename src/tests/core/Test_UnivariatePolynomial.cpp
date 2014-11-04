@@ -367,7 +367,7 @@ TEST(UnivariatePolynomial, resultant)
 	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p3(x, {MultivariatePolynomial<cln::cl_RA>(-Term<cln::cl_RA>(1)), MultivariatePolynomial<cln::cl_RA>(0), MultivariatePolynomial<cln::cl_RA>(1)});
 	
 	// r1 = 2*y^2 - 1
-	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r1(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y*2, Term<cln::cl_RA>(-1)}));
+	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r1(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y*cln::cl_RA(2), Term<cln::cl_RA>(-1)}));
 	// r2 = y^2 - 1
 	UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> r2(x, MultivariatePolynomial<cln::cl_RA>({Term<cln::cl_RA>(y)*y, Term<cln::cl_RA>(-1)}));
 	// r3 = y^4

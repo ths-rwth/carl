@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include "../numbers/typetraits.h"
-#include "carl/util/Cache.h"
+#include "../util/Cache.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl
@@ -178,14 +178,28 @@ namespace carl
         }
         
         /**
+         * Set coefficient
+         * @param coeff Coefficient
+         */
+        //TODO make private and fix friend declaration
+        void setCoefficient( CoeffType coeff ) const
+        {
+            mCoefficient = coeff;
+        }
+
+        /**
          * @return The factorization of this polynomial.
          */
         const Factorization<P>& factorization() const
         {
             assert( existsFactorization( *this ) );
             //TODO (matthias) activate?
-            if( content().flattenFactorization() )
+            CoeffType c = content().flattenFactorization();
+            if( c != CoeffType( 0 ) )
+            {
+                mCoefficient *= c;
                 rehash();
+            }
             return content().factorization();
         }
 
@@ -197,6 +211,7 @@ namespace carl
                 content().mpPolynomial = new P( computePolynomial( content().factorization() ) );
                 rehash();
             }
+
             return *content().mpPolynomial;
         }
 
@@ -206,6 +221,14 @@ namespace carl
         const CoeffType& coefficient() const
         {
             return mCoefficient;
+        }
+
+        /**
+         * @return 
+         */
+        CoeffType coprimeFactor() const
+        {
+            return CoeffType(1)/mCoefficient;
         }
 
         /**

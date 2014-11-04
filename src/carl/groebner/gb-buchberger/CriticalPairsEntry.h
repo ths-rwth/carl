@@ -57,7 +57,7 @@ public:
 	 * Get the LCM of the first element.
      * @return 
      */
-    const Monomial& getSortedFirstLCM( ) const
+    const Monomial::Arg& getSortedFirstLCM( ) const
     {
         return mPairs.front( ).mLcm;
     }

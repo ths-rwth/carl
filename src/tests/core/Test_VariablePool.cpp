@@ -16,7 +16,7 @@ TEST(VariablePool, singleton)
 	ASSERT_EQ(name, pool2.getName(x));
 }
 
-TEST(VariablePool, variablePool)
+TEST(VariablePool, variableName)
 {
 	VariablePool& vpool = VariablePool::getInstance();
 	Variable x = vpool.getFreshVariable( carl::VariableType::VT_INT );
@@ -26,4 +26,16 @@ TEST(VariablePool, variablePool)
 	o << x;
 	ASSERT_EQ(name, o.str());
 	
+}
+
+TEST(VariablePool, order)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    
+    EXPECT_TRUE(x < y);
+    EXPECT_TRUE(y > x);
+    EXPECT_FALSE(x > y);
+    EXPECT_FALSE(y < x);
 }

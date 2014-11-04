@@ -159,6 +159,15 @@ namespace carl
          * Constructor which constructs the pointinterval at n.
          * @param n Location of the pointinterval.
          */
+        explicit Interval(int n) :
+        mContent(n),
+        mLowerBoundType(BoundType::WEAK),
+        mUpperBoundType(BoundType::WEAK) { }
+
+        /**
+         * Constructor which constructs the pointinterval at n.
+         * @param n Location of the pointinterval.
+         */
         explicit Interval(const Number& n) :
         mContent(n),
         mLowerBoundType(BoundType::WEAK),
@@ -609,6 +618,9 @@ namespace carl
             return Interval<Number>(Number(0), BoundType::WEAK, Number(0), BoundType::WEAK);
         }
 
+        /**
+         * Destructor
+         */
         ~Interval() { }
 
         /***********************************************************************
@@ -1092,7 +1104,15 @@ namespace carl
          */
         Interval<Number> inverse() const;
         
+        /**
+         * Calculates the absolute value of the interval.
+         * @return Interval.
+         */
         Interval<Number> abs() const;
+        
+        /**
+         * Calculates and assigns the absolute value of the interval.
+         */
         void abs_assign();
         
         /**
@@ -1412,6 +1432,14 @@ namespace carl
     inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Number& rhs);
     
     /**
+     * Unary minus.
+     * @param interval The operand.
+     * @return Resulting interval.
+     */
+    template<typename Number>
+    inline const Interval<Number> operator -(const Interval<Number>& interval);
+    
+    /**
      * Operator for the subtraction of two intervals.
      * @param lhs Lefthand side.
      * @param rhs Righthand side.
@@ -1677,5 +1705,32 @@ namespace carl
     }
     
 }
+
+namespace std
+{
+	/**
+	 * Specialization of `std::hash` for an interval.
+	 */
+	template<typename Number>
+	struct hash<carl::Interval<Number>> {
+		/**
+		 * Calculates the hash of an interval.
+		 * @param interval An interval.
+		 * @return Hash of an interval.
+		 */
+		size_t operator()(const carl::Interval<Number>& interval) const
+        {
+            size_t result = interval.lowerBoundType();
+            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+            result ^= interval.upperBoundType();
+            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+			std::hash<Number> h;
+			result ^= h( interval.lowerBound() );
+            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+			result ^= h( interval.upperBound() );
+            return result;
+		}
+	};
+} // namespace std
 
 #include "Interval.tpp"
