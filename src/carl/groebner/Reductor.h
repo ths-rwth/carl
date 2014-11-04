@@ -61,6 +61,7 @@ public:
 };
 
 /**
+ * A dedicated algorithm for calculating the remainder of a polynomial modulo a set of other polynomials. 
  * @ingroup gb
  */
 template<typename InputPolynomial, typename PolynomialInIdeal, template <class> class Datastructure = carl::Heap, template <typename Polynomial> class Configuration = ReductorConfiguration>
