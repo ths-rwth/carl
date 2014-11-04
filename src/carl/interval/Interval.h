@@ -618,6 +618,9 @@ namespace carl
             return Interval<Number>(Number(0), BoundType::WEAK, Number(0), BoundType::WEAK);
         }
 
+        /**
+         * Destructor
+         */
         ~Interval() { }
 
         /***********************************************************************
@@ -1101,7 +1104,15 @@ namespace carl
          */
         Interval<Number> inverse() const;
         
+        /**
+         * Calculates the absolute value of the interval.
+         * @return Interval.
+         */
         Interval<Number> abs() const;
+        
+        /**
+         * Calculates and assigns the absolute value of the interval.
+         */
         void abs_assign();
         
         /**
