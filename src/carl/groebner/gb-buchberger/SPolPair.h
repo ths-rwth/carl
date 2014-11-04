@@ -18,14 +18,14 @@ namespace carl
      */
     struct SPolPair
     {
-        SPolPair( size_t p1, size_t p2, const Monomial& lcm ) : mP1( p1 ), mP2( p2 ), mLcm( lcm )
+        SPolPair( size_t p1, size_t p2, const Monomial::Arg& lcm ) : mP1( p1 ), mP2( p2 ), mLcm( lcm )
         {
 
         }
 
         const size_t mP1;
         const size_t mP2;
-        const Monomial mLcm;
+        const Monomial::Arg mLcm;
 
         void print( std::ostream& os = std::cout ) const
         {

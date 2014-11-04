@@ -200,7 +200,7 @@ private:
 			{
 				if(j == i) continue;
 
-				divisible = mGb->getGenerator(i).lmon()->divisible(*mGb->getGenerator(j).lmon());
+				divisible = mGb->getGenerator(i).lmon()->divisible(mGb->getGenerator(j).lmon());
 				LOGMSG_TRACE("carl.gb.gbproc", "" << (divisible ? "" : "not ") << "divisible by " << mGb->getGenerator(j));
 			}
 

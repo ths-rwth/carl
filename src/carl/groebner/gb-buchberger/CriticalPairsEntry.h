@@ -47,7 +47,7 @@ public:
         mPairs.sort( SPolPairCompare<Compare > ( ) );
     }
 
-    const Monomial& getSortedFirstLCM( ) const
+    const Monomial::Arg& getSortedFirstLCM( ) const
     {
         return mPairs.front( ).mLcm;
     }
