@@ -421,7 +421,8 @@ namespace carl
              * @param _constraint The constraint to print.
              * @return The given stream after printing.
              */
-            friend std::ostream& operator<<( std::ostream& _out, const Constraint& _constraint );
+            template<typename P>
+            friend std::ostream& operator<<( std::ostream& _out, const Constraint<P>& _constraint );
             
             /**
              * Calculates the coefficient of the given variable with the given degree. Note, that it only

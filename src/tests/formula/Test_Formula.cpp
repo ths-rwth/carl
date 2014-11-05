@@ -16,14 +16,14 @@ TEST(Formula, Construction)
 {
     Variable x = newArithmeticVariable( "x", VariableType::VT_REAL );
     Variable y = newArithmeticVariable( "y", VariableType::VT_REAL );
-    Variable i = newArithmeticVariable( "i", VariableType::VT_INT );
+//    Variable i = newArithmeticVariable( "i", VariableType::VT_INT );
     Variable b = newBooleanVariable( "b" );
-    Sort sortS = newSort( "S" );
-    Sort sortT = newSort( "T" );
-    Variable u = VariableNamePool::getInstance().newUninterpretedVariable( "u" );
-    Variable v = VariableNamePool::getInstance().newUninterpretedVariable( "v" );
-    UVariable uu( u, sortS );
-    UVariable uv( v, sortT );
+//    Sort sortS = newSort( "S" );
+//    Sort sortT = newSort( "T" );
+//    Variable u = VariableNamePool::getInstance().newUninterpretedVariable( "u" );
+//    Variable v = VariableNamePool::getInstance().newUninterpretedVariable( "v" );
+//    UVariable uu( u, sortS );
+//    UVariable uv( v, sortT );
 
     // Next we see an example how to create polynomials, which form the left-hand sides of the constraints:
     Pol px( x );
