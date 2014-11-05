@@ -133,7 +133,7 @@ namespace carl
             union
             {
                 /// The only sub-formula, in case this formula is an negation.
-                const Formula<Pol> mSubformula;
+                Formula<Pol> mSubformula;
                 /// The premise and conclusion, in case this formula is an implication.
                 IMPLIESContent<Pol>* mpImpliesContent;
                 /// The condition, then- and else-case, in case this formula is an ite-expression of formulas.

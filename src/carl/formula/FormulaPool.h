@@ -185,7 +185,7 @@ namespace carl
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( const PointerMultiSet<Formula<Pol>>& _subformulas )
+            ConstElementSPtr create( const std::multiset<const Formula<Pol>>& _subformulas )
             {
                 if( _subformulas.empty() ) return mpFalse;
                 if( _subformulas.size() == 1 ) return *_subformulas.begin();
