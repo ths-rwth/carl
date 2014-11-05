@@ -56,10 +56,11 @@ public:
 	}
     
 	std::shared_ptr<const carl::Monomial> randomMonomial(std::size_t degree) const {
-		std::vector<std::pair<carl::Variable, exponent>> newExps;
-		for (unsigned d = 1; d < degree; d++) 
-            newExps.emplace_back( randomVariable(), 1 );
-		return std::shared_ptr<const carl::Monomial>( new carl::Monomial( std::move( newExps ) ) );
+		Monomial::Arg res;
+		for (unsigned d = 1; d < degree; d++) {
+            res = res * randomVariable();
+		}
+		return res;
 	}
     
 	template<typename C>
