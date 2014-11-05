@@ -55,18 +55,6 @@ namespace carl {
 	};
 
 	//##### Executor
-	struct NoneExecutor {
-		template<typename Coeff>
-		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>>& args) {
-			return std::get<0>(args);
-		}
-		GMP operator()(const std::tuple<GMP>& args) {
-			return std::get<0>(args);
-		}
-		ZMP operator()(const std::tuple<ZMP>& args) {
-			return std::get<0>(args);
-		}
-	};	
 	struct AdditionExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
@@ -77,7 +65,7 @@ namespace carl {
 		}
 		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
 			auto res = std::get<0>(args) + std::get<1>(args);
-			res.m().lex_sort(res);
+			//res.m().lex_sort(res);
 			return res;
 		}
 	};
@@ -98,7 +86,10 @@ namespace carl {
 	struct DivisionExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
-			return std::get<0>(args).quotient(std::get<1>(args));
+			//return std::get<0>(args).quotient(std::get<1>(args));
+			CMP<Coeff> res;
+			std::get<0>(args).divideBy(std::get<1>(args), res);
+			return res;
 		}
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
 			GMP res;
@@ -216,28 +207,15 @@ TEST_F(BenchmarkTest, ReleaseCheck)
 #endif
 }
 
-/*
-TEST_F(BenchmarkTest, None)
-{
-	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
-	bi.degree = 2;
-	bi.n = 3;
-	Benchmark<ResultComparator<Coeff>, NoneExecutor<Coeff>, CMP<Coeff>, CMP<Coeff>> bench(bi, "CArL");
-	bench.compare<GMP, GMP>("GiNaC");
-	//bench.compare<ZMP, ZMP>("Z3");
-	file.push(bench.result(), bi.degree);
-}//*/
-
 TEST_F(BenchmarkTest, Addition)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
-	bi.n = 1000;
-	bi.compareResults = true;
-	for (bi.degree = 15; bi.degree < 20; bi.degree++) {
+	bi.n = 100;
+	for (bi.degree = 15; bi.degree < 16; bi.degree++) {
 		Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
 		//bench.compare<CMP<mpq_class>, TupleConverter<CMP<mpq_class>,CMP<mpq_class>>>("CArL GMP");
-		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
-		bench.compare<ZMP, TupleConverter<ZMP,ZMP>>("Z3");
+		//bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
+		//bench.compare<ZMP, TupleConverter<ZMP,ZMP>>("Z3");
 		file.push(bench.result(), bi.degree);
 	}
 }
@@ -246,7 +224,6 @@ TEST_F(BenchmarkTest, Multiplication)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
-	//bi.compareResults = true;
 	for (bi.degree = 5; bi.degree < 10; bi.degree++) {
 		Benchmark<AdditionGenerator<Coeff>, MultiplicationExecutor, CMP<Coeff>> bench(bi, "CArL");
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
@@ -259,7 +236,6 @@ TEST_F(BenchmarkTest, Division)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 3);
 	bi.n = 1000;
-	bi.compareResults = true;
 	for (bi.degree = 10; bi.degree < 20; bi.degree++) {
 		Benchmark<DivisionGenerator<Coeff>, DivisionExecutor, CMP<Coeff>> bench(bi, "CArL");
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
