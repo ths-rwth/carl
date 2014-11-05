@@ -16,12 +16,6 @@ using namespace carl;
 template<typename T>
 class MultivariatePolynomialTest: public testing::Test {};
 
-template<typename T>
-class Testtest
-{
-    typedef Interval<T> testtestInterval;
-};
-
 TYPED_TEST_CASE(MultivariatePolynomialTest, RationalTypes); // TODO should use NumberTypes
 
 TEST(MultivariatePolynomial, Constructor)
@@ -33,14 +27,6 @@ TEST(MultivariatePolynomial, Constructor)
     MultivariatePolynomial<mpz_class> p1(3);
     EXPECT_EQ((unsigned)1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
-    
-    Term<Interval<double>> ti(v0);
-    MultivariatePolynomial<Interval<double>> intervalPolyA(1);
-    MultivariatePolynomial<Interval<double>> intervalPolyB(ti);
-    EXPECT_EQ((unsigned)1, intervalPolyA.nrTerms());
-    EXPECT_TRUE(intervalPolyA.isLinear());
-    
-    Testtest<double> tt;
 }
 
 TEST(MultivariatePolynomial, Operators)
