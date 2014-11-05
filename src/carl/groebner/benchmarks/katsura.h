@@ -99,8 +99,10 @@ std::vector<MultivariatePolynomial<C, O, P>> katsura(unsigned index)
 		run_katsura_case(5);
 		//run_katsura_case(6);
 		//run_katsura_case(4);
+		default:
+			assert(index < 6):
 	}
-	
+	return std::vector<MultivariatePolynomial<C, O, P>>();
 }
 	
 	
