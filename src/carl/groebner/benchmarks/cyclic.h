@@ -59,6 +59,7 @@ std::vector<MultivariatePolynomial<C, O, P>> cyclic(unsigned index)
 		//run_katsura_case(6);
 		//run_katsura_case(4);
 		default:
+			assert(index > 1);
 			assert(index < 4):
 	}
 	return std::vector<MultivariatePolynomial<C, O, P>>();
