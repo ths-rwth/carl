@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cassert>
 #include "../../core/MultivariatePolynomial.h"
 #include "../../util/stringparser.h"
 
@@ -101,7 +102,7 @@ std::vector<MultivariatePolynomial<C, O, P>> katsura(unsigned index)
 		//run_katsura_case(4);
 		default:
 			assert(index > 1);
-			assert(index < 6):
+			assert(index < 6);
 	}
 	return std::vector<MultivariatePolynomial<C, O, P>>();
 }

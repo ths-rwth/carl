@@ -114,6 +114,7 @@ int execute(std::ostream& os = std::cout)
     {
         delete p;
     }
+    return 0;
         
 }
 
