@@ -1,6 +1,6 @@
 # Add test cpp file
 add_executable(runFormulaTests
-	Test_Ast.cpp
+	Test_Formula.cpp
 )
 cotire(runFormulaTests)
 
