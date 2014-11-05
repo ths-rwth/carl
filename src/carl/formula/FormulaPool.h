@@ -174,7 +174,7 @@ namespace carl
              */
             ConstElementSPtr create( FormulaType _type, const Formula<Pol>& _subFormulaA, const Formula<Pol>& _subFormulaB )
             {
-                std::set<const Formula<Pol>> subFormulas;
+                std::set<Formula<Pol>> subFormulas;
                 subFormulas.insert( _subFormulaA );
                 subFormulas.insert( _subFormulaB );
                 return create( _type, std::move( subFormulas ) );
@@ -185,11 +185,11 @@ namespace carl
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( const std::multiset<const Formula<Pol>>& _subformulas )
+            ConstElementSPtr create( const std::multiset<Formula<Pol>>& _subformulas )
             {
                 if( _subformulas.empty() ) return mpFalse;
                 if( _subformulas.size() == 1 ) return *_subformulas.begin();
-                std::set<const Formula<Pol>> subFormulas;
+                std::set<Formula<Pol>> subFormulas;
                 auto lastSubFormula = _subformulas.begin();
                 auto subFormula = lastSubFormula;
                 ++subFormula;
@@ -223,9 +223,9 @@ namespace carl
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( FormulaType _type, const std::set<const Formula<Pol>>& _subformulas )
+            ConstElementSPtr create( FormulaType _type, const std::set<Formula<Pol>>& _subformulas )
             {
-                return create( _type, std::move( std::set<const Formula<Pol>>( _subformulas ) ) );
+                return create( _type, std::move( std::set<Formula<Pol>>( _subformulas ) ) );
             }
 
 			ConstElementSPtr create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
@@ -267,7 +267,7 @@ namespace carl
              * sub-formula are condensed. You should only use it, if you can exlcude this 
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
-            ConstElementSPtr create( FormulaType _type, std::set<const Formula<Pol>>&& _subformulas );
+            ConstElementSPtr create( FormulaType _type, std::set<Formula<Pol>>&& _subformulas );
         
             /**
              * Creates a formula of the given type but with only one sub-formula.

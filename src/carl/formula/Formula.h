@@ -141,7 +141,7 @@ namespace carl
                 /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
                 QuantifierContent<Pol>* mpQuantifierContent;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                std::set<const Formula<Pol>>* mpSubformulas;
+                std::set<Formula<Pol>>* mpSubformulas;
                 /// The constraint, in case this formulas wraps a constraint.
                 const Constraint<Pol>* mpConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
@@ -212,7 +212,7 @@ namespace carl
              * @param _type The type of the formula to construct.
              * @param _subformulas The sub-formulas of the formula to construct.
              */
-            FormulaContent( const FormulaType _type, std::set<const Formula<Pol>>&& _subformulas );
+            FormulaContent( const FormulaType _type, std::set<Formula<Pol>>&& _subformulas );
 
             FormulaContent(); // Disabled
             FormulaContent( const FormulaContent& ); // Disabled
@@ -242,9 +242,9 @@ namespace carl
         
         public:
             /// A constant iterator to a sub-formula of a formula.
-            typedef typename std::set<const Formula>::const_iterator const_iterator;
+            typedef typename std::set<Formula>::const_iterator const_iterator;
             /// A constant reverse iterator to a sub-formula of a formula.
-            typedef typename std::set<const Formula>::const_reverse_iterator const_reverse_iterator;
+            typedef typename std::set<Formula>::const_reverse_iterator const_reverse_iterator;
             
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.
@@ -319,7 +319,7 @@ namespace carl
                 }
                 else
                 {
-                    std::set<const Formula> subFormulas;
+                    std::set<Formula> subFormulas;
                     subFormulas.insert( _subformulaA );
                     subFormulas.insert( _subformulaB );
                     subFormulas.insert( _subformulaC );
@@ -327,17 +327,17 @@ namespace carl
                 }
             }
             
-            Formula( FormulaType _type, const std::multiset<const Formula>& _subformulas ):
+            Formula( FormulaType _type, const std::multiset<Formula>& _subformulas ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _subformulas ) )
             {
                 assert( _type == FormulaType::XOR );
             }
             
-            Formula( FormulaType _type, const std::set<const Formula>& _subasts ):
+            Formula( FormulaType _type, const std::set<Formula>& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
-            Formula( FormulaType _type, std::set<const Formula>&& _subasts ):
+            Formula( FormulaType _type, std::set<Formula>&& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, move(_subasts) ) )
             {}
             
@@ -551,7 +551,7 @@ namespace carl
              * @return A constant reference to the list of sub-formulas of this formula. Note, that
              *          this formula has to be a Boolean combination, if you invoke this method.
              */
-            const std::set<const Formula>& subformulas() const
+            const std::set<Formula>& subformulas() const
             {
                 assert( isNary() );
                 return *mpContent->mpSubformulas;
@@ -971,7 +971,7 @@ namespace carl
              *                (_inConjunction == false) to which the bounds are added is invalid resp. valid;
              *         false, otherwise.
              */
-            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, std::set<const Formula>& _intoAsts, bool _inConjunction );
+            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, std::set<Formula>& _intoAsts, bool _inConjunction );
     };
     
     /**

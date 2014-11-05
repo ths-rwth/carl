@@ -42,12 +42,12 @@ TEST(Formula, Construction)
     const Formula<Pol> atomC = Formula<Pol>( b );
     
     // and the Ast itself:
-    std::set<const Formula<Pol>> subAstsA;
+    std::set<Formula<Pol>> subAstsA;
     subAstsA.insert( Formula<Pol>( FormulaType::NOT, atomC ) );
     subAstsA.insert( atomA );
     subAstsA.insert( atomB );
-    const Formula<Pol> phiA = Formula<Pol>( FormulaType::AND, subAstsA );
-    const Formula<Pol> phiC = Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, atomA ), atomC );
-    const Formula<Pol> phiE = Formula<Pol>( FormulaType::IMPLIES, phiA, phiC );
+    const Formula<Pol> phiA( FormulaType::AND, subAstsA );
+    const Formula<Pol> phiC( FormulaType::OR, Formula<Pol>( FormulaType::NOT, atomA ), atomC );
+    const Formula<Pol> phiE( FormulaType::IMPLIES, phiA, phiC );
     std::cout << phiE << std::endl;
 }
