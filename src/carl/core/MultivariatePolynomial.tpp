@@ -1286,6 +1286,16 @@ bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
+	/** @todo Make this faster
+	 * 
+	 * If both polynomials are ordered: Use merging strategy we used before.
+	 * 
+	 * Otherwise:
+	 *  Insert only terms of a single polynomial (the smaller one)
+	 *  Check if the terms of the other ones are in the map
+	 *    If yes: Remove from map, add to result
+	 *    If no: add to result
+     */
 	assert(this->isConsistent());
 	assert(rhs.isConsistent());
     if(mTerms.size() == 0) 
