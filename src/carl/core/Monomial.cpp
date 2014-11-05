@@ -280,22 +280,25 @@ namespace carl
                 ++itleft;
             }
 
-            else if(itleft->first > itright->first) 
+            else if(itleft->first < itright->first) 
             {
                 ++itright;
             }
             else
             {
-                assert(itright->first > itleft->first);
+                assert(itleft->first > itright->first);
                 ++itleft;
             }
         }
          // Insert remaining part
-        #ifdef USE_MONOMIAL_POOL
-        std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
-        #else
-        std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), expsum );
-        #endif
+		std::shared_ptr<const Monomial> result;
+		if (!newExps.empty()) {
+			#ifdef USE_MONOMIAL_POOL
+			std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
+			#else
+			std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), expsum );
+			#endif
+		}
         LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
         return result;
     }
