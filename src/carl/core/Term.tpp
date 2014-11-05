@@ -28,20 +28,20 @@ Term<Coefficient>::Term(const Coefficient& c) :
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
-    mCoeff(1), mMonomial(new Monomial(v))
+    mCoeff(1), mMonomial(std::make_shared<const Monomial>(v))
 {
     assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const std::shared_ptr<const Monomial>& m) :
+Term<Coefficient>::Term(const Monomial::Arg& m) :
     mCoeff(1), mMonomial(m)
 {
     assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m) :
+Term<Coefficient>::Term(const Coefficient& c, const Monomial::Arg& m) :
     mCoeff(c), mMonomial(m)
 {
     assert(this->isConsistent());
@@ -53,7 +53,7 @@ Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e):
     #ifdef USE_MONOMIAL_POOL
     mMonomial( MonomialPool::getInstance().create( v, e ) )
     #else
-    mMonomial( std::shared_ptr<const Monomial>( new Monomial(v, e) ) )
+    mMonomial( std::make_shared<const Monomial>( v, e) )
     #endif
 {
     assert(this->isConsistent());
@@ -345,17 +345,17 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
     }
     if(mMonomial)
     {
-        mMonomial = std::shared_ptr<const Monomial>(mMonomial * rhs);
+        mMonomial = mMonomial * rhs;
     }
     else
     {
-        mMonomial = std::shared_ptr<const Monomial>(new Monomial(rhs));
+        mMonomial = std::make_shared<const Monomial>(rhs);
     }
     return *this;
 }
 
 template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(const std::shared_ptr<const Monomial>& rhs)
+Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
 {
     if(mCoeff == Coefficient(0)) return *this;
     

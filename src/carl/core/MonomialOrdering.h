@@ -84,7 +84,7 @@ struct MonomialComparator
         #ifdef USE_MONOMIAL_POOL
         return f(t1.monomial(), MonomialPool::getInstance().create( v ));
         #else
-        return f(t1.monomial(), std::shared_ptr<const Monomial>( new Monomial( v ) ));
+        return f(t1.monomial(), std::make_shared<const Monomial>( v ));
         #endif
     }
     

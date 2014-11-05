@@ -84,7 +84,7 @@ public:
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
 	explicit MultivariatePolynomial(const std::shared_ptr<const Monomial>& m);
-	explicit MultivariatePolynomial(std::shared_ptr<const Term<Coeff >> t);
+	explicit MultivariatePolynomial(const std::shared_ptr<const Term<Coeff >>& t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<class OtherPolicy>
@@ -136,7 +136,7 @@ public:
 	 * The leading monomial
 	 * @return 
 	 */
-	const std::shared_ptr<const Monomial>& lmon() const;
+	const Monomial::Arg& lmon() const;
 	/**
 	 * The leading term
 	 * @return 
@@ -449,7 +449,7 @@ public:
 	MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator+=(const TermType& rhs);
 	MultivariatePolynomial& operator+=(const std::shared_ptr<const TermType>& rhs);
-	MultivariatePolynomial& operator+=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator+=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator+=(Variable::Arg rhs);
 	MultivariatePolynomial& operator+=(const Coeff& rhs);
 	/// @}
@@ -464,7 +464,7 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
-	MultivariatePolynomial& operator-=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator-=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator-=(Variable::Arg);
 	MultivariatePolynomial& operator-=(const Coeff& c);
 	/// @}
@@ -482,7 +482,7 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
-	MultivariatePolynomial& operator*=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator*=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator*=(Variable::Arg);
 	MultivariatePolynomial& operator*=(const Coeff& c);
 	/// @}
@@ -497,7 +497,7 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
-	MultivariatePolynomial& operator/=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator/=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator/=(Variable::Arg);
 	MultivariatePolynomial& operator/=(const Coeff& c);
 	/// @}

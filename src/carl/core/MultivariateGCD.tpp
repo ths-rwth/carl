@@ -89,7 +89,7 @@ std::shared_ptr<const Monomial> gcd(const MultivariatePolynomial<C,O,P>& a, std:
     #ifdef USE_MONOMIAL_POOL
     return MonomialPool::getInstance().create( std::move(vepairs) );
     #else
-    return std::shared_ptr<const Monomial>( new Monomial( std::move(vepairs) ) );
+    return std::make_shared<const Monomial>( std::move(vepairs) );
     #endif
 }
 

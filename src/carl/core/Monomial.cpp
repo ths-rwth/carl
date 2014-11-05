@@ -10,12 +10,14 @@ namespace carl
 {
     std::shared_ptr<const Monomial> Monomial::dropVariable(Variable::Arg v) const
     {
+		///@todo this should work on the shared_ptr directly. Then we could directly return this shared_ptr instead of the ugly copying.
         LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
         auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 
         if (it == mExponents.cend())
         {
-            return std::shared_ptr<const Monomial>( this );
+			std::vector<std::pair<Variable, exponent>> exps(this->mExponents);
+			return std::make_shared<const Monomial>(std::move(exps), this->mTotalDegree);
         }
         if (mExponents.size() == 1) return nullptr;
 
@@ -26,7 +28,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), tDeg );
         #else
-        return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tDeg ) );
+        return std::make_shared<const Monomial>( std::move(newExps), tDeg );
         #endif
     }
     
@@ -50,7 +52,7 @@ namespace carl
             #ifdef USE_MONOMIAL_POOL
             return MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
             #else
-            return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), (exponent)(mTotalDegree - 1) ) );
+            return std::make_shared<const Monomial>( std::move(newExps), (exponent)(mTotalDegree - 1) );
             #endif
         }
     }
@@ -80,7 +82,7 @@ namespace carl
                 #ifdef USE_MONOMIAL_POOL
                 std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
                 #else
-                std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) ) );
+                std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
                 #endif
                 LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
                 return std::make_pair(result,true);;
@@ -127,7 +129,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
         #else
-        std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) ) );
+        std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
         #endif
         LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
         return std::make_pair(result,true);
@@ -150,7 +152,7 @@ namespace carl
                 #ifdef USE_MONOMIAL_POOL
                 return MonomialPool::getInstance().create( std::move(newExps), tdegree );
                 #else
-                return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tdegree ) );
+                return std::make_shared<const Monomial>( std::move(newExps), tdegree );
                 #endif
             }
             // Variable is present in both monomials.
@@ -185,7 +187,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), tdegree);
         #else
-        return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tdegree ) );
+        return std::make_shared<const Monomial>( std::move(newExps), tdegree );
         #endif
     }
     
@@ -199,7 +201,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), (exponent)mExponents.size() );
         #else
-        return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), (exponent)mExponents.size() ) );
+        return std::make_shared<const Monomial>( std::move(newExps), (exponent)mExponents.size() );
         #endif
     }
     
@@ -219,7 +221,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), expsum );
         #else
-        return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), expsum ) );
+        return std::make_shared<const Monomial>( std::move(newExps), expsum );
         #endif
     }
     
@@ -292,7 +294,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
         #else
-        std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial(  std::move(newExps), expsum ) );
+        std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), expsum );
         #endif
         LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
         return result;
@@ -323,7 +325,7 @@ namespace carl
                 #ifdef USE_MONOMIAL_POOL
                 std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
                 #else
-                std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), expsum ) );
+                std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), expsum );
                 #endif
                 LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
                 return result;
@@ -356,7 +358,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
         #else
-        std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), expsum ) );
+        std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), expsum );
         #endif
         LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
         return result;
@@ -459,7 +461,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + rhs->tdeg() );
         #else
-        std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), lhs->tdeg() + rhs->tdeg() ) );
+        std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), lhs->tdeg() + rhs->tdeg() );
         #endif
         LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
         return result;
@@ -488,7 +490,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 );
         #else
-        return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), lhs->tdeg() + 1 ) );
+        return std::make_shared<const Monomial>( std::move(newExps), lhs->tdeg() + 1 );
         #endif
     }
     
@@ -515,7 +517,7 @@ namespace carl
         #ifdef USE_MONOMIAL_POOL
         return MonomialPool::getInstance().create( std::move(newExps), 2 );
         #else
-        return std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), 2 ) );
+        return std::make_shared<const Monomial>( std::move(newExps), 2 );
         #endif
     }
 }

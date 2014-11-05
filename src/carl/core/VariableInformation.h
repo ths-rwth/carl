@@ -8,6 +8,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <memory>
 #include <algorithm>
 
 #include "Variable.h"
@@ -197,7 +198,7 @@ namespace carl
             }
             if(totalDegree != 0) 
             { 
-                typename CoeffType::MonomType* m = new typename CoeffType::MonomType(std::move(exps), totalDegree);
+                std::shared_ptr<typename CoeffType::MonomType> m = std::make_shared<typename CoeffType::MonomType>(std::move(exps), totalDegree);
                 updateCoeff(e, typename CoeffType::TermType(termCoeff, m));
             }
             else

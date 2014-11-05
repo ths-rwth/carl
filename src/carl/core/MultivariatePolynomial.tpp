@@ -61,7 +61,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(v))
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const std::shared_ptr<const carl::Monomial>& m) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Monomial::Arg& m) :
 Policies(),
 mTerms(1,std::make_shared<const Term<Coeff>>(m))
 {
@@ -82,7 +82,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(t))
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(std::shared_ptr<const Term<Coeff>> t) :
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const std::shared_ptr<const Term<Coeff>>& t) :
 Policies(),
 mTerms(1,t)
 {
@@ -228,7 +228,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 }
     
 template<typename Coeff, typename Ordering, typename Policies>
-const std::shared_ptr<const Monomial>& MultivariatePolynomial<Coeff,Ordering,Policies>::lmon() const
+const Monomial::Arg& MultivariatePolynomial<Coeff,Ordering,Policies>::lmon() const
 {
     return lterm()->monomial();
 }
@@ -956,6 +956,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	TermsType tmpTerms;
 	for(const auto& t : mTerms) {
 		tmpTerms.emplace_back(t->derivative(v));
+		if (tmpTerms.back()->isZero()) tmpTerms.pop_back();
 	}
 	return MultivariatePolynomial(std::move(tmpTerms), true, false);
 }
@@ -1336,8 +1337,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const TermType& rhs) {
-	std::shared_ptr<const TermType> t(new TermType(rhs));
-	return *this += t;
+	return *this += std::make_shared<const TermType>(rhs);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1563,7 +1563,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const std::shared_ptr<const carl::Monomial>& rhs)
+MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const Monomial::Arg& rhs)
 {
 	///@todo Check if this works with ordering.
     if(!rhs) 
@@ -1662,7 +1662,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
     return *this;
 }
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const std::shared_ptr<const carl::Monomial>& rhs)
+MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator*=(const Monomial::Arg& rhs)
 {
 	assert(this->isConsistent());
 	///@todo more efficient.
