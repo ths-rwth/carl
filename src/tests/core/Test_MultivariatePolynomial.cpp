@@ -92,6 +92,7 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
 
 TEST(MultivariatePolynomial, Addition)
 {
+	VariablePool::getInstance().clear();
     Variable v0((unsigned)1);
     Term<mpz_class> t0(v0);
     MultivariatePolynomial<mpz_class> p0(v0);
@@ -209,10 +210,10 @@ TEST(MultivariatePolynomial, Normalize)
     mp2 += v1;
     EXPECT_EQ(mp2, mp.normalize());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v1);
-    mp += (cln::cl_RA)4 * v0;
-    mp2 = MultivariatePolynomial<cln::cl_RA>(v1);
-    mp2 += (cln::cl_RA)2 * v0;
+    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
+    mp += (cln::cl_RA)4 * v1;
+    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
+    mp2 += (cln::cl_RA)2 * v1;
     EXPECT_EQ(mp2, mp.normalize());
 }
 
@@ -428,7 +429,7 @@ TEST(MultivariatePolynomial, GatherVariables)
     MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
     std::set<Variable> vars;
     f1.gatherVariables(vars);
-    EXPECT_EQ(x, *vars.begin());
+    EXPECT_EQ(y, *vars.begin());
     EXPECT_EQ((unsigned)2, vars.size());
 }
 

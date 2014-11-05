@@ -64,7 +64,7 @@ TYPED_TEST(TermTest, TermMultiplication)
     Variable y = pool.getFreshVariable("y");
 
     EXPECT_EQ(Term<TypeParam>(12, x * x * y), Term<TypeParam>(3, x * y) * Term<TypeParam>(4, x, 1));
-    EXPECT_EQ(Term<TypeParam>(0, x * x * y * y * y), Term<TypeParam>(3, x * x) * Term<TypeParam>(0, y * y * y));
+    EXPECT_EQ(Term<TypeParam>(TypeParam(0)), Term<TypeParam>(3, x * x) * Term<TypeParam>(0, y * y * y));
     EXPECT_EQ(Term<TypeParam>(18, x * x * y * y * y), Term<TypeParam>(9, x * y) * Term<TypeParam>(2, x * y * y));
 }
 
@@ -100,11 +100,11 @@ TYPED_TEST(TermTest, Comparison)
     Variable z = pool.getFreshVariable("z");
 
     ComparisonList<Term<TypeParam> > terms;
-    terms.push_back((TypeParam)2 * x * y * z);
     terms.push_back((TypeParam)3 * y * z * z);
     terms.push_back((TypeParam)9 * y * z * z);
-    terms.push_back((TypeParam)7 * x * y * y * z);
+    terms.push_back((TypeParam)2 * x * y * z);
     terms.push_back((TypeParam)4 * x * y * z * z);
+    terms.push_back((TypeParam)7 * x * y * y * z);
 
     expectRightOrder(terms);
 }
@@ -117,15 +117,15 @@ TYPED_TEST(TermTest, OtherComparison)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    list.push_back(x);
-    list.push_back((TypeParam)7 * x);
     list.push_back(y);
     list.push_back((TypeParam)3 * y);
+    list.push_back(x);
+    list.push_back((TypeParam)7 * x);
     list.push_back(x * x);
     list.push_back((TypeParam)3 * x * x);
-    list.push_back((TypeParam)9 * x * x * y);
     list.push_back(x * y * y);
     list.push_back((TypeParam)5 * x * y * y);
+    list.push_back((TypeParam)9 * x * x * y);
 
     expectRightOrder(list);
 }

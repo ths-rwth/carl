@@ -25,11 +25,11 @@ TEST(Variable, Comparison)
 {
     ComparisonList<Variable> list;
 
-    Variable v0(321);
-    Variable v1(123);
-    Variable v2(132);
+    Variable v0(1);
+    Variable v1(2);
+    Variable v2(3);
 
-    list.push_back(v0);
-    list.push_back(v1);
     list.push_back(v2);
+    list.push_back(v1);
+    list.push_back(v0);
 }

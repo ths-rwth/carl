@@ -38,7 +38,7 @@ TEST(Monomial, VariableMultiplication)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1)}, 1)), x);
+    EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1)})), x);
     EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1), std::make_pair(y, 1)})), x * y);
     EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 2), std::make_pair(y, 1)})), x * x * y);
     EXPECT_EQ(std::shared_ptr<const Monomial>(new Monomial({std::make_pair(x, 1), std::make_pair(y, 2)})), y * x * y);
@@ -101,11 +101,11 @@ TEST(Monomial, Comparison)
     Variable z = pool.getFreshVariable("z");
 
     ComparisonList<Monomial::Arg> monomials;
-    monomials.push_back(x * x * x);
-    monomials.push_back(x * x * y);
-    monomials.push_back(x * y * y);
     monomials.push_back(y * y * y);
     monomials.push_back(x * y * z);
+    monomials.push_back(x * y * y);
+    monomials.push_back(x * x * y);
+    monomials.push_back(x * x * x);
     monomials.push_back(x * y * y * z);
     monomials.push_back(x * x * z * z);
 
@@ -121,13 +121,13 @@ TEST(Monomial, OtherComparison)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    list.push_back(x);
     list.push_back(y);
-    list.push_back(x * x);
-    list.push_back(x * y);
+    list.push_back(x);
     list.push_back(y * y);
-    list.push_back(x * x * x);
+    list.push_back(x * y);
+    list.push_back(x * x);
     list.push_back(x * x * y);
+    list.push_back(x * x * x);
     list.push_back(x * x * x * x);
 
     expectRightOrder(list);
