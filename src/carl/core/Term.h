@@ -16,7 +16,7 @@
 
 namespace carl
 {
-
+    
 /**
  * Represents a single term, that is a numeric coefficient and a monomial.
  * @ingroup multirp
@@ -258,7 +258,7 @@ class Term
 			}
 			
 		}
-
+        
 	    template<typename C = Coefficient, DisableIf<is_interval<C>> = dummy>
 	    std::string toString(bool infix=true, bool friendlyVarNames=true) const;
         

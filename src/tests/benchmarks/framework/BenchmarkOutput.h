@@ -26,7 +26,8 @@ public:
 template<typename... Identifier>
 std::ostream& operator<<(std::ostream& os, const BenchmarkFile<Identifier...>& file) {
 	os << "\\begin{tabular}{|r";
-	for (auto name: file.names) os << "|r";
+    auto ns = file.names.size();
+	for (unsigned i = 0; i < ns; ++i) os << "|r";
 	os << "|}" << std::endl;
 	os << "\\hline" << std::endl;
 	os << "degree";

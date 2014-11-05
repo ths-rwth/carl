@@ -1,15 +1,14 @@
 # Header files in here (only headers from this directory!)
 set(carl_lib_formula_headers 
-    Ast.h
-    Ast.tpp
-    AstPool.h
-    AstPool.tpp
+    Formula.h
+    Formula.tpp
+    FormulaPool.h
+    FormulaPool.tpp
     Condition.h
     Constraint.h
     Constraint.tpp
     ConstraintPool.h
     ConstraintPool.tpp
-    Formula.h
     Relation.h
     Sort.h 
     SortManager.h 

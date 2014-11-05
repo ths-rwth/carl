@@ -1589,7 +1589,11 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const std::shared_ptr<const carl::Monomial>& rhs)
 {
 	///@todo Check if this works with ordering.
-    if(rhs->tdeg() == 0) return *this - 1;
+    if(!rhs) 
+    {
+        *this -= Coeff(1);
+        return *this;
+    }
     if(Policies::searchLinear) 
     {
         typename TermsType::iterator it(mTerms.begin());

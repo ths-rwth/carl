@@ -45,26 +45,33 @@ public:
 	T geomDist() const {
 		return geom(rand) + 1;
 	}
+    
 	/// integers: [0, ..., mod-1]
 	std::size_t uniDist(std::size_t mod) const {
 		return rand() % mod;
 	}
+    
 	carl::Variable randomVariable() const {
 		return bi.variables[uniDist(bi.variables.size())];
 	}
-	carl::Monomial randomMonomial(std::size_t degree) const {
-		carl::Monomial m = randomVariable();
-		for (unsigned d = 1; d < degree; d++) m *= randomVariable();
-		return m;
+    
+	std::shared_ptr<const carl::Monomial> randomMonomial(std::size_t degree) const {
+		std::vector<std::pair<carl::Variable, exponent>> newExps;
+		for (unsigned d = 1; d < degree; d++) 
+            newExps.emplace_back( randomVariable(), 1 );
+		return std::shared_ptr<const carl::Monomial>( new carl::Monomial( std::move( newExps ) ) );
 	}
+    
 	template<typename C>
 	carl::Term<C> randomTerm(std::size_t degree) const {
 		return geomDist<C>() * randomMonomial(degree);
 	}
+    
 	template<typename C>
 	CMP<C> newMP() const {
 		return newMP<C>(bi.degree);
 	}
+    
 	template<typename C>
 	CMP<C> newMP(std::size_t deg) const {
 		carl::MultivariatePolynomial<C> res;
@@ -78,10 +85,12 @@ public:
 		}
 		return res;
 	}
+    
 	template<typename C>
 	CUMP<C> newUMP() const {
 		return newMP<C>().toUnivariatePolynomial(randomVariable());
 	}
+    
 	template<typename C>
 	CUMP<C> newUMP(carl::Variable::Arg v) const {
 		return newMP<C>().toUnivariatePolynomial(v);

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../../carl/formula/Ast.h"
+#include "../../carl/formula/Formula.h"
 #include "../../carl/formula/VariableNamePool.h"
 #include "../../carl/util/stringparser.h"
 
@@ -11,10 +11,8 @@ using namespace carl;
 typedef cln::cl_RA Rational;
 typedef MultivariatePolynomial<Rational> Pol;
 typedef Constraint<Pol> Constr;
-typedef Ast<Pol> Astt;
 
-
-TEST(Ast, Construction)
+TEST(Formula, Construction)
 {
     Variable x = newArithmeticVariable( "x", VariableType::VT_REAL );
     Variable y = newArithmeticVariable( "y", VariableType::VT_REAL );
@@ -35,24 +33,21 @@ TEST(Ast, Construction)
     
     // Constraints can then be constructed as follows:
     const Constr* constraintA = newConstraint<Pol>( lhsA, Relation::LESS );
-    const Constr* constraintB = newConstraint<Pol>( lhsB, Relation::EQ );
     
     // Uninterpreted functions are 
     
     // Now, we can construct the atoms of the Boolean Ast
-    const Astt* atomA = newAst<Pol>( constraintA );
-    const Astt* atomB = newAst<Pol>( constraintB );
-    const Astt* atomC = newBoolean<Pol>( b );
+    const Formula<Pol> atomA = Formula<Pol>( constraintA );
+    const Formula<Pol> atomB = Formula<Pol>( lhsB, Relation::EQ );
+    const Formula<Pol> atomC = Formula<Pol>( b );
     
     // and the Ast itself:
-    PointerSet<Astt> subAstsA;
-    subAstsA.insert( newNegation<Pol>( atomC ) );
+    std::set<const Formula<Pol>> subAstsA;
+    subAstsA.insert( Formula<Pol>( FormulaType::NOT, atomC ) );
     subAstsA.insert( atomA );
     subAstsA.insert( atomB );
-    const Astt* phiA = newAst<Pol>( AND, subAstsA );
-    PointerSet<Astt> subAstsB;
-    subAstsB.insert( newNegation<Pol>( atomA ) );
-    subAstsB.insert( atomC );
-    const Astt* phiC = newAst<Pol>( OR, subAstsB );
-    const Astt* phiE = newImplication<Pol>( phiA, phiC );
+    const Formula<Pol> phiA = Formula<Pol>( FormulaType::AND, subAstsA );
+    const Formula<Pol> phiC = Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, atomA ), atomC );
+    const Formula<Pol> phiE = Formula<Pol>( FormulaType::IMPLIES, phiA, phiC );
+    std::cout << phiE << std::endl;
 }

@@ -190,5 +190,19 @@ inline bool isInteger(const GFNumber<IntegerT>&) {
 	return false;
 }
 
+/**
+ * Creates the string representation to the given galois field number.
+ * @param _number The galois field number to get its string representation for.
+ * @param _infix A flag indicating whether the galois field number should be represented in infix (if true) or prefix (otherwise).
+ * @return The string representation to the given galois field number.
+ */
+template<typename IntegerType>
+std::string toString(const GFNumber<IntegerType>& _number, bool)
+{
+    std::stringstream s;
+    s << _number;
+    return s.str();
+}
+
 }
 #include "GFNumber.tpp"
