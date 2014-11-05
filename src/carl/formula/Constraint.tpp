@@ -9,7 +9,7 @@
 
 #include "Constraint.h"
 #ifdef COMPARE_WITH_GINAC
-#include "../converter/GinacConverter.h"
+#include "../converter/OldGinacConverter.h"
 #endif
 
 using namespace std;
