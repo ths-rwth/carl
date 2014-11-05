@@ -236,7 +236,7 @@ namespace carl
 				LOG_ASSERT("carl.stringparser", mSingleSymbVariables, "The implicit mode can only be set with single symbol variables");				
 			}
 			
-			std::sort(varExpPairs.begin(), varExpPairs.end());
+			std::sort(varExpPairs.begin(), varExpPairs.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });
 			size_t nrVariables = varExpPairs.size();
 			std::unique(varExpPairs.begin(), varExpPairs.end());
 			if(nrVariables != varExpPairs.size())
