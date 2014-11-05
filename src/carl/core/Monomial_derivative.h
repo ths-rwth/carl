@@ -46,7 +46,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
             std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), mTotalDegree - 1 ) );
             #endif
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-            return new Term<Coefficient>(1, result);
+            return new Term<Coefficient>((Coefficient)1, result);
         }
         // We have to decrease the exponent of the variable by one.
         else
