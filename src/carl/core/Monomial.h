@@ -134,10 +134,12 @@ namespace carl
 		 * @param exponents The variables and their exponents.
 		 * @param totalDegree The total degree of the monomial to generate.
 		 */
-		Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents, exponent totalDegree) :
+		explicit Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents) :
             mExponents(exponents),
-            mTotalDegree(totalDegree)
+            mTotalDegree(0)
         {
+			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });
+			for (const auto& e: mExponents) mTotalDegree += e.second;
             calcHash();
 			assert(isConsistent());
         }
@@ -658,14 +660,12 @@ namespace carl
     
 	inline bool operator<(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		if (lhs == nullptr) return true;
-		if (lhs->tdeg() == 0) return true;
 		if (lhs->tdeg() > 1) return false;
 		return lhs->begin()->first < rhs;
 	}
     
 	inline bool operator<(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		if (rhs == nullptr) return false;
-		if (rhs->tdeg() == 0) return false;
 		if (rhs->tdeg() > 1) return true;
 		return lhs < rhs->begin()->first;
 	}

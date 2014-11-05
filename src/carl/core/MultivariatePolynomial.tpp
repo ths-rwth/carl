@@ -233,21 +233,21 @@ const std::shared_ptr<const Monomial>& MultivariatePolynomial<Coeff,Ordering,Pol
     return lterm()->monomial();
 }
 template<typename Coeff, typename Ordering, typename Policies>
-std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
+const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
 {
     LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
 	return mTerms.back();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-std::shared_ptr<const Term<Coeff>> MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
+const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
 {
     LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
 	return mTerms.front();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
+const Coeff& MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 {
     return lterm()->coeff();
 }
@@ -1373,7 +1373,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		if (lcoeff() + rhs->coeff() == Coeff(0)) {
 			mTerms.pop_back();
 			makeMinimallyOrdered();
-		} else this->lterm().reset(new Term<Coeff>(lcoeff() + rhs->coeff(), rhs->monomial()));
+		} else mTerms.back().reset(new Term<Coeff>(lcoeff() + rhs->coeff(), rhs->monomial()));
 	} else if (Ordering::less(lterm(), rhs)) {
 		// New leading term.
 		mTerms.push_back(rhs);
@@ -1393,7 +1393,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const std::shared_ptr<const carl::Monomial>& rhs)
+MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const Monomial::Arg& rhs)
 {
 	if (mTerms.size() == 0) {
 		// Empty -> just insert.
@@ -1406,18 +1406,29 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		if (lcoeff() == Coeff(-1)) {
 			mTerms.pop_back();
 			makeMinimallyOrdered();
-		} else this->lterm().reset(new Term<Coeff>(lcoeff() + 1, lmon()));
+		} else {
+			mTerms.back().reset(new Term<Coeff>(lcoeff() + 1, lmon()));
+		}
 	} else if (Ordering::less(lmon(),rhs)) {
 		// New leading term.
 		mTerms.emplace_back(new TermType(rhs));
 	} else {
-		// Full-blown addition.
-		std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + 1);
-		for (const auto& term: mTerms) {
-			mTermAdditionManager.addTerm(*this, id, term);
+		///@todo insert at correct position if already ordered
+		auto it = mTerms.begin();
+		for (; it != mTerms.end(); it++) {
+			if ((*it)->monomial() == rhs) {
+				if ((*it)->coeff() == Coeff(-1)) {
+					mTerms.erase(it);
+				} else {
+					it->reset(new Term<Coeff>((*it)->coeff() + 1, (*it)->monomial()));
+				}
+				break;
+			}
 		}
-		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType(rhs)));
-		mTermAdditionManager.readTerms(*this, id, mTerms);
+		if (it == mTerms.end()) {
+			mTerms.emplace_back(new Term<Coeff>(Coeff(1), rhs));
+			std::swap(mTerms[mTerms.size()-2], mTerms[mTerms.size()-1]);
+		}
 		mOrdered = false;
 	}
 	assert(this->isConsistent());
@@ -1427,41 +1438,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(Variable::Arg rhs)
 {
-	///@todo make this more efficient
-    if(Policies::searchLinear) 
-    {
-        typename TermsType::iterator it(mTerms.begin());
-        while(it != mTerms.end())
-        {
-            CompareResult cmpres(Ordering::compare(**it, rhs));
-            if( cmpres == CompareResult::GREATER ) break;
-            if( cmpres == CompareResult::EQUAL )
-            {
-                // new coefficient would be zero, simply removing is enough.
-                if((**it).coeff() == -1)
-                {
-                    mTerms.erase(it);
-                }
-                // we have to create a new term object.
-                else
-                {
-                    *it = std::make_shared<const Term<Coeff>>((**it).coeff()+1, (**it).monomial());
-                }
-				assert(this->isConsistent());
-                return *this;
-            }
-            ++it;    
-        }
-        // no eq ual monomial does occur. We can simply insert.
-        mTerms.insert(it,std::make_shared<const Term<Coeff>>(rhs));
-    }
-    else 
-    {
-        LOG_NOTIMPLEMENTED();
-        
-    }
-	assert(this->isConsistent());
-    return *this;
+    return *this += std::make_shared<const Monomial>(rhs);
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

@@ -153,6 +153,9 @@ public:
 	 * Compares two variables.
 	 *
 	 * Note that for performance reasons, we compare the not only the id but the whole content of the variable (including type and rank).
+	 *
+	 * Note that the variable order is not the order of the variable id. We consider variables greater, if they are defined earlier, i.e. if they have a smaller id.
+	 * Hence, the variables order and the order of the variable ids are reversed.
 	 * @param lhs First variable.
 	 * @param rhs Second variable.
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
@@ -164,16 +167,16 @@ public:
 		return lhs.mContent != rhs.mContent;
 	}
 	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs) {
-		return lhs.mContent < rhs.mContent;
-	}
-	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) {
-		return lhs.mContent <= rhs.mContent;
-	}
-	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent > rhs.mContent;
 	}
-	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) {
 		return lhs.mContent >= rhs.mContent;
+	}
+	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) {
+		return lhs.mContent < rhs.mContent;
+	}
+	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) {
+		return lhs.mContent <= rhs.mContent;
 	}
 	/// @}
 

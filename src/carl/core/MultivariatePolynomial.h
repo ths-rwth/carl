@@ -141,13 +141,13 @@ public:
 	 * The leading term
 	 * @return 
 	 */
-	std::shared_ptr<const Term<Coeff>> lterm() const;
+	const std::shared_ptr<const Term<Coeff>>& lterm() const;
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
 	 * @return 
 	 */
-	Coeff lcoeff() const;
+	const Coeff& lcoeff() const;
 	/**
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
@@ -204,7 +204,7 @@ public:
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 
 	 */
-	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
+	const std::shared_ptr<const Term<Coeff>>& trailingTerm() const;
 	/**
 	 * Checks if the polynomial has a constant term that is not zero.
 	 * @return If there is a constant term unequal to zero.

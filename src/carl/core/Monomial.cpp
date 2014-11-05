@@ -364,17 +364,19 @@ namespace carl
     
     bool Monomial::isConsistent() const
     {
-        LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree);
+        LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
         if (mTotalDegree < 1) return false;
         if (mHash == 0) return false;
         unsigned tdegree = 0;
-        unsigned lastVarIndex = 0;
+        Variable lastVar = Variable::NO_VARIABLE;
         for(auto ve : mExponents)
         {
             if (ve.second <= 0) return false;
-            if (ve.first.getId() < lastVarIndex) return false;
+			if (lastVar != Variable::NO_VARIABLE) {
+				if (ve.first > lastVar) return false;
+			}
             tdegree += ve.second;
-            lastVarIndex = ve.first.getId();
+            lastVar = ve.first;
         }
         if (tdegree != mTotalDegree) return false;
         return true;
@@ -385,10 +387,10 @@ namespace carl
         if (&lhs == &rhs) {
             return CompareResult::EQUAL;
         }
-        auto lhsit = lhs.mExponents.rbegin( );
-        auto rhsit = rhs.mExponents.rbegin( );
-        auto lhsend = lhs.mExponents.rend( );
-        auto rhsend = rhs.mExponents.rend( );
+        auto lhsit = lhs.mExponents.begin( );
+        auto rhsit = rhs.mExponents.begin( );
+        auto lhsend = lhs.mExponents.end( );
+        auto rhsend = rhs.mExponents.end( );
         while( lhsit != lhsend )
         {
             if( rhsit == rhsend )
@@ -438,7 +440,7 @@ namespace carl
                 ++itright;
             }
             // Variable is not present in lhs, we have to insert var-exp pair from rhs.
-            else if(itleft->first > itright->first) 
+            else if(itleft->first < itright->first)
             {
                 newExps.push_back( *itright );
                 ++itright;
@@ -472,11 +474,11 @@ namespace carl
 		bool inserted = false;
 		for (const auto& p: *lhs) {
 			if (inserted) newExps.push_back(p);
-			else if (p.first < rhs) newExps.push_back(p);
+			else if (p.first > rhs) newExps.push_back(p);
 			else if (p.first == rhs) {
 				newExps.emplace_back(rhs, p.second + 1);
 				inserted = true;
-			} else if (p.first > rhs) {
+			} else if (p.first < rhs) {
 				newExps.emplace_back(rhs, 1);
 				newExps.push_back(p);
 				inserted = true;
