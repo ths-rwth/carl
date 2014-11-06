@@ -540,6 +540,7 @@ private:
 	/**
 	 * Make sure that the terms are at least minimally ordered.
 	 */
+	template<bool findConstantTerm=true, bool findLeadingTerm=true> 
 	void makeMinimallyOrdered() const;
 	/**
 	 * Make sure that the terms are at least minimally ordered.
@@ -566,6 +567,7 @@ public:
 	 */
 	bool isConsistent() const;
 };
+
 	template<typename C, typename O, typename P>
 	MultivariatePolynomial<C,O,P> quotient(const MultivariatePolynomial<C,O,P>& p, const MultivariatePolynomial<C,O,P>& q)
 	{

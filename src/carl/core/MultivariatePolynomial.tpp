@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <memory>
 #include <list>
+#include <type_traits>
 
 #include "Term.h"
 #include "UnivariatePolynomial.h"
@@ -1926,26 +1927,53 @@ std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool inf
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+template<bool findConstantTerm, bool findLeadingTerm>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered() const {
-	if (mTerms.size() < 2) return;
-	auto it = mTerms.begin();
-	auto lTerm = it;
-	auto constTerm = mTerms.end();
-	if ((*it)->isConstant()) constTerm = it;
+	static_assert(findLeadingTerm, "We do not have implementations of makeMinimallyOrdered() which assume a given leading term position.");
+	
+	if(findConstantTerm)
+	{
+		if (mTerms.size() < 2) return;
+		auto it = mTerms.begin();
+		auto lTerm = it;
+		auto constTerm = mTerms.end();
+		if ((*it)->isConstant()) constTerm = it;
 
-	for (it++; it != mTerms.end();) {
-		if ((*it)->isConstant()) {
-			assert(constTerm == mTerms.end());
-			constTerm = it;
-		} else if (Ordering::less(*lTerm, *it)) {
-			lTerm = it;
-		} else {
-			assert(!Term<Coeff>::monomialEqual(**lTerm, **it));
+		for (it++; it != mTerms.end();) {
+			if ((*it)->isConstant()) {
+				assert(constTerm == mTerms.end());
+				constTerm = it;
+			} else if (Ordering::less(*lTerm, *it)) {
+				lTerm = it;
+			} else {
+				assert(!Term<Coeff>::monomialEqual(**lTerm, **it));
+			}
+			it++;
 		}
-		it++;
+		makeMinimallyOrdered(lTerm, constTerm);
 	}
-	makeMinimallyOrdered(lTerm, constTerm);
+	else
+	{
+		if (mTerms.size() < 3) return;
+		auto it = mTerms.begin();
+		const auto itToLast = mTerms.end() - 1;
+		auto lTerm = it;
+
+		for (it++; it != itToLast; ++it) {
+			if (Ordering::less(*lTerm, *it)) {
+				lTerm = it;
+			} else {
+				assert(!Term<Coeff>::monomialEqual(**lTerm, **it));
+			}
+		}
+
+		assert(!Term<Coeff>::monomialEqual(**lTerm, **itToLast));
+		if (!Ordering::less(*lTerm, *itToLast)) {
+			std::swap(*lTerm, mTerms.back());
+		} 
+	}
 }
+
 
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered(typename TermsType::iterator& lterm, typename TermsType::iterator& cterm) const {
