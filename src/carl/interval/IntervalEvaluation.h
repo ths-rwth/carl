@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "DoubleInterval.h"
 #include "Interval.h"
 
 #include "../core/Monomial.h"
