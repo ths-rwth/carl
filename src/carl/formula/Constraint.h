@@ -17,6 +17,9 @@
 #include <sstream>
 #include <assert.h>
 #include "Relation.h"
+#include "../interval/Interval.h"
+#include "../interval/IntervalEvaluation.h"
+#include "../core/Definiteness.h"
 #include "../util/Common.h"
 #include "config.h"
 

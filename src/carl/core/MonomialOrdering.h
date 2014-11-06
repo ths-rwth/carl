@@ -82,9 +82,9 @@ struct MonomialComparator
     {
         /// @todo: let f have the template parameter specifying the type of its second argument
         #ifdef USE_MONOMIAL_POOL
-        return f(t1.monomial(), MonomialPool::getInstance().create( v ));
+        return f(t1.monomial(), MonomialPool::getInstance().create( v, 1 ));
         #else
-        return f(t1.monomial(), std::shared_ptr<const Monomial>( new Monomial( v ) ));
+        return f(t1.monomial(), std::make_shared<const Monomial>( v ));
         #endif
     }
     

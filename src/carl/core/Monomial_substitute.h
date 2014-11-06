@@ -40,7 +40,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Coefficient>& su
     #ifdef USE_MONOMIAL_POOL
     std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), tdegree );
     #else
-    std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tdegree ) );
+    std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), tdegree );
     #endif
 	LOGMSG_TRACE("carl.core.monomial", "Result: " << factor << "*" << result);
 	return new Term<Coefficient>(factor, result);	
@@ -77,7 +77,7 @@ Term<Coefficient>* Monomial::substitute(const std::map<Variable,Term<Coefficient
 	#ifdef USE_MONOMIAL_POOL
     std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), tdegree );
     #else
-    std::shared_ptr<const Monomial> result = std::shared_ptr<const Monomial>( new Monomial( std::move(newExps), tdegree ) );
+    std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), tdegree );
     #endif
 	if(factor.monomial())
 	{

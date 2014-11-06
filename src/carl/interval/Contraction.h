@@ -7,6 +7,7 @@
 
 #include "Interval.h"
 #include "../core/Sign.h"
+#include "IntervalEvaluation.h"
 
 
 #pragma once

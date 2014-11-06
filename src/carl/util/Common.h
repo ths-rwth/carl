@@ -12,128 +12,123 @@
 #include <string.h>
 #include <unordered_set>
 #include <unordered_map>
-#include "../core/logging.h"
-#include "../core/MultivariatePolynomial.h"
+
 #include "../core/Variable.h"
-#include "../core/VariablePool.h"
-#include "../interval/Interval.h"
-#include "../interval/IntervalEvaluation.h"
-#include "../interval/Contraction.h"
-#include "../io/streamingOperators.h"
+#include "../core/VariableInformation.h"
 
 namespace carl
 {
 
-    // Enumerations.
-    /// @todo Are these enumerations needed in carl or should we put them to smtrat?
-    enum class Variable_Domain: unsigned { BOOLEAN = 0, REAL = 1, INTEGER = 2 };
-    
-    enum class Logic : unsigned { UNDEFINED, QF_NRA, QF_LRA, QF_NIA, QF_LIA };
-    inline std::ostream& operator<<(std::ostream& os, const Logic& l)
-    {
-        switch (l) 
-        {
-            case Logic::UNDEFINED:	os << "undefined"; break;
-            case Logic::QF_NRA:		os << "QF_NRA"; break;
-            case Logic::QF_LRA:		os << "QF_LRA"; break;
-            case Logic::QF_NIA:		os << "QF_NIA"; break;
-            case Logic::QF_LIA:		os << "QF_LIA"; break;
-        }
-        return os;
-    }
-    
-    /// @todo Is this enumerations needed in carl or should we put them to smtrat?
-    ///An enum with the possible answer a Module can give
-    enum Answer { True = 0, False = 1, Unknown = 2 };
-    
-    // Structures.
-    
-    template<typename T> 
-    struct pointerEqual
-    {
-        bool operator()( const T* _argA, const T* _argB ) const
-        {
-            return (*_argA)==(*_argB);
-        }
-    };
-    
-    template<typename T> 
-    struct pointerEqualWithNull
-    {
-        bool operator()( const T* _argA, const T* _argB ) const
-        {
-            if( _argA == nullptr || _argB == nullptr )
-                return _argA == _argB;
-            return (*_argA)==(*_argB);
-        }
-    };
-    
-    template<typename T> 
-    struct pointerLess
-    {
-        bool operator()( const T* _argA, const T* _argB ) const
-        {
-            return (*_argA)<(*_argB);
-        }
-    };
+	// Enumerations.
+	/// @todo Are these enumerations needed in carl or should we put them to smtrat?
+	enum class Variable_Domain: unsigned { BOOLEAN = 0, REAL = 1, INTEGER = 2 };
+	
+	enum class Logic : unsigned { UNDEFINED, QF_NRA, QF_LRA, QF_NIA, QF_LIA };
+	inline std::ostream& operator<<(std::ostream& os, const Logic& l)
+	{
+		switch (l) 
+		{
+			case Logic::UNDEFINED:	os << "undefined"; break;
+			case Logic::QF_NRA:		os << "QF_NRA"; break;
+			case Logic::QF_LRA:		os << "QF_LRA"; break;
+			case Logic::QF_NIA:		os << "QF_NIA"; break;
+			case Logic::QF_LIA:		os << "QF_LIA"; break;
+		}
+		return os;
+	}
+	
+	/// @todo Is this enumerations needed in carl or should we put them to smtrat?
+	///An enum with the possible answer a Module can give
+	enum Answer { True = 0, False = 1, Unknown = 2 };
+	
+	// Structures.
+	
+	template<typename T> 
+	struct pointerEqual
+	{
+		bool operator()( const T* _argA, const T* _argB ) const
+		{
+			return (*_argA)==(*_argB);
+		}
+	};
+	
+	template<typename T> 
+	struct pointerEqualWithNull
+	{
+		bool operator()( const T* _argA, const T* _argB ) const
+		{
+			if( _argA == nullptr || _argB == nullptr )
+				return _argA == _argB;
+			return (*_argA)==(*_argB);
+		}
+	};
+	
+	template<typename T> 
+	struct pointerLess
+	{
+		bool operator()( const T* _argA, const T* _argB ) const
+		{
+			return (*_argA)<(*_argB);
+		}
+	};
 
-    template<typename T> 
-    struct pointerHash
-    {
-        size_t operator()( const T* _arg ) const
-        {
-            return std::hash<T>()( *_arg );
-        }
-    };
+	template<typename T> 
+	struct pointerHash
+	{
+		size_t operator()( const T* _arg ) const
+		{
+			return std::hash<T>()( *_arg );
+		}
+	};
 
-    template<typename T> 
-    struct pointerHashWithNull
-    {
-        size_t operator()( const T* _arg ) const
-        {
-            if( _arg == nullptr )
-                return 0;
-            return std::hash<T>()( *_arg );
-        }
-    };
-    
-    template<typename T> 
-    struct sharedPointerEqual
-    {
-        bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
-        {
-            return (*_argA)==(*_argB);
-        }
-    };
-    
-    template<typename T> 
-    struct sharedPointerEqualWithNull
-    {
-        bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
-        {
-            if( _argA == nullptr || _argB == nullptr )
-                return _argA == _argB;
-            return (*_argA)==(*_argB);
-        }
-    };
-    
-    template<typename T> 
-    struct sharedPointerLess
-    {
-        bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
-        {
-            return (*_argA)<(*_argB);
-        }
-    };
+	template<typename T> 
+	struct pointerHashWithNull
+	{
+		size_t operator()( const T* _arg ) const
+		{
+			if( _arg == nullptr )
+				return 0;
+			return std::hash<T>()( *_arg );
+		}
+	};
+	
+	template<typename T> 
+	struct sharedPointerEqual
+	{
+		bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+		{
+			return (*_argA)==(*_argB);
+		}
+	};
+	
+	template<typename T> 
+	struct sharedPointerEqualWithNull
+	{
+		bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+		{
+			if( _argA == nullptr || _argB == nullptr )
+				return _argA == _argB;
+			return (*_argA)==(*_argB);
+		}
+	};
+	
+	template<typename T> 
+	struct sharedPointerLess
+	{
+		bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+		{
+			return (*_argA)<(*_argB);
+		}
+	};
 
-    template<typename T> 
-    struct sharedPointerHash
-    {
-        size_t operator()( std::shared_ptr<const T> _arg ) const
-        {
-            return std::hash<T>()( *_arg );
-        }
-    };
+	template<typename T> 
+	struct sharedPointerHash
+	{
+		size_t operator()( std::shared_ptr<const T> _arg ) const
+		{
+			return std::hash<T>()( *_arg );
+		}
+	};
 
     template<typename T> 
     struct sharedPointerHashWithNull
@@ -227,9 +222,9 @@ namespace carl
     
     // Macros.
 
-    #define CIRCULAR_SHIFT(_intType, _value, _shift) ((_value << _shift) | (_value >> (sizeof(_intType)*8 - _shift)))
-    
-}    // namespace carl
+	#define CIRCULAR_SHIFT(_intType, _value, _shift) ((_value << _shift) | (_value >> (sizeof(_intType)*8 - _shift)))
+	
+}	// namespace carl
 
 
 

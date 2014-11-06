@@ -3,12 +3,13 @@
 
 #include "carl/groebner/groebner.h"
 #include "carl/groebner/benchmarks/katsura.h"
+#include "carl/groebner/benchmarks/cyclic.h"
 #include "carl/core/MultivariatePolynomial.h"
 
 
 using namespace carl;
 const static int MAX_KATSURA = 5;
-const static int MAX_CYCLIC = 1;
+const static int MAX_CYCLIC = 3;
 
 template <typename C, typename O, typename P>
 struct GbBenchmark
@@ -52,8 +53,13 @@ struct ExecuteBenchmarks {
 
         for(int index = 2; index <= MAX_CYCLIC; index++)
         {
-            std::cout << "Load benchmark: Cyclic " << index << std::endl;
-
+             std::stringstream name;
+            name << " Cyclic " << index;
+            std::cout << "Load benchmark: "  << name.str() << std::endl;
+            res.push_back(GbBenchmark<C, O, P>(name.str(), carl::benchmarks::cyclic<C, O, P>(index)));
+            if(verbose) { 
+                std::cout << res.back() << std::endl;
+            }
         }
         return res;
 
@@ -108,10 +114,11 @@ int execute(std::ostream& os = std::cout)
     {
         delete p;
     }
+    return 0;
         
 }
 
-int main (int argc, char** argv) 
+int main (int, char** ) 
 {    
     //execute<mpq_class, GrLexOrdering, StdMultivariatePolynomialPolicies<NoReasons, NoAllocator>>();
     execute<cln::cl_RA, GrLexOrdering, StdMultivariatePolynomialPolicies<NoReasons, NoAllocator>>();

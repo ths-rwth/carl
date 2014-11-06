@@ -17,6 +17,7 @@
 
 #include "../util/Singleton.h"
 #include "../util/Common.h"
+#include "../io/streamingOperators.h"
 #include "Sort.h"
 
 namespace carl

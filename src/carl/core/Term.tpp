@@ -15,118 +15,114 @@ namespace carl
 
 template<typename Coefficient>
 Term<Coefficient>::Term() :
-    mCoeff(Coefficient(0)), mMonomial()
+	mCoeff(Coefficient(0)), mMonomial()
 {
-    assert(this->isConsistent());
+	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c) :
-    mCoeff(c), mMonomial()
+	mCoeff(c), mMonomial()
 {
-    assert(this->isConsistent());
+	assert(this->isConsistent());
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
-    mCoeff(1), mMonomial(new Monomial(v))
+	mCoeff(1), mMonomial(createMonomial(v, 1))
 {
-    assert(this->isConsistent());
+	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const std::shared_ptr<const Monomial>& m) :
-    mCoeff(1), mMonomial(m)
+Term<Coefficient>::Term(const Monomial::Arg& m) :
+	mCoeff(1), mMonomial(m)
 {
-    assert(this->isConsistent());
+	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m) :
-    mCoeff(c), mMonomial(m)
+Term<Coefficient>::Term(const Coefficient& c, const Monomial::Arg& m) :
+	mCoeff(c), mMonomial(m)
 {
-    assert(this->isConsistent());
+	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e): 
-    mCoeff(c),
-    #ifdef USE_MONOMIAL_POOL
-    mMonomial( MonomialPool::getInstance().create( v, e ) )
-    #else
-    mMonomial( std::shared_ptr<const Monomial>( new Monomial(v, e) ) )
-    #endif
+	mCoeff(c),
+	mMonomial(createMonomial(v,e))
 {
-    assert(this->isConsistent());
+	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Coefficient& c) const
 {
-    assert(c != Coefficient(0));
-    return new Term(mCoeff / c, mMonomial);
+	assert(c != Coefficient(0));
+	return new Term(mCoeff / c, mMonomial);
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
 {
-    if(mMonomial)
-    {
-        std::shared_ptr<const Monomial> div = mMonomial->divide(v);
-        if(div != nullptr)
-        {
+	if(mMonomial)
+	{
+		std::shared_ptr<const Monomial> div = mMonomial->divide(v);
+		if(div != nullptr)
+		{
 			if (div->tdeg() == 0) {
 				return new Term<Coefficient>(mCoeff);
 			}
-            return new Term<Coefficient>(mCoeff, div);
-        }   
-    }
-    return nullptr;    
+			return new Term<Coefficient>(mCoeff, div);
+		}   
+	}
+	return nullptr;	
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const std::shared_ptr<const Monomial>& m) const
 {
-    if(mMonomial)
-    {
+	if(mMonomial)
+	{
 		auto res = mMonomial->divide(m);
-        if (res.second) {
+		if (res.second) {
 			if (res.first != nullptr && res.first->tdeg() == 0) {
 				return new Term<Coefficient>(mCoeff);
 			}
-            return new Term<Coefficient>(mCoeff, res.first);
-        }   
-    }
-    return nullptr;  
+			return new Term<Coefficient>(mCoeff, res.first);
+		}   
+	}
+	return nullptr;  
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
 {
-    assert(t.mCoeff != Coefficient(0));
-    if(mMonomial)
-    {
-        if(!t.mMonomial)
-        {
-            // Term is just a constant.
-            return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
-        }
+	assert(t.mCoeff != Coefficient(0));
+	if(mMonomial)
+	{
+		if(!t.mMonomial)
+		{
+			// Term is just a constant.
+			return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
+		}
 		auto res = mMonomial->divide(t.mMonomial);
 		if (!res.second) return nullptr;
 		if (res.first != nullptr) {
 			if (res.first->tdeg() == 0) {
 				return new Term<Coefficient>(mCoeff / t.mCoeff);
 			}
-            return new Term<Coefficient>(mCoeff / t.mCoeff, res.first);
-        } else {
+			return new Term<Coefficient>(mCoeff / t.mCoeff, res.first);
+		} else {
 			return new Term<Coefficient>(mCoeff / t.mCoeff);
 		}
-    } 
-    else if(!t.mMonomial)
-    {
-       // Division of constants.
-        return new Term<Coefficient>(mCoeff / t.mCoeff);
-    }
-    return nullptr;  
+	} 
+	else if(!t.mMonomial)
+	{
+	   // Division of constants.
+		return new Term<Coefficient>(mCoeff / t.mCoeff);
+	}
+	return nullptr;  
 }
 
 template<typename Coefficient>
@@ -137,42 +133,42 @@ Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 		// Derivatives of constants are zero.
 		return new Term<Coefficient>(Coefficient(0));
 	}
-    Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
-    *t *= mCoeff;
-    return t;
+	Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
+	*t *= mCoeff;
+	return t;
 }
 
 template<typename Coefficient>
 Definiteness Term<Coefficient>::definiteness() const
 {
-    if(mMonomial)
-    {
-        if(mMonomial->isSquare())
-            return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
-    }
-    else if(mCoeff != Coefficient(0))
-        return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
-    return Definiteness::NON;
+	if(mMonomial)
+	{
+		if(mMonomial->isSquare())
+			return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
+	}
+	else if(mCoeff != Coefficient(0))
+		return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
+	return Definiteness::NON;
 }
 
 template<typename Coefficient>
 template<typename SubstitutionType>
 Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
-    if(mMonomial)
-    {
-        return mMonomial->substitute<Coefficient>(substitutions, coeff());
-    }
-    else
-    {
-        return new Term<Coefficient>( mCoeff );
-    }
+	if(mMonomial)
+	{
+		return mMonomial->substitute<Coefficient>(substitutions, coeff());
+	}
+	else
+	{
+		return new Term<Coefficient>( mCoeff );
+	}
 }
 
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
-    if(mMonomial)
+	if(mMonomial)
 	{
 		return mMonomial->substitute<Coefficient>(substitutions, coeff());
 	}
@@ -224,10 +220,10 @@ void Term<Coefficient>::gatherVarInfo(Variable::Arg var, VariableInformation<gat
 	{
 		varinfo.collect(var, coeff(), *mMonomial);
 	}
-    else
-    {
-        varinfo.updateCoeff( 0, *this );
-    }
+	else
+	{
+		varinfo.updateCoeff( 0, *this );
+	}
 }
 
 template<typename Coefficient>
@@ -251,28 +247,28 @@ bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	return lhs.monomial() == rhs.monomial();
 }
 template<typename Coeff>
-bool operator==(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
+bool operator==(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
-    return lhs.coeff() == Coeff(1);
-    #else
+	return lhs.coeff() == Coeff(1);
+	#else
 	if (lhs.coeff() != Coeff(1)) return false;
-    return lhs.monomial() == rhs;
-    #endif
+	return lhs.monomial() == rhs;
+	#endif
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs) {
-    #ifdef USE_MONOMIAL_POOL
+	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
-    return lhs.coeff() == Coeff(1);
-    #else
+	return lhs.coeff() == Coeff(1);
+	#else
 	if (lhs.coeff() != Coeff(1)) return false;
-    return lhs.monomial() == rhs;
-    #endif
+	return lhs.monomial() == rhs;
+	#endif
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Coeff& rhs) {
-    return !lhs.monomial() && lhs.coeff() == rhs;
+	return !lhs.monomial() && lhs.coeff() == rhs;
 }
 
 template<typename Coeff>
@@ -321,70 +317,70 @@ bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
 template<typename Coefficient>
 const Term<Coefficient> Term<Coefficient>::operator-() const
 {
-    return Term<Coefficient>(-mCoeff,mMonomial);
+	return Term<Coefficient>(-mCoeff,mMonomial);
 }
 
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 {
-    if(rhs == Coefficient(0)) 
-    {
-        clear();
-        return *this;
-    }
-    assert(mCoeff == Coefficient(0) || mCoeff * rhs != Coefficient(0));
-    mCoeff *= rhs;
-    return *this;
+	if(rhs == Coefficient(0)) 
+	{
+		clear();
+		return *this;
+	}
+	assert(mCoeff == Coefficient(0) || mCoeff * rhs != Coefficient(0));
+	mCoeff *= rhs;
+	return *this;
 }
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 {
-    if(mCoeff == Coefficient(0))
-    {
-        return *this;
-    }
-    if(mMonomial)
-    {
-        mMonomial = std::shared_ptr<const Monomial>(mMonomial * rhs);
-    }
-    else
-    {
-        mMonomial = std::shared_ptr<const Monomial>(new Monomial(rhs));
-    }
-    return *this;
+	if(mCoeff == Coefficient(0))
+	{
+		return *this;
+	}
+	if(mMonomial)
+	{
+		mMonomial = mMonomial * rhs;
+	}
+	else
+	{
+		mMonomial = createMonomial(rhs, 1);
+	}
+	return *this;
 }
 
 template<typename Coefficient>
-Term<Coefficient>& Term<Coefficient>::operator*=(const std::shared_ptr<const Monomial>& rhs)
+Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
 {
-    if(mCoeff == Coefficient(0)) return *this;
-    
-    if(mMonomial)
-    {
-        mMonomial = mMonomial * rhs;
-        
-    }
-    else
-    {
-        mMonomial = rhs;
-    }
-    return *this;   
+	if(mCoeff == Coefficient(0)) return *this;
+	
+	if(mMonomial)
+	{
+		mMonomial = mMonomial * rhs;
+		
+	}
+	else
+	{
+		mMonomial = rhs;
+	}
+	return *this;   
 }
 
 
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 {
-    if(mCoeff == Coefficient(0)) return *this;
-    if(rhs.mCoeff == Coefficient(0)) 
-    {
-        clear();
-        return *this;
-    }
-    
-    mMonomial = mMonomial * rhs.mMonomial;
+	if(mCoeff == Coefficient(0)) return *this;
+	if(rhs.mCoeff == Coefficient(0)) 
+	{
+		clear();
+		return *this;
+	}
+	
+	mMonomial = mMonomial * rhs.mMonomial;
 	mCoeff *= rhs.mCoeff;
-    return *this;   
+	return *this;   
 }
 
 template<typename Coeff>
@@ -396,7 +392,7 @@ const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs)
 template<typename Coeff>
 std::ostream& operator<<(std::ostream& os, const Term<Coeff>& rhs)
 {
-    return (os << rhs.toString(true, true));
+	return (os << rhs.toString(true, true));
 }
 
 template<typename Coeff>
@@ -410,55 +406,55 @@ template<typename Coefficient>
 template<typename C, DisableIf<is_interval<C>>>
 std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
-    if(mMonomial)
-    {
-        if(mCoeff != Coefficient(1))
-        {
-            std::stringstream s;
-            if(!infix) s << " ";
-            s << carl::toString( mCoeff, infix );
-            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
-            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
-        }
-        else
-        {
-            if(infix) return mMonomial->toString(true, friendlyVarNames);
-            else return mMonomial->toString(infix, friendlyVarNames);
-        }
-    }
-    else 
-    {
-        std::stringstream s;
-        s << carl::toString( mCoeff, infix );
-        return s.str();
-    }
+	if(mMonomial)
+	{
+		if(mCoeff != Coefficient(1))
+		{
+			std::stringstream s;
+			if(!infix) s << " ";
+			s << carl::toString( mCoeff, infix );
+			if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+			else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+		}
+		else
+		{
+			if(infix) return mMonomial->toString(true, friendlyVarNames);
+			else return mMonomial->toString(infix, friendlyVarNames);
+		}
+	}
+	else 
+	{
+		std::stringstream s;
+		s << carl::toString( mCoeff, infix );
+		return s.str();
+	}
 }
 
 template<typename Coefficient>
 template<typename C, EnableIf<is_interval<C>>>
 std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
-    if(mMonomial)
-    {
-        if(mCoeff != C(1))
-        {
-            std::stringstream s;
-            s << mCoeff;
-            if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
-            else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
-        }
-        else
-        {
-            if(infix) return mMonomial->toString(true, friendlyVarNames);
-            else return mMonomial->toString(infix, friendlyVarNames);
-        }
-    }
-    else 
-    {
-        std::stringstream s;
-        s << mCoeff;
-        return s.str();
-    }
+	if(mMonomial)
+	{
+		if(mCoeff != C(1))
+		{
+			std::stringstream s;
+			s << mCoeff;
+			if(infix) return s.str() + "*" + mMonomial->toString(true, friendlyVarNames);
+			else return "(*" + s.str() + " " + mMonomial->toString(infix, friendlyVarNames) + ")";
+		}
+		else
+		{
+			if(infix) return mMonomial->toString(true, friendlyVarNames);
+			else return mMonomial->toString(infix, friendlyVarNames);
+		}
+	}
+	else 
+	{
+		std::stringstream s;
+		s << mCoeff;
+		return s.str();
+	}
 }
 
 template<typename Coefficient>

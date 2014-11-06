@@ -47,14 +47,14 @@ class Term
 		 * Constructs a term of value \f$ m \f$.
 		 * @param m Monomial pointer.
 		 */
-		explicit Term(const std::shared_ptr<const Monomial>& m);
+		explicit Term(const Monomial::Arg& m);
         
 		/**
 		 * Constructs a term of value \f$ c \cdot m \f$.
 		 * @param c Coefficient.
 		 * @param m Monomial pointer.
 		 */
-		Term(const Coefficient& c, const std::shared_ptr<const Monomial>& m);
+		Term(const Coefficient& c, const Monomial::Arg& m);
 		/**
 		 * Constructs a term of value \f$ c \cdot v^e \f$.
 		 * @param c Coefficient.
@@ -276,10 +276,10 @@ class Term
 		 * @param rhs Right hand side.
 		 * @return Changed term.
 		 */
-		Term& operator *=(const Coefficient& rhs);
-		Term& operator *=(Variable::Arg rhs);
-		Term& operator *=(const std::shared_ptr<const Monomial>& rhs);
-		Term& operator *=(const Term& rhs);
+		Term& operator*=(const Coefficient& rhs);
+		Term& operator*=(Variable::Arg rhs);
+		Term& operator*=(const Monomial::Arg& rhs);
+		Term& operator*=(const Term& rhs);
 		/// @}
 
 		/// @name Division operators
@@ -359,7 +359,7 @@ class Term
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
-	inline bool operator==(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs);
+	inline bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
 	template<typename Coeff>

@@ -84,7 +84,7 @@ public:
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
 	explicit MultivariatePolynomial(const std::shared_ptr<const Monomial>& m);
-	explicit MultivariatePolynomial(std::shared_ptr<const Term<Coeff >> t);
+	explicit MultivariatePolynomial(const std::shared_ptr<const Term<Coeff >>& t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<class OtherPolicy>
@@ -136,18 +136,18 @@ public:
 	 * The leading monomial
 	 * @return 
 	 */
-	const std::shared_ptr<const Monomial>& lmon() const;
+	const Monomial::Arg& lmon() const;
 	/**
 	 * The leading term
 	 * @return 
 	 */
-	std::shared_ptr<const Term<Coeff>> lterm() const;
+	const std::shared_ptr<const Term<Coeff>>& lterm() const;
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
 	 * @return 
 	 */
-	Coeff lcoeff() const;
+	const Coeff& lcoeff() const;
 	/**
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
@@ -204,7 +204,7 @@ public:
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 
 	 */
-	std::shared_ptr<const Term<Coeff>> trailingTerm() const;
+	const std::shared_ptr<const Term<Coeff>>& trailingTerm() const;
 	/**
 	 * Checks if the polynomial has a constant term that is not zero.
 	 * @return If there is a constant term unequal to zero.
@@ -449,7 +449,7 @@ public:
 	MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator+=(const TermType& rhs);
 	MultivariatePolynomial& operator+=(const std::shared_ptr<const TermType>& rhs);
-	MultivariatePolynomial& operator+=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator+=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator+=(Variable::Arg rhs);
 	MultivariatePolynomial& operator+=(const Coeff& rhs);
 	/// @}
@@ -464,7 +464,7 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
-	MultivariatePolynomial& operator-=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator-=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator-=(Variable::Arg);
 	MultivariatePolynomial& operator-=(const Coeff& c);
 	/// @}
@@ -482,7 +482,7 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
-	MultivariatePolynomial& operator*=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator*=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator*=(Variable::Arg);
 	MultivariatePolynomial& operator*=(const Coeff& c);
 	/// @}
@@ -497,7 +497,7 @@ public:
 	///@todo find new lterm
 	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
-	MultivariatePolynomial& operator/=(const std::shared_ptr<const Monomial>& rhs);
+	MultivariatePolynomial& operator/=(const Monomial::Arg& rhs);
 	MultivariatePolynomial& operator/=(Variable::Arg);
 	MultivariatePolynomial& operator/=(const Coeff& c);
 	/// @}
@@ -912,15 +912,15 @@ public:
 		return res += rhs;
 	}
 	template<typename C, typename O, typename P>
-	inline const MultivariatePolynomial<C,O,P> operator+(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline const MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs + lhs;
 	}
 	template<typename C>
-	inline const MultivariatePolynomial<C> operator+(const std::shared_ptr<const Monomial>& lhs, const Term<C>& rhs) {
+	inline const MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return rhs + lhs;
 	}
 	template<typename C>
-	inline const MultivariatePolynomial<C> operator+(const std::shared_ptr<const Monomial>& lhs, const C& rhs) {
+	inline const MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const C& rhs) {
 		MultivariatePolynomial<C> res(lhs);
 		return res += rhs;
 	}
@@ -946,7 +946,7 @@ public:
 		return rhs + lhs;
 	}
 	template<typename C>
-	inline const MultivariatePolynomial<C> operator+(const C& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline const MultivariatePolynomial<C> operator+(const C& lhs, const Monomial::Arg& rhs) {
 		return rhs + lhs;
 	}
 	template<typename C>

@@ -1,13 +1,13 @@
 set(carl_lib_interval_headers 
         Contraction.h	
-        DoubleInterval.h
+        #DoubleInterval.h
 	IntervalEvaluation.h
-        PointIntervalFactory.h
+        #PointIntervalFactory.h
         Interval.h
 ) 
 # Source files in here
 set(carl_lib_interval_sources 
-	interval/DoubleInterval.cpp
+	#interval/DoubleInterval.cpp
 
 PARENT_SCOPE)
 

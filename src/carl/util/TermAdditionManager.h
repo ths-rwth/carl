@@ -15,6 +15,75 @@
 namespace carl
 {
 
+#ifdef USE_MONOMIAL_POOL
+
+template<typename Polynomial>
+class TermAdditionManager {
+public:
+	typedef Term<typename Polynomial::CoeffType> TermType;
+	typedef std::shared_ptr<const TermType> TermPtr;
+	typedef std::vector<TermPtr> Terms;
+private:
+	std::size_t mNextId;
+	std::vector<Terms> mTerms;
+	std::vector<bool> mUsed;
+	mutable std::mutex mMutex;
+	std::hash<Monomial::Arg> mHash;
+public:
+	TermAdditionManager(): mNextId(0), mTerms(1), mUsed(1, false)
+	{
+	}
+	
+	std::size_t getId() {
+		std::lock_guard<std::mutex> lock(mMutex);
+		while (mUsed.at(mNextId)) {
+			mNextId++;
+			if (mNextId == mTerms.size()) {
+				mTerms.emplace_back();
+				mUsed.emplace_back(false);
+			}
+		}
+		assert(mUsed.at(mNextId) == false);
+		assert(mTerms.at(mNextId).empty());
+		mUsed[mNextId] = true;
+		mTerms[mNextId].clear();
+		std::size_t result = mNextId;
+		mNextId = (mNextId + 1) % mTerms.size();
+		return result;
+	}
+	
+	void addTerm(std::size_t id, const TermPtr& term) {
+		assert(mUsed.at(id));
+		Terms& terms = mTerms[id];
+		std::size_t termId = 0;
+		if (term->monomial()) termId = term->monomial()->id();
+		if (termId >= terms.size()) terms.resize(termId + 8);
+		if (terms.at(termId) == nullptr) {
+			terms[termId] = term;
+		} else {
+			auto coeff = terms.at(termId)->coeff() + term->coeff();
+			if (coeff == typename Polynomial::CoeffType(0)) {
+				terms[termId] = nullptr;
+			} else {
+				terms[termId] = std::make_shared<const TermType>(coeff, term->monomial());
+			}
+		}
+	}
+	
+	void readTerms(std::size_t id, Terms& terms) {
+		assert(mUsed.at(id));
+		terms.clear();
+		for (const auto& t: mTerms.at(id)) {
+			if (t != nullptr) terms.push_back(t);
+		}
+		mTerms.at(id).clear();
+		mUsed.at(id) = false;
+	}
+};
+	
+
+#else
+
 /**
  * Class to manage term addition.
  */
@@ -32,7 +101,7 @@ class TermAdditionManager
 			hashEqual> MapType;
     
         /// Id of the next free map.
-        size_t mNextMapId;
+        std::size_t mNextMapId;
         /** 
          * If the ith map is used by the polynomial p, this map stores a reference to p at the ith entry of this vector. 
          * This is only for asserting that no illegal access occurs.
@@ -187,6 +256,8 @@ class TermAdditionManager
             return false;
         }
 };
+
+#endif
 
 }
 
