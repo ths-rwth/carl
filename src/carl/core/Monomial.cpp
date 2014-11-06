@@ -32,7 +32,7 @@ namespace carl
         #endif
     }
     
-    std::shared_ptr<const Monomial> Monomial::divide(Variable::Arg v) const
+    Monomial::Arg Monomial::divide(Variable::Arg v) const
     {
         auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
         if(it == mExponents.cend()) return nullptr;
@@ -57,7 +57,7 @@ namespace carl
         }
     }
     
-    std::pair<std::shared_ptr<const Monomial>,bool> Monomial::divide(const std::shared_ptr<const Monomial>& m) const
+    std::pair<Monomial::Arg,bool> Monomial::divide(const Monomial::Arg& m) const
     {
         LOG_FUNC("carl.core.monomial", *this << ", " << m);
         if( !m )
@@ -104,14 +104,14 @@ namespace carl
                 itright++;
             }
             // Variable is not present in lhs, division fails.
-            else if(itleft->first > itright->first) 
+            else if(itleft->first < itright->first) 
             {
                 LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
                 return std::make_pair(nullptr,false);
             }
             else
             {
-                assert(itright->first > itleft->first);
+                assert(itleft->first > itright->first);
                 newExps.push_back(*itleft);
             }
         }
