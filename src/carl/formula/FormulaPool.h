@@ -141,10 +141,10 @@ namespace carl
             ConstElementSPtr createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
             {
                 #ifdef SIMPLIFY_FORMULA
-                if( _condition == mpFalse || *_then == *_else )
-                    return _else;
-                if( _condition == mpTrue )
-                    return _then;
+                if( _condition.mpContent == mpFalse || _then == _else )
+                    return _else.mpContent;
+                if( _condition.mpContent == mpTrue )
+                    return _then.mpContent;
                 #endif
                 return add( ElementSPtr( new Element( _condition, _then, _else ) ) );
             }
@@ -162,7 +162,7 @@ namespace carl
 				if (_vars.size() > 0) {
 					return add( ElementSPtr( new Element(_type, std::move(_vars), _term ) ) );
 				} else {
-					return _term->mpContent;
+					return _term.mpContent;
 				}
 			}
             
@@ -188,7 +188,7 @@ namespace carl
             ConstElementSPtr create( const std::multiset<Formula<Pol>>& _subformulas )
             {
                 if( _subformulas.empty() ) return mpFalse;
-                if( _subformulas.size() == 1 ) return *_subformulas.begin();
+                if( _subformulas.size() == 1 ) return _subformulas.begin()->mpContent;
                 std::set<Formula<Pol>> subFormulas;
                 auto lastSubFormula = _subformulas.begin();
                 auto subFormula = lastSubFormula;
@@ -239,24 +239,25 @@ namespace carl
 			}
             
             template<typename ArgType>
-            void forallDo( void (*_func)( ArgType*, ConstElementSPtr ), ArgType* _arg ) const
+            void forallDo( void (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
             {
                 FORMULA_POOL_LOCK_GUARD
                 for( ConstElementSPtr formula : mPool )
-                    (*_func)( _arg, formula );
+                    (*_func)( _arg, Formula<Pol>( formula ) );
             }
             
             template<typename ReturnType, typename ArgType>
-            std::map<const Formula<Pol>,ReturnType> forallDo( ReturnType (*_func)( ArgType*, ConstElementSPtr ), ArgType* _arg ) const
+            std::map<const Formula<Pol>,ReturnType> forallDo( ReturnType (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
             {
                 FORMULA_POOL_LOCK_GUARD
                 std::map<const Formula<Pol>,ReturnType> result;
                 for( ConstElementSPtr elem : mPool )
-                    result[Formula<Pol>(elem)] = (*_func)( _arg, elem );
+                {
+                    Formula<Pol> form(elem);
+                    result[form] = (*_func)( _arg, form );
+                }
                 return result;
             }
-            
-    private:
         
             /**
              * @param _type The type of the n-ary operator (n>1) of the formula to create.
@@ -268,6 +269,8 @@ namespace carl
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
             ConstElementSPtr create( FormulaType _type, std::set<Formula<Pol>>&& _subformulas );
+            
+    private:
         
             /**
              * Creates a formula of the given type but with only one sub-formula.

@@ -172,7 +172,7 @@ namespace carl
             else
             {
                 Constraint<Pol>* constraint = _constraint->simplify();
-                if( constraint != NULL ) // Constraint could be simplified.
+                if( constraint != nullptr ) // Constraint could be simplified.
                 {
 //                    cout << *_constraint << " can be simplified to " << *constraint << endl;
                     mConstraints.erase( iterBoolPair.first );

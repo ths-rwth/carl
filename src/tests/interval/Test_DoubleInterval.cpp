@@ -21,55 +21,8 @@ using namespace carl;
 
 typedef Interval<double> DoubleInterval;
 
-typedef boost::numeric::interval_lib::save_state<boost::numeric::interval_lib::rounded_transc_opp<double>> roundingPX;
-typedef boost::numeric::interval_lib::checking_no_nan<double, boost::numeric::interval_lib::checking_no_nan<double>> checkingPX;
-typedef boost::numeric::interval<double, boost::numeric::interval_lib::policies<roundingPX, checkingPX>> BoostIntervalX;
-
 TEST(DoubleInterval, Constructor)
 {
-    
-    for( int i = -100; i<=100; ++i )
-    {
-        for( int j = -100; j<=100; ++j )
-        {
-            if( j == 0 ) continue;
-            double id = i;
-            double jd = j;
-            BoostIntervalX bIntervalA( id );
-//            std::cout << "[" << std::setprecision(100) << bIntervalA.lower();
-//            std::cout << ", ";
-//            std::cout << std::setprecision(100) << bIntervalA.upper();
-//            std::cout << "]" << std::endl;
-            BoostIntervalX bIntervalB( jd );
-//            std::cout << "[" << std::setprecision(100) << bIntervalB.lower();
-//            std::cout << ", ";
-//            std::cout << std::setprecision(100) << bIntervalB.upper();
-//            std::cout << "]" << std::endl;
-            BoostIntervalX bIntervalC( double(1) );
-//            std::cout << "[" << std::setprecision(100) << bIntervalC.lower();
-//            std::cout << ", ";
-//            std::cout << std::setprecision(100) << bIntervalC.upper();
-//            std::cout << "]" << std::endl;
-            BoostIntervalX bIntervalE = bIntervalC/bIntervalB;
-//            std::cout << "[" << std::setprecision(100) << bIntervalE.lower();
-//            std::cout << ", ";
-//            std::cout << std::setprecision(100) << bIntervalE.upper();
-//            std::cout << "]" << std::endl;
-            BoostIntervalX bIntervalD = bIntervalA*bIntervalE;
-//            std::cout << "[" << std::setprecision(100) << bIntervalD.lower();
-//            std::cout << ", ";
-//            std::cout << std::setprecision(100) << bIntervalD.upper();
-//            std::cout << "]" << std::endl;
-            cln::cl_RA numA(i);
-            cln::cl_RA numB(j);
-            cln::cl_RA numC = numA/numB;
-//            std::cout << numC << std::endl;
-//            std::cout << cln::rationalize(cln::cl_R(bIntervalD.lower())) << std::endl;
-//            std::cout << cln::rationalize(cln::cl_R(bIntervalD.upper())) << std::endl;
-            EXPECT_TRUE(cln::rationalize(cln::cl_R(bIntervalD.lower()))<=numC);
-            EXPECT_TRUE(cln::rationalize(cln::cl_R(bIntervalD.upper()))>=numC);
-        } 
-    }
     DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
     DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
     DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);

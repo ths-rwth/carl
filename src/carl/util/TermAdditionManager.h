@@ -28,7 +28,6 @@ private:
 	std::vector<Terms> mTerms;
 	std::vector<bool> mUsed;
 	mutable std::mutex mMutex;
-	std::hash<Monomial::Arg> mHash;
 public:
 	TermAdditionManager(): mNextId(0), mTerms(1), mUsed(1, false)
 	{
@@ -55,17 +54,17 @@ public:
 	void addTerm(std::size_t id, const TermPtr& term) {
 		assert(mUsed.at(id));
 		Terms& terms = mTerms[id];
-		std::size_t termId = 0;
-		if (term->monomial()) termId = term->monomial()->id();
-		if (termId >= terms.size()) terms.resize(termId + 8);
-		if (terms.at(termId) == nullptr) {
-			terms[termId] = term;
+		std::size_t monId = 0;
+		if (term->monomial()) monId = term->monomial()->id();
+		if (monId >= terms.size()) terms.resize(monId + 1);
+		if (terms.at(monId) == nullptr) {
+			terms[monId] = term;
 		} else {
-			auto coeff = terms.at(termId)->coeff() + term->coeff();
+			auto coeff = terms.at(monId)->coeff() + term->coeff();
 			if (coeff == typename Polynomial::CoeffType(0)) {
-				terms[termId] = nullptr;
+				terms[monId] = nullptr;
 			} else {
-				terms[termId] = std::make_shared<const TermType>(coeff, term->monomial());
+				terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
 			}
 		}
 	}

@@ -70,7 +70,7 @@ namespace carl
 namespace carl {
 
 template<typename... T>
-Monomial::Arg createMonomial(T... t) {
+inline Monomial::Arg createMonomial(T... t) {
 #ifdef USE_MONOMIAL_POOL
 	return MonomialPool::getInstance().create(t...);
 #else

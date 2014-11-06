@@ -359,7 +359,7 @@ class Term
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs);
 	template<typename Coeff>
-	inline bool operator==(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs);
+	inline bool operator==(const Term<Coeff>& lhs, const Monomial& rhs);
 	template<typename Coeff>
 	inline bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs);
 	template<typename Coeff>

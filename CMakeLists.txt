@@ -47,6 +47,7 @@ option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result com
 option( COMPARE_WITH_Z3 "Compile with testing with the runtime and result comparisons of carl to z3" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
+option( USE_MONOMIAL_POOL "Use monomial pool" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )

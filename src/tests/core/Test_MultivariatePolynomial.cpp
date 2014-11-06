@@ -515,15 +515,15 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
     Variable y = pool.getFreshVariable("y");
     Variable z = pool.getFreshVariable("z");
 
-    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z; // 3x²y+7yz
-    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y; // 3x²y+2x²z
-    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * x * y * y + (TypeParam)3 * z; // 5x²y+3z
-    MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * x * x * z * z * z + (TypeParam)6 * y; // 4x²z³+6y
+    MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z;
+    MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y;
+    MultivariatePolynomial<TypeParam> p2 = (TypeParam)5 * x * y * y + (TypeParam)3 * z;
+    MultivariatePolynomial<TypeParam> p3 = (TypeParam)4 * x * x * z * z * z + (TypeParam)6 * y;
 
     ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
     polynomials.push_back(p0);
-    polynomials.push_back(p1);
     polynomials.push_back(p2);
+    polynomials.push_back(p1);
     polynomials.push_back(p3);
 
     expectRightOrder(polynomials);
@@ -540,12 +540,12 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
     list.push_back(Term<TypeParam>((TypeParam)0));
     list.push_back(Term<TypeParam>((TypeParam)1));
     list.push_back(Term<TypeParam>((TypeParam)5));
-    list.push_back(x);
     list.push_back(y);
+    list.push_back(x);
     list.push_back((TypeParam)2 * x * x + y);
+    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
     list.push_back((TypeParam)3 * x * x);
     list.push_back((TypeParam)4 * x * y + (TypeParam)5 * x * x);
-    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
     list.push_back((TypeParam)6 * x * x + y * y);
     list.push_back(x * x * y);
     list.push_back((TypeParam)7 * x * x * y);

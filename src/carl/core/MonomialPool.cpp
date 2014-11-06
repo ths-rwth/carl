@@ -18,7 +18,8 @@ namespace carl
 			_monomial->mId = mIdAllocator;  // id should be set here to avoid conflicts when multi-threading
 			++mIdAllocator;
 		}
-		return *iterBoolPair.first;   
+		assert(_monomial == *iterBoolPair.first);
+		return *iterBoolPair.first;
 	}
 	
 	Monomial::Arg MonomialPool::create( Variable::Arg _var, exponent _exp )

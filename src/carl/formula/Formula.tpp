@@ -10,6 +10,8 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
+#include "VariableNamePool.h"
+#include "ConstraintPool.h"
 
 using namespace std;
 
@@ -162,7 +164,7 @@ namespace carl
         }
         else if( mType == FormulaType::CONSTRAINT )
         {
-            mpConstraint = NULL;
+            mpConstraint = nullptr;
         }
         else if( mType == FormulaType::IMPLIES )
         {
@@ -310,7 +312,7 @@ namespace carl
                 unsigned result = 0;
                 for( auto subFormula = subformulas().begin(); subFormula != subformulas().end(); ++subFormula )
                 {
-                    switch( subFormula.satisfiedBy( _assignment ) )
+                    switch( subFormula->satisfiedBy( _assignment ) )
                     {
                         case 0:
                             break;
@@ -327,7 +329,7 @@ namespace carl
                 unsigned result = 1;
                 for( auto subFormula = subformulas().begin(); subFormula != subformulas().end(); ++subFormula )
                 {
-                    switch( subFormula.satisfiedBy( _assignment ) )
+                    switch( subFormula->satisfiedBy( _assignment ) )
                     {
                         case 0:
                             return 0;
@@ -369,13 +371,13 @@ namespace carl
             case FormulaType::IFF:
             {
                 auto subFormula = subformulas().begin();
-                unsigned result = subFormula.satisfiedBy( _assignment );
+                unsigned result = subFormula->satisfiedBy( _assignment );
                 bool containsTrue = (result == 1 ? true : false);
                 bool containsFalse = (result == 0 ? true : false);
                 ++subFormula;
                 while( subFormula != subformulas().end() )
                 {
-                    unsigned resultTmp = subFormula.satisfiedBy( _assignment );
+                    unsigned resultTmp = subFormula->satisfiedBy( _assignment );
                     switch( resultTmp )
                     {
                         case 0:
@@ -395,12 +397,12 @@ namespace carl
             case FormulaType::XOR:
             {
                 auto subFormula = subformulas().begin();
-                unsigned result = subFormula.satisfiedBy( _assignment );
+                unsigned result = subFormula->satisfiedBy( _assignment );
                 if( result == 2 ) return 2;
                 ++subFormula;
                 while( subFormula != subformulas().end() )
                 {
-                    unsigned resultTmp = subFormula.satisfiedBy( _assignment );
+                    unsigned resultTmp = subFormula->satisfiedBy( _assignment );
                     if( resultTmp == 2 ) return 2;
                     result = resultTmp != result;
                     ++subFormula;
@@ -936,17 +938,17 @@ namespace carl
     }
 
     template<typename Pol>
-    const Formula<Pol> Formula<Pol>::resolveNegation( bool _keepConstraint ) const
+    Formula<Pol> Formula<Pol>::resolveNegation( bool _keepConstraint ) const
     {
-        if( getType() != FormulaType::NOT ) return this;
+        if( getType() != FormulaType::NOT ) return *this;
         FormulaType newType = getType();
         switch( subformula().getType() )
         {
             case FormulaType::BOOL:
-                return this;
+                return *this;
             case FormulaType::UEQ:
                 if( _keepConstraint )
-                    return this;
+                    return *this;
                 else
                 {
                     const UEquality& ueq = subformula().uequality();
@@ -956,7 +958,7 @@ namespace carl
             {
                 const Constraint<Pol>* constraint = subformula().pConstraint();
                 if( _keepConstraint )
-                    return this;
+                    return *this;
                 else
                 {
                     switch( constraint->relation() )
@@ -989,7 +991,7 @@ namespace carl
                         {
                             assert( false );
                             cerr << "Unexpected relation symbol!" << endl;
-                            return this;
+                            return *this;
                         }
                     }
                 }
@@ -1026,12 +1028,12 @@ namespace carl
             }
             case FormulaType::XOR: // (not (xor phi_1 .. phi_n))  ->  (xor (not phi_1) phi_2 .. phi_n)
             {
-                auto& subFormula = subformula().subformulas().begin();
+                auto subFormula = subformula().subformulas().begin();
                 std::set<Formula> subFormulas;
-                subFormulas.insert( Formula<Pol>( NOT, subFormula ) );
+                subFormulas.insert( Formula<Pol>( NOT, *subFormula ) );
                 ++subFormula;
                 for( ; subFormula != subformula().subformulas().end(); ++subFormula )
-                    subFormulas.insert( subFormula );
+                    subFormulas.insert( *subFormula );
                 return Formula<Pol>( XOR, move( subFormulas ) );
             }
             case FormulaType::AND: // (not (and phi_1 .. phi_n))  ->  (or (not phi_1) .. (not phi_n))
@@ -1049,7 +1051,7 @@ namespace carl
             default:
                 assert( false );
                 cerr << "Unexpected type of formula!" << endl;
-                return this;
+                return *this;
         }
         assert( newType != subformula().getType() );
         assert( subformula().getType() == FormulaType::AND || subformula().getType() == FormulaType::OR );
@@ -1060,7 +1062,7 @@ namespace carl
     }
     
     template<typename Pol>
-    const Formula<Pol> Formula<Pol>::connectPrecedingSubformulas() const
+    Formula<Pol> Formula<Pol>::connectPrecedingSubformulas() const
     {
         assert( isNary() );
         if( subformulas().size() > 2 )
@@ -1080,7 +1082,7 @@ namespace carl
     }
 
     template<typename Pol>
-    const Formula<Pol> Formula<Pol>::toQF(QuantifiedVariables& variables, unsigned level, bool negated) const
+    Formula<Pol> Formula<Pol>::toQF(QuantifiedVariables& variables, unsigned level, bool negated) const
     {
         switch (getType()) {
             case FormulaType::AND:
@@ -1165,7 +1167,7 @@ namespace carl
     }
 
     template<typename Pol>
-    const Formula<Pol> Formula<Pol>::toCNF( bool _keepConstraints, bool _simplifyConstraintCombinations ) const
+    Formula<Pol> Formula<Pol>::toCNF( bool _keepConstraints, bool _simplifyConstraintCombinations ) const
     {
         if( !_simplifyConstraintCombinations && propertyHolds( PROP_IS_IN_CNF ) )
         {
@@ -1179,10 +1181,10 @@ namespace carl
         }
         else if( isAtom() )
             return *this;
-        std::map<const Formula, pair<const Formula<Pol>, const Formula<Pol>>*> tseitinVars;
+        std::map<Formula, pair<Formula<Pol>, Formula<Pol>>*> tseitinVars;
         std::set<Formula> resultSubformulas;
         ConstraintBounds constraintBoundsAnd;
-        vector<const Formula<Pol>> subformulasToTransform;
+        vector<Formula<Pol>> subformulasToTransform;
         subformulasToTransform.push_back( *this );
         while( !subformulasToTransform.empty() )
         {
@@ -1212,7 +1214,7 @@ namespace carl
                 {   
                     if( _simplifyConstraintCombinations )
                     {
-                        if( addConstraintBound( constraintBoundsAnd, currentFormula, true ) == NULL )
+                        if( addConstraintBound( constraintBoundsAnd, currentFormula, true ) == nullptr )
                         {
                             goto ReturnFalse;
                         }
@@ -1227,7 +1229,7 @@ namespace carl
                     goto ReturnFalse;
                 case FormulaType::NOT: // Try to resolve this negation.
                 {
-                    const Formula<Pol> resolvedFormula = currentFormula.resolveNegation( _keepConstraints );
+                    Formula<Pol> resolvedFormula = currentFormula.resolveNegation( _keepConstraints );
                     if( resolvedFormula.propertyHolds( PROP_IS_A_LITERAL ) ) // It is a literal.
                     {
                         if( resolvedFormula.getType() == FormulaType::CONSTRAINT 
@@ -1235,7 +1237,7 @@ namespace carl
                         {
                             if( _simplifyConstraintCombinations )
                             {
-                                if( addConstraintBound( constraintBoundsAnd, resolvedFormula, true ) == NULL )
+                                if( addConstraintBound( constraintBoundsAnd, resolvedFormula, true ) == nullptr )
                                 {
                                     goto ReturnFalse;
                                 }
@@ -1307,7 +1309,7 @@ namespace carl
                 case FormulaType::XOR: // (xor lhs rhs) -> (or lhs rhs) and (or (not lhs) (not rhs)) are added to the queue
                 {
                     // Get lhs and rhs.
-                    const Formula<Pol> lhs = currentFormula.connectPrecedingSubformulas();
+                    Formula<Pol> lhs = currentFormula.connectPrecedingSubformulas();
                     const Formula<Pol>& rhs = currentFormula.back();
                     // add (or lhs rhs) to the queue
                     subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, lhs, rhs) );
@@ -1322,10 +1324,10 @@ namespace carl
                     bool currentFormulaValid = false;
                     ConstraintBounds constraintBoundsOr;
                     std::set<Formula> subsubformulas;
-                    vector<const Formula<Pol>> phis;
+                    vector<Formula<Pol>> phis;
                     for( const Formula<Pol>& subFormula : currentFormula.subformulas() )
                         phis.push_back( subFormula );
-                    vector<const Formula<Pol>> subformulasToTransformTmp;
+                    vector<Formula<Pol>> subformulasToTransformTmp;
                     while( !currentFormulaValid && !phis.empty() )
                     {
                         const Formula<Pol>& currentSubformula = phis.back();
@@ -1371,7 +1373,7 @@ namespace carl
                             }
                             case FormulaType::NOT: // resolve the negation
                             {
-                                const Formula<Pol> resolvedFormula = currentSubformula.resolveNegation( _keepConstraints );
+                                Formula<Pol> resolvedFormula = currentSubformula.resolveNegation( _keepConstraints );
                                 if( resolvedFormula.propertyHolds( PROP_IS_A_LITERAL ) ) // It is a literal.
                                 {
                                     if( resolvedFormula.getType() == FormulaType::CONSTRAINT 
@@ -1379,7 +1381,7 @@ namespace carl
                                     {
                                         if( _simplifyConstraintCombinations )
                                         {
-                                            if( addConstraintBound( constraintBoundsOr, resolvedFormula, false ) == NULL )
+                                            if( addConstraintBound( constraintBoundsOr, resolvedFormula, false ) == nullptr )
                                             {
                                                 currentFormulaValid = true;
                                                 break;
@@ -1405,14 +1407,14 @@ namespace carl
                                 bool conjunctionIsFalse = false;
                                 ConstraintBounds constraintBoundsOrAnd;
                                 std::set<Formula> tmpSubSubformulas;
-                                for( const Formula<Pol>& subsubformula : currentSubformula->subformulas() )
+                                for( const Formula<Pol>& subsubformula : currentSubformula.subformulas() )
                                 {
                                     if( subsubformula.getType() == FormulaType::CONSTRAINT 
                                             || (subsubformula.getType() == FormulaType::NOT && subsubformula.subformula().getType() == FormulaType::CONSTRAINT ) )
                                     {
                                         if( _simplifyConstraintCombinations )
                                         {
-                                            if( addConstraintBound( constraintBoundsOrAnd, subsubformula, true ) == NULL )
+                                            if( addConstraintBound( constraintBoundsOrAnd, subsubformula, true ) == nullptr )
                                             {
                                                 conjunctionIsFalse = true;
                                                 break;
@@ -1432,13 +1434,13 @@ namespace carl
                                     break;
                                 if( _simplifyConstraintCombinations && swapConstraintBounds( constraintBoundsOrAnd, tmpSubSubformulas, true ) )
                                     break;
-                                auto iter = tseitinVars.insert( pair<const Formula<Pol>,pair<const Formula<Pol>,const Formula<Pol>>*>( currentSubformula, NULL ) );
+                                auto iter = tseitinVars.insert( pair<Formula<Pol>,pair<Formula<Pol>,Formula<Pol>>*>( currentSubformula, nullptr ) );
                                 if( iter.second )
                                 {
                                     Variable auxVar = newAuxiliaryBooleanVariable();
-                                    const Formula<Pol> hi = Formula<Pol>( auxVar );
-                                    hi->setDifficulty( currentSubformula.difficulty() );
-                                    iter.first->second = new pair<const Formula<Pol>,const Formula<Pol>>( hi, Formula<Pol>( FormulaType::NOT, hi ) );
+                                    Formula<Pol> hi = Formula<Pol>( auxVar );
+                                    hi.setDifficulty( currentSubformula.difficulty() );
+                                    iter.first->second = new pair<Formula<Pol>,Formula<Pol>>( hi, Formula<Pol>( FormulaType::NOT, hi ) );
                                 }
                                 for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, iter.first->second->second, subsubformula ) );
@@ -1454,7 +1456,7 @@ namespace carl
                             {
                                 if( _simplifyConstraintCombinations )
                                 {
-                                    if( addConstraintBound( constraintBoundsOr, currentSubformula, false ) == NULL )
+                                    if( addConstraintBound( constraintBoundsOr, currentSubformula, false ) == nullptr )
                                     {
                                         currentFormulaValid = true;
                                         break;
@@ -1482,7 +1484,7 @@ namespace carl
                             case FormulaType::XOR: // (xor lhs rhs) -> (and lhs (not rhs)) and (and (not lhs) rhs) are added to the queue
                             {
                                 // Get lhs and rhs.
-                                const Formula<Pol> lhs = currentSubformula.connectPrecedingSubformulas();
+                                Formula<Pol> lhs = currentSubformula.connectPrecedingSubformulas();
                                 const Formula<Pol>& rhs = currentSubformula.back();
                                 // add (and lhs (not rhs)) to the queue
                                 phis.push_back( Formula<Pol>( FormulaType::AND, lhs, Formula<Pol>( FormulaType::NOT, rhs )) );
@@ -1565,7 +1567,7 @@ namespace carl
     }
             
     template<typename Pol>
-    const Formula<Pol> Formula<Pol>::substitute( const map<Variable, const Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
+    Formula<Pol> Formula<Pol>::substitute( const map<Variable, const Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
     {
         switch( getType() )
         {
@@ -1597,15 +1599,15 @@ namespace carl
             }
             case FormulaType::IMPLIES:
             {
-                const Formula<Pol> premiseSubstituted = premise().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                const Formula<Pol> conclusionSubstituted = conclusion().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
+                Formula<Pol> premiseSubstituted = premise().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
+                Formula<Pol> conclusionSubstituted = conclusion().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
                 return Formula<Pol>( FormulaType::IMPLIES, premiseSubstituted, conclusionSubstituted );
             }
             case FormulaType::ITE:
             {
-                const Formula<Pol> conditionSubstituted = condition().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                const Formula<Pol> thenSubstituted = firstCase().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
-                const Formula<Pol> elseSubstituted = secondCase().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
+                Formula<Pol> conditionSubstituted = condition().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
+                Formula<Pol> thenSubstituted = firstCase().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
+                Formula<Pol> elseSubstituted = secondCase().substitute( _booleanSubstitutions, _arithmeticSubstitutions );
                 return Formula<Pol>( FormulaType::ITE, conditionSubstituted, thenSubstituted, elseSubstituted );
             }
             case FormulaType::EXISTS:
@@ -1627,7 +1629,7 @@ namespace carl
 //    #define CONSTRAINT_BOUND_DEBUG
 
     template<typename Pol>
-    const Formula<Pol> Formula<Pol>::addConstraintBound( ConstraintBounds& _constraintBounds, const Formula<Pol>& _constraint, bool _inConjunction )
+    Formula<Pol> Formula<Pol>::addConstraintBound( ConstraintBounds& _constraintBounds, const Formula<Pol>& _constraint, bool _inConjunction )
     {
         #ifdef CONSTRAINT_BOUND_DEBUG
         cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << *_constraint << endl;
@@ -1639,7 +1641,7 @@ namespace carl
         typename Pol::NumberType boundValue;
         Relation relation = negated ? Constraint<Pol>::invertRelation( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
-        Pol* poly = NULL;
+        Pol* poly = nullptr;
         bool multipliedByMinusOne = lhs.lterm()->coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
@@ -1659,7 +1661,7 @@ namespace carl
         #ifdef CONSTRAINT_BOUND_DEBUG
         cout << "try to add the bound  " << Constraint<Pol>::relationToString( relation ) << boundValue << "  for the polynomial  " << *poly << endl; 
         #endif
-        auto resA = _constraintBounds.insert( make_pair( poly, std::move( map<typename Pol::NumberType, pair<Relation, const Formula<Pol>>>() ) ) );
+        auto resA = _constraintBounds.insert( make_pair( poly, std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
         if( !resA.second )
         {
             delete poly;
@@ -1679,7 +1681,7 @@ namespace carl
                         return resB.first->second.second;
                     }
                     else
-                        return NULL;
+                        return Formula( FormulaType::FALSE );
                 }
                 else
                 {
@@ -1699,7 +1701,7 @@ namespace carl
                             return resB.first->second.second;
                         default:
                             assert( resB.first->second.first == Relation::NEQ );
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                     }
                 }
             case Relation::LEQ:
@@ -1716,7 +1718,7 @@ namespace carl
                         case Relation::LESS:
                             return resB.first->second.second;
                         case Relation::GREATER:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         default:
                             assert( resB.first->second.first == Relation::NEQ );
                             resB.first->second.first = Relation::LESS;
@@ -1733,16 +1735,16 @@ namespace carl
                             resB.first->second.second = _constraint;
                             return resB.first->second.second;
                         case Relation::GEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LESS:
                             resB.first->second.first = Relation::LEQ;
                             resB.first->second.second = _constraint;
                             return resB.first->second.second;
                         case Relation::GREATER:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         default:
                             assert( resB.first->second.first == Relation::NEQ );
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                     }
                 }
             case Relation::GEQ:
@@ -1757,7 +1759,7 @@ namespace carl
                             resB.first->second.second = Formula<Pol>( lhs, Relation::EQ );
                             return resB.first->second.second;
                         case Relation::LESS:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GREATER:
                             return resB.first->second.second;
                         default:
@@ -1776,16 +1778,16 @@ namespace carl
                             resB.first->second.second = _constraint;
                             return resB.first->second.second;
                         case Relation::LEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LESS:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GREATER:
                             resB.first->second.first = Relation::GEQ;
                             resB.first->second.second = _constraint;
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         default:
                             assert( resB.first->second.first == Relation::NEQ );
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                     }
                 }
             case Relation::LESS:
@@ -1794,15 +1796,15 @@ namespace carl
                     switch( resB.first->second.first )
                     {
                         case Relation::EQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LEQ:
                             resB.first->second.first = Relation::LESS;
                             resB.first->second.second = _constraint;
                             return resB.first->second.second;
                         case Relation::GEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GREATER:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         default:
                             assert( resB.first->second.first == Relation::NEQ );
                             resB.first->second.first = Relation::LESS;
@@ -1821,7 +1823,7 @@ namespace carl
                         case Relation::LEQ:
                             return resB.first->second.second;
                         case Relation::GEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GREATER:
                             resB.first->second.first = Relation::NEQ;
                             resB.first->second.second = Formula<Pol>( lhs, Relation::NEQ );
@@ -1837,15 +1839,15 @@ namespace carl
                     switch( resB.first->second.first )
                     {
                         case Relation::EQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GEQ:
                             resB.first->second.first = Relation::GREATER;
                             resB.first->second.second = _constraint;
                             return resB.first->second.second;
                         case Relation::LESS:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         default:
                             assert( resB.first->second.first == Relation::NEQ );
                             resB.first->second.first = Relation::GREATER;
@@ -1862,7 +1864,7 @@ namespace carl
                             resB.first->second.second = Formula<Pol>( lhs, multipliedByMinusOne ? Relation::LEQ : Relation::GEQ );
                             return resB.first->second.second;
                         case Relation::LEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GEQ:
                             return resB.first->second.second;
                         case Relation::LESS:
@@ -1881,7 +1883,7 @@ namespace carl
                     switch( resB.first->second.first )
                     {
                         case Relation::EQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LEQ:
                             resB.first->second.first = Relation::LESS;
                             resB.first->second.second = Formula<Pol>( lhs, multipliedByMinusOne ? Relation::GREATER : Relation::LESS );
@@ -1906,11 +1908,11 @@ namespace carl
                     switch( resB.first->second.first )
                     {
                         case Relation::EQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::GEQ:
-                            return NULL;
+                            return Formula( FormulaType::FALSE );
                         case Relation::LESS:
                             return resB.first->second.second;
                         default:
@@ -1932,7 +1934,7 @@ namespace carl
             #ifdef CONSTRAINT_BOUND_DEBUG
             cout << "for the bounds of  " << *_constraintBounds.begin()->first << endl;
             #endif
-            const map<typename Pol::NumberType, pair<Relation, const Formula<Pol>>>& bounds = _constraintBounds.begin()->second;
+            const map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>& bounds = _constraintBounds.begin()->second;
             assert( !bounds.empty() );
             if( bounds.size() == 1 )
             {
