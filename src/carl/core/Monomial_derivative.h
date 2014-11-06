@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Monomial.h"
+#include "MonomialPool.h"
 #include "Term.h"
 
 namespace carl

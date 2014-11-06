@@ -18,7 +18,6 @@
 #include "carlLoggingHelper.h"
 #include "../numbers/numbers.h"
 #include "VariablePool.h"
-#include "MonomialPool.h"
 
 namespace carl
 {   
@@ -68,11 +67,12 @@ namespace carl
 		std::vector<std::pair<Variable, exponent>> mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
+#ifdef USE_MONOMIAL_POOL
+		/// Monomial id.
+		mutable std::size_t mId;
+#else
 		/// Cached hash.
 		mutable std::size_t mHash = 0;
-#ifdef USE_MONOMIAL_POOL
-		/// Cached hash.
-		mutable std::size_t mOrder;
 #endif
 
 		typedef std::vector<std::pair<Variable, exponent>>::iterator exponents_it;
@@ -87,6 +87,7 @@ namespace carl
 		 * Calculates the hash and stores it to mHash.
          */
 		void calcHash() {
+#ifndef USE_MONOMIAL_POOL
 			std::hash<carl::Variable> h;
 			size_t result = 0;
 			for (const auto& it: mExponents) {
@@ -97,6 +98,7 @@ namespace carl
 				result ^= it.second;
 			}
 			mHash = result;
+#endif
 		}
 #ifndef USE_MONOMIAL_POOL
 	public:
@@ -216,7 +218,11 @@ namespace carl
          * @return Hash.
          */
 		inline std::size_t hash() const {
+#ifdef USE_MONOMIAL_POOL
+			return mId;
+#else
 			return mHash;
+#endif
 		}
 		
 		/**
@@ -617,7 +623,7 @@ namespace carl
 		if (lhs.get() == rhs.get()) return true;
 		if (lhs == nullptr || rhs == nullptr) return false;
         #ifdef USE_MONOMIAL_POOL
-        return lhs->mOrder == rhs->mOrder;
+        return lhs->hash() == rhs->hash();
         #else
         if (lhs->hash() != rhs->hash()) return false;
         if (lhs->tdeg() != rhs->tdeg()) return false;
