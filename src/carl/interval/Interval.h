@@ -460,6 +460,86 @@ namespace carl
         }
 
         /**
+         * Constructor which constructs a pointinterval from a passed unsigned int.
+         * @param n The passed double.
+         */
+        template<typename N = Number, DisableIf<std::is_same<N, unsigned int >> = dummy >
+        explicit Interval(const unsigned int& n) :
+        mContent(carl::Interval<Number>::BoostInterval(n, n)),
+        mLowerBoundType(BoundType::WEAK),
+        mUpperBoundType(BoundType::WEAK) { }
+
+        /**
+         * Constructor which constructs an interval from the passed unsigned int bounds.
+         * @param lower The desired lower bound.
+         * @param upper The desired upper bound.
+         */
+        template<typename N = Number, DisableIf<std::is_same<N, unsigned int >> = dummy>
+        Interval(unsigned int lower, unsigned int upper)
+        {
+            if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK))
+            {
+                mContent = BoostInterval(lower, upper);
+                mLowerBoundType = BoundType::WEAK;
+                mUpperBoundType = BoundType::WEAK;
+            }
+            else
+            {
+                mContent = BoostInterval(Number(0));
+                mLowerBoundType = BoundType::STRICT;
+                mUpperBoundType = BoundType::STRICT;
+            }
+        }
+
+        /**
+         * Constructor which constructs the interval according to the passed unsigned int 
+         * bounds with the passed bound types. Note that if the interval is a 
+         * pointinterval with both strict bounds or the content is invalid the 
+         * empty interval is constru
+         * @param lower The desired lower bound.
+         * @param lowerBoundType The desired lower bound type.
+         * @param upper The desired upper bound.
+         * @param upperBoundType The desired upper bound type.
+         */
+        template<typename N = Number, DisableIf<std::is_same<N, unsigned int >> = dummy>
+        Interval(unsigned int lower, BoundType lowerBoundType, unsigned int upper, BoundType upperBoundType)
+        {
+            if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType))
+            {
+                if (IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
+                {
+                    mContent = BoostInterval(Number(0));
+                    mLowerBoundType = BoundType::STRICT;
+                    mUpperBoundType = BoundType::STRICT;
+                }
+                else if (IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
+                {
+                    mContent = BoostInterval(Number(0));
+                    mLowerBoundType = BoundType::INFTY;
+                    mUpperBoundType = BoundType::INFTY;
+                }
+                else if (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY)
+                {
+                    mContent = BoostInterval(lowerBoundType == BoundType::INFTY ? upper : lower);
+                    mLowerBoundType = lowerBoundType;
+                    mUpperBoundType = upperBoundType;
+                }
+                else
+                {
+                    mContent = BoostInterval(lower, upper);
+                    mLowerBoundType = lowerBoundType;
+                    mUpperBoundType = upperBoundType;
+                }
+            }
+            else
+            {
+                mContent = BoostInterval(Number(0));
+                mLowerBoundType = BoundType::STRICT;
+                mUpperBoundType = BoundType::STRICT;
+            }
+        }
+        
+        /**
          * Constructor which constructs a pointinterval from a passed general 
          * rational number.
          * @param n The passed double.
