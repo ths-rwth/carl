@@ -60,7 +60,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
             std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), mTotalDegree - 1 );
             #endif
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << it->second << "*" << result);
-            return new Term<Coefficient>((int)it->second, result);
+            return new Term<Coefficient>((Coefficient)it->second, result);
         }
     }
 }
