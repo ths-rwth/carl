@@ -64,8 +64,8 @@ public:
 	}
     
 	template<typename C>
-	carl::Term<C> randomTerm(std::size_t degree) const {
-		return geomDist<C>() * randomMonomial(degree);
+	std::shared_ptr<const carl::Term<C>> randomTerm(std::size_t degree) const {
+		return std::make_shared<const carl::Term<C>>(geomDist<C>(), randomMonomial(degree));
 	}
     
 	template<typename C>
@@ -75,16 +75,20 @@ public:
     
 	template<typename C>
 	CMP<C> newMP(std::size_t deg) const {
-		carl::MultivariatePolynomial<C> res;
-		res += C(geomDist<C>());
+		auto& manager = carl::MultivariatePolynomial<C>::mTermAdditionManager;
+		std::size_t id = manager.getId();
+		C c = C(geomDist<C>());
+		manager.addTerm(id, std::make_shared<const Term<C>>(c));
 		for (std::size_t i = 1; i <= deg; i++) {
 			std::binomial_distribution<> bin((int)((deg-i)*(deg-i)), 0.5);
 			std::size_t num = (std::size_t)bin(rand) + 1;
 			for (std::size_t j = 0; j < num; j++) {
-				res += randomTerm<C>(i);
+				manager.addTerm(id, randomTerm<C>(i));
 			}
 		}
-		return res;
+		std::vector<std::shared_ptr<const Term<C>>> terms;
+		manager.readTerms(id, terms);
+		return carl::MultivariatePolynomial<C>(std::move(terms));
 	}
     
 	template<typename C>
