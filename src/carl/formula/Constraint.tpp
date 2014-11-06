@@ -259,7 +259,8 @@ namespace carl
         assert( varInfo != mVarInfoMap.end() );
         if( !varInfo->second.hasCoeff() )
         {
-            varInfo->second = mLhs.getVarInfo<true>( _var );
+            // @todo Why does this not compile??
+//            varInfo->second = mLhs.getVarInfo<true>( _var );
         }
         auto d = varInfo->second.coeffs().find( _degree );
         return d != varInfo->second.coeffs().end() ? d->second : Pol( typename Pol::NumberType( 0 ) );
@@ -276,7 +277,8 @@ namespace carl
             {
                 if( !varInfoPair->second.hasCoeff() )
                 {
-                    varInfoPair->second = mLhs.getVarInfo<true>( varInfoPair->first );
+                    // @todo Why does this not compile??
+//                    varInfoPair->second = mLhs.getVarInfo<true>( varInfoPair->first );
                 }
                 auto d = varInfoPair->second.coeffs().find( 1 );
                 assert( d != varInfoPair->second.coeffs().end() );
@@ -702,7 +704,7 @@ namespace carl
         // The first two terms are not constant.
         if( termA != _constraintA->lhs().rend() && !(*termA)->isConstant() && termB != _constraintB->lhs().rend() && !(*termB)->isConstant() )
         {
-            if( *(*termA)->monomial() != *(*termB)->monomial() ) return 0;
+            if( (*termA)->monomial() != (*termB)->monomial() ) return 0;
             // Find an appropriate g.
             typename Pol::NumberType termAcoeffAbs = cln::abs( (*termA)->coeff() ); // TODO: use some method of carl instead of cln::abs
             typename Pol::NumberType termBcoeffAbs = cln::abs( (*termB)->coeff() );
@@ -725,7 +727,7 @@ namespace carl
             ++termB;
             while( termA != _constraintA->lhs().rend() && !(*termA)->isConstant() && termB != _constraintB->lhs().rend() && !(*termB)->isConstant() )
             {
-                if( *(*termA)->monomial() != *(*termB)->monomial() ) return 0;
+                if( (*termA)->monomial() != (*termB)->monomial() ) return 0;
                 else if( termACoeffGreater )
                 {
                     if( (*termA)->coeff() != g * (*termB)->coeff() ) return 0;

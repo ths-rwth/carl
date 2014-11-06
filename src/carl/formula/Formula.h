@@ -30,9 +30,9 @@ namespace carl
     struct IMPLIESContent
     {
         /// The premise of the implication.
-        const Formula<Pol> mPremise;
+        Formula<Pol> mPremise;
         /// The conclusion of the implication.
-        const Formula<Pol> mConlusion;
+        Formula<Pol> mConlusion;
 
         /**
          * Constructs the content of a formula being an implication.
@@ -50,11 +50,11 @@ namespace carl
     struct ITEContent
     {
         /// The condition of the if-then-else expression.
-        const Formula<Pol> mCondition;
+        Formula<Pol> mCondition;
         /// The then-case of the if-then-else expression.
-        const Formula<Pol> mThen;
+        Formula<Pol> mThen;
         /// The else-case of if-then-else expression.
-        const Formula<Pol> mElse;
+        Formula<Pol> mElse;
 
         /**
          * Constructs the content of a formula being an implication.
@@ -75,7 +75,7 @@ namespace carl
         /// The quantified variables.
         std::vector<carl::Variable> mVariables;
         /// The formula bound by this quantifier.
-        const Formula<Pol> mFormula;
+        Formula<Pol> mFormula;
 
         /**
          * Constructs the content of a quantified formula.
@@ -430,6 +430,22 @@ namespace carl
             {
                 return mpContent->mId;
             }
+            
+            /**
+             * @return true, if this formula represents TRUE.
+             */
+            bool isTrue() const
+            {
+                return mpContent->mType == FormulaType::TRUE;
+            }
+            
+            /**
+             * @return true, if this formula represents FALSE.
+             */
+            bool isFalse() const
+            {
+                return mpContent->mType == FormulaType::FALSE;
+            }
 
             /**
              * @return The bit-vector representing the propositions of this formula. For further information see the Condition class.
@@ -544,7 +560,7 @@ namespace carl
 			const Formula& quantifiedFormula() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
-				return *mpContent->mpQuantifierContent->mpAst;
+				return mpContent->mpQuantifierContent->mFormula;
 			}
 
             /**
@@ -670,11 +686,11 @@ namespace carl
                 if( mpContent->mType == FormulaType::NOT )
                     return mpContent->mSubformula;
                 else if( mpContent->mType == FormulaType::IMPLIES )
-                    return *mpContent->mpImpliesContent->mpConlusion;
+                    return mpContent->mpImpliesContent->mConlusion;
                 else if( mpContent->mType == FormulaType::ITE )
-                    return *mpContent->mpIteContent->mpElse;
+                    return mpContent->mpIteContent->mElse;
                 else
-                    return **(--(mpContent->mpSubformulas->end()));
+                    return *(--(mpContent->mpSubformulas->end()));
             }
             
             /**
@@ -764,9 +780,9 @@ namespace carl
                 if( mpContent->mType == FormulaType::NOT )
                     return mpContent->mSubformula == _formula;
                 else if( mpContent->mType == FormulaType::IMPLIES )
-                    return (mpContent->mpImpliesContent->mpPremise == _formula || mpContent->mpImpliesContent->mpConlusion == _formula);
+                    return (mpContent->mpImpliesContent->mPremise == _formula || mpContent->mpImpliesContent->mConclusion == _formula);
                 else if( mpContent->mType == FormulaType::ITE )
-                    return (mpContent->mpIteContent->mpCondition == _formula || mpContent->mpIteContent->mpThen == _formula || mpContent->mpIteContent->mpElse == _formula);
+                    return (mpContent->mpIteContent->mCondition == _formula || mpContent->mpIteContent->mThen == _formula || mpContent->mpIteContent->mElse == _formula);
                 else
                     return mpContent->mpSubformulas->find( _formula ) != mpContent->mpSubformulas->end();
             }
@@ -881,7 +897,7 @@ namespace carl
              * to resolve the negation in front of them, or to keep the constraints and leave 
              * the negation.
              */
-            const Formula resolveNegation( bool _keepConstraints = true ) const;
+            Formula resolveNegation( bool _keepConstraints = true ) const;
             
             /**
              * [Auxiliary method]
@@ -890,7 +906,7 @@ namespace carl
              *         Example: this = (op a1 a2 .. an) -> return = (op a1 .. an-1)
              *                  If n = 2, return = a1
              */
-            const Formula connectPrecedingSubformulas() const;
+            Formula connectPrecedingSubformulas() const;
 
 			/**
 			 * Transforms this formula to its quantifier free equivalent.
@@ -901,7 +917,7 @@ namespace carl
 			 * @param negated Used for internal recursion.
 			 * @return The quantifier-free version of this formula.
 			 */
-			const Formula toQF(QuantifiedVariables& variables, unsigned level = 0, bool negated = false) const;
+			Formula toQF(QuantifiedVariables& variables, unsigned level = 0, bool negated = false) const;
 
             /**
              * Transforms this formula to conjunctive normal form (CNF).
@@ -909,14 +925,14 @@ namespace carl
              *                          resolve constraints p!=0 to (or p<0 p>0) and to resolve negations in
              *                          front of constraints, e.g., (not p<0) gets p>=0.
              */
-            const Formula toCNF( bool _keepConstraints = true, bool _simplifyConstraintCombinations = false ) const;
+            Formula toCNF( bool _keepConstraints = true, bool _simplifyConstraintCombinations = false ) const;
             
             /**
              * Substitutes all occurrences of the given arithmetic variables in this formula by the given polynomials.
              * @param _arithmeticSubstitutions A substitution-mapping of arithmetic variables to polynomials.
              * @return The resulting formula after substitution.
              */
-            const Formula substitute( const std::map<carl::Variable, Pol>& _arithmeticSubstitutions ) const
+            Formula substitute( const std::map<carl::Variable, Pol>& _arithmeticSubstitutions ) const
             {
                 std::map<carl::Variable, const Formula> booleanSubstitutions;
                 return substitute( booleanSubstitutions, _arithmeticSubstitutions );
@@ -927,7 +943,7 @@ namespace carl
              * @param _booleanSubstitutions A substitution-mapping of Boolean variables to formulas.
              * @return The resulting formula after substitution.
              */
-            const Formula substitute( const std::map<carl::Variable, const Formula>& _booleanSubstitutions ) const
+            Formula substitute( const std::map<carl::Variable, const Formula>& _booleanSubstitutions ) const
             {
                 std::map<carl::Variable, Pol> arithmeticSubstitutions;
                 return substitute( _booleanSubstitutions, arithmeticSubstitutions );
@@ -939,10 +955,10 @@ namespace carl
              * @param _arithmeticSubstitutions A substitution-mapping of arithmetic variables to polynomials.
              * @return The resulting formula after substitution.
              */
-            const Formula substitute( const std::map<carl::Variable, const Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
+            Formula substitute( const std::map<carl::Variable,const Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
             
             /// A map from formula pointers to a map of rationals to a pair of a constraint relation and a formula pointer. (internally used)
-            typedef FastPointerMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation, const Formula>>> ConstraintBounds;
+            typedef FastPointerMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
             
             /**
              * Adds the bound to the bounds of the polynomial specified by this constraint. E.g., if the constraint is p+b~0, where p is a sum 
@@ -953,11 +969,11 @@ namespace carl
              * @param _constraint The constraint to find a bound for a polynomial for.
              * @param _inConjunction true, if the constraint is part of a conjunction.
              *                       false, if the constraint is part of a disjunction.
-             * @return true, if the yet determined bounds imply that the conjunction (_inConjunction == true) or disjunction 
+             * @return Formula( FALSE ), if the yet determined bounds imply that the conjunction (_inConjunction == true) or disjunction 
              *                (_inConjunction == false) of which we got the given constraint is invalid resp. valid;
-             *         false, otherwise.
+             *         false, the added constraint.
              */
-            static const Formula addConstraintBound( ConstraintBounds& _constraintBounds, const Formula& _constraint, bool _inConjunction );
+            static Formula addConstraintBound( ConstraintBounds& _constraintBounds, const Formula& _constraint, bool _inConjunction );
             
             /**
              * Stores for every polynomial for which we determined bounds for given constraints a minimal set of constraints

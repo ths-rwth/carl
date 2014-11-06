@@ -150,11 +150,11 @@ namespace carl
     template<typename T> 
     using EvaluationMap = std::map<Variable, T>;
     
-    template<typename Polynomial>
-    using VarInfo = VariableInformation<true, Polynomial>;
+    template<typename Pol>
+    using VarInfo = VariableInformation<true, Pol>;
     
-    template<typename Polynomial>
-    using VarInfoMap = std::map<Variable, VarInfo<Polynomial>>;
+    template<typename Pol>
+    using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
     
     typedef std::set<Variable> Variables;
 
@@ -208,11 +208,11 @@ namespace carl
     template<typename T1,typename T2> 
     using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
-    template<typename Polynomial>
-    using Factors = FastMap<Polynomial,unsigned>;
+    template<typename Pol>
+    using Factors = FastMap<Pol,unsigned>;
     
-    template<template<typename> class Operator, typename Polynomial>
-    using Contractor = Contraction<Operator, Polynomial>;
+    template<template<typename> class Operator, typename Pol>
+    using Contractor = Contraction<Operator, Pol>;
     
     // Constants.
     ///@todo move static variables to own cpp

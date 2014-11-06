@@ -235,7 +235,10 @@ namespace carl
                 auto varInfo = mVarInfoMap.find( _variable );
                 assert( varInfo != mVarInfoMap.end() );
                 if( _withCoefficients && !varInfo->second.hasCoeff() )
-                    varInfo->second = mLhs.getVarInfo<true>( _variable );
+                {
+                    // @todo Why does this not compile??
+//                    varInfo->second = mLhs.getVarInfo<true>( _variable );
+                }
                 return varInfo->second;
             }
 
