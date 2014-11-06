@@ -106,9 +106,9 @@ TEST(MultivariatePolynomial, Addition)
     Variable v1((unsigned)2);
     Variable v2((unsigned)3);
     p0 += v1;
-    p0 += std::make_shared<const Monomial>(v2);
+    p0 += createMonomial(v2, 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += std::make_shared<const Monomial>(v2);
+    p0 += createMonomial(v2, 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
     p0 += Term<mpz_class>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
@@ -153,9 +153,9 @@ TEST(MultivariatePolynomial, Substraction)
     Variable v2((unsigned)3);
     p0 -= v1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
-    p0 -= std::make_shared<const Monomial>(v2);
+    p0 -= createMonomial(v2, 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= std::make_shared<const Monomial>(v2);
+    p0 -= createMonomial(v2, 1);
     
     EXPECT_EQ((unsigned)3,p0.nrTerms());
     p0 -= Term<mpz_class>(-2,v2,1);

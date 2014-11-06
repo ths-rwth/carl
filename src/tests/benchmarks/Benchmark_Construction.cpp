@@ -210,12 +210,12 @@ TEST_F(BenchmarkTest, ReleaseCheck)
 TEST_F(BenchmarkTest, Addition)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
-	bi.n = 100;
-	for (bi.degree = 15; bi.degree < 16; bi.degree++) {
+	bi.n = 1000;
+	for (bi.degree = 15; bi.degree < 20; bi.degree++) {
 		Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
 		//bench.compare<CMP<mpq_class>, TupleConverter<CMP<mpq_class>,CMP<mpq_class>>>("CArL GMP");
-		//bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
-		//bench.compare<ZMP, TupleConverter<ZMP,ZMP>>("Z3");
+		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
+		bench.compare<ZMP, TupleConverter<ZMP,ZMP>>("Z3");
 		file.push(bench.result(), bi.degree);
 	}
 }

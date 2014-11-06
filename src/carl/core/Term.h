@@ -276,10 +276,10 @@ class Term
 		 * @param rhs Right hand side.
 		 * @return Changed term.
 		 */
-		Term& operator *=(const Coefficient& rhs);
-		Term& operator *=(Variable::Arg rhs);
-		Term& operator *=(const Monomial::Arg& rhs);
-		Term& operator *=(const Term& rhs);
+		Term& operator*=(const Coefficient& rhs);
+		Term& operator*=(Variable::Arg rhs);
+		Term& operator*=(const Monomial::Arg& rhs);
+		Term& operator*=(const Term& rhs);
 		/// @}
 
 		/// @name Division operators

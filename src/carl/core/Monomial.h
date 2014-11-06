@@ -58,7 +58,7 @@ namespace carl
 	class Monomial
 	{
 #ifdef USE_MONOMIAL_POOL
-        friend class MonomialPool;
+		friend class MonomialPool;
 #endif
 	public:
 		typedef std::shared_ptr<const Monomial> Arg;
@@ -70,10 +70,9 @@ namespace carl
 #ifdef USE_MONOMIAL_POOL
 		/// Monomial id.
 		mutable std::size_t mId;
-#else
+#endif
 		/// Cached hash.
 		mutable std::size_t mHash = 0;
-#endif
 
 		typedef std::vector<std::pair<Variable, exponent>>::iterator exponents_it;
 		typedef std::vector<std::pair<Variable, exponent>>::const_iterator exponents_cIt;
@@ -85,9 +84,8 @@ namespace carl
 
 		/**
 		 * Calculates the hash and stores it to mHash.
-         */
+		 */
 		void calcHash() {
-#ifndef USE_MONOMIAL_POOL
 			std::hash<carl::Variable> h;
 			size_t result = 0;
 			for (const auto& it: mExponents) {
@@ -98,7 +96,6 @@ namespace carl
 				result ^= it.second;
 			}
 			mHash = result;
-#endif
 		}
 #ifndef USE_MONOMIAL_POOL
 	public:
@@ -130,21 +127,21 @@ namespace carl
 			calcHash();
 			assert(isConsistent());
 		}
-                
-                /**
+				
+				/**
 		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
 		 * @param exponents The variables and their exponents.
 		 * @param totalDegree The total degree of the monomial to generate.
 		 */
 		explicit Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents) :
-            mExponents(exponents),
-            mTotalDegree(0)
-        {
+			mExponents(exponents),
+			mTotalDegree(0)
+		{
 			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });
 			for (const auto& e: mExponents) mTotalDegree += e.second;
-            calcHash();
+			calcHash();
 			assert(isConsistent());
-        }
+		}
 		
 		/**
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
@@ -162,13 +159,13 @@ namespace carl
 			calcHash();
 			assert(isConsistent());
 		}
-        
-        #ifndef USE_MONOMIAL_POOL
+		
+		#ifndef USE_MONOMIAL_POOL
 		/**
 		 * Assignment operator.
-         * @param rhs Other monomial.
-         * @return this.
-         */
+		 * @param rhs Other monomial.
+		 * @return this.
+		 */
 		Monomial& operator=(const Monomial& rhs)
 		{
 			// Check for self-assignment.
@@ -178,8 +175,8 @@ namespace carl
 			mHash = rhs.mHash;
 			return *this;
 		}
-        #endif
-        
+		#endif
+		
 #ifdef USE_MONOMIAL_POOL
 	public:
 #endif
@@ -214,16 +211,22 @@ namespace carl
 		}
 
 		/**
-		 * Returne the hash of this monomial
-         * @return Hash.
-         */
+		 * Returns the hash of this monomial
+		 * @return Hash.
+		 */
 		inline std::size_t hash() const {
-#ifdef USE_MONOMIAL_POOL
-			return mId;
-#else
 			return mHash;
-#endif
 		}
+
+#ifdef USE_MONOMIAL_POOL
+		/**
+		 * Return the id of this monomial.
+		 * @return Id.
+		 */
+		inline std::size_t id() const {
+			return mId;
+		}
+#endif
 		
 		/**
 		 * Gives the total degree, i.e. the sum of all exponents.
@@ -377,7 +380,7 @@ namespace carl
 		 */
 		bool divisible(const std::shared_ptr<const Monomial>& m) const
 		{
-            if(!m) return true;
+			if(!m) return true;
 			assert(isConsistent());
 			if(m->mTotalDegree > mTotalDegree) return false;
 			if(m->nrVariables() > nrVariables()) return false;
@@ -503,13 +506,13 @@ namespace carl
 
 		static CompareResult compareLexical(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
 		{
-            if( !lhs && !rhs )
-                return CompareResult::EQUAL;
-            if( !lhs )
-                return CompareResult::LESS;
-            if( !rhs )
-                return CompareResult::GREATER;
-            return lexicalCompare(*lhs, *rhs);
+			if( !lhs && !rhs )
+				return CompareResult::EQUAL;
+			if( !lhs )
+				return CompareResult::LESS;
+			if( !rhs )
+				return CompareResult::GREATER;
+			return lexicalCompare(*lhs, *rhs);
 		}
 		
 		static CompareResult compareLexical(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs)
@@ -524,12 +527,12 @@ namespace carl
 
 		static CompareResult compareGradedLexical(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
 		{
-            if( !lhs && !rhs )
-                return CompareResult::EQUAL;
-            if( !lhs )
-                return CompareResult::LESS;
-            if( !rhs )
-                return CompareResult::GREATER;
+			if( !lhs && !rhs )
+				return CompareResult::EQUAL;
+			if( !lhs )
+				return CompareResult::LESS;
+			if( !rhs )
+				return CompareResult::GREATER;
 			if(lhs->mTotalDegree < rhs->mTotalDegree) return CompareResult::LESS;
 			if(lhs->mTotalDegree > rhs->mTotalDegree) return CompareResult::GREATER;
 			return lexicalCompare(*lhs, *rhs);
@@ -622,96 +625,96 @@ namespace carl
 	inline bool operator==(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		if (lhs.get() == rhs.get()) return true;
 		if (lhs == nullptr || rhs == nullptr) return false;
-        #ifdef USE_MONOMIAL_POOL
-        return lhs->hash() == rhs->hash();
-        #else
-        if (lhs->hash() != rhs->hash()) return false;
-        if (lhs->tdeg() != rhs->tdeg()) return false;
+		#ifdef USE_MONOMIAL_POOL
+		return lhs->hash() == rhs->hash();
+		#else
+		if (lhs->hash() != rhs->hash()) return false;
+		if (lhs->tdeg() != rhs->tdeg()) return false;
 		return lhs->exponents() == rhs->exponents();
-        #endif
+		#endif
 	}
-    
+	
 	inline bool operator==(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		if (lhs == nullptr) return false;
 		if (lhs->tdeg() != 1) return false;
 		if (lhs->begin()->first == rhs) return true;
 		return false;
 	}
-    
+	
 	inline bool operator==(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		return rhs == lhs;
 	}
-    
+	
 	inline bool operator!=(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		return !(lhs == rhs);
 	}
-    
+	
 	inline bool operator!=(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		return !(lhs == rhs);
 	}
-    
+	
 	inline bool operator!=(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		return !(rhs == lhs);
 	}
-    
+	
 	inline bool operator<(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		if (lhs.get() == rhs.get()) return false;
 		if (lhs == nullptr) return true;
 		if (rhs == nullptr) return false;
-        if(lhs->tdeg() < rhs->tdeg()) return true;
-        if(lhs->tdeg() > rhs->tdeg()) return false;
+		if(lhs->tdeg() < rhs->tdeg()) return true;
+		if(lhs->tdeg() > rhs->tdeg()) return false;
 		CompareResult cr = Monomial::lexicalCompare(*lhs, *rhs);
 		return cr == CompareResult::LESS;
 	}
-    
+	
 	inline bool operator<(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		if (lhs == nullptr) return true;
 		if (lhs->tdeg() > 1) return false;
 		return lhs->begin()->first < rhs;
 	}
-    
+	
 	inline bool operator<(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		if (rhs == nullptr) return false;
 		if (rhs->tdeg() > 1) return true;
 		return lhs < rhs->begin()->first;
 	}
-    
+	
 	inline bool operator<=(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		return !(rhs < lhs);
 	}
-    
+	
 	inline bool operator<=(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		return !(rhs < lhs);
 	}
-    
+	
 	inline bool operator<=(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		return !(rhs < lhs);
 	}
-    
+	
 	inline bool operator>(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		return rhs < lhs;
 	}
-    
+	
 	inline bool operator>(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		return rhs < lhs;
 	}
-    
+	
 	inline bool operator>(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		return rhs < lhs;
 	}
-    
+	
 	inline bool operator>=(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		return rhs <= lhs;
 	}
-    
+	
 	inline bool operator>=(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		return rhs <= lhs;
 	}
-    
+	
 	inline bool operator>=(Variable::Arg lhs, const Monomial::Arg& rhs) {
 		return rhs <= lhs;
 	}
-    
+	
 	/// @}
 
 	/// @name Multiplication operators
@@ -723,11 +726,11 @@ namespace carl
 	 * @return `lhs * rhs`
 	 */
 	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
-    
+	
 	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, Variable::Arg rhs);
-    
+	
 	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const Monomial::Arg& rhs);
-    
+	
 	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}
 
@@ -758,14 +761,20 @@ namespace carl
 namespace std
 {
 	template<>
-	struct less<std::shared_ptr<const carl::Monomial>> {
-		bool operator()(const std::shared_ptr<const carl::Monomial>& lhs, const std::shared_ptr<const carl::Monomial>& rhs) const {
+	struct equal_to<carl::Monomial::Arg> {
+		bool operator()(const carl::Monomial::Arg& lhs, const carl::Monomial::Arg& rhs) const {
+			return lhs == rhs;
+		}
+	};
+	template<>
+	struct less<carl::Monomial::Arg> {
+		bool operator()(const carl::Monomial::Arg& lhs, const carl::Monomial::Arg& rhs) const {
 			if (lhs && rhs) return lhs < rhs;
 			if (lhs) return false;
 			return true;
 		}
 	};
-    
+	
 	/**
 	 * The template specialization of `std::hash` for `carl::Monomial`.
 	 * @param monomial Monomial.
@@ -779,16 +788,16 @@ namespace std
 			return monomial.hash();
 		}
 	};
-    
+	
 	/**
 	 * The template specialization of `std::hash` for a shared pointer of a `carl::Monomial`.
 	 * @param monomial The shared pointer to a monomial.
 	 * @return Hash of monomial.
 	 */
 	template<>
-	struct hash<shared_ptr<const carl::Monomial>>
+	struct hash<carl::Monomial::Arg>
 	{
-		size_t operator()(const shared_ptr<const carl::Monomial> monomial) const 
+		size_t operator()(const carl::Monomial::Arg& monomial) const 
 		{
 			if (!monomial) return 0;
 			return monomial->hash();

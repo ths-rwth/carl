@@ -35,7 +35,7 @@ TEST(IntervalEvaluation, Monomial)
     MultivariatePolynomial<cln::cl_RA> e3({(cln::cl_RA)1*a*b*c,(cln::cl_RA)1*d});
     MultivariatePolynomial<cln::cl_RA> e4({(cln::cl_RA)1*a,(cln::cl_RA)1*b,(cln::cl_RA)-1*c,(cln::cl_RA)-1*d});
     MultivariatePolynomial<cln::cl_RA> e5({(cln::cl_RA)1*a,(cln::cl_RA)1*b,Term<cln::cl_RA>(7)});
-    MultivariatePolynomial<cln::cl_RA> e6({(cln::cl_RA)12*a,(cln::cl_RA)3*b, (cln::cl_RA)1*std::shared_ptr<const Monomial>(new Monomial(c,2)),(cln::cl_RA)-1*std::shared_ptr<const Monomial>(new Monomial(d,3))});
+    MultivariatePolynomial<cln::cl_RA> e6({(cln::cl_RA)12*a,(cln::cl_RA)3*b, (cln::cl_RA)1*c*c,(cln::cl_RA)-1*d*d*d});
 //    MultivariatePolynomial<cln::cl_RA> e7({(cln::cl_RA)1*a,(cln::cl_RA)1*b*, Monomial(c,2),(cln::cl_RA)-1*Monomial(d,3)});
     MultivariatePolynomial<cln::cl_RA> e7({a,c});
     e7 = e7.pow(2)*b*d+a;

@@ -912,15 +912,15 @@ public:
 		return res += rhs;
 	}
 	template<typename C, typename O, typename P>
-	inline const MultivariatePolynomial<C,O,P> operator+(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline const MultivariatePolynomial<C,O,P> operator+(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs + lhs;
 	}
 	template<typename C>
-	inline const MultivariatePolynomial<C> operator+(const std::shared_ptr<const Monomial>& lhs, const Term<C>& rhs) {
+	inline const MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return rhs + lhs;
 	}
 	template<typename C>
-	inline const MultivariatePolynomial<C> operator+(const std::shared_ptr<const Monomial>& lhs, const C& rhs) {
+	inline const MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const C& rhs) {
 		MultivariatePolynomial<C> res(lhs);
 		return res += rhs;
 	}
@@ -946,7 +946,7 @@ public:
 		return rhs + lhs;
 	}
 	template<typename C>
-	inline const MultivariatePolynomial<C> operator+(const C& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline const MultivariatePolynomial<C> operator+(const C& lhs, const Monomial::Arg& rhs) {
 		return rhs + lhs;
 	}
 	template<typename C>

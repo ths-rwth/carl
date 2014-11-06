@@ -7,9 +7,12 @@
 
 #pragma once
 
+#include <mutex>
+#include <sstream>
+
 #include "../util/Singleton.h"
 #include "../util/Common.h"
-#include <mutex>
+#include "../core/VariablePool.h"
 
 namespace carl
 {

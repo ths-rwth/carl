@@ -18,16 +18,14 @@ TYPED_TEST(TermTest, Constructor)
 {
     Term<TypeParam> t(1);
     Variable v0(1);
-    Monomial::Arg m0 = std::make_shared<const Monomial>(v0);
-    Term<TypeParam> t0(m0);
+    Term<TypeParam> t0(v0);
 }
 
 TYPED_TEST(TermTest, Operators)
 {
     Term<TypeParam> t(1);
     Variable v0(1);
-    Monomial::Arg m0 = std::make_shared<const Monomial>(v0);
-    Term<TypeParam> t0(m0);
+    Term<TypeParam> t0(v0);
     EXPECT_TRUE(t0.isLinear());
     EXPECT_TRUE(t.isLinear());
     EXPECT_EQ((unsigned)0, t.getNrVariables());
