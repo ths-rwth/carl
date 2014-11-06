@@ -28,11 +28,7 @@ Term<Coefficient>::Term(const Coefficient& c) :
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
-#ifdef USE_MONOMIAL_POOL
-	mCoeff(1), mMonomial(MonomialPool::getInstance().create(v, 1))
-#else
-	mCoeff(1), mMonomial(std::make_shared<const Monomial>(v, 1))
-#endif
+	mCoeff(1), mMonomial(createMonomial(v, 1))
 {
 	assert(this->isConsistent());
 }
@@ -54,11 +50,7 @@ Term<Coefficient>::Term(const Coefficient& c, const Monomial::Arg& m) :
 template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e): 
 	mCoeff(c),
-#ifdef USE_MONOMIAL_POOL
-	mMonomial( MonomialPool::getInstance().create( v, e ) )
-#else
-	mMonomial( std::make_shared<const Monomial>( v, e) )
-#endif
+	mMonomial(createMonomial(v,e))
 {
 	assert(this->isConsistent());
 }
@@ -255,7 +247,7 @@ bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 	return lhs.monomial() == rhs.monomial();
 }
 template<typename Coeff>
-bool operator==(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
+bool operator==(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
 	return lhs.coeff() == Coeff(1);
@@ -353,11 +345,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 	}
 	else
 	{
-#ifdef USE_MONOMIAL_POOL
-		mMonomial = MonomialPool::getInstance().create(rhs, 1);
-#else
-		mMonomial = std::make_shared<const Monomial>(rhs);
-#endif
+		mMonomial = createMonomial(rhs, 1);
 	}
 	return *this;
 }

@@ -8,12 +8,12 @@
 #pragma once
 
 #include "config.h"
+#include "Monomial.h"
 
 #ifdef USE_MONOMIAL_POOL
 
 #include "../util/Common.h"
 #include "../util/Singleton.h"
-#include "Monomial.h"
 
 namespace carl
 {   
