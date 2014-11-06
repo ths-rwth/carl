@@ -166,9 +166,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 	mOrdered(ordered)
 {
 	if( duplicates ) {
+#ifdef USE_MONOMIAL_POOL
 		std::size_t id = mTermAdditionManager.getId();
 		for (const auto& t: mTerms) mTermAdditionManager.addTerm(id, t);
 		mTermAdditionManager.readTerms(id, mTerms);
+#else
+		mTermAdditionManager.removeDuplicates(*this);
+#endif
 	}
 	
 	if (!ordered) {
@@ -184,9 +188,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	mOrdered(ordered)
 {
 	if( duplicates ) {
+#ifdef USE_MONOMIAL_POOL
 		std::size_t id = mTermAdditionManager.getId();
 		for (const auto& t: mTerms) mTermAdditionManager.addTerm(id, t);
 		mTermAdditionManager.readTerms(id, mTerms);
+#else
+		mTermAdditionManager.removeDuplicates(*this);
+#endif
 	} 
 	if (!ordered) {
 		makeMinimallyOrdered();
@@ -1777,7 +1785,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	TermType* newlterm = nullptr;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
-			if (newlterm != nullptr) mTermAdditionManager.addTerm(id, std::shared_ptr<const TermType>(new TermType((**t1)*(**t2))));
+			if (newlterm != nullptr) mTermAdditionManager.addTerm(id, std::make_shared<const TermType>((**t1)*(**t2)));
 			else newlterm = new TermType(**t1 * **t2);
 		}
 	}
