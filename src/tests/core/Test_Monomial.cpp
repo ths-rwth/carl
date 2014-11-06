@@ -53,11 +53,11 @@ TEST(Monomial, VariableMultiplication)
     EXPECT_EQ(MonomialPool::getInstance().create({std::make_pair(x, 1), std::make_pair(y, 2)}), y * x * y);
     EXPECT_EQ(MonomialPool::getInstance().create({std::make_pair(x, 3)}), x * x * x);
 #else
-    EXPECT_EQ(std::make_shared<const Monomial>({std::make_pair(x, 1)}), x);
-    EXPECT_EQ(std::make_shared<const Monomial>({std::make_pair(x, 1), std::make_pair(y, 1)}), x * y);
-    EXPECT_EQ(std::make_shared<const Monomial>({std::make_pair(x, 2), std::make_pair(y, 1)}), x * x * y);
-    EXPECT_EQ(std::make_shared<const Monomial>({std::make_pair(x, 1), std::make_pair(y, 2)}), y * x * y);
-    EXPECT_EQ(std::make_shared<const Monomial>({std::make_pair(x, 3)}), x * x * x);
+    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1)})), x);
+    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)})), x * y);
+    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 1)})), x * x * y);
+    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})), y * x * y);
+    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3)})), x * x * x);
 #endif
 }
 
@@ -81,16 +81,16 @@ TEST(Monomial, MonomialMultiplication)
 	);
 #else
     EXPECT_EQ(
-		std::make_shared<const Monomial>({std::make_pair(x, 2), std::make_pair(y, 3)}), 
-		std::make_shared<const Monomial>({std::make_pair(x, 1), std::make_pair(y, 2)}) * std::make_shared<const Monomial>({std::make_pair(x, 1), std::make_pair(y, 1)})
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})), 
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}))
 	);
     EXPECT_EQ(
-		std::make_shared<const Monomial>({std::make_pair(x, 2), std::make_pair(y, 3)}), 
-		std::make_shared<const Monomial>({std::make_pair(x, 2)}) * std::make_shared<const Monomial>({std::make_pair(y, 3)})
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})), 
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 3)}))
 	);
     EXPECT_EQ(
-		std::make_shared<const Monomial>({std::make_pair(x, 5), std::make_pair(y, 3)}), 
-		std::make_shared<const Monomial>({std::make_pair(x, 2)}) * std::make_shared<const Monomial>({std::make_pair(x, 3), std::make_pair(y, 3)})
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 5), std::make_pair(y, 3)})), 
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3), std::make_pair(y, 3)}))
 	);
 #endif
 }
