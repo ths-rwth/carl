@@ -75,8 +75,8 @@ public:
     
 	template<typename C>
 	CMP<C> newMP(std::size_t deg) const {
-		auto& manager = carl::MultivariatePolynomial<C>::mTermAdditionManager;
 #ifdef USE_MONOMIAL_POOL
+		auto& manager = carl::MultivariatePolynomial<C>::mTermAdditionManager;
 		std::size_t id = manager.getId();
 		C c = C(geomDist<C>());
 		manager.addTerm(id, std::make_shared<const Term<C>>(c));
