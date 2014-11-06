@@ -55,16 +55,17 @@ public:
 	void addTerm(std::size_t id, const TermPtr& term) {
 		assert(mUsed.at(id));
 		Terms& terms = mTerms[id];
-		std::size_t hash = mHash(term->monomial());
-		if (hash >= terms.size()) terms.resize(hash + 1);
-		if (terms.at(hash) == nullptr) {
-			terms[hash] = term;
+		std::size_t termId = 0;
+		if (term->monomial()) termId = term->monomial()->id();
+		if (termId >= terms.size()) terms.resize(termId + 8);
+		if (terms.at(termId) == nullptr) {
+			terms[termId] = term;
 		} else {
-			auto coeff = terms.at(hash)->coeff() + term->coeff();
+			auto coeff = terms.at(termId)->coeff() + term->coeff();
 			if (coeff == typename Polynomial::CoeffType(0)) {
-				terms[hash] = nullptr;
+				terms[termId] = nullptr;
 			} else {
-				terms[hash] = std::make_shared<const TermType>(coeff, term->monomial());
+				terms[termId] = std::make_shared<const TermType>(coeff, term->monomial());
 			}
 		}
 	}
