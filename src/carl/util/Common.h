@@ -206,9 +206,6 @@ namespace carl
     template<typename Pol>
     using Factors = FastMap<Pol,unsigned>;
     
-    template<template<typename> class Operator, typename Pol>
-    using Contractor = Contraction<Operator, Pol>;
-    
     // Constants.
     ///@todo move static variables to own cpp
     
