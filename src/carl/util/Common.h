@@ -13,6 +13,7 @@
 #include <string.h>
 #include <unordered_set>
 #include <unordered_map>
+#include <memory>
 
 #include "../core/Variable.h"
 //#include "../core/VariableInformation.h"

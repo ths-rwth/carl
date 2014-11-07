@@ -22,7 +22,9 @@
 #include "../core/Definiteness.h"
 #include "../util/Common.h"
 #include "../core/VariableInformation.h"
+#include "../core/VariablesInformation.h"
 #include "config.h"
+#include "../core/MultivariatePolynomial.h"
 
 
 namespace carl
@@ -104,7 +106,7 @@ namespace carl
             void initVariableInformations()
             {
                 // @todo Why does this not compile??
-                VariablesInformation<false,Pol> varinfos = mLhs.getVarInfo<false>();
+                VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
                 for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
                     mVarInfoMap.emplace_hint( mVarInfoMap.end(), *varInfo );
             }
