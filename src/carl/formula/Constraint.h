@@ -21,6 +21,8 @@
 #include "../interval/IntervalEvaluation.h"
 #include "../core/Definiteness.h"
 #include "../util/Common.h"
+#include "../core/VariableInformation.h"
+#include "../core/VariablesInformation.h"
 #include "config.h"
 
 
@@ -29,6 +31,12 @@ namespace carl
     // Forward declaration
     template<typename Pol>
     class ConstraintPool;
+    
+    template<typename Pol>
+    using VarInfo = VariableInformation<true, Pol>;
+    
+    template<typename Pol>
+    using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
     
     /**
      * Class to create a constraint object.
@@ -97,9 +105,9 @@ namespace carl
             void initVariableInformations()
             {
                 // @todo Why does this not compile??
-//                VariablesInformation<false,Pol> varinfos = mLhs.getVarInfo<false>();
-//                for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
-//                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), *varInfo );
+                VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
+                for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
+                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), *varInfo );
             }
             
         public:

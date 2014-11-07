@@ -130,6 +130,7 @@ public:
 		if (isOrdered()) return;
 		std::sort(mTerms.begin(), mTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
 		mOrdered = true;
+        assert(this->isConsistent());
 	}
 	
 	/**

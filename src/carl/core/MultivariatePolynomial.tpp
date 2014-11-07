@@ -236,6 +236,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
 		// special treatment of unary minus
 		*this *= -1;
+        assert(this->isConsistent());
 		return;
 	}
 	if (op == ConstructorOperation::DIV) {
@@ -477,6 +478,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	for (unsigned i = 0; i < res.mTerms.size(); i++) {
 		res.mTerms.emplace_back(res.mTerms[i]->divideBy(divisor));
 	}
+    assert(res.isConsistent());
 	return res;
 }
 
@@ -633,6 +635,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 			if( O::degreeOrder )
 			{
 				remainder += p;
+                assert(remainder.isConsistent());
 				return remainder;
 			}
 			remainder += p.lterm();
@@ -685,6 +688,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 		}
 		mTerms.swap(newTerms);
 		LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+        assert(this->isConsistent());
 		return;
 	}
 	// Find all exponents occurring with the variable to substitute as basis.
@@ -840,6 +844,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 			result.substituteIn(sub->first, sub->second);
 			if(result.isConstant())
 			{
+                assert(result.isConsistent());
 				return result;
 			}
 		}
@@ -1418,6 +1423,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if(mTerms.size() == 0) 
 	{
 		mTerms = rhs.mTerms;
+        assert(this->isConsistent());
 		return *this;
 	}
 	if(rhs.mTerms.size() == 0) return *this;
@@ -1654,6 +1660,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if(mTerms.size() == 0)
 	{
 		*this = -rhs;
+        assert(this->isConsistent());
 		return *this;
 	}
 	if(rhs.mTerms.size() == 0) return *this;
@@ -1733,6 +1740,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if(!rhs) 
 	{
 		*this -= Coeff(1);
+        assert(this->isConsistent());
 		return *this;
 	}
 	if(Policies::searchLinear) 
@@ -1792,6 +1800,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	if(mTerms.size() == 0) return *this;
 	if(rhs.mTerms.size() == 0) {
 		mTerms.clear();
+        assert(this->isConsistent());
 		return *this;
 	}
 #ifdef USE_MONOMIAL_POOL
@@ -1874,6 +1883,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	if(c == (Coeff)0) 
 	{
 		mTerms.clear();
+        assert(this->isConsistent());
 		return *this;
 	}
 	TermsType newTerms;
@@ -1917,6 +1927,7 @@ const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P
 		result.mTerms.emplace_back(new Term<C>(*t/rhs));
 	}
 	result.mOrdered = lhs.mOrdered;
+    assert(result.isConsistent());
 	return result;
 }
 
@@ -2018,11 +2029,13 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
 	mTerms.clear();
 	if(newTerms.empty())
 	{
+        assert(this->isConsistent());
 		return;
 	}
 	else if(newTerms.size() == 1)
 	{
 		mTerms.push_back(newTerms.back());
+        assert(this->isConsistent());
 		return;
 	}
 	// Sort the entries from newterms.
@@ -2067,6 +2080,7 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
 		mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
 	}
 //	assert( newTerms.empty() );
+    assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

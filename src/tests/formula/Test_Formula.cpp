@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "../../carl/core/MultivariatePolynomial.h"
 #include "../../carl/formula/Formula.h"
 #include "../../carl/formula/VariableNamePool.h"
 #include "../../carl/util/stringparser.h"
