@@ -1214,7 +1214,7 @@ namespace carl
                 {   
                     if( _simplifyConstraintCombinations )
                     {
-                        if( addConstraintBound( constraintBoundsAnd, currentFormula, true ) == nullptr )
+                        if( addConstraintBound( constraintBoundsAnd, currentFormula, true ).isFalse() )
                         {
                             goto ReturnFalse;
                         }
@@ -1237,7 +1237,7 @@ namespace carl
                         {
                             if( _simplifyConstraintCombinations )
                             {
-                                if( addConstraintBound( constraintBoundsAnd, resolvedFormula, true ) == nullptr )
+                                if( addConstraintBound( constraintBoundsAnd, resolvedFormula, true ).isFalse() )
                                 {
                                     goto ReturnFalse;
                                 }
@@ -1381,7 +1381,7 @@ namespace carl
                                     {
                                         if( _simplifyConstraintCombinations )
                                         {
-                                            if( addConstraintBound( constraintBoundsOr, resolvedFormula, false ) == nullptr )
+                                            if( addConstraintBound( constraintBoundsOr, resolvedFormula, false ).isFalse() )
                                             {
                                                 currentFormulaValid = true;
                                                 break;
@@ -1414,7 +1414,7 @@ namespace carl
                                     {
                                         if( _simplifyConstraintCombinations )
                                         {
-                                            if( addConstraintBound( constraintBoundsOrAnd, subsubformula, true ) == nullptr )
+                                            if( addConstraintBound( constraintBoundsOrAnd, subsubformula, true ).isFalse() )
                                             {
                                                 conjunctionIsFalse = true;
                                                 break;
@@ -1456,7 +1456,7 @@ namespace carl
                             {
                                 if( _simplifyConstraintCombinations )
                                 {
-                                    if( addConstraintBound( constraintBoundsOr, currentSubformula, false ) == nullptr )
+                                    if( addConstraintBound( constraintBoundsOr, currentSubformula, false ).isFalse() )
                                     {
                                         currentFormulaValid = true;
                                         break;
