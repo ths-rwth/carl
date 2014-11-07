@@ -946,6 +946,16 @@ namespace carl
             assert(this->isConsistent());
             return this->isPointInterval() && (mContent.lower() == 0);
         }
+		
+		/**
+         * Function which determines, if the interval is the one interval.
+         * @return True if it is a pointinterval rooted at 1.
+         */
+        inline bool isOne() const
+        {
+            assert(this->isConsistent());
+            return this->isPointInterval() && (mContent.lower() == 1);
+        }
 
         /**
          * Determine whether the interval lays entirely left of 0 (NEGATIVE_SIGN), right of 0 (POSITIVE_SIGN) or contains 0 (ZERO_SIGN).
