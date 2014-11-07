@@ -17,6 +17,7 @@
 #include <vector>
 #include "typetraits.h"
 #include "boost/algorithm/string.hpp"
+#include "../constants.h"
 
 namespace carl {
 
@@ -28,7 +29,13 @@ inline bool isZero(const cln::cl_RA& n) {
 	return zerop(n);
 }
 
-
+inline bool isOne(const cln::cl_I& n) {
+	return n == carl::constant_one<cln::cl_I>().get();
+}	
+	
+inline bool isOne(const cln::cl_RA& n) {
+	return n  == carl::constant_one<cln::cl_RA>().get();
+}
 	
 /**
  * Extract the numerator from a fraction.

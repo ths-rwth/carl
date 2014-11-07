@@ -100,7 +100,7 @@ class Term
 		 */
 		bool isZero() const
 		{
-			return mCoeff == Coefficient(0);
+			return carl::isZero(mCoeff);
 		}
 		
 		/**
@@ -109,7 +109,7 @@ class Term
          */
 		bool isOne() const
 		{
-			return (isConstant() && mCoeff == Coefficient(1));
+			return (isConstant() && carl::isOne(mCoeff));
 		}
 		/**
 		 * Checks whether the monomial is a constant.
@@ -183,7 +183,7 @@ class Term
 		 */
 		void clear()
 		{
-			mCoeff = Coefficient(0);
+			mCoeff = carl::constant_zero<Coefficient>().get();
 			mMonomial = nullptr;
 		}
 

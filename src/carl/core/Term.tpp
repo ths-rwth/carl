@@ -15,7 +15,7 @@ namespace carl
 
 template<typename Coefficient>
 Term<Coefficient>::Term() :
-	mCoeff(Coefficient(0)), mMonomial()
+	mCoeff(carl::constant_zero<Coefficient>().get()), mMonomial()
 {
 	assert(this->isConsistent());
 }
@@ -28,14 +28,14 @@ Term<Coefficient>::Term(const Coefficient& c) :
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
-	mCoeff(1), mMonomial(createMonomial(v, 1))
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, 1))
 {
 	assert(this->isConsistent());
 }
 
 template<typename Coefficient>
 Term<Coefficient>::Term(const Monomial::Arg& m) :
-	mCoeff(1), mMonomial(m)
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(m)
 {
 	assert(this->isConsistent());
 }
@@ -58,7 +58,7 @@ Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e):
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Coefficient& c) const
 {
-	assert(c != Coefficient(0));
+	assert(!carl::isZero(c));
 	return new Term(mCoeff / c, mMonomial);
 }
 
@@ -98,7 +98,7 @@ Term<Coefficient>* Term<Coefficient>::divideBy(const std::shared_ptr<const Monom
 template<typename Coefficient>
 Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
 {
-	assert(t.mCoeff != Coefficient(0));
+	assert(!carl::isZero(t.mCoeff));
 	if(mMonomial)
 	{
 		if(!t.mMonomial)
@@ -131,7 +131,7 @@ Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
 	if(!mMonomial)
 	{
 		// Derivatives of constants are zero.
-		return new Term<Coefficient>(Coefficient(0));
+		return new Term<Coefficient>(carl::constant_zero<Coefficient>().get());
 	}
 	Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
 	*t *= mCoeff;
@@ -144,10 +144,10 @@ Definiteness Term<Coefficient>::definiteness() const
 	if(mMonomial)
 	{
 		if(mMonomial->isSquare())
-			return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
+			return (mCoeff < carl::constant_zero<Coefficient>().get() ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI);
 	}
-	else if(mCoeff != Coefficient(0))
-		return (mCoeff < Coefficient(0) ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
+	else if(!carl::isZero(mCoeff))
+		return (mCoeff < carl::constant_zero<Coefficient>().get() ? Definiteness::NEGATIVE : Definiteness::POSITIVE);
 	return Definiteness::NON;
 }
 
@@ -185,11 +185,11 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<co
 	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
 	if(tmp->tdeg() == 0)
 	{
-		return Term(1);
+		return Term(carl::constant_one<Coefficient>().get());
 	}
 	else
 	{
-		return Term(1, tmp);
+		return Term(carl::constant_one<Coefficient>().get(), tmp);
 	}	
 	
 
@@ -250,9 +250,9 @@ template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
-	return lhs.coeff() == Coeff(1);
+	return carl::isOne(lhs.coeff());
 	#else
-	if (lhs.coeff() != Coeff(1)) return false;
+	if (!carl::isOne(lhs.coeff())) return false;
 	return lhs.monomial() == rhs;
 	#endif
 }
@@ -260,9 +260,9 @@ template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs) {
 	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
-	return lhs.coeff() == Coeff(1);
+	return carl::isOne(lhs.coeff());
 	#else
-	if (lhs.coeff() != Coeff(1)) return false;
+	if (!carl::isOne(lhs.coeff())) return false;
 	return lhs.monomial() == rhs;
 	#endif
 }
@@ -280,13 +280,13 @@ bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 
 template<typename Coeff>
 bool operator<(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
-	if (lhs.monomial() == rhs) return lhs.coeff() < Coeff(1);
+	if (lhs.monomial() == rhs) return lhs.coeff() < carl::constant_one<Coeff>().get();
 	return lhs.monomial() < rhs;
 }
 
 template<typename Coeff>
 bool operator<(const Term<Coeff>& lhs, Variable::Arg rhs) {
-	if (lhs.monomial() == rhs) return lhs.coeff() < Coeff(1);
+	if (lhs.monomial() == rhs) return lhs.coeff() < carl::constant_one<Coeff>().get();
 	return lhs.monomial() < rhs;
 }
 
@@ -298,13 +298,13 @@ bool operator<(const Term<Coeff>& lhs, const Coeff& rhs) {
 
 template<typename Coeff>
 bool operator<(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
-	if (lhs == rhs.monomial()) return Coeff(1) < rhs.coeff();
+	if (lhs == rhs.monomial()) return carl::constant_one<Coeff>().get() < rhs.coeff();
 	return lhs < rhs.monomial();
 }
 
 template<typename Coeff>
 bool operator<(Variable::Arg lhs, const Term<Coeff>& rhs) {
-	if (lhs == rhs.monomial()) return Coeff(1) < rhs.coeff();
+	if (lhs == rhs.monomial()) return carl::constant_one<Coeff>().get() < rhs.coeff();
 	return lhs < rhs.monomial();
 }
 
@@ -323,19 +323,19 @@ const Term<Coefficient> Term<Coefficient>::operator-() const
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 {
-	if(rhs == Coefficient(0)) 
+	if(carl::isZero(rhs)) 
 	{
 		clear();
 		return *this;
 	}
-	assert(mCoeff == Coefficient(0) || mCoeff * rhs != Coefficient(0));
+	assert(carl::isZero(mCoeff) || !carl::isZero(mCoeff * rhs));
 	mCoeff *= rhs;
 	return *this;
 }
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 {
-	if(mCoeff == Coefficient(0))
+	if(carl::isZero(mCoeff))
 	{
 		return *this;
 	}
@@ -353,7 +353,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
 {
-	if(mCoeff == Coefficient(0)) return *this;
+	if(carl::isZero(mCoeff)) return *this;
 	
 	if(mMonomial)
 	{
@@ -371,8 +371,8 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Monomial::Arg& rhs)
 template<typename Coefficient>
 Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 {
-	if(mCoeff == Coefficient(0)) return *this;
-	if(rhs.mCoeff == Coefficient(0)) 
+	if(carl::isZero(mCoeff)) return *this;
+	if(carl::isZero(rhs.mCoeff)) 
 	{
 		clear();
 		return *this;
@@ -436,7 +436,7 @@ std::string Term<Coefficient>::toString(bool infix, bool friendlyVarNames) const
 { 
 	if(mMonomial)
 	{
-		if(mCoeff != C(1))
+		if(!carl::isOne(mCoeff))
 		{
 			std::stringstream s;
 			s << mCoeff;

@@ -68,6 +68,27 @@ namespace carl
     */
    template <class Number> struct is_interval<const carl::Interval<Number>> : std::true_type {};
     
+   /**
+	* Function which determines, if the interval is the zero interval.
+	* @return True if it is a pointinterval rooted at 0.
+	*/
+   template<typename Number>
+   static bool isZero(const Interval<Number>& _in)
+   {
+	   return _in.isZero();
+   }
+
+   /**
+	* Function which determines, if the interval is the one interval.
+	* @return True if it is a pointinterval rooted at 1.
+	*/
+   template<typename Number>
+   static bool isOne(const Interval<Number>& _in)
+   {
+	   return _in.isOne();
+   }
+   
+   
     /**
      * Struct which holds the rounding and checking policies required for boost 
      * interval.
@@ -154,15 +175,6 @@ namespace carl
         mContent(Number(0)),
         mLowerBoundType(BoundType::STRICT),
         mUpperBoundType(BoundType::STRICT) { }
-
-        /**
-         * Constructor which constructs the pointinterval at n.
-         * @param n Location of the pointinterval.
-         */
-        explicit Interval(int n) :
-        mContent(n),
-        mLowerBoundType(BoundType::WEAK),
-        mUpperBoundType(BoundType::WEAK) { }
 
         /**
          * Constructor which constructs the pointinterval at n.
@@ -384,7 +396,7 @@ namespace carl
          * @param n The passed double.
          */
         template<typename N = Number, DisableIf<std::is_same<N, int >> = dummy >
-        explicit Interval(const int& n) :
+        Interval(const int& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
         mUpperBoundType(BoundType::WEAK) { }
@@ -475,7 +487,7 @@ namespace carl
          * @param upper The desired upper bound.
          */
         template<typename N = Number, DisableIf<std::is_same<N, unsigned int >> = dummy>
-        Interval(unsigned int lower, unsigned int upper)
+        explicit Interval(unsigned int lower, unsigned int upper)
         {
             if (BOUNDS_OK(lower, BoundType::WEAK, upper, BoundType::WEAK))
             {
@@ -502,7 +514,7 @@ namespace carl
          * @param upperBoundType The desired upper bound type.
          */
         template<typename N = Number, DisableIf<std::is_same<N, unsigned int >> = dummy>
-        Interval(unsigned int lower, BoundType lowerBoundType, unsigned int upper, BoundType upperBoundType)
+        explicit Interval(unsigned int lower, BoundType lowerBoundType, unsigned int upper, BoundType upperBoundType)
         {
             if (BOUNDS_OK(lower, lowerBoundType, upper, upperBoundType))
             {
@@ -1039,6 +1051,12 @@ namespace carl
          * @return True if the value is contained in this.
          */
         bool contains(const Number& val) const;
+		
+		template<typename Num = Number, DisableIf<std::is_same<Num, int >> = dummy>
+		bool contains(int val) const
+		{
+			return this->contains(Number(val));
+		}
 
         /**
          * Checks if the interval contains the given interval.
@@ -1555,6 +1573,24 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs);
+	
+	/**
+     * Operator for the subtraction of two intervals with assignment.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return Resulting interval.
+     */
+	template<typename Number>
+    inline const Interval<Number> operator -=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    
+    /**
+     * Operator for the subtraction of an interval and a number with assignment.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return Resulting interval.
+     */
+    template<typename Number>
+    inline const Interval<Number> operator -=(const Interval<Number>& lhs, const Number& rhs);
     
     /**
      * Operator for the multiplication of two intervals.
