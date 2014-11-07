@@ -213,7 +213,7 @@ public:
 	bool hasConstantTerm() const;
 	/**
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
-	 * @return Constant term.
+	 * @reiturn Constant term.
 	 */
 	const Coeff& constantPart() const;
 	
