@@ -24,7 +24,6 @@
 #include "../core/VariableInformation.h"
 #include "../core/VariablesInformation.h"
 #include "config.h"
-#include "../core/MultivariatePolynomial.h"
 
 
 namespace carl
