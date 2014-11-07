@@ -9,12 +9,13 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include <string.h>
 #include <unordered_set>
 #include <unordered_map>
 
 #include "../core/Variable.h"
-#include "../core/VariableInformation.h"
+//#include "../core/VariableInformation.h"
 
 namespace carl
 {
@@ -145,11 +146,11 @@ namespace carl
     template<typename T> 
     using EvaluationMap = std::map<Variable, T>;
     
-    template<typename Pol>
-    using VarInfo = VariableInformation<true, Pol>;
-    
-    template<typename Pol>
-    using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
+//    template<typename Pol>
+//    using VarInfo = VariableInformation<true, Pol>;
+//    
+//    template<typename Pol>
+//    using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
     
     typedef std::set<Variable> Variables;
 
