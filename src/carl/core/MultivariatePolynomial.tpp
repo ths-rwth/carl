@@ -312,13 +312,13 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-Coeff MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
+const Coeff& MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 {
-	if(isZero()) return (Coeff)0;
+	if(isZero()) return constant_zero<Coeff>::get();
 	if(trailingTerm()->isConstant()) {
 		return trailingTerm()->coeff();
 	}
-	return (Coeff)0;
+	return constant_zero<Coeff>::get();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1687,7 +1687,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator-=(const Term<Coeff>& rhs)
 {
 	///@todo Check if this works with ordering.
-	if(rhs.coeff() == (Coeff)0) return *this;
+	if(isZero(rhs.coeff())) return *this;
 	if(Policies::searchLinear) 
 	{
 		typename TermsType::iterator it(mTerms.begin());

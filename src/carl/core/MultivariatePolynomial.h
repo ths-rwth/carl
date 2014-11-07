@@ -214,7 +214,7 @@ public:
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
 	 * @return Constant term.
 	 */
-	Coeff constantPart() const;
+	const Coeff& constantPart() const;
 	
 	typename TermsType::const_iterator begin() const
 	{
