@@ -2,6 +2,8 @@
 
 namespace carl
 {
+
+
     mpq_class pow(const mpq_class& b, unsigned e)
     {
         mpz_class den = b.get_den();

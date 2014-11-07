@@ -20,6 +20,16 @@
 
 namespace carl {
 
+inline bool isZero(const cln::cl_I& n) {
+	return zerop(n);
+}	
+	
+inline bool isZero(const cln::cl_RA& n) {
+	return zerop(n);
+}
+
+
+	
 /**
  * Extract the numerator from a fraction.
  * @param n Fraction.

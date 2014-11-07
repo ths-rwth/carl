@@ -101,6 +101,7 @@ template<typename T> struct is_subset_of_rationals;
  *
  * All types that are marked with `is_rational` represent a field.
  */
+
 /**
  * States if a type is a field.
  * Default is true for rationals, false otherwise.
@@ -115,7 +116,6 @@ struct is_field: std::integral_constant<bool, is_rational<T>::value> {};
  */
 template<typename C>
 struct is_field<GFNumber<C>>: std::true_type {};
-
 
 
 /**

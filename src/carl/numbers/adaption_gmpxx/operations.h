@@ -16,15 +16,33 @@ CLANG_WARNING_RESET
 #include <sstream>
 #include <vector>
 #include "boost/algorithm/string.hpp"
+#include "constants.h"
 
 namespace carl {
+
 
 /**
  * Informational functions
  * 
  * The following functions return informations about the given numbers.
  */
+inline bool isZero(const mpz_class& n) {
+	return constant_zero<mpz_class>::get() == n;
+}
 
+inline bool isZero(const mpq_class& n) {
+	return constant_zero<mpz_class>::get() == n;
+}
+
+inline bool isOne(const mpz_class& n) {
+	return constant_one<mpz_class>::get() == n;
+}
+
+inline bool isOne(const mpq_class& n) {
+	return constant_one<mpz_class>::get() == n;
+}
+
+	
 inline mpz_class getNum(const mpq_class& n) {
 	return n.get_num();
 }
