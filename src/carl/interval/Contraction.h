@@ -57,7 +57,7 @@ namespace carl {
             
             bool split = numerator.div_ext(denominator, result1, result2);
             if (split) {
-                
+				
                 if(result1 <= result2) {
                     resB = intervals.at(variable).intersect(centerInterval.sub(result1));
                     resA = intervals.at(variable).intersect(centerInterval.sub(result2));

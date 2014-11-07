@@ -51,6 +51,11 @@ TEST(Contraction, SimpleNewton)
     PolynomialContraction<SimpleNewton> e5_contractor(e5);
     PolynomialContraction<SimpleNewton> e6_contractor(e6);
     PolynomialContraction<SimpleNewton> e7_contractor(e7);
+	
+	MultivariatePolynomial<cln::cl_RA> test((cln::cl_RA)1*c*c);
+	
+	std::cout << "short Test: " <<  IntervalEvaluation::evaluate(test,map) << std::endl;
+	
     
     bool split;
     
@@ -83,16 +88,14 @@ TEST(Contraction, SimpleNewton)
     */
     
     split = e6_contractor(map,c,resultA,resultB);
-    EXPECT_EQ(split, true);
-    overapprox = Interval<double>(-1.0, BoundType::INFTY, -1.2, BoundType::WEAK);
-    
-    EXPECT_EQ(overapprox.upper() >= resultA.upper(), true);
-    overapprox = Interval<double>(3.0625, BoundType::WEAK, 1.0, BoundType::INFTY);
-    EXPECT_EQ(overapprox.lower() <= resultB.lower() && overapprox.upper() >= resultB.upper(), true);
+    EXPECT_EQ(split, false);
+    overapprox = Interval<double>(-2.0, BoundType::WEAK, -1.2, BoundType::WEAK); 
+	
+    EXPECT_EQ(overapprox.upper() >= resultA.upper() && overapprox.lower() <= resultA.lower(), true);
     
     split = e6_contractor(map,d,resultA,resultB);
     EXPECT_EQ(split, false);
-    overapprox = Interval<double>(2.41666666666666651863693004998, BoundType::WEAK, 1.0, BoundType::INFTY);
-    EXPECT_EQ(overapprox.lower() <= resultA.lower() && overapprox.upper() >= resultA.upper(), true);
+    
+    EXPECT_EQ(resultA.isEmpty(), true);
     
 }

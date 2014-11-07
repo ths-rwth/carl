@@ -94,7 +94,7 @@ namespace carl
          */
         bool operator==( const QuantifierContent& _qc )
         {
-            return (mVariables == _qc.mVariables) && (mFormula == _qc.mFormula);
+            return (mFormula == _qc.mFormula) && (mVariables == _qc.mVariables);
         }
     };
     
@@ -341,8 +341,12 @@ namespace carl
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, move(_subasts) ) )
             {}
             
-            Formula( FormulaType _type, const std::vector<Variable>& _vars, const Formula& _term ):
+            Formula( FormulaType _type, const std::vector<Variable>&& _vars, const Formula& _term ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move( _vars ), _term ) )
+            {}
+            
+            Formula( FormulaType _type, const std::vector<Variable>& _vars, const Formula& _term ):
+                Formula( _type, std::move( std::vector<Variable>( _vars ) ), _term )
             {}
             
             Formula( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated ):
@@ -934,7 +938,7 @@ namespace carl
              */
             Formula substitute( const std::map<carl::Variable, Pol>& _arithmeticSubstitutions ) const
             {
-                std::map<carl::Variable, const Formula> booleanSubstitutions;
+                std::map<carl::Variable, Formula> booleanSubstitutions;
                 return substitute( booleanSubstitutions, _arithmeticSubstitutions );
             }
             
@@ -943,7 +947,7 @@ namespace carl
              * @param _booleanSubstitutions A substitution-mapping of Boolean variables to formulas.
              * @return The resulting formula after substitution.
              */
-            Formula substitute( const std::map<carl::Variable, const Formula>& _booleanSubstitutions ) const
+            Formula substitute( const std::map<carl::Variable, Formula>& _booleanSubstitutions ) const
             {
                 std::map<carl::Variable, Pol> arithmeticSubstitutions;
                 return substitute( _booleanSubstitutions, arithmeticSubstitutions );
@@ -955,7 +959,7 @@ namespace carl
              * @param _arithmeticSubstitutions A substitution-mapping of arithmetic variables to polynomials.
              * @return The resulting formula after substitution.
              */
-            Formula substitute( const std::map<carl::Variable,const Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
+            Formula substitute( const std::map<carl::Variable, Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
             
             /// A map from formula pointers to a map of rationals to a pair of a constraint relation and a formula pointer. (internally used)
             typedef FastPointerMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;

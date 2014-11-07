@@ -1214,7 +1214,7 @@ namespace carl
                 {   
                     if( _simplifyConstraintCombinations )
                     {
-                        if( addConstraintBound( constraintBoundsAnd, currentFormula, true ) == nullptr )
+                        if( addConstraintBound( constraintBoundsAnd, currentFormula, true ).isFalse() )
                         {
                             goto ReturnFalse;
                         }
@@ -1237,7 +1237,7 @@ namespace carl
                         {
                             if( _simplifyConstraintCombinations )
                             {
-                                if( addConstraintBound( constraintBoundsAnd, resolvedFormula, true ) == nullptr )
+                                if( addConstraintBound( constraintBoundsAnd, resolvedFormula, true ).isFalse() )
                                 {
                                     goto ReturnFalse;
                                 }
@@ -1381,7 +1381,7 @@ namespace carl
                                     {
                                         if( _simplifyConstraintCombinations )
                                         {
-                                            if( addConstraintBound( constraintBoundsOr, resolvedFormula, false ) == nullptr )
+                                            if( addConstraintBound( constraintBoundsOr, resolvedFormula, false ).isFalse() )
                                             {
                                                 currentFormulaValid = true;
                                                 break;
@@ -1414,7 +1414,7 @@ namespace carl
                                     {
                                         if( _simplifyConstraintCombinations )
                                         {
-                                            if( addConstraintBound( constraintBoundsOrAnd, subsubformula, true ) == nullptr )
+                                            if( addConstraintBound( constraintBoundsOrAnd, subsubformula, true ).isFalse() )
                                             {
                                                 conjunctionIsFalse = true;
                                                 break;
@@ -1456,7 +1456,7 @@ namespace carl
                             {
                                 if( _simplifyConstraintCombinations )
                                 {
-                                    if( addConstraintBound( constraintBoundsOr, currentSubformula, false ) == nullptr )
+                                    if( addConstraintBound( constraintBoundsOr, currentSubformula, false ).isFalse() )
                                     {
                                         currentFormulaValid = true;
                                         break;
@@ -1567,17 +1567,17 @@ namespace carl
     }
             
     template<typename Pol>
-    Formula<Pol> Formula<Pol>::substitute( const map<Variable, const Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
+    Formula<Pol> Formula<Pol>::substitute( const map<Variable, Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
     {
         switch( getType() )
         {
             case FormulaType::TRUE:
             {
-                return this;
+                return *this;
             }
             case FormulaType::FALSE:
             {
-                return this;
+                return *this;
             }
             case FormulaType::BOOL:
             {
@@ -1586,7 +1586,7 @@ namespace carl
                 {
                     return iter->second;
                 }
-                return this;
+                return *this;
             }
             case FormulaType::CONSTRAINT:
             {
@@ -1613,7 +1613,8 @@ namespace carl
             case FormulaType::EXISTS:
             case FormulaType::FORALL:
             {
-                return newQuantifier(getType(), quantifiedVariables(), quantifiedFormula().substitute(_booleanSubstitutions, _arithmeticSubstitutions));
+                std::vector<Variable> vars( quantifiedVariables() );
+                return Formula<Pol>(getType(), std::move( vars ), quantifiedFormula().substitute(_booleanSubstitutions, _arithmeticSubstitutions));
             }
             default:
             {
