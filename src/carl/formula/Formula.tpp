@@ -1567,17 +1567,17 @@ namespace carl
     }
             
     template<typename Pol>
-    Formula<Pol> Formula<Pol>::substitute( const map<Variable, const Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
+    Formula<Pol> Formula<Pol>::substitute( const map<Variable, Formula<Pol>>& _booleanSubstitutions, const map<Variable, Pol>& _arithmeticSubstitutions ) const
     {
         switch( getType() )
         {
             case FormulaType::TRUE:
             {
-                return this;
+                return *this;
             }
             case FormulaType::FALSE:
             {
-                return this;
+                return *this;
             }
             case FormulaType::BOOL:
             {
@@ -1586,7 +1586,7 @@ namespace carl
                 {
                     return iter->second;
                 }
-                return this;
+                return *this;
             }
             case FormulaType::CONSTRAINT:
             {
@@ -1613,7 +1613,8 @@ namespace carl
             case FormulaType::EXISTS:
             case FormulaType::FORALL:
             {
-                return newQuantifier(getType(), quantifiedVariables(), quantifiedFormula().substitute(_booleanSubstitutions, _arithmeticSubstitutions));
+                std::vector<Variable> vars( quantifiedVariables() );
+                return Formula<Pol>(getType(), std::move( vars ), quantifiedFormula().substitute(_booleanSubstitutions, _arithmeticSubstitutions));
             }
             default:
             {
