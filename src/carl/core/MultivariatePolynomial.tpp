@@ -835,12 +835,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		return result;
 	}
-    std::cout << "substiute  " << *this << "  by  [ ";
+    std::cout << "substitute  " << *this << "  by  [ ";
     for( auto& sub : substitutions)
     {
         std::cout << "(" << sub.first << ", " << sub.second << ") ";
     }
-    std::cout << std::endl;
+    std::cout << "]" << std::endl;
 	// Substitute the variables, which have to be replaced by 0, beforehand, 
 	// as this could significantly simplify this multivariate polynomial.
 	for(auto sub = substitutions.begin(); sub != substitutions.end(); ++sub)

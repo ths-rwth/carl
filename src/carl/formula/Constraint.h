@@ -105,7 +105,6 @@ namespace carl
             
             void initVariableInformations()
             {
-                // @todo Why does this not compile??
                 VariablesInformation<false,Pol> varinfos = mLhs.template getVarInfo<false>();
                 for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
                     mVarInfoMap.emplace_hint( mVarInfoMap.end(), *varInfo );
@@ -248,8 +247,7 @@ namespace carl
                 assert( varInfo != mVarInfoMap.end() );
                 if( _withCoefficients && !varInfo->second.hasCoeff() )
                 {
-                    // @todo Why does this not compile??
-//                    varInfo->second = mLhs.getVarInfo<true>( _variable );
+                    varInfo->second = mLhs.template getVarInfo<true>( _variable );
                 }
                 return varInfo->second;
             }
