@@ -218,3 +218,134 @@ TYPED_TEST(Operators, InplaceMultiplication)
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, carl::Variable>));
 	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, TypeParam>));
 }
+
+template<typename T>
+class OperatorsInterval: public testing::Test {};
+
+TYPED_TEST_CASE(OperatorsInterval, IntervalTypes);
+
+TYPED_TEST(OperatorsInterval, Comparison)
+{
+	BOOST_CONCEPT_ASSERT((Comparison<TypeParam, TypeParam>));
+	
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::Variable>));
+	
+	BOOST_CONCEPT_ASSERT((Comparison<std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Comparison<std::shared_ptr<const carl::Monomial>, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, std::shared_ptr<const carl::Monomial>>));
+	
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Term<TypeParam>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Term<TypeParam>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Term<TypeParam>, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Term<TypeParam>, TypeParam>));
+	BOOST_CONCEPT_ASSERT((Comparison<std::shared_ptr<const carl::Monomial>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<TypeParam, carl::Term<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Comparison<carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::MultivariatePolynomial<TypeParam>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::MultivariatePolynomial<TypeParam>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::MultivariatePolynomial<TypeParam>, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::MultivariatePolynomial<TypeParam>, TypeParam>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<std::shared_ptr<const carl::Monomial>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<carl::Variable, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Comparison<TypeParam, carl::MultivariatePolynomial<TypeParam>>));
+}
+
+TYPED_TEST(OperatorsInterval, Addition)
+{
+	BOOST_CONCEPT_ASSERT((Addition<TypeParam, TypeParam, TypeParam>));
+	
+	BOOST_CONCEPT_ASSERT((Addition<carl::Variable, TypeParam, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<TypeParam, carl::Variable, carl::MultivariatePolynomial<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Addition<carl::Monomial::Arg, TypeParam, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<TypeParam, carl::Monomial::Arg, carl::MultivariatePolynomial<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Addition<carl::Term<TypeParam>, carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Term<TypeParam>, carl::Monomial::Arg, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Term<TypeParam>, carl::Variable, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Term<TypeParam>, TypeParam, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Monomial::Arg, carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Variable, carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<TypeParam, carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Addition<carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::MultivariatePolynomial<TypeParam>, carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::MultivariatePolynomial<TypeParam>, carl::Monomial::Arg, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::MultivariatePolynomial<TypeParam>, carl::Variable, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::MultivariatePolynomial<TypeParam>, TypeParam, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Monomial::Arg, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<carl::Variable, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Addition<TypeParam, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+}
+
+TYPED_TEST(OperatorsInterval, UnaryMinus)
+{
+	BOOST_CONCEPT_ASSERT((UnaryMinus<TypeParam>));
+	BOOST_CONCEPT_ASSERT((UnaryMinus<carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((UnaryMinus<carl::MultivariatePolynomial<TypeParam>>));
+}
+
+TYPED_TEST(OperatorsInterval, Multiplication)
+{
+	BOOST_CONCEPT_ASSERT((Multiplication<TypeParam, TypeParam, TypeParam>));
+	
+    BOOST_CONCEPT_ASSERT((Multiplication<carl::Variable, carl::Variable, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Variable, TypeParam, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<TypeParam, carl::Variable, carl::Term<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Multiplication<std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<std::shared_ptr<const carl::Monomial>, carl::Variable, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<std::shared_ptr<const carl::Monomial>, TypeParam, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Variable, std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<TypeParam, std::shared_ptr<const carl::Monomial>, carl::Term<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Term<TypeParam>, carl::Term<TypeParam>, carl::Term<TypeParam>>));
+	//BOOST_CONCEPT_ASSERT((Multiplication<carl::Term<TypeParam>, std::shared_ptr<const carl::Monomial>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Term<TypeParam>, carl::Variable, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Term<TypeParam>, TypeParam, carl::Term<TypeParam>>));
+	//BOOST_CONCEPT_ASSERT((Multiplication<std::shared_ptr<const carl::Monomial>, carl::Term<TypeParam>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Variable, carl::Term<TypeParam>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<TypeParam, carl::Term<TypeParam>, carl::Term<TypeParam>>));
+	
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::MultivariatePolynomial<TypeParam>, carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	//BOOST_CONCEPT_ASSERT((Multiplication<carl::MultivariatePolynomial<TypeParam>, std::shared_ptr<const carl::Monomial>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::MultivariatePolynomial<TypeParam>, carl::Variable, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::MultivariatePolynomial<TypeParam>, TypeParam, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Term<TypeParam>, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	//BOOST_CONCEPT_ASSERT((Multiplication<std::shared_ptr<const carl::Monomial>, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<carl::Variable, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((Multiplication<TypeParam, carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+}
+
+TYPED_TEST(OperatorsInterval, InplaceAddition)
+{	
+	BOOST_CONCEPT_ASSERT((InplaceAddition<TypeParam, TypeParam>));
+	
+	BOOST_CONCEPT_ASSERT((InplaceAddition<carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((InplaceAddition<carl::MultivariatePolynomial<TypeParam>, carl::Term<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((InplaceAddition<carl::MultivariatePolynomial<TypeParam>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((InplaceAddition<carl::MultivariatePolynomial<TypeParam>, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((InplaceAddition<carl::MultivariatePolynomial<TypeParam>, TypeParam>));
+}
+
+TYPED_TEST(OperatorsInterval, InplaceMultiplication)
+{
+	//BOOST_CONCEPT_ASSERT((InplaceMultiplication<std::shared_ptr<const carl::Monomial>, std::shared_ptr<const carl::Monomial>>));
+	//BOOST_CONCEPT_ASSERT((InplaceMultiplication<std::shared_ptr<const carl::Monomial>, carl::Variable>));
+	
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, carl::Term<TypeParam>>));
+	//BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::Term<TypeParam>, TypeParam>));
+	
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, carl::MultivariatePolynomial<TypeParam>>));
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, carl::Term<TypeParam>>));
+	//BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, std::shared_ptr<const carl::Monomial>>));
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, carl::Variable>));
+	BOOST_CONCEPT_ASSERT((InplaceMultiplication<carl::MultivariatePolynomial<TypeParam>, TypeParam>));
+}

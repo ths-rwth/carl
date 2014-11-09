@@ -171,6 +171,16 @@ class GFNumber
 };
 
 template<typename IntegerT>
+static bool isZero(const GFNumber<IntegerT>& _in) {
+	return _in.isZero();
+}
+
+template<typename IntegerT>
+static bool isOne(const GFNumber<IntegerT>& _in) {
+	return _in.isOne();
+}
+
+template<typename IntegerT>
 GFNumber<IntegerT> quotient(const GFNumber<IntegerT>& lhs, const GFNumber<IntegerT>& rhs) {
 	return lhs / rhs;
 }

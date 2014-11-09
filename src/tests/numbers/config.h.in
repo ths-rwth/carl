@@ -5,7 +5,16 @@
 #cmakedefine USE_MPFR_FLOAT
 
 #include <cln/cln.h>
+#include "../../carl/interval/Interval.h"
+#ifdef USE_MPFR_FLOAT
+#include "../../carl/numbers/FLOAT_T.h"
+#endif
 
 typedef testing::Types<int, cln::cl_I> IntegerTypes;
 typedef testing::Types<cln::cl_RA> RationalTypes;
 typedef testing::Types<int, cln::cl_I, cln::cl_RA> NumberTypes;
+#ifdef USE_MPFR_FLOAT
+typedef testing::Types<carl::Interval<double>, carl::Interval<int>, carl::Interval<cln::cl_RA>, carl::Interval<cln::cl_I>, carl::Interval<carl::FLOAT_T<mpfr_t> > > IntervalTypes;
+#else
+typedef testing::Types<carl::Interval<double>, carl::Interval<int>, carl::Interval<cln::cl_RA>, carl::Interval<cln::cl_I> > IntervalTypes;
+#endif
