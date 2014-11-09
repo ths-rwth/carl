@@ -834,6 +834,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		return result;
 	}
+    std::cout << "substiute  " << *this << "  by  [ ";
+    for( auto& sub : substitutions)
+    {
+        std::cout << "(" << sub.first << ", " << sub.second << ") ";
+    }
+    std::cout << std::endl;
 	// Substitute the variables, which have to be replaced by 0, beforehand, 
 	// as this could significantly simplify this multivariate polynomial.
 	for(auto sub = substitutions.begin(); sub != substitutions.end(); ++sub)
@@ -866,6 +872,11 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 			}
 		}
 	}
+    std::cout << "expResults:" << std::endl;
+    for(auto& er : expResults)
+    {
+        std::cout << er.first.first << "^" << er.first.second << ":  " << er.second << std::endl; 
+    }
 	// Calculate the exponentiation of the multivariate polynomial to substitute the
 	// for variables for, reusing the already calculated exponentiations.
 	if(!expResults.empty())

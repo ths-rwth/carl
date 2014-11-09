@@ -17,11 +17,11 @@
 #include <sstream>
 #include <assert.h>
 #include "Relation.h"
+#include "../core/VariableInformation.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
 #include "../core/Definiteness.h"
 #include "../util/Common.h"
-#include "../core/VariableInformation.h"
 #include "config.h"
 
 
@@ -104,9 +104,9 @@ namespace carl
             void initVariableInformations()
             {
                 // @todo Why does this not compile??
-                VariablesInformation<false,Pol> varinfos = mLhs.getVarInfo<false>();
-                for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
-                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), *varInfo );
+//                VariablesInformation<false,Pol> varinfos = mLhs.getVarInfo<false>();
+//                for( auto varInfo = varinfos.begin(); varInfo != varinfos.end(); ++varInfo )
+//                    mVarInfoMap.emplace_hint( mVarInfoMap.end(), *varInfo );
             }
             
         public:

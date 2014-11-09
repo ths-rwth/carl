@@ -18,30 +18,7 @@
 //#include "../core/VariableInformation.h"
 
 namespace carl
-{
-
-	// Enumerations.
-	/// @todo Are these enumerations needed in carl or should we put them to smtrat?
-	enum class Variable_Domain: unsigned { BOOLEAN = 0, REAL = 1, INTEGER = 2 };
-	
-	enum class Logic : unsigned { UNDEFINED, QF_NRA, QF_LRA, QF_NIA, QF_LIA };
-	inline std::ostream& operator<<(std::ostream& os, const Logic& l)
-	{
-		switch (l) 
-		{
-			case Logic::UNDEFINED:	os << "undefined"; break;
-			case Logic::QF_NRA:		os << "QF_NRA"; break;
-			case Logic::QF_LRA:		os << "QF_LRA"; break;
-			case Logic::QF_NIA:		os << "QF_NIA"; break;
-			case Logic::QF_LIA:		os << "QF_LIA"; break;
-		}
-		return os;
-	}
-	
-	/// @todo Is this enumerations needed in carl or should we put them to smtrat?
-	///An enum with the possible answer a Module can give
-	enum Answer { True = 0, False = 1, Unknown = 2 };
-	
+{	
 	// Structures.
 	
 	template<typename T> 
@@ -205,7 +182,7 @@ namespace carl
     using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
     template<typename Pol>
-    using Factors = FastMap<Pol,unsigned>;
+    using Factors = FastMap<Pol,exponent>;
     
     // Constants.
     ///@todo move static variables to own cpp
