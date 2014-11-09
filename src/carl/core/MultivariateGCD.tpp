@@ -100,7 +100,7 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 #ifdef COMPARE_WITH_GINAC
 	assert(checkConversion(a));
 	assert(checkConversion(b));
-	assert(ginacGcd(a,b) == gcd_calc.calculate());
+    assert(ginacGcd(a,b) == gcd_calc.calculate());
 #endif 
 	return gcd_calc.calculate();
 }

@@ -258,53 +258,52 @@ namespace carl
 	
 	std::shared_ptr<const carl::Monomial> Monomial::gcd(const std::shared_ptr<const Monomial>& rhs, const std::shared_ptr<const Monomial>& lhs)
 	{
-		if(!lhs && !rhs) return nullptr;
-		if(!lhs) return rhs;
-		if(!rhs) return lhs;
-			
-		LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
-		assert(lhs->isConsistent());
-		assert(rhs->isConsistent());
+            if(!lhs && !rhs) return nullptr;
+            if(!lhs) return rhs;
+            if(!rhs) return lhs;
 
-		std::vector<std::pair<Variable, exponent>> newExps;
-		exponent expsum = 0;
-		// Linear, as we expect small monomials.
-		auto itright = rhs->mExponents.cbegin();
-		auto leftEnd = lhs->mExponents.cend();
-		auto rightEnd = rhs->mExponents.cend();
-		for(auto itleft = lhs->mExponents.cbegin(); (itleft != leftEnd && itright != rightEnd);)
-		{
-			// Variable is present in both monomials.
-			if(itleft->first == itright->first)
-			{
-				exponent newExp = std::min(itleft->second, itright->second);
-				newExps.push_back(std::make_pair(itleft->first, newExp));
-				expsum += newExp;
-				++itright;
-				++itleft;
-			}
+            LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
+            assert(lhs->isConsistent());
+            assert(rhs->isConsistent());
 
-			else if(itleft->first < itright->first) 
-			{
-				++itright;
-			}
-			else
-			{
-				assert(itleft->first > itright->first);
-				++itleft;
-			}
-		}
-		 // Insert remaining part
-		std::shared_ptr<const Monomial> result;
-		if (!newExps.empty()) {
-			#ifdef USE_MONOMIAL_POOL
-			std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
-			#else
-			std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), expsum );
-			#endif
-		}
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-		return result;
+            std::vector<std::pair<Variable, exponent>> newExps;
+            exponent expsum = 0;
+            // Linear, as we expect small monomials.
+            auto itright = rhs->mExponents.cbegin();
+            auto leftEnd = lhs->mExponents.cend();
+            auto rightEnd = rhs->mExponents.cend();
+            for(auto itleft = lhs->mExponents.cbegin(); (itleft != leftEnd && itright != rightEnd);)
+            {
+                // Variable is present in both monomials.
+                if(itleft->first == itright->first)
+                {
+                    exponent newExp = std::min(itleft->second, itright->second);
+                    newExps.push_back(std::make_pair(itleft->first, newExp));
+                    expsum += newExp;
+                    ++itright;
+                    ++itleft;
+                }
+                else if(itleft->first < itright->first) 
+                {
+                    ++itright;
+                }
+                else
+                {
+                    assert(itleft->first > itright->first);
+                    ++itleft;
+                }
+            }
+             // Insert remaining part
+            std::shared_ptr<const Monomial> result;
+            if (!newExps.empty()) {
+                #ifdef USE_MONOMIAL_POOL
+                std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
+                #else
+                result = std::make_shared<const Monomial>( std::move(newExps), expsum );
+                #endif
+            }
+            LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+            return result;
 	}
 	
 	std::shared_ptr<const carl::Monomial> Monomial::lcm(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)

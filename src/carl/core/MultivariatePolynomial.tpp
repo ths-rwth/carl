@@ -663,10 +663,6 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	return remainder;
 }
 
-
-
-
-
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
@@ -835,12 +831,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		return result;
 	}
-    std::cout << "substitute  " << *this << "  by  [ ";
-    for( auto& sub : substitutions)
-    {
-        std::cout << "(" << sub.first << ", " << sub.second << ") ";
-    }
-    std::cout << "]" << std::endl;
 	// Substitute the variables, which have to be replaced by 0, beforehand, 
 	// as this could significantly simplify this multivariate polynomial.
 	for(auto sub = substitutions.begin(); sub != substitutions.end(); ++sub)
@@ -873,11 +863,6 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 			}
 		}
 	}
-    std::cout << "expResults:" << std::endl;
-    for(auto& er : expResults)
-    {
-        std::cout << er.first.first << "^" << er.first.second << ":  " << er.second << std::endl; 
-    }
 	// Calculate the exponentiation of the multivariate polynomial to substitute the
 	// for variables for, reusing the already calculated exponentiations.
 	if(!expResults.empty())
@@ -885,12 +870,11 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		auto expResultA = expResults.begin();
 		auto expResultB = expResultA;
 		auto sub = substitutions.begin();
-		while(sub->second.isZero()) 
+		while(sub->first != expResultB->first.first) 
 		{
 			assert(sub != substitutions.end());
 			++sub;
 		}
-		assert(sub->first == expResultB->first.first);
 		expResultB->second = sub->second.pow(expResultB->first.second);
 		++expResultB;
 		while(expResultB != expResults.end())
@@ -1433,7 +1417,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	assert(rhs.isConsistent());
 	if(mTerms.size() == 0) 
 	{
-		mTerms = rhs.mTerms;
+		*this = rhs;
         assert(this->isConsistent());
 		return *this;
 	}
