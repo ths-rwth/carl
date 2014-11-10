@@ -539,6 +539,17 @@ TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
             MultivariatePolynomial<TypeParam>({(TypeParam)1*x*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)8*x, Term<TypeParam>(6), (TypeParam)9*y}));
 }
 
+TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)5*x*y, (TypeParam)7*y, (TypeParam)11*x*x}), (TypeParam)5*x*y+(TypeParam)7*y+(TypeParam)11*x*x);
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}), (TypeParam)1*x + (TypeParam)1*y);
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)8*x*x*y, (TypeParam)6*x*y, (TypeParam)9*x*y*y}), (TypeParam)3*x*x*y + (TypeParam)4*x*y + (TypeParam)9*x*y*y + (TypeParam)2*x*y + (TypeParam)5*x*x*y);
+}
+
 TYPED_TEST(MultivariatePolynomialTest, Comparison)
 {
     VariablePool& pool = VariablePool::getInstance();
