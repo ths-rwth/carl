@@ -12,15 +12,33 @@ using namespace std;
 
 namespace carl
 {   
-    ostream& UFInstanceManager::print( ostream& _out, const UFInstance& _ufi ) const
+    ostream& UFInstanceManager::print( ostream& _out, const UFInstance& _ufi, bool _infix, bool _friendlyNames ) const
     {
         assert( _ufi.id() != 0 );
         assert( _ufi.id() < mUFInstances.size() );
         const UFInstanceContent& ufic = *mUFInstances[_ufi.id()];
-        _out << "(" << ufic.uninterpretedFunction().name();
-        for( auto& arg : ufic.args() )
+        if( _infix )
         {
-            _out << " " << arg;
+            _out << _ufi.uninterpretedFunction().name() << "(";
+        }
+        else
+        {
+            _out << "(" << ufic.uninterpretedFunction().name();
+        }
+        for( auto iter = _ufi.args().begin(); iter != _ufi.args().end(); ++iter )
+        {
+            if( _infix )
+            {
+                if( iter != _ufi.args().begin() )
+                {
+                    _out << ", ";
+                }
+            }
+            else
+            {
+                _out << " ";
+            }
+            _out << iter->toString( _friendlyNames );
         }
         _out << ")";
         return _out;

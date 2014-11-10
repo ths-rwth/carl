@@ -92,6 +92,11 @@ namespace carl
             }
             
             /**
+             * @return The string representation of this uninterpreted function instance.
+             */
+            std::string toString( bool _infix, bool _friendlyNames ) const;
+            
+            /**
              * Prints the given uninterpreted function instance on the given output stream.
              * @param _os The output stream to print on.
              * @param _ufun The uninterpreted function instance to print.
