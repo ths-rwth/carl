@@ -12,6 +12,8 @@
 
 #ifdef USE_MONOMIAL_POOL
 
+#include <unordered_set>
+
 #include "../util/Common.h"
 #include "../util/Singleton.h"
 
@@ -43,7 +45,7 @@ namespace carl
 			MonomialPool( unsigned _capacity = 10000 ):
 				Singleton<MonomialPool>(),
 				mIdAllocator( 1 ),
-				mPool()
+				mPool(_capacity)
 			{}
 			
 		public:

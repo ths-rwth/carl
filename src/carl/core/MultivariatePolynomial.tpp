@@ -1810,7 +1810,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	TermType* newlterm = nullptr;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
-			if (newlterm != nullptr) mTermAdditionManager.addTerm(id, std::make_shared<const TermType>((**t1)*(**t2)));
+			if (newlterm != nullptr) mTermAdditionManager.addTerm(id, std::make_shared<const TermType>(std::move((**t1)*(**t2))));
 			else newlterm = new TermType(**t1 * **t2);
 		}
 	}

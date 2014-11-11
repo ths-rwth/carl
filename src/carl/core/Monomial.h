@@ -121,7 +121,7 @@ namespace carl
 		 * @param totalDegree The total degree of the monomial to generate.
 		 */
 		Monomial(std::vector<std::pair<Variable, exponent>>&& exponents, exponent totalDegree) :
-			mExponents(exponents),
+			mExponents(std::move(exponents)),
 			mTotalDegree(totalDegree)
 		{
 			calcHash();
@@ -148,7 +148,7 @@ namespace carl
 		 * @param exponents The variables and their exponents.
 		 */
 		explicit Monomial(std::vector<std::pair<Variable, exponent>>&& exponents) :
-			mExponents(exponents),
+			mExponents(std::move(exponents)),
 			mTotalDegree(0)
 		{
 			

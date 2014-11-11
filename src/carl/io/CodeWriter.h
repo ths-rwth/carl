@@ -17,7 +17,7 @@
 
 namespace carl {
 
-std::string demangle(const char* name) const {
+inline std::string demangle(const char* name) {
 	int status = -4; // some arbitrary value to eliminate the compiler warning
 	// enable c++11 by passing the flag -std=c++11 to g++
 	std::unique_ptr<char, void(*)(void*)> res {
@@ -27,7 +27,7 @@ std::string demangle(const char* name) const {
 	return (status == 0) ? res.get() : name ;
 }
 template<typename T>
-std::string typeString() const {
+std::string typeString() {
 	const char* name = typeid(T).name();
 	return demangle(name);
 }
