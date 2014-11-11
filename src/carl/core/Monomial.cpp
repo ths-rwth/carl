@@ -8,7 +8,7 @@
 
 namespace carl
 {
-	std::shared_ptr<const Monomial> Monomial::dropVariable(Variable::Arg v) const
+	Monomial::Arg Monomial::dropVariable(Variable::Arg v) const
 	{
 		///@todo this should work on the shared_ptr directly. Then we could directly return this shared_ptr instead of the ugly copying.
 		LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
@@ -140,7 +140,7 @@ namespace carl
 	}
 	
 	
-	std::shared_ptr<const Monomial> Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
+	Monomial::Arg Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
 	{
 		std::vector<std::pair<Variable, exponent>> newExps;
 		exponent tdegree = mTotalDegree;
@@ -195,7 +195,7 @@ namespace carl
 		#endif
 	}
 	
-	std::shared_ptr<const Monomial> Monomial::separablePart() const
+	Monomial::Arg Monomial::separablePart() const
 	{
 		std::vector<std::pair<Variable, exponent>> newExps;
 		for (auto& it: mExponents)
@@ -209,7 +209,7 @@ namespace carl
 		#endif
 	}
 	
-	std::shared_ptr<const Monomial> Monomial::pow(unsigned exp) const
+	Monomial::Arg Monomial::pow(unsigned exp) const
 	{
 		if (exp == 0)
 		{
@@ -256,7 +256,7 @@ namespace carl
 		return ss.str();
 	}
 	
-	std::shared_ptr<const carl::Monomial> Monomial::gcd(const std::shared_ptr<const Monomial>& rhs, const std::shared_ptr<const Monomial>& lhs)
+	Monomial::Arg Monomial::gcd(const std::shared_ptr<const Monomial>& rhs, const std::shared_ptr<const Monomial>& lhs)
 	{
             if(!lhs && !rhs) return nullptr;
             if(!lhs) return rhs;
@@ -306,7 +306,7 @@ namespace carl
             return result;
 	}
 	
-	std::shared_ptr<const carl::Monomial> Monomial::lcm(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
+	Monomial::Arg Monomial::lcm(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
 	{
 		if (!lhs && !rhs) return nullptr;
 		if (!lhs) return rhs;
@@ -426,7 +426,7 @@ namespace carl
 		return CompareResult::LESS;
 	}
 	
-	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
+	Monomial::Arg operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 	{
 		LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
 		if(!lhs)
@@ -436,6 +436,7 @@ namespace carl
 		assert( rhs->tdeg() > 0 );
 		assert( lhs->tdeg() > 0 );
 		std::vector<std::pair<Variable, exponent>> newExps;
+		newExps.reserve(lhs->exponents().size() + rhs->exponents().size());
 
 		// Linear, as we expect small monomials.
 		auto itleft = lhs->begin();
@@ -452,12 +453,13 @@ namespace carl
 			// Variable is not present in lhs, we have to insert var-exp pair from rhs.
 			else if(itleft->first < itright->first)
 			{
-				newExps.push_back( *itright );
+				newExps.emplace_back( itright->first, itright->second );
 				++itright;
-			}		
+			}
+			// Variable is not present in rhs, we have to insert var-exp pair from lhs.
 			else 
 			{
-				newExps.push_back( *itleft );
+				newExps.emplace_back( itleft->first, itleft->second );
 				++itleft;
 			}
 		}
@@ -475,7 +477,7 @@ namespace carl
 		return result;
 	}
 
-	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
+	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
 	{
 		if (!lhs) {
 #ifdef USE_MONOMIAL_POOL
@@ -508,12 +510,12 @@ namespace carl
 		#endif
 	}
 	
-	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const Monomial::Arg& rhs)
+	Monomial::Arg operator*(Variable::Arg lhs, const Monomial::Arg& rhs)
 	{
 		return rhs * lhs;
 	}
 	
-	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, Variable::Arg rhs)
+	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs)
 	{
 		std::vector<std::pair<Variable, exponent>> newExps;
 		if( lhs < rhs )
