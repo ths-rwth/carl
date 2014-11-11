@@ -5,7 +5,7 @@
  * @author Benedikt Seidl
  *
  * @since	2014-01-31
- * @version 2014-01-30
+ * @version 2014-11-11
  */
 
 #include "../../carl/util/platform.h"
@@ -30,10 +30,12 @@ TEST(clRA_Interval, Constructor)
     EXPECT_EQ(clRA_Interval(1, BoundType::WEAK, -1, BoundType::WEAK), clRA_Interval::emptyInterval());
     clRA_Interval test5 = clRA_Interval::unboundedInterval();
     clRA_Interval test6 = clRA_Interval::emptyInterval();
-	/*
+	
     clRA_Interval test7 = clRA_Interval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
-    */
+    
 	clRA_Interval test8 = clRA_Interval(2, BoundType::STRICT, 0, BoundType::INFTY);
+	clRA_Interval test9 = clRA_Interval(1);
+	clRA_Interval test10 = clRA_Interval(0);
     SUCCEED();
 }
 
@@ -45,6 +47,8 @@ TEST(clRA_Interval, Getters)
     clRA_Interval test4 = clRA_Interval(4, BoundType::WEAK, 2, BoundType::WEAK);
     clRA_Interval test5 = clRA_Interval();
     clRA_Interval test6 = clRA_Interval(4);
+	clRA_Interval test7 = clRA_Interval(1);
+	clRA_Interval test8 = clRA_Interval(0);
     
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
@@ -108,12 +112,20 @@ TEST(clRA_Interval, Getters)
     EXPECT_EQ(0, test2.lower());
     EXPECT_EQ(0, test2.upper());
     EXPECT_TRUE(test2.isEmpty());
+	
+	EXPECT_TRUE(test7.isOne());
+	EXPECT_TRUE(isOne(test7));
+	
+	EXPECT_TRUE(test8.isZero());
+	EXPECT_TRUE(isZero(test8));
 }
 
 TEST(clRA_Interval, StaticCreators)
 {
     clRA_Interval i1 = clRA_Interval::emptyInterval();
     clRA_Interval i2 = clRA_Interval::unboundedInterval();
+	clRA_Interval i3 = carl::constant_one<clRA_Interval>().get();
+	clRA_Interval i4 = carl::constant_zero<clRA_Interval>().get();
     
     EXPECT_TRUE(i1.isEmpty());
     EXPECT_EQ(0, i1.lower());
@@ -122,6 +134,12 @@ TEST(clRA_Interval, StaticCreators)
     EXPECT_TRUE(i2.isUnbounded());
     EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
     EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
+	
+	EXPECT_TRUE(i3.isOne());
+	EXPECT_TRUE(isOne(i3));
+	
+	EXPECT_TRUE(i4.isZero());
+	EXPECT_TRUE(isZero(i4));
 }
 
 TEST(clRA_Interval, Addition)

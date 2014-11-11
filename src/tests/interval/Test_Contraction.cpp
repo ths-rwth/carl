@@ -53,9 +53,6 @@ TEST(Contraction, SimpleNewton)
     PolynomialContraction<SimpleNewton> e7_contractor(e7);
 	
 	MultivariatePolynomial<cln::cl_RA> test((cln::cl_RA)1*c*c);
-	
-	std::cout << "short Test: " <<  IntervalEvaluation::evaluate(test,map) << std::endl;
-	
     
     bool split;
     
