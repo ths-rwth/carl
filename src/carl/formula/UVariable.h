@@ -10,6 +10,7 @@
 #include "../util/Common.h"
 #include "Sort.h"
 #include "SortManager.h"
+#include "VariableNamePool.h"
 
 namespace carl
 {
@@ -83,6 +84,14 @@ namespace carl
             bool operator<( const UVariable& _uvar ) const
             {
                 return mVar < _uvar();
+            }
+            
+            /**
+             * @return The string representation of this uninterpreted variable.
+             */
+            std::string toString( bool _friendlyNames ) const
+            {
+                return variablePool().getVariableName( mVar, _friendlyNames );
             }
             
             /**

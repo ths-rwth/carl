@@ -928,8 +928,13 @@ namespace carl
              * @param _keepConstraints A flag indicating whether to keep the constraints as they are, or to
              *                          resolve constraints p!=0 to (or p<0 p>0) and to resolve negations in
              *                          front of constraints, e.g., (not p<0) gets p>=0.
+             * @param _simplifyConstraintCombinations A flag, which is true, if simplifications shall be applied to conjunctions
+             *                                        disjunctions of constraints.
+             * @param _tseitinWithEquivalence A flag, which is true, if variables, which are introduced by the tseitin encoding
+             *                                are set to be equivalent to the formula they represent. Otherwise, they imply the formula,
+             *                                which is also valid, as the current formula context is in NNF.
              */
-            Formula toCNF( bool _keepConstraints = true, bool _simplifyConstraintCombinations = false ) const;
+            Formula toCNF( bool _keepConstraints = true, bool _simplifyConstraintCombinations = false, bool _tseitinWithEquivalence = true ) const;
             
             /**
              * Substitutes all occurrences of the given arithmetic variables in this formula by the given polynomials.

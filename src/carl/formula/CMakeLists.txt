@@ -21,6 +21,7 @@ set(carl_lib_formula_headers
 
 # Source files in here
 set(carl_lib_formula_sources 
+    formula/UEquality.cpp
     formula/Sort.cpp 
     formula/SortManager.cpp 
     formula/UFInstance.cpp 

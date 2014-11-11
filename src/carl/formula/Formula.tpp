@@ -662,6 +662,10 @@ namespace carl
         }
         else if( getType() == FormulaType::CONSTRAINT )
             return (_init + constraint().toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+        else if( getType() == FormulaType::UEQ )
+        {
+            return (_init + uequality().toString( _infix, _friendlyNames ) + activity);
+        }
         else if( isAtom() )
             return (_init + FormulaTypeToString( getType() ) + activity);
         else if( getType() == FormulaType::NOT )
@@ -757,12 +761,6 @@ namespace carl
             result += mpContent->mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
             result += ")";
             return result;
-        }
-		else if( getType() == FormulaType::UEQ )
-        {
-            std::stringstream ss;
-			ss << mpContent->mUIEquality;
-			return ss.str();
         }
         assert( getType() == FormulaType::AND || getType() == FormulaType::OR || getType() == FormulaType::IFF || getType() == FormulaType::XOR );
         string stringOfType = FormulaTypeToString( getType() );
@@ -1167,7 +1165,7 @@ namespace carl
     }
 
     template<typename Pol>
-    Formula<Pol> Formula<Pol>::toCNF( bool _keepConstraints, bool _simplifyConstraintCombinations ) const
+    Formula<Pol> Formula<Pol>::toCNF( bool _keepConstraints, bool _simplifyConstraintCombinations, bool _tseitinWithEquivalence ) const
     {
         if( !_simplifyConstraintCombinations && propertyHolds( PROP_IS_IN_CNF ) )
         {
@@ -1444,11 +1442,14 @@ namespace carl
                                 }
                                 for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, iter.first->second->second, subsubformula ) );
-                                std::set<Formula> tmpSubformulas;
-                                tmpSubformulas.insert( iter.first->second->first );
-                                for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
-                                    tmpSubformulas.insert( Formula<Pol>( NOT, subsubformula ) );
-                                subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
+                                if( _tseitinWithEquivalence )
+                                {
+                                    std::set<Formula> tmpSubformulas;
+                                    tmpSubformulas.insert( iter.first->second->first );
+                                    for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
+                                        tmpSubformulas.insert( Formula<Pol>( NOT, subsubformula ) );
+                                    subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
+                                }
                                 subsubformulas.insert( iter.first->second->first );
                                 break;
                             }

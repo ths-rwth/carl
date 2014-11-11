@@ -22,6 +22,13 @@ namespace carl
        return UFInstanceManager::getInstance().getArgs( *this );
     }
     
+    std::string UFInstance::toString( bool _infix, bool _friendlyNames ) const
+    {
+        std::stringstream ss;
+        UFInstanceManager::getInstance().print( ss, *this, _infix, _friendlyNames );
+        return ss.str();
+    }
+    
     ostream& operator<<( ostream& _out, const UFInstance& _ufic )
     {
         return UFInstanceManager::getInstance().print( _out, _ufic );

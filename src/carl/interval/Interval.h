@@ -1,8 +1,8 @@
 /* The class which contains the interval arithmetic including trigonometric 
- * functions. The template parameter contains the numbertype used for the 
- * boundaries. It is neccessary to implement the rounding and checking policies 
+ * functions. The template parameter contains the number type used for the 
+ * boundaries. It is necessary to implement the rounding and checking policies 
  * for any non-primitive type such that the desired inclusion property can be 
- * mainained.
+ * maintained.
  *
  * Requirements for the NumberType:
  * - Operators +,-,*,/ with the expected functionality
@@ -18,7 +18,7 @@
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  *
  * @since	2013-12-13
- * @version     2014-08-29
+ * @version 2014-11-11
  */
 
 #pragma once
@@ -32,8 +32,7 @@
 #include "BoundType.h"
 #include "checking.h"
 #include "rounding.h"
-#include "../numbers/adaption_cln/operations.h"
-#include "../numbers/adaption_native/operations.h"
+#include "../numbers/numbers.h"
 #include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
@@ -113,10 +112,10 @@ namespace carl
 
     /**
      *The class which contains the interval arithmetic including trigonometric 
-     * functions. The template parameter contains the numbertype used for the 
-     * boundaries. It is neccessary to implement the rounding and checking policies 
+     * functions. The template parameter contains the number type used for the 
+     * boundaries. It is necessary to implement the rounding and checking policies 
      * for any non-primitive type such that the desired inclusion property can be 
-     * mainained.
+     * maintained.
      *
      * Requirements for the NumberType:
      * - Operators +,-,*,/ with the expected functionality
@@ -172,7 +171,7 @@ namespace carl
          * Default constructor which constructs the empty interval at point 0.
          */
         Interval() :
-        mContent(Number(0)),
+        mContent(carl::constant_zero<Number>().get()),
         mLowerBoundType(BoundType::STRICT),
         mUpperBoundType(BoundType::STRICT) { }
 
@@ -202,7 +201,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -224,13 +223,13 @@ namespace carl
             {
                 if (IS_EMPTY(content.lower(), lowerBoundType, content.upper(), upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
                     mUpperBoundType = BoundType::STRICT;
                 }
                 if (IS_UNBOUNDED(content.lower(), lowerBoundType, content.upper(), upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::INFTY;
                     mUpperBoundType = BoundType::INFTY;
                 }
@@ -249,7 +248,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -271,13 +270,13 @@ namespace carl
             {
                 if (IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
                     mUpperBoundType = BoundType::STRICT;
                 }
                 else if (IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::INFTY;
                     mUpperBoundType = BoundType::INFTY;
                 }
@@ -296,7 +295,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -337,7 +336,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -360,13 +359,13 @@ namespace carl
             {
                 if (IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
                     mUpperBoundType = BoundType::STRICT;
                 }
                 else if (IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::INFTY;
                     mUpperBoundType = BoundType::INFTY;
                 }
@@ -385,7 +384,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -417,7 +416,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -440,13 +439,13 @@ namespace carl
             {
                 if (IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
                     mUpperBoundType = BoundType::STRICT;
                 }
                 else if (IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::INFTY;
                     mUpperBoundType = BoundType::INFTY;
                 }
@@ -465,7 +464,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -497,7 +496,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -520,13 +519,13 @@ namespace carl
             {
                 if (IS_EMPTY(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
                     mUpperBoundType = BoundType::STRICT;
                 }
                 else if (IS_UNBOUNDED(lower, lowerBoundType, upper, upperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::INFTY;
                     mUpperBoundType = BoundType::INFTY;
                 }
@@ -545,7 +544,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -595,7 +594,7 @@ namespace carl
             if (dRight == std::numeric_limits<double>::infinity()) mUpperBoundType = BoundType::INFTY;
             if (mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY)
             {
-                mContent = BoostInterval(Num(0));
+                mContent = BoostInterval(carl::constant_zero<Num>().get());
             }
             else if (mLowerBoundType == BoundType::INFTY)
             {
@@ -609,7 +608,7 @@ namespace carl
             {
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
-                mContent = BoostInterval(Num(0));
+                mContent = BoostInterval(carl::constant_zero<Num>().get());
             }
             else
             {
@@ -661,7 +660,7 @@ namespace carl
             //if(right == std::numeric_limits<double>::infinity()) mUpperBoundType = BoundType::INFTY;
             if (mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY)
             {
-                mContent = BoostInterval(Num(0));
+                mContent = BoostInterval(carl::constant_zero<Num>().get());
             }
             else if (mLowerBoundType == BoundType::INFTY)
             {
@@ -675,7 +674,71 @@ namespace carl
             {
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
-                mContent = BoostInterval(Num(0));
+                mContent = BoostInterval(carl::constant_zero<Num>().get());
+            }
+            else
+            {
+                mContent = BoostInterval(left, right);
+            }
+        }
+		
+		/**
+         * Constructor which constructs a pointinterval from a passed general 
+         * float number (e.g. FLOAT_T).
+         * @param n The passed double.
+         */
+        template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        explicit Interval(Rational n)
+        {
+            *this = Interval<double>(n, n);
+        }
+
+        /**
+         * Constructor which constructs an interval from the passed general float 
+         * bounds (e.g. FLOAT_T).
+         * @param lower The desired lower bound.
+         * @param upper The desired upper bound.
+         */
+        template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        Interval(Rational lower, Rational upper)
+        {
+            *this = Interval<double>(lower, BoundType::WEAK, upper, BoundType::WEAK);
+        }
+
+        /**
+         * Constructor which constructs the interval according to the passed general
+         * float bounds (e.g. FLOAT_T) with the passed bound types. Note that if the interval is a 
+         * pointinterval with both strict bounds or the content is invalid the 
+         * empty interval is constru
+         * @param lower The desired lower bound.
+         * @param lowerBoundType The desired lower bound type.
+         * @param upper The desired upper bound.
+         * @param upperBoundType The desired upper bound type.
+         */
+        template<typename Num = Number, typename Rational, EnableIf<is_rational<Num >> = dummy, EnableIf<is_rational<Rational >> = dummy, DisableIf<std::is_same<Num, Rational >> = dummy>
+        Interval(Rational lower, BoundType lowerBoundType, Rational upper, BoundType upperBoundType)
+        {
+            mLowerBoundType = lowerBoundType;
+            mUpperBoundType = upperBoundType;
+            Num left = carl::rationalize<Num>(toDouble(lower));
+            Num right = carl::rationalize<Num>(toDouble(upper));
+            if (mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY)
+            {
+                mContent = BoostInterval(carl::constant_zero<Num>().get());
+            }
+            else if (mLowerBoundType == BoundType::INFTY)
+            {
+                mContent = BoostInterval(right);
+            }
+            else if (mUpperBoundType == BoundType::INFTY)
+            {
+                mContent = BoostInterval(left);
+            }
+            else if ((lower == upper && lowerBoundType != upperBoundType) || lower > upper)
+            {
+                mLowerBoundType = BoundType::STRICT;
+                mUpperBoundType = BoundType::STRICT;
+                mContent = BoostInterval(carl::constant_zero<Num>().get());
             }
             else
             {
@@ -689,7 +752,7 @@ namespace carl
          */
         static Interval<Number> unboundedInterval()
         {
-            return Interval<Number>(Number(0), BoundType::INFTY, Number(0), BoundType::INFTY);
+            return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::INFTY, carl::constant_zero<Number>().get(), BoundType::INFTY);
         }
 
         /**
@@ -698,7 +761,7 @@ namespace carl
          */
         static Interval<Number> emptyInterval()
         {
-            return Interval<Number>(Number(0), BoundType::STRICT, Number(0), BoundType::STRICT);
+            return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::STRICT, carl::constant_zero<Number>().get(), BoundType::STRICT);
         }
 
         /**
@@ -707,7 +770,7 @@ namespace carl
          */
         static Interval<Number> zeroInterval()
         {
-            return Interval<Number>(Number(0), BoundType::WEAK, Number(0), BoundType::WEAK);
+            return Interval<Number>(carl::constant_zero<Number>().get(), BoundType::WEAK, carl::constant_zero<Number>().get(), BoundType::WEAK);
         }
 
         /**
@@ -801,7 +864,7 @@ namespace carl
             {
                 mLowerBoundType = b;
                 mContent = (mUpperBoundType == BoundType::INFTY)
-                        ? BoostInterval(Number(0))
+                        ? BoostInterval(carl::constant_zero<Number>().get())
                         : BoostInterval(mContent.lower());
             }
             else
@@ -820,7 +883,7 @@ namespace carl
             {
                 mUpperBoundType = b;
                 mContent = (mLowerBoundType == BoundType::INFTY)
-                        ? BoostInterval(Number(0))
+                        ? BoostInterval(carl::constant_zero<Number>().get())
                         : BoostInterval(mContent.upper());
             }
             else
@@ -867,13 +930,13 @@ namespace carl
             {
                 if (IS_EMPTY(content.lower(), mLowerBoundType, content.upper(), mUpperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
                     mUpperBoundType = BoundType::STRICT;
                 }
                 if (IS_UNBOUNDED(content.lower(), mLowerBoundType, content.upper(), mUpperBoundType))
                 {
-                    mContent = BoostInterval(Number(0));
+                    mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::INFTY;
                     mUpperBoundType = BoundType::INFTY;
                 }
@@ -888,7 +951,7 @@ namespace carl
             }
             else
             {
-                mContent = BoostInterval(Number(0));
+                mContent = BoostInterval(carl::constant_zero<Number>().get());
                 mLowerBoundType = BoundType::STRICT;
                 mUpperBoundType = BoundType::STRICT;
             }
@@ -956,7 +1019,7 @@ namespace carl
         inline bool isZero() const
         {
             assert(this->isConsistent());
-            return this->isPointInterval() && (mContent.lower() == 0);
+            return this->isPointInterval() && (mContent.lower() == carl::constant_zero<Number>().get());
         }
 		
 		/**
@@ -966,7 +1029,7 @@ namespace carl
         inline bool isOne() const
         {
             assert(this->isConsistent());
-            return this->isPointInterval() && (mContent.lower() == 1);
+            return this->isPointInterval() && (mContent.lower() == carl::constant_one<Number>().get());
         }
 
         /**

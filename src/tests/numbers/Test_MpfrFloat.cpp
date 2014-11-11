@@ -3,33 +3,34 @@
  * @author Benedikt Seidl
  */
 
-#ifdef USE_MPFR_FLOAT
+ 
 #include "gtest/gtest.h"
 #include "../../carl/numbers/FLOAT_T.h"
 
+#ifdef USE_MPFR_FLOAT
 TEST(mpfrFloatTest, Constructor)
 { 
     // double constructor tests
     double dVal = 4;
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf1 = carl::FLOAT_T<mpfr_t>(dVal));
-    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(dVal,10));
-    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(dVal,10,carl::CARL_RND::A));
+    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(dVal,carl::CARL_RND::A));
+    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(dVal,carl::CARL_RND::A,10));
     dVal = 0;
     EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(dVal).getValue()) != 0);
     
     // float constructor tests
     float fVal = 4;
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf1 = carl::FLOAT_T<mpfr_t>(fVal));
-    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(fVal,10));
-    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(fVal,10,carl::CARL_RND::A));
+    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(fVal,carl::CARL_RND::A));
+    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(fVal,carl::CARL_RND::A,10));
     fVal = 0;
     EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(fVal).getValue()) != 0);
     
     // integer constructor tests
     int iVal = 4;
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf1 = carl::FLOAT_T<mpfr_t>(iVal));
-    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(iVal,10));
-    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(iVal,10,carl::CARL_RND::A));
+    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(iVal,carl::CARL_RND::A));
+    ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(iVal,carl::CARL_RND::A,10));
     iVal = 0;
     EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(iVal).getValue()) != 0);
     
@@ -38,10 +39,10 @@ TEST(mpfrFloatTest, Constructor)
     mpfr_init(mVal);
     mpfr_set_d(mVal,  3.14159265358979323846264338327950288419716939937510582097494459230781640628620899, MPFR_RNDNA);
     carl::FLOAT_T<mpfr_t> hf1 = carl::FLOAT_T<mpfr_t>(mVal);
-    std::cout << hf1 << std::endl;
+    //std::cout << hf1 << std::endl;
     hf1.setPrec(10);
     EXPECT_EQ(10, hf1.getPrec());
-    std::cout << hf1 << std::endl;
+    //std::cout << hf1 << std::endl;
     
     // copy constructor test
     ASSERT_EQ(hf1, carl::FLOAT_T<mpfr_t>(hf1));
@@ -146,6 +147,11 @@ TEST(mpfrFloatTest, Subtraction)
     double vResult3 = 9;
     double vResult4 = 9;
     
+	double dUnary = 5;
+	double dUnaryResult = -5;
+	double dUnary2 = -3;
+	double dUnaryResult2 = 3;
+	
     carl::FLOAT_T<mpfr_t> f1 = carl::FLOAT_T<mpfr_t>(v1);
     carl::FLOAT_T<mpfr_t> f2 = carl::FLOAT_T<mpfr_t>(v2);
     carl::FLOAT_T<mpfr_t> f3 = carl::FLOAT_T<mpfr_t>(v3);
@@ -158,6 +164,11 @@ TEST(mpfrFloatTest, Subtraction)
     carl::FLOAT_T<mpfr_t> result2 = carl::FLOAT_T<mpfr_t>(vResult2);
     carl::FLOAT_T<mpfr_t> result3 = carl::FLOAT_T<mpfr_t>(vResult3);
     carl::FLOAT_T<mpfr_t> result4 = carl::FLOAT_T<mpfr_t>(vResult4);
+	
+	carl::FLOAT_T<mpfr_t> unary = carl::FLOAT_T<mpfr_t>(dUnary);
+	carl::FLOAT_T<mpfr_t> unaryResult = carl::FLOAT_T<mpfr_t>(dUnaryResult);
+	carl::FLOAT_T<mpfr_t> unary2 = carl::FLOAT_T<mpfr_t>(dUnary2);
+	carl::FLOAT_T<mpfr_t> unaryResult2 = carl::FLOAT_T<mpfr_t>(dUnaryResult2);
     
     f1.sub_assign(f2, carl::CARL_RND::N);
     ASSERT_EQ(result1, f1);
@@ -170,6 +181,11 @@ TEST(mpfrFloatTest, Subtraction)
     
     f7.sub_assign(f8, carl::CARL_RND::N);
     ASSERT_EQ(result4, f7);
+	
+	unary = -unary;
+	unary2 = -unary2;
+	ASSERT_EQ(unaryResult, unary);
+	ASSERT_EQ(unaryResult2, unary2);
 }
 
 /*

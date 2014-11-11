@@ -508,6 +508,48 @@ TEST(MultivariatePolynomial, Quotient)
 	EXPECT_EQ(res, m1.quotient(m2));
 }
 
+TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)12*x*x*x*x*x*y, (TypeParam)6*x*x*x*y*y*y, (TypeParam)27*x*x*y*y, (TypeParam)28*x*x*x*x*y, (TypeParam)14*x*x*y*y*y, (TypeParam)63*x*y*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)3*x*x*y, (TypeParam)7*x*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)4*x*x*x, (TypeParam)2*x*y*y, (TypeParam)9*y}));
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)30*x*y*y, (TypeParam)18*x*y*y*y, (TypeParam)8*x*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)3*x*y, (TypeParam)4*x}) * MultivariatePolynomial<TypeParam>({(TypeParam)2*y, (TypeParam)6*y*y}));
+            
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)12*x*y, (TypeParam)21*x, (TypeParam)8*y, Term<TypeParam>(14)}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)3*x, Term<TypeParam>(2)}) * MultivariatePolynomial<TypeParam>({(TypeParam)4*y, Term<TypeParam>(7)}));
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x*x, (TypeParam)-1*y*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)-1*y}));
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x*x, (TypeParam)2*x*y, (TypeParam)1*y*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}));
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x*x, (TypeParam)-2*x*y, (TypeParam)1*y*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)-1*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)-1*y}));
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)12*x*x, (TypeParam)6*x*y*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)3*x}) * MultivariatePolynomial<TypeParam>({(TypeParam)4*x, (TypeParam)2*y*y}));
+    
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)8*x*x*y, (TypeParam)6*x*y, (TypeParam)9*x*y*y}),
+            MultivariatePolynomial<TypeParam>({(TypeParam)1*x*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)8*x, Term<TypeParam>(6), (TypeParam)9*y}));
+}
+
+TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)5*x*y, (TypeParam)7*y, (TypeParam)11*x*x}), (TypeParam)5*x*y+(TypeParam)7*y+(TypeParam)11*x*x);
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}), (TypeParam)1*x + (TypeParam)1*y);
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)8*x*x*y, (TypeParam)6*x*y, (TypeParam)9*x*y*y}), (TypeParam)3*x*x*y + (TypeParam)4*x*y + (TypeParam)9*x*y*y + (TypeParam)2*x*y + (TypeParam)5*x*x*y);
+}
+
 TYPED_TEST(MultivariatePolynomialTest, Comparison)
 {
     VariablePool& pool = VariablePool::getInstance();

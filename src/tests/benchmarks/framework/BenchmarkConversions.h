@@ -3,8 +3,12 @@
 
 #include "../config.h"
 #include "carl/converter/CArLConverter.h"
+#ifdef COMPARE_WITH_GINAC
 #include "carl/converter/GiNaCConverter.h"
+#endif
+#ifdef COMPARE_WITH_Z3
 #include "carl/converter/Z3Converter.h"
+#endif
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/util/tuple_util.h"
 
@@ -16,10 +20,14 @@ namespace carl {
  * Information needed for all of the convert methods below.
  */
 struct ConversionInformation {
-	std::map<carl::Variable, GiNaC::ex> ginacVariables;
 	CArLConverter carl;
+    #ifdef COMPARE_WITH_GINAC
+	std::map<carl::Variable, GiNaC::ex> ginacVariables;
 	GiNaCConverter ginac;
+    #endif
+    #ifdef COMPARE_WITH_Z3
 	Z3Converter z3;
+    #endif
 };
 typedef std::shared_ptr<ConversionInformation> CIPtr;
 
@@ -36,6 +44,7 @@ CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const CMP<cl
 	}
 	return res;
 }
+#ifdef COMPARE_WITH_GINAC
 template<>
 GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->ginac(m);
@@ -52,6 +61,8 @@ template<>
 GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->ginac(m);
 }
+#endif
+#ifdef COMPARE_WITH_Z3
 template<>
 ZMP Conversion::convert<ZMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->z3(m);
@@ -68,6 +79,7 @@ template<>
 ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
 	return ci->z3(v);
 }
+#endif
 
 template<>
 unsigned Conversion::convert(const unsigned& n, const CIPtr&) {
