@@ -5,7 +5,7 @@
  * @author Benedikt Seidl
  *
  * @since	2014-01-31
- * @version 2014-01-30
+ * @version 2014-11-11
  */
 
 #include "../../carl/util/platform.h"
