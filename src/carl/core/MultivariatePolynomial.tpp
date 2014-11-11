@@ -950,7 +950,6 @@ template<typename SubstitutionType>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
     static_assert(!std::is_same<SubstitutionType, Term<Coeff>>::value, "Terms are handled by a seperate method.");
-    
     TermsType newTerms;
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId();
@@ -961,7 +960,15 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+        Term<Coeff >* resultTerm = term->substitute(substitutions);
+        if( !resultTerm->isZero() )
+        {
+            mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
+        }
+        else
+        {
+            delete resultTerm;
+        }
 	}
 	mTermAdditionManager.readTerms(*this, id, newTerms);
 #endif
