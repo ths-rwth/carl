@@ -237,7 +237,7 @@ template<typename Number>
 template<typename Number>
 void Interval<Number>::shrink_by(const Number& width)
 	{
-		this->bloat_by(Number(-width));
+		this->bloat_by(Number(-1)*width);
 	}
 
 template<typename Number>

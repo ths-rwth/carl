@@ -116,6 +116,18 @@ namespace carl
             assert(std::is_floating_point<FloatType>::value);
             mValue = _int;
         }
+		
+		/**
+         * Constructor, which takes an unsigned integer as input and optional rounding, which
+         * can be used, if the underlying fp implementation allows this.
+         * @param _int Value to be initialized.
+         * @param N Possible rounding direction.
+         */
+        FLOAT_T<FloatType>(const unsigned _int, const CARL_RND=CARL_RND::N)
+        {
+            assert(std::is_floating_point<FloatType>::value);
+            mValue = _int;
+        }
         
         /**
          * Constructor, which takes a long as input and optional rounding, which
@@ -1234,7 +1246,7 @@ namespace carl
          */
         friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs)
         {
-            return FLOAT_T<FloatType>(-1*_lhs);
+            return FLOAT_T<FloatType>(-1)*_lhs;
         }
 
         /**

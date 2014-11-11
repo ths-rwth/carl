@@ -20,21 +20,28 @@ class FLOAT_T<mpfr_t>
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const double _double, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const double _double, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_d(mValue,_double,mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const float _float, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const float _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53 )
         {
             mpfr_init2(mValue, _prec);
             mpfr_set_flt(mValue, _float, mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const int _int, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const int _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+        {
+            mpfr_init2(mValue,_prec);
+            mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
+        }
+		
+		// Default precision is initially set to 53 bits in mpfr implementation
+        FLOAT_T(const unsigned _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
@@ -53,7 +60,7 @@ class FLOAT_T<mpfr_t>
         }
         
         template<typename F, DisableIf< std::is_same<F, mpfr_t> > = dummy>
-        FLOAT_T(const FLOAT_T<F>& _float, precision_t _prec=53, const CARL_RND _rnd=CARL_RND::N)
+        FLOAT_T(const FLOAT_T<F>& _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_d(mValue,_float.toDouble(),mpfr_rnd_t(_rnd));
@@ -70,7 +77,6 @@ class FLOAT_T<mpfr_t>
         
         const mpfr_t& getValue() const
         {
-            std::cout << "getValue" << std::endl;
             return mValue;
         }
         
@@ -144,47 +150,47 @@ class FLOAT_T<mpfr_t>
          * arithmetic operations
          */
 
-        FLOAT_T<mpfr_t>& add_assign( const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd )
+        FLOAT_T<mpfr_t>& add_assign( const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N )
         {
             mpfr_add(mValue, mValue, _op2.mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void add( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd ) const
+        void add( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N ) const
         {
             mpfr_add(_result.mValue, this->mValue, _op2.mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& sub_assign( const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd )
+        FLOAT_T<mpfr_t>& sub_assign( const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N )
         {
             mpfr_sub(mValue, mValue, _op2.mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void sub( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd ) const
+        void sub( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N ) const
         {
             mpfr_sub(_result.mValue, this->mValue, _op2.mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& mul_assign(const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd)
+        FLOAT_T<mpfr_t>& mul_assign(const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N)
         {
             mpfr_mul(mValue, mValue, _op2.mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void mul( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd) const
+        void mul( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N) const
         {
             mpfr_mul(_result.mValue, this->mValue, _op2.mValue, mpfr_rnd_t(_rnd));
         }
 
-        FLOAT_T<mpfr_t>& div_assign(const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd)
+        FLOAT_T<mpfr_t>& div_assign(const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N)
         {
             assert( _op2 != 0 );
             mpfr_div(mValue, mValue, _op2.mValue, mpfr_rnd_t(_rnd));
             return *this;
         }
 
-        void div( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd) const
+        void div( FLOAT_T<mpfr_t>& _result, const FLOAT_T<mpfr_t>& _op2, CARL_RND _rnd=CARL_RND::N) const
         {
             assert( _op2 != 0 );
             mpfr_div(_result.mValue, this->mValue, _op2.mValue, mpfr_rnd_t(_rnd));
@@ -528,6 +534,13 @@ class FLOAT_T<mpfr_t>
         {
             FLOAT_T<mpfr_t> res;
             mpfr_sub(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
+            return res;
+        }
+		
+		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs)
+        {
+            FLOAT_T<mpfr_t> res;
+            mpfr_mul_si(res.mValue, _lhs.mValue, -1, MPFR_RNDN);
             return res;
         }
 	

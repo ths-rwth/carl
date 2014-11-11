@@ -4,7 +4,7 @@
  */
 
 #pragma once
-
+#ifdef COMPARE_WITH_Z3
 #include <utility>
 
 // Prevent Z3 from using openmp
@@ -121,3 +121,4 @@ public:
 };
 
 }
+#endif
