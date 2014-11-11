@@ -91,12 +91,16 @@ protected:
 	bool operator()(const CMP<Coeff>& lhs, const CMP<Coeff>& rhs) {
 		return lhs == rhs;
 	}
+    #ifdef COMPARE_WITH_GINAC
 	bool operator()(const GMP& lhs, const GMP& rhs) {
 		return lhs == rhs;
 	}
+    #endif
+    #ifdef COMPARE_WITH_Z3
 	bool operator()(const ZMP& lhs, const ZMP& rhs) {
 		return eq(lhs, rhs);
 	}
+    #endif
 public:
 	BenchmarkResultComparator(const std::string& lname, const std::string& rname, const CIPtr& ci): ci(ci), names(lname, rname) {}
 	template<typename T2>
