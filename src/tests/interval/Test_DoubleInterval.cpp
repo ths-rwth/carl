@@ -29,10 +29,12 @@ TEST(DoubleInterval, Constructor)
     EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::emptyInterval());
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
-	/*
+	
     DoubleInterval test7 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
-    */
+    
 	DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
+	DoubleInterval test9 = DoubleInterval(1);
+	DoubleInterval test10 = DoubleInterval(0);
     SUCCEED();
 }
 
@@ -44,6 +46,8 @@ TEST(DoubleInterval, Getters)
     DoubleInterval test4 = DoubleInterval(4, BoundType::WEAK, 2, BoundType::WEAK);
     DoubleInterval test5 = DoubleInterval();
     DoubleInterval test6 = DoubleInterval(4);
+	DoubleInterval test7 = DoubleInterval(1);
+	DoubleInterval test8 = DoubleInterval(0);
     
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
@@ -107,12 +111,20 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(0, test2.lower());
     EXPECT_EQ(0, test2.upper());
     EXPECT_TRUE(test2.isEmpty());
+	
+	EXPECT_TRUE(test7.isOne());
+	EXPECT_TRUE(isOne(test7));
+	
+	EXPECT_TRUE(test8.isZero());
+	EXPECT_TRUE(isZero(test8));
 }
 
 TEST(DoubleInterval, StaticCreators)
 {
     DoubleInterval i1 = DoubleInterval::emptyInterval();
     DoubleInterval i2 = DoubleInterval::unboundedInterval();
+	DoubleInterval i3 = carl::constant_one<DoubleInterval>().get();
+	DoubleInterval i4 = carl::constant_zero<DoubleInterval>().get();
     
     EXPECT_TRUE(i1.isEmpty());
     EXPECT_EQ(0, i1.lower());
@@ -121,6 +133,12 @@ TEST(DoubleInterval, StaticCreators)
     EXPECT_TRUE(i2.isUnbounded());
     EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
     EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
+	
+	EXPECT_TRUE(i3.isOne());
+	EXPECT_TRUE(isOne(i3));
+	
+	EXPECT_TRUE(i4.isZero());
+	EXPECT_TRUE(isZero(i4));
 }
 
 TEST(DoubleInterval, Addition)

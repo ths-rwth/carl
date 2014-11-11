@@ -29,10 +29,12 @@ TEST(MpqInterval, Constructor)
     EXPECT_EQ(MpqInterval(1, BoundType::WEAK, -1, BoundType::WEAK), MpqInterval::emptyInterval());
     MpqInterval test5 = MpqInterval::unboundedInterval();
     MpqInterval test6 = MpqInterval::emptyInterval();
-	/*
+	
     MpqInterval test7 = MpqInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
-    */
+    
 	MpqInterval test8 = MpqInterval(2, BoundType::STRICT, mpq_class(0), BoundType::INFTY);
+	MpqInterval test9 = MpqInterval(1);
+	MpqInterval test10 = MpqInterval(0);
     SUCCEED();
 }
 
@@ -44,6 +46,8 @@ TEST(MpqInterval, Getters)
     MpqInterval test4 = MpqInterval(4, BoundType::WEAK, 2, BoundType::WEAK);
     MpqInterval test5 = MpqInterval();
     MpqInterval test6 = MpqInterval(4);
+	MpqInterval test7 = MpqInterval(1);
+	MpqInterval test8 = MpqInterval(0);
     
     EXPECT_EQ(-1, test1.lower());
     EXPECT_EQ(1, test1.upper());
@@ -107,12 +111,20 @@ TEST(MpqInterval, Getters)
     EXPECT_EQ(0, test2.lower());
     EXPECT_EQ(0, test2.upper());
     EXPECT_TRUE(test2.isEmpty());
+	
+	EXPECT_TRUE(test7.isOne());
+	EXPECT_TRUE(isOne(test7));
+	
+	EXPECT_TRUE(test8.isZero());
+	EXPECT_TRUE(isZero(test8));
 }
 
 TEST(MpqInterval, StaticCreators)
 {
     MpqInterval i1 = MpqInterval::emptyInterval();
     MpqInterval i2 = MpqInterval::unboundedInterval();
+	MpqInterval i3 = carl::constant_one<MpqInterval>().get();
+	MpqInterval i4 = carl::constant_zero<MpqInterval>().get();
     
     EXPECT_TRUE(i1.isEmpty());
     EXPECT_EQ(0, i1.lower());
@@ -121,6 +133,12 @@ TEST(MpqInterval, StaticCreators)
     EXPECT_TRUE(i2.isUnbounded());
     EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
     EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
+	
+	EXPECT_TRUE(i3.isOne());
+	EXPECT_TRUE(isOne(i3));
+	
+	EXPECT_TRUE(i4.isZero());
+	EXPECT_TRUE(isZero(i4));
 }
 
 TEST(MpqInterval, Addition)
