@@ -16,7 +16,9 @@
 using namespace std;
 
 namespace carl
-{   
+{
+    //string formulaTypeToString( FormulaType _type )2
+    
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( bool _true, size_t _id ):
         mDeducted( false ),
@@ -179,7 +181,7 @@ namespace carl
     template<typename Pol>
     bool FormulaContent<Pol>::operator==( const FormulaContent& _content ) const
     {
-        if( mId == 0 || _content.mType == 0 )
+        if( mId == 0 || _content.mId == 0 )
         {
             if( mType != _content.mType )
                 return false;
@@ -197,7 +199,7 @@ namespace carl
                     return mSubformula == _content.mSubformula;
                 case FormulaType::IMPLIES:
                     return mpImpliesContent->mPremise == _content.mpImpliesContent->mPremise 
-                            && mpImpliesContent->mConlusion == _content.mpImpliesContent->mConlusion;
+                            && mpImpliesContent->mConclusion == _content.mpImpliesContent->mConclusion;
                 case FormulaType::ITE:
                     return mpIteContent->mCondition == _content.mpIteContent->mCondition
                             && mpIteContent->mThen == _content.mpIteContent->mThen
@@ -214,6 +216,151 @@ namespace carl
         }
         else
             return mId == _content.mId;
+    }
+    
+    template<typename Pol>
+    string FormulaContent<Pol>::toString( bool _withActivity, unsigned _resolveUnequal, const string _init, bool _oneline, bool _infix, bool _friendlyNames ) const
+    {
+        string activity = "";
+        if( _withActivity )
+        {
+            stringstream s;
+            s << " [" << mDifficulty << ":" << mActivity << "]";
+            activity += s.str();
+        }
+        if( mType == FormulaType::BOOL )
+        {
+            return (_init + variablePool().getVariableName( mBoolean, _friendlyNames ) + activity);
+        }
+        else if( mType == FormulaType::CONSTRAINT )
+            return (_init + mpConstraint->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+        else if( mType == FormulaType::UEQ )
+        {
+            return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
+        }
+        else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
+            return (_init + formulaTypeToString( mType ) + activity);
+        else if( mType == FormulaType::NOT )
+        {
+            string result = _init;
+            if( _infix )
+            {
+                result += "not(";
+                if( !_oneline ) result += "\n";
+            }
+            else
+            {
+                result += "(not";
+                result += (_oneline ? " " : "\n");
+            }
+            result += mSubformula.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames );
+            result += (_oneline ? "" : "\n") + _init + ")";
+            return result;
+        }
+        else if( mType == FormulaType::IMPLIES )
+        {
+            string result = _init + "(";
+            if( _infix )
+            {
+                if( !_oneline ) 
+                    result += "\n";
+                result += mpImpliesContent->mPremise.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
+                result += " " + formulaTypeToString( FormulaType::IMPLIES ) + " ";
+                if( !_oneline ) 
+                    result += "\n";
+                result += mpImpliesContent->mConclusion.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
+            }
+            else
+            {
+                result += formulaTypeToString( FormulaType::IMPLIES );
+                result += (_oneline ? " " : "\n");
+                result += mpImpliesContent->mPremise.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+                result += (_oneline ? " " : "\n");
+                result += mpImpliesContent->mConclusion.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+            }
+            result += ")";
+            if( _withActivity )
+                result += activity;
+            return result;
+        }
+        else if( mType == FormulaType::ITE )
+        {
+            string result = _init + "(";
+            if( _infix )
+            {
+                if( !_oneline ) 
+                    result += "\n";
+                result += mpIteContent->mCondition.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
+                result += " " + formulaTypeToString( FormulaType::ITE ) + " ";
+                if( !_oneline ) 
+                    result += "\n";
+                result += mpIteContent->mThen.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
+                if( !_oneline ) 
+                    result += "\n";
+                result += mpIteContent->mElse.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
+            }
+            else
+            {
+                result += formulaTypeToString( FormulaType::ITE );
+                result += (_oneline ? " " : "\n");
+                result += mpIteContent->mCondition.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+                result += (_oneline ? " " : "\n");
+                result += mpIteContent->mThen.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+                result += (_oneline ? " " : "\n");
+                result += mpIteContent->mElse.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+            }
+            result += ")";
+            if( _withActivity )
+                result += activity;
+            return result;
+        }
+        else if (mType == FormulaType::EXISTS)
+        {
+            string result = _init + "(exists ";
+            for (auto v: mpQuantifierContent->mVariables) {
+                result += variablePool().getVariableName(v, _friendlyNames) + " ";
+            }
+            result += mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+            result += ")";
+            return result;
+        }
+        else if (mType == FormulaType::FORALL)
+        {
+            string result = _init + "(forall ";
+            for (auto v: mpQuantifierContent->mVariables) {
+                result += variablePool().getVariableName(v, _friendlyNames) + " ";
+            }
+            result += mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+            result += ")";
+            return result;
+        }
+        assert( mType == FormulaType::AND || mType == FormulaType::OR || mType == FormulaType::IFF || mType == FormulaType::XOR );
+        string stringOfType = formulaTypeToString( mType );
+        string result = _init + "(";
+        if( _infix )
+        {
+            for( auto subFormula = mpSubformulas->begin(); subFormula != mpSubformulas->end(); ++subFormula )
+            {
+                if( subFormula != mpSubformulas->begin() )
+                    result += " " + stringOfType + " ";
+                if( !_oneline ) 
+                    result += "\n";
+                result += subFormula->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
+            }
+        }
+        else
+        {
+            result += stringOfType;
+            for( auto subFormula = mpSubformulas->begin(); subFormula != mpSubformulas->end(); ++subFormula )
+            {
+                result += (_oneline ? " " : "\n");
+                result += subFormula->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
+            }
+        }
+        result += ")";
+        if( _withActivity )
+            result += activity;
+        return result;
     }
         
     template<typename Pol>
@@ -516,7 +663,7 @@ namespace carl
                 if( !(PROP_IS_IN_NNF<=subFormulaCondsA) )
                     _content.mProperties &= ~PROP_IS_IN_NNF;
                 _content.mProperties |= (subFormulaCondsA & WEAK_CONDITIONS);
-                Condition subFormulaCondsB = _content.mpImpliesContent->mConlusion.properties();
+                Condition subFormulaCondsB = _content.mpImpliesContent->mConclusion.properties();
                 if( !(PROP_IS_IN_NNF<=subFormulaCondsB) )
                     _content.mProperties &= ~PROP_IS_IN_NNF;
                 _content.mProperties |= (subFormulaCondsB & WEAK_CONDITIONS);
@@ -645,151 +792,6 @@ namespace carl
         if( _constraint.hasRealValuedVariable() )
             _properties |= PROP_CONTAINS_REAL_VALUED_VARS;
     }
-
-    template<typename Pol>
-    string Formula<Pol>::toString( bool _withActivity, unsigned _resolveUnequal, const string _init, bool _oneline, bool _infix, bool _friendlyNames ) const
-    {
-        string activity = "";
-        if( _withActivity )
-        {
-            stringstream s;
-            s << " [" << mpContent->mDifficulty << ":" << mpContent->mActivity << "]";
-            activity += s.str();
-        }
-        if( getType() == FormulaType::BOOL )
-        {
-            return (_init + variablePool().getVariableName( boolean(), _friendlyNames ) + activity);
-        }
-        else if( getType() == FormulaType::CONSTRAINT )
-            return (_init + constraint().toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
-        else if( getType() == FormulaType::UEQ )
-        {
-            return (_init + uequality().toString( _infix, _friendlyNames ) + activity);
-        }
-        else if( isAtom() )
-            return (_init + FormulaTypeToString( getType() ) + activity);
-        else if( getType() == FormulaType::NOT )
-        {
-            string result = _init;
-            if( _infix )
-            {
-                result += "not(";
-                if( !_oneline ) result += "\n";
-            }
-            else
-            {
-                result += "(not";
-                result += (_oneline ? " " : "\n");
-            }
-            result += subformula().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames );
-            result += (_oneline ? "" : "\n") + _init + ")";
-            return result;
-        }
-        else if( getType() == FormulaType::IMPLIES )
-        {
-            string result = _init + "(";
-            if( _infix )
-            {
-                if( !_oneline ) 
-                    result += "\n";
-                result += premise().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-                result += " " + FormulaTypeToString( FormulaType::IMPLIES ) + " ";
-                if( !_oneline ) 
-                    result += "\n";
-                result += conclusion().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-            }
-            else
-            {
-                result += FormulaTypeToString( FormulaType::IMPLIES );
-                result += (_oneline ? " " : "\n");
-                result += premise().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-                result += (_oneline ? " " : "\n");
-                result += conclusion().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-            }
-            result += ")";
-            if( _withActivity )
-                result += activity;
-            return result;
-        }
-        else if( getType() == FormulaType::ITE )
-        {
-            string result = _init + "(";
-            if( _infix )
-            {
-                if( !_oneline ) 
-                    result += "\n";
-                result += condition().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-                result += " " + FormulaTypeToString( FormulaType::ITE ) + " ";
-                if( !_oneline ) 
-                    result += "\n";
-                result += firstCase().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-                if( !_oneline ) 
-                    result += "\n";
-                result += secondCase().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-            }
-            else
-            {
-                result += FormulaTypeToString( FormulaType::ITE );
-                result += (_oneline ? " " : "\n");
-                result += condition().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-                result += (_oneline ? " " : "\n");
-                result += firstCase().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-                result += (_oneline ? " " : "\n");
-                result += secondCase().toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-            }
-            result += ")";
-            if( _withActivity )
-                result += activity;
-            return result;
-        }
-        else if (getType() == FormulaType::EXISTS)
-        {
-            string result = _init + "(exists ";
-            for (auto v: mpContent->mpQuantifierContent->mVariables) {
-                result += variablePool().getVariableName(v, _friendlyNames) + " ";
-            }
-            result += mpContent->mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
-            result += ")";
-            return result;
-        }
-        else if (getType() == FormulaType::FORALL)
-        {
-            string result = _init + "(forall ";
-            for (auto v: mpContent->mpQuantifierContent->mVariables) {
-                result += variablePool().getVariableName(v, _friendlyNames) + " ";
-            }
-            result += mpContent->mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
-            result += ")";
-            return result;
-        }
-        assert( getType() == FormulaType::AND || getType() == FormulaType::OR || getType() == FormulaType::IFF || getType() == FormulaType::XOR );
-        string stringOfType = FormulaTypeToString( getType() );
-        string result = _init + "(";
-        if( _infix )
-        {
-            for( auto subFormula = subformulas().begin(); subFormula != subformulas().end(); ++subFormula )
-            {
-                if( subFormula != subformulas().begin() )
-                    result += " " + stringOfType + " ";
-                if( !_oneline ) 
-                    result += "\n";
-                result += subFormula->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-            }
-        }
-        else
-        {
-            result += stringOfType;
-            for( auto subFormula = subformulas().begin(); subFormula != subformulas().end(); ++subFormula )
-            {
-                result += (_oneline ? " " : "\n");
-                result += subFormula->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-            }
-        }
-        result += ")";
-        if( _withActivity )
-            result += activity;
-        return result;
-    }
     
     template<typename Pol>
     ostream& operator<<( ostream& _ostream, const Formula<Pol>& _formula )
@@ -814,7 +816,7 @@ namespace carl
     string Formula<Pol>::toRedlogFormat( bool _withVariables ) const
     {
         string result = "";
-        string oper = Formula<Pol>::FormulaTypeToString( getType() );
+        string oper = formulaTypeToString( getType() );
         switch( getType() )
         {
             // unary cases
@@ -905,34 +907,6 @@ namespace carl
             }
         }
         return result;
-    }
-
-    template<typename Pol>
-    string Formula<Pol>::FormulaTypeToString( FormulaType _type )
-    {
-        switch( _type )
-        {
-            case FormulaType::AND:
-                return "and";
-            case FormulaType::OR:
-                return "or";
-            case FormulaType::NOT:
-                return "not";
-            case FormulaType::IFF:
-                return "=";
-            case FormulaType::XOR:
-                return "xor";
-            case FormulaType::IMPLIES:
-                return "=>";
-            case FormulaType::ITE:
-                return "ite";
-            case FormulaType::TRUE:
-                return "true";
-            case FormulaType::FALSE:
-                return "false";
-            default:
-                return "";
-        }
     }
 
     template<typename Pol>

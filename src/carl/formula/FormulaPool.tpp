@@ -55,7 +55,7 @@ namespace carl
     typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::create( FormulaType _type, std::set<Formula<Pol>>&& _subformulas )
     {
         assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
-//        cout << "create new formula with type " << FormulaType::FormulaTypeToString( _type ) << endl;
+//        cout << "create new formula with type " << formulaTypeToString( _type ) << endl;
 //        for( auto f : _subformulas )
 //            cout << *f << endl;
         for( auto iter = _subformulas.begin(); iter != _subformulas.end(); )

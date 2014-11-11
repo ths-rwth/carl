@@ -74,16 +74,16 @@ namespace carl
 	template<typename T> 
 	struct sharedPointerEqual
 	{
-		bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+		bool operator()( const std::shared_ptr<const T>& _argA, const std::shared_ptr<const T>& _argB ) const
 		{
-			return (*_argA)==(*_argB);
+            return (*_argA)==(*_argB);
 		}
 	};
 	
 	template<typename T> 
 	struct sharedPointerEqualWithNull
 	{
-		bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+		bool operator()( const std::shared_ptr<const T>& _argA, const std::shared_ptr<const T>& _argB ) const
 		{
 			if( _argA == nullptr || _argB == nullptr )
 				return _argA == _argB;
@@ -94,7 +94,7 @@ namespace carl
 	template<typename T> 
 	struct sharedPointerLess
 	{
-		bool operator()( std::shared_ptr<const T> _argA, std::shared_ptr<const T> _argB ) const
+		bool operator()( const std::shared_ptr<const T>& _argA, const std::shared_ptr<const T>& _argB ) const
 		{
 			return (*_argA)<(*_argB);
 		}
@@ -103,16 +103,16 @@ namespace carl
 	template<typename T> 
 	struct sharedPointerHash
 	{
-		size_t operator()( std::shared_ptr<const T> _arg ) const
+		size_t operator()( const std::shared_ptr<const T>& _arg ) const
 		{
-			return std::hash<T>()( *_arg );
+            return std::hash<T>()( *_arg );
 		}
 	};
 
     template<typename T> 
     struct sharedPointerHashWithNull
     {
-        size_t operator()( std::shared_ptr<const T> _arg ) const
+        size_t operator()( const std::shared_ptr<const T>& _arg ) const
         {
             if( _arg == nullptr )
                 return 0;
