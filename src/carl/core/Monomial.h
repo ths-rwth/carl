@@ -62,20 +62,21 @@ namespace carl
 #endif
 	public:
 		typedef std::shared_ptr<const Monomial> Arg;
+		typedef std::vector<std::pair<Variable, exponent>> Content;
 	protected:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
-		std::vector<std::pair<Variable, exponent>> mExponents;
+		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
 #ifdef USE_MONOMIAL_POOL
 		/// Monomial id.
-		mutable std::size_t mId;
+		mutable std::size_t mId = 0;
 #endif
 		/// Cached hash.
 		mutable std::size_t mHash = 0;
 
-		typedef std::vector<std::pair<Variable, exponent>>::iterator exponents_it;
-		typedef std::vector<std::pair<Variable, exponent>>::const_iterator exponents_cIt;
+		typedef Content::iterator exponents_it;
+		typedef Content::const_iterator exponents_cIt;
 
 		/**
 		 * Default constructor.
@@ -86,16 +87,7 @@ namespace carl
 		 * Calculates the hash and stores it to mHash.
 		 */
 		void calcHash() {
-			std::hash<carl::Variable> h;
-			size_t result = 0;
-			for (const auto& it: mExponents) {
-				// perform a circular shift by 5 bits.
-				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-				result ^= h( it.first );
-				result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-				result ^= it.second;
-			}
-			mHash = result;
+			mHash = Monomial::hashContent(mExponents);
 		}
 #ifndef USE_MONOMIAL_POOL
 	public:
@@ -120,7 +112,7 @@ namespace carl
 		 * @param exponents The variables and their exponents.
 		 * @param totalDegree The total degree of the monomial to generate.
 		 */
-		Monomial(std::vector<std::pair<Variable, exponent>>&& exponents, exponent totalDegree) :
+		Monomial(Content&& exponents, exponent totalDegree) :
 			mExponents(std::move(exponents)),
 			mTotalDegree(totalDegree)
 		{
@@ -147,7 +139,7 @@ namespace carl
 		 * Generate a monomial from a vector of variable-exponent pairs and a total degree.
 		 * @param exponents The variables and their exponents.
 		 */
-		explicit Monomial(std::vector<std::pair<Variable, exponent>>&& exponents) :
+		explicit Monomial(Content&& exponents) :
 			mExponents(std::move(exponents)),
 			mTotalDegree(0)
 		{
@@ -157,6 +149,25 @@ namespace carl
 				mTotalDegree += ve.second;
 			}
 			calcHash();
+			assert(isConsistent());
+		}
+
+		explicit Monomial(std::size_t hash, const Content& exponents) :
+			mExponents(exponents),
+			mTotalDegree(0),
+			mHash(hash)
+		{
+			for(auto const& ve : mExponents)
+			{
+				mTotalDegree += ve.second;
+			}
+			assert(isConsistent());
+		}
+		explicit Monomial(std::size_t hash, const Content& exponents, exponent totalDegree) :
+			mExponents(exponents),
+			mTotalDegree(totalDegree),
+			mHash(hash)
+		{
 			assert(isConsistent());
 		}
 		
@@ -237,7 +248,7 @@ namespace carl
 			return mTotalDegree;
 		}
 		
-		const std::vector<std::pair<Variable, exponent>>& exponents() const {
+		const Content& exponents() const {
 			return mExponents;
 		}
 		
@@ -362,7 +373,7 @@ namespace carl
 		 * For a monomial m = Prod( x_i^e_i ) * v^e, divides m by v^e
 		 * @return nullptr if result is 1, otherwise m/v^e.
 		 */
-		std::shared_ptr<const Monomial> dropVariable(Variable::Arg v) const;
+		Monomial::Arg dropVariable(Variable::Arg v) const;
 
 		/**
 		 * Divides the monomial by a variable v.
@@ -370,7 +381,7 @@ namespace carl
 		 * @param v Variable
 		 * @return This divided by v.
 		 */
-		std::shared_ptr<const Monomial> divide(Variable::Arg v) const;
+		Monomial::Arg divide(Variable::Arg v) const;
 
 		
 		/**
@@ -378,7 +389,7 @@ namespace carl
 		 * @param m Monomial.
 		 * @return If this is divisible by m.
 		 */
-		bool divisible(const std::shared_ptr<const Monomial>& m) const
+		bool divisible(const Monomial::Arg& m) const
 		{
 			if(!m) return true;
 			assert(isConsistent());
@@ -431,14 +442,14 @@ namespace carl
 		 * @param m Monomial.
 		 * @return this divided by m.
 		 */
-		std::pair<std::shared_ptr<const Monomial>,bool> divide(const std::shared_ptr<const Monomial>& m) const;
+		std::pair<Monomial::Arg,bool> divide(const Monomial::Arg& m) const;
 		
 		/**
 		 * 
 		 * @param m
 		 * @return 
 		 */
-		std::shared_ptr<const Monomial> calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const;
+		Monomial::Arg calcLcmAndDivideBy(const Monomial::Arg& m) const;
 		
 		template<typename Coeff, bool gatherCoeff, typename CoeffType>
 		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
@@ -454,14 +465,14 @@ namespace carl
 		 * For a monomial \f$ \\prod_i x_i^e_i with e_i \neq 0 \f$, this is \f$ \\prod_i x_i^1 \f$.
 		 * @return Separable part.
 		 */
-		std::shared_ptr<const Monomial> separablePart() const;
+		Monomial::Arg separablePart() const;
 
 		/**
 		 * Calculates the given power of this monomial.
 		 * @param exp Exponent.
 		 * @return this to the power of exp.
 		 */
-		std::shared_ptr<const Monomial> pow(unsigned exp) const;
+		Monomial::Arg pow(unsigned exp) const;
 		
 		/**
 		 * Fill the set of variables with the variables from this monomial.
@@ -504,7 +515,7 @@ namespace carl
 		// Orderings
 		///////////////////////////
 
-		static CompareResult compareLexical(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
+		static CompareResult compareLexical(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 		{
 			if( !lhs && !rhs )
 				return CompareResult::EQUAL;
@@ -515,7 +526,7 @@ namespace carl
 			return lexicalCompare(*lhs, *rhs);
 		}
 		
-		static CompareResult compareLexical(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs)
+		static CompareResult compareLexical(const Monomial::Arg& lhs, Variable::Arg rhs)
 		{
 			if(!lhs) return CompareResult::LESS;
 			if(lhs->mExponents.front().first < rhs) return CompareResult::GREATER;
@@ -525,7 +536,7 @@ namespace carl
 		}
 
 
-		static CompareResult compareGradedLexical(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs)
+		static CompareResult compareGradedLexical(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 		{
 			if( !lhs && !rhs )
 				return CompareResult::EQUAL;
@@ -538,7 +549,7 @@ namespace carl
 			return lexicalCompare(*lhs, *rhs);
 		}
 		
-		static CompareResult compareGradedLexical(const std::shared_ptr<const Monomial>& lhs, Variable::Arg rhs)
+		static CompareResult compareGradedLexical(const Monomial::Arg& lhs, Variable::Arg rhs)
 		{
 			if(!lhs) return CompareResult::LESS;
 			if(lhs->mTotalDegree > 1) return CompareResult::GREATER;
@@ -566,7 +577,13 @@ namespace carl
 		{
 			return os << rhs.toString(true, true);
 		}
-		friend std::ostream& operator<<( std::ostream& os, const std::shared_ptr<const Monomial>& rhs )
+		/**
+		 * Streaming operator for std::shared_ptr<Monomial>.
+		 * @param os Output stream.
+		 * @parem rhs Monomial.
+		 * @return `os`
+		 */
+		friend std::ostream& operator<<( std::ostream& os, const Monomial::Arg& rhs )
 		{
 			if (rhs) return os << *rhs;
 			return os << "1";
@@ -604,6 +621,24 @@ namespace carl
 		 * @see @cite GCL92, page 47.
 		 */
 		static CompareResult lexicalCompare(const Monomial& lhs, const Monomial& rhs);
+
+		/**
+		 * Calculate the hash of a monomial based on its content.
+		 * @param c Content of a monomial.
+		 * @return Hash of the monomial.
+		 */
+		static std::size_t hashContent(const Monomial::Content& c) {
+			std::hash<carl::Variable> h;
+			size_t result = 0;
+			for (const auto& it: c) {
+				// perform a circular shift by 5 bits.
+				result = (result << 5) | (result >> (sizeof(std::size_t)*8 - 5));
+				result ^= h( it.first );
+				result = (result << 5) | (result >> (sizeof(std::size_t)*8 - 5));
+				result ^= it.second;
+			}
+			return result;
+		}
 
 	private:
 		
