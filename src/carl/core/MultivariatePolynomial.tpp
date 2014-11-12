@@ -174,10 +174,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 #else
 		mTermAdditionManager.removeDuplicates(*this);
 #endif
-		ordered = false;
+		mOrdered = false;
 	}
 	
-	if (!ordered) {
+	if (!mOrdered) {
 		makeMinimallyOrdered();
 	}
 
