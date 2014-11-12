@@ -32,7 +32,7 @@ namespace carl
         /// The premise of the implication.
         Formula<Pol> mPremise;
         /// The conclusion of the implication.
-        Formula<Pol> mConlusion;
+        Formula<Pol> mConclusion;
 
         /**
          * Constructs the content of a formula being an implication.
@@ -40,7 +40,7 @@ namespace carl
          * @param _conclusion The conclusion of the implication.
          */
         IMPLIESContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion): 
-            mPremise( _premise ), mConlusion( _conclusion ) {}
+            mPremise( _premise ), mConclusion( _conclusion ) {}
     };
 
     /**
@@ -105,6 +105,37 @@ namespace carl
     
     /// The possible types of a formula.
     enum FormulaType { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, TRUE, FALSE, EXISTS, FORALL, UEQ };
+            
+    /**
+     * @param _type The formula type to get the string representation for.
+     * @return The string representation of the given type.
+     */
+    inline std::string formulaTypeToString( FormulaType _type )
+    {
+        switch( _type )
+        {
+            case FormulaType::AND:
+                return "and";
+            case FormulaType::OR:
+                return "or";
+            case FormulaType::NOT:
+                return "not";
+            case FormulaType::IFF:
+                return "=";
+            case FormulaType::XOR:
+                return "xor";
+            case FormulaType::IMPLIES:
+                return "=>";
+            case FormulaType::ITE:
+                return "ite";
+            case FormulaType::TRUE:
+                return "true";
+            case FormulaType::FALSE:
+                return "false";
+            default:
+                return "";
+        }
+    }
     
     template<typename Pol>
     class FormulaContent
@@ -230,6 +261,31 @@ namespace carl
             }
 
             bool operator==( const FormulaContent& _content ) const;
+            
+            /**
+             * Gives the string representation of this formula content.
+             * @param _withActivity A flag which indicates whether to add the formula's activity to the result.
+             * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal. 
+             *                         (for further description see documentation of Constraint::toString( .. ))
+             * @param _init The initial string of every row of the result.
+             * @param _oneline A flag indicating whether the formula shall be printed on one line.
+             * @param _infix A flag indicating whether to print the formula in infix or prefix notation.
+             * @param _friendlyNames A flag that indicates whether to print the variables with their internal representation (false)
+             *                        or with their dedicated names.
+             * @return The resulting string representation of this formula.
+             */
+            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const; 
+            
+            /**
+             * The output operator of a formula.
+             * @param _out The stream to print on.
+             * @param _init
+             */
+            template<typename P>
+            friend std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
+            {
+                return (_out << _formula.toString());
+            }
     };
     
     /**
@@ -519,7 +575,7 @@ namespace carl
             const Formula& conclusion() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mpImpliesContent->mConlusion;
+                return mpContent->mpImpliesContent->mConclusion;
             }
             
             /**
@@ -690,7 +746,7 @@ namespace carl
                 if( mpContent->mType == FormulaType::NOT )
                     return mpContent->mSubformula;
                 else if( mpContent->mType == FormulaType::IMPLIES )
-                    return mpContent->mpImpliesContent->mConlusion;
+                    return mpContent->mpImpliesContent->mConclusion;
                 else if( mpContent->mType == FormulaType::ITE )
                     return mpContent->mpIteContent->mElse;
                 else
@@ -858,7 +914,10 @@ namespace carl
              *                        or with their dedicated names.
              * @return The resulting string representation of this formula.
              */
-            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const; 
+            inline std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const
+            {
+                return mpContent->toString( _withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames );
+            }
             
             /**
              * The output operator of a formula.
@@ -888,12 +947,6 @@ namespace carl
              * @return The string, which represents all variables occurring in this formula in a row, separated by the given separator.
              */
             std::string variableListToString( std::string _separator = ",", const std::unordered_map<std::string, std::string>& _variableIds = (std::unordered_map<std::string, std::string>())) const;
-            
-            /**
-             * @param _type The formula type to get the string representation for.
-             * @return The string representation of the given type.
-             */
-            static std::string FormulaTypeToString( FormulaType _type );
             
             /**
              * Resolves the outermost negation of this formula.
