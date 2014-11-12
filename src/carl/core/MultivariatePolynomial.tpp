@@ -1830,6 +1830,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 	mTerms.emplace_back(newlterm);
 #endif
+	makeMinimallyOrdered();
 	mOrdered = false;
 	assert(this->isConsistent());
 	return *this;
