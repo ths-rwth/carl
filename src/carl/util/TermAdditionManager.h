@@ -6,16 +6,100 @@
  */
 
 #pragma once 
+
+#include <mutex>
+#include <unordered_map>
+#include <vector>
+
 #include "../core/Term.h"
 #include "../core/pointerOperations.h"
-#include <vector>
-#include <unordered_map>
-#include <mutex>
+#include "../io/streamingOperators.h"
 
 namespace carl
 {
 
 #ifdef USE_MONOMIAL_POOL
+
+#define USE_INDIRECTION
+#ifdef USE_INDIRECTION
+
+template<typename Polynomial>
+class TermAdditionManager {
+public:
+	typedef Term<typename Polynomial::CoeffType> TermType;
+	typedef std::shared_ptr<const TermType> TermPtr;
+	typedef std::vector<std::size_t> TermIDs;
+	typedef std::vector<TermPtr> Terms;
+private:
+	std::size_t mNextId;
+	std::vector<TermIDs> mTermIDs;
+	std::vector<Terms> mTerms;
+	std::vector<bool> mUsed;
+	mutable std::mutex mMutex;
+public:
+	TermAdditionManager(): mNextId(0), mTermIDs(1), mTerms(1), mUsed(1, false)
+	{
+	}
+	
+	std::size_t getId() {
+		std::lock_guard<std::mutex> lock(mMutex);
+		while (mUsed.at(mNextId)) {
+			mNextId++;
+			if (mNextId == mTerms.size()) {
+				mTermIDs.emplace_back();
+				mTerms.emplace_back();
+				mUsed.emplace_back(false);
+			}
+		}
+		assert(mTermIDs.at(mNextId).empty());
+		assert(mTerms.at(mNextId).empty());
+		assert(mUsed.at(mNextId) == false);
+		mTermIDs[mNextId].clear();
+		mTerms[mNextId].resize(1);
+		mTerms[mNextId][0] = nullptr;
+		mUsed[mNextId] = true;
+		std::size_t result = mNextId;
+		mNextId = (mNextId + 1) % mTerms.size();
+		return result;
+	}
+	
+	void addTerm(std::size_t id, const TermPtr& term) {
+		assert(mUsed.at(id));
+		TermIDs& termIDs = mTermIDs[id];
+		Terms& terms = mTerms[id];
+		std::size_t monId = 0;
+		if (term->monomial()) monId = term->monomial()->id();
+		if (monId >= termIDs.size()) termIDs.resize(monId + 1);
+		if (termIDs.at(monId) == 0) {
+			termIDs[monId] = terms.size();
+			terms.push_back(term);
+		} else {
+			monId = termIDs.at(monId);
+			if (terms.at(monId) == nullptr) terms[monId] = term;
+			else {
+				auto coeff = terms.at(monId)->coeff() + term->coeff();
+				if (coeff == typename Polynomial::CoeffType(0)) {
+					terms[monId] = nullptr;
+				} else {
+					terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
+				}
+			}
+		}
+	}
+	
+	void readTerms(std::size_t id, Terms& terms) {
+		assert(mUsed.at(id));
+		terms.clear();
+		for (const auto& t: mTerms.at(id)) {
+			if (t != nullptr) terms.push_back(t);
+		}
+		mTermIDs.at(id).clear();
+		mTerms.at(id).clear();
+		mUsed.at(id) = false;
+	}
+};
+
+#else
 
 template<typename Polynomial>
 class TermAdditionManager {
@@ -79,7 +163,7 @@ public:
 		mUsed.at(id) = false;
 	}
 };
-	
+#endif
 
 #else
 
