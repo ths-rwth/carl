@@ -10,7 +10,7 @@
 namespace carl {
 namespace cad {
 
-#ifdef LOGGING_CARL
+#if defined(LOGGING) && defined(LOGGING_CARL)
 
 /**
  * This class is used to create a dot file representing the elimination phase of the CAD.
