@@ -5,8 +5,6 @@
  * @version 2014-10-22
  */
 
-#pragma once
-
 #include "UEquality.h"
 
 namespace carl
