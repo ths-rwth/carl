@@ -83,6 +83,7 @@ namespace carl
              */
             ConstElementSPtr create( const Constraint<Pol>* _constraint )
             {
+				assert(_constraint != nullptr);
                 #ifdef SIMPLIFY_FORMULA
                 if( _constraint == constraintPool<Pol>().consistentConstraint() )
                     return mpTrue;

@@ -174,9 +174,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 #else
 		mTermAdditionManager.removeDuplicates(*this);
 #endif
+		mOrdered = false;
 	}
 	
-	if (!ordered) {
+	if (!mOrdered) {
 		makeMinimallyOrdered();
 	}
 
@@ -1073,6 +1074,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	/// - allow 0
 	/// - fix ordering issues with result
 	assert(!isZero());
+	assert(this->isConsistent());
 	// TODO n > 1 not yet implemented!
 	assert(nth == 1);
 	TermsType tmpTerms;
@@ -1828,6 +1830,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 	mTerms.emplace_back(newlterm);
 #endif
+	makeMinimallyOrdered();
 	mOrdered = false;
 	assert(this->isConsistent());
 	return *this;
