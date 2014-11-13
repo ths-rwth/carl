@@ -247,7 +247,10 @@ TEST(doubleFloatTest, Division)
     f5.div_assign(f6, carl::CARL_RND::N);
     ASSERT_EQ(result3, f5);
     
+#ifndef NDEBUG
+	// This may not fail if we are not compiling in DEBUG mode.
     ASSERT_DEATH(f7.div_assign(f8, carl::CARL_RND::N), ".*");
+#endif
 }
 
 /*
@@ -286,8 +289,10 @@ TEST(doubleFloatTest, Roots)
     // Todo: yet to be implemented!
 //    f3.root_assign(i1, carl::CARL_RND::N);
 //    ASSERT_EQ(result3, f3);
-    
+#ifndef NDEBUG
+	// This may not fail if we are not compiling in DEBUG mode.
     ASSERT_DEATH(f4.sqrt_assign(carl::CARL_RND::N), ".*");
+#endif
 }
 
 TEST(doubleFloatTest, ConversionOperators)
