@@ -62,7 +62,7 @@ public:
 		mNextId = (mNextId + 1) % mTerms.size();
 		return result;
 	}
-	
+
 	void addTerm(std::size_t id, const TermPtr& term) {
 		assert(mUsed.at(id));
 		TermIDs& termIDs = mTermIDs[id];
@@ -89,10 +89,15 @@ public:
 	
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(mUsed.at(id));
-		terms.clear();
-		for (const auto& t: mTerms.at(id)) {
-			if (t != nullptr) terms.push_back(t);
+		Terms& t = mTerms.at(id);
+		for (auto i = t.begin(); i != t.end();) {
+			if (*i == nullptr) {
+				std::swap(*i, *t.rbegin());
+				t.pop_back();
+			} else i++;
 		}
+		std::swap(t, terms);
+		std::lock_guard<std::mutex> lock(mMutex);
 		mTermIDs.at(id).clear();
 		mTerms.at(id).clear();
 		mUsed.at(id) = false;
