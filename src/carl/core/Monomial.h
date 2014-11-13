@@ -13,7 +13,6 @@
 
 #include "Variable.h"
 #include "CompareResult.h"
-#include "VariablesInformation.h"
 #include "logging.h"
 #include "carlLoggingHelper.h"
 #include "../numbers/numbers.h"
@@ -451,8 +450,8 @@ namespace carl
 		 */
 		Monomial::Arg calcLcmAndDivideBy(const Monomial::Arg& m) const;
 		
-		template<typename Coeff, bool gatherCoeff, typename CoeffType>
-		void gatherVarInfo(VariablesInformation<gatherCoeff, CoeffType>& varinfo, const Coeff& coeffFromTerm) const
+		template<typename Coeff, typename VarInfo>
+		void gatherVarInfo(VarInfo& varinfo, const Coeff& coeffFromTerm) const
 		{
 			for (auto ve : mExponents )
 			{

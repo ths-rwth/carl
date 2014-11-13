@@ -28,7 +28,7 @@ Term<Coefficient>::Term(const Coefficient& c) :
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
-	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, 1))
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, (exponent)1))
 {
 	assert(this->isConsistent());
 }
@@ -345,7 +345,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 	}
 	else
 	{
-		mMonomial = createMonomial(rhs, 1);
+		mMonomial = createMonomial(rhs, (exponent)1);
 	}
 	return *this;
 }

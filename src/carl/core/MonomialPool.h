@@ -109,7 +109,7 @@ namespace carl {
 template<typename... T>
 inline Monomial::Arg createMonomial(T... t) {
 #ifdef USE_MONOMIAL_POOL
-	return MonomialPool::getInstance().create(t...);
+	return MonomialPool::getInstance().create(std::forward<T>(t)...);
 #else
 	return std::make_shared<const Monomial>(t...);
 #endif

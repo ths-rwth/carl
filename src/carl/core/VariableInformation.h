@@ -12,6 +12,7 @@
 #include <algorithm>
 
 #include "Variable.h"
+#include "MonomialPool.h"
 namespace carl
 {
 
@@ -198,7 +199,7 @@ namespace carl
             }
             if(totalDegree != 0) 
             { 
-                std::shared_ptr<const typename CoeffType::MonomType> m = std::make_shared<const typename CoeffType::MonomType>(std::move(exps), totalDegree);
+                auto m = createMonomial(std::move(exps), totalDegree);
                 updateCoeff(e, typename CoeffType::TermType(termCoeff, m));
             }
             else
