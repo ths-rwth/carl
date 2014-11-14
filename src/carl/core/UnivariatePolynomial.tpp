@@ -70,7 +70,7 @@ mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not 
 		mCoefficients.clear();
 	}
 	this->stripLeadingZeroes();
-	assert(this->isConsistent());
+ 	assert(this->isConsistent());
 }
 
 template<typename Coeff>
@@ -783,9 +783,11 @@ template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>, EnableIf<i
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const typename UnivariatePolynomial<Coeff>::NumberType& divisor) const 
 {
 	UnivariatePolynomial<Coeff> res(*this);
+    assert(res.isConsistent());
 	for (unsigned i = 0; i < res.mCoefficients.size(); i++) {
 		res.mCoefficients[i] = res.mCoefficients[i].divideBy(divisor);
 	}
+    assert(res.isConsistent());
 	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
 }
 
