@@ -376,7 +376,7 @@ namespace carl
 		LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
 		if (mTotalDegree < 1) return false;
 #ifndef USE_MONOMIAL_POOL	
-		if (mHash == 0) return false;
+		if ((mHash == 0) && (hashContent(mExponents) != 0)) return false;
 #endif
 		unsigned tdegree = 0;
 		Variable lastVar = Variable::NO_VARIABLE;
@@ -471,6 +471,7 @@ namespace carl
 			newExps.insert(newExps.end(), itleft, lhs->end());
 		else if( itright != rhs->end() )
 			newExps.insert(newExps.end(), itright, rhs->end());
+                    std::cout << lhs << " * " << rhs << " = " << newExps << std::endl;
 #ifdef USE_MONOMIAL_POOL
 		std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + rhs->tdeg() );
 #else
