@@ -1241,8 +1241,8 @@ typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numeri
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		///@todo gcd needed for fractions
-		//res = carl::gcd(res, this->mTerms[i]->coeff());
-		assert(false);
+		res = carl::gcd(res, this->mTerms[i]->coeff());
+		//assert(false);
 	}
 	return res;
 }

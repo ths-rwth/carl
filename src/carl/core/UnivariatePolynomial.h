@@ -106,7 +106,7 @@ public:
 	 * Construct a zero polynomial with the given main variable.
 	 * @param mainVar New main variable.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar);
+	explicit UnivariatePolynomial(Variable::Arg mainVar);
 	/**
 	 * Construct \f$ coeff \cdot mainVar^{degree} \f$.
 	 * @param mainVar New main variable.
