@@ -111,7 +111,7 @@ inline Monomial::Arg createMonomial(T... t) {
 #ifdef USE_MONOMIAL_POOL
 	return MonomialPool::getInstance().create(std::forward<T>(t)...);
 #else
-	return std::make_shared<const Monomial>(t...);
+	return std::make_shared<const Monomial>(std::forward<T>(t)...);
 #endif
 }
 
