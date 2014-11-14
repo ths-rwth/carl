@@ -476,7 +476,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	MultivariatePolynomial<Coeff,Ordering,Policies> res;
 	res.mTerms.reserve(mTerms.size());
-	for (unsigned i = 0; i < res.mTerms.size(); i++) {
+	for (unsigned i = 0; i < mTerms.size(); i++) {
 		res.mTerms.emplace_back(res.mTerms[i]->divideBy(divisor));
 	}
     assert(res.isConsistent());
@@ -812,6 +812,8 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
+    mOrdered = false;
+    makeMinimallyOrdered();
 	assert(mTerms.size() <= expectedResultSize);
 	assert(this->isConsistent());
 }
