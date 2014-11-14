@@ -183,7 +183,7 @@ template<typename Coefficient>
 Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
 {
 	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
-	if(tmp->tdeg() == 0)
+	if(tmp == nullptr)
 	{
 		return Term(carl::constant_one<Coefficient>().get());
 	}

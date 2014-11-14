@@ -165,7 +165,7 @@ namespace carl
 				exponent newExp = std::max(itleft->second, itright->second) - itright->second;
 				if(newExp != 0)
 				{
-					newExps.push_back(std::make_pair(itleft->first, newExp));
+					newExps.emplace_back(itleft->first, newExp);
 					tdegree -= itright->second;
 				}
 				else
@@ -188,6 +188,7 @@ namespace carl
 				++itleft;
 			}
 		}
+                if (newExps.empty()) return nullptr;
 		#ifdef USE_MONOMIAL_POOL
 		return MonomialPool::getInstance().create( std::move(newExps), tdegree);
 		#else
@@ -435,7 +436,9 @@ namespace carl
 			return lhs;
 		assert( rhs->tdeg() > 0 );
 		assert( lhs->tdeg() > 0 );
-		std::vector<std::pair<Variable, exponent>> newExps;
+		assert(lhs->isConsistent());
+		assert(rhs->isConsistent());
+                std::vector<std::pair<Variable, exponent>> newExps;
 		newExps.reserve(lhs->exponents().size() + rhs->exponents().size());
 
 		// Linear, as we expect small monomials.

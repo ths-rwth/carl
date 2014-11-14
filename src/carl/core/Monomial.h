@@ -639,7 +639,7 @@ namespace carl
 			return result;
 		}
 
-	private:
+	public:
 		
 		/**
 		 * Checks if the monomial is consistent.
