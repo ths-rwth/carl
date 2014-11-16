@@ -8,6 +8,11 @@
 
 namespace carl
 {
+	Monomial::~Monomial() {
+#ifdef PRUNE_MONOMIAL_POOL
+		MonomialPool::getInstance().free(this);
+#endif
+	}
 	Monomial::Arg Monomial::dropVariable(Variable::Arg v) const
 	{
 		///@todo this should work on the shared_ptr directly. Then we could directly return this shared_ptr instead of the ugly copying.
@@ -398,6 +403,11 @@ namespace carl
 		if (&lhs == &rhs) {
 			return CompareResult::EQUAL;
 		}
+#ifdef USE_MONOMIAL_POOL
+		if ((lhs.id() != 0) && (rhs.id() != 0)) {
+			if (lhs.id() == rhs.id()) return CompareResult::EQUAL;
+		}
+#endif
 		auto lhsit = lhs.mExponents.begin( );
 		auto rhsit = rhs.mExponents.begin( );
 		auto lhsend = lhs.mExponents.end( );

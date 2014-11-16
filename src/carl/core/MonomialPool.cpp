@@ -5,11 +5,52 @@
 
 #include "MonomialPool.h"
 
+#include "../io/streamingOperators.h"
+
 #ifdef USE_MONOMIAL_POOL
 
 namespace carl
 {
-#ifdef NEWPOOL
+#ifdef PRUNE_MONOMIAL_POOL
+	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
+		MONOMIAL_POOL_LOCK_GUARD
+		auto iter = mPool.insert(pe);
+		Monomial::Arg res;
+		if (iter.second) {
+			if (iter.first->monomial.expired()) {
+				if (totalDegree == 0) {
+					res = Monomial::Arg(new Monomial(iter.first->hash, iter.first->content));
+					iter.first->monomial = res;
+				} else {
+					res = Monomial::Arg(new Monomial(iter.first->hash, iter.first->content, totalDegree));
+					iter.first->monomial = res;
+				}
+			} else {
+				res = iter.first->monomial.lock();
+			}
+			res->mId = mIDs.get();
+		} else {
+			res = iter.first->monomial.lock();
+		}
+		//std::cout << "Returning " << res << " -> " << res->id() << std::endl;
+		return res;
+	}
+
+	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial ) {
+		assert(_monomial->id() == 0);
+		MONOMIAL_POOL_LOCK_GUARD
+		PoolEntry pe(_monomial->hash(), _monomial->exponents(), _monomial);
+		Monomial::Arg res = _monomial;
+		auto iter = mPool.insert(pe);
+		if (iter.second) {
+			res->mId = mIDs.get();
+		} else {
+			res = iter.first->monomial.lock();
+		}
+		//std::cout << "Returning " << res << " -> " << res->id() << std::endl;
+		return res;
+	}
+#else
 	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
 		MONOMIAL_POOL_LOCK_GUARD
 		auto iter = mPool.insert(pe);
@@ -21,8 +62,7 @@ namespace carl
 					iter.first->monomial.reset(new Monomial(iter.first->hash, iter.first->content, totalDegree));
 				}
 			}
-			iter.first->monomial->mId = mIdAllocator;
-			++mIdAllocator;
+			iter.first->monomial->mId = mIDs.get();
 		}
 		return iter.first->monomial;
 	}
@@ -30,24 +70,11 @@ namespace carl
 	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial ) {
 		assert(_monomial->id() == 0);
 		return MonomialPool::add(std::move(PoolEntry(_monomial->hash(), _monomial->exponents(), _monomial)));
-	}
+		}
+#endif
 	Monomial::Arg MonomialPool::add( Monomial::Content&& c, exponent totalDegree) {
 		return MonomialPool::add(std::move(PoolEntry(Monomial::hashContent(c), std::move(c))), totalDegree);
 	}
-#else
-	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial )
-	{
-		MONOMIAL_POOL_LOCK_GUARD
-		auto iterBoolPair = mPool.insert( _monomial );
-		if( iterBoolPair.second )
-		{
-			_monomial->mId = mIdAllocator;  // id should be set here to avoid conflicts when multi-threading
-			++mIdAllocator;
-		}
-		assert(_monomial == *iterBoolPair.first);
-		return *iterBoolPair.first;
-	}
-#endif
 	
 	Monomial::Arg MonomialPool::create( Variable::Arg _var, exponent _exp )
 	{

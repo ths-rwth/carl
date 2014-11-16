@@ -62,6 +62,7 @@ namespace carl
 	public:
 		typedef std::shared_ptr<const Monomial> Arg;
 		typedef std::vector<std::pair<Variable, exponent>> Content;
+		~Monomial();
 	protected:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
 		Content mExponents;
@@ -659,13 +660,12 @@ namespace carl
 	inline bool operator==(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		if (lhs.get() == rhs.get()) return true;
 		if (lhs == nullptr || rhs == nullptr) return false;
-		#ifdef USE_MONOMIAL_POOL
-		return lhs->hash() == rhs->hash();
-		#else
+#ifdef USE_MONOMIAL_POOL
+		if ((lhs->id() != 0) && (rhs->id() != 0)) return lhs->id() == rhs->id();
+#endif
 		if (lhs->hash() != rhs->hash()) return false;
 		if (lhs->tdeg() != rhs->tdeg()) return false;
 		return lhs->exponents() == rhs->exponents();
-		#endif
 	}
 	
 	inline bool operator==(const Monomial::Arg& lhs, Variable::Arg rhs) {
@@ -695,6 +695,11 @@ namespace carl
 		if (lhs.get() == rhs.get()) return false;
 		if (lhs == nullptr) return true;
 		if (rhs == nullptr) return false;
+#ifdef USE_MONOMIAL_POOL
+		if ((lhs->id() != 0) && (rhs->id() != 0)) {
+			if (lhs->id() == rhs->id()) return false;
+		}
+#endif
 		if(lhs->tdeg() < rhs->tdeg()) return true;
 		if(lhs->tdeg() > rhs->tdeg()) return false;
 		CompareResult cr = Monomial::lexicalCompare(*lhs, *rhs);

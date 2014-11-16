@@ -10,20 +10,31 @@
 
 #ifdef USE_MONOMIAL_POOL
 
+#include <memory.h>
 #include <unordered_set>
 
 #include "../util/Common.h"
+#include "../util/IDGenerator.h"
 #include "../util/Singleton.h"
 
 namespace carl{
 
-#define NEWPOOL
 
 	class MonomialPool : public Singleton<MonomialPool>
 	{
 		friend class Singleton<MonomialPool>;
-#ifdef NEWPOOL
 		public:
+#ifdef PRUNE_MONOMIAL_POOL
+			struct PoolEntry {
+				std::size_t hash;
+				Monomial::Content content;
+				mutable std::weak_ptr<const Monomial> monomial;
+				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): hash(h), content(c), monomial(m) {}
+				PoolEntry(std::size_t h, Monomial::Content&& c): hash(h), content(std::move(c)) {
+					assert(monomial.expired());
+				}
+			};
+#else
 			struct PoolEntry {
 				std::size_t hash;
 				Monomial::Content content;
@@ -31,6 +42,7 @@ namespace carl{
 				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): hash(h), content(c), monomial(m) {}
 				PoolEntry(std::size_t h, Monomial::Content&& c): hash(h), content(std::move(c)), monomial(nullptr) {}
 			};
+#endif
 			struct hash {
 				std::size_t operator()(const PoolEntry& p) const {
 					return p.hash;
@@ -39,23 +51,25 @@ namespace carl{
 			struct equal {
 				bool operator()(const PoolEntry& p1, const PoolEntry& p2) const {
 					if (p1.hash != p2.hash) return false;
+#ifdef PRUNE_MONOMIAL_POOL
+					if (!p1.monomial.expired() && !p2.monomial.expired()) {
+						return p1.monomial.lock() == p2.monomial.lock();
+					}
+#else
 					if (p1.monomial && p2.monomial) {
 						return p1.monomial == p2.monomial;
 					}
+#endif
 					return p1.content == p2.content;
 				}
 			};
-#endif
 		private:
 			// Members:
 			/// id allocator
-			size_t mIdAllocator;
+			IDGenerator mIDs;
+			//size_t mIdAllocator;
 			/// The pool.
-#ifdef NEWPOOL
 			std::unordered_set<PoolEntry, MonomialPool::hash, MonomialPool::equal> mPool;
-#else
-			std::unordered_set<Monomial::Arg, std::hash<Monomial::Arg>> mPool;
-#endif
 			/// Mutex to avoid multiple access to the pool
 			mutable std::mutex mMutex;
 			
@@ -71,13 +85,10 @@ namespace carl{
 			 */
 			MonomialPool( unsigned _capacity = 10000 ):
 				Singleton<MonomialPool>(),
-				mIdAllocator( 1 ),
 				mPool(_capacity)
 			{}
 
-#ifdef NEWPOOL
 			Monomial::Arg add( MonomialPool::PoolEntry&& pe, exponent totalDegree = 0 );
-#endif
 		public:
 			
 			/**
@@ -86,9 +97,7 @@ namespace carl{
 			 * @return The corresponding monomial in the pool.
 			 */
 			Monomial::Arg add( const Monomial::Arg& _monomial );
-#ifdef NEWPOOL
 			Monomial::Arg add( Monomial::Content&& c, exponent totalDegree = 0 );
-#endif
 			
 			Monomial::Arg create( Variable::Arg _var, exponent _exp );
 			
@@ -97,6 +106,20 @@ namespace carl{
 			Monomial::Arg create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents, exponent _totalDegree );
 			
 			Monomial::Arg create( std::vector<std::pair<Variable, exponent>>&& _exponents );
+
+#ifdef PRUNE_MONOMIAL_POOL
+			void free(const Monomial* m) {
+				if (m->id() == 0) return;
+				PoolEntry pe(m->mHash, m->mExponents, nullptr);
+				auto it = mPool.find(pe);
+				if (it != mPool.end()) {
+					if (!it->monomial.expired()) {
+						mIDs.free(it->monomial.lock()->id());
+					}
+					mPool.erase(it);
+				}
+			}
+#endif
 	};
 } // end namespace carl
 
