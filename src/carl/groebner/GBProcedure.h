@@ -219,7 +219,7 @@ public:
 		{
 			toBeReduced.push_back(*it);
 		}
-		sort(toBeReduced.begin(), toBeReduced.end(), Polynomial::compareByLeadingTerm);
+		std::sort(toBeReduced.begin(), toBeReduced.end(), Polynomial::compareByLeadingTerm);
 
 		// We will continue to generate new scheduled polynomials, which make the scheduled polynomials from before superfluous.
 		mInputScheduled.clear();

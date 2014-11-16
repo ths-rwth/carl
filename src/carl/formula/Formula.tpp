@@ -1156,7 +1156,7 @@ namespace carl
         std::map<Formula, pair<Formula<Pol>, Formula<Pol>>*> tseitinVars;
         std::set<Formula> resultSubformulas;
         ConstraintBounds constraintBoundsAnd;
-        vector<Formula<Pol>> subformulasToTransform;
+        std::vector<Formula<Pol>> subformulasToTransform;
         subformulasToTransform.push_back( *this );
         while( !subformulasToTransform.empty() )
         {
@@ -1296,10 +1296,10 @@ namespace carl
                     bool currentFormulaValid = false;
                     ConstraintBounds constraintBoundsOr;
                     std::set<Formula> subsubformulas;
-                    vector<Formula<Pol>> phis;
+                    std::vector<Formula<Pol>> phis;
                     for( const Formula<Pol>& subFormula : currentFormula.subformulas() )
                         phis.push_back( subFormula );
-                    vector<Formula<Pol>> subformulasToTransformTmp;
+                    std::vector<Formula<Pol>> subformulasToTransformTmp;
                     while( !currentFormulaValid && !phis.empty() )
                     {
                         const Formula<Pol>& currentSubformula = phis.back();
