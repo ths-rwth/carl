@@ -35,9 +35,10 @@ private:
 	std::vector<TermIDs> mTermIDs;
 	std::vector<Terms> mTerms;
 	std::vector<bool> mUsed;
+	std::vector<typename Polynomial::CoeffType> mConstant;
 	mutable std::mutex mMutex;
 public:
-	TermAdditionManager(): mNextId(0), mTermIDs(1), mTerms(1), mUsed(1, false)
+	TermAdditionManager(): mNextId(0), mTermIDs(1), mTerms(1), mUsed(1, false), mConstant(1)
 	{
 	}
 	
@@ -49,6 +50,7 @@ public:
 				mTermIDs.emplace_back();
 				mTerms.emplace_back();
 				mUsed.push_back(false);
+				mConstant.emplace_back();
 			}
 		}
 		assert(mTermIDs.at(mNextId).empty());
@@ -59,38 +61,44 @@ public:
 		mTerms[mNextId].reserve(expectedSize);
 		mTerms[mNextId].emplace_back(nullptr);
 		mUsed[mNextId] = true;
+		mConstant[mNextId] = constant_zero<typename Polynomial::CoeffType>::get();
 		std::size_t result = mNextId;
 		mNextId = (mNextId + 1) % mTerms.size();
 		return result;
 	}
 
 	void addTerm(std::size_t id, const TermPtr& term) {
-		assert(mUsed.at(id));
+		assert(mUsed[id]);
 		TermIDs& termIDs = mTermIDs[id];
 		Terms& terms = mTerms[id];
-		std::size_t monId = 0;
-		if (term->monomial()) monId = term->monomial()->id();
-		if (monId >= termIDs.size()) termIDs.resize(monId + 1);
-		if ((monId > 0) && (termIDs.at(monId) == 0)) {
-			termIDs[monId] = (unsigned short)terms.size();
-			terms.push_back(term);
-		} else {
-			monId = termIDs.at(monId);
-			if (terms.at(monId) == nullptr) terms[monId] = term;
-			else {
-				auto coeff = terms.at(monId)->coeff() + term->coeff();
-				if (isZero(coeff)) {
-					terms[monId] = nullptr;
-				} else {
-					terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
+		if (term->monomial()) {
+			std::size_t monId = term->monomial()->id();
+			if (monId >= termIDs.size()) termIDs.resize(monId + 1);
+
+			if (termIDs[monId] == 0) {
+				termIDs[monId] = (unsigned short)terms.size();
+				terms.push_back(term);
+			} else {
+				monId = termIDs[monId];
+				if (terms[monId] == nullptr) terms[monId] = term;
+				else {
+					auto coeff = terms[monId]->coeff() + term->coeff();
+					if (isZero(coeff)) {
+						terms[monId] = nullptr;
+					} else {
+						terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
+					}
 				}
 			}
+		} else {
+			mConstant[id] += term->coeff();
 		}
 	}
 	
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(mUsed.at(id));
 		Terms& t = mTerms[id];
+		t[0] = std::make_shared<const TermType>(mConstant[id], nullptr);
 		for (auto i = t.begin(); i != t.end();) {
 			if (*i == nullptr) {
 				std::swap(*i, *t.rbegin());
