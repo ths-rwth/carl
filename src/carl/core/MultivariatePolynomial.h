@@ -294,6 +294,13 @@ public:
 	bool isReducibleIdentity() const;
 
 	/**
+	 * Subtract a term times a polynomial from this polynomial.
+	 * @param factor Term.
+	 * @param p Polynomial.
+	 */
+	void subtractProduct(const Term<Coeff>& factor, const MultivariatePolynomial& p);
+
+	/**
 	 * Divides the polynomial by the given coefficient.
 	 * Applies if the coefficients are from a field.
 	 * @param divisor
@@ -432,7 +439,7 @@ public:
 	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
 	
 	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
-	typename UnderlyingNumberType<C>::type numericContent() const;
+	Coeff numericContent() const;
 	template<typename C=Coeff, DisableIf<is_number<C>> = dummy>
 	typename UnderlyingNumberType<C>::type numericContent() const;
 	

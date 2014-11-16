@@ -28,7 +28,7 @@ class TermAdditionManager {
 public:
 	typedef Term<typename Polynomial::CoeffType> TermType;
 	typedef std::shared_ptr<const TermType> TermPtr;
-	typedef std::vector<std::size_t> TermIDs;
+	typedef std::vector<unsigned short> TermIDs;
 	typedef std::vector<TermPtr> Terms;
 private:
 	std::size_t mNextId;
@@ -41,22 +41,22 @@ public:
 	{
 	}
 	
-	std::size_t getId() {
+	std::size_t getId(std::size_t expectedSize = 0) {
 		std::lock_guard<std::mutex> lock(mMutex);
 		while (mUsed.at(mNextId)) {
 			mNextId++;
 			if (mNextId == mTerms.size()) {
 				mTermIDs.emplace_back();
 				mTerms.emplace_back();
-				mUsed.emplace_back(false);
+				mUsed.push_back(false);
 			}
 		}
 		assert(mTermIDs.at(mNextId).empty());
 		assert(mTerms.at(mNextId).empty());
 		assert(mUsed.at(mNextId) == false);
 		mTermIDs[mNextId].clear();
-		mTerms[mNextId].resize(1);
-		mTerms[mNextId][0] = nullptr;
+		mTerms[mNextId].reserve(expectedSize);
+		mTerms[mNextId].emplace_back(nullptr);
 		mUsed[mNextId] = true;
 		std::size_t result = mNextId;
 		mNextId = (mNextId + 1) % mTerms.size();
@@ -89,7 +89,9 @@ public:
 	
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(mUsed.at(id));
-		Terms& t = mTerms.at(id);
+		Terms& t = mTerms[id];
+		std::swap(*t.begin(), *t.rbegin());
+		t.pop_back();
 		for (auto i = t.begin(); i != t.end();) {
 			if (*i == nullptr) {
 				std::swap(*i, *t.rbegin());

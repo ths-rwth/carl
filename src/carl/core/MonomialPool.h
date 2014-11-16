@@ -3,8 +3,6 @@
  * @author Florian Corzilius <corzilius@cs.rwth-aachen.de>
  */
 
-//#define USE_MONOMIAL_POOL
-
 #pragma once
 
 #include "config.h"

@@ -168,7 +168,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 {
 	if( duplicates ) {
 #ifdef USE_MONOMIAL_POOL
-		std::size_t id = mTermAdditionManager.getId();
+		std::size_t id = mTermAdditionManager.getId(mTerms.size());
 		for (const auto& t: mTerms) mTermAdditionManager.addTerm(id, t);
 		mTermAdditionManager.readTerms(id, mTerms);
 #else
@@ -191,7 +191,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 {
 	if( duplicates ) {
 #ifdef USE_MONOMIAL_POOL
-		std::size_t id = mTermAdditionManager.getId();
+		std::size_t id = mTermAdditionManager.getId(mTerms.size());
 		for (const auto& t: mTerms) mTermAdditionManager.addTerm(id, t);
 		mTermAdditionManager.readTerms(id, mTerms);
 #else
@@ -471,13 +471,52 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term<Coeff>& factor, const MultivariatePolynomial<Coeff,Ordering,Policies> & p) {
+	assert(this->isConsistent());
+	assert(p.isConsistent());
+	if(mTerms.size() == 0)
+	{
+		*this = factor*p;
+        assert(this->isConsistent());
+	}
+	if(p.mTerms.size() == 0) return;
+	if(factor.coeff() == constant_zero<Coeff>::get()) return;
+
+#ifdef USE_MONOMIAL_POOL
+	std::size_t id = mTermAdditionManager.getId(mTerms.size() + p.mTerms.size());
+	for (const auto& term: mTerms) {
+		mTermAdditionManager.addTerm(id, term);
+	}
+	for (const auto& term: p.mTerms) {
+		auto c = - factor.coeff() * term->coeff();
+		auto m = factor.monomial() * term->monomial();
+		mTermAdditionManager.addTerm(id, std::make_shared<const TermType>(c, m));
+	}
+	mTermAdditionManager.readTerms(id, mTerms);
+#else
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + rhs.mTerms.size());
+	for (const auto& term: mTerms) {
+		mTermAdditionManager.addTerm(*this, id, term);
+	}
+	for (const auto& term: rhs.mTerms) {
+		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType(-*term)));
+	}
+	mTermAdditionManager.readTerms(*this, id, mTerms);
+#endif
+	mOrdered = false;
+	makeMinimallyOrdered();
+	assert(this->isConsistent());
+}
+
+
+template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Coeff& divisor) const
 {
 	MultivariatePolynomial<Coeff,Ordering,Policies> res;
 	res.mTerms.reserve(mTerms.size());
 	for (unsigned i = 0; i < mTerms.size(); i++) {
-		res.mTerms.emplace_back(res.mTerms[i]->divideBy(divisor));
+		res.mTerms.emplace_back(mTerms[i]->divideBy(divisor));
 	}
     assert(res.isConsistent());
 	return res;
@@ -488,17 +527,18 @@ template<typename C, EnableIf<is_field<C>>>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
 	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	MultivariatePolynomial p(*this);
+	MultivariatePolynomial res(*this);
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
-	while(!p.isZero())
+	std::size_t id = mTermAdditionManager.getId(res.mTerms.size());
+	while(!res.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = res.lterm()->divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
+			res.subtractProduct(*factor, divisor);
+			//p -= *factor * divisor;
 			mTermAdditionManager.addTerm(id, std::shared_ptr<TermType>(factor));
-			p -= *factor * divisor;
 		}
 		else
 		{
@@ -508,14 +548,14 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	mTermAdditionManager.readTerms(id, quotient.mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * divisor.nrTerms());
-	while(!p.isZero())
+	while(!res.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = res.lterm()->divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
 			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<TermType>(factor));
-			p -= *factor * divisor;
+			res -= *factor * divisor;
 		}
 		else
 		{
@@ -543,7 +583,8 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 		if(factor != nullptr)
 		{
 			result.quotient += *factor;
-			p -= *factor * divisor;
+			p.subtractProduct(*factor, divisor);
+			//p -= *factor * divisor;
 			delete factor;
 		}
 		else
@@ -573,14 +614,15 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	//static_assert(is_field<C>::value, "Division only defined for field coefficients");
 	MultivariatePolynomial p(*this);
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(p.mTerms.size());
 	while(!p.isZero())
 	{
 		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
-			p -= *factor * divisor;
+			//p -= *factor * divisor;
+			p.subtractProduct(*factor, divisor);
 			mTermAdditionManager.addTerm(id, std::shared_ptr<TermType>(factor));
 		}
 		else
@@ -648,7 +690,8 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 			// nullptr if lt(divisor) does not divide lt(p).
 			if(factor != nullptr)
 			{
-				p -= *factor * divisor;
+				p.subtractProduct(*factor, divisor);
+				//p -= *factor * divisor;
 				delete factor;
 				p.makeMinimallyOrdered();
 			}
@@ -744,7 +787,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	}
 	// Substitute the variable.
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(expectedResultSize);
 	for (const auto& term: mTerms)
 	{
 		if (term->monomial() == nullptr) {
@@ -955,9 +998,17 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
     static_assert(!std::is_same<SubstitutionType, Term<Coeff>>::value, "Terms are handled by a seperate method.");
     TermsType newTerms;
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+        Term<Coeff >* resultTerm = term->substitute(substitutions);
+        if( !resultTerm->isZero() )
+        {
+            mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
+        }
+        else
+        {
+            delete resultTerm;
+        }
 	}
 	mTermAdditionManager.readTerms(id, newTerms);
 #else
@@ -986,7 +1037,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 {
 	TermsType newTerms;
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
 	}
@@ -1237,7 +1288,7 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 
 template<typename Coeff, typename O, typename P>
 template<typename C, EnableIf<is_number<C>>>
-typename UnderlyingNumberType<C>::type MultivariatePolynomial<Coeff,O,P>::numericContent() const
+Coeff MultivariatePolynomial<Coeff,O,P>::numericContent() const
 {
 	if (this->isZero()) return 0;
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
@@ -1450,7 +1501,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 #endif
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.addTerm(id, term);
 	}
@@ -1530,7 +1581,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	} else {
 		// Full-blown addition.
 #ifdef USE_MONOMIAL_POOL
-		std::size_t id = mTermAdditionManager.getId();
+		std::size_t id = mTermAdditionManager.getId(mTerms.size()+1);
 		for (const auto& term: mTerms) {
 			mTermAdditionManager.addTerm(id, term);
 		}
@@ -1672,7 +1723,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if(rhs.mTerms.size() == 0) return *this;
 	
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.addTerm(id, term);
 	}
@@ -1810,7 +1861,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 		return *this;
 	}
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId();
+	std::size_t id = mTermAdditionManager.getId(mTerms.size() * rhs.mTerms.size());
 	TermType* newlterm = nullptr;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
