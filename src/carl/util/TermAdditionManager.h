@@ -28,7 +28,7 @@ class TermAdditionManager {
 public:
 	typedef Term<typename Polynomial::CoeffType> TermType;
 	typedef std::shared_ptr<const TermType> TermPtr;
-	typedef std::vector<std::size_t> TermIDs;
+	typedef std::vector<unsigned short> TermIDs;
 	typedef std::vector<TermPtr> Terms;
 private:
 	std::size_t mNextId;
