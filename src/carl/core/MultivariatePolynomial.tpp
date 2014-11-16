@@ -477,7 +477,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	MultivariatePolynomial<Coeff,Ordering,Policies> res;
 	res.mTerms.reserve(mTerms.size());
 	for (unsigned i = 0; i < mTerms.size(); i++) {
-		res.mTerms.emplace_back(res.mTerms[i]->divideBy(divisor));
+		res.mTerms.emplace_back(mTerms[i]->divideBy(divisor));
 	}
     assert(res.isConsistent());
 	return res;

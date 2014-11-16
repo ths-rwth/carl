@@ -471,7 +471,6 @@ namespace carl
 			newExps.insert(newExps.end(), itleft, lhs->end());
 		else if( itright != rhs->end() )
 			newExps.insert(newExps.end(), itright, rhs->end());
-                    std::cout << lhs << " * " << rhs << " = " << newExps << std::endl;
 #ifdef USE_MONOMIAL_POOL
 		std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + rhs->tdeg() );
 #else
