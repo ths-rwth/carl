@@ -1027,6 +1027,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	}
 	mTermAdditionManager.readTerms(*this, id, result.mTerms);
 #endif
+	result.mOrdered = false;
     result.makeMinimallyOrdered<false, true>();
 	assert(result.isConsistent());
 	return result;
@@ -1049,6 +1050,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 	}
 	mTermAdditionManager.readTerms(*this, id, result.mTerms);
 #endif
+	result.mOrdered = false;
 	result.makeMinimallyOrdered<false, true>();
 	assert(result.isConsistent());
 	return result;
