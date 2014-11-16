@@ -37,7 +37,7 @@ struct Conversion {
 };
 
 template<>
-CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
+inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
 	CMP<mpq_class> res;
 	for (auto t: p) {
 		res += Term<mpq_class>(ci->carl.toGMP(t->coeff()), t->monomial());
@@ -46,19 +46,19 @@ CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const CMP<cl
 }
 #ifdef COMPARE_WITH_GINAC
 template<>
-GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
+inline GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->ginac(m);
 }
 template<>
-GMP Conversion::convert<GMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
+inline GMP Conversion::convert<GMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
 	return ci->ginac(m);
 }
 template<>
-GVAR Conversion::convert<GiNaC::symbol, carl::Variable>(const carl::Variable& v, const CIPtr& ci) {
+inline GVAR Conversion::convert<GiNaC::symbol, carl::Variable>(const carl::Variable& v, const CIPtr& ci) {
 	return ci->ginac(v);
 }
 template<>
-GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
+inline GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->ginac(m);
 }
 #endif
@@ -82,7 +82,7 @@ ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
 #endif
 
 template<>
-unsigned Conversion::convert(const unsigned& n, const CIPtr&) {
+inline unsigned Conversion::convert(const unsigned& n, const CIPtr&) {
 	return n;
 }
 
