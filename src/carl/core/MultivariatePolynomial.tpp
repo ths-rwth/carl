@@ -476,7 +476,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 {
 	MultivariatePolynomial<Coeff,Ordering,Policies> res;
 	res.mTerms.reserve(mTerms.size());
-	for (unsigned i = 0; i < res.mTerms.size(); i++) {
+	for (unsigned i = 0; i < mTerms.size(); i++) {
 		res.mTerms.emplace_back(res.mTerms[i]->divideBy(divisor));
 	}
     assert(res.isConsistent());
@@ -812,6 +812,8 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
+    mOrdered = false;
+    makeMinimallyOrdered();
 	assert(mTerms.size() <= expectedResultSize);
 	assert(this->isConsistent());
 }
@@ -1241,8 +1243,8 @@ Coeff MultivariatePolynomial<Coeff,O,P>::numericContent() const
 	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		///@todo gcd needed for fractions
-		//res = carl::gcd(res, this->mTerms[i]->coeff());
-		assert(false);
+		res = carl::gcd(res, this->mTerms[i]->coeff());
+		//assert(false);
 	}
 	return res;
 }
