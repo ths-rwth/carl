@@ -79,7 +79,7 @@ public:
 			if (terms.at(monId) == nullptr) terms[monId] = term;
 			else {
 				auto coeff = terms.at(monId)->coeff() + term->coeff();
-				if (coeff == typename Polynomial::CoeffType(0)) {
+				if (isZero(coeff)) {
 					terms[monId] = nullptr;
 				} else {
 					terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
