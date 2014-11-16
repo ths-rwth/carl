@@ -55,6 +55,7 @@ public:
 		assert(mTerms.at(mNextId).empty());
 		assert(mUsed.at(mNextId) == false);
 		mTermIDs[mNextId].clear();
+		mTerms[mNextId].clear();
 		mTerms[mNextId].reserve(expectedSize);
 		mTerms[mNextId].emplace_back(nullptr);
 		mUsed[mNextId] = true;
@@ -70,7 +71,7 @@ public:
 		std::size_t monId = 0;
 		if (term->monomial()) monId = term->monomial()->id();
 		if (monId >= termIDs.size()) termIDs.resize(monId + 1);
-		if (termIDs.at(monId) == 0) {
+		if ((monId > 0) && (termIDs.at(monId) == 0)) {
 			termIDs[monId] = (unsigned short)terms.size();
 			terms.push_back(term);
 		} else {
@@ -90,8 +91,6 @@ public:
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(mUsed.at(id));
 		Terms& t = mTerms[id];
-		std::swap(*t.begin(), *t.rbegin());
-		t.pop_back();
 		for (auto i = t.begin(); i != t.end();) {
 			if (*i == nullptr) {
 				std::swap(*i, *t.rbegin());
