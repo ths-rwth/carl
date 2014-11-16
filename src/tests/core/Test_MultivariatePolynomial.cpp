@@ -3,7 +3,6 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/converter/OldGinacConverter.h"
 #include "carl/interval/Interval.h"
 #include <cln/cln.h>
 #include <gmpxx.h>
