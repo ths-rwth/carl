@@ -1000,7 +1000,15 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+        Term<Coeff >* resultTerm = term->substitute(substitutions);
+        if( !resultTerm->isZero() )
+        {
+            mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
+        }
+        else
+        {
+            delete resultTerm;
+        }
 	}
 	mTermAdditionManager.readTerms(id, newTerms);
 #else
