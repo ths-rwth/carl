@@ -71,7 +71,7 @@ public:
 		if (term->monomial()) monId = term->monomial()->id();
 		if (monId >= termIDs.size()) termIDs.resize(monId + 1);
 		if (termIDs.at(monId) == 0) {
-			termIDs[monId] = terms.size();
+			termIDs[monId] = (unsigned short)terms.size();
 			terms.push_back(term);
 		} else {
 			monId = termIDs.at(monId);
