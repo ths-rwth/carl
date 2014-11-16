@@ -1490,7 +1490,6 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if (rhs.mTerms.empty()) return *this;
 	std::shared_ptr<const TermType> newlterm;
 	std::shared_ptr<const TermType> oldrhs;
-	bool ltermFromRHS = false;
 	if (Term<Coeff>::monomialLess(rhs.lterm(), lterm())) {
 		newlterm = lterm();
 		mTerms.pop_back();
