@@ -1175,8 +1175,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(unsigned exp) const
 {
-	if (exp == 0) return MultivariatePolynomial((Coeff)1);
-	if (isZero()) return MultivariatePolynomial((Coeff)0);
+	if (exp == 0) return MultivariatePolynomial(constant_one<Coeff>::get());
+	if (isZero()) return MultivariatePolynomial(constant_zero<Coeff>::get());
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(constant_one<Coeff>::get());
 	MultivariatePolynomial<Coeff,Ordering,Policies> mult(*this);
 	while(exp > 0) {
