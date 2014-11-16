@@ -262,7 +262,7 @@ namespace carl
 		return ss.str();
 	}
 	
-	Monomial::Arg Monomial::gcd(const std::shared_ptr<const Monomial>& rhs, const std::shared_ptr<const Monomial>& lhs)
+	Monomial::Arg Monomial::gcd(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 	{
             if(!lhs && !rhs) return nullptr;
             if(!lhs) return rhs;
@@ -302,11 +302,7 @@ namespace carl
              // Insert remaining part
             std::shared_ptr<const Monomial> result;
             if (!newExps.empty()) {
-                #ifdef USE_MONOMIAL_POOL
-                std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
-                #else
-                result = std::make_shared<const Monomial>( std::move(newExps), expsum );
-                #endif
+				result = createMonomial(std::move(newExps), expsum);
             }
             LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
             return result;
