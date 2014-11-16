@@ -520,6 +520,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	for (unsigned i = 0; i < mTerms.size(); i++) {
 		res.mTerms.emplace_back(mTerms[i]->divideBy(divisor));
 	}
+	res.mOrdered = this->mOrdered;
     assert(res.isConsistent());
 	return res;
 }
