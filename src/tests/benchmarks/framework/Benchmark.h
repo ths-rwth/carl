@@ -15,6 +15,7 @@
 
 #include "../config.h"
 #include "carl/core/carlLogging.h"
+#include "carl/util/Timer.h"
 #include "carl/core/MultivariatePolynomial.h"
 
 #include "BenchmarkConversions.h"
@@ -37,7 +38,7 @@ public:
 		std::cout << "Generating " << bi.n << " examples ... ";
 		std::cout.flush();
 		Generator g(bi);
-		carl::logging::Timer timer;
+		carl::Timer timer;
 		for (std::size_t i = 0; i < bi.n; i++) {
 			samples.emplace_back(g());
 		}
@@ -66,7 +67,7 @@ public:
 		Converter conv(bg.getCI());
 		//std::cout << "Converting ... ";
 		//std::cout.flush();
-		carl::logging::Timer timer;
+		carl::Timer timer;
 		for (auto it: bg) {	
 			samples.emplace_back(conv(it));
 		}
@@ -134,7 +135,7 @@ public:
 	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi), name(name) {
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
-		carl::logging::Timer timer;
+		carl::Timer timer;
 		for (auto cur: reference) {
 			results.emplace_back(executor(cur));
 		}
@@ -148,7 +149,7 @@ public:
 		BenchmarkConverter<Converter> benchmarks(reference);
 		std::cout << "Comparing " << name << " ... ";
 		std::cout.flush();
-		carl::logging::Timer timer;
+		carl::Timer timer;
 		for (auto cur: benchmarks) {
 			res.emplace_back(executor(cur));
 		}
