@@ -432,7 +432,7 @@ public:
 	VariablesInformation<gatherCoeff, MultivariatePolynomial> getVarInfo() const;
 	
 	template<typename C=Coeff, EnableIf<is_number<C>> = dummy>
-	typename UnderlyingNumberType<C>::type numericContent() const;
+	Coeff numericContent() const;
 	template<typename C=Coeff, DisableIf<is_number<C>> = dummy>
 	typename UnderlyingNumberType<C>::type numericContent() const;
 	
