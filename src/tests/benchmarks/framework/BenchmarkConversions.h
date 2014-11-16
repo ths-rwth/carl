@@ -44,6 +44,14 @@ inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const
 	}
 	return res;
 }
+template<>
+inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
+	CMP<rational> res;
+	for (auto t: p) {
+		res += Term<rational>(ci->carl.toZ3Rational(t->coeff()), t->monomial());
+	}
+	return res;
+}
 #ifdef COMPARE_WITH_GINAC
 template<>
 inline GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
@@ -72,7 +80,15 @@ ZMP Conversion::convert<ZMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPt
 	return ci->z3(m);
 }
 template<>
+ZMP Conversion::convert<ZMP, CMP<rational>>(const CMP<rational>& m, const CIPtr& ci) {
+	return ci->z3(m);
+}
+template<>
 ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
+	return ci->z3(m);
+}
+template<>
+ZMP Conversion::convert<ZMP, CUMP<rational>>(const CUMP<rational>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
 template<>
