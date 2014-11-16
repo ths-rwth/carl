@@ -43,7 +43,7 @@ public:
 	/// integers: [0, ...]
 	template<typename T>
 	T geomDist() const {
-		return geom(rand) + 1;
+		return T(geom(rand)) + T(1);
 	}
     
 	/// integers: [0, ..., mod-1]
