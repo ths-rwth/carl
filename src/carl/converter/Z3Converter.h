@@ -7,13 +7,8 @@
 #ifdef COMPARE_WITH_Z3
 #include <utility>
 
-// Prevent Z3 from using openmp
-#define _NO_OMP_
-#define uint64 unsigned long
-typedef unsigned digit_t;
+#include "../numbers/adaption_z3/z3_include.h"
 
-#include <z3/src/math/polynomial/polynomial.h>
-#include <z3/src/util/mpz.h>
 
 #include "carl/numbers/numbers.h"
 #include "carl/core/Variable.h"
@@ -41,6 +36,9 @@ public:
 	/**
 	 * Converts a number.
      */
+	rational operator()(const rational& n) {
+		return n;
+	}
 	rational operator()(const cln::cl_RA& n) {
 		std::stringstream ss1;
 		ss1 << carl::getDenom(n);

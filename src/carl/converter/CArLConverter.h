@@ -18,6 +18,23 @@ public:
 		mpz_class num(ss2.str());
 		return carl::quotient(num, denom);
 	}
+	mpz toZ3MPZ(const cln::cl_I& n) {
+		mpz res;
+		std::stringstream ss;
+		ss << n;
+		mpzmanager().set(res, ss.str().c_str());
+		return res;
+	}
+	mpq toZ3MPQ(const cln::cl_RA& n) {
+		mpz num = toZ3MPZ(getNum(n));
+		mpz den = toZ3MPZ(getDenom(n));
+		mpq res;
+		mpqmanager().set(res, num, den);
+		return res;
+	}
+	rational toZ3Rational(const cln::cl_RA& n) {
+		return rational(toZ3MPQ(n));
+	}
 };
 
 }
