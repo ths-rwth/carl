@@ -527,6 +527,7 @@ template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::squareFreePart() const {
 	if (this->isZero()) return *this;
+	if (this->isLinearInMainVar()) return *this;
 	UnivariatePolynomial normalized = this->coprimeCoefficients().template convert<Coeff>();
 	return normalized.divideBy(UnivariatePolynomial::gcd(normalized, normalized.derivative())).quotient;
 }
