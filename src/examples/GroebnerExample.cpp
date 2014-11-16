@@ -5,7 +5,7 @@
 #include "carl/groebner/benchmarks/katsura.h"
 #include "carl/groebner/benchmarks/cyclic.h"
 #include "carl/core/MultivariatePolynomial.h"
-
+#include "carl/util/Timer.h"
 
 using namespace carl;
 const static int MAX_KATSURA = 5;
@@ -89,23 +89,23 @@ int execute(std::ostream& os = std::cout)
             os << "\tProcedure: " << pCount << "/" << procedures.size() << std::endl;
             os << "\t\t Adding .. \n";
             os.flush();
-            //carl::logging::Timer timer;
+            carl::Timer timer;
             for(const auto& pol : b.polynomials)
             {
-                //std::cout << pol << std::endl;
+                std::cout << pol << std::endl;
                 p->addPolynomial(pol);
             }
-            //os << timer << std::endl;
+            os << timer << std::endl;
             os << "\t\t Reducing .. \n";
             os.flush();
-            //timer.reset();
+            timer.reset();
             p->reduceInput();
-            //os << timer << std::endl;
+            os << timer << std::endl;
             os << "\t\t Calculating .. \n";
             os.flush();
-            //timer.reset();
+            timer.reset();
             p->calculate();
-            //os << timer << std::endl;
+            os << timer << std::endl;
             os << "\t\t Done .. \n";
         }
     }
