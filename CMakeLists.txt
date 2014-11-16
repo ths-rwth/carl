@@ -48,6 +48,7 @@ option( COMPARE_WITH_Z3 "Compile with testing with the runtime and result compar
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( USE_MONOMIAL_POOL "Use monomial pool" OFF )
+option( PRUNE_MONOMIAL_POOL "Prune monomial pool" OFF )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -105,7 +106,7 @@ endif()
 if(DEVELOPER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wno-deprecated-declarations")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
-	#set(CMAKE_BUILD_TYPE "DEBUG")
+	set(CMAKE_BUILD_TYPE "DEBUG")
 endif()
 
 message("-- CXX Flags: ${CMAKE_CXX_FLAGS}")
