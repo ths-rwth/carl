@@ -105,7 +105,7 @@ Policies()
 		if (exp == 0) {
 			for (const auto& term: c) mTermAdditionManager.addTerm(id, term);
 		} else {
-			for (const auto& term: c * Term<Coeff>(1, p.mainVar(), exp)) {
+			for (const auto& term: c * Term<Coeff>(constant_one<Coeff>::get(), p.mainVar(), exp)) {
 				mTermAdditionManager.addTerm(id, term);
 			}
 		}
