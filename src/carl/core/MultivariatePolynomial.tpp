@@ -494,12 +494,14 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 #else
-	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + rhs.mTerms.size());
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + p.mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.addTerm(*this, id, term);
 	}
-	for (const auto& term: rhs.mTerms) {
-		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType(-*term)));
+	for (const auto& term: p.mTerms) {
+		auto c = - factor.coeff() * term->coeff();
+		auto m = factor.monomial() * term->monomial();
+		mTermAdditionManager.addTerm(*this, id, std::make_shared<const TermType>(c, m));
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
