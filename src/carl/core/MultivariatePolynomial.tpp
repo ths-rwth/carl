@@ -471,6 +471,45 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() cons
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term<Coeff>& factor, const MultivariatePolynomial<Coeff,Ordering,Policies> & p) {
+	assert(this->isConsistent());
+	assert(p.isConsistent());
+	if(mTerms.size() == 0)
+	{
+		*this = factor*p;
+        assert(this->isConsistent());
+	}
+	if(p.mTerms.size() == 0) return;
+	if(factor.coeff() == constant_zero<Coeff>::get()) return;
+
+#ifdef USE_MONOMIAL_POOL
+	std::size_t id = mTermAdditionManager.getId(mTerms.size() + p.mTerms.size());
+	for (const auto& term: mTerms) {
+		mTermAdditionManager.addTerm(id, term);
+	}
+	for (const auto& term: p.mTerms) {
+		auto c = - factor.coeff() * term->coeff();
+		auto m = factor.monomial() * term->monomial();
+		mTermAdditionManager.addTerm(id, std::make_shared<const TermType>(c, m));
+	}
+	mTermAdditionManager.readTerms(id, mTerms);
+#else
+	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + rhs.mTerms.size());
+	for (const auto& term: mTerms) {
+		mTermAdditionManager.addTerm(*this, id, term);
+	}
+	for (const auto& term: rhs.mTerms) {
+		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType(-*term)));
+	}
+	mTermAdditionManager.readTerms(*this, id, mTerms);
+#endif
+	mOrdered = false;
+	makeMinimallyOrdered();
+	assert(this->isConsistent());
+}
+
+
+template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Coeff& divisor) const
 {
@@ -488,17 +527,18 @@ template<typename C, EnableIf<is_field<C>>>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const MultivariatePolynomial<Coeff,Ordering,Policies>& divisor, MultivariatePolynomial<Coeff,Ordering,Policies>& quotient) const
 {
 	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	MultivariatePolynomial p(*this);
+	MultivariatePolynomial res(*this);
 #ifdef USE_MONOMIAL_POOL
-	std::size_t id = mTermAdditionManager.getId(p.mTerms.size());
-	while(!p.isZero())
+	std::size_t id = mTermAdditionManager.getId(res.mTerms.size());
+	while(!res.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = res.lterm()->divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
+			res.subtractProduct(*factor, divisor);
+			//p -= *factor * divisor;
 			mTermAdditionManager.addTerm(id, std::shared_ptr<TermType>(factor));
-			p -= *factor * divisor;
 		}
 		else
 		{
@@ -508,14 +548,14 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	mTermAdditionManager.readTerms(id, quotient.mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * divisor.nrTerms());
-	while(!p.isZero())
+	while(!res.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = res.lterm()->divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
 			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<TermType>(factor));
-			p -= *factor * divisor;
+			res -= *factor * divisor;
 		}
 		else
 		{
@@ -543,7 +583,8 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 		if(factor != nullptr)
 		{
 			result.quotient += *factor;
-			p -= *factor * divisor;
+			p.subtractProduct(*factor, divisor);
+			//p -= *factor * divisor;
 			delete factor;
 		}
 		else
@@ -580,7 +621,8 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
-			p -= *factor * divisor;
+			//p -= *factor * divisor;
+			p.subtractProduct(*factor, divisor);
 			mTermAdditionManager.addTerm(id, std::shared_ptr<TermType>(factor));
 		}
 		else
@@ -648,7 +690,8 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 			// nullptr if lt(divisor) does not divide lt(p).
 			if(factor != nullptr)
 			{
-				p -= *factor * divisor;
+				p.subtractProduct(*factor, divisor);
+				//p -= *factor * divisor;
 				delete factor;
 				p.makeMinimallyOrdered();
 			}
