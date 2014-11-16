@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../core/logging.h"
+#include "../util/Timer.h"
 
 namespace carl {
 namespace cad {
@@ -17,7 +18,7 @@ namespace cad {
  */
 class DotGenerator: public carl::Singleton<DotGenerator> {
 	struct DotFormatter: public carl::logging::Formatter {
-		virtual void prefix(std::ostream&, const carl::logging::Timer&, const std::string&, carl::logging::LogLevel, const carl::logging::RecordInfo&) {
+		virtual void prefix(std::ostream&, const carl::Timer&, const std::string&, carl::logging::LogLevel, const carl::logging::RecordInfo&) {
 		}
 	};
 	struct DotSink : public carl::logging::FileSink {
