@@ -83,7 +83,7 @@ public:
 				if (terms[monId] == nullptr) terms[monId] = term;
 				else {
 					auto coeff = terms[monId]->coeff() + term->coeff();
-					if (isZero(coeff)) {
+					if (carl::isZero(coeff)) {
 						terms[monId] = nullptr;
 					} else {
 						terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
@@ -99,7 +99,7 @@ public:
 		assert(mUsed.at(id));
 		Terms& t = mTerms[id];
 		t[0] = std::make_shared<const TermType>(mConstant[id], nullptr);
-		for (auto i = t.begin(); i != t.end();) {
+		for (auto i = t.begin()+1; i != t.end();) {
 			if (*i == nullptr) {
 				std::swap(*i, *t.rbegin());
 				t.pop_back();
