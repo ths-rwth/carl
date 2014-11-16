@@ -1,7 +1,7 @@
 #include <gmpxx.h>
 #include "gtest/gtest.h"
 #include "carl/io/CodeWriter.h"
-#include "carl/core/Monomial.h"
+#include "carl/core/MultivariatePolynomial.h"
 
 #include <fstream>
 
@@ -10,41 +10,64 @@ using namespace carl;
 TEST(CodeWriter, Basic)
 {
 		
-    carl::GeneratorWriter<Monomial::Arg, Monomial::Arg> gw("TestAdditionGenerator");
+    carl::GeneratorWriter<carl::MultivariatePolynomial<cln::cl_RA>, carl::MultivariatePolynomial<cln::cl_RA>> gw("TestAdditionGenerator");
 	
-	carl::Variable v1(1);
-	carl::Variable v2(2);
-	carl::Variable v3(3);
-	gw.addCall(v1*v2, v2*v3);
-	gw.addCall(v2*v2, v2*v1);
-	gw.addCall(v3*v2, v2*v2);
+	carl::Variable x(1);
+	carl::Variable y(2);
+	carl::Variable z(3);
+	
+	carl::MultivariatePolynomial<cln::cl_RA> p1({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
+	carl::MultivariatePolynomial<cln::cl_RA> p2({(cln::cl_RA)1*x, (cln::cl_RA)-1*y*z, (cln::cl_RA)3*x*z*z});
+	carl::MultivariatePolynomial<cln::cl_RA> p3({(cln::cl_RA)1*z, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*y*x*x});
+	
+	
+	gw.addCall(p1*p2, p2*p3);
+	gw.addCall(p2*p2, p2*p1);
+	gw.addCall(p3*p2, p2*p2);
 	
 	std::ofstream out("test.cpp");
-	out << "#include \"Benchmark.h\"" << std::endl;
+	out << "\
+#include <utility>\n\
+#include <memory>\n\
+#include \"gtest/gtest.h\"\n\
+#include \"BenchmarkTest.h\"\n\
+#include \"carl/core/Monomial.h\"\n\
+#include \"framework/Benchmark.h\"\n\
+#include \"framework/BenchmarkGenerator.h\"\n\
+#include \"framework/Common.h\"\n";
+	out << "\
+using carl::Variable;\n\
+using carl::exponent;\n\
+using carl::Monomial;\n";
 	out << gw << std::endl;
 	out << "\
-struct TestAdditionExecutor {\
-	template<typename Coeff>\
-	CUMP<Coeff> operator()(const std::tuple<CUMP<Coeff>,CUMP<Coeff>>& args) {\
-		return std::get<0>(args) + std::get<1>(args);\
-	}\
-	GMP operator()(const std::tuple<GMP,GMP,GVAR>& args) {\
-		return GiNaC::expand(std::get<0>(args) + std::get<1>(args));\
-	}\
-	ZMP operator()(const std::tuple<ZMP,ZMP,ZVAR>& args) {\
-		return std::get<0>(args) + std::get<1>(args);\
-	}\
-};" << std::endl;
-	out << "\
-TEST_F(BenchmarkTest, Addition)\
-{\
-	BenchmarkInformation bi(BenchmarkSelection::Random, 6);\
-	bi.n = TestAdditionGenerator::size;\
-	Benchmark<TestAdditionGenerator, TestAdditionExecutor, CMP<Coeff>> bench(bi, \"CArL\");\
-	bench.compare<GMP, TupleConverter<GMP,GMP>>(\"GiNaC\");\
-	bench.compare<ZMP, TupleConverter<ZMP,ZMP>>(\"Z3\");\
+struct TestAdditionExecutor {\n\
+	\ttemplate<typename Coeff>\n\
+	\tcarl::CMP<Coeff> operator()(const std::tuple<carl::CMP<Coeff>,carl::CMP<Coeff>>& args) {\n\
+		\t\treturn std::get<0>(args) + std::get<1>(args);\n\
+	\t}\n\
+	\tcarl::GMP operator()(const std::tuple<carl::GMP,carl::GMP>& args) {\n\
+		\t\treturn GiNaC::expand(std::get<0>(args) + std::get<1>(args));\n\
+	\t}\n\
+	\t#ifdef COMPARE_WITH_Z3 \n\
+	\tcarl::ZMP operator()(const std::tuple<carl::ZMP,carl::ZMP>& args) {\n\
+		\t\treturn std::get<0>(args) + std::get<1>(args);\n\
+	\t}\n\
+	\t#endif\n\
+};" << std::endl<<std::endl;
+	out << "using carl::BenchmarkTest;\n\
+TEST_F(BenchmarkTest, Addition)\n\
+{\n\
+	\tcarl::BenchmarkInformation bi(carl::BenchmarkSelection::Random, 6);\n\
+	\tbi.n = TestAdditionGenerator<Coeff>::size;\n\
+	\tcarl::Benchmark<TestAdditionGenerator<Coeff>, TestAdditionExecutor, carl::CMP<Coeff>> bench(bi, \"CArL\");\n\
+	\tbench.compare<carl::GMP, carl::TupleConverter<carl::GMP,carl::GMP>>(\"GiNaC\");\n\
+	\t#ifdef COMPARE_WITH_Z3\n\
+	\tbench.compare<carl::ZMP, carl::TupleConverter<carl::ZMP,carl::ZMP>>(\"Z3\");\n\
+	\t#endif\n\
 }\
 " << std::endl;
 }
 	
 
+	
