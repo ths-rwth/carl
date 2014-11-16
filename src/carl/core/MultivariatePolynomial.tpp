@@ -1543,6 +1543,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const std::shared_ptr<const TermType>& rhs)
 {
+	assert(this->isConsistent());
 	if(rhs->coeff() == constant_zero<Coeff>::get()) return *this;
 	if (mTerms.size() == 0) {
 		// Empty -> just insert.
@@ -2040,7 +2041,7 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered() c
 	}
 	else
 	{
-		if (mTerms.size() < 3) return;
+		if (mTerms.size() < 2) return;
 		auto it = mTerms.begin();
 		const auto itToLast = mTerms.end() - 1;
 		auto lTerm = it;
