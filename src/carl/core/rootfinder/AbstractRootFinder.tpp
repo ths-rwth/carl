@@ -36,7 +36,10 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 	if (this->polynomial.zeroIsRoot()) {
 		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
 	}
-	if (this->polynomial.isZero()) return;
+	if (this->polynomial.isZero()) {
+		this->setFinished();
+		return;
+	}
 	if (tryTrivialSolver && this->solveTrivial()) {
 		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
 		this->setFinished();
