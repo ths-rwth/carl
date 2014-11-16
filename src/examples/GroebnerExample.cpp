@@ -38,7 +38,7 @@ struct ExecuteBenchmarks {
     {
         std::vector<GbBenchmark<C, O, P>> res;
         bool verbose = true;
-        for(int index = 2; index <= MAX_KATSURA; index++)
+        for(unsigned index = 2; index <= MAX_KATSURA; index++)
         {
             std::stringstream name;
             name << " Katsura " << index;
@@ -51,7 +51,7 @@ struct ExecuteBenchmarks {
 
         }
 
-        for(int index = 2; index <= MAX_CYCLIC; index++)
+        for(unsigned index = 2; index <= MAX_CYCLIC; index++)
         {
              std::stringstream name;
             name << " Cyclic " << index;
