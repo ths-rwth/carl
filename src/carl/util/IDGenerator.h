@@ -30,15 +30,20 @@ public:
 	}
 
 	void free(std::size_t id) {
+		assert(id > 0);
 		if (id == mNext-1) {
 			mNext--;
-			while (mFree.top() == mNext-1) {
+			while (!mFree.empty()) {
+				if (mFree.top() != mNext-1) break;
 				mNext--;
 				mFree.pop();
 			}
 		} else {
 			mFree.push(id);
 		}
+	}
+	std::size_t nextID() const {
+		return mNext;
 	}
 };
 
@@ -62,6 +67,9 @@ public:
 
 	void free(std::size_t id) {
 		mFree.push(id);
+	}
+	std::size_t nextID() const {
+		return mNext;
 	}
 };
 
