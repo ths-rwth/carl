@@ -218,6 +218,9 @@ TEST_F(BenchmarkTest, ReleaseCheck)
 #ifndef NDEBUG
 	std::cout << "Warning: You have compiled in DEBUG mode." << std::endl;
 #endif
+#ifdef LOGGING
+	std::cout << "Warning: You have compiled with LOGGING enabled." << std::endl;
+#endif
 }
 
 TEST_F(BenchmarkTest, Addition)
