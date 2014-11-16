@@ -2,6 +2,7 @@
 
 #include "framework/Benchmark.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include "BenchmarkTest.h"
 
 using namespace carl;
 
@@ -210,32 +211,7 @@ namespace carl {
 
 typedef cln::cl_RA Coeff;
 
-class BenchmarkTest : public ::testing::Test {
-protected:
-    
-	BenchmarkTest(): file({
-        "CArL" 
-        #ifdef COMPARE_WITH_GINAC
-        ,"GiNaC"
-        #endif
-        #ifdef COMPARE_WITH_Z3
-        ,"Z3"
-        #endif
-    }) {
-	}
-	~BenchmarkTest() {
-		auto info = ::testing::UnitTest::GetInstance()->current_test_info();
-		std::stringstream ss;
-		ss << "benchmark_" << info->name() << ".tex";
-		std::ofstream out(ss.str(), std::ios_base::out);
-		out << file;
-	}
-	virtual void SetUp() {
-	}
-	virtual void TearDown() {
-	}
-	BenchmarkFile<std::size_t> file;
-};
+
 
 TEST_F(BenchmarkTest, ReleaseCheck)
 {
