@@ -1696,6 +1696,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 		const SubresultantStrategy strategy
 ) const {
 	assert(p.mainVar() == this->mainVar());
+	if (this->isZero()) return UnivariatePolynomial(this->mainVar());
+	if (p.isZero()) return UnivariatePolynomial(this->mainVar());
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
 	LOGMSG_TRACE("carl.core.resultant", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
