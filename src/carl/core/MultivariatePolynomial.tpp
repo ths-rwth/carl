@@ -1400,6 +1400,9 @@ bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, cons
 
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	if (lhs.isZero() && rhs.isZero()) return false;
+	if (lhs.isZero()) return true;
+	if (rhs.isZero()) return false;
 	if (lhs.totalDegree() != rhs.totalDegree()) return lhs.totalDegree() < rhs.totalDegree();
 	if (lhs.totalDegree() == 0) return lhs.constantPart() < rhs.constantPart();
 	if (*lhs.lterm() < *rhs.lterm()) return true;
