@@ -48,7 +48,7 @@ public:
 			if (mNextId == mTerms.size()) {
 				mTermIDs.emplace_back();
 				mTerms.emplace_back();
-				mUsed.emplace_back(false);
+				mUsed.push_back(false);
 			}
 		}
 		assert(mTermIDs.at(mNextId).empty());
