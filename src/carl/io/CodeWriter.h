@@ -34,7 +34,7 @@ std::string typeString() {
 
 struct ConstructorPrinter {
 	void operator()(std::ostream& os, const cln::cl_RA& n) {
-		os << "(cln::cl_RA)(" << carl::getDenom(n) << ")";
+		os << "(cln::cl_RA)(" << carl::getNum(n) << ")";
 		os << "/";
 		os << "(cln::cl_RA)(" << carl::getDenom(n) << ")";
 	}
@@ -70,7 +70,7 @@ struct ConstructorPrinter {
 		for (const auto& t: p) {
 			if (!first) os << ", ";
 			first = false;
-			(*this)(os, t);
+			(*this)(os, *t);
 		}
 		os << "})";
 	}
@@ -145,15 +145,15 @@ public:
 
 	template<typename TL, typename TR>
 	friend std::ostream& operator<<(std::ostream& os, const GeneratorWriter<TL,TR>& gw) {
-		os << "template<typename C>>" << std::endl;
-		os << "struct " << gw.mClassname << ": public BaseGenerator {" << std::endl;
+		os << "template<typename C>" << std::endl;
+		os << "struct " << gw.mClassname << ": public carl::BaseGenerator {" << std::endl;
 		os << "\ttypedef std::tuple<" << typeString<TL>() << "," << typeString<TR>() << "> type;" << std::endl;
-		os << "\tstatic std::size size = " << gw.calls.size() << ";" << std::endl;
+		os << "\tstatic const std::size_t size = " << gw.calls.size() << ";" << std::endl;
 		gw.printMember(os);
-		os << "\t" << gw.mClassname << "(const BenchmarkInformation& bi): BaseGenerator(bi) {" << std::endl;
+		os << "\t" << gw.mClassname << "(const carl::BenchmarkInformation& bi): BaseGenerator(bi) {" << std::endl;
 		gw.printInitialization(os);
 		os << "\t}" << std::endl;
-		os << "\ttype operator()() const {" << std::endl;
+		os << "\ttype operator()() {" << std::endl;
 		gw.printGeneration(os);
 		os << "\t}" << std::endl;
 		os << "};" << std::endl;
