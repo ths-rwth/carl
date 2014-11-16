@@ -30,6 +30,9 @@ namespace carl{
 				Monomial::Content content;
 				mutable std::weak_ptr<const Monomial> monomial;
 				PoolEntry(std::size_t h, const Monomial::Content& c, const Monomial::Arg& m): hash(h), content(c), monomial(m) {}
+				PoolEntry(std::size_t h, const Monomial::Content& c): hash(h), content(c) {
+					assert(monomial.expired());
+				}
 				PoolEntry(std::size_t h, Monomial::Content&& c): hash(h), content(std::move(c)) {
 					assert(monomial.expired());
 				}
@@ -52,7 +55,7 @@ namespace carl{
 				bool operator()(const PoolEntry& p1, const PoolEntry& p2) const {
 					if (p1.hash != p2.hash) return false;
 #ifdef PRUNE_MONOMIAL_POOL
-					if (!p1.monomial.expired() && !p2.monomial.expired()) {
+					if (p1.monomial.lock() && p2.monomial.lock()) {
 						return p1.monomial.lock() == p2.monomial.lock();
 					}
 #else
@@ -109,17 +112,22 @@ namespace carl{
 
 #ifdef PRUNE_MONOMIAL_POOL
 			void free(const Monomial* m) {
+				if (m == nullptr) return;
 				if (m->id() == 0) return;
-				PoolEntry pe(m->mHash, m->mExponents, nullptr);
+				PoolEntry pe(m->mHash, m->mExponents);
 				auto it = mPool.find(pe);
 				if (it != mPool.end()) {
-					if (!it->monomial.expired()) {
-						mIDs.free(it->monomial.lock()->id());
-					}
+					mIDs.free(m->id());
 					mPool.erase(it);
 				}
 			}
 #endif
+			std::size_t size() const {
+				return mPool.size();
+			}
+			std::size_t nextID() const {
+				return mIDs.nextID();
+			}
 	};
 } // end namespace carl
 
