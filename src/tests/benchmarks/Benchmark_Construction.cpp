@@ -228,7 +228,7 @@ TEST_F(BenchmarkTest, Addition)
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
 	for (bi.degree = 15; bi.degree < 20; bi.degree++) {
-		Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
+                Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
 		//bench.compare<CMP<mpq_class>, TupleConverter<CMP<mpq_class>,CMP<mpq_class>>>("CArL GMP");
         #ifdef COMPARE_WITH_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
