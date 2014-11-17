@@ -1542,7 +1542,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 #endif
 	if (newlterm != nullptr) {
 		mTerms.push_back(newlterm);
-		if (oldrhs != nullptr) rhs.mTerms.push_back(newlterm);
+		if (oldrhs != nullptr) rhs.mTerms.push_back(oldrhs);
 	} else {
 		makeMinimallyOrdered<false,true>();
 	}
@@ -1982,7 +1982,7 @@ const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator/=(const Coeff& c)
 {
-	assert(!isZero(c));
+	assert(!carl::isZero(c));
 	if (carl::isOne(c)) return *this;
 	for (auto& term : mTerms) {
 		///@todo add /=(Coefficient) for Term.
