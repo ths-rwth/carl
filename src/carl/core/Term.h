@@ -71,9 +71,14 @@ class Term
 		{
 			return mCoeff;
 		}
-		bool addToCoeff(const Coefficient& c) {
-			mCoeff += c;
-			return mCoeff != Coefficient(0);
+		void setCoeff(Coefficient&& c) {
+			mCoeff = c;
+			assert(!carl::isZero(mCoeff));
+		}
+		template<typename Coeff>
+		static void setCoeff(const std::shared_ptr<const Term<Coeff>>& s, Coeff&& c) {
+			assert(s.unique());
+			const_cast<Term<Coeff>*>(s.get())->setCoeff(std::move(c));
 		}
 		
 		/**
