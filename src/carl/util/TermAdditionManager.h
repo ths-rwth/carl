@@ -36,7 +36,7 @@ public:
 	typedef std::shared_ptr<const TermType> TermPtr;
 	typedef std::vector<IDType> TermIDs;
 	typedef std::vector<TermPtr> Terms;
-	typedef std::tuple<TermIDs,Terms,bool,Coeff> Tuple;
+	typedef std::tuple<TermIDs,Terms,bool,Coeff,IDType> Tuple;
 private:
 	std::size_t mNextId;
 	std::vector<Tuple> mData;
@@ -45,25 +45,25 @@ public:
 	TermAdditionManager(): mNextId(0)
 	{
 		mData.emplace_back();
+		std::get<4>(mData.back()) = 1;
 	}
 	
 	std::size_t getId(std::size_t expectedSize = 0) {
-		std::lock_guard<std::mutex> lock(mMutex);
+		//std::lock_guard<std::mutex> lock(mMutex);
 		while (std::get<2>(mData[mNextId])) {
 			mNextId++;
 			if (mNextId == mData.size()) {
 				mData.emplace_back();
+				std::get<4>(mData.back()) = 1;
 			}
 		}
-		assert(std::get<0>(mData.at(mNextId)).empty());
-		assert(std::get<1>(mData.at(mNextId)).empty());
-		assert(std::get<2>(mData.at(mNextId)) == false);
-		assert(carl::isZero(std::get<3>(mData.at(mNextId))));
-		std::get<0>(mData[mNextId]).reserve(MonomialPool::getInstance().nextID());
-		std::get<1>(mData[mNextId]).reserve(expectedSize);
-		std::get<1>(mData[mNextId]).emplace_back(nullptr);
+		memset(&std::get<0>(mData[mNextId])[0], 0, sizeof(IDType)*std::get<0>(mData[mNextId]).size());
+		std::get<0>(mData[mNextId]).resize(MonomialPool::getInstance().nextID());
+		std::get<1>(mData[mNextId]).clear();
+		std::get<1>(mData[mNextId]).resize(expectedSize);
 		std::get<2>(mData[mNextId]) = true;
 		std::get<3>(mData[mNextId]) = constant_zero<Coeff>::get();
+		std::get<4>(mData[mNextId]) = 1;
 		std::size_t result = mNextId;
 		mNextId = (mNextId + 1) % mData.size();
 		return result;
@@ -78,8 +78,12 @@ public:
 			if (monId >= termIDs.size()) termIDs.resize(monId + 1);
 
 			if (termIDs[monId] == 0) {
-				termIDs[monId] = (IDType)terms.size();
-				terms.push_back(term);
+				IDType nextID = std::get<4>(mData[id]);
+				if (nextID >= terms.size()) terms.resize(nextID + 1);
+				assert(nextID < terms.size());
+				termIDs[monId] = nextID;
+				terms[nextID] = term;
+				std::get<4>(mData[id])++;
 			} else {
 				monId = termIDs[monId];
 				if (terms[monId] == nullptr) terms[monId] = term;
@@ -112,12 +116,8 @@ public:
 			} else i++;
 		}
 		std::swap(t, terms);
-		std::lock_guard<std::mutex> lock(mMutex);
-		memset(&std::get<0>(mData[id])[0], 0, sizeof(IDType)*std::get<0>(mData[id]).size());
-		std::get<0>(mData[id]).clear();
-		std::get<1>(mData[id]).clear();
+		//std::lock_guard<std::mutex> lock(mMutex);
 		std::get<2>(mData[id]) = false;
-		std::get<3>(mData[id]) = constant_zero<Coeff>::get();
 	}
 };
 
