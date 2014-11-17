@@ -139,7 +139,7 @@ private:
 		std::cout.flush();
 		carl::Timer timer;
 		for (const auto& cur: reference) {
-			results.emplace_back(executor(cur));
+			results.emplace_back(std::move(executor(cur)));
 		}
 		unsigned time = timer.passed();
 		runtimes[name] = time;
@@ -157,8 +157,8 @@ public:
 		std::cout << "Comparing " << name << " ... ";
 		std::cout.flush();
 		carl::Timer timer;
-		for (auto cur: benchmarks) {
-			res.emplace_back(executor(cur));
+		for (const auto& cur: benchmarks) {
+			res.emplace_back(std::move(executor(cur)));
 		}
 		unsigned time = timer.passed();
 		runtimes[name] = time;
