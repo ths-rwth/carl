@@ -2,7 +2,7 @@
  * @file z3_include.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
-
+#ifdef COMPARE_WITH_Z3
 #pragma once
 
 // Prevent Z3 from using openmp
@@ -13,3 +13,5 @@ typedef unsigned digit_t;
 #include <z3/src/util/mpz.h>
 #include <z3/src/util/mpq.h>
 #include <z3/src/math/polynomial/polynomial.h>
+
+#endif
