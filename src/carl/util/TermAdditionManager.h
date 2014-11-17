@@ -70,7 +70,7 @@ public:
 	}
 
 	void addTerm(std::size_t id, const TermPtr& term) {
-		assert(mUsed[id]);
+		assert(std::get<2>(mData[id]));
 		TermIDs& termIDs = std::get<0>(mData[id]);
 		Terms& terms = std::get<1>(mData[id]);
 		if (term->monomial()) {
@@ -100,7 +100,7 @@ public:
 	}
 	
 	void readTerms(std::size_t id, Terms& terms) {
-		assert(mUsed.at(id));
+		assert(std::get<2>(mData[id]));
 		Terms& t = std::get<1>(mData[id]);
 		if (!isZero(std::get<3>(mData[id])))	{
 			t[0] = std::make_shared<const TermType>(std::get<3>(mData[id]), nullptr);
