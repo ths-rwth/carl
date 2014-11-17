@@ -138,7 +138,7 @@ private:
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
 		carl::Timer timer;
-		for (auto cur: reference) {
+		for (const auto& cur: reference) {
 			results.emplace_back(executor(cur));
 		}
 		unsigned time = timer.passed();
