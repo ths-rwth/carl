@@ -60,7 +60,7 @@ public:
 		memset(&std::get<0>(mData[mNextId])[0], 0, sizeof(IDType)*std::get<0>(mData[mNextId]).size());
 		std::get<0>(mData[mNextId]).resize(MonomialPool::getInstance().nextID());
 		std::get<1>(mData[mNextId]).clear();
-		std::get<1>(mData[mNextId]).resize(expectedSize);
+		std::get<1>(mData[mNextId]).resize(expectedSize + 1);
 		std::get<2>(mData[mNextId]) = true;
 		std::get<3>(mData[mNextId]) = constant_zero<Coeff>::get();
 		std::get<4>(mData[mNextId]) = 1;
@@ -106,7 +106,7 @@ public:
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(std::get<2>(mData[id]));
 		Terms& t = std::get<1>(mData[id]);
-		if (!isZero(std::get<3>(mData[id])))	{
+		if (!isZero(std::get<3>(mData[id]))) {
 			t[0] = std::make_shared<const TermType>(std::get<3>(mData[id]), nullptr);
 		}
 		for (auto i = t.begin(); i != t.end();) {
@@ -117,6 +117,7 @@ public:
 		}
 		std::swap(t, terms);
 		//std::lock_guard<std::mutex> lock(mMutex);
+		std::get<1>(mData[id]).clear();
 		std::get<2>(mData[id]) = false;
 	}
 };
