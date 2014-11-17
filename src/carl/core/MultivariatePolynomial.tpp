@@ -1505,10 +1505,11 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if (rhs.mTerms.empty()) return *this;
 	std::shared_ptr<const TermType> newlterm;
 	std::shared_ptr<const TermType> oldrhs;
-	if (Term<Coeff>::monomialLess(rhs.lterm(), lterm())) {
+	CompareResult res = Ordering::compare(lterm()->monomial(), rhs.lterm()->monomial());
+	if (res == CompareResult::GREATER) {
 		newlterm = lterm();
 		mTerms.pop_back();
-	} else if (Term<Coeff>::monomialLess(lterm(), rhs.lterm())) {
+	} else if (res == CompareResult::LESS) {
 		newlterm = rhs.lterm();
 		oldrhs = rhs.lterm();
 		rhs.mTerms.pop_back();
