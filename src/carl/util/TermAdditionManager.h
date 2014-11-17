@@ -26,9 +26,11 @@ namespace carl
 template<typename Polynomial>
 class TermAdditionManager {
 public:
-	typedef Term<typename Polynomial::CoeffType> TermType;
+	typedef unsigned short IDType;
+	typedef typename Polynomial::CoeffType Coeff;
+	typedef Term<Coeff> TermType;
 	typedef std::shared_ptr<const TermType> TermPtr;
-	typedef std::vector<unsigned short> TermIDs;
+	typedef std::vector<IDType> TermIDs;
 	typedef std::vector<TermPtr> Terms;
 private:
 	std::size_t mNextId;
@@ -61,7 +63,7 @@ public:
 		mTerms[mNextId].reserve(expectedSize);
 		mTerms[mNextId].emplace_back(nullptr);
 		mUsed[mNextId] = true;
-		mConstant[mNextId] = constant_zero<typename Polynomial::CoeffType>::get();
+		mConstant[mNextId] = constant_zero<Coeff>::get();
 		std::size_t result = mNextId;
 		mNextId = (mNextId + 1) % mTerms.size();
 		return result;
@@ -76,13 +78,13 @@ public:
 			if (monId >= termIDs.size()) termIDs.resize(monId + 1);
 
 			if (termIDs[monId] == 0) {
-				termIDs[monId] = (unsigned short)terms.size();
+				termIDs[monId] = (IDType)terms.size();
 				terms.push_back(term);
 			} else {
 				monId = termIDs[monId];
 				if (terms[monId] == nullptr) terms[monId] = term;
 				else {
-					auto coeff = terms[monId]->coeff() + term->coeff();
+					Coeff coeff = terms[monId]->coeff() + term->coeff();
 					if (carl::isZero(coeff)) {
 						terms[monId] = nullptr;
 					} else {

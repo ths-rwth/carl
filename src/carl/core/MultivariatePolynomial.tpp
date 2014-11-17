@@ -1498,7 +1498,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		oldrhs = rhs.lterm();
 		rhs.mTerms.pop_back();
 	} else {
-		auto c = rhs.lcoeff() + lcoeff();
+		Coeff c = rhs.lcoeff() + lcoeff();
 		if (!carl::isZero(c)) {
 			newlterm = std::make_shared<const TermType>(c, lmon());
 		}
@@ -1554,7 +1554,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	} else if (rhs->isConstant()) {
 		if (this->hasConstantTerm()) {
 			// Combine with constant term.
-			if (carl::isZero(mTerms.front()->coeff() + rhs->coeff())) {
+			if (carl::isZero(Coeff(mTerms.front()->coeff() + rhs->coeff()))) {
 				mTerms.erase(mTerms.begin());
 			} else mTerms.front().reset(new Term<Coeff>(mTerms.front()->coeff() + rhs->coeff(), nullptr));
 		} else if (mTerms.size() == 1) {
@@ -1572,7 +1572,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		}
 	} else if (Term<Coeff>::monomialEqual(lterm(), rhs)) {
 		// Combine with leading term.
-		if (carl::isZero(lcoeff() + rhs->coeff())) {
+		if (carl::isZero(Coeff(lcoeff() + rhs->coeff()))) {
 			mTerms.pop_back();
 			makeMinimallyOrdered<false, true>();
 		} else mTerms.back().reset(new Term<Coeff>(lcoeff() + rhs->coeff(), rhs->monomial()));
@@ -1661,7 +1661,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 {
 	if (carl::isZero(c)) return *this;
 	if (hasConstantTerm()) {
-		if (carl::isZero(constantPart() + c)) mTerms.erase(mTerms.begin());
+		if (carl::isZero(Coeff(constantPart() + c))) mTerms.erase(mTerms.begin());
 		else mTerms.front().reset(new TermType(constantPart() + c));
 	} else {
 		mTerms.emplace(mTerms.begin(), new TermType(c));
