@@ -24,10 +24,12 @@
 #include "adaption_native/operations.h"
 #include "adaption_native/typetraits.h"
 
+#ifdef USE_Z3_NUMBERS
 #include "adaption_z3/hash.h"
 #include "adaption_z3/operations.h"
 #include "adaption_z3/typetraits.h"
 #include "adaption_z3/constants.h"
+#endif
 
 #include "GaloisField.h"
 #include "GFNumber.h"

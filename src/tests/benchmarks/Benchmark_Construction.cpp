@@ -87,7 +87,7 @@ namespace carl {
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
 			auto res = std::get<0>(args) * std::get<1>(args);
-			res.m().lex_sort(res);
+			//res.m().lex_sort(res);
 			return res;
 		}
         #endif
@@ -110,7 +110,7 @@ namespace carl {
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
 			auto res = exact_div(std::get<0>(args), std::get<1>(args));
-			res.m().lex_sort(res);
+			//res.m().lex_sort(res);
 			return res;
 		}
         #endif
@@ -154,7 +154,7 @@ namespace carl {
 			ZMP p = std::get<0>(args);
 			ZMP res(p.m());
 			p.m().pw(p, std::get<1>(args), res);
-			res.m().lex_sort(res);
+			//res.m().lex_sort(res);
 			return res;
 		}
         #endif
@@ -246,6 +246,10 @@ TEST_F(BenchmarkTest, Multiplication)
 	bi.n = 1000;
 	for (bi.degree = 5; bi.degree < 10; bi.degree++) {
 		Benchmark<AdditionGenerator<Coeff>, MultiplicationExecutor, CMP<Coeff>> bench(bi, "CArL");
+		//break;
+		#ifdef USE_Z3_NUMBERS
+		bench.compare<CMP<rational>, TupleConverter<CMP<rational>,CMP<rational>>>("CArL rational");
+		#endif
         #ifdef COMPARE_WITH_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
         #endif

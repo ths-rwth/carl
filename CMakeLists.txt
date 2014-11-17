@@ -45,6 +45,7 @@ option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient meth
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 option( COMPARE_WITH_Z3 "Compile with testing with the runtime and result comparisons of carl to z3" OFF )
+option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( USE_MONOMIAL_POOL "Use monomial pool" OFF )

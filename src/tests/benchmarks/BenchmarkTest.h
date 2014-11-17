@@ -18,13 +18,13 @@ class BenchmarkTest : public ::testing::Test {
 protected:
     
 	BenchmarkTest(): file({
-        "CArL" 
-        #ifdef COMPARE_WITH_GINAC
-        ,"GiNaC"
-        #endif
-        #ifdef COMPARE_WITH_Z3
-        ,"Z3"
-        #endif
+		"CArL"
+#ifdef COMPARE_WITH_GINAC
+		,"GiNaC"
+#endif
+#ifdef COMPARE_WITH_Z3
+		,"Z3"
+#endif
     }) {
 	}
 	~BenchmarkTest() {

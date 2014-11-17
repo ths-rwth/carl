@@ -44,6 +44,7 @@ inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const
 	}
 	return res;
 }
+#ifdef USE_Z3_NUMBERS
 template<>
 inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
 	CMP<rational> res;
@@ -52,6 +53,7 @@ inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const C
 	}
 	return res;
 }
+#endif
 #ifdef COMPARE_WITH_GINAC
 template<>
 inline GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
