@@ -50,6 +50,9 @@ public:
 	typename Samples::const_iterator end() const {
 		return samples.end();
 	}
+	std::size_t size() const {
+		return samples.size();
+	}
 	CIPtr getCI() const {
 		return ci;
 	}
@@ -131,8 +134,7 @@ private:
 	Executor executor;
 	BenchmarkResult runtimes;
 	std::string name;
-public:
-	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi), name(name) {
+	void runSamples() {
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
 		carl::Timer timer;
@@ -142,6 +144,11 @@ public:
 		unsigned time = timer.passed();
 		runtimes[name] = time;
 		std::cout << time << " ms" << std::endl;
+	}
+public:
+	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi), name(name) {
+		results.reserve(reference.size());
+		runSamples();
 	}
 	template<typename R, typename Converter>
 	void compare(const std::string& name) {
