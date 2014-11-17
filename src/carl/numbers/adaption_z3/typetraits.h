@@ -6,7 +6,7 @@
  * @author Gereon Kremer
  *
  */
-
+#ifdef COMPARE_WITH_Z3
 #pragma once
 
 #include "../../util/platform.h"
@@ -26,3 +26,4 @@ TRAIT_TYPE(IntegralType, mpq, mpz, z3);
 TRAIT_TYPE(IntegralType, mpz, mpz, z3);
 
 }
+#endif

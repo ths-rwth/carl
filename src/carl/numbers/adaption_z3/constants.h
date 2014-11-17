@@ -4,7 +4,7 @@
  *
  * @since November 6, 2014
  */
-
+#ifdef COMPARE_WITH_Z3
 #pragma once
 //
 #include "../constants.h"
@@ -15,3 +15,4 @@
 //	constant_declarations(mpq_class)
 //	constant_declarations(mpz_class)
 //}
+#endif
