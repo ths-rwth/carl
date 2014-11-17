@@ -59,6 +59,7 @@ public:
 		assert(mTerms.at(mNextId).empty());
 		assert(mUsed.at(mNextId) == false);
 		mTermIDs[mNextId].clear();
+		mTermIDs[mNextId].reserve(MonomialPool::getInstance().nextID());
 		mTerms[mNextId].clear();
 		mTerms[mNextId].reserve(expectedSize);
 		mTerms[mNextId].emplace_back(nullptr);
@@ -100,8 +101,10 @@ public:
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(mUsed.at(id));
 		Terms& t = mTerms[id];
-		t[0] = std::make_shared<const TermType>(mConstant[id], nullptr);
-		for (auto i = t.begin()+1; i != t.end();) {
+		if (!isZero(mConstant[id]))	{
+			t[0] = std::make_shared<const TermType>(mConstant[id], nullptr);
+		}
+		for (auto i = t.begin(); i != t.end();) {
 			if (*i == nullptr) {
 				std::swap(*i, *t.rbegin());
 				t.pop_back();
@@ -109,6 +112,7 @@ public:
 		}
 		std::swap(t, terms);
 		std::lock_guard<std::mutex> lock(mMutex);
+		memset(&mTermIDs.at(id)[0], 0, sizeof(IDType)*mTermIDs.at(id).size());
 		mTermIDs.at(id).clear();
 		mTerms.at(id).clear();
 		mUsed.at(id) = false;
