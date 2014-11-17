@@ -1173,6 +1173,22 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
+{
+	assert(this->isConsistent());
+	TermsType tmp;
+	for (auto it1 = mTerms.begin(); it1 != mTerms.end(); it1++) {
+		tmp.emplace_back((*it1)->pow(2));
+		for (auto it2 = it1+1; it2 != mTerms.end(); it2++) {
+			tmp.push_back(std::make_shared<const TermType>(Coeff(2) * **it1 * **it2));
+		}
+	}
+	std::swap(tmp, mTerms);
+	assert(this->isConsistent());
+}
+
+
+template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(unsigned exp) const
 {
 	if (exp == 0) return MultivariatePolynomial(constant_one<Coeff>::get());
@@ -1182,8 +1198,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	while(exp > 0) {
 		if (exp & 1) res *= mult;
 		exp /= 2;
-		if(exp > 0)
-			mult *= mult;
+		if(exp > 0) mult.square();
 	}
 	return res;
 }
@@ -1882,7 +1897,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 	mTerms.emplace_back(newlterm);
 #endif
-	makeMinimallyOrdered<false, true>();
+	//makeMinimallyOrdered<false, true>();
 	mOrdered = false;
 	assert(this->isConsistent());
 	return *this;

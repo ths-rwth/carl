@@ -228,11 +228,7 @@ namespace carl
 			newExps.push_back( std::make_pair( it.first, (exponent)(it.second * exp) ) );
 			expsum += newExps.back().second;
 		}
-		#ifdef USE_MONOMIAL_POOL
-		return MonomialPool::getInstance().create( std::move(newExps), expsum );
-		#else
-		return std::make_shared<const Monomial>( std::move(newExps), expsum );
-		#endif
+		return createMonomial(std::move(newExps), expsum);
 	}
 	
 	std::string Monomial::toString(bool infix, bool friendlyVarNames) const

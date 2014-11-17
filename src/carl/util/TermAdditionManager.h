@@ -9,6 +9,7 @@
 
 #include <mutex>
 #include <unordered_map>
+#include <tuple>
 #include <vector>
 
 #include "../core/Term.h"
@@ -22,6 +23,105 @@ namespace carl
 
 #define USE_INDIRECTION
 #ifdef USE_INDIRECTION
+
+#define USE_TUPLE
+#ifdef USE_TUPLE
+
+template<typename Polynomial>
+class TermAdditionManager {
+public:
+	typedef unsigned short IDType;
+	typedef typename Polynomial::CoeffType Coeff;
+	typedef Term<Coeff> TermType;
+	typedef std::shared_ptr<const TermType> TermPtr;
+	typedef std::vector<IDType> TermIDs;
+	typedef std::vector<TermPtr> Terms;
+	typedef std::tuple<TermIDs,Terms,bool,Coeff> Tuple;
+private:
+	std::size_t mNextId;
+	std::vector<Tuple> mData;
+	mutable std::mutex mMutex;
+public:
+	TermAdditionManager(): mNextId(0)
+	{
+		mData.emplace_back();
+	}
+	
+	std::size_t getId(std::size_t expectedSize = 0) {
+		std::lock_guard<std::mutex> lock(mMutex);
+		while (std::get<2>(mData[mNextId])) {
+			mNextId++;
+			if (mNextId == mData.size()) {
+				mData.emplace_back();
+			}
+		}
+		assert(std::get<0>(mData.at(mNextId)).empty());
+		assert(std::get<1>(mData.at(mNextId)).empty());
+		assert(std::get<2>(mData.at(mNextId)) == false);
+		assert(carl::isZero(std::get<3>(mData.at(mNextId))));
+		std::get<0>(mData[mNextId]).reserve(MonomialPool::getInstance().nextID());
+		std::get<1>(mData[mNextId]).reserve(expectedSize);
+		std::get<1>(mData[mNextId]).emplace_back(nullptr);
+		std::get<2>(mData[mNextId]) = true;
+		std::get<3>(mData[mNextId]) = constant_zero<Coeff>::get();
+		std::size_t result = mNextId;
+		mNextId = (mNextId + 1) % mData.size();
+		return result;
+	}
+
+	void addTerm(std::size_t id, const TermPtr& term) {
+		assert(mUsed[id]);
+		TermIDs& termIDs = std::get<0>(mData[id]);
+		Terms& terms = std::get<1>(mData[id]);
+		if (term->monomial()) {
+			std::size_t monId = term->monomial()->id();
+			if (monId >= termIDs.size()) termIDs.resize(monId + 1);
+
+			if (termIDs[monId] == 0) {
+				termIDs[monId] = (IDType)terms.size();
+				terms.push_back(term);
+			} else {
+				monId = termIDs[monId];
+				if (terms[monId] == nullptr) terms[monId] = term;
+				else {
+					Coeff coeff = terms[monId]->coeff() + term->coeff();
+					if (carl::isZero(coeff)) {
+						terms[monId] = nullptr;
+					} else if (terms[monId].unique()) {
+						TermType::setCoeff(terms[monId], std::move(coeff));
+					} else {
+						terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
+					}
+				}
+			}
+		} else {
+			std::get<3>(mData[id]) += term->coeff();
+		}
+	}
+	
+	void readTerms(std::size_t id, Terms& terms) {
+		assert(mUsed.at(id));
+		Terms& t = std::get<1>(mData[id]);
+		if (!isZero(std::get<3>(mData[id])))	{
+			t[0] = std::make_shared<const TermType>(std::get<3>(mData[id]), nullptr);
+		}
+		for (auto i = t.begin(); i != t.end();) {
+			if (*i == nullptr) {
+				std::swap(*i, *t.rbegin());
+				t.pop_back();
+			} else i++;
+		}
+		std::swap(t, terms);
+		std::lock_guard<std::mutex> lock(mMutex);
+		memset(&std::get<0>(mData[id])[0], 0, sizeof(IDType)*std::get<0>(mData[id]).size());
+		std::get<0>(mData[id]).clear();
+		std::get<1>(mData[id]).clear();
+		std::get<2>(mData[id]) = false;
+		std::get<3>(mData[id]) = constant_zero<Coeff>::get();
+	}
+};
+
+#else
 
 template<typename Polynomial>
 class TermAdditionManager {
@@ -59,6 +159,7 @@ public:
 		assert(mTerms.at(mNextId).empty());
 		assert(mUsed.at(mNextId) == false);
 		mTermIDs[mNextId].clear();
+		mTermIDs[mNextId].reserve(MonomialPool::getInstance().nextID());
 		mTerms[mNextId].clear();
 		mTerms[mNextId].reserve(expectedSize);
 		mTerms[mNextId].emplace_back(nullptr);
@@ -87,6 +188,8 @@ public:
 					Coeff coeff = terms[monId]->coeff() + term->coeff();
 					if (carl::isZero(coeff)) {
 						terms[monId] = nullptr;
+					} else if (terms[monId].unique()) {
+						TermType::setCoeff(terms[monId], std::move(coeff));
 					} else {
 						terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
 					}
@@ -100,8 +203,10 @@ public:
 	void readTerms(std::size_t id, Terms& terms) {
 		assert(mUsed.at(id));
 		Terms& t = mTerms[id];
-		t[0] = std::make_shared<const TermType>(mConstant[id], nullptr);
-		for (auto i = t.begin()+1; i != t.end();) {
+		if (!isZero(mConstant[id]))	{
+			t[0] = std::make_shared<const TermType>(mConstant[id], nullptr);
+		}
+		for (auto i = t.begin(); i != t.end();) {
 			if (*i == nullptr) {
 				std::swap(*i, *t.rbegin());
 				t.pop_back();
@@ -109,11 +214,14 @@ public:
 		}
 		std::swap(t, terms);
 		std::lock_guard<std::mutex> lock(mMutex);
+		memset(&mTermIDs.at(id)[0], 0, sizeof(IDType)*mTermIDs.at(id).size());
 		mTermIDs.at(id).clear();
 		mTerms.at(id).clear();
 		mUsed.at(id) = false;
 	}
 };
+
+#endif
 
 #else
 
