@@ -153,6 +153,7 @@ public:
 	template<typename R, typename Converter>
 	void compare(const std::string& name) {
 		std::vector<R> res;
+		res.reserve(reference.size());
 		BenchmarkConverter<Converter> benchmarks(reference);
 		std::cout << "Comparing " << name << " ... ";
 		std::cout.flush();
