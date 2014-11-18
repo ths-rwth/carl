@@ -33,7 +33,7 @@ public:
 	typedef unsigned short IDType;
 	typedef typename Polynomial::CoeffType Coeff;
 	typedef Term<Coeff> TermType;
-	typedef std::shared_ptr<const TermType> TermPtr;
+	typedef TermType TermPtr;
 	typedef std::vector<IDType> TermIDs;
 	typedef std::vector<TermPtr> Terms;
 	typedef std::tuple<TermIDs,Terms,bool,Coeff,IDType> Tuple;
@@ -82,20 +82,20 @@ public:
 		assert(std::get<2>(data));
 		TermIDs& termIDs = std::get<0>(data);
 		Terms& terms = std::get<1>(data);
-		if (term->monomial()) {
-			std::size_t monId = term->monomial()->id();
+		if (term.monomial()) {
+			std::size_t monId = term.monomial()->id();
 			if (NewMonomials && monId >= termIDs.size()) termIDs.resize(monId + 1);
-            IDType& locId = termIDs[monId];
-			if (locId) {
+            IDType locId = termIDs[monId];
+			if (locId != 0) {
+				if (SizeUnknown && locId >= terms.size()) terms.resize(locId + 1);
+				assert(locId < terms.size());
                 TermPtr& t = terms[locId];
-				if (t) {
-					Coeff coeff = t->coeff() + term->coeff();
+				if (!isZero(t.coeff())) {
+					Coeff coeff = t.coeff() + term.coeff();
 					if (carl::isZero(coeff)) {
-						t = nullptr;
-					} else if (t.unique()) {
-						TermType::setCoeff(t, std::move(coeff));
+						t = TermType();
 					} else {
-						t = std::make_shared<const TermType>(std::move(coeff), term->monomial());
+						t = TermType(coeff, term.monomial());
 					}
 				}
 				else
@@ -104,12 +104,12 @@ public:
 				IDType& nextID = std::get<4>(data);
 				if (SizeUnknown && nextID >= terms.size()) terms.resize(nextID + 1);
 				assert(nextID < terms.size());
-				locId = nextID;
+				termIDs[monId] = nextID;
 				terms[nextID] = term;
 				++nextID;
 			}
 		} else {
-			std::get<3>(data) += term->coeff();
+			std::get<3>(data) += term.coeff();
 		}
 	}
     
@@ -211,8 +211,8 @@ public:
 		assert(mUsed[id]);
 		TermIDs& termIDs = mTermIDs[id];
 		Terms& terms = mTerms[id];
-		if (term->monomial()) {
-			std::size_t monId = term->monomial()->id();
+		if (term.monomial()) {
+			std::size_t monId = term.monomial()->id();
 			if (SizeUnknown && monId >= termIDs.size()) termIDs.resize(monId + 1);
 
 			if (termIDs[monId] == 0) {
@@ -222,18 +222,18 @@ public:
 				monId = termIDs[monId];
 				if (terms[monId] == nullptr) terms[monId] = term;
 				else {
-					Coeff coeff = terms[monId]->coeff() + term->coeff();
+					Coeff coeff = terms[monId]->coeff() + term.coeff();
 					if (carl::isZero(coeff)) {
 						terms[monId] = nullptr;
 					} else if (terms[monId].unique()) {
 						TermType::setCoeff(terms[monId], std::move(coeff));
 					} else {
-						terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
+						terms[monId] = std::make_shared<const TermType>(coeff, term.monomial());
 					}
 				}
 			}
 		} else {
-			mConstant[id] += term->coeff();
+			mConstant[id] += term.coeff();
 		}
 	}
 	
@@ -300,16 +300,16 @@ public:
 		assert(mUsed.at(id));
 		Terms& terms = mTerms[id];
 		std::size_t monId = 0;
-		if (term->monomial()) monId = term->monomial()->id();
+		if (term.monomial()) monId = term.monomial()->id();
 		if (monId >= terms.size()) terms.resize(monId + 1);
 		if (terms.at(monId) == nullptr) {
 			terms[monId] = term;
 		} else {
-			auto coeff = terms.at(monId)->coeff() + term->coeff();
+			auto coeff = terms.at(monId)->coeff() + term.coeff();
 			if (coeff == typename Polynomial::CoeffType(0)) {
 				terms[monId] = nullptr;
 			} else {
-				terms[monId] = std::make_shared<const TermType>(coeff, term->monomial());
+				terms[monId] = std::make_shared<const TermType>(coeff, term.monomial());
 			}
 		}
 	}
@@ -413,10 +413,10 @@ class TermAdditionManager
             MapType& mcMap = mTermMaps[_id];
 			///@todo what is this supposed to do?
             assert( mcMap.size() < (mcMap.max_load_factor()*mcMap.bucket_count()) );
-            auto res = mcMap.emplace( _term->monomial(), _term );
+            auto res = mcMap.emplace( _term.monomial(), _term );
             if( res.second )
             {
-                if( _term->monomial() == nullptr )
+                if( _term.monomial() == nullptr )
                 {
                     assert( mConstantTerms.at( _id ) == mcMap.end() );
                     mConstantTerms[_id] = res.first;
@@ -424,7 +424,7 @@ class TermAdditionManager
             }
             else
             {
-                typename Polynomial::CoeffType tmp = res.first->second->coeff() + _term->coeff();
+                typename Polynomial::CoeffType tmp = res.first->second->coeff() + _term.coeff();
                 if( tmp == typename Polynomial::CoeffType(0) )
                 {
                     mcMap.erase( res.first );
@@ -432,7 +432,7 @@ class TermAdditionManager
                 }
                 else
                 {
-                    res.first->second = std::make_shared<const Term<typename Polynomial::CoeffType>>( tmp, _term->monomial() );
+                    res.first->second = std::make_shared<const Term<typename Polynomial::CoeffType>>( tmp, _term.monomial() );
                 }
             }
         }
