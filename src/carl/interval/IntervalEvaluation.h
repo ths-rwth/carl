@@ -100,9 +100,9 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomi
 	if(p.isZero()) {
 		return Interval<Numeric>(0);
 	} else {
-		Interval<Numeric> result(evaluate(*p[0], map)); 
+		Interval<Numeric> result(evaluate(p[0], map)); 
 		for (unsigned i = 1; i < p.nrTerms(); ++i) {
-			result += evaluate(*p[i], map);
+			result += evaluate(p[i], map);
 		}
 		return result;
 	}

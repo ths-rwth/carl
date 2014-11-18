@@ -70,7 +70,7 @@ struct ConstructorPrinter {
 		for (const auto& t: p) {
 			if (!first) os << ", ";
 			first = false;
-			(*this)(os, *t);
+			(*this)(os, t);
 		}
 		os << "})";
 	}

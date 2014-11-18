@@ -78,9 +78,11 @@ class Term
 		{
 			return mCoeff;
 		}
+		void setCoeff(const Coefficient& c) {
+			mCoeff = c;
+		}
 		void setCoeff(Coefficient&& c) {
 			mCoeff = c;
-			assert(!carl::isZero(mCoeff));
 		}
 		template<typename Coeff>
 		static void setCoeff(const std::shared_ptr<const Term<Coeff>>& s, Coeff&& c) {
