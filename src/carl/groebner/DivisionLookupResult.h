@@ -21,7 +21,7 @@ template<typename Polynomial>
 struct DivisionLookupResult
 {
 	DivisionLookupResult() :
-    mDivisor(nullptr), mFactor(nullptr)
+    mDivisor(nullptr), mFactor()
     {
         
     }
@@ -38,7 +38,7 @@ struct DivisionLookupResult
 		// intentionally left empty
 	}
 		
-    DivisionLookupResult(const Polynomial* divisor, const std::shared_ptr<const Term<typename Polynomial::CoeffType>>& factor) :
+    DivisionLookupResult(const Polynomial* divisor, const Term<typename Polynomial::CoeffType>& factor) :
     mDivisor(divisor), mFactor(factor)
     {
         
@@ -51,7 +51,7 @@ struct DivisionLookupResult
     
     
     const Polynomial* const mDivisor;
-    std::shared_ptr<const Term<typename Polynomial::CoeffType>> mFactor;
+    Term<typename Polynomial::CoeffType> mFactor;
 };
 
 }

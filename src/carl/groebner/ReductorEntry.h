@@ -26,8 +26,8 @@ class ReductorEntry
 protected:
     typedef typename Polynomial::CoeffType   Coeff;
     Polynomial                         mTail;
-    std::shared_ptr<const Term<Coeff>>    mLead;
-    std::shared_ptr<const Term<Coeff>>    mMultiple;
+    Term<Coeff>    mLead;
+    Term<Coeff>    mMultiple;
 
 public:
     /**
@@ -36,10 +36,10 @@ public:
      * @param pol
      * Resulting polynomial = multiple * pol.
      */
-    ReductorEntry(std::shared_ptr<const Term<Coeff>>  multiple, const Polynomial& pol) :
-    mTail(pol.tail()), mLead(std::make_shared<const Term<Coeff>>(*multiple * *pol.lterm())), mMultiple(multiple)
+    ReductorEntry(const Term<Coeff>&  multiple, const Polynomial& pol) :
+    mTail(pol.tail()), mLead(multiple * pol.lterm()), mMultiple(multiple)
     {
-		assert(multiple);
+		assert(!multiple.isZero());
     }
 
     /**
@@ -47,7 +47,7 @@ public:
      * @param pol
      */
     ReductorEntry(const Term<Coeff>& pol)
-    : mTail(), mLead(pol), mMultiple(std::make_shared<const Term<Coeff>>(Coeff(1)))
+    : mTail(), mLead(pol), mMultiple(Term<Coeff>(Coeff(1)))
     {
     }
 
@@ -63,7 +63,7 @@ public:
      * 
      * @return 
      */
-    std::shared_ptr<const Term<Coeff>> getLead() const
+    const Term<Coeff>& getLead() const
     {
         return mLead;
     }
@@ -72,7 +72,7 @@ public:
      * 
      * @return 
      */
-    std::shared_ptr<const Term<Coeff>> getMultiple() const
+    const Term<Coeff>& getMultiple() const
     {
         return mMultiple;
     }
@@ -83,8 +83,8 @@ public:
     void removeLeadingTerm()
     {
         assert(mTail.nrTerms() != 0);
-		assert(mMultiple);
-		mLead = std::make_shared<const Term<Coeff>>(*mMultiple * *mTail.lterm());
+		assert(!mMultiple.isZero());
+		mLead = mMultiple * mTail.lterm();
         mTail.stripLT();
     }
 
@@ -100,7 +100,7 @@ public:
 		
         if(newCoeff != 0)
         {
-			mLead = std::make_shared<const Term<Coeff>>(newCoeff, mLead->monomial());
+			mLead = Term<Coeff>(newCoeff, mLead->monomial());
             return false;
         }
         else if(mTail.nrTerms() != 0)
@@ -109,7 +109,7 @@ public:
         }
         else
         {
-            mLead.reset();
+            mLead = Term<Coeff>();
         }
         return true;
     }
@@ -120,8 +120,8 @@ public:
      */
     bool empty() const
     {
-		assert(mLead || mTail.isZero());
-        return !mLead;
+		assert(!mLead.isZero() || mTail.isZero());
+        return !mLead.isZero();
     }
 
     /**
@@ -137,7 +137,7 @@ public:
 		}
 		else
 		{
-			os << *mLead << " +(" << *mMultiple << " * " << mTail << ")";
+			os << mLead << " +(" << mMultiple << " * " << mTail << ")";
 		}
     }
 

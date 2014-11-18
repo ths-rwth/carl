@@ -75,14 +75,14 @@ protected:
 private:
 	const Ideal<PolynomialInIdeal>& mIdeal;
 	Datastructure<Configuration<InputPolynomial>> mDatastruct;
-	std::vector<std::shared_ptr<const Term<Coeff>>> mRemainder;
+	std::vector<Term<Coeff>> mRemainder;
 	bool mReductionOccured;
 	BitVector mReasons;
 public:
 	Reductor(const Ideal<PolynomialInIdeal>& ideal, const InputPolynomial& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>()), mReductionOccured(false)
 	{
-		insert(f, std::make_shared<const Term<Coeff>>(Coeff(1)));
+		insert(f, Term<Coeff>(Coeff(1)));
 		if(InputPolynomial::Policy::has_reasons)
 		{
 			mReasons = f.getReasons();
@@ -90,7 +90,7 @@ public:
 				
 	}
 
-	Reductor(const Ideal<PolynomialInIdeal>& ideal, const Term<Coeff> f) :
+	Reductor(const Ideal<PolynomialInIdeal>& ideal, const Term<Coeff>& f) :
 	mIdeal(ideal), mDatastruct(Configuration<InputPolynomial>())
 	{
 		insert(f);
@@ -107,7 +107,7 @@ public:
 		while(!mDatastruct.empty())
 		{
 			typename Configuration<InputPolynomial>::Entry entry;
-			std::shared_ptr<const Term < Coeff >> leadingTerm;
+			Term < Coeff > leadingTerm;
 			// Find a leading term.
 			do
 			{
@@ -115,24 +115,24 @@ public:
 				entry = mDatastruct.top();
 				leadingTerm = entry->getLead();
 				LOGMSG_TRACE("carl.gb.reductor", "Intermediate leading term: " << *leadingTerm);
-				assert(!leadingTerm->isZero());
+				assert(!leadingTerm.isZero());
 				// update the data structure.
 				// only insert non-empty polynomials.
 				if(!updateDatastruct(entry)) break;
 				typename Configuration<InputPolynomial>::Entry newentry = mDatastruct.top();
-				while(entry != newentry && Term<Coeff>::monomialEqual(*leadingTerm, *(newentry->getLead())))
+				while(entry != newentry && Term<Coeff>::monomialEqual(leadingTerm, (newentry->getLead())))
 				{
 					assert(!newentry->empty());
-					leadingTerm = std::make_shared<const Term<Coeff>>(leadingTerm->coeff() + newentry->getLead()->coeff(), leadingTerm->monomial());
+					leadingTerm = Term<Coeff>(leadingTerm.coeff() + newentry->getLead().coeff(), leadingTerm.monomial());
 					if(!updateDatastruct(newentry)) break;
 					newentry = mDatastruct.top();
 				}
 			}
-			while(leadingTerm->isZero() && !mDatastruct.empty());
+			while(leadingTerm.isZero() && !mDatastruct.empty());
 			// Done finding leading term.
 			//std::cout <<  "Leading term: " << *leadingTerm << std::endl;
 			// We have found the leading term..
-			if(leadingTerm->isZero())
+			if(leadingTerm.isZero())
 			{
 				assert(mDatastruct.empty());
 				//then the datastructure is empty, we are done.
@@ -141,7 +141,7 @@ public:
 			//std::cout <<  "Look for divisor.." << std::endl;
 			
 			//find a suitable reductor and the corresponding factor.
-			DivisionLookupResult<PolynomialInIdeal> divres(mIdeal.getDivisor(*leadingTerm));
+			DivisionLookupResult<PolynomialInIdeal> divres(mIdeal.getDivisor(leadingTerm));
 			// check if the reduction succeeded.
 			if(divres.success())
 			{
@@ -229,18 +229,18 @@ private:
 		return true;
 	}
 
-	void insert(const InputPolynomial& g, std::shared_ptr<const Term<Coeff>> fact)
+	void insert(const InputPolynomial& g, const Term<Coeff>& fact)
 	{
 		if(!g.isZero())
 		{
-			LOGMSG_TRACE("carl.gb.reductor", "Insert polynomial: " << g << " * " << *fact);
+			LOGMSG_TRACE("carl.gb.reductor", "Insert polynomial: " << g << " * " << fact);
 			mDatastruct.push(new EntryType(fact, g));
 		}
 	}
 
-	void insert(std::shared_ptr<const Term<Coeff>> g)
+	void insert(const Term<Coeff>& g)
 	{
-		assert(g->getCoeff() != 0);
+		assert(g.getCoeff() != 0);
 		mDatastruct.push(new EntryType(g));
 	}
 

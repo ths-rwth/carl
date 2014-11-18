@@ -86,7 +86,7 @@ namespace carl
         unsigned result = 2;
         Pol tmp = mLhs.substitute( _assignment );
         if( tmp.isConstant() )
-            result = evaluate( (tmp.isZero() ? typename Pol::NumberType( 0 ) : tmp.trailingTerm()->coeff()), relation() ) ? 1 : 0;
+            result = evaluate( (tmp.isZero() ? typename Pol::NumberType( 0 ) : tmp.trailingTerm().coeff()), relation() ) ? 1 : 0;
 //        std::cout << "result is " << result << std::endl;
 //        std::cout << std::endl;
         return result;
@@ -308,12 +308,12 @@ namespace carl
                     if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
                         return new Constraint( Pol( typename Pol::NumberType( -1 ) ) * Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel );
                     else
-                        return new Constraint( (mLhs.trailingTerm()->coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
+                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
                 case Relation::GEQ:
                     if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
                         return new Constraint( Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel );
                     else
-                        return new Constraint( (mLhs.trailingTerm()->coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
+                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
                 case Relation::LESS:
                     if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
                         return new Constraint( Pol( *mVariables.begin() ), Relation::NEQ );
@@ -322,7 +322,7 @@ namespace carl
                         if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
                             return new Constraint( Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel );
                         else
-                            return new Constraint( (mLhs.trailingTerm()->coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
+                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
                     }
                 case Relation::GREATER:
                     if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
@@ -332,7 +332,7 @@ namespace carl
                         if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
                             return new Constraint( Pol( typename Pol::NumberType( -1 ) ) * Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel ); 
                         else
-                            return new Constraint( (mLhs.trailingTerm()->coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel ); 
+                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel ); 
                     }
                 default:
                     assert( false );
@@ -344,15 +344,15 @@ namespace carl
             {
                 // Find the gcd of the coefficients of the non-constant terms.
                 auto term = lhs().rbegin();
-                assert( !(*term)->isConstant() && carl::isInteger( (*term)->coeff() ) );
-                typename Pol::NumberType g = carl::abs( (*term)->coeff() );
+                assert( !(term)->isConstant() && carl::isInteger( (term)->coeff() ) );
+                typename Pol::NumberType g = carl::abs( (term)->coeff() );
                 ++term;
                 for( ; term != lhs().rend(); ++term )
                 {
-                    if( !(*term)->isConstant() )
+                    if( !(term)->isConstant() )
                     {
-                        assert( carl::isInteger( (*term)->coeff() ) );
-                        g = carl::gcd( carl::getNum( g ), carl::getNum( carl::abs( (*term)->coeff() ) ) );
+                        assert( carl::isInteger( (term)->coeff() ) );
+                        g = carl::gcd( carl::getNum( g ), carl::getNum( carl::abs( (term)->coeff() ) ) );
                     }
                 }
                 assert( g > typename Pol::NumberType( 0 ) );
@@ -700,19 +700,19 @@ namespace carl
         bool termACoeffGreater = false;
         bool termBCoeffGreater = false;
         // The first two terms are not constant.
-        if( termA != _constraintA->lhs().rend() && !(*termA)->isConstant() && termB != _constraintB->lhs().rend() && !(*termB)->isConstant() )
+        if( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
         {
-            if( (*termA)->monomial() != (*termB)->monomial() ) return 0;
+            if( (termA)->monomial() != (termB)->monomial() ) return 0;
             // Find an appropriate g.
-            typename Pol::NumberType termAcoeffAbs = cln::abs( (*termA)->coeff() ); // TODO: use some method of carl instead of cln::abs
-            typename Pol::NumberType termBcoeffAbs = cln::abs( (*termB)->coeff() );
+            typename Pol::NumberType termAcoeffAbs = cln::abs( (termA)->coeff() ); // TODO: use some method of carl instead of cln::abs
+            typename Pol::NumberType termBcoeffAbs = cln::abs( (termB)->coeff() );
             termACoeffGreater = termAcoeffAbs > termBcoeffAbs; 
             termBCoeffGreater = termAcoeffAbs < termBcoeffAbs;
             if( termACoeffGreater ) 
-                g = (*termA)->coeff()/(*termB)->coeff();
+                g = (termA)->coeff()/(termB)->coeff();
             else if( termBCoeffGreater ) 
-                g = (*termB)->coeff()/(*termA)->coeff();
-            else if( (*termA)->coeff() == (*termB)->coeff() ) 
+                g = (termB)->coeff()/(termA)->coeff();
+            else if( (termA)->coeff() == (termB)->coeff() ) 
                 g = typename Pol::NumberType( 1 );
             else
             {
@@ -723,36 +723,36 @@ namespace carl
             // are equal when one of the left-hand sides is multiplied by g.
             ++termA;
             ++termB;
-            while( termA != _constraintA->lhs().rend() && !(*termA)->isConstant() && termB != _constraintB->lhs().rend() && !(*termB)->isConstant() )
+            while( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
             {
-                if( (*termA)->monomial() != (*termB)->monomial() ) return 0;
+                if( (termA)->monomial() != (termB)->monomial() ) return 0;
                 else if( termACoeffGreater )
                 {
-                    if( (*termA)->coeff() != g * (*termB)->coeff() ) return 0;
+                    if( (termA)->coeff() != g * (termB)->coeff() ) return 0;
                 }
                 else if( termBCoeffGreater )
                 {
-                    if( g * (*termA)->coeff() != (*termB)->coeff() ) return 0;
+                    if( g * (termA)->coeff() != (termB)->coeff() ) return 0;
                 }
-                else if( (*termA)->coeff() != (*termB)->coeff() ) return 0;
+                else if( (termA)->coeff() != (termB)->coeff() ) return 0;
                 ++termA;
                 ++termB;
             }
         }
         if( termA != _constraintA->lhs().rend() )
         {
-            if( (*termA)->isConstant() )
+            if( (termA)->isConstant() )
             {
-                c = (termBCoeffGreater ? (*termA)->coeff() * g : (*termA)->coeff());
+                c = (termBCoeffGreater ? (termA)->coeff() * g : (termA)->coeff());
             }
             else
                 return 0;
         }
         if( termB != _constraintB->lhs().rend() )
         {
-            if( (*termB)->isConstant() )
+            if( (termB)->isConstant() )
             {
-                d = (termACoeffGreater ? (*termB)->coeff() * g : (*termB)->coeff());
+                d = (termACoeffGreater ? (termB)->coeff() * g : (termB)->coeff());
             }
             else
                 return 0;
