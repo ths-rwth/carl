@@ -79,12 +79,12 @@ public:
 		auto& manager = carl::MultivariatePolynomial<C>::mTermAdditionManager;
 		std::size_t id = manager.getId();
 		C c = C(geomDist<C>());
-		manager.addTerm(id, std::make_shared<const Term<C>>(c));
+		manager.template addTerm<true>(id, std::make_shared<const Term<C>>(c));
 		for (std::size_t i = 1; i <= deg; i++) {
 			std::binomial_distribution<> bin((int)((deg-i)*(deg-i)), 0.5);
 			std::size_t num = (std::size_t)bin(rand) + 1;
 			for (std::size_t j = 0; j < num; j++) {
-				manager.addTerm(id, randomTerm<C>(i));
+				manager.template addTerm<true>(id, randomTerm<C>(i));
 			}
 		}
 		std::vector<std::shared_ptr<const Term<C>>> terms;

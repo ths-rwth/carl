@@ -48,6 +48,13 @@ Term<Coefficient>::Term(const Coefficient& c, const Monomial::Arg& m) :
 }
 
 template<typename Coefficient>
+Term<Coefficient>::Term(Coefficient&& c, const Monomial::Arg& m) :
+	mCoeff(std::move(c)), mMonomial(m)
+{
+	assert(this->isConsistent());
+}
+
+template<typename Coefficient>
 Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e): 
 	mCoeff(c),
 	mMonomial(createMonomial(v,e))

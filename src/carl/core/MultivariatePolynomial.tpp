@@ -135,10 +135,10 @@ Policies()
 	exponent exp = 0;
 	for (const auto& c: p.coefficients()) {
 		if (exp == 0) {
-			for (const auto& term: c) mTermAdditionManager.addTerm(id, term);
+			for (const auto& term: c) mTermAdditionManager.template addTerm<true>(id, term);
 		} else {
 			for (const auto& term: c * Term<Coeff>(constant_one<Coeff>::get(), p.mainVar(), exp)) {
-				mTermAdditionManager.addTerm(id, term);
+				mTermAdditionManager.template addTerm<true>(id, term);
 			}
 		}
 		exp++;
@@ -151,10 +151,10 @@ Policies()
 	exponent exp = 0;
 	for (const auto& c: p.coefficients()) {
 		if (exp == 0) {
-			for (const auto& term: c) mTermAdditionManager.addTerm(*this, id, term);
+			for (const auto& term: c) mTermAdditionManager.template addTerm<true>(*this, id, term);
 		} else {
 			for (const auto& term: c * Term<Coeff>(1, p.mainVar(), exp)) {
-				mTermAdditionManager.addTerm(*this, id, term);
+				mTermAdditionManager.template addTerm<true>(*this, id, term);
 			}
 		}
 		exp++;
@@ -201,7 +201,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 	if( duplicates ) {
 #ifdef USE_MONOMIAL_POOL
 		std::size_t id = mTermAdditionManager.getId(mTerms.size());
-		for (const auto& t: mTerms) mTermAdditionManager.addTerm(id, t);
+		for (const auto& t: mTerms) mTermAdditionManager.template addTerm<false>(id, t);
 		mTermAdditionManager.readTerms(id, mTerms);
 #else
 		mTermAdditionManager.removeDuplicates(*this);
@@ -224,7 +224,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	if( duplicates ) {
 #ifdef USE_MONOMIAL_POOL
 		std::size_t id = mTermAdditionManager.getId(mTerms.size());
-		for (const auto& t: mTerms) mTermAdditionManager.addTerm(id, t);
+		for (const auto& t: mTerms) mTermAdditionManager.template addTerm<false>(id, t);
 		mTermAdditionManager.readTerms(id, mTerms);
 #else
 		mTermAdditionManager.removeDuplicates(*this);
@@ -517,23 +517,23 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() + p.mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(id, term);
+		mTermAdditionManager.template addTerm<false>(id, term);
 	}
 	for (const auto& term: p.mTerms) {
 		auto c = - factor.coeff() * term->coeff();
 		auto m = factor.monomial() * term->monomial();
-		mTermAdditionManager.addTerm(id, std::make_shared<const TermType>(c, m));
+		mTermAdditionManager.template addTerm<false>(id, std::make_shared<const TermType>(c, m));
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + p.mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(*this, id, term);
+		mTermAdditionManager.template addTerm<false>(*this, id, term);
 	}
 	for (const auto& term: p.mTerms) {
 		auto c = - factor.coeff() * term->coeff();
 		auto m = factor.monomial() * term->monomial();
-		mTermAdditionManager.addTerm(*this, id, std::make_shared<const TermType>(c, m));
+		mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<const TermType>(c, m));
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
@@ -573,7 +573,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		{
 			res.subtractProduct(*factor, divisor);
 			//p -= *factor * divisor;
-			mTermAdditionManager.addTerm(id, std::shared_ptr<TermType>(factor));
+			mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<TermType>(factor));
 		}
 		else
 		{
@@ -589,7 +589,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
-			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<TermType>(factor));
+			mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<TermType>(factor));
 			res -= *factor * divisor;
 		}
 		else
@@ -658,7 +658,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 		{
 			//p -= *factor * divisor;
 			p.subtractProduct(*factor, divisor);
-			mTermAdditionManager.addTerm(id, std::shared_ptr<TermType>(factor));
+			mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<TermType>(factor));
 		}
 		else
 		{
@@ -676,7 +676,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 		if(factor != nullptr)
 		{
 			p -= *factor * divisor;
-			mTermAdditionManager.addTerm(*this, id, std::shared_ptr<TermType>(factor));
+			mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<TermType>(factor));
 		}
 		else
 		{
@@ -825,7 +825,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	for (const auto& term: mTerms)
 	{
 		if (term->monomial() == nullptr) {
-			mTermAdditionManager.addTerm(id, term);
+			mTermAdditionManager.template addTerm<false>(id, term);
 		} else {
 			exponent e = term->monomial()->exponentOfVariable(var);
 			Monomial::Arg mon;
@@ -833,23 +833,23 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 			if (e == 1) {
 				for(auto vterm : value.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.addTerm(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.addTerm(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
+					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
 				}
 			} else if(e > 1) {
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
 				for(auto vterm : iter->second.first.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.addTerm(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.addTerm(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
+					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
 				}
 			}
 			else
 			{
-				mTermAdditionManager.addTerm(id, term);
+				mTermAdditionManager.template addTerm<false>(id, term);
 			}
 		}
 	}
@@ -859,7 +859,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	for (const auto& term: mTerms)
 	{
 		if (term->monomial() == nullptr) {
-			mTermAdditionManager.addTerm(*this, id, term);
+			mTermAdditionManager.template addTerm<false>(*this, id, term);
 		} else {
 			exponent e = term->monomial()->exponentOfVariable(var);
 			Monomial::Arg mon;
@@ -867,23 +867,23 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 			if (e == 1) {
 				for(auto vterm : value.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
+					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
 				}
 			} else if(e > 1) {
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
 				for(auto vterm : iter->second.first.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.addTerm(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
+					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
 				}
 			}
 			else
 			{
-				mTermAdditionManager.addTerm(*this, id, term);
+				mTermAdditionManager.template addTerm<false>(*this, id, term);
 			}
 		}
 	}
@@ -1037,7 +1037,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         Term<Coeff >* resultTerm = term->substitute(substitutions);
         if( !resultTerm->isZero() )
         {
-            mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
+            mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
         }
         else
         {
@@ -1051,7 +1051,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         Term<Coeff >* resultTerm = term->substitute(substitutions);
         if( !resultTerm->isZero() )
         {
-            mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
+            mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
         }
         else
         {
@@ -1073,13 +1073,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+		mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
 	}
 	mTermAdditionManager.readTerms(id, result.mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+		mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
 	}
 	mTermAdditionManager.readTerms(*this, id, result.mTerms);
 #endif
@@ -1556,20 +1556,20 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
-	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(id, term);
+	for (auto termIter = mTerms.begin(); termIter != mTerms.end(); ++termIter) {
+		mTermAdditionManager.template addTerm<false,false>(id, *termIter);
 	}
-	for (const auto& term: rhs.mTerms) {
-		mTermAdditionManager.addTerm(id, term);
+	for (auto termIter = rhs.mTerms.begin(); termIter != rhs.mTerms.end(); ++termIter) {
+		mTermAdditionManager.template addTerm<false,false>(id, *termIter);
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(*this, id, term);
+		mTermAdditionManager.template addTerm<false>(*this, id, term);
 	}
 	for (const auto& term: rhs.mTerms) {
-		mTermAdditionManager.addTerm(*this, id, term);
+		mTermAdditionManager.template addTerm<false>(*this, id, term);
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
@@ -1632,16 +1632,16 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 #ifdef USE_MONOMIAL_POOL
 		std::size_t id = mTermAdditionManager.getId(mTerms.size()+1);
 		for (const auto& term: mTerms) {
-			mTermAdditionManager.addTerm(id, term);
+			mTermAdditionManager.template addTerm<false>(id, term);
 		}
-		mTermAdditionManager.addTerm(id, rhs);
+		mTermAdditionManager.template addTerm<false>(id, rhs);
 		mTermAdditionManager.readTerms(id, mTerms);
 #else
 		std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + 1);
 		for (const auto& term: mTerms) {
-			mTermAdditionManager.addTerm(*this, id, term);
+			mTermAdditionManager.template addTerm<false>(*this, id, term);
 		}
-		mTermAdditionManager.addTerm(*this, id, rhs);
+		mTermAdditionManager.template addTerm<false>(*this, id, rhs);
 		mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
 		makeMinimallyOrdered<false, true>();
@@ -1772,19 +1772,19 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(id, term);
+		mTermAdditionManager.template addTerm<false>(id, term);
 	}
 	for (const auto& term: rhs.mTerms) {
-		mTermAdditionManager.addTerm(id, std::shared_ptr<const TermType>(new TermType(-*term)));
+		mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const TermType>(new TermType(-*term)));
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.addTerm(*this, id, term);
+		mTermAdditionManager.template addTerm<false>(*this, id, term);
 	}
 	for (const auto& term: rhs.mTerms) {
-		mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType(-*term)));
+		mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<const TermType>(new TermType(-*term)));
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
@@ -1912,7 +1912,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	TermType* newlterm = nullptr;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
-			if (newlterm != nullptr) mTermAdditionManager.addTerm(id, std::make_shared<const TermType>(std::move((**t1)*(**t2))));
+			if (newlterm != nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<const TermType>(std::move((**t1)*(**t2))));
 			else newlterm = new TermType(**t1 * **t2);
 		}
 	}
@@ -1923,7 +1923,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	TermType* newlterm = nullptr;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
-			if (newlterm != nullptr) mTermAdditionManager.addTerm(*this, id, std::shared_ptr<const TermType>(new TermType((**t1)*(**t2))));
+			if (newlterm != nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<const TermType>(new TermType((**t1)*(**t2))));
 			else newlterm = new TermType(**t1 * **t2);
 		}
 	}
