@@ -13,5 +13,6 @@ typedef unsigned digit_t;
 #include <z3/src/util/mpz.h>
 #include <z3/src/util/mpq.h>
 #include <z3/src/math/polynomial/polynomial.h>
+#include <z3/src/util/vector.h>
 
 #endif
