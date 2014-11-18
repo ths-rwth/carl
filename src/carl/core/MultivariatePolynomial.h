@@ -434,7 +434,7 @@ public:
 	UnivariatePolynomial<Coeff> toUnivariatePolynomial() const;
 	UnivariatePolynomial<MultivariatePolynomial> toUnivariatePolynomial(Variable::Arg mainVar) const;
 	
-	const std::shared_ptr<const Term<Coeff>>& operator[](unsigned) const;
+	const Term<Coeff>& operator[](unsigned) const;
 
 	MultivariatePolynomial mod(const typename IntegralType<Coeff>::type& modulo) const;
 	

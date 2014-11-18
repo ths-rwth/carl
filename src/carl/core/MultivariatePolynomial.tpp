@@ -174,8 +174,8 @@ Policies()
 	mTerms.reserve(p.degree());
 	for (const auto& c: p.coefficients()) {
 		if (!carl::isZero(c)) {
-			if (exp == 0) mTerms.emplace_back(new Term<Coeff>(c));
-			else mTerms.emplace_back(new Term<Coeff>(c, p.mainVar(), exp));
+			if (exp == 0) mTerms.emplace_back(c);
+			else mTerms.emplace_back(c, p.mainVar(), exp);
 		}
 		exp++;
 	}
@@ -253,7 +253,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::initializer_list<Variable>& terms)
 {
 	for (const Variable& t: terms) {
-		mTerms.push_back(std::make_shared<const Term<Coeff>>(t));
+		mTerms.emplace_back(t);
 	}
 	makeMinimallyOrdered();
 	mOrdered = false;
@@ -383,7 +383,7 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
 	{
 		for( ; term != mTerms.rend(); ++term )
 		{
-			Definiteness termDefin = (*term)->definiteness();
+			Definiteness termDefin = (term)->definiteness();
 			if( termDefin > Definiteness::NON )
 			{
 				if( termDefin > result ) result = termDefin;
@@ -395,7 +395,7 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
 	{
 		for( ; term != mTerms.rend(); ++term )
 		{
-			Definiteness termDefin = (*term)->definiteness();
+			Definiteness termDefin = (term)->definiteness();
 			if( termDefin < Definiteness::NON )
 			{
 				if( termDefin > result ) result = termDefin;
@@ -417,7 +417,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](unsigned index) const
+const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](unsigned index) const
 {
 	assert(index < nrTerms());
 	return mTerms.at(index);
@@ -482,7 +482,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
 {
 	// A polynomial is a tsos if it is the sum of squares in its standard representation.
-	for(const std::shared_ptr<const TermType>& term : mTerms)
+	for(const auto& term : mTerms)
 	{
 		if(!term.isSquare()) return false;
 	}
@@ -552,7 +552,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	MultivariatePolynomial<Coeff,Ordering,Policies> res;
 	res.mTerms.reserve(mTerms.size());
 	for (unsigned i = 0; i < mTerms.size(); i++) {
-		res.mTerms.emplace_back(mTerms[i]->divideBy(divisor));
+		auto tmp = mTerms[i].divideBy(divisor);
+		res.mTerms.push_back(*tmp);
+		delete tmp;
 	}
 	res.mOrdered = this->mOrdered;
     assert(res.isConsistent());
@@ -713,7 +715,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	{
 		if(p.lterm().tdeg() < divisor.lterm().tdeg())
 		{
-			assert(p.lterm().divideBy(*divisor.lterm()) == nullptr);
+			assert(p.lterm().divideBy(divisor.lterm()) == nullptr);
 			if( O::degreeOrder )
 			{
 				remainder += p;
@@ -725,7 +727,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 		}
 		else
 		{
-			Term<C>* factor = p.lterm().divideBy(*divisor.lterm());
+			Term<C>* factor = p.lterm().divideBy(divisor.lterm());
 			// nullptr if lt(divisor) does not divide lt(p).
 			if(factor != nullptr)
 			{
@@ -1111,12 +1113,12 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);
 	typename TermsType::const_iterator it = mTerms.begin();
-	typename IntegralType<Coeff>::type num = getNum((*it)->coeff());
-	typename IntegralType<Coeff>::type den = getDenom((*it)->coeff());
+	typename IntegralType<Coeff>::type num = getNum((it)->coeff());
+	typename IntegralType<Coeff>::type den = getDenom((it)->coeff());
 	for(++it; it != mTerms.end(); ++it)
 	{
-		num = carl::gcd(num, getNum((*it)->coeff()));
-		den = carl::lcm(den, getDenom((*it)->coeff()));
+		num = carl::gcd(num, getNum((it)->coeff()));
+		den = carl::lcm(den, getDenom((it)->coeff()));
 	}
 	return Coeff(den)/num;
 }
@@ -1131,7 +1133,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	result.mTerms.reserve(mTerms.size());
 	for (const auto& term: mTerms)
 	{
-		result.mTerms.push_back(std::make_shared<const TermType>(*term * factor));
+		result.mTerms.push_back(term * factor);
 	}
     result.mOrdered = mOrdered;
     assert(result.isConsistent());
@@ -1149,7 +1151,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	result.mTerms.reserve(mTerms.size());
 	for (const auto& it: mTerms)
 	{
-		result.mTerms.emplace_back(it->divideBy(lcoeff()));
+		auto tmp = it.divideBy(lcoeff());
+		result.mTerms.emplace_back(*tmp);
+		delete tmp;
 	}
 	result.mOrdered = mOrdered;
 	assert(result.isConsistent());
@@ -1170,8 +1174,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	assert(nth == 1);
 	TermsType tmpTerms;
 	for(const auto& t : mTerms) {
-		tmpTerms.emplace_back(t->derivative(v));
-		if (tmpTerms.back()->isZero()) tmpTerms.pop_back();
+		auto tmp = t.derivative(v);
+		tmpTerms.push_back(*tmp);
+		delete tmp;
+		if (tmpTerms.back().isZero()) tmpTerms.pop_back();
 	}
 	MultivariatePolynomial result(std::move(tmpTerms), true, mOrdered);
     assert(result.isConsistent());
@@ -1314,7 +1320,7 @@ UnivariatePolynomial<C> MultivariatePolynomial<C,O,P>::toUnivariatePolynomial() 
 	std::vector<C> coeffs(totalDegree()+1,0);
 	for (const auto& t : mTerms)
 	{
-		coeffs[t->tdeg()] = t->coeff();
+		coeffs[t.tdeg()] = t.coeff();
 	}
 	return UnivariatePolynomial<C>(x, coeffs);
 }
@@ -1346,10 +1352,10 @@ template<typename C, EnableIf<is_number<C>>>
 Coeff MultivariatePolynomial<Coeff,O,P>::numericContent() const
 {
 	if (this->isZero()) return 0;
-	typename UnderlyingNumberType<C>::type res = this->mTerms.front()->coeff();
+	typename UnderlyingNumberType<C>::type res = this->mTerms.front().coeff();
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
 		///@todo gcd needed for fractions
-		res = carl::gcd(res, this->mTerms[i]->coeff());
+		res = carl::gcd(res, this->mTerms[i].coeff());
 		//assert(false);
 	}
 	return res;
@@ -1372,7 +1378,7 @@ template<typename C, EnableIf<is_number<C>>>
 typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial<Coeff,O,P>::mainDenom() const {
 	IntNumberType res = 1;
 	for (const auto& t: mTerms) {
-		res = carl::lcm(res, getDenom(t->coeff()));
+		res = carl::lcm(res, getDenom(t.coeff()));
 	}
 	return res;
 }
@@ -1402,7 +1408,7 @@ template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
 	if (lhs.isZero() && carl::isZero(rhs.coeff())) return true;
 	if (lhs.nrTerms() > 1) return false;
-	return *(lhs.lterm()) == rhs;
+	return lhs.lterm() == rhs;
 }
 
 template<typename C, typename O, typename P>
@@ -1812,13 +1818,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		while(it != mTerms.end())
 		{
 			// TODO consider comparing the shared pointers.
-			if ((**it).monomial() != nullptr) {
-				CompareResult cmpres(Ordering::compare((**it), rhs));
+			if ((*it).monomial() != nullptr) {
+				CompareResult cmpres(Ordering::compare((*it), rhs));
 				if( cmpres == CompareResult::GREATER ) break;
 				if( cmpres == CompareResult::EQUAL )
 				{
 					// new coefficient would be zero, simply removing is enough.
-					if((**it).coeff() == rhs.coeff())
+					if((*it).coeff() == rhs.coeff())
 					{
 						mTerms.erase(it);
 					}
@@ -1859,13 +1865,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		typename TermsType::iterator it(mTerms.begin());
 		while(it != mTerms.end())
 		{
-			if ((**it).monomial() != nullptr) {
-				CompareResult cmpres(Ordering::compare((**it).monomial(), rhs));
+			if ((*it).monomial() != nullptr) {
+				CompareResult cmpres(Ordering::compare((*it).monomial(), rhs));
 				if( cmpres == CompareResult::GREATER ) break;
 				if( cmpres == CompareResult::EQUAL )
 				{
 					// new coefficient would be zero, simply removing is enough.
-					if(carl::isOne((**it).coeff()))
+					if(carl::isOne((*it).coeff()))
 					{
 						mTerms.erase(it);
 					}
