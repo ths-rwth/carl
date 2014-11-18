@@ -78,7 +78,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(unsigned
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Coeff& c) :
 Policies(),
-mTerms(c == (Coeff)0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
+mTerms(c == (Coeff)0 ? 0 : 1,Term<Coeff>(c))
 {
 	mOrdered = true;
 	assert(this->isConsistent());
@@ -87,7 +87,7 @@ mTerms(c == (Coeff)0 ? 0 : 1,std::make_shared<const Term<Coeff>>(c))
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(Variable::Arg v) :
 Policies(),
-mTerms(1,std::make_shared<const Term<Coeff>>(v))
+mTerms(1,Term<Coeff>(v))
 {
 	mOrdered = true;
 	assert(this->isConsistent());
@@ -96,7 +96,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(v))
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Monomial::Arg& m) :
 Policies(),
-mTerms(1,std::make_shared<const Term<Coeff>>(m))
+mTerms(1,Term<Coeff>(m))
 {
 	mOrdered = true;
 	assert(this->isConsistent());
@@ -105,7 +105,7 @@ mTerms(1,std::make_shared<const Term<Coeff>>(m))
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Term<Coeff>& t) :
 Policies(),
-mTerms(1,std::make_shared<const Term<Coeff>>(t))
+mTerms(1,t)
 {
 	if (t.isZero()) {
 		this->mTerms.clear();
@@ -224,7 +224,9 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	if( duplicates ) {
 #ifdef USE_MONOMIAL_POOL
 		std::size_t id = mTermAdditionManager.getId(mTerms.size());
-		for (const auto& t: mTerms) mTermAdditionManager.template addTerm<false>(id, t);
+		for (const auto& t: mTerms) {
+			mTermAdditionManager.template addTerm<false>(id, t);
+		}
 		mTermAdditionManager.readTerms(id, mTerms);
 #else
 		mTermAdditionManager.removeDuplicates(*this);
@@ -240,7 +242,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms)
 {
 	for (const auto& t: terms) {
-		mTerms.push_back(std::make_shared<const Term<Coeff>>(t));
+		mTerms.push_back(t);
 	}
 	makeMinimallyOrdered();
 	mOrdered = false;
@@ -293,17 +295,17 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 template<typename Coeff, typename Ordering, typename Policies>
 const Monomial::Arg& MultivariatePolynomial<Coeff,Ordering,Policies>::lmon() const
 {
-	return lterm()->monomial();
+	return lterm().monomial();
 }
 template<typename Coeff, typename Ordering, typename Policies>
-const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
+const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
 {
 	LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
 	return mTerms.back();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
+const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
 {
 	LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
 	return mTerms.front();
@@ -312,7 +314,7 @@ const std::shared_ptr<const Term<Coeff>>& MultivariatePolynomial<Coeff,Ordering,
 template<typename Coeff, typename Ordering, typename Policies>
 const Coeff& MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 {
-	return lterm()->coeff();
+	return lterm().coeff();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -320,7 +322,7 @@ exponent MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
 	assert(!mTerms.empty());
 	if (Ordering::degreeOrder) {
-		return this->lterm()->tdeg();
+		return this->lterm().tdeg();
 	} else {
 		LOG_NOTIMPLEMENTED();
 	}
@@ -335,22 +337,22 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isZero() const
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isOne() const
 {
-	return (mTerms.size() == 1) && mTerms.front()->isOne();
+	return (mTerms.size() == 1) && mTerms.front().isOne();
 }
 
 
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isConstant() const
 {
-	return (mTerms.empty()) || (mTerms.size() == 1 && mTerms.front()->isConstant());
+	return (mTerms.empty()) || (mTerms.size() == 1 && mTerms.front().isConstant());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 const Coeff& MultivariatePolynomial<Coeff, Ordering, Policies>::constantPart() const
 {
 	if(isZero()) return constant_zero<Coeff>::get();
-	if(trailingTerm()->isConstant()) {
-		return trailingTerm()->coeff();
+	if(trailingTerm().isConstant()) {
+		return trailingTerm().coeff();
 	}
 	return constant_zero<Coeff>::get();
 }
@@ -361,7 +363,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 	if(mTerms.empty()) return true;
 	if(Ordering::degreeOrder)
 	{
-		return this->lterm()->isLinear();
+		return this->lterm().isLinear();
 	}
 	else 
 	{
@@ -374,7 +376,7 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
 {
 	auto term = mTerms.rbegin();
 	if( term == mTerms.rend() ) return Definiteness::NON;
-	Definiteness result = (*term)->definiteness();
+	Definiteness result = term->definiteness();
 	++term;
 	if( term == mTerms.rend() ) return result;
 	if( result > Definiteness::NON )
@@ -410,7 +412,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
 	if(nrTerms() == 0) return false;
 	else {
 		// A term may not be zero...
-		return trailingTerm()->isConstant();
+		return trailingTerm().isConstant();
 	}
 }
 
@@ -465,13 +467,13 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 	// A constant polynomial is obviously univariate.
 	if (isConstant()) return true;
 	
-	if (this->lterm()->getNrVariables() > 1) {
+	if (this->lterm().getNrVariables() > 1) {
 		return false;
 	}
 	
-	Variable v = lterm()->getSingleVariable();
+	Variable v = lterm().getSingleVariable();
 	for (auto term : mTerms) {
-		if (!term->hasNoOtherVariable(v)) return false;
+		if (!term.hasNoOtherVariable(v)) return false;
 	}
 	return true;
 }
@@ -482,7 +484,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isTsos() const
 	// A polynomial is a tsos if it is the sum of squares in its standard representation.
 	for(const std::shared_ptr<const TermType>& term : mTerms)
 	{
-		if(!term->isSquare()) return false;
+		if(!term.isSquare()) return false;
 	}
 	return true;
 }
@@ -491,7 +493,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::has(Variable::Arg v) const
 {
 	for (auto& term : mTerms)
-		if (term->has(v)) return true;
+		if (term.has(v)) return true;
 	return false;
 }
 
@@ -520,9 +522,9 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 		mTermAdditionManager.template addTerm<false>(id, term);
 	}
 	for (const auto& term: p.mTerms) {
-		auto c = - factor.coeff() * term->coeff();
-		auto m = factor.monomial() * term->monomial();
-		mTermAdditionManager.template addTerm<false>(id, std::make_shared<const TermType>(c, m));
+		auto c = - factor.coeff() * term.coeff();
+		auto m = factor.monomial() * term.monomial();
+		mTermAdditionManager.template addTerm<false>(id, TermType(c, m));
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 #else
@@ -531,9 +533,9 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 		mTermAdditionManager.template addTerm<false>(*this, id, term);
 	}
 	for (const auto& term: p.mTerms) {
-		auto c = - factor.coeff() * term->coeff();
-		auto m = factor.monomial() * term->monomial();
-		mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<const TermType>(c, m));
+		auto c = - factor.coeff() * term.coeff();
+		auto m = factor.monomial() * term.monomial();
+		mTermAdditionManager.template addTerm<false>(*this, id, TermType(c, m));
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
@@ -567,13 +569,14 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	std::size_t id = mTermAdditionManager.getId(res.mTerms.size());
 	while(!res.isZero())
 	{
-		Term<C>* factor = res.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = res.lterm().divideBy(divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
 			res.subtractProduct(*factor, divisor);
 			//p -= *factor * divisor;
-			mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<TermType>(factor));
+			mTermAdditionManager.template addTerm<false>(id, *factor);
+			delete factor;
 		}
 		else
 		{
@@ -585,7 +588,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * divisor.nrTerms());
 	while(!res.isZero())
 	{
-		Term<C>* factor = res.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = res.lterm().divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
@@ -613,7 +616,7 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = p.lterm().divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
@@ -652,13 +655,14 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	std::size_t id = mTermAdditionManager.getId(p.mTerms.size());
 	while(!p.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = p.lterm().divideBy(divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
 			//p -= *factor * divisor;
 			p.subtractProduct(*factor, divisor);
-			mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<TermType>(factor));
+			mTermAdditionManager.template addTerm<false>(id, *factor);
+			delete factor;
 		}
 		else
 		{
@@ -671,7 +675,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * divisor.nrTerms());
 	while(!p.isZero())
 	{
-		Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+		Term<C>* factor = p.lterm().divideBy(*divisor.lterm());
 		// nullptr if lt(divisor) does not divide lt(p).
 		if(factor != nullptr)
 		{
@@ -707,9 +711,9 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
 	{
-		if(p.lterm()->tdeg() < divisor.lterm()->tdeg())
+		if(p.lterm().tdeg() < divisor.lterm().tdeg())
 		{
-			assert(p.lterm()->divideBy(*divisor.lterm()) == nullptr);
+			assert(p.lterm().divideBy(*divisor.lterm()) == nullptr);
 			if( O::degreeOrder )
 			{
 				remainder += p;
@@ -721,7 +725,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 		}
 		else
 		{
-			Term<C>* factor = p.lterm()->divideBy(*divisor.lterm());
+			Term<C>* factor = p.lterm().divideBy(*divisor.lterm());
 			// nullptr if lt(divisor) does not divide lt(p).
 			if(factor != nullptr)
 			{
@@ -756,7 +760,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	if(value.isZero())
 	{
 		for (const auto& term: mTerms) {
-			if (!term->has(var)) {
+			if (!term.has(var)) {
 				newTerms.push_back(term);
 			}
 		}
@@ -773,9 +777,9 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	std::pair<MultivariatePolynomial, unsigned> def( MultivariatePolynomial((Coeff) 1), 1 );
 	for(const auto& term: mTerms)
 	{
-		if(term->monomial())
+		if(term.monomial())
 		{ // This is not the constant part.
-			exponent e = term->monomial()->exponentOfVariable(var);
+			exponent e = term.monomial()->exponentOfVariable(var);
 			if(e > 1)
 			{ // Variable occurs with exponent at least two. Insert into map and increase counter in map.
 				auto iterBoolPair = expResults.insert(std::pair<exponent, std::pair<MultivariatePolynomial, size_t>>(e, def));
@@ -824,27 +828,27 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	std::size_t id = mTermAdditionManager.getId(expectedResultSize);
 	for (const auto& term: mTerms)
 	{
-		if (term->monomial() == nullptr) {
+		if (term.monomial() == nullptr) {
 			mTermAdditionManager.template addTerm<false>(id, term);
 		} else {
-			exponent e = term->monomial()->exponentOfVariable(var);
+			exponent e = term.monomial()->exponentOfVariable(var);
 			Monomial::Arg mon;
-			if (e > 0) mon = term->monomial()->dropVariable(var);
+			if (e > 0) mon = term.monomial()->dropVariable(var);
 			if (e == 1) {
 				for(auto vterm : value.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial()));
+					else if (vterm.monomial() == nullptr) mTermAdditionManager.template addTerm<false>(id, Term<Coeff>(vterm.coeff() * term.coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial() * mon));
 				}
 			} else if(e > 1) {
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
 				for(auto vterm : iter->second.first.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.template addTerm<false>(id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial()));
+					else if (vterm.monomial() == nullptr) mTermAdditionManager.template addTerm<false>(id, Term<Coeff>(vterm.coeff() * term.coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial() * mon));
 				}
 			}
 			else
@@ -858,27 +862,27 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, expectedResultSize);
 	for (const auto& term: mTerms)
 	{
-		if (term->monomial() == nullptr) {
+		if (term.monomial() == nullptr) {
 			mTermAdditionManager.template addTerm<false>(*this, id, term);
 		} else {
-			exponent e = term->monomial()->exponentOfVariable(var);
+			exponent e = term.monomial()->exponentOfVariable(var);
 			Monomial::Arg mon;
-			if (e > 0) mon = term->monomial()->dropVariable(var);
+			if (e > 0) mon = term.monomial()->dropVariable(var);
 			if (e == 1) {
 				for(auto vterm : value.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial()));
+					else if (vterm.monomial() == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, Term<Coeff>(vterm.coeff() * term.coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(*this, id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial() * mon));
 				}
 			} else if(e > 1) {
 				auto iter = expResults.find(e);
 				assert(iter != expResults.end());
 				for(auto vterm : iter->second.first.mTerms)
 				{
-					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial()));
-					else if (vterm->monomial() == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), mon));
-					else mTermAdditionManager.template addTerm<false>(*this, id, std::make_shared<Term<Coeff>>(vterm->coeff() * term->coeff(), vterm->monomial() * mon));
+					if (mon == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial()));
+					else if (vterm.monomial() == nullptr) mTermAdditionManager.template addTerm<false>(*this, id, Term<Coeff>(vterm.coeff() * term.coeff(), mon));
+					else mTermAdditionManager.template addTerm<false>(*this, id, Term<Coeff>(vterm.coeff() * term.coeff(), vterm.monomial() * mon));
 				}
 			}
 			else
@@ -929,9 +933,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	std::map<std::pair<Variable, exponent>, MultivariatePolynomial> expResults;
 	for(const auto& term: result.mTerms)
 	{
-		if(term->monomial())
+		if(term.monomial())
 		{
-			const Monomial& m = *(term->monomial());
+			const Monomial& m = *(term.monomial());
 			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
 			for(unsigned i = 0; i < m.nrVariables(); ++i)
 			{
@@ -984,10 +988,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	// Substitute the variable for which all occurring exponentiations are calculated.
 	for(const auto& term: result.mTerms)
 	{
-		MultivariatePolynomial termResult(term->coeff());
-		if(term->monomial())
+		MultivariatePolynomial termResult(term.coeff());
+		if(term.monomial())
 		{   
-			const Monomial& m = *(term->monomial());
+			const Monomial& m = *(term.monomial());
 			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
 			for(unsigned i = 0; i < m.nrVariables(); ++i)
 			{
@@ -1034,7 +1038,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-        Term<Coeff >* resultTerm = term->substitute(substitutions);
+        Term<Coeff >* resultTerm = term.substitute(substitutions);
         if( !resultTerm->isZero() )
         {
             mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
@@ -1048,7 +1052,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size());
 	for (const auto& term: mTerms) {
-        Term<Coeff >* resultTerm = term->substitute(substitutions);
+        Term<Coeff >* resultTerm = term.substitute(substitutions);
         if( !resultTerm->isZero() )
         {
             mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
@@ -1073,13 +1077,13 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+		mTermAdditionManager.template addTerm<false>(id, term.substitute(substitutions));
 	}
 	mTermAdditionManager.readTerms(id, result.mTerms);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.template addTerm<false>(*this, id, std::shared_ptr<const Term<Coeff >>( term->substitute(substitutions) ));
+		mTermAdditionManager.template addTerm<false>(*this, id, term.substitute(substitutions));
 	}
 	mTermAdditionManager.readTerms(*this, id, result.mTerms);
 #endif
@@ -1191,15 +1195,15 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	}
 	else if( p.nrTerms() == 1 )
 	{
-		return -(p.lterm()->calcLcmAndDivideBy( q.lmon() ) * q.tail());
+		return -(p.lterm().calcLcmAndDivideBy( q.lmon() ) * q.tail());
 	}
 	else if( q.nrTerms() == 1 )
 	{
-		return (q.lterm()->calcLcmAndDivideBy( p.lmon() ) * p.tail());
+		return (q.lterm().calcLcmAndDivideBy( p.lmon() ) * p.tail());
 	}
 	else
 	{
-		return (p.tail() * q.lterm()->calcLcmAndDivideBy(p.lmon())) - (q.tail() * p.lterm()->calcLcmAndDivideBy( q.lmon() ));
+		return (p.tail() * q.lterm().calcLcmAndDivideBy(p.lmon())) - (q.tail() * p.lterm().calcLcmAndDivideBy( q.lmon() ));
 	}
 	
 }
@@ -1210,9 +1214,11 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 	assert(this->isConsistent());
 	TermsType tmp;
 	for (auto it1 = mTerms.begin(); it1 != mTerms.end(); it1++) {
-		tmp.emplace_back((*it1)->pow(2));
+		auto t = (*it1).pow(2);
+		tmp.push_back(*t);
+		delete t;
 		for (auto it2 = it1+1; it2 != mTerms.end(); it2++) {
-			tmp.push_back(std::make_shared<const TermType>(Coeff(2) * **it1 * **it2));
+			tmp.push_back(Coeff(2) * *it1 * *it2);
 		}
 	}
 	std::swap(tmp, mTerms);
@@ -1257,7 +1263,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::gatherVariables(std::set<V
 {
 	for(const auto& t : mTerms)
 	{
-		t->gatherVariables(vars);
+		t.gatherVariables(vars);
 	}
 }
 
@@ -1278,7 +1284,7 @@ VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>
 	for(const auto& term : mTerms)
 	{
 		// And gather information from the terms and meanwhile up
-		term->gatherVarInfo(var, varinfomap);
+		term.gatherVarInfo(var, varinfomap);
 	}
 	return varinfomap;
 	
@@ -1293,7 +1299,7 @@ VariablesInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies
 	for(const auto& term : mTerms)
 	{
 		// And gather information from the terms and meanwhile up
-		term->gatherVarInfo(varinfomap);
+		term.gatherVarInfo(varinfomap);
 	}
 	return varinfomap;
 	
@@ -1319,15 +1325,15 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 	assert(this->isConsistent());
 	std::vector<MultivariatePolynomial<C,O,P>> coeffs(1);
 	for (const auto& term: this->mTerms) {
-		if (term->monomial() == nullptr) coeffs[0] += *term;
+		if (term.monomial() == nullptr) coeffs[0] += term;
 		else {
-			auto mon = term->monomial();
+			auto mon = term.monomial();
 			auto exponent = mon->exponentOfVariable(v);
 			if (exponent >= coeffs.size()) {
 				coeffs.resize(exponent + 1, MultivariatePolynomial<C,O,P>(0));
 			}
 			std::shared_ptr<const carl::Monomial> tmp = mon->dropVariable(v);
-			coeffs[exponent] += term->coeff() * tmp;
+			coeffs[exponent] += term.coeff() * tmp;
 		}
 	}
 	// Convert result back to MultivariatePolynomial and check that the result is equal to *this
@@ -1380,15 +1386,15 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	if (lhs.nrTerms() == 0) return true;
 	if (lhs.hasConstantTerm() ^ rhs.hasConstantTerm()) return false;
 	if (lhs.hasConstantTerm() && (lhs.constantPart() != rhs.constantPart())) return false;
-	if (*lhs.lterm() != *rhs.lterm()) return false;
+	if (lhs.lterm() != rhs.lterm()) return false;
 	lhs.makeOrdered();
 	rhs.makeOrdered();
 	// Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
 	return std::equal(lhs.begin(), lhs.end(), rhs.begin(),
-		[](const std::shared_ptr<const Term<C>>& lterm, const std::shared_ptr<const Term<C>>& rterm) 
+		[](const Term<C>& lterm, const Term<C>& rterm)
 		-> bool 
 		{
-			return lterm == rterm || *lterm == *rterm;
+			return &lterm == &rterm || lterm == rterm;
 		});
 }
 
@@ -1453,8 +1459,8 @@ bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolyn
 	if (rhs.isZero()) return false;
 	if (lhs.totalDegree() != rhs.totalDegree()) return lhs.totalDegree() < rhs.totalDegree();
 	if (lhs.totalDegree() == 0) return lhs.constantPart() < rhs.constantPart();
-	if (*lhs.lterm() < *rhs.lterm()) return true;
-	if (*lhs.lterm() > *rhs.lterm()) return false;
+	if (lhs.lterm() < rhs.lterm()) return true;
+	if (lhs.lterm() > rhs.lterm()) return false;
 	// We have to sort, but we can skip the leading term.
 	lhs.makeOrdered();
 	rhs.makeOrdered();
@@ -1462,56 +1468,56 @@ bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolyn
 	auto rit = rhs.rbegin();
 	for (lit++, rit++; lit != lhs.rend(); lit++, rit++) {
 		if (rit == rhs.rend()) return false;
-		if (**lit < **rit) return true;
-		if (**lit > **rit) return false;
+		if (*lit < *rit) return true;
+		if (*lit > *rit) return false;
 	}
 	return rit != rhs.rend();
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
 	if (lhs.isZero()) return carl::constant_zero<C>().get() < rhs;
-	return *(lhs.lterm()) < rhs;
+	return (lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const carl::Monomial>& rhs) {
 	if (lhs.nrTerms() == 0) return true;
-	return *(lhs.lterm()) < rhs;
+	return (lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
 	if (lhs.nrTerms() == 0) return true;
-	return *(lhs.lterm()) < rhs;
+	return (lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
 	if (lhs.nrTerms() == 0) return carl::constant_zero<C>().get() < rhs;
-	return *(lhs.lterm()) < rhs;
+	return (lhs.lterm()) < rhs;
 }
 template<typename C, typename O, typename P>
 bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return lhs < carl::constant_zero<C>().get();
-	if (lhs < *(rhs.lterm())) return true;
-	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	if (lhs < (rhs.lterm())) return true;
+	if (lhs == (rhs.lterm())) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 bool operator<(const std::shared_ptr<const carl::Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return false;
-	if (lhs < *(rhs.lterm())) return true;
-	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	if (lhs < (rhs.lterm())) return true;
+	if (lhs == (rhs.lterm())) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 bool operator<(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return false;
-	if (lhs < *(rhs.lterm())) return true;
-	if (lhs == *(rhs.lterm())) return rhs.nrTerms() > 1;
+	if (lhs < (rhs.lterm())) return true;
+	if (lhs == (rhs.lterm())) return rhs.nrTerms() > 1;
 	return false;
 }
 template<typename C, typename O, typename P>
 bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	if (rhs.nrTerms() == 0) return lhs < carl::constant_zero<C>().get();
-	return lhs < *(rhs.lterm());
+	return lhs < (rhs.lterm());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1535,9 +1541,9 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		return *this;
 	}
 	if (rhs.mTerms.empty()) return *this;
-	std::shared_ptr<const TermType> newlterm;
-	std::shared_ptr<const TermType> oldrhs;
-	CompareResult res = Ordering::compare(lterm()->monomial(), rhs.lterm()->monomial());
+	TermType newlterm;
+	TermType oldrhs;
+	CompareResult res = Ordering::compare(lterm().monomial(), rhs.lterm().monomial());
 	if (res == CompareResult::GREATER) {
 		newlterm = lterm();
 		mTerms.pop_back();
@@ -1548,7 +1554,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	} else {
 		Coeff c = rhs.lcoeff() + lcoeff();
 		if (!carl::isZero(c)) {
-			newlterm = std::make_shared<const TermType>(c, lmon());
+			newlterm = TermType(c, lmon());
 		}
 		oldrhs = rhs.lterm();
 		mTerms.pop_back();
@@ -1573,38 +1579,39 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	mTermAdditionManager.readTerms(*this, id, mTerms);
 #endif
-	if (newlterm != nullptr) {
+	if (!newlterm.isZero()) {
 		mTerms.push_back(newlterm);
-		if (oldrhs != nullptr) rhs.mTerms.push_back(oldrhs);
+		if (!oldrhs.isZero()) rhs.mTerms.push_back(oldrhs);
 	} else {
 		makeMinimallyOrdered<false,true>();
 	}
 	mOrdered = false;
 	assert(this->isConsistent());
+	assert(rhs.isConsistent());
 	return *this;
 }
 
 
-template<typename Coeff, typename Ordering, typename Policies>
+/*template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const TermType& rhs) {
 	return *this += std::make_shared<const TermType>(rhs);
-}
+}*/
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const std::shared_ptr<const TermType>& rhs)
+MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const TermType& rhs)
 {
 	assert(this->isConsistent());
-	if (carl::isZero(rhs->coeff())) return *this;
+	if (carl::isZero(rhs.coeff())) return *this;
 	if (mTerms.empty()) {
 		// Empty -> just insert.
 		mTerms.push_back(rhs);
 		mOrdered = true;
-	} else if (rhs->isConstant()) {
+	} else if (rhs.isConstant()) {
 		if (this->hasConstantTerm()) {
 			// Combine with constant term.
-			if (carl::isZero(Coeff(mTerms.front()->coeff() + rhs->coeff()))) {
+			if (carl::isZero(Coeff(mTerms.front().coeff() + rhs.coeff()))) {
 				mTerms.erase(mTerms.begin());
-			} else mTerms.front().reset(new Term<Coeff>(mTerms.front()->coeff() + rhs->coeff(), nullptr));
+			} else mTerms.front() = Term<Coeff>(mTerms.front().coeff() + rhs.coeff(), nullptr);
 		} else if (mTerms.size() == 1) {
 			// Only a single term, insert and swap.
 			mTerms.push_back(rhs);
@@ -1620,10 +1627,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		}
 	} else if (Term<Coeff>::monomialEqual(lterm(), rhs)) {
 		// Combine with leading term.
-		if (carl::isZero(Coeff(lcoeff() + rhs->coeff()))) {
+		if (carl::isZero(Coeff(lcoeff() + rhs.coeff()))) {
 			mTerms.pop_back();
 			makeMinimallyOrdered<false, true>();
-		} else mTerms.back().reset(new Term<Coeff>(lcoeff() + rhs->coeff(), rhs->monomial()));
+		} else mTerms.back() = Term<Coeff>(lcoeff() + rhs.coeff(), rhs.monomial());
 	} else if (Ordering::less(lterm(), rhs)) {
 		// New leading term.
 		mTerms.push_back(rhs);
@@ -1656,36 +1663,36 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 {
 	if (mTerms.empty()) {
 		// Empty -> just insert.
-		mTerms.emplace_back(new TermType(constant_one<Coeff>::get(), rhs));
+		mTerms.emplace_back(constant_one<Coeff>::get(), rhs);
 		mOrdered = true;
-	} else if (lterm()->isConstant()) {
-		mTerms.emplace_back(new TermType(constant_one<Coeff>::get(), rhs));
+	} else if (lterm().isConstant()) {
+		mTerms.emplace_back(constant_one<Coeff>::get(), rhs);
 	} else if (lmon() == rhs) {
 		// Combine with leading term.
 		if (lcoeff() == -carl::constant_one<Coeff>().get()) {
 			mTerms.pop_back();
 			makeMinimallyOrdered<false, true>();
 		} else {
-			mTerms.back().reset(new Term<Coeff>(lcoeff() + constant_one<Coeff>::get(), lmon()));
+			mTerms.back() = Term<Coeff>(lcoeff() + constant_one<Coeff>::get(), lmon());
 		}
 	} else if (Ordering::less(lmon(),rhs)) {
 		// New leading term.
-		mTerms.emplace_back(new TermType(rhs));
+		mTerms.emplace_back(rhs);
 	} else {
 		///@todo insert at correct position if already ordered
 		auto it = mTerms.begin();
 		for (; it != mTerms.end(); it++) {
-			if ((*it)->monomial() == rhs) {
-				if ((*it)->coeff() == -carl::constant_one<Coeff>().get()) {
+			if ((*it).monomial() == rhs) {
+				if ((*it).coeff() == -carl::constant_one<Coeff>().get()) {
 					mTerms.erase(it);
 				} else {
-					it->reset(new Term<Coeff>((*it)->coeff() + constant_one<Coeff>::get(), (*it)->monomial()));
+					*it = Term<Coeff>((*it).coeff() + constant_one<Coeff>::get(), (*it).monomial());
 				}
 				break;
 			}
 		}
 		if (it == mTerms.end()) {
-			mTerms.emplace_back(new Term<Coeff>(constant_one<Coeff>::get(), rhs));
+			mTerms.emplace_back(constant_one<Coeff>::get(), rhs);
 			std::swap(mTerms[mTerms.size()-2], mTerms[mTerms.size()-1]);
 		}
 		mOrdered = false;
@@ -1710,9 +1717,9 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	if (carl::isZero(c)) return *this;
 	if (hasConstantTerm()) {
 		if (carl::isZero(Coeff(constantPart() + c))) mTerms.erase(mTerms.begin());
-		else mTerms.front().reset(new TermType(constantPart() + c));
+		else mTerms.front() = TermType(constantPart() + c);
 	} else {
-		mTerms.emplace(mTerms.begin(), new TermType(c));
+		mTerms.emplace(mTerms.begin(), c);
 	}
 	assert(this->isConsistent());
 	return *this;
@@ -1749,7 +1756,7 @@ const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<C
 	MultivariatePolynomial<Coeff, Ordering, Policies> negation;
 	negation.mTerms.reserve(mTerms.size());
 	for (const auto& term: mTerms) {
-		negation.mTerms.push_back(std::make_shared<const Term<Coeff>>(-*term));
+		negation.mTerms.push_back(-term);
 	}
 	negation.mOrdered = this->mOrdered;
 	assert(negation.isConsistent());
@@ -1775,7 +1782,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		mTermAdditionManager.template addTerm<false>(id, term);
 	}
 	for (const auto& term: rhs.mTerms) {
-		mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const TermType>(new TermType(-*term)));
+		mTermAdditionManager.template addTerm<false>(id, -term);
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 #else
@@ -1818,7 +1825,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 					// we have to create a new term object.
 					else
 					{
-						*it = std::make_shared<const Term<Coeff>>((**it).coeff()-rhs.coeff(), (**it).monomial());
+						it->setCoeff(it->coeff() - rhs.coeff());
 					}
 					assert(this->isConsistent());
 					return *this;
@@ -1827,7 +1834,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 			++it;	
 		}
 		// no equal monomial does occur. We can simply insert.
-		mTerms.insert(it,std::make_shared<const Term<Coeff>>(-rhs));
+		mTerms.insert(it,-rhs);
 		assert(this->isConsistent());
 		return *this;
 	}
@@ -1865,7 +1872,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 					// we have to create a new term object.
 					else
 					{
-						*it = std::make_shared<const Term<Coeff>>((**it).coeff()-constant_one<Coeff>::get(), (**it).monomial());
+						it->setCoeff(it->coeff() - constant_one<Coeff>::get());
 					}
 					assert(this->isConsistent());
 					return *this;
@@ -1874,7 +1881,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 			++it;	
 		}
 		// no equal monomial does occur. We can simply insert.
-		mTerms.insert(it,std::make_shared<const Term<Coeff>>(-carl::constant_one<Coeff>().get(), rhs));
+		mTerms.insert(it,Term<Coeff>(-carl::constant_one<Coeff>().get(), rhs));
 		assert(this->isConsistent());
 		return *this;
 	}
@@ -1909,15 +1916,16 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	}
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() * rhs.mTerms.size());
-	TermType* newlterm = nullptr;
+	TermType newlterm;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
-			if (newlterm != nullptr) mTermAdditionManager.template addTerm<false>(id, std::make_shared<const TermType>(std::move((**t1)*(**t2))));
-			else newlterm = new TermType(**t1 * **t2);
+			if (newlterm != nullptr) mTermAdditionManager.template addTerm<false>(id, TermType(std::move((*t1)*(*t2))));
+			else newlterm = *t1 * *t2;
 		}
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
-	mTerms.emplace_back(newlterm);
+	if (newlterm.isZero()) makeMinimallyOrdered<false, true>();
+	else mTerms.push_back(newlterm);
 #else
 	std::size_t id = mTermAdditionManager.getTermMapId(*this, mTerms.size() * rhs.mTerms.size());
 	TermType* newlterm = nullptr;
@@ -1945,7 +1953,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	newTerms.reserve(mTerms.size());
 	for(const auto& term : mTerms)
 	{
-		newTerms.push_back(std::make_shared<Term<Coeff>>(*term * rhs));
+		newTerms.push_back(term * rhs);
 	}
 	mTerms = std::move(newTerms);
 	assert(this->isConsistent());
@@ -1960,7 +1968,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	newTerms.reserve(mTerms.size());
 	for(const auto& term : mTerms)
 	{
-		newTerms.push_back(std::make_shared<Term<Coeff>>(*term * rhs));
+		newTerms.push_back(term * rhs);
 	}
 	mTerms = std::move(newTerms);
 	assert(this->isConsistent());
@@ -1974,7 +1982,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	newTerms.reserve(mTerms.size());
 	for(const auto& term : mTerms)
 	{
-		newTerms.push_back(std::make_shared<Term<Coeff>>(*term * rhs));
+		newTerms.push_back(term * rhs);
 	}
 	mTerms = std::move(newTerms);
 	assert(this->isConsistent());
@@ -1995,7 +2003,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	newTerms.reserve(mTerms.size());
 	for(auto term : mTerms)
 	{
-		newTerms.push_back(std::make_shared<Term<Coeff>>(*term * c));
+		newTerms.push_back(term * c);
 	}
 	mTerms = std::move(newTerms);
 	assert(this->isConsistent());
@@ -2019,7 +2027,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	if (carl::isOne(c)) return *this;
 	for (auto& term : mTerms) {
 		///@todo add /=(Coefficient) for Term.
-		term.reset(term->divideBy(c));
+		term.reset(term.divideBy(c));
 	}
 	return *this;
 }
@@ -2047,7 +2055,7 @@ std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool inf
 {
 	///@todo sort for this?
 	if(mTerms.empty()) return "0";
-	if(mTerms.size() == 1) return this->mTerms.front()->toString(infix, friendlyVarNames);
+	if(mTerms.size() == 1) return this->mTerms.front().toString(infix, friendlyVarNames);
 	std::string result = "";
 	if( !infix ) result += "(+";
 	for (auto term = mTerms.rbegin(); term != mTerms.rend(); term++)
@@ -2057,7 +2065,7 @@ std::string MultivariatePolynomial<Coeff, Ordering, Policies>::toString(bool inf
 			if(term != mTerms.rbegin()) result += "+";
 		}
 		else result += " ";
-		result += (*term)->toString(infix, friendlyVarNames);
+		result += (*term).toString(infix, friendlyVarNames);
 	}
 	if( !infix ) result += ")";
 	return result;
@@ -2067,23 +2075,22 @@ template<typename Coeff, typename Ordering, typename Policies>
 template<bool findConstantTerm, bool findLeadingTerm>
 void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered() const {
 	static_assert(findLeadingTerm, "We do not have implementations of makeMinimallyOrdered() which assume a given leading term position.");
-	
 	if(findConstantTerm)
 	{
 		if (mTerms.size() < 2) return;
 		auto it = mTerms.begin();
 		auto lTerm = it;
 		auto constTerm = mTerms.end();
-		if ((*it)->isConstant()) constTerm = it;
+		if ((*it).isConstant()) constTerm = it;
 
 		for (it++; it != mTerms.end();) {
-			if ((*it)->isConstant()) {
+			if ((*it).isConstant()) {
 				assert(constTerm == mTerms.end());
 				constTerm = it;
 			} else if (Ordering::less(*lTerm, *it)) {
 				lTerm = it;
 			} else {
-				assert(!Term<Coeff>::monomialEqual(**lTerm, **it));
+				assert(!Term<Coeff>::monomialEqual(*lTerm, *it));
 			}
 			it++;
 		}
@@ -2100,11 +2107,11 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered() c
 			if (Ordering::less(*lTerm, *it)) {
 				lTerm = it;
 			} else {
-				assert(!Term<Coeff>::monomialEqual(**lTerm, **it));
+				assert(!Term<Coeff>::monomialEqual(*lTerm, *it));
 			}
 		}
 
-		assert(!Term<Coeff>::monomialEqual(**lTerm, **itToLast));
+		assert(!Term<Coeff>::monomialEqual(*lTerm, *itToLast));
 		if (!Ordering::less(*lTerm, *itToLast)) {
 			std::swap(*lTerm, mTerms.back());
 		} 
@@ -2191,10 +2198,10 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff, Ordering, Policies>::isConsistent() const {
 	for (unsigned i = 0; i < this->mTerms.size(); i++) {
-		assert(this->mTerms[i]);
-		assert(!this->mTerms[i]->isZero());
+		//assert(this->mTerms[i]);
+		assert(!this->mTerms[i].isZero());
 		if (i > 0) {
-			assert(this->mTerms[i]->tdeg() > 0);
+			assert(this->mTerms[i].tdeg() > 0);
 		}
 	}
 	if (mOrdered) {
