@@ -60,7 +60,7 @@ public:
 	typedef typename IntegralType<NumberType>::type IntNumberType;
 protected:
 	/// Type our terms vector.
-	typedef std::vector<std::shared_ptr<const Term<Coeff >> > TermsType;
+	typedef std::vector<Term<Coeff>> TermsType;
 	
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
@@ -132,7 +132,7 @@ public:
      */
 	inline void makeOrdered() const {
 		if (isOrdered()) return;
-		std::sort(mTerms.begin(), mTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
+		std::sort(mTerms.begin(), mTerms.end(), (bool (&)(Term<Coeff> const&, Term<Coeff> const&))Ordering::less);
 		mOrdered = true;
         assert(this->isConsistent());
 	}
@@ -146,7 +146,7 @@ public:
 	 * The leading term
 	 * @return 
 	 */
-	const std::shared_ptr<const Term<Coeff>>& lterm() const;
+	const Term<Coeff>& lterm() const;
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
@@ -209,7 +209,7 @@ public:
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 
 	 */
-	const std::shared_ptr<const Term<Coeff>>& trailingTerm() const;
+	const Term<Coeff>& trailingTerm() const;
 	/**
 	 * Checks if the polynomial has a constant term that is not zero.
 	 * @return If there is a constant term unequal to zero.
@@ -1156,7 +1156,7 @@ namespace std
 			for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
                         {
                             result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-                            result ^= h(**iter);
+                            result ^= h(*iter);
 			}
                         return result;
 		}
