@@ -12,10 +12,10 @@ namespace carl
         GiNaC::ex result = 0;
         for(auto term = poly.begin(); term != poly.end(); ++term)
         {
-            GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( (*term)->coeff() ) );
-            if((*term)->monomial())
+            GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( term->coeff() ) );
+            if((*term).monomial())
             {
-                for (auto it: *((*term)->monomial())) {
+                for (auto it: *(term->monomial())) {
                     auto carlToGinacVar = vars.find(it.first);
                     assert(carlToGinacVar != vars.end());
                     factor *= GiNaC::pow(carlToGinacVar->second, it.second);

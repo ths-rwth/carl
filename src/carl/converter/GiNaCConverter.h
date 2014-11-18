@@ -46,7 +46,7 @@ public:
 	template<typename Coeff>
 	GiNaC::ex operator()(const carl::MultivariatePolynomial<Coeff>& p) {
 		GiNaC::ex res;
-		for (auto t: p) res += (*this)(*t);
+		for (auto t: p) res += (*this)(t);
 		return GiNaC::expand(res);
 	}
 	template<typename Coeff>

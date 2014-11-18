@@ -99,7 +99,7 @@ public:
 	polynomial::polynomial_ref operator()(const carl::MultivariatePolynomial<Coeff>& p) {
 		polynomial::polynomial_ref res(this->m);
 		res = (*this)(this->m.mk_zero());
-		for (auto t: p) res = res + (*this)(*t);
+		for (auto t: p) res = res + (*this)(t);
 		this->m.lex_sort(res);
 		return res;
 	}
