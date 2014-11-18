@@ -28,6 +28,38 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial()
 	mOrdered = true;
 	assert(this->isConsistent());
 }
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>& p) :
+	Policies(),
+	mTerms(p.mTerms),
+	mOrdered(p.isOrdered())
+{
+	assert(this->isConsistent());
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&& p) :
+	Policies(),
+	mTerms(std::move(p.mTerms)),
+	mOrdered(p.isOrdered())
+{
+	assert(this->isConsistent());
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator=(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
+	mTerms = p.mTerms;
+	mOrdered = p.mOrdered;
+	return *this;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator=(MultivariatePolynomial<Coeff,Ordering,Policies>&& p) {
+	mTerms = std::move(p.mTerms);
+	mOrdered = p.mOrdered;
+	return *this;
+}
    
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(int c) : MultivariatePolynomial((Coeff)c)
@@ -152,7 +184,7 @@ Policies()
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-template<typename OtherPolicies>
+template<typename OtherPolicies, DisableIf<std::is_same<Policies,OtherPolicies>>>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicies>& pol) :
 	Policies(),
 	mTerms(pol.begin(), pol.end()),

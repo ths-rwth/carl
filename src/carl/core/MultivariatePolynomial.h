@@ -78,6 +78,10 @@ public:
 	/// @name Constructors
 	/// @{
 	MultivariatePolynomial();
+	MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>&);
+	MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&&);
+	MultivariatePolynomial& operator=(const MultivariatePolynomial& p);
+	MultivariatePolynomial& operator=(MultivariatePolynomial&& p);
 	explicit MultivariatePolynomial(int c);
 	explicit MultivariatePolynomial(unsigned c);
 	explicit MultivariatePolynomial(const Coeff& c);
@@ -87,8 +91,8 @@ public:
 	explicit MultivariatePolynomial(const std::shared_ptr<const Term<Coeff >>& t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
-	template<class OtherPolicy>
-	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicy>&);
+	template<class OtherPolicies, DisableIf<std::is_same<Policies,OtherPolicies>> = dummy>
+	explicit MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, OtherPolicies>&);
 	explicit MultivariatePolynomial(TermsType&& terms, bool duplicates = true, bool ordered = false);
 	explicit MultivariatePolynomial(const TermsType& terms, bool duplicates = true, bool ordered = false);
 	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
