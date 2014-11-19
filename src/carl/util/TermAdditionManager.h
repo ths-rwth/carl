@@ -56,12 +56,14 @@ public:
         Tuple& data = mData[mNextId];
 		//std::lock_guard<std::mutex> lock(mMutex);
         Terms& terms = std::get<1>(data);
-        if( terms.size() < expectedSize + 1) terms.resize(expectedSize + 1);
+		terms.clear();
+        terms.resize(expectedSize + 1);
         #ifdef SWAP_TERMS
-        memset(&terms[0], 0, sizeof(TermPtr)*terms.size());
+        //memset(&terms[0], 0, sizeof(TermPtr)*terms.size());
         #endif
         size_t greatestIdPlusOne = MonomialPool::getInstance().nextID();
 		if( std::get<0>(data).size() < greatestIdPlusOne ) std::get<0>(data).resize(greatestIdPlusOne);
+		//memset(&std::get<0>(data)[0], 0, sizeof(IDType)*std::get<0>(data).size());
 		std::get<3>(data) = constant_zero<Coeff>::get();
 		std::get<4>(data) = 1;
 		std::get<2>(data) = true;
@@ -72,6 +74,7 @@ public:
 
     template<bool SizeUnknown, bool NewMonomials = true>
 	void addTerm(std::size_t id, const TermPtr& term) {
+		assert(!term.isZero());
         Tuple& data = mData[id];
 		assert(std::get<2>(data));
 		TermIDs& termIDs = std::get<0>(data);
@@ -87,17 +90,18 @@ public:
 				if (!isZero(t.coeff())) {
 					Coeff coeff = t.coeff() + term.coeff();
 					if (carl::isZero(coeff)) {
+						termIDs[monId] = 0;
 						t = TermType();
 					} else {
-						t = TermType(coeff, term.monomial());
+						t.setCoeff(std::move(coeff));
 					}
-				}
-				else
-                     t = term;
+				} else 
+                    t = term;
 			} else {
 				IDType& nextID = std::get<4>(data);
 				if (SizeUnknown && nextID >= terms.size()) terms.resize(nextID + 1);
 				assert(nextID < terms.size());
+				assert(nextID < std::numeric_limits<IDType>::max());
 				termIDs[monId] = nextID;
 				terms[nextID] = term;
 				++nextID;
@@ -114,17 +118,14 @@ public:
         TermIDs& termIDs = std::get<0>(data);
         #ifdef SWAP_TERMS
 		if (!isZero(std::get<3>(data))) {
-			t[0] = std::make_shared<const TermType>(std::move(std::get<3>(data)), nullptr);
+			t[0] = TermType(std::move(std::get<3>(data)), nullptr);
 		}
-        auto i = t.begin();
-        ++i;
-		for (; i != t.end();) {
-			if (*i == nullptr) {
+		for (auto i = t.begin(); i != t.end();) {
+			if (i->isZero()) {
 				std::swap(*i, *t.rbegin());
 				t.pop_back();
-			} else
-            {
-                termIDs[(*i)->monomial()->id()] = 0;
+			} else {
+				if ((*i).monomial()) termIDs[(*i).monomial()->id()] = 0;
                 ++i;
             }
 		}
