@@ -16,7 +16,7 @@ CLANG_WARNING_RESET
 #include <sstream>
 #include <vector>
 #include "boost/algorithm/string.hpp"
-#include "constants.h"
+#include "../constants.h"
 
 namespace carl {
 

@@ -134,7 +134,7 @@ struct hash<carl::UFInstanceContent>
 {
 public:
     /**
-     * @param _ueq The uninterpreted function to get the hash for.
+     * @param _ufun The uninterpreted function to get the hash for.
      * @return The hash of the given uninterpreted function.
      */
     size_t operator()( const carl::UFInstanceContent& _ufun ) const 
@@ -218,6 +218,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
          * Prints the given uninterpreted function instance on the given output stream.
          * @param _out The output stream to print the given uninterpreted function instance on.
          * @param  _ufi The uninterpreted function instance to print.
+		 * @param _infix If infix notation shall be used.
          * @return The output stream after printing the given uninterpreted function instance on it.
          */
         std::ostream& print( std::ostream& _out, const UFInstance& _ufi, bool _infix = false, bool _friendlyNames = true ) const;

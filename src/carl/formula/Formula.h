@@ -1,5 +1,5 @@
 /**
- * @file Ast.h
+ * @file Formula.h
  * @author Florian Corzilius<corzilius@cs.rwth-aachen.de>
  * @author Ulrich Loup
  * @author Sebastian Junges

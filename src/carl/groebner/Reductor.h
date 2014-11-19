@@ -114,7 +114,7 @@ public:
 				// get actual leading term
 				entry = mDatastruct.top();
 				leadingTerm = entry->getLead();
-				LOGMSG_TRACE("carl.gb.reductor", "Intermediate leading term: " << *leadingTerm);
+				LOGMSG_TRACE("carl.gb.reductor", "Intermediate leading term: " << leadingTerm);
 				assert(!leadingTerm.isZero());
 				// update the data structure.
 				// only insert non-empty polynomials.
@@ -157,7 +157,7 @@ public:
 			}
 			else
 			{
-				LOGMSG_DEBUG("carl.gb.reductor", "Not reducible: " << *leadingTerm);
+				LOGMSG_DEBUG("carl.gb.reductor", "Not reducible: " << leadingTerm);
 				mRemainder.push_back(leadingTerm);
 				return false;
 			}

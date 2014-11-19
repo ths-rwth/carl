@@ -156,7 +156,7 @@ struct hash<carl::UFContent>
 {
 public:
     /**
-     * @param _ueq The uninterpreted function to get the hash for.
+     * @param _ufun The uninterpreted function to get the hash for.
      * @return The hash of the given uninterpreted function.
      */
     size_t operator()( const carl::UFContent& _ufun ) const 
@@ -250,7 +250,7 @@ class UFManager : public Singleton<UFManager>
         /**
          * Prints the given uninterpreted function on the given output stream.
          * @param _out The output stream to print the given uninterpreted function on.
-         * @param  _ufi The uninterpreted function to print.
+         * @param  _uf The uninterpreted function to print.
          * @return The output stream after printing the given uninterpreted function on it.
          */
         std::ostream& print( std::ostream& _out, const UninterpretedFunction& _uf ) const;

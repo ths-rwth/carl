@@ -122,6 +122,7 @@ namespace carl
              * Gets the variable by its name. Note that this is expensive and should only be used
              * for outputting reasons. In the actual implementations you should store the variables instead.
              * @param _varName The name of the variable to search for.
+			 * @param _byFriendlyName If the name is the friendly name.
              * @return The found variable.
              */
             Variable getArithmeticVariableByName( const std::string& _varName, bool _byFriendlyName = false ) const
@@ -169,7 +170,7 @@ namespace carl
             }
                
             /**
-             * @param _varName The Boolean variable name to check.
+             * @param _booleanName The Boolean variable name to check.
              * @return true, if the given Boolean variable name already exists. 
              */
             bool booleanExistsAlready( const std::string& _booleanName ) const
@@ -277,6 +278,7 @@ namespace carl
 	 * Constructs a new arithmetic variable of the given domain.
 	 * @param _name The intended name of the arithmetic variable.
 	 * @param _domain The domain of the arithmetic variable.
+	 * @param _parsed If the variable name was parsed.
 	 * @return The constructed arithmetic variable.
 	 */
 	Variable newArithmeticVariable( const std::string& _name, VariableType _domain, bool _parsed = false );
@@ -284,6 +286,7 @@ namespace carl
 	/**
 	 * Constructs a new Boolean variable.
 	 * @param _name The intended name of the variable.
+	 * @param _parsed If the variable name was parsed.
 	 * @return A pointer to the name of the constructed Boolean variable.
 	 */
 	Variable newBooleanVariable( const std::string& _name, bool _parsed = false );
