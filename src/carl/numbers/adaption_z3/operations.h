@@ -9,7 +9,6 @@
 #pragma once
 #include "../../util/platform.h"
 #include <limits.h>
-#include "constants.h"
 
 #include "z3_include.h"
 

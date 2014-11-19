@@ -95,6 +95,9 @@ protected:
 	bool operator()(const CMP<Coeff>& lhs, const CMP<Coeff>& rhs) {
 		return lhs == rhs;
 	}
+	bool operator()(const bool lhs, const bool rhs) {
+		return lhs == rhs;
+	}
     #ifdef COMPARE_WITH_GINAC
 	bool operator()(const GMP& lhs, const GMP& rhs) {
 		return lhs == rhs;
@@ -139,7 +142,7 @@ private:
 	unsigned runSamples(std::vector<R>& res, const Src& src, const std::string& name) {
 		carl::Timer timer;
 		for (const auto& cur: src) {
-			res.emplace_back(std::move(executor(cur)));
+			res.push_back(std::move(executor(cur)));
 		}
 		return timer.passed();
 	}
