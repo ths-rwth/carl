@@ -18,7 +18,7 @@ struct BenchmarkInformation {
 	std::size_t n = 100;
 	std::size_t degree = 5;
 	std::vector<std::size_t> degrees;
-	bool compareResults = true;
+	bool compareResults = false;
 	std::vector<carl::Variable> variables;
 	
 	BenchmarkInformation(BenchmarkSelection bs, std::size_t variableCount)
@@ -64,8 +64,8 @@ public:
 	}
     
 	template<typename C>
-	std::shared_ptr<const carl::Term<C>> randomTerm(std::size_t degree) const {
-		return std::make_shared<const carl::Term<C>>(geomDist<C>(), randomMonomial(degree));
+	carl::Term<C> randomTerm(std::size_t degree) const {
+		return carl::Term<C>(geomDist<C>(), randomMonomial(degree));
 	}
     
 	template<typename C>
@@ -77,9 +77,9 @@ public:
 	CMP<C> newMP(std::size_t deg) const {
 #ifdef USE_MONOMIAL_POOL
 		auto& manager = carl::MultivariatePolynomial<C>::mTermAdditionManager;
-		std::size_t id = manager.getId();
+		std::size_t id = manager.getId(deg*deg*deg);
 		C c = C(geomDist<C>());
-		manager.template addTerm<true>(id, std::make_shared<const Term<C>>(c));
+		manager.template addTerm<true>(id, Term<C>(c));
 		for (std::size_t i = 1; i <= deg; i++) {
 			std::binomial_distribution<> bin((int)((deg-i)*(deg-i)), 0.5);
 			std::size_t num = (std::size_t)bin(rand) + 1;
@@ -87,9 +87,9 @@ public:
 				manager.template addTerm<true>(id, randomTerm<C>(i));
 			}
 		}
-		std::vector<std::shared_ptr<const Term<C>>> terms;
+		std::vector<Term<C>> terms;
 		manager.readTerms(id, terms);
-		return carl::MultivariatePolynomial<C>(std::move(terms));
+		return carl::MultivariatePolynomial<C>(terms);
 #else
 		carl::MultivariatePolynomial<C> result;
 		result += C(geomDist<C>());
