@@ -12,41 +12,81 @@ typedef std::map<std::string, unsigned> BenchmarkResult;
 template<typename... Identifier>
 class BenchmarkFile {
 private:
-	std::vector<std::string> names;
+	std::map<std::string, bool> names;
 	std::vector<std::pair<std::tuple<Identifier...>,BenchmarkResult>> data;
+	static std::vector<std::string> tikzColors;
+	static std::vector<std::string> tikzMarks;
 public:
-	BenchmarkFile(const std::initializer_list<std::string>& init): names(init) {}
+	BenchmarkFile(const std::initializer_list<std::string>& init) {
+		for (const auto& name: init) names[name] = false;
+	}
 	void push(const BenchmarkResult& res, Identifier... identifier) {
 		data.emplace_back(std::make_tuple(identifier...), res);
+		for (const auto& it: res) names[it.first] = true;
 	}
-	template<typename... Ident>
-	friend std::ostream& operator<<(std::ostream& os, const BenchmarkFile<Ident...>& file);
-};
-
-template<typename... Identifier>
-std::ostream& operator<<(std::ostream& os, const BenchmarkFile<Identifier...>& file) {
-	os << "\\begin{tabular}{|r";
-    auto ns = file.names.size();
-	for (unsigned i = 0; i < ns; ++i) os << "|r";
-	os << "|}" << std::endl;
-	os << "\\hline" << std::endl;
-	os << "degree";
-	for (auto name: file.names) {
-		os << "\t& " << name;
+	void writePlotData(std::ostream& os, const std::string& benchmark) {
+		os << "\\begin{filecontents}{benchmarks/plot_" << benchmark << ".data}" << std::endl;
+		os << "# degree";
+		for (const auto& name: names) {
+			if (name.second) os << "\t" << name.first;
+		}
+		os << std::endl;
+		for (auto res: data) {
+			if (sizeof...(Identifier) == 1) os << std::get<0>(res.first);
+			else os << res.first;
+			for (const auto& name: names) {
+				if (name.second) {
+					auto it = res.second.find(name.first);
+					if (it != res.second.end()) os << "\t" << (it->second / 1000.0);
+					else os << "\tnan";
+				}
+			}
+			os << std::endl;
+		}
+		os << "\\end{filecontents}" << std::endl;
 	}
-	os << " \\\\" << std::endl << "\\hline" << std::endl;
-	for (auto res: file.data) {
-		if (sizeof...(Identifier) == 1) os << std::get<0>(res.first);
-		else os << res.first;
-		for (auto name: file.names) {
-			auto it = res.second.find(name);
-			if (it == res.second.end()) os << "\t& --";
-			else os << "\t& " << it->second;
+	void writePlot(std::ostream& os, const std::string& benchmark) {
+		os << "%\\begin{tikzpicture}[scale=0.5]" << std::endl;
+		os << "\\begin{axis}[grid=major, ymin=0, legend pos=north west, xtick=data, y tick label style={/pgf/number format/.cd, fixed, precision=2, /tikz/.cd}]" << std::endl;
+		unsigned row = 1;
+		for (const auto& name: names) {
+			if (name.second) {
+				os << "\\addplot[mark=" << tikzMarks[row-1] << ", " << tikzColors[row-1] << "] table[x index=0,y index=" << row << "] {benchmarks/plot_" << benchmark << ".data};" << std::endl;
+				os << "\\addlegendentry{" << name.first << "}" << std::endl;
+				row++;
+			}
+		}
+		os << "\\end{axis}" << std::endl;
+		os << "%\\end{tikzpicture}" << std::endl;
+	}
+	void writeTable(std::ostream& os) {
+		os << "\\begin{tabular}{|r";
+		auto ns = names.size();
+		for (unsigned i = 0; i < ns; ++i) os << "|r";
+		os << "|}" << std::endl;
+		os << "\\hline" << std::endl;
+		os << "degree";
+		for (const auto& name: names) {
+			os << "\t& " << name;
 		}
 		os << " \\\\" << std::endl << "\\hline" << std::endl;
+		for (const auto& res: data) {
+			if (sizeof...(Identifier) == 1) os << std::get<0>(res.first);
+			else os << res.first;
+			for (const auto& name: names) {
+				auto it = res.second.find(name.first);
+				if (it != res.second.end()) os << "\t& --";
+				else os << "\t& " << it->second;
+			}
+			os << " \\\\" << std::endl << "\\hline" << std::endl;
+		}
+		os << "\\end{tabular}" << std::endl;
 	}
-	os << "\\end{tabular}" << std::endl;
-	return os;
-}
+};
+
+template<typename... I>
+std::vector<std::string> BenchmarkFile<I...>::tikzColors = {"black", "blue", "orange", "teal"};
+template<typename... I>
+std::vector<std::string> BenchmarkFile<I...>::tikzMarks = {"square*", "triangle*", "o", "triangle*"};
 
 }
