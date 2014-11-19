@@ -1399,7 +1399,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	//if (lhs.lterm() != rhs.lterm()) return false;
 	static std::vector<const C*> coeffs;
 	coeffs.reserve(MonomialPool::getInstance().nextID());
-	memset(&coeffs[0], 0, sizeof(std::nullptr_t)*coeffs.size());
+	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
 	for (const auto& t: lhs.mTerms) {
 		std::size_t id = 0;
 		if (t.monomial()) id = t.monomial()->id();
