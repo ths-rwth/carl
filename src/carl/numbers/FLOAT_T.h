@@ -481,7 +481,7 @@ namespace carl
         /**
          * Function for the nth power of the number, which assigns the result to the 
          * calling number.
-         * @param _exp Degree.
+         * @param _exp Exponent.
          * @param N Possible rounding direction.
          * @return Reference to this.
          */
@@ -495,7 +495,7 @@ namespace carl
          * Function which calculates the power of this number and puts it into a passed result
          * parameter.
          * @param _result Result.
-         * @param _deg Degree.
+         * @param _exp Exponent.
          * @param N Possible rounding direction.
          * @return Reference to the result.
          */
@@ -1505,7 +1505,7 @@ namespace carl
     
     /**
      * Method which returns the absolute value of the passed number.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
@@ -1518,7 +1518,7 @@ namespace carl
     
     /**
      * Method which returns the logarithm of the passed number.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
@@ -1531,7 +1531,7 @@ namespace carl
     
     /**
      * Method which returns the square root of the passed number.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
@@ -1545,7 +1545,7 @@ namespace carl
     /**
      * Method which returns the next smaller integer of this number or the number
      * itself, if it is already an integer.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
@@ -1559,7 +1559,7 @@ namespace carl
     /**
      * Method which returns the next larger integer of the passed number or the
      * number itself, if it is already an integer.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename FloatType>
@@ -1584,18 +1584,18 @@ namespace carl
     
     /**
      * Implicitly converts the number to a rational and returns the denominator.
-     * @param in Number.
+     * @param _in Number.
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
-    inline cln::cl_I getDenom(const FLOAT_T<FloatType>& in)
+    inline cln::cl_I getDenom(const FLOAT_T<FloatType>& _in)
     {
-        return carl::getDenom(carl::rationalize<cln::cl_RA>(in.toDouble()));
+        return carl::getDenom(carl::rationalize<cln::cl_RA>(_in.toDouble()));
     }
     
     /**
      * Implicitly converts the number to a rational and returns the nominator.
-     * @param in Number.
+     * @param _in Number.
      * @return Cln interger which holds the result.
      */
     template<typename FloatType>
