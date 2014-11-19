@@ -25,6 +25,7 @@
 #include "adaption_native/typetraits.h"
 
 #ifdef USE_Z3_NUMBERS
+#include "adaption_z3/z3_include.h"
 #include "adaption_z3/hash.h"
 #include "adaption_z3/operations.h"
 #include "adaption_z3/typetraits.h"
