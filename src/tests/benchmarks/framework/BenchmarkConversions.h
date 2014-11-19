@@ -37,10 +37,15 @@ struct Conversion {
 };
 
 template<>
+inline bool Conversion::convert<bool,std::_Bit_reference>(const std::_Bit_reference& b, const CIPtr& ci) {
+	return b;
+}
+
+template<>
 inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
 	CMP<mpq_class> res;
 	for (auto t: p) {
-		res += Term<mpq_class>(ci->carl.toGMP(t->coeff()), t->monomial());
+		res += Term<mpq_class>(ci->carl.toGMP(t.coeff()), t.monomial());
 	}
 	return res;
 }
@@ -49,7 +54,7 @@ template<>
 inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
 	CMP<rational> res;
 	for (auto t: p) {
-		res += Term<rational>(ci->carl.toZ3Rational(t->coeff()), t->monomial());
+		res += Term<rational>(ci->carl.toZ3Rational(t.coeff()), t.monomial());
 	}
 	return res;
 }
@@ -89,10 +94,12 @@ template<>
 ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
+#ifdef USE_Z3_NUMBERS
 template<>
 ZMP Conversion::convert<ZMP, CUMP<rational>>(const CUMP<rational>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
+#endif
 template<>
 ZVAR Conversion::convert<ZVAR, CVAR>(const CVAR& v, const CIPtr& ci) {
 	return ci->z3(v);
