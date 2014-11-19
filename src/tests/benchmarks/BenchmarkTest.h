@@ -29,10 +29,24 @@ protected:
 	}
 	~BenchmarkTest() {
 		auto info = ::testing::UnitTest::GetInstance()->current_test_info();
-		std::stringstream ss;
-		ss << "benchmark_" << info->name() << ".tex";
-		std::ofstream out(ss.str(), std::ios_base::out);
-		out << file;
+		{
+			std::stringstream ss;
+			ss << "benchmarks/benchmark_" << info->name() << "_plot.tex";
+			std::ofstream out(ss.str(), std::ios_base::out);
+			file.writePlot(out, info->name());
+		}
+		{
+			std::stringstream ss;
+			ss << "benchmarks/benchmark_" << info->name() << "_data.tex";
+			std::ofstream out(ss.str(), std::ios_base::out);
+			file.writePlotData(out, info->name());
+		}
+		{
+			std::stringstream ss;
+			ss << "benchmarks/benchmark_" << info->name() << "_table.tex";
+			std::ofstream out(ss.str(), std::ios_base::out);
+			file.writeTable(out);
+		}
 	}
 	virtual void SetUp() {
 	}
