@@ -51,6 +51,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator=(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
 	mTerms = p.mTerms;
 	mOrdered = p.mOrdered;
+	assert(this->isConsistent());
 	return *this;
 }
 
@@ -58,6 +59,7 @@ template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator=(MultivariatePolynomial<Coeff,Ordering,Policies>&& p) {
 	mTerms = std::move(p.mTerms);
 	mOrdered = p.mOrdered;
+	assert(this->isConsistent());
 	return *this;
 }
    
@@ -1227,6 +1229,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 			tmp.push_back(Coeff(2) * *it1 * *it2);
 		}
 	}
+	mOrdered = false;
 	std::swap(tmp, mTerms);
 	assert(this->isConsistent());
 }
@@ -1388,20 +1391,26 @@ typename MultivariatePolynomial<Coeff,O,P>::IntNumberType MultivariatePolynomial
 template<typename C, typename O, typename P>
 bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 	// Try to avoid sorting
+	if (&lhs == &rhs) return true;
 	if (lhs.nrTerms() != rhs.nrTerms()) return false;
 	if (lhs.nrTerms() == 0) return true;
-	if (lhs.hasConstantTerm() ^ rhs.hasConstantTerm()) return false;
-	if (lhs.hasConstantTerm() && (lhs.constantPart() != rhs.constantPart())) return false;
-	if (lhs.lterm() != rhs.lterm()) return false;
-	lhs.makeOrdered();
-	rhs.makeOrdered();
-	// Compare vector entries. We cannot use std::vector== as we not only want to compare the pointers.
-	return std::equal(lhs.begin(), lhs.end(), rhs.begin(),
-		[](const Term<C>& lterm, const Term<C>& rterm)
-		-> bool 
-		{
-			return &lterm == &rterm || lterm == rterm;
-		});
+	//if (lhs.hasConstantTerm() != rhs.hasConstantTerm()) return false;
+	//if (lhs.hasConstantTerm() && (lhs.constantPart() != rhs.constantPart())) return false;
+	//if (lhs.lterm() != rhs.lterm()) return false;
+	static std::vector<const C*> coeffs;
+	coeffs.reserve(MonomialPool::getInstance().nextID());
+	memset(&coeffs[0], 0, sizeof(std::nullptr_t)*coeffs.size());
+	for (const auto& t: lhs.mTerms) {
+		std::size_t id = 0;
+		if (t.monomial()) id = t.monomial()->id();
+		coeffs[id] = &t.coeff();
+	}
+	for (const auto& t: rhs.mTerms) {
+		std::size_t id = 0;
+		if (t.monomial()) id = t.monomial()->id();
+		if ((coeffs[id] == nullptr) || *coeffs[id] != t.coeff()) return false;
+	}
+	return true;
 }
 
 template<typename C, typename O, typename P>
@@ -1923,10 +1932,13 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 #ifdef USE_MONOMIAL_POOL
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() * rhs.mTerms.size());
 	TermType newlterm;
+	bool first = true;
 	for (auto t1 = mTerms.rbegin(); t1 != mTerms.rend(); t1++) {
 		for (auto t2 = rhs.mTerms.rbegin(); t2 != rhs.mTerms.rend(); t2++) {
-			if (newlterm != nullptr) mTermAdditionManager.template addTerm<false>(id, TermType(std::move((*t1)*(*t2))));
-			else newlterm = *t1 * *t2;
+			if (first) {
+				newlterm = *t1 * *t2;
+				first = false;
+			} else mTermAdditionManager.template addTerm<false>(id, std::move((*t1)*(*t2)));
 		}
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
