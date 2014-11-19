@@ -479,8 +479,8 @@ public:
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator-=(const Monomial::Arg& rhs);
-	MultivariatePolynomial& operator-=(Variable::Arg);
-	MultivariatePolynomial& operator-=(const Coeff& c);
+	MultivariatePolynomial& operator-=(Variable::Arg rhs);
+	MultivariatePolynomial& operator-=(const Coeff& rhs);
 	/// @}
 
 
@@ -497,8 +497,8 @@ public:
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator*=(const Monomial::Arg& rhs);
-	MultivariatePolynomial& operator*=(Variable::Arg);
-	MultivariatePolynomial& operator*=(const Coeff& c);
+	MultivariatePolynomial& operator*=(Variable::Arg rhs);
+	MultivariatePolynomial& operator*=(const Coeff& rhs);
 	/// @}
 
 	/// @name In-place division operators
@@ -512,8 +512,8 @@ public:
 	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator/=(const Monomial::Arg& rhs);
-	MultivariatePolynomial& operator/=(Variable::Arg);
-	MultivariatePolynomial& operator/=(const Coeff& c);
+	MultivariatePolynomial& operator/=(Variable::Arg rhs);
+	MultivariatePolynomial& operator/=(const Coeff& rhs);
 	/// @}
 	
 	/// @name Division operators
@@ -616,7 +616,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs);
 	template<typename C, typename O, typename P, DisableIf<std::is_integral<C>> = dummy>
-	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int i);
+	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, int rhs);
 	template<typename C, typename O, typename P>
 	inline bool operator==(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs == lhs;

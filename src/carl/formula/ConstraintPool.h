@@ -50,9 +50,9 @@ namespace carl
              * Creates a normalized constraint, which has the same solutions as the constraint consisting of the given
              * left-hand side and relation symbol.
              * Note, that this method uses the allocator which is locked before calling.
-             * @param _lhs The left-hand side of the constraint before normalization,
+             * @param _var The left-hand side of the constraint before normalization,
              * @param _rel The relation symbol of the constraint before normalization,
-             * @param _variables An over-approximation of the variables occurring in the given left-hand side.
+             * @param _bound
              * @return The constructed constraint.
              */
             Constraint<Pol>* createNormalizedBound( const Variable& _var, const Relation _rel, const typename Pol::NumberType& _bound ) const;
@@ -63,7 +63,6 @@ namespace carl
              * Note, that this method uses the allocator which is locked before calling.
              * @param _lhs The left-hand side of the constraint before normalization,
              * @param _rel The relation symbol of the constraint before normalization,
-             * @param _variables An over-approximation of the variables occurring in the given left-hand side.
              * @return The constructed constraint.
              */
             Constraint<Pol>* createNormalizedConstraint( const Pol& _lhs, const Relation _rel ) const;
@@ -198,9 +197,9 @@ namespace carl
              * not necessarily equal to the given left-hand side. The same holds for the relation symbol.
              * However, it is assured that the returned constraint has the same solutions as
              * the expected one.
-             * @param _lhs The left-hand side of the constraint.
+             * @param _var The left-hand side of the constraint.
              * @param _rel The relation symbol of the constraint.
-             * @param _variables An over-approximation of the variables which occur on the left-hand side.
+             * @param _bound An over-approximation of the variables which occur on the left-hand side.
              * @return The constructed constraint.
              */
             const Constraint<Pol>* newBound( const Variable& _var, const Relation _rel, const typename Pol::NumberType& _bound );
@@ -214,7 +213,6 @@ namespace carl
              * the expected one.
              * @param _lhs The left-hand side of the constraint.
              * @param _rel The relation symbol of the constraint.
-             * @param _variables An over-approximation of the variables which occur on the left-hand side.
              * @return The constructed constraint.
              */
             const Constraint<Pol>* newConstraint( const Pol& _lhs, const Relation _rel );
@@ -234,9 +232,9 @@ namespace carl
       * not necessarily equal to the given left-hand side. The same holds for the relation symbol.
       * However, it is assured that the returned constraint has the same solutions as
       * the expected one.
-      * @param _lhs The left-hand side of the constraint.
+      * @param _var The left-hand side of the constraint.
       * @param _rel The relation symbol of the constraint.
-      * @param _variables An over-approximation of the variables which occur on the left-hand side.
+      * @param _bound
       * @return The constructed constraint.
       */
      template<typename Pol>
@@ -251,7 +249,6 @@ namespace carl
       * the expected one.
       * @param _lhs The left-hand side of the constraint.
       * @param _rel The relation symbol of the constraint.
-      * @param _variables An over-approximation of the variables which occur on the left-hand side.
       * @return The constructed constraint.
       */
      template<typename Pol>

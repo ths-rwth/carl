@@ -263,6 +263,7 @@ namespace carl
 	 * Constructs a new variable of the given domain.
 	 * @param _name The intended name of the variable.
 	 * @param _domain The domain of the variable.
+	 * @param _parsed
 	 * @return The constructed variable.
 	 */
 	Variable newVariable( const std::string& _name, VariableType _domain, bool _parsed = false );

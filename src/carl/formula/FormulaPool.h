@@ -95,7 +95,7 @@ namespace carl
             
             /**
              * 
-             * @param _subformula
+             * @param _subFormula
              * @return 
              */
             ConstElementSPtr createNegation( const Formula<Pol>& _subFormula )
@@ -114,8 +114,8 @@ namespace carl
     
             /**
              * 
-             * @param _subformulaA
-             * @param _subformulaB
+             * @param _premise
+             * @param _conclusion
              * @return 
              */
             ConstElementSPtr createImplication( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion )
@@ -134,10 +134,11 @@ namespace carl
             }
     
             /**
-             * 
-             * @param _subformulaA
-             * @param _subformulaB
-             * @return 
+             * Create a formula representing an if-then-else.
+             * @param _condition Condition.
+             * @param _then Then.
+			 * @param _else Else.
+             * @return
              */
             ConstElementSPtr createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
             {
@@ -169,8 +170,8 @@ namespace carl
             
             /**
              * @param _type The type of the n-ary operator (n>1) of the formula to create.
-             * @param _subformulaA The first sub-formula of the formula to create.
-             * @param _subformulaB The second sub-formula of the formula to create.
+             * @param _subFormulaA The first sub-formula of the formula to create.
+             * @param _subFormulaB The second sub-formula of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
             ConstElementSPtr create( FormulaType _type, const Formula<Pol>& _subFormulaA, const Formula<Pol>& _subFormulaB )
@@ -182,7 +183,6 @@ namespace carl
             }
             
             /**
-             * @param _type The type of the n-ary operator (n>1) of the formula to create.
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */

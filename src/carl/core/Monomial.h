@@ -580,7 +580,7 @@ namespace carl
 		/**
 		 * Streaming operator for std::shared_ptr<Monomial>.
 		 * @param os Output stream.
-		 * @parem rhs Monomial.
+		 * @param rhs Monomial.
 		 * @return `os`
 		 */
 		friend std::ostream& operator<<( std::ostream& os, const Monomial::Arg& rhs )

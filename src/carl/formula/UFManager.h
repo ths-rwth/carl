@@ -102,7 +102,7 @@ class UFContent
         }
         
         /**
-         * @param _ufic The uninterpreted function's content to compare with.
+         * @param _ufc The uninterpreted function's content to compare with.
          * @return true, if this uninterpreted function's content is less than the given one.
          */
         bool operator==( const UFContent& _ufc ) const
@@ -237,7 +237,7 @@ class UFManager : public Singleton<UFManager>
         }
         
         /**
-         * @param _ufi An uninterpreted function.
+         * @param _uf An uninterpreted function.
          * @return The codomain of the uninterpreted function of the given uninterpreted function.
          */
         const Sort& getCodomain( const UninterpretedFunction& _uf ) const
