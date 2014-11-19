@@ -763,13 +763,19 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	// If we replace a variable by zero, just eliminate all terms containing the variable.
 	if(value.isZero())
 	{
+		bool removedLast = false;
 		for (const auto& term: mTerms) {
 			if (!term.has(var)) {
 				newTerms.push_back(term);
-			}
+				removedLast = false;
+			} else removedLast = true;
 		}
 		mTerms.swap(newTerms);
 		LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+		if (removedLast) {
+			mOrdered = false;
+			makeMinimallyOrdered<false, true>();
+		}
         assert(this->isConsistent());
 		return;
 	}
