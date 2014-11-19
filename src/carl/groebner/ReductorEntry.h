@@ -121,7 +121,7 @@ public:
     bool empty() const
     {
 		assert(!mLead.isZero() || mTail.isZero());
-        return !mLead.isZero();
+        return mLead.isZero();
     }
 
     /**
