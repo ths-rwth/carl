@@ -51,7 +51,7 @@ public:
 	 * Returns the single instance of this class by reference.
 	 * If there is no instance yet, a new one is created.
 	 */
-	static T& getInstance() {
+	static inline T& getInstance() {
 		static T t;
 		return t;
 	}

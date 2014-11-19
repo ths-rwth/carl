@@ -33,6 +33,23 @@ class Term
 		 * Default constructor. Constructs a term of value zero.
 		 */
 		Term();
+		
+		Term(const Term& t): mCoeff(t.mCoeff), mMonomial(t.mMonomial) {
+			assert(this->isConsistent());
+		}
+		Term(Term&& t): mCoeff(std::move(t.mCoeff)), mMonomial(std::move(t.mMonomial)) {
+			assert(this->isConsistent());
+		}
+		Term& operator=(const Term& t) {
+			mCoeff = t.mCoeff;
+			mMonomial = t.mMonomial;
+			return *this;
+		}
+		Term& operator=(Term&& t) {
+			mCoeff = std::move(t.mCoeff);
+			mMonomial = std::move(t.mMonomial);
+			return *this;
+		}
 		/**
 		 * Constructs a term of value \f$ c \f$.
 		 * @param c Coefficient.
@@ -74,14 +91,14 @@ class Term
 		 * Get the coefficient.
 		 * @return Coefficient.
 		 */
-		const Coefficient& coeff() const
+		inline const Coefficient& coeff() const
 		{
 			return mCoeff;
 		}
-		void setCoeff(const Coefficient& c) {
+		inline void setCoeff(const Coefficient& c) {
 			mCoeff = c;
 		}
-		void setCoeff(Coefficient&& c) {
+		inline void setCoeff(Coefficient&& c) {
 			mCoeff = c;
 		}
 		template<typename Coeff>
@@ -94,7 +111,7 @@ class Term
 		 * Get the monomial.
 		 * @return Monomial.
 		 */
-		const std::shared_ptr<const Monomial>& monomial() const
+		inline const Monomial::Arg& monomial() const
 		{
 			return mMonomial;
 		}
@@ -102,7 +119,7 @@ class Term
 		 * Gives the total degree, i.e. the sum of all exponents.
 		 * @return Total degree.
 		 */
-		exponent tdeg() const
+		inline exponent tdeg() const
 		{
 			if(!mMonomial) return 0;
 			return mMonomial->tdeg();
@@ -112,7 +129,7 @@ class Term
 		 * Checks whether the term is zero.
 		 * @return 
 		 */
-		bool isZero() const
+		inline bool isZero() const
 		{
 			return carl::isZero(mCoeff);
 		}
@@ -121,7 +138,7 @@ class Term
 		 * Checks whether the term equals one.
          * @return 
          */
-		bool isOne() const
+		inline bool isOne() const
 		{
 			return (isConstant() && carl::isOne(mCoeff));
 		}
@@ -129,7 +146,7 @@ class Term
 		 * Checks whether the monomial is a constant.
 		 * @return 
 		 */
-		bool isConstant() const
+		inline bool isConstant() const
 		{
 			return !mMonomial;
 		}
@@ -137,7 +154,7 @@ class Term
 		 * Checks whether the monomial has exactly the degree one.
 		 * @return 
 		 */
-		bool isLinear() const
+		inline bool isLinear() const
 		{
 			if(!mMonomial) return true;
 			return mMonomial->isLinear();
@@ -146,7 +163,7 @@ class Term
 		 * 
 		 * @return 
 		 */
-		size_t getNrVariables() const
+		inline size_t getNrVariables() const
 		{
 			if(!mMonomial) return 0;
 			return mMonomial->nrVariables();
@@ -156,7 +173,7 @@ class Term
 		 * @param v The variable to check for its occurrence.
 		 * @return true, if the variable occurs in this term.
 		 */
-		bool has(Variable::Arg v) const
+		inline bool has(Variable::Arg v) const
 		{
 			if (!mMonomial) return false;
 			return mMonomial->has(v);
@@ -533,8 +550,7 @@ class Term
 	 */
 	template<typename Coeff>
 	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
-		Term<Coeff> res(lhs);
-		return res *= rhs;
+		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
 	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const std::shared_ptr<const Monomial>& rhs) {
