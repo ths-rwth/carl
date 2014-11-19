@@ -67,7 +67,7 @@ public:
 		os << "\\hline" << std::endl;
 		os << "degree";
 		for (const auto& name: names) {
-			os << "\t& " << name;
+			os << "\t& " << name.first;
 		}
 		os << " \\\\" << std::endl << "\\hline" << std::endl;
 		for (const auto& res: data) {
@@ -75,7 +75,7 @@ public:
 			else os << res.first;
 			for (const auto& name: names) {
 				auto it = res.second.find(name.first);
-				if (it != res.second.end()) os << "\t& --";
+				if (it == res.second.end()) os << "\t& --";
 				else os << "\t& " << it->second;
 			}
 			os << " \\\\" << std::endl << "\\hline" << std::endl;
