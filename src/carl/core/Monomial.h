@@ -628,7 +628,7 @@ namespace carl
 		 * @return Hash of the monomial.
 		 */
 		static std::size_t hashContent(const Monomial::Content& c) {
-			std::hash<carl::Variable> h;
+			static std::hash<carl::Variable> h;
 			size_t result = 0;
 			for (const auto& it: c) {
 				// perform a circular shift by 5 bits.

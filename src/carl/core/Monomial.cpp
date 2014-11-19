@@ -440,7 +440,7 @@ namespace carl
 		assert( lhs->tdeg() > 0 );
 		assert(lhs->isConsistent());
 		assert(rhs->isConsistent());
-                std::vector<std::pair<Variable, exponent>> newExps;
+		std::vector<std::pair<Variable, exponent>> newExps;
 		newExps.reserve(lhs->exponents().size() + rhs->exponents().size());
 
 		// Linear, as we expect small monomials.
@@ -473,11 +473,7 @@ namespace carl
 			newExps.insert(newExps.end(), itleft, lhs->end());
 		else if( itright != rhs->end() )
 			newExps.insert(newExps.end(), itright, rhs->end());
-#ifdef USE_MONOMIAL_POOL
-		std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + rhs->tdeg() );
-#else
-		std::shared_ptr<const Monomial> result = std::make_shared<const Monomial>( std::move(newExps), lhs->tdeg() + rhs->tdeg() );
-#endif
+		Monomial::Arg result = createMonomial(std::move(newExps), lhs->tdeg() + rhs->tdeg());
 		LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
 		return result;
 	}
