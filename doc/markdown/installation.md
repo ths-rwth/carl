@@ -43,4 +43,4 @@ Advanced building topics
 
 Troubleshooting
 --------------------------------------------
-If you're experiencing problems, take a look at our [troubleshooting] section. If that doesn't help you, feel free to contact us.
+If you're experiencing problems, take a look at our @subpage troubleshooting section. If that doesn't help you, feel free to contact us.
