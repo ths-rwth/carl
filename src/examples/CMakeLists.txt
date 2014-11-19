@@ -27,3 +27,5 @@ target_link_libraries(GroebnerExample lib_carl ${libraries} )
 target_link_libraries(IntervalExample lib_carl ${libraries} )
 target_link_libraries(MpqIntervalExample lib_carl ${libraries} )
 target_link_libraries(example_smt2 lib_carl ${libraries} )
+
+add_subdirectory(tutorial EXCLUDE_FROM_ALL)

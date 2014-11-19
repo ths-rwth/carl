@@ -15,7 +15,7 @@ We consider any of the following events a (potential) bug:
 In any of the above cases, make sure that:
 - You have installed all necessary @ref dependencies in the required versions.
 - You work on something that is similar to a system listed as supported platform at @ref getting_started.
-- You can (somewhat reliably) reproduce the error with a (somewhat) clean build of CArL. (i.e., you did not screw up the CMake flags)
+- You can (somewhat reliably) reproduce the error with a (somewhat) clean build of CArL. (i.e., you did not screw up the CMake flags, see @ref build_cmake for more information)
 - You compile either with `CMAKE_BUILD_TYPE=DEBUG` or `DEVELOPER=ON`. This will give additional warnings during compilation and enable assertions during runtime. This will slow down CArL significantly, but detect errors before an actual crash happens and give a meaningful error message in many cases.
 
 If you are unable to solve issue yourself or you find the issue to be an actual bug in CArL, please do not hesitate to contact us.
