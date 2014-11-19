@@ -136,21 +136,21 @@ private:
 	std::string name;
 
 	template<typename R, typename Src>
-	void runSamples(std::vector<R>& res, const Src& src, const std::string& name) {
+	unsigned runSamples(std::vector<R>& res, const Src& src, const std::string& name) {
 		carl::Timer timer;
 		for (const auto& cur: src) {
-			res.push_back(executor(cur));
+			res.emplace_back(std::move(executor(cur)));
 		}
-		unsigned time = timer.passed();
-		runtimes[name] = time;
-		std::cout << time << " ms" << std::endl;
+		return timer.passed();
 	}
 public:
 	Benchmark(const BenchmarkInformation& bi, const std::string& name): ci(new ConversionInformation), reference(bi, ci), bi(bi), name(name) {
 		results.reserve(reference.size());
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
-		runSamples(results, reference, name);
+		unsigned time = runSamples(results, reference, name);
+		runtimes[name] = time;
+		std::cout << time << " ms" << std::endl;
 	}
 	template<typename R, typename Converter>
 	void compare(const std::string& name) {
@@ -159,7 +159,9 @@ public:
 		BenchmarkConverter<Converter> benchmarks(reference);
 		std::cout << "Comparing " << name << " ... ";
 		std::cout.flush();
-		runSamples(res, benchmarks, name);
+		unsigned time = runSamples(res, benchmarks, name);
+		runtimes[name] = time;
+		std::cout << time << " ms" << std::endl;
 		
 		if (bi.compareResults) {
 			BenchmarkResultComparator<R> c(name, this->name, ci);
