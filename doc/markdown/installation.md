@@ -1,10 +1,15 @@
 Getting Started {#getting_started}
 =======
 
+Download
+--------
+Here are archived versions of CArL for download:
+- [19.11.2014](http://ths.informatik.rwth-aachen.de/releases/carl-2014-11-19.tgz)
+
 Quick installation guide
 --------------------------------------------
 - Make sure all @subpage dependencies "dependencies" are available.
-- Clone the git repository from https://srv-i2.informatik.rwth-aachen.de:8443/git/carl.git
+- Download the latest release or clone the git repository from https://srv-i2.informatik.rwth-aachen.de:8443/git/carl.git
 - Prepare the build.
 @code{.sh}
 $ mkdir build && cd build && cmake ../
