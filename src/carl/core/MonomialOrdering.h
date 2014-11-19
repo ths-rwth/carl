@@ -41,24 +41,7 @@ struct MonomialComparator
 
 	static CompareResult compare(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
 	{
-		if(m1 && m2)
-        {
-            if(m1 == m2) return CompareResult::EQUAL;
-            return f(m1, m2);
-        }
-        else if(!m1 && m2)
-        {
-            return CompareResult::LESS;
-        }
-        else if(m1)
-        {
-			assert(!m2);
-            return CompareResult::GREATER;
-        }
-        else
-        {
-            return CompareResult::EQUAL;
-        }
+		return f(m1, m2);
 	}
  
 	
