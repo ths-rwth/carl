@@ -3,7 +3,6 @@
 
 namespace carl
 {
-	/// Instance of an invalid variable.
 	const Variable Variable::NO_VARIABLE = Variable();
 	
     void Variable::printFriendlyName(std::ostream& os) const {

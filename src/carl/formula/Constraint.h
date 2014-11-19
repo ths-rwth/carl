@@ -441,7 +441,7 @@ namespace carl
             /**
              * Calculates the coefficient of the given variable with the given degree. Note, that it only
              * computes the coefficient once and stores the result.
-             * @param _variable The variable for which to calculate the coefficient.
+             * @param _var The variable for which to calculate the coefficient.
              * @param _degree The according degree of the variable for which to calculate the coefficient.
              * @return The ith coefficient of the given variable, where i is the given degree.
              */

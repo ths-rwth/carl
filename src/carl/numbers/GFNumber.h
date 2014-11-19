@@ -203,7 +203,6 @@ inline bool isInteger(const GFNumber<IntegerT>&) {
 /**
  * Creates the string representation to the given galois field number.
  * @param _number The galois field number to get its string representation for.
- * @param _infix A flag indicating whether the galois field number should be represented in infix (if true) or prefix (otherwise).
  * @return The string representation to the given galois field number.
  */
 template<typename IntegerType>

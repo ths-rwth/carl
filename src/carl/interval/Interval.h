@@ -1831,7 +1831,7 @@ namespace carl
     
     /**
      * Method which returns the absolute value of the passed number.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename Number>
@@ -1842,7 +1842,7 @@ namespace carl
     
     /**
      * Method which returns the logarithm of the passed number.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename Number>
@@ -1872,7 +1872,7 @@ namespace carl
     /**
      * Method which returns the next smaller integer of this number or the number
      * itself, if it is already an integer.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename Number>
@@ -1884,7 +1884,7 @@ namespace carl
     /**
      * Method which returns the next larger integer of the passed number or the
      * number itself, if it is already an integer.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename Number>
