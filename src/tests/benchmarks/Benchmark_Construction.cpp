@@ -1,8 +1,11 @@
 #include "gtest/gtest.h"
 
+#include <algorithm>
+
 #include "framework/Benchmark.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "BenchmarkTest.h"
+#include "framework/BenchmarkGenerator.h"
 
 using namespace carl;
 
@@ -40,7 +43,7 @@ namespace carl {
 		typedef std::tuple<CMP<C>,CVAR,CMP<C>> type;
 		SubstituteGenerator(const BenchmarkInformation& bi): BaseGenerator(bi) {}
 		type operator()() const {
-			return std::make_tuple(g.newMP<C>(), g.randomVariable(), g.newMP<C>());
+			return std::make_tuple(g.newMP<C>(), g.randomVariable(), g.newMP<C>(2));
 		}
 	};
 	template<typename C>
@@ -54,41 +57,53 @@ namespace carl {
 			return std::make_tuple(p1, p2);
 		}
 	};
+	template<typename C>
+	struct ComparisonGenerator: public BaseGenerator {
+		typedef std::tuple<CMP<C>,CMP<C>> type;
+		ComparisonGenerator(const BenchmarkInformation& bi): BaseGenerator(bi) {}
+		type operator()() const {
+			auto p1 = g.newMP<C>();
+			auto p2(p1);
+			std::random_shuffle(p1.getTerms().begin(), p1.getTerms().end());
+			p1.makeMinimallyOrdered();
+			return std::make_tuple(p1, p2);
+		}
+	};
 
 	//##### Executor
 	struct AdditionExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
-			return std::get<0>(args) + std::get<1>(args);
+			return std::forward<const CMP<Coeff>>(std::get<0>(args) + std::get<1>(args));
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
-			return GiNaC::expand(std::get<0>(args) + std::get<1>(args));
+			return std::forward<const GMP>(GiNaC::expand(std::get<0>(args) + std::get<1>(args)));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
 			auto res = std::get<0>(args) + std::get<1>(args);
 			//res.m().lex_sort(res);
-			return res;
+			return std::forward<const ZMP>(res);
 		}
         #endif
 	};
 	struct MultiplicationExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
-			return std::get<0>(args) * std::get<1>(args);
+			return std::forward<const CMP<Coeff>>(std::get<0>(args) * std::get<1>(args));
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
-			return GiNaC::expand(std::get<0>(args) * std::get<1>(args));
+			return std::forward<const GMP>(GiNaC::expand(std::get<0>(args) * std::get<1>(args)));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
 			auto res = std::get<0>(args) * std::get<1>(args);
 			//res.m().lex_sort(res);
-			return res;
+			return std::forward<const ZMP>(res);
 		}
         #endif
 	};
@@ -98,33 +113,33 @@ namespace carl {
 			//return std::get<0>(args).quotient(std::get<1>(args));
 			CMP<Coeff> res;
 			std::get<0>(args).divideBy(std::get<1>(args), res);
-			return res;
+			return std::forward<const CMP<Coeff>>(res);
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
 			GMP res;
 			GiNaC::divide(std::get<0>(args), std::get<1>(args), res);
-			return GiNaC::expand(res);
+			return std::forward<const GMP>(GiNaC::expand(res));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
 			auto res = exact_div(std::get<0>(args), std::get<1>(args));
 			//res.m().lex_sort(res);
-			return res;
+			return std::forward<const ZMP>(res);
 		}
         #endif
 	};
 	struct RemainderExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
-			return std::get<0>(args).remainder(std::get<1>(args));
+			return std::forward<const CMP<Coeff>>(std::get<0>(args).remainder(std::get<1>(args)));
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,GMP>& args) {
 			GMP res;
 			GiNaC::prem(std::get<0>(args), std::get<1>(args), res);
-			return GiNaC::expand(res);
+			return std::forward<const GMP>(GiNaC::expand(res));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
@@ -135,18 +150,18 @@ namespace carl {
 			unsigned d;
 			res = pseudo_remainder(p1, p2, 0, d);
 			//res.m().lex_sort(res);
-			return res;
+			return std::forward<const ZMP>(res);
 		}
         #endif
 	};
 	struct PowerExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,unsigned>& args) {
-			return std::get<0>(args).pow(std::get<1>(args));
+			return std::forward<const CMP<Coeff>>(std::get<0>(args).pow(std::get<1>(args)));
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,unsigned>& args) {
-			return GiNaC::expand(GiNaC::pow(std::get<0>(args), std::get<1>(args)));
+			return std::forward<const GMP>(GiNaC::expand(GiNaC::pow(std::get<0>(args), std::get<1>(args))));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
@@ -155,39 +170,76 @@ namespace carl {
 			ZMP res(p.m());
 			p.m().pw(p, std::get<1>(args), res);
 			//res.m().lex_sort(res);
-			return res;
+			return std::forward<const ZMP>(res);
 		}
         #endif
 	};
 	struct SubstituteExecutor {
 		template<typename Coeff>
 		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CVAR,CMP<Coeff>>& args) {
-			return std::get<0>(args).substitute(std::get<1>(args), std::get<2>(args));
+			return std::forward<const CMP<Coeff>>(std::get<0>(args).substitute(std::get<1>(args), std::get<2>(args)));
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,GVAR,GMP>& args) {
-			return GiNaC::expand(std::get<0>(args).subs(std::get<1>(args) == std::get<2>(args)));
+			return std::forward<const GMP>(GiNaC::expand(std::get<0>(args).subs(std::get<1>(args) == std::get<2>(args))));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZVAR,ZMP>& args) {
-			return std::get<0>(args);
+			return std::forward<const ZMP>(std::get<0>(args));
 		}
         #endif
 	};
 	struct ResultantExecutor {
 		template<typename Coeff>
 		CUMP<Coeff> operator()(const std::tuple<CUMP<Coeff>,CUMP<Coeff>>& args) {
-			return std::get<0>(args).resultant(std::get<1>(args));
+			return std::forward<const CUMP<Coeff>>(std::get<0>(args).resultant(std::get<1>(args)));
 		}
         #ifdef COMPARE_WITH_GINAC
 		GMP operator()(const std::tuple<GMP,GMP,GVAR>& args) {
-			return GiNaC::expand(GiNaC::resultant(std::get<0>(args), std::get<1>(args), std::get<2>(args)));
+			return std::forward<const GMP>(GiNaC::expand(GiNaC::resultant(std::get<0>(args), std::get<1>(args), std::get<2>(args))));
 		}
         #endif
         #ifdef COMPARE_WITH_Z3
 		ZMP operator()(const std::tuple<ZMP,ZMP,ZVAR>& args) {
-			return resultant(std::get<0>(args), std::get<1>(args), std::get<2>(args));
+			return std::forward<const ZMP>(resultant(std::get<0>(args), std::get<1>(args), std::get<2>(args)));
+		}
+        #endif
+	};
+	struct GCDExecutor {
+		template<typename Coeff>
+		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
+			return std::forward<const CMP<Coeff>>(carl::gcd(std::get<0>(args), std::get<1>(args)));
+		}
+        #ifdef COMPARE_WITH_GINAC
+		GMP operator()(const std::tuple<GMP,GMP>& args) {
+			return std::forward<const GMP>(GiNaC::expand(GiNaC::gcd(std::get<0>(args), std::get<1>(args))));
+		}
+        #endif
+        #ifdef COMPARE_WITH_Z3
+		ZMP operator()(const std::tuple<ZMP,ZMP>& args) {
+			ZMP p1 = std::get<0>(args);
+			ZMP p2 = std::get<1>(args);
+			ZMP res(p1.m());
+			p1.m().gcd(p1, p2, res);
+			//res.m().lex_sort(res);
+			return std::forward<const ZMP>(res);
+		}
+        #endif
+	};
+	struct CompareExecutor {
+		template<typename Coeff>
+		bool operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>>& args) {
+			return std::get<0>(args) == std::get<1>(args);
+		}
+        #ifdef COMPARE_WITH_GINAC
+		bool operator()(const std::tuple<GMP,GMP>& args) {
+			return std::get<0>(args) == std::get<1>(args);
+		}
+        #endif
+        #ifdef COMPARE_WITH_Z3
+		bool operator()(const std::tuple<ZMP,ZMP>& args) {
+			return eq(std::get<0>(args), std::get<1>(args));
 		}
         #endif
 	};
@@ -227,8 +279,8 @@ TEST_F(BenchmarkTest, Addition)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
-	for (bi.degree = 15; bi.degree < 20; bi.degree++) {
-                Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
+	for (bi.degree = 15; bi.degree < 31; bi.degree += 2) {
+        Benchmark<AdditionGenerator<Coeff>, AdditionExecutor, CMP<Coeff>> bench(bi, "CArL");
 		//bench.compare<CMP<mpq_class>, TupleConverter<CMP<mpq_class>,CMP<mpq_class>>>("CArL GMP");
         #ifdef COMPARE_WITH_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
@@ -244,13 +296,14 @@ TEST_F(BenchmarkTest, Multiplication)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
-	for (bi.degree = 5; bi.degree < 10; bi.degree++) {
+	for (bi.degree = 5; bi.degree < 16; bi.degree++) {
 		Benchmark<AdditionGenerator<Coeff>, MultiplicationExecutor, CMP<Coeff>> bench(bi, "CArL");
 		//break;
 		#ifdef USE_Z3_NUMBERS
 		bench.compare<CMP<rational>, TupleConverter<CMP<rational>,CMP<rational>>>("CArL rational");
 		#endif
         #ifdef COMPARE_WITH_GINAC
+		if (bi.degree <= 10)
 		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
         #endif
         #ifdef COMPARE_WITH_Z3
@@ -280,9 +333,10 @@ TEST_F(BenchmarkTest, Power)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
-	for (bi.degree = 5; bi.degree < 8; bi.degree++) {
+	for (bi.degree = 5; bi.degree < 10; bi.degree++) {
 		Benchmark<PowerGenerator<Coeff>, PowerExecutor, CMP<Coeff>> bench(bi, "CArL");
         #ifdef COMPARE_WITH_GINAC
+		if (bi.degree <= 7)
 		bench.compare<GMP, TupleConverter<GMP,unsigned>>("GiNaC");
         #endif
         #ifdef COMPARE_WITH_Z3
@@ -296,7 +350,7 @@ TEST_F(BenchmarkTest, Substitute)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 6);
 	bi.n = 1000;
-	for (bi.degree = 5; bi.degree < 8; bi.degree++) {
+	for (bi.degree = 5; bi.degree < 12; bi.degree++) {
 		Benchmark<SubstituteGenerator<Coeff>, SubstituteExecutor, CMP<Coeff>> bench(bi, "CArL");
         #ifdef COMPARE_WITH_GINAC
 		bench.compare<GMP, TupleConverter<GMP,GVAR,GMP>>("GiNaC");
@@ -304,7 +358,7 @@ TEST_F(BenchmarkTest, Substitute)
 		file.push(bench.result(), bi.degree);
 	}
 }
-
+/*
 TEST_F(BenchmarkTest, Resultant)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 4);
@@ -321,10 +375,44 @@ TEST_F(BenchmarkTest, Resultant)
 	}
 }
 
+TEST_F(BenchmarkTest, GCD)
+{
+	BenchmarkInformation bi(BenchmarkSelection::Random, 4);
+	bi.n = 10;
+	for (bi.degree = 5; bi.degree < 15; bi.degree++) {
+		Benchmark<AdditionGenerator<Coeff>, GCDExecutor, CMP<Coeff>> bench(bi, "CArL");
+        #ifdef COMPARE_WITH_GINAC
+		bench.compare<GMP, TupleConverter<GMP,GMP>>("GiNaC");
+        #endif
+        #ifdef COMPARE_WITH_Z3
+		bench.compare<ZMP, TupleConverter<ZMP,ZMP>>("Z3");
+        #endif
+		file.push(bench.result(), bi.degree);
+	}
+}*/
+
+TEST_F(BenchmarkTest, Compare)
+{
+	BenchmarkInformation bi(BenchmarkSelection::Random, 3);
+	bi.n = 1000;
+	for (bi.degree = 20; bi.degree < 31; bi.degree+=2) {
+		Benchmark<ComparisonGenerator<Coeff>, CompareExecutor, bool> bench(bi, "CArL");
+        #ifdef COMPARE_WITH_GINAC
+		bench.compare<bool, TupleConverter<GMP,GMP>>("GiNaC");
+        #endif
+        #ifdef COMPARE_WITH_Z3
+		bench.compare<bool, TupleConverter<ZMP,ZMP>>("Z3");
+        #endif
+		file.push(bench.result(), bi.degree);
+	}
+}
+
 TEST(Benchmark, BuildPDF)
 {
-	std::ofstream out("benchmarks.tex");
+	std::ofstream out("benchmarks/benchmarks.tex");
 	out << "\\documentclass{article}" << std::endl;
+	out << "\\usepackage{tikz}" << std::endl;
+	out << "\\usepackage{pgfplots}" << std::endl;
 	out << "\\begin{document}" << std::endl;
 	auto inst = ::testing::UnitTest::GetInstance();
 	auto testcase = inst->GetTestCase(0);
@@ -335,5 +423,5 @@ TEST(Benchmark, BuildPDF)
 	}
 	out << "\\end{document}";
 	out.close();
-	system("pdflatex benchmarks");
+	//system("cd benchmarks && pdflatex benchmarks");
 }
