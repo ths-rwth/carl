@@ -118,15 +118,15 @@ TEST(MultivariatePolynomial, Addition)
     EXPECT_EQ((unsigned)2,p0.nrTerms());   
     MultivariatePolynomial<mpz_class> mp2(v0);
     mp2 += (mpz_class)2 * v1;
-    EXPECT_EQ(v0, *mp2.lterm());
+    EXPECT_EQ(v0, mp2.lterm());
     MultivariatePolynomial<mpz_class> p10a;
     p10a += v0*v0;
     p10a += v1;
-    EXPECT_EQ(v0*v0, *p10a.lterm());
+    EXPECT_EQ(v0*v0, p10a.lterm());
     MultivariatePolynomial<mpz_class> p10b;
     p10b += v1;
     p10b += v0*v0;
-    EXPECT_EQ(v0*v0, *p10b.lterm());
+    EXPECT_EQ(v0*v0, p10b.lterm());
 	EXPECT_EQ(p10a, p10b);
     p10a += p10b;
 	p10a += mp2;
@@ -173,7 +173,7 @@ TEST(MultivariatePolynomial, Multiplication)
     MultivariatePolynomial<mpz_class> p0(v0);
     
     p0 *= v0;
-    EXPECT_EQ(Term<mpz_class>((unsigned)1,v0,2), *(p0.lterm()));
+    EXPECT_EQ(Term<mpz_class>((unsigned)1,v0,2), p0.lterm());
     
     MultivariatePolynomial<mpz_class> q({mpz_class(2)*v0*v0, mpz_class(1)*v0*v1});
     Term<mpz_class> t(1, v0,2);
