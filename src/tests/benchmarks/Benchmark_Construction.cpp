@@ -43,7 +43,7 @@ namespace carl {
 		typedef std::tuple<CMP<C>,CVAR,CMP<C>> type;
 		SubstituteGenerator(const BenchmarkInformation& bi): BaseGenerator(bi) {}
 		type operator()() const {
-			return std::make_tuple(g.newMP<C>(), g.randomVariable(), g.newMP<C>(2));
+			return std::make_tuple(g.newMP<C>(), g.randomVariable(), g.newMP<C>(4));
 		}
 	};
 	template<typename C>
