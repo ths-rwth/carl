@@ -1820,7 +1820,7 @@ namespace carl
     /**
      * Casts the Interval to an arbitrary integer type which has a constructor for
      * a native int.
-     * @param _floatinterval
+     * @param _floatInterval
      * @return Integer type which holds floor(_float).
      */
     template<typename Integer, typename Number>
@@ -1853,7 +1853,7 @@ namespace carl
     
     /**
      * Method which returns the square root of the passed number.
-     * @param in Number.
+     * @param _in Number.
      * @return Number which holds the result.
      */
     template<typename Number>

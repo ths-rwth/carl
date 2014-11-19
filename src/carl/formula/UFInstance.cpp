@@ -29,8 +29,8 @@ namespace carl
         return ss.str();
     }
     
-    ostream& operator<<( ostream& _out, const UFInstance& _ufic )
+    ostream& operator<<( ostream& _os, const UFInstance& _ufun )
     {
-        return UFInstanceManager::getInstance().print( _out, _ufic );
+        return UFInstanceManager::getInstance().print( _os, _ufun );
     }
 }

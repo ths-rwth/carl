@@ -897,7 +897,7 @@ public:
 
 
 	/**
-	 * Implements subresultants algorithm with optimizations described in @cite Ducos00.
+	 * Implements subresultants algorithm with optimizations described in @cite Ducos00 .
 	 * @param p First polynomial.
 	 * @param q First polynomial.
 	 * @param strategy Strategy.

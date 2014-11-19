@@ -236,6 +236,7 @@ namespace carl
             
             /**
              * @param _variable The variable to find variable information for.
+			 * @param _withCoefficients
              * @return The whole variable information object.
              * Note, that if the given variable is not in this constraints, this method fails.
              * Furthermore, the variable information returned do provide coefficients only, if
@@ -430,7 +431,7 @@ namespace carl
             
             /**
              * Prints the representation of the given constraints on the given stream.
-             * @param _ostream The stream to print on.
+             * @param _out The stream to print on.
              * @param _constraint The constraint to print.
              * @return The given stream after printing.
              */
@@ -484,8 +485,6 @@ namespace carl
             /**
              * Prints the properties of this constraints on the given stream.
              * @param _out The stream to print on.
-             * @param _friendlyVarNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                           or with their dedicated names.
              */
             void printProperties( std::ostream& _out = std::cout ) const;
             
@@ -499,7 +498,7 @@ namespace carl
             /**
              * Checks whether the given value satisfies the given relation to zero.
              * @param _value The value to compare with zero.
-             * @param _relation The relation between the given value and zero.
+             * @param _rel The relation between the given value and zero.
              * @return true,  if the given value satisfies the given relation to zero;
              *          false, otherwise.
              */

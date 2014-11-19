@@ -267,7 +267,7 @@ namespace carl
             /**
              * Prints the given uninterpreted equality on the given output stream.
              * @param _os The output stream to print on.
-             * @param _uvar The uninterpreted equality to print.
+             * @param _ueq The uninterpreted equality to print.
              * @return The output stream after printing the given uninterpreted equality on it.
              */
             friend std::ostream& operator<<( std::ostream& _os, const UEquality& _ueq );

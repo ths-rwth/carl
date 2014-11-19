@@ -217,8 +217,9 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
         /**
          * Prints the given uninterpreted function instance on the given output stream.
          * @param _out The output stream to print the given uninterpreted function instance on.
-         * @param  _ufi The uninterpreted function instance to print.
+         * @param _ufi The uninterpreted function instance to print.
 		 * @param _infix If infix notation shall be used.
+		 * @param _friendlyNames Whether to use the friendly names for printing.
          * @return The output stream after printing the given uninterpreted function instance on it.
          */
         std::ostream& print( std::ostream& _out, const UFInstance& _ufi, bool _infix = false, bool _friendlyNames = true ) const;

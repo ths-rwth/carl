@@ -127,9 +127,8 @@ std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
 
 /**
  * Output a std::tuple with arbitrary content.
- * The format is `(<item>, <item>, ...)`
+ * Final case for `I == 0`.
  * @param os Output stream.
- * @param t tuple to be printed.
  * @return Output stream.
  */
 template<std::size_t I = 0, typename... T, typename std::enable_if<I == sizeof...(T), void>::type* = nullptr>
@@ -137,6 +136,13 @@ std::ostream& operator<<(std::ostream& os, const std::tuple<T...>&) {
 	return os << ")";
 }
 
+/**
+ * Output a std::tuple with arbitrary content.
+ * The format is `(<item>, <item>, ...)`
+ * @param os Output stream.
+ * @param t tuple to be printed.
+ * @return Output stream.
+ */
 template<std::size_t I = 0, typename... T, typename std::enable_if<I < sizeof...(T), void>::type* = nullptr>
 std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
 	if (I == 0) os << "(" << std::get<I>(t);
