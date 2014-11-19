@@ -14,7 +14,7 @@ namespace carl
 #ifdef PRUNE_MONOMIAL_POOL
 	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
 		MONOMIAL_POOL_LOCK_GUARD
-		auto iter = mPool.insert(pe);
+		auto iter = mPool.insert(std::move(pe));
 		Monomial::Arg res;
 		if (iter.second) {
 			if (iter.first->monomial.expired()) {
@@ -32,23 +32,20 @@ namespace carl
 		} else {
 			res = iter.first->monomial.lock();
 		}
-		//std::cout << "Returning " << res << " -> " << res->id() << std::endl;
 		return res;
 	}
 
 	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial ) {
 		assert(_monomial->id() == 0);
-		MONOMIAL_POOL_LOCK_GUARD
 		PoolEntry pe(_monomial->hash(), _monomial->exponents(), _monomial);
-		Monomial::Arg res = _monomial;
+		MONOMIAL_POOL_LOCK_GUARD
 		auto iter = mPool.insert(pe);
 		if (iter.second) {
-			res->mId = mIDs.get();
+			_monomial->mId = mIDs.get();
+			return _monomial;
 		} else {
-			res = iter.first->monomial.lock();
+			return iter.first->monomial.lock();
 		}
-		//std::cout << "Returning " << res << " -> " << res->id() << std::endl;
-		return res;
 	}
 #else
 	Monomial::Arg MonomialPool::add( MonomialPool::PoolEntry&& pe, exponent totalDegree) {
@@ -70,7 +67,7 @@ namespace carl
 	Monomial::Arg MonomialPool::add( const Monomial::Arg& _monomial ) {
 		assert(_monomial->id() == 0);
 		return MonomialPool::add(std::move(PoolEntry(_monomial->hash(), _monomial->exponents(), _monomial)));
-		}
+	}
 #endif
 	Monomial::Arg MonomialPool::add( Monomial::Content&& c, exponent totalDegree) {
 		return MonomialPool::add(std::move(PoolEntry(Monomial::hashContent(c), std::move(c))), totalDegree);
