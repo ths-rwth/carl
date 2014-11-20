@@ -56,9 +56,7 @@ namespace carl
 	 */
 	class Monomial
 	{
-#ifdef USE_MONOMIAL_POOL
 		friend class MonomialPool;
-#endif
 	public:
 		typedef std::shared_ptr<const Monomial> Arg;
 		typedef std::vector<std::pair<Variable, exponent>> Content;
@@ -68,10 +66,8 @@ namespace carl
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
-#ifdef USE_MONOMIAL_POOL
 		/// Monomial id.
 		mutable std::size_t mId = 0;
-#endif
 		/// Cached hash.
 		mutable std::size_t mHash = 0;
 
@@ -89,9 +85,7 @@ namespace carl
 		void calcHash() {
 			mHash = Monomial::hashContent(mExponents);
 		}
-#ifndef USE_MONOMIAL_POOL
 	public:
-#endif
 		/**
 		 * Generate a monomial from a variable and an exponent.
 		 * @param v The variable.
@@ -169,28 +163,8 @@ namespace carl
 		{
 			assert(isConsistent());
 		}
-		
-		#ifndef USE_MONOMIAL_POOL
-		/**
-		 * Assignment operator.
-		 * @param rhs Other monomial.
-		 * @return this.
-		 */
-		Monomial& operator=(const Monomial& rhs)
-		{
-			// Check for self-assignment.
-			if(this == &rhs) return *this;
-			mExponents = rhs.mExponents;
-			mTotalDegree = rhs.mTotalDegree;
-			mHash = rhs.mHash;
-			return *this;
-		}
-		#endif
-		
-#ifdef USE_MONOMIAL_POOL
+
 	public:
-#endif
-		
 		/**
 		 * Returns iterator on first pair of variable and exponent.
 		 * @return Iterator on begin.
@@ -228,7 +202,6 @@ namespace carl
 			return mHash;
 		}
 
-#ifdef USE_MONOMIAL_POOL
 		/**
 		 * Return the id of this monomial.
 		 * @return Id.
@@ -236,7 +209,6 @@ namespace carl
 		inline std::size_t id() const {
 			return mId;
 		}
-#endif
 		
 		/**
 		 * Gives the total degree, i.e. the sum of all exponents.
@@ -659,9 +631,7 @@ namespace carl
 	inline bool operator==(const Monomial::Arg& lhs, const Monomial::Arg& rhs) {
 		if (lhs.get() == rhs.get()) return true;
 		if (lhs == nullptr || rhs == nullptr) return false;
-#ifdef USE_MONOMIAL_POOL
 		if ((lhs->id() != 0) && (rhs->id() != 0)) return lhs->id() == rhs->id();
-#endif
 		if (lhs->hash() != rhs->hash()) return false;
 		if (lhs->tdeg() != rhs->tdeg()) return false;
 		return lhs->exponents() == rhs->exponents();
@@ -694,11 +664,9 @@ namespace carl
 		if (lhs.get() == rhs.get()) return false;
 		if (lhs == nullptr) return true;
 		if (rhs == nullptr) return false;
-#ifdef USE_MONOMIAL_POOL
 		if ((lhs->id() != 0) && (rhs->id() != 0)) {
 			if (lhs->id() == rhs->id()) return false;
 		}
-#endif
 		if(lhs->tdeg() < rhs->tdeg()) return true;
 		if(lhs->tdeg() > rhs->tdeg()) return false;
 		CompareResult cr = Monomial::lexicalCompare(*lhs, *rhs);

@@ -29,6 +29,6 @@ namespace carl
     
     ostream& operator<<( ostream& _os, const UninterpretedFunction& _ufun )
     {
-        return UFManager::getInstance().print( _o, _ufun );
+        return UFManager::getInstance().print( _os, _ufun );
     }
 }
