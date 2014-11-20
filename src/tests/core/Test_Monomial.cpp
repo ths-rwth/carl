@@ -84,11 +84,15 @@ TEST(Monomial, division)
     Monomial::Arg m2 = v0 * v0 * v1 * v2;
     Monomial::Arg m0x = v0 * v0 * v1 * v2;
     Monomial::Arg m0y = v0 * v0 * v1 * v1;
-    EXPECT_FALSE(m0->divide(m1).second);
-    EXPECT_FALSE(m1->divide(m0).second);
-    EXPECT_EQ(m0x, m0->divide(v1));
-    EXPECT_EQ(m0y, m0->divide(v2));
-    EXPECT_EQ(v1, m0->divide(m2).first);
+	Monomial::Arg tmp;
+    EXPECT_FALSE(m0->divide(m1, tmp));
+    EXPECT_FALSE(m1->divide(m0, tmp));
+	m0->divide(v1, tmp);
+    EXPECT_EQ(m0x, tmp);
+	m0->divide(v2, tmp);
+    EXPECT_EQ(m0y, tmp);
+	m0->divide(m2, tmp);
+    EXPECT_EQ(v1, tmp);
 }
 
 TEST(Monomial, Comparison)

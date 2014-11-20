@@ -352,7 +352,7 @@ namespace carl
 		 * @param v Variable
 		 * @return This divided by v.
 		 */
-		Monomial::Arg divide(Variable::Arg v) const;
+		bool divide(Variable::Arg v, Monomial::Arg& res) const;
 
 		
 		/**
@@ -413,7 +413,7 @@ namespace carl
 		 * @param m Monomial.
 		 * @return this divided by m.
 		 */
-		std::pair<Monomial::Arg,bool> divide(const Monomial::Arg& m) const;
+		bool divide(const Monomial::Arg& m, Monomial::Arg& res) const;
 		
 		/**
 		 * 

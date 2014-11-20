@@ -69,14 +69,12 @@ public:
                 continue;
             }
 			
-            Term<typename Polynomial::CoeffType>* divres = t.divideBy(mGenerators[*it].lterm());
-			
-            //Division succeeded, so we have found a divisor;
-            //To eliminate, we have to negate the factor.
-            if(divres != nullptr)
-            {
-				divres->negate();
-                return DivisionLookupResult<Polynomial>(&mGenerators[*it], *divres);
+            Term<typename Polynomial::CoeffType> divres;
+			if (t.divide(mGenerators[*it].lterm(), divres)) {
+				//Division succeeded, so we have found a divisor;
+				//To eliminate, we have to negate the factor.
+				divres.negate();
+                return DivisionLookupResult<Polynomial>(&mGenerators[*it], divres);
 				///@todo delete divres ?
             }
             ++it;

@@ -26,7 +26,7 @@ class Term
 {
 	private:
 		Coefficient mCoeff = Coefficient(0);
-		std::shared_ptr<const Monomial> mMonomial;
+		Monomial::Arg mMonomial;
 
 	public:
 		/**
@@ -94,15 +94,8 @@ class Term
 		inline Coefficient& coeff() {
 			return mCoeff;
 		}
-		inline const Coefficient& coeff() const
-		{
+		inline const Coefficient& coeff() const {
 			return mCoeff;
-		}
-		inline void setCoeff(const Coefficient& c) {
-			mCoeff = c;
-		}
-		inline void setCoeff(Coefficient&& c) {
-			mCoeff = c;
 		}
 		
 		/**
@@ -229,23 +222,16 @@ class Term
 		 * @param c a non-zero coefficient.
 		 * @return 
 		 */
-		Term* divideBy(const Coefficient& c) const;
-		/**
-		 * 
-		 * @param v
-		 * @return 
-		 */
-		Term* divideBy(Variable::Arg v) const;
-		/**
-		 * 
-		 * @param m
-		 * @return 
-		 */
-		Term* divideBy(const std::shared_ptr<const Monomial>& m) const;
+		Term divide(const Coefficient& c) const;
+		bool divide(const Coefficient& c, Term& res) const;
 		
-		Term* divideBy(const Term&) const;
+		bool divide(Variable::Arg v, Term& res) const;
 		
-		Term calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const;
+		bool divide(const Monomial::Arg& m, Term& res) const;
+		
+		bool divide(const Term&, Term& res) const;
+		
+		Term calcLcmAndDivideBy(const Monomial::Arg& m) const;
 		
 		template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 		bool divisible(const Term&) const;

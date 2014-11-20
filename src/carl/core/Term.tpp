@@ -63,73 +63,67 @@ Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e):
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::divideBy(const Coefficient& c) const
+Term<Coefficient> Term<Coefficient>::divide(const Coefficient& c) const
 {
 	assert(!carl::isZero(c));
-	return new Term(mCoeff / c, mMonomial);
+	return Term(mCoeff / c, mMonomial);
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::divideBy(Variable::Arg v) const
+bool Term<Coefficient>::divide(const Coefficient& c, Term& res) const
 {
-	if(mMonomial)
-	{
-		std::shared_ptr<const Monomial> div = mMonomial->divide(v);
-		if(div != nullptr)
-		{
-			if (div->tdeg() == 0) {
-				return new Term<Coefficient>(mCoeff);
-			}
-			return new Term<Coefficient>(mCoeff, div);
-		}   
-	}
-	return nullptr;	
+	assert(!carl::isZero(c));
+	res.mCoeff = mCoeff / c;
+	res.mMonomial = mMonomial;
+	return true;
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::divideBy(const std::shared_ptr<const Monomial>& m) const
+bool Term<Coefficient>::divide(Variable::Arg v, Term& res) const
 {
-	if(mMonomial)
-	{
-		auto res = mMonomial->divide(m);
-		if (res.second) {
-			if (res.first != nullptr && res.first->tdeg() == 0) {
-				return new Term<Coefficient>(mCoeff);
-			}
-			return new Term<Coefficient>(mCoeff, res.first);
-		}   
+	if(mMonomial) {
+		if(mMonomial->divide(v, res.mMonomial)) {
+			res.mCoeff = mCoeff;
+			return true;
+		}
 	}
-	return nullptr;  
+	return false;
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::divideBy(const Term& t) const
+bool Term<Coefficient>::divide(const Monomial::Arg& m, Term& res) const
+{
+	if (mMonomial) {
+		if (mMonomial->divide(m, res.mMonomial)) {
+			res.mCoeff = mCoeff;
+			return true;
+		}
+		return false;
+	}
+	res = *this;
+	return true;
+}
+
+template<typename Coefficient>
+bool Term<Coefficient>::divide(const Term& t, Term& res) const
 {
 	assert(!carl::isZero(t.mCoeff));
-	if(mMonomial)
-	{
-		if(!t.mMonomial)
-		{
-			// Term is just a constant.
-			return new Term<Coefficient>(mCoeff / t.mCoeff, mMonomial);
-		}
-		auto res = mMonomial->divide(t.mMonomial);
-		if (!res.second) return nullptr;
-		if (res.first != nullptr) {
-			if (res.first->tdeg() == 0) {
-				return new Term<Coefficient>(mCoeff / t.mCoeff);
+	if (mMonomial) {
+		if (t.mMonomial) {
+			if (mMonomial->divide(t.mMonomial, res.mMonomial)) {
+				res.mCoeff = mCoeff / t.mCoeff;
+				return true;
 			}
-			return new Term<Coefficient>(mCoeff / t.mCoeff, res.first);
-		} else {
-			return new Term<Coefficient>(mCoeff / t.mCoeff);
+			return false;
 		}
-	} 
-	else if(!t.mMonomial)
-	{
-	   // Division of constants.
-		return new Term<Coefficient>(mCoeff / t.mCoeff);
+		res.mMonomial = mMonomial;
+		res.mCoeff = mCoeff / t.mCoeff;
+		return true;
 	}
-	return nullptr;  
+	if (t.mMonomial) return false;
+	res.mMonomial = nullptr;
+	res.mCoeff = mCoeff / t.mCoeff;
+	return true;
 }
 
 template<typename Coefficient>

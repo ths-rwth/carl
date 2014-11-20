@@ -33,10 +33,10 @@ namespace carl
 		return MonomialPool::getInstance().create( std::move(newExps), tDeg );
 	}
 	
-	Monomial::Arg Monomial::divide(Variable::Arg v) const
+	bool Monomial::divide(Variable::Arg v, Monomial::Arg& res) const
 	{
 		auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
-		if(it == mExponents.cend()) return nullptr;
+		if(it == mExponents.cend()) return false;
 		else {
 			std::vector<std::pair<Variable, exponent>> newExps;
 			// If the exponent is one, the variable does not occur in the new monomial.
@@ -50,20 +50,23 @@ namespace carl
 				newExps.assign(mExponents.begin(), mExponents.end());
 				newExps[(unsigned)(it - mExponents.begin())].second -= 1;
 			}
-			return MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			return true;
 		}
 	}
 	
-	std::pair<Monomial::Arg,bool> Monomial::divide(const Monomial::Arg& m) const
+	bool Monomial::divide(const Monomial::Arg& m, Monomial::Arg& res) const
 	{
 		LOG_FUNC("carl.core.monomial", *this << ", " << m);
-		if( !m )
-			return std::make_pair(std::shared_ptr<const Monomial>(this), true);
+		if (!m) {
+			res = std::make_shared<const Monomial>(mHash, mExponents, mTotalDegree);
+			return true;
+		}
 		if(m->mTotalDegree > mTotalDegree || m->mExponents.size() > mExponents.size())
 		{
 			// Division will fail.
 			LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-			return std::make_pair(nullptr,false);
+			return false;
 		}
 		std::vector<std::pair<Variable, exponent>> newExps;
 
@@ -76,9 +79,9 @@ namespace carl
 			{
 				// Insert remaining part
 				newExps.insert(newExps.end(), itleft, mExponents.end());
-				std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
-				LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-				return std::make_pair(result,true);;
+				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
+				LOGMSG_TRACE("carl.core.monomial", "Result: " << res);
+				return true;
 			}
 			// Variable is present in both monomials.
 			if(itleft->first == itright->first)
@@ -87,7 +90,7 @@ namespace carl
 				{
 					// Underflow, itright->exp was larger than itleft->exp.
 					LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-					return std::make_pair(nullptr,false);
+					return false;
 				}
 				exponent newExp = itleft->second - itright->second;
 				if(newExp > 0)
@@ -100,7 +103,7 @@ namespace carl
 			else if(itleft->first < itright->first) 
 			{
 				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-				return std::make_pair(nullptr,false);
+				return false;
 			}
 			else
 			{
@@ -112,16 +115,17 @@ namespace carl
 		if(itright != m->mExponents.end())
 		{
 			LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-			return std::make_pair(nullptr,false);
+			return false;
 		}
 		if (newExps.empty())
 		{
 			LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
-			return std::make_pair(nullptr,true);
+			res = nullptr;
+			return true;
 		}
-		std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-		return std::make_pair(result,true);
+		res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
+		LOGMSG_TRACE("carl.core.monomial", "Result: " << res);
+		return true;
 	}
 	
 	

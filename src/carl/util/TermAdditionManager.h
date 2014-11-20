@@ -91,7 +91,7 @@ public:
 						termIDs[monId] = 0;
 						t = TermType();
 					} else {
-						t.setCoeff(std::move(coeff));
+						t.coeff() = coeff;
 					}
 				} else 
                     t = term;

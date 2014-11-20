@@ -515,9 +515,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	MultivariatePolynomial<Coeff,Ordering,Policies> res;
 	res.mTerms.reserve(mTerms.size());
 	for (unsigned i = 0; i < mTerms.size(); i++) {
-		auto tmp = mTerms[i].divideBy(divisor);
-		res.mTerms.push_back(*tmp);
-		delete tmp;
+		Term<Coeff> tmp;
+		if (mTerms[i].divide(divisor, tmp)) {
+			res.mTerms.push_back(tmp);
+		}
 	}
 	res.mOrdered = this->mOrdered;
     assert(res.isConsistent());
@@ -533,17 +534,12 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 	std::size_t id = mTermAdditionManager.getId(res.mTerms.size());
 	while(!res.isZero())
 	{
-		Term<C>* factor = res.lterm().divideBy(divisor.lterm());
-		// nullptr if lt(divisor) does not divide lt(p).
-		if(factor != nullptr)
-		{
-			res.subtractProduct(*factor, divisor);
-			//p -= *factor * divisor;
-			mTermAdditionManager.template addTerm<false>(id, *factor);
-			delete factor;
-		}
-		else
-		{
+		Term<C> factor;
+		if (res.lterm().divide(divisor.lterm(), factor)) {
+			res.subtractProduct(factor, divisor);
+			//p -= factor * divisor;
+			mTermAdditionManager.template addTerm<false>(id, factor);
+		} else {
 			return false;
 		}
 	}
@@ -562,14 +558,11 @@ DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::div
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
 	{
-		Term<C>* factor = p.lterm().divideBy(*divisor.lterm());
-		// nullptr if lt(divisor) does not divide lt(p).
-		if(factor != nullptr)
-		{
-			result.quotient += *factor;
-			p.subtractProduct(*factor, divisor);
-			//p -= *factor * divisor;
-			delete factor;
+		Term<C> factor;
+		if (p.lterm().divide(divisor.lterm(), factor)) {
+			result.quotient += factor;
+			p.subtractProduct(factor, divisor);
+			//p -= factor * divisor;
 		}
 		else
 		{
@@ -600,14 +593,11 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 	std::size_t id = mTermAdditionManager.getId(p.mTerms.size());
 	while(!p.isZero())
 	{
-		Term<C>* factor = p.lterm().divideBy(divisor.lterm());
-		// nullptr if lt(divisor) does not divide lt(p).
-		if(factor != nullptr)
-		{
-			//p -= *factor * divisor;
-			p.subtractProduct(*factor, divisor);
-			mTermAdditionManager.template addTerm<false>(id, *factor);
-			delete factor;
+		Term<C> factor;
+		if (p.lterm().divide(divisor.lterm(), factor)) {
+			//p -= factor * divisor;
+			p.subtractProduct(factor, divisor);
+			mTermAdditionManager.template addTerm<false>(id, factor);
 		}
 		else
 		{
@@ -639,7 +629,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	{
 		if(p.lterm().tdeg() < divisor.lterm().tdeg())
 		{
-			assert(p.lterm().divideBy(divisor.lterm()) == nullptr);
+			assert(!p.lterm().divisible(divisor.lterm()));
 			if( O::degreeOrder )
 			{
 				remainder += p;
@@ -651,13 +641,10 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 		}
 		else
 		{
-			Term<C>* factor = p.lterm().divideBy(divisor.lterm());
-			// nullptr if lt(divisor) does not divide lt(p).
-			if(factor != nullptr)
-			{
-				p.subtractProduct(*factor, divisor);
-				//p -= *factor * divisor;
-				delete factor;
+			Term<C> factor;
+			if (p.lterm().divide(divisor.lterm(), factor)) {
+				p.subtractProduct(factor, divisor);
+				//p -= factor * divisor;
 			}
 			else
 			{
@@ -1013,19 +1000,16 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::normalize() const
 {
-	MultivariatePolynomial result;
+	MultivariatePolynomial result(*this);
 	if(Policies::has_reasons)
 	{
 		result.setReasons(this->getReasons());
 	}
-	result.mTerms.reserve(mTerms.size());
-	for (const auto& it: mTerms)
+	auto lc = lcoeff();
+	for (auto& it: result.mTerms)
 	{
-		auto tmp = it.divideBy(lcoeff());
-		result.mTerms.emplace_back(*tmp);
-		delete tmp;
+		it.coeff() /= lc;
 	}
-	result.mOrdered = mOrdered;
 	assert(result.isConsistent());
 	return result;
 	
@@ -1670,7 +1654,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 					// we have to create a new term object.
 					else
 					{
-						it->setCoeff(it->coeff() - rhs.coeff());
+						it->coeff() -= rhs.coeff();
 					}
 					assert(this->isConsistent());
 					return *this;
@@ -1717,7 +1701,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 					// we have to create a new term object.
 					else
 					{
-						it->setCoeff(it->coeff() - constant_one<Coeff>::get());
+						it->coeff() -= constant_one<Coeff>::get();
 					}
 					assert(this->isConsistent());
 					return *this;
