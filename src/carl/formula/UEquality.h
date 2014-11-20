@@ -100,10 +100,28 @@ namespace carl
 				mLhs( _uvarA ),
 				mRhs( _uvarB )
 			{
-				if (lhsIsUV() && rhsIsUV()) assert( lhsAsUV().domain() == rhsAsUV().domain() );
-				else if (lhsIsUV() && rhsIsUF()) assert( lhsAsUV().domain() == rhsAsUF().uninterpretedFunction().codomain() );
-				else if (lhsIsUF() && rhsIsUV()) assert( lhsAsUF().uninterpretedFunction().codomain() == rhsAsUV().domain() );
-				else if (lhsIsUF() && rhsIsUF()) assert( lhsAsUF().uninterpretedFunction().codomain() == rhsAsUF().uninterpretedFunction().codomain() );
+				if( lhsIsUV() && rhsIsUV() )
+                {
+                    assert( lhsAsUV().domain() == rhsAsUV().domain() );
+                    if( rhsAsUV() < lhsAsUV() )
+                        std::swap( mLhs, mRhs );
+                }
+				else if( lhsIsUV() && rhsIsUF() )
+                {
+                    assert( lhsAsUV().domain() == rhsAsUF().uninterpretedFunction().codomain() );
+                }
+                else if( lhsIsUF() && rhsIsUV() )
+                {
+                    assert( lhsAsUF().uninterpretedFunction().codomain() == rhsAsUV().domain() );
+                    std::swap( mLhs, mRhs );
+                }
+                else if( lhsIsUF() && rhsIsUF() )
+                {
+                    assert( lhsAsUF().uninterpretedFunction().codomain() == rhsAsUF().uninterpretedFunction().codomain() );
+                    if( rhsAsUF() < lhsAsUF() )
+                        std::swap( mLhs, mRhs );
+                }
+                
 			}
 
             /**
@@ -118,6 +136,8 @@ namespace carl
                 mRhs( _uvarB )
             {
                 assert( _uvarA.domain() == _uvarB.domain() );
+                if( rhsAsUV() < lhsAsUV() )
+                        std::swap( mLhs, mRhs );
             }
             
             /**
@@ -142,8 +162,8 @@ namespace carl
              */
             UEquality( const UFInstance& _ufun, const UVariable& _uvar, bool _negated ):
                 mNegated( _negated ),
-                mLhs( _ufun ),
-                mRhs( _uvar )
+                mLhs( _uvar ),
+                mRhs( _ufun )
             {
                 assert( _uvar.domain() == _ufun.uninterpretedFunction().codomain() );
             }
