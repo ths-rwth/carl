@@ -91,6 +91,9 @@ class Term
 		 * Get the coefficient.
 		 * @return Coefficient.
 		 */
+		inline Coefficient& coeff() {
+			return mCoeff;
+		}
 		inline const Coefficient& coeff() const
 		{
 			return mCoeff;
@@ -100,11 +103,6 @@ class Term
 		}
 		inline void setCoeff(Coefficient&& c) {
 			mCoeff = c;
-		}
-		template<typename Coeff>
-		static void setCoeff(const std::shared_ptr<const Term<Coeff>>& s, Coeff&& c) {
-			assert(s.unique());
-			const_cast<Term<Coeff>*>(s.get())->setCoeff(std::move(c));
 		}
 		
 		/**
