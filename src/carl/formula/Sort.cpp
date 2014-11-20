@@ -28,8 +28,8 @@ namespace carl
         return mId < _sort.id();
     }
     
-    ostream& operator<<( ostream& _out, const Sort& _sort )
+    ostream& operator<<( ostream& _os, const Sort& _sort )
     {
-        return SortManager::getInstance().print( _out, _sort );
+        return SortManager::getInstance().print( _os, _sort );
     }
 }

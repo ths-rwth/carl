@@ -9,6 +9,7 @@ Note that some of the documentation may be incomplete or rendered incorrectly, e
 - Comments in code blocks (see below) may not work correctly (e.g. with doxygen 1.8.1.2). See [here](http://doxygen.10944.n7.nabble.com/Including-doc-comments-in-code-blocks-in-markdown-td5592.html) for a workaround. This will however look ugly for newer doxygen versions, hence we do not use it.
 - Files with `static_assert` statements will be incomplete. A [patch](https://bugzilla.gnome.org/show_bug.cgi?id=737172) is pending and will hopefully make it into doxygen 1.8.9.
 - Member groups (usually used to group operators) may or may not work. There still seem to be a few cases where doxygen [messes up](https://bugzilla.gnome.org/show_bug.cgi?id=737112).
+- Documenting unnamed parameters is not possible. A corresponding [ticket](https://bugzilla.gnome.org/show_bug.cgi?id=152990) exists for several years.
 
 ## Modules
 In order to structure the reference, we use the concept of
@@ -22,8 +23,8 @@ Literature references should be provided when appropriate.
 
 We use a bibtex database located at `/doc/literature.bib` with the following conventions:
 
-- Label for one author: `LastnameYY`, for example `Ducos00` for @cite Ducos00.
-- Label for multiple authors: `ABCYY` where `ABC` are the first letters of the authors last names. For example `GCL92` for @cite GCL92.
+- Label for one author: `LastnameYY`, for example `Ducos00` for @cite Ducos00 .
+- Label for multiple authors: `ABCYY` where `ABC` are the first letters of the authors last names. For example `GCL92` for @cite GCL92 .
 - Order the bibtex entrys by label.
 
 These references can be used with `@cite label`, for example like this:

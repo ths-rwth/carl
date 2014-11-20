@@ -27,8 +27,8 @@ namespace carl
        return UFManager::getInstance().getCodomain( *this );
     }
     
-    ostream& operator<<( ostream& _out, const UninterpretedFunction& _uf )
+    ostream& operator<<( ostream& _os, const UninterpretedFunction& _ufun )
     {
-        return UFManager::getInstance().print( _out, _uf );
+        return UFManager::getInstance().print( _os, _ufun );
     }
 }

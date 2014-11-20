@@ -95,6 +95,9 @@ protected:
 	bool operator()(const CMP<Coeff>& lhs, const CMP<Coeff>& rhs) {
 		return lhs == rhs;
 	}
+	bool operator()(const bool lhs, const bool rhs) {
+		return lhs == rhs;
+	}
     #ifdef COMPARE_WITH_GINAC
 	bool operator()(const GMP& lhs, const GMP& rhs) {
 		return lhs == rhs;
@@ -136,10 +139,10 @@ private:
 	std::string name;
 
 	template<typename R, typename Src>
-	unsigned runSamples(std::vector<R>& res, const Src& src, const std::string& name) {
+	unsigned runSamples(std::vector<R>& res, const Src& src) {
 		carl::Timer timer;
 		for (const auto& cur: src) {
-			res.emplace_back(std::move(executor(cur)));
+			res.push_back(std::move(executor(cur)));
 		}
 		return timer.passed();
 	}
@@ -148,7 +151,7 @@ public:
 		results.reserve(reference.size());
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
-		unsigned time = runSamples(results, reference, name);
+		unsigned time = runSamples(results, reference);
 		runtimes[name] = time;
 		std::cout << time << " ms" << std::endl;
 	}
@@ -159,7 +162,7 @@ public:
 		BenchmarkConverter<Converter> benchmarks(reference);
 		std::cout << "Comparing " << name << " ... ";
 		std::cout.flush();
-		unsigned time = runSamples(res, benchmarks, name);
+		unsigned time = runSamples(res, benchmarks);
 		runtimes[name] = time;
 		std::cout << time << " ms" << std::endl;
 		

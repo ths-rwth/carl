@@ -189,17 +189,17 @@ namespace carl
         /**
          * Calculates the factorization of the gcd of the polynomial represented by the two given polynomial factorization pairs. 
          * As a side effect the factorizations of these pairs can be refined. (c.f. Accelerating Parametric Probabilistic Verification, Algorithm 2)
-         * @param _factA The first polynomial factorization pair to calculate the gcd with.
-         * @param _factB The second polynomial factorization pair to calculate the gcd with.
+         * @param _pfPairA The first polynomial factorization pair to calculate the gcd with.
+         * @param _pfPairB The second polynomial factorization pair to calculate the gcd with.
          * @param _restA The remaining factorization of the first polynomial without the gcd.
          * @param _restB The remaining factorization of the second polynomial without the gcd.
          * @param _coeff 
-         * @param _factARefined A bool which is set to true, if the factorization of the first given polynomial factorization pair has been refined.
-         * @param _factBRefined A bool which is set to true, if the factorization of the second given polynomial factorization pair has been refined.
+         * @param _pfPairARefined A bool which is set to true, if the factorization of the first given polynomial factorization pair has been refined.
+         * @param _pfPairBRefined A bool which is set to true, if the factorization of the second given polynomial factorization pair has been refined.
          * @return The factorization of the gcd of the polynomial represented by the two given polynomial factorization pairs. 
          */
         template<typename P1>
-        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, typename P1::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined );
+        friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _restB, typename P1::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         /**
          * Prints the given polynomial-factorization pair on the given output stream.

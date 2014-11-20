@@ -1,5 +1,5 @@
 /**
- * @file Ast.h
+ * @file Formula.h
  * @author Florian Corzilius<corzilius@cs.rwth-aachen.de>
  * @author Ulrich Loup
  * @author Sebastian Junges
@@ -192,8 +192,7 @@ namespace carl
 
             /**
              * Constructs a formula being a Boolean variable.
-             * @param _booleanVarName The pointer to the string representing the name of the Boolean variable.
-             * @param _id A unique id of the formula to create.
+             * @param _boolean The pointer to the string representing the name of the Boolean variable.
              */
             FormulaContent( carl::Variable::Arg _boolean );
 
@@ -279,7 +278,7 @@ namespace carl
             /**
              * The output operator of a formula.
              * @param _out The stream to print on.
-             * @param _init
+             * @param _formula
              */
             template<typename P>
             friend std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
@@ -305,6 +304,7 @@ namespace carl
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.
              * @param _constraint The constraint to add propositions for.
+			 * @param _properties
              */
             static void addConstraintProperties( const Constraint<Pol>& _constraint, Condition& _properties );
             
@@ -416,7 +416,7 @@ namespace carl
             // Methods.
 
             /**
-             * Sets the deduction flag to the given value..
+             * Sets the deduction flag to the given value.
              * @param _deducted The value to set the deduction flag to.
              */
             void setDeducted( bool _deducted ) const
@@ -544,7 +544,7 @@ namespace carl
             
             /**
              * Collects all arithmetic variables occurring in this formula.
-             * @param _arithmeticVars The container to collect the arithmetic variables in.
+             * @param _booleanVars The container to collect the arithmetic variables in.
              */
             void booleanVars( Variables& _booleanVars ) const
             {
@@ -863,7 +863,9 @@ namespace carl
 
             /**
              * Collects all Boolean variables occurring in this formula.
-             * @param _booleanVars The container to collect the Boolean variables in.
+             * @param _vars The container to collect the Boolean variables in.
+			 * @param _type
+			 * @param _ofThisType
              */
             void collectVariables( Variables& _vars, carl::VariableType _type, bool _ofThisType = true ) const;
             
@@ -922,7 +924,7 @@ namespace carl
             /**
              * The output operator of a formula.
              * @param _out The stream to print on.
-             * @param _init
+             * @param _formula
              */
             template<typename P>
             friend std::ostream& operator<<( std::ostream& _out, const Formula<P>& _formula );
