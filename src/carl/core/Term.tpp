@@ -255,23 +255,13 @@ bool operator==(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
-	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
 	return carl::isOne(lhs.coeff());
-	#else
-	if (!carl::isOne(lhs.coeff())) return false;
-	return lhs.monomial() == rhs;
-	#endif
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, Variable::Arg rhs) {
-	#ifdef USE_MONOMIAL_POOL
 	if (lhs.monomial() != rhs) return false;
 	return carl::isOne(lhs.coeff());
-	#else
-	if (!carl::isOne(lhs.coeff())) return false;
-	return lhs.monomial() == rhs;
-	#endif
 }
 template<typename Coeff>
 bool operator==(const Term<Coeff>& lhs, const Coeff& rhs) {

@@ -48,7 +48,6 @@ option( COMPARE_WITH_Z3 "Compile with testing with the runtime and result compar
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
-option( USE_MONOMIAL_POOL "Use monomial pool" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" OFF )
 
 # Offer the user the choice of overriding the installation directories
@@ -98,6 +97,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	endif()
 	message("-- Using g++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmax-errors=5 -fdiagnostics-color=auto")
 	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} -O3")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} -O1")
 else()

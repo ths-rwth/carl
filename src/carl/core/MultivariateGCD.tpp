@@ -86,11 +86,7 @@ std::shared_ptr<const Monomial> gcd(const MultivariatePolynomial<C,O,P>& a, std:
 			vepairs.push_back(ve.first, std::min(varinfo.getVarInfo(ve.first)->minDegree(), ve.second));
 		}
 	}
-    #ifdef USE_MONOMIAL_POOL
-    return MonomialPool::getInstance().create( std::move(vepairs) );
-    #else
-    return std::make_shared<const Monomial>( std::move(vepairs) );
-    #endif
+	return createMonomial( std::move(vepairs) );
 }
 
 template<typename C, typename O, typename P>

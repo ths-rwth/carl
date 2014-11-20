@@ -7,8 +7,6 @@
 
 #include "../io/streamingOperators.h"
 
-#ifdef USE_MONOMIAL_POOL
-
 namespace carl
 {
 #ifdef PRUNE_MONOMIAL_POOL
@@ -93,5 +91,3 @@ namespace carl
 		return add(std::move(_exponents));
 	}
 } // end namespace carl
-
-#endif
