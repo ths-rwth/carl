@@ -14,7 +14,7 @@ TEST(Monomial, Operators)
     Variable v1 = Variable((unsigned)2);
     Variable v2 = Variable((unsigned)3);
     
-	Monomial::Arg m0 = carl::createMonomial(v0, 1);
+	Monomial::Arg m0 = carl::createMonomial(v0, (exponent) 1);
 	m0 = m0 * v1;
     EXPECT_EQ((unsigned)1,m0->exponentOfVariable(v1));
     m0 = m0 * v1;
@@ -25,8 +25,8 @@ TEST(Monomial, Operators)
     EXPECT_EQ((unsigned)4,m0->tdeg());
     EXPECT_EQ((unsigned)3,m0->nrVariables());
     
-	Monomial::Arg m2 = carl::createMonomial(v1, 1);
-	Monomial::Arg m3 = carl::createMonomial(v1, 1);
+	Monomial::Arg m2 = carl::createMonomial(v1, (exponent) 1);
+	Monomial::Arg m3 = carl::createMonomial(v1, (exponent) 1);
     m2 = m2 * v1;
     m3 = m3 * v1;
     EXPECT_EQ(m2, m3);
