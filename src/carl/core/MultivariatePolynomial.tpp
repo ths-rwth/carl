@@ -936,7 +936,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
         Term<Coeff >* resultTerm = term.substitute(substitutions);
         if( !resultTerm->isZero() )
         {
-            mTermAdditionManager.template addTerm<false>(id, std::shared_ptr<const Term<Coeff >>( resultTerm ));
+            mTermAdditionManager.template addTerm<false>(id, *resultTerm );
         }
         else
         {
@@ -1861,8 +1861,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	assert(!carl::isZero(c));
 	if (carl::isOne(c)) return *this;
 	for (auto& term : mTerms) {
-		///@todo add /=(Coefficient) for Term.
-		term.reset(term.divideBy(c));
+		term.setCoeff(term.coeff() / c);
 	}
 	return *this;
 }

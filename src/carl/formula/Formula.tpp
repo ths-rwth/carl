@@ -1618,7 +1618,7 @@ namespace carl
         Relation relation = negated ? Constraint<Pol>::invertRelation( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
         Pol* poly = nullptr;
-        bool multipliedByMinusOne = lhs.lterm()->coeff() < typename Pol::NumberType( 0 );
+        bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
             boundValue = constraint.constantPart();
