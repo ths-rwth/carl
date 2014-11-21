@@ -327,33 +327,33 @@ namespace carl
              */
             static void init( const FormulaContent<Pol>& _content );
             
-            Formula( FormulaType _type = TRUE ):
+            explicit Formula( FormulaType _type = TRUE ):
                 mpContent( _type == TRUE ? FormulaPool<Pol>::getInstance().trueFormula() : FormulaPool<Pol>::getInstance().falseFormula() )
             {}
                 
-            Formula( Variable::Arg _booleanVar ):
+            explicit Formula( Variable::Arg _booleanVar ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _booleanVar ) )
             {}
                 
-            Formula( const Pol& _pol, Relation _rel ):
+            explicit Formula( const Pol& _pol, Relation _rel ):
                 mpContent( FormulaPool<Pol>::getInstance().create( ConstraintPool<Pol>::getInstance().newConstraint( _pol, _rel ) ) )
             {}
                 
-            Formula( Pol&& _pol, Relation _rel ):
+            explicit Formula( Pol&& _pol, Relation _rel ):
                 mpContent( FormulaPool<Pol>::getInstance().create( ConstraintPool<Pol>::getInstance().newConstraint( std::move( _pol ), _rel ) ) )
             {}
                 
-            Formula( const Constraint<Pol>* _constraint ):
+            explicit Formula( const Constraint<Pol>* _constraint ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
                 
-            Formula( FormulaType _type, const Formula& _subformula ):
+            explicit Formula( FormulaType _type, const Formula& _subformula ):
                 mpContent( FormulaPool<Pol>::getInstance().createNegation( _subformula ) )
             {
                 assert( _type == FormulaType::NOT );
             }
                 
-            Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB )
+            explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB )
             {
                 assert( _type == FormulaType::AND || _type == FormulaType::IFF || _type == FormulaType::IMPLIES || _type == FormulaType::OR || _type == FormulaType::XOR );
                 if( _type == FormulaType::IMPLIES )
@@ -366,7 +366,7 @@ namespace carl
                 }
             }
             
-            Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB, const Formula& _subformulaC )
+            explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB, const Formula& _subformulaC )
             {
                 assert( _type == FormulaType::AND || _type == FormulaType::IFF || _type == FormulaType::ITE || _type == FormulaType::OR || _type == FormulaType::XOR );
                 if( _type == FormulaType::ITE )
@@ -383,33 +383,33 @@ namespace carl
                 }
             }
             
-            Formula( FormulaType _type, const std::multiset<Formula>& _subformulas ):
+            explicit Formula( FormulaType _type, const std::multiset<Formula>& _subformulas ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _subformulas ) )
             {
                 assert( _type == FormulaType::XOR );
             }
             
-            Formula( FormulaType _type, const std::set<Formula>& _subasts ):
+            explicit Formula( FormulaType _type, const std::set<Formula>& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
-            Formula( FormulaType _type, std::set<Formula>&& _subasts ):
+            explicit Formula( FormulaType _type, std::set<Formula>&& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, move(_subasts) ) )
             {}
             
-            Formula( FormulaType _type, const std::vector<Variable>&& _vars, const Formula& _term ):
+            explicit Formula( FormulaType _type, const std::vector<Variable>&& _vars, const Formula& _term ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move( _vars ), _term ) )
             {}
             
-            Formula( FormulaType _type, const std::vector<Variable>& _vars, const Formula& _term ):
+            explicit Formula( FormulaType _type, const std::vector<Variable>& _vars, const Formula& _term ):
                 Formula( _type, std::move( std::vector<Variable>( _vars ) ), _term )
             {}
             
-            Formula( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated ):
+            explicit Formula( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _lhs, _rhs, _negated ) )
             {}
             
-            Formula( UEquality&& _eq ):
+            explicit Formula( UEquality&& _eq ):
                 mpContent( FormulaPool<Pol>::getInstance().create( std::move( _eq ) ) )
             {}
 
