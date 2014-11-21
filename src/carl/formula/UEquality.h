@@ -26,12 +26,10 @@ namespace carl
             /// The type of the left and right-hand side of an uninterpreted equality.
             typedef boost::variant<UVariable, UFInstance> Arg;
 
-        private:
-
             /**
              * Checks whether the given argument is an uninterpreted variable.
              */
-            struct IsUIVariable: public boost::static_visitor<bool> 
+            struct IsUVariable: public boost::static_visitor<bool> 
             {
                 /**
                  * @param An uninterpreted variable.
@@ -75,6 +73,8 @@ namespace carl
                     return true;
                 }
             };
+
+        private:
 
             // Member.
 
@@ -130,13 +130,13 @@ namespace carl
              * @param _uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
              * @param _uvarB An uninterpreted variable, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const UVariable& _uvarA, const UVariable& _uvarB, bool _negated ):
+            UEquality( const UVariable& _uvarA, const UVariable& _uvarB, bool _negated, bool _orderCorrect = false ):
                 mNegated( _negated ),
                 mLhs( _uvarA ),
                 mRhs( _uvarB )
             {
                 assert( _uvarA.domain() == _uvarB.domain() );
-                if( rhsAsUV() < lhsAsUV() )
+                if( !_orderCorrect && rhsAsUV() < lhsAsUV() )
                         std::swap( mLhs, mRhs );
             }
             
@@ -174,13 +174,26 @@ namespace carl
              * @param _ufunA An uninterpreted function instance, which is going to be the left-hand side of this uninterpreted equality.
              * @param _ufunB An uninterpreted function instance, which is going to be the right-hand side of this uninterpreted equality.
              */
-            UEquality( const UFInstance& _ufunA, const UFInstance& _ufunB, bool _negated ):
+            UEquality( const UFInstance& _ufunA, const UFInstance& _ufunB, bool _negated, bool _orderCorrect = false ):
                 mNegated( _negated ),
                 mLhs( _ufunA ),
                 mRhs( _ufunB )
             {
                 assert( _ufunA.uninterpretedFunction().codomain() == _ufunB.uninterpretedFunction().codomain() );
+                if( !_orderCorrect && rhsAsUF() < lhsAsUF() )
+                    std::swap( mLhs, mRhs );
             }
+            
+            /**
+             * Copies the given uninterpreted equality.
+             * @param _ueq The uninterpreted equality to copy.
+             * @param _invert true, if the inverse of the given uninterpreted equality shall be constructed. (== -> != resp. != -> ==)
+             */
+            UEquality( const UEquality& _ueq, bool _invert = false ):
+                mNegated( _invert ? !_ueq.mNegated : _ueq.mNegated ),
+                mLhs( _ueq.mLhs ),
+                mRhs( _ueq.mRhs )
+            {}
             
             /**
              * @return true, if the negation of this equation shall hold, that is, it is actually an inequality.
@@ -211,7 +224,7 @@ namespace carl
              */
             bool lhsIsUV() const 
             {
-                return boost::apply_visitor(IsUIVariable(), mLhs);
+                return boost::apply_visitor(IsUVariable(), mLhs);
             }
 
             /**
@@ -219,7 +232,7 @@ namespace carl
              */
             bool rhsIsUV() const 
             {
-                return boost::apply_visitor(IsUIVariable(), mRhs);
+                return boost::apply_visitor(IsUVariable(), mRhs);
             }
 
             /**

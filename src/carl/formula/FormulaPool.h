@@ -12,6 +12,7 @@
 #include "ConstraintPool.h"
 #include "../util/Singleton.h"
 #include <mutex>
+#include <boost/variant.hpp>
 
 #define SIMPLIFY_FORMULA
 
@@ -74,7 +75,7 @@ namespace carl
              */
             ConstElementSPtr create( Variable::Arg _booleanVar )
             {
-                return add( ElementSPtr( new Element( _booleanVar ) ) );
+                return add( std::move( ElementSPtr( new Element( _booleanVar ) ) ) );
             }
             
             /**
@@ -90,7 +91,7 @@ namespace carl
                 if( _constraint == constraintPool<Pol>().inconsistentConstraint() )
                     return mpFalse;
                 #endif
-                return add( ElementSPtr( new Element( _constraint ) ) );
+                return add( std::move( ElementSPtr( new Element( _constraint ) ) ) );
             }
             
             /**
@@ -109,7 +110,7 @@ namespace carl
 					return _subFormula.subformula().mpContent;
                 #endif
                 // TODO: Actually we know that this formula does not begin with NOT and is already in the pool. Use this for optimization purposes.
-                return add( ElementSPtr( new Element( _subFormula ) ) );
+                return add( std::move( ElementSPtr( new Element( _subFormula ) ) ) );
             }
     
             /**
@@ -130,7 +131,7 @@ namespace carl
                 if( _conclusion.mpContent == mpFalse )
                     return createNegation( _premise.mpContent );
                 #endif
-                return add( ElementSPtr( new Element( _premise, _conclusion ) ) );
+                return add( std::move( ElementSPtr( new Element( _premise, _conclusion ) ) ) );
             }
     
             /**
@@ -148,7 +149,7 @@ namespace carl
                 if( _condition.mpContent == mpTrue )
                     return _then.mpContent;
                 #endif
-                return add( ElementSPtr( new Element( _condition, _then, _else ) ) );
+                return add( std::move( ElementSPtr( new Element( _condition, _then, _else ) ) ) );
             }
 
 			/**
@@ -162,7 +163,7 @@ namespace carl
 			{
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
 				if (_vars.size() > 0) {
-					return add( ElementSPtr( new Element(_type, std::move(_vars), _term ) ) );
+					return add( std::move( ElementSPtr( new Element(_type, std::move(_vars), _term ) ) ) );
 				} else {
 					return _term.mpContent;
 				}
@@ -231,12 +232,46 @@ namespace carl
 
 			ConstElementSPtr create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
 			{
-				return add( ElementSPtr( new Element( UEquality( _lhs, _rhs, _negated ) ) ) );
+                #ifdef SIMPLIFY_FORMULA
+                if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
+                {
+                    if( boost::get<UVariable>(_lhs) < boost::get<UVariable>(_rhs) )
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) ) ), true );
+                    if( boost::get<UVariable>(_rhs) < boost::get<UVariable>(_lhs) )
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) ) ), true );
+                    else if( _negated )
+                        return mpFalse;
+                    else
+                        return mpTrue;
+                }
+				else if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) )
+                {
+                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) ) ), true );
+                }
+                else if( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
+                {
+                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) ) ), true );
+                }
+                else
+                {
+                    assert( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) );
+                    if( boost::get<UFInstance>(_lhs) < boost::get<UFInstance>(_rhs) )
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) ) ), true );
+                    if( boost::get<UFInstance>(_rhs) < boost::get<UFInstance>(_lhs) )
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) ) ), true );
+                    else if( _negated )
+                        return mpFalse;
+                    else
+                        return mpTrue;
+                }
+                #else
+                return add( std::move( ElementSPtr( new Element( UEquality( _lhs, _rhs, _negated ) ) ) ) );
+                #endif
 			}
 
 			ConstElementSPtr create( UEquality&& eq )
 			{
-				return add( ElementSPtr( new Element( std::move( eq ) ) ) );
+				return add( std::move( ElementSPtr( new Element( std::move( eq ) ) ) ) );
 			}
             
             template<typename ArgType>
@@ -259,6 +294,10 @@ namespace carl
                 }
                 return result;
             }
+            
+            /**
+             */
+            bool formulasInverse( const Formula<Pol>& _subformulaA, const Formula<Pol>& _subformulaB );
         
             /**
              * @param _type The type of the n-ary operator (n>1) of the formula to create.
@@ -297,14 +336,22 @@ namespace carl
             }
             
             /**
+             * Inserts the given formula to the pool, if it does not yet occur in there.
+             * @param _formula The formula to add to the pool.
+             * @param _elementNotInPool true, if the element is not yet in the pool; false, if this is not known.
+             * @return The position of the given formula in the pool and true, if it did not yet occur in the pool;
+             *         The position of the equivalent formula in the pool and false, otherwise.
+             */
+            std::pair<typename FastSharedPointerSet<Element>::iterator,bool> insert( ElementSPtr&& _formula, bool _elementNotInPool );
+            
+            /**
              * Adds the given formula to the pool, if it does not yet occur in there.
              * Note, that this method uses the allocator which is locked before calling.
-             * @sideeffect The given formula will be deleted, if it already occurs in the pool.
              * @param _formula The formula to add to the pool.
              * @return The given formula, if it did not yet occur in the pool;
              *         The equivalent formula already occurring in the pool, otherwise.
              */
-            ConstElementSPtr add( ElementSPtr _formula );
+            ConstElementSPtr add( ElementSPtr&& _formula, bool _addInverse = false );
     };
 }    // namespace carl
 

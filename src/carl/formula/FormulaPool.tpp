@@ -29,26 +29,89 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr _element )
+    std::pair<typename FastSharedPointerSet<typename FormulaPool<Pol>::Element>::iterator,bool> FormulaPool<Pol>::insert( ElementSPtr&& _element, bool _elementNotInPool )
+    {
+        auto iterBoolPair = mPool.insert( std::move( _element ) );
+        assert( _elementNotInPool <= iterBoolPair.second );
+        if( _elementNotInPool || iterBoolPair.second ) // Formula has not yet been generated.
+        {
+            (*iterBoolPair.first)->mId = mIdAllocator; // id should be set here to avoid conflicts when multi-threading
+            Formula<Pol>::init( **iterBoolPair.first );
+            ++mIdAllocator;
+        }
+        return iterBoolPair;
+    }
+    
+    template<typename Pol>
+    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr&& _element, bool _addInverse )
     {
         FORMULA_POOL_LOCK_GUARD
-        auto iterBoolPair = mPool.insert( _element );
+        auto iterBoolPair = insert( std::move( _element ), false );
         if( iterBoolPair.second ) // Formula has not yet been generated.
         {
-            _element->mId = mIdAllocator; // id should be set here to avoid conflicts when multi-threading
-            Formula<Pol>::init( *_element );
-            ++mIdAllocator;
             // Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
-            ElementSPtr formulaNegated = ElementSPtr( new Element( Formula<Pol>( _element ) ) );
-            assert( mPool.find( formulaNegated ) == mPool.end() );
-            mPool.insert( formulaNegated );
-            formulaNegated->mId = mIdAllocator;
-            Formula<Pol>::init( *formulaNegated );
-            ++mIdAllocator;
+            insert( std::move( ElementSPtr( new Element( Formula<Pol>( *iterBoolPair.first ) ) ) ), true );
+            if( _addInverse )
+            {
+                switch( (*iterBoolPair.first)->mType )
+                {
+                    case FormulaType::UEQ:
+                    {
+                        auto iterBoolPairInv = insert( std::move( ElementSPtr( new Element( UEquality( (*iterBoolPair.first)->mUIEquality, true ) ) ) ), true );
+                        insert( std::move( ElementSPtr( new Element( Formula<Pol>( *iterBoolPairInv.first ) ) ) ), true );
+                        break;
+                    }
+                    case FormulaType::CONSTRAINT:
+                    {
+                        break;
+                    }
+                    default:
+                    {
+                        assert( false );
+                    }
+                }
+            }
         }
         return *iterBoolPair.first;   
+    }
+    
+    template<typename Pol>
+    bool FormulaPool<Pol>::formulasInverse( const Formula<Pol>& _subformulaA, const Formula<Pol>& _subformulaB )
+    {
+        if( _subformulaA.mpContent == mpTrue && _subformulaB.mpContent == mpFalse )
+            return true;
+        if( _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA )
+            return true;
+        if( _subformulaA.getType() == FormulaType::UEQ )
+        {
+            if( !_subformulaA.uequality().negated() && _subformulaB.getType() == FormulaType::UEQ )
+            {
+                if( _subformulaA.getId() == _subformulaB.getId() + 2 )
+                {
+                    assert( _subformulaB.uequality().negated() );
+                    assert( _subformulaA.uequality().lhs() == _subformulaB.uequality().lhs() );
+                    assert( _subformulaA.uequality().rhs() == _subformulaB.uequality().rhs() );
+                    return true;
+                }
+            }
+        }
+        else if( _subformulaA.getType() == FormulaType::NOT && _subformulaA.subformula().getType() == FormulaType::UEQ )
+        {
+            if( !_subformulaA.subformula().uequality().negated() 
+                    && _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula().getType() == FormulaType::UEQ )
+            {
+                if( _subformulaA.getId() == _subformulaB.getId() + 2 )
+                {
+                    assert( _subformulaB.subformula().uequality().negated() );
+                    assert( _subformulaA.subformula().uequality().lhs() == _subformulaB.subformula().uequality().lhs() );
+                    assert( _subformulaA.subformula().uequality().rhs() == _subformulaB.subformula().uequality().rhs() );
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     template<typename Pol>
@@ -82,7 +145,7 @@ namespace carl
                 // itself and assign the next id to it.
                 if( iter != _subformulas.end() )
                 {
-                    if( (iterB->mpContent == mpTrue && iter->mpContent == mpFalse) || (iter->getType() == FormulaType::NOT && iter->subformula() == (*iterB)) )
+                    if( formulasInverse( *iterB, *iter ) )
                     {
                         switch( _type )
                         {
@@ -160,6 +223,6 @@ namespace carl
             if( _subformulas.size() == 1 )
                 return newFormulaWithOneSubformula( _type, *(_subformulas.begin()) );
         }
-        return add( ElementSPtr( new Element( _type, std::move( _subformulas ) ) ) );
+        return add( std::move( ElementSPtr( new Element( _type, std::move( _subformulas ) ) ) ) );
     }
 }    // namespace carl

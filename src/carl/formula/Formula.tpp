@@ -578,7 +578,7 @@ namespace carl
     }
     
     template<typename Pol>
-    void Formula<Pol>::init( FormulaContent<Pol>& _content )
+    void Formula<Pol>::init( const FormulaContent<Pol>& _content )
     {
         _content.mProperties = Condition();
         switch( _content.mType )

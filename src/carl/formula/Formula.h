@@ -153,7 +153,7 @@ namespace carl
             /// The hash value.
             size_t mHash;
             /// The unique id.
-            size_t mId;
+            mutable size_t mId;
             /// The activity for this formula, which means, how much is this formula involved in the solving procedure.
             mutable double mActivity;
             /// Some value stating an expected difficulty of solving this formula for satisfiability.
@@ -181,7 +181,7 @@ namespace carl
                 UEquality mUIEquality;
             };
             /// The propositions of this formula.
-            Condition mProperties;
+            mutable Condition mProperties;
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
@@ -325,7 +325,7 @@ namespace carl
              * Gets the propositions of this formula. It updates and stores the propositions
              * if they are not up to date, hence this method is quite efficient.
              */
-            static void init( FormulaContent<Pol>& _content );
+            static void init( const FormulaContent<Pol>& _content );
             
             Formula( FormulaType _type = TRUE ):
                 mpContent( _type == TRUE ? FormulaPool<Pol>::getInstance().trueFormula() : FormulaPool<Pol>::getInstance().falseFormula() )
@@ -871,20 +871,64 @@ namespace carl
             
             /**
              * @param _formula The formula to compare with.
-             * @return true, if this formula and the given formula have the same id;
+             * @return true, if this formula and the given formula are equal;
              *         false, otherwise.
              */
             bool operator==( const Formula& _formula ) const;
             
             /**
              * @param _formula The formula to compare with.
-             * @return true, if the id of this formula is smaller than the id of the given one.
+             * @return true, if this formula and the given formula are not equal.
+             */
+            bool operator!=( const Formula& _formula ) const
+            {
+                assert( mpContent->mId != 0 );
+                assert( _formula.getId() != 0 );
+                return mpContent->mId != _formula.getId();
+            }
+            
+            /**
+             * @param _formula The formula to compare with.
+             * @return true, if the id of this formula is less than the id of the given one.
              */
             bool operator<( const Formula& _formula ) const
             {
                 assert( mpContent->mId != 0 );
                 assert( _formula.getId() != 0 );
                 return mpContent->mId < _formula.getId();
+            }
+            
+            /**
+             * @param _formula The formula to compare with.
+             * @return true, if the id of this formula is greater than the id of the given one.
+             */
+            bool operator>( const Formula& _formula ) const
+            {
+                assert( mpContent->mId != 0 );
+                assert( _formula.getId() != 0 );
+                return mpContent->mId > _formula.getId();
+            }
+            
+            /**
+             * @param _formula The formula to compare with.
+             * @return true, if the id of this formula is less or equal than the id of the given one.
+             */
+            bool operator<=( const Formula& _formula ) const
+            {
+                assert( mpContent->mId != 0 );
+                assert( _formula.getId() != 0 );
+                return mpContent->mId <= _formula.getId();
+            }
+            
+            /**
+             * @param _formula The formula to compare with.
+             * @return true, if the id of this formula is greater or equal than the id of the given one.
+             */
+            bool operator>=( const Formula& _formula ) const
+            {
+                assert( mpContent->mId != 0 );
+                assert( _formula.getId() != 0 );
+                return mpContent->mId >= _formula.getId();
             }
             
             /**
