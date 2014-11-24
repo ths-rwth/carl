@@ -58,6 +58,16 @@ namespace carl
             FormulaPool( unsigned _capacity = 10000 );
             
         public:
+            
+            void print() const
+            {
+                std::cout << "Formula pool contains:" << std::endl;
+                for( const auto& ele : mPool )
+                {
+                    std::cout << "id " << ele->mId << ":  " << *ele << std::endl;
+                }
+                std::cout << std::endl;
+            }
     
             ConstElementSPtr trueFormula()
             {

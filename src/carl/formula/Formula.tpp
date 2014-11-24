@@ -1302,7 +1302,7 @@ namespace carl
                     std::vector<Formula<Pol>> subformulasToTransformTmp;
                     while( !currentFormulaValid && !phis.empty() )
                     {
-                        const Formula<Pol>& currentSubformula = phis.back();
+                        Formula<Pol> currentSubformula = phis.back();
 //                        cout << "    To add:" << endl;
 //                        for( auto f : phis )
 //                            cout << "       " << *f << endl;
