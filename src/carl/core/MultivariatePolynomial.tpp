@@ -1406,35 +1406,30 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	if (rhs.mTerms.empty()) return *this;
 	TermType newlterm;
-	TermType oldrhs;
 	CompareResult res = Ordering::compare(lterm().monomial(), rhs.lterm().monomial());
+    auto rhsEnd = rhs.mTerms.end();
 	if (res == CompareResult::GREATER) {
-		newlterm = lterm();
-		mTerms.pop_back();
+		newlterm = std::move( mTerms.back() );
+        mTerms.pop_back();
 	} else if (res == CompareResult::LESS) {
 		newlterm = rhs.lterm();
-		oldrhs = rhs.lterm();
-		rhs.mTerms.pop_back();
+		--rhsEnd;
 	} else {
-		Coeff c = rhs.lcoeff() + lcoeff();
-		if (!carl::isZero(c)) {
-			newlterm = TermType(c, lmon());
-		}
-		oldrhs = rhs.lterm();
-		mTerms.pop_back();
-		rhs.mTerms.pop_back();
+		mTerms.back().coeff() += lcoeff();
+		newlterm = std::move( mTerms.back() );
+        mTerms.pop_back();
+		--rhsEnd;
 	}
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (auto termIter = mTerms.begin(); termIter != mTerms.end(); ++termIter) {
 		mTermAdditionManager.template addTerm<false,false>(id, *termIter);
 	}
-	for (auto termIter = rhs.mTerms.begin(); termIter != rhs.mTerms.end(); ++termIter) {
+	for (auto termIter = rhs.mTerms.begin(); termIter != rhsEnd; ++termIter) {
 		mTermAdditionManager.template addTerm<false,false>(id, *termIter);
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 	if (!newlterm.isZero()) {
 		mTerms.push_back(newlterm);
-		if (!oldrhs.isZero()) rhs.mTerms.push_back(oldrhs);
 	} else {
 		makeMinimallyOrdered<false,true>();
 	}
