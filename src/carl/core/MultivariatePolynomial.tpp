@@ -1415,7 +1415,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		newlterm = rhs.lterm();
 		--rhsEnd;
 	} else {
-		mTerms.back().coeff() += lcoeff();
+		mTerms.back().coeff() += rhs.lcoeff(); 
 		newlterm = std::move( mTerms.back() );
         mTerms.pop_back();
 		--rhsEnd;
@@ -1428,10 +1428,10 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		mTermAdditionManager.template addTerm<false,false>(id, *termIter);
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
-	if (!newlterm.isZero()) {
-		mTerms.push_back(newlterm);
-	} else {
+	if (newlterm.isZero()) {
 		makeMinimallyOrdered<false,true>();
+	} else {
+		mTerms.push_back(newlterm);
 	}
 	mOrdered = false;
 	assert(this->isConsistent());
