@@ -37,7 +37,7 @@ struct Conversion {
 };
 
 template<>
-inline bool Conversion::convert<bool,std::_Bit_reference>(const std::_Bit_reference& b, const CIPtr&) {
+inline bool Conversion::convert<bool,std::vector<bool>::reference>(const std::vector<bool>::reference& b, const CIPtr&) {
 	return b;
 }
 
