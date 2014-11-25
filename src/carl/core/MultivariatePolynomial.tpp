@@ -597,7 +597,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::quotient(const Mult
 		if (p.lterm().divide(divisor.lterm(), factor)) {
 			//p -= factor * divisor;
 			p.subtractProduct(factor, divisor);
-			mTermAdditionManager.template addTerm<false>(id, factor);
+			mTermAdditionManager.template addTerm<true>(id, factor);
 		}
 		else
 		{
