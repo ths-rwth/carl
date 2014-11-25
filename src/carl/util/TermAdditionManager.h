@@ -89,9 +89,9 @@ public:
 					Coeff coeff = t.coeff() + term.coeff();
 					if (carl::isZero(coeff)) {
 						termIDs[monId] = 0;
-						t = TermType();
+						t = std::move(TermType());
 					} else {
-						t.coeff() = coeff;
+						t.coeff() = std::move(coeff);
 					}
 				} else 
                     t = term;
@@ -116,7 +116,7 @@ public:
         TermIDs& termIDs = std::get<0>(data);
         #ifdef SWAP_TERMS
 		if (!isZero(std::get<3>(data))) {
-			t[0] = TermType(std::move(std::get<3>(data)), nullptr);
+			t[0] = std::move(TermType(std::move(std::get<3>(data)), nullptr));
 		}
 		for (auto i = t.begin(); i != t.end();) {
 			if (i->isZero()) {
