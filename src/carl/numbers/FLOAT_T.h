@@ -177,6 +177,11 @@ namespace carl
         {
             mValue = _float.toDouble();
         }
+		
+		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
+		{
+			mValue = std::atof(_string.c_str());
+		}
 
         /**
          * Destructor. Note that for some specializations memory management has to
