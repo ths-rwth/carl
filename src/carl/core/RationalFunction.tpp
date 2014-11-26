@@ -34,17 +34,38 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const RationalFunction<Pol, AS>& rhs)
 	{
-		if(mNominator.isOne())
+		if(mDenominator.isConstant() && rhs.mDenominator.isConstant())
 		{
-			
+			mNominator *= rhs.mDenominator.constantPart();
+			mNominator += rhs.mNominator * mDenominator.constantPart();
 		}
-		
-		mIsSimplified = false;
-		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
-		mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) + rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
-		mDenominator = leastCommonMultiple;
-		eliminateCommonFactor( !AS );
+		else
+		{
+			mIsSimplified = false;
+			if(mDenominator.isConstant())
+			{
+				// TODO use more efficient elimination
+				mNominator *= rhs.mDenominator;
+				mNominator += rhs.mNominator * mDenominator.constantPart();
+				// TODO use info that it is faster
+				mDenominator *= rhs.mDenominator;
+			}
+			else if(rhs.mDenominator.isConstant())
+			{
+				mNominator *= rhs.mDenominator.constantPart();
+				mNominator += rhs.mNominator * mDenominator;
+				mDenominator *= rhs.mDenominator.constantPart();
+			}
+			else
+			{
+				Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
+				mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) + rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
+				mDenominator = leastCommonMultiple;
+			}
+			eliminateCommonFactor( !AS );
+		}
 		return *this;
+		
 	}
 	
 	template<typename Pol, bool AS>
