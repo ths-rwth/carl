@@ -1269,6 +1269,7 @@ bool CAD<Number>::mainCheck(
 	 * - We start from the smallest level (0, 2, ..., dim-1) where lifting is still possible.
 	 */
 	
+	maxDepth = this->sampleTree.max_depth(sampleTreeRoot);
 	// invariant: either the last level is completely developed (dim or 0), or something in between due to bounds
 	assert(maxDepth == (unsigned)dim || maxDepth == (unsigned)0 || boundsNontrivial);
 	LOGMSG_TRACE("carl.cad", __func__ << ": Phase 3");

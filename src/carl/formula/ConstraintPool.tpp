@@ -22,6 +22,11 @@ namespace carl
         mInconsistentConstraint( new Constraint<Pol>( Pol( typename Pol::NumberType( 0 ) ), Relation::LESS, 2 ) ),
         mConstraints()
     {
+		/* Make sure that the MonomialPool is created before the ConstraintPool.
+		 * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
+		 * Thereby, destroying the constraints (and the Monomials contained) works correctly.
+		 */
+		MonomialPool::getInstance();
         mConstraints.reserve( _capacity );
         mConstraints.insert( mConsistentConstraint );
         mConstraints.insert( mInconsistentConstraint );

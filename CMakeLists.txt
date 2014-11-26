@@ -38,17 +38,21 @@ include(FindPackageHandleStandardArgs)
 # # # # # # # # # # # # # # # # # # # # # #
 
 # options
-option( DEVELOPER "Compile with extra warnings" ON )
-option( LOGGING "Enable logging within the carl library" ON )
+option( DEVELOPER "Compile with extra warnings" OFF )
+option( LOGGING "Enable logging within the carl library" OFF )
 option( LOGGING_CARL "Compile with the logging facility of the carl library" ON )
 option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" ON )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
-option( COMPARE_WITH_Z3 "Compile with testing with the runtime and result comparisons of carl to z3" OFF )
+option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
-option( PRUNE_MONOMIAL_POOL "Prune monomial pool" OFF )
+option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
+
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "RELEASE")
+endif()
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )

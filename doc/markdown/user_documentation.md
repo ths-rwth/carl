@@ -14,7 +14,4 @@ Tutorial
 ---------------------
 
 There are some introductory code examples how CArL can be used.
-The following examples are small working code samples 
-
-## Working with Polynomials
-- @ref tutorial/MultivariatePolynomial_Create.cpp "Creating Polynomials"
+You find them at @subpage tutorial .

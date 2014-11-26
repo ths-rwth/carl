@@ -4,7 +4,7 @@ Getting Started {#getting_started}
 Download
 --------
 Here are archived versions of CArL for download:
-- [19.11.2014](http://ths.informatik.rwth-aachen.de/releases/carl-2014-11-19.tgz)
+- [latest](http://ths.informatik.rwth-aachen.de/releases/carl-latest.tgz)
 
 Quick installation guide
 --------------------------------------------
