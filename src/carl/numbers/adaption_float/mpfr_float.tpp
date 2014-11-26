@@ -58,6 +58,11 @@ class FLOAT_T<mpfr_t>
             mpfr_init2(mValue, mpfr_get_prec(_float.mValue));
             mpfr_set(mValue, _float.mValue, MPFR_RNDN);
         }
+		
+		FLOAT_T(const std::string& _string)
+		{
+			mpfr_init_set_str(mValue, _string.c_str(), 10, MPFR_RNDN);
+		}
         
         template<typename F, DisableIf< std::is_same<F, mpfr_t> > = dummy>
         FLOAT_T(const FLOAT_T<F>& _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
