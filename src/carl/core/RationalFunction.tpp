@@ -34,14 +34,15 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const RationalFunction<Pol, AS>& rhs)
 	{
+        mIsSimplified = false;
 		if(mDenominator.isConstant() && rhs.mDenominator.isConstant())
 		{
 			mNominator *= rhs.mDenominator.constantPart();
 			mNominator += rhs.mNominator * mDenominator.constantPart();
+            mDenominator *= rhs.mDenominator.constantPart();
 		}
 		else
 		{
-			mIsSimplified = false;
 			if(mDenominator.isConstant())
 			{
 				// TODO use more efficient elimination
@@ -62,10 +63,9 @@ namespace carl
 				mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) + rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
 				mDenominator = leastCommonMultiple;
 			}
-			eliminateCommonFactor( !AS );
 		}
+        eliminateCommonFactor( !AS );
 		return *this;
-		
 	}
 	
 	template<typename Pol, bool AS>
