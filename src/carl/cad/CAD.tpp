@@ -698,7 +698,7 @@ void CAD<Number>::removePolynomial(const MPolynomial& polynomial) {
 	this->polynomialMap.erase(upit);
 	
 	// possibly remove the polynomial from the list of scheduled polynomials
-	for (const auto& p = this->scheduledPolynomials.begin(); p != this->scheduledPolynomials.end(); p++) {
+	for (auto p = this->scheduledPolynomials.begin(); p != this->scheduledPolynomials.end(); p++) {
 		if (*p == up) {
 			// in this case, there is neither any other occurrence of p in mScheduledPolynomials nor in mEliminationSets[0] (see addPolynomial for reason)
 			this->scheduledPolynomials.erase(p);
@@ -707,7 +707,7 @@ void CAD<Number>::removePolynomial(const MPolynomial& polynomial) {
 	}
 	
 	// remove the polynomial from the list of all polynomials
-	for (const auto& p = this->polynomials.begin(); p != this->polynomials.end(); p++) {
+	for (auto p = this->polynomials.begin(); p != this->polynomials.end(); p++) {
 		if (*p == up) {
 			this->polynomials.erase(p);
 			break;
