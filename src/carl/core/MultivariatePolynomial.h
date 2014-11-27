@@ -1144,13 +1144,13 @@ namespace std
 			std::hash<carl::Term<C>> h;
 			size_t result = 0;
 			for(auto it = mpoly.begin(); it != mpoly.end(); ++it) {
-				if (it == (mpoly.end()-1) && it->isConstant()) {
-					// Shift before constant term
+				if (it == (mpoly.end()-1)) {
+					// Shift before leading term
 					result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
 				}
 				result ^= h(*it);
-				if (it == mpoly.begin()) {
-					// Shift after leading term
+				if (it == mpoly.begin() && it->isConstant()) {
+					// Shift after constant term
 					result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
 				}
 			}
