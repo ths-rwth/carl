@@ -459,7 +459,6 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
-	///@todo find new lterm
 	MultivariatePolynomial& operator+=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator+=(const TermType& rhs);
 	MultivariatePolynomial& operator+=(const std::shared_ptr<const TermType>& rhs);
@@ -475,7 +474,6 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
-	///@todo find new lterm
 	MultivariatePolynomial& operator-=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator-=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator-=(const Monomial::Arg& rhs);
@@ -493,7 +491,6 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
-	///@todo find new lterm
 	MultivariatePolynomial& operator*=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator*=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator*=(const Monomial::Arg& rhs);
@@ -508,7 +505,6 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
-	///@todo find new lterm
 	MultivariatePolynomial& operator/=(const MultivariatePolynomial& rhs);
 	MultivariatePolynomial& operator/=(const Term<Coeff>& rhs);
 	MultivariatePolynomial& operator/=(const Monomial::Arg& rhs);

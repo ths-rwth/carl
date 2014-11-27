@@ -1387,16 +1387,6 @@ bool operator<(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff, Ordering, Policies>::operator+=(const MultivariatePolynomial& rhs)
 {
-	/** @todo Make this faster
-	 * 
-	 * If both polynomials are ordered: Use merging strategy we used before.
-	 * 
-	 * Otherwise:
-	 *  Insert only terms of a single polynomial (the smaller one)
-	 *  Check if the terms of the other ones are in the map
-	 *	If yes: Remove from map, add to result
-	 *	If no: add to result
-	 */
 	assert(this->isConsistent());
 	assert(rhs.isConsistent());
 	if (mTerms.empty())  	{
@@ -1405,6 +1395,14 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		return *this;
 	}
 	if (rhs.mTerms.empty()) return *this;
+	if (rhs.isConstant()) {
+		return *this += rhs.constantPart();
+	}
+	if (this->isConstant()) {
+		Coeff c = constantPart();
+		*this = rhs;
+		return *this += c;
+	}
 	TermType newlterm;
 	CompareResult res = Ordering::compare(lterm().monomial(), rhs.lterm().monomial());
     auto rhsEnd = rhs.mTerms.end();
@@ -1610,6 +1608,14 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		return *this;
 	}
 	if(rhs.mTerms.empty()) return *this;
+	if (rhs.isConstant()) {
+		return *this -= rhs.constantPart();
+	}
+	if (this->isConstant()) {
+		Coeff c = constantPart();
+		*this = rhs;
+		return *this -= c;
+	}
 	
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
@@ -1737,6 +1743,14 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 		mTerms.clear();
         assert(this->isConsistent());
 		return *this;
+	}
+	if (rhs.isConstant()) {
+		return *this *= rhs.constantPart();
+	}
+	if (this->isConstant()) {
+		Coeff c = constantPart();
+		*this = rhs;
+		return *this *= c;
 	}
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() * rhs.mTerms.size());
 	TermType newlterm;
