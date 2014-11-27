@@ -1144,14 +1144,21 @@ namespace std
 		 */
 		size_t operator()(const carl::MultivariatePolynomial<C,O,P>& mpoly) const 
 		{
-			size_t result = 0;
+			assert(mpoly.isConsistent());
 			std::hash<carl::Term<C>> h;
-			for(auto iter = mpoly.begin(); iter != mpoly.end(); ++iter)
-                        {
-                            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-                            result ^= h(*iter);
+			size_t result = 0;
+			for(auto it = mpoly.begin(); it != mpoly.end(); ++it) {
+				if (it == (mpoly.end()-1) && it->isConstant()) {
+					// Shift before constant term
+					result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+				}
+				result ^= h(*it);
+				if (it == mpoly.begin()) {
+					// Shift after leading term
+					result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
+				}
 			}
-                        return result;
+			return result;
 		}
 	};
 } // namespace std
