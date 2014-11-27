@@ -120,7 +120,7 @@ template<typename Number>
 std::vector<RealAlgebraicPoint<Number>> CAD<Number>::samples() const {
 	size_t dim  = this->variables.size();
 	std::vector<RealAlgebraicPoint<Number>> s;
-	for (const auto& leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
+	for (auto leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
 		// for each leaf construct the path by iterating back to the root
 		RealAlgebraicPoint<Number> sample(this->constructSampleAt(leaf, this->sampleTree.begin()));
 
@@ -134,7 +134,7 @@ std::vector<RealAlgebraicPoint<Number>> CAD<Number>::samples() const {
 
 template<typename Number>
 void CAD<Number>::printSampleTree(std::ostream& os) const {
-	for (const auto& i = this->sampleTree.begin(); i != this->sampleTree.end(); i++) {
+	for (auto i = this->sampleTree.begin(); i != this->sampleTree.end(); i++) {
 		for (unsigned d = 0; d != this->sampleTree.depth(i); d++) {
 			os << " [";
 		}
@@ -1008,11 +1008,11 @@ std::vector<Variable> CAD<Number>::orderVariablesGreeedily(
 	cad::CADSettings s = cad::CADSettings::getSettings();
 	unsigned variableCount = 0;
 	
-	for (const auto& variable = firstVariable; variable != lastVariable; variable++) {
+	for (auto variable = firstVariable; variable != lastVariable; variable++) {
 		// build the first elimination set w.r.t. variable and measure its sum of total degrees
 		cad::EliminationSet<Number> eliminationInput(this);
 		// add input polynomials to temporary input set, unifying their variables
-		for (const auto& p = firstPolynomial; p != lastPolynomial; p++) {
+		for (auto p = firstPolynomial; p != lastPolynomial; p++) {
 			if (!p.isConstant()) {
 				eliminationInput.insert(p);
 			}
@@ -1786,7 +1786,7 @@ void CAD<Number>::trimVariables() {
 	
 	// simultaneously remove elimination sets, variables and samples
 	auto variable = this->variables.begin();
-	for (const auto& eliminationSet = this->eliminationSets.begin(); eliminationSet != this->eliminationSets.end(); eliminationSet++) {
+	for (auto eliminationSet = this->eliminationSets.begin(); eliminationSet != this->eliminationSets.end(); eliminationSet++) {
 		if (eliminationSet->empty()) {
 			/* In this level, *variable would have to be eliminated, but the level is empty (and not empty just because of certain bounds).
 			 * Thus, there is no polynomial in further levels claiming this variable.
@@ -1794,7 +1794,7 @@ void CAD<Number>::trimVariables() {
 			if (eliminationSet != this->eliminationSets.begin()) {
 				// check whether no previous elimination level claims the variable
 				bool foundVariable = false;
-				for (const auto& previous = eliminationSet-1; previous != this->eliminationSets.begin(); --previous) {
+				for (auto previous = eliminationSet-1; previous != this->eliminationSets.begin(); --previous) {
 					for (const auto& p: previous) {
 						if (p->has(*variable)) {
 							foundVariable = true;
@@ -1817,14 +1817,14 @@ void CAD<Number>::trimVariables() {
 				// remove the complete layer of samples from the sample tree at the given depth
 				// fix the iterators to be deleted in a separate list independent of merging with the children
 				std::queue<typename tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
-				for (const auto& node = this->sampleTree.begin_fixed(this->sampleTree.begin(), depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
+				for (auto node = this->sampleTree.begin_fixed(this->sampleTree.begin(), depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
 					toDelete.push(node);
 				}
 				while (!toDelete.empty()) {
 					// move all children of every node to be deleted, to the current level in a sorted manner, including the subtrees
 					auto node = toDelete.front();
 					auto parent = this->sampleTree.parent(node);
-					for (const auto& child = this->sampleTree.begin(node); child != this->sampleTree.end(node); child++) {
+					for (auto child = this->sampleTree.begin(node); child != this->sampleTree.end(node); child++) {
 						auto newNode = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), *child, std::less<RealAlgebraicNumberPtr<Number>>());
 						if (newNode == this->sampleTree.end(parent)) {
 							// the child is not contained in the siblings nor any child is greater than it
