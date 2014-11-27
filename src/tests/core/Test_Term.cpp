@@ -72,8 +72,8 @@ TYPED_TEST(TermTest, Derivative)
     Variable v1(2);
     Term<TypeParam> t(3);
     t *= v0 * v0 * v0 * v1;
-    Term<TypeParam>* tprime = t.derivative(v0);
-    EXPECT_EQ(9,tprime->coeff());
+    Term<TypeParam> tprime = t.derivative(v0);
+    EXPECT_EQ(9,tprime.coeff());
 }
 
 TYPED_TEST(TermTest, Substitute)
@@ -85,9 +85,9 @@ TYPED_TEST(TermTest, Substitute)
     t *= v0 * v0 * v1;
     std::map<Variable, Term<TypeParam>> substitutes;
     substitutes.emplace(v1, c4);
-    Term<TypeParam>* res = t.substitute(substitutes);
-    EXPECT_EQ(12, res->coeff());
-    EXPECT_EQ((unsigned)2, res->tdeg());
+    Term<TypeParam> res = t.substitute(substitutes);
+    EXPECT_EQ(12, res.coeff());
+    EXPECT_EQ((unsigned)2, res.tdeg());
 }
 
 TYPED_TEST(TermTest, Comparison)

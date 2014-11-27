@@ -68,8 +68,8 @@ TEST(Monomial, derivative)
     Variable v0((unsigned)1);
     Variable v1((unsigned)2);
     Monomial::Arg m0 = v0 * v1;
-    Term<int>* t = m0->derivative<int>(v0);
-    EXPECT_EQ((unsigned)1, t->getNrVariables());
+    Term<int> t = m0->derivative<int>(v0);
+    EXPECT_EQ((unsigned)1, t.getNrVariables());
     
 }
 
