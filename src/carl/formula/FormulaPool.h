@@ -246,9 +246,9 @@ namespace carl
                 if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
                 {
                     if( boost::get<UVariable>(_lhs) < boost::get<UVariable>(_rhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) ) ), true );
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) ) ) );
                     if( boost::get<UVariable>(_rhs) < boost::get<UVariable>(_lhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) ) ), true );
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) ) ) );
                     else if( _negated )
                         return mpFalse;
                     else
@@ -256,19 +256,19 @@ namespace carl
                 }
 				else if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) )
                 {
-                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) ) ), true );
+                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) ) ) );
                 }
                 else if( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
                 {
-                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) ) ), true );
+                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) ) ) );
                 }
                 else
                 {
                     assert( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) );
                     if( boost::get<UFInstance>(_lhs) < boost::get<UFInstance>(_rhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) ) ), true );
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) ) ) );
                     if( boost::get<UFInstance>(_rhs) < boost::get<UFInstance>(_lhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) ) ), true );
+                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) ) ) );
                     else if( _negated )
                         return mpFalse;
                     else
@@ -361,7 +361,7 @@ namespace carl
              * @return The given formula, if it did not yet occur in the pool;
              *         The equivalent formula already occurring in the pool, otherwise.
              */
-            ConstElementSPtr add( ElementSPtr&& _formula, bool _addInverse = false );
+            ConstElementSPtr add( ElementSPtr&& _formula );
     };
 }    // namespace carl
 

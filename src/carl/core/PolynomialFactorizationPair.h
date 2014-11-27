@@ -137,13 +137,13 @@ namespace carl
 
     public:
         // Constructor.
-        PolynomialFactorizationPair(); // no implementation
+        PolynomialFactorizationPair() = delete; // no implementation
         /*
          * @param _factorization The factorization. Every factor must be not constant.
          * @param _polynomial Polynomial with Polynomial = Factorization * Coefficient
          */
         PolynomialFactorizationPair( Factorization<P>&& _factorization, P* _polynomial = nullptr );
-        PolynomialFactorizationPair( const PolynomialFactorizationPair& ); // no implementation
+        PolynomialFactorizationPair( const PolynomialFactorizationPair& ) = delete; // no implementation
         ~PolynomialFactorizationPair();
         
         /**

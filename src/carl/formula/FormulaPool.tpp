@@ -43,7 +43,7 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr&& _element, bool _addInverse )
+    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr&& _element )
     {
         FORMULA_POOL_LOCK_GUARD
         auto iterBoolPair = insert( std::move( _element ), false );
@@ -53,26 +53,6 @@ namespace carl
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
             insert( std::move( ElementSPtr( new Element( Formula<Pol>( *iterBoolPair.first ) ) ) ), true );
-            if( _addInverse )
-            {
-                switch( (*iterBoolPair.first)->mType )
-                {
-                    case FormulaType::UEQ:
-                    {
-                        auto iterBoolPairInv = insert( std::move( ElementSPtr( new Element( UEquality( (*iterBoolPair.first)->mUIEquality, true ) ) ) ), true );
-                        insert( std::move( ElementSPtr( new Element( Formula<Pol>( *iterBoolPairInv.first ) ) ) ), true );
-                        break;
-                    }
-                    case FormulaType::CONSTRAINT:
-                    {
-                        break;
-                    }
-                    default:
-                    {
-                        assert( false );
-                    }
-                }
-            }
         }
         return *iterBoolPair.first;   
     }
@@ -84,33 +64,6 @@ namespace carl
             return true;
         if( _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA )
             return true;
-        if( _subformulaA.getType() == FormulaType::UEQ )
-        {
-            if( !_subformulaA.uequality().negated() && _subformulaB.getType() == FormulaType::UEQ )
-            {
-                if( _subformulaA.getId() == _subformulaB.getId() + 2 )
-                {
-                    assert( _subformulaB.uequality().negated() );
-                    assert( _subformulaA.uequality().lhs() == _subformulaB.uequality().lhs() );
-                    assert( _subformulaA.uequality().rhs() == _subformulaB.uequality().rhs() );
-                    return true;
-                }
-            }
-        }
-        else if( _subformulaA.getType() == FormulaType::NOT && _subformulaA.subformula().getType() == FormulaType::UEQ )
-        {
-            if( !_subformulaA.subformula().uequality().negated() 
-                    && _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula().getType() == FormulaType::UEQ )
-            {
-                if( _subformulaA.getId() == _subformulaB.getId() + 2 )
-                {
-                    assert( _subformulaB.subformula().uequality().negated() );
-                    assert( _subformulaA.subformula().uequality().lhs() == _subformulaB.subformula().uequality().lhs() );
-                    assert( _subformulaA.subformula().uequality().rhs() == _subformulaB.subformula().uequality().rhs() );
-                    return true;
-                }
-            }
-        }
         return false;
     }
     
