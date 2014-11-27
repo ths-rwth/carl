@@ -11,7 +11,7 @@
 namespace carl
 {
 template<typename Coefficient>
-Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
+Term<Coefficient> Monomial::derivative(Variable::Arg v) const
 {
 	LOG_FUNC("carl.core.monomial", *this << ", " << v);
     // TODO code is very similar to divideBy(variable)...
@@ -21,7 +21,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
     if(it == mExponents.cend())
     {
 		LOGMSG_TRACE("carl.core.monomial", "Result: 0");
-        return new Term<Coefficient>();
+        return std::move(Term<Coefficient>());
     }
     else
     {
@@ -32,7 +32,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
 			if(mExponents.size() == 1) 
 			{
 				LOGMSG_TRACE("carl.core.monomial", "Result: 1");
-				return new Term<Coefficient>((Coefficient)1);
+				return std::move(Term<Coefficient>(carl::constant_one<Coefficient>::get()));
 			}
 
             std::vector<std::pair<Variable, exponent>> newExps;
@@ -43,7 +43,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
             newExps.insert(newExps.end(), it+1, mExponents.end());
 			std::shared_ptr<const Monomial> result = createMonomial( std::move(newExps), mTotalDegree - 1 );
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
-            return new Term<Coefficient>((Coefficient)1, result);
+            return std::move(Term<Coefficient>((Coefficient)1, result));
         }
         // We have to decrease the exponent of the variable by one.
         else
@@ -53,7 +53,7 @@ Term<Coefficient>* Monomial::derivative(Variable::Arg v) const
             newExps[(unsigned)(it - mExponents.begin())].second -= (exponent)1;
 			std::shared_ptr<const Monomial> result = createMonomial( std::move(newExps), mTotalDegree - 1 );
 			LOGMSG_TRACE("carl.core.monomial", "Result: " << it->second << "*" << result);
-            return new Term<Coefficient>((Coefficient)it->second, result);
+            return std::move(Term<Coefficient>((Coefficient)it->second, result));
         }
     }
 }

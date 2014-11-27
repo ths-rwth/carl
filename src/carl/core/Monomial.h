@@ -462,7 +462,7 @@ namespace carl
 		 * @return Partial derivative.
 		 */
 		template<typename Coefficient>
-		Term<Coefficient>* derivative(Variable::Arg v) const;
+		Term<Coefficient> derivative(Variable::Arg v) const;
 		
 		/**
 		 * Applies the given substitutions to this monomial.
@@ -472,7 +472,7 @@ namespace carl
 		 * @return \f$ factor \cdot this[<substitutions>] \f$
 		 */
 		template<typename Coefficient>
-		Term<Coefficient>* substitute(const std::map<Variable, Coefficient>& substitutions, Coefficient factor) const;
+		Term<Coefficient> substitute(const std::map<Variable, Coefficient>& substitutions, Coefficient factor) const;
 		/**
 		 * Applies the given substitutions to this monomial.
 		 * Every variable may be substituted by some term. Additionally, a constant factor may be given that is multiplied with the result.
@@ -481,7 +481,7 @@ namespace carl
 		 * @return \f$ factor \cdot this[<substitutions>] \f$
 		 */
 		template<typename Coefficient>
-		Term<Coefficient>* substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
+		Term<Coefficient> substitute(const std::map<Variable, Term<Coefficient>>& substitutions, const Coefficient& factor) const;
 		///////////////////////////
 		// Orderings
 		///////////////////////////

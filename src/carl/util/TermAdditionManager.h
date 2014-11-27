@@ -85,7 +85,7 @@ public:
 				if (SizeUnknown && locId >= terms.size()) terms.resize(locId + 1);
 				assert(locId < terms.size());
                 TermPtr& t = terms[locId];
-				if (!isZero(t.coeff())) {
+				if (!carl::isZero(t.coeff())) {
 					Coeff coeff = t.coeff() + term.coeff();
 					if (carl::isZero(coeff)) {
 						termIDs[monId] = 0;

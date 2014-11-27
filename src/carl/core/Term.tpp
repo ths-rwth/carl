@@ -127,16 +127,16 @@ bool Term<Coefficient>::divide(const Term& t, Term& res) const
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::derivative(Variable::Arg v) const
+Term<Coefficient> Term<Coefficient>::derivative(Variable::Arg v) const
 {
 	if(!mMonomial)
 	{
 		// Derivatives of constants are zero.
-		return new Term<Coefficient>(carl::constant_zero<Coefficient>().get());
+		return std::move(Term<Coefficient>(carl::constant_zero<Coefficient>().get()));
 	}
-	Term<Coefficient>* t = mMonomial->derivative<Coefficient>(v);
-	*t *= mCoeff;
-	return t;
+	Term<Coefficient> t = mMonomial->derivative<Coefficient>(v);
+	t *= mCoeff;
+	return std::move(t);
 }
 
 template<typename Coefficient>
@@ -154,28 +154,28 @@ Definiteness Term<Coefficient>::definiteness() const
 
 template<typename Coefficient>
 template<typename SubstitutionType>
-Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
+Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	if(mMonomial)
 	{
-		return mMonomial->substitute<Coefficient>(substitutions, coeff());
+		return std::move(mMonomial->substitute<Coefficient>(substitutions, coeff()));
 	}
 	else
 	{
-		return new Term<Coefficient>( mCoeff );
+		return std::move(Term<Coefficient>(mCoeff));
 	}
 }
 
 template<typename Coefficient>
-Term<Coefficient>* Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
+Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const
 {
 	if(mMonomial)
 	{
-		return mMonomial->substitute<Coefficient>(substitutions, coeff());
+		return std::move(mMonomial->substitute<Coefficient>(substitutions, coeff()));
 	}
 	else
 	{
-		return new Term<Coefficient>(mCoeff);
+		return std::move(Term<Coefficient>(mCoeff));
 	}
 }
 
@@ -306,9 +306,9 @@ bool operator<(const Coeff& lhs, const Term<Coeff>& rhs) {
 }
 
 template<typename Coefficient>
-const Term<Coefficient> Term<Coefficient>::operator-() const
+Term<Coefficient> Term<Coefficient>::operator-() const
 {
-	return Term<Coefficient>(-mCoeff,mMonomial);
+	return std::move(Term<Coefficient>(-mCoeff,mMonomial));
 }
 
 template<typename Coefficient>
@@ -319,7 +319,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Coefficient& rhs)
 		clear();
 		return *this;
 	}
-	assert(carl::isZero(mCoeff) || !carl::isZero(mCoeff * rhs));
+	assert(carl::isZero(mCoeff) || !carl::isZero(Coefficient(mCoeff * rhs)));
 	mCoeff *= rhs;
 	return *this;
 }

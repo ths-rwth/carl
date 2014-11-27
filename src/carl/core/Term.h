@@ -238,13 +238,13 @@ class Term
 		template<typename C = Coefficient, DisableIf<is_field<C>> = dummy>
 		bool divisible(const Term&) const;
 		
-		Term* derivative(Variable::Arg) const;
+		Term derivative(Variable::Arg) const;
 		
 		Definiteness definiteness() const;
 		
 		template<typename SubstitutionType=Coefficient>
-		Term* substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
-		Term* substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
+		Term substitute(const std::map<Variable, SubstitutionType>& substitutions) const;
+		Term substitute(const std::map<Variable, Term<Coefficient>>& substitutions) const;
 		
 		
 		template<bool gatherCoeff, typename CoeffType>
@@ -261,15 +261,15 @@ class Term
 			}
 		}
 		
-		Term* pow(unsigned exp) const
+		Term pow(unsigned exp) const
 		{
 			if(mMonomial)
 			{
-				return new Term(carl::pow(coeff(),exp), mMonomial->pow(exp));
+				return Term(carl::pow(coeff(),exp), mMonomial->pow(exp));
 			}
 			else
 			{
-				return new Term(carl::pow(coeff(),exp), mMonomial);
+				return Term(carl::pow(coeff(),exp), mMonomial);
 			}
 			
 		}
@@ -282,7 +282,7 @@ class Term
 
 		bool isConsistent() const;
 		
-		const Term<Coefficient> operator-() const;
+		Term<Coefficient> operator-() const;
 		
 		/// @name In-place multiplication operators
 		/// @{
@@ -533,51 +533,48 @@ class Term
 	 * @return `lhs * rhs`
 	 */
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
+	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const std::shared_ptr<const Monomial>& rhs) {
-		Term<Coeff> res(lhs);
-		return res *= rhs;
+	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs) {
-		Term<Coeff> res(lhs);
-		return res *= rhs;
+	inline Term<Coeff> operator*(const Term<Coeff>& lhs, Variable::Arg rhs) {
+		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs) {
-		Term<Coeff> res(lhs);
-		return res *= rhs;
+	inline Term<Coeff> operator*(const Term<Coeff>& lhs, const Coeff& rhs) {
+		return std::move(Term<Coeff>(lhs) *= rhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const std::shared_ptr<const Monomial>& lhs, const Term<Coeff>& rhs) {
-		return rhs * lhs;
+	inline Term<Coeff> operator*(const std::shared_ptr<const Monomial>& lhs, const Term<Coeff>& rhs) {
+		return std::move(rhs * lhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const std::shared_ptr<const Monomial>& lhs, const Coeff& rhs) {
-		return Term<Coeff>(rhs, lhs);
+	inline Term<Coeff> operator*(const std::shared_ptr<const Monomial>& lhs, const Coeff& rhs) {
+		return std::move(Term<Coeff>(rhs, lhs));
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(Variable::Arg lhs, const Term<Coeff>& rhs) {
-		return rhs * lhs;
+	inline Term<Coeff> operator*(Variable::Arg lhs, const Term<Coeff>& rhs) {
+		return std::move(rhs * lhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs) {
-		return Term<Coeff>(rhs, lhs, 1);
+	inline Term<Coeff> operator*(Variable::Arg lhs, const Coeff& rhs) {
+		return std::move(Term<Coeff>(rhs, lhs, 1));
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
-		return rhs * lhs;
+	inline Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
+		return std::move(rhs * lhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Coeff& lhs, const std::shared_ptr<const Monomial>& rhs) {
-		return rhs * lhs;
+	inline Term<Coeff> operator*(const Coeff& lhs, const std::shared_ptr<const Monomial>& rhs) {
+		return std::move(rhs * lhs);
 	}
 	template<typename Coeff>
-	inline const Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs) {
-		return rhs * lhs;
+	inline Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs) {
+		return std::move(rhs * lhs);
 	}
 	/// @}
 

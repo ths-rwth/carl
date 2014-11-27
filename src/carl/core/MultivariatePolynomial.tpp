@@ -920,14 +920,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	MultivariatePolynomial result;
 	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-        Term<Coeff >* resultTerm = term.substitute(substitutions);
-        if( !resultTerm->isZero() )
+        Term<Coeff> resultTerm = term.substitute(substitutions);
+        if( !resultTerm.isZero() )
         {
-            mTermAdditionManager.template addTerm<false>(id, *resultTerm );
-        }
-        else
-        {
-            delete resultTerm;
+            mTermAdditionManager.template addTerm<false>(id, resultTerm );
         }
 	}
 	mTermAdditionManager.readTerms(id, result.mTerms);
@@ -1028,9 +1024,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	assert(nth == 1);
 	TermsType tmpTerms;
 	for(const auto& t : mTerms) {
-		auto tmp = t.derivative(v);
-		tmpTerms.push_back(*tmp);
-		delete tmp;
+		tmpTerms.push_back(t.derivative(v));
 		if (tmpTerms.back().isZero()) tmpTerms.pop_back();
 	}
 	MultivariatePolynomial result(std::move(tmpTerms), true, mOrdered);
@@ -1074,9 +1068,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 	assert(this->isConsistent());
 	TermsType tmp;
 	for (auto it1 = mTerms.begin(); it1 != mTerms.end(); it1++) {
-		auto t = (*it1).pow(2);
-		tmp.push_back(*t);
-		delete t;
+		tmp.push_back(it1->pow(2));
 		for (auto it2 = it1+1; it2 != mTerms.end(); it2++) {
 			tmp.push_back(Coeff(2) * *it1 * *it2);
 		}
@@ -1559,31 +1551,31 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
+MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
 	LOG_NOTIMPLEMENTED();
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<C>&)
+MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<C>&)
 {
 	LOG_NOTIMPLEMENTED();
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
+MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
 	LOG_NOTIMPLEMENTED();
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<MultivariatePolynomial<C>>&)
+MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<MultivariatePolynomial<C>>&)
 {
 	LOG_NOTIMPLEMENTED();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-const MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::operator -() const
+MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::operator -() const
 {
 	assert(this->isConsistent());
 	MultivariatePolynomial<Coeff, Ordering, Policies> negation;
@@ -1864,7 +1856,7 @@ const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P
 {
 	MultivariatePolynomial<C,O,P> result;
 	for (const auto& t: lhs.mTerms) {
-		result.mTerms.emplace_back(new Term<C>(*t/rhs));
+		result.mTerms.emplace_back(t/rhs);
 	}
 	result.mOrdered = lhs.mOrdered;
     assert(result.isConsistent());

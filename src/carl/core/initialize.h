@@ -14,6 +14,7 @@
 #include <iostream>
 #include "config.h"
 #include "logging.h"
+#include "MonomialPool.h"
 
 namespace carl
 {
@@ -27,7 +28,8 @@ namespace carl
         // initializing the logging library.
         logging::configureLogging();
         // initialize anything else here!
-		
+		MonomialPool::getInstance();
+
         return 0;
     }
 
