@@ -126,7 +126,6 @@ namespace carl
             mpCache->reg( mCacheRef );
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
-        assert(computePolynomial(*this) == computePolynomial(_toCopy));
     }
     
     template<typename P>
@@ -219,13 +218,13 @@ namespace carl
     }
     
     template<typename P>
-    const P computePolynomial( const FactorizedPolynomial<P>& _fpoly )
+    P computePolynomial( const FactorizedPolynomial<P>& _fpoly )
     {
         if( _fpoly.pCache() == nullptr )
-            return P( _fpoly.coefficient() );
+            return std::move( P( _fpoly.coefficient() ) );
         P result( computePolynomial( _fpoly.content() ) );
         result *= _fpoly.coefficient();
-        return result;
+        return std::move( result );
     }
     
     template<typename P>
@@ -237,20 +236,20 @@ namespace carl
             result *= carl::pow( factor->first.coefficient(), factor->second );
             factor->first.mCoefficient = 1;
         }
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpoly )
+    FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpoly )
     {
         FactorizedPolynomial<P> result( _fpoly );
         result.mCoefficient *= Coeff<P>( -1 );
         assert( (-computePolynomial( _fpoly )) == computePolynomial( result ) );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
@@ -263,20 +262,20 @@ namespace carl
             {
                 FactorizedPolynomial<P> result( _fpolyB.polynomial() * _fpolyB.coefficient() + _fpolyA.coefficient(), _fpolyB.pCache() );
                 assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
-                return result;
+                return std::move( result );
             }
             else
             {
                 FactorizedPolynomial<P> result( _fpolyA.coefficient() + _fpolyB.coefficient() );
                 assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
-                return result;
+                return std::move( result );
             }
         }
         else if ( !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result( _fpolyA.polynomial() * _fpolyA.coefficient() + _fpolyB.coefficient(), _fpolyA.pCache() );
             assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
 
         Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )) /
@@ -288,7 +287,7 @@ namespace carl
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
 
         Factorization<P> factorizationRestA, factorizationRestB;
@@ -307,7 +306,7 @@ namespace carl
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
         else
         {
@@ -327,7 +326,7 @@ namespace carl
         }
         FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
         assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
@@ -360,56 +359,60 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
+        std::cout << _fpolyA << " - " << _fpolyB << std::endl;
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
-        Coeff<P> coefficient = -_fpolyB.coefficient();
+        const Coeff<P>& coefficient = -_fpolyB.coefficient();
         if ( existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result = _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.pCache() );
+            std::cout << "results in " << result << std::endl;
+            std::cout << computePolynomial( _fpolyA ) << " - " << computePolynomial( _fpolyB ) << " = " << computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) << std::endl;
             assert( computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
         else
         {
             FactorizedPolynomial<P> result = _fpolyA + FactorizedPolynomial<P>( coefficient );
+            std::cout << "results in " << result << std::endl;
             assert( computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
     }
     
     template<typename P>
-    const FactorizedPolynomial<P> operator*( const Coeff<P>& _coeff, const FactorizedPolynomial<P>& _fpoly )
+    FactorizedPolynomial<P> operator*( const Coeff<P>& _coeff, const FactorizedPolynomial<P>& _fpoly )
     {
         if( _coeff == 0 )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
         FactorizedPolynomial<P> result( _fpoly );
         result.mCoefficient *= _coeff;
         assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
-        return result;
+        return std::move( result );
     }
     
     template<typename P>
-    const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const Coeff<P>& _coeff )
+    FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const Coeff<P>& _coeff )
     {
         if( _coeff == 0 )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
         FactorizedPolynomial<P> result( _fpoly );
         result.mCoefficient *= _coeff;
         assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
@@ -419,7 +422,7 @@ namespace carl
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
 
         if( !existsFactorization( _fpolyB ) )
@@ -427,14 +430,14 @@ namespace carl
             FactorizedPolynomial<P> result( _fpolyA );
             result.mCoefficient *= _fpolyB.mCoefficient;
             assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> result( _fpolyB );
             result.mCoefficient *= _fpolyA.mCoefficient;
             assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
 
         Factorization<P> resultFactorization;
@@ -477,7 +480,7 @@ namespace carl
         coefficientResult *= distributeCoefficients( resultFactorization );
         FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
         assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
-        return result;
+        return std::move( result );
     }
     
     template<typename P>
@@ -521,33 +524,33 @@ namespace carl
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> FactorizedPolynomial<P>::quotient(const FactorizedPolynomial<P>& _fdivisor) const
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::quotient(const FactorizedPolynomial<P>& _fdivisor) const
     {
         assert( !_fdivisor.isZero() );
         if( isZero() )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( *this ).quotient( computePolynomial( _fdivisor ) ) == computePolynomial( result ) );
-            return result;
+            return std::move( result );
         }
         FactorizedPolynomial<P> result = lazyDiv( *this, _fdivisor );
         assert( computePolynomial( *this ).quotient( computePolynomial( _fdivisor ) ) == computePolynomial( result ) );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( !_fpolyB.isZero() );
-        return _fpolyA.quotient( _fpolyB );
+        return std::move( _fpolyA.quotient( _fpolyB ) );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> lazyDiv( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> lazyDiv( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( !_fpolyB.isZero() );
         if( _fpolyA.isZero() )
-            return FactorizedPolynomial<P>();
+            return std::move( FactorizedPolynomial<P>() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
@@ -558,7 +561,7 @@ namespace carl
             assert( _fpolyB.mCoefficient != 0 );
             result.mCoefficient /= _fpolyB.mCoefficient;
             assert( computePolynomial( _fpolyB ) * computePolynomial( result ) == computePolynomial( _fpolyA ) );
-            return result;
+            return std::move( result );
         }
         else if( !existsFactorization( _fpolyA ) )
         {
@@ -566,7 +569,7 @@ namespace carl
             assert( _fpolyA.mCoefficient != 0 );
             result.mCoefficient /= _fpolyA.mCoefficient;
             assert( computePolynomial( _fpolyB ) * computePolynomial( result ) == computePolynomial( _fpolyA ) );
-            return result;
+            return std::move( result );
         }
         Factorization<P> resultFactorization;
         const Factorization<P>& factorizationA = _fpolyA.factorization();
@@ -597,11 +600,11 @@ namespace carl
         }
         Coeff<P> coefficientResult = _fpolyA.coefficient() / _fpolyB.coefficient();
         assert( computePolynomial( _fpolyB ) * computePolynomial( resultFactorization ) * coefficientResult == computePolynomial( _fpolyA ) );
-        return FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
+        return std::move( FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) ) );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> lcm( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> lcm( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
@@ -618,7 +621,7 @@ namespace carl
             result.mCoefficient = coefficientLCM;
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
-            return result;
+            return std::move( result );
         }
         else if( !existsFactorization( _fpolyA ) )
         {
@@ -626,7 +629,7 @@ namespace carl
             result.mCoefficient = coefficientLCM;
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
-            return result;
+            return std::move( result );
         }
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "Compute LCM of " << _fpolyA << " and " << _fpolyB );
 
@@ -661,11 +664,11 @@ namespace carl
         LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "LCM of " << _fpolyA << " and " << _fpolyB << ": " << result);
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonMultiple( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> commonMultiple( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
@@ -681,7 +684,7 @@ namespace carl
             result.mCoefficient = coefficientLCM;
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
-            return result;
+            return std::move( result );
         }
         else if( !existsFactorization( _fpolyA ) )
         {
@@ -689,7 +692,7 @@ namespace carl
             result.mCoefficient = coefficientLCM;
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
-            return result;
+            return std::move( result );
         }
         
         Factorization<P> cmFactorization;
@@ -729,11 +732,11 @@ namespace carl
         FactorizedPolynomial<P> result( std::move( cmFactorization ), coefficientLCM, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> commonDivisor( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
@@ -747,7 +750,7 @@ namespace carl
             FactorizedPolynomial<P> result( coefficientCommon );
             assert( computePolynomial( _fpolyA ).remainder( computePolynomial( result ) ).isZero() );
             assert( computePolynomial( _fpolyB ).remainder( computePolynomial( result ) ).isZero() );
-            return result;
+            return std::move( result );
         }
         
         Factorization<P> cdFactorization;
@@ -771,11 +774,11 @@ namespace carl
         FactorizedPolynomial<P> result( std::move( cdFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
         assert( computePolynomial( _fpolyA ).remainder( computePolynomial( result ) ).isZero() );
         assert( computePolynomial( _fpolyB ).remainder( computePolynomial( result ) ).isZero() );
-        return result;
+        return std::move( result );
     }
 
     template<typename P>
-    const Factorization<P> commonDivisor( const Factorization<P>& _fFactorizationA, const Factorization<P>& _fFactorizationB, Factorization<P>& _fFactorizationRestA, Factorization<P>& _fFactorizationRestB)
+    Factorization<P> commonDivisor( const Factorization<P>& _fFactorizationA, const Factorization<P>& _fFactorizationB, Factorization<P>& _fFactorizationRestA, Factorization<P>& _fFactorizationRestB)
     {
         assert( !_fFactorizationA.empty() && !_fFactorizationB.empty() );
         Factorization<P> resultFactorization;
@@ -827,19 +830,19 @@ namespace carl
         }
         assert( computePolynomial( _fFactorizationA ) == computePolynomial( resultFactorization ) * computePolynomial( _fFactorizationRestA ) );
         assert( computePolynomial( _fFactorizationB ) == computePolynomial( resultFactorization ) * computePolynomial( _fFactorizationRestB ) );
-        return resultFactorization;
+        return std::move( resultFactorization );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         FactorizedPolynomial<P> restA, restB;
-        return gcd( _fpolyA, _fpolyB, restA, restB );
+        return std::move( gcd( _fpolyA, _fpolyB, restA, restB ) );
     }
 
     template<typename P>
-    const FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )
+    FactorizedPolynomial<P> gcd( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB, FactorizedPolynomial<P>& _fpolyRestA, FactorizedPolynomial<P>& _fpolyRestB )
     {
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         _fpolyA.strengthenActivity();
@@ -862,7 +865,7 @@ namespace carl
                 FactorizedPolynomial<P> result( coefficientCommon );
                 assert( computePolynomial( _fpolyA ) == computePolynomial( result ) * computePolynomial( _fpolyRestA ) );
                 assert( computePolynomial( _fpolyB ) == computePolynomial( result ) * computePolynomial( _fpolyRestB ) );
-                return result;
+                return std::move( result );
             }
             else
             {
@@ -871,7 +874,7 @@ namespace carl
                 FactorizedPolynomial<P> result( coefficientCommon );
                 assert( computePolynomial( _fpolyA ) == computePolynomial( result ) * computePolynomial( _fpolyRestA ) );
                 assert( computePolynomial( _fpolyB ) == computePolynomial( result ) * computePolynomial( _fpolyRestB ) );
-                return result;
+                return std::move( result );
             }
         }
         else if ( !existsFactorization( _fpolyB ) )
@@ -881,7 +884,7 @@ namespace carl
             FactorizedPolynomial<P> result( coefficientCommon );
             assert( computePolynomial( _fpolyA ) == computePolynomial( result ) * computePolynomial( _fpolyRestA ) );
             assert( computePolynomial( _fpolyB ) == computePolynomial( result ) * computePolynomial( _fpolyRestB ) );
-            return result;
+            return std::move( result );
         }
 
         //Both polynomials are not constant
@@ -905,7 +908,7 @@ namespace carl
         FactorizedPolynomial<P> result( std::move( gcdFactorization ), coefficientCommon, _fpolyA.pCache() );
         assert( computePolynomial( _fpolyA ) == computePolynomial( result ) * computePolynomial( _fpolyRestA ) );
         assert( computePolynomial( _fpolyB ) == computePolynomial( result ) * computePolynomial( _fpolyRestB ) );
-        return result;
+        return std::move( result );
     }
     
     template <typename P>

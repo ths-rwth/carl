@@ -1605,8 +1605,8 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	if (this->isConstant()) {
 		Coeff c = constantPart();
-		*this = rhs;
-		return *this -= c;
+		*this = -rhs;
+		return *this += c;
 	}
 	
 	std::size_t id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());

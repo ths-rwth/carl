@@ -88,6 +88,7 @@ namespace carl
         
         inline bool factorizedTrivially() const
         {
+            assert( !mFactorization.empty() );
             return this == &mFactorization.begin()->first.content();
         }
         

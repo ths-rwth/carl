@@ -92,7 +92,7 @@ namespace carl
          * @return The factorization of a common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const Factorization<P1> commonDivisor( const FactorizedPolynomial<P1>& _fFactorizationA, const FactorizedPolynomial<P1>& _fFactorizationB, Factorization<P1>& _fFactorizationRestA, Factorization<P1>& _fFactorizationRestB);
+        friend Factorization<P1> commonDivisor( const FactorizedPolynomial<P1>& _fFactorizationA, const FactorizedPolynomial<P1>& _fFactorizationB, Factorization<P1>& _fFactorizationRestA, Factorization<P1>& _fFactorizationRestB);
 
         /**
          * @param _fpolyA The factorized polynomial to divide by the common factors of the two given factorized polynomials.
@@ -100,7 +100,7 @@ namespace carl
          * @return The quotient of the first given factorized polynomial and the common factors of both given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> lazyDiv( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend FactorizedPolynomial<P1> lazyDiv( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * Determines the greatest common divisor of the two given factorized polynomials. The method exploits the partial factorization
@@ -112,7 +112,7 @@ namespace carl
          * @return The greatest common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB, FactorizedPolynomial<P1>& _fpolyRestA, FactorizedPolynomial<P1>& _fpolyRestB);
+        friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB, FactorizedPolynomial<P1>& _fpolyRestA, FactorizedPolynomial<P1>& _fpolyRestB);
 
     public:
            
@@ -288,14 +288,14 @@ namespace carl
         }
         
         template<typename P1>
-        friend const P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
+        friend P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
         
         /**
          * @param _fpoly The operand.
          * @return The given factorized polynomial times -1.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpoly);
+        friend FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpoly);
         
         /**
          * @param _fpolyA The first summand.
@@ -303,7 +303,7 @@ namespace carl
          * @return The sum of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        friend FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
 
         /**
          * @param _coef The summand to add this factorized polynomial with.
@@ -335,7 +335,7 @@ namespace carl
          * @return The difference between the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        friend FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
         
         /**
          * @param _coeff The first factor.
@@ -343,7 +343,7 @@ namespace carl
          * @return The product of a coefficient type and a factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> operator*( const Coeff<P1>& _coeff, const FactorizedPolynomial<P1>& _fpoly );
+        friend FactorizedPolynomial<P1> operator*( const Coeff<P1>& _coeff, const FactorizedPolynomial<P1>& _fpoly );
         
         /**
          * @param _fpoly The first factor.
@@ -351,7 +351,7 @@ namespace carl
          * @return The product of a factorized polynomials and a coefficient type.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpoly, const Coeff<P1>& _coeff );
+        friend FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpoly, const Coeff<P1>& _coeff );
         
         /**
          * @param _fpolyA The first factor.
@@ -359,7 +359,7 @@ namespace carl
          * @return The product of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * @param _coef The factor to multiply this factorized polynomial with.
@@ -390,7 +390,7 @@ namespace carl
          * @param _fdivisor The divisor
          * @return The quotient
          */
-        const FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fdivisor ) const;
+        FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fdivisor ) const;
 
         /**
          * Calculates the quotient of the polynomials. Notice: the second polynomial has to be a factor of the first polynomial.
@@ -399,7 +399,7 @@ namespace carl
          * @return The quotient
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend FactorizedPolynomial<P1> quotient( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**Computes the least common multiple of two given polynomials. The method refines the factorization.
          * @param _fpolyA The first factorized polynomial to compute the lcm for.
@@ -407,7 +407,7 @@ namespace carl
          * @return The lcm of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> lcm( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend FactorizedPolynomial<P1> lcm( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * @param _fpolyA The first factorized polynomial to compute the common divisor for.
@@ -415,7 +415,7 @@ namespace carl
          * @return A common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> commonDivisor( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend FactorizedPolynomial<P1> commonDivisor( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * @param _fpolyA The first factorized polynomial to compute the common multiple for.
@@ -423,7 +423,7 @@ namespace carl
          * @return A common multiple of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> commonMultiple( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
+        friend FactorizedPolynomial<P1> commonMultiple( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * Determines the greatest common divisor of the two given factorized polynomials. The method exploits the partial factorization
@@ -433,7 +433,7 @@ namespace carl
          * @return The greatest common divisor of the two given factorized polynomials.
          */
         template<typename P1>
-        friend const FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
     };
     
     /**
@@ -467,7 +467,7 @@ namespace carl
      * @return The polynomial (representation) of this factorized polynomial
      */
     template<typename P>
-    const P computePolynomial(const FactorizedPolynomial<P>& _fpoly );
+    P computePolynomial(const FactorizedPolynomial<P>& _fpoly );
 
     /**
      * Prints the factorization representation of the given factorized polynomial on the given output stream.
