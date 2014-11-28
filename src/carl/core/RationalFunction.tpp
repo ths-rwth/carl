@@ -366,6 +366,36 @@ namespace carl
 		mPolynomialQuotient->first /= rhs;
 		return *this;
 	}
+    
+	template<typename Pol, bool AS>
+	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
+	{
+        if( lhs.isConstant() )
+        {
+            if( rhs.isConstant() )
+                return lhs.mNumberQuotient == rhs.mNumberQuotient;
+            else
+                return false;
+        }
+        if( rhs.isConstant() )
+            return false;
+		return lhs.nominatorAsPolynomial() == rhs.nominatorAsPolynomial() && lhs.denominatorAsPolynomial() == rhs.denominatorAsPolynomial();
+	}
+	
+	template<typename Pol, bool AS>
+	bool operator<(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
+	{
+        if( lhs.isConstant() )
+        {
+            if( rhs.isConstant() )
+                return lhs.mNumberQuotient < rhs.mNumberQuotient;
+            else
+                return true;
+        }
+        if( rhs.isConstant() )
+            return false;
+		return lhs.nominatorAsPolynomial()*rhs.denominatorAsPolynomial() < rhs.nominatorAsPolynomial()*lhs.denominatorAsPolynomial();
+	}
 	
 	template<typename Pol, bool AS>
 	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs)

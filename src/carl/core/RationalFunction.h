@@ -385,6 +385,12 @@ namespace carl
         /// @}
         
         template<typename PolA, bool ASA>
+        friend bool operator==(const RationalFunction<PolA, ASA>& lhs, const RationalFunction<PolA, ASA>& rhs);
+        
+        template<typename PolA, bool ASA>
+        friend bool operator<(const RationalFunction<PolA, ASA>& lhs, const RationalFunction<PolA, ASA>& rhs);
+        
+        template<typename PolA, bool ASA>
         friend std::ostream& operator<<(std::ostream& os, const RationalFunction<PolA, ASA>& rhs);
     };
 
@@ -512,36 +518,6 @@ namespace carl
 	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, unsigned long rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) /= rhs );
-	}
-    
-	template<typename Pol, bool AS>
-	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-        if( lhs.isConstant() )
-        {
-            if( rhs.isConstant() )
-                return lhs.mNumberQuotient == rhs.mNumberQuotient;
-            else
-                return false;
-        }
-        if( rhs.isConstant() )
-            return false;
-		return lhs.nominatorAsPolynomial() == rhs.nominatorAsPolynomial() && lhs.denominatorAsPolynomial() == rhs.denominatorAsPolynomial();
-	}
-	
-	template<typename Pol, bool AS>
-	bool operator<(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-        if( lhs.isConstant() )
-        {
-            if( rhs.isConstant() )
-                return lhs.mNumberQuotient < rhs.mNumberQuotient;
-            else
-                return true;
-        }
-        if( rhs.isConstant() )
-            return false;
-		return lhs.nominatorAsPolynomial()*rhs.denominatorAsPolynomial() < rhs.nominatorAsPolynomial()*lhs.denominatorAsPolynomial();
 	}
 	
 	template<typename Pol, bool AS>

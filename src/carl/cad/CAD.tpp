@@ -396,6 +396,7 @@ bool CAD<Number>::check(
 	bool next,
 	bool checkBounds)
 {
+    #ifdef LOGGING_CARL
 	LOGMSG_DEBUG("carl.cad", "Checking the system");
 	for (const auto& c: constraints) LOGMSG_DEBUG("carl.cad", "  " << c);
 	LOGMSG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
@@ -406,6 +407,7 @@ bool CAD<Number>::check(
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
 		LOGMSG_DEBUG("carl.cad", "  Level " << i << " (" << this->eliminationSets[i].size() << "): " << this->eliminationSets[i]);
 	}
+    #endif
 	assert(this->isSampleTreeConsistent());
 
 #ifdef CAD_CHECK_REDIRECT
