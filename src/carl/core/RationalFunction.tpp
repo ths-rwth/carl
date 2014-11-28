@@ -1,6 +1,7 @@
 /** 
  * @file:   RationalFunction.tpp
  * @author: Sebastian Junges
+ * @author: Florian Corzilius
  *
  * @since March 16, 2014
  */
@@ -11,137 +12,224 @@
 #pragma once
 
 namespace carl
-{
-	template<typename Pol, bool AS>
-	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		return lhs.nominator() == rhs.nominator() && lhs.denominator() == rhs.denominator();
-	}
-	
-	template<typename Pol, bool AS>
-	bool operator<(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		return lhs.nominator()*rhs.denominator() < rhs.nominator()*lhs.denominator();
-	}
-	
-	template<typename Pol, bool AS>
-	bool operator!=(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		return !(lhs == rhs);
-	}
-	
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const RationalFunction<Pol, AS>& rhs)
-	{
+{   
+    template<typename Pol, bool AS>
+	void RationalFunction<Pol, AS>::eliminateCommonFactor( bool _justNormalize )
+    {
+        if(mIsSimplified) return;
+        if(nominatorAsPolynomial().isZero())
+        {
+            delete mPolynomialQuotient;
+            mPolynomialQuotient = nullptr;
+            mNumberQuotient = std::move(CoeffType(0));
+            mIsSimplified = true;
+            return;
+        }
+        if(nominatorAsPolynomial() == denominatorAsPolynomial())
+        {
+            delete mPolynomialQuotient;
+            mPolynomialQuotient = nullptr;
+            mNumberQuotient = std::move(CoeffType(1));
+            mIsSimplified = true;
+            return;
+        }
+        CoeffType cpFactorNom( std::move( nominatorAsPolynomial().coprimeFactor() ) );
+        CoeffType cpFactorDen( std::move( denominatorAsPolynomial().coprimeFactor() ) );
+        mPolynomialQuotient->first *= cpFactorNom;
+        mPolynomialQuotient->second *= cpFactorDen;
+        CoeffType cpFactor( std::move( cpFactorDen/cpFactorNom ) );
+        if(!_justNormalize && !denominatorAsPolynomial().isConstant())
+        {
+            Pol gcd = carl::gcd(nominatorAsPolynomial(), denominatorAsPolynomial());
+            assert(nominatorAsPolynomial().quotient(gcd) * gcd == nominatorAsPolynomial());
+            mPolynomialQuotient->first = std::move( nominatorAsPolynomial().quotient(gcd) );
+            assert(denominatorAsPolynomial().quotient(gcd) * gcd == denominatorAsPolynomial());
+            mPolynomialQuotient->second = std::move( denominatorAsPolynomial().quotient(gcd) );
+            CoeffType cpFactorNom( std::move( nominatorAsPolynomial().coprimeFactor() ) );
+            CoeffType cpFactorDen( std::move( denominatorAsPolynomial().coprimeFactor() ) );
+            mPolynomialQuotient->first *= cpFactorNom;
+            mPolynomialQuotient->second *= cpFactorDen;
+            cpFactor *= cpFactorDen/cpFactorNom;
+            mIsSimplified = 1;
+        }
+        mPolynomialQuotient->first *= carl::getNum( cpFactor );
+        mPolynomialQuotient->second *= carl::getDenom( cpFactor );
+        if( nominatorAsPolynomial().isConstant() && denominatorAsPolynomial().isConstant() )
+        {
+            mNumberQuotient = std::move( constantPart() );
+            delete mPolynomialQuotient;
+            mPolynomialQuotient = nullptr;
+            mIsSimplified = true;
+        }
+    }
+    
+    template<typename Pol, bool AS>
+    template<bool byInverse>
+    RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::add(const RationalFunction<Pol, AS>& rhs)
+    {
+        if( this->isConstant() && rhs.isConstant() )
+        {
+            if(byInverse)
+                this->mNumberQuotient -= rhs.mNumberQuotient;
+            else
+                this->mNumberQuotient += rhs.mNumberQuotient;
+            return *this;
+        }
+        else if( this->isConstant() )
+        {
+            CoeffType c = this->mNumberQuotient;
+            *this = rhs;
+            if(byInverse)
+                return *this -= c;
+            else
+                return *this += c;
+        }
+        else if( rhs.isConstant() )
+        {
+            if(byInverse)
+                return *this -= rhs.mNumberQuotient;
+            else
+                return *this += rhs.mNumberQuotient;
+        }
         mIsSimplified = false;
-		if(mDenominator.isConstant() && rhs.mDenominator.isConstant())
+		if(denominatorAsPolynomial().isConstant() && rhs.denominatorAsPolynomial().isConstant())
 		{
-			mNominator *= rhs.mDenominator.constantPart();
-			mNominator += rhs.mNominator * mDenominator.constantPart();
-            mDenominator *= rhs.mDenominator.constantPart();
+			mPolynomialQuotient->first *= rhs.denominatorAsPolynomial().constantPart();
+            if(byInverse)
+                mPolynomialQuotient->first -= rhs.nominatorAsPolynomial() * denominatorAsPolynomial().constantPart();
+            else
+                mPolynomialQuotient->first += rhs.nominatorAsPolynomial() * denominatorAsPolynomial().constantPart();
+            mPolynomialQuotient->second *= rhs.denominatorAsPolynomial().constantPart();
 		}
 		else
 		{
-			if(mDenominator.isConstant())
+			if(denominatorAsPolynomial().isConstant())
 			{
 				// TODO use more efficient elimination
-				mNominator *= rhs.mDenominator;
-				mNominator += rhs.mNominator * mDenominator.constantPart();
+				mPolynomialQuotient->first *= rhs.denominatorAsPolynomial();
+                if(byInverse)
+                    mPolynomialQuotient->first -= rhs.nominatorAsPolynomial() * denominatorAsPolynomial().constantPart();
+                else
+                    mPolynomialQuotient->first += rhs.nominatorAsPolynomial() * denominatorAsPolynomial().constantPart();
 				// TODO use info that it is faster
-				mDenominator *= rhs.mDenominator;
+				mPolynomialQuotient->second *= rhs.denominatorAsPolynomial();
 			}
-			else if(rhs.mDenominator.isConstant())
+			else if(rhs.denominatorAsPolynomial().isConstant())
 			{
-				mNominator *= rhs.mDenominator.constantPart();
-				mNominator += rhs.mNominator * mDenominator;
-				mDenominator *= rhs.mDenominator.constantPart();
+				mPolynomialQuotient->first *= rhs.denominatorAsPolynomial().constantPart();
+                if(byInverse)
+                    mPolynomialQuotient->first -= rhs.nominatorAsPolynomial() * denominatorAsPolynomial();
+                else
+                    mPolynomialQuotient->first += rhs.nominatorAsPolynomial() * denominatorAsPolynomial();
+				mPolynomialQuotient->second *= rhs.denominatorAsPolynomial().constantPart();
 			}
 			else
 			{
-				Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
-				mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) + rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
-				mDenominator = leastCommonMultiple;
+				Pol leastCommonMultiple( std::move( carl::lcm(this->denominatorAsPolynomial(), rhs.denominatorAsPolynomial() ) ) );
+                if(byInverse)
+                {
+                    mPolynomialQuotient->first = std::move( this->nominatorAsPolynomial() * quotient(leastCommonMultiple,this->denominatorAsPolynomial()) 
+                                                - rhs.nominatorAsPolynomial() * quotient(leastCommonMultiple,rhs.denominatorAsPolynomial()) );
+                }
+                else
+                {
+                    mPolynomialQuotient->first = std::move( this->nominatorAsPolynomial() * quotient(leastCommonMultiple,this->denominatorAsPolynomial()) 
+                                                + rhs.nominatorAsPolynomial() * quotient(leastCommonMultiple,rhs.denominatorAsPolynomial()) );
+                }
+				mPolynomialQuotient->second = std::move( leastCommonMultiple );
 			}
 		}
         eliminateCommonFactor( !AS );
 		return *this;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const Pol& rhs)
-	{
+    }
+    
+    template<typename Pol, bool AS>
+    template<bool byInverse>
+    RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::add(const Pol& rhs)
+    {
+        if( this->isConstant() )
+        {
+            CoeffType c = this->mNumberQuotient;
+            Pol resultNum( std::move( byInverse ? (rhs * getDenom(c) - getNum(c)) : (rhs * getDenom(c) + getNum(c)) ) );
+            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(getDenom(c))) ) );
+            return *this;
+        }
 		mIsSimplified = false;
-		mNominator += rhs * mDenominator;
+        if(byInverse)
+            mPolynomialQuotient->first -= std::move(rhs * denominatorAsPolynomial());
+        else
+            mPolynomialQuotient->first += std::move(rhs * denominatorAsPolynomial());
 		eliminateCommonFactor( !AS );
 		return *this;
-	}	
-
-	template<typename Pol, bool AS>
-    template<typename P, DisableIf<needs_cache<P>>>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(Variable::Arg rhs)
-	{
+    }
+    
+    template<typename Pol, bool AS>
+    template<bool byInverse, typename P, DisableIf<needs_cache<P>>>
+    RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::add(Variable::Arg rhs)
+    {
+        if( this->isConstant() )
+        {
+            CoeffType c(this->mNumberQuotient);
+            Pol resultNum( rhs );
+            resultNum *= getDenom(c);
+            if(byInverse)
+                resultNum -= getNum(c);
+            else
+                resultNum += getNum(c);
+            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(getDenom(c))) ) );
+            return *this;
+        }
 		mIsSimplified = false;
-		mNominator += rhs * mDenominator;
+        if(byInverse)
+            mPolynomialQuotient->first -= std::move(rhs * denominatorAsPolynomial());
+        else
+            mPolynomialQuotient->first += std::move(rhs * denominatorAsPolynomial());
 		eliminateCommonFactor( !AS );
 		return *this;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator+=(const typename Pol::CoeffType& rhs)
-	{
+    }
+    
+    template<typename Pol, bool AS>
+    template<bool byInverse>
+    RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::add(const typename Pol::CoeffType& rhs)
+    {
+        if( this->isConstant() )
+        {
+            if(byInverse)
+                this->mNumberQuotient -= rhs;
+            else
+                this->mNumberQuotient += rhs;
+            return *this;
+        }
 		mIsSimplified = false;
-		mNominator += rhs * mDenominator;
+        if(byInverse)
+            mPolynomialQuotient->first -= std::move(rhs * denominatorAsPolynomial());
+        else
+            mPolynomialQuotient->first += std::move(rhs * denominatorAsPolynomial());
 		eliminateCommonFactor( !AS );
 		return *this;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const RationalFunction<Pol, AS>& rhs)
-	{
-		mIsSimplified = false;
-		Pol leastCommonMultiple = carl::lcm(this->mDenominator, rhs.mDenominator);
-		mNominator = this->mNominator * quotient(leastCommonMultiple,this->mDenominator) - rhs.mNominator * quotient(leastCommonMultiple,rhs.mDenominator);
-		mDenominator = leastCommonMultiple;
-		eliminateCommonFactor( !AS );
-		return *this;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const Pol& rhs)
-	{
-		mIsSimplified = false;
-		mNominator = this->mNominator + rhs.mNominator * this->mDenominator;
-		eliminateCommonFactor( !AS );
-		return *this;
-	}	
-
-	template<typename Pol, bool AS>
-    template<typename P, DisableIf<needs_cache<P>>>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(Variable::Arg rhs)
-	{
-		mIsSimplified = false;
-		mNominator -= rhs * mDenominator;
-		eliminateCommonFactor( !AS );
-		return *this;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator-=(const typename Pol::CoeffType& rhs)
-	{
-		mIsSimplified = false;
-		mNominator -= rhs * mDenominator;
-		eliminateCommonFactor( !AS );
-		return *this;
-	}
-	
+    }
 	
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const RationalFunction<Pol, AS>& rhs)
 	{
+        if( this->isConstant() && rhs.isConstant() )
+        {
+            this->mNumberQuotient *= rhs.mNumberQuotient;
+            return *this;
+        }
+        else if( this->isConstant() )
+        {
+            CoeffType c(this->mNumberQuotient);
+            *this = rhs;
+            return *this *= c;
+        }
+        else if( rhs.isConstant() )
+        {
+            return *this *= rhs.mNumberQuotient;
+        }
 		mIsSimplified = false;
-		mNominator *= rhs.mNominator;
-		mDenominator *= rhs.mDenominator;
+		mPolynomialQuotient->first *= rhs.nominatorAsPolynomial();
+		mPolynomialQuotient->second *= rhs.denominatorAsPolynomial();
 		eliminateCommonFactor( !AS );
 		return *this;
 	}
@@ -149,8 +237,16 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const Pol& rhs)
 	{
+        if( this->isConstant() )
+        {
+            CoeffType c = this->mNumberQuotient;
+            Pol resultNum( rhs );
+            resultNum *= getNum(c);
+            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(getDenom(c))) ) );
+            return *this;
+        }
 		mIsSimplified = false;
-		mNominator *= rhs;
+		mPolynomialQuotient->first *= rhs;
 		eliminateCommonFactor( !AS );
 		return *this;
 	}	
@@ -159,8 +255,16 @@ namespace carl
     template<typename P, DisableIf<needs_cache<P>>>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(Variable::Arg rhs)
 	{
+        if( this->isConstant() )
+        {
+            CoeffType c(this->mNumberQuotient);
+            Pol resultNum( rhs );
+            resultNum *= getNum(c);
+            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(getDenom(c))) ) );
+            return *this;
+        }
 		mIsSimplified = false;
-		mNominator *= rhs;
+		mPolynomialQuotient->first *= rhs;
 		eliminateCommonFactor( !AS );
 		return *this;
 	}
@@ -168,23 +272,42 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator*=(const typename Pol::CoeffType& rhs)
 	{
+        if( this->isConstant() )
+        {
+            this->mNumberQuotient *= rhs;
+            return *this;
+        }
         mIsSimplified = false;
-		mNominator *= rhs;
+		mPolynomialQuotient->first *= rhs;
 		eliminateCommonFactor( !AS );
 		return *this;
 	}
 	
-	
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const RationalFunction<Pol, AS>& rhs)
 	{
+        if( this->isConstant() && rhs.isConstant() )
+        {
+            this->mNumberQuotient /= rhs.mNumberQuotient;
+            return *this;
+        }
+        else if( this->isConstant() )
+        {
+            CoeffType c(this->mNumberQuotient);
+            *this = rhs;
+            return *this /= c;
+        }
+        else if( rhs.isConstant() )
+        {
+            return *this /= rhs.mNumberQuotient;
+        }
 		mIsSimplified = false;
-		if(rhs.mDenominator.isOne())
+		if(rhs.denominatorAsPolynomial().isOne())
 		{
-			return *this /= rhs.mNominator;
+			return *this /= rhs.nominatorAsPolynomial();
 		}
-		mNominator *= rhs.mDenominator;
-		mDenominator *= rhs.mNominator;
+		mPolynomialQuotient->first *= rhs.denominatorAsPolynomial();
+		mPolynomialQuotient->second *= rhs.nominatorAsPolynomial();
 		eliminateCommonFactor( !AS );
 		return *this;
 	}
@@ -192,26 +315,41 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const Pol& rhs)
 	{
+        if( this->isConstant() )
+        {
+            CoeffType c(this->mNumberQuotient);
+            Pol resultNum( rhs );
+            resultNum *= getDenom(c);
+            *this = std::move( RationalFunction<Pol, AS>( std::move(Pol(getNum(c))), std::move(resultNum) ) );
+            return *this;
+        }
         mIsSimplified = false;
 		if(rhs.isConstant()) 
 		{ 
-			mNominator /= rhs.constantPart();
+			mPolynomialQuotient->first /= rhs.constantPart();
 		}
 		else
 		{
-			mDenominator *= rhs;
+			mPolynomialQuotient->second *= rhs;
 			eliminateCommonFactor( !AS );
 		}
 		return *this;
 	}
 	
-	
 	template<typename Pol, bool AS>
     template<typename P, DisableIf<needs_cache<P>>>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(Variable::Arg rhs)
 	{
+        if( this->isConstant() )
+        {
+            CoeffType c(this->mNumberQuotient);
+            Pol resultNum( rhs );
+            resultNum *= getDenom(c);
+            *this = std::move( RationalFunction<Pol, AS>( std::move(Pol(getNum(c))), std::move(resultNum) ) );
+            return *this;
+        }
 		mIsSimplified = false;
-		mDenominator *= rhs;
+		mPolynomialQuotient->second *= rhs;
 		eliminateCommonFactor( !AS );
 		return *this;
 	}
@@ -219,175 +357,21 @@ namespace carl
 	template<typename Pol, bool AS>
 	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(unsigned long rhs)
 	{
+        if( this->isConstant() )
+        {
+            this->mNumberQuotient /= rhs;
+            return *this;
+        }
 		mIsSimplified = false;
-		mNominator /= rhs;
+		mPolynomialQuotient->first /= rhs;
 		return *this;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res += rhs;
-	}
-	
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res += rhs;
-	}
-	
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res += rhs;
-	}
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res += rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res += rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res -= rhs;
-	}
-	
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res -= rhs;
-	}
-	
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res -= rhs;
-	}
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res -= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res -= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res *= rhs;
-	}
-	
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res *= rhs;
-	}
-	
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res *= rhs;
-	}
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res *= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res *= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res /= rhs;
-	}
-	
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Pol& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res /= rhs;
-	}
-	
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Term<typename Pol::CoeffType>& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res /= rhs;
-	}
-	
-	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>>>
-	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res /= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const typename Pol::CoeffType& rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res /= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, unsigned long rhs)
-	{
-		RationalFunction<Pol, AS> res(lhs);
-		return res /= rhs;
-	}
-	
-	template<typename Pol, bool AS>
-	RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& rhs)
-	{
-		return RationalFunction<Pol, AS>(-rhs.nominator(), rhs.denominator());
 	}
 	
 	template<typename Pol, bool AS>
 	std::ostream& operator<<(std::ostream& os, const RationalFunction<Pol, AS>& rhs)
 	{
-		return os << "(" << rhs.nominator() << ")/(" << rhs.denominator() << ")";
+        if( rhs.isConstant() )
+            return os << rhs.mNumberQuotient;
+		return os << "(" << rhs.nominatorAsPolynomial() << ")/(" << rhs.denominatorAsPolynomial() << ")";
 	}
 }
