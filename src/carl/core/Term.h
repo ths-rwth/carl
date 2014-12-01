@@ -12,7 +12,7 @@
 #include "VariablesInformation.h"
 #include "Definiteness.h"
 #include "../interval/Interval.h"
-#include "pointerOperations.h"
+#include "../util/pointerOperations.h"
 
 namespace carl
 {
@@ -581,15 +581,6 @@ class Term
 } // namespace carl
 
 namespace std {
-
-	template<typename Coefficient>
-	struct less<std::shared_ptr<const carl::Term<Coefficient>>> {
-		bool operator()(const std::shared_ptr<const carl::Term<Coefficient>>& lhs, const std::shared_ptr<const carl::Term<Coefficient>>& rhs) {
-			if (lhs && rhs) return *lhs < *rhs;
-			if (lhs) return true;
-			return false;
-		}
-	};
 
 	/**
 	 * Specialization of `std::hash` for a Term.

@@ -17,108 +17,38 @@
 
 #include "../core/Variable.h"
 //#include "../core/VariableInformation.h"
+#include "pointerOperations.h"
 
 namespace carl
 {	
 	// Structures.
-	
-	template<typename T> 
-	struct pointerEqual
-	{
-		bool operator()( const T* _argA, const T* _argB ) const
-		{
-			return (*_argA)==(*_argB);
-		}
-	};
-	
-	template<typename T> 
-	struct pointerEqualWithNull
-	{
-		bool operator()( const T* _argA, const T* _argB ) const
-		{
-			if( _argA == nullptr || _argB == nullptr )
-				return _argA == _argB;
-			return (*_argA)==(*_argB);
-		}
-	};
-	
-	template<typename T> 
-	struct pointerLess
-	{
-		bool operator()( const T* _argA, const T* _argB ) const
-		{
-			return (*_argA)<(*_argB);
-		}
-	};
 
-	template<typename T> 
-	struct pointerHash
-	{
-		size_t operator()( const T* _arg ) const
-		{
-			return std::hash<T>()( *_arg );
-		}
-	};
-
-	template<typename T> 
-	struct pointerHashWithNull
-	{
-		size_t operator()( const T* _arg ) const
-		{
-			if( _arg == nullptr )
-				return 0;
-			return std::hash<T>()( *_arg );
-		}
-	};
+	template<typename T>
+	using pointerEqual = carl::equal_to<T*, false>;
+	template<typename T>
+	using pointerEqualWithNull = carl::equal_to<T*, true>;
+	template<typename T>
+	using sharedPointerEqual = carl::equal_to<std::shared_ptr<const T>, false>;
+	template<typename T>
+	using sharedPointerEqualWithNull = carl::equal_to<std::shared_ptr<const T>, true>;
 	
-	template<typename T> 
-	struct sharedPointerEqual
-	{
-		bool operator()( const std::shared_ptr<const T>& _argA, const std::shared_ptr<const T>& _argB ) const
-		{
-            return (*_argA)==(*_argB);
-		}
-	};
+	template<typename T>
+	using pointerLess = carl::less<T*, false>;
+	template<typename T>
+	using pointerLessWithNull = carl::less<T*, true>;
+	template<typename T>
+	using sharedPointerLess = carl::less<std::shared_ptr<const T>*, false>;
+	template<typename T>
+	using sharedPointerLessWithNull = carl::less<std::shared_ptr<const T>, true>;
 	
-	template<typename T> 
-	struct sharedPointerEqualWithNull
-	{
-		bool operator()( const std::shared_ptr<const T>& _argA, const std::shared_ptr<const T>& _argB ) const
-		{
-			if( _argA == nullptr || _argB == nullptr )
-				return _argA == _argB;
-			return (*_argA)==(*_argB);
-		}
-	};
-	
-	template<typename T> 
-	struct sharedPointerLess
-	{
-		bool operator()( const std::shared_ptr<const T>& _argA, const std::shared_ptr<const T>& _argB ) const
-		{
-			return (*_argA)<(*_argB);
-		}
-	};
-
-	template<typename T> 
-	struct sharedPointerHash
-	{
-		size_t operator()( const std::shared_ptr<const T>& _arg ) const
-		{
-            return std::hash<T>()( *_arg );
-		}
-	};
-
-    template<typename T> 
-    struct sharedPointerHashWithNull
-    {
-        size_t operator()( const std::shared_ptr<const T>& _arg ) const
-        {
-            if( _arg == nullptr )
-                return 0;
-            return std::hash<T>()( *_arg );
-        }
-    };
+	template<typename T>
+	using pointerHash = carl::hash<T*, false>;
+	template<typename T>
+	using pointerHashWithNull = carl::hash<T*, true>;
+	template<typename T>
+	using sharedPointerHash = carl::hash<std::shared_ptr<const T>*, false>;
+	template<typename T>
+	using sharedPointerHashWithNull = carl::hash<std::shared_ptr<const T>*, true>;
     
     // Further type definitions.
     template<typename T> 
@@ -198,6 +128,8 @@ namespace carl
     
     // Macros.
 
+	///@todo replace by version without _intType:
+	/// #define CIRCULAR_SHIFT(_value, _shift) ((_value << _shift) | (_value >> ((sizeof _value)*8 - _shift)))
 	#define CIRCULAR_SHIFT(_intType, _value, _shift) ((_value << _shift) | (_value >> (sizeof(_intType)*8 - _shift)))
 	
 }	// namespace carl

@@ -12,8 +12,8 @@
 #include <tuple>
 #include <vector>
 
+#include "pointerOperations.h"
 #include "../core/Term.h"
-#include "../core/pointerOperations.h"
 #include "../io/streamingOperators.h"
 
 namespace carl
