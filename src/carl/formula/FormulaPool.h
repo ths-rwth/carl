@@ -27,9 +27,9 @@ namespace carl
             ///
             typedef FormulaContent<Pol> Element;
             ///
-            typedef std::shared_ptr<Element> ElementSPtr;
+            typedef Element* ElementSPtr;
             ///
-            typedef std::shared_ptr<const Element> ConstElementSPtr;
+            typedef const Element* ConstElementSPtr;
         
         private:
             
@@ -41,7 +41,7 @@ namespace carl
             /// The unique formula representing false.
             ElementSPtr mpFalse;
             /// The formula pool.
-            FastSharedPointerSet<Element> mPool;
+            FastPointerSet<Element> mPool;
             /// Mutex to avoid multiple access to the pool
             mutable std::mutex mMutexPool;
             
@@ -85,7 +85,7 @@ namespace carl
              */
             ConstElementSPtr create( Variable::Arg _booleanVar )
             {
-                return add( std::move( ElementSPtr( new Element( _booleanVar ) ) ) );
+                return add( new Element( _booleanVar ) );
             }
             
             /**
@@ -101,7 +101,7 @@ namespace carl
                 if( _constraint == constraintPool<Pol>().inconsistentConstraint() )
                     return mpFalse;
                 #endif
-                return add( std::move( ElementSPtr( new Element( _constraint ) ) ) );
+                return add( new Element( _constraint ) );
             }
             
             /**
@@ -120,7 +120,7 @@ namespace carl
 					return _subFormula.subformula().mpContent;
                 #endif
                 // TODO: Actually we know that this formula does not begin with NOT and is already in the pool. Use this for optimization purposes.
-                return add( std::move( ElementSPtr( new Element( _subFormula ) ) ) );
+                return add( new Element( _subFormula ) );
             }
     
             /**
@@ -141,7 +141,7 @@ namespace carl
                 if( _conclusion.mpContent == mpFalse )
                     return createNegation( _premise.mpContent );
                 #endif
-                return add( std::move( ElementSPtr( new Element( _premise, _conclusion ) ) ) );
+                return add( new Element( _premise, _conclusion ) );
             }
     
             /**
@@ -159,7 +159,7 @@ namespace carl
                 if( _condition.mpContent == mpTrue )
                     return _then.mpContent;
                 #endif
-                return add( std::move( ElementSPtr( new Element( _condition, _then, _else ) ) ) );
+                return add( new Element( _condition, _then, _else ) );
             }
 
 			/**
@@ -173,7 +173,7 @@ namespace carl
 			{
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
 				if (_vars.size() > 0) {
-					return add( std::move( ElementSPtr( new Element(_type, std::move(_vars), _term ) ) ) );
+					return add( new Element(_type, std::move(_vars), _term ) );
 				} else {
 					return _term.mpContent;
 				}
@@ -246,9 +246,9 @@ namespace carl
                 if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
                 {
                     if( boost::get<UVariable>(_lhs) < boost::get<UVariable>(_rhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) ) ) );
+                        return add( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) );
                     if( boost::get<UVariable>(_rhs) < boost::get<UVariable>(_lhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) ) ) );
+                        return add( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) );
                     else if( _negated )
                         return mpFalse;
                     else
@@ -256,32 +256,32 @@ namespace carl
                 }
 				else if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) )
                 {
-                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) ) ) );
+                    return add( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) );
                 }
                 else if( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
                 {
-                    return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) ) ) );
+                    return add( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) );
                 }
                 else
                 {
                     assert( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) );
                     if( boost::get<UFInstance>(_lhs) < boost::get<UFInstance>(_rhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) ) ) );
+                        return add( new Element( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) );
                     if( boost::get<UFInstance>(_rhs) < boost::get<UFInstance>(_lhs) )
-                        return add( std::move( ElementSPtr( new Element( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) ) ) );
+                        return add( new Element( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) );
                     else if( _negated )
                         return mpFalse;
                     else
                         return mpTrue;
                 }
                 #else
-                return add( std::move( ElementSPtr( new Element( UEquality( _lhs, _rhs, _negated ) ) ) ) );
+                return add( new Element( UEquality( _lhs, _rhs, _negated ) ) );
                 #endif
 			}
 
 			ConstElementSPtr create( UEquality&& eq )
 			{
-				return add( std::move( ElementSPtr( new Element( std::move( eq ) ) ) ) );
+				return add( new Element( std::move( eq ) ) );
 			}
             
             template<typename ArgType>
@@ -352,7 +352,7 @@ namespace carl
              * @return The position of the given formula in the pool and true, if it did not yet occur in the pool;
              *         The position of the equivalent formula in the pool and false, otherwise.
              */
-            std::pair<typename FastSharedPointerSet<Element>::iterator,bool> insert( ElementSPtr&& _formula, bool _elementNotInPool );
+            std::pair<typename FastPointerSet<Element>::iterator,bool> insert( ElementSPtr _formula, bool _elementNotInPool );
             
             /**
              * Adds the given formula to the pool, if it does not yet occur in there.
@@ -361,7 +361,7 @@ namespace carl
              * @return The given formula, if it did not yet occur in the pool;
              *         The equivalent formula already occurring in the pool, otherwise.
              */
-            ConstElementSPtr add( ElementSPtr&& _formula );
+            ConstElementSPtr add( ElementSPtr _formula );
     };
 }    // namespace carl
 

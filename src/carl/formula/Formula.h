@@ -153,7 +153,7 @@ namespace carl
             /// The hash value.
             size_t mHash;
             /// The unique id.
-            mutable size_t mId;
+            size_t mId;
             /// The activity for this formula, which means, how much is this formula involved in the solving procedure.
             mutable double mActivity;
             /// Some value stating an expected difficulty of solving this formula for satisfiability.
@@ -181,7 +181,7 @@ namespace carl
                 UEquality mUIEquality;
             };
             /// The propositions of this formula.
-            mutable Condition mProperties;
+            Condition mProperties;
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
@@ -312,10 +312,10 @@ namespace carl
             // Members.
 
             /// The content of this formula.
-            std::shared_ptr<const FormulaContent<Pol>> mpContent;
+            const FormulaContent<Pol>* mpContent;
             
             
-            Formula( std::shared_ptr<const FormulaContent<Pol>> _content ):
+            Formula( const FormulaContent<Pol>* _content ):
                 mpContent( _content )
             {}
             
@@ -325,7 +325,7 @@ namespace carl
              * Gets the propositions of this formula. It updates and stores the propositions
              * if they are not up to date, hence this method is quite efficient.
              */
-            static void init( const FormulaContent<Pol>& _content );
+            static void init( FormulaContent<Pol>& _content );
             
             explicit Formula( FormulaType _type = TRUE ):
                 mpContent( _type == TRUE ? FormulaPool<Pol>::getInstance().trueFormula() : FormulaPool<Pol>::getInstance().falseFormula() )
