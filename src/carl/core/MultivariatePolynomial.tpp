@@ -1066,15 +1066,18 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 {
 	assert(this->isConsistent());
-	TermsType tmp;
-	for (auto it1 = mTerms.begin(); it1 != mTerms.end(); it1++) {
-		tmp.push_back(it1->pow(2));
-		for (auto it2 = it1+1; it2 != mTerms.end(); it2++) {
-			tmp.push_back(Coeff(2) * *it1 * *it2);
+	std::size_t id = mTermAdditionManager.getId(mTerms.size() * mTerms.size());
+	Term<Coeff> newlterm;
+	for (auto it1 = mTerms.rbegin(); it1 != mTerms.rend(); it1++) {
+		if (it1 == mTerms.rbegin()) newlterm = it1->pow(2);
+		else mTermAdditionManager.template addTerm<false>(id, it1->pow(2));
+		for (auto it2 = it1+1; it2 != mTerms.rend(); it2++) {
+			mTermAdditionManager.template addTerm<false>(id, Coeff(2) * *it1 * *it2);
 		}
 	}
 	mOrdered = false;
-	std::swap(tmp, mTerms);
+	mTermAdditionManager.readTerms(id, mTerms);
+	if (!newlterm.isZero()) mTerms.push_back(newlterm);
 	assert(this->isConsistent());
 }
 
