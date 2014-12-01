@@ -367,8 +367,6 @@ namespace carl
         if ( existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> result = _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.pCache() );
-            std::cout << "results in " << result << std::endl;
-            std::cout << computePolynomial( _fpolyA ) << " - " << computePolynomial( _fpolyB ) << " = " << computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) << std::endl;
             assert( computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) == computePolynomial( result ) );
             return std::move( result );
         }
