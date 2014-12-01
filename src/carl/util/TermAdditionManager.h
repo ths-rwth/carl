@@ -36,6 +36,7 @@ private:
 public:
 	TermAdditionManager(): mNextId(0)
 	{
+        MonomialPool::getInstance();
 		mData.emplace_back();
 		std::get<4>(mData.back()) = 1;
 	}

@@ -23,9 +23,6 @@ namespace carl
 template<typename Coeff>
 class UnivariatePolynomial;
 
-template<typename Polynomial>
-class TermAdditionManager;
-
 /**
  * The general-purpose multivariate polynomial class.
  *
