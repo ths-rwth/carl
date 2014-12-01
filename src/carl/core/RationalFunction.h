@@ -423,7 +423,13 @@ namespace carl
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) += rhs );
 	}
-	
+
+    template<typename Pol, bool AS>
+	inline RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs)
+	{
+		return std::move( RationalFunction<Pol, AS>(lhs) *= typename Pol::CoeffType(-1) );
+	}
+    
 	template<typename Pol, bool AS>
 	inline RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{

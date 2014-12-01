@@ -17,8 +17,8 @@ namespace carl
     FormulaPool<Pol>::FormulaPool( unsigned _capacity ):
         Singleton<FormulaPool<Pol>>(),
         mIdAllocator( 3 ),
-        mpTrue( ElementSPtr( new Element( true, 1 ) ) ),
-        mpFalse( ElementSPtr( new Element( false, 2 ) ) ),
+        mpTrue( new Element( true, 1 ) ),
+        mpFalse( new Element( false, 2 ) ),
         mPool()
     {
         mPool.reserve( _capacity );
@@ -29,30 +29,30 @@ namespace carl
     }
     
     template<typename Pol>
-    std::pair<typename FastSharedPointerSet<typename FormulaPool<Pol>::Element>::iterator,bool> FormulaPool<Pol>::insert( ElementSPtr&& _element, bool _elementNotInPool )
+    std::pair<typename FastPointerSet<typename FormulaPool<Pol>::Element>::iterator,bool> FormulaPool<Pol>::insert( ElementSPtr _element, bool _elementNotInPool )
     {
-        auto iterBoolPair = mPool.insert( std::move( _element ) );
+        auto iterBoolPair = mPool.insert( _element );
         assert( _elementNotInPool <= iterBoolPair.second );
         if( _elementNotInPool || iterBoolPair.second ) // Formula has not yet been generated.
         {
-            (*iterBoolPair.first)->mId = mIdAllocator; // id should be set here to avoid conflicts when multi-threading
-            Formula<Pol>::init( **iterBoolPair.first );
+            _element->mId = mIdAllocator; // id should be set here to avoid conflicts when multi-threading
+            Formula<Pol>::init( *_element );
             ++mIdAllocator;
         }
         return iterBoolPair;
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr&& _element )
+    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr _element )
     {
         FORMULA_POOL_LOCK_GUARD
-        auto iterBoolPair = insert( std::move( _element ), false );
+        auto iterBoolPair = insert( _element, false );
         if( iterBoolPair.second ) // Formula has not yet been generated.
         {
             // Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
-            insert( std::move( ElementSPtr( new Element( Formula<Pol>( *iterBoolPair.first ) ) ) ), true );
+            insert( new Element( Formula<Pol>( *iterBoolPair.first ) ), true );
         }
         return *iterBoolPair.first;   
     }
@@ -176,6 +176,6 @@ namespace carl
             if( _subformulas.size() == 1 )
                 return newFormulaWithOneSubformula( _type, *(_subformulas.begin()) );
         }
-        return add( std::move( ElementSPtr( new Element( _type, std::move( _subformulas ) ) ) ) );
+        return add( new Element( _type, std::move( _subformulas ) ) );
     }
 }    // namespace carl

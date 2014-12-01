@@ -359,6 +359,19 @@ namespace carl
 	{
         if( this->isConstant() )
         {
+            this->mNumberQuotient /= CoeffType(rhs);
+            return *this;
+        }
+		mIsSimplified = false;
+		mPolynomialQuotient->first /= rhs;
+		return *this;
+	}
+
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS>& RationalFunction<Pol, AS>::operator/=(const typename Pol::CoeffType& rhs)
+	{
+        if( this->isConstant() )
+        {
             this->mNumberQuotient /= rhs;
             return *this;
         }
@@ -366,7 +379,7 @@ namespace carl
 		mPolynomialQuotient->first /= rhs;
 		return *this;
 	}
-    
+
 	template<typename Pol, bool AS>
 	bool operator==(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{

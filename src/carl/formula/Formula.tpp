@@ -578,7 +578,7 @@ namespace carl
     }
     
     template<typename Pol>
-    void Formula<Pol>::init( const FormulaContent<Pol>& _content )
+    void Formula<Pol>::init( FormulaContent<Pol>& _content )
     {
         _content.mProperties = Condition();
         switch( _content.mType )
@@ -1162,12 +1162,12 @@ namespace carl
         {
             const Formula<Pol>& currentFormula = subformulasToTransform.back();
 //            cout << "To add:" << endl;
-//            for( auto f : subformulasToTransform )
-//                cout << "   " << *f << endl;
+//            for( const auto& f : subformulasToTransform )
+//                cout << "   " << f << endl;
 //            cout << endl;
 //            cout << "Conjunction:" << endl;
-//            for( auto f : resultSubformulas )
-//                cout << "   " << *f << endl;
+//            for( const auto& f : resultSubformulas )
+//                cout << "   " << f << endl;
 //            cout << endl;
             subformulasToTransform.pop_back();
             switch( currentFormula.getType() )
@@ -1304,12 +1304,12 @@ namespace carl
                     {
                         Formula<Pol> currentSubformula = phis.back();
 //                        cout << "    To add:" << endl;
-//                        for( auto f : phis )
-//                            cout << "       " << *f << endl;
+//                        for( const auto& f : phis )
+//                            cout << "       " << f << endl;
 //                        cout << endl;
 //                        cout << "    Disjunction:" << endl;
-//                        for( auto f : subsubformulas )
-//                            cout << "       " << *f << endl;
+//                        for( const auto& f : subsubformulas )
+//                            cout << "       " << f << endl;
 //                        cout << endl;
                         phis.pop_back();
                         switch( currentSubformula.getType() )
