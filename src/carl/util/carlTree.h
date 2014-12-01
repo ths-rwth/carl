@@ -12,6 +12,11 @@
 
 namespace carl {
 
+/**
+ * This class represents a tree.
+ *
+ * It tries to stick to the STL style as close as possible.
+ */
 template<typename T>
 class Tree {
 private:
@@ -29,12 +34,28 @@ private:
 		bool operator==(const Node& n) {
 			return this == &n;
 		}
+		void updateDepth(std::size_t newDepth) {
+			depth = newDepth;
+			for (auto& c: children) c.updateDepth(newDepth + 1);
+		}
 	};
 	
 	Node* root;
 	
-public:
-
+protected:
+	/**
+	 * This is the base class for all iterators.
+	 * It takes care of correct implementation of all operators and reversion.
+	 *
+	 * An actual iterator `T<reverse>` only has to
+	 * - inherit from `BaseIterator<T, reverse>`,
+	 * - provide appropriate constructors,
+	 * - implement `next()` and `previous()`.
+	 * If the iterator supports only forward iteration, it omits the template
+	 * argument, inherits from `BaseIterator<T, false>` and does not implement
+	 * `previous()`.
+	 */
+	template<typename Iterator, bool reverse>
 	struct BaseIterator {
 		friend Tree;
 	protected:
@@ -61,24 +82,61 @@ public:
 		const T& operator*() const {
 			return this->current->data;
 		}
-		bool operator==(const BaseIterator& i) {
-			return current == i.current;
+
+		template<typename I = Iterator>
+		typename std::enable_if<!reverse,I>::type& operator++() {
+			return static_cast<Iterator*>(this)->next();
 		}
-		bool operator!=(const BaseIterator& i) {
-			return current != i.current;
+		template<typename I = Iterator>
+		typename std::enable_if<reverse,I>::type& operator++() {
+			return static_cast<Iterator*>(this)->previous();
+		}
+		template<typename I = Iterator>
+		typename std::enable_if<!reverse,I>::type operator++(int) {
+			return static_cast<Iterator*>(this)->next();
+		}
+		template<typename I = Iterator>
+		typename std::enable_if<reverse,I>::type operator++(int) {
+			return static_cast<Iterator*>(this)->previous();
+		}
+		template<typename I = Iterator>
+		typename std::enable_if<!reverse,I>::type& operator--() {
+			return static_cast<Iterator*>(this)->previous();
+		}
+		template<typename I = Iterator>
+		typename std::enable_if<reverse,I>::type& operator-() {
+			return static_cast<Iterator*>(this)->next();
+		}
+		template<typename I = Iterator>
+		typename std::enable_if<!reverse,I>::type operator--(int) {
+			return static_cast<Iterator*>(this)->previous();
+		}
+		template<typename I = Iterator>
+		typename std::enable_if<reverse,I>::type operator--(int) {
+			return static_cast<Iterator*>(this)->next();
 		}
 	};
+public:
 	
+	template<typename Iterator>
+	friend bool operator==(const Iterator& i1, const Iterator& i2) {
+		return i1.current == i2.current;
+	}
+	template<typename Iterator>
+	friend bool operator!=(const Iterator& i1, const Iterator& i2) {
+		return i1.current != i2.current;
+	}
+
+	/**
+	 * Iterator class for pre-order iterations over all elements.
+	 */
 	template<bool reverse = false>
-	struct PreorderIterator: public BaseIterator {
+	struct PreorderIterator: public BaseIterator<PreorderIterator<reverse>, reverse> {
 		friend Tree;
 	protected:
-		PreorderIterator(): BaseIterator(nullptr) {}
-		PreorderIterator(Node* root): BaseIterator(root) {}
-	public:
-		PreorderIterator(const PreorderIterator& ii): BaseIterator(ii.current) {}
-		PreorderIterator(PreorderIterator&& ii): BaseIterator(ii.current) {}
-		virtual ~PreorderIterator() {}
+		typedef BaseIterator<PreorderIterator<reverse>, reverse> Base;
+		PreorderIterator(): Base(nullptr) {}
+		PreorderIterator(Node* root): Base(root) {}
 		PreorderIterator& next() {
 			if (this->current->children.empty()) {
 				while (this->current->nextSibling == nullptr) {
@@ -102,18 +160,10 @@ public:
 			}
 			return *this;
 		}
-		PreorderIterator operator++() {
-			return reverse ? previous() : next();
-		}
-		PreorderIterator operator++(int) {
-			return reverse ? previous() : next();
-		}
-		PreorderIterator operator--() {
-			return reverse ? next() : previous();
-		}
-		PreorderIterator operator--(int) {
-			return reverse ? next() : previous();
-		}
+	public:
+		PreorderIterator(const PreorderIterator& ii): Base(ii.current) {}
+		PreorderIterator(PreorderIterator&& ii): Base(ii.current) {}
+		virtual ~PreorderIterator() {}
 	};
 	static_assert(std::is_copy_constructible<PreorderIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<PreorderIterator<false>>::value, "");
@@ -121,17 +171,17 @@ public:
 	static_assert(std::is_copy_constructible<PreorderIterator<true>>::value, "");
 	static_assert(std::is_move_constructible<PreorderIterator<true>>::value, "");
 	static_assert(std::is_destructible<PreorderIterator<true>>::value, "");
-	
+
+	/**
+	 * Iterator class for post-order iterations over all elements.
+	 */
 	template<bool reverse = false>
-	struct PostorderIterator: public BaseIterator {
+	struct PostorderIterator: public BaseIterator<PostorderIterator<reverse>,reverse> {
 		friend Tree;
 	protected:
-		PostorderIterator(): BaseIterator(nullptr) {}
-		PostorderIterator(Node* root): BaseIterator(root) {}
-	public:
-		PostorderIterator(const PostorderIterator& ii): BaseIterator(ii.current) {}
-		PostorderIterator(PostorderIterator&& ii): BaseIterator(ii.current) {}
-		virtual ~PostorderIterator() {}
+		typedef BaseIterator<PostorderIterator<reverse>,reverse> Base;
+		PostorderIterator(): Base(nullptr) {}
+		PostorderIterator(Node* root): Base(root) {}
 		PostorderIterator& next() {
 			if (this->current->nextSibling == nullptr) {
 				this->current = this->current->parent;
@@ -159,18 +209,10 @@ public:
 			}
 			return *this;
 		}
-		PostorderIterator operator++() {
-			return reverse ? previous() : next();
-		}
-		PostorderIterator operator++(int) {
-			return reverse ? previous() : next();
-		}
-		PostorderIterator operator--() {
-			return reverse ? next() : previous();
-		}
-		PostorderIterator operator--(int) {
-			return reverse ? next() : previous();
-		}
+	public:
+		PostorderIterator(const PostorderIterator& ii): Base(ii.current) {}
+		PostorderIterator(PostorderIterator&& ii): Base(ii.current) {}
+		virtual ~PostorderIterator() {}
 	};
 	static_assert(std::is_copy_constructible<PostorderIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<PostorderIterator<false>>::value, "");
@@ -178,17 +220,16 @@ public:
 	static_assert(std::is_copy_constructible<PostorderIterator<true>>::value, "");
 	static_assert(std::is_move_constructible<PostorderIterator<true>>::value, "");
 	static_assert(std::is_destructible<PostorderIterator<true>>::value, "");
-	
+
+	/**
+	 * Iterator class for iterations over all leaf elements.
+	 */
 	template<bool reverse = false>
 	struct LeafIterator: public PreorderIterator<false> {
 		friend Tree;
 	protected:
 		LeafIterator(): PreorderIterator<false>() {}
 		LeafIterator(Node* root): PreorderIterator<false>(root) {}
-	public:
-		LeafIterator(const LeafIterator& ii): PreorderIterator<false>(ii.current) {}
-		LeafIterator(LeafIterator&& ii): PreorderIterator<false>(ii.current) {}
-		virtual ~LeafIterator() {}
 		LeafIterator& next() {
 			do {
 				PreorderIterator<false>::next();
@@ -204,18 +245,10 @@ public:
 			} while (!this->current->children.empty());
 			return *this;
 		}
-		LeafIterator operator++() {
-			return reverse ? previous() : next();
-		}
-		LeafIterator operator++(int) {
-			return reverse ? previous() : next();
-		}
-		LeafIterator operator--() {
-			return reverse ? next() : previous();
-		}
-		LeafIterator operator--(int) {
-			return reverse ? next() : previous();
-		}
+	public:
+		LeafIterator(const LeafIterator& ii): PreorderIterator<false>(ii.current) {}
+		LeafIterator(LeafIterator&& ii): PreorderIterator<false>(ii.current) {}
+		virtual ~LeafIterator() {}
 	};
 	static_assert(std::is_copy_constructible<LeafIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<LeafIterator<false>>::value, "");
@@ -223,13 +256,17 @@ public:
 	static_assert(std::is_copy_constructible<LeafIterator<true>>::value, "");
 	static_assert(std::is_move_constructible<LeafIterator<true>>::value, "");
 	static_assert(std::is_destructible<LeafIterator<true>>::value, "");
-	
+
+	/**
+	 * Iterator class for iterations over all elements of a certain depth.
+	 */
 	template<bool reverse = false>
-	struct DepthIterator: public BaseIterator {
+	struct DepthIterator: public BaseIterator<DepthIterator<reverse>,reverse> {
 		friend Tree;
 	protected:
-		DepthIterator(): BaseIterator(nullptr) {}
-		DepthIterator(Node* root, std::size_t depth): BaseIterator(root) {
+		typedef BaseIterator<DepthIterator<reverse>,reverse> Base;
+		DepthIterator(): Base(nullptr) {}
+		DepthIterator(Node* root, std::size_t depth): Base(root) {
 			assert(root != nullptr);
 			if (reverse) {
 				PostorderIterator<reverse> it(this->current);
@@ -241,10 +278,6 @@ public:
 				this->current = it.current;
 			}
 		}
-	public:
-		DepthIterator(const DepthIterator& ii): BaseIterator(ii.current) {}
-		DepthIterator(DepthIterator&& ii): BaseIterator(ii.current) {}
-		virtual ~DepthIterator() {}
 		DepthIterator& next() {
 			if (this->current->nextSibling == nullptr) {
 				std::size_t target = this->current->depth;
@@ -279,18 +312,10 @@ public:
 			}
 			return *this;
 		}
-		DepthIterator operator++() {
-			return reverse ? previous() : next();
-		}
-		DepthIterator operator++(int) {
-			return reverse ? previous() : next();
-		}
-		DepthIterator operator--() {
-			return reverse ? next() : previous();
-		}
-		DepthIterator operator--(int) {
-			return reverse ? next() : previous();
-		}
+	public:
+		DepthIterator(const DepthIterator& ii): Base(ii.current) {}
+		DepthIterator(DepthIterator&& ii): Base(ii.current) {}
+		virtual ~DepthIterator() {}
 	};
 	static_assert(std::is_copy_constructible<DepthIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<DepthIterator<false>>::value, "");
@@ -298,13 +323,17 @@ public:
 	static_assert(std::is_copy_constructible<DepthIterator<true>>::value, "");
 	static_assert(std::is_move_constructible<DepthIterator<true>>::value, "");
 	static_assert(std::is_destructible<DepthIterator<true>>::value, "");
-	
+
+	/**
+	 * Iterator class for iterations over all children of a given element.
+	 */
 	template<bool reverse = false>
-	struct ChildrenIterator: public BaseIterator {
+	struct ChildrenIterator: public BaseIterator<ChildrenIterator<reverse>,reverse> {
 		friend Tree;
 	protected:
-		ChildrenIterator(): BaseIterator(nullptr) {}
-		ChildrenIterator(Node* base): BaseIterator(base) {
+		typedef BaseIterator<ChildrenIterator<reverse>,reverse> Base;
+		ChildrenIterator(): Base(nullptr) {}
+		ChildrenIterator(Node* base): Base(base) {
 			assert(base != nullptr);
 			if (this->current->children.empty()) this->current = nullptr;
 			else {
@@ -315,10 +344,6 @@ public:
 				}
 			}
 		}
-	public:
-		ChildrenIterator(const ChildrenIterator& ii): BaseIterator(ii.current) {}
-		ChildrenIterator(ChildrenIterator&& ii): BaseIterator(ii.current) {}
-		virtual ~ChildrenIterator() {}
 		ChildrenIterator& next() {
 			this->current = this->current->nextSibling;
 			return *this;
@@ -327,18 +352,10 @@ public:
 			this->current = this->current->previousSibling;
 			return *this;
 		}
-		ChildrenIterator operator++() {
-			return reverse ? previous() : next();
-		}
-		ChildrenIterator operator++(int) {
-			return reverse ? previous() : next();
-		}
-		ChildrenIterator operator--() {
-			return reverse ? next() : previous();
-		}
-		ChildrenIterator operator--(int) {
-			return reverse ? next() : previous();
-		}
+	public:
+		ChildrenIterator(const ChildrenIterator& ii): Base(ii.current) {}
+		ChildrenIterator(ChildrenIterator&& ii): Base(ii.current) {}
+		virtual ~ChildrenIterator() {}
 	};
 	static_assert(std::is_copy_constructible<ChildrenIterator<false>>::value, "");
 	static_assert(std::is_move_constructible<ChildrenIterator<false>>::value, "");
@@ -346,36 +363,34 @@ public:
 	static_assert(std::is_copy_constructible<ChildrenIterator<true>>::value, "");
 	static_assert(std::is_move_constructible<ChildrenIterator<true>>::value, "");
 	static_assert(std::is_destructible<ChildrenIterator<true>>::value, "");
-	
-	struct PathIterator: public BaseIterator {
+
+	/**
+	 * Iterator class for iterations from a given element to the root.
+	 */
+	struct PathIterator: public BaseIterator<PathIterator,false> {
 		friend Tree;
 	protected:
-		PathIterator(Node* root): BaseIterator(root) {}
-	public:
-		PathIterator(const PathIterator& ii): BaseIterator(ii.current) {}
-		PathIterator(PathIterator&& ii): BaseIterator(ii.current) {}
-		virtual ~PathIterator() {}
+		typedef BaseIterator<PathIterator,false> Base;
+		PathIterator(Node* root): Base(root) {}
 		PathIterator& next() {
 			if (this->current != nullptr) {
 				this->current = this->current->parent;
 			}
 			return *this;
 		}
-		PathIterator operator++() {
-			return next();
-		}
-		PathIterator operator++(int) {
-			return next();
-		}
+	public:
+		PathIterator(const PathIterator& ii): Base(ii.current) {}
+		PathIterator(PathIterator&& ii): Base(ii.current) {}
+		virtual ~PathIterator() {}
 	};
 	static_assert(std::is_copy_constructible<PathIterator>::value, "");
 	static_assert(std::is_move_constructible<PathIterator>::value, "");
 	static_assert(std::is_destructible<PathIterator>::value, "");
-	
+
 	Tree() {
 		root = nullptr;
 	}
-	
+
 	PreorderIterator<false> begin_preorder() const {
 		return PreorderIterator<false>(root);
 	}
@@ -432,61 +447,115 @@ public:
 	DepthIterator<true> rend_depth() const {
 		return DepthIterator<true>();
 	}
-	ChildrenIterator<false> begin_children(const BaseIterator& it) const {
+	template<typename Iterator>
+	ChildrenIterator<false> begin_children(const Iterator& it) const {
 		return ChildrenIterator<false>(it.current);
 	}
 	ChildrenIterator<false> end_children() const {
 		return ChildrenIterator<false>();
 	}
-	ChildrenIterator<true> rbegin_children(const BaseIterator& it) const {
+	template<typename Iterator>
+	ChildrenIterator<true> rbegin_children(const Iterator& it) const {
 		return ChildrenIterator<true>(it.current);
 	}
 	ChildrenIterator<true> rend_children() const {
 		return ChildrenIterator<true>();
 	}
-	PathIterator begin_path(const BaseIterator& it) const {
+	template<typename Iterator>
+	PathIterator begin_path(const Iterator& it) const {
 		return PathIterator(it.current);
 	}
 	PathIterator end_path() const {
 		return PathIterator(nullptr);
 	}
-	
-	BaseIterator setRoot(const T& data) {
+
+	/**
+	 * Retrieves the maximum depth of all elements.
+     * @return Maximum depth.
+     */
+	std::size_t max_depth() const {
+		std::size_t max = 0;
+		for (auto it = begin_leaf(); it != end_leaf(); ++it) {
+			if (it.depth() > max) max = it.depth();
+		}
+		return max;
+	}
+
+	/**
+	 * Sets the value of the root element.
+     * @param data Data.
+     * @return Iterator to the root.
+     */
+	PreorderIterator<> setRoot(const T& data) {
 		if (root == nullptr) root = new Node(data, nullptr);
 		else root->data = data;
-		return BaseIterator(root);
+		return PreorderIterator<>(root);
 	}
+	/**
+	 * Clears the tree.
+     */
 	void clear() {
 		delete root;
 		root = nullptr;
 	}
-	BaseIterator insert(const T& data) {
+	/**
+	 * Add the given data as last child of the root element.
+     * @param data Data.
+     * @return Iterator to inserted element.
+     */
+	PreorderIterator<> insert(const T& data) {
 		if (root == nullptr) setRoot(T());
-		return insert(BaseIterator(root), data);
+		return insert(PreorderIterator<>(root), data);
 	}
-	BaseIterator insert(BaseIterator position, const T& data) {
+	/**
+	 * Add the given data as last child of the given element.
+     * @param position Element.
+     * @param data Data.
+     * @return Iterator to inserted element.
+     */
+	template<typename Iterator>
+	Iterator insert(Iterator position, const T& data) {
 		Node n(data, position.current);
 		std::size_t id = position.current->children.size();
 		if (id > 0) n.previousSibling = &(position.current->children.back());
 		position.current->children.push_back(n);
 		if (id > 0) n.previousSibling->nextSibling = &(position.current->children.back());
-		return BaseIterator(&(position.current->children.back()));
+		return Iterator(&(position.current->children.back()));
 	}
-	BaseIterator append(Tree&& tree) {
+	/**
+	 * Append another tree as last child of the root element.
+     * @param tree Tree.
+     * @return Iterator to root of inserted subtree.
+     */
+	PreorderIterator<> append(Tree&& tree) {
 		if (root == nullptr) std::swap(root, tree.root);
-		return append(BaseIterator(root), std::move(tree));
+		return append(PreorderIterator<>(root), std::move(tree));
 	}
-	BaseIterator append(BaseIterator position, Tree&& data) {
+	/**
+	 * Append another tree as last child of the given element.
+	 * @param position Element.
+     * @param tree Tree.
+     * @return Iterator to root of inserted subtree.
+     */
+	template<typename Iterator>
+	Iterator append(Iterator position, Tree&& data) {
 		Node* r = data.root;
+		r->updateDepth(position.depth() + 1);
 		data.root = nullptr;
 		r->parent = position.current;
 		std::size_t id = position.current->children.size();
 		if (id > 0) r->previousSibling = &(position.current->children.back());
 		position.current->children.push_back(*r);
 		if (id > 0) r->previousSibling->nextSibling = &(position.current->children.back());
-		return BaseIterator(&(position.current->children.back()));
+		return Iterator(&(position.current->children.back()));
 	}
-	
+
+	/**
+	 * Erase the element at the given position.
+	 * Returns an iterator to the next position.
+     * @param position Element.
+     * @return Next element.
+     */
 	template<typename Iterator>
 	Iterator erase(Iterator position) {
 		eraseChildren(position);
@@ -504,10 +573,14 @@ public:
 		}
 		return position;
 	}
-	void eraseChildren(const BaseIterator& position) {
+	/**
+	 * Erase all children of the given element.
+     * @param position Element.
+     */
+	template<typename Iterator>
+	void eraseChildren(const Iterator& position) {
 		position.current->children.clear();
 	}
-	
 
 	template<typename TT>
 	friend std::ostream& operator<<(std::ostream& os, const Tree<TT>& tree) {
@@ -515,16 +588,6 @@ public:
 			os << std::string(it.depth(), '\t') << *it << std::endl;
 		}
 		return os;
-	}
-	
-	void dump(std::ostream& os, const Node& cur) const {
-		os << cur.data << " next " << cur.nextSibling << " prev " << cur.previousSibling << " depth " << cur.depth << std::endl;
-		for (const auto& c: cur.children) dump(os, c);
-	}
-	
-	void dump(std::ostream& os) const {
-		if (root == nullptr) return;
-		dump(os, *root);
 	}
 };
 
