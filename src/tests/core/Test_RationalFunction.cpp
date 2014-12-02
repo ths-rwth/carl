@@ -31,6 +31,8 @@ TEST(RationalFunction, Construction)
     Pol p4 = p3;
     p4 *= Pol::CoeffType(-1);
     p4 += Pol::CoeffType(1);
+    Pol p5 = sp.parseMultivariatePolynomial<Rational>("2184*x^17+15708*x+(-126672)*x^2+643384*x^3+(-2306444)*x^4+4162512*x^13+(-10186920)*x^12+18820800*x^11+(-27118448)*x^10+31123477*x^9+6199788*x^5+(-12956461)*x^6+21524503*x^7+(-28784511)*x^8+(-1226048)*x^14+245224*x^15+(-31192)*x^16+(-924)");
+    Pol p6 = sp.parseMultivariatePolynomial<Rational>("3360*x^16+(-33600)*x^13+33600*x^14+(-16800)*x^15+16800*x^12+(-3360)*x^11");
     
     RFunc r1(p1, p2);
     EXPECT_EQ(p1, r1.nominator());
@@ -41,11 +43,15 @@ TEST(RationalFunction, Construction)
     std::cout << "Construct rational function from " << p4 << " leads to " << r2 << std::endl; 
     EXPECT_EQ(p4, r2.nominator());
     
+    RFunc r3(p5, p6);
+    
     std::shared_ptr<CachePol> pCache( new CachePol );
     
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
     FPol fp3(p4, pCache);
+    FPol fp5(p5, pCache);
+    FPol fp6(p6, pCache);
     
     RFactFunc rf1(fp1, fp2);
     EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
@@ -55,6 +61,8 @@ TEST(RationalFunction, Construction)
     RFactFunc rf2(fp3);
     std::cout << "Construct factorized rational function from " << p4 << " leads to " << r2 << std::endl; 
     EXPECT_EQ(p4, computePolynomial(rf2.nominator()));
+    
+    RFactFunc rf3(fp5, fp6);
 }
 
 TEST(RationalFunction, Multiplication)

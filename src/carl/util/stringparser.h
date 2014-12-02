@@ -259,13 +259,25 @@ namespace carl
 		template<typename C>
 		C constructCoefficient(const std::string& inputString) const
 		{
+            std::string inputStringCopy = inputString;
+            assert(!inputStringCopy.empty());
+            if( inputStringCopy[0] == '(' )
+            {
+                assert(inputStringCopy.back() == ')');
+                inputStringCopy = inputStringCopy.substr( 1, inputStringCopy.size()-2 );
+            }
+            assert(!inputStringCopy.empty());
+            if( inputStringCopy[0] == '-' )
+            {
+                inputStringCopy = inputStringCopy.substr( 1, inputStringCopy.size()-1 );
+            }
 			try
 			{
-				return rationalize<C>(inputString);
+				return rationalize<C>(inputStringCopy);
 			}
 			catch(std::exception& e)
 			{
-				throw InvalidInputStringException("Could not build coefficient", inputString);
+				throw InvalidInputStringException("Could not build coefficient", inputStringCopy);
 			}
 			
 		}
