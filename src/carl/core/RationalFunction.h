@@ -189,7 +189,7 @@ namespace carl
         /**
          * @return The nominator as a polynomial.
          */
-        inline const CoeffType& nominatorAsNumber() const
+        inline CoeffType nominatorAsNumber() const
         {
             assert( isConstant() );
             return carl::getDenom(mNumberQuotient);
@@ -198,7 +198,7 @@ namespace carl
         /**
          * @return  The denominator as a polynomial.
          */
-        inline const CoeffType& denominatorAsNumber() const
+        inline CoeffType denominatorAsNumber() const
         {
             assert( isConstant() );
             return carl::getNum(mNumberQuotient);
