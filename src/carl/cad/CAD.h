@@ -40,7 +40,8 @@
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicPoint.h"
 #include "../core/Variable.h"
-#include "../util/tree.h"
+//#include "../util/tree.h"
+#include "../util/carlTree.h"
 
 #include "CADTypes.h"
 #include "CADSettings.h"
@@ -63,7 +64,7 @@ public:
 	typedef carl::cad::MPolynomial<Number> MPolynomial;
 
 	/// Type of an iterator over the samples.
-	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
+	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
 	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
 private:
@@ -75,7 +76,7 @@ private:
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
-	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
+	carl::Tree<RealAlgebraicNumberPtr<Number>> sampleTree;
 
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)
@@ -666,7 +667,7 @@ public:
 	template<typename It>
 	bool isSampleConsistent(It node) const {
 		bool lastRoot = false;
-		for (auto cur = node.begin(); cur != node.end(); cur++) {
+		for (auto cur = sampleTree.begin_children(node); cur != sampleTree.end_children(node); cur++) {
 			if ((*cur)->isRoot() && lastRoot) return false;
 			lastRoot = (*cur)->isRoot();
 			if (!isSampleConsistent(cur)) return false;

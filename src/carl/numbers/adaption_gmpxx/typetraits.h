@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../../util/platform.h"
+#include <cstddef>
 CLANG_WARNING_DISABLE("-Wsign-conversion")
 #include <gmpxx.h>
 CLANG_WARNING_RESET
