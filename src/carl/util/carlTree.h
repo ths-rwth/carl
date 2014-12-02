@@ -69,9 +69,9 @@ protected:
 		friend Tree;
 	protected:
 		const Tree<T>* tree;
-		std::size_t current;
 		BaseIterator(const Tree<T>* t, std::size_t root): tree(t), current(root) {}
 	public:
+		std::size_t current;
 		BaseIterator(const BaseIterator& ii): tree(ii.tree), current(ii.current) {}
 		BaseIterator(BaseIterator&& ii): tree(ii.tree), current(ii.current) {}
 		template<typename It, bool r>
@@ -118,7 +118,7 @@ protected:
 			return static_cast<Iterator*>(this)->previous();
 		}
 		template<typename I = Iterator>
-		typename std::enable_if<reverse,I>::type& operator-() {
+		typename std::enable_if<reverse,I>::type& operator--() {
 			return static_cast<Iterator*>(this)->next();
 		}
 		template<typename I = Iterator>
@@ -131,12 +131,12 @@ protected:
 		}
 	};
 public:
-	template<typename Iterator>
-	friend bool operator==(const Iterator& i1, const Iterator& i2) {
+	template<typename I, bool r>
+	friend bool operator==(const BaseIterator<I,r>& i1, const BaseIterator<I,r>& i2) {
 		return i1.current == i2.current;
 	}
-	template<typename Iterator>
-	friend bool operator!=(const Iterator& i1, const Iterator& i2) {
+	template<typename I, bool r>
+	friend bool operator!=(const BaseIterator<I,r>& i1, const BaseIterator<I,r>& i2) {
 		return i1.current != i2.current;
 	}
 
