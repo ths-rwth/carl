@@ -19,7 +19,7 @@
 
 namespace carl {
 
-#ifdef DEBUG
+#ifndef NDEBUG
 
 /**
  * Uses GDB to print a stack trace.

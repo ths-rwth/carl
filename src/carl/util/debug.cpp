@@ -17,12 +17,12 @@ void printStacktrace(bool interaction) {
 std::string last_assertion_string = "";
 int last_assertion_code = 23;
 
-#ifdef DEBUG
+#ifndef NDEBUG
 /**
  * Actual signal handler.
  */
 void handle_signal(int signal) {
-	printStacktrace(false);
+	//printStacktrace(false);
 	std::cerr << std::endl << "Catched SIGABRT " << signal << ", exiting with " << (last_assertion_code%256) << std::endl;
 	if (last_assertion_string.size() != 0) {
 		std::cerr << "Last Assertion catched is: " << last_assertion_string << std::endl;
@@ -34,8 +34,8 @@ void handle_signal(int signal) {
  * Installs the signal handler.
  */
 bool install_signal_handler() {
-	//LOGMSG_INFO("carl.util", "Installing signal handler for SIGABRT");
-	//std::signal(SIGABRT, handle_signal);
+	LOGMSG_INFO("carl.util", "Installing signal handler for SIGABRT");
+	std::signal(SIGABRT, handle_signal);
 	return true;
 }
 /**
