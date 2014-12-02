@@ -36,7 +36,7 @@ CAD<Number>::CAD():
 		setting(cad::CADSettings::getSettings())
 {
 	// initialize root with empty node
-	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
+	this->sampleTree.setRoot(nullptr);
 }
 
 template<typename Number>
@@ -767,7 +767,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	 * - Add all Children of the level which are not present yet (merging).
 	 *
 	 */
-	int maxDepth = this->sampleTree.max_depth();
+	std::size_t maxDepth = this->sampleTree.max_depth();
 	auto sampleTreeRoot = this->sampleTree.begin();
 	for (int l = (int)dim - 1; l >= (int)level; l--) {
 		// iterate from the leaves to the root (more efficient if several levels are to be cleaned)
@@ -775,19 +775,12 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 			// there is nothing more to be done for this level, so erase all samples
 			unsigned depth = dim - (unsigned)l;
 			assert(maxDepth <= this->sampleTree.max_depth());
-			if ((int)depth <= maxDepth) {
+			if (depth <= maxDepth) {
 				// erase all samples on this level
-				auto node = this->sampleTree.begin_fixed(sampleTreeRoot, depth);
-				std::forward_list<typename tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
-				while (this->sampleTree.is_valid(node)) {
-					this->sampleTree.erase_children(node);
-					toDelete.push_front(node);
-					node = this->sampleTree.next_at_same_depth(node);
-				}
-				for (const auto& node: toDelete) {
+				for (auto node = this->sampleTree.begin_depth(depth); node != this->sampleTree.end_depth(); ++node) {
 					this->sampleTree.erase(node);
 				}
-				maxDepth = (int)depth-1;
+				maxDepth = depth-1;
 			}
 		}
 	}
@@ -1084,19 +1077,19 @@ std::list<RealAlgebraicNumberPtr<Number>> CAD<Number>::constructSampleAt(sampleI
 		while (node != root) {
 			if (!(*node)->isRoot()) return {};
 			v.push_back(*node);
-			node = this->sampleTree.parent(node);
+			node = this->sampleTree.get_parent(node);
 		}
 	} else if (this->setting.inequalitiesOnly) {
 		while (node != root) {
 			if ((*node)->isRoot()) return {};
 			v.push_back(*node);
-			node = this->sampleTree.parent(node);
+			node = this->sampleTree.get_parent(node);
 		}
 	} else {
 		while (node != root) {
 			assert(sampleTree.is_valid(node));
 			v.push_back(*node);
-			node = this->sampleTree.parent(node);
+			node = this->sampleTree.get_parent(node);
 			assert(sampleTree.is_valid(node));
 			assert(node != sampleTree.end());
 		}
@@ -1201,7 +1194,7 @@ bool CAD<Number>::mainCheck(
 	const unsigned dim = (unsigned)this->variables.size();
 	LOGMSG_TRACE("carl.cad", "mainCheck: dimension is " << dim);
 	auto sampleTreeRoot = this->sampleTree.begin();
-	int tmp = this->sampleTree.max_depth(sampleTreeRoot);
+	std::size_t tmp = this->sampleTree.max_depth(sampleTreeRoot);
 	assert(tmp >= 0);
 	unsigned maxDepth = (unsigned)tmp;
 	// if the elimination sets were extended (i.e. the sample tree is not developed completely), we obtain new samples already in phase one
@@ -1317,7 +1310,7 @@ bool CAD<Number>::mainCheck(
 		unsigned depth = (unsigned)((int)dim - level - 1);
 		assert(depth >= 0 && depth < dim);
 		assert(depth <= (unsigned)this->sampleTree.max_depth());
-		for (auto node = this->sampleTree.begin_fixed(sampleTreeRoot, depth); this->sampleTree.is_valid(node) && (int)depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
+		for (auto node = this->sampleTree.begin_depth(depth); node != this->sampleTree.end_depth(); ++node) {
 			// traverse all nodes at depth, i.e., sample points of dimension dim - level - 1 equaling the number of coefficient variables of the lifting position at level
 			std::list<RealAlgebraicNumberPtr<Number>> sampleList = this->constructSampleAt(node, sampleTreeRoot);
 			// no degenerate sample points are considered here because they were already discarded in Phase 2
@@ -1374,9 +1367,9 @@ bool CAD<Number>::mainCheck(
 template<typename Number>
 typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node) {
 	//LOG_FUNC("carl.cad", newSample << ", " << *node);
-	sampleIterator newNode = std::lower_bound(this->sampleTree.begin(node), this->sampleTree.end(node), newSample, carl::less<RealAlgebraicNumberPtr<Number>>());
-	if (newNode == this->sampleTree.end(node)) {
-		newNode = this->sampleTree.append_child(node, newSample);
+	auto newNode = std::lower_bound(this->sampleTree.begin_children(node), this->sampleTree.end_children(node), newSample, carl::less<RealAlgebraicNumberPtr<Number>>());
+	if (newNode == this->sampleTree.end_children(node)) {
+		newNode = this->sampleTree.insert(node, newSample);
 	} else if (carl::equal_to<RealAlgebraicNumberPtr<Number>>()(*newNode, newSample)) {
 		newNode = this->sampleTree.replace(newNode, newSample);
 	} else {
@@ -1464,7 +1457,7 @@ bool CAD<Number>::liftCheck(
 	bool computeMoreSamples = false;
 	// the current list of samples at this position in the sample tree
 	cad::SampleSet<Number> currentSamples(setting.sampleOrdering);
-	currentSamples.insert(this->sampleTree.begin(node), this->sampleTree.end(node));
+	currentSamples.insert(this->sampleTree.begin_children(node), this->sampleTree.end_children(node));
 	// the current samples queue for this lifting process
 	cad::SampleSet<Number> sampleSetIncrement(setting.sampleOrdering);
 	std::forward_list<RealAlgebraicNumberPtr<Number>> replacedSamples;
@@ -1818,7 +1811,7 @@ void CAD<Number>::trimVariables() {
 			if (depth <= maxDepth) {
 				// remove the complete layer of samples from the sample tree at the given depth
 				// fix the iterators to be deleted in a separate list independent of merging with the children
-				std::queue<typename tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
+				std::queue<typename Tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
 				for (auto node = this->sampleTree.begin_fixed(this->sampleTree.begin(), depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
 					toDelete.push(node);
 				}
