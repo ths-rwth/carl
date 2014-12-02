@@ -54,7 +54,7 @@ CAD<Number>::CAD(cad::PolynomialOwner<Number>* parent):
 		setting(cad::CADSettings::getSettings())
 {
 	// initialize root with empty node
-	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
+	this->sampleTree.setRoot(nullptr);
 }
 
 template<typename Number>
