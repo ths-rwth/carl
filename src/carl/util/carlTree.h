@@ -781,7 +781,6 @@ public:
 			++position;
 			return position;
 		}
-		eraseChildren(id);
 		++position;
 		if (nodes[id].nextSibling != MAXINT) {
 			nodes[nodes[id].nextSibling].previousSibling = nodes[id].previousSibling;
@@ -846,7 +845,7 @@ private:
 		nodes[id].lastChild = MAXINT;
 	}
 	void eraseNode(std::size_t id) {
-		assert(nodes[id].firstChild == MAXINT);
+		eraseChildren(id);
 		nodes[id].nextSibling = emptyNodes;
 		nodes[id].previousSibling = MAXINT;
 	}
