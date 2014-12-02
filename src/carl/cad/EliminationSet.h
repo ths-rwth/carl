@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "../core/pointerOperations.h"
+#include "../util/pointerOperations.h"
 #include "../core/UnivariatePolynomial.h"
 #include "../core/logging.h"
 
@@ -94,7 +94,7 @@ private:
 	/**
 	 * A set of polynomials.
 	 */
-	typedef std::unordered_set<const UPolynomial*, carl::ptr_hash<UPolynomial>, std::equal_to<UPolynomial*>> PolynomialSet;
+	typedef std::unordered_set<const UPolynomial*, carl::hash<UPolynomial*>, carl::equal_to<UPolynomial*>> PolynomialSet;
 	//typedef std::set<const UPolynomial*> PolynomialSet;
 
 	/**

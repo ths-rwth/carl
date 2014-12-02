@@ -6,11 +6,11 @@
  */
 
 #include "RealAlgebraicNumberIR.h"
-#include "pointerOperations.h"
+#include "../util/pointerOperations.h"
 
 #pragma once
 
-namespace std {
+namespace carl {
 
 /**
  * Specialization of `std::equal_to` for RealAlgebraicNumberPtr.
@@ -86,24 +86,6 @@ struct equal_to<carl::RealAlgebraicNumberNRPtr<Number>> {
 };
 
 /**
- * Specialization of `std::not_equal_to` for RealAlgebraicNumberPtr.
- */
-template<typename Number>
-struct not_equal_to<carl::RealAlgebraicNumberPtr<Number>> {
-	/// Equality operator for RealAlgebraicNumberPtr.
-	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
-	/**
-	 * Calls `!eq(lhs, rhs)`.
-	 * @param lhs First number.
-	 * @param rhs Second number.
-	 * @return `lhs != rhs`.
-	 */
-	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
-		return !eq(lhs, rhs);
-	}
-};
-
-/**
  * Specialization of `std::less` for RealAlgebraicNumberPtr.
  */
 template<typename Number>
@@ -148,24 +130,6 @@ struct less<carl::RealAlgebraicNumberPtr<Number>> {
 				return std::const_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhsIR)->lessWhileUnequal(rhsIR);
 			}
 		}
-	}
-};
-
-/**
- * Specialization of `std::greater` for RealAlgebraicNumberPtr.
- */
-template<typename Number>
-struct greater<carl::RealAlgebraicNumberPtr<Number>> {
-	/// Less operator for RealAlgebraicNumberPtr.
-	std::less<carl::RealAlgebraicNumberPtr<Number>> less;
-	/**
-	 * Calls `less(rhs, lhs)`.
-	 * @param lhs First number.
-	 * @param rhs Second number.
-	 * @return `lhs > rhs`.
-	 */
-	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
-		return less(rhs, lhs);
 	}
 };
 
