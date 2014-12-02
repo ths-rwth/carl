@@ -78,11 +78,11 @@ namespace carl
         else if( this->isConstant() )
         {
             CoeffType c = this->mNumberQuotient;
-            *this = rhs;
             if(byInverse)
-                return *this -= c;
+                *this = -rhs;
             else
-                return *this += c;
+                *this = rhs;
+            return *this += c;
         }
         else if( rhs.isConstant() )
         {
