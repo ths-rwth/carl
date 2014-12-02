@@ -1,7 +1,7 @@
-#include <gmpxx.h>
 #include "gtest/gtest.h"
 #include "carl/util/stringparser.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include "carl/numbers/numbers.h"
 
 #include <type_traits>
 #include <typeinfo>

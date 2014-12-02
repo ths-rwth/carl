@@ -8,6 +8,7 @@
 
 #pragma once
 #include <functional>
+#include <cstddef>
 #include <gmpxx.h>
 
 namespace std

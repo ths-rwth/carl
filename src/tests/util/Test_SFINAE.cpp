@@ -1,6 +1,5 @@
-#include <gmpxx.h>
 #include "gtest/gtest.h"
-#include "carl/numbers/GFNumber.h"
+#include "carl/numbers/numbers.h"
 #include "carl/util/SFINAE.h"
 
 #include <type_traits>

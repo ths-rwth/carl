@@ -1,4 +1,3 @@
-#include <gmpxx.h>
 #include "gtest/gtest.h"
 #include "../../carl/numbers/numbers.h"
 #include "../../carl/numbers/adaption_native/EEA.h"
