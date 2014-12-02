@@ -266,11 +266,6 @@ namespace carl
                 assert(inputStringCopy.back() == ')');
                 inputStringCopy = inputStringCopy.substr( 1, inputStringCopy.size()-2 );
             }
-            assert(!inputStringCopy.empty());
-            if( inputStringCopy[0] == '-' )
-            {
-                inputStringCopy = inputStringCopy.substr( 1, inputStringCopy.size()-1 );
-            }
 			try
 			{
 				return rationalize<C>(inputStringCopy);
