@@ -37,7 +37,7 @@ Supported platforms
 --------------------------------------------
 We have tested carl successfully on the following platforms:
 
-- @if Gereon @endif     Arch Linux (Kernel 3.16.2) with Clang 3.5.0 and GCC 4.9.1
+- @if Gereon @endif     Arch Linux (Kernel 3.17.4) with Clang 3.5.0 and GCC 4.9.2
 - @if Florian @endif    Ubuntu 12.04 LTS with GCC 4.8.1
 - @if Florian @endif    MacOSX 10.9 with Clang 3.3
 - @if Stefan @endif		MacOSX 10.9.1 with Clang 3.3
