@@ -128,7 +128,15 @@ namespace carl
         {
             mIsSimplified = _rf.mIsSimplified;
             mNumberQuotient = _rf.mNumberQuotient;
-            if( !_rf.isConstant() )
+            if( _rf.isConstant() )
+            {
+                if( !isConstant() )
+                {
+                    delete mPolynomialQuotient;
+                    mPolynomialQuotient = nullptr;
+                }
+            }
+            else
             {
                 mPolynomialQuotient = new std::pair<Pol,Pol>(_rf.nominatorAsPolynomial(), _rf.denominatorAsPolynomial());
             }
@@ -139,7 +147,15 @@ namespace carl
         {
             mIsSimplified = _rf.mIsSimplified;
             mNumberQuotient = _rf.mNumberQuotient;
-            if( !_rf.isConstant() )
+            if( _rf.isConstant() )
+            {
+                if( !isConstant() )
+                {
+                    delete mPolynomialQuotient;
+                    mPolynomialQuotient = nullptr;
+                }
+            }
+            else
             {
                 mPolynomialQuotient = _rf.mPolynomialQuotient;
                 _rf.mPolynomialQuotient = nullptr;

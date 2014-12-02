@@ -203,8 +203,10 @@ TEST(FactorizedPolynomial, Construction)
     FPol fpMul3 = fc4 * fpB;
     std::cout << fpMul3 << std::endl;
     EXPECT_EQ( fMul3, computePolynomial( fpMul3 ) );
+    std::cout << "fMul4 = " << c2 << " * " << c3 << " = ";
     Pol fMul4 = c2 * c3;
-    std::cout << fc2 << " * " << fc3 << ": ";
+    std::cout << fMul4 << std::endl;
+    std::cout << "fpMul4 = " << fc2 << " * " << fc3 << " = ";
     FPol fpMul4 = fc2 * fc3;
     std::cout << fpMul4 << std::endl;
     EXPECT_EQ( fMul4, computePolynomial( fpMul4 ) );

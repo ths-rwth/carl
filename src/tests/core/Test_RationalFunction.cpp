@@ -27,21 +27,42 @@ TEST(RationalFunction, Construction)
     sp.setVariables({"x", "y", "z"});
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("5*y + 3*x");
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol p4 = p3;
+    p4 *= Pol::CoeffType(-1);
+    p4 += Pol::CoeffType(1);
+    Pol p5 = sp.parseMultivariatePolynomial<Rational>("2184*x^17+15708*x+(-126672)*x^2+643384*x^3+(-2306444)*x^4+4162512*x^13+(-10186920)*x^12+18820800*x^11+(-27118448)*x^10+31123477*x^9+6199788*x^5+(-12956461)*x^6+21524503*x^7+(-28784511)*x^8+(-1226048)*x^14+245224*x^15+(-31192)*x^16+(-924)");
+    Pol p6 = sp.parseMultivariatePolynomial<Rational>("3360*x^16+(-33600)*x^13+33600*x^14+(-16800)*x^15+16800*x^12+(-3360)*x^11");
     
     RFunc r1(p1, p2);
     EXPECT_EQ(p1, r1.nominator());
     EXPECT_EQ(p2, r1.denominator());
     EXPECT_FALSE(r1.isZero());
     
+    RFunc r2(p4);
+    std::cout << "Construct rational function from " << p4 << " leads to " << r2 << std::endl; 
+    EXPECT_EQ(p4, r2.nominator());
+    
+    RFunc r3(p5, p6);
+    
     std::shared_ptr<CachePol> pCache( new CachePol );
     
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
+    FPol fp3(p4, pCache);
+    FPol fp5(p5, pCache);
+    FPol fp6(p6, pCache);
     
     RFactFunc rf1(fp1, fp2);
     EXPECT_EQ(computePolynomial(fp1), computePolynomial(rf1.nominator()));
     EXPECT_EQ(computePolynomial(fp2), computePolynomial(rf1.denominator()));
     EXPECT_FALSE(rf1.isZero());
+    
+    RFactFunc rf2(fp3);
+    std::cout << "Construct factorized rational function from " << p4 << " leads to " << r2 << std::endl; 
+    EXPECT_EQ(p4, computePolynomial(rf2.nominator()));
+    
+    RFactFunc rf3(fp5, fp6);
 }
 
 TEST(RationalFunction, Multiplication)
@@ -148,26 +169,40 @@ TEST(RationalFunction, Subtraction)
     carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x"});
-
+    
+    Pol p0 = sp.parseMultivariatePolynomial<Rational>("1");
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("1");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("1");
 
     Pol p3 = sp.parseMultivariatePolynomial<Rational>("1+x");
     Pol p4 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol p7 = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol p6 = p7;
+    p6 *= Pol::CoeffType(-1);
+    p6 += Pol::CoeffType(1);
 
     RFunc r1(p1, p2);
     RFunc r2(p3, p4);
 
     RFunc r3 = r1 - r2;
     EXPECT_EQ(p4, r3.denominator());
+    
+    RFunc r4(p0);
+    RFunc r5(p7);
+    RFunc r6 = r4 - r5;
+    std::cout << "Calculate: " << r4 << " - " << r5 << " = " << r6 << std::endl;
+    EXPECT_EQ(p6, r6.nominator());
 
     std::shared_ptr<CachePol> pCache( new CachePol );
 
+    FPol fp0(p0, pCache);
     FPol fp1(p1, pCache);
     FPol fp2(p2, pCache);
 
     FPol fp3(p3, pCache);
     FPol fp4(p4, pCache);
+    FPol fp6(p6, pCache);
+    FPol fp7(p7, pCache);
 
     RFactFunc rf1(fp1, fp2);
     RFactFunc rf2(fp3, fp4);
@@ -175,6 +210,12 @@ TEST(RationalFunction, Subtraction)
     RFactFunc rf3 = rf1 - rf2;
     FPol tmp = fp1 - fp3;
     EXPECT_EQ(computePolynomial(fp4), computePolynomial(rf3.denominator()));
+    
+    RFactFunc rf4(fp0);
+    RFactFunc rf5(fp7);
+    RFactFunc rf6 = rf4 - rf5;
+    std::cout << "Calculate: " << rf4 << " - " << rf5 << " = " << rf6 << std::endl;
+    EXPECT_EQ(fp6, rf6.nominator());
 }
 
 TEST(RationalFunction, Hash)
