@@ -370,7 +370,6 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
-        std::cout << _fpolyA << " - " << _fpolyB << std::endl;
         ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
         const Coeff<P>& coefficient = -_fpolyB.coefficient();
         if ( existsFactorization( _fpolyB ) )
@@ -382,7 +381,6 @@ namespace carl
         else
         {
             FactorizedPolynomial<P> result = _fpolyA + FactorizedPolynomial<P>( coefficient );
-            std::cout << "results in " << result << std::endl;
             assert( computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) == computePolynomial( result ) );
             return std::move( result );
         }
