@@ -22,7 +22,7 @@ namespace carl
 template<typename Polynomial>
 class TermAdditionManager {
 public:
-	typedef unsigned short IDType;
+	typedef unsigned IDType;
 	typedef typename Polynomial::CoeffType Coeff;
 	typedef Term<Coeff> TermType;
 	typedef TermType TermPtr;
