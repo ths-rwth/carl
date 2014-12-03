@@ -114,15 +114,19 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
  * @param finder Root finder.
  */
 template<typename Number>
-void buildIsolation(std::vector<double>& roots, const Interval<Number>& interval, RootFinder<Number>& finder) {
+void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& interval, RootFinder<Number>& finder) {
 	assert(interval.lower() < interval.upper());
-	std::sort(roots.begin(), roots.end());
-	for (auto it = roots.begin(); it != roots.end(); ) {
-		if (!isNumber(*it)) roots.erase(it);
-		else it++;
+	std::sort(doubleRoots.begin(), doubleRoots.end());
+	auto it = std::unique(doubleRoots.begin(), doubleRoots.end());
+	doubleRoots.resize((size_t)std::distance(doubleRoots.begin(), it));
+	std::vector<Number> roots;
+	for (auto it = doubleRoots.begin(); it != doubleRoots.end(); it++) {
+		if (!isNumber(*it)) continue;
+		Number n = carl::rationalize<Number>(*it);
+		if (!interval.contains(n)) continue;
+		if (roots.size() > 0 && n - roots.back() < 1) continue;
+		roots.push_back(n);
 	}
-	auto it = std::unique(roots.begin(), roots.end());
-	roots.resize((size_t)std::distance(roots.begin(), it));
 
 	std::vector<Number> res;
 	res.reserve(roots.size() + 3);
@@ -130,26 +134,24 @@ void buildIsolation(std::vector<double>& roots, const Interval<Number>& interval
 	try {
 		res.push_back(interval.lower());
 		if (roots.size() == 1) {
-			Number tmp = carl::rationalize<Number>(carl::floor(roots[0]));
+			Number tmp = carl::floor(roots[0]);
 			if (interval.contains(tmp)) res.push_back(tmp);
-			tmp = carl::rationalize<Number>(carl::ceil(roots[0]));
+			tmp = carl::ceil(roots[0]);
 			if (interval.contains(tmp)) res.push_back(tmp);
-		} else {
-			Number tmp = carl::rationalize<Number>(2 * roots[0] - roots[1]);
+		} else if (roots.size() > 1) {
+			Number tmp = 2 * roots[0] - roots[1];
 			if (interval.contains(tmp)) res.push_back(tmp);
 			for (unsigned int i = 0; i < roots.size()-1; i++) {
-				Number tmp = carl::rationalize<Number>(roots[i]);
-				if (interval.contains(tmp) && finder.getPolynomial().evaluate(tmp) == 0) {
-					res.push_back(tmp);
+				if (interval.contains(roots[i]) && finder.getPolynomial().evaluate(roots[i]) == 0) {
+					res.push_back(roots[i]);
 				}
-				tmp = carl::rationalize<Number>(Interval<double>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample());
+				Number tmp = Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample();
 				if (interval.contains(tmp)) res.push_back(tmp);
 			}
-			tmp = carl::rationalize<Number>(roots.back());
-			if (interval.contains(tmp) && finder.getPolynomial().evaluate(tmp) == 0) {
-				res.push_back(tmp);
+			if (interval.contains(roots.back()) && finder.getPolynomial().evaluate(roots.back()) == 0) {
+				res.push_back(roots.back());
 			}
-			tmp = carl::rationalize<Number>(2 * roots.back() - roots[roots.size()-2]);
+			tmp = 2 * roots.back() - roots[roots.size()-2];
 			if (interval.contains(tmp)) res.push_back(tmp);
 		}
 		res.push_back(interval.upper());
@@ -242,11 +244,12 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	// Save real parts to tmp
 	std::vector<double> tmp((size_t)eigenvalues.size());
 	for (unsigned int i = 0; i < eigenvalues.size(); i++) {
-		tmp[i] = eigenvalues[i].real();
+		if (eigenvalues[i].imag() > eigenvalues[i].real() / 4) tmp[i] = 0;
+		else tmp[i] = eigenvalues[i].real();
 	}
 	
 	// Build isolation
-	buildIsolation(tmp, interval, finder);
+	buildIsolation(std::move(tmp), interval, finder);
 }
 
 }
