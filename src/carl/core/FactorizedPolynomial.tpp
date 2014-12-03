@@ -629,7 +629,7 @@ namespace carl
             assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
             return std::move( result );
         }
-        LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "Compute LCM of " << _fpolyA << " and " << _fpolyB );
+        CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "Compute LCM of " << _fpolyA << " and " << _fpolyB );
 
         //Both polynomials are not constant
         Factorization<P> restAFactorization, restBFactorization;
@@ -659,7 +659,7 @@ namespace carl
 
         coefficientLCM *= distributeCoefficients( lcmFactorization );
         FactorizedPolynomial<P> result( std::move( lcmFactorization ), coefficientLCM, _fpolyA.pCache() );
-        LOGMSG_DEBUG( "carl.core.factorizedpolynomial", "LCM of " << _fpolyA << " and " << _fpolyB << ": " << result);
+        CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "LCM of " << _fpolyA << " and " << _fpolyB << ": " << result);
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyA ) ).isZero() );
         assert( computePolynomial( result ).remainder( computePolynomial( _fpolyB ) ).isZero() );
         return std::move( result );

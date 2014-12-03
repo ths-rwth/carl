@@ -48,7 +48,7 @@ class DiophantineEquations
 		//Integer a_v = I.rend()->second;
 		if(v > 1)
 		{
-			LOG_NOTIMPLEMENTED();
+			CARL_LOG_NOTIMPLEMENTED();
 		}
 		else
 		{
@@ -130,17 +130,17 @@ class DiophantineEquations
 	std::vector<Polynomial> EEAlift(Polynomial a, Polynomial b) const
 	{
 		assert(a.mainVar() == b.mainVar());
-		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: a=" << a << ", b=" << b );
+		CARL_LOG_DEBUG("carl.core.hensel", "EEALIFT: a=" << a << ", b=" << b );
 		const Variable& x = a.mainVar();
 		Polynomial amodp = a.toFiniteDomain(mGf_p);
 		Polynomial bmodp = b.toFiniteDomain(mGf_p);
-		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: a mod p=" << amodp << ", b mod p=" << bmodp );
+		CARL_LOG_DEBUG("carl.core.hensel", "EEALIFT: a mod p=" << amodp << ", b mod p=" << bmodp );
 		Polynomial s(x);
 		Polynomial t(x);
 		Polynomial g(x);
 		g = Polynomial::extended_gcd(amodp,bmodp,s,t);
-		LOGMSG_DEBUG("carl.core.hensel", "EEALIFT: g=" << g << ", s=" << s << ", t=" << t );
-		LOG_ASSERT("carl.core.hensel", g.isOne(), "g expected to be one");
+		CARL_LOG_DEBUG("carl.core.hensel", "EEALIFT: g=" << g << ", s=" << s << ", t=" << t );
+		CARL_LOG_ASSERT("carl.core.hensel", g.isOne(), "g expected to be one");
 		Polynomial smodp = s;
 		Polynomial tmodp = t;
 		assert( mGf_p->p() == mGf_pk->p());

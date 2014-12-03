@@ -800,7 +800,7 @@ public:
 		eraseChildren(position.current);
 	}
 	template<typename TT>
-	friend std::ostream& operator<<(std::ostream& os, Tree<TT>& tree) {
+	friend std::ostream& operator<<(std::ostream& os, const Tree<TT>& tree) {
 		for (auto it = tree.begin_preorder(); it != tree.end_preorder(); it++) {
 			os << std::string(it.depth(), '\t') << *it << std::endl;
 		}

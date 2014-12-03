@@ -8,8 +8,8 @@ namespace logging {
 
 void setInitialLogLevel()
 {
-	carl::logging::logger().configure("logfile", "carl.log");
-	carl::logging::logger().filter("logfile")
+	carl::logging::logger().configure("carl_logfile", "carl.log");
+	carl::logging::logger().filter("carl_logfile")
 		("carl", carl::logging::LogLevel::LVL_INFO)
 		("carl.cad", carl::logging::LogLevel::LVL_TRACE)
 		("carl.cad.dot.elimination", carl::logging::LogLevel::LVL_INFO)

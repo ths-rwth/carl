@@ -48,16 +48,16 @@ public:
 	}
 	
 	void log(const std::string& id, const std::string& s) {
-		LOGMSG_TRACE("carl.cad.dot." + id, s);
+		CARL_LOG_TRACE("carl.cad.dot." + id, s);
 	}
 	
 	void node(const std::string& id, const std::string& name, const std::string& options) {
-		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name << "\" [" << options << "];");
+		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << name << "\" [" << options << "];");
 	}
 	template<typename Coeff>
 	void node(const std::string& id, const carl::cad::UPolynomial<Coeff>* name, const std::string& options) {
 		if (name->isZero()) return;
-		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name->mainVar() << ":" << *name << "\" [" << options << "];");
+		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << name->mainVar() << ":" << *name << "\" [" << options << "];");
 	}
 
 	template<typename Coeff>
@@ -71,7 +71,7 @@ public:
 	template<typename Coeff>
 	void edge(const std::string& id, const carl::cad::UPolynomial<Coeff>& from, const carl::cad::UPolynomial<Coeff>& to, const std::string& options = "") {
 		if (to.isZero()) return;
-		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << from.mainVar() << ":" << from << "\" -> \"" << to.mainVar() << ":" << to << "\" [" << options << "];");
+		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << from.mainVar() << ":" << from << "\" -> \"" << to.mainVar() << ":" << to << "\" [" << options << "];");
 	}
 	template<typename Coeff>
 	void hyperedge(const std::string& id, const std::initializer_list<const carl::cad::UPolynomial<Coeff>*>& from, const carl::cad::UPolynomial<Coeff>* to) {
@@ -91,17 +91,17 @@ public:
 			std::vector<const carl::cad::UPolynomial<Coeff>*> hashes(from.begin(), from.end());
 			std::sort(hashes.begin(), hashes.end());
 			for (auto h: hashes) name << h;
-			LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name.str() << "\" [shape=point];");
+			CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << name.str() << "\" [shape=point];");
 			for (auto f: from) {
-				LOGMSG_TRACE("carl.cad.dot." + id, "\"" << f->mainVar() << ":" << *f << "\" -> \""<< name.str() << "\";");
+				CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << f->mainVar() << ":" << *f << "\" -> \""<< name.str() << "\";");
 			}
-			LOGMSG_TRACE("carl.cad.dot." + id, "\"" << name.str() << "\" -> \"" << to.mainVar() << ":" << to << "\";");
+			CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << name.str() << "\" -> \"" << to.mainVar() << ":" << to << "\";");
 		}
 	}
 
 	template<typename Coeff>
 	void sample(const std::string& id, const carl::RealAlgebraicNumberPtr<Coeff>& s, const carl::RealAlgebraicNumberPtr<Coeff>& p) {
-		LOGMSG_TRACE("carl.cad.dot." + id, "\"" << p << "\" -> \"" << s << "\";");
+		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << p << "\" -> \"" << s << "\";");
 	}
 };
 

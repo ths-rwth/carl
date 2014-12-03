@@ -16,7 +16,7 @@ namespace carl
 	Monomial::Arg Monomial::dropVariable(Variable::Arg v) const
 	{
 		///@todo this should work on the shared_ptr directly. Then we could directly return this shared_ptr instead of the ugly copying.
-		LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
+		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << v);
 		auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 
 		if (it == mExponents.cend())
@@ -57,7 +57,7 @@ namespace carl
 	
 	bool Monomial::divide(const Monomial::Arg& m, Monomial::Arg& res) const
 	{
-		LOG_FUNC("carl.core.monomial", *this << ", " << m);
+		CARL_LOG_FUNC("carl.core.monomial", *this << ", " << m);
 		if (!m) {
 			res = std::make_shared<const Monomial>(mHash, mExponents, mTotalDegree);
 			return true;
@@ -65,7 +65,7 @@ namespace carl
 		if(m->mTotalDegree > mTotalDegree || m->mExponents.size() > mExponents.size())
 		{
 			// Division will fail.
-			LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 			return false;
 		}
 		std::vector<std::pair<Variable, exponent>> newExps;
@@ -80,7 +80,7 @@ namespace carl
 				// Insert remaining part
 				newExps.insert(newExps.end(), itleft, mExponents.end());
 				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
-				LOGMSG_TRACE("carl.core.monomial", "Result: " << res);
+				CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
 				return true;
 			}
 			// Variable is present in both monomials.
@@ -89,7 +89,7 @@ namespace carl
 				if (itleft->second < itright->second)
 				{
 					// Underflow, itright->exp was larger than itleft->exp.
-					LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+					CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 					return false;
 				}
 				exponent newExp = itleft->second - itright->second;
@@ -102,7 +102,7 @@ namespace carl
 			// Variable is not present in lhs, division fails.
 			else if(itleft->first < itright->first) 
 			{
-				LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+				CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 				return false;
 			}
 			else
@@ -114,17 +114,17 @@ namespace carl
 		// If there remain variables in the m, it fails.
 		if(itright != m->mExponents.end())
 		{
-			LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 			return false;
 		}
 		if (newExps.empty())
 		{
-			LOGMSG_TRACE("carl.core.monomial", "Result: nullptr");
+			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 			res = nullptr;
 			return true;
 		}
 		res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << res);
+		CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
 		return true;
 	}
 	
@@ -236,7 +236,7 @@ namespace carl
             if(!lhs) return rhs;
             if(!rhs) return lhs;
 
-            LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
+            CARL_LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
             assert(lhs->isConsistent());
             assert(rhs->isConsistent());
 
@@ -272,7 +272,7 @@ namespace carl
             if (!newExps.empty()) {
 				result = createMonomial(std::move(newExps), expsum);
             }
-            LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+            CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
             return result;
 	}
 	
@@ -281,7 +281,7 @@ namespace carl
 		if (!lhs && !rhs) return nullptr;
 		if (!lhs) return rhs;
 		if (!rhs) return lhs;
-		LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
+		CARL_LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
 		assert(lhs->isConsistent());
 		assert(rhs->isConsistent());
 
@@ -299,7 +299,7 @@ namespace carl
 				// Insert remaining part
 				newExps.insert(newExps.end(), itleft, lhs->mExponents.end());
 				std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
-				LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+				CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
 				return result;
 			}
 			// Variable is present in both monomials.
@@ -328,13 +328,13 @@ namespace carl
 		 // Insert remaining part
 		newExps.insert(newExps.end(), itright, rhs->mExponents.end());
 		std::shared_ptr<const Monomial> result = MonomialPool::getInstance().create( std::move(newExps), expsum );
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+		CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
 		return result;
 	}
 	
 	bool Monomial::isConsistent() const
 	{
-		LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
+		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
 		if (mTotalDegree < 1) return false;
 		unsigned tdegree = 0;
 		Variable lastVar = Variable::NO_VARIABLE;
@@ -390,7 +390,7 @@ namespace carl
 	
 	Monomial::Arg operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs)
 	{
-		LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
+		CARL_LOG_FUNC("carl.core.monomial", lhs << ", " << rhs);
 		if(!lhs)
 			return rhs;
 		if(!rhs)
@@ -433,7 +433,7 @@ namespace carl
 		else if( itright != rhs->end() )
 			newExps.insert(newExps.end(), itright, rhs->end());
 		Monomial::Arg result = createMonomial(std::move(newExps), lhs->tdeg() + rhs->tdeg());
-		LOGMSG_TRACE("carl.core.monomial", "Result: " << result);
+		CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
 		return std::move(result);
 	}
 

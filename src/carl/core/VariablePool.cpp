@@ -18,7 +18,7 @@ VariablePool::VariablePool():
 	Singleton(),
 	mNextVarId(1)
 {
-	LOGMSG_INFO("carl.varpool", "Constructor called");
+	CARL_LOG_INFO("carl.varpool", "Constructor called");
 }
 
 Variable VariablePool::getFreshVariable(VariableType type) {
@@ -27,7 +27,7 @@ Variable VariablePool::getFreshVariable(VariableType type) {
 		std::lock_guard<std::mutex> lock(this->freshVarMutex);
 		tmp = mNextVarId++;
 	}
-	LOGMSG_DEBUG("carl.varpool", "New variable of type " << type << " with id " << tmp);
+	CARL_LOG_DEBUG("carl.varpool", "New variable of type " << type << " with id " << tmp);
 	return Variable(tmp, type);
 }
 

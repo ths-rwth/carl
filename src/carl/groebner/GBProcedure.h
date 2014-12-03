@@ -191,7 +191,7 @@ public:
      */
 	void calculate()
 	{
-		LOGMSG_INFO("carl.gb.gbproc", "Calculate gb");
+		CARL_LOG_INFO("carl.gb.gbproc", "Calculate gb");
 		if(mGb->getGenerators().size() + mInputScheduled.size() == 0)
 		{
 			return;
@@ -201,7 +201,7 @@ public:
 		// remove the just added polynomials from the set of input polynomials
 		mInputScheduled.clear();
 		mGb->removeEliminated();
-		LOGMSG_DEBUG("carl.gb.gbproc", "GB, before reduction: " << *mGb);
+		CARL_LOG_DEBUG("carl.gb.gbproc", "GB, before reduction: " << *mGb);
 		// We have to update our indices list. but we do this just before returning because in the next step
 		// we further shrink the size.
 		reduceGB();
@@ -213,7 +213,7 @@ public:
      */
 	std::list<std::pair<BitVector, BitVector> > reduceInput()
 	{
-		LOGMSG_TRACE("carl.gb.gbproc", "Reduce input");
+		CARL_LOG_TRACE("carl.gb.gbproc", "Reduce input");
 		std::vector<Polynomial> toBeReduced;
 		//We only schedule "new" input for reduction
 		for(typename std::list<Polynomial>::const_iterator it = mInputScheduled.begin(); it != mInputScheduled.end(); ++it)
@@ -244,7 +244,7 @@ public:
 			}
 			else // ( !res.isZero( ) )
 			{
-				LOGMSG_TRACE("carl.gb.gbproc", "Add input polynomial " << res.normalize());
+				CARL_LOG_TRACE("carl.gb.gbproc", "Add input polynomial " << res.normalize());
 				// Use the polynomial to reduce other input polynomials.
 				reduced.addGenerator(res.normalize());
 				// And restore it as scheduled polynomial.
@@ -262,23 +262,23 @@ private:
 		{
 			bool divisible = false;
 
-			LOGMSG_TRACE("carl.gb.gbproc", "Check " << mGb->getGenerator(i));
+			CARL_LOG_TRACE("carl.gb.gbproc", "Check " << mGb->getGenerator(i));
 			for(size_t j = 0; !divisible && j != mGb->nrGenerators(); ++j)
 			{
 				if(j == i) continue;
 
 				divisible = mGb->getGenerator(i).lmon()->divisible(mGb->getGenerator(j).lmon());
-				LOGMSG_TRACE("carl.gb.gbproc", "" << (divisible ? "" : "not ") << "divisible by " << mGb->getGenerator(j));
+				CARL_LOG_TRACE("carl.gb.gbproc", "" << (divisible ? "" : "not ") << "divisible by " << mGb->getGenerator(j));
 			}
 
 			if(divisible)
 			{
-				LOGMSG_TRACE("carl.gb.gbproc", "Eliminate " << mGb->getGenerator(i));
+				CARL_LOG_TRACE("carl.gb.gbproc", "Eliminate " << mGb->getGenerator(i));
 				mGb->eliminateGenerator(i);
 			}
 		}
 		mGb->removeEliminated();
-		LOGMSG_DEBUG("carl.gb.gbproc", "GB Reduction, minimal GB: " << *mGb);
+		CARL_LOG_DEBUG("carl.gb.gbproc", "GB Reduction, minimal GB: " << *mGb);
 		// Calculate reduction
 		// The number of polynomials will not change anymore!
 		std::vector<size_t> toBeReduced(mGb->getOrderedIndices());
@@ -288,7 +288,7 @@ private:
 		{
 			Reductor<Polynomial, Polynomial> reduct(*reduced, mGb->getGenerator(*index));
 			Polynomial res = reduct.fullReduce().normalize();
-			LOGMSG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);
+			CARL_LOG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);
 			reduced->addGenerator(res);
 		}
 

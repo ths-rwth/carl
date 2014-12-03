@@ -450,7 +450,7 @@ Sign RealAlgebraicNumberIR<Number>::sgn(const UnivariatePolynomial<Number>& p) c
 		case 0: return Sign::ZERO;
 		case 1: return Sign::POSITIVE;
 	}
-	LOGMSG_ERROR("carl.RANIR", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+	CARL_LOG_ERROR("carl.RANIR", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
 	return Sign::ZERO;
 }
 

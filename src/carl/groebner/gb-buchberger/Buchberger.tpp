@@ -37,7 +37,7 @@ namespace carl
 template<class Polynomial, template<typename> class AddingPolicy>
 void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>& scheduledForAdding)
 {
-	LOGMSG_INFO("carl.gb.buchberger", "Calculate gb");
+	CARL_LOG_INFO("carl.gb.buchberger", "Calculate gb");
 	for(unsigned i = 0; i < pGb->getGenerators().size(); ++i)
 	{
 		mGbElementsIndices.push_back(i);
@@ -48,7 +48,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 	{
 		if(addToGb(newPol))
 		{
-			LOGMSG_INFO("carl.gb.buchberger", "Added a constant polynomial.");
+			CARL_LOG_INFO("carl.gb.buchberger", "Added a constant polynomial.");
 			foundGB = true;
 			break;
 		}
@@ -62,16 +62,16 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 		{
 			// Takes the next pair scheduled
 			SPolPair critPair = mCritPairs.pop();
-			LOGMSG_DEBUG("carl.gb.buchberger", "Calculate SPol for: " << pGb->getGenerators()[critPair.mP1] << ", " << pGb->getGenerators()[critPair.mP2]);
+			CARL_LOG_DEBUG("carl.gb.buchberger", "Calculate SPol for: " << pGb->getGenerators()[critPair.mP1] << ", " << pGb->getGenerators()[critPair.mP2]);
 			// Calculates the S-Polynomial
 			Polynomial spol = Polynomial::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
 			spol.setReasons(pGb->getGenerators()[critPair.mP1].getReasons() | pGb->getGenerators()[critPair.mP2].getReasons());
-			LOGMSG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
+			CARL_LOG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
 			// Schedules the S-polynomial for reduction
 			Reductor<Polynomial, Polynomial> reductor(*pGb, spol);
 			// Does a full reduction on this
 			Polynomial remainder = reductor.fullReduce();
-			LOGMSG_DEBUG("carl.gb.buchberger", "Remainder of SPol: " << remainder);
+			CARL_LOG_DEBUG("carl.gb.buchberger", "Remainder of SPol: " << remainder);
 			// If it is not zero, we should add this one to our GB
 			if(!remainder.isZero())
 			{

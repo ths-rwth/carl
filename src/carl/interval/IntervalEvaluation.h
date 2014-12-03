@@ -46,12 +46,12 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 {
 	Interval<Numeric> result(1);
 	// TODO use iterator.
-	LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
+	CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
 	for(unsigned i = 0; i < m.nrVariables(); ++i)
 	{
-		LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+		CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 		// We expect every variable to be in the map.
-		LOG_ASSERT("carl.interval", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
+		CARL_LOG_ASSERT("carl.interval", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
 		result *= map.at(m[i].first).pow(m[i].second);
 	}
 	return result;
@@ -64,9 +64,9 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 	if (t.monomial()) {
 		const Monomial& m = *t.monomial();
 		// TODO use iterator.
-		LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
+		CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
 		for (unsigned i = 0; i < m.nrVariables(); ++i) {
-			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+			CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].first) > 0);
 			result *= map.at(m[i].first).pow(m[i].second);
@@ -82,9 +82,9 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 	if (t.monomial()) {
 		const Monomial& m = *t.monomial();
 		// TODO use iterator.
-		LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
+		CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
 		for (unsigned i = 0; i < m.nrVariables(); ++i) {
-			LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+			CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 			// We expect every variable to be in the map.
 			assert(map.count(m[i].first) > 0);
 			result *= map.at(m[i].first).pow(m[i].second);
@@ -96,7 +96,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 template<typename Coeff, typename Policy, typename Ordering, typename Numeric>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomial<Coeff, Policy, Ordering>& p, const std::map<Variable, Interval<Numeric>>& map)
 {
-	LOG_FUNC("carl.core.monomial", p << ", " << map);
+	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
 	if(p.isZero()) {
 		return Interval<Numeric>(0);
 	} else {
@@ -110,7 +110,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomi
 
 template<typename Numeric, typename Coeff, EnableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
-	LOG_FUNC("carl.core.monomial", p << ", " << map);
+	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
 	assert(map.count(p.mainVar()) > 0);
 	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
 	const Interval<Numeric> varValue = map.at(p.mainVar());
@@ -124,7 +124,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 
 template<typename Numeric, typename Coeff, DisableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial<Coeff>& p, const std::map<Variable, Interval<Numeric>>& map) {
-	LOG_FUNC("carl.core.monomial", p << ", " << map);
+	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
 	assert(map.count(p.mainVar()) > 0);
 	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
 	const Interval<Numeric> varValue = map.at(p.mainVar());

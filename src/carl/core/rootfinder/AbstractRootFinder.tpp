@@ -26,13 +26,13 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 {
 #ifdef ROOTFINDER_CACHE
 	if (this->inCache()) {
-		LOGMSG_TRACE("carl.core.rootfinder", "Hit cache: " << this->originalPolynomial);
+		CARL_LOG_TRACE("carl.core.rootfinder", "Hit cache: " << this->originalPolynomial);
 		this->roots = cache[this->originalPolynomial];
 		this->finished = true;
 		return;
 	}
 #endif
-	LOGMSG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
+	CARL_LOG_TRACE("carl.core.rootfinder", "Creating abstract rootfinder for " << polynomial << " with interval " << this->interval);
 	if (this->polynomial.zeroIsRoot()) {
 		this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
 	}
@@ -41,7 +41,7 @@ AbstractRootFinder<Number>::AbstractRootFinder(
 		return;
 	}
 	if (tryTrivialSolver && this->solveTrivial()) {
-		LOGMSG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
+		CARL_LOG_TRACE("carl.core.rootfinder", "Polynomial was solved trivially.");
 		this->setFinished();
 		return;
 	}

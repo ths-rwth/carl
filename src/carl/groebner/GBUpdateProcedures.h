@@ -121,7 +121,7 @@ public:
 			mStats->ReducibleIdentity();
 #endif
 			Polynomial r;
-			LOG_NOTIMPLEMENTED();
+			CARL_LOG_NOTIMPLEMENTED();
 			//Polynomial r(p.getReducibleIdentity());
 			//r.setOrigins(p.getOrigins());
 			size_t index = gb->addGenerator(p);

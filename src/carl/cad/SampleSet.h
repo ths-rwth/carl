@@ -157,7 +157,7 @@ public:
 	SampleSet(SampleOrdering ordering = SampleOrdering::Default):
 		mComp(ordering)
 	{
-		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
+		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
 	}
 
 	/**
@@ -182,10 +182,10 @@ public:
      * @return An iterator to the inserted sample and a flag that indicates if the inserted value was new or already present.
      */
 	std::pair<Iterator, bool> insert(RealAlgebraicNumberPtr<Number> r) {
-		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
+		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
 		assert(this->isConsistent());
 		auto res = this->mSamples.insert(r);
-		LOGMSG_TRACE("carl.cad.sampleset", "\tinsert(): " << *res.first << ", " << res.second);
+		CARL_LOG_TRACE("carl.cad.sampleset", "\tinsert(): " << *res.first << ", " << res.second);
 		if (res.second) {
 			mHeap.push_back(r);
 			std::push_heap(mHeap.begin(), mHeap.end(), mComp);
@@ -221,7 +221,7 @@ public:
 	 */
 	SampleSet::Iterator remove(SampleSet::Iterator position) {
 		assert(position != mSamples.end());
-		LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
+		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
 		auto it = std::find(mHeap.begin(), mHeap.end(), *position);
 		std::swap(*it, mHeap.back());
 		mHeap.pop_back();

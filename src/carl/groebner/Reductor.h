@@ -114,7 +114,7 @@ public:
 				// get actual leading term
 				entry = mDatastruct.top();
 				leadingTerm = entry->getLead();
-				LOGMSG_TRACE("carl.gb.reductor", "Intermediate leading term: " << leadingTerm);
+				CARL_LOG_TRACE("carl.gb.reductor", "Intermediate leading term: " << leadingTerm);
 				assert(!leadingTerm.isZero());
 				// update the data structure.
 				// only insert non-empty polynomials.
@@ -157,7 +157,7 @@ public:
 			}
 			else
 			{
-				LOGMSG_DEBUG("carl.gb.reductor", "Not reducible: " << leadingTerm);
+				CARL_LOG_DEBUG("carl.gb.reductor", "Not reducible: " << leadingTerm);
 				mRemainder.push_back(leadingTerm);
 				return false;
 			}
@@ -233,7 +233,7 @@ private:
 	{
 		if(!g.isZero())
 		{
-			LOGMSG_TRACE("carl.gb.reductor", "Insert polynomial: " << g << " * " << fact);
+			CARL_LOG_TRACE("carl.gb.reductor", "Insert polynomial: " << g << " * " << fact);
 			mDatastruct.push(new EntryType(fact, g));
 		}
 	}

@@ -149,7 +149,7 @@ class EZGCD
 			else
 			{
 				// Special gcd.
-				LOG_NOTIMPLEMENTED();
+				CARL_LOG_NOTIMPLEMENTED();
 			}
 			
 			// Lifting step.
@@ -158,7 +158,7 @@ class EZGCD
 			Coeff c_I = mod(c.evaluate(eval_b),p);
 			C_I = c_I * C_I;
 			//MultivariateH
-			LOG_NOTIMPLEMENTED();
+			CARL_LOG_NOTIMPLEMENTED();
 			std::vector<Polynomial> CE; //= EZ_LIFT(U_I, C_I, H_i, b, c_I) // EZ_LIFT(U_I, C_I, H_i, b, p, c)
 			assert(CE.size() == 2);
 			if(U_I == CE.front()*CE.back()) 

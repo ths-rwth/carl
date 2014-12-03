@@ -15,59 +15,53 @@
 
 #include "config.h"
 
-#ifndef LOGGING
-	#undef LOGGING_CARL
-#endif
-
-#ifdef LOGGING_CARL
-	#include "carlLogging.h"
-#endif
+#include "carlLogging.h"
 
 namespace carl {
 namespace logging {
 
 #if defined LOGGING_CARL
-	#define LOGMSG_FATAL(channel, msg) CARLLOG_FATAL(channel, msg)
-	#define LOGMSG_ERROR(channel, msg) CARLLOG_ERROR(channel, msg)
-	#define LOGMSG_WARN(channel, msg) CARLLOG_WARN(channel, msg)
-	#define LOGMSG_INFO(channel, msg) CARLLOG_INFO(channel, msg)
-	#define LOGMSG_DEBUG(channel, msg) CARLLOG_DEBUG(channel, msg)	
-	#define LOGMSG_TRACE(channel, msg) CARLLOG_TRACE(channel, msg)
+	#define CARL_LOG_FATAL(channel, msg) __CARL_LOG_FATAL(channel, msg)
+	#define CARL_LOG_ERROR(channel, msg) __CARL_LOG_ERROR(channel, msg)
+	#define CARL_LOG_WARN(channel, msg) __CARL_LOG_WARN(channel, msg)
+	#define CARL_LOG_INFO(channel, msg) __CARL_LOG_INFO(channel, msg)
+	#define CARL_LOG_DEBUG(channel, msg) __CARL_LOG_DEBUG(channel, msg)	
+	#define CARL_LOG_TRACE(channel, msg) __CARL_LOG_TRACE(channel, msg)
 
-	#define LOG_FUNC(channel, args) CARLLOG_FUNC(channel, args)
-	#define LOG_ASSERT(channel, condition, msg) CARLLOG_ASSERT(channel, condition, msg)
-	#define LOG_NOTIMPLEMENTED() CARLLOG_ERROR("", "Not implemented method-stub called.")
-	#define LOG_INEFFICIENT() CARLLOG_WARN("", "Inefficient method called.")
+	#define CARL_LOG_FUNC(channel, args) __CARL_LOG_FUNC(channel, args)
+	#define CARL_LOG_ASSERT(channel, condition, msg) __CARL_LOG_ASSERT(channel, condition, msg)
+	#define CARL_LOG_NOTIMPLEMENTED() __CARL_LOG_ERROR("", "Not implemented method-stub called.")
+	#define CARL_LOG_INEFFICIENT() __CARL_LOG_WARN("", "Inefficient method called.")
 #elif defined LOGGING
-	#define LOGMSG_BASIC(level, channel, msg) std::cerr << level << " " << channel << " " << __FILE__ << ":" << __LINE__ << " " << msg
-	#define LOGMSG_FATAL(channel, msg) LOGMSG_BASIC("FATAL", channel, msg)
-	#define LOGMSG_ERROR(channel, msg) LOGMSG_BASIC("ERROR", channel, msg)
-	#define LOGMSG_WARN(channel, msg) LOGMSG_BASIC("WARN", channel, msg)
-	#define LOGMSG_INFO(channel, msg)
-	#define LOGMSG_DEBUG(channel, msg)
-	#define LOGMSG_TRACE(channel, msg)
+	#define CARL_LOG_BASIC(level, channel, msg) std::cerr << level << " " << channel << " " << __FILE__ << ":" << __LINE__ << " " << msg
+	#define CARL_LOG_FATAL(channel, msg) CARL_LOG_BASIC("FATAL", channel, msg)
+	#define CARL_LOG_ERROR(channel, msg) CARL_LOG_BASIC("ERROR", channel, msg)
+	#define CARL_LOG_WARN(channel, msg) CARL_LOG_BASIC("WARN", channel, msg)
+	#define CARL_LOG_INFO(channel, msg)
+	#define CARL_LOG_DEBUG(channel, msg)
+	#define CARL_LOG_TRACE(channel, msg)
 
-	#define LOG_FUNC(channel, args)
-	#define LOG_ASSERT(channel, condition, msg) assert(condition)
-	#define LOG_NOTIMPLEMENTED() std::cerr << "Not implemented method-stub called: " << __func__ << std::endl
-	#define LOG_INEFFICIENT() std::cerr << "Inefficient method called: " << __func__ << std::endl
+	#define CARL_LOG_FUNC(channel, args)
+	#define CARL_LOG_ASSERT(channel, condition, msg) assert(condition)
+	#define CARL_LOG_NOTIMPLEMENTED() std::cerr << "Not implemented method-stub called: " << __func__ << std::endl
+	#define CARL_LOG_INEFFICIENT() std::cerr << "Inefficient method called: " << __func__ << std::endl
 #else
-	#define LOGMSG_FATAL(channel, msg)
-	#define LOGMSG_ERROR(channel, msg)
-	#define LOGMSG_WARN(channel, msg)
-	#define LOGMSG_INFO(channel, msg)
-	#define LOGMSG_DEBUG(channel, msg)
-	#define LOGMSG_TRACE(channel, msg)
+	#define CARL_LOG_FATAL(channel, msg)
+	#define CARL_LOG_ERROR(channel, msg)
+	#define CARL_LOG_WARN(channel, msg)
+	#define CARL_LOG_INFO(channel, msg)
+	#define CARL_LOG_DEBUG(channel, msg)
+	#define CARL_LOG_TRACE(channel, msg)
 
-	#define LOG_FUNC(channel, args)
-	#define LOG_ASSERT(channel, condition, msg) assert(condition)
-	#define LOG_NOTIMPLEMENTED()
-	#define LOG_INEFFICIENT()
+	#define CARL_LOG_FUNC(channel, args)
+	#define CARL_LOG_ASSERT(channel, condition, msg) assert(condition)
+	#define CARL_LOG_NOTIMPLEMENTED()
+	#define CARL_LOG_INEFFICIENT()
 #endif
 
 #ifdef LOGGING_DISABLE_INEFFICIENT
-	#undef LOG_INEFFICIENT
-	#define LOG_INEFFICIENT()
+	#undef CARL_LOG_INEFFICIENT
+	#define CARL_LOG_INEFFICIENT()
 #endif
 
 void setInitialLogLevel();
