@@ -300,8 +300,17 @@ namespace carl
         Factorization<P> resultFactorization = commonDivisor( factorizationA, factorizationB, factorizationRestA, factorizationRestB );
 
         //Compute remaining sum
-        P sum = computePolynomial( factorizationRestA ) * coefficientRestA;
-        sum += computePolynomial( factorizationRestB ) * coefficientRestB;
+        P sum;
+        if( resultFactorization.empty() )
+        {
+            sum = _fpolyA.polynomial() * coefficientRestA;
+            sum += _fpolyB.polynomial() * coefficientRestB;
+        }
+        else
+        {
+            sum = computePolynomial( factorizationRestA ) * coefficientRestA;
+            sum += computePolynomial( factorizationRestB ) * coefficientRestB;
+        }
         if ( sum.isZero() )
         {
             FactorizedPolynomial<P> result;
