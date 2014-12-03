@@ -939,7 +939,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 	MultivariatePolynomial result;
 	std::size_t id = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& term: mTerms) {
-		mTermAdditionManager.template addTerm<false>(id, *term.substitute(substitutions));
+		mTermAdditionManager.template addTerm<false>(id, term.substitute(substitutions));
 	}
 	mTermAdditionManager.readTerms(id, result.mTerms);
 	result.mOrdered = false;

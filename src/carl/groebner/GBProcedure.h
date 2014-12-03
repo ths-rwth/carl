@@ -65,6 +65,7 @@ public:
 	
 	GBProcedure(const GBProcedure& old)
 	:
+    Procedure<Polynomial, AddingPolynomialPolicy>(old),
 	mGb(new Ideal<Polynomial>(*old.mGb)),
 	mInputScheduled(old.mInputScheduled),
 	mOrigGenerators(old.mOrigGenerators),
