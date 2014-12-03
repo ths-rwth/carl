@@ -63,7 +63,7 @@ public:
      */
 	virtual ~PolynomialOwner() {
 		if (this->ownedPolynomials.size() > 0) {
-			LOGMSG_DEBUG("carl.cad", "Deleting " << this->ownedPolynomials.size() << " polynomials.");
+			CARL_LOG_DEBUG("carl.cad", "Deleting " << this->ownedPolynomials.size() << " polynomials.");
 		}
 		for (auto p: this->ownedPolynomials) {
 			delete p;

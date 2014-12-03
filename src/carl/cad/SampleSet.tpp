@@ -49,7 +49,7 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 			return carl::less<RealAlgebraicNumberPtr<Number>>()(lhs, rhs);
 			break;
 		default:
-			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
+			CARL_LOG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
 			return false;
 	}
@@ -74,7 +74,7 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 		case SampleOrdering::Value:
 			return true;
 		default:
-			LOGMSG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
+			CARL_LOG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
 			return false;
 	}
@@ -82,7 +82,7 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 
 template<typename Number>
 void SampleSet<Number>::pop() {
-	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
+	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	if (this->mHeap.empty()) return;
 	this->mSamples.erase(mHeap.front());
 	std::pop_heap(mHeap.begin(), mHeap.end(), mComp);
@@ -92,7 +92,7 @@ void SampleSet<Number>::pop() {
 
 template<typename Number>
 bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to) {
-	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << from << " -> " << to << " )");
+	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << from << " -> " << to << " )");
 	assert(this->isConsistent());
 	if (mSamples.count(from) > 0) {
 		mSamples.erase(from);
@@ -107,7 +107,7 @@ bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, Re
 
 template<typename Number>
 std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Number>::simplify(bool fast) {
-	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
+	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	std::pair<SampleSimplification, bool> simplification;
 	if (this->empty()) return simplification;
 	simplification.second = false;
@@ -144,14 +144,14 @@ std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
 
 template<typename Number>
 bool SampleSet<Number>::isConsistent() const {
-	LOGMSG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
-	LOGMSG_TRACE("carl.cad.sampleset", "samples: " << mSamples);
-	LOGMSG_TRACE("carl.cad.sampleset", "heap:    " << mHeap);
+	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
+	CARL_LOG_TRACE("carl.cad.sampleset", "samples: " << mSamples);
+	CARL_LOG_TRACE("carl.cad.sampleset", "heap:    " << mHeap);
 	std::set<RealAlgebraicNumberPtr<Number>> queue(mHeap.begin(), mHeap.end());
 	for (auto n: this->mSamples) {
 		auto it = queue.find(n);
 		if (it == queue.end()) {
-			LOGMSG_ERROR("carl.cad.sampleset", "Sample " << n << " is not in queue.");
+			CARL_LOG_ERROR("carl.cad.sampleset", "Sample " << n << " is not in queue.");
 			assert(queue.find(n) != queue.end());
 		}
 		queue.erase(it);
@@ -159,14 +159,14 @@ bool SampleSet<Number>::isConsistent() const {
 	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
 	for (auto n: this->mSamples) {
 		if (lastSample != nullptr && !carl::less<RealAlgebraicNumberPtr<Number>>()(lastSample, n)) {
-			LOGMSG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
-			LOGMSG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
+			CARL_LOG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
+			CARL_LOG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
 			assert(carl::less<RealAlgebraicNumberPtr<Number>>()(lastSample, n));
 		}
 		lastSample = n;
 	}
 	if (!queue.empty()) {
-		LOGMSG_ERROR("carl.cad.sampleset", "Additional samples in queue: " << queue);
+		CARL_LOG_ERROR("carl.cad.sampleset", "Additional samples in queue: " << queue);
 		assert(queue.empty());
 	}
 	return true;

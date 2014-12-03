@@ -703,7 +703,7 @@ public:
 	template<typename SubstitutionType, typename C = Coefficient, EnableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
 	{
-		LOG_NOTIMPLEMENTED();
+		CARL_LOG_NOTIMPLEMENTED();
 	}
 	template<typename SubstitutionType, typename C = Coefficient, DisableIf<is_instantiation_of<MultivariatePolynomial, C>> = dummy>
 	UnivariatePolynomial<Coefficient> evaluateCoefficient(const std::map<Variable, SubstitutionType>&) const
@@ -726,7 +726,7 @@ public:
 	UnivariatePolynomial& normalizeCoefficients()
 	{
 		static_assert(std::is_same<T,Coefficient>::value, "No template parameters should be given");
-		LOGMSG_WARN("carl.core", "normalize not possible");
+		CARL_LOG_WARN("carl.core", "normalize not possible");
 		return *this;
 	}
 	/**

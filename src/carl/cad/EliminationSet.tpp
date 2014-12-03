@@ -55,7 +55,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		bool avoidSingle
 		)
 {
-	LOG_FUNC("carl.cad.elimination", *r << ", " << avoidSingle);
+	CARL_LOG_FUNC("carl.cad.elimination", *r << ", " << avoidSingle);
 	assert(r->isConsistent());
 	std::pair<typename PolynomialSet::iterator, bool> insertValue = this->polynomials.insert(r);
 	typename PolynomialSet::iterator pos = insertValue.first;
@@ -123,7 +123,7 @@ std::pair<typename EliminationSet<Coefficient>::PolynomialSet::iterator, bool> E
 		}
 	}
 	assert(this->isConsistent());
-	LOGMSG_TRACE("carl.cad.elimination", "Now: " << *this);
+	CARL_LOG_TRACE("carl.cad.elimination", "Now: " << *this);
 	return insertValue;
 }
 
@@ -586,7 +586,7 @@ void EliminationSet<Coeff>::elimination(
 			EliminationSet<Coeff>& eliminated,
 			bool avoidSingle
 ) {
-	LOG_FUNC("carl.cad.eliminationset", *p << ", " << variable << ", " << avoidSingle);
+	CARL_LOG_FUNC("carl.cad.eliminationset", *p << ", " << variable << ", " << avoidSingle);
 	std::list<const UPolynomial*> parents({p});
 	// add all coefficients of p
 	for (auto coeff: p->coefficients()) {

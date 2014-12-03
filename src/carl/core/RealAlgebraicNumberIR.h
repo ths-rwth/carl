@@ -95,7 +95,7 @@ public:
 			const bool isRoot = true) {
 		assert(i.isOpenInterval() || i.isPointInterval());
 		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, s, normalize, isRoot));
-		LOGMSG_TRACE("carl.core", "Creating " << res);
+		CARL_LOG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
 	}

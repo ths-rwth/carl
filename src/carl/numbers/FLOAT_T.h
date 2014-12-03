@@ -464,7 +464,7 @@ namespace carl
         {
             assert(*this >= 0);
             /// @todo implement root_assign for FLOAT_T
-            LOG_NOTIMPLEMENTED();
+            CARL_LOG_NOTIMPLEMENTED();
             return *this;
         }
 
@@ -479,7 +479,7 @@ namespace carl
         FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
         {
             assert(*this >= 0);
-            LOG_NOTIMPLEMENTED();
+            CARL_LOG_NOTIMPLEMENTED();
             /// @todo implement root for FLOAT_T
         }
 

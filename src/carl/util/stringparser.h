@@ -114,7 +114,7 @@ namespace carl
          */
 		void setSumOfTermsForm(bool to)
 		{
-			LOG_ASSERT("carl.stringparser", to, "Extended parser not supported");
+			CARL_LOG_ASSERT("carl.stringparser", to, "Extended parser not supported");
 			mSumOfTermsForm = to;
 		}
 		
@@ -171,7 +171,7 @@ namespace carl
 			}
 			else
 			{
-				LOG_NOTIMPLEMENTED();
+				CARL_LOG_NOTIMPLEMENTED();
 			}
 			return result;
 		}
@@ -233,7 +233,7 @@ namespace carl
 			}
 			else
 			{
-				LOG_ASSERT("carl.stringparser", mSingleSymbVariables, "The implicit mode can only be set with single symbol variables");				
+				CARL_LOG_ASSERT("carl.stringparser", mSingleSymbVariables, "The implicit mode can only be set with single symbol variables");
 			}
 			
 			std::sort(varExpPairs.begin(), varExpPairs.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });

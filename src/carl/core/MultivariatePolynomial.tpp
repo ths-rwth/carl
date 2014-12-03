@@ -276,14 +276,14 @@ const Monomial::Arg& MultivariatePolynomial<Coeff,Ordering,Policies>::lmon() con
 template<typename Coeff, typename Ordering, typename Policies>
 const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() const
 {
-	LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
+	CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
 	return mTerms.back();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
 const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
 {
-	LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
+	CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
 	return mTerms.front();
 }
 
@@ -300,7 +300,7 @@ exponent MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 	if (Ordering::degreeOrder) {
 		return this->lterm().tdeg();
 	} else {
-		LOG_NOTIMPLEMENTED();
+		CARL_LOG_NOTIMPLEMENTED();
 	}
 }
 
@@ -343,7 +343,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 	}
 	else 
 	{
-		LOG_NOTIMPLEMENTED();
+		CARL_LOG_NOTIMPLEMENTED();
 	}
 }
 
@@ -476,7 +476,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::has(Variable::Arg v) const
 template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isReducibleIdentity() const
 {
-	LOG_NOTIMPLEMENTED();
+	CARL_LOG_NOTIMPLEMENTED();
 	return false;
 }
 
@@ -680,7 +680,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 			} else removedLast = true;
 		}
 		mTerms.swap(newTerms);
-		LOGMSG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+		CARL_LOG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
 		if (removedLast) {
 			mOrdered = false;
 			makeMinimallyOrdered<false, true>();
@@ -819,10 +819,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		if(term.monomial())
 		{
 			const Monomial& m = *(term.monomial());
-			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
+			CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
 			for(unsigned i = 0; i < m.nrVariables(); ++i)
 			{
-				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+				CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 				if(m[i].second > 1 && substitutions.find(m[i].first) != substitutions.end())
 				{
 					expResults[m[i]] = MultivariatePolynomial((Coeff) 1);
@@ -875,10 +875,10 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		if(term.monomial())
 		{   
 			const Monomial& m = *(term.monomial());
-			LOGMSG_TRACE("carl.core.monomial", "Iterating over " << m);
+			CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
 			for(unsigned i = 0; i < m.nrVariables(); ++i)
 			{
-				LOGMSG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
+				CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
 				if(m[i].second == 1)
 				{
 					auto iter = substitutions.find(m[i].first);
@@ -954,7 +954,7 @@ template<typename SubstitutionType>
 Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
 {
 	// We do not have to construct polynomials all the time.
-	LOG_INEFFICIENT();
+	CARL_LOG_INEFFICIENT();
 	MultivariatePolynomial result = substitute(substitutions);
 	assert(result.isConstant());
 	return result.constantPart();
@@ -1105,7 +1105,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 		return MultivariatePolynomial((Coeff)1);
 	}
 	
-	LOG_INEFFICIENT();
+	CARL_LOG_INEFFICIENT();
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
 	for(unsigned i = 1; i < exp; i++)
 	{
@@ -1296,7 +1296,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
 
 template<typename C, typename O, typename P>
 bool operator==(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	LOG_INEFFICIENT();
+	CARL_LOG_INEFFICIENT();
 	return MultivariatePolynomial<C,O,P>(lhs) == rhs;
 }
 
@@ -1307,7 +1307,7 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolyno
 
 template<typename C, typename O, typename P>
 bool operator==(const UnivariatePolynomial<MultivariatePolynomial<C>>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-	LOG_INEFFICIENT();
+	CARL_LOG_INEFFICIENT();
 	return MultivariatePolynomial<C>(lhs) == rhs;
 }
 
@@ -1556,25 +1556,25 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
-	LOG_NOTIMPLEMENTED();
+	CARL_LOG_NOTIMPLEMENTED();
 }
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<C>&)
 {
-	LOG_NOTIMPLEMENTED();
+	CARL_LOG_NOTIMPLEMENTED();
 }
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> operator+(const UnivariatePolynomial<MultivariatePolynomial<C>>&, const MultivariatePolynomial<C,O,P>&)
 {
-	LOG_NOTIMPLEMENTED();
+	CARL_LOG_NOTIMPLEMENTED();
 }
 
 template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>&, const UnivariatePolynomial<MultivariatePolynomial<C>>&)
 {
-	LOG_NOTIMPLEMENTED();
+	CARL_LOG_NOTIMPLEMENTED();
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1665,7 +1665,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	else 
 	{
-		LOG_NOTIMPLEMENTED();
+		CARL_LOG_NOTIMPLEMENTED();
 	}
 }
 
@@ -1712,7 +1712,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 	}
 	else 
 	{
-		LOG_NOTIMPLEMENTED();
+		CARL_LOG_NOTIMPLEMENTED();
 	}
 }
 
@@ -1836,7 +1836,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>&, const MultivariatePolynomial<C,O,P>&)
 {
-	LOG_NOTIMPLEMENTED();
+	CARL_LOG_NOTIMPLEMENTED();
 }
 template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs)

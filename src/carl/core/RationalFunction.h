@@ -233,7 +233,7 @@ namespace carl
         {
             if( AutoSimplify )
             {
-                LOGMSG_WARN("carl.core","Calling simplify on rational function with AutoSimplify");
+                CARL_LOG_WARN("carl.core","Calling simplify on rational function with AutoSimplify");
             }
             eliminateCommonFactor( false );
         }

@@ -126,7 +126,7 @@ protected:
 	
 	bool addToGb(const Polynomial& newPol)
 	{
-		 LOGMSG_DEBUG("carl.gb.buchberger", "Add to gb: " << newPol);
+		 CARL_LOG_DEBUG("carl.gb.buchberger", "Add to gb: " << newPol);
 		 return AddingPolicy<Polynomial>::addToGb( newPol, pGb, &mUpdateCallBack);
 	}
 	void removeBuchbergerTriples(std::unordered_map<size_t, SPolPair>& spairs, std::vector<size_t>& primelist);

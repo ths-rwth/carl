@@ -21,15 +21,15 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
-	LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
+	CARL_LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
 	assert(m.count(p.mainVar()) == 0);
 	
 	if (p.isZero()) {
-		LOGMSG_TRACE("carl.core.rootfinder", "p is 0 -> sampling " << interval.sample());
+		CARL_LOG_TRACE("carl.core.rootfinder", "p is 0 -> sampling " << interval.sample());
 		return { RealAlgebraicNumberNR<Number>::create(interval.sample(), true) };
 	}
 	if (p.isConstant()) {
-		LOGMSG_TRACE("carl.core.rootfinder", "p is constant but not zero -> no root");
+		CARL_LOG_TRACE("carl.core.rootfinder", "p is constant but not zero -> no root");
 		return {};
 	}
 	
@@ -80,7 +80,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
-	LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
+	CARL_LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
 	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(p, m, varToInterval);
 	return realRoots(res, interval, pivoting);
