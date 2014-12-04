@@ -128,38 +128,31 @@ namespace carl
         {
             mIsSimplified = _rf.mIsSimplified;
             mNumberQuotient = _rf.mNumberQuotient;
-            if( _rf.isConstant() )
+            if( !isConstant() )
             {
-                if( !isConstant() )
-                {
-                    delete mPolynomialQuotient;
-                    mPolynomialQuotient = nullptr;
-                }
+                delete mPolynomialQuotient;
             }
-            else
-            {
-                mPolynomialQuotient = new std::pair<Pol,Pol>(_rf.nominatorAsPolynomial(), _rf.denominatorAsPolynomial());
-            }
+            mPolynomialQuotient = _rf.isConstant() ? nullptr : new std::pair<Pol,Pol>(_rf.nominatorAsPolynomial(), _rf.denominatorAsPolynomial());
             return *this;
         }
         
         RationalFunction& operator=(RationalFunction&& _rf)
         {
             mIsSimplified = _rf.mIsSimplified;
-            mNumberQuotient = _rf.mNumberQuotient;
+            if( !isConstant() )
+            {
+                delete mPolynomialQuotient;
+            }
             if( _rf.isConstant() )
             {
-                if( !isConstant() )
-                {
-                    delete mPolynomialQuotient;
-                    mPolynomialQuotient = nullptr;
-                }
+                mPolynomialQuotient = nullptr;
             }
             else
             {
                 mPolynomialQuotient = _rf.mPolynomialQuotient;
                 _rf.mPolynomialQuotient = nullptr;
             }
+            mNumberQuotient = std::move(_rf.mNumberQuotient);
             return *this;
         }
 

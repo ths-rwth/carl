@@ -37,6 +37,21 @@ namespace carl
     }
     
     template<typename T>
+    Cache<T>::~Cache()
+    {
+        std::cout << __func__ << std::endl;
+        mCacheRefs.clear();
+        while( !mCache.empty() )
+        {
+            TypeInfoPair<T,Info>* tip = *mCache.begin();
+            mCache.erase( mCache.begin() );
+            T* t = tip->first;
+            delete tip;
+            delete t;
+        }
+    }
+    
+    template<typename T>
     std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
