@@ -1499,7 +1499,7 @@ namespace carl
                         }
                         else
                         {
-                            resultSubformulas.insert( Formula<Pol>( OR, move( subsubformulas ) ) );
+                            resultSubformulas.insert( Formula<Pol>( OR, std::move( subsubformulas ) ) );
                         }
                     }
                     break;

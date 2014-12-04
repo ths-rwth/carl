@@ -394,7 +394,7 @@ namespace carl
             {}
             
             explicit Formula( FormulaType _type, std::set<Formula>&& _subasts ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _type, move(_subasts) ) )
+                mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
             {}
             
             explicit Formula( FormulaType _type, const std::vector<Variable>&& _vars, const Formula& _term ):

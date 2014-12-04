@@ -57,6 +57,8 @@ namespace carl
              */
             FormulaPool( unsigned _capacity = 10000 );
             
+            ~FormulaPool();
+            
         public:
             
             void print() const
