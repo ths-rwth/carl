@@ -44,6 +44,8 @@ namespace carl
             FastPointerSet<Element> mPool;
             /// Mutex to avoid multiple access to the pool
             mutable std::mutex mMutexPool;
+            ///
+            FastMap<Formula<Pol>,Formula<Pol>> mTseitinVars;
             
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock( mMutexPool );
             #define FORMULA_POOL_LOCK mMutexPool.lock();
@@ -56,6 +58,8 @@ namespace carl
              * @param _capacity Expected necessary capacity of the pool.
              */
             FormulaPool( unsigned _capacity = 10000 );
+            
+            ~FormulaPool();
             
         public:
             
@@ -86,6 +90,18 @@ namespace carl
             ConstElementSPtr create( Variable::Arg _booleanVar )
             {
                 return add( new Element( _booleanVar ) );
+            }
+            
+            Formula<Pol> getTseitinVar( const Formula<Pol>& _formula )
+            {
+                auto iter = mTseitinVars.insert( std::make_pair( _formula, Formula<Pol>() ) );
+                if( iter.second )
+                {
+                    Formula<Pol> hi( newAuxiliaryBooleanVariable() );
+                    hi.setDifficulty( _formula.difficulty() );
+                    iter.first->second = std::move( hi );
+                }
+                return iter.first->second;
             }
             
             /**

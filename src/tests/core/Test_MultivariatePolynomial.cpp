@@ -9,6 +9,7 @@
 #include "Util.cpp"
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
+#include "carl/util/stringparser.h"
 
 
 using namespace carl;
@@ -394,6 +395,40 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(f2.substitute(substitutions5), convertToCarl(f2g.subs(substitutions5g), vars));
     #endif
 }
+
+//typedef cln::cl_RA Rat;
+//typedef MultivariatePolynomial<Rat> Pol;
+//
+//TEST(MultivariatePolynomial, VSRules)
+//{
+//    carl::VariablePool::getInstance().clear();
+//    StringParser sp;
+//    sp.setVariables({"v", "w", "x", "y", "z"});
+//    Variable v = sp.variables().at("v");
+//    Variable w = sp.variables().at("w");
+//    Variable x = sp.variables().at("x");
+//    Variable y = sp.variables().at("y");
+//    Variable z = sp.variables().at("z");
+//    
+//    Pol pz = sp.parseMultivariatePolynomial<Rat>("(-1)*x^2*z*y+(-1)*x*z*y^2+(-1)*z*y+(-1)*x^2*z+(-1)*x*w*y+(-1)*x*w+(-1)*w+1");
+//    Pol ztNum = sp.parseMultivariatePolynomial<Rat>("(-1)*x^2*w*y+w+x*w*y+(-1)*x^2*w");
+//    Pol ztDenom = sp.parseMultivariatePolynomial<Rat>("x^3*y+(-1)*x^2*y+(-1)*x^2+x^3+x*y+(-1)*x*y^2+(-1)*y+x^2*y^2+1");
+//    Pol pzSub = pz.substitute( z, ztNum );
+//    std::cout << pzSub << std::endl;
+//    Pol py1 = sp.parseMultivariatePolynomial<Rat>("x^3*y+(-1)*x^2+(-1)*x^2*y+(-1)*x*w*y+(-1)*y+(-1)*x*y^2+(-1)*x*w+x*y+x^3+(-1)*w+x^2*y^2+1");
+//    std::cout << py1 << std::endl;
+//    pzSub *= ztDenom;
+//    EXPECT_EQ( pzSub, py1 );
+//    Pol py2 = sp.parseMultivariatePolynomial<Rat>("(-1)*x^3*y+y+x^2+(-1)*x^3+x*y^2+(-1)*x*y+(-1)*x^2*y^2+x^2*y");
+//    Pol ytNum = sp.parseMultivariatePolynomial<Rat>("(-1)*x");
+//    Pol ytDenom = sp.parseMultivariatePolynomial<Rat>("x+(-1)");
+//    Pol px = sp.parseMultivariatePolynomial<Rat>("2*x+w+(-1)");
+//    Pol xt = Pol(Rat(0));
+//    Pol pv = sp.parseMultivariatePolynomial<Rat>("w+(-1)");
+//    Pol vt = Pol(Rat(1));
+//    Pol pw = sp.parseMultivariatePolynomial<Rat>("w+(-1)");
+//    Pol wt = Pol(Rat(0));
+//}
 
 TEST(MultivariatePolynomial, SPolynomial)
 {

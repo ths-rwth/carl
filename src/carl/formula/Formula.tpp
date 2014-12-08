@@ -21,7 +21,6 @@ namespace carl
     
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( bool _true, size_t _id ):
-        mDeducted( false ),
         mHash( ((size_t)(_true ? ConstraintPool<Pol>::getInstance().consistentConstraint()->id() : ConstraintPool<Pol>::getInstance().inconsistentConstraint()->id())) << (sizeof(size_t)*4) ),
         mId( _id ),
         mActivity( 0 ),
@@ -33,7 +32,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( carl::Variable::Arg _boolean ):
-        mDeducted( false ),
         mHash( (size_t)_boolean.getId() ), // TODO: subtract the id of the boolean variable with the smallest id
         mId( 0 ),
         mActivity( 0 ),
@@ -47,7 +45,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Constraint<Pol>* _constraint ):
-        mDeducted( false ),
         mHash( ((size_t) _constraint->id()) << (sizeof(size_t)*4) ),
         mId( 0 ),
         mActivity( 0 ),
@@ -73,7 +70,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( UEquality&& _ueq ):
-        mDeducted( false ),
         mHash( std::hash<UEquality>()( _ueq ) ),
         mId( 0 ),
         mActivity( 0 ),
@@ -85,7 +81,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _subformula ):
-        mDeducted( false ),
         mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
         mId( 0 ),
         mActivity( 0 ),
@@ -97,7 +92,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion ):
-        mDeducted( false ),
         mHash( CIRCULAR_SHIFT(size_t, (((size_t)IMPLIES << 5) ^ _premise.getHash()), 5) ^ _conclusion.getHash() ),
         mId( 0 ),
         mActivity( 0 ),
@@ -110,7 +104,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else ):
-        mDeducted( false ),
         mHash( CIRCULAR_SHIFT(size_t, (CIRCULAR_SHIFT(size_t, (((size_t)ITE << 5) ^ _condition.getHash()), 5) ^ _then.getHash()), 5) ^ _else.getHash() ),
         mId( 0 ),
         mActivity( 0 ),
@@ -123,7 +116,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(const FormulaType _type, const std::vector<carl::Variable>&& _vars, const Formula<Pol>& _term):
-        mDeducted( false ),
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
         mId( 0 ),
@@ -138,7 +130,6 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const FormulaType _type, std::set<Formula<Pol>>&& _subformulas ):
-        mDeducted( false ),
         mHash( (size_t)_type ),
         mId( 0 ),
         mActivity( 0 ),
@@ -1406,25 +1397,18 @@ namespace carl
                                     break;
                                 if( _simplifyConstraintCombinations && swapConstraintBounds( constraintBoundsOrAnd, tmpSubSubformulas, true ) )
                                     break;
-                                auto iter = tseitinVars.insert( pair<Formula<Pol>,pair<Formula<Pol>,Formula<Pol>>*>( currentSubformula, nullptr ) );
-                                if( iter.second )
-                                {
-                                    Variable auxVar = newAuxiliaryBooleanVariable();
-                                    Formula<Pol> hi = Formula<Pol>( auxVar );
-                                    hi.setDifficulty( currentSubformula.difficulty() );
-                                    iter.first->second = new pair<Formula<Pol>,Formula<Pol>>( hi, Formula<Pol>( FormulaType::NOT, hi ) );
-                                }
+                                Formula<Pol> tseitinVar = FormulaPool<Pol>::getInstance().getTseitinVar( currentSubformula );
                                 for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
-                                    subformulasToTransformTmp.push_back( Formula<Pol>( OR, iter.first->second->second, subsubformula ) );
+                                    subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
                                 if( _tseitinWithEquivalence )
                                 {
                                     std::set<Formula> tmpSubformulas;
-                                    tmpSubformulas.insert( iter.first->second->first );
+                                    tmpSubformulas.insert( tseitinVar );
                                     for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                         tmpSubformulas.insert( Formula<Pol>( NOT, subsubformula ) );
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
                                 }
-                                subsubformulas.insert( iter.first->second->first );
+                                subsubformulas.insert( tseitinVar );
                                 break;
                             }
                             case FormulaType::CONSTRAINT: // p~0 -> p~0
@@ -1499,7 +1483,7 @@ namespace carl
                         }
                         else
                         {
-                            resultSubformulas.insert( Formula<Pol>( OR, move( subsubformulas ) ) );
+                            resultSubformulas.insert( Formula<Pol>( OR, std::move( subsubformulas ) ) );
                         }
                     }
                     break;
@@ -1532,12 +1516,6 @@ namespace carl
         else
             return Formula<Pol>( FormulaType::AND, move( resultSubformulas ) );
         ReturnFalse:
-            while( !tseitinVars.empty() ) // TODO: why only here?
-            {
-                auto toDel = tseitinVars.begin()->second;
-                tseitinVars.erase( tseitinVars.begin() );
-                delete toDel;
-            }
             return Formula<Pol>( FormulaType::FALSE );
     }
             

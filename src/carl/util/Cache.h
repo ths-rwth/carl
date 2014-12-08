@@ -152,7 +152,9 @@ namespace carl
 
         // The constructor.
         Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
-        Cache( const Cache& ); // no implementation
+        Cache( const Cache& ) = delete; // no implementation
+        
+        ~Cache();
         
         /**
          * Caches the given object.

@@ -29,6 +29,17 @@ namespace carl
     }
     
     template<typename Pol>
+    FormulaPool<Pol>::~FormulaPool()
+    {
+        while( !mPool.empty() )
+        {
+            const Element* ele = *mPool.begin();
+            mPool.erase( mPool.begin() );
+            delete ele;
+        }
+    }
+    
+    template<typename Pol>
     std::pair<typename FastPointerSet<typename FormulaPool<Pol>::Element>::iterator,bool> FormulaPool<Pol>::insert( ElementSPtr _element, bool _elementNotInPool )
     {
         auto iterBoolPair = mPool.insert( _element );
@@ -38,6 +49,10 @@ namespace carl
             _element->mId = mIdAllocator; // id should be set here to avoid conflicts when multi-threading
             Formula<Pol>::init( *_element );
             ++mIdAllocator;
+        }
+        else
+        {
+            delete _element;
         }
         return iterBoolPair;
     }
