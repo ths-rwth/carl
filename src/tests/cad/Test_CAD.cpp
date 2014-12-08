@@ -22,7 +22,7 @@ protected:
 		y(carl::VariablePool::getInstance().getFreshVariable("y")),
 		z(carl::VariablePool::getInstance().getFreshVariable("z"))
 	{
-		LOGMSG_INFO("carl.core", "Variables " << x << ", " << y);
+		CARL_LOG_INFO("carl.core", "Variables " << x << ", " << y);
 	}
 	~CADTest() {}
 
