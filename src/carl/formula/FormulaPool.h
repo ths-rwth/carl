@@ -224,7 +224,7 @@ namespace carl
                 int counter = 1;
                 while( subFormula != _subformulas.end() )
                 {
-                    if( **lastSubFormula == **subFormula )
+                    if( *lastSubFormula == *subFormula )
                     {
                         ++counter;
                     }
@@ -243,7 +243,7 @@ namespace carl
                 {
                     subFormulas.insert( subFormulas.end(), *lastSubFormula );
                 }
-                return create( Formula<Pol>::XOR, std::move( subFormulas ) );
+                return create( FormulaType::XOR, std::move( subFormulas ) );
             }
             
             /**
