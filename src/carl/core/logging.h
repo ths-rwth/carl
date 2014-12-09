@@ -7,6 +7,10 @@
  * Otherwise, if LOGGING_CARL is set, we log using our own logging machinery.
  * If neither is set, important messages are sent to `std::cerr`.
  *
+ * Note that this header should *not* be included if you want to use the carl
+ * logging facilities yourself. To do that, include carlLogging.h and create
+ * logging macros like below for your own application.
+ *
  * Created: 21/11/2012
  * @version: 2014-07-30
  */
