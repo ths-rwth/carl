@@ -514,7 +514,7 @@ namespace carl
          * @param N Possible rounding direction.
          * @return Reference to this.
          */
-        FLOAT_T<FloatType>& pow_assign(unsigned long int _exp, CARL_RND = CARL_RND::N)
+        FLOAT_T<FloatType>& pow_assign(unsigned _exp, CARL_RND = CARL_RND::N)
         {
             mValue = std::pow(mValue, _exp);
             return *this;
@@ -528,7 +528,7 @@ namespace carl
          * @param N Possible rounding direction.
          * @return Reference to the result.
          */
-        FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, unsigned long int _exp, CARL_RND = CARL_RND::N) const
+        FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, unsigned _exp, CARL_RND = CARL_RND::N) const
         {
             _result.mValue = std::pow(mValue, _exp);
             return _result;
@@ -1458,7 +1458,9 @@ namespace carl
          */
         FLOAT_T<FloatType>& operator /=(const FLOAT_T<FloatType>& _rhs)
         {
+			std::cout << __func__ << " mValue: " << mValue << " _rhs: " << _rhs << std::endl;
             mValue = mValue / _rhs.mValue;
+			std::cout << __func__ << " *this: " << *this << std::endl;
             return *this;
         }
 
@@ -1470,7 +1472,9 @@ namespace carl
          */
         FLOAT_T<FloatType>& operator /=(const FloatType& _rhs)
         {
+			std::cout << __func__ << " mValue: " << mValue << " _rhs: " << _rhs << std::endl;
             mValue = mValue / _rhs;
+			std::cout << __func__ << " *this: " << *this << std::endl;
             return *this;
         }
         
@@ -1574,7 +1578,8 @@ namespace carl
 	template<typename FloatType>
 	inline FLOAT_T<FloatType> pow(const FLOAT_T<FloatType>& _in, unsigned _exp)
 	{
-		FLOAT_T<FloatType> result = result.pow_assign(_exp);
+		FLOAT_T<FloatType> result;
+		_in.pow(result, _exp);
 		return result;
 	}
     
