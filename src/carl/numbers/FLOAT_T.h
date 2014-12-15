@@ -11,6 +11,7 @@
 #pragma once
 
 #include <string>
+#include <cfloat>
 #include <iostream>
 #include <assert.h>
 #include <math.h>
@@ -56,6 +57,28 @@ namespace carl
             return FLOAT_T<T1>(_op2.toDouble());
         }
     };
+	
+	
+	enum Str2Double_Error { FLOAT_SUCCESS, FLOAT_OVERFLOW, FLOAT_UNDERFLOW, FLOAT_INCONVERTIBLE };
+
+	static Str2Double_Error str2double (double &d, char const *s)
+	{
+		char *end;
+		long double  l;
+		errno = 0;
+		l = strtod(s, &end);
+		if ((errno == ERANGE && l == LDBL_MAX) || l > DBL_MAX) {
+			return FLOAT_OVERFLOW;
+		}
+		if ((errno == ERANGE && l == LDBL_MIN) || l < DBL_MIN) {
+			return FLOAT_UNDERFLOW;
+		}
+		if (*s == '\0' || *end != '\0') {
+			return FLOAT_INCONVERTIBLE;
+		}
+		d = double(l);
+		return FLOAT_SUCCESS;
+	}
     
     /**
      * Templated wrapper class which allows universal usage of different 
@@ -75,10 +98,10 @@ namespace carl
         /**
          * Default empty constructor, which initializes to zero.
          */
-        FLOAT_T<FloatType>()
+        FLOAT_T<FloatType>() :
+			mValue()
         {
             assert(std::is_floating_point<FloatType>::value);
-            mValue = FloatType(0);
         }
 
         /**
@@ -180,7 +203,8 @@ namespace carl
 		
 		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
 		{
-			mValue = std::atof(_string.c_str());
+			str2double (mValue, _string);
+//			mValue = std::atof(_string.c_str());
 		}
 
         /**
@@ -1464,7 +1488,7 @@ namespace carl
     inline bool isInteger(const FLOAT_T<FloatType>&) {
 	return false;
     }
-    
+	
     /**
      * Implements the division which assumes that there is no remainder.
      * @param _lhs 
@@ -1546,6 +1570,13 @@ namespace carl
         _in.sqrt(result);
         return result;
     }
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> pow(const FLOAT_T<FloatType>& _in, unsigned _exp)
+	{
+		FLOAT_T<FloatType> result = result.pow_assign(_exp);
+		return result;
+	}
     
     /**
      * Method which returns the next smaller integer of this number or the number
@@ -1609,6 +1640,11 @@ namespace carl
         return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
     }
     
+	template<typename FloatType>
+	inline bool isZero(const FLOAT_T<FloatType>& _in) {
+		return _in.mValue == 0;
+	}	
+	
 #ifdef USE_MPFR_FLOAT
 #include "adaption_float/mpfr_float.tpp"
 #endif
