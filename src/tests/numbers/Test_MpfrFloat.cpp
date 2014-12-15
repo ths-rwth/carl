@@ -16,7 +16,7 @@ TEST(mpfrFloatTest, Constructor)
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(dVal,carl::CARL_RND::A));
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(dVal,carl::CARL_RND::A,10));
     dVal = 0;
-    EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(dVal).getValue()) != 0);
+    EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(dVal).value()) != 0);
     
     // float constructor tests
     float fVal = 4;
@@ -24,7 +24,7 @@ TEST(mpfrFloatTest, Constructor)
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(fVal,carl::CARL_RND::A));
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(fVal,carl::CARL_RND::A,10));
     fVal = 0;
-    EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(fVal).getValue()) != 0);
+    EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(fVal).value()) != 0);
     
     // integer constructor tests
     int iVal = 4;
@@ -32,7 +32,7 @@ TEST(mpfrFloatTest, Constructor)
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf2 = carl::FLOAT_T<mpfr_t>(iVal,carl::CARL_RND::A));
     ASSERT_NO_THROW(carl::FLOAT_T<mpfr_t> hf3 = carl::FLOAT_T<mpfr_t>(iVal,carl::CARL_RND::A,10));
     iVal = 0;
-    EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(iVal).getValue()) != 0);
+    EXPECT_TRUE(mpfr_zero_p(carl::FLOAT_T<mpfr_t>(iVal).value()) != 0);
     
     // mpfr constructor tests
     mpfr_t mVal;
@@ -40,8 +40,8 @@ TEST(mpfrFloatTest, Constructor)
     mpfr_set_d(mVal,  3.14159265358979323846264338327950288419716939937510582097494459230781640628620899, MPFR_RNDNA);
     carl::FLOAT_T<mpfr_t> hf1 = carl::FLOAT_T<mpfr_t>(mVal);
     //std::cout << hf1 << std::endl;
-    hf1.setPrec(10);
-    EXPECT_EQ(10, hf1.getPrec());
+    hf1.setPrecision(10);
+    EXPECT_EQ(10, hf1.precision());
     //std::cout << hf1 << std::endl;
     
     // copy constructor test
