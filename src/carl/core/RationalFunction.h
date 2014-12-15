@@ -535,6 +535,17 @@ namespace carl
 		return std::move( RationalFunction<Pol, AS>(lhs) /= rhs );
 	}
 	
+	// TODO: Make more efficient :).
+	template<typename Pol, bool AS>
+	inline RationalFunction<Pol, AS> pow(unsigned exp, const RationalFunction<Pol, AS>& rf)
+	{
+		RationalFunction<Pol, AS> res = carl::constant_one<RationalFunction<Pol, AS>>();
+		for(unsigned i = exp; i > 0; --i) {
+			res *= rf;
+		}
+		return res;
+	}
+	
 	template<typename Pol, bool AS>
 	inline bool operator!=(const RationalFunction<Pol, AS>& lhs, const RationalFunction<Pol, AS>& rhs)
 	{
