@@ -1458,9 +1458,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& operator /=(const FLOAT_T<FloatType>& _rhs)
         {
-			std::cout << __func__ << " mValue: " << mValue << " _rhs: " << _rhs << std::endl;
             mValue = mValue / _rhs.mValue;
-			std::cout << __func__ << " *this: " << *this << std::endl;
             return *this;
         }
 
@@ -1472,9 +1470,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& operator /=(const FloatType& _rhs)
         {
-			std::cout << __func__ << " mValue: " << mValue << " _rhs: " << _rhs << std::endl;
             mValue = mValue / _rhs;
-			std::cout << __func__ << " *this: " << *this << std::endl;
             return *this;
         }
         
