@@ -539,7 +539,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	inline RationalFunction<Pol, AS> pow(unsigned exp, const RationalFunction<Pol, AS>& rf)
 	{
-		RationalFunction<Pol, AS> res = carl::constant_one<RationalFunction<Pol, AS>>();
+		RationalFunction<Pol, AS> res = carl::constant_one<RationalFunction<Pol, AS>>().get();
 		for(unsigned i = exp; i > 0; --i) {
 			res *= rf;
 		}
