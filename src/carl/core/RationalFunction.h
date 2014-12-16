@@ -5,7 +5,7 @@
  */
 
 #pragma once
-#include "../numbers/typetraits.h"
+#include "../numbers/numbers.h"
 #include "MultivariateGCD.h"
 #include "FactorizedPolynomial.h"
 
@@ -539,6 +539,7 @@ namespace carl
 	template<typename Pol, bool AS>
 	inline RationalFunction<Pol, AS> pow(unsigned exp, const RationalFunction<Pol, AS>& rf)
 	{
+		static_assert(std::is_same<Pol,Pol>::value, "Use carl::pow(rf, exp) instead. ");
 		RationalFunction<Pol, AS> res = carl::constant_one<RationalFunction<Pol, AS>>().get();
 		for(unsigned i = exp; i > 0; --i) {
 			res *= rf;
