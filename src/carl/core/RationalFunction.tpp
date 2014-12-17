@@ -294,7 +294,7 @@ namespace carl
         else if( this->isConstant() )
         {
             CoeffType c(this->mNumberQuotient);
-            *this = rhs;
+            *this = rhs.inverse();
             return *this /= c;
         }
         else if( rhs.isConstant() )

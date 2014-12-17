@@ -101,6 +101,12 @@ namespace carl
             eliminateCommonFactor( !AutoSimplify );
             assert(isConstant() || !denominatorAsPolynomial().isZero());
         }
+
+		explicit RationalFunction(std::pair<Pol,Pol>* quotient, const CoeffType& num, bool simplified):
+			mPolynomialQuotient(quotient),
+			mNumberQuotient(num),
+			mIsSimplified(simplified)
+		{}
         
         RationalFunction(const RationalFunction& _rf):
             mPolynomialQuotient( _rf.isConstant() ? nullptr : new std::pair<Pol,Pol>(_rf.nominator(), _rf.denominator()) ),
@@ -230,6 +236,19 @@ namespace carl
             }
             eliminateCommonFactor( false );
         }
+
+		/**
+		 * Returns the inverse of this rational function.
+		 * @return Inverse of this.
+		 */
+		RationalFunction inverse() const {
+			assert(!this->isZero());
+			if (isConstant()) {
+				return RationalFunction(nullptr, 1/mNumberQuotient, mIsSimplified);
+			} else {
+				return RationalFunction(new std::pair<Pol,Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first), carl::constant_zero<Coeff>().get(), mIsSimplified);
+			}
+		}
 
         /**
          * Check whether the rational function is zero
