@@ -246,7 +246,7 @@ namespace carl
 			if (isConstant()) {
 				return RationalFunction(nullptr, 1/mNumberQuotient, mIsSimplified);
 			} else {
-				return RationalFunction(new std::pair<Pol,Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first), carl::constant_zero<Coeff>().get(), mIsSimplified);
+				return RationalFunction(new std::pair<Pol,Pol>(mPolynomialQuotient->second, mPolynomialQuotient->first), carl::constant_zero<CoeffType>().get(), mIsSimplified);
 			}
 		}
 
