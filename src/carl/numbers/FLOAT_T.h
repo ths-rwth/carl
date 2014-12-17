@@ -61,7 +61,7 @@ namespace carl
 	
 	enum Str2Double_Error { FLOAT_SUCCESS, FLOAT_OVERFLOW, FLOAT_UNDERFLOW, FLOAT_INCONVERTIBLE };
 
-	static Str2Double_Error str2double (double &d, char const *s)
+	inline Str2Double_Error str2double (double &d, char const *s)
 	{
 		char *end;
 		long double  l;
