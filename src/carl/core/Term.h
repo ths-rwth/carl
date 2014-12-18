@@ -552,7 +552,7 @@ class Term
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
 		return std::move(rhs * lhs);
 	}
-	template<typename Coeff, EnableIf<carl::is_number<Coeff>>>
+	template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
 	inline Term<Coeff> operator*(const Monomial::Arg& lhs, const Coeff& rhs) {
 		return std::move(Term<Coeff>(rhs, lhs));
 	}
@@ -568,7 +568,7 @@ class Term
 	inline Term<Coeff> operator*(const Coeff& lhs, const Term<Coeff>& rhs) {
 		return std::move(rhs * lhs);
 	}
-	template<typename Coeff, EnableIf<carl::is_number<Coeff>>>
+	template<typename Coeff, EnableIf<carl::is_number<Coeff>> = dummy>
 	inline Term<Coeff> operator*(const Coeff& lhs, const Monomial::Arg& rhs) {
 		return std::move(rhs * lhs);
 	}

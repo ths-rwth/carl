@@ -922,7 +922,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C, EnableIf<carl::is_number<C>>>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const C& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
@@ -946,7 +946,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const C& lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C, EnableIf<carl::is_number<C>>>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator+(const C& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
@@ -1021,7 +1021,7 @@ public:
 	inline MultivariatePolynomial<C> operator-(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
-	template<typename C, EnableIf<carl::is_number<C>>>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator-(const Monomial::Arg& lhs, const C& rhs) {
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
@@ -1045,7 +1045,7 @@ public:
 	inline MultivariatePolynomial<C> operator-(const C& lhs, const Term<C>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
-	template<typename C, EnableIf<carl::is_number<C>>>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator-(const C& lhs, const Monomial::Arg& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
