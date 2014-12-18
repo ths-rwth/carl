@@ -1649,4 +1649,4 @@ namespace carl
 #ifdef USE_MPFR_FLOAT
 #include "adaption_float/mpfr_float.tpp"
 #endif
-}
+} // namespace
