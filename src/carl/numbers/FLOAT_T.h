@@ -1578,7 +1578,39 @@ namespace carl
 		_in.pow(result, _exp);
 		return result;
 	}
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> sin(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.sin(result);
+		return result;
+	}
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> cos(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.cos(result);
+		return result;
+	}
     
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> asin(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.asin(result);
+		return result;
+	}
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> acos(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.acos(result);
+		return result;
+	}
+	
     /**
      * Method which returns the next smaller integer of this number or the number
      * itself, if it is already an integer.
