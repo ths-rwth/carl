@@ -181,7 +181,7 @@ Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Co
 
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
+Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
 	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
 	if(tmp == nullptr)
@@ -270,7 +270,7 @@ bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
+bool operator<(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	if (lhs.monomial() == rhs) return lhs.coeff() < carl::constant_one<Coeff>().get();
 	return lhs.monomial() < rhs;
 }
@@ -288,7 +288,7 @@ bool operator<(const Term<Coeff>& lhs, const Coeff& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
+bool operator<(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
 	if (lhs == rhs.monomial()) return carl::constant_one<Coeff>().get() < rhs.coeff();
 	return lhs < rhs.monomial();
 }
