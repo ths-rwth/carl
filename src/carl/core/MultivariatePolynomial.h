@@ -603,7 +603,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
-	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs);
+	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs);
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
@@ -615,7 +615,7 @@ public:
 		return rhs == lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator==(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator==(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs == lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -654,7 +654,7 @@ public:
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -670,7 +670,7 @@ public:
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator!=(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator!=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -713,7 +713,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
-	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs);
+	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs);
 	template<typename C, typename O, typename P>
 	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
@@ -721,7 +721,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
-	bool operator<(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	bool operator<(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	bool operator<(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
@@ -745,7 +745,7 @@ public:
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
@@ -761,7 +761,7 @@ public:
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator<=(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator<=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
@@ -791,7 +791,7 @@ public:
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -807,7 +807,7 @@ public:
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator>(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -837,7 +837,7 @@ public:
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -853,7 +853,7 @@ public:
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>=(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator>=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -883,7 +883,7 @@ public:
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -903,7 +903,7 @@ public:
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
 	template<typename C>
-	inline MultivariatePolynomial<C> operator+(const Term<C>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C> operator+(const Term<C>& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
 	template<typename C>
@@ -922,7 +922,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C>
+	template<typename C, EnableIf<carl::is_number<C>>>
 	inline MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const C& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
@@ -946,7 +946,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const C& lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C>
+	template<typename C, EnableIf<carl::is_number<C>>>
 	inline MultivariatePolynomial<C> operator+(const C& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
@@ -982,7 +982,7 @@ public:
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -1002,7 +1002,7 @@ public:
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const Term<C>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C> operator-(const Term<C>& lhs, const Monomial::Arg& rhs) {
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C>
@@ -1014,15 +1014,15 @@ public:
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator-(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
 	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const std::shared_ptr<const Monomial>& lhs, const Term<C>& rhs) {
+	inline MultivariatePolynomial<C> operator-(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
-	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const std::shared_ptr<const Monomial>& lhs, const C& rhs) {
+	template<typename C, EnableIf<carl::is_number<C>>>
+	inline MultivariatePolynomial<C> operator-(const Monomial::Arg& lhs, const C& rhs) {
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C, typename O, typename P>
@@ -1045,8 +1045,8 @@ public:
 	inline MultivariatePolynomial<C> operator-(const C& lhs, const Term<C>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
-	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const C& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	template<typename C, EnableIf<carl::is_number<C>>>
+	inline MultivariatePolynomial<C> operator-(const C& lhs, const Monomial::Arg& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
 	template<typename C>
