@@ -81,20 +81,20 @@ namespace carl
 	}
     
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
-	inline bool AlmostEqual2sComplement(float A, float B, int maxUlps = 1)
+	inline bool AlmostEqual2sComplement(double A, double B, int maxUlps = 1)
 	{
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
 		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		int aInt = *(int*)&A;
+		long int aInt = *(long int*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
-			aInt = 0x80000000 - aInt;
+			aInt = 0x8000000000000000 - aInt;
 		// Make bInt lexicographically ordered as a twos-complement int
-		int bInt = *(int*)&B;
+		long int bInt = *(long int*)&B;
 		if (bInt < 0)
-			bInt = 0x80000000 - bInt;
-		int intDiff = std::abs(aInt - bInt);
+			bInt = 0x8000000000000000 - bInt;
+		long int intDiff = std::abs(aInt - bInt);
 		if (intDiff <= maxUlps)
 			return true;
 
