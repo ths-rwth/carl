@@ -154,6 +154,10 @@ class SortManager : public Singleton<SortManager>
         Sort newSort( const SortContent* _sc );
 
     public:
+		~SortManager() {
+			for (auto& s: mSorts) delete s;
+			mSorts.clear();
+		}
         
         /**
          * @param _sort A sort.
