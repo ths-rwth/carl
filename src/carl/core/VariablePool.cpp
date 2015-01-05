@@ -31,6 +31,9 @@ Variable VariablePool::getFreshVariable(VariableType type) {
 }
 
 Variable VariablePool::getFreshVariable(const std::string& name, VariableType type) {
+	if (name.substr(0, mVariablePrefix.size()) == mVariablePrefix) {
+		CARL_LOG_WARN("carl", "The prefix for auxiliary variable names \"" << mVariablePrefix << "\" is a prefix for the variable name \"" << name << "\".");
+	}
 	Variable tmp = this->getFreshVariable(type);
 	this->setName(tmp, name);
 	return tmp;
