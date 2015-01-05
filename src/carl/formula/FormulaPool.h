@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "Formula.h"
-#include "VariableNamePool.h"
-#include "ConstraintPool.h"
 #include "../util/Singleton.h"
+#include "../core/VariablePool.h"
+#include "Formula.h"
+#include "ConstraintPool.h"
 #include <mutex>
 #include <boost/variant.hpp>
 
@@ -97,7 +97,7 @@ namespace carl
                 auto iter = mTseitinVars.insert( std::make_pair( _formula, Formula<Pol>() ) );
                 if( iter.second )
                 {
-                    Formula<Pol> hi( newAuxiliaryBooleanVariable() );
+                    Formula<Pol> hi(carl::freshBooleanVariable());
                     hi.setDifficulty( _formula.difficulty() );
                     iter.first->second = std::move( hi );
                 }

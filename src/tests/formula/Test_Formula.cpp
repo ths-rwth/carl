@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "../../carl/core/MultivariatePolynomial.h"
+#include "../../carl/core/VariablePool.h"
 #include "../../carl/formula/Formula.h"
-#include "../../carl/formula/VariableNamePool.h"
 #include "../../carl/util/stringparser.h"
 
 #include <cln/cln.h>
@@ -15,10 +15,10 @@ typedef Constraint<Pol> Constr;
 
 TEST(Formula, Construction)
 {
-    Variable x = newArithmeticVariable( "x", VariableType::VT_REAL );
-    Variable y = newArithmeticVariable( "y", VariableType::VT_REAL );
+    Variable x = VariablePool::getInstance().getFreshVariable( "x", VariableType::VT_REAL );
+    Variable y = VariablePool::getInstance().getFreshVariable( "y", VariableType::VT_REAL );
 //    Variable i = newArithmeticVariable( "i", VariableType::VT_INT );
-    Variable b = newBooleanVariable( "b" );
+    Variable b = VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL );
 //    Sort sortS = newSort( "S" );
 //    Sort sortT = newSort( "T" );
 //    Variable u = VariableNamePool::getInstance().newUninterpretedVariable( "u" );

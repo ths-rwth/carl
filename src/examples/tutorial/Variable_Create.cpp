@@ -10,9 +10,7 @@ int main() {
 	 * A carl::Variable object represents a single variable.
 	 * A variable can have any type from carl::VariableType:
 	 * - Real (VT_REAL)
-	 * - Rational (VT_RATIONAL)
 	 * - Integer (VT_INT)
-	 * - Natural (VT_NATURAL)
 	 * - Boolean (VT_BOOL)
 	 * - Uninterpreted (VT_UNINTERPRETED)
 	 *

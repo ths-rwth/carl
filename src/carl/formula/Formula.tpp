@@ -10,7 +10,6 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
-#include "VariableNamePool.h"
 #include "ConstraintPool.h"
 
 using namespace std;
@@ -221,7 +220,7 @@ namespace carl
         }
         if( mType == FormulaType::BOOL )
         {
-            return (_init + variablePool().getVariableName( mBoolean, _friendlyNames ) + activity);
+            return (_init + VariablePool::getInstance().getName( mBoolean, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::CONSTRAINT )
             return (_init + mpConstraint->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
@@ -309,7 +308,7 @@ namespace carl
         {
             string result = _init + "(exists ";
             for (auto v: mpQuantifierContent->mVariables) {
-                result += variablePool().getVariableName(v, _friendlyNames) + " ";
+                result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
             }
             result += mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
             result += ")";
@@ -319,7 +318,7 @@ namespace carl
         {
             string result = _init + "(forall ";
             for (auto v: mpQuantifierContent->mVariables) {
-                result += variablePool().getVariableName(v, _friendlyNames) + " ";
+                result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
             }
             result += mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
             result += ")";
@@ -824,7 +823,7 @@ namespace carl
                 result += constraint().toString( 1 );
                 break;
             case FormulaType::BOOL:
-                result += variablePool().getVariableName( boolean(), true ) + " = 1";
+                result += VariablePool::getInstance().getName( boolean(), true ) + " = 1";
                 break;
             case FormulaType::IMPLIES:
                 result += "( " + premise().toRedlogFormat( _withVariables ) + " " + oper + " " + premise().toRedlogFormat( _withVariables ) + " )";
@@ -842,7 +841,7 @@ namespace carl
                     booleanVars( boolVars );
                     for( auto j = boolVars.begin(); j != boolVars.end(); ++j )
                     {
-                        string boolName = variablePool().getVariableName( *j, true );
+                        string boolName = VariablePool::getInstance().getName( *j, true );
                         result += "(" + boolName + " = 0 or " + boolName + " = 1) and ";
                     }
                 }
@@ -886,12 +885,12 @@ namespace carl
         }
         else if( j != boolVars.end() )
         {
-            string boolName = variablePool().getVariableName( *j, true );
+            string boolName = VariablePool::getInstance().getName( *j, true );
             unordered_map<string, string>::const_iterator vId = _variableIds.find(boolName);
             result += vId == _variableIds.end() ? boolName : vId->second;
             for( ++j; j != boolVars.end(); ++j )
             {
-                boolName = variablePool().getVariableName( *j, true );
+                boolName = VariablePool::getInstance().getName( *j, true );
                 result += _separator;
                 vId = _variableIds.find(boolName);
                 result += vId == _variableIds.end() ? boolName : vId->second;

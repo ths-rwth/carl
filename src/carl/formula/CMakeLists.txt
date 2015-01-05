@@ -16,7 +16,6 @@ set(carl_lib_formula_headers
     UFInstanceManager.h
     UFManager.h
     UninterpretedFunction.h
-    VariableNamePool.h
 )
 
 # Source files in here
@@ -28,7 +27,6 @@ set(carl_lib_formula_sources
     formula/UFInstanceManager.cpp
     formula/UFManager.cpp
     formula/UninterpretedFunction.cpp
-    formula/VariableNamePool.cpp
     PARENT_SCOPE
 )
 

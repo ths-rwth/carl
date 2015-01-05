@@ -19,12 +19,11 @@ typedef unsigned exponent;
 	
 /**
  * Several types of variables are supported.
- * REAL: the reals RR
- * RATIONAL: rational numbers QQ
- * INT: the integers ZZ
- * NATURAL: nonnegative integers NN
+ * BOOL: the booleans
+ * REAL: the reals
+ * INT: the integers
  */
-enum class VariableType : unsigned { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, VT_NATURAL = 3, VT_BOOL = 4, VT_UNINTERPRETED = 5, MIN_TYPE = 0, MAX_TYPE = VT_UNINTERPRETED };
+enum class VariableType : unsigned { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, MIN_TYPE = 0, MAX_TYPE = VT_UNINTERPRETED, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 /**
  * Streaming operator for VariableType.
@@ -35,11 +34,10 @@ enum class VariableType : unsigned { VT_REAL = 0, VT_RATIONAL = 1, VT_INT = 2, V
 inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 	switch (t) {
 		case VariableType::VT_BOOL: return os << "Bool";
-		case VariableType::VT_INT: return os << "Int";
-		case VariableType::VT_NATURAL: return os << "Natural";
-		case VariableType::VT_RATIONAL: return os << "Rational";
 		case VariableType::VT_REAL: return os << "Real";
+		case VariableType::VT_INT: return os << "Int";
 		case VariableType::VT_UNINTERPRETED: return os << "Uninterpreted";
+		default: return os << "Invalid";
 	}
 	return os << "Unknown";
 }
@@ -48,9 +46,13 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
  * A Variable represents an algebraic variable that can be used throughout carl.
  *
  * Variables are basically bitvectors that contain `[rank | id | type]`, called *content*.
- * - The `id` is the actual identifier of this variable, unique throughout the program state.
- * - The `type` is the variable type. Although there can be multiple instances with the same id but different types, this shall be avoided.
+ * - The `id` is the identifier of this variable.
+ * - The `type` is the variable type.
  * - The `rank` is zero be default, but can be used to create a custom variable ordering, as the comparison operators compare the whole content.
+ * The `id` and the `type` together form a unique identifier for a variable.
+ * If the VariablePool is used to construct variables (and we advise to do so), the id's will be consecutive starting with one for each variable type.
+ * The `rank` is meant to change the variable order when passing a set of variables to another context, for example a function.
+ * A single variable (identified by `id` and `type`) should not occur with two different `rank` values in the same context and hence such a comparison should never take place.
  *
  * A variable with id zero is considered invalid. It can be used as a default argument and can be compared to Variable::NO_VARIABLE.
  * Such a variable can only be constructed using the default constructor and its content will always be zero.
@@ -84,7 +86,7 @@ private:
 	 * In order to keep a variable object small, this is the only data member.
 	 * All other data (like names or alike) are stored in the VariablePool.
 	 */
-	unsigned mContent;
+	std::size_t mContent;
 
 public:
 	
@@ -101,11 +103,11 @@ public:
 	 * @param type The type.
 	 * @param rank The rank.
 	 */
-	explicit Variable(unsigned id, VariableType type = VariableType::VT_REAL, unsigned rank = 0):
+	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0):
 		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | (unsigned)type)
 	{
 		assert(rank < (1 << RESERVED_FOR_RANK));
-		assert(0 < id && id < (1 << AVAILABLE));
+		assert(0 < id && id < ((std::size_t)1 << AVAILABLE));
 		assert(VariableType::MIN_TYPE <= type && type <= VariableType::MAX_TYPE);
 	}
 	
@@ -113,8 +115,8 @@ public:
 	 * Retrieves the id of the variable.
 	 * @return Variable id.
 	 */
-	unsigned getId() const {
-		return (mContent >> RESERVED_FOR_TYPE) % (1 << AVAILABLE);
+	std::size_t getId() const {
+		return (mContent >> RESERVED_FOR_TYPE) % ((std::size_t)1 << AVAILABLE);
 	}
 	
 	/**
@@ -122,14 +124,14 @@ public:
 	 * @return Variable type.
 	 */
 	VariableType getType() const {
-		return (VariableType)(mContent % (1 << RESERVED_FOR_TYPE));
+		return (VariableType)(mContent % ((std::size_t)1 << RESERVED_FOR_TYPE));
 	}
 	
 	/**
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
 	 */
-	unsigned getRank() const {
+	std::size_t getRank() const {
 		return mContent >> (AVAILABLE + RESERVED_FOR_TYPE);
 	}
 	
@@ -152,7 +154,7 @@ public:
 	/**
 	 * Compares two variables.
 	 *
-	 * Note that for performance reasons, we compare the not only the id but the whole content of the variable (including type and rank).
+	 * Note that for performance reasons, we compare the whole content of the variable (including the rank).
 	 *
 	 * Note that the variable order is not the order of the variable id. We consider variables greater, if they are defined earlier, i.e. if they have a smaller id.
 	 * Hence, the variables order and the order of the variable ids are reversed.
@@ -183,7 +185,7 @@ public:
 	/// Number of bits available for the content.
 	static constexpr unsigned BITSIZE = CHAR_BIT * sizeof(mContent);
 	/// Number of bits reserved for the type.
-	static constexpr unsigned RESERVED_FOR_TYPE = 4;
+	static constexpr unsigned RESERVED_FOR_TYPE = 3;
 	/// Number of bits reserved for the rank.
 	static constexpr unsigned RESERVED_FOR_RANK = 4;
 	/// Overall number of bits reserved.

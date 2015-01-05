@@ -5,6 +5,8 @@
  * @version 2014-10-30
  */
 
+#include <sstream>
+
 #include "UFInstance.h"
 #include "UFInstanceManager.h"
 

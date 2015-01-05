@@ -8,9 +8,9 @@
 #pragma once
 
 #include "../util/Common.h"
+#include "../core/VariablePool.h"
 #include "Sort.h"
 #include "SortManager.h"
-#include "VariableNamePool.h"
 
 namespace carl
 {
@@ -91,7 +91,7 @@ namespace carl
              */
             std::string toString( bool _friendlyNames ) const
             {
-                return variablePool().getVariableName( mVar, _friendlyNames );
+				return VariablePool::getInstance().getName(mVar, _friendlyNames);
             }
             
             /**
