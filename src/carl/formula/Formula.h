@@ -147,6 +147,9 @@ namespace carl
             
             // Member.
             
+            /// The deduction flag, which indicates, that this formula g is a direct sub-formula of
+            /// a conjunction of formulas (and g f_1 .. f_n), and, that (implies (and f_1 .. f_n) g) holds.
+            mutable bool mDeducted;
             /// The hash value.
             size_t mHash;
             /// The unique id.
@@ -411,6 +414,24 @@ namespace carl
             {}
 
             // Methods.
+
+            /**
+             * Sets the deduction flag to the given value.
+             * @param _deducted The value to set the deduction flag to.
+             */
+            void setDeducted( bool _deducted ) const
+            {
+                mpContent->mDeducted = _deducted;
+            }
+
+            /**
+             * @return The deduction flag, which indicates, that this formula g is a direct sub-formula of
+             *          a conjunction of formulas (and g f_1 .. f_n), and, that (implies (and f_1 .. f_n) g) holds.
+             */
+            bool deducted() const
+            {
+                return mpContent->mDeducted;
+            }
 
             /**
              * @return Some value stating an expected difficulty of solving this formula for satisfiability.
