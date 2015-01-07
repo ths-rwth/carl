@@ -20,6 +20,7 @@ namespace carl
     
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( bool _true, size_t _id ):
+        mDeducted( false ),
         mHash( ((size_t)(_true ? ConstraintPool<Pol>::getInstance().consistentConstraint()->id() : ConstraintPool<Pol>::getInstance().inconsistentConstraint()->id())) << (sizeof(size_t)*4) ),
         mId( _id ),
         mActivity( 0 ),
@@ -31,6 +32,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( carl::Variable::Arg _boolean ):
+        mDeducted( false ),
         mHash( (size_t)_boolean.getId() ), // TODO: subtract the id of the boolean variable with the smallest id
         mId( 0 ),
         mActivity( 0 ),
@@ -44,6 +46,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Constraint<Pol>* _constraint ):
+        mDeducted( false ),
         mHash( ((size_t) _constraint->id()) << (sizeof(size_t)*4) ),
         mId( 0 ),
         mActivity( 0 ),
@@ -69,6 +72,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( UEquality&& _ueq ):
+        mDeducted( false ),
         mHash( std::hash<UEquality>()( _ueq ) ),
         mId( 0 ),
         mActivity( 0 ),
@@ -80,6 +84,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _subformula ):
+        mDeducted( false ),
         mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
         mId( 0 ),
         mActivity( 0 ),
@@ -91,6 +96,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion ):
+        mDeducted( false ),
         mHash( CIRCULAR_SHIFT(size_t, (((size_t)IMPLIES << 5) ^ _premise.getHash()), 5) ^ _conclusion.getHash() ),
         mId( 0 ),
         mActivity( 0 ),
@@ -103,6 +109,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else ):
+        mDeducted( false ),
         mHash( CIRCULAR_SHIFT(size_t, (CIRCULAR_SHIFT(size_t, (((size_t)ITE << 5) ^ _condition.getHash()), 5) ^ _then.getHash()), 5) ^ _else.getHash() ),
         mId( 0 ),
         mActivity( 0 ),
@@ -115,6 +122,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(const FormulaType _type, const std::vector<carl::Variable>&& _vars, const Formula<Pol>& _term):
+        mDeducted( false ),
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
         mId( 0 ),
@@ -129,6 +137,7 @@ namespace carl
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const FormulaType _type, std::set<Formula<Pol>>&& _subformulas ):
+        mDeducted( false ),
         mHash( (size_t)_type ),
         mId( 0 ),
         mActivity( 0 ),
