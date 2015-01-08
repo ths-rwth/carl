@@ -196,7 +196,9 @@ TEST(CAD, Samples)
 	
 	carl::Interval<cln::cl_RA> bounds(0, carl::BoundType::STRICT, 1, carl::BoundType::INFTY);
 	
-	carl::cad::SampleSet<cln::cl_RA> res = carl::CAD<cln::cl_RA>::samples(roots, currentSamples, replacedSamples, bounds);
+	carl::CAD<cln::cl_RA> cad;
+	
+	carl::cad::SampleSet<cln::cl_RA> res = cad.samples(roots, currentSamples, replacedSamples, bounds);
 
 	std::cout << res << std::endl;
 	ASSERT_TRUE(!res.empty());
