@@ -44,7 +44,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 	}
 
 	bool foundGB = false;
-	for(Polynomial newPol : scheduledForAdding)
+	for(const Polynomial& newPol : scheduledForAdding)
 	{
 		if(addToGb(newPol))
 		{
