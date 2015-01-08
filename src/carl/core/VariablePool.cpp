@@ -18,6 +18,7 @@ VariablePool::VariablePool(): Singleton()
 {
 	CARL_LOG_INFO("carl.varpool", "Constructor called");
 	clear();
+	setPrefix();
 }
 
 Variable VariablePool::getFreshVariable(VariableType type) {

@@ -45,11 +45,11 @@ private:
 	std::mutex setNameMutex;
 
 	std::size_t& nextID(const VariableType& vt) {
-		assert((std::size_t)vt >= 0 && (std::size_t)vt < mNextIDs.size());
+		assert((std::size_t)vt < mNextIDs.size());
 		return mNextIDs[(std::size_t)vt];
 	}
 	const std::size_t& nextID(const VariableType& vt) const {
-		assert((std::size_t)vt >= 0 && (std::size_t)vt < mNextIDs.size());
+		assert((std::size_t)vt < mNextIDs.size());
 		return mNextIDs[(std::size_t)vt];
 	}
 
