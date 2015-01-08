@@ -111,6 +111,7 @@ public:
 			if (v == curVars[i]) return i;
 		}
 		assert(false);
+		return 0;
 	}
 	
 	friend std::ostream& operator<<(std::ostream& os, const Variables& v);
