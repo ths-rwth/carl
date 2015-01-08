@@ -65,6 +65,9 @@ const std::string VariablePool::getName(Variable::Arg v, bool variableName) cons
 			return mVariablePrefix + "i_" + std::to_string(v.getId());
 		case VariableType::VT_UNINTERPRETED:
 			return mVariablePrefix + "u_" + std::to_string(v.getId());
+		default:
+			assert(false);
+			return "";
 	}
 }
 

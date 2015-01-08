@@ -49,6 +49,7 @@
 #include "Constraint.h"
 #include "EliminationSet.h"
 #include "SampleSet.h"
+#include "Variables.h"
 
 namespace carl {
 
@@ -68,10 +69,8 @@ public:
 	/// Type of a map of variable bounds.
 	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
 private:
-	/**
-	 * Fix list of variables for all computations.
-	 */
-	std::vector<Variable> variables;
+	
+	cad::Variables variables;
 	
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
@@ -98,10 +97,6 @@ private:
 	 */
 	std::list<const UPolynomial*> scheduledPolynomials;
 	
-	/**
-	 * list of new variables introduced by the scheduled elimination polynomials (mNewvariables and mVeriables are disjoint)
-	 */
-	std::vector<Variable> newVariables;
 	
 	/**
 	 * flag indicating whether the sample construction is completed or not
@@ -191,7 +186,7 @@ public:
 	* @return list of main variables of the polynomials of this cad
 	*/
 	const std::vector<Variable>& getVariables() const {
-		return this->variables;
+		return this->variables.getCurrent();
 	}
 	
 	/**
@@ -221,13 +216,6 @@ public:
 	bool isInterupted() const {
 		return this->interrupted;
 	}
-	
-	/** Gives the index of a given variable in the CAD's internal list of variables which is corresponding to the current elimination status.
-	 * @param v variable whose index shall be determined
-	 * @return index of the variable in the list of variables or the number of variables if no such index was found
-	 * @complexity linear in the number of variables
-	 */
-	unsigned indexOf(Variable::Arg v) const;
 	
 	/**
 	 * Collects all samples which were constructed for this sample tree node.
@@ -411,7 +399,7 @@ public:
 	 * @return a set of sample points for the given univariate polynomial sorted in ascending order.
 	 * @complexity linear in <code>roots.size()</code>
 	 */
-	static cad::SampleSet<Number> samples(
+	cad::SampleSet<Number> samples(
 			const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
@@ -430,14 +418,13 @@ public:
 	* @return a set of sample points for the given univariate polynomial
 	* @complexity linear in the number of roots of <code>p</code> plus the complexity of <code>RealAlgebraicNumberFactory::realRoots( p )</code>
 	*/
-	static cad::SampleSet<Number> samples(
+	cad::SampleSet<Number> samples(
 			const UPolynomial* p,
 			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 			const std::list<Variable>& variables,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-			const Interval<Number>& bounds = Interval<Number>::unboundedInterval(),
-			cad::CADSettings settings = cad::CADSettings::getSettings()
+			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
 	);
 
 	/**
@@ -453,7 +440,7 @@ public:
 	* @complexity cubic in the number of variables
 	*/
 	template<class VariableIterator, class PolynomialIterator>
-	std::vector<Variable> orderVariablesGreeedily(
+	std::vector<Variable> orderVariablesGreedily(
 			VariableIterator firstVariable,
 			VariableIterator lastVariable,
 			PolynomialIterator firstPolynomial,

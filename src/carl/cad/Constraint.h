@@ -20,6 +20,7 @@
 #include "../core/Variable.h"
 #include "../interval/IntervalEvaluation.h"
 #include "CADSettings.h"
+#include "Variables.h"
 
 namespace carl {
 namespace cad {
@@ -122,7 +123,7 @@ public:
 	 * Changes the variables of this constraint to start with v, where all other variables are being dropped.
 	 * @param v
 	 */
-	void unifyVariables(const std::vector<Variable>& v) {
+	void unifyVariables(const cad::Variables& v) {
 		this->variables.assign(v.begin(), v.end());
 	}
 	

@@ -29,7 +29,6 @@ CAD<Number>::CAD():
 		eliminationSets(),
 		polynomials(),
 		scheduledPolynomials(),
-		newVariables(),
 		iscomplete(false),
 		interrupted(false),
 		interrupts(),
@@ -47,7 +46,6 @@ CAD<Number>::CAD(cad::PolynomialOwner<Number>* parent):
 		eliminationSets(),
 		polynomials(),
 		scheduledPolynomials(),
-		newVariables(),
 		iscomplete(false),
 		interrupted(false),
 		interrupts(),
@@ -76,7 +74,7 @@ CAD<Number>::CAD(const std::list<const UPolynomial*>& s, const std::vector<Varia
 		CAD()
 {
 	this->scheduledPolynomials.assign(s.begin(), s.end());
-	this->newVariables = v;
+	this->variables.setNewVariables(v);
 	this->setting = setting;
 	this->prepareElimination();
 }
@@ -99,14 +97,6 @@ CAD<Number>::CAD(const CAD<Number>& cad):
 		interrupted( cad.interrupted ),
 		setting( cad.setting )
 {
-}
-
-template<typename Number>
-unsigned CAD<Number>::indexOf(Variable::Arg v) const {
-	for(unsigned int i = 0; i < this->variables.size(); ++i) {
-		if (v == this->variables[i]) return i;
-	}
-	assert(false);
 }
 
 template<typename Number>
@@ -215,11 +205,11 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 template<typename Number>
 bool CAD<Number>::prepareElimination() {
 	CARL_LOG_TRACE("carl.cad", __func__ << "()");
-	if ((this->newVariables.empty() && this->scheduledPolynomials.empty()) || (variables.empty() && newVariables.empty())) {
+	if (this->variables.newEmpty() && (this->scheduledPolynomials.empty() || variables.empty())) {
 		return false;
 	}
 	
-	long unsigned newVariableCount = this->newVariables.size();
+	std::size_t newVariableCount = this->variables.newSize();
 	
 	/* Algorithm overview:
 	 *
@@ -241,15 +231,13 @@ bool CAD<Number>::prepareElimination() {
 			// VariableListPool::addVariable(v);
 		//}
 	}
-	if (!this->newVariables.empty()) {
+	if (!this->variables.newEmpty()) {
 		// introduce new elimination levels and fill them appropriately
 		// (1)
 		
-		CARL_LOG_TRACE("carl.cad", "Adding " << this->newVariables.size() << " to " << this->variables.size() << " old variables.");
+		CARL_LOG_TRACE("carl.cad", "Adding " << this->variables.newSize() << " to " << this->variables.size() << " old variables.");
 		// variables, newVariables = newVariables:variables, []
-		this->newVariables.insert(this->newVariables.end(), this->variables.begin(), this->variables.end());
-		this->variables.clear();
-		std::swap(this->variables, this->newVariables);
+		this->variables.appendNewToCur();
 		
 		// (1)
 		/// @todo make this more efficient
@@ -372,7 +360,6 @@ void CAD<Number>::clear() {
 	this->eliminationSets.clear();
 	this->polynomials.clear();
 	this->scheduledPolynomials.clear();
-	this->newVariables.clear();
 	this->iscomplete = false;
 	this->interrupted = false;
 	this->interrupts.clear();
@@ -654,8 +641,7 @@ template<typename Number>
 void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
 	CARL_LOG_TRACE("carl.cad", __func__ << "( " << p << ", " << v << " )");
 	Variable var = v.front();
-	if (!this->variables.empty()) var = this->variables.front();
-	else if (!this->newVariables.empty()) var = this->newVariables.front();
+	if (!this->variables.empty()) var = this->variables.first();
 
 	CARL_LOG_TRACE("carl.core", "Adding " << p);
 	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var));
@@ -677,15 +663,7 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 	this->scheduledPolynomials.push_back(this->take(up));
 	
 	// determine the variables differing from mVariables and add them to the front of the existing variables
-	for (Variable var: v) {
-		if (
-			(std::find(this->variables.begin(), this->variables.end(), var) == this->variables.end()) &&
-			(std::find(this->newVariables.begin(), this->newVariables.end(), var) == this->newVariables.end())
-		) {
-			// found a new variable
-			this->newVariables.push_back(var);
-		}
-	}
+	this->variables.complete(v);
 }
 
 template<typename Number>
@@ -849,6 +827,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	}
 	CARL_LOG_FUNC("carl.cad", roots << ", " << currentSamples.samples() << ", " << bounds);
 	if (!currentSamples.samples().empty()) {
+		// Sanity check: Assert that outermost sample is a root.
 		auto first = *currentSamples.samples().begin();
 		assert(!first->isRoot());
 	}
@@ -978,12 +957,11 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		const std::list<Variable>& variables,
 		cad::SampleSet<Number>& currentSamples,
 		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-		const Interval<Number>& bounds,
-		cad::CADSettings settings
+		const Interval<Number>& bounds
 ) {
 	assert(variables.size() == sample.size());
-	return CAD<Number>::samples(
-		carl::rootfinder::realRoots(*p, variables, sample, bounds, settings.splittingStrategy),
+	return this->samples(
+		carl::rootfinder::realRoots(*p, variables, sample, bounds, this->setting.splittingStrategy),
 		currentSamples,
 		replacedSamples,
 		bounds
@@ -992,7 +970,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 
 template<typename Number>
 template<class VariableIterator, class PolynomialIterator>
-std::vector<Variable> CAD<Number>::orderVariablesGreeedily(
+std::vector<Variable> CAD<Number>::orderVariablesGreedily(
 		VariableIterator firstVariable,
 		VariableIterator lastVariable,
 		PolynomialIterator firstPolynomial,
@@ -1503,9 +1481,9 @@ bool CAD<Number>::liftCheck(
 			CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()]);
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
-				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, bound->second, this->setting));
+				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, bound->second));
 			} else {
-				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, Interval<Number>::unboundedInterval(), this->setting));
+				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, Interval<Number>::unboundedInterval()));
 			}
 			
 			// replace all samples in the tree which were changed in the current samples list
@@ -1879,7 +1857,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(this));
 	CARL_LOG_INFO("carl.core", "Now in nested CAD " << &cadbox);
 	cadbox.scheduledPolynomials.assign({p});
-	cadbox.newVariables = variables;
+	cadbox.variables.setNewVariables(variables);
 	cadbox.setting = boxSetting;
 	
 	RealAlgebraicPoint<Number> r;
