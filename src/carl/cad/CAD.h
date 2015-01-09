@@ -402,6 +402,7 @@ public:
 	 * @complexity linear in <code>roots.size()</code>
 	 */
 	cad::SampleSet<Number> samples(
+			std::size_t openVariableCount,
 			const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
@@ -421,6 +422,7 @@ public:
 	* @complexity linear in the number of roots of <code>p</code> plus the complexity of <code>RealAlgebraicNumberFactory::realRoots( p )</code>
 	*/
 	cad::SampleSet<Number> samples(
+			std::size_t openVariableCount,
 			const UPolynomial* p,
 			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 			const std::list<Variable>& variables,

@@ -853,6 +853,7 @@ RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
 
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
+		std::size_t openVariableCount,
 		const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 		cad::SampleSet<Number>& currentSamples,
 		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
@@ -957,6 +958,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 
 template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
+		std::size_t openVariableCount,
 		const UPolynomial* p,
 		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
 		const std::list<Variable>& variables,
@@ -966,6 +968,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 ) {
 	assert(variables.size() == sample.size());
 	return this->samples(
+		openVariableCount,
 		carl::rootfinder::realRoots(*p, variables, sample, bounds, this->setting.splittingStrategy),
 		currentSamples,
 		replacedSamples,
@@ -1467,12 +1470,12 @@ bool CAD<Number>::liftCheck(
 			boundRoots.push_back(RealAlgebraicNumberNR<Number>::create(bound->second.upper(), true));
 		}
 		if (boundRoots.empty()) {
-			sampleSetIncrement.insert(this->samples({RealAlgebraicNumberNR<Number>::create(bound->second.center(), true)}, currentSamples, replacedSamples));
+			sampleSetIncrement.insert(this->samples(openVariableCount, {RealAlgebraicNumberNR<Number>::create(bound->second.center(), true)}, currentSamples, replacedSamples));
 		} else {
-			sampleSetIncrement.insert(this->samples(boundRoots, currentSamples, replacedSamples));
+			sampleSetIncrement.insert(this->samples(openVariableCount, boundRoots, currentSamples, replacedSamples));
 		}
 	} else {
-		sampleSetIncrement.insert(this->samples({RealAlgebraicNumberNR<Number>::create(0, true)}, currentSamples, replacedSamples));
+		sampleSetIncrement.insert(this->samples(openVariableCount, {RealAlgebraicNumberNR<Number>::create(0, true)}, currentSamples, replacedSamples));
 	}
 	
 	while (true) {
@@ -1497,9 +1500,9 @@ bool CAD<Number>::liftCheck(
 			CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()]);
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
-				sampleSetIncrement.insert(this->samples(next, sample, variables, currentSamples, replacedSamples, bound->second));
+				sampleSetIncrement.insert(this->samples(openVariableCount, next, sample, variables, currentSamples, replacedSamples, bound->second));
 			} else {
-				sampleSetIncrement.insert(this->samples(next, sample, variables, currentSamples, replacedSamples));
+				sampleSetIncrement.insert(this->samples(openVariableCount, next, sample, variables, currentSamples, replacedSamples));
 			}
 			
 			// replace all samples in the tree which were changed in the current samples list
