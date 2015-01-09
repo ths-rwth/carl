@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-mkdir build || exit 1
-cd build/ || exit 1
-cmake -D DEVELOPER=ON ../ || exit 1
-make resources || exit 1
+mkdir build || return 1
+cd build/ || return 1
+cmake -D DEVELOPER=ON ../ || return 1
+make resources || return 1
 make -j4 lib_carl
-exit $?
+return $?
