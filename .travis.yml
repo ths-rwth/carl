@@ -30,7 +30,7 @@ before_install:
 script:
   - source ./.travis.build
 
-after_script: make test
+after_script: make -j4 && make test
 
 notifications:
   email:

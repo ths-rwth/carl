@@ -4,5 +4,5 @@ mkdir build || exit 1
 cd build/ || exit 1
 cmake -D DEVELOPER=ON ../ || exit 1
 make resources || exit 1
-make -j4
+make -j4 lib_carl
 exit $?
