@@ -31,7 +31,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial()
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>& p) :
-	Policies(),
+	Policies(p),
 	mTerms(p.mTerms),
 	mOrdered(p.isOrdered())
 {
@@ -40,7 +40,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&& p) :
-	Policies(),
+	Policies(p),
 	mTerms(std::move(p.mTerms)),
 	mOrdered(p.isOrdered())
 {
@@ -49,7 +49,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(Multivar
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator=(const MultivariatePolynomial<Coeff,Ordering,Policies>& p) {
-	mTerms = p.mTerms;
+	Policies::operator=(p);
+    mTerms = p.mTerms;
 	mOrdered = p.mOrdered;
 	assert(this->isConsistent());
 	return *this;
@@ -57,7 +58,8 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator=(MultivariatePolynomial<Coeff,Ordering,Policies>&& p) {
-	mTerms = std::move(p.mTerms);
+	Policies::operator=(p);
+    mTerms = std::move(p.mTerms);
 	mOrdered = p.mOrdered;
 	assert(this->isConsistent());
 	return *this;

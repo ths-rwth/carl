@@ -146,7 +146,7 @@ public:
 	
 	void printScheduledPolynomials(bool breakLines = true, bool printReasons = true, std::ostream& os = std::cout) const
 	{
-		for(Polynomial p : mInputScheduled)
+		for(const Polynomial& p : mInputScheduled)
 		{
 			os << p;
 			if(printReasons)
