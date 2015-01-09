@@ -500,10 +500,8 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 	}
 	for (const auto& term: p.mTerms) {
 		Coeff c = - factor.coeff() * term.coeff();
-		if(!carl::isZero(c)) {
-			auto m = factor.monomial() * term.monomial();
-			mTermAdditionManager.template addTerm<false>(id, TermType(c, m));
-		}
+		auto m = factor.monomial() * term.monomial();
+		mTermAdditionManager.template addTerm<false>(id, TermType(c, m));
 	}
 	mTermAdditionManager.readTerms(id, mTerms);
 	mOrdered = false;
