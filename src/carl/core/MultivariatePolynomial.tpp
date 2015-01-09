@@ -499,7 +499,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 		mTermAdditionManager.template addTerm<false>(id, term);
 	}
 	for (const auto& term: p.mTerms) {
-		auto c = - factor.coeff() * term.coeff();
+		Coeff c = - factor.coeff() * term.coeff();
 		auto m = factor.monomial() * term.monomial();
 		mTermAdditionManager.template addTerm<false>(id, TermType(c, m));
 	}
