@@ -389,6 +389,8 @@ public:
 	 */
 	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
 
+	static RealAlgebraicNumberNRPtr<Number> createSample(const RealAlgebraicNumberPtr<Number>& left, const RealAlgebraicNumberPtr<Number>& right);
+	
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.
 	 * This method only returns samples which are new, i.e. not contained in currentSamples. The new samples are already added to currentSamples.

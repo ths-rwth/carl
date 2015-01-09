@@ -814,6 +814,44 @@ bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad
 }
 
 template<typename Number>
+RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
+		const RealAlgebraicNumberPtr<Number>& left,
+		const RealAlgebraicNumberPtr<Number>& right
+) {
+	carl::Interval<Number> interval;
+	if (left == nullptr) {
+		if (right == nullptr) {
+			return RealAlgebraicNumberNR<Number>::create(carl::constant_zero<Number>::get(), false);
+		} else if (right->isNumeric()) {
+			return RealAlgebraicNumberNR<Number>::create(carl::floor(right->value()) - 1, false);
+		} else {
+			auto rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(right);
+			return RealAlgebraicNumberNR<Number>::create(carl::floor(rIR->getInterval().lower()) - 1, false);
+		}
+	} else if (left->isNumeric()) {
+		if (right == nullptr) {
+			return RealAlgebraicNumberNR<Number>::create(carl::ceil(left->value()) + 1, false);
+		} else if (right->isNumeric()) {
+			interval.set(left->value(), right->value());
+		} else {
+			auto rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(right);
+			interval.set(left->value(), rIR->getInterval().lower());
+		}
+	} else {
+		auto lIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(left);
+		if (right == nullptr) {
+			return RealAlgebraicNumberNR<Number>::create(carl::ceil(lIR->getInterval().upper()) + 1, false);
+		} else if (right->isNumeric()) {
+			interval.set(lIR->getInterval().upper(), right->value());
+		} else {
+			auto rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(right);
+			interval.set(lIR->getInterval().upper(), rIR->getInterval().lower());
+		}
+	}
+	return RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
+}
+
+template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
 		const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 		cad::SampleSet<Number>& currentSamples,
@@ -873,7 +911,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 			newSampleSet.insert(*insertValue.first);
 		}
 		// local set storing the elements which shall be added to currentSampleSet and newSampleSet in the end
-		std::list<RealAlgebraicNumberNRPtr<Number>> currentSamplesIncrement;
+		std::list<RealAlgebraicNumberNRPtr<Number>> newSamples;
 		
 		/** Situation: One, next or previous, has to be a root (assumption) or we meet one of the outmost positions.
 		 * --------|-------------------|-----------------|---
@@ -886,65 +924,32 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
-			// rightmost position
-			// insert one rightmost sample (by adding 1 or taking the rightmost interval bound)
-			if ((*insertValue.first)->isNumeric()) {
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create((*insertValue.first)->value() + 1, false));
-			} else {
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().upper(), false));
-			}
+			newSamples.push_front(createSample((*insertValue.first), nullptr));
 		} else if ((*neighbor)->isRoot()) {
-			// sample between neighbor and insertValue.first needed and will be added to newSampleSet
-			if ((*insertValue.first)->isNumeric()) {
-				if ((*neighbor)->isNumeric()) {
-					assert((*insertValue.first)->value() < (*neighbor)->value());
-					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(Interval<Number>((*insertValue.first)->value(), BoundType::STRICT, (*neighbor)->value(), BoundType::STRICT).sample(), false));
-				} else {
-					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().lower(), false));
-				}
-			} else {
-				// interval representation, take right bound of insertValue.first which must be strictly between insertValue.first and neighbor
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().upper(), false));
-			}
+			newSamples.push_front(createSample((*insertValue.first), (*neighbor)));
 		}
 		
 		// previous: left neighbor
 		neighbor = insertValue.first;
 		if (neighbor == currentSamples.begin()) {
-			// leftmost position
-			// insert one leftmost sample (by subtracting 1 or taking the leftmost interval bound)
-			if ((*insertValue.first)->isNumeric()) {
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create((*insertValue.first)->value() - 1, false));
-			} else {
-				currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().lower(), false));
-			}
+			newSamples.push_front(createSample(nullptr, (*insertValue.first)));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if ((*neighbor)->isRoot()) {
-				// sample between neighbor and insertValue.first needed and will be added to newSampleSet
-				if ((*insertValue.first)->isNumeric()) {
-					if ((*neighbor)->isNumeric()) {
-						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(Interval<Number>((*neighbor)->value(), BoundType::STRICT, (*insertValue.first)->value(), BoundType::STRICT).sample(), false));
-					} else {
-						currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*neighbor)->getInterval().upper(), false));
-					}
-				} else {
-					// interval representation, take left bound of insertValue.first which must be strictly between insertValue.first and neighbor
-					currentSamplesIncrement.push_front(RealAlgebraicNumberNR<Number>::create(std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(*insertValue.first)->getInterval().lower(), false));
-				}
+				newSamples.push_front(createSample((*neighbor), (*insertValue.first)));
 			}
 		}
 		
 		if (boundsActive) {
 			// remove samples which do not lie within the (weak) bounds
-			for (auto i = currentSamplesIncrement.begin(); i != currentSamplesIncrement.end(); ) {
+			for (auto i = newSamples.begin(); i != newSamples.end(); ) {
 				if (bounds.meets((*i)->value())) i++;
-				else i = currentSamplesIncrement.erase(i);
+				else i = newSamples.erase(i);
 			}
 		}
-		newSampleSet.insert(currentSamplesIncrement.begin(), currentSamplesIncrement.end());
-		currentSamples.insert(currentSamplesIncrement.begin(), currentSamplesIncrement.end());
+		newSampleSet.insert(newSamples.begin(), newSamples.end());
+		currentSamples.insert(newSamples.begin(), newSamples.end());
 	}
 	CARL_LOG_TRACE("carl.cad", (void*)(&currentSamples) << " -> " << newSampleSet.samples());
 	return newSampleSet;
@@ -1487,13 +1492,14 @@ bool CAD<Number>::liftCheck(
 				// break if all lifting positions are considered or the level is empty
 				break;
 			}
+			auto next = this->eliminationSets[openVariableCount].nextLiftingPosition();
 			
 			CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()]);
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
-				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, bound->second));
+				sampleSetIncrement.insert(this->samples(next, sample, variables, currentSamples, replacedSamples, bound->second));
 			} else {
-				sampleSetIncrement.insert(this->samples(this->eliminationSets[openVariableCount].nextLiftingPosition(), sample, variables, currentSamples, replacedSamples, Interval<Number>::unboundedInterval()));
+				sampleSetIncrement.insert(this->samples(next, sample, variables, currentSamples, replacedSamples));
 			}
 			
 			// replace all samples in the tree which were changed in the current samples list
