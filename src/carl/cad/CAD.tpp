@@ -1357,6 +1357,31 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 }
 
 template<typename Number>
+bool CAD<Number>::baseLiftCheck(
+		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
+		const std::vector<cad::Constraint<Number>>& constraints,
+		RealAlgebraicPoint<Number>& r,
+		cad::ConflictGraph& conflictGraph
+) {
+	// check whether an interuption flag is set
+	if (this->anAnswerFound()) {
+		// interrupt the check procedure
+		this->interrupted = true;
+		CARL_LOG_TRACE("carl.cad", "Returning true as an answer was found");
+		return true;
+	}
+	RealAlgebraicPoint<Number> t(sample);
+	if ((this->setting.computeConflictGraph && this->satisfies(t, constraints, conflictGraph)) ||
+		(!this->setting.computeConflictGraph && this->satisfies(t, constraints))) {
+		r = t;
+		CARL_LOG_TRACE("carl.cad", "Returning true as a satisfying sample was found");
+		return true;
+	}
+	CARL_LOG_TRACE("carl.cad", "Returning false...");
+	return false;
+}
+
+template<typename Number>
 bool CAD<Number>::liftCheck(
 		sampleIterator node,
 		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
@@ -1387,22 +1412,7 @@ bool CAD<Number>::liftCheck(
 
 	// base level: zero variables left to substitute => evaluate the constraint
 	if (openVariableCount == 0) {
-		// check whether an interuption flag is set
-		if (this->anAnswerFound()) {
-			// interrupt the check procedure
-			this->interrupted = true;
-			CARL_LOG_TRACE("carl.cad", "Returning true as an answer was found");
-			return true;
-		}
-		RealAlgebraicPoint<Number> t(sample);
-		if ((this->setting.computeConflictGraph && this->satisfies(t, constraints, conflictGraph)) ||
-			(!this->setting.computeConflictGraph && this->satisfies(t, constraints))) {
-			r = t;
-			CARL_LOG_TRACE("carl.cad", "Returning true as a satisfying sample was found");
-			return true;
-		}
-		CARL_LOG_TRACE("carl.cad", "Returning false...");
-		return false;
+		return this->baseLiftCheck(sample, constraints, r, conflictGraph);
 	}
 	
 	// openVariableCount > 0: lifting

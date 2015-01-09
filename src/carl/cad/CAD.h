@@ -546,6 +546,13 @@ public:
      */
 	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
+	bool baseLiftCheck(
+		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
+		const std::vector<cad::Constraint<Number>>& constraints,
+		RealAlgebraicPoint<Number>& r,
+		cad::ConflictGraph& conflictGraph
+	);
+
 	/**
 	 * Constructs sample points for the given number of open variables openVariableCount by lifting
 	 * the polynomials available in the lifting queue in the corresponding level of CAD::eliminationSets.
@@ -664,9 +671,9 @@ public:
 
 	bool isSampleTreeConsistent() const {
 		bool isOk = isSampleConsistent(this->sampleTree.begin());
-        #if defined(LOGGING_CARL) || defined(LOGGING)
-		if (!isOk) CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
-        #endif
+		if (!isOk) {
+			CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
+		}
 		assert(isOk);
 		return isOk;
 	}
