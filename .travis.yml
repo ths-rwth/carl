@@ -27,7 +27,8 @@ matrix:
 before_install:
   - source ./.travis.setup
 
-script: mkdir build && cd build/ && cmake -D DEVELOPER=ON ../ && make resources && make -j4
+script:
+  - source ./.travis.build
 
 after_script: make test
 
