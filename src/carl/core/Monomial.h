@@ -407,14 +407,11 @@ namespace carl
 		bool divide(const Monomial::Arg& m, Monomial::Arg& res) const;
 		
 		/**
-		 * Calculates the square root of this monomial.
-		 * Returns true, iff the monomial is a square as checked by isSquare().
-		 * In that case, res will changed to be the square root.
-		 * Otherwise, res is undefined.
-		 * @param res Square root of this monomial.
-		 * @return If square root could be calculated.
+		 * Calculates and returns the square root of this monomial, iff the monomial is a square as checked by isSquare().
+		 * Otherwise, nullptr is returned.
+		 * @return The square root of this monomial, iff the monomial is a square as checked by isSquare().
 		 */
-		bool sqrt(Monomial::Arg& res) const;
+		Monomial::Arg sqrt() const;
 
 		/**
 		 * 

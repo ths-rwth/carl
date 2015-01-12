@@ -332,6 +332,16 @@ inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
 }
 
 /**
+ * Calculate the square root of a fraction if possible.
+ * 
+ * @param a The fraction to calculate the square root for.
+ * @param b A reference to the rational, in which the result is stored.
+ * @return true, if the number to calculate the square root for is a square;
+ *         false, otherwise.
+ */
+bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b);
+
+/**
  * Calculate the square root of a fraction.
  * 
  * If we are able to find a an \f$x\f$ such that \f$x\f$ is the exact root of \f$a\f$, \f$(x,x)\f$ is returned.

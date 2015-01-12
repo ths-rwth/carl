@@ -1014,6 +1014,22 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::sqrt(MultivariatePolynomial<Coeff,Ordering,Policies>& res) const
+{
+    if (isZero()) {
+        res = *this;
+        return true;
+    } else if (mTerms.size() == 1) {
+        Term<Coeff> t;
+        if (mTerms.back().sqrt(t)) {
+            res = MultivariatePolynomial(t);
+            return true;
+        }
+        return false;
+    }
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::derivative(Variable::Arg v, unsigned nth) const
 {
 	///@todo this method is broken:
