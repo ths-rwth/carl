@@ -256,7 +256,7 @@ namespace carl
 		bool isSquare() const
 		{
 			if (mTotalDegree % 2 == 1) return false;
-			for (auto it: mExponents)
+			for (const auto& it: mExponents)
 			{
 				if (it.second % 2 == 1) return false;
 			}
@@ -290,19 +290,10 @@ namespace carl
 		 */
 		bool hasNoOtherVariable(Variable::Arg v) const
 		{
-			if(mExponents.size() == 1)
-			{
-				if(mExponents.front().first == v) return true;
-				return false;
+			if(mExponents.size() == 1) {
+				return mExponents.front().first == v;
 			}
-			else if(mExponents.size() == 0) 
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return mExponents.size() == 0;
 		}
 		
 		/**
@@ -415,6 +406,16 @@ namespace carl
 		 */
 		bool divide(const Monomial::Arg& m, Monomial::Arg& res) const;
 		
+		/**
+		 * Calculates the square root of this monomial.
+		 * Returns true, iff the monomial is a square as checked by isSquare().
+		 * In that case, res will changed to be the square root.
+		 * Otherwise, res is undefined.
+		 * @param res Square root of this monomial.
+		 * @return If square root could be calculated.
+		 */
+		bool sqrt(Monomial::Arg& res) const;
+
 		/**
 		 * 
 		 * @param m
