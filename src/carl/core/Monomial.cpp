@@ -128,15 +128,14 @@ namespace carl
 		return true;
 	}
 	
-	bool Monomial::sqrt(Monomial::Arg& res) const {
-		if (mTotalDegree % 2 == 1) return false;
+	Monomial::Arg Monomial::sqrt() const {
+		if (mTotalDegree % 2 == 1) return nullptr;
 		std::vector<std::pair<Variable, exponent>> newExps;
 		for (const auto& it: mExponents) {
-			if (it.second % 2 == 1) return false;
+			if (it.second % 2 == 1) return nullptr;
 			newExps.emplace_back(it.first, it.second / 2);
 		}
-		res = createMonomial(std::move(newExps), mTotalDegree / 2);
-		return true;
+		return createMonomial(std::move(newExps), mTotalDegree / 2);
 	}
 
 	Monomial::Arg Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const

@@ -174,6 +174,16 @@ inline mpz_class pow(const mpz_class& b, unsigned e) {
 
 mpq_class pow(const mpq_class& b, unsigned e);
 
+/**
+ * Calculate the square root of a fraction if possible.
+ * 
+ * @param a The fraction to calculate the square root for.
+ * @param b A reference to the rational, in which the result is stored.
+ * @return true, if the number to calculate the square root for is a square;
+ *         false, otherwise.
+ */
+bool sqrtp(const mpq_class& a, mpq_class& b);
+
 std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a);
 
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {

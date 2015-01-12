@@ -197,6 +197,20 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) 
 }
 
 template<typename Coefficient>
+bool Term<Coefficient>::sqrt(Term<Coefficient>& res) const {
+    Coefficient resCoeff;
+    if (!carl::sqrtp(this->coeff(), resCoeff)) return false;
+    if (this->monomial() == nullptr) {
+        res = Term(resCoeff);
+        return true;
+    }
+    Monomial::Arg resMonomial = this->monomial()->sqrt();
+    if (resMonomial == nullptr) return false;
+    res = Term(resCoeff, resMonomial);
+    return true;
+}
+
+template<typename Coefficient>
 template<typename C, EnableIf<is_field<C>>>
 bool Term<Coefficient>::divisible(const Term& t) const {
 	if (this->monomial() == nullptr) return t.monomial() == nullptr;

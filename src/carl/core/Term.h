@@ -232,6 +232,16 @@ class Term
 		bool divide(const Term&, Term& res) const;
 		
 		Term calcLcmAndDivideBy(const Monomial::Arg& m) const;
+        
+        /**
+		 * Calculates the square root of this term.
+		 * Returns true, iff the term is a square as checked by isSquare().
+		 * In that case, res will changed to be the square root.
+		 * Otherwise, res is undefined.
+		 * @param res Square root of this term.
+		 * @return If square root could be calculated.
+		 */
+		bool sqrt(Term& res) const;
 		
 		template<typename C = Coefficient, EnableIf<is_field<C>> = dummy>
 		bool divisible(const Term&) const;

@@ -50,6 +50,12 @@ namespace carl
         return 0;
     }
     
+    bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b)
+    {
+        if( a < 0 ) return false;
+        return cln::sqrtp( a, &b );
+    }
+    
     std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a)
     {
         assert( a >= 0 );

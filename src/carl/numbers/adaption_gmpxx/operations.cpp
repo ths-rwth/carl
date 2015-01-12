@@ -21,6 +21,31 @@ namespace carl
             return res;
     }
 
+    bool sqrtp(const mpq_class& a, mpq_class& b)
+    {
+        if( mpq_sgn(a.__get_mp()) < 0 ) return false;
+        mpz_class den = a.get_den();
+        mpz_class num = a.get_num();
+        mpz_class root_den;
+        mpz_class root_den_rem;
+        mpz_sqrtrem(root_den.__get_mp(), root_den_rem.__get_mp(), den.__get_mp());
+        if( !carl::isZero( root_den_rem ) )
+            return false;
+
+        mpz_class root_num;
+        mpz_class root_num_rem;
+        mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
+        if( !carl::isZero( root_num_rem ) )
+            return false;
+        
+        mpq_class resNum;
+        mpq_set_z(resNum.get_mpq_t(), root_num.get_mpz_t());
+        mpq_class resDen;
+        mpq_set_z(resDen.get_mpq_t(), root_den.get_mpz_t());
+        mpq_div(b.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
+        return true;
+    }
+    
     std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a)
     {
         assert( mpq_sgn(a.__get_mp()) > 0 );

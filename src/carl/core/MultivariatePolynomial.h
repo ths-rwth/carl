@@ -350,6 +350,13 @@ public:
 	
 	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
+    
+    /**
+     * Calculates the square of this multivariate polynomial if it is a square.
+     * @param res Used to store the result in.
+     * @return true, if this multivariate polynomial is a square; false, otherwise.
+     */
+    bool sqrt(MultivariatePolynomial& res) const;
 	
 	/**
 	 * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
