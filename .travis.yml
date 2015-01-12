@@ -28,9 +28,7 @@ before_install:
   - source ./.travis.setup
 
 script:
-  - source ./.travis.build
-
-after_script: make -j4 && make test
+  - source ./.travis.build && cd build/ && make -j4 && make test && cd ../
 
 notifications:
   email:
