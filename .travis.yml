@@ -7,25 +7,20 @@ os:
 env:
   - USE=g++-4.8
   - USE=g++-4.9
-  - USE=clang++-3.3
   - USE=clang++-3.4
   - USE=clang++-3.5
 
 matrix:
   exclude:
-    - os: linux
-      env: USE=clang++-3.3
     - os: osx
       env: USE=g++-4.8
     - os: osx
       env: USE=g++-4.9
     - os: osx
-      env: USE=clang++-3.3
-    - os: osx
       env: USE=clang++-3.4
 
 before_install:
-  - source ./.travis.setup
+  - cd installation/ && source setup_travis.sh && cd ../
 
 script:
   - source ./.travis.build && cd build/ && make -j4 && make test && cd ../

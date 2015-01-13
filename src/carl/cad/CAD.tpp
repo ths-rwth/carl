@@ -835,6 +835,7 @@ RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
 			interval.set(left->value(), right->value());
 		} else {
 			auto rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(right);
+			while (left->value() >= rIR->getInterval().lower()) rIR->refineAvoiding(left->value());
 			interval.set(left->value(), rIR->getInterval().lower());
 		}
 	} else {
@@ -842,9 +843,14 @@ RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
 		if (right == nullptr) {
 			return RealAlgebraicNumberNR<Number>::create(carl::ceil(lIR->getInterval().upper()) + 1, false);
 		} else if (right->isNumeric()) {
+			while (lIR->getInterval().upper() >= right->value()) lIR->refineAvoiding(right->value());
 			interval.set(lIR->getInterval().upper(), right->value());
 		} else {
 			auto rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(right);
+			while (lIR->getInterval().upper() >= rIR->getInterval().lower()) {
+				lIR->refine();
+				rIR->refine();
+			}
 			interval.set(lIR->getInterval().upper(), rIR->getInterval().lower());
 		}
 	}
