@@ -1025,8 +1025,8 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::sqrt(MultivariatePolynomia
             res = MultivariatePolynomial(t);
             return true;
         }
-        return false;
     }
+    return false;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
