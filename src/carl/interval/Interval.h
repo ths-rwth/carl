@@ -1084,12 +1084,34 @@ namespace carl
          * Computes and assigns the magnitude of the interval.
          */
         void magnitude_assign();
-
+        
         /**
          * Returns the center point of the interval.
          * @return Center.
          */
-        Number center() const;
+        template<typename N = Number, DisableIf<std::is_floating_point<N>> = dummy>
+		Number center() const
+		{
+			assert(this->isConsistent());
+			if (this->isUnbounded()) return carl::constant_zero<Number>().get();
+			if (this->mLowerBoundType == BoundType::INFTY)
+				return (Number)(carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get());
+			if (this->mUpperBoundType == BoundType::INFTY)
+				return (Number)(carl::ceil(this->mContent.lower()) + carl::constant_one<Number>().get());
+			return boost::numeric::median(mContent);
+		}
+
+		template<typename N = Number, EnableIf<std::is_floating_point<N>> = dummy>
+		N center() const
+		{
+			assert(this->isConsistent());
+			if (this->isUnbounded()) return carl::constant_zero<N>().get();
+			if (this->mLowerBoundType == BoundType::INFTY)
+				return (N)(std::nextafter(this->mContent.upper(), -INFINITY));
+			if (this->mUpperBoundType == BoundType::INFTY)
+				return (N)(std::nextafter(this->mContent.lower(), INFINITY));
+			return boost::numeric::median(mContent);
+		}
         
         /**
          * Computes and assigns the center point of the interval.

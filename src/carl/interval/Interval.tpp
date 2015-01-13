@@ -83,18 +83,6 @@ template<typename Number>
 	}
 
 template<typename Number>
-	Number Interval<Number>::center() const
-	{
-		assert(this->isConsistent());
-		if (this->isUnbounded()) return carl::constant_zero<Number>().get();
-		if (this->mLowerBoundType == BoundType::INFTY)
-            return (Number)carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get();
-		if (this->mUpperBoundType == BoundType::INFTY)
-            return (Number)carl::ceil(this->mContent.lower()) + carl::constant_one<Number>().get();
-		return boost::numeric::median(mContent);
-	}
-
-template<typename Number>
 	void Interval<Number>::center_assign()
 	{
 		this->set(BoostInterval(this->center()));
