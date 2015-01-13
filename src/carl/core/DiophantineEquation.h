@@ -18,4 +18,8 @@ std::vector<T> solveDiophantine(const MultivariatePolynomial<T>& p) {
 	return res;
 }
 
+cln::cl_I gcdOfLinearCoefficients(MultivariatePolynomial<cln::cl_I>& p) {
+    
+}
+
 }
