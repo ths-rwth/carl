@@ -6,10 +6,6 @@ function install {
 	sudo apt-get -qq install --force-yes $*
 }
 
-sudo add-apt-repository -y ppa:kalakris/cmake
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.4 main" 
-sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.5 main" 
 sudo apt-get -qq update
 
 install cmake libboost1.55-all-dev libcln-dev libeigen3-dev libgtest-dev libstdc++-4.9-dev
