@@ -83,7 +83,7 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::create( FormulaType _type, std::set<Formula<Pol>>&& _subformulas )
+    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::create( FormulaType _type, Formulas<Pol>&& _subformulas )
     {
         assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
 //        cout << "create new formula with type " << formulaTypeToString( _type ) << endl;

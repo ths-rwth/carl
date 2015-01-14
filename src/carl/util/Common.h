@@ -24,18 +24,18 @@ namespace carl
 	// Structures.
 
 	template<typename T>
-	using pointerEqual = carl::equal_to<T*, false>;
+	using pointerEqual = carl::equal_to<const T*, false>;
 	template<typename T>
-	using pointerEqualWithNull = carl::equal_to<T*, true>;
+	using pointerEqualWithNull = carl::equal_to<const T*, true>;
 	template<typename T>
 	using sharedPointerEqual = carl::equal_to<std::shared_ptr<const T>, false>;
 	template<typename T>
 	using sharedPointerEqualWithNull = carl::equal_to<std::shared_ptr<const T>, true>;
 	
 	template<typename T>
-	using pointerLess = carl::less<T*, false>;
+	using pointerLess = carl::less<const T*, false>;
 	template<typename T>
-	using pointerLessWithNull = carl::less<T*, true>;
+	using pointerLessWithNull = carl::less<const T*, true>;
 	template<typename T>
 	using sharedPointerLess = carl::less<std::shared_ptr<const T>*, false>;
 	template<typename T>
