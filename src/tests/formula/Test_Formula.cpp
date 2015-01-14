@@ -43,7 +43,7 @@ TEST(Formula, Construction)
     const Formula<Pol> atomC = Formula<Pol>( b );
     
     // and the Ast itself:
-    std::set<Formula<Pol>> subAstsA;
+    Formulas<Pol> subAstsA;
     subAstsA.insert( Formula<Pol>( FormulaType::NOT, atomC ) );
     subAstsA.insert( atomA );
     subAstsA.insert( atomB );
