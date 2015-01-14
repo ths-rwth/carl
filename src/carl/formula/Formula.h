@@ -22,14 +22,11 @@ namespace carl
     // Forward definition.
     template<typename Pol>
     class Formula;
-    
-    template<typename Poly, bool mayBeNull>
-    struct less<Formula<Poly>, mayBeNull> {
-        bool operator()(const Formula<Poly>& lhs, const Formula<Poly>& rhs) const;
-    };
-    
+
     template<typename Poly>
-    using Formulas = std::set<Formula<Poly>,carl::less<Formula<Poly>,false>>;
+    using Formulas = std::set<Formula<Poly>, carl::less<Formula<Poly>, false>>;
+	template<typename Poly>
+    using FormulasMulti = std::multiset<Formula<Poly>, carl::less<Formula<Poly>, false>>;
     
     /**
      * Stores the sub-formulas of a formula being an implication.
@@ -388,7 +385,7 @@ namespace carl
                 }
             }
             
-            explicit Formula( FormulaType _type, const std::multiset<Formula>& _subformulas ):
+            explicit Formula( FormulaType _type, const FormulasMulti<Pol>& _subformulas ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _subformulas ) )
             {
                 assert( _type == FormulaType::XOR );
@@ -1093,11 +1090,7 @@ namespace carl
      */
     template<typename Poly>
     std::ostream& operator<<( std::ostream& _out, const Formula<Poly>& _formula );
-    
-    template<typename Poly, bool mayBeNull>
-    bool less<Formula<Poly>, mayBeNull>::operator()(const Formula<Poly>& lhs, const Formula<Poly>& rhs) const {
-        return lhs < rhs;
-    }
+
 }    // namespace carl
 
 namespace std
