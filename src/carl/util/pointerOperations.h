@@ -25,7 +25,12 @@ namespace carl {
  * Note that the memory location may also be zero.
  */
 template<typename T, bool mayBeNull = true>
-struct equal_to;
+struct equal_to {
+	std::equal_to<T> eq;
+	bool operator()(const T& lhs, const T& rhs) const {
+		return eq(lhs, rhs);
+	}
+};
 
 template<typename T, bool mayBeNull>
 struct equal_to<T*, mayBeNull> {
@@ -50,7 +55,12 @@ struct equal_to<std::shared_ptr<T>, mayBeNull> {
 };
 
 template<typename T, bool mayBeNull = true>
-struct not_equal_to;
+struct not_equal_to {
+	std::not_equal_to<T> neq;
+	bool operator()(const T& lhs, const T& rhs) const {
+		return neq(lhs, rhs);
+	}
+};
 
 template<typename T, bool mayBeNull>
 struct not_equal_to<T*, mayBeNull> {
@@ -73,7 +83,12 @@ struct not_equal_to<std::shared_ptr<T>, mayBeNull> {
  * Note that the memory location may also be zero.
  */
 template<typename T, bool mayBeNull = true>
-struct less;
+struct less {
+	std::less<T> less;
+	bool operator()(const T& lhs, const T& rhs) const {
+		return less(lhs, rhs);
+	}
+};
 
 template<typename T, bool mayBeNull>
 struct less<T*, mayBeNull> {
@@ -98,7 +113,12 @@ struct less<std::shared_ptr<T>, mayBeNull> {
 };
 
 template<typename T, bool mayBeNull = true>
-struct greater;
+struct greater {
+	std::greater<T> greater;
+	bool operator()(const T& lhs, const T& rhs) const {
+		return greater(lhs, rhs);
+	}
+};
 
 template<typename T, bool mayBeNull>
 struct greater<T*, mayBeNull> {
@@ -120,7 +140,12 @@ struct greater<std::shared_ptr<T>, mayBeNull> {
  * In case the pointer is not a nullptr, we return the hash of the object it points to.
  */
 template<typename T, bool mayBeNull = true>
-struct hash;
+struct hash {
+	std::hash<T> hash;
+	bool operator()(const T& lhs, const T& rhs) const {
+		return hash(lhs, rhs);
+	}
+};
 
 template<typename T, bool mayBeNull>
 struct hash<T*, mayBeNull> {
