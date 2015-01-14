@@ -23,6 +23,14 @@ namespace carl
     template<typename Pol>
     class Formula;
     
+    template<typename Poly, bool mayBeNull>
+    struct less<Formula<Poly>, mayBeNull> {
+        bool operator()(const Formula<Poly>& lhs, const Formula<Poly>& rhs) const;
+    };
+    
+    template<typename Poly>
+    using Formulas = std::set<Formula<Poly>,carl::less<Formula<Poly>,false>>;
+    
     /**
      * Stores the sub-formulas of a formula being an implication.
      */
@@ -169,7 +177,7 @@ namespace carl
                 /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
                 QuantifierContent<Pol>* mpQuantifierContent;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                std::set<Formula<Pol>>* mpSubformulas;
+                Formulas<Pol>* mpSubformulas;
                 /// The constraint, in case this formulas wraps a constraint.
                 const Constraint<Pol>* mpConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
@@ -239,7 +247,7 @@ namespace carl
              * @param _type The type of the formula to construct.
              * @param _subformulas The sub-formulas of the formula to construct.
              */
-            FormulaContent( const FormulaType _type, std::set<Formula<Pol>>&& _subformulas );
+            FormulaContent( const FormulaType _type, Formulas<Pol>&& _subformulas );
 
             FormulaContent(); // Disabled
             FormulaContent( const FormulaContent& ); // Disabled
@@ -294,9 +302,9 @@ namespace carl
         
         public:
             /// A constant iterator to a sub-formula of a formula.
-            typedef typename std::set<Formula>::const_iterator const_iterator;
+            typedef typename Formulas<Pol>::const_iterator const_iterator;
             /// A constant reverse iterator to a sub-formula of a formula.
-            typedef typename std::set<Formula>::const_reverse_iterator const_reverse_iterator;
+            typedef typename Formulas<Pol>::const_reverse_iterator const_reverse_iterator;
             
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.
@@ -372,7 +380,7 @@ namespace carl
                 }
                 else
                 {
-                    std::set<Formula> subFormulas;
+                    Formulas<Pol> subFormulas;
                     subFormulas.insert( _subformulaA );
                     subFormulas.insert( _subformulaB );
                     subFormulas.insert( _subformulaC );
@@ -386,11 +394,11 @@ namespace carl
                 assert( _type == FormulaType::XOR );
             }
             
-            explicit Formula( FormulaType _type, const std::set<Formula>& _subasts ):
+            explicit Formula( FormulaType _type, const Formulas<Pol>& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
-            explicit Formula( FormulaType _type, std::set<Formula>&& _subasts ):
+            explicit Formula( FormulaType _type, Formulas<Pol>&& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
             {}
             
@@ -606,7 +614,7 @@ namespace carl
              * @return A constant reference to the list of sub-formulas of this formula. Note, that
              *          this formula has to be a Boolean combination, if you invoke this method.
              */
-            const std::set<Formula>& subformulas() const
+            const Formulas<Pol>& subformulas() const
             {
                 assert( isNary() );
                 return *mpContent->mpSubformulas;
@@ -1074,7 +1082,7 @@ namespace carl
              *                (_inConjunction == false) to which the bounds are added is invalid resp. valid;
              *         false, otherwise.
              */
-            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, std::set<Formula>& _intoAsts, bool _inConjunction );
+            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction );
     };
     
     /**
@@ -1085,6 +1093,11 @@ namespace carl
      */
     template<typename Poly>
     std::ostream& operator<<( std::ostream& _out, const Formula<Poly>& _formula );
+    
+    template<typename Poly, bool mayBeNull>
+    bool less<Formula<Poly>, mayBeNull>::operator()(const Formula<Poly>& lhs, const Formula<Poly>& rhs) const {
+        return lhs < rhs;
+    }
 }    // namespace carl
 
 namespace std

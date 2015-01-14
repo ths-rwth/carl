@@ -203,7 +203,7 @@ namespace carl
              */
             ConstElementSPtr create( FormulaType _type, const Formula<Pol>& _subFormulaA, const Formula<Pol>& _subFormulaB )
             {
-                std::set<Formula<Pol>> subFormulas;
+                Formulas<Pol> subFormulas;
                 subFormulas.insert( _subFormulaA );
                 subFormulas.insert( _subFormulaB );
                 return create( _type, std::move( subFormulas ) );
@@ -217,7 +217,7 @@ namespace carl
             {
                 if( _subformulas.empty() ) return mpFalse;
                 if( _subformulas.size() == 1 ) return _subformulas.begin()->mpContent;
-                std::set<Formula<Pol>> subFormulas;
+                Formulas<Pol> subFormulas;
                 auto lastSubFormula = _subformulas.begin();
                 auto subFormula = lastSubFormula;
                 ++subFormula;
@@ -251,9 +251,9 @@ namespace carl
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( FormulaType _type, const std::set<Formula<Pol>>& _subformulas )
+            ConstElementSPtr create( FormulaType _type, const Formulas<Pol>& _subformulas )
             {
-                return create( _type, std::move( std::set<Formula<Pol>>( _subformulas ) ) );
+                return create( _type, std::move( Formulas<Pol>( _subformulas ) ) );
             }
 
 			ConstElementSPtr create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
@@ -334,7 +334,7 @@ namespace carl
              * sub-formula are condensed. You should only use it, if you can exlcude this 
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
-            ConstElementSPtr create( FormulaType _type, std::set<Formula<Pol>>&& _subformulas );
+            ConstElementSPtr create( FormulaType _type, Formulas<Pol>&& _subformulas );
             
     private:
         
