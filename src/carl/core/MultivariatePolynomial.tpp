@@ -540,7 +540,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		if (res.lterm().divide(divisor.lterm(), factor)) {
 			res.subtractProduct(factor, divisor);
 			//p -= factor * divisor;
-			mTermAdditionManager.template addTerm<false>(id, factor);
+			mTermAdditionManager.template addTerm<true>(id, factor);
 		} else {
 			return false;
 		}
