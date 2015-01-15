@@ -1456,7 +1456,9 @@ bool CAD<Number>::liftCheck(
 	std::forward_list<RealAlgebraicNumberPtr<Number>> replacedSamples;
 	
 	// fill in a standard sample to ensure termination in the main loop
-	CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()]);
+	if (*node != nullptr) {
+		CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth() - 1]);
+	}
 	if (boundActive) {
 		// add the bounds as roots and appropriate intermediate samples and start the lifting with this initial list
 		std::list<RealAlgebraicNumberPtr<Number>> boundRoots;
@@ -1494,7 +1496,9 @@ bool CAD<Number>::liftCheck(
 			}
 			auto next = this->eliminationSets[openVariableCount].nextLiftingPosition();
 			
-			CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()]);
+			if (*node != nullptr) {
+				CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()-1]);
+			}
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
 				sampleSetIncrement.insert(this->samples(openVariableCount, next, sample, variables, currentSamples, replacedSamples, bound->second));
