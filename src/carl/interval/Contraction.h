@@ -46,7 +46,7 @@ namespace carl {
             double center = intervals.at(variable).center();
             Interval<double> centerInterval = Interval<double>(center);
             
-			std::cout << __func__ << ": centerInterval: " << centerInterval << std::endl;
+//			std::cout << __func__ << ": centerInterval: " << centerInterval << std::endl;
 			
             // Create map for replacement of variables by intervals and replacement of center by point interval
             typename Interval<double>::evalintervalmap substitutedIntervalMap = intervals;
@@ -57,11 +57,11 @@ namespace carl {
             Interval<double> denominator = IntervalEvaluation::evaluate(derivative, intervals);
             Interval<double> result1, result2;
 			
-			std::cout << __func__ << ": numerator: " << numerator << ", denominator: " << denominator << std::endl;
+//			std::cout << __func__ << ": numerator: " << numerator << ", denominator: " << denominator << std::endl;
             
             bool split = numerator.div_ext(denominator, result1, result2);
             if (split) {
-				std::cout << __func__ << ": caused split: " << result1 << " and " << result2 << std::endl;
+//				std::cout << __func__ << ": caused split: " << result1 << " and " << result2 << std::endl;
                 if(result1 >= result2) {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result2));
@@ -91,7 +91,7 @@ namespace carl {
                 }
                 return true;
             } else {
-				std::cout << __func__ << ": result: " << result1 << std::endl;
+//				std::cout << __func__ << ": result: " << result1 << std::endl;
                 resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                 return false;
             }
