@@ -23,7 +23,7 @@ typedef unsigned exponent;
  * REAL: the reals
  * INT: the integers
  */
-enum class VariableType : unsigned { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, MIN_TYPE = 0, MAX_TYPE = VT_UNINTERPRETED, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
+enum class VariableType : unsigned { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_UNINTERPRETED, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 /**
  * Streaming operator for VariableType.
