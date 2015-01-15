@@ -22,7 +22,7 @@ VariablePool::VariablePool(): Singleton()
 }
 
 Variable VariablePool::getFreshVariable(VariableType type) {
-	unsigned tmp = 0;
+	std::size_t tmp = 0;
 	{
 		std::lock_guard<std::mutex> lock(this->freshVarMutex);
 		tmp = nextID(type)++;
