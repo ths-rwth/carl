@@ -43,6 +43,7 @@
 //#include "../util/tree.h"
 #include "../util/carlTree.h"
 
+#include "CADPolynomials.h"
 #include "CADTypes.h"
 #include "CADSettings.h"
 #include "ConflictGraph.h"
@@ -57,12 +58,12 @@ namespace carl {
  * This class implements the core of the CAD algorithm.
  */
 template<typename Number>
-class CAD : public carl::cad::PolynomialOwner<Number> {
+class CAD {
 public:
 	/// Type of univariate polynomials.
-	typedef carl::cad::UPolynomial<Number> UPolynomial;
+	typedef typename cad::CADPolynomials<Number>::UPolynomial UPolynomial;
 	/// Type of multivariate polynomials.
-	typedef carl::cad::MPolynomial<Number> MPolynomial;
+	typedef typename cad::CADPolynomials<Number>::MPolynomial MPolynomial;
 
 	/// Type of an iterator over the samples.
 	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
@@ -83,20 +84,9 @@ private:
 	std::vector<cad::EliminationSet<Number>> eliminationSets;
 	
 	/**
-	 * List of all polynomials for elimination.
+	 * Stores the original polynomials and the queue of polynomials that are scheduled.
 	 */
-	std::list<const UPolynomial*> polynomials;
-
-	/**
-	 * Maps multivariate polynomials given as input to the univariate polynomials that are used internally.
-	 */
-	std::unordered_map<const MPolynomial, const UPolynomial*, std::hash<MPolynomial>> polynomialMap;
-
-	/**
-	 * list of polynomials scheduled for elimination
-	 */
-	std::list<const UPolynomial*> scheduledPolynomials;
-	
+	cad::CADPolynomials<Number> polynomials;
 	
 	/**
 	 * flag indicating whether the sample construction is completed or not

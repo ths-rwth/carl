@@ -28,7 +28,6 @@ CAD<Number>::CAD():
 		sampleTree(),
 		eliminationSets(),
 		polynomials(),
-		scheduledPolynomials(),
 		iscomplete(false),
 		interrupted(false),
 		interrupts(),
@@ -40,12 +39,10 @@ CAD<Number>::CAD():
 
 template<typename Number>
 CAD<Number>::CAD(cad::PolynomialOwner<Number>* parent):
-		cad::PolynomialOwner<Number>(parent),
 		variables(),
 		sampleTree(),
 		eliminationSets(),
-		polynomials(),
-		scheduledPolynomials(),
+		polynomials(parent),
 		iscomplete(false),
 		interrupted(false),
 		interrupts(),
@@ -92,7 +89,6 @@ CAD<Number>::CAD(const CAD<Number>& cad):
 		sampleTree( cad.sampleTree ),
 		eliminationSets( cad.eliminationSets ),
 		polynomials( cad.polynomials ),
-		scheduledPolynomials( cad.scheduledPolynomials ),
 		iscomplete( cad.iscomplete ),
 		interrupted( cad.interrupted ),
 		setting( cad.setting )
@@ -189,7 +185,6 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;
 	os << "Variables: " << cad.variables << std::endl;
 	os << "Polynomials: " << cad.polynomials << std::endl;
-	os << "Scheduled: " << cad.scheduledPolynomials << std::endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
 	for (const auto& i: cad.getEliminationSets()) {
@@ -205,7 +200,7 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 template<typename Number>
 bool CAD<Number>::prepareElimination() {
 	CARL_LOG_TRACE("carl.cad", __func__ << "()");
-	if (this->variables.newEmpty() && (this->scheduledPolynomials.empty() || variables.empty())) {
+	if (this->variables.newEmpty() && (!polynomials.hasScheduled() || variables.empty())) {
 		return false;
 	}
 	
@@ -241,7 +236,7 @@ bool CAD<Number>::prepareElimination() {
 		
 		// (1)
 		/// @todo make this more efficient
-		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(this, this->setting.order, this->setting.order));
+		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(&this->polynomials, this->setting.order, this->setting.order));
 		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
 		}
@@ -249,12 +244,13 @@ bool CAD<Number>::prepareElimination() {
 	}
 	
 	// add new polynomials to level 0, unifying their variables, and the list of all polynomials
-	for (const auto& p: this->scheduledPolynomials) {
+	for (const auto& p: polynomials.getScheduled()) {
 		auto tmp = p;
 		if (p->mainVar() != this->variables.front()) {
-			tmp = this->take(new UPolynomial(p->switchVariable(this->variables.front())));
+			tmp = new UPolynomial(p->switchVariable(this->variables.front()));
+			this->polynomials.take(tmp);
 		}
-		this->polynomials.push_back(tmp);
+		this->polynomials.addPolynomial(tmp);
 		this->eliminationSets.front().insert(tmp);
 	}
 	
@@ -269,7 +265,7 @@ bool CAD<Number>::prepareElimination() {
 		this->eliminationSets.front().removePolynomialsWithoutRealRoots();
 	}
 	// done for the current scheduled polynomials
-	this->scheduledPolynomials.clear();
+	polynomials.clearScheduled();
 	CARL_LOG_TRACE("carl.cad", "Done with prepareElimination()");
 	return newVariableCount != 0;
 }
@@ -299,14 +295,14 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
 			if (b.second.lowerBoundType() != BoundType::INFTY) {
-				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.lower()), MPolynomial(1)})));
+				tmp.push_back(this->polynomials.take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.lower()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
 			if (b.second.upperBoundType() != BoundType::INFTY) {
-				tmp.push_back(this->take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.upper()), MPolynomial(1)})));
+				tmp.push_back(this->polynomials.take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.upper()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -547,7 +543,7 @@ bool CAD<Number>::check(
 			std::list<const UPolynomial*> tmp;
 			if (b.second.lowerBoundType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.lower())), MPolynomial(Term<Number>(1))});
-				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
+				tmp.push_back(this->polynomials.take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
 				assert(b.first < boundPolynomials.size());
@@ -555,7 +551,7 @@ bool CAD<Number>::check(
 			}
 			if (b.second.upperBoundType() != BoundType::INFTY) {
 				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.upper())), MPolynomial(Term<Number>(1))});
-				tmp.push_back(this->take(new UPolynomial(p.pseudoPrimpart())));
+				tmp.push_back(this->polynomials.take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
 				boundPolynomials[b.first].first = tmp.back();
@@ -607,11 +603,11 @@ bool CAD<Number>::check(
 		if (this->setting.simplifyEliminationByBounds) {
 			// re-add the input polynomials to the top-level (for they could have been deleted)
 			this->eliminationSets.front().clear();
-			for (const auto& p: this->polynomials) {
+			for (const auto& p: this->polynomials.getPolynomials()) {
 				if (p->mainVar() == this->variables.front()) {
 					this->eliminationSets.front().insert(p);
 				} else {
-					this->eliminationSets.front().insert(this->take(new UPolynomial(p->switchVariable(this->variables.front()))));
+					this->eliminationSets.front().insert(this->polynomials.take(new UPolynomial(p->switchVariable(this->variables.front()))));
 				}
 			}
 		} else {
@@ -645,7 +641,7 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 
 	CARL_LOG_TRACE("carl.core", "Adding " << p);
 	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var));
-	if (std::find(this->scheduledPolynomials.begin(), this->scheduledPolynomials.end(), up) != this->scheduledPolynomials.end()) {
+	if (polynomials.isScheduled(up)) {
 		// same polynomial was already considered in scheduled polynomials
 		delete up;
 		return;
@@ -657,10 +653,8 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 			return;
 		}
 	}
-	//std::cout << "\t inserting " << p << std::endl;
-	this->polynomialMap[p] = up;
 	// schedule the polynomial for the next elimination
-	this->scheduledPolynomials.push_back(this->take(up));
+	this->polynomials.schedule(p, up);
 	
 	// determine the variables differing from mVariables and add them to the front of the existing variables
 	this->variables.complete(v);
@@ -669,30 +663,9 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 template<typename Number>
 void CAD<Number>::removePolynomial(const MPolynomial& polynomial) {
 	CARL_LOG_TRACE("carl.cad", __func__ << "( " << polynomial << " )");
-	auto upit = this->polynomialMap.find(polynomial);
-	if (upit == this->polynomialMap.end()) {
-		return;
-	}
-	assert(upit != this->polynomialMap.end());
-	auto up = upit->second;
-	this->polynomialMap.erase(upit);
 	
-	// possibly remove the polynomial from the list of scheduled polynomials
-	for (auto p = this->scheduledPolynomials.begin(); p != this->scheduledPolynomials.end(); p++) {
-		if (*p == up) {
-			// in this case, there is neither any other occurrence of p in mScheduledPolynomials nor in mEliminationSets[0] (see addPolynomial for reason)
-			this->scheduledPolynomials.erase(p);
-			return;
-		}
-	}
-	
-	// remove the polynomial from the list of all polynomials
-	for (auto p = this->polynomials.begin(); p != this->polynomials.end(); p++) {
-		if (*p == up) {
-			this->polynomials.erase(p);
-			break;
-		}
-	}
+	auto up = polynomials.removePolynomial(polynomial);
+	if (up == nullptr) return;
 	
 	// determine the level of the polynomial (first level from the top) and remove the respective pointer from it
 	for (unsigned level = 0; level < this->eliminationSets.size(); level++) {
@@ -1879,9 +1852,9 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	
 	// optimization for equations not valid in general
 	boxSetting.equationsOnly = variables.size() <= 1;
-	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(this));
+	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(&this->polynomials));
 	CARL_LOG_INFO("carl.core", "Now in nested CAD " << &cadbox);
-	cadbox.scheduledPolynomials.assign({p});
+	cadbox.polynomials.schedule(p);
 	cadbox.variables.setNewVariables(variables);
 	cadbox.setting = boxSetting;
 	
