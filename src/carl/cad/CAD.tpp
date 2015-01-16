@@ -372,6 +372,7 @@ bool CAD<Number>::check(
 	bool next,
 	bool checkBounds)
 {
+	this->constraints = constraints;
     #ifdef LOGGING_CARL
 	CARL_LOG_DEBUG("carl.cad", "Checking the system");
 	for (const auto& c: constraints) CARL_LOG_DEBUG("carl.cad", "  " << c);
@@ -1158,6 +1159,7 @@ bool CAD<Number>::mainCheck(
 	next = next && (maxDepth == dim);
 	
 	// unify the variables for each constraint to match the CAD's variable order
+	// @todo is this necessary? why?
 	//for (unsigned i = 0; i < constraints.size(); ++i) {
 	//	constraints[i].unifyVariables(this->variables);
 	//}
@@ -1338,7 +1340,6 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 template<typename Number>
 bool CAD<Number>::baseLiftCheck(
 		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-		//const std::vector<cad::Constraint<Number>>& constraints,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 ) {
@@ -1367,7 +1368,6 @@ bool CAD<Number>::liftCheck(
 		unsigned openVariableCount,
 		bool restartLifting,
 		const std::list<Variable>& variables,
-		//const std::vector<cad::Constraint<Number>>& constraints,
 		const BoundMap& bounds,
 		bool boundsActive,
 		bool checkBounds,

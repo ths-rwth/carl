@@ -27,6 +27,11 @@ public:
 		return constraints.size();
 	}
 	
+	CADConstraints<Number>& operator=(const std::vector<cad::Constraint<Number>>& constraints) {
+		this->constraints = constraints;
+		return *this;
+	}
+	
 	bool satisfiedBy(RealAlgebraicPoint<Number>& r) const {
 		for (const auto& c: constraints) {
 			if (!c.satisfiedBy(r)) return false;
