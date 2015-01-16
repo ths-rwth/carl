@@ -218,14 +218,7 @@ bool CAD<Number>::prepareElimination() {
 	 */
 
 	/* Part A */
-	
-	/// @todo Check if this code is actually necessary
-	if (this->setting.simplifyByGroebner) {
-		// add new variables to the variable list pool
-		//for (const auto& v: this->newVariables) {
-			// VariableListPool::addVariable(v);
-		//}
-	}
+
 	if (!this->variables.newEmpty()) {
 		// introduce new elimination levels and fill them appropriately
 		// (1)
@@ -1007,9 +1000,6 @@ void CAD<Number>::alterSetting(const cad::CADSettings& setting) {
 		for (auto& i: this->eliminationSets) {
 			i.setLiftingOrder(setting.order);
 		}
-	}
-	if (!this->setting.simplifyByGroebner && setting.simplifyByGroebner) {
-		CARL_LOG_WARN("carl.cad", "Changing simplifyByGroebner during computation is not supported yet.");
 	}
 	if (!this->setting.simplifyByRootcounting && setting.simplifyByRootcounting) {
 		for (auto& i: this->eliminationSets) {
