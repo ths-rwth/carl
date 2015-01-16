@@ -6,6 +6,7 @@
 #pragma once
 
 #include <forward_list>
+#include <iostream>
 #include <vector>
 
 #include "ConflictGraph.h"
@@ -57,6 +58,11 @@ public:
 		// store that the constraints are satisfied by r
 		conflictGraph.addEdges(vertices.begin(), vertices.end());
 		return satisfied;
+	}
+	
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const CADConstraints<Num>& c) {
+		return os << c.constraints;
 	}
 };
 
