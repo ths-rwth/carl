@@ -9,9 +9,11 @@
 #include <iostream>
 #include <vector>
 
+#include "CADTypes.h"
 #include "ConflictGraph.h"
 #include "Constraint.h"
 #include "../core/RealAlgebraicPoint.h"
+#include "../io/streamingOperators.h"
 
 namespace carl {
 namespace cad {
@@ -47,7 +49,7 @@ public:
 	}
 	bool satisfiedBy(RealAlgebraicPoint<Number>& r, cad::ConflictGraph& conflictGraph) const {
 		bool satisfied = true;
-		std::forward_list<unsigned> vertices;
+		std::forward_list<std::size_t> vertices;
 		for (std::size_t i = 0; i < constraints.size(); i++) {
 			if (constraints[i].satisfiedBy(r)) {
 				vertices.push_front(i);

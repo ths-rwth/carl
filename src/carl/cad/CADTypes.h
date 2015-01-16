@@ -14,6 +14,7 @@
 
 namespace carl {
 namespace cad {
+using carl::operator<<;
 
 template<typename Coeff>
 using MPolynomial = carl::MultivariatePolynomial<Coeff>;
