@@ -238,7 +238,7 @@ public:
 	 * @param constraints
 	 * @param filename
 	 */
-	void printConstraints(const std::vector<cad::Constraint<Number>>& constraints, const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
+	void printConstraints(const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
 
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const CAD<Num>& cad);
@@ -467,7 +467,6 @@ private:
      * @param node
      * @param fullRestart
      * @param excludePrevious
-	 * @param constraints
 	 * @param bounds
 	 * @param r
 	 * @param conflictGraph
@@ -495,7 +494,6 @@ private:
 	 * Phase 2: Search the sample tree for already satisfying samples and lift the samples not yet lifted to the full dimension (all possibly within given bounds).
 	 * Phase 3: Lift at those sample tree nodes where lifting is still possible (possibly within given bounds).
 	 *
-	 * @param constraints
 	 * @param bounds
 	 * @param r
 	 * @param conflictGraph
@@ -599,7 +597,7 @@ public:
 	 * @param bounds
 	 * @param constraints
 	 */
-	void widenBounds(BoundMap& bounds, std::vector<cad::Constraint<Number>>& constraints);
+	void widenBounds(BoundMap& bounds);
 
 	/**
 	 * The given bounds are shrunk to the a value close to the given (satisfying) point for every variable.

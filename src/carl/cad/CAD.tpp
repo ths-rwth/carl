@@ -130,7 +130,7 @@ void CAD<Number>::printSampleTree(std::ostream& os) const {
 }
 
 template<typename Number>
-void CAD<Number>::printConstraints(const std::vector<cad::Constraint<Number>>& constraints, const std::string& filename) const {
+void CAD<Number>::printConstraints(const std::string& filename) const {
 	if( !constraints.empty() ){
 		std::ofstream smtlibFile;
 		smtlibFile.open(filename);
@@ -365,14 +365,14 @@ void CAD<Number>::complete() {
 
 template<typename Number>
 bool CAD<Number>::check(
-	std::vector<cad::Constraint<Number>>& constraints,
+	std::vector<cad::Constraint<Number>>& _constraints,
 	RealAlgebraicPoint<Number>& r,
 	cad::ConflictGraph& conflictGraph,
 	BoundMap& bounds,
 	bool next,
 	bool checkBounds)
 {
-	this->constraints = constraints;
+	this->constraints = _constraints;
     #ifdef LOGGING_CARL
 	CARL_LOG_DEBUG("carl.cad", "Checking the system");
 	for (const auto& c: constraints) CARL_LOG_DEBUG("carl.cad", "  " << c);
@@ -430,7 +430,7 @@ bool CAD<Number>::check(
 				assert(false);
 		}
 	}
-	this->printConstraints(constraints, filename);
+	this->printConstraints(filename);
 	CARL_LOG_INFO("carl.cad", "done.");
 #endif
 	
@@ -478,12 +478,13 @@ bool CAD<Number>::check(
 		}
 		if (!m.empty()) {
 			// there are bounds we can use
-			for (auto& constraint: constraints) {
+			for (const auto& constraint: constraints) {
 				/// @todo A Constraint may be negated.
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
-					std::swap(constraints.back(), constraint);
+					exit(123);
+					//std::swap(constraints.back(), constraint);
 					conflictGraph = cad::ConflictGraph();
 					return false;
 				}
@@ -578,7 +579,7 @@ bool CAD<Number>::check(
 			if (satisfiable) {
 				this->shrinkBounds(bounds, r);
 			} else {
-				this->widenBounds(bounds, constraints);
+				this->widenBounds(bounds);
 			}
 		}
 		
@@ -1701,7 +1702,7 @@ Interval<Number> CAD<Number>::getBounds(const typename CAD<Number>::sampleIterat
 }
 
 template<typename Number>
-void CAD<Number>::widenBounds(BoundMap&, std::vector<cad::Constraint<Number>>&) {
+void CAD<Number>::widenBounds(BoundMap&) {
 }
 
 template<typename Number>

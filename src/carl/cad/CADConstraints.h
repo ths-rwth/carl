@@ -20,16 +20,22 @@ class CADConstraints {
 private:
 	std::vector<cad::Constraint<Number>> constraints;
 public:
+	CADConstraints<Number>& operator=(const std::vector<cad::Constraint<Number>>& constraints) {
+		this->constraints = constraints;
+		return *this;
+	}
+	
 	bool empty() const {
 		return constraints.empty();
 	}
 	std::size_t size() const {
 		return constraints.size();
 	}
-	
-	CADConstraints<Number>& operator=(const std::vector<cad::Constraint<Number>>& constraints) {
-		this->constraints = constraints;
-		return *this;
+	auto begin() const -> decltype(constraints.begin()) {
+		return constraints.begin();
+	}
+	auto end() const -> decltype(constraints.end()) {
+		return constraints.end();
 	}
 	
 	bool satisfiedBy(RealAlgebraicPoint<Number>& r) const {
