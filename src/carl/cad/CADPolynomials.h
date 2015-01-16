@@ -37,7 +37,7 @@ private:
 	 */
 	std::vector<const UPolynomial*> scheduled;
 public:
-	CADPolynomials() {}
+	CADPolynomials(): cad::PolynomialOwner<Number>() {}
 	CADPolynomials(cad::PolynomialOwner<Number>* parent): cad::PolynomialOwner<Number>(parent) {}
 	
 	bool hasScheduled() const {
@@ -46,12 +46,13 @@ public:
 	bool isScheduled(const UPolynomial* up) const {
 		return std::find(scheduled.begin(), scheduled.end(), up) != scheduled.end();
 	}
-	void schedule(const UPolynomial* up) {
-		scheduled.push_back(this->take(up));
+	void schedule(const UPolynomial* up, bool take = true) {
+		if (take) scheduled.push_back(this->take(up));
+		else scheduled.push_back(up);
 	}
-	void schedule(const MPolynomial& p, const UPolynomial* up) {
+	void schedule(const MPolynomial& p, const UPolynomial* up, bool take = true) {
 		map[p] = up;
-		scheduled.push_back(this->take(up));
+		schedule(up, take);
 	}
 	void clearScheduled() {
 		scheduled.clear();

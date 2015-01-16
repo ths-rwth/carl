@@ -1850,7 +1850,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	boxSetting.equationsOnly = variables.size() <= 1;
 	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(&this->polynomials));
 	CARL_LOG_INFO("carl.core", "Now in nested CAD " << &cadbox);
-	cadbox.polynomials.schedule(p);
+	cadbox.polynomials.schedule(p, false);
 	cadbox.variables.setNewVariables(variables);
 	cadbox.setting = boxSetting;
 	
