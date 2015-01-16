@@ -567,7 +567,7 @@ bool CAD<Number>::check(
 	
 	// call the main check function according to the settings
 	CARL_LOG_DEBUG("carl.cad", "Calling mainCheck...");
-	bool satisfiable = this->mainCheck(constraints, bounds, r, conflictGraph, next, useBounds, checkBounds);
+	bool satisfiable = this->mainCheck(bounds, r, conflictGraph, next, useBounds, checkBounds);
 	CARL_LOG_DEBUG("carl.cad", "mainCheck returned " << satisfiable);
 	
 	if (useBounds) {
@@ -753,30 +753,6 @@ std::vector<Interval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoint<Nu
 		parent = node;
 	}
 	return bounds;
-}
-
-template<typename Number>
-bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints) {
-	for (unsigned i = 0; i < constraints.size(); i++) {
-		if (!constraints[i].satisfiedBy(r)) return false;
-	}
-	return true;
-}
-
-template<typename Number>
-bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph) {
-	bool satisfied = true;
-	std::forward_list<unsigned> vertices;
-	for (unsigned i = 0; i < constraints.size(); i++) {
-		if (constraints[i].satisfiedBy(r)) {
-			vertices.push_front(i);
-		} else {
-			satisfied = false;
-		}
-	}
-	// store that the constraints are satisfied by r
-	conflictGraph.addEdges(vertices.begin(), vertices.end());
-	return satisfied;
 }
 
 template<typename Number>
@@ -1085,7 +1061,6 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
-		std::vector<cad::Constraint<Number>>& constraints,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph,
@@ -1127,8 +1102,8 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		if (excludePrevious) return std::make_pair(false, true);
 		
 		if (
-			(this->setting.computeConflictGraph && this->satisfies(sample, constraints, conflictGraph)) ||
-			(!this->setting.computeConflictGraph && this->satisfies(sample, constraints))
+			(this->setting.computeConflictGraph && constraints.satisfiedBy(sample, conflictGraph)) ||
+			(!this->setting.computeConflictGraph && constraints.satisfiedBy(sample))
 			) {
 			r = sample;
 			CARL_LOG_TRACE("carl.cad", "sample is good!");
@@ -1147,7 +1122,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 			variables.push_front(this->variables[i]);
 		}
 		// perform lifting at the incomplete leaf (without elimination, only by the current elimination polynomials)
-		if (this->liftCheck(node, sampleList, i, fullRestart, variables, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
+		if (this->liftCheck(node, sampleList, i, fullRestart, variables, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
 			CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting succesfull");
 			return std::make_pair(true, false);
 		}
@@ -1158,7 +1133,6 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 
 template<typename Number>
 bool CAD<Number>::mainCheck(
-		std::vector<cad::Constraint<Number>>& constraints,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph,
@@ -1184,9 +1158,9 @@ bool CAD<Number>::mainCheck(
 	next = next && (maxDepth == dim);
 	
 	// unify the variables for each constraint to match the CAD's variable order
-	for (unsigned i = 0; i < constraints.size(); ++i) {
-		constraints[i].unifyVariables(this->variables);
-	}
+	//for (unsigned i = 0; i < constraints.size(); ++i) {
+	//	constraints[i].unifyVariables(this->variables);
+	//}
 	
 	////////////
 	// Main search strategy
@@ -1225,13 +1199,13 @@ bool CAD<Number>::mainCheck(
 			if (lastRes == -1) {
 				CARL_LOG_TRACE("carl.cad", "Lifting");
 				// eliminate will not be able to produce a new polynomial.
-				return this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph);
+				return this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph);
 			}
 			CARL_LOG_DEBUG("carl.cad", "Waiting for something to lift, lastRes = " << lastRes << std::endl << *this);
 		};
 		
 		// perform an initial lifting step in order to fill the tree once
-		if (this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
+		if (this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
 			// lifting yields a satisfying sample
 			return true;
 		}
@@ -1241,7 +1215,7 @@ bool CAD<Number>::mainCheck(
 		for (auto leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
 			// traverse the current sample tree leaves for satisfying samples
 			CARL_LOG_TRACE("carl.cad", this->sampleTree);
-			auto res = this->checkNode(leaf, true, next, constraints, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);
+			auto res = this->checkNode(leaf, true, next, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);
 			if (res.first) return true;
 			if (res.second) continue;
 		}
@@ -1326,7 +1300,7 @@ bool CAD<Number>::mainCheck(
 			}
 			assert(level + 1 == (int)i);
 			// perform lifting at the incomplete leaf with the stored lifting queue (reset performed in liftCheck)
-			if (liftCheck(node, sampleList, i, false, variables, constraints, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
+			if (liftCheck(node, sampleList, i, false, variables, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
 				// lifting yields a satisfying sample
 				return true;
 			}
@@ -1364,7 +1338,7 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 template<typename Number>
 bool CAD<Number>::baseLiftCheck(
 		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-		const std::vector<cad::Constraint<Number>>& constraints,
+		//const std::vector<cad::Constraint<Number>>& constraints,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 ) {
@@ -1376,8 +1350,8 @@ bool CAD<Number>::baseLiftCheck(
 		return true;
 	}
 	RealAlgebraicPoint<Number> t(sample);
-	if ((this->setting.computeConflictGraph && this->satisfies(t, constraints, conflictGraph)) ||
-		(!this->setting.computeConflictGraph && this->satisfies(t, constraints))) {
+	if ((this->setting.computeConflictGraph && constraints.satisfiedBy(t, conflictGraph)) ||
+		(!this->setting.computeConflictGraph && constraints.satisfiedBy(t))) {
 		r = t;
 		CARL_LOG_TRACE("carl.cad", "Returning true as a satisfying sample was found");
 		return true;
@@ -1393,7 +1367,7 @@ bool CAD<Number>::liftCheck(
 		unsigned openVariableCount,
 		bool restartLifting,
 		const std::list<Variable>& variables,
-		const std::vector<cad::Constraint<Number>>& constraints,
+		//const std::vector<cad::Constraint<Number>>& constraints,
 		const BoundMap& bounds,
 		bool boundsActive,
 		bool checkBounds,
@@ -1417,7 +1391,7 @@ bool CAD<Number>::liftCheck(
 
 	// base level: zero variables left to substitute => evaluate the constraint
 	if (openVariableCount == 0) {
-		return this->baseLiftCheck(sample, constraints, r, conflictGraph);
+		return this->baseLiftCheck(sample, r, conflictGraph);
 	}
 	
 	// openVariableCount > 0: lifting
@@ -1543,7 +1517,7 @@ bool CAD<Number>::liftCheck(
 			
 			// Lifting
 			// start lifting with the fresh new sample at the next level for *all* lifting positions
-			bool liftingSuccessful = this->liftCheck(newNode, extSample, openVariableCount, true, newVariables, constraints, bounds, boundsActive, checkBounds, r, conflictGraph);
+			bool liftingSuccessful = this->liftCheck(newNode, extSample, openVariableCount, true, newVariables, bounds, boundsActive, checkBounds, r, conflictGraph);
 			
 			///@todo warum hier pop() und nicht oben jeweils nach dem get()?
 			// Sample pop if lifting unsuccessful or at the last level, i.e. level == 0

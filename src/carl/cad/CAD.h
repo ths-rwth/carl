@@ -43,6 +43,7 @@
 //#include "../util/tree.h"
 #include "../util/carlTree.h"
 
+#include "CADConstraints.h"
 #include "CADPolynomials.h"
 #include "CADTypes.h"
 #include "CADSettings.h"
@@ -107,6 +108,8 @@ private:
 	 * setting for internal heuristics
 	 */
 	cad::CADSettings setting;
+	
+	cad::CADConstraints<Number> constraints;
 	
 	static unsigned checkCallCount;
 
@@ -361,23 +364,6 @@ public:
 	///////////////////////////
 	// PUBLIC STATIC METHODS //
 	///////////////////////////
-	
-	/**
-	 * Returns the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point r.
-	 * @param r
-	 * @param constraints
-	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
-	 */
-	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints);
-
-	/**
-	 * Returns the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point r.
-	 * @param r
-	 * @param constraints
-	 * @param conflictGraph See CAD::check for a full description.
-	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
-	 */
-	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
 
 	template<typename Inserter>
 	static void addSamples(const RealAlgebraicNumberPtr<Number>& left, const RealAlgebraicNumberPtr<Number>& right, VariableType type, Inserter i);
@@ -494,7 +480,6 @@ private:
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
-		std::vector<cad::Constraint<Number>>& constraints,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph,
@@ -521,7 +506,6 @@ private:
 	 */
 public:
 	bool mainCheck(
-			std::vector<cad::Constraint<Number>>& constraints,
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
 			cad::ConflictGraph& conflictGraph,
@@ -543,7 +527,6 @@ public:
 	
 	bool baseLiftCheck(
 		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-		const std::vector<cad::Constraint<Number>>& constraints,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 	);
@@ -580,7 +563,6 @@ public:
 			unsigned openVariableCount,
 			bool restartLifting,
 			const std::list<Variable>& variables,
-			const std::vector<cad::Constraint<Number>>& constraints,
 			const BoundMap& bounds,
 			bool boundsActive,
 			bool checkBounds,
