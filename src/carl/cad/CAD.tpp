@@ -780,23 +780,30 @@ bool CAD<Number>::satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad
 }
 
 template<typename Number>
-RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
+template<typename Inserter>
+void CAD<Number>::addSamples(
 		const RealAlgebraicNumberPtr<Number>& left,
-		const RealAlgebraicNumberPtr<Number>& right
+		const RealAlgebraicNumberPtr<Number>& right,
+		VariableType type,
+		Inserter i
 ) {
 	carl::Interval<Number> interval;
 	if (left == nullptr) {
 		if (right == nullptr) {
-			return RealAlgebraicNumberNR<Number>::create(carl::constant_zero<Number>::get(), false);
+			i = RealAlgebraicNumberNR<Number>::create(carl::constant_zero<Number>::get(), false);
+			return;
 		} else if (right->isNumeric()) {
-			return RealAlgebraicNumberNR<Number>::create(carl::floor(right->value()) - 1, false);
+			i = RealAlgebraicNumberNR<Number>::create(carl::floor(right->value()) - 1, false);
+			return;
 		} else {
 			auto rIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(right);
-			return RealAlgebraicNumberNR<Number>::create(carl::floor(rIR->getInterval().lower()) - 1, false);
+			i = RealAlgebraicNumberNR<Number>::create(carl::floor(rIR->getInterval().lower()) - 1, false);
+			return;
 		}
 	} else if (left->isNumeric()) {
 		if (right == nullptr) {
-			return RealAlgebraicNumberNR<Number>::create(carl::ceil(left->value()) + 1, false);
+			i = RealAlgebraicNumberNR<Number>::create(carl::ceil(left->value()) + 1, false);
+			return;
 		} else if (right->isNumeric()) {
 			interval.set(left->value(), right->value());
 		} else {
@@ -807,7 +814,8 @@ RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
 	} else {
 		auto lIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(left);
 		if (right == nullptr) {
-			return RealAlgebraicNumberNR<Number>::create(carl::ceil(lIR->getInterval().upper()) + 1, false);
+			i = RealAlgebraicNumberNR<Number>::create(carl::ceil(lIR->getInterval().upper()) + 1, false);
+			return;
 		} else if (right->isNumeric()) {
 			while (lIR->getInterval().upper() >= right->value()) lIR->refineAvoiding(right->value());
 			interval.set(lIR->getInterval().upper(), right->value());
@@ -820,7 +828,22 @@ RealAlgebraicNumberNRPtr<Number> CAD<Number>::createSample(
 			interval.set(lIR->getInterval().upper(), rIR->getInterval().lower());
 		}
 	}
-	return RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
+	if (type == VariableType::VT_INT) {
+		//std::cout << "Using integer exploration. Diameter: " << interval.diameter() << std::endl;
+		if (interval.diameter() <= 1) {
+			i = RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
+		} else if (interval.diameter() < 10) {
+			Number x = carl::ceil(interval.lower());
+			while (interval.contains(x)) {
+				i = RealAlgebraicNumberNR<Number>::create(x, false);
+				x += carl::constant_one<Number>::get();
+			}
+		} else {
+			i = RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
+		}
+	} else {
+		i = RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
+	}
 }
 
 template<typename Number>
@@ -892,25 +915,30 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		 *     (root?)              (root)            (root?)
 		 */
 		
+		//std::cout << *this << std::endl;
+		carl::VariableType type = this->variables[openVariableCount].getType();
+		if (!this->setting.exploreInteger) type = VariableType::VT_REAL;
+		//std::cout << "Current var: " << openVariableCount << " -> " << this->variables[openVariableCount] << std::endl;
+		//REGISTERED_ASSERT(openVariableCount > 1);
 		// next: right neighbor
 		auto neighbor = insertValue.first;
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
-			newSamples.push_front(createSample((*insertValue.first), nullptr));
+			addSamples((*insertValue.first), nullptr, type, std::front_inserter(newSamples));
 		} else if ((*neighbor)->isRoot()) {
-			newSamples.push_front(createSample((*insertValue.first), (*neighbor)));
+			addSamples((*insertValue.first), (*neighbor), type, std::front_inserter(newSamples));
 		}
 		
 		// previous: left neighbor
 		neighbor = insertValue.first;
 		if (neighbor == currentSamples.begin()) {
-			newSamples.push_front(createSample(nullptr, (*insertValue.first)));
+			addSamples(nullptr, (*insertValue.first), type, std::front_inserter(newSamples));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if ((*neighbor)->isRoot()) {
-				newSamples.push_front(createSample((*neighbor), (*insertValue.first)));
+				addSamples((*neighbor), (*insertValue.first), type, std::front_inserter(newSamples));
 			}
 		}
 		

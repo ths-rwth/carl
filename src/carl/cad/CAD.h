@@ -379,7 +379,8 @@ public:
 	 */
 	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
 
-	static RealAlgebraicNumberNRPtr<Number> createSample(const RealAlgebraicNumberPtr<Number>& left, const RealAlgebraicNumberPtr<Number>& right);
+	template<typename Inserter>
+	static void addSamples(const RealAlgebraicNumberPtr<Number>& left, const RealAlgebraicNumberPtr<Number>& right, VariableType type, Inserter i);
 	
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.
