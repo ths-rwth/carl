@@ -39,7 +39,6 @@ namespace carl
     template<typename T>
     Cache<T>::~Cache()
     {
-        std::cout << __func__ << std::endl;
         mCacheRefs.clear();
         while( !mCache.empty() )
         {
