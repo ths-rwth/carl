@@ -383,7 +383,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		this->erase(p);
 		return {};
 	}
-	const UPolynomial* pNewVar = new UPolynomial(p->switchVariable(variable));
+	const UPolynomial* pNewVar = this->polynomialOwner->take(new UPolynomial(p->switchVariable(variable)));
 	destination.insert(pNewVar, this->getParentsOf(p), avoidSingle);
 	if( setting.removeConstants ) { /* remove constant from this level */
 		DOT_NODE("elimination", p, "shape=box");
