@@ -152,6 +152,8 @@ namespace carl
             
             // Member.
             
+            /// The negation
+            FormulaContent<Pol> *mNegation;
             /// The hash value.
             size_t mHash;
             /// The unique id.
