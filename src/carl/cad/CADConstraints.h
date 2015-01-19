@@ -41,17 +41,17 @@ public:
 		return constraints.end();
 	}
 	
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& vars) const {
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r) const {
 		for (const auto& c: constraints) {
-			if (!c.satisfiedBy(r, vars)) return false;
+			if (!c.satisfiedBy(r)) return false;
 		}
 		return true;
 	}
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& vars, cad::ConflictGraph& conflictGraph) const {
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r, cad::ConflictGraph& conflictGraph) const {
 		bool satisfied = true;
 		std::forward_list<std::size_t> vertices;
 		for (std::size_t i = 0; i < constraints.size(); i++) {
-			if (constraints[i].satisfiedBy(r, vars)) {
+			if (constraints[i].satisfiedBy(r)) {
 				vertices.push_front(i);
 			} else {
 				satisfied = false;
