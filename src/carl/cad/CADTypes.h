@@ -14,6 +14,7 @@
 
 namespace carl {
 namespace cad {
+using carl::operator<<;
 
 template<typename Coeff>
 using MPolynomial = carl::MultivariatePolynomial<Coeff>;
@@ -77,6 +78,7 @@ public:
      */
 	const UPolynomial<Coeff>* take(const UPolynomial<Coeff>* p) {
 		if (this->parentOwner != nullptr) return this->parentOwner->take(p);
+		assert(std::find(ownedPolynomials.begin(), ownedPolynomials.end(), p) == ownedPolynomials.end());
 		this->ownedPolynomials.push_back(p);
 		return p;
 	}
@@ -87,6 +89,7 @@ public:
      */
 	UPolynomial<Coeff>* take(UPolynomial<Coeff>* p) {
 		if (this->parentOwner != nullptr) return this->parentOwner->take(p);
+		assert(std::find(ownedPolynomials.begin(), ownedPolynomials.end(), p) == ownedPolynomials.end());
 		this->ownedPolynomials.push_back(p);
 		return p;
 	}
