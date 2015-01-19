@@ -1104,8 +1104,8 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		if (excludePrevious) return std::make_pair(false, true);
 		
 		if (
-			(this->setting.computeConflictGraph && constraints.satisfiedBy(sample, conflictGraph)) ||
-			(!this->setting.computeConflictGraph && constraints.satisfiedBy(sample))
+			(this->setting.computeConflictGraph && constraints.satisfiedBy(sample, getVariables(), conflictGraph)) ||
+			(!this->setting.computeConflictGraph && constraints.satisfiedBy(sample, getVariables()))
 			) {
 			r = sample;
 			CARL_LOG_TRACE("carl.cad", "sample is good!");
@@ -1352,8 +1352,8 @@ bool CAD<Number>::baseLiftCheck(
 		return true;
 	}
 	RealAlgebraicPoint<Number> t(sample);
-	if ((this->setting.computeConflictGraph && constraints.satisfiedBy(t, conflictGraph)) ||
-		(!this->setting.computeConflictGraph && constraints.satisfiedBy(t))) {
+	if ((this->setting.computeConflictGraph && constraints.satisfiedBy(t, getVariables(), conflictGraph)) ||
+		(!this->setting.computeConflictGraph && constraints.satisfiedBy(t, getVariables()))) {
 		r = t;
 		CARL_LOG_TRACE("carl.cad", "Returning true as a satisfying sample was found");
 		return true;
