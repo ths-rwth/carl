@@ -1407,13 +1407,8 @@ bool CAD<Number>::liftCheck(
 	auto bound = boundsActive ? bounds.find(openVariableCount) : bounds.end();
 	bool boundActive = bounds.end() != bound;
 	
-	if (restartLifting) {
-		// use the complete set of lifting positions
-		this->eliminationSets[openVariableCount].resetLiftingPositionsFully();
-	} else {
-		// use the currently stored lifting queue
-		this->eliminationSets[openVariableCount].resetLiftingPositions();
-	}
+	// restore the lifting queue.
+	this->eliminationSets[openVariableCount].resetLiftingPositions(restartLifting);
 
 	/*
 	 * Main loop: performs all operations possible in one level > 0, in particular, 2 phases.
