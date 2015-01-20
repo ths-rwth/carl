@@ -151,7 +151,6 @@ namespace carl
         private:
             
             // Member.
-            
             /// The hash value.
             size_t mHash;
             /// The unique id.
@@ -182,6 +181,8 @@ namespace carl
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                 UEquality mUIEquality;
             };
+            /// The negation
+            FormulaContent<Pol> *mNegation;
             /// The propositions of this formula.
             Condition mProperties;
 

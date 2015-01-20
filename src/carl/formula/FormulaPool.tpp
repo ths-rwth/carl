@@ -21,6 +21,8 @@ namespace carl
         mpFalse( new Element( false, 2 ) ),
         mPool()
     {
+        mpTrue->mNegation = mpFalse;
+     	mpFalse->mNegation = mpTrue;
         mPool.reserve( _capacity );
         mPool.insert( mpTrue );
         mPool.insert( mpFalse );
@@ -67,7 +69,9 @@ namespace carl
             // Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
-            insert( new Element( Formula<Pol>( *iterBoolPair.first ) ), true );
+            _element->mNegation = new Element(Formula<Pol>( *iterBoolPair.first ));
+         	_element->mNegation->mNegation = _element;
+            insert(_element->mNegation, true);
         }
         return *iterBoolPair.first;   
     }

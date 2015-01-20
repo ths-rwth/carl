@@ -127,16 +127,7 @@ namespace carl
              */
             ConstElementSPtr createNegation( const Formula<Pol>& _subFormula )
             {
-                #ifdef SIMPLIFY_FORMULA
-                if( _subFormula.mpContent == mpTrue )
-                    return mpFalse;
-                if( _subFormula.mpContent == mpFalse )
-                    return mpTrue;
-				if (_subFormula.getType() == FormulaType::NOT)
-					return _subFormula.subformula().mpContent;
-                #endif
-                // TODO: Actually we know that this formula does not begin with NOT and is already in the pool. Use this for optimization purposes.
-                return add( new Element( _subFormula ) );
+                return _subFormula.mpContent->mNegation;
             }
     
             /**
