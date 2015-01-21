@@ -277,8 +277,9 @@ TEST(mpfrFloatTest, Division)
     
     f5.div_assign(f6, carl::CARL_RND::N);
     ASSERT_EQ(result3, f5);
-    
+#ifndef NDEBUG
     ASSERT_DEATH(f7.div_assign(f8, carl::CARL_RND::N), ".*");
+#endif
 }
 
 /*
@@ -315,8 +316,9 @@ TEST(mpfrFloatTest, Roots)
 
     f3.root_assign(i1, carl::CARL_RND::N);
     ASSERT_EQ(result3, f3);
-    
+#ifndef NDEBUG
     ASSERT_DEATH(f4.sqrt_assign(carl::CARL_RND::N), ".*");
+#endif
 }
 
 TEST(mpfrFloatTest, ConversionOperators)
