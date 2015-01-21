@@ -85,7 +85,7 @@ class Buchberger : private AddingPolicy<Polynomial>
 protected:
 	std::shared_ptr<Ideal<Polynomial>> pGb;
 	std::vector<size_t> mGbElementsIndices;
-    CritPairs mCritPairs;
+    std::shared_ptr<CritPairs> pCritPairs;
 	UpdateFnct<Buchberger<Polynomial, AddingPolicy>> mUpdateCallBack;
 #ifdef BUCHBERGER_STATISTICS
 	BuchbergerStats* mStats;
@@ -94,6 +94,7 @@ protected:
 
 public:
 	Buchberger() :
+    pCritPairs(new CritPairs()),
 	mUpdateCallBack(this)
 	{
 		
@@ -107,7 +108,7 @@ public:
 	Buchberger(const Buchberger& rhs) :
 	pGb(new Ideal<Polynomial>(*rhs.pGb)),
 	mGbElementsIndices(rhs.mGbElementsIndices),
-	mCritPairs(rhs.mCritPairs),
+	pCritPairs(new CritPairs(*rhs.pCritPairs)),
 	mUpdateCallBack(this)
 	{
 		
@@ -117,6 +118,10 @@ public:
 	void setIdeal(const std::shared_ptr<Ideal<Polynomial>>& ideal)
 	{
 		pGb = ideal;
+	}
+	void setCriticalPairs(const std::shared_ptr<CritPairs>& criticalPairs)
+	{
+		pCritPairs = criticalPairs;
 	}
 
 	//std::list<std::pair<BitVector, BitVector> > reduceInput();
