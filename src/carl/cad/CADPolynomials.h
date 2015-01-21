@@ -76,14 +76,14 @@ public:
 		map.erase(it);
 		
 		for (auto it = scheduled.begin(); it != scheduled.end(); ++it) {
-			if (*it == up) {
+			if (**it == *up) {
 				scheduled.erase(it);
 				return up;
 			}
 		}
 		
 		for (auto it = polynomials.begin(); it != polynomials.end(); ++it) {
-			if (*it == up) {
+			if (**it == *up) {
 				polynomials.erase(it);
 				return up;
 			}
