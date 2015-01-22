@@ -1,6 +1,7 @@
 # Add test cpp file
 add_executable(runFormulaTests
 	Test_Formula.cpp
+	Test_BVConstraint.cpp
 )
 cotire(runFormulaTests)
 
