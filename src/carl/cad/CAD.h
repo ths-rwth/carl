@@ -652,6 +652,20 @@ public:
 		assert(isOk);
 		return isOk;
 	}
+
+	/**
+	 * Check if the sample point represented by a given node in the sample tree matches the integrality constraints imposed by the variables.
+	 * @param node Node in sample tree.
+	 * @return If sample fulfills integrality constraints.
+	 */
+	template<typename It>
+	bool checkIntegrality(It node) const {
+		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
+			Variable var = variables[pit.depth() - 1];
+			if ((var.getType() == VariableType::VT_INT) && (!(*pit)->isIntegral())) return false;
+		}
+		return true;
+	}
 };
 
 }
