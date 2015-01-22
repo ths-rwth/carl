@@ -860,91 +860,91 @@ template<typename Number>
 		assert(this->isConsistent());
 		assert(rhs.isConsistent());
 		Number lowerValue;
-                Number upperValue;
-                BoundType maxLowest;
-                BoundType minUppest;
-                // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
-                if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-                {
-                    if ( mContent.lower() < rhs.lower() )
-                    {
-                        lowerValue = rhs.lower();
-                        maxLowest = rhs.lowerBoundType();
-                    }
-                    else if ( rhs.lower() < mContent.lower() )
-                    {
-                        lowerValue = mContent.lower();
-                        maxLowest = mLowerBoundType;
-                    }
-                    else
-                    {
-                        lowerValue = mContent.lower();
-                        maxLowest = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
-                    }
-                }
-                else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-                {
-                    lowerValue = rhs.lower();
-                    maxLowest = rhs.lowerBoundType();
-                }
-                else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
-                {
-                    lowerValue = mContent.lower();
-                    maxLowest = mLowerBoundType;
-                }
-                else
-                {
-                    lowerValue = carl::constant_zero<Number>().get();
-                    maxLowest = BoundType::INFTY;
-                }
+        Number upperValue;
+        BoundType maxLowest;
+        BoundType minUppest;
+        // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
+        if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+        {
+            if ( mContent.lower() < rhs.lower() )
+            {
+                lowerValue = rhs.lower();
+                maxLowest = rhs.lowerBoundType();
+            }
+            else if ( rhs.lower() < mContent.lower() )
+            {
+                lowerValue = mContent.lower();
+                maxLowest = mLowerBoundType;
+            }
+            else
+            {
+                lowerValue = mContent.lower();
+                maxLowest = getStrictestBoundType(mLowerBoundType, rhs.lowerBoundType());
+            }
+        }
+        else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+        {
+            lowerValue = rhs.lower();
+            maxLowest = rhs.lowerBoundType();
+        }
+        else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
+        {
+            lowerValue = mContent.lower();
+            maxLowest = mLowerBoundType;
+        }
+        else
+        {
+            lowerValue = carl::constant_zero<Number>().get();
+            maxLowest = BoundType::INFTY;
+        }
 
-                // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
-                if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-                {
-                    if ( mContent.upper() > rhs.upper() )
-                    {
-                        upperValue = rhs.upper();
-                        minUppest = rhs.upperBoundType();
-                    }
-                    else if ( rhs.upper() > mContent.upper() )
-                    {
-                        upperValue = mContent.upper();
-                        minUppest = mUpperBoundType;
-                    }
-                    else
-                    {
-                        upperValue = mContent.upper();
-                        minUppest = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
-                    }
-                    if( maxLowest == BoundType::INFTY )
-                    {
-                        lowerValue = upperValue;
-                    }
-                }
-                else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-                {
-                    upperValue = rhs.upper();
-                    minUppest = rhs.upperBoundType();
-                    if( maxLowest == BoundType::INFTY )
-                    {
-                        lowerValue = upperValue;
-                    }
-                }
-                else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-                {
-                    upperValue = mContent.upper();
-                    minUppest = mUpperBoundType;
-                    if( maxLowest == BoundType::INFTY )
-                    {
-                        lowerValue = upperValue;
-                    }
-                }
-                else
-                {
-                    upperValue = lowerValue;
-                    minUppest = BoundType::INFTY;
-                }
-                return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
+        // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
+        if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+        {
+            if ( mContent.upper() > rhs.upper() )
+            {
+                upperValue = rhs.upper();
+                minUppest = rhs.upperBoundType();
+            }
+            else if ( rhs.upper() > mContent.upper() )
+            {
+                upperValue = mContent.upper();
+                minUppest = mUpperBoundType;
+            }
+            else
+            {
+                upperValue = mContent.upper();
+                minUppest = getStrictestBoundType(mUpperBoundType, rhs.upperBoundType());
+            }
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+        {
+            upperValue = rhs.upper();
+            minUppest = rhs.upperBoundType();
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+        {
+            upperValue = mContent.upper();
+            minUppest = mUpperBoundType;
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else
+        {
+            upperValue = lowerValue;
+            minUppest = BoundType::INFTY;
+        }
+        return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
 	}
 	
 template<typename Number>
