@@ -69,7 +69,7 @@ public:
 	/// Type of an iterator over the samples.
 	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
-	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
+	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
 	
 	cad::Variables variables;
@@ -401,8 +401,7 @@ public:
 	cad::SampleSet<Number> samples(
 			std::size_t openVariableCount,
 			const UPolynomial* p,
-			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-			const std::list<Variable>& variables,
+			sampleIterator node,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
@@ -484,7 +483,7 @@ private:
 		cad::ConflictGraph& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
-		unsigned dim
+		std::size_t dim
 	);
 	
 	/**
@@ -524,7 +523,7 @@ public:
 	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
 	bool baseLiftCheck(
-		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
+		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 	);
@@ -553,19 +552,20 @@ public:
 	 * @param checkBounds if true, all points are checked against the bounds
 	 * @param r RealAlgebraicPoint which contains the satisfying sample point if the check results true
 	 * @param conflictGraph This is a conflict graph. See CAD::check for a full description.
+	 * @param satPath Indices of regions that lead to a satisfying sample. This is used, if we backtrack due to integrality errors.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
 	bool liftCheck(
 			sampleIterator node,
-			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-			unsigned openVariableCount,
+			std::size_t openVariableCount,
 			bool restartLifting,
 			const std::list<Variable>& variables,
 			const BoundMap& bounds,
 			bool boundsActive,
 			bool checkBounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph
+			cad::ConflictGraph& conflictGraph,
+			std::stack<std::size_t>& satPath
 	);
 	
 	/**
@@ -579,7 +579,7 @@ public:
 	 * @return the level to which at least one new polynomial was added due to elimination;
 	 * or -1 if no more polynomials could be eliminated into the given level or a level before
 	 */
-	int eliminate(unsigned level, const BoundMap& bounds, bool boundsActive);
+	int eliminate(std::size_t level, const BoundMap& bounds, bool boundsActive);
 
 	/**
 	 * Get the boundaries of the cad cell interval defined by the children of the given sample tree node for the given sample.
@@ -620,7 +620,7 @@ public:
 	 * @param recuperate if true, the polynomials computed are recuperated into this CAD's elimination sets (default: true)
 	 * @return true if p has a root in the given box, false otherwise
 	 */
-	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, unsigned level, bool recuperate = true);
+	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, std::size_t level, bool recuperate = true);
 
 	/**
 	 * Checks whether one of the flags indicating whether to stop a currently running check procedure is set to true.
@@ -651,6 +651,20 @@ public:
 		}
 		assert(isOk);
 		return isOk;
+	}
+
+	/**
+	 * Check if the sample point represented by a given node in the sample tree matches the integrality constraints imposed by the variables.
+	 * @param node Node in sample tree.
+	 * @return If sample fulfills integrality constraints.
+	 */
+	template<typename It>
+	bool checkIntegrality(It node) const {
+		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
+			Variable var = variables[pit.depth() - 1];
+			if ((var.getType() == VariableType::VT_INT) && (!(*pit)->isIntegral())) return false;
+		}
+		return true;
 	}
 };
 

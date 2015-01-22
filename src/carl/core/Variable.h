@@ -37,7 +37,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 		case VariableType::VT_REAL: return os << "Real";
 		case VariableType::VT_INT: return os << "Int";
 		case VariableType::VT_UNINTERPRETED: return os << "Uninterpreted";
-		default: return os << "Invalid";
+		default: return os << "Invalid " << unsigned(t);
 	}
 	return os << "Unknown";
 }
