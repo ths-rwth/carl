@@ -283,7 +283,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 	if (useBounds) {
 		// construct constraints and polynomials representing the bounds
 		for (const auto& b: bounds) {
-			unsigned l = b.first;
+			std::size_t l = b.first;
 			if (l >= this->variables.size()) continue;
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
@@ -554,7 +554,7 @@ bool CAD<Number>::check(
 			
 			// eliminate bound-related polynomials only
 			// l: variable index of the elimination destination
-			unsigned l = b.first + 1;
+			std::size_t l = b.first + 1;
 			while (!tmp.empty() && l < this->variables.size()) {
 				std::list<const UPolynomial*> tmp2;
 				for (const auto& p: tmp) {
@@ -1068,7 +1068,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		cad::ConflictGraph& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
-		unsigned dim
+		std::size_t dim
 ) {
 	assert(this->sampleTree.is_valid(node));
 	CARL_LOG_TRACE("carl.cad", __func__ << "( " << *node << ", " << bounds << " )");
@@ -1115,11 +1115,11 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", continue lifting");
 		// found an incomplete sample, then first check the bounds and possibly restart lifting at the respective level
 		// prepare the variables for lifting
-		unsigned i = dim;
+		std::size_t i = dim;
 		std::list<Variable> variables;
 		// TODO: Check this
 		//for (const auto& component: sampleList) {
-		for (unsigned int j = 0; j < sampleList.size(); j++) {
+		for (std::size_t j = 0; j < sampleList.size(); j++) {
 			i--;
 			variables.push_front(this->variables[i]);
 		}
@@ -1150,7 +1150,7 @@ bool CAD<Number>::mainCheck(
 		return constraints.empty();
 	}
 	
-	const unsigned dim = (unsigned)this->variables.size();
+	const std::size_t dim = this->variables.size();
 	CARL_LOG_TRACE("carl.cad", "mainCheck: dimension is " << dim);
 	auto sampleTreeRoot = this->sampleTree.begin();
 	std::size_t tmp = this->sampleTree.max_depth(sampleTreeRoot);
@@ -1279,7 +1279,7 @@ bool CAD<Number>::mainCheck(
 			RealAlgebraicPoint<Number> sample(sampleList);
 			bool boundsOK = true;
 			// offset for incomplete samples (sample is filled from behind)
-			unsigned firstLevel = (unsigned)(this->variables.size() - sample.dim());
+			std::size_t firstLevel = this->variables.size() - sample.dim();
 			// test if the sample _r is already outside the bounds (boundsOK=false) or if it can be checked against the constraints or further lifted (boundsOK=true)
 			for (const auto& i: bounds) {
 				// bounds correspond to mVariables indices, so shift those indices by firstLevel to the left
@@ -1292,11 +1292,11 @@ bool CAD<Number>::mainCheck(
 			if (!boundsOK) continue;
 			
 			// prepare the variables for lifting
-			unsigned i = dim;
+			std::size_t i = dim;
 			std::list<Variable> variables;
 			// TODO: Check this
 			//for (const auto& component: sampleList) {
-			for (unsigned int j = 0; j < sampleList.size(); j++) {
+			for (std::size_t j = 0; j < sampleList.size(); j++) {
 				assert(i > 0);
 				i--;
 				variables.push_front(this->variables[i]);
@@ -1554,11 +1554,11 @@ bool CAD<Number>::liftCheck(
 }
 
 template<typename Number>
-int CAD<Number>::eliminate(unsigned level, const BoundMap& bounds, bool boundsActive) {
+int CAD<Number>::eliminate(std::size_t level, const BoundMap& bounds, bool boundsActive) {
 	CARL_LOG_FUNC("carl.cad.elimination", level << ", " << bounds);
 	while (true) {
 		if (!this->eliminationSets[level].emptyLiftingQueue()) return (int)level;
-		unsigned l = level;
+		std::size_t l = level;
 		// find the first level where elimination polynomials can be generated
 		int ltmp = (int)l;
 		do {
@@ -1817,7 +1817,7 @@ void CAD<Number>::trimVariables() {
 }
 
 template<typename Number>
-bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsigned level, bool recuperate) {
+bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, std::size_t level, bool recuperate) {
 	cad::CADSettings boxSetting = cad::CADSettings::getSettings();
 	boxSetting.simplifyEliminationByBounds = false; // would cause recursion in vanishesInBox
 	boxSetting.earlyLiftingPruningByBounds = true; // important for efficiency
@@ -1830,7 +1830,7 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 	BoundMap bounds;
 	// variable index for the cad box
 	unsigned j = 0;
-	for (unsigned i = level; i < this->variables.size(); i++) {
+	for (std::size_t i = level; i < this->variables.size(); i++) {
 		// prune the variables not occurring in p in order to trim the cadBox in advance
 		if (p->has(this->variables[i])) {
 			// the variable is actually occurring in p
@@ -1857,8 +1857,8 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, unsig
 		CARL_LOG_TRACE("carl.core", "Back from nested CAD " << &cadbox);
 		if (recuperate) {
 			// recuperate eliminated polynomials and go on with the elimination
-			unsigned j = 0;
-			for (unsigned i = level + 1; i < this->variables.size(); i++) {
+			std::size_t j = 0;
+			for (std::size_t i = level + 1; i < this->variables.size(); i++) {
 				// we start with level + 1 because p is already in mEliminationSets[level]
 				// search for the variables actually occurring in cadBox
 				while (j < cadbox.variables.size() && this->variables[i] != cadbox.variables[j]) {

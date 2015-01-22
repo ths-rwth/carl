@@ -69,7 +69,7 @@ public:
 	/// Type of an iterator over the samples.
 	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
-	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
+	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
 	
 	cad::Variables variables;
@@ -484,7 +484,7 @@ private:
 		cad::ConflictGraph& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
-		unsigned dim
+		std::size_t dim
 	);
 	
 	/**
@@ -579,7 +579,7 @@ public:
 	 * @return the level to which at least one new polynomial was added due to elimination;
 	 * or -1 if no more polynomials could be eliminated into the given level or a level before
 	 */
-	int eliminate(unsigned level, const BoundMap& bounds, bool boundsActive);
+	int eliminate(std::size_t level, const BoundMap& bounds, bool boundsActive);
 
 	/**
 	 * Get the boundaries of the cad cell interval defined by the children of the given sample tree node for the given sample.
@@ -620,7 +620,7 @@ public:
 	 * @param recuperate if true, the polynomials computed are recuperated into this CAD's elimination sets (default: true)
 	 * @return true if p has a root in the given box, false otherwise
 	 */
-	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, unsigned level, bool recuperate = true);
+	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, std::size_t level, bool recuperate = true);
 
 	/**
 	 * Checks whether one of the flags indicating whether to stop a currently running check procedure is set to true.
