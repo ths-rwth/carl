@@ -318,7 +318,6 @@ public:
      * @param sink Sink.
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
-		assert(this->data.find(id) == this->data.end());
 		this->data[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
 	}
 	/**
