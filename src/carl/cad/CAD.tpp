@@ -810,14 +810,16 @@ void CAD<Number>::addSamples(
 		//std::cout << "Using integer exploration. Diameter: " << interval.diameter() << std::endl;
 		if (interval.diameter() <= 1) {
 			i = RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
-		} else if (interval.diameter() < 10) {
+		} else if (interval.diameter() < 7) {
 			Number x = carl::ceil(interval.lower());
 			while (interval.contains(x)) {
 				i = RealAlgebraicNumberNR<Number>::create(x, false);
 				x += carl::constant_one<Number>::get();
 			}
 		} else {
+			i = RealAlgebraicNumberNR<Number>::create(carl::ceil(interval.lower()) + 1, false);
 			i = RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
+			i = RealAlgebraicNumberNR<Number>::create(carl::floor(interval.upper()) - 1, false);
 		}
 	} else {
 		i = RealAlgebraicNumberNR<Number>::create(interval.sample(false), false);
@@ -1129,7 +1131,8 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 			variables.push_front(this->variables[i]);
 		}
 		// perform lifting at the incomplete leaf (without elimination, only by the current elimination polynomials)
-		if (this->liftCheck(node, sampleList, i, fullRestart, variables, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
+		std::stack<std::size_t> satPath;
+		if (this->liftCheck(node, i, fullRestart, variables, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath)) {
 			CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting succesfull");
 			return std::make_pair(true, false);
 		}
@@ -1207,13 +1210,15 @@ bool CAD<Number>::mainCheck(
 			if (lastRes == -1) {
 				CARL_LOG_TRACE("carl.cad", "Lifting");
 				// eliminate will not be able to produce a new polynomial.
-				return this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph);
+				std::stack<std::size_t> satPath;
+				return this->liftCheck(this->sampleTree.begin_leaf(), dim-this->sampleTree.begin_leaf().depth(), true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath);
 			}
 			CARL_LOG_DEBUG("carl.cad", "Waiting for something to lift, lastRes = " << lastRes << std::endl << *this);
 		};
 		
 		// perform an initial lifting step in order to fill the tree once
-		if (this->liftCheck(this->sampleTree.begin_leaf(), {}, dim, true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
+		std::stack<std::size_t> satPath;
+		if (this->liftCheck(this->sampleTree.begin_leaf(), dim-this->sampleTree.begin_leaf().depth(), true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath)) {
 			// lifting yields a satisfying sample
 			return true;
 		}
@@ -1308,7 +1313,8 @@ bool CAD<Number>::mainCheck(
 			}
 			assert(level + 1 == (int)i);
 			// perform lifting at the incomplete leaf with the stored lifting queue (reset performed in liftCheck)
-			if (liftCheck(node, sampleList, i, false, variables, bounds, boundsNontrivial, checkBounds, r, conflictGraph)) {
+			std::stack<std::size_t> satPath;
+			if (liftCheck(node, i, false, variables, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath)) {
 				// lifting yields a satisfying sample
 				return true;
 			}
@@ -1381,7 +1387,8 @@ bool CAD<Number>::liftCheck(
 		bool boundsActive,
 		bool checkBounds,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph
+		cad::ConflictGraph& conflictGraph,
+		std::stack<std::size_t>& satPath
 ) {
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
 	assert(this->sampleTree.is_valid(node));
@@ -1525,6 +1532,7 @@ bool CAD<Number>::liftCheck(
 			sampleSetIncrement.pop();
 
 
+			bool integralityBacktracking = false;
 			if (liftingSuccessful) {
 				CARL_LOG_TRACE("carl.cad", "Lifting was successfull");
 				// there might still be samples left but not stored yet
@@ -1533,8 +1541,29 @@ bool CAD<Number>::liftCheck(
 					this->storeSampleInTree(sampleSetIncrement.next(), node);
 					sampleSetIncrement.pop();
 				}
-				return true;
-				CARL_LOG_TRACE("carl.cad", "Returning true as lifting was successful");
+				if (checkIntegrality(newNode)) {
+					return true;
+					CARL_LOG_TRACE("carl.cad", "Returning true as lifting was successful");
+				} else {
+					integralityBacktracking = true;
+					CARL_LOG_ERROR("carl.cad", "Lifting was successful, but integrality is violated.");
+				}
+			} else if (!satPath.empty()) {
+				// Sample was SAT, but not integral.
+				if (checkIntegrality(newNode)) {
+					CARL_LOG_ERROR("carl.cad", "Found sample, but integrality failed.");
+				}
+			}
+			if (integralityBacktracking) {
+				std::size_t id = 0;
+				bool root = false;
+				for (auto it = sampleTree.begin_children(node); it != sampleTree.end_children(node); ++it) {
+					if (*it == *newNode) break;
+					if ((*it)->isRoot() != root) id++;
+					root = (*it)->isRoot();
+				}
+				satPath.push(id);
+				return false;
 			}
 		}
 		if (this->eliminationSets[openVariableCount].emptyLiftingQueue()) {

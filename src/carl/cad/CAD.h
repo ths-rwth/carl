@@ -552,6 +552,7 @@ public:
 	 * @param checkBounds if true, all points are checked against the bounds
 	 * @param r RealAlgebraicPoint which contains the satisfying sample point if the check results true
 	 * @param conflictGraph This is a conflict graph. See CAD::check for a full description.
+	 * @param satPath Indices of regions that lead to a satisfying sample. This is used, if we backtrack due to integrality errors.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
 	bool liftCheck(
@@ -563,7 +564,8 @@ public:
 			bool boundsActive,
 			bool checkBounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph
+			cad::ConflictGraph& conflictGraph,
+			std::stack<std::size_t>& satPath
 	);
 	
 	/**
