@@ -76,7 +76,7 @@ private:
 		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
 		 */
 		inline std::pair<bool, bool> compare(bool l, bool r) const {
-			if (l xor r) return std::make_pair(true, l);
+			if (l xor r) return std::make_pair(true, r);
 			return std::make_pair(false, false);
 		}
 		/**
