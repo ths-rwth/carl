@@ -664,7 +664,7 @@ namespace carl
             size_t size() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE 
-                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT )
+                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ )
                     return 1;
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return 2;
