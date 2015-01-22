@@ -401,8 +401,7 @@ public:
 	cad::SampleSet<Number> samples(
 			std::size_t openVariableCount,
 			const UPolynomial* p,
-			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-			const std::list<Variable>& variables,
+			sampleIterator node,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
@@ -524,7 +523,7 @@ public:
 	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
 	bool baseLiftCheck(
-		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
+		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 	);
@@ -557,8 +556,7 @@ public:
 	 */
 	bool liftCheck(
 			sampleIterator node,
-			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-			unsigned openVariableCount,
+			std::size_t openVariableCount,
 			bool restartLifting,
 			const std::list<Variable>& variables,
 			const BoundMap& bounds,

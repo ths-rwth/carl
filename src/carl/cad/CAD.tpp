@@ -938,16 +938,21 @@ template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
 		std::size_t openVariableCount,
 		const UPolynomial* p,
-		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-		const std::list<Variable>& variables,
+		sampleIterator node,
 		cad::SampleSet<Number>& currentSamples,
 		std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
 		const Interval<Number>& bounds
 ) {
-	assert(variables.size() == sample.size());
+	assert(variables.size() == node.depth() + openVariableCount + 1);
+	std::map<Variable, RealAlgebraicNumberPtr<Number>> m;
+	auto valit = sampleTree.begin_path(node);
+	for (std::size_t i = 1; i <= node.depth(); i++) {
+		m[variables[variables.size() - i]] = *valit;
+		valit++;
+	}
 	return this->samples(
 		openVariableCount,
-		carl::rootfinder::realRoots(*p, variables, sample, bounds, this->setting.splittingStrategy),
+		carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy),
 		currentSamples,
 		replacedSamples,
 		bounds
@@ -1326,21 +1331,23 @@ bool CAD<Number>::mainCheck(
 
 template<typename Number>
 typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node) {
-	//CARL_LOG_FUNC("carl.cad", newSample << ", " << *node);
+	CARL_LOG_FUNC("carl.cad", newSample << ", " << *node);
 	auto newNode = std::lower_bound(this->sampleTree.begin_children(node), this->sampleTree.end_children(node), newSample, carl::less<RealAlgebraicNumberPtr<Number>>());
 	if (newNode == this->sampleTree.end_children(node)) {
-		newNode = this->sampleTree.insert(node, newSample);
+		newNode = this->sampleTree.append(node, newSample);
 	} else if (carl::equal_to<RealAlgebraicNumberPtr<Number>>()(*newNode, newSample)) {
 		newNode = this->sampleTree.replace(newNode, newSample);
+		assert(newNode.depth() <= variables.size());
 	} else {
 		newNode = this->sampleTree.insert(newNode, newSample);
+		assert(newNode.depth() <= variables.size());
 	}
 	return newNode;
 }
 
 template<typename Number>
 bool CAD<Number>::baseLiftCheck(
-		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
+		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 ) {
@@ -1351,7 +1358,9 @@ bool CAD<Number>::baseLiftCheck(
 		CARL_LOG_TRACE("carl.cad", "Returning true as an answer was found");
 		return true;
 	}
-	RealAlgebraicPoint<Number> t(sample);
+	std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+	sample.pop_back();
+	RealAlgebraicPoint<Number> t(std::move(sample));
 	if ((this->setting.computeConflictGraph && constraints.satisfiedBy(t, getVariables(), conflictGraph)) ||
 		(!this->setting.computeConflictGraph && constraints.satisfiedBy(t, getVariables()))) {
 		r = t;
@@ -1365,8 +1374,7 @@ bool CAD<Number>::baseLiftCheck(
 template<typename Number>
 bool CAD<Number>::liftCheck(
 		sampleIterator node,
-		const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-		unsigned openVariableCount,
+		std::size_t openVariableCount,
 		bool restartLifting,
 		const std::list<Variable>& variables,
 		const BoundMap& bounds,
@@ -1375,16 +1383,16 @@ bool CAD<Number>::liftCheck(
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph
 ) {
-	CARL_LOG_FUNC("carl.cad", *node << ", " << bounds);
+	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
 	assert(this->sampleTree.is_valid(node));
-	if (checkBounds && boundsActive && !sample.empty()) {
+	if (checkBounds && boundsActive && (*node != nullptr)) {
 		// bounds shall be checked and the level is non-empty
 		// level should be non-empty
 		assert(openVariableCount < this->variables.size());
 		// see if bounds are given for the previous level
 		auto bound = bounds.find(openVariableCount);
 		if (bound != bounds.end()) {
-			if (!sample.front()->containedIn(bound->second)) {
+			if (!(*node)->containedIn(bound->second)) {
 				return false;
 			}
 		}
@@ -1392,14 +1400,13 @@ bool CAD<Number>::liftCheck(
 
 	// base level: zero variables left to substitute => evaluate the constraint
 	if (openVariableCount == 0) {
-		return this->baseLiftCheck(sample, r, conflictGraph);
+		return this->baseLiftCheck(node, r, conflictGraph);
 	}
 	
 	// openVariableCount > 0: lifting
 	// previous variable will be substituted next
 	openVariableCount--;
 	
-	std::list<RealAlgebraicNumberPtr<Number>> extSample(sample.begin(), sample.end());
 	std::list<Variable> newVariables(variables);
 	// the first variable is always the last one lifted
 	newVariables.push_front(this->variables[openVariableCount]);
@@ -1471,9 +1478,9 @@ bool CAD<Number>::liftCheck(
 			}
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
-				sampleSetIncrement.insert(this->samples(openVariableCount, next, sample, variables, currentSamples, replacedSamples, bound->second));
+				sampleSetIncrement.insert(this->samples(openVariableCount, next, node, currentSamples, replacedSamples, bound->second));
 			} else {
-				sampleSetIncrement.insert(this->samples(openVariableCount, next, sample, variables, currentSamples, replacedSamples));
+				sampleSetIncrement.insert(this->samples(openVariableCount, next, node, currentSamples, replacedSamples));
 			}
 			
 			// replace all samples in the tree which were changed in the current samples list
@@ -1508,19 +1515,15 @@ bool CAD<Number>::liftCheck(
 
 			// Sample storage
 			auto newNode = this->storeSampleInTree(newSample, node);
-			// insert at the first position in order to meet the correct variable order
-			extSample.push_front(newSample);
 			
 			// Lifting
 			// start lifting with the fresh new sample at the next level for *all* lifting positions
-			bool liftingSuccessful = this->liftCheck(newNode, extSample, openVariableCount, true, newVariables, bounds, boundsActive, checkBounds, r, conflictGraph);
+			bool liftingSuccessful = this->liftCheck(newNode, openVariableCount, true, newVariables, bounds, boundsActive, checkBounds, r, conflictGraph, satPath);
 			
 			///@todo warum hier pop() und nicht oben jeweils nach dem get()?
 			// Sample pop if lifting unsuccessful or at the last level, i.e. level == 0
 			sampleSetIncrement.pop();
 
-			// clean sample point component again
-			extSample.pop_front();
 
 			if (liftingSuccessful) {
 				CARL_LOG_TRACE("carl.cad", "Lifting was successfull");
