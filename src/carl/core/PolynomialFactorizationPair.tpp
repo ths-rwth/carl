@@ -315,8 +315,15 @@ namespace carl
         assert( exponentA > 0 );
         assert( exponentB > 0 );
         mFactorization.clear();
-        mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
-        mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
+        if( _fpolyA == _fpolyB )
+        {
+            mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA+exponentB ) );
+        }
+        else
+        {   
+            mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
+            mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
+        }
         assert( mpPolynomial != nullptr );
         assert( *mpPolynomial == computePolynomial( mFactorization ) );
         assert( assertFactorization() );
