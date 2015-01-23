@@ -734,7 +734,7 @@ public:
 	 */
 	template<typename Iterator>
 	Iterator append(Iterator parent, const T& data) {
-		std::size_t id = newNode(data, parent.current, nodes[parent.current].depth + 1);
+		std::size_t id = createNode(data, parent.current, nodes[parent.current].depth + 1);
 		return Iterator(this, id);
 	}
 
@@ -746,24 +746,20 @@ public:
 	 */
 	template<typename Iterator>
 	Iterator insert(Iterator position, const T& data) {
-		std::size_t newID = 0;
 		std::size_t parent = nodes[position.current].parent;
-		if (emptyNodes == MAXINT) {
-			nodes.emplace_back(nodes.size(), data, parent, nodes[position.current].depth);
-			newID = nodes.size() - 1;
+		std::size_t newID = newNode(data, parent, nodes[position.current].depth);
+		std::size_t prev = nodes[position.current].previousSibling;
+		std::size_t next = position.current;
+		nodes[newID].previousSibling = prev;
+		nodes[newID].nextSibling = next;
+		if (next != MAXINT) {
+			nodes[next].previousSibling = newID;
 		} else {
-			newID = emptyNodes;
-			emptyNodes = nodes[emptyNodes].nextSibling;
-			nodes[newID].data = data;
-			nodes[newID].parent = parent;
-			nodes[newID].depth = nodes[position.current].depth;
-		}
-		nodes[newID].nextSibling = position.current;
-		if (position.current != MAXINT) {
-			nodes[position.current].previousSibling = newID;
 			nodes[parent].lastChild = newID;
 		}
-		if (nodes[parent].firstChild == position.current) {
+		if (prev != MAXINT) {
+			nodes[prev].nextSibling = newID;
+		} else {
 			nodes[parent].firstChild = newID;
 		}
 		return PreorderIterator<false>(this, newID);
@@ -845,18 +841,22 @@ public:
 
 private:
 	std::size_t newNode(const T& data, std::size_t parent, std::size_t depth) {
-		std::size_t res = 0;
+		std::size_t newID = 0;
 		if (emptyNodes == MAXINT) {
 			nodes.emplace_back(nodes.size(), data, parent, depth);
-			res = nodes.size() - 1;
+			newID = nodes.size() - 1;
 		} else {
-			std::size_t res = emptyNodes;
+			newID = emptyNodes;
 			emptyNodes = nodes[emptyNodes].nextSibling;
-			nodes[res].data = data;
-			nodes[res].parent = parent;
-			nodes[res].depth = depth;
-			nodes[res].nextSibling = MAXINT;
+			nodes[newID].data = data;
+			nodes[newID].parent = parent;
+			nodes[newID].depth = depth;
 		}
+		return newID;
+	}
+	std::size_t createNode(const T& data, std::size_t parent, std::size_t depth) {
+		std::size_t res = newNode(data, parent, depth);
+		nodes[res].nextSibling = MAXINT;
 		if (parent != MAXINT) {
 			if (nodes[parent].lastChild != MAXINT) {
 				nodes[nodes[parent].lastChild].nextSibling = res;
