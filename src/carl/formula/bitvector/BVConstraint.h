@@ -14,6 +14,8 @@ namespace carl
 	template<typename Pol>
 	class BVConstraint
 	{
+		friend class Pool<BVConstraint<Pol>>;
+
 	private:
 		/// The hash value.
 		size_t mHash;
@@ -128,6 +130,16 @@ namespace carl
 		friend std::ostream& operator<<(std::ostream& _out, const BVConstraint<P>& _constraint)
 		{
 			return(_out << _constraint.toString());
+		}
+
+		bool operator==(const BVConstraint<Pol>& _other) const
+		{
+			return mId == _other.mId; // TODO: Make sure this also works if any mId is not set
+		}
+
+		size_t hash() const
+		{
+			return 0; // TODO: Implement ;)
 		}
 	};
 } // namespace carl

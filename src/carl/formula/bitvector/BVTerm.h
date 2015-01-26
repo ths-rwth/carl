@@ -123,9 +123,15 @@ namespace carl
 		}
 	};
 
+	// Forward declaration
+	template<typename Element>
+	class Pool;
+
 	template<typename Pol>
 	class BVTerm
 	{
+		friend class Pool<BVTerm<Pol>>;
+
 	private:
 		BVTermType mType;
 
@@ -139,6 +145,7 @@ namespace carl
 			BVExtractContent<Pol> mExtract;
 		};
 		size_t mWidth;
+		size_t mId;
 
 	public:
 
@@ -317,6 +324,11 @@ namespace carl
 			}
 		}
 
+		bool operator==(const BVTerm<Pol>& _other) const
+		{
+			return mId == _other.mId; // TODO: Make sure this also works if any mId is not set
+		}
+
 		/**
 		 * The output operator of a term.
 		 * @param _out The stream to print on.
@@ -326,6 +338,27 @@ namespace carl
 		friend std::ostream& operator<<(std::ostream& _out, const BVTerm<P>& _term)
 		{
 			return(_out << _term.toString());
+		}
+	};
+}
+
+namespace std
+{
+	/**
+	 * Implements std::hash for bit vector terms.
+	 */
+	template<typename Pol>
+	struct hash<carl::BVTerm<Pol>>
+	{
+		public:
+
+		/**
+		 * @param _formula The bit vector term to get the hash for.
+		 * @return The hash of the given bit vector term.
+		 */
+		size_t operator()(const carl::BVTerm<Pol>& _term) const
+		{
+			return 0; // TODO: Implement :)
 		}
 	};
 }
