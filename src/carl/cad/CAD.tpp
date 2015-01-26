@@ -1320,7 +1320,7 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 		newNode = this->sampleTree.append(node, newSample);
 	} else if (carl::equal_to<RealAlgebraicNumberPtr<Number>>()(*newNode, newSample)) {
 		assert(newSample->isRoot() || (!(*newNode)->isRoot()));
-		newNode =F this->sampleTree.replace(newNode, newSample);
+		newNode = this->sampleTree.replace(newNode, newSample);
 		assert(newNode.depth() <= variables.size());
 	} else {
 		newNode = this->sampleTree.insert(newNode, newSample);
