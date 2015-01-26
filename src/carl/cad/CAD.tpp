@@ -1326,7 +1326,6 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 		newNode = this->sampleTree.insert(newNode, newSample);
 		assert(newNode.depth() <= variables.size());
 	}
-	assert(this->isSampleTreeConsistent());
 	return newNode;
 }
 
