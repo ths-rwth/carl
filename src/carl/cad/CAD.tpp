@@ -681,6 +681,7 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	if (p == nullptr) return;
 	CARL_LOG_FUNC("carl.cad", *p << ", " << level << ", " << childrenOnly);
 	CARL_LOG_TRACE("carl.cad", "Before: " << std::endl << this->sampleTree);
+	assert(this->isSampleTreeConsistent());
 	
 	/* Delete
 	 * 1. the polynomial from the given level in the elimination sets,
@@ -847,44 +848,20 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	}
 
 	bool boundsActive = !bounds.isEmpty() && !bounds.isUnbounded();
-	
+
 	for (const auto& i: roots) {
 		if (!i->containedIn(bounds)) continue;
 		auto insertValue = currentSamples.insert(i);
-		if (!insertValue.second) {
-			// value already in the list => do not include in newSampleSet
-			if (!(*insertValue.first)->isRoot()) {
-				// the new root is already contained, but only as sample value => switch to root and start sample construction from scratch
-				assert(i->isRoot());
-				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, carl::less<RealAlgebraicNumberPtr<Number>>());
-				if (pos != newSampleSet.end()) {
-					newSampleSet.remove(pos);
-				}
-				RealAlgebraicNumberPtr<Number> r = (*insertValue.first)->clone();
-				currentSamples.remove(insertValue.first);
-				r->setIsRoot(true);
-				insertValue = currentSamples.insert(r);
-				newSampleSet.insert(r);
-				replacedSamples.push_front(r);
-			} else if (!(*insertValue.first)->isNumeric() && i->isNumeric()) {
-				// there is already an interval-represented root with the same value present and it can be replaced by a numeric
-				currentSamples.remove(insertValue.first);
-				insertValue = currentSamples.insert(RealAlgebraicNumberNR<Number>::create(i->value(), true));
-				// this value might have been added to newSamples already, so switch the root status there as well
-				auto pos = std::lower_bound(newSampleSet.begin(), newSampleSet.end(), *insertValue.first, carl::less<RealAlgebraicNumberPtr<Number>>());
-				if (pos != newSampleSet.end()) {
-					newSampleSet.remove(pos);
-					newSampleSet.insert(*insertValue.first);
-				}
-				replacedSamples.push_front(i);
-			} else {
-				// nothing changes by the new root, thus proceed with the next root
-				continue;
+		auto insertIt = std::get<0>(insertValue);
+		if (!std::get<1>(insertValue)) {
+			if (std::get<2>(insertValue)) {
+				newSampleSet.insert(*insertIt);
+				replacedSamples.push_front(*insertIt);
 			}
 		} else {
 			// we found a new sample
 			// add the root to new samples (with root switch on)
-			newSampleSet.insert(*insertValue.first);
+			newSampleSet.insert(*insertIt);
 		}
 		// local set storing the elements which shall be added to currentSampleSet and newSampleSet in the end
 		std::list<RealAlgebraicNumberNRPtr<Number>> newSamples;
@@ -901,24 +878,24 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		//std::cout << "Current var: " << openVariableCount << " -> " << this->variables[openVariableCount] << std::endl;
 		//REGISTERED_ASSERT(openVariableCount > 1);
 		// next: right neighbor
-		auto neighbor = insertValue.first;
+		auto neighbor = insertIt;
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
-			addSamples((*insertValue.first), nullptr, type, std::front_inserter(newSamples));
+			addSamples((*insertIt), nullptr, type, std::front_inserter(newSamples));
 		} else if ((*neighbor)->isRoot()) {
-			addSamples((*insertValue.first), (*neighbor), type, std::front_inserter(newSamples));
+			addSamples((*insertIt), (*neighbor), type, std::front_inserter(newSamples));
 		}
 		
 		// previous: left neighbor
-		neighbor = insertValue.first;
+		neighbor = insertIt;
 		if (neighbor == currentSamples.begin()) {
-			addSamples(nullptr, (*insertValue.first), type, std::front_inserter(newSamples));
+			addSamples(nullptr, (*insertIt), type, std::front_inserter(newSamples));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if ((*neighbor)->isRoot()) {
-				addSamples((*neighbor), (*insertValue.first), type, std::front_inserter(newSamples));
+				addSamples((*neighbor), (*insertIt), type, std::front_inserter(newSamples));
 			}
 		}
 		
@@ -932,7 +909,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		newSampleSet.insert(newSamples.begin(), newSamples.end());
 		currentSamples.insert(newSamples.begin(), newSamples.end());
 	}
-	CARL_LOG_TRACE("carl.cad", (void*)(&currentSamples) << " -> " << newSampleSet.samples());
+	CARL_LOG_TRACE("carl.cad", (void*)(&currentSamples) << " -> " << currentSamples);
 	return newSampleSet;
 }
 
@@ -1342,12 +1319,14 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 	if (newNode == this->sampleTree.end_children(node)) {
 		newNode = this->sampleTree.append(node, newSample);
 	} else if (carl::equal_to<RealAlgebraicNumberPtr<Number>>()(*newNode, newSample)) {
-		newNode = this->sampleTree.replace(newNode, newSample);
+		assert(newSample->isRoot() || (!(*newNode)->isRoot()));
+		newNode =F this->sampleTree.replace(newNode, newSample);
 		assert(newNode.depth() <= variables.size());
 	} else {
 		newNode = this->sampleTree.insert(newNode, newSample);
 		assert(newNode.depth() <= variables.size());
 	}
+	assert(this->isSampleTreeConsistent());
 	return newNode;
 }
 

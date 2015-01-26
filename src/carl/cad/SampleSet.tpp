@@ -81,6 +81,31 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 }
 
 template<typename Number>
+std::tuple<typename SampleSet<Number>::Iterator, bool, bool> SampleSet<Number>::insert(RealAlgebraicNumberPtr<Number> r) {
+	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
+	CARL_LOG_TRACE("carl.cad.sampleset", *this);
+	assert(this->isConsistent());
+	auto res = this->mSamples.insert(r);
+	auto result = std::make_tuple(res.first, res.second, false);
+	CARL_LOG_TRACE("carl.cad.sampleset", "\tinsert(): " << *res.first << ", " << res.second);
+	if (res.second) {
+		mHeap.push_back(r);
+		std::push_heap(mHeap.begin(), mHeap.end(), mComp);
+	} else if (!(*res.first)->isRoot() && r->isRoot()) {
+		this->remove(res.first);
+		std::get<0>(result) = std::get<0>(this->insert(r));
+		std::get<2>(result) = true;
+	} else if (!(*res.first)->isNumeric() && r->isNumeric()) {
+		this->remove(res.first);
+		std::get<0>(result) = std::get<0>(this->insert(RealAlgebraicNumberNR<Number>::create(r->value(), true)));
+		std::get<2>(result) = true;
+	}
+	assert(this->isConsistent());
+	CARL_LOG_TRACE("carl.cad.sampleset", *this);
+	return result;
+}
+
+template<typename Number>
 void SampleSet<Number>::pop() {
 	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	if (this->mHeap.empty()) return;
