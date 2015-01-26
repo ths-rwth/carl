@@ -66,6 +66,7 @@ const std::string VariablePool::getName(Variable::Arg v, bool variableName) cons
 		case VariableType::VT_UNINTERPRETED:
 			return mVariablePrefix + "u_" + std::to_string(v.getId());
 		default:
+			CARL_LOG_ERROR("carl", "Variable has invalid type: " << v.getType());
 			assert(false);
 			return "";
 	}

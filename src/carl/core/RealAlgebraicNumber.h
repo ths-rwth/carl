@@ -148,6 +148,14 @@ public:
 		return i.contains(this->value());
 	}
 
+	/**
+	 * Checks if the represented value is integral.
+	 * @return If this is integral.
+	 */
+	virtual bool isIntegral() const {
+		return carl::isInteger(mValue);
+	}
+
 	////////////////
 	// Operations //
 	////////////////

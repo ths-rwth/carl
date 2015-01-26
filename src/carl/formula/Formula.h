@@ -664,7 +664,7 @@ namespace carl
             size_t size() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE 
-                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT )
+                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ )
                     return 1;
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return 2;
@@ -859,7 +859,10 @@ namespace carl
              * @return true, if this formula and the given formula are equal;
              *         false, otherwise.
              */
-            bool operator==( const Formula& _formula ) const;
+            bool operator==( const Formula& _formula ) const
+            {
+                return mpContent == _formula.mpContent;
+            }
             
             /**
              * @param _formula The formula to compare with.
@@ -867,9 +870,7 @@ namespace carl
              */
             bool operator!=( const Formula& _formula ) const
             {
-                assert( mpContent->mId != 0 );
-                assert( _formula.getId() != 0 );
-                return mpContent->mId != _formula.getId();
+                return mpContent != _formula.mpContent;
             }
             
             /**

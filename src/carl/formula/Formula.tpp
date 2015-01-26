@@ -405,12 +405,6 @@ namespace carl
     }
     
     template<typename Pol>
-    bool Formula<Pol>::operator==( const Formula<Pol>& _formula ) const
-    {
-        return *mpContent == *_formula.mpContent;
-    }
-    
-    template<typename Pol>
     unsigned Formula<Pol>::satisfiedBy( const EvaluationMap<typename Pol::NumberType>& _assignment ) const
     {
         switch( getType() )

@@ -100,9 +100,11 @@ public:
 	}
 	
 	Variable operator[](std::size_t i) const {
+		REGISTERED_ASSERT(i < curVars.size());
 		return curVars[i];
 	}
 	Variable& operator[](std::size_t i) {
+		REGISTERED_ASSERT(i < curVars.size());
 		return curVars[i];
 	}
 	

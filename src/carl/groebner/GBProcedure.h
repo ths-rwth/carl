@@ -86,6 +86,7 @@ public:
 		mOrigGenerators = rhs.mOrigGenerators;
 		mOrigGeneratorsIndices = rhs.mOrigGeneratorsIndices;
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
+        Procedure<Polynomial, AddingPolynomialPolicy>::setCriticalPairs(rhs.pCritPairs);
 		return *this;
 	}
 	
@@ -293,6 +294,7 @@ private:
 		}
 
 		mGb = reduced;
+        Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 };
 }

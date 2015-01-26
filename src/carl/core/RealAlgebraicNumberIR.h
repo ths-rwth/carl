@@ -139,6 +139,15 @@ public:
 	}
 
 	/**
+	 * Checks if the represented value is integral.
+	 * @return If this is integral.
+	 */
+	virtual bool isIntegral() const {
+		if (this->isNumeric()) return carl::isInteger(this->value());
+		return false;
+	}
+
+	/**
 	 * Selects the polynomial having this real algebraic number as one of its roots.
 	 * @return polynomial having the number as one of its roots
 	 */

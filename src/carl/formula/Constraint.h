@@ -408,6 +408,18 @@ namespace carl
             unsigned consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval ) const;
             
             /**
+             * Checks whether this constraint is consistent with the given assignment from 
+             * the its variables to interval domains.
+             * @param _solutionInterval The interval domains of the variables.
+             * @param _stricterRelation This relation is set to a relation R such that this constraint and the given variable bounds
+             *                           imply the constraint formed by R, comparing this constraint's left-hand side to zero.
+             * @return 1, if this constraint is consistent with the given intervals;
+             *          0, if this constraint is not consistent with the given intervals;
+             *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
+             */
+            unsigned consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation ) const;
+            
+            /**
              * @param _var The variable to check the size of its solution set for.
              * @return true, if it is easy to decide whether this constraint has a finite solution set
              *                in the given variable;

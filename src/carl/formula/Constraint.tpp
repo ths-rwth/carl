@@ -152,11 +152,26 @@ namespace carl
             return evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
-            auto comp = []( const Variable& a, const pair<Variable, Interval<double>>& b) { return a == b.first; };
-            if( !std::equal( variables().begin(), variables().end(), _solutionInterval.begin(), comp ) )
+            auto varIter = variables().begin();
+            auto varIntervalIter = _solutionInterval.begin();
+            while( varIter != variables().end() && varIntervalIter != _solutionInterval.end() )
             {
-                return 2;
+                if( *varIter < varIntervalIter->first )
+                {
+                    return 2;
+                }
+                else if( *varIter > varIntervalIter->first )
+                {
+                    ++varIntervalIter;
+                }
+                else
+                {
+                    ++varIter;
+                    ++varIntervalIter;
+                }
             }
+            if( varIter != variables().end() )
+                return 2;
             Interval<double> solutionSpace = IntervalEvaluation::evaluate( mLhs, _solutionInterval );
             if( solutionSpace.isEmpty() )
                 return 2;
@@ -225,6 +240,147 @@ namespace carl
                             return 0;
                         else if( solutionSpace.upper() == 0 && solutionSpace.upperBoundType() == BoundType::STRICT )
                             return 0;
+                    }
+                    break;
+                }
+                default:
+                {
+                    cout << "Error in isConsistent: unexpected relation symbol." << endl;
+                    return 0;
+                }
+            }
+            return 2;
+        }
+    }
+    
+    template<typename Pol>
+    unsigned Constraint<Pol>::consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation ) const
+    {
+        _stricterRelation = mRelation;
+        if( variables().empty() )
+            return evaluate( constantPart(), relation() ) ? 1 : 0;
+        else
+        {
+            auto varIter = variables().begin();
+            auto varIntervalIter = _solutionInterval.begin();
+            while( varIter != variables().end() && varIntervalIter != _solutionInterval.end() )
+            {
+                if( *varIter < varIntervalIter->first )
+                {
+                    return 2;
+                }
+                else if( *varIter > varIntervalIter->first )
+                {
+                    ++varIntervalIter;
+                }
+                else
+                {
+                    ++varIter;
+                    ++varIntervalIter;
+                }
+            }
+            if( varIter != variables().end() )
+                return 2;
+            Interval<double> solutionSpace = IntervalEvaluation::evaluate( mLhs, _solutionInterval );
+            if( solutionSpace.isEmpty() )
+                return 2;
+            switch( relation() )
+            {
+                case Relation::EQ:
+                {
+                    if( solutionSpace.isZero() )
+                        return 1;
+                    else if( !solutionSpace.contains( 0 ) )
+                        return 0;
+                    break;
+                }
+                case Relation::NEQ:
+                {
+                    if( !solutionSpace.contains( 0 ) )
+                        return 1;
+                    if( solutionSpace.upperBoundType() == BoundType::WEAK && solutionSpace.upper() == 0 )
+                    {
+                        _stricterRelation = Relation::LESS;
+                    }
+                    else if( solutionSpace.lowerBoundType() == BoundType::WEAK && solutionSpace.lower() == 0 )
+                    {
+                        _stricterRelation = Relation::GREATER;
+                    }
+                    break;
+                }
+                case Relation::LESS:
+                {
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.upper() < 0 )
+                            return 1;
+                        else if( solutionSpace.upper() == 0 && solutionSpace.upperBoundType() == BoundType::STRICT )
+                            return 1;
+                    }
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY && solutionSpace.lower() >= 0 )
+                        return 0;
+                    break;
+                }
+                case Relation::GREATER:
+                {
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.lower() > 0 )
+                            return 1;
+                        else if( solutionSpace.lower() == 0 && solutionSpace.lowerBoundType() == BoundType::STRICT )
+                            return 1;
+                    }
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY && solutionSpace.upper() <= 0 )
+                        return 0;
+                    break;
+                }
+                case Relation::LEQ:
+                {
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.upper() <= 0)
+                        {
+                            return 1;
+                        }
+                    }
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.lower() > 0 )
+                        {
+                            return 0;
+                        }
+                        else if( solutionSpace.lower() == 0 )
+                        {
+                            if( solutionSpace.lowerBoundType() == BoundType::STRICT )
+                            {
+                                return 0;
+                            }
+                            else
+                            {
+                                _stricterRelation = Relation::EQ;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case Relation::GEQ:
+                {
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.lower() >= 0 )
+                            return 1;
+                    }
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.upper() < 0 )
+                            return 0;
+                        else if( solutionSpace.upper() == 0 )
+                        {
+                            if( solutionSpace.upperBoundType() == BoundType::STRICT )
+                                return 0;
+                            else
+                                _stricterRelation = Relation::EQ;
+                        }
                     }
                     break;
                 }

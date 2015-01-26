@@ -91,9 +91,11 @@ protected:
 			return tree->nodes[current].depth;
 		}
 		T& operator*() {
+			assert(current != MAXINT);
 			return tree->nodes[current].data;
 		}
 		const T& operator*() const {
+			assert(current != MAXINT);
 			return tree->nodes[current].data;
 		}
 
@@ -430,10 +432,11 @@ public:
 	protected:
 		typedef BaseIterator<ChildrenIterator<reverse>,reverse> Base;
 		std::size_t parent;
-		ChildrenIterator(const Tree<T>* t, std::size_t base): Base(t, base) {
+		ChildrenIterator(const Tree<T>* t, std::size_t base, bool end = false): Base(t, base) {
 			parent = base;
 			assert(base != MAXINT);
-			if (this->tree->nodes[this->current].firstChild == MAXINT) this->current = MAXINT;
+			if (end) this->current = MAXINT;
+			else if (this->tree->nodes[this->current].firstChild == MAXINT) this->current = MAXINT;
 			else {
 				if (reverse) {
 					this->current = this->tree->nodes[this->current].lastChild;
@@ -607,19 +610,19 @@ public:
 	}
 	template<typename Iterator>
 	ChildrenIterator<false> begin_children(const Iterator& it) const {
-		return ChildrenIterator<false>(this, it.current);
+		return ChildrenIterator<false>(this, it.current, false);
 	}
 	template<typename Iterator>
 	ChildrenIterator<false> end_children(const Iterator& it) const {
-		return ChildrenIterator<false>(this, it.current);
+		return ChildrenIterator<false>(this, it.current, true);
 	}
 	template<typename Iterator>
 	ChildrenIterator<true> rbegin_children(const Iterator& it) const {
-		return ChildrenIterator<true>(this, it.current);
+		return ChildrenIterator<true>(this, it.current, false);
 	}
 	template<typename Iterator>
 	ChildrenIterator<true> rend_children(const Iterator& it) const {
-		return ChildrenIterator<true>(this, it.current);
+		return ChildrenIterator<true>(this, it.current, true);
 	}
 	template<typename Iterator>
 	PathIterator begin_path(const Iterator& it) const {
@@ -718,21 +721,50 @@ public:
 	 * @param data Data.
 	 * @return Iterator to inserted element.
 	 */
-	PreorderIterator<> insert(const T& data) {
+	PreorderIterator<> append(const T& data) {
 		if (nodes.empty()) setRoot(T());
-		return insert(PreorderIterator<>(this, 0), data);
+		return append(PreorderIterator<>(this, 0), data);
 	}
+
 	/**
 	 * Add the given data as last child of the given element.
-	 * @param position Element.
+	 * @param parent Parent element.
 	 * @param data Data.
 	 * @return Iterator to inserted element.
 	 */
 	template<typename Iterator>
-	Iterator insert(Iterator position, const T& data) {
-		std::size_t id = newNode(data, position.current, nodes[position.current].depth + 1);
+	Iterator append(Iterator parent, const T& data) {
+		std::size_t id = createNode(data, parent.current, nodes[parent.current].depth + 1);
 		return Iterator(this, id);
 	}
+
+	/**
+	 * Insert element before the given position.
+	 * @param position Position to insert before.
+	 * @param data Element to insert.
+	 * @return PreorderIterator to inserted element.
+	 */
+	template<typename Iterator>
+	Iterator insert(Iterator position, const T& data) {
+		std::size_t parent = nodes[position.current].parent;
+		std::size_t newID = newNode(data, parent, nodes[position.current].depth);
+		std::size_t prev = nodes[position.current].previousSibling;
+		std::size_t next = position.current;
+		nodes[newID].previousSibling = prev;
+		nodes[newID].nextSibling = next;
+		if (next != MAXINT) {
+			nodes[next].previousSibling = newID;
+		} else {
+			nodes[parent].lastChild = newID;
+		}
+		if (prev != MAXINT) {
+			nodes[prev].nextSibling = newID;
+		} else {
+			nodes[parent].firstChild = newID;
+		}
+		return PreorderIterator<false>(this, newID);
+	}
+
 	/**
 	 * Append another tree as last child of the root element.
 	 * @param tree Tree.
@@ -809,18 +841,22 @@ public:
 
 private:
 	std::size_t newNode(const T& data, std::size_t parent, std::size_t depth) {
-		std::size_t res = 0;
+		std::size_t newID = 0;
 		if (emptyNodes == MAXINT) {
 			nodes.emplace_back(nodes.size(), data, parent, depth);
-			res = nodes.size() - 1;
+			newID = nodes.size() - 1;
 		} else {
-			std::size_t res = emptyNodes;
+			newID = emptyNodes;
 			emptyNodes = nodes[emptyNodes].nextSibling;
-			nodes[res].data = data;
-			nodes[res].parent = parent;
-			nodes[res].depth = depth;
-			nodes[res].nextSibling = MAXINT;
+			nodes[newID].data = data;
+			nodes[newID].parent = parent;
+			nodes[newID].depth = depth;
 		}
+		return newID;
+	}
+	std::size_t createNode(const T& data, std::size_t parent, std::size_t depth) {
+		std::size_t res = newNode(data, parent, depth);
+		nodes[res].nextSibling = MAXINT;
 		if (parent != MAXINT) {
 			if (nodes[parent].lastChild != MAXINT) {
 				nodes[nodes[parent].lastChild].nextSibling = res;
