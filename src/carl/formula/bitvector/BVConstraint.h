@@ -39,11 +39,11 @@ namespace carl
 		 */
 		BVConstraint(const BVCompareRelation& _relation,
 			const BVTerm<Pol>& _lhs, const BVTerm<Pol>& _rhs) :
-		mRelation(_relation), mLhs(_lhs), mRhs(_rhs)
+		mRelation(_relation), mLhs(_lhs), mRhs(_rhs),
+		mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash())
 		{
 			assert(_lhs.width() == _rhs.width());
 		}
-		// TODO: Manage mHash and mId
 
 		/**
 		 * @return The bit-vector term being the left-hand side of this constraint.
@@ -139,7 +139,7 @@ namespace carl
 
 		size_t hash() const
 		{
-			return 0; // TODO: Implement ;)
+			return mHash;
 		}
 	};
 } // namespace carl

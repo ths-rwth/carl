@@ -23,9 +23,9 @@ namespace carl
 		SGE // signed >=
 	};
 
-	inline std::string toString(BVCompareRelation r)
+	inline std::string toString(BVCompareRelation _r)
 	{
-		switch(r) {
+		switch(_r) {
 		case BVCompareRelation::EQ: return "=";
 		case BVCompareRelation::NEQ: return "<>";
 		case BVCompareRelation::ULT: return "bvult";
@@ -41,14 +41,19 @@ namespace carl
 		return "";
 	}
 
-	inline std::ostream& operator<<(std::ostream& os, const BVCompareRelation& r)
+	inline std::ostream& operator<<(std::ostream& _os, const BVCompareRelation& _r)
 	{
-		return(os << toString(r));
+		return(_os << toString(_r));
 	}
 
-	inline BVCompareRelation inverse(BVCompareRelation c)
+	inline std::size_t toId(const BVCompareRelation _relation)
 	{
-		switch(c) {
+		return static_cast<std::size_t>(_relation);
+	}
+
+	inline BVCompareRelation inverse(BVCompareRelation _c)
+	{
+		switch(_c) {
 		case BVCompareRelation::EQ: return BVCompareRelation::NEQ;
 		case BVCompareRelation::NEQ: return BVCompareRelation::EQ;
 		case BVCompareRelation::ULT: return BVCompareRelation::UGE;
@@ -64,21 +69,21 @@ namespace carl
 		return BVCompareRelation::EQ;
 	}
 
-	inline bool relationIsStrict(BVCompareRelation r)
+	inline bool relationIsStrict(BVCompareRelation _r)
 	{
-		return r == BVCompareRelation::ULT ||
-			r == BVCompareRelation::UGT ||
-			r == BVCompareRelation::SLT ||
-			r == BVCompareRelation::UGT ||
-			r == BVCompareRelation::NEQ;
+		return _r == BVCompareRelation::ULT ||
+			_r == BVCompareRelation::UGT ||
+			_r == BVCompareRelation::SLT ||
+			_r == BVCompareRelation::UGT ||
+			_r == BVCompareRelation::NEQ;
 	}
 
-	inline bool relationIsSigned(BVCompareRelation r)
+	inline bool relationIsSigned(BVCompareRelation _r)
 	{
-		return r == BVCompareRelation::SLT ||
-			r == BVCompareRelation::SLE ||
-			r == BVCompareRelation::SGT ||
-			r == BVCompareRelation::SGE;
+		return _r == BVCompareRelation::SLT ||
+			_r == BVCompareRelation::SLE ||
+			_r == BVCompareRelation::SGT ||
+			_r == BVCompareRelation::SGE;
 	}
 
 } // end namespace carl
@@ -90,9 +95,9 @@ namespace std
 	struct hash<carl::BVCompareRelation>
 	{
 
-		std::size_t operator()(const carl::BVCompareRelation& rel) const
+		std::size_t operator()(const carl::BVCompareRelation& _rel) const
 		{
-			return std::size_t(rel);
+			return std::size_t(_rel);
 		}
 	};
 

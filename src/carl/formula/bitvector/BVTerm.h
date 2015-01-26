@@ -9,11 +9,28 @@
 #include "../Formula.h"
 #include <boost/dynamic_bitset.hpp>
 
+/**
+ * Implementation of boost::hash_value for dynamic bitsets.
+ * TODO: Make more efficient (currently uses convertion to string).
+ * See also: https://stackoverflow.com/q/3896357
+ */
+namespace boost
+{
+
+	template <typename B, typename A>
+	std::size_t hash_value(const boost::dynamic_bitset<B, A>& bs)
+	{
+		std::string stringRepresentation;
+		boost::to_string(bs, stringRepresentation);
+		return std::hash<std::string>()(stringRepresentation);
+	}
+}
+
 namespace carl
 {
 	typedef boost::dynamic_bitset<> BVValue;
 
-	enum class BVTermType
+	enum class BVTermType : unsigned
 	{
 		CONSTANT,
 		VARIABLE,
@@ -66,6 +83,11 @@ namespace carl
 		}
 		assert(false);
 		return "";
+	}
+
+	inline std::size_t toId(const BVTermType _type)
+	{
+		return static_cast<std::size_t>(_type);
 	}
 
 	// forward declaration
@@ -146,31 +168,36 @@ namespace carl
 		};
 		size_t mWidth;
 		size_t mId;
+		size_t mHash;
 
 	public:
 
 		BVTerm(BVTermType _type, BVValue _value) :
-		mType(_type), mValue(_value), mWidth(_value.size())
+		mType(_type), mValue(_value), mWidth(_value.size()),
+		mHash((boost::hash_value(_value) << 5) ^ toId(_type))
 		{
 			assert(_type == BVTermType::CONSTANT);
 		}
 
 		BVTerm(BVTermType _type, Variable::Arg _variable, size_t _width = 1) :
-		mType(_type), mVariable(_variable, _width), mWidth(_width)
+		mType(_type), mVariable(_variable, _width), mWidth(_width),
+		mHash(((size_t)_variable.getId() << 5) ^ toId(_type))
 		{
 			assert(_type == BVTermType::VARIABLE);
 			// assert( _variable.getType() == VariableType::VT_BITVECTOR );
 		}
 
 		BVTerm(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
-		mType(_type), mIte(_booleanFormula, _subtermA, _subtermB), mWidth(_subtermA.width())
+		mType(_type), mIte(_booleanFormula, _subtermA, _subtermB), mWidth(_subtermA.width()),
+		mHash((_booleanFormula.getHash() << 15) ^ (_subtermA.hash() << 10) ^ (_subtermB.hash() << 5) ^ toId(_type))
 		{
 			assert(_type == BVTermType::ITE);
 			assert(_subtermA.width() == _subtermB.width());
 		}
 
 		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
-		mType(_type), mUnary(_operand, _index)
+		mType(_type), mUnary(_operand, _index),
+		mHash((_index << 10) ^ (_operand.hash() << 5) ^ toId(_type))
 		{
 			if(_type == BVTermType::NOT || _type == BVTermType::NEG) {
 				assert(_index == 0);
@@ -190,7 +217,8 @@ namespace carl
 		}
 
 		BVTerm(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
-		mType(_type), mBinary(_first, _second)
+		mType(_type), mBinary(_first, _second),
+		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ toId(_type))
 		{
 			assert(
 				_type == BVTermType::CONCAT || _type == BVTermType::AND || _type == BVTermType::OR
@@ -212,7 +240,8 @@ namespace carl
 		}
 
 		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
-		mType(_type), mExtract(_operand, _first, _last)
+		mType(_type), mExtract(_operand, _first, _last),
+		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ toId(_type))
 		{
 			assert(_type == BVTermType::EXTRACT);
 			assert(_first >= 0 && _last >= _first && _last < _operand.width());
@@ -324,6 +353,11 @@ namespace carl
 			}
 		}
 
+		size_t hash() const
+		{
+			return this->mHash;
+		}
+
 		bool operator==(const BVTerm<Pol>& _other) const
 		{
 			return mId == _other.mId; // TODO: Make sure this also works if any mId is not set
@@ -358,7 +392,7 @@ namespace std
 		 */
 		size_t operator()(const carl::BVTerm<Pol>& _term) const
 		{
-			return 0; // TODO: Implement :)
+			return _term.hash();
 		}
 	};
 }
