@@ -23,8 +23,6 @@ TEST(BVConstraint, Construction)
 	auto a_t = BV_TERM_POOL.create(BVTermType::VARIABLE, a, 16);
 	auto b_t = BV_TERM_POOL.create(BVTermType::VARIABLE, b, 16);
 
-	auto foo = BV_TERM_POOL.create(BVTermType::CONSTANT, BVValue(16, 65520));
-
 	auto oxfff0 = BV_TERM_POOL.create(BVTermType::CONSTANT, BVValue(16, 65520));
 	const Formula<Pol> trueFormula = Formula<Pol>(FormulaType::TRUE);
 
