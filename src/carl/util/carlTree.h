@@ -648,7 +648,7 @@ public:
 		std::size_t max = 0;
 		for (auto i = begin_children(it); i != end_children(it); ++i) {
 			std::size_t d = max_depth(i);
-			if (d > max + 1) max = d + 1;
+			if (d + 1 > max) max = d + 1;
 		}
 		return max;
 	}

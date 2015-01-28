@@ -19,7 +19,7 @@ TEST(SampleSet, BasicOperations)
 	nums.push_back(RealAlgebraicNumberNR<cln::cl_RA>::create(2));
 	s.insert(nums.begin(), nums.end());
 
-	ASSERT_NO_THROW(s.remove(pos.first));
+	ASSERT_NO_THROW(s.remove(std::get<0>(pos)));
 	ASSERT_FALSE(s.empty());
 	ASSERT_NO_THROW(s.pop());
 	ASSERT_NO_THROW(s.pop());

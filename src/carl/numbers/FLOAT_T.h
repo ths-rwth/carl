@@ -81,7 +81,14 @@ namespace carl
 	}
     
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
-	inline bool AlmostEqual2sComplement(double A, double B, int maxUlps = 1)
+	template<typename Number>
+	inline bool AlmostEqual2sComplement(Number A, Number B, int maxUlps = 1)
+	{
+		return A == B;
+	}
+	
+	template<>
+	inline bool AlmostEqual2sComplement(double A, double B, int maxUlps)
 	{
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.

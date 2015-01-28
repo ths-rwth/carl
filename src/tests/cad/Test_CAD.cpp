@@ -76,7 +76,6 @@ TEST_F(CADTest, Check1)
 {
 	RealAlgebraicPoint<cln::cl_RA> r;
 	std::vector<Constraint> cons;
-
 	this->cad.addPolynomial(this->p[0], {x, y});
 	this->cad.addPolynomial(this->p[1], {x, y});
 	cons.assign({
