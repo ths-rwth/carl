@@ -46,6 +46,9 @@ namespace carl {
             double center = intervals.at(variable).center();
             Interval<double> centerInterval = Interval<double>(center);
             
+//            std::cout << "variable = " << variable << std::endl;
+//            std::cout << "constraint = " << constraint << std::endl;
+//            std::cout << "derivative = " << derivative << std::endl;
 //			std::cout << __func__ << ": centerInterval: " << centerInterval << std::endl;
 			
             // Create map for replacement of variables by intervals and replacement of center by point interval

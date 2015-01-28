@@ -1031,6 +1031,54 @@ namespace carl
             assert(this->isConsistent());
             return this->isPointInterval() && (mContent.lower() == carl::constant_one<Number>().get());
         }
+		
+		/**
+         * @return true, if it this interval contains only positive values.
+         */
+        inline bool isPositive() const
+        {
+            assert(this->isConsistent());
+            if( mLowerBoundType == BoundType::WEAK )
+                return mContent.lower() > carl::constant_zero<Number>().get();
+            if( mLowerBoundType == BoundType::STRICT )
+                return mContent.lower() >= carl::constant_zero<Number>().get();
+            return false;
+        }
+		
+		/**
+         * @return true, if it this interval contains only negative values.
+         */
+        inline bool isNegative() const
+        {
+            assert(this->isConsistent());
+            if( mUpperBoundType == BoundType::WEAK )
+                return mContent.upper() < carl::constant_zero<Number>().get();
+            if( mUpperBoundType == BoundType::STRICT )
+                return mContent.upper() <= carl::constant_zero<Number>().get();
+            return false;
+        }
+		
+		/**
+         * @return true, if it this interval contains only positive values or 0.
+         */
+        inline bool isSemiPositive() const
+        {
+            assert(this->isConsistent());
+            if( mLowerBoundType != BoundType::INFTY )
+                return mContent.lower() >= carl::constant_zero<Number>().get();
+            return false;
+        }
+		
+		/**
+         * @return true, if it this interval contains only negative values or 0.
+         */
+        inline bool isSemiNegative() const
+        {
+            assert(this->isConsistent());
+            if( mUpperBoundType != BoundType::INFTY )
+                return mContent.upper() >= carl::constant_zero<Number>().get();
+            return false;
+        }
 
         /**
          * Determine whether the interval lays entirely left of 0 (NEGATIVE_SIGN), right of 0 (POSITIVE_SIGN) or contains 0 (ZERO_SIGN).

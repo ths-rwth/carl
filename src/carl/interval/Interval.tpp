@@ -23,13 +23,13 @@ namespace carl
 
 template<typename Number>
 Sign Interval<Number>::sgn() const
-	{
-		assert(this->isConsistent());
-		if (this->isUnbounded()) return Sign::ZERO;
-		if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
-		if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
-		return Sign::ZERO;
-	}
+{
+    assert(this->isConsistent());
+    if (this->isUnbounded()) return Sign::ZERO;
+    if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
+    if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
+    return Sign::ZERO;
+}
 
 template<typename Number>
 Interval<Number> Interval<Number>::integralPart() const
@@ -148,18 +148,20 @@ template<typename Number>
 	bool Interval<Number>::contains(const Interval<Number>& rhs) const
 	{
 		assert(this->isConsistent());
-                // if one bound is totally wrong, we can just return false
-                if (
-                        (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
-                        || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY)
-                    )
-                {
-                    return false;
-                }
+        if( rhs.isEmpty() )
+            return true;
+        // if one bound is totally wrong, we can just return false
+        if (
+                (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
+                || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY)
+            )
+        {
+            return false;
+        }
 
-                // check the bounds
-                bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
-                bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
+        // check the bounds
+        bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
+        bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
                 
                 // if both are ok, return true
 		if( lowerOk && upperOk )
@@ -332,27 +334,61 @@ void Interval<Number>::sub_assign(const Interval<Number>& rhs)
 
 template<typename Number>
 Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		BoundType lowerBoundType = BoundType::WEAK;
-        BoundType upperBoundType = BoundType::WEAK;
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
-		   || (rhs.upperBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY))) )
-        {
-            lowerBoundType = BoundType::INFTY;
-        }
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < carl::constant_zero<Number>().get() || (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY)))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > carl::constant_zero<Number>().get() || (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY)))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY)))
-		   || (rhs.upperBoundType() == BoundType::INFTY && (mContent.lower() > carl::constant_zero<Number>().get() || (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))) )
-        {
-            upperBoundType = BoundType::INFTY;
-        }
-        return Interval<Number>(BoostInterval( mContent*rhs.content() ), lowerBoundType, upperBoundType );
-	}
+{
+    assert(this->isConsistent());
+    assert(rhs.isConsistent());
+    BoundType lowerBoundType = BoundType::WEAK;
+    BoundType upperBoundType = BoundType::WEAK;
+    // We apply the following multiplication:
+    //   <a,b>*<c,d> with <a, <c in {(-oo} u {(r |r in Q} u {[r |r in Q}
+    //               and b>, d> in   {oo)}  u {r) |r in Q} u {r] |r in Q}
+    // 1.) (r_1,r_2)*<c,d> or <a,b>*(r_3,r_4)
+    if((mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT) || (rhs.lowerBoundType() == BoundType::STRICT && rhs.upperBoundType() == BoundType::STRICT))
+    {
+        lowerBoundType = BoundType::STRICT;
+        upperBoundType = BoundType::STRICT;
+    }
+    // 2.) <a,b>*<c,d> with a,b <= 0 or c,d <= 0   ->   resulting lower/upper bound is formed by the upper/lower bounds
+    else if( this->isNegative() || rhs.isNegative())
+    {
+        if( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+            lowerBoundType = getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() );
+        if( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+            upperBoundType = getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() );
+    }
+    // 3.) <a,b>*<c,d> with a,b >= 0 or c,d >= 0   ->   resulting lower/upper bound is formed by the lower/upper bounds
+    else if( this->isPositive() || rhs.isPositive() )
+    {
+        if( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+            lowerBoundType = getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() );
+        if( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+            upperBoundType = getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() );
+    }
+        // 4.) 1.) - 3.) do not hold, but at least one bound is strict (then it must hold that a,c < 0 and b,d > 0)
+//        else if(mLowerBoundType == BoundType::STRICT || mUpperBoundType == BoundType::STRICT || rhs.lowerBoundType() == BoundType::STRICT || rhs.upperBoundType() == BoundType::STRICT)
+//        {
+            // if resulting lower bound min(a*d,b*c) = a*d -> type is the stricter of <a and d>
+            // if resulting lower bound min(a*d,b*c) = b*c -> type is the stricter of <b and c>
+            // if resulting upper bound max(a*c,b*d) = a*c -> type is the stricter of <a and c>
+            // if resulting upper bound max(a*c,b*d) = b*d -> type is the stricter of <b and d>
+//        }
+//        // 5.) otherwise resulting bounds are weak or infinite
+    if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
+       || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
+       || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
+       || (rhs.upperBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY))) )
+    {
+        lowerBoundType = BoundType::INFTY;
+    }
+    if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < carl::constant_zero<Number>().get() || (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY)))
+       || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > carl::constant_zero<Number>().get() || (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY)))
+       || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY)))
+       || (rhs.upperBoundType() == BoundType::INFTY && (mContent.lower() > carl::constant_zero<Number>().get() || (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))) )
+    {
+        upperBoundType = BoundType::INFTY;
+    }
+    return Interval<Number>(BoostInterval( mContent*rhs.content() ), lowerBoundType, upperBoundType );
+}
 
 template<typename Number>
 void Interval<Number>::mul_assign(const Interval<Number>& rhs)
