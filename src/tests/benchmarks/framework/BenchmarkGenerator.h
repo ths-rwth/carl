@@ -76,7 +76,7 @@ public:
 	template<typename C>
 	CMP<C> newMP(std::size_t deg) const {
 		auto& manager = carl::MultivariatePolynomial<C>::mTermAdditionManager;
-		std::size_t id = manager.getId(deg*deg*deg);
+		auto id = manager.getId(deg*deg*deg);
 		C c = C(geomDist<C>());
 		manager.template addTerm<true>(id, Term<C>(c));
 		for (std::size_t i = 1; i <= deg; i++) {
