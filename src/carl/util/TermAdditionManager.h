@@ -7,6 +7,7 @@
 
 #pragma once 
 
+#include <list>
 #include <mutex>
 #include <unordered_map>
 #include <tuple>
@@ -29,30 +30,30 @@ public:
 	typedef std::vector<IDType> TermIDs;
 	typedef std::vector<TermPtr> Terms;
 	typedef std::tuple<TermIDs,Terms,bool,Coeff,IDType> Tuple;
+	typedef typename std::list<Tuple>::iterator TAMId;
 private:
-	std::size_t mNextId;
-	std::vector<Tuple> mData;
+	std::list<Tuple> mData;
+	TAMId mNextId;
 	mutable std::mutex mMutex;
 public:
-	TermAdditionManager(): mNextId(0)
+	TermAdditionManager(): mData(1), mNextId(mData.begin())
 	{
         MonomialPool::getInstance();
-		mData.emplace_back();
 		std::get<4>(mData.back()) = 1;
 	}
 	
     #define SWAP_TERMS
 	
-	std::size_t getId(std::size_t expectedSize = 0) {
-		//std::lock_guard<std::mutex> lock(mMutex);
-		while (std::get<2>(mData[mNextId])) {
+	TAMId getId(std::size_t expectedSize = 0) {
+		std::lock_guard<std::mutex> lock(mMutex);
+		while (std::get<2>(*mNextId)) {
 			mNextId++;
-			if (mNextId == mData.size()) {
-				mData.emplace_back();
-				std::get<4>(mData.back()) = 1;
+			if (mNextId == mData.end()) {
+				mNextId = mData.emplace(mData.end());
+				std::get<4>(*mNextId) = 1;
 			}
 		}
-        Tuple& data = mData[mNextId];
+        Tuple& data = *mNextId;
 		//std::lock_guard<std::mutex> lock(mMutex);
         Terms& terms = std::get<1>(data);
 		terms.clear();
@@ -60,21 +61,22 @@ public:
         #ifdef SWAP_TERMS
         //memset(&terms[0], 0, sizeof(TermPtr)*terms.size());
         #endif
-        size_t greatestIdPlusOne = MonomialPool::getInstance().nextID();
+        std::size_t greatestIdPlusOne = MonomialPool::getInstance().nextID();
 		if( std::get<0>(data).size() < greatestIdPlusOne ) std::get<0>(data).resize(greatestIdPlusOne);
 		//memset(&std::get<0>(data)[0], 0, sizeof(IDType)*std::get<0>(data).size());
 		std::get<3>(data) = constant_zero<Coeff>::get();
 		std::get<4>(data) = 1;
 		std::get<2>(data) = true;
-		std::size_t result = mNextId;
-		mNextId = (mNextId + 1) % mData.size();
+		TAMId result = mNextId;
+		mNextId++;
+		if (mNextId == mData.end()) mNextId = mData.begin();
 		return result;
 	}
 
     template<bool SizeUnknown, bool NewMonomials = true>
-	void addTerm(std::size_t id, const TermPtr& term) {
+	void addTerm(TAMId id, const TermPtr& term) {
 		assert(!term.isZero());
-        Tuple& data = mData[id];
+        Tuple& data = *id;
 		assert(std::get<2>(data));
 		TermIDs& termIDs = std::get<0>(data);
 		Terms& terms = std::get<1>(data);
@@ -110,8 +112,8 @@ public:
 		}
 	}
     
-	void readTerms(std::size_t id, Terms& terms) {
-        Tuple& data = mData[id];
+	void readTerms(TAMId id, Terms& terms) {
+        Tuple& data = *id;
 		assert(std::get<2>(data));
 		Terms& t = std::get<1>(data);
         TermIDs& termIDs = std::get<0>(data);
