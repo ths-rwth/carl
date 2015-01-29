@@ -82,7 +82,7 @@ namespace carl
     
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	template<typename Number>
-	inline bool AlmostEqual2sComplement(Number A, Number B, int maxUlps = 1)
+	inline bool AlmostEqual2sComplement(Number A, Number B, int = 1)
 	{
 		return A == B;
 	}
