@@ -26,6 +26,8 @@ namespace carl {
  */
 void printStacktrace(bool interaction = false);
 
+std::string callingFunction();
+
 /**
  * Stores a textual representation of the last assertion that was registered via REGISTER_ASSERT.
  */
