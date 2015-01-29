@@ -394,7 +394,6 @@ public:
 	* @param currentSamples samples already present where the new samples shall be integrated. Each new sample is automatically inserted in this list.
 	* @param replacedSamples samples being replaced in currentSamples (due to simplification or root preference) but not added to the new samples
 	* @param bounds the resulting sample set does not contain any samples outside the given bounds (standard: no bounds)
-	* @param settings a setting type for a collection of CAD settings (standard option is the standard option of CADSettings::getSettings( ))
 	* @return a set of sample points for the given univariate polynomial
 	* @complexity linear in the number of roots of <code>p</code> plus the complexity of <code>RealAlgebraicNumberFactory::realRoots( p )</code>
 	*/
