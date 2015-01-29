@@ -8,6 +8,7 @@
 #include "MultivariatePolynomial.h"
 #include <algorithm>
 #include <memory>
+#include <mutex>
 #include <list>
 #include <type_traits>
 
@@ -1259,6 +1260,8 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	if (&lhs == &rhs) return true;
 	if (lhs.nrTerms() != rhs.nrTerms()) return false;
 	if (lhs.nrTerms() == 0) return true;
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lock(mutex);
 	static std::vector<const C*> coeffs;
 	coeffs.reserve(MonomialPool::getInstance().nextID());
 	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
