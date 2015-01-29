@@ -287,12 +287,11 @@ public:
 			if (this->current == MAXINT) {
 				this->current = this->tree->begin_leaf().current;
 			} else {
-				std::size_t target = this->tree->nodes[this->current].depth;
 				PreorderIterator<false> it(this->tree, this->current);
 				do {
 					++it;
 					if (it.current == MAXINT) break;
-				} while (this->tree->nodes[it.current].depth != target);
+				} while (this->tree->nodes[it.current].firstChild != MAXINT);
 				this->current = it.current;
 			}
 			return *this;
@@ -301,12 +300,11 @@ public:
 			if (this->current == MAXINT) {
 				this->current = this->tree->rbegin_leaf().current;
 			} else {
-				std::size_t target = this->tree->nodes[this->current].depth;
 				PreorderIterator<false> it(this->tree, this->current);
 				do {
-					it.previous();
+					--it;
 					if (it.current == MAXINT) break;
-				} while (this->tree->nodes[it.current].depth != target);
+				} while (this->tree->nodes[it.current].firstChild != MAXINT);
 				this->current = it.current;
 			}
 			return *this;
