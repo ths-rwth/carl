@@ -680,7 +680,6 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 	// no equivalent polynomial for p in any level
 	if (p == nullptr) return;
 	CARL_LOG_FUNC("carl.cad", *p << ", " << level << ", " << childrenOnly);
-	CARL_LOG_TRACE("carl.cad", "Before: " << std::endl << this->sampleTree);
 	assert(this->isSampleTreeConsistent());
 	
 	/* Delete
@@ -731,7 +730,6 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 			}
 		}
 	}
-	CARL_LOG_TRACE("carl.cad", "After: " << std::endl << this->sampleTree);
 }
 
 template<typename Number>
@@ -909,7 +907,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		newSampleSet.insert(newSamples.begin(), newSamples.end());
 		currentSamples.insert(newSamples.begin(), newSamples.end());
 	}
-	CARL_LOG_TRACE("carl.cad", (void*)(&currentSamples) << " -> " << currentSamples);
+	CARL_LOG_TRACE("carl.cad", " -> " << currentSamples);
 	return newSampleSet;
 }
 
@@ -925,7 +923,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	assert(variables.size() == node.depth() + openVariableCount + 1);
 	std::map<Variable, RealAlgebraicNumberPtr<Number>> m;
 	auto valit = sampleTree.begin_path(node);
-	for (std::size_t i = 1; i <= node.depth(); i++) {
+	for (std::size_t i = node.depth(); i > 0; i--) {
 		m[variables[variables.size() - i]] = *valit;
 		valit++;
 	}
