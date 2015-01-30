@@ -201,9 +201,7 @@ public:
 	 * @param l Other SampleSet.
 	 */
 	void insert(const SampleSet& l) {
-		CARL_LOG_TRACE("carl.cad", "Inserting " << std::endl << l << std::endl << " into " << std::endl << *this);
 		this->insert(l.begin(), l.end());
-		CARL_LOG_TRACE("carl.cad", "Result: " << std::endl << *this);
 	}
 	
 	/**
