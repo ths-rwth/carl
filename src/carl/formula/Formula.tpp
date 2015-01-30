@@ -1579,7 +1579,7 @@ namespace carl
     Formula<Pol> Formula<Pol>::addConstraintBound( ConstraintBounds& _constraintBounds, const Formula<Pol>& _constraint, bool _inConjunction )
     {
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << *_constraint << endl;
+        cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << _constraint << endl;
         #endif
         bool negated = _constraint.getType() == FormulaType::NOT;
         assert( _constraint.getType() == FormulaType::CONSTRAINT || (negated && _constraint.subformula().getType() == FormulaType::CONSTRAINT ) );
@@ -1900,7 +1900,7 @@ namespace carl
                 for( ; iter != bounds.end(); ++iter )
                 {
                     #ifdef CONSTRAINT_BOUND_DEBUG
-                    cout << "   bound is  " << Constraint::relationToString( iter->second.first ) << iter->first << endl;
+                    cout << "   bound is  " << Constraint<Pol>::relationToString( iter->second.first ) << iter->first << endl;
                     #endif
                     if( (_inConjunction && iter->second.first == Relation::NEQ)
                         || (!_inConjunction && iter->second.first == Relation::EQ) )
@@ -1957,7 +1957,7 @@ namespace carl
                     {
                         // _inConjunction == true: found already another equality or an upper bound -> conjunction is invalid!
                         // _inConjunction == false: found already another bound with != as relation or a lower bound -> disjunction is valid!
-                        if( moreSignificantCase != bounds.end() || mostSignificantUpperBound != bounds.end() )
+                        if( moreSignificantCase != bounds.end() || (_inConjunction ? mostSignificantUpperBound : mostSignificantLowerBound) != bounds.end() )
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
                             cout << "      case: " << __LINE__ << endl;
@@ -2013,8 +2013,8 @@ namespace carl
                         || !( !_inConjunction || mostSignificantUpperBound == bounds.end() || mostSignificantLowerBound == bounds.end() 
                              || mostSignificantLowerBound->first > mostSignificantUpperBound->first ) )
                     {
-                        cout << "mostSignificantUpperBound:   " << mostSignificantUpperBound->first << "  [" << *mostSignificantUpperBound->second.second << "]" << endl;
-                        cout << "mostSignificantLowerBound:   " << mostSignificantLowerBound->first << "  [" << *mostSignificantLowerBound->second.second << "]" << endl;
+                        cout << "mostSignificantUpperBound:   " << mostSignificantUpperBound->first << "  [" << mostSignificantUpperBound->second.second << "]" << endl;
+                        cout << "mostSignificantLowerBound:   " << mostSignificantLowerBound->first << "  [" << mostSignificantLowerBound->second.second << "]" << endl;
                     }
                     #endif
                     assert( !_inConjunction || mostSignificantUpperBound == bounds.end() || mostSignificantLowerBound == bounds.end() 

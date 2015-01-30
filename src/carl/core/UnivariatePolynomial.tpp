@@ -274,7 +274,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
-		factor = carl::quotient(*prefactor * lcoeff(), divisor.lcoeff());
+		factor = carl::quotient(Coeff(*prefactor * lcoeff()), divisor.lcoeff());
 		// There should be no remainder.
 		assert(factor * divisor.lcoeff() == *prefactor * lcoeff());
 	}
