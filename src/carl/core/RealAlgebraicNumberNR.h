@@ -59,7 +59,7 @@ using RealAlgebraicNumberNRPtr = std::shared_ptr<RealAlgebraicNumberNR<Number>>;
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumberNR<Number>* n) {
 	if (n == nullptr) return os << "nullptr";
-	return os << "(NR " << n->value() << ")";
+	return os << "(NR " << n->value() << (n->isRoot() ? " R" : "") << ")";
 }
 
 }
