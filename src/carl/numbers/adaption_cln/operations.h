@@ -18,6 +18,7 @@
 #include "typetraits.h"
 #include "boost/algorithm/string.hpp"
 #include "../constants.h"
+#include "../operations.h"
 
 namespace carl {
 
@@ -327,7 +328,8 @@ inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
  * @param e Exponent.
  * @return \f$n^e\f$
  */
-inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
+template<>
+inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
 	return cln::expt(n, (int)e);
 }
 
