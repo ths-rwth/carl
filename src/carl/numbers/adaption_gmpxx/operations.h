@@ -70,6 +70,23 @@ inline bool isInteger(const mpz_class&) {
 }
 
 /**
+ * Get the bit size of the representation of a integer.
+ * @param n An integer.
+ * @return Bit size of n.
+ */
+inline std::size_t bitsize(const mpz_class& n) {
+	return mpz_sizeinbase(n.__get_mp(),10);
+}
+/**
+ * Get the bit size of the representation of a fraction.
+ * @param n A fraction.
+ * @return Bit size of n.
+ */
+inline std::size_t bitsize(const mpq_class& n) {
+	return mpz_sizeinbase(getNum(n).__get_mp(),10) + mpz_sizeinbase(getDenom(n).__get_mp(),10);
+}
+
+/**
  * Conversion functions
  * 
  * The following function convert types to other types.
@@ -126,6 +143,7 @@ inline mpz_class floor(const mpq_class& n) {
 	mpz_fdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
 	return res;
 }
+
 inline mpz_class floor(const mpz_class& n) {
 	return n;
 }
@@ -203,6 +221,15 @@ bool sqrtp(const mpq_class& a, mpq_class& b);
 
 std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a);
 
+/**
+ * Compute square root in a fast but less precise way.
+ * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
+ * Otherwise use the nearest integers as bounds on the square root.
+ * @param a Some number.
+ * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z. 
+ */
+std::pair<mpq_class,mpq_class> sqrt_fast(const mpq_class& a);
+
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
@@ -221,8 +248,67 @@ inline mpz_class operator/(const mpz_class& n, const mpz_class& d)
 	return quotient(n,d);
 }
 
+inline mpq_class quotient(const mpq_class& n, const mpq_class& d)
+{
+	mpq_class res;
+	mpq_div(res.get_mpq_t(), n.get_mpq_t(), d.get_mpq_t());
+	return res;
+}
+
+inline mpq_class operator/(const mpq_class& n, const mpq_class& d)
+{
+	return quotient(n,d);
+}
+
 inline void divide(const mpz_class& dividend, const mpz_class& divisor, mpz_class& quotient, mpz_class& remainder) {
 	mpz_divmod(quotient.get_mpz_t(), remainder.get_mpz_t(), dividend.get_mpz_t(), divisor.get_mpz_t());
+}
+
+/**
+ * Divide two fractions.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return \f$ a / b \f$.
+ */
+inline mpq_class div(const mpq_class& a, const mpq_class& b) {
+	return carl::quotient(a,b);
+}
+
+/**
+ * Divide two integers.
+ * Asserts that the remainder is zero.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return \f$ a / b \f$.
+ */
+inline mpz_class div(const mpz_class& a, const mpz_class& b) {
+	assert(carl::mod(a, b) == 0);
+	return carl::quotient(a, b);
+}
+
+/**
+ * Divide two integers.
+ * Asserts that the remainder is zero.
+ * Stores the result in the first argument.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return \f$ a / b \f$.
+ */
+inline mpz_class& div_assign(mpz_class& a, const mpz_class& b) {
+	a = carl::quotient(a, b);
+    return a;
+}
+/**
+ * Divide two integers.
+ * Asserts that the remainder is zero.
+ * Stores the result in the first argument.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return \f$ a / b \f$.
+ */
+inline mpq_class& div_assign(mpq_class& a, const mpq_class& b) {
+	a = carl::quotient(a, b);
+    return a;
 }
 
 inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
@@ -230,14 +316,6 @@ inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 	mpq_t res;
 	mpq_init(res);
 	mpq_mul(res, lhs.get_mpq_t(), rhs.get_mpq_t());
-	return mpq_class(res);
-}
-
-inline mpq_class operator /(const mpq_class& lhs, const mpq_class& rhs)
-{
-	mpq_t res;
-	mpq_init(res);
-	mpq_div(res, lhs.get_mpq_t(), rhs.get_mpq_t());
 	return mpq_class(res);
 }
 
