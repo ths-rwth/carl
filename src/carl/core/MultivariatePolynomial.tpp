@@ -1004,6 +1004,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		result.setReasons(this->getReasons());
 	}
+    if (isZero()) return result;
 	auto lc = lcoeff();
 	for (auto& it: result.mTerms)
 	{
