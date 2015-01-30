@@ -235,7 +235,7 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	m(0, degree-1) = toDouble(-p.coefficients()[0] / p.coefficients()[degree]);
 	for (unsigned int i = 1; i < degree; i++) {
 		m(i, i-1) = 1;
-		m(i, degree-1) = toDouble(-p.coefficients()[i] / p.coefficients()[degree]);
+		m(i, degree-1) = toDouble(Number(-p.coefficients()[i] / p.coefficients()[degree]));
 	}
 	
 	// Obtain eigenvalues
