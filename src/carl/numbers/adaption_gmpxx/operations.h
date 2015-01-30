@@ -18,6 +18,7 @@ CLANG_WARNING_RESET
 #include <vector>
 #include "boost/algorithm/string.hpp"
 #include "../constants.h"
+#include "../operations.h"
 
 namespace carl {
 
@@ -166,13 +167,29 @@ inline mpz_class lcm(const mpq_class& a, const mpq_class& b) {
 	return res;
 }
 
-inline mpz_class pow(const mpz_class& b, unsigned e) {
+template<>
+inline mpz_class pow(const mpz_class& b, std::size_t e) {
 	mpz_class res;
 	mpz_pow_ui(res.get_mpz_t(), b.get_mpz_t(), e);
 	return res;
 }
 
-mpq_class pow(const mpq_class& b, unsigned e);
+template<>
+inline mpq_class pow(const mpq_class& b, std::size_t e) {
+	mpz_class den = b.get_den();
+	mpz_class powDen;
+	mpz_pow_ui(powDen.get_mpz_t(), den.get_mpz_t(), e);
+	mpz_class num = b.get_num();
+	mpz_class powNum;
+	mpz_pow_ui(powNum.get_mpz_t(), num.get_mpz_t(), e);
+	mpq_class resNum;
+	mpq_set_z(resNum.get_mpq_t(), powNum.get_mpz_t());
+	mpq_class resDen;
+	mpq_set_z(resDen.get_mpq_t(), powDen.get_mpz_t());
+	mpq_class res;
+	mpq_div(res.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
+	return res;
+}
 
 /**
  * Calculate the square root of a fraction if possible.
