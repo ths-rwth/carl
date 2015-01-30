@@ -882,7 +882,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 	
 	// now, some coefficient * mainDenom is always integral.
 	// we convert such a product to an integral data type by getNum()
-	Coeff c = this->numericContent(0) * mainDenom;
+	UnivariatePolynomial<Coeff>::NumberType c = this->numericContent(0) * mainDenom;
 	assert(getDenom(c) == 1);
 	IntNumberType res = getNum(c);
 	for (unsigned i = 1; i < this->mCoefficients.size(); i++) {
