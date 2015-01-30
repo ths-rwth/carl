@@ -349,9 +349,9 @@ template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
 	if (n == nullptr) return os << "nullptr";
 	if (n->isNumeric()) {
-		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << ")";
+		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << (n->isRoot() ? " R" : "") << ")";
 	}
-	return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << ")";
+	return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << (n->isRoot() ? " R" : "") << ")";
 }
 
 }
