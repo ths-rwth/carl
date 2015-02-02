@@ -304,6 +304,13 @@ namespace carl
             denominatorAsPolynomial().gatherVariables(vars);
         }
         
+        CoeffType evaluate(const std::map<Variable,CoeffType>& substitutions) const
+        {
+            // FIXME: check that rational function is not constant before evaluation.
+            CARL_LOG_INEFFICIENT();
+            return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
+        }
+        
     private:
         
         /**

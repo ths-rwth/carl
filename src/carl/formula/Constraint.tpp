@@ -522,25 +522,25 @@ namespace carl
                             return new Constraint( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ );
                         case Relation::LEQ:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
+                            Pol newLhs = ((lhs() - lhs().constantPart()) * (typename Pol::NumberType( 1 ) / g));
                             newLhs += carl::floor( (lhs().constantPart() / g) ) + typename Pol::NumberType( 1 );
                             return new Constraint( newLhs, Relation::LEQ );
                         }
                         case Relation::GEQ:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
+                            Pol newLhs = ((lhs() - lhs().constantPart()) * (typename Pol::NumberType( 1 ) / g));
                             newLhs += carl::floor( (lhs().constantPart() / g) );
                             return new Constraint( newLhs, Relation::GEQ );
                         }
                         case Relation::LESS:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
+                            Pol newLhs = ((lhs() - lhs().constantPart()) * (typename Pol::NumberType( 1 ) / g));
                             newLhs += carl::floor( (lhs().constantPart() / g) ) + typename Pol::NumberType( 1 );
                             return new Constraint( newLhs, Relation::LEQ );
                         }
                         case Relation::GREATER:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
+                            Pol newLhs = ((lhs() - lhs().constantPart()) * (typename Pol::NumberType( 1 ) / g));
                             newLhs += carl::floor( (lhs().constantPart() / g) );
                             return new Constraint( newLhs, Relation::GEQ );
                         }
@@ -860,8 +860,8 @@ namespace carl
         {
             if( (termA)->monomial() != (termB)->monomial() ) return 0;
             // Find an appropriate g.
-            typename Pol::NumberType termAcoeffAbs = cln::abs( (termA)->coeff() ); // TODO: use some method of carl instead of cln::abs
-            typename Pol::NumberType termBcoeffAbs = cln::abs( (termB)->coeff() );
+            typename Pol::NumberType termAcoeffAbs = carl::abs( (termA)->coeff() );
+            typename Pol::NumberType termBcoeffAbs = carl::abs( (termB)->coeff() );
             termACoeffGreater = termAcoeffAbs > termBcoeffAbs; 
             termBCoeffGreater = termAcoeffAbs < termBcoeffAbs;
             if( termACoeffGreater ) 

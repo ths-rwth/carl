@@ -53,6 +53,21 @@ namespace carl
         return std::make_pair(lower,upper);
     }
     
+    std::pair<mpq_class, mpq_class> sqrt_fast(const mpq_class& a)
+    {
+        assert(a >= 0);
+        mpq_class exact_root;
+        if (carl::sqrtp(a, exact_root)) {
+            // root can be computed exactly.
+            return std::make_pair(exact_root, exact_root);
+        } else {
+            // compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
+            mpz_class lower( floor( sqrt( mpf_class( a ) ) ) );
+            mpz_class upper = lower + carl::constant_one<mpz_class>::get();
+            return std::make_pair(lower, upper);
+        }
+    }
+    
     template<>
     mpq_class rationalize<mpq_class>(const std::string& inputstring)
     {

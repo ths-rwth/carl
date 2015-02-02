@@ -138,8 +138,8 @@ bool AbstractRootFinder<Number>::solveTrivial() {
 				} else {
 					// Root is within interval (res.first, res.second)
 					Interval<Number> r(res.first, BoundType::STRICT, res.second, BoundType::STRICT);
-					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b - r) / (2*a)), false);
-					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (-b + r) / (2*a)), false);
+					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (Number(-b) - r) / Number(2*a)), false);
+					this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, (Number(-b) + r) / Number(2*a)), false);
 				}
 			}
 			break;

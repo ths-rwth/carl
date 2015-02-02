@@ -274,7 +274,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
-		factor = carl::quotient(*prefactor * lcoeff(), divisor.lcoeff());
+		factor = carl::quotient(Coeff(*prefactor * lcoeff()), divisor.lcoeff());
 		// There should be no remainder.
 		assert(factor * divisor.lcoeff() == *prefactor * lcoeff());
 	}
@@ -822,8 +822,8 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 		num = carl::gcd(num, getNum(tmp));
 		den = carl::lcm(den, getDenom(tmp));
 	}
-	assert(getDenom(max*den/num) == 1);
-	return getNum(max*den/num);
+	assert(getDenom(Coeff(max*den/num)) == 1);
+	return getNum(Coeff(max*den/num));
 }
 
 template<typename Coeff>
@@ -882,11 +882,13 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 	
 	// now, some coefficient * mainDenom is always integral.
 	// we convert such a product to an integral data type by getNum()
-	assert(getDenom(this->numericContent(0) * mainDenom) == 1);
-	IntNumberType res = getNum(this->numericContent(0) * mainDenom);
+	UnivariatePolynomial<Coeff>::NumberType c = this->numericContent(0) * mainDenom;
+	assert(getDenom(c) == 1);
+	IntNumberType res = getNum(c);
 	for (unsigned i = 1; i < this->mCoefficients.size(); i++) {
-		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
-		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
+		c = this->numericContent(i) * mainDenom;
+		assert(getDenom(c) == 1);
+		res = carl::gcd(getNum(c), res);
 	}
 	return NumberType(res) / mainDenom;
 }

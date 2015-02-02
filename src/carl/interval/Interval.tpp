@@ -215,34 +215,34 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
 	{
-                return this->isSubset(rhs);
-        }
+        return this->isSubset(rhs);
+    }
 	
-template<typename Number>
+    template<typename Number>
 	void Interval<Number>::bloat_by(const Number& width)
 	{
-                this->set(boost::numeric::widen(mContent, width));
+        this->set(boost::numeric::widen(mContent, width));
 	}
 
-template<typename Number>
-void Interval<Number>::shrink_by(const Number& width)
+    template<typename Number>
+    void Interval<Number>::shrink_by(const Number& width)
 	{
 		this->bloat_by(Number(-1)*width);
 	}
 
-template<typename Number>
-std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
+    template<typename Number>
+    std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
 	{
 		std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
-                if( this->isEmpty() || this->isPointInterval() )
-                {
-                    return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
-                }
+        if( this->isEmpty() || this->isPointInterval() )
+        {
+            return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
+        }
 		return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
 	}
 
-template<typename Number>
-std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
+    template<typename Number>
+    std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
 	{
 		std::list<Interval<Number> > result;
 		if(n == 0)
@@ -271,7 +271,7 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
 		return result;
 	}
 	
-template<typename Number>
+    template<typename Number>
 	std::string Interval<Number>::toString() const
 	{
 		std::ostringstream oss;
@@ -304,75 +304,177 @@ template<typename Number>
 
 template<typename Number>
 Interval<Number> Interval<Number>::add(const Interval<Number>& rhs) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		return Interval<Number>( mContent + rhs.content(),
-                              getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
-                              getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() ) );
-	}
+{
+    assert(this->isConsistent());
+    assert(rhs.isConsistent());
+    return Interval<Number>( mContent + rhs.content(),
+                          getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
+                          getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() ) );
+}
 
 template<typename Number>
 void Interval<Number>::add_assign(const Interval<Number>& rhs)
-	{
-		*this = this->add(rhs);
-	}
+{
+    *this = this->add(rhs);
+}
 
 template<typename Number>
 Interval<Number> Interval<Number>::sub(const Interval<Number>& rhs) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		return this->add(rhs.inverse());
-	}
+{
+    assert(this->isConsistent());
+    assert(rhs.isConsistent());
+    return this->add(rhs.inverse());
+}
 
 template<typename Number>
 void Interval<Number>::sub_assign(const Interval<Number>& rhs)
-	{
-		*this = this->sub(rhs);
-	}
+{
+    *this = this->sub(rhs);
+}
 
 template<typename Number>
 Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
 {
     assert(this->isConsistent());
     assert(rhs.isConsistent());
+    if( this->isEmpty() || rhs.isEmpty() ) return emptyInterval();
     BoundType lowerBoundType = BoundType::WEAK;
     BoundType upperBoundType = BoundType::WEAK;
-    // We apply the following multiplication:
-    //   <a,b>*<c,d> with <a, <c in {(-oo} u {(r |r in Q} u {[r |r in Q}
-    //               and b>, d> in   {oo)}  u {r) |r in Q} u {r] |r in Q}
-    // 1.) (r_1,r_2)*<c,d> or <a,b>*(r_3,r_4)
-    if((mLowerBoundType == BoundType::STRICT && mUpperBoundType == BoundType::STRICT) || (rhs.lowerBoundType() == BoundType::STRICT && rhs.upperBoundType() == BoundType::STRICT))
+    BoostInterval resultInterval;
+    // The following unfortunately copies the content of boost::interval::mul, but we need to get into the case distinction to find the right bound types
+    typename BoostIntervalPolicies::rounding rnd;
+    const Number& xl = this->lower();
+    const Number& xu = this->upper();
+    const Number& yl = rhs.lower();
+    const Number& yu = rhs.upper();
+    const BoundType& xlt = this->lowerBoundType();
+    const BoundType& xut = this->upperBoundType();
+    const BoundType& ylt = rhs.lowerBoundType();
+    const BoundType& yut = rhs.upperBoundType();
+
+    if (xl < carl::constant_zero<Number>().get())
     {
-        lowerBoundType = BoundType::STRICT;
-        upperBoundType = BoundType::STRICT;
+        if (xu > carl::constant_zero<Number>().get())
+        {
+            if (yl < carl::constant_zero<Number>().get())
+            {
+                if (yu > carl::constant_zero<Number>().get()) // M * M
+                {
+                    Number lowerA = rnd.mul_down(xl, yu);
+                    Number lowerB = rnd.mul_down(xu, yl);
+                    if( lowerA > lowerB )
+                    {
+                        lowerA = lowerB;
+                        lowerBoundType = getStrictestBoundType(xut, ylt);
+                    }
+                    else
+                    {
+                        lowerBoundType = getStrictestBoundType(xlt, yut);
+                    }
+                    Number upperA = rnd.mul_up(xl, yl);
+                    Number upperB = rnd.mul_up(xu, yu);
+                    if( upperA < upperB )
+                    {
+                        upperA = upperB;
+                        upperBoundType = getStrictestBoundType(xut, yut);
+                    }
+                    else
+                    {
+                        upperBoundType = getStrictestBoundType(xlt, ylt);
+                    }
+                    resultInterval = BoostInterval(lowerA, upperA, true);
+                }
+                else // M * N
+                {
+                    lowerBoundType = getStrictestBoundType(xut, ylt);
+                    upperBoundType = getStrictestBoundType(xlt, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yl), rnd.mul_up(xl, yl), true);
+                }
+            }
+            else
+            {
+                if (yu > carl::constant_zero<Number>().get()) // M * P
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, yut);
+                    upperBoundType = getStrictestBoundType(xut, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yu), rnd.mul_up(xu, yu), true);
+                }
+                else // M * Z
+                {
+                    resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+                }
+            }
+        }
+        else
+        {
+            if (yl < carl::constant_zero<Number>().get())
+            {
+                if (yu > carl::constant_zero<Number>().get()) // N * M
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, yut);
+                    upperBoundType = getStrictestBoundType(xlt, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yu), rnd.mul_up(xl, yl), true);
+                }
+                else // N * N
+                {
+                    lowerBoundType = getStrictestBoundType(xut, yut);
+                    upperBoundType = getStrictestBoundType(xlt, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yu), rnd.mul_up(xl, yl), true);
+                }
+            }
+            else
+            {
+                if (yu > carl::constant_zero<Number>().get()) // N * P
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, yut);
+                    upperBoundType = getStrictestBoundType(xut, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yu), rnd.mul_up(xu, yl), true);
+                }
+                else // N * Z
+                {
+                    resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+                }
+            }
+        }
     }
-    // 2.) <a,b>*<c,d> with a,b <= 0 or c,d <= 0   ->   resulting lower/upper bound is formed by the upper/lower bounds
-    else if( this->isNegative() || rhs.isNegative())
+    else
     {
-        if( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-            lowerBoundType = getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() );
-        if( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-            upperBoundType = getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() );
+        if (xu > carl::constant_zero<Number>().get())
+        {
+            if (yl < carl::constant_zero<Number>().get())
+            {
+                if (yu > carl::constant_zero<Number>().get()) // P * M
+                {
+                    lowerBoundType = getStrictestBoundType(xut, ylt);
+                    upperBoundType = getStrictestBoundType(xut, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yl), rnd.mul_up(xu, yu), true);
+                }
+                else // P * N
+                {
+                    lowerBoundType = getStrictestBoundType(xut, ylt);
+                    upperBoundType = getStrictestBoundType(xlt, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yl), rnd.mul_up(xl, yu), true);
+                }
+            }
+            else
+            {
+                if (yu > carl::constant_zero<Number>().get()) // P * P
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, ylt);
+                    upperBoundType = getStrictestBoundType(xut, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yl), rnd.mul_up(xu, yu), true);
+                }
+                else // P * Z
+                {
+                    resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+                }
+            }
+        }
+        else // Z * ?
+        {
+            resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+        }
     }
-    // 3.) <a,b>*<c,d> with a,b >= 0 or c,d >= 0   ->   resulting lower/upper bound is formed by the lower/upper bounds
-    else if( this->isPositive() || rhs.isPositive() )
-    {
-        if( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-            lowerBoundType = getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() );
-        if( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-            upperBoundType = getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() );
-    }
-        // 4.) 1.) - 3.) do not hold, but at least one bound is strict (then it must hold that a,c < 0 and b,d > 0)
-//        else if(mLowerBoundType == BoundType::STRICT || mUpperBoundType == BoundType::STRICT || rhs.lowerBoundType() == BoundType::STRICT || rhs.upperBoundType() == BoundType::STRICT)
-//        {
-            // if resulting lower bound min(a*d,b*c) = a*d -> type is the stricter of <a and d>
-            // if resulting lower bound min(a*d,b*c) = b*c -> type is the stricter of <b and c>
-            // if resulting upper bound max(a*c,b*d) = a*c -> type is the stricter of <a and c>
-            // if resulting upper bound max(a*c,b*d) = b*d -> type is the stricter of <b and d>
-//        }
-//        // 5.) otherwise resulting bounds are weak or infinite
     if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
        || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
        || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
@@ -387,7 +489,7 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
     {
         upperBoundType = BoundType::INFTY;
     }
-    return Interval<Number>(BoostInterval( mContent*rhs.content() ), lowerBoundType, upperBoundType );
+    return Interval<Number>(std::move(resultInterval), lowerBoundType, upperBoundType );
 }
 
 template<typename Number>
