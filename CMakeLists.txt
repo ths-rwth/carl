@@ -183,9 +183,9 @@ find_package(GMPXX REQUIRED)
 find_library(GMPXX_DYNAMIC NAMES libgmpxx.${DYNAMIC_EXT})
 find_library(GMPXX_STATIC NAMES libgmpxx.${STATIC_EXT})
 
-include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS} ${CLN_INCLUDE_DIR} ${Eigen3_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} )
-set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC} ${CLN_DYNAMIC} ${GMP_DYNAMIC} ${GMPXX_DYNAMIC})
-set(libs_static ${libs_static} ${Boost_STATIC} ${CLN_STATIC} ${GMP_STATIC} ${GMPXX_STATIC})
+include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS} ${CLN_INCLUDE_DIR} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
+set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC} ${CLN_DYNAMIC} ${GMPXX_DYNAMIC} ${GMP_DYNAMIC})
+set(libs_static ${libs_static} ${Boost_STATIC} ${CLN_STATIC} ${GMPXX_STATIC} ${GMP_STATIC})
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
