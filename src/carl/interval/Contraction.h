@@ -68,6 +68,10 @@ namespace carl {
                 if(result1 >= result2) {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result2));
+					if (variable.getType() == VariableType::VT_INT) {
+						resA = resA.integralPart();
+						resB = resB.integralPart();
+					}
                     if( resB.isEmpty() )
                     {
                         return false;
@@ -82,6 +86,10 @@ namespace carl {
                 {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result2));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result1));
+					if (variable.getType() == VariableType::VT_INT) {
+						resA = resA.integralPart();
+						resB = resB.integralPart();
+					}
                     if( resB.isEmpty() )
                     {
                         return false;
@@ -96,6 +104,9 @@ namespace carl {
             } else {
 //				std::cout << __func__ << ": result: " << result1 << std::endl;
                 resA = intervals.at(variable).intersect(centerInterval.sub(result1));
+				if (variable.getType() == VariableType::VT_INT) {
+					resA = resA.integralPart();
+				}
                 return false;
             }
         }
