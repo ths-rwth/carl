@@ -136,8 +136,8 @@ namespace carl
          */
         //typedef typename policies<Number>::checking checking;
         //typedef typename policies<Number>::rounding rounding;
-
-        typedef boost::numeric::interval< Number, boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP > > BoostInterval;
+        typedef boost::numeric::interval_lib::policies< typename policies<Number>::roundingP, typename policies<Number>::checkingP > BoostIntervalPolicies;
+        typedef boost::numeric::interval< Number, BoostIntervalPolicies > BoostInterval;
         typedef std::map<Variable, Interval<Number> > evalintervalmap;
 
         /// Macro to perform a quick check on the passed interval bounds.
