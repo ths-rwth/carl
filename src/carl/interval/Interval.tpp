@@ -34,7 +34,7 @@ Sign Interval<Number>::sgn() const
 template<typename Number>
 Interval<Number> Interval<Number>::integralPart() const
 {
-    return Interval<Number>(BoostInterval(ceil(mContent.lower()), floor(mContent.upper())), BoundType::WEAK, BoundType::WEAK);
+    return Interval<Number>(ceil(mContent.lower(), BoundType::WEAK, floor(mContent.upper()), BoundType::WEAK));
 }
 
 template<typename Number>

@@ -143,7 +143,7 @@ namespace carl
         /// Macro to perform a quick check on the passed interval bounds.
 #define BOUNDS_OK( lower, lowerBoundType, upper, upperBoundType )\
 (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY || lower <= upper)
-
+		
         /// Macro to perform a quick check for emptiness of the interval.
 #define IS_EMPTY(lower, lowerBoundType, upper, upperBoundType )\
 (((lowerBoundType == BoundType::STRICT && upperBoundType != BoundType::INFTY) || (lowerBoundType != BoundType::INFTY && upperBoundType == BoundType::STRICT)) && lower == upper)
@@ -221,7 +221,7 @@ namespace carl
         {
             if (BOUNDS_OK(content.lower(), lowerBoundType, content.upper(), upperBoundType))
             {
-                if (IS_EMPTY(content.lower(), lowerBoundType, content.upper(), upperBoundType))
+                if (IS_EMPTY(content.lower(), lowerBoundType, content.upper(), upperBoundType) )
                 {
                     mContent = BoostInterval(carl::constant_zero<Number>().get());
                     mLowerBoundType = BoundType::STRICT;
