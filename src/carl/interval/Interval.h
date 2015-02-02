@@ -926,16 +926,17 @@ namespace carl
          */
         inline void set(const Number& lower, const Number& upper)
         {
-	    if(lower <= upper) {
-		mContent = BoostInterval(lower, upper);
-		mLowerBoundType = BoundType::WEAK;
-		mUpperBoundType = BoundType::WEAK;
-	    }
-	    else {
-		mContent = BoostInterval(carl::constant_zero<Number>().get());
-		mLowerBoundType = BoundType::STRICT;
-		mUpperBoundType = BoundType::STRICT;
-	    }
+			if(isUnbounded()) {
+				mContent = BoostInterval(lower, upper);
+				mLowerBoundType = BoundType::WEAK;
+				mUpperBoundType = BoundType::WEAK;
+			} else if(lower <= upper) {
+				mContent = BoostInterval(lower, upper);
+			} else {
+			mContent = BoostInterval(carl::constant_zero<Number>().get());
+			mLowerBoundType = BoundType::STRICT;
+			mUpperBoundType = BoundType::STRICT;
+			}
         }
 
         /**
