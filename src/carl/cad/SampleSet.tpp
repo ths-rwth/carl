@@ -161,9 +161,7 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const SampleSet<Number>& s) {
-	os << "SampleSet " << &s << " with ordering " << s.ordering() << std::endl;
-	os << "samples: " << s.mSamples << std::endl;
-	os << "heap: " << s.mHeap << std::endl;
+	os << s.mSamples;
 	return os;
 }
 
