@@ -842,7 +842,7 @@ namespace carl
          */
         inline void setLower(const Number& n)
         {
-            this->set(BoostInterval(n, mContent.upper()));
+            this->set(n, mContent.upper());
         }
 
         /**
@@ -851,7 +851,7 @@ namespace carl
          */
         inline void setUpper(const Number& n)
         {
-            this->set(BoostInterval(mContent.lower(), n));
+            this->set(mContent.lower(), n);
         }
 
         /**
