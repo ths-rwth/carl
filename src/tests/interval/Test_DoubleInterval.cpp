@@ -569,6 +569,9 @@ TEST(DoubleInterval, Multiplication)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c8.mul( d12 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    
+    result  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ).mul(DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ));
+    EXPECT_EQ( DoubleInterval( 1, BoundType::STRICT, 4, BoundType::WEAK ), result );
 }
 
 
