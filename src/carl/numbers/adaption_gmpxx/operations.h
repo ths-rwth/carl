@@ -139,6 +139,7 @@ inline mpq_class abs(const mpq_class& n) {
 }
 
 inline mpz_class floor(const mpq_class& n) {
+	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
 	mpz_fdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
 	return res;
@@ -149,6 +150,7 @@ inline mpz_class floor(const mpz_class& n) {
 }
 
 inline mpz_class ceil(const mpq_class& n) {
+	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
 	mpz_cdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
 	return res;
