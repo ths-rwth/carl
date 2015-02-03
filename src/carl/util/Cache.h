@@ -242,6 +242,7 @@ namespace carl
             T* toDel = _toRemove->first;
             delete _toRemove;
             delete toDel;
+            assert( checkNumOfUnusedEntries() );
             return result;
         }
         
@@ -267,7 +268,21 @@ namespace carl
             auto result = mCache.erase( _toRemove );
             delete toDelB;
             delete toDel;
+            assert( checkNumOfUnusedEntries() );
             return result;
+        }
+        
+        bool checkNumOfUnusedEntries() const
+        {
+            unsigned actualNumOfUnusedEntries = 0;
+            for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
+            {
+                if( (*iter)->second.usageCount == 0 )
+                {
+                    ++actualNumOfUnusedEntries;
+                }
+            }
+            return mNumOfUnusedEntries == actualNumOfUnusedEntries;
         }
         
     };

@@ -77,6 +77,7 @@ namespace carl
                 delete newElement;
                 assert( (*retB.first)->second.refStoragePositions.size() > 0);
                 assert( (*retB.first)->second.refStoragePositions.front() > 0 );
+                assert( checkNumOfUnusedEntries() );
                 return std::make_pair( (*retB.first)->second.refStoragePositions.front(), false );
             }
             else
@@ -101,6 +102,7 @@ namespace carl
         }
         assert( (*ret.first)->second.refStoragePositions.size() > 0);
         assert( (*ret.first)->second.refStoragePositions.front() > 0 );
+        assert( checkNumOfUnusedEntries() );
         return std::make_pair( (*ret.first)->second.refStoragePositions.front(), ret.second );
     }
     
@@ -117,6 +119,7 @@ namespace carl
             --mNumOfUnusedEntries;
         }
         ++cacheRef->second.usageCount;
+        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
@@ -137,6 +140,7 @@ namespace carl
                 erase( cacheRef );
             }   
         }
+        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
@@ -155,6 +159,7 @@ namespace carl
             delete cacheRef->first;
         }
         mCacheRefs[_refStoragePos] = *(ret.first);
+        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
@@ -202,6 +207,7 @@ namespace carl
                     erase( *iter );
                 }
             }
+            assert( checkNumOfUnusedEntries() );
         }
     }
     
@@ -232,6 +238,7 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mMaxActivity < cacheRef->second.activity )
             mMaxActivity = cacheRef->second.activity;
+        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
