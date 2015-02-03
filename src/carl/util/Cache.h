@@ -229,6 +229,7 @@ namespace carl
         size_t erase( TypeInfoPair<T,Info>* _toRemove )
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
+            assert( checkNumOfUnusedEntries() );
             assert( _toRemove->second.usageCount == 0 );
             for( Ref ref : _toRemove->second.refStoragePositions )
             {
@@ -254,6 +255,7 @@ namespace carl
         typename Container::iterator erase( typename Container::iterator _toRemove )
         {
             std::lock_guard<std::recursive_mutex> lock( mMutex );
+            assert( checkNumOfUnusedEntries() );
             assert( (*_toRemove)->second.usageCount == 0 );
             for( Ref ref : (*_toRemove)->second.refStoragePositions )
             {
