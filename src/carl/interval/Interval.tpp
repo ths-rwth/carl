@@ -34,7 +34,7 @@ Sign Interval<Number>::sgn() const
 template<typename Number>
 Interval<Number> Interval<Number>::integralPart() const
 {
-    return Interval<Number>(BoostInterval(ceil(mContent.lower()), floor(mContent.upper())), mLowerBoundType, mUpperBoundType);
+    return Interval<Number>(ceil(mContent.lower()), BoundType::WEAK, floor(mContent.upper()), BoundType::WEAK);
 }
 
 template<typename Number>
@@ -219,27 +219,39 @@ template<typename Number>
     }
 	
     template<typename Number>
-	void Interval<Number>::bloat_by(const Number& width)
-	{
-        this->set(boost::numeric::widen(mContent, width));
+    void Interval<Number>::bloat_by(const Number& width)
+    {
+	if(!isUnbounded()){
+	    BoundType lowerTmp = mLowerBoundType;
+	    BoundType upperTmp = mUpperBoundType;
+	    this->set(boost::numeric::widen(mContent, width));
+	    mLowerBoundType = lowerTmp;
+	    mUpperBoundType = upperTmp;
+	} else if (mLowerBoundType != BoundType::INFTY) {
+	    this->set(boost::numeric::widen(mContent, width));
+	    mUpperBoundType = BoundType::INFTY;
+	} else if (mUpperBoundType != BoundType::INFTY) {
+	    this->set(boost::numeric::widen(mContent, width));
+	    mLowerBoundType = BoundType::INFTY;
 	}
+    }
 
     template<typename Number>
     void Interval<Number>::shrink_by(const Number& width)
-	{
-		this->bloat_by(Number(-1)*width);
-	}
+    {
+	this->bloat_by(Number(-1)*width);
+    }
 
     template<typename Number>
     std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
+    {
+	std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
+	if( this->isEmpty() || this->isPointInterval() )
 	{
-		std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
-        if( this->isEmpty() || this->isPointInterval() )
-        {
-            return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
-        }
-		return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
+	    return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
 	}
+	return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
+    }
 
     template<typename Number>
     std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
@@ -262,6 +274,7 @@ template<typename Number>
         for( unsigned i = 1; i < (n-1); ++i )
         {
             tmp.set(diameter*i, diameter*(i+1));
+	    tmp.setUpperBoundType(BoundType::STRICT);
             result.push_back(tmp);
         }
 		
