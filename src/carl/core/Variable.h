@@ -23,7 +23,7 @@ typedef unsigned exponent;
  * REAL: the reals
  * INT: the integers
  */
-enum class VariableType : unsigned { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_UNINTERPRETED, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
+enum class VariableType : unsigned { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 /**
  * Streaming operator for VariableType.
@@ -37,6 +37,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 		case VariableType::VT_REAL: return os << "Real";
 		case VariableType::VT_INT: return os << "Int";
 		case VariableType::VT_UNINTERPRETED: return os << "Uninterpreted";
+		case VariableType::VT_BITVECTOR: return os << "Bitvector";
 		default: return os << "Invalid " << unsigned(t);
 	}
 	return os << "Unknown";
