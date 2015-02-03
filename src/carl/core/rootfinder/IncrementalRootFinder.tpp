@@ -232,7 +232,7 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	// Create companion matrix
 	unsigned int degree = p.degree();
 	Eigen::MatrixXd m = Eigen::MatrixXd::Zero(degree, degree);
-	m(0, degree-1) = toDouble(Number()-p.coefficients()[0] / p.coefficients()[degree]));
+	m(0, degree-1) = toDouble(Number(-p.coefficients()[0] / p.coefficients()[degree]));
 	for (unsigned int i = 1; i < degree; i++) {
 		m(i, i-1) = 1;
 		m(i, degree-1) = toDouble(Number(-p.coefficients()[i] / p.coefficients()[degree]));
