@@ -73,7 +73,7 @@ namespace carl
                 element->first->rehash();
                 auto retB = mCache.insert( element );
                 assert( retB.second );
-                for( Ref ref : element->second.refStoragePositions )
+                for( const Ref& ref : element->second.refStoragePositions )
                     mCacheRefs[ref] = *retB.first;
                 delete newElement;
                 assert( (*retB.first)->second.refStoragePositions.size() > 0);
@@ -161,7 +161,12 @@ namespace carl
         auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
+            if ((*ret.first)->second.usageCount == 0)
+            {
+                --mNumOfUnusedEntries;
+            }
             (*ret.first)->second.usageCount += cacheRef->second.usageCount;
+            assert( checkNumOfUnusedEntries() );
             delete cacheRef->first;
         }
         mCacheRefs[_refStoragePos] = *(ret.first);
