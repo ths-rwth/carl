@@ -75,9 +75,11 @@ namespace carl
                 for( const Ref& ref : element->second.refStoragePositions )
                     mCacheRefs[ref] = *retB.first;
                 delete newElement;
-                assert( (*retB.first)->second.refStoragePositions.size() > 0);
-                assert( (*retB.first)->second.refStoragePositions.front() > 0 );
-                return std::make_pair( (*retB.first)->second.refStoragePositions.front(), false );
+                Info& info = (*retB.first)->second;
+                assert( info.refStoragePositions.size() > 0);
+                assert( info.refStoragePositions.front() > 0 );
+                info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
+                return std::make_pair( info.refStoragePositions.front(), false );
             }
             else
                 delete newElement;
@@ -151,19 +153,32 @@ namespace carl
         assert( cacheRef != nullptr );
         mCache.erase( cacheRef );
         cacheRef->first->rehash();
+        const Info& infoB = cacheRef->second;
         auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
-            if ((*ret.first)->second.usageCount == 0)
+            Info& info = (*ret.first)->second;
+            if( info.usageCount == 0 && infoB.usageCount > 0 )
             {
-                --mNumOfUnusedEntries;
+                assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
+                mNumOfUnusedEntries -= info.refStoragePositions.size();
             }
-            assert( (*ret.first)->second.usageCount + cacheRef->second.usageCount >= (*ret.first)->second.usageCount );
-            (*ret.first)->second.usageCount += cacheRef->second.usageCount;
+            else if( infoB.usageCount == 0 && info.usageCount > 0 )
+            {
+                assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
+                mNumOfUnusedEntries -= infoB.refStoragePositions.size();
+            }
+            assert( info.usageCount + infoB.usageCount >= info.usageCount );
+            info.usageCount += infoB.usageCount;
+            info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
             delete cacheRef->first;
         }
-        for( const Ref& ref : cacheRef->second.refStoragePositions )
+        assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
+        for( const Ref& ref : infoB.refStoragePositions )
             mCacheRefs[ref] = *(ret.first);
+        if( !ret.second )
+            delete cacheRef;
+        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
