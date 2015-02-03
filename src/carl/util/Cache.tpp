@@ -125,6 +125,7 @@ namespace carl
     template<typename T>
     void Cache<T>::dereg( Ref _refStoragePos )
     {
+        assert( checkNumOfUnusedEntries() );
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
@@ -138,7 +139,9 @@ namespace carl
             if( mCache.size() - mNumOfUnusedEntries >= mMaxCacheSize )
             {
                 erase( cacheRef );
-            }   
+                assert( checkNumOfUnusedEntries() );
+            }
+            assert( checkNumOfUnusedEntries() );
         }
         assert( checkNumOfUnusedEntries() );
     }
