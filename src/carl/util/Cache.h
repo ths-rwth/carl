@@ -153,7 +153,8 @@ namespace carl
         // The constructor.
         Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
         Cache( const Cache& ) = delete; // no implementation
-        
+        Cache& operator=( const Cache& ) = delete; // no implementation
+
         ~Cache();
         
         /**
@@ -231,7 +232,7 @@ namespace carl
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( checkNumOfUnusedEntries() );
             assert( _toRemove->second.usageCount == 0 );
-            for( Ref ref : _toRemove->second.refStoragePositions )
+            for( const Ref& ref : _toRemove->second.refStoragePositions )
             {
                 mCacheRefs[ref] = nullptr;
                 assert (ref > 0);
@@ -239,6 +240,7 @@ namespace carl
             }
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
+            assert(_toRemove->second.usageCount == 0);
             auto result = mCache.erase( _toRemove );
             T* toDel = _toRemove->first;
             delete _toRemove;
@@ -257,7 +259,7 @@ namespace carl
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( checkNumOfUnusedEntries() );
             assert( (*_toRemove)->second.usageCount == 0 );
-            for( Ref ref : (*_toRemove)->second.refStoragePositions )
+            for( const Ref& ref : (*_toRemove)->second.refStoragePositions )
             {
                 mCacheRefs[ref] = nullptr;
                 assert (ref > 0);
@@ -265,6 +267,7 @@ namespace carl
             }
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
+            assert((*_toRemove)->second.usageCount == 0);
             T* toDel = (*_toRemove)->first;
             TypeInfoPair<T,Info>* toDelB = *_toRemove;
             auto result = mCache.erase( _toRemove );
@@ -276,7 +279,7 @@ namespace carl
         
         bool checkNumOfUnusedEntries() const
         {
-            unsigned actualNumOfUnusedEntries = 0;
+            size_t actualNumOfUnusedEntries = 0;
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
             {
                 if( (*iter)->second.usageCount == 0 )

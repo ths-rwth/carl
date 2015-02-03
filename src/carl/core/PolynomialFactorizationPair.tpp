@@ -332,6 +332,14 @@ namespace carl
     template<typename P>
     Factorization<P> gcd( const PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, Factorization<P>& _restA, Factorization<P>& _restB, typename P::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined )
     {
+        std::cout << "at entry: " << std::endl;
+        std::cout << "_pfPairA: " << _pfPairA << std::endl;
+        std::cout << "_pfPairB: " << _pfPairB << std::endl;
+        std::cout << "_restA: " << _restA << std::endl;
+        std::cout << "_restB: " << _restB << std::endl;
+        std::cout << "_coeff:" << _coeff << std::endl;
+        std::cout << "_pfPairARefined: " << _pfPairARefined << std::endl;
+
         if( &_pfPairA == &_pfPairB )
             return _pfPairA.factorization();
 
@@ -498,6 +506,14 @@ namespace carl
         assert( _pfPairA.assertFactorization() );
         assert( _pfPairB.assertFactorization() );
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "GCD (internal) of " << _pfPairA << " and " << _pfPairB << ": " << result << " with rests " << _restA << " and " << _restB );
+        std::cout << "at end: " << std::endl;
+        std::cout << "_pfPairA: " << _pfPairA << std::endl;
+        std::cout << "_pfPairB: " << _pfPairB << std::endl;
+        std::cout << "_restA: " << _restA << std::endl;
+        std::cout << "_restB: " << _restB << std::endl;
+        std::cout << "_coeff:" << _coeff << std::endl;
+        std::cout << "_pfPairARefined: " << _pfPairARefined << std::endl;
+        std::cout << computePolynomial( result ) << " * " << computePolynomial( _restA ) << " == " << computePolynomial( _pfPairA ) << " failed." << std::endl;
         assert( computePolynomial( result ) * computePolynomial( _restA ) == computePolynomial( _pfPairA ) );
         assert( computePolynomial( result ) * computePolynomial( _restB ) == computePolynomial( _pfPairB ) );
 
