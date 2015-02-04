@@ -159,6 +159,8 @@ namespace carl
     {
         assert( checkNumOfUnusedEntries() );
         size_t tmpSumUC = sumOfAllUsageCounts();
+        std::stringstream s;
+        print( s );
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
@@ -199,6 +201,8 @@ namespace carl
             delete cacheRef;
         if( tmpSumUC != sumOfAllUsageCounts() )
         {
+            std::cout << s.str() << std::endl;
+            print();
             std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
         }
         assert( tmpSumUC == sumOfAllUsageCounts() );
@@ -288,30 +292,30 @@ namespace carl
     }
     
     template<typename T>
-    void Cache<T>::print() const
+    void Cache<T>::print( std::ostream& _out ) const
     {
-        std::cout << "General cache information:" << std::endl;
-        std::cout << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
-        std::cout << "   number of unused entries                                   : "  << mNumOfUnusedEntries << std::endl;
-        std::cout << "   desired reduction amount when cleaning the cache (not used): "  << mCacheReductionAmount << std::endl;
-        std::cout << "   maximum of all activities                                  : "  << mMaxActivity << std::endl;
-        std::cout << "   the current value of the activity increment                : "  << mActivityIncrement << std::endl;
-        std::cout << "   decay factor for the given activities                      : "  << mDecay << std::endl;
-        std::cout << "   upper bound of the activities                              : "  << mActivityThreshold << std::endl;
-        std::cout << "   scaling factor of the activities                           : "  << mActivityDecrementFactor << std::endl;
-        std::cout << "   current size of the cache                                  : "  << mCache.size() << std::endl;
-        std::cout << "   number of yet involved references                          : "  << mCacheRefs.size() << std::endl;
-        std::cout << "   number of currently freed references                       : "  << mUnusedPositionsInCacheRefs.size() << std::endl;
-        std::cout << "Cache contains:" << std::endl;
+        _out << "General cache information:" << std::endl;
+        _out << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
+        _out << "   number of unused entries                                   : "  << mNumOfUnusedEntries << std::endl;
+        _out << "   desired reduction amount when cleaning the cache (not used): "  << mCacheReductionAmount << std::endl;
+        _out << "   maximum of all activities                                  : "  << mMaxActivity << std::endl;
+        _out << "   the current value of the activity increment                : "  << mActivityIncrement << std::endl;
+        _out << "   decay factor for the given activities                      : "  << mDecay << std::endl;
+        _out << "   upper bound of the activities                              : "  << mActivityThreshold << std::endl;
+        _out << "   scaling factor of the activities                           : "  << mActivityDecrementFactor << std::endl;
+        _out << "   current size of the cache                                  : "  << mCache.size() << std::endl;
+        _out << "   number of yet involved references                          : "  << mCacheRefs.size() << std::endl;
+        _out << "   number of currently freed references                       : "  << mUnusedPositionsInCacheRefs.size() << std::endl;
+        _out << "Cache contains:" << std::endl;
         for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
         {
             assert( (*iter)->first != nullptr );
-            std::cout << "   " << *(*iter)->first << std::endl;
-            std::cout << "                       usage count: " << (*iter)->second.usageCount << std::endl;
-            std::cout << "        reference storage positions:";
+            _out << "   " << *(*iter)->first << std::endl;
+            _out << "                       usage count: " << (*iter)->second.usageCount << std::endl;
+            _out << "        reference storage positions:";
             for( Ref ref : (*iter)->second.refStoragePositions )
-                std::cout << "  " << ref;
-            std::cout << "                          activity: " << (*iter)->second.activity << std::endl;
+                _out << "  " << ref;
+            _out << "                          activity: " << (*iter)->second.activity << std::endl;
         }
     }
     
