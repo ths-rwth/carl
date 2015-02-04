@@ -201,8 +201,9 @@ namespace carl
         
         /**
          * Prints all information stored in this cache to std::cout.
+         * @param _out The stream to print on.
          */
-        void print() const;
+        void print( std::ostream& _out = std::cout ) const;
         
         /**
          * @param _refStoragePos The reference of the entry to obtain the object from. 

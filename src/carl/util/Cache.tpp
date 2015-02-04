@@ -159,9 +159,13 @@ namespace carl
     {
         assert( checkNumOfUnusedEntries() );
         size_t tmpSumUC = sumOfAllUsageCounts();
+        std::stringstream s;
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
+        s << "_refStoragePos = " << _refStoragePos << std::endl;
+        s << "cacheRef->second.usageCount = " << cacheRef->second.usageCount << std::endl;
+        print( s );
         assert( cacheRef != nullptr );
         mCache.erase( cacheRef );
         cacheRef->first->rehash();
@@ -169,14 +173,17 @@ namespace carl
         auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
+            s << __func__ << ":" << __LINE__ << std::endl;
             Info& info = (*ret.first)->second;
             if( info.usageCount == 0 && infoB.usageCount > 0 )
             {
+                s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
                 mNumOfUnusedEntries -= info.refStoragePositions.size();
             }
             else if( infoB.usageCount == 0 && info.usageCount > 0 )
             {
+                s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
                 mNumOfUnusedEntries -= infoB.refStoragePositions.size();
             }
@@ -195,8 +202,17 @@ namespace carl
         assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
         for( const Ref& ref : infoB.refStoragePositions )
             mCacheRefs[ref] = *(ret.first);
+        if( tmpSumUC != sumOfAllUsageCounts() )
+        {
+            std::cout << s.str() << std::endl;
+            print();
+            std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
+        }
         if( !ret.second )
+        {
+            s << __func__ << ":" << __LINE__ << std::endl;
             delete cacheRef;
+        }
         if( tmpSumUC != sumOfAllUsageCounts() )
         {
             std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
@@ -288,30 +304,30 @@ namespace carl
     }
     
     template<typename T>
-    void Cache<T>::print() const
+    void Cache<T>::print( std::ostream& _out ) const
     {
-        std::cout << "General cache information:" << std::endl;
-        std::cout << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
-        std::cout << "   number of unused entries                                   : "  << mNumOfUnusedEntries << std::endl;
-        std::cout << "   desired reduction amount when cleaning the cache (not used): "  << mCacheReductionAmount << std::endl;
-        std::cout << "   maximum of all activities                                  : "  << mMaxActivity << std::endl;
-        std::cout << "   the current value of the activity increment                : "  << mActivityIncrement << std::endl;
-        std::cout << "   decay factor for the given activities                      : "  << mDecay << std::endl;
-        std::cout << "   upper bound of the activities                              : "  << mActivityThreshold << std::endl;
-        std::cout << "   scaling factor of the activities                           : "  << mActivityDecrementFactor << std::endl;
-        std::cout << "   current size of the cache                                  : "  << mCache.size() << std::endl;
-        std::cout << "   number of yet involved references                          : "  << mCacheRefs.size() << std::endl;
-        std::cout << "   number of currently freed references                       : "  << mUnusedPositionsInCacheRefs.size() << std::endl;
-        std::cout << "Cache contains:" << std::endl;
+        _out << "General cache information:" << std::endl;
+        _out << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
+        _out << "   number of unused entries                                   : "  << mNumOfUnusedEntries << std::endl;
+        _out << "   desired reduction amount when cleaning the cache (not used): "  << mCacheReductionAmount << std::endl;
+        _out << "   maximum of all activities                                  : "  << mMaxActivity << std::endl;
+        _out << "   the current value of the activity increment                : "  << mActivityIncrement << std::endl;
+        _out << "   decay factor for the given activities                      : "  << mDecay << std::endl;
+        _out << "   upper bound of the activities                              : "  << mActivityThreshold << std::endl;
+        _out << "   scaling factor of the activities                           : "  << mActivityDecrementFactor << std::endl;
+        _out << "   current size of the cache                                  : "  << mCache.size() << std::endl;
+        _out << "   number of yet involved references                          : "  << mCacheRefs.size() << std::endl;
+        _out << "   number of currently freed references                       : "  << mUnusedPositionsInCacheRefs.size() << std::endl;
+        _out << "Cache contains:" << std::endl;
         for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
         {
             assert( (*iter)->first != nullptr );
-            std::cout << "   " << *(*iter)->first << std::endl;
-            std::cout << "                       usage count: " << (*iter)->second.usageCount << std::endl;
-            std::cout << "        reference storage positions:";
+            _out << "   " << *(*iter)->first << std::endl;
+            _out << "                       usage count: " << (*iter)->second.usageCount << std::endl;
+            _out << "        reference storage positions:";
             for( Ref ref : (*iter)->second.refStoragePositions )
-                std::cout << "  " << ref;
-            std::cout << "                          activity: " << (*iter)->second.activity << std::endl;
+                _out << "  " << ref;
+            _out << "                          activity: " << (*iter)->second.activity << std::endl;
         }
     }
     
