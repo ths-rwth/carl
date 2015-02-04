@@ -183,6 +183,12 @@ namespace carl
             assert( info.usageCount + infoB.usageCount >= info.usageCount );
             info.usageCount += infoB.usageCount;
             info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
+            if( tmpSumUC != sumOfAllUsageCounts() )
+            {
+                std::cout << "info.usageCount = " << info.usageCount << std::endl;
+                std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
+            }
+            assert( tmpSumUC == sumOfAllUsageCounts() );
             assert( checkNumOfUnusedEntries() );
             delete cacheRef->first;
         }
@@ -191,6 +197,10 @@ namespace carl
             mCacheRefs[ref] = *(ret.first);
         if( !ret.second )
             delete cacheRef;
+        if( tmpSumUC != sumOfAllUsageCounts() )
+        {
+            std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
+        }
         assert( tmpSumUC == sumOfAllUsageCounts() );
         assert( checkNumOfUnusedEntries() );
     }
