@@ -242,10 +242,10 @@ TEST(RationalFunction, Derivative)
     sp.setVariables({"x", "y", "z"});
     
 	// from http://de.wikipedia.org/wiki/Quotientenregel#Beispiel
-    Pol p1 = sp.parseMultivariatePolynomial<Rational>("1*x*x + -1");
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("1*x^2 + -1");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("2 + -3*x");
     
-    Pol p3 = sp.parseMultivariatePolynomial<Rational>("-3*x*x + 4*x + -3");
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("-3*x^2 + 4*x + -3");
 
 	std::shared_ptr<CachePol> pCache( new CachePol );
 	FPol fp1(p1, pCache);

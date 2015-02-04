@@ -24,11 +24,18 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	assert(!mp1.isZero());
 	assert(!mp2.isZero());
 	// We start with some trivial cases.
-	if(mp1.isOne() || mp2.isOne()) return Polynomial(1);
-	if(is_field<C>::value && (mp1.isConstant() || mp2.isConstant()))
+	if(mp1.isOne() || mp2.isOne())
+    {
+        return Polynomial(1);
+    }
+	if(is_field<C>::value && mp1.isConstant())
 	{
-		return Polynomial(1);
+		return Polynomial(carl::gcd( mp2.constantPart(), carl::constant_one<C>().get()/mp1.coprimeFactor() ));
 	}
+    if(is_field<C>::value && mp2.isConstant())
+    {
+		return Polynomial(carl::gcd( mp2.constantPart(), carl::constant_one<C>().get()/mp1.coprimeFactor() ));
+    }
 	if(mp1.nrTerms() == 1 && mp2.nrTerms() == 1)
 	{
 		return Polynomial(Term<C>::gcd(mp1.lterm(), mp2.lterm()));

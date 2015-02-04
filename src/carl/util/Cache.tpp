@@ -53,8 +53,6 @@ namespace carl
     template<typename T>
     std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
-        assert( checkNumOfUnusedEntries() );
-        size_t tmpSumUC = sumOfAllUsageCounts();
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mCache.size() >= mMaxCacheSize ) // Clean, if the number of elements in the cache exceeds the threshold.
         {
@@ -81,8 +79,6 @@ namespace carl
                 assert( info.refStoragePositions.size() > 0);
                 assert( info.refStoragePositions.front() > 0 );
                 info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
-                assert( tmpSumUC == sumOfAllUsageCounts() );
-                assert( checkNumOfUnusedEntries() );
                 return std::make_pair( info.refStoragePositions.front(), false );
             }
             else
@@ -108,15 +104,12 @@ namespace carl
         }
         assert( (*ret.first)->second.refStoragePositions.size() > 0);
         assert( (*ret.first)->second.refStoragePositions.front() > 0 );
-        assert( tmpSumUC == sumOfAllUsageCounts() );
-        assert( checkNumOfUnusedEntries() );
         return std::make_pair( (*ret.first)->second.refStoragePositions.front(), ret.second );
     }
     
     template<typename T>
     void Cache<T>::reg( Ref _refStoragePos )
     {
-        assert( checkNumOfUnusedEntries() );
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
@@ -128,13 +121,11 @@ namespace carl
         }
         assert( cacheRef->second.usageCount < std::numeric_limits<ContentType>::max() );
         ++cacheRef->second.usageCount;
-        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
     void Cache<T>::dereg( Ref _refStoragePos )
     {
-        assert( checkNumOfUnusedEntries() );
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
@@ -151,21 +142,14 @@ namespace carl
                 erase( cacheRef );
             }
         }
-        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
     void Cache<T>::rehash( Ref _refStoragePos )
     {
-        assert( checkNumOfUnusedEntries() );
-        size_t tmpSumUC = sumOfAllUsageCounts();
-        std::stringstream s;
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
-        s << "_refStoragePos = " << _refStoragePos << std::endl;
-        s << "cacheRef->second.usageCount = " << cacheRef->second.usageCount << std::endl;
-        print( s );
         assert( cacheRef != nullptr );
         mCache.erase( cacheRef );
         cacheRef->first->rehash();
@@ -173,42 +157,24 @@ namespace carl
         auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
-            s << __func__ << ":" << __LINE__ << std::endl;
             Info& info = (*ret.first)->second;
-            s << "info.usageCount = " << info.usageCount << std::endl;
-            s << "infoB.usageCount = " << infoB.usageCount << std::endl;
             if( infoB.usageCount == 0 )
             {
-                s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
                 --mNumOfUnusedEntries;
             }
             else if( info.usageCount == 0 )
             {
-                s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
                 --mNumOfUnusedEntries;
             }
-            s << "info.usageCount = " << info.usageCount << std::endl;
-            s << "infoB.usageCount = " << infoB.usageCount << std::endl;
             assert( info.usageCount + infoB.usageCount >= info.usageCount );
             info.usageCount += infoB.usageCount;
             info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
-            assert( tmpSumUC == sumOfAllUsageCounts() );
-            if( !checkNumOfUnusedEntries() )
-            {
-                std::cout << s.str() << std::endl;
-                print();
-                std::cout << "info.usageCount = " << info.usageCount << std::endl;
-                std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
-            }
-            assert( checkNumOfUnusedEntries() );
         }
         assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
         for( const Ref& ref : infoB.refStoragePositions )
             mCacheRefs[ref] = *(ret.first);
-        assert( tmpSumUC == sumOfAllUsageCounts() );
-        assert( checkNumOfUnusedEntries() );
         if( !ret.second )
         {
             delete cacheRef->first;
@@ -219,7 +185,6 @@ namespace carl
     template<typename T>
     void Cache<T>::clean()
     {
-        assert( checkNumOfUnusedEntries() );
         CARL_LOG_TRACE( "carl.util.cache", "Cleaning cache..." );
         if( mNumOfUnusedEntries < ((double) mCache.size() * mCacheReductionAmount) )
         {
@@ -239,7 +204,6 @@ namespace carl
                 }
             }
             assert( mNumOfUnusedEntries == 0 );
-            assert( checkNumOfUnusedEntries() );
         }
         else
         {
@@ -263,7 +227,6 @@ namespace carl
                     erase( *iter );
                 }
             }
-            assert( checkNumOfUnusedEntries() );
         }
     }
     
@@ -277,7 +240,6 @@ namespace carl
     template<typename T>
     void Cache<T>::strengthenActivity( Ref _refStoragePos )
     {
-        assert( checkNumOfUnusedEntries() );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
         assert( cacheRef != nullptr );
@@ -295,7 +257,6 @@ namespace carl
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mMaxActivity < cacheRef->second.activity )
             mMaxActivity = cacheRef->second.activity;
-        assert( checkNumOfUnusedEntries() );
     }
     
     template<typename T>
