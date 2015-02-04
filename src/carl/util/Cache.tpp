@@ -197,7 +197,6 @@ namespace carl
             }
             assert( tmpSumUC == sumOfAllUsageCounts() );
             assert( checkNumOfUnusedEntries() );
-            delete cacheRef->first;
         }
         assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
         for( const Ref& ref : infoB.refStoragePositions )
@@ -208,17 +207,18 @@ namespace carl
             print();
             std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
         }
-        if( !ret.second )
-        {
-            s << __func__ << ":" << __LINE__ << std::endl;
-            delete cacheRef;
-        }
         if( tmpSumUC != sumOfAllUsageCounts() )
         {
             std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
         }
         assert( tmpSumUC == sumOfAllUsageCounts() );
         assert( checkNumOfUnusedEntries() );
+        if( !ret.second )
+        {
+            s << __func__ << ":" << __LINE__ << std::endl;
+            delete cacheRef->first;
+            delete cacheRef;
+        }
     }
     
     template<typename T>
