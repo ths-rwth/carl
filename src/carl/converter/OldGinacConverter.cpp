@@ -169,7 +169,8 @@ namespace carl
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
         gatherVariables(polyA, carlToGinacVarMap, ginacToCarlVarMap);
-        return polyA == convertToCarl(convertToGinac(polyA, carlToGinacVarMap), ginacToCarlVarMap);  
+        MultivariatePolynomial<cln::cl_RA> result = convertToCarl(convertToGinac(polyA, carlToGinacVarMap), ginacToCarlVarMap);
+        return polyA == result;  
     }
 
     bool ginacDivide(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB, MultivariatePolynomial<cln::cl_RA>& result)
