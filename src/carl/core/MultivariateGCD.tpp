@@ -13,7 +13,6 @@
 
 #include "MultivariatePolynomial.h"
 #include "VariablesInformation.h"
-#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
@@ -50,7 +49,9 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	// gcd(p, ay + b) is either ay + b or 1.
     
     #ifdef COMPARE_WITH_GINAC
-    return ginacGcd( mp1, mp2 );
+    std::lock_guard<std::mutex> lock(mGinacMutex);
+    typedef MultivariatePolynomial<C,O,P> PolyT;
+    return ginacGcd<PolyT>( mp1, mp2 );
     #else 
 	Variable x = getMainVar(mp1, mp2);
 	if(x == Variable::NO_VARIABLE)
@@ -102,9 +103,7 @@ MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const 
 {
 	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
 #ifdef COMPARE_WITH_GINAC
-	assert(checkConversion(a));
-	assert(checkConversion(b));
-    assert(ginacGcd(a,b) == gcd_calc.calculate());
+    assert( gcd_calc.checkCorrectnessWithGinac() );
 #endif 
 	return gcd_calc.calculate();
 }

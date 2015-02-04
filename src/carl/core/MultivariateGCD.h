@@ -8,8 +8,10 @@
 
 #pragma once
 
+#include <mutex>
 #include "MonomialOrdering.h"
 #include "MultivariatePolynomialPolicy.h"
+#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
@@ -77,6 +79,11 @@ struct GCDResult
 template<typename GCDCalculation, typename Coeff, typename Ordering= GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariateGCD : GCDCalculation
 {
+    public:
+    template<typename C, typename O, typename P>
+    friend MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
+    
+    private:
 	typedef GCDResult<Coeff,Ordering,Policies> Result;
 	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
 	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
@@ -84,6 +91,9 @@ class MultivariateGCD : GCDCalculation
 	
 	const Polynomial& mp1;
 	const Polynomial& mp2;
+    #ifdef COMPARE_WITH_GINAC
+    std::mutex mGinacMutex;
+    #endif
 	
 	public:
 	MultivariateGCD(const MultivariatePolynomial<Coeff,Ordering,Policies>& p1,const MultivariatePolynomial<Coeff,Ordering,Policies>& p2)
@@ -123,7 +133,18 @@ class MultivariateGCD : GCDCalculation
 			return *common.begin();
 		}
 		
-	}	
+	}
+    
+    #ifdef COMPARE_WITH_GINAC
+    bool checkCorrectnessWithGinac()
+    {
+        std::lock_guard<std::mutex> lock(mGinacMutex);
+        if(!checkConversion<Polynomial>(mp1)) return false;
+        if(!checkConversion<Polynomial>(mp2)) return false;
+        if(ginacGcd<Polynomial>(mp1,mp2) != calculate()) return false;
+        return true;
+    }
+    #endif
 		
 };
 
