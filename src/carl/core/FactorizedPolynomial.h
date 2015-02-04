@@ -269,6 +269,25 @@ namespace carl
                 return;
             content().gatherVariables( _vars );
         }
+		
+		/**
+		 * Derivative of the factorized polynomial wrt variable x
+		 * @param x main variable
+		 * @param nth how often should derivative be applied
+		 * 
+		 * @todo only nth == 1 is supported
+		 * @todo we do not use factorization currently
+		 */
+		FactorizedPolynomial<P> derivative(const carl::Variable& x, unsigned nth = 1) const;
+		
+		/**
+		 * Raise polynomial to the power 
+         * @param exponent the exponent of the power
+         * @return p^exponent
+		 * 
+		 * @todo uses multiplication -> bad idea.
+         */
+		FactorizedPolynomial<P> pow(unsigned exponent) const;
 
         /**
          * Choose a non-null cache from two caches.
