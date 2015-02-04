@@ -160,10 +160,12 @@ namespace carl
         assert( checkNumOfUnusedEntries() );
         size_t tmpSumUC = sumOfAllUsageCounts();
         std::stringstream s;
-        print( s );
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
+        s << "_refStoragePos = " << _refStoragePos << std::endl;
+        s << "cacheRef->second.usageCount = " << cacheRef->second.usageCount << std::endl;
+        print( s );
         assert( cacheRef != nullptr );
         mCache.erase( cacheRef );
         cacheRef->first->rehash();
@@ -171,14 +173,17 @@ namespace carl
         auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
+            s << __func__ << ":" << __LINE__ << std::endl;
             Info& info = (*ret.first)->second;
             if( info.usageCount == 0 && infoB.usageCount > 0 )
             {
+                s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
                 mNumOfUnusedEntries -= info.refStoragePositions.size();
             }
             else if( infoB.usageCount == 0 && info.usageCount > 0 )
             {
+                s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
                 mNumOfUnusedEntries -= infoB.refStoragePositions.size();
             }
@@ -197,12 +202,19 @@ namespace carl
         assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
         for( const Ref& ref : infoB.refStoragePositions )
             mCacheRefs[ref] = *(ret.first);
-        if( !ret.second )
-            delete cacheRef;
         if( tmpSumUC != sumOfAllUsageCounts() )
         {
             std::cout << s.str() << std::endl;
             print();
+            std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
+        }
+        if( !ret.second )
+        {
+            s << __func__ << ":" << __LINE__ << std::endl;
+            delete cacheRef;
+        }
+        if( tmpSumUC != sumOfAllUsageCounts() )
+        {
             std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
         }
         assert( tmpSumUC == sumOfAllUsageCounts() );
