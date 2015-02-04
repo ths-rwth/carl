@@ -36,31 +36,36 @@ Interval<Number> Interval<Number>::integralPart() const
 {
 	Number newLowerBound = 0;
 	Number newUpperBound = 0;
+	BoundType newLowerBoundType = mLowerBoundType;
+	BoundType newUpperBoundType = mUpperBoundType;
+	
 	switch(mLowerBoundType) {
 		case BoundType::WEAK:
 			newLowerBound = ceil(mContent.lower());
+			newLowerBoundType = BoundType::WEAK;
 			break;
 		case BoundType::STRICT:
 			newLowerBound = ceil(mContent.lower());
+			newLowerBoundType = BoundType::WEAK;
 			if(newLowerBound == ceil(mContent.lower()))
 				newLowerBound += 1;
-			break;
 		default:
 			break;
 	}
 	switch(mUpperBoundType) {
 		case BoundType::WEAK:
 			newUpperBound = floor(mContent.upper());
+			newLowerBoundType = BoundType::WEAK;
 			break;
 		case BoundType::STRICT:
 			newUpperBound = floor(mContent.upper());
+			newLowerBoundType = BoundType::WEAK;
 			if(newUpperBound == floor(mContent.upper()))
 				newLowerBound -= 1;
-			break;
 		default:
 			break;
 	}
-	return Interval<Number>(newLowerBound, BoundType::WEAK, newUpperBound, BoundType::WEAK);
+	return Interval<Number>(newLowerBound, newLowerBoundType, newUpperBound, newUpperBoundType);
 }
 
 template<typename Number>
