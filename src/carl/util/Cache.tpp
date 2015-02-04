@@ -177,17 +177,17 @@ namespace carl
             Info& info = (*ret.first)->second;
             s << "info.usageCount = " << info.usageCount << std::endl;
             s << "infoB.usageCount = " << infoB.usageCount << std::endl;
-            if( info.usageCount == 0 && infoB.usageCount > 0 )
-            {
-                s << __func__ << ":" << __LINE__ << std::endl;
-                assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
-                mNumOfUnusedEntries -= info.refStoragePositions.size();
-            }
-            else if( infoB.usageCount == 0 && info.usageCount > 0 )
+            if( infoB.usageCount == 0 )
             {
                 s << __func__ << ":" << __LINE__ << std::endl;
                 assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
-                mNumOfUnusedEntries -= infoB.refStoragePositions.size();
+                --mNumOfUnusedEntries;
+            }
+            else if( info.usageCount == 0 )
+            {
+                s << __func__ << ":" << __LINE__ << std::endl;
+                assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
+                --mNumOfUnusedEntries;
             }
             s << "info.usageCount = " << info.usageCount << std::endl;
             s << "infoB.usageCount = " << infoB.usageCount << std::endl;
