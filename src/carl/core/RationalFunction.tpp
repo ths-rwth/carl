@@ -13,6 +13,25 @@
 
 namespace carl
 {   
+	
+	template<typename Pol, bool AS>
+	RationalFunction<Pol, AS> RationalFunction<Pol, AS>::derivative( const Variable& x, unsigned nth) const
+	{
+		assert(nth == 1);
+		if( isConstant() ) {
+			return RationalFunction<Pol, AS>(0);
+		}
+		
+		// TODO use factorization whenever possible.
+		// TODO specialize if it is just a polynomial.
+		CARL_LOG_INEFFICIENT();
+		// (u/v)' = (u'v - uv')/(v^2)
+		const auto& u = nominatorAsPolynomial();
+		const auto& v = denominatorAsPolynomial();
+		return RationalFunction<Pol, AS>(u.derivative(x) * v - u * v.derivative(x), v.pow(2));
+	}
+	
+	
     template<typename Pol, bool AS>
 	void RationalFunction<Pol, AS>::eliminateCommonFactor( bool _justNormalize )
     {

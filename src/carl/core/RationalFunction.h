@@ -321,6 +321,16 @@ namespace carl
 			}            
         }
         
+		/**
+		 * Derivative of the rational function with respect to variable x
+         * @param x the main variable
+         * @param nth which derivative one should take
+         * @return 
+		 * 
+		 * @todo Currently only nth = 1 is supported
+		 * @todo Curretnly only factorized polynomials are supported
+         */
+		RationalFunction derivative(const Variable& x, unsigned nth = 1) const;
 		
 		
     private:

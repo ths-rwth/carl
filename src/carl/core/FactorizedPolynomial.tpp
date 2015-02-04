@@ -171,6 +171,31 @@ namespace carl
         return *this;
     }
         
+	template<typename P>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::derivative(const carl::Variable& x, unsigned nth) const {
+		assert(nth == 1);
+		// TODO VERY NAIVE
+		return FactorizedPolynomial<P>(computePolynomial(*this).derivative(x), mpCache);
+	}
+	
+	template<typename P>
+	FactorizedPolynomial<P> FactorizedPolynomial<P>::pow(unsigned exponent) const {
+		if(exponent == 0) return FactorizedPolynomial<P>(P(1), mpCache);
+		if(exponent == 1) return *this;
+		
+		//TODO VERY NAIVE
+		FactorizedPolynomial<P> res(computePolynomial(*this) * computePolynomial(*this), mpCache);
+		exponent -= 2;
+		while(exponent > 0)
+		{
+			res *= *this;
+			--exponent;
+		}
+		return res;
+		
+	}
+	
+	
     template<typename P>
     bool operator==( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
     {
