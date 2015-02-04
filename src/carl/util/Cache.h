@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <cassert>
 #include <mutex>
+#include <limits>
 #include "Common.h"
 
 
@@ -153,7 +154,8 @@ namespace carl
         // The constructor.
         Cache( size_t _maxCacheSize = 10000, double _cacheReductionAmount = 0.2, double _decay = 0.98 );
         Cache( const Cache& ) = delete; // no implementation
-        
+        Cache& operator=( const Cache& ) = delete; // no implementation
+
         ~Cache();
         
         /**
@@ -199,8 +201,9 @@ namespace carl
         
         /**
          * Prints all information stored in this cache to std::cout.
+         * @param _out The stream to print on.
          */
-        void print() const;
+        void print( std::ostream& _out = std::cout ) const;
         
         /**
          * @param _refStoragePos The reference of the entry to obtain the object from. 
@@ -228,9 +231,10 @@ namespace carl
          */
         size_t erase( TypeInfoPair<T,Info>* _toRemove )
         {
+            assert( checkNumOfUnusedEntries() );
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( _toRemove->second.usageCount == 0 );
-            for( Ref ref : _toRemove->second.refStoragePositions )
+            for( const Ref& ref : _toRemove->second.refStoragePositions )
             {
                 mCacheRefs[ref] = nullptr;
                 assert (ref > 0);
@@ -238,6 +242,7 @@ namespace carl
             }
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
+            assert(_toRemove->second.usageCount == 0);
             auto result = mCache.erase( _toRemove );
             T* toDel = _toRemove->first;
             delete _toRemove;
@@ -253,9 +258,10 @@ namespace carl
          */
         typename Container::iterator erase( typename Container::iterator _toRemove )
         {
+            assert( checkNumOfUnusedEntries() );
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( (*_toRemove)->second.usageCount == 0 );
-            for( Ref ref : (*_toRemove)->second.refStoragePositions )
+            for( const Ref& ref : (*_toRemove)->second.refStoragePositions )
             {
                 mCacheRefs[ref] = nullptr;
                 assert (ref > 0);
@@ -263,6 +269,7 @@ namespace carl
             }
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
+            assert((*_toRemove)->second.usageCount == 0);
             T* toDel = (*_toRemove)->first;
             TypeInfoPair<T,Info>* toDelB = *_toRemove;
             auto result = mCache.erase( _toRemove );
@@ -274,7 +281,7 @@ namespace carl
         
         bool checkNumOfUnusedEntries() const
         {
-            unsigned actualNumOfUnusedEntries = 0;
+            size_t actualNumOfUnusedEntries = 0;
             for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
             {
                 if( (*iter)->second.usageCount == 0 )
@@ -283,6 +290,16 @@ namespace carl
                 }
             }
             return mNumOfUnusedEntries == actualNumOfUnusedEntries;
+        }
+        
+        size_t sumOfAllUsageCounts() const
+        {
+            size_t result = 0;
+            for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
+            {
+                result += (*iter)->second.usageCount;
+            }
+            return result;
         }
         
     };
