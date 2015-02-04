@@ -179,7 +179,7 @@ namespace carl
          * Constructor which constructs the pointinterval at n.
          * @param n Location of the pointinterval.
          */
-        explicit Interval(const Number& n) :
+        Interval(const Number& n) :
         mContent(n),
         mLowerBoundType(BoundType::WEAK),
         mUpperBoundType(BoundType::WEAK) { }
@@ -395,7 +395,7 @@ namespace carl
          * @param n The passed double.
          */
         template<typename N = Number, DisableIf<std::is_same<N, int >> = dummy >
-        Interval(const int& n) :
+        explicit Interval(const int& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
         mUpperBoundType(BoundType::WEAK) { }
