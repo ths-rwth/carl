@@ -34,10 +34,33 @@ Sign Interval<Number>::sgn() const
 template<typename Number>
 Interval<Number> Interval<Number>::integralPart() const
 {
-	if(!this->isEmpty())
-		return Interval<Number>(ceil(mContent.lower()), BoundType::WEAK, floor(mContent.upper()), BoundType::WEAK);
-	else
-		return *this;
+	Number newLowerBound = 0;
+	Number newUpperBound = 0;
+	switch(mLowerBoundType) {
+		case BoundType::WEAK:
+			newLowerBound = ceil(mContent.lower());
+			break;
+		case BoundType::STRICT:
+			newLowerBound = ceil(mContent.lower());
+			if(newLowerBound == ceil(mContent.lower()))
+				newLowerBound += 1;
+			break;
+		default:
+			break;
+	}
+	switch(mUpperBoundType) {
+		case BoundType::WEAK:
+			newUpperBound = floor(mContent.upper());
+			break;
+		case BoundType::STRICT:
+			newUpperBound = floor(mContent.upper());
+			if(newUpperBound == floor(mContent.upper()))
+				newLowerBound -= 1;
+			break;
+		default:
+			break;
+	}
+	return Interval<Number>(newLowerBound, BoundType::WEAK, newUpperBound, BoundType::WEAK);
 }
 
 template<typename Number>
