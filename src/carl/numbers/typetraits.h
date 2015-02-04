@@ -341,9 +341,9 @@ class PreventConversion
     private:
         T mContent;
     public:
-        PreventConversion( const T& _other ) : mContent( _other ) {}
-        template<typename O>
-        PreventConversion( const O& _other ) = delete;
+        explicit PreventConversion( const T& _other ) : mContent( _other ) {}
+//        template<typename O>
+//        PreventConversion( const O& _other ) = delete;
         operator T () const { return mContent; }
 };
 }

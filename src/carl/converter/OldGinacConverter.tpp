@@ -47,7 +47,7 @@ namespace carl
                         }
                         else if(GiNaC::is_exactly_a<GiNaC::numeric>(factorEx))
                         {
-                            carlSummand *= carl::rationalize<typename Poly::CoeffType>(cln::rationalize(cln::realpart(GiNaC::ex_to<GiNaC::numeric>(factorEx).to_cl_N())));
+                            carlSummand *= carl::rationalize<typename Poly::CoeffType>(PreventConversion<typename Poly::CoeffType>(cln::rationalize(cln::realpart(GiNaC::ex_to<GiNaC::numeric>(factorEx).to_cl_N()))));
                         }
                         else if(GiNaC::is_exactly_a<GiNaC::power>(factorEx))
                         {
@@ -73,7 +73,7 @@ namespace carl
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::numeric>(summandEx))
                 {
-                    result += carl::rationalize<typename Poly::CoeffType>(cln::rationalize(cln::realpart(GiNaC::ex_to<GiNaC::numeric>(summandEx).to_cl_N())));
+                    result += carl::rationalize<typename Poly::CoeffType>(PreventConversion<typename Poly::CoeffType>(cln::rationalize(cln::realpart(GiNaC::ex_to<GiNaC::numeric>(summandEx).to_cl_N()))));
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::power>(summandEx))
                 {
@@ -104,7 +104,7 @@ namespace carl
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::numeric>(factorEx))
                 {
-                    result *= carl::rationalize<typename Poly::CoeffType>(cln::rationalize(cln::realpart(GiNaC::ex_to<GiNaC::numeric>(factorEx).to_cl_N())));
+                    result *= carl::rationalize<typename Poly::CoeffType>(PreventConversion<typename Poly::CoeffType>(cln::rationalize(cln::realpart(GiNaC::ex_to<GiNaC::numeric>(factorEx).to_cl_N()))));
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::power>(factorEx))
                 {
@@ -129,7 +129,7 @@ namespace carl
         }
         else if(GiNaC::is_exactly_a<GiNaC::numeric>(ginacPoly))
         {
-            result = Poly(carl::rationalize<typename Poly::CoeffType>(cln::rationalize(cln::realpart( GiNaC::ex_to<GiNaC::numeric>(ginacPoly).to_cl_N()))));
+            result = Poly(carl::rationalize<typename Poly::CoeffType>(PreventConversion<typename Poly::CoeffType>(cln::rationalize(cln::realpart( GiNaC::ex_to<GiNaC::numeric>(ginacPoly).to_cl_N())))));
         }
         else if(GiNaC::is_exactly_a<GiNaC::power>(ginacPoly))
         {
