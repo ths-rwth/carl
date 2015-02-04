@@ -158,7 +158,10 @@ namespace carl
         gatherVariables(polyA, carlToGinacVarMap, ginacToCarlVarMap);
         gatherVariables(polyB, carlToGinacVarMap, ginacToCarlVarMap);
         GiNaC::ex ginacResult = GiNaC::gcd(convertToGinac(polyA, carlToGinacVarMap), convertToGinac(polyB, carlToGinacVarMap));
-        return convertToCarl(ginacResult, ginacToCarlVarMap);
+        result = convertToCarl(ginacResult, ginacToCarlVarMap);
+        if( !result.isZero() && result.lcoeff() < carl::constant_zero<cln::cl_RA>().get() )
+            return -result;
+        return result;
     }
     
     bool checkConversion(const MultivariatePolynomial<cln::cl_RA>& polyA)
