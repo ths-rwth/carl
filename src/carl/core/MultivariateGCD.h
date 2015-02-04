@@ -138,10 +138,12 @@ class MultivariateGCD : GCDCalculation
     #ifdef COMPARE_WITH_GINAC
     bool checkCorrectnessWithGinac()
     {
-        std::lock_guard<std::mutex> lock(mGinacMutex);
+        mGinacMutex.lock();
         if(!checkConversion<Polynomial>(mp1)) return false;
         if(!checkConversion<Polynomial>(mp2)) return false;
-        if(ginacGcd<Polynomial>(mp1,mp2) != calculate()) return false;
+        Polynomial result = ginacGcd<Polynomial>(mp1,mp2);
+        mGinacMutex.unlock();
+        if(result != calculate()) return false;
         return true;
     }
     #endif
