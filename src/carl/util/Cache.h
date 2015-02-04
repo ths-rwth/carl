@@ -230,6 +230,7 @@ namespace carl
          */
         size_t erase( TypeInfoPair<T,Info>* _toRemove )
         {
+            assert( checkNumOfUnusedEntries() );
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( _toRemove->second.usageCount == 0 );
             for( const Ref& ref : _toRemove->second.refStoragePositions )
@@ -245,6 +246,7 @@ namespace carl
             T* toDel = _toRemove->first;
             delete _toRemove;
             delete toDel;
+            assert( checkNumOfUnusedEntries() );
             return result;
         }
         
@@ -255,6 +257,7 @@ namespace carl
          */
         typename Container::iterator erase( typename Container::iterator _toRemove )
         {
+            assert( checkNumOfUnusedEntries() );
             std::lock_guard<std::recursive_mutex> lock( mMutex );
             assert( (*_toRemove)->second.usageCount == 0 );
             for( const Ref& ref : (*_toRemove)->second.refStoragePositions )
@@ -271,6 +274,7 @@ namespace carl
             auto result = mCache.erase( _toRemove );
             delete toDelB;
             delete toDel;
+            assert( checkNumOfUnusedEntries() );
             return result;
         }
         
@@ -285,6 +289,16 @@ namespace carl
                 }
             }
             return mNumOfUnusedEntries == actualNumOfUnusedEntries;
+        }
+        
+        size_t sumOfAllUsageCounts() const
+        {
+            size_t result = 0;
+            for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
+            {
+                result += (*iter)->second.usageCount;
+            }
+            return result;
         }
         
     };
