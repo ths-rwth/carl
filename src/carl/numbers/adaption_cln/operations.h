@@ -9,7 +9,7 @@
  */
 
 #pragma once
-
+#include "../../util/platform.h"
 #include <cassert>
 #include <limits>
 #include <cmath>
@@ -183,8 +183,24 @@ inline cln::cl_LF toLF(const cln::cl_RA& n) {
 
 template<typename T>
 inline T rationalize(double n);
+
 template<typename T>
 inline T rationalize(float n);
+
+template<typename T>
+inline T rationalize(int n);
+
+template<typename T>
+inline T rationalize(size_t n);
+
+template<typename T>
+inline T rationalize(const std::string& n);
+
+template<typename T>
+inline T rationalize(const PreventConversion<cln::cl_RA>&);
+
+template<typename T>
+inline T rationalize(const PreventConversion<mpq_class>&);
 
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
@@ -194,6 +210,31 @@ cln::cl_RA rationalize<cln::cl_RA>(double n);
 
 template<>
 cln::cl_RA rationalize<cln::cl_RA>(float n);
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(size_t n) {
+	return cln::cl_RA(n);
+}
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
+	return cln::cl_RA(n);
+}
+
+template<>
+cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n) {
+    std::stringstream s;
+    s << ((mpq_class)n);
+	return rationalize<cln::cl_RA>(s.str());
+}
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<cln::cl_RA>& n) {
+	return n;
+}
 
 /**
  * Get absolute value of an integer.
@@ -466,12 +507,6 @@ inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return quotient(a,b);
 }
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
-template<>
-cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
 
 std::string toString(const cln::cl_RA& _number, bool _infix);
 

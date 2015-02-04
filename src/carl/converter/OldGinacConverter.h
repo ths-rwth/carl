@@ -12,23 +12,20 @@
 #ifdef COMPARE_WITH_GINAC
 #include <unordered_map>
 #include <ginac/ginac.h>
-#include "../core/Variable.h"
-
-namespace carl {
-	bool similar(GiNaC::ex a, GiNaC::ex b);
-	template<typename Poly> void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap);
-}
-
-#include "../core/MultivariatePolynomial.h"
+#include "../core/VariablePool.h"
 
 namespace carl
 {
 
 	bool similar(GiNaC::ex a, GiNaC::ex b);
-	
-    GiNaC::ex convertToGinac(const MultivariatePolynomial<cln::cl_RA>& poly, const std::map<carl::Variable, GiNaC::ex>& vars);
     
-    MultivariatePolynomial<cln::cl_RA> convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars);
+	template<typename Poly> void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap);
+
+    template<typename Poly>
+	GiNaC::ex convertToGinac(const Poly& poly, const std::map<carl::Variable, GiNaC::ex>& vars);
+    
+    template<typename Poly>
+	Poly convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars);
     
 	template<typename Poly>
 	void gatherVariables(const Poly& poly, std::map<Variable, GiNaC::ex>& carlToGinacVarMap, std::map<GiNaC::ex, Variable, GiNaC::ex_is_less>& ginacToCarlVarMap)
@@ -45,14 +42,20 @@ namespace carl
         }
 	}
     
-    MultivariatePolynomial<cln::cl_RA> ginacGcd(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB);
+    template<typename Poly>
+	Poly ginacGcd(const Poly& polyA, const Poly& polyB);
     
-    bool ginacDivide(const MultivariatePolynomial<cln::cl_RA>& polyA, const MultivariatePolynomial<cln::cl_RA>& polyB, MultivariatePolynomial<cln::cl_RA>& result);
+    template<typename Poly>
+	bool ginacDivide(const Poly& polyA, const Poly& polyB, Poly& result);
     
-    std::unordered_map<const MultivariatePolynomial<cln::cl_RA>, unsigned, std::hash<MultivariatePolynomial<cln::cl_RA>>> ginacFactorization(const MultivariatePolynomial<cln::cl_RA>& poly);
+    template<typename Poly>
+	std::unordered_map<const Poly, unsigned, std::hash<Poly>> ginacFactorization(const Poly& poly);
 	
-	bool checkConversion(const MultivariatePolynomial<cln::cl_RA>& polyA);
+	template<typename Poly>
+	bool checkConversion(const Poly& polyA);
 }
+
+#include "OldGinacConverter.tpp"
 
 #endif
 
