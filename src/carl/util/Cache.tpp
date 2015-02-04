@@ -175,6 +175,8 @@ namespace carl
         {
             s << __func__ << ":" << __LINE__ << std::endl;
             Info& info = (*ret.first)->second;
+            s << "info.usageCount = " << info.usageCount << std::endl;
+            s << "infoB.usageCount = " << infoB.usageCount << std::endl;
             if( info.usageCount == 0 && infoB.usageCount > 0 )
             {
                 s << __func__ << ":" << __LINE__ << std::endl;
@@ -187,35 +189,28 @@ namespace carl
                 assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
                 mNumOfUnusedEntries -= infoB.refStoragePositions.size();
             }
+            s << "info.usageCount = " << info.usageCount << std::endl;
+            s << "infoB.usageCount = " << infoB.usageCount << std::endl;
             assert( info.usageCount + infoB.usageCount >= info.usageCount );
             info.usageCount += infoB.usageCount;
             info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
-            if( tmpSumUC != sumOfAllUsageCounts() )
+            assert( tmpSumUC == sumOfAllUsageCounts() );
+            if( !checkNumOfUnusedEntries() )
             {
+                std::cout << s.str() << std::endl;
+                print();
                 std::cout << "info.usageCount = " << info.usageCount << std::endl;
                 std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
             }
-            assert( tmpSumUC == sumOfAllUsageCounts() );
             assert( checkNumOfUnusedEntries() );
         }
         assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
         for( const Ref& ref : infoB.refStoragePositions )
             mCacheRefs[ref] = *(ret.first);
-        if( tmpSumUC != sumOfAllUsageCounts() )
-        {
-            std::cout << s.str() << std::endl;
-            print();
-            std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
-        }
-        if( tmpSumUC != sumOfAllUsageCounts() )
-        {
-            std::cout << "infoB.usageCount = " << infoB.usageCount << std::endl;
-        }
         assert( tmpSumUC == sumOfAllUsageCounts() );
         assert( checkNumOfUnusedEntries() );
         if( !ret.second )
         {
-            s << __func__ << ":" << __LINE__ << std::endl;
             delete cacheRef->first;
             delete cacheRef;
         }
