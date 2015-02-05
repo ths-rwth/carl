@@ -1144,7 +1144,7 @@ namespace carl
         subformulasToTransform.push_back( *this );
         while( !subformulasToTransform.empty() )
         {
-            const Formula<Pol>& currentFormula = subformulasToTransform.back();
+            Formula<Pol> currentFormula = subformulasToTransform.back();
 //            cout << "To add:" << endl;
 //            for( const auto& f : subformulasToTransform )
 //                cout << "   " << f << endl;
