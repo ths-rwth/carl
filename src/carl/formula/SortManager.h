@@ -179,6 +179,12 @@ class SortManager : public Singleton<SortManager>
 		 */
 		const std::string& getName( const Sort& _sort ) const;
 		
+		const std::vector<std::size_t>* getIndices(const Sort& _sort) const {
+			assert( _sort.id() != 0 );
+			assert( _sort.id() < mSorts.size() );
+			return mSorts[_sort.id()]->indices;
+		}
+
 		/**
 		 * Prints the given sort on the given output stream.
 		 * @param _out The output stream to print the given sort on.
