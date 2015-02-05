@@ -225,11 +225,7 @@ template<>
 cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
 
 template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n) {
-    std::stringstream s;
-    s << ((mpq_class)n);
-	return rationalize<cln::cl_RA>(s.str());
-}
+cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n);
 
 template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<cln::cl_RA>& n) {
