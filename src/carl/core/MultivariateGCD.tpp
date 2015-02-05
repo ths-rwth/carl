@@ -29,7 +29,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
     }
 	if(is_field<C>::value && mp1.isConstant())
 	{
-		return Polynomial(carl::gcd( mp2.constantPart(), carl::constant_one<C>().get()/mp1.coprimeFactor() ));
+		return Polynomial(carl::gcd( mp1.constantPart(), carl::constant_one<C>().get()/mp2.coprimeFactor() ));
 	}
     if(is_field<C>::value && mp2.isConstant())
     {
@@ -102,9 +102,9 @@ template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
 {
 	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
-#ifdef COMPARE_WITH_GINAC
+    #ifdef COMPARE_WITH_GINAC
     assert( gcd_calc.checkCorrectnessWithGinac() );
-#endif 
+    #endif 
 	return gcd_calc.calculate();
 }
 
