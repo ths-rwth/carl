@@ -90,6 +90,14 @@ namespace carl
         }
         return result;
     }
+    
+    template<>
+    mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n) {
+        std::stringstream s;
+        s << ((cln::cl_RA)n);
+        mpq_class result = rationalize<mpq_class>(s.str());
+        return result;
+    }
 
     std::string toString(const mpq_class& _number, bool _infix)
     {

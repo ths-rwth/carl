@@ -147,16 +147,12 @@ template<>
 mpq_class rationalize<mpq_class>(const std::string& inputstring);
 
 template<>
-inline mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n) {
-    std::stringstream s;
-    s << ((cln::cl_RA)n);
-	return rationalize<mpq_class>(s.str());
-}
-
-template<>
 inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
 }
+
+template<>
+mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n);
 
 /**
  * Basic Operators
@@ -179,7 +175,7 @@ inline mpq_class abs(const mpq_class& n) {
 inline mpz_class floor(const mpq_class& n) {
 	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
-	mpz_fdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
+	mpz_fdiv_q(res.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
 	return res;
 }
 
@@ -190,7 +186,7 @@ inline mpz_class floor(const mpz_class& n) {
 inline mpz_class ceil(const mpq_class& n) {
 	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;
-	mpz_cdiv_q(res.get_mpz_t(), n.get_den_mpz_t(), n.get_num_mpz_t());
+	mpz_cdiv_q(res.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
 	return res;
 }
 inline mpz_class ceil(const mpz_class& n) {
