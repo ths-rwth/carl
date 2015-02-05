@@ -3,8 +3,9 @@
 namespace carl
 {
     template<typename Poly>
-    GiNaC::ex convertToGinac(const Poly& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
+    GiNaC::ex OldGinacConverter<Poly>::convertToGinac(const Poly& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
     {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         GiNaC::ex result = 0;
         for(auto term = poly.begin(); term != poly.end(); ++term)
         {
@@ -23,8 +24,9 @@ namespace carl
     }
 
     template<typename Poly>
-    Poly convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars)
+    Poly OldGinacConverter<Poly>::convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars)
     {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         Poly result;
         GiNaC::ex ginacPoly = _toConvert.expand();
         if(GiNaC::is_exactly_a<GiNaC::add>(ginacPoly))
@@ -148,33 +150,36 @@ namespace carl
     }
 
     template<typename Poly>
-    Poly ginacGcd(const Poly& polyA, const Poly& polyB)
+    Poly OldGinacConverter<Poly>::ginacGcd(const Poly& polyA, const Poly& polyB)
     {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         Poly result;
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
         gatherVariables(polyA, carlToGinacVarMap, ginacToCarlVarMap);
         gatherVariables(polyB, carlToGinacVarMap, ginacToCarlVarMap);
         GiNaC::ex ginacResult = GiNaC::gcd(convertToGinac(polyA, carlToGinacVarMap), convertToGinac(polyB, carlToGinacVarMap));
-        result = convertToCarl<Poly>(ginacResult, ginacToCarlVarMap);
+        result = convertToCarl(ginacResult, ginacToCarlVarMap);
         if( !result.isZero() && result.lcoeff() < carl::constant_zero<typename Poly::CoeffType>().get() )
             return -result;
         return result;
     }
     
     template<typename Poly>
-    bool checkConversion(const Poly& polyA)
+    bool OldGinacConverter<Poly>::checkConversion(const Poly& polyA)
     {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
         gatherVariables(polyA, carlToGinacVarMap, ginacToCarlVarMap);
-        Poly result = convertToCarl<Poly>(convertToGinac(polyA, carlToGinacVarMap), ginacToCarlVarMap);
+        Poly result = convertToCarl(convertToGinac(polyA, carlToGinacVarMap), ginacToCarlVarMap);
         return polyA == result;  
     }
 
     template<typename Poly>
-    bool ginacDivide(const Poly& polyA, const Poly& polyB, Poly& result)
+    bool OldGinacConverter<Poly>::ginacDivide(const Poly& polyA, const Poly& polyB, Poly& result)
     {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
         gatherVariables(polyA, carlToGinacVarMap, ginacToCarlVarMap);
@@ -182,13 +187,14 @@ namespace carl
         GiNaC::ex ginacResult;
         bool divided = GiNaC::divide(convertToGinac(polyA, carlToGinacVarMap), convertToGinac(polyB, carlToGinacVarMap), ginacResult);
         if(divided)
-            result = convertToCarl<Poly>(ginacResult, ginacToCarlVarMap);
+            result = convertToCarl(ginacResult, ginacToCarlVarMap);
         return divided;
     }
 
     template<typename Poly>
-    std::unordered_map<const Poly, unsigned, std::hash<Poly>> ginacFactorization(const Poly& poly)
+    std::unordered_map<const Poly, unsigned, std::hash<Poly>> OldGinacConverter<Poly>::ginacFactorization(const Poly& poly)
     {
+        std::lock_guard<std::recursive_mutex> lock( mMutex );
         std::unordered_map<const Poly, unsigned, std::hash<Poly>> result;
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
@@ -206,13 +212,13 @@ namespace carl
                     assert(!exponent.info(GiNaC::info_flags::negative));
                     unsigned exp = static_cast<unsigned>(exponent.integer_content().to_int());
                     GiNaC::ex subterm = *factorEx.begin();
-                    Poly carlFactor = convertToCarl<Poly>(subterm, ginacToCarlVarMap);
+                    Poly carlFactor = convertToCarl(subterm, ginacToCarlVarMap);
                     assert(result.find(carlFactor) == result.end());
                     result.insert(std::pair<Poly, unsigned>(carlFactor, exp));
                 }
                 else
                 {
-                    Poly carlFactor = convertToCarl<Poly>(factorEx, ginacToCarlVarMap);
+                    Poly carlFactor = convertToCarl(factorEx, ginacToCarlVarMap);
                     assert(result.find(carlFactor) == result.end());
                     result.insert(std::pair<Poly, unsigned>(carlFactor, 1));
                 }
@@ -225,11 +231,11 @@ namespace carl
             assert(!exponent.info(GiNaC::info_flags::negative));
             unsigned exp = static_cast<unsigned>(exponent.integer_content().to_int());
             GiNaC::ex subterm = *ginacResult.begin();
-            result.insert(std::pair<Poly, unsigned>(convertToCarl<Poly>(subterm, ginacToCarlVarMap), exp));
+            result.insert(std::pair<Poly, unsigned>(convertToCarl(subterm, ginacToCarlVarMap), exp));
         }
         else
         {
-            result.insert(std::pair<Poly, unsigned>(convertToCarl<Poly>(ginacResult, ginacToCarlVarMap), 1));
+            result.insert(std::pair<Poly, unsigned>(convertToCarl(ginacResult, ginacToCarlVarMap), 1));
         }
         return result;
     }

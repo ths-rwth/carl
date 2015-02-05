@@ -1,8 +1,11 @@
 #include "OldGinacConverter.h"
 
 #ifdef COMPARE_WITH_GINAC
-
-bool similar(GiNaC::ex a, GiNaC::ex b) {
+namespace carl
+{
+template<typename Poly>
+bool OldGinacConverter<Poly>::similar( const GiNaC::ex& a, const GiNaC::ex& b) {
+    std::lock_guard<std::recursive_mutex> lock( mMutex );
     if (b == 0) return a == 0;
     GiNaC::ex x = a, y = b;
     while ((!GiNaC::is_exactly_a<GiNaC::numeric>(b)) && GiNaC::divide(x, b, x));
@@ -25,6 +28,7 @@ bool similar(GiNaC::ex a, GiNaC::ex b) {
         }
     }
     return true;
+}
 }
 
 #endif

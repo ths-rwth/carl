@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <mutex>
 #include "MonomialOrdering.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "../converter/OldGinacConverter.h"
@@ -91,9 +90,6 @@ class MultivariateGCD : GCDCalculation
 	
 	const Polynomial& mp1;
 	const Polynomial& mp2;
-    #ifdef COMPARE_WITH_GINAC
-    std::mutex mGinacMutex;
-    #endif
 	
 	public:
 	MultivariateGCD(const MultivariatePolynomial<Coeff,Ordering,Policies>& p1,const MultivariatePolynomial<Coeff,Ordering,Policies>& p2)
@@ -138,7 +134,6 @@ class MultivariateGCD : GCDCalculation
     #ifdef COMPARE_WITH_GINAC
     bool checkCorrectnessWithGinac()
     {
-        mGinacMutex.lock();
         if(!checkConversion<Polynomial>(mp1))
         {
             return false;
@@ -148,7 +143,6 @@ class MultivariateGCD : GCDCalculation
             return false;
         }
         Polynomial result = ginacGcd<Polynomial>(mp1,mp2);
-        mGinacMutex.unlock();
         Polynomial resultB = calculate();
         if(result != resultB)
         {
