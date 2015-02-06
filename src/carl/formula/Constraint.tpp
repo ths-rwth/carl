@@ -393,6 +393,46 @@ namespace carl
             return 2;
         }
     }
+
+	template<typename Pol>
+	unsigned Constraint<Pol>::evaluate(const EvaluationMap<Interval<typename carl::UnderlyingNumberType<Pol>::type>>& _assignment) const {
+		// 0 = False, 1 = Maybe, 2 = True
+		Interval<typename carl::UnderlyingNumberType<Pol>::type> res = IntervalEvaluation::evaluate(mLhs, _assignment);
+		switch (mRelation) {
+			case Relation::EQ: {
+				if (res.isZero()) return 2;
+				else if (res.contains(0)) return 1;
+				else return 0;
+			}
+			case Relation::NEQ: {
+				if (res.isZero()) return 0;
+				else if (res.contains(0)) return 1;
+				else return 2;
+			}
+			case Relation::LESS: {
+				if (res.isNegative()) return 2;
+				else if (res.isSemiPositive()) return 0;
+				else return 1;
+			}
+			case Relation::GREATER: {
+				if (res.isPositive()) return 2;
+				else if (res.isSemiNegative()) return 0;
+				else return 1;
+			}
+			case Relation::LEQ: {
+				if (res.isSemiNegative()) return 2;
+				else if (res.isPositive()) return 0;
+				else return 1;
+			}
+			case Relation::GEQ: {
+				if (res.isSemiPositive()) return 2;
+				else if (res.isNegative()) return 0;
+				else return 1;
+			}
+		}
+		assert(false);
+		return 1;
+	}
     
     template<typename Pol>
     bool Constraint<Pol>::hasFinitelyManySolutionsIn( const Variable& _var ) const

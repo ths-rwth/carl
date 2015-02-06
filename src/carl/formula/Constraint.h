@@ -418,7 +418,19 @@ namespace carl
              *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
              */
             unsigned consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation ) const;
-            
+
+			/**
+			 * Checks whether the given interval assignment may fulfill the constraint.
+			 * Note that the assignment must be complete.
+			 * There are three possible outcomes:
+			 * - True (2), i.e. all actual assignments satisfy the constraint.
+			 * - Maybe (1), i.e. some actual assignments satisfy the constraint.
+			 * - False (0), i.e. no actual assignment satisfies the constraint.
+			 * @param _assignment Variable assignment.
+			 * @return 0, 1 or 2.
+			 */
+			unsigned evaluate(const EvaluationMap<Interval<typename carl::UnderlyingNumberType<Pol>::type>>& _assignment) const;
+
             /**
              * @param _var The variable to check the size of its solution set for.
              * @return true, if it is easy to decide whether this constraint has a finite solution set
