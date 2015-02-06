@@ -34,6 +34,9 @@ Sign Interval<Number>::sgn() const
 template<typename Number>
 Interval<Number> Interval<Number>::integralPart() const
 {
+	if(this->isEmpty())
+		return *this;
+	
 	Number newLowerBound = 0;
 	Number newUpperBound = 0;
 	BoundType newLowerBoundType = mLowerBoundType;
@@ -48,21 +51,28 @@ Interval<Number> Interval<Number>::integralPart() const
 			newLowerBound = ceil(mContent.lower());
 			newLowerBoundType = BoundType::WEAK;
 			if(newLowerBound == ceil(mContent.lower()))
-				newLowerBound += 1;
+				newLowerBound += carl::constant_one<Number>::get();
+			break;
 		default:
 			break;
 	}
 	switch(mUpperBoundType) {
 		case BoundType::WEAK:
 			newUpperBound = floor(mContent.upper());
-			newLowerBoundType = BoundType::WEAK;
+			newUpperBoundType = BoundType::WEAK;
+			if(newLowerBoundType == BoundType::INFTY)
+				newLowerBound = newUpperBound;
 			break;
 		case BoundType::STRICT:
 			newUpperBound = floor(mContent.upper());
-			newLowerBoundType = BoundType::WEAK;
+			newUpperBoundType = BoundType::WEAK;
 			if(newUpperBound == floor(mContent.upper()))
-				newLowerBound -= 1;
+				newLowerBound -= carl::constant_one<Number>::get();
+			if(newLowerBoundType == BoundType::INFTY)
+				newLowerBound = newUpperBound;
 		default:
+			if(newLowerBoundType != BoundType::INFTY)
+				newUpperBound = newLowerBound;
 			break;
 	}
 	return Interval<Number>(newLowerBound, newLowerBoundType, newUpperBound, newUpperBoundType);

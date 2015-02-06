@@ -12,6 +12,8 @@
 
 #pragma once
 
+//#define CONTRACTION_DEBUG
+
 namespace carl {
 
     template <template<typename> class Operator, typename Polynomial>
@@ -46,10 +48,12 @@ namespace carl {
             double center = intervals.at(variable).center();
             Interval<double> centerInterval = Interval<double>(center);
             
-//            std::cout << "variable = " << variable << std::endl;
-//            std::cout << "constraint = " << constraint << std::endl;
-//            std::cout << "derivative = " << derivative << std::endl;
-//			std::cout << __func__ << ": centerInterval: " << centerInterval << std::endl;
+			#ifdef CONTRACTION_DEBUG
+            std::cout << "variable = " << variable << std::endl;
+            std::cout << "constraint = " << constraint << std::endl;
+            std::cout << "derivative = " << derivative << std::endl;
+			std::cout << __func__ << ": centerInterval: " << centerInterval << std::endl;
+			#endif
 			
             // Create map for replacement of variables by intervals and replacement of center by point interval
             typename Interval<double>::evalintervalmap substitutedIntervalMap = intervals;
@@ -60,11 +64,15 @@ namespace carl {
             Interval<double> denominator = IntervalEvaluation::evaluate(derivative, intervals);
             Interval<double> result1, result2;
 			
-//			std::cout << __func__ << ": numerator: " << numerator << ", denominator: " << denominator << std::endl;
+			#ifdef CONTRACTION_DEBUG
+			std::cout << __func__ << ": numerator: " << numerator << ", denominator: " << denominator << std::endl;
+			#endif
             
             bool split = numerator.div_ext(denominator, result1, result2);
             if (split) {
-//				std::cout << __func__ << ": caused split: " << result1 << " and " << result2 << std::endl;
+				#ifdef CONTRACTION_DEBUG
+				std::cout << __func__ << ": caused split: " << result1 << " and " << result2 << std::endl;
+				#endif
                 if(result1 >= result2) {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result2));
@@ -72,6 +80,9 @@ namespace carl {
 						resA = resA.integralPart();
 						resB = resB.integralPart();
 					}
+					#ifdef CONTRACTION_DEBUG
+					std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
+					#endif
                     if( resB.isEmpty() )
                     {
                         return false;
@@ -90,6 +101,9 @@ namespace carl {
 						resA = resA.integralPart();
 						resB = resB.integralPart();
 					}
+					#ifdef CONTRACTION_DEBUG
+					std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
+					#endif
                     if( resB.isEmpty() )
                     {
                         return false;
@@ -102,11 +116,16 @@ namespace carl {
                 }
                 return true;
             } else {
-//				std::cout << __func__ << ": result: " << result1 << std::endl;
+				#ifdef CONTRACTION_DEBUG
+				std::cout << __func__ << ": result: " << result1 << std::endl;
+				#endif
                 resA = intervals.at(variable).intersect(centerInterval.sub(result1));
 				if (variable.getType() == VariableType::VT_INT) {
 					resA = resA.integralPart();
 				}
+				#ifdef CONTRACTION_DEBUG
+				std::cout << __func__ << ": result after intersection: " << resA << std::endl;
+				#endif
                 return false;
             }
         }
