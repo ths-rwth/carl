@@ -149,6 +149,12 @@ inline long int toInt<long int>(const cln::cl_I& n) {
     assert(n >= std::numeric_limits<long int>::min());
     return cln::cl_I_to_long(n);
 }
+template<>
+inline std::size_t toInt<std::size_t>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<std::size_t>::max());
+    assert(n >= std::numeric_limits<std::size_t>::min());
+    return cln::cl_I_to_ulong(n);
+}
 
 /**
  * Convert a fraction to an integer.
@@ -170,6 +176,10 @@ inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
 template<>
 inline unsigned toInt<unsigned>(const cln::cl_RA& n) {
 	return toInt<unsigned>(toInt<cln::cl_I>(n));
+}
+template<>
+inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
+	return toInt<std::size_t>(toInt<cln::cl_I>(n));
 }
 
 /**
