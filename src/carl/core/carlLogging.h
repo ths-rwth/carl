@@ -405,29 +405,29 @@ inline Logger& logger() {
 }
 
 /// Create a record info.
-#define __CARL_LOG_RECORD carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
+#define __CARL_LOG_RECORD ::carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
 /// Create a record info without function name.
-#define __CARL_LOG_RECORD_NOFUNC carl::logging::RecordInfo(__FILE__, "", __LINE__)
+#define __CARL_LOG_RECORD_NOFUNC ::carl::logging::RecordInfo(__FILE__, "", __LINE__)
 /// Basic logging macro.
-#define __CARL_LOG(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD); }
+#define __CARL_LOG(level, channel, expr) { std::stringstream ss; ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD); }
 /// Basic logging macro without function name.
-#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD_NOFUNC); }
+#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD_NOFUNC); }
 
 /// Intended to be called when entering a function. Format: `<function name>(<args>)`.
-#define __CARL_LOG_FUNC(channel, args) __CARL_LOG_NOFUNC(carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");
+#define __CARL_LOG_FUNC(channel, args) __CARL_LOG_NOFUNC(::carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");
 
 /// Log with level LVL_TRACE.
-#define __CARL_LOG_TRACE(channel, expr) __CARL_LOG(carl::logging::LogLevel::LVL_TRACE, channel, expr)
+#define __CARL_LOG_TRACE(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_TRACE, channel, expr)
 /// Log with level LVL_DEBUG.
-#define __CARL_LOG_DEBUG(channel, expr) __CARL_LOG(carl::logging::LogLevel::LVL_DEBUG, channel, expr)
+#define __CARL_LOG_DEBUG(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_DEBUG, channel, expr)
 /// Log with level LVL_INFO.
-#define __CARL_LOG_INFO(channel, expr) __CARL_LOG(carl::logging::LogLevel::LVL_INFO, channel, expr)
+#define __CARL_LOG_INFO(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_INFO, channel, expr)
 /// Log with level LVL_WARN.
-#define __CARL_LOG_WARN(channel, expr) __CARL_LOG(carl::logging::LogLevel::LVL_WARN, channel, expr)
+#define __CARL_LOG_WARN(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_WARN, channel, expr)
 /// Log with level LVL_ERROR.
-#define __CARL_LOG_ERROR(channel, expr) __CARL_LOG(carl::logging::LogLevel::LVL_ERROR, channel, expr)
+#define __CARL_LOG_ERROR(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_ERROR, channel, expr)
 /// Log with level LVL_FATAL.
-#define __CARL_LOG_FATAL(channel, expr) __CARL_LOG(carl::logging::LogLevel::LVL_FATAL, channel, expr)
+#define __CARL_LOG_FATAL(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_FATAL, channel, expr)
 
 /// Log and assert the given condition, if the condition evaluates to false.
 #define __CARL_LOG_ASSERT(channel, condition, expr) if (!condition) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
