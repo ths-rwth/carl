@@ -2053,5 +2053,107 @@ namespace carl
             return true;
         }
     }
+
+	template<typename Formula>
+	void FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<void(Formula)>& func) {
+		func(formula);
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			for (const auto& cur: formula.subformulas()) visit(cur, func);
+			break;
+		}
+		case NOT: {
+			visit(formula.subformula(), func);
+			break;
+		}
+		case IMPLIES: {
+			visit(formula.premise());
+			visit(formula.conclusion(), func);
+			break;
+		}
+		case ITE: {
+			visit(formula.condition(), func);
+			visit(formula.firstCase(), func);
+			visit(formula.secondCase(), func);
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			visit(formula.quantifiedFormula(), func);
+			break;
+		}
+		}
+	}
+
+	template<typename Formula>
+	Formula FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<Formula(Formula)>& func) {
+		Formula newFormula = func(formula);
+		switch (newFormula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			Formulas<typename Formula::PolynomialType> newSubformulas;
+			bool changed = false;
+			for (const auto& cur: newFormula.subformulas()) {
+				Formula newCur = visit(cur, func);
+				if (newCur != cur) changed = true;
+				newSubformulas.insert(newCur);
+			}
+			if (changed) {
+				return Formula(newFormula.getType(), newSubformulas);
+			}
+			break;
+		}
+		case NOT: {
+			Formula cur = visit(newFormula.subformula(), func);
+			if (cur != newFormula.subformula()) {
+				return Formula(NOT, cur);
+			}
+			break;
+		}
+		case IMPLIES: {
+			Formula prem = visit(newFormula.premise(), func);
+			Formula conc = visit(newFormula.conclusion(), func);
+			if ((prem != newFormula.premise()) || (conc != newFormula.conclusion())) {
+				return Formula(IMPLIES, prem, conc);
+			}
+			break;
+		}
+		case ITE: {
+			Formula cond = visit(newFormula.condition(), func);
+			Formula fCase = visit(newFormula.firstCase(), func);
+			Formula sCase = visit(newFormula.secondCase(), func);
+			if ((cond != newFormula.condition()) || (fCase != newFormula.firstCase()) || (sCase != newFormula.secondCase())) {
+				return Formula(ITE, cond, fCase, sCase);
+			}
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			Formula sub = visit(newFormula.quantifiedFormula(), func);
+			if (sub != newFormula.quantifiedFormula()) {
+				return Formula(newFormula.getType(), newFormula.quantifiedVariables(), sub);
+			}
+			break;
+		}
+		}
+		return newFormula;
+	}
 }    // namespace carl
 

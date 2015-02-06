@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <functional>
 #include <string.h>
 #include <string>
 #include <set>
@@ -303,6 +304,8 @@ namespace carl
             typedef typename Formulas<Pol>::const_iterator const_iterator;
             /// A constant reverse iterator to a sub-formula of a formula.
             typedef typename Formulas<Pol>::const_reverse_iterator const_reverse_iterator;
+			/// A typedef for the template argument.
+			typedef Pol PolynomialType;
             
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.
@@ -1092,6 +1095,27 @@ namespace carl
      */
     template<typename Poly>
     std::ostream& operator<<( std::ostream& _out, const Formula<Poly>& _formula );
+
+	/**
+	 * This class provides a generic visitor for the above Formula class.
+	 */
+	template<typename Formula>
+	struct FormulaVisitor {
+		/**
+		 * Recursively calls func on every subformula.
+		 * @param formula Formula to visit.
+		 * @param func Function to call.
+		 */
+		void visit(const Formula& formula, const std::function<void(Formula)>& func);
+		/**
+		 * Recursively calls func on every subformula and return a new formula.
+		 * On every call of func, the passed formula is replaced by the result.
+		 * @param formula Formula to visit.
+		 * @param func Function to call.
+		 * @return New formula.
+		 */
+		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
+	};
 
 }    // namespace carl
 
