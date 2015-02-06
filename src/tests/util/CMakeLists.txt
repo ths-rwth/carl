@@ -2,6 +2,7 @@
 add_executable( runUtilTests
 				Test_SFINAE.cpp
 				Test_StringParser.cpp
+				Test_Parser.cpp
 				#Test_CodeWriter.cpp
 				 )
 cotire(runUtilTests)
