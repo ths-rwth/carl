@@ -1058,7 +1058,7 @@ namespace carl
         {
             assert(this->isConsistent());
             if( mUpperBoundType != BoundType::INFTY )
-                return mContent.upper() >= carl::constant_zero<Number>().get();
+                return mContent.upper() <= carl::constant_zero<Number>().get();
             return false;
         }
 
