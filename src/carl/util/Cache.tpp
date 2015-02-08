@@ -160,12 +160,12 @@ namespace carl
             Info& info = (*ret.first)->second;
             if( infoB.usageCount == 0 )
             {
-                assert( mNumOfUnusedEntries >= infoB.refStoragePositions.size() );
+                assert( mNumOfUnusedEntries > 0 );
                 --mNumOfUnusedEntries;
             }
             else if( info.usageCount == 0 )
             {
-                assert( mNumOfUnusedEntries >= info.refStoragePositions.size() );
+                assert( mNumOfUnusedEntries > 0 );
                 --mNumOfUnusedEntries;
             }
             assert( info.usageCount + infoB.usageCount >= info.usageCount );
