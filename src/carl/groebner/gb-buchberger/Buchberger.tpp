@@ -62,9 +62,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 		{
 			// Takes the next pair scheduled
 			SPolPair critPair = pCritPairs->pop();
-            if( critPair.mP1 >= pGb->getGenerators().size() ) exit(1234);
             assert( critPair.mP1 < pGb->getGenerators().size() );
-            if( critPair.mP2 >= pGb->getGenerators().size() ) exit(1234);
             assert( critPair.mP2 < pGb->getGenerators().size() );
 			CARL_LOG_DEBUG("carl.gb.buchberger", "Calculate SPol for: " << pGb->getGenerators()[critPair.mP1] << ", " << pGb->getGenerators()[critPair.mP2]);
 			// Calculates the S-Polynomial
