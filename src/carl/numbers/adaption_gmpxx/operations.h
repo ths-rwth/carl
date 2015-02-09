@@ -101,12 +101,14 @@ template<typename Integer>
 inline Integer toInt(const mpz_class& n);
 template<>
 inline signed long int toInt<signed long int>(const mpz_class& n) {
-    assert(n <= INT_MAX);
+    assert(n <= std::numeric_limits<signed long int>::max());
+    assert(n >= std::numeric_limits<signed long int>::min());
     return mpz_get_si(n.get_mpz_t());
 }
 template<>
 inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
-    assert(n <= UINT_MAX);
+    assert(n <= std::numeric_limits<unsigned long int>::max());
+    assert(n >= std::numeric_limits<unsigned long int>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
 
