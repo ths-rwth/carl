@@ -488,7 +488,7 @@ Term<Coefficient> Term<Coefficient>::gcd(const Term<Coefficient>& t1, const Term
 	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
 	assert(!t1.isZero());
 	assert(!t2.isZero());
-	if(t1.isConstant() || t2.isConstant()) return Term(Coefficient(1));
+	if(t1.isConstant() || t2.isConstant()) return Term(Coefficient(carl::gcd(t1.coeff(), t2.coeff())));
 	return Term(Coefficient(carl::gcd(t1.coeff(), t2.coeff())), Monomial::gcd(t1.monomial(), t2.monomial()));
 }
 
