@@ -207,11 +207,17 @@ inline mpz_class lcm(const mpz_class& a, const mpz_class& b) {
 	return res;
 }
 
-inline mpz_class gcd(const mpq_class& a, const mpq_class& b) {
-    assert( isInteger(a) );
-    assert( isInteger(b) );
-	mpz_class res;
-	mpz_gcd(res.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+inline mpq_class gcd(const mpq_class& a, const mpq_class& b) {
+    mpz_class resNum;
+	mpz_gcd(resNum.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+	mpz_class resDen;
+	mpz_lcm(resDen.get_mpz_t(), getDenom(a).get_mpz_t(), getDenom(b).get_mpz_t());
+	mpq_class resqNum;
+	mpq_set_z(resqNum.get_mpq_t(), resNum.get_mpz_t());
+	mpq_class resqDen;
+	mpq_set_z(resqDen.get_mpq_t(), resDen.get_mpz_t());
+	mpq_class res;
+	mpq_div(res.get_mpq_t(), resqNum.get_mpq_t(), resqDen.get_mpq_t());
 	return res;
 }
 

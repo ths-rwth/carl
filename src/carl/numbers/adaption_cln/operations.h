@@ -327,9 +327,7 @@ inline cln::cl_I& gcd_assign(cln::cl_I& a, const cln::cl_I& b) {
  * @return Updated a.
  */
 inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
-    assert( carl::isInteger( a ) );
-    assert( carl::isInteger( b ) );
-	a = cln::gcd(carl::getNum(a),carl::getNum(b));
+	a = cln::gcd(carl::getNum(a),carl::getNum(b)) / cln::lcm(carl::getDenom(a),carl::getDenom(b));
 	return a;
 }
 
@@ -341,8 +339,6 @@ inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
  * @return Gcd of a and b.
  */
 inline cln::cl_RA gcd(const cln::cl_RA& a, const cln::cl_RA& b) {
-    // assert( carl::isInteger( a ) );
-    // assert( carl::isInteger( b ) );
 	return cln::gcd(carl::getNum(a),carl::getNum(b)) / cln::lcm(carl::getDenom(a),carl::getDenom(b));
 }
 
