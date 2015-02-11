@@ -10,7 +10,7 @@
 #pragma once
 
 //#define NDEBUG
-//#define CONSTRAINT_WITH_FACTORIZATION
+#define CONSTRAINT_WITH_FACTORIZATION
 
 #include <iostream>
 #include <cstring>
@@ -262,6 +262,13 @@ namespace carl
             {
                 return (_rel == Relation::NEQ || _rel == Relation::LESS || _rel == Relation::GREATER);
             }
+			
+			bool relationIsStrict() const {
+				return constraintRelationIsStrict(mRelation);
+			}
+			bool relationIsWeak() const {
+				return !constraintRelationIsStrict(mRelation);
+			}
             
             /**
              * Checks if the given variable occurs in the constraint.
@@ -423,9 +430,11 @@ namespace carl
 			 * Checks whether the given interval assignment may fulfill the constraint.
 			 * Note that the assignment must be complete.
 			 * There are three possible outcomes:
-			 * - True (2), i.e. all actual assignments satisfy the constraint.
-			 * - Maybe (1), i.e. some actual assignments satisfy the constraint.
-			 * - False (0), i.e. no actual assignment satisfies the constraint.
+			 * - True (4), i.e. all actual assignments satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow True$
+			 * - Maybe (3), i.e. some actual assignments satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow ?$
+			 * - Not null (2), i.e. all assignments that make the constraint evaluate not to zero satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow p \neq 0$
+			 * - Null (1), i.e. only assignments that make the constraint evaluate to zero satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow p_\alpha = 0$
+			 * - False (0), i.e. no actual assignment satisfies the constraint: $p ~_\alpha 0 \Leftrightarrow False$
 			 * @param _assignment Variable assignment.
 			 * @return 0, 1 or 2.
 			 */
