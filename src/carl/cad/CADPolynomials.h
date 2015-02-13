@@ -92,6 +92,10 @@ public:
 		assert(false);
 		return up;
 	}
+	
+	void clear() {
+		polynomials.clear();
+	}
 };
 
 template<typename Number>
