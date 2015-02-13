@@ -626,7 +626,9 @@ namespace carl
             && maxDegree() <= MAX_DEGREE_FOR_FACTORIZATION && maxDegree() >= MIN_DEGREE_FOR_FACTORIZATION )
         {
             mFactorization = ginacFactorization( mLhs );
-        }
+        } else {
+			mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
+		}
         #else
         mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
         #endif
