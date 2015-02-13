@@ -49,6 +49,14 @@ namespace carl
 			
 		}
         
+		VariableInformation(unsigned maxDegree, unsigned minDegree, unsigned occurence)
+		:	mMaxDegree(maxDegree), 
+			mMinDegree(minDegree), 
+			mOccurence(occurence)
+		{
+			
+		}
+        
 		VariableInformation(const VariableInformation<false, CoeffType>& varInfo)
 		:	mMaxDegree(varInfo.mMaxDegree), 
 			mMinDegree(varInfo.mMinDegree), 
@@ -149,6 +157,12 @@ namespace carl
 		VariableInformation(unsigned degreeOfOccurence) :  VariableInformation<false, CoeffType>(degreeOfOccurence)
 		{
 		}
+        
+        VariableInformation(unsigned maxDegree, unsigned minDegree, unsigned occurence, std::map<unsigned, CoeffType>&& coeffs):
+            VariableInformation<false, CoeffType>(maxDegree, minDegree, occurence),
+            mCoeffs(coeffs)
+        {
+        }
         
 		VariableInformation(const VariableInformation<false, CoeffType>& varInfo) :  VariableInformation<false, CoeffType>(varInfo)
         {

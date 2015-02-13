@@ -21,6 +21,9 @@ namespace carl
     using Factorization = std::map<FactorizedPolynomial<P>, carl::exponent>;
     
     template <typename P>
+    std::string factorizationToString( const Factorization<P>& _factorization, bool _infix = true, bool _friendlyVarNames = true );
+    
+    template <typename P>
     std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization );
     
     template<typename P>
@@ -90,24 +93,6 @@ namespace carl
         {
             assert( !mFactorization.empty() );
             return this == &mFactorization.begin()->first.content();
-        }
-        
-        typename P::CoeffType constantPart() const
-        {   
-            if( mFactorization.size() == 1 && mFactorization.begin()->second == 1 )
-            {
-                mpPolynomial->constantPart();
-            }
-            typename P::CoeffType result( 1 );
-            for( auto const& factor : mFactorization )
-            {
-                typename P::CoeffType factorCP( factor.first.constantPart() );
-                if( factorCP == 0 )
-                    return factorCP;
-                result *= carl::pow( factorCP, factor.second );
-            }
-            assert(computePolynomial(mFactorization).constantPart() == result);
-            return result;
         }
         
         void gatherVariables( std::set<carl::Variable>& _vars ) const
@@ -201,6 +186,13 @@ namespace carl
          */
         template<typename P1>
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _restB, typename P1::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined );
+        
+        /**
+         * @param _infix
+         * @param _friendlyVarNames
+         * @return 
+         */
+        std::string toString( bool _infix = true, bool _friendlyVarNames = true ) const;
         
         /**
          * Prints the given polynomial-factorization pair on the given output stream.

@@ -55,10 +55,15 @@ public:
 	typedef typename UnderlyingNumberType<Coeff>::type NumberType;
 	/// Integer type associated with the number type.
 	typedef typename IntegralType<NumberType>::type IntNumberType;
-protected:
+    ///
+    typedef MultivariatePolynomial<Coeff, Ordering, Policies> PolyType;
+    /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
+    typedef std::vector<int> CACHE;
 	/// Type our terms vector.
 	typedef std::vector<Term<Coeff>> TermsType;
-	
+    
+protected:
+    
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
@@ -202,6 +207,16 @@ public:
 	{
 		return mTerms.size();
 	}
+    
+    /**
+     * @return A rough estimation of the size of this polynomial being the number of its terms.
+     *         (Note, that this method is required, as it is provided of other polynomials not necessarily being straightforward.)
+     */
+    size_t size() const
+    {
+        return mTerms.size();
+    }
+    
 	/**
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 
@@ -265,6 +280,16 @@ public:
 	 */
 	///@todo find new lterm
 	MultivariatePolynomial& stripLT();
+    
+    /**
+     * For terms with exactly one variable, get this variable.
+     * @return The only variable occuring in the term.
+     */
+    Variable::Arg getSingleVariable() const
+    {
+        assert( !isConstant() );
+        return lterm().getSingleVariable();
+    }
 	
 	/**
 	 * Checks whether only one variable occurs.
@@ -364,6 +389,13 @@ public:
 	 */
 	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coeff coprimeFactor() const;
+    
+    /**
+	 * @return The lcm of the denominators of the coefficients (without the constant one) in p divided by the gcd of numerators 
+	 *		 of the coefficients in p.
+	 */
+	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
+	Coeff coprimeFactorWithoutConstant() const;
 	
 	/**
 	 * @return p * p.coprimeFactor()

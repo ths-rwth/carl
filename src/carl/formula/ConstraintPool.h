@@ -35,6 +35,8 @@ namespace carl
             mutable std::mutex mMutexPool;
             /// The constraint pool.
             FastPointerSet<Constraint<Pol>> mConstraints;
+            /// Pointer to the polynomial cache, if cache is needed of the polynomial type, otherwise, it is nullptr.
+            std::shared_ptr<typename Pol::CACHE> mpPolynomialCache;
             
             #ifdef SMTRAT_STRAT_PARALLEL_MODE
             #define CONSTRAINT_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock1( mMutexPool );
@@ -150,6 +152,11 @@ namespace carl
             {
                 return mInconsistentConstraint;
             }
+            
+            const std::shared_ptr<typename Pol::CACHE>& pPolynomialCache() const
+            {
+                return mpPolynomialCache;
+            }
 
             /**
              * Note: This method makes the other accesses to the constraint pool waiting.
@@ -202,7 +209,7 @@ namespace carl
              * @param _bound An over-approximation of the variables which occur on the left-hand side.
              * @return The constructed constraint.
              */
-            const Constraint<Pol>* newBound( const Variable& _var, const Relation _rel, const typename Pol::NumberType& _bound );
+            const Constraint<Pol>* newBound( const Variable& _var, Relation _rel, const typename Pol::NumberType& _bound );
             
             /**
              * Constructs a new constraint and adds it to the pool, if it is not yet a member. If it is a
@@ -215,7 +222,29 @@ namespace carl
              * @param _rel The relation symbol of the constraint.
              * @return The constructed constraint.
              */
-            const Constraint<Pol>* newConstraint( const Pol& _lhs, const Relation _rel );
+            const Constraint<Pol>* newConstraint( Pol&& _lhs, Relation _rel );
+            
+            const Constraint<Pol>* newConstraint( const Pol& _lhs, Relation _rel )
+            {
+                return newConstraint(std::move(Pol(_lhs)), _rel );
+            }
+            
+            const Constraint<Pol>* newConstraint( const carl::Variable::Arg _var, Relation _rel )
+            {
+                return newConstraint( std::move( makePolynomial<Pol>(_var) ), _rel );
+            }
+            
+            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
+            const Constraint<Pol>* newConstraint( typename Pol::PolyType&& _lhs, Relation _rel )
+            {
+                return newConstraint( std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel );
+            }
+            
+            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
+            const Constraint<Pol>* newConstraint( const typename Pol::PolyType& _lhs, Relation _rel )
+            {
+                return newConstraint( std::move( makePolynomial<Pol>( _lhs ) ), _rel );
+            }
             
             /**
              * Prints all constraints in the constraint pool on the given stream.
@@ -226,33 +255,41 @@ namespace carl
     };
     
     /**
-      * Constructs a new constraint and adds it to the shared constraint pool, if it is not yet a member. If it is a
-      * member, this will be returned instead of a new constraint.
-      * Note, that the left-hand side of the constraint is simplified and normalized, hence it is
-      * not necessarily equal to the given left-hand side. The same holds for the relation symbol.
-      * However, it is assured that the returned constraint has the same solutions as
-      * the expected one.
-      * @param _var The left-hand side of the constraint.
-      * @param _rel The relation symbol of the constraint.
-      * @param _bound
-      * @return The constructed constraint.
-      */
-     template<typename Pol>
-     const Constraint<Pol>* newBound( const Variable& _var, const Relation _rel, const typename Pol::NumberType& _bound );
+     * Constructs a new constraint and adds it to the shared constraint pool, if it is not yet a member. If it is a
+     * member, this will be returned instead of a new constraint.
+     * Note, that the left-hand side of the constraint is simplified and normalized, hence it is
+     * not necessarily equal to the given left-hand side. The same holds for the relation symbol.
+     * However, it is assured that the returned constraint has the same solutions as
+     * the expected one.
+     * @param _var The left-hand side of the constraint.
+     * @param _rel The relation symbol of the constraint.
+     * @param _bound
+     * @return The constructed constraint.
+     */
+    template<typename Pol>
+    const Constraint<Pol>* newBound( const Variable& _var, const Relation _rel, const typename Pol::NumberType& _bound );
 
-     /**
-      * Constructs a new constraint and adds it to the shared constraint pool, if it is not yet a member. If it is a
-      * member, this will be returned instead of a new constraint.
-      * Note, that the left-hand side of the constraint is simplified and normalized, hence it is
-      * not necessarily equal to the given left-hand side. The same holds for the relation symbol.
-      * However, it is assured that the returned constraint has the same solutions as
-      * the expected one.
-      * @param _lhs The left-hand side of the constraint.
-      * @param _rel The relation symbol of the constraint.
-      * @return The constructed constraint.
-      */
-     template<typename Pol>
-     const Constraint<Pol>* newConstraint( const Pol& _lhs, const Relation _rel );
+    /**
+     * Constructs a new constraint and adds it to the shared constraint pool, if it is not yet a member. If it is a
+     * member, this will be returned instead of a new constraint.
+     * Note, that the left-hand side of the constraint is simplified and normalized, hence it is
+     * not necessarily equal to the given left-hand side. The same holds for the relation symbol.
+     * However, it is assured that the returned constraint has the same solutions as
+     * the expected one.
+     * @param _lhs The left-hand side of the constraint.
+     * @param _rel The relation symbol of the constraint.
+     * @return The constructed constraint.
+     */
+    template<typename Pol>
+    const Constraint<Pol>* newConstraint( const Pol& _lhs, Relation _rel );
+    template<typename Pol>
+    const Constraint<Pol>* newConstraint( const carl::Variable::Arg _var, Relation _rel );
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    const Constraint<Pol>* newConstraint( const typename Pol::PolyType& _lhs, Relation _rel );
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    const Constraint<Pol>* newConstraint( typename Pol::PolyType&& _lhs, Relation _rel );
+    template<typename Pol>
+    const Constraint<Pol>* newConstraint( Pol&& _lhs, Relation _rel );
 
      /**
       * @return A constant reference to the shared constraint pool.

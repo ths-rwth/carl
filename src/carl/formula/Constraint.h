@@ -39,6 +39,24 @@ namespace carl
     template<typename Pol>
     using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
     
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( typename Pol::PolyType&& _poly );
+
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( const carl::Variable::Arg _var );
+    
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( const typename Pol::PolyType& _poly )
+    {
+        return makePolynomial<Pol>(typename Pol::PolyType(_poly));
+    }
+
+    template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( const carl::Variable::Arg _var )
+    {
+        return Pol( _var );
+    }
+    
     /**
      * Class to create a constraint object.
      */
@@ -72,6 +90,21 @@ namespace carl
             
             /**
              * Constructs the constraint:   _lhs _rel 0
+             * @param _var The left-hand side of the constraint to construct being a polynomial.
+             * @param _rel The relation symbol.
+             * @param _id The unique id for this constraint. It should be maintained by a central instance
+             *             as the offered ConstraintPool class, therefore the constructors are private and
+             *             can only be invoked using the constraint pool or more precisely using the 
+             *             method newConstraint( _lhs, _rel )  or
+             *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
+             *             and b is a rational.
+             */
+            Constraint( const carl::Variable::Arg _var, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>(_var) ), _rel, _id )
+            {}
+            
+            /**
+             * Constructs the constraint:   _lhs _rel 0
              * @param _lhs The left-hand side of the constraint to construct being a polynomial.
              * @param _rel The relation symbol.
              * @param _id The unique id for this constraint. It should be maintained by a central instance
@@ -81,7 +114,21 @@ namespace carl
              *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
              *             and b is a rational.
              */
-            Constraint( const Pol& _lhs, const Relation _rel, unsigned _id = 0 );
+            Constraint( const Pol& _lhs, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( Pol( _lhs ) ), _rel, _id)
+            {}
+            
+            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
+            Constraint( const typename Pol::PolyType& _lhs, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>( _lhs ) ), _rel, _id )
+            {}
+            
+            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
+            Constraint( typename Pol::PolyType&& _lhs, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel, _id )
+            {}
+            
+            Constraint( Pol&& _lhs, Relation _rel, unsigned _id = 0 );
             
             /**
              * Copies the given constraint.
@@ -184,7 +231,7 @@ namespace carl
                 else
                     return typename Pol::NumberType( 0 );
             }
-
+            
             /**
              * @param _variable The variable for which to determine the maximal degree.
              * @return The maximal degree of the given variable in this constraint. (Monomial-wise)
@@ -602,3 +649,4 @@ namespace std
 } // namespace std
 
 #include "Constraint.tpp"
+

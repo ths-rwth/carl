@@ -557,26 +557,27 @@ template<typename C, typename O, typename P>
 DivisionResult<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P>::divideBy(const MultivariatePolynomial& divisor) const
 {
 	static_assert(is_field<C>::value, "Division only defined for field coefficients");
-	DivisionResult<MultivariatePolynomial<C,O,P>> result;
+	MultivariatePolynomial<C,O,P> q;
+	MultivariatePolynomial<C,O,P> r;
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
 	{
 		Term<C> factor;
 		if (p.lterm().divide(divisor.lterm(), factor)) {
-			result.quotient += factor;
+			q += factor;
 			p.subtractProduct(factor, divisor);
 			//p -= factor * divisor;
 		}
 		else
 		{
-			result.remainder += p.lterm();
+			r += p.lterm();
 			p.stripLT();
 		}
 	}
-	assert(result.quotient.isConsistent());
-	assert(result.remainder.isConsistent());
-	assert(*this == result.quotient * divisor + result.remainder);
-	return result;
+	assert(q.isConsistent());
+	assert(r.isConsistent());
+	assert(*this == q * divisor + r);
+	return DivisionResult<MultivariatePolynomial<C,O,P>>(q,r);
 }
 
 template<typename C, typename O, typename P>
@@ -969,6 +970,24 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);
 	typename TermsType::const_iterator it = mTerms.begin();
+	typename IntegralType<Coeff>::type num = getNum((it)->coeff());
+	typename IntegralType<Coeff>::type den = getDenom((it)->coeff());
+	for(++it; it != mTerms.end(); ++it)
+	{
+		num = carl::gcd(num, getNum((it)->coeff()));
+		den = carl::lcm(den, getDenom((it)->coeff()));
+	}
+	return Coeff(den)/num;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+template<typename C, EnableIf<is_subset_of_rationals<C>>>
+Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactorWithoutConstant() const
+{
+	assert(nrTerms() != 0);
+	typename TermsType::const_iterator it = mTerms.begin();
+    if(it->isConstant())
+        ++it;
 	typename IntegralType<Coeff>::type num = getNum((it)->coeff());
 	typename IntegralType<Coeff>::type den = getDenom((it)->coeff());
 	for(++it; it != mTerms.end(); ++it)

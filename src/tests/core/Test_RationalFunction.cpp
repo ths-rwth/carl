@@ -91,6 +91,7 @@ TEST(RationalFunction, Multiplication)
     r4 *= x;
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
     EXPECT_FALSE(needs_cache<Pol>::value);
+    EXPECT_TRUE(needs_cache<FPol>::value);
     
     std::shared_ptr<CachePol> pCache( new CachePol );
     
