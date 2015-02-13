@@ -61,7 +61,8 @@ class SortManager : public Singleton<SortManager>
 			explicit SortContent( const std::string& _name, VariableType _type ):
 				name( _name ),
 				type( _type ),
-				interpreted( true )
+				interpreted( true ),
+				indices( nullptr )
 			{}
 			
 			/**

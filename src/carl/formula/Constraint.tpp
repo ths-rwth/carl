@@ -409,38 +409,40 @@ namespace carl
 
 	template<typename Pol>
 	unsigned Constraint<Pol>::evaluate(const EvaluationMap<Interval<typename carl::UnderlyingNumberType<Pol>::type>>& _assignment) const {
-		// 0 = False, 1 = Maybe, 2 = True
+		// 0 = False, 1 = Null, 2 = Maybe, 3 = True
 		Interval<typename carl::UnderlyingNumberType<Pol>::type> res = IntervalEvaluation::evaluate(mLhs, _assignment);
 		switch (mRelation) {
 			case Relation::EQ: {
-				if (res.isZero()) return 2;
-				else if (res.contains(0)) return 1;
+				if (res.isZero()) return 3;
+				else if (res.contains(0)) return 2;
 				else return 0;
 			}
 			case Relation::NEQ: {
 				if (res.isZero()) return 0;
-				else if (res.contains(0)) return 1;
-				else return 2;
+				else if (res.contains(0)) return 2;
+				else return 3;
 			}
 			case Relation::LESS: {
-				if (res.isNegative()) return 2;
+				if (res.isNegative()) return 3;
 				else if (res.isSemiPositive()) return 0;
-				else return 1;
+				else return 2;
 			}
 			case Relation::GREATER: {
-				if (res.isPositive()) return 2;
+				if (res.isPositive()) return 3;
 				else if (res.isSemiNegative()) return 0;
-				else return 1;
+				else return 2;
 			}
 			case Relation::LEQ: {
-				if (res.isSemiNegative()) return 2;
+				if (res.isSemiNegative()) return 3;
 				else if (res.isPositive()) return 0;
-				else return 1;
+				else if (res.isSemiPositive()) return 1;
+				else return 2;
 			}
 			case Relation::GEQ: {
-				if (res.isSemiPositive()) return 2;
+				if (res.isSemiPositive()) return 3;
 				else if (res.isNegative()) return 0;
-				else return 1;
+				else if (res.isSemiNegative()) return 1;
+				else return 2;
 			}
 		}
 		assert(false);
@@ -628,7 +630,9 @@ namespace carl
             && maxDegree() <= MAX_DEGREE_FOR_FACTORIZATION && maxDegree() >= MIN_DEGREE_FOR_FACTORIZATION )
         {
             mFactorization = ginacFactorization( mLhs );
-        }
+        } else {
+			mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
+		}
         #else
         mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
         #endif

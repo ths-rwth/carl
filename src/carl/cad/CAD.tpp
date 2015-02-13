@@ -348,7 +348,7 @@ void CAD<Number>::clear() {
 	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
 	this->eliminationSets.clear();
 	this->polynomials.clear();
-	this->scheduledPolynomials.clear();
+	this->polynomials.clearScheduled();
 	this->iscomplete = false;
 	this->interrupted = false;
 	this->interrupts.clear();

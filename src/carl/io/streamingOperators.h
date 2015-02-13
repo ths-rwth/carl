@@ -31,7 +31,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
 	os << "[";
 	bool first = true;
-	for (auto it: l) {
+	for (const auto& it: l) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -50,7 +50,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
 	os << "[" << l.size() << ": ";
 	bool first = true;
-	for (auto it: l) {
+	for (const auto& it: l) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -69,7 +69,7 @@ template<typename Key, typename Value>
 std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
 	os << "{";
 	bool first = true;
-	for (auto it: m) {
+	for (const auto& it: m) {
 		if (!first) os << ", ";
 		first = false;
 		os << it.first << " : " << it.second;
@@ -100,7 +100,7 @@ template<typename T, typename C>
 std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
 	os << "{" << s.size() << ": ";
 	bool first = true;
-	for (auto it: s) {
+	for (const auto& it: s) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -140,11 +140,11 @@ std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
  * @param m map to be printed.
  * @return Output stream.
  */
-template<typename Key, typename Value>
-std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value>& m) {
+template<typename Key, typename Value, typename H, typename E, typename A>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m) {
 	os << "{";
 	bool first = true;
-	for (auto it: m) {
+	for (const auto& it: m) {
 		if (!first) os << ", ";
 		first = false;
 		os << it.first << " : " << it.second;
@@ -163,7 +163,7 @@ template<typename T, typename H, typename K, typename A>
 std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>& s) {
 	os << "{" << s.size() << ": ";
 	bool first = true;
-	for (auto it: s) {
+	for (const auto& it: s) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -182,7 +182,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
 	os << "[" << v.size() << ": ";
 	bool first = true;
-	for (auto it: v) {
+	for (const auto& it: v) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
