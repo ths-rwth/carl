@@ -152,7 +152,7 @@ namespace carl
          */
         FactorizedPolynomial<P>& operator=( const FactorizedPolynomial<P>& );
         
-        operator PolyType() const
+        explicit operator PolyType() const
         {
             if( existsFactorization( *this ) )
                 return this->polynomial();

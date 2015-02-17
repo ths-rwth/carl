@@ -621,7 +621,7 @@ namespace carl
             return *this;
         if( factorizedTrivially() )
         {
-            P subResult = polynomial().substitute( _var, _value );
+            P subResult = polynomial().substitute( _var, (P) _value );
             if( subResult.isConstant() )
                 return FactorizedPolynomial<P>( (subResult.constantPart() * mCoefficient) );
             FactorizedPolynomial<P> result( std::move( subResult ), mpCache );
@@ -651,7 +651,7 @@ namespace carl
                 }
             }
             FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
-            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _var, _value ) );
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _var, (P)_value ) );
             return std::move( result );
         }
     }
