@@ -45,7 +45,7 @@ namespace carl
                         {
                             auto iter = vars.find(factorEx);
                             assert(iter != vars.end());
-                            carlSummand *= iter->second;
+                            carlSummand *= createPolynomial( iter->second );
                         }
                         else if(GiNaC::is_exactly_a<GiNaC::numeric>(factorEx))
                         {
@@ -61,7 +61,7 @@ namespace carl
                             assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
                             auto iter = vars.find(subterm);
                             assert(iter != vars.end());
-                            carlSummand *= typename Poly::TermType((typename Poly::CoeffType)1, iter->second, exp);
+                            carlSummand *= createPolynomial(iter->second).pow(exp);
                         }
                         else assert(false);
                     }
@@ -71,7 +71,7 @@ namespace carl
                 {
                     auto iter = vars.find(summandEx);
                     assert(iter != vars.end());
-                    result += iter->second;
+                    result += createPolynomial(iter->second);
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::numeric>(summandEx))
                 {
@@ -87,7 +87,7 @@ namespace carl
                     assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
                     auto iter = vars.find(subterm);
                     assert(iter != vars.end());
-                    result += typename Poly::TermType((typename Poly::CoeffType)1, iter->second, exp);
+                    result += createPolynomial(iter->second).pow(exp);
                 }
                 else assert(false);
             }
@@ -102,7 +102,7 @@ namespace carl
                 {
                     auto iter = vars.find(factorEx);
                     assert(iter != vars.end());
-                    result *= iter->second;
+                    result *= createPolynomial(iter->second);
                 }
                 else if(GiNaC::is_exactly_a<GiNaC::numeric>(factorEx))
                 {
@@ -118,7 +118,7 @@ namespace carl
                     assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
                     auto iter = vars.find(subterm);
                     assert(iter != vars.end());
-                    result *= typename Poly::TermType((typename Poly::CoeffType)1, iter->second, exp);
+                    result *= createPolynomial(iter->second).pow(exp);
                 }
                 else assert( false );
             }
@@ -127,7 +127,7 @@ namespace carl
         {
             auto iter = vars.find(ginacPoly);
             assert(iter != vars.end());
-            result = Poly(iter->second);
+            result = createPolynomial(iter->second);
         }
         else if(GiNaC::is_exactly_a<GiNaC::numeric>(ginacPoly))
         {
@@ -143,7 +143,7 @@ namespace carl
             assert(GiNaC::is_exactly_a<GiNaC::symbol>(subterm));
             auto iter = vars.find(subterm);
             assert(iter != vars.end());
-            result = Poly(typename Poly::TermType((typename Poly::CoeffType)1, iter->second, exp));
+            result = createPolynomial(iter->second).pow(exp);
         }
         else assert( false );
         return result;

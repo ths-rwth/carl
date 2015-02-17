@@ -896,26 +896,70 @@ namespace carl
          *                   a_i = g * b_i for all 1<=i<=k 
          *              or   b_i = g * a_i for all 1<=i<=k 
          */
-        typename Pol::NumberType one_divided_by_a = _constraintA->lhs().coprimeFactorWithoutConstant();
-        typename Pol::NumberType one_divided_by_b = _constraintB->lhs().coprimeFactorWithoutConstant();
-        typename Pol::NumberType c = _constraintA->lhs().constantPart();
-        typename Pol::NumberType d = _constraintB->lhs().constantPart();
-        assert( carl::isOne(carl::getNum(one_divided_by_a)) && carl::isOne(carl::getNum(one_divided_by_b)) );
-        Pol tmpA = (_constraintA->lhs() - c) * one_divided_by_a;
-        Pol tmpB = (_constraintB->lhs() - d) * one_divided_by_b;
-        if( tmpA != tmpB ) return 0;
+        auto termA = _constraintA->lhs().rbegin();
+        auto termB = _constraintB->lhs().rbegin();
+        typename Pol::NumberType g = 1;
+        typename Pol::NumberType c = 0;
+        typename Pol::NumberType d = 0;
         bool termACoeffGreater = false;
-        typename Pol::NumberType g;
-        if( carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b) )
+        bool termBCoeffGreater = false;
+        // The first two terms are not constant.
+        if( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
         {
-            g = carl::getDenom(one_divided_by_a)/carl::getDenom(one_divided_by_b);
-            c /= g; 
-            termACoeffGreater = true;
+            if( (termA)->monomial() != (termB)->monomial() ) return 0;
+            // Find an appropriate g.
+            typename Pol::NumberType termAcoeffAbs = carl::abs( (termA)->coeff() );
+            typename Pol::NumberType termBcoeffAbs = carl::abs( (termB)->coeff() );
+            termACoeffGreater = termAcoeffAbs > termBcoeffAbs; 
+            termBCoeffGreater = termAcoeffAbs < termBcoeffAbs;
+            if( termACoeffGreater ) 
+                g = (termA)->coeff()/(termB)->coeff();
+            else if( termBCoeffGreater ) 
+                g = (termB)->coeff()/(termA)->coeff();
+            else if( (termA)->coeff() == (termB)->coeff() ) 
+                g = typename Pol::NumberType( 1 );
+            else
+            {
+                g = typename Pol::NumberType( -1 );
+                termBCoeffGreater = true;
+            }
+            // Check whether the left-hand sides of the two constraints without their constant part
+            // are equal when one of the left-hand sides is multiplied by g.
+            ++termA;
+            ++termB;
+            while( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
+            {
+                if( (termA)->monomial() != (termB)->monomial() ) return 0;
+                else if( termACoeffGreater )
+                {
+                    if( (termA)->coeff() != g * (termB)->coeff() ) return 0;
+                }
+                else if( termBCoeffGreater )
+                {
+                    if( g * (termA)->coeff() != (termB)->coeff() ) return 0;
+                }
+                else if( (termA)->coeff() != (termB)->coeff() ) return 0;
+                ++termA;
+                ++termB;
+            }
         }
-        else
+        if( termA != _constraintA->lhs().rend() )
         {
-            g = carl::getDenom(one_divided_by_b)/carl::getDenom(one_divided_by_a);
-            d /= g;
+            if( (termA)->isConstant() )
+            {
+                c = (termBCoeffGreater ? (termA)->coeff() * g : (termA)->coeff());
+            }
+            else
+                return 0;
+        }
+        if( termB != _constraintB->lhs().rend() )
+        {
+            if( (termB)->isConstant() )
+            {
+                d = (termACoeffGreater ? (termB)->coeff() * g : (termB)->coeff());
+            }
+            else
+                return 0;
         }
         // Apply the multiplication by a negative g to the according relation symbol, which
         // has to be turned around then.

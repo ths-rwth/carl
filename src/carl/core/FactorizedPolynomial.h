@@ -66,8 +66,6 @@ namespace carl
         mutable CoeffType mCoefficient;
         
         explicit FactorizedPolynomial( Factorization<P>&& _factorization, const CoeffType&, const std::shared_ptr<CACHE>& );
-        
-        explicit FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _p);
 
         /**
          * Updates the hash of the entry in the cache corresponding to this factorized 
@@ -142,6 +140,7 @@ namespace carl
         explicit FactorizedPolynomial( const CoeffType& );
         explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>&, bool = false );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
+        explicit FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _p);
         
         // Destructor.
         ~FactorizedPolynomial();

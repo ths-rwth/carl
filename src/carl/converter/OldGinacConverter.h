@@ -15,6 +15,8 @@
 #include <mutex>
 #include "../core/VariablePool.h"
 #include "../util/Singleton.h"
+#include "../util/SFINAE.h"
+#include "../numbers/typetraits.h"
 
 namespace carl
 {   
@@ -24,11 +26,41 @@ namespace carl
         friend Singleton<OldGinacConverter>;
     private:
         std::recursive_mutex mMutex;
+        std::shared_ptr<typename Poly::CACHE> mpPolynomialCache;
     public:
         
         OldGinacConverter() : Singleton<OldGinacConverter<Poly>>() {}
             
         ~OldGinacConverter() {}
+        
+        void setPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
+        {
+            mpPolynomialCache = _cache;
+        }
+        
+        template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
+        P createPolynomial( typename P::PolyType&& _poly )
+        {
+            return P( std::move(_poly), mpPolynomialCache );
+        }
+
+        template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
+        P createPolynomial( const Variable::Arg _var )
+        {
+            return P( std::move(typename P::PolyType(_var)), mpPolynomialCache );
+        }
+
+        template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
+        P createPolynomial( const typename P::PolyType& _poly )
+        {
+            return createPolynomial(typename P::PolyType(_poly));
+        }
+
+        template<typename P = Poly, DisableIf<needs_cache<P>> = dummy>
+        P createPolynomial( const Variable::Arg _var )
+        {
+            return P( _var );
+        }
         
         bool similar( const GiNaC::ex& a, const GiNaC::ex& b);
 
@@ -106,6 +138,12 @@ namespace carl
 	bool checkConversion(const Poly& polyA)
     {
         return OldGinacConverter<Poly>::getInstance().checkConversion(polyA);
+    }
+	
+	template<typename Poly>
+	bool setGinacConverterPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
+    {
+        return OldGinacConverter<Poly>::getInstance().setGinacConverterPolynomialCache( _cache );
     }
 }
 

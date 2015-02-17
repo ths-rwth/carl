@@ -48,8 +48,6 @@ namespace carl
                 poly *= CoeffType(-1);
                 mCoefficient *= CoeffType(-1);
             }
-            
-
             /*
              * The following is not very nice, but we know, that the hash won't change, once the polynomial 
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
@@ -131,33 +129,40 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>::FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _pair)
     {
-//        auto op = p.first;
-//        auto sub = p.second;
-//        assert(!sub.empty());
-//        auto it = sub.begin();
-//        *this = *it;
-//        if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
-//            // special treatment of unary minus
-//            *this *= -1;
-//            assert(this->isConsistent());
-//            return;
-//        }
-//        if (op == ConstructorOperation::DIV) {
-//            // division shall have at least two arguments
-//            assert(sub.size() >= 2);
-//        }
-//        for (it++; it != sub.end(); it++) {
-//        switch (op) {
-//            case ConstructorOperation::ADD: *this += *it; break;
-//            case ConstructorOperation::SUB: *this -= *it; break;
-//            case ConstructorOperation::MUL: *this *= *it; break;
-//            case ConstructorOperation::DIV: 
-//                assert(it->isConstant());
-//                *this /= it->constantPart();
-//                break;
-//            }
-//        }
-//        assert(this->isConsistent());
+        auto op = _pair.first;
+        auto sub = _pair.second;
+        assert(!sub.empty());
+        auto it = sub.begin();
+        *this = *it;
+        if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
+            // special treatment of unary minus
+            *this = -(*this);
+            return;
+        }
+        if( op == ConstructorOperation::DIV )
+        {
+            // division shall have at least two arguments
+            assert(sub.size() >= 2);
+        }
+        for( ++it; it != sub.end(); ++it)
+        {
+            switch( op )
+            {
+                case ConstructorOperation::ADD: 
+                    *this += *it; 
+                    break;
+                case ConstructorOperation::SUB: 
+                    *this -= *it; 
+                    break;
+                case ConstructorOperation::MUL: 
+                    *this *= *it; 
+                    break;
+                case ConstructorOperation::DIV: 
+                    assert(it->isConstant());
+                    *this /= it->constantPart();
+                    break;
+              }
+        }
     }
     
     template<typename P>
