@@ -154,7 +154,9 @@ namespace carl
         
         operator PolyType() const
         {
-            return this->polynomial();
+            if( existsFactorization( *this ) )
+                return this->polynomial();
+            return PolyType( mCoefficient );
         }
         
         /**
