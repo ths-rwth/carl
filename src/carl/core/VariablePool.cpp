@@ -14,7 +14,11 @@
 namespace carl
 {
 
-VariablePool::VariablePool(): Singleton()
+VariablePool::VariablePool():
+    Singleton(),
+    mNextIDs(),
+    mVariableNames(),
+    mVariablePrefix()
 {
 	CARL_LOG_INFO("carl.varpool", "Constructor called");
 	clear();
