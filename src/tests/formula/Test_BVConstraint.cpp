@@ -4,6 +4,7 @@
 #include "../../carl/core/MultivariatePolynomial.h"
 #include "../../carl/core/VariablePool.h"
 #include "../../carl/formula/FormulaPool.h"
+#include "../../carl/formula/SortManager.h"
 // #include "../../carl/formula/Formula.h"
 // #include "../../carl/util/stringparser.h"
 
@@ -20,8 +21,11 @@ TEST(BVConstraint, Construction)
 	Variable a = VariablePool::getInstance().getFreshVariable("a", VariableType::VT_BITVECTOR);
 	Variable b = VariablePool::getInstance().getFreshVariable("b", VariableType::VT_BITVECTOR);
 
-	BVTerm<Pol> a_t(BVTermType::VARIABLE, a, 16);
-	BVTerm<Pol> b_t(BVTermType::VARIABLE, b, 16);
+	Sort bvSort = SortManager::getInstance().interpretedSort("BitVec", VariableType::VT_BITVECTOR);
+	Sort bv16Sort = SortManager::getInstance().index(bvSort, {16});
+
+	BVTerm<Pol> a_t(BVTermType::VARIABLE, BVVariable(a, bv16Sort));
+	BVTerm<Pol> b_t(BVTermType::VARIABLE, BVVariable(b, bv16Sort));
 
 	BVTerm<Pol> check_for_default_constructor;
 

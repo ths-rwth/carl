@@ -207,12 +207,11 @@ namespace carl
 			assert(_type == BVTermType::CONSTANT);
 		}
 
-		BVTermContent(BVTermType _type, Variable::Arg _variable, size_t _width = 1) :
-		mType(_type), mVariable(_variable, _width), mWidth(_width),
-		mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
+		BVTermContent(BVTermType _type, const BVVariable& _variable) :
+		mType(_type), mVariable(_variable), mWidth(_variable.width()) //,
+		// TODO: Hash - mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::VARIABLE);
-			assert(_variable.getType() == VariableType::VT_BITVECTOR);
 		}
 
 		BVTermContent(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
@@ -416,8 +415,8 @@ namespace carl
 		{
 		}
 
-		BVTerm(BVTermType _type, Variable::Arg _variable, size_t _width) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _variable, _width))
+		BVTerm(BVTermType _type, const BVVariable& _variable) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _variable))
 		{
 		}
 

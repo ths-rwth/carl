@@ -33,14 +33,14 @@ namespace carl
 			return this->mpInvalid;
 		}
 
-		ConstTermPtr create(BVTermType _type, BVValue _value)
+		ConstTermPtr create(BVTermType _type, const BVValue _value)
 		{
 			return this->add(new Term(_type, _value));
 		}
 
-		ConstTermPtr create(BVTermType _type, Variable::Arg _variable, size_t _width = 1)
+		ConstTermPtr create(BVTermType _type, const BVVariable& _variable)
 		{
-			return this->add(new Term(_type, _variable, _width));
+			return this->add(new Term(_type, _variable));
 		}
 
 		ConstTermPtr create(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB)

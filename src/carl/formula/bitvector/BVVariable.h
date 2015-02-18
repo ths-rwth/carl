@@ -7,6 +7,7 @@
 
 #include "../../core/Variable.h"
 #include "../../core/VariablePool.h"
+#include "../SortManager.h"
 
 namespace carl
 {
@@ -15,6 +16,7 @@ namespace carl
 	{
 	private:
 		Variable mVar;
+		Sort mSort;
 		size_t mWidth;
 
 	public:
@@ -23,8 +25,20 @@ namespace carl
 		{
 		}
 
+		BVVariable(Variable::Arg _variable, const Sort& _sort) :
+		mVar(_variable), mSort(_sort)
+		{
+			assert(SortManager::getInstance().isInterpreted(_sort));
+			assert(SortManager::getInstance().interpretedType(_sort) == VariableType::VT_BITVECTOR);
+
+			const std::vector<std::size_t>* indices = SortManager::getInstance().getIndices(_sort);
+			assert(indices != nullptr && indices->size() == 1 && indices->front() > 0);
+
+			mWidth = indices->front();
+		}
+
 		BVVariable(Variable::Arg _variable, size_t _width = 1) :
-		mVar(_variable), mWidth(_width)
+		BVVariable(_variable, SortManager::getInstance().index(SortManager::getInstance().interpretedSort(VariableType::VT_BITVECTOR), {_width}))
 		{
 		}
 
