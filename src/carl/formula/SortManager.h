@@ -111,10 +111,10 @@ class SortManager : public Singleton<SortManager>
 			{
 				if (name != _sc.name) return name < _sc.name;
 				if (interpreted != _sc.interpreted) return interpreted;
-				if (!interpreted) {
+				if (interpreted) {
 					if (type != _sc.type) return type < _sc.type;
 				}
-				if (interpreted) {
+				if (!interpreted) {
 					if (parameters == nullptr && _sc.parameters != nullptr) return true;
 					if (parameters != nullptr && _sc.parameters == nullptr) return false;
 					if (parameters != nullptr && _sc.parameters != nullptr) {
