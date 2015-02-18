@@ -11,10 +11,18 @@
 namespace carl
 {
 
+	// Forward declaration
+	template<typename Pol>
+	class BVConstraintPool;
+
 	template<typename Pol>
 	class BVConstraint
 	{
+		// TODO: Assigning mId requires Pool<BVConstraint<Pol>> to be a friend,
+		// using the private constructors requires BVConstraintPool<Pol> to be
+		// a friend. Should we move mId assignment to subclass?
 		friend class Pool<BVConstraint<Pol>>;
+		friend class BVConstraintPool<Pol>;
 
 	private:
 		/// The hash value.
@@ -23,13 +31,16 @@ namespace carl
 		size_t mId;
 
 		/// The relation for comparing left- and right-hand side.
-		const BVCompareRelation mRelation;
+		BVCompareRelation mRelation;
 		/// The left-hand side of the (in)equality.
-		const BVTerm<Pol>& mLhs;
+		BVTerm<Pol> mLhs;
 		/// The right-hand size of the (in)equality.
-		const BVTerm<Pol>& mRhs;
+		BVTerm<Pol> mRhs;
 
-	public:
+
+		BVConstraint(bool _consistent = true) :
+		mRelation(_consistent ? BVCompareRelation::EQ : BVCompareRelation::NEQ)
+		{}
 
 		/**
 		 * Constructs the constraint: _lhs _relation _rhs
@@ -43,6 +54,19 @@ namespace carl
 		mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash())
 		{
 			assert(_lhs.width() == _rhs.width());
+		}
+
+	public:
+
+		static BVConstraint<Pol> create(bool _consistent = true)
+		{
+			return *(BVConstraintPool<Pol>::getInstance().create(_consistent));
+		}
+
+		static BVConstraint<Pol> create(const BVCompareRelation& _relation,
+			const BVTerm<Pol>& _lhs, const BVTerm<Pol>& _rhs)
+		{
+			return *(BVConstraintPool<Pol>::getInstance().create(_relation, _lhs, _rhs));
 		}
 
 		/**
@@ -134,7 +158,14 @@ namespace carl
 
 		bool operator==(const BVConstraint<Pol>& _other) const
 		{
-			return mId == _other.mId; // TODO: Make sure this also works if any mId is not set
+			if(mId && _other.mId) {
+				return mId == _other.mId;
+			}
+
+			return
+				mRelation == _other.mRelation
+				&& mLhs == _other.mLhs
+				&& mRhs == _other.mRhs;
 		}
 
 		size_t hash() const

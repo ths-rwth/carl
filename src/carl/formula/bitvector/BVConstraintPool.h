@@ -21,6 +21,11 @@ namespace carl
 
 		public:
 
+		ConstConstraintPtr create(bool _consistent = true)
+		{
+			return this->add(new Constraint(_consistent));
+		}
+
 		ConstConstraintPtr create(const BVCompareRelation& _relation,
 			const BVTerm<Pol>& _lhs, const BVTerm<Pol>& _rhs)
 		{

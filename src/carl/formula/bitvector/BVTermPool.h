@@ -11,15 +11,27 @@
 namespace carl
 {
 	template<typename Pol>
-	class BVTermPool : public Singleton<BVTermPool<Pol>>, public Pool<BVTerm<Pol>>
+	class BVTermPool : public Singleton<BVTermPool<Pol>>, public Pool<BVTermContent<Pol>>
 	{
 		friend Singleton<BVTermPool>;
 
-		typedef BVTerm<Pol> Term;
+		typedef BVTermContent<Pol> Term;
 		typedef Term* TermPtr;
 		typedef const Term* ConstTermPtr;
 
+		ConstTermPtr mpInvalid;
+
 		public:
+
+		BVTermPool() : Singleton<BVTermPool<Pol>> (), Pool<BVTermContent<Pol>> ()
+		{
+			this->mpInvalid = this->add(new Term);
+		}
+
+		ConstTermPtr create()
+		{
+			return this->mpInvalid;
+		}
 
 		ConstTermPtr create(BVTermType _type, BVValue _value)
 		{

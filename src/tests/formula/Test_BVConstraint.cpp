@@ -17,33 +17,39 @@ typedef MultivariatePolynomial<Rational> Pol;
 
 TEST(BVConstraint, Construction)
 {
-	Variable a = VariablePool::getInstance().getFreshVariable("a", VariableType::VT_REAL); // TODO: Should be VT_BITVECTOR
-	Variable b = VariablePool::getInstance().getFreshVariable("b", VariableType::VT_REAL); // TODO: Should be VT_BITVECTOR
+	Variable a = VariablePool::getInstance().getFreshVariable("a", VariableType::VT_BITVECTOR);
+	Variable b = VariablePool::getInstance().getFreshVariable("b", VariableType::VT_BITVECTOR);
 
-	auto a_t = BV_TERM_POOL.create(BVTermType::VARIABLE, a, 16);
-	auto b_t = BV_TERM_POOL.create(BVTermType::VARIABLE, b, 16);
+	BVTerm<Pol> a_t(BVTermType::VARIABLE, a, 16);
+	BVTerm<Pol> b_t(BVTermType::VARIABLE, b, 16);
 
-	auto oxfff0 = BV_TERM_POOL.create(BVTermType::CONSTANT, BVValue(16, 65520));
+	BVTerm<Pol> check_for_default_constructor;
+
+	BVTerm<Pol> oxfff0(BVTermType::CONSTANT, BVValue(16, 65520));
 	const Formula<Pol> trueFormula = Formula<Pol>(FormulaType::TRUE);
 
-	auto ite = BV_TERM_POOL.create(BVTermType::ITE, trueFormula, *a_t, *b_t);
+	BVTerm<Pol> ite(BVTermType::ITE, trueFormula, a_t, b_t);
 
-	auto bvand = BV_TERM_POOL.create(BVTermType::AND, *a_t, *oxfff0);
-	auto bvmul = BV_TERM_POOL.create(BVTermType::MUL, *bvand, *b_t);
+	BVTerm<Pol> bvand(BVTermType::AND, a_t, oxfff0);
+	BVTerm<Pol> bvmul(BVTermType::MUL, bvand, b_t);
 
-	auto bvnot = BV_TERM_POOL.create(BVTermType::NOT, *bvmul);
+	BVTerm<Pol> bvnot(BVTermType::NOT, bvmul);
 
-	auto oxa = BV_TERM_POOL.create(BVTermType::CONSTANT, BVValue(4, 10));
-	auto oxaa = BV_TERM_POOL.create(BVTermType::REPEAT, *oxa, 2);
+	BVTerm<Pol> oxa(BVTermType::CONSTANT, BVValue(4, 10));
+	BVTerm<Pol> oxaa(BVTermType::REPEAT, oxa, 2);
 
-	auto bvextract = BV_TERM_POOL.create(BVTermType::EXTRACT, *bvnot, 6, 8);
-	auto bvconcat = BV_TERM_POOL.create(BVTermType::CONCAT, *bvextract, *bvextract);
+	BVTerm<Pol> bvextract(BVTermType::EXTRACT, bvnot, 6, 8);
+	BVTerm<Pol> bvconcat(BVTermType::CONCAT, bvextract, bvextract);
 
-	auto bvzeroext = BV_TERM_POOL.create(BVTermType::EXT_U, *bvconcat, 8);
+	BVTerm<Pol> bvzeroext(BVTermType::EXT_U, bvconcat, 8);
 
-	auto constraint = BV_CONSTRAINT_POOL.create(BVCompareRelation::SLT, *oxaa, *bvzeroext);
+	// check for copy assignment
+	check_for_default_constructor = bvzeroext;
 
-	std::cout << constraint->toString(false, 0, "", false, false, true) << std::endl;
+	BVConstraint<Pol> constraint = BVConstraint<Pol>::create(BVCompareRelation::SLT, oxaa, bvzeroext);
+	BVConstraint<Pol> inconsistentConstraint = BVConstraint<Pol>::create(false);
+
+	std::cout << constraint.toString(false, 0, "", false, false, true) << std::endl;
 
 	BV_TERM_POOL.print();
 	BV_CONSTRAINT_POOL.print();

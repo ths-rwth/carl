@@ -7,6 +7,7 @@
 
 #include "BVVariable.h"
 #include "../Formula.h"
+#include "BVTermPool.h"
 #include <boost/dynamic_bitset.hpp>
 
 /**
@@ -85,9 +86,31 @@ namespace carl
 		return "";
 	}
 
-	inline std::size_t toId(const BVTermType _type)
+	inline std::size_t typeId(const BVTermType _type)
 	{
 		return static_cast<std::size_t>(_type);
+	}
+
+	inline bool typeIsUnary(const BVTermType _type)
+	{
+		return(
+			_type == BVTermType::NOT || _type == BVTermType::NEG || _type == BVTermType::LROTATE
+			|| _type == BVTermType::RROTATE || _type == BVTermType::REPEAT || _type == BVTermType::EXT_U
+			|| _type == BVTermType::EXT_S
+			);
+	}
+
+	inline bool typeIsBinary(const BVTermType _type)
+	{
+		return(
+			_type == BVTermType::CONCAT || _type == BVTermType::AND || _type == BVTermType::OR
+			|| _type == BVTermType::XOR || _type == BVTermType::NAND || _type == BVTermType::NOR
+			|| _type == BVTermType::XNOR || _type == BVTermType::ADD || _type == BVTermType::SUB
+			|| _type == BVTermType::MUL || _type == BVTermType::DIV_U || _type == BVTermType::DIV_S
+			|| _type == BVTermType::MOD_U || _type == BVTermType::MOD_S1 || _type == BVTermType::MOD_S2
+			|| _type == BVTermType::EQ || _type == BVTermType::LSHIFT || _type == BVTermType::RSHIFT_LOGIC
+			|| _type == BVTermType::RSHIFT_ARITH
+			);
 	}
 
 	// forward declaration
@@ -150,9 +173,9 @@ namespace carl
 	class Pool;
 
 	template<typename Pol>
-	class BVTerm
+	class BVTermContent
 	{
-		friend class Pool<BVTerm<Pol>>;
+		friend class Pool<BVTermContent<Pol>>;
 
 	private:
 		BVTermType mType;
@@ -172,33 +195,40 @@ namespace carl
 
 	public:
 
-		BVTerm(BVTermType _type, BVValue _value) :
+		BVTermContent() :
+		mType(BVTermType::CONSTANT), mValue(), mWidth(0)
+		{
+		}
+
+		BVTermContent(BVTermType _type, BVValue _value) :
 		mType(_type), mValue(_value), mWidth(_value.size()),
-		mHash((boost::hash_value(_value) << 5) ^ toId(_type))
+		mHash((boost::hash_value(_value) << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::CONSTANT);
 		}
 
-		BVTerm(BVTermType _type, Variable::Arg _variable, size_t _width = 1) :
+		BVTermContent(BVTermType _type, Variable::Arg _variable, size_t _width = 1) :
 		mType(_type), mVariable(_variable, _width), mWidth(_width),
-		mHash(((size_t)_variable.getId() << 5) ^ toId(_type))
+		mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::VARIABLE);
-			// assert( _variable.getType() == VariableType::VT_BITVECTOR );
+			assert(_variable.getType() == VariableType::VT_BITVECTOR);
 		}
 
-		BVTerm(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
+		BVTermContent(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
 		mType(_type), mIte(_booleanFormula, _subtermA, _subtermB), mWidth(_subtermA.width()),
-		mHash((_booleanFormula.getHash() << 15) ^ (_subtermA.hash() << 10) ^ (_subtermB.hash() << 5) ^ toId(_type))
+		mHash((_booleanFormula.getHash() << 15) ^ (_subtermA.hash() << 10) ^ (_subtermB.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::ITE);
 			assert(_subtermA.width() == _subtermB.width());
 		}
 
-		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
+		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
 		mType(_type), mUnary(_operand, _index),
-		mHash((_index << 10) ^ (_operand.hash() << 5) ^ toId(_type))
+		mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
+			assert(typeIsUnary(_type));
+
 			if(_type == BVTermType::NOT || _type == BVTermType::NEG) {
 				assert(_index == 0);
 				mWidth = _operand.width();
@@ -216,19 +246,11 @@ namespace carl
 			}
 		}
 
-		BVTerm(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
+		BVTermContent(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
 		mType(_type), mBinary(_first, _second),
-		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ toId(_type))
+		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
 		{
-			assert(
-				_type == BVTermType::CONCAT || _type == BVTermType::AND || _type == BVTermType::OR
-				|| _type == BVTermType::XOR || _type == BVTermType::NAND || _type == BVTermType::NOR
-				|| _type == BVTermType::XNOR || _type == BVTermType::ADD || _type == BVTermType::SUB
-				|| _type == BVTermType::MUL || _type == BVTermType::DIV_U || _type == BVTermType::DIV_S
-				|| _type == BVTermType::MOD_U || _type == BVTermType::MOD_S1 || _type == BVTermType::MOD_S2
-				|| _type == BVTermType::EQ || _type == BVTermType::LSHIFT || _type == BVTermType::RSHIFT_LOGIC
-				|| _type == BVTermType::RSHIFT_ARITH
-				);
+			assert(typeIsBinary(_type));
 
 			if(_type == BVTermType::CONCAT) {
 				mWidth = _first.width() + _second.width();
@@ -239,16 +261,16 @@ namespace carl
 			}
 		}
 
-		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
+		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
 		mType(_type), mExtract(_operand, _first, _last),
-		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ toId(_type))
+		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::EXTRACT);
 			assert(_first >= 0 && _last >= _first && _last < _operand.width());
 			mWidth = _last - _first + 1;
 		}
 
-		~BVTerm()
+		~BVTermContent()
 		{
 			if(mType == BVTermType::VARIABLE) {
 				mVariable.~BVVariable();
@@ -284,9 +306,13 @@ namespace carl
 		std::string toString(bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
 			if(mType == BVTermType::CONSTANT) {
-				string valueStr;
-				boost::to_string(mValue, valueStr);
-				return _init + "0b" + valueStr;
+				if(mWidth == 0) {
+					return _init + "%invalid%";
+				} else {
+					string valueStr;
+					boost::to_string(mValue, valueStr);
+					return _init + "0b" + valueStr;
+				}
 			} else if(mType == BVTermType::VARIABLE) {
 				return _init + mVariable.toString(_friendlyNames);
 			} else {
@@ -315,21 +341,14 @@ namespace carl
 					argThird = mIte.mElse.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				} else if(mType == BVTermType::EXTRACT) {
 					argFirst = mExtract.mOperand.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else if(mType == BVTermType::NOT || mType == BVTermType::NEG || mType == BVTermType::LROTATE
-					|| mType == BVTermType::RROTATE || mType == BVTermType::REPEAT || mType == BVTermType::EXT_U
-					|| mType == BVTermType::EXT_S) {
+				} else if(typeIsUnary(mType)) {
 					argFirst = mUnary.mOperand.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else if(mType == BVTermType::CONCAT || mType == BVTermType::AND || mType == BVTermType::OR
-					|| mType == BVTermType::XOR || mType == BVTermType::NAND || mType == BVTermType::NOR
-					|| mType == BVTermType::XNOR || mType == BVTermType::ADD || mType == BVTermType::SUB
-					|| mType == BVTermType::MUL || mType == BVTermType::DIV_U || mType == BVTermType::DIV_S
-					|| mType == BVTermType::MOD_U || mType == BVTermType::MOD_S1 || mType == BVTermType::MOD_S2
-					|| mType == BVTermType::EQ || mType == BVTermType::LSHIFT || mType == BVTermType::RSHIFT_LOGIC
-					|| mType == BVTermType::RSHIFT_ARITH) {
+				} else if(typeIsBinary(mType)) {
 					argFirst = mBinary.mFirst.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 					argSecond = mBinary.mSecond.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else
+				} else {
 					assert(false);
+				}
 
 				if(_infix && !argFirst.empty() && !argSecond.empty() && argThird.empty()) {
 					// Infix notation is only really infix if we have exactly two arguments
@@ -358,7 +377,7 @@ namespace carl
 			return this->mHash;
 		}
 
-		bool operator==(const BVTerm<Pol>& _other) const
+		bool operator==(const BVTermContent<Pol>& _other) const
 		{
 			return mId == _other.mId; // TODO: Make sure this also works if any mId is not set
 		}
@@ -369,9 +388,88 @@ namespace carl
 		 * @param _term The term to be printed.
 		 */
 		template<typename P>
+		friend std::ostream& operator<<(std::ostream& _out, const BVTermContent<P>& _term)
+		{
+			return(_out << _term.toString());
+		}
+	};
+
+	// Forward declaration
+	template<typename Pol>
+	class BVTermPool;
+
+	template<typename Pol>
+	class BVTerm
+	{
+	private:
+		const BVTermContent<Pol> * mpContent;
+
+	public:
+
+		BVTerm() :
+		mpContent(BVTermPool<Pol>::getInstance().create())
+		{
+		}
+
+		BVTerm(BVTermType _type, BVValue _value) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _value))
+		{
+		}
+
+		BVTerm(BVTermType _type, Variable::Arg _variable, size_t _width) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _variable, _width))
+		{
+		}
+
+		BVTerm(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _booleanFormula, _subtermA, _subtermB))
+		{
+		}
+
+		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _operand, _index))
+		{
+		}
+
+		BVTerm(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _first, _second))
+		{
+		}
+
+		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
+		mpContent(BVTermPool<Pol>::getInstance().create(_type, _operand, _first, _last))
+		{
+		}
+
+		std::string toString(bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
+		{
+			return mpContent->toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+		}
+
+		template<typename P>
 		friend std::ostream& operator<<(std::ostream& _out, const BVTerm<P>& _term)
 		{
 			return(_out << _term.toString());
+		}
+
+		size_t hash() const
+		{
+			return mpContent->hash();
+		}
+
+		size_t width() const
+		{
+			return mpContent->width();
+		}
+
+		BVTermType type() const
+		{
+			return mpContent->type();
+		}
+
+		bool operator==(const BVTerm<Pol>& _other) const
+		{
+			return mpContent == _other.mpContent;
 		}
 	};
 }
@@ -382,7 +480,7 @@ namespace std
 	 * Implements std::hash for bit vector terms.
 	 */
 	template<typename Pol>
-	struct hash<carl::BVTerm<Pol>>
+	struct hash<carl::BVTermContent<Pol>>
 	{
 		public:
 
@@ -390,7 +488,7 @@ namespace std
 		 * @param _formula The bit vector term to get the hash for.
 		 * @return The hash of the given bit vector term.
 		 */
-		size_t operator()(const carl::BVTerm<Pol>& _term) const
+		size_t operator()(const carl::BVTermContent<Pol>& _term) const
 		{
 			return _term.hash();
 		}
