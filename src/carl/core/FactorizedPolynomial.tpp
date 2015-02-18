@@ -437,49 +437,6 @@ namespace carl
         return VariableInformation<false, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence() );
 
     }
-
-    template<typename P>
-    template<bool gatherCoeff>
-    VariablesInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo() const
-    {
-        // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
-        if( gatherCoeff )
-        {
-            VariablesInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>();
-            VariablesInformation<gatherCoeff, FactorizedPolynomial<P>> result;
-//            for( const auto& varViPair : vi )
-//            {
-//                const auto& varI = varViPair.second;
-//                std::map<unsigned,FactorizedPolynomial<P>> coeffs;
-//                for( const auto& expCoeffPair : varI.coeffs() )
-//                {
-//                    if( expCoeffPair.second.isConstant() )
-//                    {
-//                        coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() ) ) );
-//                    }
-//                    else
-//                    {
-//                        coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) ) );
-//                    }
-//                }
-//                VariableInformation<gatherCoeff, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence(), std::move( coeffs ) );
-//                result.insert( result.end(), std::make_pair( varViPair.first, std::move( viFactorized ) ) );
-//            }
-            return result;
-        }
-        else
-        {
-            VariablesInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>();
-            VariablesInformation<gatherCoeff, FactorizedPolynomial<P>> result;
-//            for( const auto& varViPair : vi )
-//            {
-//                const auto& varI = varViPair.second;
-//                VariableInformation<gatherCoeff, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence() );
-//                result.insert( result.end(), std::make_pair( varViPair.first, std::move( viFactorized ) ) );
-//            }
-            return result;
-        }
-    }
     
     template<typename P>
     Definiteness FactorizedPolynomial<P>::definiteness() const
