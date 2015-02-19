@@ -173,6 +173,42 @@ public:
 	exponent totalDegree() const;
 
 	/**
+	 * Calculates the degree of this polynomial with respect to the given variable.
+	 * @param var Variable.
+	 * @return Degree w.r.t. var.
+	 */
+	std::size_t degree(Variable::Arg var) const {
+		std::size_t max = 0;
+		for (const auto& t: mTerms) {
+			if (t.monomial() == nullptr) continue;
+			std::size_t c = t.monomial()->exponentOfVariable(var);
+			if (c > max) max = c;
+		}
+		return max;
+	}
+
+	/**
+	 * Calculates the coefficient of var^exp.
+	 * @param var Variable.
+	 * @param exp Exponent.
+	 * @return Coefficient of var^exp.
+	 */
+	MultivariatePolynomial coeff(Variable::Arg var, exponent exp) const {
+		MultivariatePolynomial res;
+		for (const auto& t: mTerms) {
+			if (t.monomial() == nullptr) {
+				if (exp == 0) res.mTerms.push_back(t);
+			} else if (t.monomial()->exponentOfVariable(var) == exp) {
+				Monomial::Arg newMon = t.monomial()->dropVariable(var);
+				res.mTerms.push_back(TermType(t.coeff(), newMon));
+			}
+		}
+		res.mOrdered = false;
+		res.makeMinimallyOrdered<true,true>();
+		return res;
+	}
+
+	/**
 	 * Checks if the polynomial is zero.
 	 * @return If this is zero.
 	 */
