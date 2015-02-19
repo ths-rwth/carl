@@ -371,6 +371,12 @@ public:
 	 * @param p Polynomial.
 	 */
 	void subtractProduct(const Term<Coeff>& factor, const MultivariatePolynomial& p);
+	
+	/**
+	 * Adds a single term without using a TermAdditionManager or changing the ordering status.
+	 * @param term Term.
+	 */
+	void addTerm(const Term<Coeff>& term);
 
 	/**
 	 * Divides the polynomial by the given coefficient.

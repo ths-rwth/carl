@@ -523,6 +523,67 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
 	assert(this->isConsistent());
 }
 
+template<typename Coeff, typename Ordering, typename Policies>
+void MultivariatePolynomial<Coeff,Ordering,Policies>::addTerm(const Term<Coeff>& term) {
+	//std::cout << *this << " + " << term << std::endl;
+	if (term.isConstant()) {
+		if (hasConstantTerm()) {
+			trailingTerm().coeff() += term.coeff();
+			if (carl::isZero(trailingTerm().coeff())) {
+				mTerms.erase(mTerms.begin());
+			}
+		} else mTerms.insert(mTerms.begin(), term);
+		return;
+	}
+	if (mOrdered) {
+		auto it = mTerms.begin();
+		for (; it != mTerms.end(); it++) {
+			CompareResult res = Ordering::compare(term, *it);
+			switch (res) {
+			case CompareResult::LESS: break;
+			case CompareResult::EQUAL: {
+				it->coeff() += term.coeff();
+				if (carl::isZero(it->coeff())) {
+					mTerms.erase(it);
+				}
+				return;
+			}
+			case CompareResult::GREATER: ;
+			}
+		}
+		mTerms.insert(it, term);
+	} else {
+		switch (Ordering::compare(lterm(), term)) {
+		case CompareResult::LESS: {
+			mTerms.push_back(term);
+			break;
+		}
+		case CompareResult::EQUAL: {
+			lterm().coeff() += term.coeff();
+			if (carl::isZero(lterm().coeff())) {
+				mTerms.pop_back();
+				makeMinimallyOrdered<false,true>();
+			}
+			break;
+		}
+		case CompareResult::GREATER: {
+			for (auto it = mTerms.begin(); it != mTerms.end(); it++) {
+				if (Ordering::equal(*it, term)) {
+					it->coeff() += term.coeff();
+					if (carl::isZero(it->coeff())) {
+						mTerms.erase(it);
+					}
+					return;
+				}
+			}
+			auto lt = mTerms.back();
+			mTerms.push_back(term);
+			std::swap(lt, mTerms.back());
+		}
+		}
+	}
+}
+
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename C, EnableIf<is_field<C>>>
