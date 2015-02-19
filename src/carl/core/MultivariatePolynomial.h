@@ -423,7 +423,7 @@ public:
 	 * @see MultivariatePolynomial::divideBy
 	 */
 	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
-	MultivariatePolynomial prem(const MultivariatePolynomial& divisor) const;
+	MultivariatePolynomial prem(const MultivariatePolynomial& divisor, Variable::Arg var) const;
 	
 	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;

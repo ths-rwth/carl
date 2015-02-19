@@ -736,6 +736,13 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	return remainder;
 }
 
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::prem(const MultivariatePolynomial& divisor, Variable::Arg var) const
+{
+	return MultivariatePolynomial(this->toUnivariatePolynomial(var).prem(divisor.toUnivariatePolynomial(var)));
+	return this->remainder(divisor);
+}
+
 template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg var, const MultivariatePolynomial<Coeff, Ordering, Policies>& value)
 {
