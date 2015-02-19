@@ -500,13 +500,19 @@ template<typename Coeff, typename Ordering, typename Policies>
 void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term<Coeff>& factor, const MultivariatePolynomial<Coeff,Ordering,Policies> & p) {
 	assert(this->isConsistent());
 	assert(p.isConsistent());
-	if(mTerms.empty())
-	{
-		*this = factor*p;
+	if (p.isZero()) return;
+	if (isZero()) {
+		*this = - factor * p;
         assert(this->isConsistent());
 	}
-	if(p.mTerms.empty()) return;
 	if (carl::isZero(factor.coeff())) return;
+	if (p.nrTerms() < 3) {
+		for (const auto& t: p) {
+			this->addTerm(- factor * t);
+		}
+		assert(isConsistent());
+		return;
+	}
 
 	auto id = mTermAdditionManager.getId(mTerms.size() + p.mTerms.size());
 	for (const auto& term: mTerms) {
