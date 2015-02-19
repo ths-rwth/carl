@@ -368,10 +368,10 @@ namespace carl
 		if ((lhs.id() != 0) && (rhs.id() != 0)) {
 			if (lhs.id() == rhs.id()) return CompareResult::EQUAL;
 		}
-		auto lhsit = lhs.mExponents.begin( );
-		auto rhsit = rhs.mExponents.begin( );
-		auto lhsend = lhs.mExponents.end( );
-		auto rhsend = rhs.mExponents.end( );
+		auto lhsit = lhs.mExponents.begin();
+		auto rhsit = rhs.mExponents.begin();
+		auto lhsend = lhs.mExponents.end();
+		auto rhsend = rhs.mExponents.end();
 		while( lhsit != lhsend )
 		{
 			if( rhsit == rhsend )
