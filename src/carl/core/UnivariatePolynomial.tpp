@@ -564,6 +564,21 @@ UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const C
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::pow(std::size_t exp) const
+{
+	if (exp == 0) return UnivariatePolynomial(mMainVar, constant_one<Coeff>::get());
+	if (isZero()) return UnivariatePolynomial(mMainVar);
+	UnivariatePolynomial<Coeff> res(mMainVar, constant_one<Coeff>::get());
+	UnivariatePolynomial<Coeff> mult(*this);
+	while(exp > 0) {
+		if (exp & 1) res *= mult;
+		exp /= 2;
+		if(exp > 0) mult = mult * mult;
+	}
+	return res;
+}
+
+template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients(bool check) const {
 	std::vector<NumberType> coeffs;
