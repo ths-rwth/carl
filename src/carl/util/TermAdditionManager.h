@@ -111,6 +111,18 @@ public:
 			std::get<3>(data) += term.coeff();
 		}
 	}
+
+	template<typename Ordering>
+	TermType getMaxTerm(TAMId id) const {
+		Tuple& data = *id;
+		Terms& terms = std::get<1>(data);
+		std::size_t max = 0;
+		assert(terms.size() > 0);
+		for (std::size_t i = 1; i < terms.size(); i++) {
+			if (Ordering::less(terms[max], terms[i])) max = i;
+		}
+		return terms[max];
+	}
     
 	void readTerms(TAMId id, Terms& terms) {
         Tuple& data = *id;
@@ -149,6 +161,17 @@ public:
 		}
         #endif
         
+		std::get<2>(data) = false;
+	}
+
+	void dropTerms(TAMId id) {
+		Tuple& data = *id;
+		assert(std::get<2>(data));
+		Terms& t = std::get<1>(data);
+        TermIDs& termIDs = std::get<0>(data);
+		for (auto i = t.begin(); i != t.end(); i++) {
+			if ((*i).monomial()) termIDs[(*i).monomial()->id()] = 0;
+		}
 		std::get<2>(data) = false;
 	}
 };
