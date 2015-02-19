@@ -282,9 +282,22 @@ const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm() cons
 	CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
 	return mTerms.back();
 }
+template<typename Coeff, typename Ordering, typename Policies>
+Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::lterm()
+{
+	CARL_LOG_ASSERT("carl.core", !isZero(), "Leading term undefined on zero polynomials.");
+	return mTerms.back();
+}
 
 template<typename Coeff, typename Ordering, typename Policies>
 const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm() const
+{
+	CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
+	return mTerms.front();
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::trailingTerm()
 {
 	CARL_LOG_ASSERT("carl.core", !isZero(), "Trailing term undefined on zero polynomials.");
 	return mTerms.front();

@@ -149,12 +149,21 @@ public:
 	 * @return 
 	 */
 	const Term<Coeff>& lterm() const;
+	Term<Coeff>& lterm();
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
-	 * @return 
+	 * @return Leading coefficient.
 	 */
 	const Coeff& lcoeff() const;
+	/**
+	 * Returns the leading coefficient with respect to the given variable.
+	 * @param var Variable.
+	 * @return Leading coefficient.
+	 */
+	MultivariatePolynomial lcoeff(Variable::Arg var) const {
+		return coeff(var, degree(var));
+	}
 	/**
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
@@ -222,6 +231,7 @@ public:
 	 * @return 
 	 */
 	const Term<Coeff>& trailingTerm() const;
+	Term<Coeff>& trailingTerm();
 	/**
 	 * Checks if the polynomial has a constant term that is not zero.
 	 * @return If there is a constant term unequal to zero.
@@ -229,7 +239,7 @@ public:
 	bool hasConstantTerm() const;
 	/**
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
-	 * @reiturn Constant term.
+	 * @return Constant term.
 	 */
 	const Coeff& constantPart() const;
 	
