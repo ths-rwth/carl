@@ -768,7 +768,7 @@ Interval<Number> Interval<Number>::pow(unsigned exp) const
 	{
 		assert(this->isConsistent());
 		assert(exp <= INT_MAX );
-        if( exp % 2 == carl::constant_zero<Number>().get() )
+        if( int(exp % 2) == carl::constant_zero<Number>().get() )
         {
             if( mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY )
             {
