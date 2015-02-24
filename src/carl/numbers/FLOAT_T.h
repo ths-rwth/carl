@@ -291,7 +291,7 @@ namespace carl
         {
 			//std::cout << "COMPARISON: " << *this << " == " << _rhs << " : " << (mValue == _rhs.mValue) << std::endl;
             //return mValue == _rhs.mValue;
-			return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue));
+			return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue), 4);
         }
 
         /**
