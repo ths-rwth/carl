@@ -455,6 +455,8 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // M * Z
                 {
+                    lowerBoundType = ylt;
+                    upperBoundType = yut;
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }
@@ -486,6 +488,8 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // N * Z
                 {
+                    lowerBoundType = ylt;
+                    upperBoundType = yut;
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }
@@ -520,12 +524,16 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // P * Z
                 {
+                    lowerBoundType = ylt;
+                    upperBoundType = yut;
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }
         }
         else // Z * ?
         {
+            lowerBoundType = xlt;
+            upperBoundType = xut;
             resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
         }
     }
@@ -768,7 +776,7 @@ Interval<Number> Interval<Number>::pow(unsigned exp) const
 	{
 		assert(this->isConsistent());
 		assert(exp <= INT_MAX );
-        if( exp % 2 == carl::constant_zero<Number>().get() )
+        if( exp % 2 == 0 )
         {
             if( mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY )
             {
