@@ -455,8 +455,10 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // M * Z
                 {
-                    lowerBoundType = ylt;
-                    upperBoundType = yut;
+                    if( ylt != BoundType::INFTY )
+                        lowerBoundType = ylt;
+                    if( yut != BoundType::INFTY )
+                        upperBoundType = yut;
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }
@@ -488,8 +490,10 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // N * Z
                 {
-                    lowerBoundType = ylt;
-                    upperBoundType = yut;
+                    if( ylt != BoundType::INFTY )
+                        lowerBoundType = ylt;
+                    if( yut != BoundType::INFTY )
+                        upperBoundType = yut;
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }
@@ -524,30 +528,34 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
                 }
                 else // P * Z
                 {
-                    lowerBoundType = ylt;
-                    upperBoundType = yut;
+                    if( ylt != BoundType::INFTY )
+                        lowerBoundType = ylt;
+                    if( yut != BoundType::INFTY )
+                        upperBoundType = yut;
                     resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
                 }
             }
         }
         else // Z * ?
         {
-            lowerBoundType = xlt;
-            upperBoundType = xut;
+            if( xlt != BoundType::INFTY )
+                lowerBoundType = xlt;
+            if( xut != BoundType::INFTY )
+                upperBoundType = xut;
             resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
         }
     }
-    if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
-       || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
-       || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
-       || (rhs.upperBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY))) )
+    if( (xlt == BoundType::INFTY && (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY))
+       || (xut == BoundType::INFTY && (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY))
+       || (ylt == BoundType::INFTY && (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))
+       || (yut == BoundType::INFTY && (xu < carl::constant_zero<Number>().get() || (xl < carl::constant_zero<Number>().get() || xlt == BoundType::INFTY))) )
     {
         lowerBoundType = BoundType::INFTY;
     }
-    if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < carl::constant_zero<Number>().get() || (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY)))
-       || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > carl::constant_zero<Number>().get() || (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY)))
-       || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY)))
-       || (rhs.upperBoundType() == BoundType::INFTY && (mContent.lower() > carl::constant_zero<Number>().get() || (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))) )
+    if( (xlt == BoundType::INFTY && (yu < carl::constant_zero<Number>().get() || (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY)))
+       || (xut == BoundType::INFTY && (yl > carl::constant_zero<Number>().get() || (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY)))
+       || (ylt == BoundType::INFTY && (xu < carl::constant_zero<Number>().get() || (xl < carl::constant_zero<Number>().get() || xlt == BoundType::INFTY)))
+       || (yut == BoundType::INFTY && (xl > carl::constant_zero<Number>().get() || (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))) )
     {
         upperBoundType = BoundType::INFTY;
     }
