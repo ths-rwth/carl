@@ -317,7 +317,8 @@ namespace carl
 			}
 			else{
 				CARL_LOG_INEFFICIENT();
-				return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
+				//return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
+				return (nominatorAsPolynomial()).evaluate(substitutions) / (denominatorAsPolynomial()).evaluate(substitutions);
 			}            
         }
         
