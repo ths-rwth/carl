@@ -155,7 +155,7 @@ namespace carl
         explicit operator PolyType() const
         {
             if( existsFactorization( *this ) )
-                return this->polynomial();
+                return this->polynomial()*this->mCoefficient;
             return PolyType( mCoefficient );
         }
         
@@ -251,14 +251,6 @@ namespace carl
         }
 
         /**
-         * @return 
-         */
-        CoeffType coprimeFactor() const
-        {
-            return CoeffType(1)/mCoefficient;
-        }
-
-        /**
          * @return true, if the factorized polynomial is constant.
          */
         bool isConstant() const
@@ -290,26 +282,6 @@ namespace carl
         size_t nrTerms() const
         {
             return polynomial().nrTerms();
-        }
-        
-        typename TermsType::const_iterator begin() const
-        {
-            return polynomial().begin();
-        }
-
-        typename TermsType::const_iterator end() const
-        {
-            return polynomial().end();
-        }
-
-        typename TermsType::const_reverse_iterator rbegin() const
-        {
-            return polynomial().rbegin();
-        }
-
-        typename TermsType::const_reverse_iterator rend() const
-        {
-            return polynomial().rend();
         }
         
         /**
@@ -352,7 +324,7 @@ namespace carl
         template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
         CoeffType coprimeFactor() const
         {
-            return mCoefficient;
+            return constant_one<CoeffType>::get()/mCoefficient;
         }
         
         /**
@@ -370,7 +342,9 @@ namespace carl
         {
             if( existsFactorization(*this) )
             {
-                return FactorizedPolynomial<P>( std::move(Factorization<P>( factorization() )), constant_one<CoeffType>::get(), mpCache );
+                FactorizedPolynomial<P> result( *this );
+                result.setCoefficient( constant_one<CoeffType>::get() );
+                return result;
             }
             return FactorizedPolynomial<P>( constant_one<CoeffType>::get() );
         }

@@ -127,12 +127,14 @@ namespace carl
     }
     
     template<typename P>
-    FactorizedPolynomial<P>::FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _pair)
+    FactorizedPolynomial<P>::FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _pair):
+        FactorizedPolynomial<P>::FactorizedPolynomial()
     {
         auto op = _pair.first;
         auto sub = _pair.second;
         assert(!sub.empty());
         auto it = sub.begin();
+        
         *this = *it;
         if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
             // special treatment of unary minus
@@ -312,11 +314,13 @@ namespace carl
 
     template<typename P>
     typename FactorizedPolynomial<P>::TermType FactorizedPolynomial<P>::trailingTerm() const
-    {   
+    {
         if( existsFactorization( *this ) )
         {
             if( factorizedTrivially() )
+            {
                 return polynomial().trailingTerm() * mCoefficient;
+            }
             TermType result( mCoefficient );
             for( const auto& factor : factorization() )
             {
@@ -675,7 +679,9 @@ namespace carl
         {
             P subResult = polynomial().substitute( _substitutions );
             if( subResult.isConstant() )
+            {
                 return FactorizedPolynomial<P>( (subResult.constantPart() * mCoefficient) );
+            }
             FactorizedPolynomial<P> result( std::move( subResult ), mpCache );
             result *= mCoefficient;
             return std::move(result);
