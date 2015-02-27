@@ -225,6 +225,28 @@ struct map_to_dict {
 
 };
 
+struct iter_to_tuple {
+	template<typename Iter>
+	struct iter_to_set_impl {
+		static PyObject* convert(const Iter& iter) {
+			return boost::python::incref(make_tuple(iter).ptr());
+		}
+	private:
+		static boost::python::tuple make_tuple(const Iter& iter) {
+			boost::python::list l;
+			for(auto& i : iter) {
+				l.append(i);
+			}
+			return boost::python::tuple(l);
+		}
+	};
+	template<typename Iter>
+	void to_python() {
+		boost::python::to_python_converter<Iter, iter_to_set_impl<Iter> >();
+	}
+
+};
+
 struct rational_converter {
 	  rational_converter()
 	  {
@@ -264,22 +286,21 @@ BOOST_PYTHON_MODULE(libpycarl)
 {
 	using namespace boost::python;
 
-	  // Register interable conversions.
-	  iterable_converter()
-	    .from_python<std::vector<double> >()
-	    .from_python<std::list<double> >()
-	    .from_python<std::vector<std::string> >()
-	    .from_python<std::list<std::string> >()
-	    ;
-	  dict_converter()
-	    .from_python<std::map<carl::Variable, Rational> >()
-	    ;
+	// Register interable conversions.
+	iterable_converter()
+		.from_python<std::vector<double> >()
+		.from_python<std::list<double> >().from_python<std::vector<std::string> >()
+		.from_python<std::list<std::string> >()
+		;
+	dict_converter()
+		.from_python<std::map<carl::Variable, Rational> >()
+		;
 
-
-	  typedef std::map<std::string, carl::Variable> VarMap;
-
-	  map_to_dict()
-	    .to_python<VarMap>()
+	map_to_dict()
+		.to_python<std::map<std::string, carl::Variable> >()
+		;
+	iter_to_tuple()
+		.to_python<std::set<carl::Variable> >()
 		;
 /*
 	class_<std::map<std::string, Variable> >("VariableMap")
@@ -321,16 +342,17 @@ BOOST_PYTHON_MODULE(libpycarl)
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<Polynomial>("Polynomial")
-		.def(init<Rational>())
+	class_<Polynomial>("Polynomial", init<Rational>())
 		.def(init<carl::Variable::Arg>())
 		.def(init<const carl::Monomial::Arg&>())
 		.def("evaluate", &Polynomial::evaluate<Rational>)
+		.def("gatherVariables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<RationalFunction>("RationalFunction")
+	class_<RationalFunction>("RationalFunction", init<Polynomial, Polynomial>())
 		.def("evaluate", &RationalFunction::evaluate)
+		.def("gatherVariables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
 		.def(self_ns::str(self_ns::self))
 		;
 
