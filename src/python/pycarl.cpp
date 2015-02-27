@@ -17,8 +17,10 @@ typedef mpq_class Rational;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
 
+#include "pycarl_parser.h"
 
 namespace boost{
+
 namespace python{
 /*
 template <class T>
@@ -284,7 +286,6 @@ BOOST_PYTHON_MODULE(libpycarl)
 		.def(map_indexing_suite<std::map<std::string, Variable> >() );
 */
 
-
 	class_<Rational>("Rational", init<double>())
 		.def("__float__", &Rational::get_d)
 		.def("__str__", &rational_str)
@@ -303,14 +304,14 @@ BOOST_PYTHON_MODULE(libpycarl)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
 		.def(self_ns::str(self_ns::self))
 		;
-
+/*
 	class_<carl::Monomial, carl::Monomial::Arg, boost::noncopyable>("Monomial", no_init)
 		.def("tdeg", &carl::Monomial::tdeg)
 		.def(self_ns::str(self_ns::self))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, const carl::Monomial::Arg&)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, carl::Variable::Arg)>(&carl::operator*))
 		;
-
+*/
 	class_<carl::Term<Rational>>("Term")
 		.def(init<Rational>())
 		.def(init<carl::Variable::Arg>())
@@ -333,13 +334,15 @@ BOOST_PYTHON_MODULE(libpycarl)
 		.def(self_ns::str(self_ns::self))
 		;
 
+	def("parsePolynomial", &parsePolynomial);
+	def("parseRationalFunction", &parseRationalFunction);
 
-	class_<carl::StringParser>("StringParser")
+	/*class_<carl::StringParser>("StringParser")
 		.def("setVariables", &carl::StringParser::setVariables)
 		.def("variables", &carl::StringParser::variables, return_value_policy<return_by_value>()) //capture map by value, to convert to dict()
 		.def("parseMultivariatePolynomial", &carl::StringParser::parseMultivariatePolynomial<Rational>)
 		.def("parseRationalFunction", &carl::StringParser::parseRationalFunction<Rational>)
-		;
+		;*/
 
 	class_<carl::VariablePool, boost::noncopyable>("VariablePoolInst", no_init)
 		//.def("getInstance", &carl::VariablePool::getInstance, return_value_policy<reference_existing_object>())
