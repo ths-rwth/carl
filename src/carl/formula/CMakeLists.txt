@@ -1,3 +1,6 @@
+# Add all bitvector-related sources
+add_subdirectory(bitvector)
+
 # Header files in here (only headers from this directory!)
 set(carl_lib_formula_headers 
     Formula.h
@@ -20,6 +23,7 @@ set(carl_lib_formula_headers
 
 # Source files in here
 set(carl_lib_formula_sources 
+    ${carl_lib_formula_bitvector_sources}
     formula/UEquality.cpp
     formula/Sort.cpp 
     formula/SortManager.cpp 
