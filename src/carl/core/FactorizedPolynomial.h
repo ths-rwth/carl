@@ -773,6 +773,8 @@ namespace carl
 
     template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
     
+    template<typename P> struct is_factorized<FactorizedPolynomial<P>>: std::true_type {};
+    
     /// @name Equality comparison operators
 	/// @{
 	/**

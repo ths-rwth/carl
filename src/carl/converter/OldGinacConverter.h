@@ -17,6 +17,7 @@
 #include "../util/Singleton.h"
 #include "../util/SFINAE.h"
 #include "../numbers/typetraits.h"
+#include "../numbers/numbers.h"
 
 namespace carl
 {   
@@ -64,7 +65,43 @@ namespace carl
         
         bool similar( const GiNaC::ex& a, const GiNaC::ex& b);
 
-        GiNaC::ex convertToGinac(const Poly& poly, const std::map<carl::Variable, GiNaC::ex>& vars);
+        GiNaC::ex convertToGinac(const typename Poly::PolyType& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
+        {
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
+            GiNaC::ex result = 0;
+            for(auto term = poly.begin(); term != poly.end(); ++term)
+            {
+                GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>(term->coeff())) ) );
+                if((*term).monomial())
+                {
+                    for (auto it: *(term->monomial())) {
+                        auto carlToGinacVar = vars.find(it.first);
+                        assert(carlToGinacVar != vars.end());
+                        factor *= GiNaC::pow(carlToGinacVar->second, it.second);
+                    }
+                }
+                result += factor;
+            }
+            return result;
+        }
+
+        template<typename P = Poly, EnableIf<is_factorized<P>> = dummy>
+        GiNaC::ex convertToGinac(const P& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
+        {
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
+            if( existsFactorization( poly ) )
+            {
+                if( poly.factorizedTrivially() )
+                    return convertToGinac( poly.polynomial(), vars );
+                GiNaC::ex result = GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>( poly.coefficient() ))));
+                for( const auto& factor : poly.factorization() )
+                {
+                    result *= GiNaC::pow(convertToGinac( factor.first, vars ), factor.second );
+                }
+                return result;
+            }
+            return GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>( poly.coefficient() ))));
+        }
 
         Poly convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars);
 
