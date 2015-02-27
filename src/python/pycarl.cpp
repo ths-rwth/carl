@@ -1,5 +1,6 @@
 //#include <python3.4m/Python.h>
-#include <python2.7/Python.h>
+//#include <python2.7/Python.h>
+#include <Python.h>
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>

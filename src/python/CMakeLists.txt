@@ -3,7 +3,7 @@
 if(PYTHON3)
     set(PYTHON_VERSION_STRING 3)
     set(BOOST_PYTHON_COMPONENT python)
-    set(BOOST_PYTHON_LIB boost_python3)
+    set(BOOST_PYTHON_LIB ${PROJECT_SOURCE_DIR}/build/libboost_python-py34.so)
 else()
     set(PYTHON_VERSION_STRING 2.7)
     set(BOOST_PYTHON_COMPONENT python)
@@ -13,11 +13,12 @@ endif()
 FIND_PACKAGE(PythonLibs ${PYTHON_VERSION_STRING})
 FIND_PACKAGE(Boost COMPONENTS ${BOOST_PYTHON_COMPONENT})
 
-ADD_LIBRARY(pycarl SHARED pycarl.cpp pycarl_parser.cpp)
-include_directories(${PROJECT_SOURCE_DIR}/src ${include_dirs}  ${PYTHON_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src ${include_dirs} ${PYTHON_INCLUDE_DIRS})
 
-set_target_properties( pycarl PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+ADD_LIBRARY(pycarl SHARED pycarl.cpp pycarl_parser.cpp)
+
+SET_TARGET_PROPERTIES(pycarl PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 if(BUILD_STATIC)
