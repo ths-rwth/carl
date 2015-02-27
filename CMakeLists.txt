@@ -49,6 +49,7 @@ option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
+option( PYTHON3 "Build python bindings for python3 instead of 2" OFF )
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
