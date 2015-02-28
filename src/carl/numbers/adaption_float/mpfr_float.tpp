@@ -142,10 +142,30 @@ class FLOAT_T<mpfr_t>
         {
             return mpfr_greater_p(mValue, _rhs.mValue) != 0;
         }
+		
+		bool operator > ( int _rhs) const
+        {
+            return mpfr_cmp_si(mValue, _rhs) > 0;
+        }
+		
+		bool operator > ( unsigned _rhs) const
+        {
+            return mpfr_cmp_ui(mValue, _rhs) > 0;
+        }
 
         bool operator < ( const FLOAT_T<mpfr_t> & _rhs) const
         {
             return mpfr_less_p(mValue, _rhs.mValue) != 0;
+        }
+		
+		bool operator < ( int _rhs) const
+        {
+            return mpfr_cmp_si(mValue, _rhs) < 0;
+        }
+		
+		bool operator < ( unsigned _rhs) const
+        {
+            return mpfr_cmp_ui(mValue, _rhs) < 0;
         }
 
         bool operator <= ( const FLOAT_T<mpfr_t> & _rhs) const
