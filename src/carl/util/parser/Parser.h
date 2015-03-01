@@ -10,7 +10,6 @@
 #include "../../core/logging.h"
 #include "Common.h"
 #include "PolynomialParser.h"
-#include "RationalFunctionParser.h"
 
 namespace carl {
 namespace parser {
@@ -20,7 +19,6 @@ class Parser {
 private:
 	Skipper skipper;
 	PolynomialParser<Coeff> polynomialParser;
-	RationalFunctionParser<Coeff> ratfunParser;
 	
 	template<typename Result, typename Parser>
 	bool parse(const std::string& s, const Parser& parser, Result& res) {
@@ -30,19 +28,21 @@ private:
 public:
 	
 	Poly<Coeff> polynomial(const std::string& s) {
-		Poly<Coeff> res;
+		typename PolynomialParser<Coeff>::expr_type res;
 		if (!parse(s, polynomialParser, res)) {
 			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a polynomial failed.");
 		}
-		return res;
+
+		return boost::get<Poly<Coeff>>(res);
 	}
 	
 	RatFun<Coeff> rationalFunction(const std::string& s) {
-		RatFun<Coeff> res;
-		if (!parse(s, ratfunParser, res)) {
+		typename PolynomialParser<Coeff>::expr_type res;
+		if (!parse(s, polynomialParser, res)) {
 			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a rational function failed.");
 		}
-		return res;
+
+		return boost::get<RatFun<Coeff>>(res);
 	}
 	
 	void addVariable(Variable::Arg v) {
