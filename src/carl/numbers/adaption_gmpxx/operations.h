@@ -355,6 +355,12 @@ inline mpq_class& div_assign(mpq_class& a, const mpq_class& b) {
     return a;
 }
 
+inline mpq_class reciprocal(const mpq_class& a) {
+	mpq_class res;
+	mpq_inv(res.get_mpq_t(), a.get_mpq_t());
+	return res;
+}
+
 inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 {
 	mpq_t res;

@@ -24,6 +24,10 @@ namespace boost { namespace spirit { namespace traits {
         else
             r /= carl::pow(mpq_class(10), (unsigned)(-exp));
     }
+    template<> inline mpq_class negate(bool b, const mpq_class& n) {
+        if (b) return (n * -1);
+        return n;
+    }
     template<> inline bool is_equal_to_one(const mpq_class& value) {
         return value == 1;
     }
@@ -36,6 +40,8 @@ template<typename Coeff>
 struct PolynomialParser: public qi::grammar<Iterator, Poly<Coeff>(), Skipper> {
 	PolynomialParser(): PolynomialParser<Coeff>::base_type(main, "polynomial") {
 		operation.add("+", ADD)("-", SUB);
+		operationScale.add("*", MUL)("/", DIV);
+		operationPow.add("^", POW);
 		varname = qi::lexeme[ (qi::alpha | qi::char_("_")) >> *(qi::alnum | qi::char_("_"))];
 		variable = varname[qi::_val = px::bind(&PolynomialParser<Coeff>::newVariable, px::ref(*this), qi::_1)];
 		monomial = (variable >> -('^' > exponentVal))[qi::_val = px::bind(&PolynomialParser<Coeff>::newMonomial, px::ref(*this), qi::_1, qi::_2)];
@@ -43,7 +49,8 @@ struct PolynomialParser: public qi::grammar<Iterator, Poly<Coeff>(), Skipper> {
 		        (monomial[qi::_val = px::bind(&PolynomialParser<Coeff>::newTermM, px::ref(*this), qi::_1)]));
 		expr = ("(" > expr_sum > ")")[qi::_val = qi::_1] |
 		       term[qi::_val = px::bind(&PolynomialParser<Coeff>::newPoly, px::ref(*this), qi::_1)];
-		expr_product = (expr % "*")[qi::_val = px::bind(&PolynomialParser<Coeff>::mulExpr, px::ref(*this), qi::_1)];
+		expr_power= (expr >> *(operationPow > expr))[qi::_val = px::bind(&PolynomialParser<Coeff>::powExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_product= (expr_power >> *(operationScale > expr_power))[qi::_val = px::bind(&PolynomialParser<Coeff>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
 		expr_sum = (expr_product >> *(operation > expr_product))[qi::_val = px::bind(&PolynomialParser<Coeff>::addExpr, px::ref(*this), qi::_1, qi::_2)];
 		main = expr_sum;
 
@@ -52,6 +59,7 @@ struct PolynomialParser: public qi::grammar<Iterator, Poly<Coeff>(), Skipper> {
 		monomial.name("monomial");
 		term.name("term");
 		expr.name("expr");
+		expr_power.name("expr_power");
 		expr_product.name("expr_product");
 		expr_sum.name("expr_sum");
 		main.name("main");
@@ -62,7 +70,7 @@ struct PolynomialParser: public qi::grammar<Iterator, Poly<Coeff>(), Skipper> {
 	}
 	
 private:
-	enum Operation { ADD, SUB };
+	enum Operation { ADD, SUB, MUL, DIV, POW };
 	
 	Variable newVariable(const std::string& s) {
 		Variable* vptr = nullptr;
@@ -90,12 +98,41 @@ private:
 		return Poly<Coeff>(t);
 	}
 
-	Poly<Coeff> mulExpr(const std::vector<Poly<Coeff>>& ops) {
-		Poly<Coeff> res(Coeff(1));
+	Poly<Coeff> mulExpr(const Poly<Coeff>& first, const std::vector<boost::fusion::vector2<Operation,Poly<Coeff>>>& ops) {
+		Poly<Coeff> res = first;
 		for (const auto& op: ops) {
-			res *= op;
+			switch (boost::fusion::at_c<0>(op)) {
+			case MUL: res *= boost::fusion::at_c<1>(op); break;
+			case DIV: {
+				const Poly<Coeff>& div = boost::fusion::at_c<1>(op);
+				if (div.isConstant()) {
+					res /= div.constantPart();
+				}
+			}
+			}
 		}
 		return res;
+	}
+	Poly<Coeff> powExpr(const Poly<Coeff>& first, const std::vector<boost::fusion::vector2<Operation,Poly<Coeff>>>& ops) {
+		Poly<Coeff> res = first;
+		for (const auto& op: ops) {
+			switch (boost::fusion::at_c<0>(op)) {
+			case POW: {
+				const Poly<Coeff>& div = boost::fusion::at_c<1>(op);
+				if (div.isConstant()) {
+					auto num = div.constantPart().get_num().get_ui();
+					res = res.pow(num);
+				}
+			}
+			}
+		}
+		return res;
+	}
+	Poly<Coeff> divExpr(Poly<Coeff> poly, const std::vector<Coeff>& ops) {
+		for (const auto& op: ops) {
+			poly *= carl::reciprocal(op);
+		}
+		return poly;
 	}
 	Poly<Coeff> addExpr(const Poly<Coeff>& first, const std::vector<boost::fusion::vector2<Operation,Poly<Coeff>>>& ops) {
 		Poly<Coeff> res = first;
@@ -109,15 +146,18 @@ private:
 	}
 	
 	qi::symbols<char, Operation> operation;
+	qi::symbols<char, Operation> operationScale;
+	qi::symbols<char, Operation> operationPow;
 	qi::symbols<char, Variable> varmap;
 	qi::rule<Iterator, std::string(), Skipper> varname;
-	qi::int_parser<exponent,10,1,-1> exponentVal;
+	qi::uint_parser<exponent,10,1,-1> exponentVal;
 	qi::real_parser<Coeff,RationalPolicies<Coeff>> coeff;
 	qi::rule<Iterator, Variable(), Skipper> variable;
 	qi::rule<Iterator, Monomial::Arg(), Skipper> monomial;
 	qi::rule<Iterator, Term<Coeff>(), Skipper> term;
 	qi::rule<Iterator, Poly<Coeff>(), Skipper> expr;
 	qi::rule<Iterator, Poly<Coeff>(), Skipper> expr_product;
+	qi::rule<Iterator, Poly<Coeff>(), Skipper> expr_power;
 	qi::rule<Iterator, Poly<Coeff>(), Skipper> expr_sum;
 	qi::rule<Iterator, Poly<Coeff>(), Skipper> main;
 };
