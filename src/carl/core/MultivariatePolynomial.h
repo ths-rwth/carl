@@ -1001,7 +1001,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const Term<C>& lhs, Variable::Arg rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
-	template<typename C>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator+(const Term<C>& lhs, const C& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
@@ -1025,7 +1025,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(Variable::Arg lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator+(Variable::Arg lhs, const C& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
