@@ -9,7 +9,7 @@
 
 #include "../../core/logging.h"
 #include "Common.h"
-#include "PolynomialParser.h"
+#include "ExpressionParser.h"
 
 namespace carl {
 namespace parser {
@@ -18,35 +18,34 @@ template<typename Coeff>
 class Parser {
 private:
 	Skipper skipper;
-	PolynomialParser<Coeff> polynomialParser;
+	ExpressionParser<Coeff> expressionParser;
+	typedef typename ExpressionParser<Coeff>::expr_type expr_type;
 	
-	template<typename Result, typename Parser>
-	bool parse(const std::string& s, const Parser& parser, Result& res) {
+	void parse(const std::string& s, expr_type& res) {
 		auto begin = s.begin();
-		return qi::phrase_parse(begin, s.end(), parser, skipper, res);
+		bool parseResult = qi::phrase_parse(begin, s.end(), expressionParser, skipper, res);
+		if (!parseResult) {
+			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" failed.");
+			throw std::runtime_error("Unable to parse expression");
+		}
+		//boost::apply_visitor(typename ExpressionParser<Coeff>::print_expr_type(), res);
 	}
 public:
 	
 	Poly<Coeff> polynomial(const std::string& s) {
-		typename PolynomialParser<Coeff>::expr_type res;
-		if (!parse(s, polynomialParser, res)) {
-			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a polynomial failed.");
-		}
-
-		return boost::get<Poly<Coeff>>(res);
+		expr_type res;
+		parse(s, res);
+		return boost::apply_visitor(typename ExpressionParser<Coeff>::to_poly(), res);
 	}
 	
 	RatFun<Coeff> rationalFunction(const std::string& s) {
-		typename PolynomialParser<Coeff>::expr_type res;
-		if (!parse(s, polynomialParser, res)) {
-			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a rational function failed.");
-		}
-
-		return boost::get<RatFun<Coeff>>(res);
+		expr_type res;
+		parse(s, res);
+		return boost::apply_visitor(typename ExpressionParser<Coeff>::to_ratfun(), res);
 	}
 	
 	void addVariable(Variable::Arg v) {
-		polynomialParser.addVariable(v);
+		expressionParser.addVariable(v);
 	}
 };
 

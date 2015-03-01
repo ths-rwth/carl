@@ -39,7 +39,7 @@ namespace parser {
 
 
 template<typename Coeff>
-struct PolynomialParser: public qi::grammar<Iterator,
+struct ExpressionParser: public qi::grammar<Iterator,
 		boost::variant< Coeff, Variable, Monomial::Arg, Term<Coeff>, Poly<Coeff>, RatFun<Coeff> >(),
 		Skipper> {
 	using expr_type = boost::variant< Coeff, Variable, Monomial::Arg, Term<Coeff>, Poly<Coeff>, RatFun<Coeff> >;
@@ -49,6 +49,10 @@ struct PolynomialParser: public qi::grammar<Iterator,
 		template<typename T, typename U>
 		expr_type operator()(const T& lhs, const U& rhs) const {
 			return Poly<Coeff>(lhs) + Poly<Coeff>(rhs);
+		}
+
+		expr_type operator()(const Coeff& lhs, const Coeff& rhs) const {
+			return (lhs) + (rhs);
 		}
 
 		expr_type operator()(const RatFun<Coeff>& lhs, const Monomial::Arg& rhs) const {
@@ -79,6 +83,10 @@ struct PolynomialParser: public qi::grammar<Iterator,
 		template<typename T, typename U>
 		expr_type operator()(const T& lhs, const U& rhs) const {
 			return Poly<Coeff>(lhs) - Poly<Coeff>(rhs);
+		}
+
+		expr_type operator()(const Coeff& lhs, const Coeff& rhs) const {
+			return (lhs) - (rhs);
 		}
 
 		expr_type operator()(const RatFun<Coeff>& lhs, const Monomial::Arg& rhs) const {
@@ -207,29 +215,80 @@ struct PolynomialParser: public qi::grammar<Iterator,
 			return p;
 		}
 
+		Poly<Coeff> operator()(const RatFun<Coeff>& p) const {
+			throw std::runtime_error("Cannot make polynomial out of rational function");
+		}
+
 		template<typename T>
 		Poly<Coeff> operator()(const T& expr) const {
 			return Poly<Coeff>(expr);
 		}
 	};
 
-	PolynomialParser(): PolynomialParser<Coeff>::base_type(main, "polynomial") {
+	class to_ratfun: public boost::static_visitor<RatFun<Coeff>> {
+	public:
+		RatFun<Coeff> operator()(const RatFun<Coeff>& expr) const {
+			return expr;
+		}
+
+		RatFun<Coeff> operator()(const Monomial::Arg& expr) const {
+			return RatFun<Coeff>(Poly<Coeff>(expr));
+		}
+
+		RatFun<Coeff> operator()(const Term<Coeff>& expr) const {
+			return RatFun<Coeff>(Poly<Coeff>(expr));
+		}
+
+		template<typename T>
+		RatFun<Coeff> operator()(const T& expr) const {
+			return RatFun<Coeff>(expr);
+		}
+	};
+
+	class print_expr_type: public boost::static_visitor<> {
+	public:
+		void operator()(const RatFun<Coeff>& expr) const {
+			std::cout << "Rational function " << expr << std::endl;
+		}
+
+		void operator()(const Poly<Coeff>& expr) const {
+			std::cout << "Polynomial " << expr << std::endl;
+		}
+
+		void operator()(const Term<Coeff>& expr) const {
+			std::cout << "Term " << expr << std::endl;
+		}
+
+		void operator()(const Monomial::Arg& expr) const {
+			std::cout << "Monomial " << expr << std::endl;
+		}
+
+		void operator()(const Coeff& expr) const {
+			std::cout << "Coefficient " << expr << std::endl;
+		}
+
+		void operator()(const Variable& expr) const {
+			std::cout << "Variable " << expr << std::endl;
+		}
+	};
+
+	ExpressionParser(): ExpressionParser<Coeff>::base_type(main, "polynomial") {
 		/** Tokens */
 		operation.add("+", ADD)("-", SUB);
 		operationScale.add("*", MUL)("/", DIV);
 		operationPow.add("^", POW)("**", POW);
 		varname = qi::lexeme[ (qi::alpha | qi::char_("_")) >> *(qi::alnum | qi::char_("_"))];
-		variable = varname[qi::_val = px::bind(&PolynomialParser<Coeff>::newVariable, px::ref(*this), qi::_1)];
+		variable = varname[qi::_val = px::bind(&ExpressionParser<Coeff>::newVariable, px::ref(*this), qi::_1)];
 
 		/** Rules */
 		operationScaleLA = qi::lexeme[ operationScale >> !qi::lit("*") ][qi::_val = qi::_1];
-		monomial = variable[qi::_val = px::bind(&PolynomialParser<Coeff>::newMonomial, px::ref(*this), qi::_1)];
+		monomial = variable[qi::_val = qi::_1];
 		atom = (monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
 		expr = ("(" > expr_sum > ")")[qi::_val = qi::_1] | atom[qi::_val = qi::_1];
-		expr_power = (expr >> *(operationPow > exponentVal))[qi::_val = px::bind(&PolynomialParser<Coeff>::powExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_product = (expr_power >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&PolynomialParser<Coeff>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_sum = (expr_product >> *(operation > expr_product))[qi::_val = px::bind(&PolynomialParser<Coeff>::addExpr, px::ref(*this), qi::_1, qi::_2)];
-		main = expr_sum;//[qi::_val = px::bind(&PolynomialParser<Coeff>::makePoly, px::ref(*this), qi::_1)];
+		expr_power = (expr >> *(operationPow > exponentVal))[qi::_val = px::bind(&ExpressionParser<Coeff>::powExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_product = (expr_power >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Coeff>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_sum = (expr_product >> *(operation > expr_product))[qi::_val = px::bind(&ExpressionParser<Coeff>::addExpr, px::ref(*this), qi::_1, qi::_2)];
+		main = expr_sum;
 
 		varname.name("varname");
 		variable.name("variable");
@@ -257,9 +316,6 @@ private:
 		Variable v = freshRealVariable(s);
 		varmap.add(s, v);
 		return v;
-	}
-	expr_type newMonomial(Variable v) const {
-		return createMonomial(v, 1);
 	}
 
 	expr_type addExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
@@ -306,10 +362,6 @@ private:
 			}
 		}
 		return res;
-	}
-
-	Poly<Coeff> makePoly(expr_type expr) {
-		return boost::apply_visitor( to_poly(), expr );
 	}
 
 	qi::symbols<char, Operation> operation;
