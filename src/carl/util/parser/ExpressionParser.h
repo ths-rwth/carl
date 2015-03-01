@@ -14,9 +14,6 @@ namespace boost { namespace spirit { namespace traits {
         else
             r /= carl::pow(cln::cl_RA(10), (unsigned)(-exp));
     }
-    template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
-        return value == 1;
-    }
 
     template<> inline void scale(int exp, mpq_class& r) {
         if (exp >= 0)
@@ -24,13 +21,7 @@ namespace boost { namespace spirit { namespace traits {
         else
             r /= carl::pow(mpq_class(10), (unsigned)(-exp));
     }
-    template<> inline mpq_class negate(bool b, const mpq_class& n) {
-        if (b) return (n * -1);
-        return n;
-    }
-    template<> inline bool is_equal_to_one(const mpq_class& value) {
-        return value == 1;
-    }
+
 }}}
 
 namespace carl {
@@ -281,6 +272,7 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		variable = varname[qi::_val = px::bind(&ExpressionParser<Coeff>::newVariable, px::ref(*this), qi::_1)];
 
 		/** Rules */
+		// operationScaleLA is a look-ahead hack to prevent the * operator from consuming ** (power)
 		operationScaleLA = qi::lexeme[ operationScale >> !qi::lit("*") ][qi::_val = qi::_1];
 		monomial = variable[qi::_val = qi::_1];
 		atom = (monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
@@ -302,7 +294,8 @@ struct ExpressionParser: public qi::grammar<Iterator,
 	}
 	
 	void addVariable(Variable::Arg v) {
-		varmap.add(VariablePool::getInstance().getName(v), v);
+		auto s = VariablePool::getInstance().getName(v);
+		varmap.add(s, v);
 	}
 	
 private:
@@ -385,7 +378,6 @@ private:
 	qi::rule<Iterator, expr_type(), Skipper> expr_sum;
 	qi::rule<Iterator, expr_type(), Skipper> main;
 };
-
 
 }
 }
