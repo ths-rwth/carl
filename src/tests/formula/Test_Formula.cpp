@@ -17,6 +17,9 @@ TEST(Formula, Construction)
 {
     Variable x = VariablePool::getInstance().getFreshVariable( "x", VariableType::VT_REAL );
     Variable y = VariablePool::getInstance().getFreshVariable( "y", VariableType::VT_REAL );
+    Variable i1 = VariablePool::getInstance().getFreshVariable( "i1", VariableType::VT_INT );
+    Variable i2 = VariablePool::getInstance().getFreshVariable( "i2", VariableType::VT_INT );
+    Variable i3 = VariablePool::getInstance().getFreshVariable( "i3", VariableType::VT_INT );
 //    Variable i = newArithmeticVariable( "i", VariableType::VT_INT );
     Variable b = VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL );
 //    Sort sortS = newSort( "S" );
@@ -31,6 +34,10 @@ TEST(Formula, Construction)
     Pol py( y );
     Pol lhsA = px.pow(2) - py;
     Pol lhsB = Rational(4) * px + py - Rational(8) * py.pow(7);
+    Pol pi1( i1 );
+    Pol pi2( i2 );
+    Pol pi3( i3 );
+    Pol lhsC = Rational(2) * pi1 + Rational(2) * pi2 + Rational(2) * pi3 - Rational(5);
     
     // Constraints can then be constructed as follows:
     const Constr* constraintA = newConstraint<Pol>( lhsA, Relation::LESS );
@@ -41,6 +48,9 @@ TEST(Formula, Construction)
     const Formula<Pol> atomA = Formula<Pol>( constraintA );
     const Formula<Pol> atomB = Formula<Pol>( lhsB, Relation::EQ );
     const Formula<Pol> atomC = Formula<Pol>( b );
+    const Formula<Pol> inEq = Formula<Pol>( lhsC, Relation::EQ );
+    std::cout << inEq << std::endl;
+    EXPECT_TRUE( inEq.getType() == FormulaType::FALSE );
     
     // and the Ast itself:
     Formulas<Pol> subAstsA;
