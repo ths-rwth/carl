@@ -503,99 +503,99 @@ namespace carl
     template<typename Pol>
     Constraint<Pol>* Constraint<Pol>::simplify() const
     {
-//        typedef typename Pol::PolyType PolyT;
-//        Relation rel = mRelation;
-//        if( (mLhsDefinitess == Definiteness::POSITIVE_SEMI && rel == Relation::LEQ) || (mLhsDefinitess == Definiteness::NEGATIVE_SEMI && rel == Relation::GEQ) )
-//            rel = Relation::EQ;
-//        // Left-hand side is a non-linear univariate monomial
-//        if( mVariables.size() == 1 && !mLhs.isLinear() && mLhs.nrTerms() == 1 )
-//        {
-//            switch( rel )
-//            {
-//                case Relation::EQ:
-//                    return new Constraint( *mVariables.begin(), rel );
-//                case Relation::NEQ:
-//                    return new Constraint( *mVariables.begin(), rel );
-//                case Relation::LEQ:
-//                    if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-//                        return new Constraint( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
-//                    else
-//                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
-//                case Relation::GEQ:
-//                    if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-//                        return new Constraint( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
-//                    else
-//                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
-//                case Relation::LESS:
-//                    if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-//                        return new Constraint( *mVariables.begin(), Relation::NEQ );
-//                    else
-//                    {
-//                        if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-//                            return new Constraint( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
-//                        else
-//                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
-//                    }
-//                case Relation::GREATER:
-//                    if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-//                        return new Constraint( *mVariables.begin(), Relation::NEQ );
-//                    else
-//                    {
-//                        if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-//                            return new Constraint( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel ); 
-//                        else
-//                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel ); 
-//                    }
-//                default:
-//                    assert( false );
-//            }
-//        }
-//        else if( hasIntegerValuedVariable() && !hasRealValuedVariable() && !lhs().isConstant() )
-//        {
-//            typename Pol::NumberType constPart = lhs().constantPart();
-//            if( constPart != typename Pol::NumberType( 0 ) )
-//            {
-//                // Find the gcd of the coefficients of the non-constant terms.
-//                typename Pol::NumberType g = lhs().coprimeFactorWithoutConstant();
-//                assert( g > typename Pol::NumberType( 0 ) );
-//                if( carl::mod( carl::getNum( constPart ), carl::getNum( g ) ) != 0 )
-//                {
-//                    switch( relation() )
-//                    {
-//                        case Relation::EQ:
-//                            return new Constraint( Pol( typename Pol::NumberType( 0 ) ), Relation::LESS );
-//                        case Relation::NEQ:
-//                            return new Constraint( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ );
-//                        case Relation::LEQ:
-//                        {
-//                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
-//                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
-//                            return new Constraint( newLhs, Relation::LEQ );
-//                        }
-//                        case Relation::GEQ:
-//                        {
-//                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
-//                            newLhs += carl::floor( (constPart / g) );
-//                            return new Constraint( newLhs, Relation::GEQ );
-//                        }
-//                        case Relation::LESS:
-//                        {
-//                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
-//                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
-//                            return new Constraint( newLhs, Relation::LEQ );
-//                        }
-//                        case Relation::GREATER:
-//                        {
-//                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
-//                            newLhs += carl::floor( (constPart / g) );
-//                            return new Constraint( newLhs, Relation::GEQ );
-//                        }
-//                        default:
-//                            assert( false );
-//                    }
-//                }
-//            }
-//        }
+        typedef typename Pol::PolyType PolyT;
+        Relation rel = mRelation;
+        if( (mLhsDefinitess == Definiteness::POSITIVE_SEMI && rel == Relation::LEQ) || (mLhsDefinitess == Definiteness::NEGATIVE_SEMI && rel == Relation::GEQ) )
+            rel = Relation::EQ;
+        // Left-hand side is a non-linear univariate monomial
+        if( mVariables.size() == 1 && !mLhs.isLinear() && mLhs.nrTerms() == 1 )
+        {
+            switch( rel )
+            {
+                case Relation::EQ:
+                    return new Constraint( *mVariables.begin(), rel );
+                case Relation::NEQ:
+                    return new Constraint( *mVariables.begin(), rel );
+                case Relation::LEQ:
+                    if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
+                        return new Constraint( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
+                    else
+                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
+                case Relation::GEQ:
+                    if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
+                        return new Constraint( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
+                    else
+                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
+                case Relation::LESS:
+                    if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
+                        return new Constraint( *mVariables.begin(), Relation::NEQ );
+                    else
+                    {
+                        if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
+                            return new Constraint( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
+                        else
+                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
+                    }
+                case Relation::GREATER:
+                    if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
+                        return new Constraint( *mVariables.begin(), Relation::NEQ );
+                    else
+                    {
+                        if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
+                            return new Constraint( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel ); 
+                        else
+                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel ); 
+                    }
+                default:
+                    assert( false );
+            }
+        }
+        else if( hasIntegerValuedVariable() && !hasRealValuedVariable() && !lhs().isConstant() )
+        {
+            typename Pol::NumberType constPart = lhs().constantPart();
+            if( constPart != typename Pol::NumberType( 0 ) )
+            {
+                // Find the gcd of the coefficients of the non-constant terms.
+                typename Pol::NumberType g = lhs().coprimeFactorWithoutConstant();
+                assert( g > typename Pol::NumberType( 0 ) );
+                if( carl::mod( carl::getNum( constPart ), carl::getNum( g ) ) != 0 )
+                {
+                    switch( relation() )
+                    {
+                        case Relation::EQ:
+                            return new Constraint( Pol( typename Pol::NumberType( 0 ) ), Relation::LESS );
+                        case Relation::NEQ:
+                            return new Constraint( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ );
+                        case Relation::LEQ:
+                        {
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
+                            return new Constraint( newLhs, Relation::LEQ );
+                        }
+                        case Relation::GEQ:
+                        {
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) );
+                            return new Constraint( newLhs, Relation::GEQ );
+                        }
+                        case Relation::LESS:
+                        {
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
+                            return new Constraint( newLhs, Relation::LEQ );
+                        }
+                        case Relation::GREATER:
+                        {
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) );
+                            return new Constraint( newLhs, Relation::GEQ );
+                        }
+                        default:
+                            assert( false );
+                    }
+                }
+            }
+        }
         return nullptr;
     }
 
