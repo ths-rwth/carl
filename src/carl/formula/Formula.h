@@ -823,6 +823,8 @@ namespace carl
              */
             bool contains( const Formula& _formula ) const
             {
+                if( this == &_formula )
+                    return true;
                 if( isAtom() )
                     return false;
                 if( mpContent->mType == FormulaType::NOT )
