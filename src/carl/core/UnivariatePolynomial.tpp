@@ -799,11 +799,11 @@ template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>, EnableIf<i
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const typename UnivariatePolynomial<Coeff>::NumberType& divisor) const 
 {
 	UnivariatePolynomial<Coeff> res(*this);
-    assert(res.isConsistent());
+	assert(res.isConsistent());
 	for (unsigned i = 0; i < res.mCoefficients.size(); i++) {
 		res.mCoefficients[i] = res.mCoefficients[i].divideBy(divisor);
 	}
-    assert(res.isConsistent());
+	assert(res.isConsistent());
 	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
 }
 
@@ -1222,10 +1222,10 @@ LinearFactorRemains:
 		// Add the constant factor to the factors.
 		if( !linearFactors.empty() && linearFactors.begin()->first.isConstant() )
 		{
-            if( linearFactors.begin()->first.isZero() )
-                factor = Coeff( 0 );
-            else
-                factor *= linearFactors.begin()->first.lcoeff();
+			if( linearFactors.begin()->first.isZero() )
+				factor = Coeff( 0 );
+			else
+				factor *= linearFactors.begin()->first.lcoeff();
 			linearFactors.erase(linearFactors.begin());
 		}
 		linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), factor), 1));
@@ -1725,7 +1725,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 	assert(p.mainVar() == this->mainVar());
 	if (this->isZero()) return UnivariatePolynomial(this->mainVar());
 	if (p.isZero()) return UnivariatePolynomial(this->mainVar());
-	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
+	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(this->normalized(), p.normalized(), strategy).front();
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
 		return resultant;
