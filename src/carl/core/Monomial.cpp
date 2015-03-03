@@ -362,38 +362,30 @@ namespace carl
 	
 	CompareResult Monomial::lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 	{
-		if (&lhs == &rhs) {
-			return CompareResult::EQUAL;
-		}
-		if ((lhs.id() != 0) && (rhs.id() != 0)) {
-			if (lhs.id() == rhs.id()) return CompareResult::EQUAL;
-		}
+		assert( (&lhs != &rhs) || (lhs.id() == rhs.id()) );
+		assert((lhs.id() != 0) && (rhs.id() != 0));
+		if (lhs.id() == rhs.id()) return CompareResult::EQUAL;
 		auto lhsit = lhs.mExponents.begin();
 		auto rhsit = rhs.mExponents.begin();
 		auto lhsend = lhs.mExponents.end();
 		auto rhsend = rhs.mExponents.end();
-		while( lhsit != lhsend )
-		{
-			if( rhsit == rhsend )
+		while (lhsit != lhsend) {
+			if (rhsit == rhsend)
 				return CompareResult::GREATER;
 			//which variable occurs first
-			if( lhsit->first == rhsit->first )
-			{
+			if (lhsit->first == rhsit->first) {
 				//equal variables
-				if( lhsit->second < rhsit->second )
+				if (lhsit->second < rhsit->second)
 					return CompareResult::LESS;
-				if( lhsit->second > rhsit->second )
+				if (lhsit->second > rhsit->second)
 					return CompareResult::GREATER;
-			}
-			else
-			{
-				return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
+			} else {
+				return (lhsit->first < rhsit->first) ? CompareResult::LESS : CompareResult::GREATER;
 			}
 			++lhsit;
 			++rhsit;
 		}
-		if( rhsit == rhsend )
-			return CompareResult::EQUAL;
+		assert(rhsit != rhsend);
 		return CompareResult::LESS;
 	}
 	
