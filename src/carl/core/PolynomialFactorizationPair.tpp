@@ -61,7 +61,7 @@ namespace carl
     template <typename P>
     std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization )
     {
-        _out << toString( _factorization );
+        _out << factorizationToString( _factorization );
         return _out;
     }
     
