@@ -310,7 +310,7 @@ const Coeff& MultivariatePolynomial<Coeff,Ordering,Policies>::lcoeff() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-exponent MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
+std::size_t MultivariatePolynomial<Coeff,Ordering,Policies>::totalDegree() const
 {
 	assert(!mTerms.empty());
 	if (Ordering::degreeOrder) {
@@ -506,7 +506,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::subtractProduct(const Term
         assert(this->isConsistent());
 	}
 	if (carl::isZero(factor.coeff())) return;
-	if (p.nrTerms() < 3) {
+	if (p.nrTerms() == 1) {
 		for (const auto& t: p) {
 			this->addTerm(- factor * t);
 		}
@@ -1225,16 +1225,24 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::square()
 
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(unsigned exp) const
+MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ordering,Policies>::pow(std::size_t exp) const
 {
-	if (exp == 0) return MultivariatePolynomial(constant_one<Coeff>::get());
+	//std::cout << "pw(" << *this << " ^ " << exp << ")" << std::endl;
 	if (isZero()) return MultivariatePolynomial(constant_zero<Coeff>::get());
+	if (exp == 0) return MultivariatePolynomial(constant_one<Coeff>::get());
+	if (exp == 1) return MultivariatePolynomial(*this);
+	if (exp == 2) return *this * *this;
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(constant_one<Coeff>::get());
 	MultivariatePolynomial<Coeff,Ordering,Policies> mult(*this);
 	while(exp > 0) {
+#if 0
 		if (exp & 1) res *= mult;
 		exp /= 2;
 		if(exp > 0) mult.square();
+#else
+		res *= mult;
+		exp--;
+#endif
 	}
 	return res;
 }
@@ -1885,6 +1893,9 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 	}
 	if (rhs.isConstant()) {
 		return *this *= rhs.constantPart();
+	}
+	if (this->isOne()) {
+		return *this = rhs;
 	}
 	if (this->isConstant()) {
 		Coeff c = constantPart();

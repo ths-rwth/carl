@@ -170,7 +170,7 @@ public:
 	 * @see @cite GCL92, page 48
 	 * @return Total degree.
 	 */
-	exponent totalDegree() const;
+	std::size_t totalDegree() const;
 
 	/**
 	 * Calculates the degree of this polynomial with respect to the given variable.
@@ -193,7 +193,7 @@ public:
 	 * @param exp Exponent.
 	 * @return Coefficient of var^exp.
 	 */
-	MultivariatePolynomial coeff(Variable::Arg var, exponent exp) const {
+	MultivariatePolynomial coeff(Variable::Arg var, std::size_t exp) const {
 		MultivariatePolynomial res;
 		for (const auto& t: mTerms) {
 			if (t.monomial() == nullptr) {
@@ -527,7 +527,7 @@ public:
 
 	void square();
 
-	MultivariatePolynomial pow(unsigned exp) const;
+	MultivariatePolynomial pow(std::size_t exp) const;
 	
 	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
@@ -692,7 +692,7 @@ public:
 	}
 
 	template<typename C, typename O, typename P>
-	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, unsigned exp)
+	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::size_t exp)
 	{
 		return p.pow(exp);
 	}
