@@ -400,7 +400,7 @@ namespace carl
             assert( computePolynomial(*this).hasConstantTerm() );
             return true;
         }
-        return carl::isZero( mCoefficient );
+        return !carl::isZero( mCoefficient );
     }
 
     template<typename P>
