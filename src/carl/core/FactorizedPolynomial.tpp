@@ -39,6 +39,10 @@ namespace carl
         if ( _polynomial.isConstant() )
         {
             mpCache = nullptr;
+            if ( _polynomial.lcoeff() < 0 )
+            {
+                mCoefficient *= CoeffType(-1);
+            }
         }
         else
         {
@@ -218,8 +222,8 @@ namespace carl
         {
             if( factorizedTrivially() )
             {
-                assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / mCoefficient );
-                return polynomial().coprimeFactorWithoutConstant() / mCoefficient;
+                assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / carl::abs(mCoefficient) );
+                return polynomial().coprimeFactorWithoutConstant() / carl::abs(mCoefficient);
             }
             auto factor = factorization().begin();
             CoeffType cf = factor->first.coprimeFactorWithoutConstant();
@@ -233,8 +237,8 @@ namespace carl
                 resultDenom = carl::gcd( resultDenom, carl::getDenom( cf ) );
                 ++factor;
             }
-            assert( computePolynomial(*this).coprimeFactorWithoutConstant() == ((mCoefficient*resultNum) / resultDenom) );
-            return (mCoefficient*resultNum) / resultDenom;
+            assert( computePolynomial(*this).coprimeFactorWithoutConstant() == (resultNum / (carl::abs(mCoefficient)*resultDenom)) );
+            return resultNum / (carl::abs(mCoefficient)*resultDenom);
         }
         return constant_zero<CoeffType>::get();
     }
