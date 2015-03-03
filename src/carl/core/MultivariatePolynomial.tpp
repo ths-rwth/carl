@@ -1073,8 +1073,8 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 {
 	assert(nrTerms() != 0);
 	typename TermsType::const_iterator it = mTerms.begin();
-	typename IntegralType<Coeff>::type num = abs(getNum((it)->coeff()));
-	typename IntegralType<Coeff>::type den = abs(getDenom((it)->coeff()));
+	typename IntegralType<Coeff>::type num = carl::abs(getNum((it)->coeff()));
+	typename IntegralType<Coeff>::type den = carl::abs(getDenom((it)->coeff()));
 	for(++it; it != mTerms.end(); ++it)
 	{
 		num = carl::gcd(num, getNum((it)->coeff()));
@@ -1091,8 +1091,8 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactorWithoutConst
 	typename TermsType::const_iterator it = mTerms.begin();
     if(it->isConstant())
         ++it;
-	typename IntegralType<Coeff>::type num = abs(getNum((it)->coeff()));
-	typename IntegralType<Coeff>::type den = abs(getDenom((it)->coeff()));
+	typename IntegralType<Coeff>::type num = carl::abs(getNum((it)->coeff()));
+	typename IntegralType<Coeff>::type den = carl::abs(getDenom((it)->coeff()));
 	for(++it; it != mTerms.end(); ++it)
 	{
 		num = carl::gcd(num, getNum((it)->coeff()));
