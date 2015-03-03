@@ -336,6 +336,22 @@ public:
         assert( !isConstant() );
         return lterm().getSingleVariable();
     }
+    
+    /**
+     * @return Coefficient of the polynomial (this makes only sense for polynomials storing the gcd of all coefficients separately)
+     */
+    const CoeffType& coefficient() const
+    {
+        return constant_one<CoeffType>::get();
+    }
+    
+    /**
+     * @return The coprimeCoefficients of this polyomial, if this is stored internally, otherwise this polynomial.
+     */
+    const PolyType& polynomial() const
+    {
+        return *this;
+    }
 	
 	/**
 	 * Checks whether only one variable occurs.
