@@ -628,7 +628,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		mTermAdditionManager.template addTerm<false>(thisid, t);
 	}
 	while (true) {
-		Term<C> factor = mTermAdditionManager.template getMaxTerm<Ordering>(thisid);
+		Term<C> factor = mTermAdditionManager.getMaxTerm(thisid);
 		if (factor.isZero()) break;
 		if (factor.divide(divisor.lterm(), factor)) {
 			for (const auto& t: divisor) {
