@@ -226,10 +226,7 @@ namespace carl
              */
             typename Pol::NumberType constantPart() const
             {
-                if( mLhs.hasConstantTerm() )
-                    return mLhs.trailingTerm().coeff();
-                else
-                    return typename Pol::NumberType( 0 );
+                return mLhs.constantPart();
             }
             
             /**
