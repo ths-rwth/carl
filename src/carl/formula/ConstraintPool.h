@@ -229,7 +229,7 @@ namespace carl
                 return newConstraint(std::move(Pol(_lhs)), _rel );
             }
             
-            const Constraint<Pol>* newConstraint( const carl::Variable::Arg _var, Relation _rel )
+            const Constraint<Pol>* newConstraint( carl::Variable::Arg _var, Relation _rel )
             {
                 return newConstraint( std::move( makePolynomial<Pol>(_var) ), _rel );
             }
@@ -283,7 +283,7 @@ namespace carl
     template<typename Pol>
     const Constraint<Pol>* newConstraint( const Pol& _lhs, Relation _rel );
     template<typename Pol>
-    const Constraint<Pol>* newConstraint( const carl::Variable::Arg _var, Relation _rel );
+    const Constraint<Pol>* newConstraint( carl::Variable::Arg _var, Relation _rel );
     template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
     const Constraint<Pol>* newConstraint( const typename Pol::PolyType& _lhs, Relation _rel );
     template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>

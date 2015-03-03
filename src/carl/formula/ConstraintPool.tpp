@@ -246,7 +246,7 @@ namespace carl
     }
 
     template<typename Pol>
-    const Constraint<Pol>* newConstraint( const carl::Variable::Arg _var, Relation _rel )
+    const Constraint<Pol>* newConstraint( carl::Variable::Arg _var, Relation _rel )
     {
         return ConstraintPool<Pol>::getInstance().newConstraint( _var, _rel );
     }
