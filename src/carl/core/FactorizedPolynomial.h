@@ -10,6 +10,7 @@
 #include <iostream>
 #include "../numbers/typetraits.h"
 #include "../util/Cache.h"
+#include "DivisionResult.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl
