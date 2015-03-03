@@ -896,70 +896,33 @@ namespace carl
          *                   a_i = g * b_i for all 1<=i<=k 
          *              or   b_i = g * a_i for all 1<=i<=k 
          */
-        auto termA = _constraintA->lhs().rbegin();
-        auto termB = _constraintB->lhs().rbegin();
-        typename Pol::NumberType g = 1;
-        typename Pol::NumberType c = 0;
-        typename Pol::NumberType d = 0;
+        typename Pol::NumberType one_divided_by_a = _constraintA->lhs().coprimeFactorWithoutConstant();
+        typename Pol::NumberType one_divided_by_b = _constraintB->lhs().coprimeFactorWithoutConstant();
+        typename Pol::NumberType c = _constraintA->lhs().constantPart();
+        typename Pol::NumberType d = _constraintB->lhs().constantPart();
+        assert( carl::isOne(carl::getNum(carl::abs(one_divided_by_a))) && carl::isOne(carl::getNum(carl::abs(one_divided_by_b))) );
+        Pol tmpA = (_constraintA->lhs() - c) * one_divided_by_a;
+        Pol tmpB = (_constraintB->lhs() - d) * one_divided_by_b;
+//        std::cout << "tmpA = " << tmpA << std::endl;
+//        std::cout << "tmpB = " << tmpB << std::endl;
+        if( tmpA != tmpB ) return 0;
         bool termACoeffGreater = false;
-        bool termBCoeffGreater = false;
-        // The first two terms are not constant.
-        if( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
+        bool signsDiffer = one_divided_by_a < carl::constant_zero<typename Pol::NumberType>::get() != one_divided_by_b < carl::constant_zero<typename Pol::NumberType>::get();
+        typename Pol::NumberType g;
+        if( carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b) )
         {
-            if( (termA)->monomial() != (termB)->monomial() ) return 0;
-            // Find an appropriate g.
-            typename Pol::NumberType termAcoeffAbs = carl::abs( (termA)->coeff() );
-            typename Pol::NumberType termBcoeffAbs = carl::abs( (termB)->coeff() );
-            termACoeffGreater = termAcoeffAbs > termBcoeffAbs; 
-            termBCoeffGreater = termAcoeffAbs < termBcoeffAbs;
-            if( termACoeffGreater ) 
-                g = (termA)->coeff()/(termB)->coeff();
-            else if( termBCoeffGreater ) 
-                g = (termB)->coeff()/(termA)->coeff();
-            else if( (termA)->coeff() == (termB)->coeff() ) 
-                g = typename Pol::NumberType( 1 );
-            else
-            {
-                g = typename Pol::NumberType( -1 );
-                termBCoeffGreater = true;
-            }
-            // Check whether the left-hand sides of the two constraints without their constant part
-            // are equal when one of the left-hand sides is multiplied by g.
-            ++termA;
-            ++termB;
-            while( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
-            {
-                if( (termA)->monomial() != (termB)->monomial() ) return 0;
-                else if( termACoeffGreater )
-                {
-                    if( (termA)->coeff() != g * (termB)->coeff() ) return 0;
-                }
-                else if( termBCoeffGreater )
-                {
-                    if( g * (termA)->coeff() != (termB)->coeff() ) return 0;
-                }
-                else if( (termA)->coeff() != (termB)->coeff() ) return 0;
-                ++termA;
-                ++termB;
-            }
+            g = carl::getDenom(one_divided_by_a)/carl::getDenom(one_divided_by_b);
+            if( signsDiffer )
+                g = -g;
+            termACoeffGreater = true;
+            d *= g;
         }
-        if( termA != _constraintA->lhs().rend() )
+        else
         {
-            if( (termA)->isConstant() )
-            {
-                c = (termBCoeffGreater ? (termA)->coeff() * g : (termA)->coeff());
-            }
-            else
-                return 0;
-        }
-        if( termB != _constraintB->lhs().rend() )
-        {
-            if( (termB)->isConstant() )
-            {
-                d = (termACoeffGreater ? (termB)->coeff() * g : (termB)->coeff());
-            }
-            else
-                return 0;
+            g = carl::getDenom(one_divided_by_b)/carl::getDenom(one_divided_by_a);
+            if( signsDiffer )
+                g = -g;
+            c *= g;
         }
         // Apply the multiplication by a negative g to the according relation symbol, which
         // has to be turned around then.
@@ -967,28 +930,52 @@ namespace carl
         Relation relB = _constraintB->relation();
         if( g < 0 )
         {
-            switch( (termACoeffGreater ? relB : relA ) )
+            if( termACoeffGreater )
             {
-                case Relation::LEQ:
-                    if( termACoeffGreater ) relB = Relation::GEQ; 
-                    else relA = Relation::GEQ;
-                    break;
-                case Relation::GEQ:
-                    if( termACoeffGreater ) relB = Relation::LEQ; 
-                    else relA = Relation::LEQ;
-                    break;
-                case Relation::LESS:
-                    if( termACoeffGreater ) relB = Relation::GREATER;
-                    else relA = Relation::GREATER;
-                    break;
-                case Relation::GREATER:
-                    if( termACoeffGreater )  relB = Relation::LESS;
-                    else relA = Relation::LESS;
-                    break;
-                default:
-                    break;
+                switch( relB )
+                {
+                    case Relation::LEQ:
+                        relB = Relation::GEQ;
+                        break;
+                    case Relation::GEQ:
+                        relB = Relation::LEQ;
+                        break;
+                    case Relation::LESS:
+                        relB = Relation::GREATER;
+                        break;
+                    case Relation::GREATER:
+                        relB = Relation::LESS;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch( relA )
+                {
+                    case Relation::LEQ:
+                        relA = Relation::GEQ;
+                        break;
+                    case Relation::GEQ:
+                        relA = Relation::LEQ;
+                        break;
+                    case Relation::LESS:
+                        relA = Relation::GREATER;
+                        break;
+                    case Relation::GREATER:
+                        relA = Relation::LESS;
+                        break;
+                    default:
+                        break;
+                }   
             }
         }
+//        std::cout << "c = " << c << std::endl;
+//        std::cout << "d = " << d << std::endl;
+//        std::cout << "g = " << g << std::endl;
+//        std::cout << "relA = " << relA << std::endl;
+//        std::cout << "relB = " << relB << std::endl;
         // Compare the adapted constant parts.
         switch( relB )
         {
