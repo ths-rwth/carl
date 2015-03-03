@@ -218,8 +218,8 @@ namespace carl
         {
             if( factorizedTrivially() )
             {
-                assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / mCoefficient );
-                return polynomial().coprimeFactorWithoutConstant() / mCoefficient;
+                assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / abs(mCoefficient) );
+                return polynomial().coprimeFactorWithoutConstant() / abs(mCoefficient);
             }
             auto factor = factorization().begin();
             CoeffType cf = factor->first.coprimeFactorWithoutConstant();
@@ -233,8 +233,8 @@ namespace carl
                 resultDenom = carl::gcd( resultDenom, carl::getDenom( cf ) );
                 ++factor;
             }
-            assert( computePolynomial(*this).coprimeFactorWithoutConstant() == ((mCoefficient*resultNum) / resultDenom) );
-            return (mCoefficient*resultNum) / resultDenom;
+            assert( computePolynomial(*this).coprimeFactorWithoutConstant() == (resultNum / (abs(mCoefficient)*resultDenom)) );
+            return resultNum / (abs(mCoefficient)*resultDenom);
         }
         return constant_zero<CoeffType>::get();
     }

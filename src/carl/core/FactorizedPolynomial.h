@@ -324,7 +324,7 @@ namespace carl
         template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
         CoeffType coprimeFactor() const
         {
-            return constant_one<CoeffType>::get()/mCoefficient;
+            return constant_one<CoeffType>::get()/abs(mCoefficient);
         }
         
         /**
