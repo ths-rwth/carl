@@ -388,7 +388,7 @@ namespace carl
          * @see @cite GCL92, page 48
          * @return Total degree.
          */
-        exponent totalDegree() const;
+        size_t totalDegree() const;
         
         /**
          * Returns the coefficient of the leading term.

@@ -280,7 +280,7 @@ namespace carl
     }
 
     template<typename P>
-    exponent FactorizedPolynomial<P>::totalDegree() const
+    size_t FactorizedPolynomial<P>::totalDegree() const
     {
         if( existsFactorization( *this ) )
         {
