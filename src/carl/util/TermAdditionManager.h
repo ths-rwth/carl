@@ -20,7 +20,7 @@
 namespace carl
 {
 
-template<typename Polynomial>
+template<typename Polynomial, typename Ordering>
 class TermAdditionManager {
 public:
 	typedef unsigned IDType;
@@ -29,17 +29,35 @@ public:
 	typedef TermType TermPtr;
 	typedef std::vector<IDType> TermIDs;
 	typedef std::vector<TermPtr> Terms;
+	/* 0: Maps global IDs to local IDs.
+	 * 1: Actual terms by local IDs.
+	 * 2: Flag if this entry is currently used.
+	 * 3: Constant part.
+	 * 4: Next free local ID.
+	 */
 	typedef std::tuple<TermIDs,Terms,bool,Coeff,IDType> Tuple;
 	typedef typename std::list<Tuple>::iterator TAMId;
 private:
 	std::list<Tuple> mData;
 	TAMId mNextId;
 	mutable std::mutex mMutex;
+	
+	TAMId createNewEntry() {
+		TAMId res = mData.emplace(mData.end());
+		std::get<4>(*res) = 1;
+		return res;
+	}
+	
+	bool compare(TAMId id, IDType t1, IDType t2) const {
+		Tuple& data = *id;
+		assert(std::get<2>(data));
+		Terms& t = std::get<1>(data);
+		return Ordering::less(t[t1], t[t2]);
+	}
 public:
-	TermAdditionManager(): mData(1), mNextId(mData.begin())
-	{
+	TermAdditionManager(): mData() {
         MonomialPool::getInstance();
-		std::get<4>(mData.back()) = 1;
+		mNextId = createNewEntry();
 	}
 	
     #define SWAP_TERMS
@@ -112,7 +130,6 @@ public:
 		}
 	}
 
-	template<typename Ordering>
 	TermType getMaxTerm(TAMId id) const {
 		Tuple& data = *id;
 		Terms& terms = std::get<1>(data);

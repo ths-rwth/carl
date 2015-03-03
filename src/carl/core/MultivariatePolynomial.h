@@ -38,7 +38,7 @@ class UnivariatePolynomial;
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariatePolynomial : public Polynomial, public Policies
 {
-    template<typename Polynomial>
+    template<typename Polynomial, typename Order>
     friend class TermAdditionManager;
 public:
 	/// The ordering of the terms.
@@ -73,7 +73,7 @@ protected:
 	mutable bool mOrdered;
 public:
     ///
-    static TermAdditionManager<MultivariatePolynomial> mTermAdditionManager;
+    static TermAdditionManager<MultivariatePolynomial,Ordering> mTermAdditionManager;
     
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 	
