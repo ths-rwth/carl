@@ -6,7 +6,7 @@
  */
 
 #include "FactorizedPolynomial.h"
-#include "UnivariatePolynomial.tpp"
+#include "UnivariatePolynomial.h"
 
 #pragma once
 

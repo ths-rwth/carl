@@ -43,7 +43,7 @@ namespace carl
     Pol makePolynomial( typename Pol::PolyType&& _poly );
 
     template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( const carl::Variable::Arg _var );
+    Pol makePolynomial( carl::Variable::Arg _var );
     
     template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
     Pol makePolynomial( const typename Pol::PolyType& _poly )
@@ -52,7 +52,7 @@ namespace carl
     }
 
     template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
-    Pol makePolynomial( const carl::Variable::Arg _var )
+    Pol makePolynomial( carl::Variable::Arg _var )
     {
         return Pol( _var );
     }
@@ -99,7 +99,7 @@ namespace carl
              *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
              *             and b is a rational.
              */
-            Constraint( const carl::Variable::Arg _var, Relation _rel, unsigned _id = 0 ):
+            Constraint( carl::Variable::Arg _var, Relation _rel, unsigned _id = 0 ):
                 Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>(_var) ), _rel, _id )
             {}
             

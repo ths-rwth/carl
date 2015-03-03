@@ -24,7 +24,7 @@ namespace carl
     }
 
     template<typename Pol, EnableIf<needs_cache<Pol>>>
-    Pol makePolynomial( const carl::Variable::Arg _var )
+    Pol makePolynomial( carl::Variable::Arg _var )
     {
         return Pol( std::move(typename Pol::PolyType(_var)), constraintPool<Pol>().pPolynomialCache() );
     }

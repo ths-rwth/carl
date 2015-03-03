@@ -46,6 +46,14 @@ struct MonomialComparator
 	static bool equal(const Monomial::Arg& m1, const Monomial::Arg& m2) {
         return (compare(m1, m2) == CompareResult::EQUAL );
     }
+	
+	bool operator()(const Monomial::Arg& m1, const Monomial::Arg& m2) const {
+		return less(m1, m2);
+	}
+	template<typename Coeff>
+	bool operator()(const Term<Coeff>& t1, const Term<Coeff>& t2) const {
+		return less(t1, t2);
+	}
 
     static const bool degreeOrder = degreeOrdered;
 };
