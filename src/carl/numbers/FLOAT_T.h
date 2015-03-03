@@ -313,6 +313,17 @@ namespace carl
         {
             return mValue > _rhs.mValue;
         }
+		
+		bool operator>(int _rhs) const
+        {
+            return mValue > _rhs;
+        }
+		
+		bool operator>(unsigned _rhs) const
+        {
+            return mValue > _rhs;
+        }
+		
 
         /**
          * Comparison operator for less than.
@@ -322,6 +333,16 @@ namespace carl
         bool operator<(const FLOAT_T<FloatType> & _rhs) const
         {
             return mValue < _rhs.mValue;
+        }
+		
+		bool operator<(int _rhs) const
+        {
+            return mValue < _rhs;
+        }
+		
+		bool operator<(unsigned _rhs) const
+        {
+            return mValue < _rhs;
         }
 
         /**
