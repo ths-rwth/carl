@@ -162,13 +162,13 @@ namespace carl
              * Note: This method makes the other accesses to the constraint pool waiting.
              * @return The highest degree occurring in all constraints
              */
-            size_t maxDegree() const
+            std::size_t maxDegree() const
             {
-                size_t result = 0;
+                std::size_t result = 0;
                 CONSTRAINT_POOL_LOCK_GUARD
                 for( auto constraint = mConstraints.begin(); constraint != mConstraints.end(); ++constraint )
                 {
-                    size_t maxdeg = (*constraint)->lhs().isZero() ? 0 : (*constraint)->lhs().totalDegree();
+                    std::size_t maxdeg = (*constraint)->lhs().isZero() ? 0 : (*constraint)->lhs().totalDegree();
                     if(maxdeg > result) 
                         result = maxdeg;
                 }
