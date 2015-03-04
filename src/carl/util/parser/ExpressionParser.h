@@ -200,6 +200,14 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		}
 	};
 
+	class perform_negate: public boost::static_visitor<expr_type> {
+	public:
+		template<typename T>
+		expr_type operator()(const T& lhs) const {
+			return lhs * Coeff(-1.0);
+		}
+	};
+
 	class to_poly: public boost::static_visitor<Poly<Coeff>> {
 	public:
 		Poly<Coeff> operator()(const Poly<Coeff>& p) const {
@@ -268,6 +276,7 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		operation.add("+", ADD)("-", SUB);
 		operationScale.add("*", MUL)("/", DIV);
 		operationPow.add("^", POW)("**", POW);
+		operationSign.add("-", NEG);
 		varname = qi::lexeme[ (qi::alpha | qi::char_("_")) >> *(qi::alnum | qi::char_("_"))];
 		variable = varname[qi::_val = px::bind(&ExpressionParser<Coeff>::newVariable, px::ref(*this), qi::_1)];
 
@@ -278,7 +287,8 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		atom = (monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
 		expr = ("(" > expr_sum > ")")[qi::_val = qi::_1] | atom[qi::_val = qi::_1];
 		expr_power = (expr >> *(operationPow > exponentVal))[qi::_val = px::bind(&ExpressionParser<Coeff>::powExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_product = (expr_power >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Coeff>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_sign = (*operationSign > expr_power)[qi::_val = px::bind(&ExpressionParser<Coeff>::signExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_product = (expr_sign >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Coeff>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
 		expr_sum = (expr_product >> *(operation > expr_product))[qi::_val = px::bind(&ExpressionParser<Coeff>::addExpr, px::ref(*this), qi::_1, qi::_2)];
 		main = expr_sum;
 
@@ -287,6 +297,7 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		monomial.name("monomial");
 		atom.name("atom");
 		expr.name("expr");
+		expr_sign.name("expr_sign");
 		expr_power.name("expr_power");
 		expr_product.name("expr_product");
 		expr_sum.name("expr_sum");
@@ -299,7 +310,7 @@ struct ExpressionParser: public qi::grammar<Iterator,
 	}
 	
 private:
-	enum Operation { ADD, SUB, MUL, DIV, POW };
+	enum Operation { ADD, SUB, MUL, DIV, POW, NEG };
 	
 	Variable newVariable(const std::string& s) {
 		Variable* vptr = nullptr;
@@ -357,9 +368,25 @@ private:
 		return res;
 	}
 
+	expr_type signExpr(const std::vector<Operation>& ops, const expr_type& first) {
+		expr_type res = first;
+		for(auto op : ops) {
+			switch (op) {
+				case NEG: {
+					res = boost::apply_visitor( perform_negate(), res );
+					break;
+				}
+				default:
+					throw std::runtime_error("Unknown unary operator");
+			}
+		}
+		return res;
+	}
+
 	qi::symbols<char, Operation> operation;
 	qi::symbols<char, Operation> operationScale;
 	qi::symbols<char, Operation> operationPow;
+	qi::symbols<char, Operation> operationSign;
 	qi::symbols<char, Variable> varmap;
 
 	qi::rule<Iterator, std::string(), Skipper> varname;
@@ -373,6 +400,7 @@ private:
 	qi::rule<Iterator, expr_type(), Skipper> atom;
 
 	qi::rule<Iterator, expr_type(), Skipper> expr;
+	qi::rule<Iterator, expr_type(), Skipper> expr_sign;
 	qi::rule<Iterator, expr_type(), Skipper> expr_product;
 	qi::rule<Iterator, expr_type(), Skipper> expr_power;
 	qi::rule<Iterator, expr_type(), Skipper> expr_sum;
