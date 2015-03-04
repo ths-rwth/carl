@@ -56,6 +56,12 @@ namespace carl
     {
         return Pol( _var );
     }
+
+    template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( const typename Pol::PolyType& _poly )
+    {
+        return _poly;
+    }
     
     /**
      * Class to create a constraint object.
