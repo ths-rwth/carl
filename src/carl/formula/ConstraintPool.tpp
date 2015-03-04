@@ -27,7 +27,9 @@ namespace carl
         if( needs_cache<Pol>::value )
         {
             mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
+#ifdef COMPARE_WITH_GINAC
             setGinacConverterPolynomialCache<Pol>( mpPolynomialCache );
+#endif
         }
 		/* Make sure that the MonomialPool is created before the ConstraintPool.
 		 * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
