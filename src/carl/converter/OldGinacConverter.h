@@ -178,9 +178,9 @@ namespace carl
     }
 	
 	template<typename Poly>
-	bool setGinacConverterPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
+	void setGinacConverterPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
     {
-        return OldGinacConverter<Poly>::getInstance().setGinacConverterPolynomialCache( _cache );
+        OldGinacConverter<Poly>::getInstance().setPolynomialCache( _cache );
     }
 }
 

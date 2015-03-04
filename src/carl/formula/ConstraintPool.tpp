@@ -8,6 +8,7 @@
  */
 
 #include "ConstraintPool.h"
+#include "../converter/OldGinacConverter.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ namespace carl
         if( needs_cache<Pol>::value )
         {
             mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
+            setGinacConverterPolynomialCache<Pol>( mpPolynomialCache );
         }
 		/* Make sure that the MonomialPool is created before the ConstraintPool.
 		 * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
