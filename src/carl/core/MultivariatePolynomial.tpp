@@ -1080,7 +1080,14 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 		num = carl::gcd(num, getNum((it)->coeff()));
 		den = carl::lcm(den, getDenom((it)->coeff()));
 	}
-	return Coeff(den)/num;
+    if( carl::isNegative(lcoeff()) )
+    {
+        return Coeff(den)/(-num);
+    }
+    else
+    {
+        return Coeff(den)/num;
+    }
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
@@ -1098,7 +1105,14 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactorWithoutConst
 		num = carl::gcd(num, getNum((it)->coeff()));
 		den = carl::lcm(den, getDenom((it)->coeff()));
 	}
-	return Coeff(den)/num;
+    if( carl::isNegative(lcoeff()) )
+    {
+        return Coeff(den)/(-num);
+    }
+    else
+    {
+        return Coeff(den)/num;
+    }
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

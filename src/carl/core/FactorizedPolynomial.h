@@ -325,7 +325,7 @@ namespace carl
         template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
         CoeffType coprimeFactor() const
         {
-            return constant_one<CoeffType>::get()/carl::abs(mCoefficient);
+            return constant_one<CoeffType>::get()/mCoefficient;
         }
         
         /**
@@ -483,11 +483,11 @@ namespace carl
                     {
                         if( expCoeffPair.second.isConstant() )
                         {
-                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() ) ) );
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() * mCoefficient ) ) );
                         }
                         else
                         {
-                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) ) );
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
                         }
                     }
                     VariableInformation<true, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence(), std::move( coeffs ) );
