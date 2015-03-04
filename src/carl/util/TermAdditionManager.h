@@ -138,7 +138,9 @@ public:
 		for (std::size_t i = 1; i < terms.size(); i++) {
 			if (Ordering::less(terms[max], terms[i])) max = i;
 		}
-		return terms[max];
+		assert(!terms[max].isConstant() || terms[max].isZero());
+		if (terms[max].isZero()) return TermType(std::get<3>(data));
+		else return terms[max];
 	}
     
 	void readTerms(TAMId id, Terms& terms) {
