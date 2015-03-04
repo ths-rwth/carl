@@ -37,6 +37,22 @@ inline bool isOne(const cln::cl_I& n) {
 inline bool isOne(const cln::cl_RA& n) {
 	return n  == carl::constant_one<cln::cl_RA>().get();
 }
+
+inline bool isPositive(const cln::cl_I& n) {
+	return n > carl::constant_zero<cln::cl_RA>().get();
+}	
+	
+inline bool isPositive(const cln::cl_RA& n) {
+	return n > carl::constant_zero<cln::cl_RA>().get();
+}
+
+inline bool isNegative(const cln::cl_I& n) {
+	return n < carl::constant_zero<cln::cl_RA>().get();
+}	
+	
+inline bool isNegative(const cln::cl_RA& n) {
+	return n < carl::constant_zero<cln::cl_RA>().get();
+}
 	
 /**
  * Extract the numerator from a fraction.

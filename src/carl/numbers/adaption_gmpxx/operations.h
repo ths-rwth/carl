@@ -42,6 +42,21 @@ inline bool isOne(const mpq_class& n) {
 	return constant_one<mpz_class>::get() == n;
 }
 
+inline bool isPositive(const mpz_class& n) {
+	return n > carl::constant_zero<mpz_class>().get();
+}	
+	
+inline bool isPositive(const mpq_class& n) {
+	return n > carl::constant_zero<mpz_class>().get();
+}
+
+inline bool isNegative(const mpz_class& n) {
+	return n < carl::constant_zero<mpz_class>().get();
+}	
+	
+inline bool isNegative(const mpq_class& n) {
+	return n < carl::constant_zero<mpz_class>().get();
+}
 	
 inline mpz_class getNum(const mpq_class& n) {
 	return n.get_num();

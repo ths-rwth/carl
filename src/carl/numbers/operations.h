@@ -33,7 +33,31 @@ namespace carl
 	template<typename T, DisableIf<has_isOne<T>>>
 	bool isOne(const T& t) 
 	{
-		return t.isOne();
+		return t == 1;
+	}
+    
+	template<typename T, EnableIf<has_isPositive<T>>>
+	bool isPositive(const T& t) 
+	{
+		return t.isPositive();
+	}
+	
+	template<typename T, DisableIf<has_isZero<T>>>
+	bool isPositive(const T& t)
+	{
+		return t > 0;
+	}
+	
+	template<typename T, EnableIf<has_isNegative<T>>>
+	bool isNegative(const T& t) 
+	{
+		return t.isNegative();
+	}
+	
+	template<typename T, DisableIf<has_isOne<T>>>
+	bool isNegative(const T& t) 
+	{
+		return t < 0;
 	}
 	
 	/**
