@@ -417,6 +417,22 @@ TEST(UnivariatePolynomial, resultant3)
 	//EXPECT_EQ(r, p.resultant(q));
 }
 
+TEST(UnivariatePolynomial, resultant4)
+{
+    Variable m = VariablePool::getInstance().getFreshVariable("m");
+    Variable r = VariablePool::getInstance().getFreshVariable("r");
+
+    MultivariatePolynomial<cln::cl_RA> mr(r);
+    MultivariatePolynomial<cln::cl_RA> one((cln::cl_RA)1);
+    MultivariatePolynomial<cln::cl_RA> zero((cln::cl_RA)0);
+
+    UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> p(m, {mr+one, zero, -one});
+    UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> q(m, {31, 16, 2});
+    UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> res(r, {833, -124, 4});
+
+    EXPECT_EQ(res, p.resultant(q));
+}
+
 TEST(UnivariatePolynomial, intervalCoeffs)
 {
 	Variable a = VariablePool::getInstance().getFreshVariable("a");
