@@ -621,18 +621,17 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::divideBy(const Multivariat
 		quotient = MultivariatePolynomial();
 		return true;
 	}
-	MultivariatePolynomial res(*this);
-	auto id = mTermAdditionManager.getId(res.mTerms.size());
+	auto id = mTermAdditionManager.getId(0);
 	auto thisid = mTermAdditionManager.getId(mTerms.size());
 	for (const auto& t: mTerms) {
-		mTermAdditionManager.template addTerm<false>(thisid, t);
+		mTermAdditionManager.template addTerm<false,true>(thisid, t);
 	}
 	while (true) {
 		Term<C> factor = mTermAdditionManager.getMaxTerm(thisid);
 		if (factor.isZero()) break;
 		if (factor.divide(divisor.lterm(), factor)) {
 			for (const auto& t: divisor) {
-				mTermAdditionManager.template addTerm<true>(thisid, -factor*t);
+				mTermAdditionManager.template addTerm<true,true>(thisid, -factor*t);
 			}
 			//res.subtractProduct(factor, divisor);
 			//p -= factor * divisor;
