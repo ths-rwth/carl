@@ -563,8 +563,7 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
         if( zeroBoundInvolved == 1 )
             upperBoundType = BoundType::WEAK;
     }
-    Interval<Number> result(std::move(resultInterval), lowerBoundType, upperBoundType );
-    return result;
+    return Interval<Number>(std::move(resultInterval), lowerBoundType, upperBoundType );
 }
 
 template<typename Number>
