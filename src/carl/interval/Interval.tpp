@@ -156,33 +156,33 @@ template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
 		assert(this->isConsistent());
-            switch( mLowerBoundType )
-            {
+        switch( mLowerBoundType )
+        {
+        case BoundType::INFTY:
+            break;
+        case BoundType::STRICT:
+            if( mContent.lower() >= val )
+                return false;
+            break;
+        case BoundType::WEAK:
+            if( mContent.lower() > val )
+                return false;
+        }
+        // Invariant: n is not conflicting with lower bound
+        switch( mUpperBoundType )
+        {
             case BoundType::INFTY:
                 break;
             case BoundType::STRICT:
-                if( mContent.lower() >= val )
+                if( mContent.upper() <= val )
                     return false;
                 break;
             case BoundType::WEAK:
-                if( mContent.lower() > val )
+                if( mContent.upper() < val )
                     return false;
-            }
-            // Invariant: n is not conflicting with lower bound
-            switch( mUpperBoundType )
-            {
-                case BoundType::INFTY:
-                    break;
-                case BoundType::STRICT:
-                    if( mContent.upper() <= val )
-                        return false;
-                    break;
-                case BoundType::WEAK:
-                    if( mContent.upper() < val )
-                        return false;
-                    break;
-            }
-            return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
+                break;
+        }
+        return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
 	}
 	
 	template<typename Number>
@@ -192,51 +192,40 @@ template<typename Number>
         if( rhs.isEmpty() )
             return true;
         // if one bound is totally wrong, we can just return false
-        if (
-                (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
-                || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY)
-            )
+        if((mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY) || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY))
         {
             return false;
         }
-
         // check the bounds
         bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
         bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
-                
-                // if both are ok, return true
+        // if both are ok, return true
 		if( lowerOk && upperOk )
 		{
-                    return true;
-		}
-                
-                // Note that from this point on at least one bound is equal
-                // to our bounds but no bound is outside of our bounds
-	
-                // check the bound types
-                bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
-                bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
-
-                // if upper bounds are ok and lower bound types are ok, return true
-                if (upperOk && lowerBoundTypesOk)
-                {
-                    return true;
-                }
-
-                // if lower bounds are ok and upper bound types are ok, return true
-                if (lowerOk && upperBoundTypesOk)
-                {
-                    return true;
-                }
-                
-                // if both bound types are ok, return true
-                if (lowerBoundTypesOk && upperBoundTypesOk)
-                {
-                    return true;
-                }
-            
-                // otherwise return false
-                return false; // not less and not equal
+            return true;
+		}       
+        // Note that from this point on at least one bound is equal
+        // to our bounds but no bound is outside of our bounds
+        // check the bound types
+        bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
+        bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
+        // if upper bounds are ok and lower bound types are ok, return true
+        if (upperOk && lowerBoundTypesOk)
+        {
+            return true;
+        }
+        // if lower bounds are ok and upper bound types are ok, return true
+        if (lowerOk && upperBoundTypesOk)
+        {
+            return true;
+        }
+        // if both bound types are ok, return true
+        if (lowerBoundTypesOk && upperBoundTypesOk)
+        {
+            return true;
+        }
+        // otherwise return false
+        return false; // not less and not equal
 	}
 	
 	template<typename Number>
@@ -545,12 +534,20 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
             resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
         }
     }
+    unsigned zeroBoundInvolved = 2;
     if( (xlt == BoundType::INFTY && (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY))
        || (xut == BoundType::INFTY && (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY))
        || (ylt == BoundType::INFTY && (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))
        || (yut == BoundType::INFTY && (xu < carl::constant_zero<Number>().get() || (xl < carl::constant_zero<Number>().get() || xlt == BoundType::INFTY))) )
     {
         lowerBoundType = BoundType::INFTY;
+    }
+    else if( resultInterval.lower() == carl::constant_zero<Number>().get() )
+    {
+        if( zeroBoundInvolved == 2 )
+            zeroBoundInvolved = (this->contains( carl::constant_zero<Number>().get() ) || rhs.contains( carl::constant_zero<Number>().get() )) ? 1 : 0;
+        if( zeroBoundInvolved == 1 )
+            lowerBoundType = BoundType::WEAK;
     }
     if( (xlt == BoundType::INFTY && (yu < carl::constant_zero<Number>().get() || (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY)))
        || (xut == BoundType::INFTY && (yl > carl::constant_zero<Number>().get() || (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY)))
@@ -559,7 +556,15 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
     {
         upperBoundType = BoundType::INFTY;
     }
-    return Interval<Number>(std::move(resultInterval), lowerBoundType, upperBoundType );
+    else if( resultInterval.upper() == carl::constant_zero<Number>().get() )
+    {
+        if( zeroBoundInvolved == 2 )
+            zeroBoundInvolved = (this->contains( carl::constant_zero<Number>().get() ) || rhs.contains( carl::constant_zero<Number>().get() )) ? 1 : 0;
+        if( zeroBoundInvolved == 1 )
+            upperBoundType = BoundType::WEAK;
+    }
+    Interval<Number> result(std::move(resultInterval), lowerBoundType, upperBoundType );
+    return result;
 }
 
 template<typename Number>

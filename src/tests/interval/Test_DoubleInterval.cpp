@@ -572,6 +572,16 @@ TEST(DoubleInterval, Multiplication)
     
     result  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ).mul(DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ));
     EXPECT_EQ( DoubleInterval( 1, BoundType::STRICT, 4, BoundType::WEAK ), result );
+    
+    DoubleInterval e1 = DoubleInterval( 0.0, BoundType::INFTY, 0.0, BoundType::STRICT );
+    DoubleInterval e2 = DoubleInterval( 0.0, BoundType::WEAK, 0.0, BoundType::INFTY );
+    DoubleInterval e3 = DoubleInterval( -2.0, BoundType::STRICT, 0.0, BoundType::STRICT );
+    DoubleInterval e4 = DoubleInterval( 0.0, BoundType::WEAK, 2.0, BoundType::STRICT );
+    
+    result = e1.mul( e2 );
+    EXPECT_EQ( DoubleInterval( 0.0, BoundType::INFTY, 0.0, BoundType::WEAK ), result );
+    result = e3.mul( e4 );
+    EXPECT_EQ( DoubleInterval( -4.0, BoundType::STRICT, 0.0, BoundType::WEAK ), result );
 }
 
 
