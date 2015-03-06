@@ -46,7 +46,7 @@ namespace carl
         }
 
         template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
-        P createPolynomial( const Variable::Arg _var )
+        P createPolynomial( Variable::Arg _var )
         {
             return P( std::move(typename P::PolyType(_var)), mpPolynomialCache );
         }
@@ -58,7 +58,7 @@ namespace carl
         }
 
         template<typename P = Poly, DisableIf<needs_cache<P>> = dummy>
-        P createPolynomial( const Variable::Arg _var )
+        P createPolynomial( Variable::Arg _var )
         {
             return P( _var );
         }
