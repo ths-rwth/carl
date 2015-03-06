@@ -57,16 +57,49 @@ namespace carl
     std::pair<mpq_class, mpq_class> sqrt_fast(const mpq_class& a)
     {
         assert(a >= 0);
+#if 1
+        mpz_class num;
+        mpz_class num_rem;
+        mpz_sqrtrem(num.__get_mp(), num_rem.__get_mp(), a.get_num().__get_mp());
+        mpz_class den;
+        mpz_class den_rem;
+        mpz_sqrtrem(den.__get_mp(), den_rem.__get_mp(), a.get_den().__get_mp());
+        
+        if (carl::isZero(num_rem)) {
+            if (carl::isZero(den_rem)) {
+                mpq_class exact_root = num / den;
+                return std::make_pair(exact_root, exact_root);
+            } else {
+                mpq_class lower = num / (den + 1);
+                mpq_class upper = num / den;
+                return std::make_pair(lower, upper);
+            }
+        } else {
+            if (carl::isZero(den_rem)) {
+                mpq_class lower = num / den;
+                mpq_class upper = (num + 1) / den;
+                return std::make_pair(lower, upper);
+            } else {
+                mpq_class lower = num / (den + 1);
+                mpq_class upper = (num + 1) / den;
+                return std::make_pair(lower, upper);
+            }
+        }
+#else
         mpq_class exact_root;
         if (carl::sqrtp(a, exact_root)) {
             // root can be computed exactly.
             return std::make_pair(exact_root, exact_root);
         } else {
             // compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
-            mpz_class lower( floor( sqrt( mpf_class( a ) ) ) );
-            mpz_class upper = lower + carl::constant_one<mpz_class>::get();
+            mpf_class af = sqrt(mpf_class(a));
+            mpq_class lower(af - carl::constant_one<mpf_class>::get());
+            mpq_class upper(af + carl::constant_one<mpf_class>::get());
+            assert(lower * lower < a);
+            assert(upper * upper > a);
             return std::make_pair(lower, upper);
         }
+#endif
     }
     
     template<>
