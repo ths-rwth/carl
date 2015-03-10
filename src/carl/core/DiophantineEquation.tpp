@@ -47,44 +47,44 @@ std::vector<T> solveLinearDiophantine(MultivariatePolynomial<T>& equation) {
     // initialize coefficient vector
     std::vector<carl::Term<T>> terms = equation.getTerms();
     std::vector<T> coeffs = std::vector<T>();
-    for(int i = 1; i < terms.size(); i++ ) { //terms[0] is the constant part
+    for(int i = 1; i < terms.size(); i++ ) { // terms[0] is the constant part
         coeffs.push_back(terms[i].coeff());
     }
+    
     
     std::vector<T> fromExtendedGcd = std::vector<T>(1, 1);
     T currGcd = coeffs[0];
     
-    for(int i = 0; i < coeffs.size(); i++) {
-        if(i == 0) {
-            if(carl::mod(const_part, coeffs[0]) == 0) {
-                res = std::vector<T>(coeffs.size(), 0);
-                res[0] = -carl::div(const_part, coeffs[0]);
-                return res;
-            }
+    if(carl::mod(const_part, coeffs[0]) == 0) {
+        res = std::vector<T>(coeffs.size(), 0);
+        res[0] = -carl::div(const_part, coeffs[0]);
+        return res;
+    }
+    for(int i = 1; i < coeffs.size(); i++) {
+        T s;
+        T t;
+        currGcd = extended_gcd_integer(currGcd, coeffs[i], s, t);
+        for(auto& r : fromExtendedGcd) {
+            r *= s;
         }
-        else {
-            T s;
-            T t;
-            currGcd = extended_gcd_integer(currGcd, coeffs[i], s, t);
+        fromExtendedGcd.push_back(t);
+        if(carl::mod(const_part, currGcd) == 0) {
+            T factor = -carl::div(const_part, currGcd);
             for(auto& r : fromExtendedGcd) {
-                r *= s;
+                r *= factor;
             }
-            fromExtendedGcd.push_back(t);
-            if(carl::mod(const_part, currGcd) == 0) {
-                T factor = -carl::div(const_part, currGcd);
-                for(auto& r : fromExtendedGcd) {
-                    r *= factor;
-                }
-                for(int j = coeffs.size() - fromExtendedGcd.size(); j < coeffs.size(); j++) {
-                    fromExtendedGcd.push_back(0);
-                }
-                return fromExtendedGcd;
+            int diff = coeffs.size() - fromExtendedGcd.size();
+            for(int j = 0; j < diff; j++) {
+                fromExtendedGcd.push_back(0);
             }
-            else if(i == coeffs.size() - 1) {
-                CARL_LOG_NOTIMPLEMENTED();
-            }
+            assert(fromExtendedGcd.size() == coeffs.size());
+            return fromExtendedGcd;
         }
     }
+    // no solution exists
+    CARL_LOG_NOTIMPLEMENTED(); 
+    return std::vector<cln::cl_I>(coeffs.size(), 0);
+    
 }
 
 // implementation of extended euklid for integers
