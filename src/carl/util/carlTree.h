@@ -905,6 +905,7 @@ private:
 		eraseChildren(id);
 		nodes[id].nextSibling = emptyNodes;
 		nodes[id].previousSibling = MAXINT;
+		emptyNodes = id;
 	}
 	
 public:
