@@ -46,6 +46,17 @@ private:
 			//for (auto& c: children) nodes[c].updateDepth(newDepth + 1);
 		}
 	};
+	friend std::ostream& operator<<(std::ostream& os, const Node& n) {
+		int id = n.id;
+		int parent = (n.parent == MAXINT ? -1 : n.parent);
+		int firstChild = (n.firstChild == MAXINT ? -1 : n.firstChild);
+		int lastChild = (n.lastChild == MAXINT ? -1 : n.lastChild);
+		int previousSibling = (n.previousSibling == MAXINT ? -1 : n.previousSibling);
+		int nextSibling = (n.nextSibling == MAXINT ? -1 : n.nextSibling);
+		os << "(" << n.data << " @ " << id << ", " << parent << ", " << firstChild << ":" << lastChild << ", " << previousSibling << " <-> " << nextSibling << ")\n";
+
+		return os;
+	}
 	std::vector<Node> nodes;
 	std::size_t emptyNodes = MAXINT;
 protected:
@@ -532,6 +543,11 @@ public:
 		nodes = std::move(t.nodes);
 		emptyNodes = t.emptyNodes;
 		return *this;
+	}
+
+	void debug() const {
+		std::cout << "emptyNodes: " << emptyNodes << std::endl;
+		std::cout << this->nodes << std::endl;
 	}
 
 	iterator begin() const {
