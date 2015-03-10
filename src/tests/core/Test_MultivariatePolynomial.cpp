@@ -662,7 +662,7 @@ TEST(MultivariatePolynomialTest, Resultant)
 	std::cout << "Result: " << resz3 << std::endl;
 #endif
 	
-	std::cout << "##### CArL #####" << std::endl;
-	auto res = p.toUnivariatePolynomial(x).resultant_z3(q.toUnivariatePolynomial(x));
-	std::cout << "Result: " << res << std::endl;
+//	std::cout << "##### CArL #####" << std::endl;
+//	auto res = p.toUnivariatePolynomial(x).resultant_z3(q.toUnivariatePolynomial(x));
+//	std::cout << "Result: " << res << std::endl;
 }
