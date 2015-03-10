@@ -556,8 +556,8 @@ namespace carl
             if( constPart != typename Pol::NumberType( 0 ) )
             {
                 // Find the gcd of the coefficients of the non-constant terms.
-                typename Pol::NumberType g = lhs().coprimeFactorWithoutConstant();
-                assert( g > typename Pol::NumberType( 0 ) );
+                typename Pol::NumberType g = carl::abs( lhs().coprimeFactorWithoutConstant() );
+                assert( g != typename Pol::NumberType( 0 ) );
                 if( carl::mod( carl::getNum( constPart ), carl::getDenom( g ) ) != 0 )
                 {
                     switch( relation() )
