@@ -789,6 +789,7 @@ bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolyn
 	assert(divisor.isConsistent());
 	Coeff quo;
 	bool res = Coeff(*this).divideBy(divisor, quo);
+	CARL_LOG_TRACE("carl.core", Coeff(*this) << " / " << divisor << " = " << quo);
 	assert(quo.isConsistent());
 	if (res) quotient = quo.toUnivariatePolynomial(this->mainVar());
 	return res;
@@ -1531,8 +1532,8 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	UnivariatePolynomial<Coeff> tmp = q;
 	q = p.prem(-q);
 	p = tmp;
-	CARL_LOG_TRACE("carl.core.resultant", "p = q = " << p);
 	CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q) = " << q);
+	CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
 	//CARL_LOG_TRACE("carl.core.resultant", "p = q");
 	//CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q)");
 	
@@ -1647,7 +1648,8 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
 				 */
 				UnivariatePolynomial<Coeff> reducedNewB = p.prem(-q);
-				reducedNewB.divideBy(subresLcoeff.pow(delta)*p.lcoeff(), q);
+				bool r = reducedNewB.divideBy(subresLcoeff.pow(delta)*p.lcoeff(), q);
+				assert(r);
 				break;
 			}
 			case SubresultantStrategy::Ducos: {
@@ -1726,6 +1728,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 	if (this->isZero()) return UnivariatePolynomial(this->mainVar());
 	if (p.isZero()) return UnivariatePolynomial(this->mainVar());
 	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(this->normalized(), p.normalized(), strategy).front();
+	//UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
 		return resultant;
