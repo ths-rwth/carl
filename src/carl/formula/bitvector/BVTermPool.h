@@ -14,14 +14,16 @@ namespace carl
 	class BVTermPool : public Singleton<BVTermPool<Pol>>, public Pool<BVTermContent<Pol>>
 	{
 		friend Singleton<BVTermPool>;
+	public:
 
 		typedef BVTermContent<Pol> Term;
 		typedef Term* TermPtr;
 		typedef const Term* ConstTermPtr;
+	private:
 
 		ConstTermPtr mpInvalid;
 
-		public:
+	public:
 
 		BVTermPool() : Singleton<BVTermPool<Pol>> (), Pool<BVTermContent<Pol>> ()
 		{
