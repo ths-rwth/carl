@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <functional>
 #include <string.h>
 #include <string>
 #include <set>
@@ -22,6 +23,11 @@ namespace carl
     // Forward definition.
     template<typename Pol>
     class Formula;
+
+    template<typename Poly>
+    using Formulas = std::set<Formula<Poly>, carl::less<Formula<Poly>, false>>;
+	template<typename Poly>
+    using FormulasMulti = std::multiset<Formula<Poly>, carl::less<Formula<Poly>, false>>;
     
     /**
      * Stores the sub-formulas of a formula being an implication.
@@ -146,7 +152,6 @@ namespace carl
         private:
             
             // Member.
-            
             /// The hash value.
             size_t mHash;
             /// The unique id.
@@ -169,7 +174,7 @@ namespace carl
                 /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
                 QuantifierContent<Pol>* mpQuantifierContent;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                std::set<Formula<Pol>>* mpSubformulas;
+                Formulas<Pol>* mpSubformulas;
                 /// The constraint, in case this formulas wraps a constraint.
                 const Constraint<Pol>* mpConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
@@ -177,6 +182,8 @@ namespace carl
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
                 UEquality mUIEquality;
             };
+            /// The negation
+            FormulaContent<Pol> *mNegation;
             /// The propositions of this formula.
             Condition mProperties;
 
@@ -239,7 +246,7 @@ namespace carl
              * @param _type The type of the formula to construct.
              * @param _subformulas The sub-formulas of the formula to construct.
              */
-            FormulaContent( const FormulaType _type, std::set<Formula<Pol>>&& _subformulas );
+            FormulaContent( const FormulaType _type, Formulas<Pol>&& _subformulas );
 
             FormulaContent(); // Disabled
             FormulaContent( const FormulaContent& ); // Disabled
@@ -294,9 +301,11 @@ namespace carl
         
         public:
             /// A constant iterator to a sub-formula of a formula.
-            typedef typename std::set<Formula>::const_iterator const_iterator;
+            typedef typename Formulas<Pol>::const_iterator const_iterator;
             /// A constant reverse iterator to a sub-formula of a formula.
-            typedef typename std::set<Formula>::const_reverse_iterator const_reverse_iterator;
+            typedef typename Formulas<Pol>::const_reverse_iterator const_reverse_iterator;
+			/// A typedef for the template argument.
+			typedef Pol PolynomialType;
             
             /**
              * Adds the propositions of the given constraint to the propositions of this formula.
@@ -372,7 +381,7 @@ namespace carl
                 }
                 else
                 {
-                    std::set<Formula> subFormulas;
+                    Formulas<Pol> subFormulas;
                     subFormulas.insert( _subformulaA );
                     subFormulas.insert( _subformulaB );
                     subFormulas.insert( _subformulaC );
@@ -380,17 +389,17 @@ namespace carl
                 }
             }
             
-            explicit Formula( FormulaType _type, const std::multiset<Formula>& _subformulas ):
+            explicit Formula( FormulaType _type, const FormulasMulti<Pol>& _subformulas ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _subformulas ) )
             {
                 assert( _type == FormulaType::XOR );
             }
             
-            explicit Formula( FormulaType _type, const std::set<Formula>& _subasts ):
+            explicit Formula( FormulaType _type, const Formulas<Pol>& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
-            explicit Formula( FormulaType _type, std::set<Formula>&& _subasts ):
+            explicit Formula( FormulaType _type, Formulas<Pol>&& _subasts ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
             {}
             
@@ -606,7 +615,7 @@ namespace carl
              * @return A constant reference to the list of sub-formulas of this formula. Note, that
              *          this formula has to be a Boolean combination, if you invoke this method.
              */
-            const std::set<Formula>& subformulas() const
+            const Formulas<Pol>& subformulas() const
             {
                 assert( isNary() );
                 return *mpContent->mpSubformulas;
@@ -658,7 +667,7 @@ namespace carl
             size_t size() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE 
-                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT )
+                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ )
                     return 1;
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return 2;
@@ -814,6 +823,8 @@ namespace carl
              */
             bool contains( const Formula& _formula ) const
             {
+                if( this == &_formula )
+                    return true;
                 if( isAtom() )
                     return false;
                 if( mpContent->mType == FormulaType::NOT )
@@ -853,7 +864,10 @@ namespace carl
              * @return true, if this formula and the given formula are equal;
              *         false, otherwise.
              */
-            bool operator==( const Formula& _formula ) const;
+            bool operator==( const Formula& _formula ) const
+            {
+                return mpContent == _formula.mpContent;
+            }
             
             /**
              * @param _formula The formula to compare with.
@@ -861,9 +875,7 @@ namespace carl
              */
             bool operator!=( const Formula& _formula ) const
             {
-                assert( mpContent->mId != 0 );
-                assert( _formula.getId() != 0 );
-                return mpContent->mId != _formula.getId();
+                return mpContent != _formula.mpContent;
             }
             
             /**
@@ -1074,7 +1086,7 @@ namespace carl
              *                (_inConjunction == false) to which the bounds are added is invalid resp. valid;
              *         false, otherwise.
              */
-            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, std::set<Formula>& _intoAsts, bool _inConjunction );
+            static bool swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoAsts, bool _inConjunction );
     };
     
     /**
@@ -1085,6 +1097,28 @@ namespace carl
      */
     template<typename Poly>
     std::ostream& operator<<( std::ostream& _out, const Formula<Poly>& _formula );
+
+	/**
+	 * This class provides a generic visitor for the above Formula class.
+	 */
+	template<typename Formula>
+	struct FormulaVisitor {
+		/**
+		 * Recursively calls func on every subformula.
+		 * @param formula Formula to visit.
+		 * @param func Function to call.
+		 */
+		void visit(const Formula& formula, const std::function<void(Formula)>& func);
+		/**
+		 * Recursively calls func on every subformula and return a new formula.
+		 * On every call of func, the passed formula is replaced by the result.
+		 * @param formula Formula to visit.
+		 * @param func Function to call.
+		 * @return New formula.
+		 */
+		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
+	};
+
 }    // namespace carl
 
 namespace std

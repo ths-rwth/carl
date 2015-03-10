@@ -652,6 +652,13 @@ public:
 	UnivariatePolynomial mod(const Coefficient& modulus) const;
 
 	/**
+	 * Returns this polynomial to the given power.
+	 * @param exp Exponent.
+	 * @return This to the power of exp.
+	 */
+	UnivariatePolynomial pow(std::size_t exp) const;
+
+	/**
 	 * Calculates the greatest common divisor of two polynomials.
 	 * @param a First polynomial.
 	 * @param b Second polynomial.

@@ -13,7 +13,6 @@
 
 #include "MultivariatePolynomial.h"
 #include "VariablesInformation.h"
-#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
@@ -24,11 +23,18 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	assert(!mp1.isZero());
 	assert(!mp2.isZero());
 	// We start with some trivial cases.
-	if(mp1.isOne() || mp2.isOne()) return Polynomial(1);
-	if(is_field<C>::value && (mp1.isConstant() || mp2.isConstant()))
+	if(mp1.isOne() || mp2.isOne())
+    {
+        return Polynomial(1);
+    }
+	if(is_field<C>::value && mp1.isConstant())
 	{
-		return Polynomial(1);
+		return Polynomial(carl::gcd( mp1.constantPart(), carl::constant_one<C>().get()/mp2.coprimeFactor() ));
 	}
+    if(is_field<C>::value && mp2.isConstant())
+    {
+		return Polynomial(carl::gcd( mp2.constantPart(), carl::constant_one<C>().get()/mp1.coprimeFactor() ));
+    }
 	if(mp1.nrTerms() == 1 && mp2.nrTerms() == 1)
 	{
 		return Polynomial(Term<C>::gcd(mp1.lterm(), mp2.lterm()));
@@ -43,8 +49,8 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	// gcd(p, ay + b) is either ay + b or 1.
     
     #ifdef COMPARE_WITH_GINAC
-    std::cout << "applying ginac gcd" << std::endl;
-    return ginacGcd( mp1, mp2 );
+    typedef MultivariatePolynomial<C,O,P> PolyT;
+    return ginacGcd<PolyT>( mp1, mp2 );
     #else 
 	Variable x = getMainVar(mp1, mp2);
 	if(x == Variable::NO_VARIABLE)
@@ -95,11 +101,9 @@ template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
 {
 	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
-#ifdef COMPARE_WITH_GINAC
-	assert(checkConversion(a));
-	assert(checkConversion(b));
-    assert(ginacGcd(a,b) == gcd_calc.calculate());
-#endif 
+    #ifdef COMPARE_WITH_GINAC
+    assert( gcd_calc.checkCorrectnessWithGinac() );
+    #endif 
 	return gcd_calc.calculate();
 }
 

@@ -74,6 +74,8 @@ enum CADSettingsType {
    /// bounds-related optimizations explicitely deactivated
    NOTBOUNDED = 512,
    
+   EXPLOREINTEGER = 1024,
+   
    DEFAULT = BOUNDED
 };
 
@@ -86,14 +88,10 @@ struct CADSettings {
 public:
 	/// Ordering used for samples.
 	SampleOrdering sampleOrdering;
-	/// flag indicating that Groebner bases are used to simplify the input polynomials corresponding to equations
-	bool simplifyByGroebner;
 	/// flag indicating that the elimination uses real root counting to simplify the bottom-most level
 	bool simplifyByRootcounting;
 	/// flag indicating that the elimination uses factorization of polynomials in every level
 	bool simplifyByFactorization;
-	/// flag activating the optimizations of [McCallum - "An Improved Projection Operation for Cylindrical Algebraic Decomposition of Three-dimensional Space"]
-	bool simplifyFor3D;
 	/// elimination following [McCallum - "On projection in CAD-based quantifier elimination with equational constraint"] and [McCallum - "On Propagation of Equational Constraints in CAD-Based Quantifier Elimination"], and no intermediate points are considered for lifting
 	bool equationsOnly;
 	/// only intermediate points are considered for lifting [McCallum - "Solving Polynomial Strict Inequalities Using Cylindrical Algebraic Decomposition"]
@@ -104,8 +102,6 @@ public:
 	bool trimVariables;
 	/// treat equations separately by tuning the cad object to equations
 	bool autoSeparateEquations;
-	/// if equationsOnly is set, tune the CAD as if all input equation systems are zero-dimensional
-	bool zeroDimEquations;
 	/// compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check
 	bool computeConflictGraph;
 	/// given bounds to the check method, these bounds are used to solve the constraints just by interval arithmetic
@@ -116,6 +112,7 @@ public:
 	bool simplifyEliminationByBounds;
 	/// given bounds to the check method, the bounds are widened after determining unsatisfiability by check, or shrunk after determining satisfiability by check
 	bool improveBounds;
+	bool exploreInteger;
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
 	/// standard strategy to be used for real root isolation
@@ -138,18 +135,15 @@ public:
 			cadSettings.autoSeparateEquations = false;
 			cadSettings.sampleOrdering = SampleOrdering::RatRoot;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessOddCB;
 		}
 		if (setting & IRRATIONALSAMPLE) {
 			cadSettings.autoSeparateEquations = false;
 			cadSettings.sampleOrdering = SampleOrdering::Interval;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessEvenCB;
 		}
 		if (setting & EQUATIONDETECT) {
 			cadSettings.autoSeparateEquations = true;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & BOUNDED) {
 			cadSettings.autoSeparateEquations       = true;
@@ -163,7 +157,6 @@ public:
 			cadSettings.simplifyEliminationByBounds = true;
 			cadSettings.trimVariables               = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & NOTBOUNDED) {
 			cadSettings.autoSeparateEquations       = true;
@@ -177,7 +170,6 @@ public:
 			cadSettings.simplifyEliminationByBounds = false;
 			cadSettings.trimVariables               = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess                   = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & EQUATIONSONLY) {
 			cadSettings.autoSeparateEquations = false;
@@ -185,18 +177,18 @@ public:
 			cadSettings.equationsOnly         = true;
 			cadSettings.inequalitiesOnly      = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & INEQUALITIESONLY) {
 			cadSettings.sampleOrdering		  = SampleOrdering::NonRoot;
 			cadSettings.equationsOnly         = false;
 			cadSettings.inequalitiesOnly      = true;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
-			//cadSettings.up_isLess             = UnivariatePolynomial::univariatePolynomialIsLessCB;
 		}
 		if (setting & ALTERNATIVEORDER) {
 			cadSettings.order = PolynomialComparisonOrder::LowDegree;
-			//cadSettings.up_isLess = UnivariatePolynomial::univariatePolynomialIsLessLowDeg;
+		}
+		if (setting & EXPLOREINTEGER) {
+			cadSettings.exploreInteger = true;
 		}
 
 		return cadSettings;
@@ -204,14 +196,10 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const CADSettings& settings) {
 		std::list<std::string> settingStrs;
-		if (settings.simplifyByGroebner)
-			settingStrs.push_back( "Simplify the input polynomials corresponding to equations by a Groebner basis (currently disabled)." );
 		if (settings.simplifyByRootcounting)
 			settingStrs.push_back( "Simplify the base elimination level by real root counting." );
 		if (settings.simplifyByFactorization)
 			settingStrs.push_back( "Simplify the elimination by factorization of polynomials in every level (using GiNaC::factor)." );
-		if (settings.simplifyFor3D)
-			settingStrs.push_back( "Simplify the elimination of trivariate polynomials (currently disabled)." );
 		if (settings.equationsOnly)
 			settingStrs.push_back( "Simplify elimination for equation-only use (currently disabled) + do not use intermediate points for lifting." );
 		if (settings.inequalitiesOnly)
@@ -259,10 +247,8 @@ private:
 	 */
 	CADSettings():
 		sampleOrdering( SampleOrdering::Default ),
-		simplifyByGroebner( false ),
 		simplifyByRootcounting( false ),
 		simplifyByFactorization( true ),
-		simplifyFor3D( false ),
 		equationsOnly( false ),
 		inequalitiesOnly( false ),
 		removeConstants( true ),
@@ -273,6 +259,7 @@ private:
 		earlyLiftingPruningByBounds( true ),
 		simplifyEliminationByBounds( true ),
 		improveBounds( true ),
+		exploreInteger(false),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
@@ -284,10 +271,8 @@ public:
 	 */
 	CADSettings( const CADSettings& s ):
 		sampleOrdering( s.sampleOrdering ),
-		simplifyByGroebner( s.simplifyByGroebner ),
 		simplifyByRootcounting( s.simplifyByRootcounting ),
 		simplifyByFactorization( s.simplifyByFactorization ),
-		simplifyFor3D( s.simplifyFor3D ),
 		equationsOnly( s.equationsOnly ),
 		inequalitiesOnly( s.inequalitiesOnly ),
 		removeConstants( s.removeConstants ),
@@ -298,6 +283,7 @@ public:
 		earlyLiftingPruningByBounds( s.earlyLiftingPruningByBounds ),
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),
 		improveBounds( s.improveBounds ),
+		exploreInteger(s.exploreInteger),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}

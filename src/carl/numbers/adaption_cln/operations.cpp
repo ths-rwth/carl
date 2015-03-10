@@ -1,4 +1,5 @@
-#include "operations.h"
+#include "../numbers.h"
+#include <limits>
 
 namespace carl
 {
@@ -24,7 +25,7 @@ namespace carl
         }
         return 0;
     }
-    
+
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(float n)
     {
@@ -49,19 +50,25 @@ namespace carl
         }
         return 0;
     }
-    
+
+    bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b)
+    {
+        if( a < 0 ) return false;
+        return cln::sqrtp( a, &b );
+    }
+
     std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a)
     {
         assert( a >= 0 );
-        cln::cl_R root = cln::sqrt(toLF(a));
-        cln::cl_RA rroot = cln::rationalize(root);
-        if( rroot == root ) // the result of the sqrt operation is a rational and thus an exact solution -> return a point-Interval
-        {
-            return std::make_pair(rroot, rroot);
-        }
-        else // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
-        {
-                    // Check if root^2 > a
+        cln::cl_RA exact_root;
+        if (cln::sqrtp(a, &exact_root)) {
+            // root can be computed exactly.
+            return std::make_pair(exact_root, exact_root);
+        } else {
+            cln::cl_R root = cln::sqrt(toLF(a));
+            cln::cl_RA rroot = cln::rationalize(root);
+            // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
+            // Check if root^2 > a
             if( cln::expt_pos(rroot,2) > a ) // we need to find the lower bound
             {
                 cln::cl_R lower = cln::sqrt(toLF(a-rroot));
@@ -96,25 +103,24 @@ namespace carl
             }
         }
     }
-    
+
     std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a)
     {
-	assert(a >= 0);
-	cln::cl_R tmp = cln::sqrt(toLF(a));
-	cln::cl_RA root = cln::rationalize(tmp);
-	if(root == tmp) {
-            // root is a cln::cl_RA
-            return std::make_pair(root, root);
-	} else {
-            // root is a cln::cl_LF. In this case, it is not integer and we can assume that the surrounding integers contain the actual root.
-            cln::cl_I lower = carl::floor(root);
-            cln::cl_I upper = carl::ceil(root);
+		assert(a >= 0);
+		cln::cl_RA exact_root;
+		if (cln::sqrtp(a, &exact_root)) {
+			// root can be computed exactly.
+			return std::make_pair(exact_root, exact_root);
+		} else {
+			// compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
+			cln::cl_I lower = cln::floor1(cln::sqrt(toLF(a)));
+            cln::cl_I upper = lower + 1;
             assert(cln::expt_pos(lower,2) < a);
             assert(cln::expt_pos(upper,2) > a);
             return std::make_pair(lower, upper);
         }
     }
-    
+
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring)
     {
@@ -137,6 +143,24 @@ namespace carl
         return result;
     }
 
+    template<>
+    cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n) {
+        typedef signed long int IntType;
+        mpz_class den = carl::getDenom((mpq_class)n);
+        if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )
+        {
+            mpz_class num = carl::getNum((mpq_class)n);
+            if( num <= std::numeric_limits<IntType>::max() && num >= std::numeric_limits<IntType>::min() )
+            {
+                return cln::cl_RA(carl::toInt<IntType>(num))/cln::cl_RA(carl::toInt<IntType>(den));
+            }
+        }
+        std::stringstream s;
+        s << ((mpq_class)n);
+        cln::cl_RA result = rationalize<cln::cl_RA>(s.str());
+        return result;
+    }
+
     std::string toString(const cln::cl_RA& _number, bool _infix)
     {
         std::stringstream s;
@@ -149,7 +173,7 @@ namespace carl
             if(d != cln::cl_I(1)) s << "(/ " << carl::abs(carl::getNum(_number)) << " " << carl::abs(d) << ")";
             else s << carl::abs(_number);
         }
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }
@@ -160,7 +184,7 @@ namespace carl
         bool negative = (_number < cln::cl_I(0));
         if(negative) s << "(-" << (_infix ? "" : " ");
         s << carl::abs(_number);
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }

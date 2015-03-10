@@ -114,6 +114,9 @@ TEST(FactorizedPolynomial, Construction)
     Pol f2 = sp.parseMultivariatePolynomial<Rational>("x + -1*x^2 + 3*x^3");
     Pol f3 = f1*f1*f2;
     Pol f4 = f1*f2*f2;
+    Pol f5 = sp.parseMultivariatePolynomial<Rational>("-1*x + 1");
+    Pol f6 = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol f7 = f6 - c1;
     
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fc1( (cln::cl_RA) 1 );
@@ -122,8 +125,11 @@ TEST(FactorizedPolynomial, Construction)
     FPol fc4( (cln::cl_RA) 0 );
     FPol fpA( fA, pCache );
     FPol fpB( fB, pCache );
+    FPol fp2( f2, pCache );
     FPol fp3( f3, pCache );
     FPol fp4( f4, pCache );
+    FPol fp5( f5, pCache );
+    FPol fp7( f7, pCache );
 
     //Common divisor
     std::cout << "Common divisor of " << fpA << " and " << fpB;
@@ -210,6 +216,21 @@ TEST(FactorizedPolynomial, Construction)
     FPol fpMul4 = fc2 * fc3;
     std::cout << fpMul4 << std::endl;
     EXPECT_EQ( fMul4, computePolynomial( fpMul4 ) );
+    
+    //Some test
+    FPol fres = fp5;
+    FPol ftest = fp7;
+    ftest *= fp7;
+    ftest *= fp7;
+    ftest *= fp7;
+    ftest *= fp7;
+    ftest *= fp2;
+    std::cout << "fp5 = " << fp5 << std::endl;
+    std::cout << "fp7 = " << fp7 << std::endl;
+    std::cout << "ftest = " << ftest << std::endl;
+    fres *= ftest;
+    std::cout << "fres = " << fres << std::endl;
+    EXPECT_EQ( (f5*f7.pow(5)*f2), computePolynomial( fres ) );
 
     //Addition
     Pol fAdd = fA + fB;

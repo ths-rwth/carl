@@ -10,7 +10,6 @@
 
 #include "Formula.h"
 #include "FormulaPool.h"
-#include "VariableNamePool.h"
 #include "ConstraintPool.h"
 
 using namespace std;
@@ -129,7 +128,7 @@ namespace carl
     }
 
     template<typename Pol>
-    FormulaContent<Pol>::FormulaContent( const FormulaType _type, std::set<Formula<Pol>>&& _subformulas ):
+    FormulaContent<Pol>::FormulaContent( const FormulaType _type, Formulas<Pol>&& _subformulas ):
         mHash( (size_t)_type ),
         mId( 0 ),
         mActivity( 0 ),
@@ -139,7 +138,7 @@ namespace carl
     {
         assert( _subformulas.size() > 1 );
         assert( mType == FormulaType::AND || mType == FormulaType::OR || mType == FormulaType::IFF || mType == FormulaType::XOR );
-        mpSubformulas = new std::set<Formula<Pol>>( move( _subformulas ) );
+        mpSubformulas = new Formulas<Pol>( move( _subformulas ) );
         for( const Formula<Pol>& subformula : *mpSubformulas )
         {
             mHash = CIRCULAR_SHIFT(size_t, mHash, 5);
@@ -221,7 +220,7 @@ namespace carl
         }
         if( mType == FormulaType::BOOL )
         {
-            return (_init + variablePool().getVariableName( mBoolean, _friendlyNames ) + activity);
+            return (_init + VariablePool::getInstance().getName( mBoolean, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::CONSTRAINT )
             return (_init + mpConstraint->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
@@ -309,7 +308,7 @@ namespace carl
         {
             string result = _init + "(exists ";
             for (auto v: mpQuantifierContent->mVariables) {
-                result += variablePool().getVariableName(v, _friendlyNames) + " ";
+                result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
             }
             result += mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
             result += ")";
@@ -319,7 +318,7 @@ namespace carl
         {
             string result = _init + "(forall ";
             for (auto v: mpQuantifierContent->mVariables) {
-                result += variablePool().getVariableName(v, _friendlyNames) + " ";
+                result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
             }
             result += mpQuantifierContent->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
             result += ")";
@@ -403,12 +402,6 @@ namespace carl
                     subFormula.collectVariables( _vars, _type, _ofThisType );
             }
         }
-    }
-    
-    template<typename Pol>
-    bool Formula<Pol>::operator==( const Formula<Pol>& _formula ) const
-    {
-        return *mpContent == *_formula.mpContent;
     }
     
     template<typename Pol>
@@ -824,7 +817,7 @@ namespace carl
                 result += constraint().toString( 1 );
                 break;
             case FormulaType::BOOL:
-                result += variablePool().getVariableName( boolean(), true ) + " = 1";
+                result += VariablePool::getInstance().getName( boolean(), true ) + " = 1";
                 break;
             case FormulaType::IMPLIES:
                 result += "( " + premise().toRedlogFormat( _withVariables ) + " " + oper + " " + premise().toRedlogFormat( _withVariables ) + " )";
@@ -842,13 +835,13 @@ namespace carl
                     booleanVars( boolVars );
                     for( auto j = boolVars.begin(); j != boolVars.end(); ++j )
                     {
-                        string boolName = variablePool().getVariableName( *j, true );
+                        string boolName = VariablePool::getInstance().getName( *j, true );
                         result += "(" + boolName + " = 0 or " + boolName + " = 1) and ";
                     }
                 }
                 else
                     result += "( ";
-                typename std::set<Formula>::const_iterator it = subformulas().begin();
+                typename Formulas<Pol>::const_iterator it = subformulas().begin();
                 // do not quantify variables again.
                 result += (*it)->toRedlogFormat( false );
                 for( ++it; it != subformulas().end(); ++it ) // do not quantify variables again.
@@ -886,12 +879,12 @@ namespace carl
         }
         else if( j != boolVars.end() )
         {
-            string boolName = variablePool().getVariableName( *j, true );
+            string boolName = VariablePool::getInstance().getName( *j, true );
             unordered_map<string, string>::const_iterator vId = _variableIds.find(boolName);
             result += vId == _variableIds.end() ? boolName : vId->second;
             for( ++j; j != boolVars.end(); ++j )
             {
-                boolName = variablePool().getVariableName( *j, true );
+                boolName = VariablePool::getInstance().getName( *j, true );
                 result += _separator;
                 vId = _variableIds.find(boolName);
                 result += vId == _variableIds.end() ? boolName : vId->second;
@@ -969,7 +962,7 @@ namespace carl
             {
                 assert( subformula().size() == 2 );
                 // (not (implies lhs rhs))  ->  (and lhs (not rhs))
-                std::set<Formula> subFormulas;
+                Formulas<Pol> subFormulas;
                 subFormulas.insert( subformula().premise() );
                 subFormulas.insert( Formula<Pol>( NOT, subformula().conclusion() ) );
                 return Formula<Pol>( AND, move( subFormulas ) );
@@ -980,8 +973,8 @@ namespace carl
             }
             case FormulaType::IFF: // (not (iff phi_1 .. phi_n))  ->  (and (or phi_1 .. phi_n) (or (not phi_1) .. (not phi_n)))
             {
-                std::set<Formula> subFormulasA;
-                std::set<Formula> subFormulasB;
+                Formulas<Pol> subFormulasA;
+                Formulas<Pol> subFormulasB;
                 for( auto& subFormula : subformula().subformulas() )
                 {
                     subFormulasA.insert( subFormula );
@@ -992,7 +985,7 @@ namespace carl
             case FormulaType::XOR: // (not (xor phi_1 .. phi_n))  ->  (xor (not phi_1) phi_2 .. phi_n)
             {
                 auto subFormula = subformula().subformulas().begin();
-                std::set<Formula> subFormulas;
+                Formulas<Pol> subFormulas;
                 subFormulas.insert( Formula<Pol>( NOT, *subFormula ) );
                 ++subFormula;
                 for( ; subFormula != subformula().subformulas().end(); ++subFormula )
@@ -1018,7 +1011,7 @@ namespace carl
         }
         assert( newType != subformula().getType() );
         assert( subformula().getType() == FormulaType::AND || subformula().getType() == FormulaType::OR );
-        std::set<Formula> subFormulas;
+        Formulas<Pol> subFormulas;
         for( const Formula<Pol>& subsubformula : subformula().subformulas() )
             subFormulas.insert( Formula<Pol>( FormulaType::NOT, subsubformula ) );
         return Formula<Pol>( newType, move( subFormulas ) );
@@ -1030,7 +1023,7 @@ namespace carl
         assert( isNary() );
         if( subformulas().size() > 2 )
         {
-            std::set<Formula> tmpSubformulas;
+            Formulas<Pol> tmpSubformulas;
             auto iter = subformulas().rbegin();
             ++iter;
             for( ; iter != subformulas().rend(); ++iter )
@@ -1054,21 +1047,21 @@ namespace carl
             case FormulaType::XOR:
             {
                 if (!negated) {
-                    std::set<Formula> subs;
+                    Formulas<Pol> subs;
                     for (auto& sub: subformulas()) {
                         subs.insert(sub->toQF(variables, level, false));
                     }
                     return Formula<Pol>( getType(), std::move(subs) );
                 } else if (getType() == FormulaType::AND || getType() == FormulaType::OR) {
-                    std::set<Formula> subs;
+                    Formulas<Pol> subs;
                     for (auto& sub: subformulas()) {
                         subs.insert(sub->toQF(variables, level, true));
                     }
                     if (getType() == FormulaType::AND) return Formula<Pol>(FormulaType::OR, std::move(subs));
                     else return Formula<Pol>(FormulaType::AND, std::move(subs));
                 } else if (getType() == FormulaType::IFF) {
-                    std::set<Formula> sub1;
-                    std::set<Formula> sub2;
+                    Formulas<Pol> sub1;
+                    Formulas<Pol> sub2;
                     for (auto& sub: subformulas()) {
                         sub1.insert(sub->toQF(variables, level, true));
                         sub2.insert(sub->toQF(variables, level, false));
@@ -1145,13 +1138,13 @@ namespace carl
         else if( isAtom() )
             return *this;
         std::map<Formula, pair<Formula<Pol>, Formula<Pol>>*> tseitinVars;
-        std::set<Formula> resultSubformulas;
+        Formulas<Pol> resultSubformulas;
         ConstraintBounds constraintBoundsAnd;
         std::vector<Formula<Pol>> subformulasToTransform;
         subformulasToTransform.push_back( *this );
         while( !subformulasToTransform.empty() )
         {
-            const Formula<Pol>& currentFormula = subformulasToTransform.back();
+            Formula<Pol> currentFormula = subformulasToTransform.back();
 //            cout << "To add:" << endl;
 //            for( const auto& f : subformulasToTransform )
 //                cout << "   " << f << endl;
@@ -1227,7 +1220,7 @@ namespace carl
                 }
                 case FormulaType::IMPLIES: // (-> lhs rhs)  ->  (or (not lhs) rhs)
                 {
-                    std::set<Formula> tmpSubformulas;
+                    Formulas<Pol> tmpSubformulas;
                     tmpSubformulas.insert( Formula<Pol>( NOT, currentFormula.premise() ) );
                     tmpSubformulas.insert( currentFormula.conclusion() );
                     subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, tmpSubformulas ) );
@@ -1246,8 +1239,8 @@ namespace carl
                     if( currentFormula.subformulas().size() > 2 )
                     {
                         // (iff phi_1 .. phi_n) -> (or (and phi_1 .. phi_n) (and (not phi_1) .. (not phi_n))) is added to the queue
-                        std::set<Formula> subformulasA;
-                        std::set<Formula> subformulasB;
+                        Formulas<Pol> subformulasA;
+                        Formulas<Pol> subformulasB;
                         for( auto& subFormula : currentFormula.subformulas() )
                         {
                             subformulasA.insert( subFormula );
@@ -1286,7 +1279,7 @@ namespace carl
                 {
                     bool currentFormulaValid = false;
                     ConstraintBounds constraintBoundsOr;
-                    std::set<Formula> subsubformulas;
+                    Formulas<Pol> subsubformulas;
                     std::vector<Formula<Pol>> phis;
                     for( const Formula<Pol>& subFormula : currentFormula.subformulas() )
                         phis.push_back( subFormula );
@@ -1326,7 +1319,7 @@ namespace carl
                                 break;
                             case FormulaType::ITE: // (ite cond then else)  ->  (and (or (not cond) then) (or cond else))
                             {   
-                                std::set<Formula> tmpSubformulas;
+                                Formulas<Pol> tmpSubformulas;
                                 // Add: (or (not cond) then)
                                 tmpSubformulas.insert( Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, currentSubformula.condition() ), currentSubformula.firstCase() ) );
                                 // Add: (or cond else)
@@ -1369,7 +1362,7 @@ namespace carl
                             {
                                 bool conjunctionIsFalse = false;
                                 ConstraintBounds constraintBoundsOrAnd;
-                                std::set<Formula> tmpSubSubformulas;
+                                Formulas<Pol> tmpSubSubformulas;
                                 for( const Formula<Pol>& subsubformula : currentSubformula.subformulas() )
                                 {
                                     if( subsubformula.getType() == FormulaType::CONSTRAINT 
@@ -1402,7 +1395,7 @@ namespace carl
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
                                 if( _tseitinWithEquivalence )
                                 {
-                                    std::set<Formula> tmpSubformulas;
+                                    Formulas<Pol> tmpSubformulas;
                                     tmpSubformulas.insert( tseitinVar );
                                     for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                         tmpSubformulas.insert( Formula<Pol>( NOT, subsubformula ) );
@@ -1429,8 +1422,8 @@ namespace carl
                             }
                             case FormulaType::IFF: // (iff phi_1 .. phi_n) -> (and phi_1 .. phi_n) and (and (not phi_1) .. (not phi_n)) are added to the queue
                             {
-                                std::set<Formula> subformulasA;
-                                std::set<Formula> subformulasB;
+                                Formulas<Pol> subformulasA;
+                                Formulas<Pol> subformulasB;
                                 for( auto& subFormula : currentSubformula.subformulas() )
                                 {
                                     subformulasA.insert( subFormula );
@@ -1572,7 +1565,7 @@ namespace carl
             default:
             {
                 assert( isNary() );
-                std::set<Formula> subformulasSubstituted;
+                Formulas<Pol> subformulasSubstituted;
                 for( const Formula<Pol>& subFormula : subformulas() )
                     subformulasSubstituted.insert( subFormula.substitute( _booleanSubstitutions, _arithmeticSubstitutions ) );
                 return Formula<Pol>( getType(), subformulasSubstituted );
@@ -1586,7 +1579,7 @@ namespace carl
     Formula<Pol> Formula<Pol>::addConstraintBound( ConstraintBounds& _constraintBounds, const Formula<Pol>& _constraint, bool _inConjunction )
     {
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << *_constraint << endl;
+        cout << "add from a " << (_inConjunction ? "conjunction" : "disjunction") << " to " << &_constraintBounds << ":   " << _constraint << endl;
         #endif
         bool negated = _constraint.getType() == FormulaType::NOT;
         assert( _constraint.getType() == FormulaType::CONSTRAINT || (negated && _constraint.subformula().getType() == FormulaType::CONSTRAINT ) );
@@ -1878,7 +1871,7 @@ namespace carl
     }
 
     template<typename Pol>
-    bool Formula<Pol>::swapConstraintBounds( ConstraintBounds& _constraintBounds, std::set<Formula>& _intoFormulas, bool _inConjunction )
+    bool Formula<Pol>::swapConstraintBounds( ConstraintBounds& _constraintBounds, Formulas<Pol>& _intoFormulas, bool _inConjunction )
     {
         #ifdef CONSTRAINT_BOUND_DEBUG
         cout << "swap from " << &_constraintBounds << " to a " << (_inConjunction ? "conjunction" : "disjunction") << endl;
@@ -1902,12 +1895,12 @@ namespace carl
                 auto mostSignificantLowerBound = bounds.end();
                 auto mostSignificantUpperBound = bounds.end();
                 auto moreSignificantCase = bounds.end();
-                std::set<Formula> lessSignificantCases;
+                Formulas<Pol> lessSignificantCases;
                 auto iter = bounds.begin();
                 for( ; iter != bounds.end(); ++iter )
                 {
                     #ifdef CONSTRAINT_BOUND_DEBUG
-                    cout << "   bound is  " << Constraint::relationToString( iter->second.first ) << iter->first << endl;
+                    cout << "   bound is  " << Constraint<Pol>::relationToString( iter->second.first ) << iter->first << endl;
                     #endif
                     if( (_inConjunction && iter->second.first == Relation::NEQ)
                         || (!_inConjunction && iter->second.first == Relation::EQ) )
@@ -1964,7 +1957,7 @@ namespace carl
                     {
                         // _inConjunction == true: found already another equality or an upper bound -> conjunction is invalid!
                         // _inConjunction == false: found already another bound with != as relation or a lower bound -> disjunction is valid!
-                        if( moreSignificantCase != bounds.end() || mostSignificantUpperBound != bounds.end() )
+                        if( moreSignificantCase != bounds.end() || (_inConjunction ? mostSignificantUpperBound : mostSignificantLowerBound) != bounds.end() )
                         {
                             #ifdef CONSTRAINT_BOUND_DEBUG
                             cout << "      case: " << __LINE__ << endl;
@@ -2020,8 +2013,8 @@ namespace carl
                         || !( !_inConjunction || mostSignificantUpperBound == bounds.end() || mostSignificantLowerBound == bounds.end() 
                              || mostSignificantLowerBound->first > mostSignificantUpperBound->first ) )
                     {
-                        cout << "mostSignificantUpperBound:   " << mostSignificantUpperBound->first << "  [" << *mostSignificantUpperBound->second.second << "]" << endl;
-                        cout << "mostSignificantLowerBound:   " << mostSignificantLowerBound->first << "  [" << *mostSignificantLowerBound->second.second << "]" << endl;
+                        cout << "mostSignificantUpperBound:   " << mostSignificantUpperBound->first << "  [" << mostSignificantUpperBound->second.second << "]" << endl;
+                        cout << "mostSignificantLowerBound:   " << mostSignificantLowerBound->first << "  [" << mostSignificantLowerBound->second.second << "]" << endl;
                     }
                     #endif
                     assert( !_inConjunction || mostSignificantUpperBound == bounds.end() || mostSignificantLowerBound == bounds.end() 
@@ -2060,5 +2053,107 @@ namespace carl
             return true;
         }
     }
+
+	template<typename Formula>
+	void FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<void(Formula)>& func) {
+		func(formula);
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			for (const auto& cur: formula.subformulas()) visit(cur, func);
+			break;
+		}
+		case NOT: {
+			visit(formula.subformula(), func);
+			break;
+		}
+		case IMPLIES: {
+			visit(formula.premise());
+			visit(formula.conclusion(), func);
+			break;
+		}
+		case ITE: {
+			visit(formula.condition(), func);
+			visit(formula.firstCase(), func);
+			visit(formula.secondCase(), func);
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			visit(formula.quantifiedFormula(), func);
+			break;
+		}
+		}
+	}
+
+	template<typename Formula>
+	Formula FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<Formula(Formula)>& func) {
+		Formula newFormula = func(formula);
+		switch (newFormula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			Formulas<typename Formula::PolynomialType> newSubformulas;
+			bool changed = false;
+			for (const auto& cur: newFormula.subformulas()) {
+				Formula newCur = visit(cur, func);
+				if (newCur != cur) changed = true;
+				newSubformulas.insert(newCur);
+			}
+			if (changed) {
+				return Formula(newFormula.getType(), newSubformulas);
+			}
+			break;
+		}
+		case NOT: {
+			Formula cur = visit(newFormula.subformula(), func);
+			if (cur != newFormula.subformula()) {
+				return Formula(NOT, cur);
+			}
+			break;
+		}
+		case IMPLIES: {
+			Formula prem = visit(newFormula.premise(), func);
+			Formula conc = visit(newFormula.conclusion(), func);
+			if ((prem != newFormula.premise()) || (conc != newFormula.conclusion())) {
+				return Formula(IMPLIES, prem, conc);
+			}
+			break;
+		}
+		case ITE: {
+			Formula cond = visit(newFormula.condition(), func);
+			Formula fCase = visit(newFormula.firstCase(), func);
+			Formula sCase = visit(newFormula.secondCase(), func);
+			if ((cond != newFormula.condition()) || (fCase != newFormula.firstCase()) || (sCase != newFormula.secondCase())) {
+				return Formula(ITE, cond, fCase, sCase);
+			}
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			Formula sub = visit(newFormula.quantifiedFormula(), func);
+			if (sub != newFormula.quantifiedFormula()) {
+				return Formula(newFormula.getType(), newFormula.quantifiedVariables(), sub);
+			}
+			break;
+		}
+		}
+		return newFormula;
+	}
 }    // namespace carl
 

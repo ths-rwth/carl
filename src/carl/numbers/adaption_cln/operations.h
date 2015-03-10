@@ -9,7 +9,7 @@
  */
 
 #pragma once
-
+#include "../../util/platform.h"
 #include <cassert>
 #include <limits>
 #include <cmath>
@@ -18,6 +18,7 @@
 #include "typetraits.h"
 #include "boost/algorithm/string.hpp"
 #include "../constants.h"
+#include "../operations.h"
 
 namespace carl {
 
@@ -35,6 +36,22 @@ inline bool isOne(const cln::cl_I& n) {
 	
 inline bool isOne(const cln::cl_RA& n) {
 	return n  == carl::constant_one<cln::cl_RA>().get();
+}
+
+inline bool isPositive(const cln::cl_I& n) {
+	return n > carl::constant_zero<cln::cl_RA>().get();
+}	
+	
+inline bool isPositive(const cln::cl_RA& n) {
+	return n > carl::constant_zero<cln::cl_RA>().get();
+}
+
+inline bool isNegative(const cln::cl_I& n) {
+	return n < carl::constant_zero<cln::cl_RA>().get();
+}	
+	
+inline bool isNegative(const cln::cl_RA& n) {
+	return n < carl::constant_zero<cln::cl_RA>().get();
 }
 	
 /**
@@ -148,6 +165,12 @@ inline long int toInt<long int>(const cln::cl_I& n) {
     assert(n >= std::numeric_limits<long int>::min());
     return cln::cl_I_to_long(n);
 }
+template<>
+inline std::size_t toInt<std::size_t>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<std::size_t>::max());
+    assert(n >= std::numeric_limits<std::size_t>::min());
+    return cln::cl_I_to_ulong(n);
+}
 
 /**
  * Convert a fraction to an integer.
@@ -170,6 +193,10 @@ template<>
 inline unsigned toInt<unsigned>(const cln::cl_RA& n) {
 	return toInt<unsigned>(toInt<cln::cl_I>(n));
 }
+template<>
+inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
+	return toInt<std::size_t>(toInt<cln::cl_I>(n));
+}
 
 /**
  * Convert a cln fraction to a cln long float.
@@ -182,8 +209,24 @@ inline cln::cl_LF toLF(const cln::cl_RA& n) {
 
 template<typename T>
 inline T rationalize(double n);
+
 template<typename T>
 inline T rationalize(float n);
+
+template<typename T>
+inline T rationalize(int n);
+
+template<typename T>
+inline T rationalize(size_t n);
+
+template<typename T>
+inline T rationalize(const std::string& n);
+
+template<typename T>
+inline T rationalize(const PreventConversion<cln::cl_RA>&);
+
+template<typename T>
+inline T rationalize(const PreventConversion<mpq_class>&);
 
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
@@ -193,6 +236,27 @@ cln::cl_RA rationalize<cln::cl_RA>(double n);
 
 template<>
 cln::cl_RA rationalize<cln::cl_RA>(float n);
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(size_t n) {
+	return cln::cl_RA(n);
+}
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
+	return cln::cl_RA(n);
+}
+
+template<>
+cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
+
+template<>
+cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n);
+
+template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<cln::cl_RA>& n) {
+	return n;
+}
 
 /**
  * Get absolute value of an integer.
@@ -279,9 +343,7 @@ inline cln::cl_I& gcd_assign(cln::cl_I& a, const cln::cl_I& b) {
  * @return Updated a.
  */
 inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
-    assert( carl::isInteger( a ) );
-    assert( carl::isInteger( b ) );
-	a = cln::gcd(carl::getNum(a),carl::getNum(b));
+	a = cln::gcd(carl::getNum(a),carl::getNum(b)) / cln::lcm(carl::getDenom(a),carl::getDenom(b));
 	return a;
 }
 
@@ -293,8 +355,6 @@ inline cln::cl_RA& gcd_assign(cln::cl_RA& a, const cln::cl_RA& b) {
  * @return Gcd of a and b.
  */
 inline cln::cl_RA gcd(const cln::cl_RA& a, const cln::cl_RA& b) {
-    // assert( carl::isInteger( a ) );
-    // assert( carl::isInteger( b ) );
 	return cln::gcd(carl::getNum(a),carl::getNum(b)) / cln::lcm(carl::getDenom(a),carl::getDenom(b));
 }
 
@@ -327,9 +387,20 @@ inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
  * @param e Exponent.
  * @return \f$n^e\f$
  */
-inline cln::cl_RA pow(const cln::cl_RA& n, unsigned e) {
+template<>
+inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
 	return cln::expt(n, (int)e);
 }
+
+/**
+ * Calculate the square root of a fraction if possible.
+ * 
+ * @param a The fraction to calculate the square root for.
+ * @param b A reference to the rational, in which the result is stored.
+ * @return true, if the number to calculate the square root for is a square;
+ *         false, otherwise.
+ */
+bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b);
 
 /**
  * Calculate the square root of a fraction.
@@ -454,12 +525,6 @@ inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return quotient(a,b);
 }
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
-template<>
-cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
 
 std::string toString(const cln::cl_RA& _number, bool _infix);
 

@@ -11,11 +11,24 @@
 #ifdef COMPARE_WITH_GINAC
 #include "../converter/OldGinacConverter.h"
 #endif
+#include "ConstraintPool.h"
 
 using namespace std;
 
 namespace carl
 {
+    template<typename Pol, EnableIf<needs_cache<Pol>>>
+    Pol makePolynomial( typename Pol::PolyType&& _poly )
+    {
+        return Pol( std::move(_poly), constraintPool<Pol>().pPolynomialCache() );
+    }
+
+    template<typename Pol, EnableIf<needs_cache<Pol>>>
+    Pol makePolynomial( carl::Variable::Arg _var )
+    {
+        return Pol( std::move(typename Pol::PolyType(_var)), constraintPool<Pol>().pPolynomialCache() );
+    }
+    
     template<typename Pol>
     Constraint<Pol>::Constraint():
         mID( 0 ),
@@ -29,11 +42,11 @@ namespace carl
     {}
 
     template<typename Pol>
-    Constraint<Pol>::Constraint( const Pol& _lhs, const Relation _rel, unsigned _id ):
+    Constraint<Pol>::Constraint( Pol&& _lhs, Relation _rel, unsigned _id ):
         mID( _id ),
         mHash( CONSTRAINT_HASH( _lhs, _rel, Pol ) ),
         mRelation( _rel ),
-        mLhs( _lhs ),
+        mLhs( std::move(_lhs) ),
         mFactorization(),
         mVariables(),
         mVarInfoMap(),
@@ -45,13 +58,13 @@ namespace carl
         {
             if( relation() == Relation::LESS )
             {
-                mLhs = mLhs + typename Pol::NumberType( 1 );
+                mLhs += typename Pol::NumberType( 1 );
                 mRelation = Relation::LEQ;
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
             if( relation() == Relation::GREATER )
             {
-                mLhs = mLhs - typename Pol::NumberType( 1 );
+                mLhs -= typename Pol::NumberType( 1 );
                 mRelation = Relation::GEQ;
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
@@ -152,11 +165,26 @@ namespace carl
             return evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
-            auto comp = []( const Variable& a, const pair<Variable, Interval<double>>& b) { return a == b.first; };
-            if( !std::equal( variables().begin(), variables().end(), _solutionInterval.begin(), comp ) )
+            auto varIter = variables().begin();
+            auto varIntervalIter = _solutionInterval.begin();
+            while( varIter != variables().end() && varIntervalIter != _solutionInterval.end() )
             {
-                return 2;
+                if( *varIter < varIntervalIter->first )
+                {
+                    return 2;
+                }
+                else if( *varIter > varIntervalIter->first )
+                {
+                    ++varIntervalIter;
+                }
+                else
+                {
+                    ++varIter;
+                    ++varIntervalIter;
+                }
             }
+            if( varIter != variables().end() )
+                return 2;
             Interval<double> solutionSpace = IntervalEvaluation::evaluate( mLhs, _solutionInterval );
             if( solutionSpace.isEmpty() )
                 return 2;
@@ -239,6 +267,189 @@ namespace carl
     }
     
     template<typename Pol>
+    unsigned Constraint<Pol>::consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation ) const
+    {
+        _stricterRelation = mRelation;
+        if( variables().empty() )
+            return evaluate( constantPart(), relation() ) ? 1 : 0;
+        else
+        {
+            auto varIter = variables().begin();
+            auto varIntervalIter = _solutionInterval.begin();
+            while( varIter != variables().end() && varIntervalIter != _solutionInterval.end() )
+            {
+                if( *varIter < varIntervalIter->first )
+                {
+                    return 2;
+                }
+                else if( *varIter > varIntervalIter->first )
+                {
+                    ++varIntervalIter;
+                }
+                else
+                {
+                    ++varIter;
+                    ++varIntervalIter;
+                }
+            }
+            if( varIter != variables().end() )
+                return 2;
+            Interval<double> solutionSpace = IntervalEvaluation::evaluate( mLhs, _solutionInterval );
+            if( solutionSpace.isEmpty() )
+                return 2;
+            switch( relation() )
+            {
+                case Relation::EQ:
+                {
+                    if( solutionSpace.isZero() )
+                        return 1;
+                    else if( !solutionSpace.contains( 0 ) )
+                        return 0;
+                    break;
+                }
+                case Relation::NEQ:
+                {
+                    if( !solutionSpace.contains( 0 ) )
+                        return 1;
+                    if( solutionSpace.upperBoundType() == BoundType::WEAK && solutionSpace.upper() == 0 )
+                    {
+                        _stricterRelation = Relation::LESS;
+                    }
+                    else if( solutionSpace.lowerBoundType() == BoundType::WEAK && solutionSpace.lower() == 0 )
+                    {
+                        _stricterRelation = Relation::GREATER;
+                    }
+                    break;
+                }
+                case Relation::LESS:
+                {
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.upper() < 0 )
+                            return 1;
+                        else if( solutionSpace.upper() == 0 && solutionSpace.upperBoundType() == BoundType::STRICT )
+                            return 1;
+                    }
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY && solutionSpace.lower() >= 0 )
+                        return 0;
+                    break;
+                }
+                case Relation::GREATER:
+                {
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.lower() > 0 )
+                            return 1;
+                        else if( solutionSpace.lower() == 0 && solutionSpace.lowerBoundType() == BoundType::STRICT )
+                            return 1;
+                    }
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY && solutionSpace.upper() <= 0 )
+                        return 0;
+                    break;
+                }
+                case Relation::LEQ:
+                {
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.upper() <= 0)
+                        {
+                            return 1;
+                        }
+                    }
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.lower() > 0 )
+                        {
+                            return 0;
+                        }
+                        else if( solutionSpace.lower() == 0 )
+                        {
+                            if( solutionSpace.lowerBoundType() == BoundType::STRICT )
+                            {
+                                return 0;
+                            }
+                            else
+                            {
+                                _stricterRelation = Relation::EQ;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case Relation::GEQ:
+                {
+                    if( solutionSpace.lowerBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.lower() >= 0 )
+                            return 1;
+                    }
+                    if( solutionSpace.upperBoundType() != BoundType::INFTY )
+                    {
+                        if( solutionSpace.upper() < 0 )
+                            return 0;
+                        else if( solutionSpace.upper() == 0 )
+                        {
+                            if( solutionSpace.upperBoundType() == BoundType::STRICT )
+                                return 0;
+                            else
+                                _stricterRelation = Relation::EQ;
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    cout << "Error in isConsistent: unexpected relation symbol." << endl;
+                    return 0;
+                }
+            }
+            return 2;
+        }
+    }
+
+	template<typename Pol>
+	unsigned Constraint<Pol>::evaluate(const EvaluationMap<Interval<typename carl::UnderlyingNumberType<Pol>::type>>& _assignment) const {
+		// 0 = False, 1 = Null, 2 = Maybe, 3 = True
+		Interval<typename carl::UnderlyingNumberType<Pol>::type> res = IntervalEvaluation::evaluate(mLhs, _assignment);
+		switch (mRelation) {
+			case Relation::EQ: {
+				if (res.isZero()) return 3;
+				else if (res.contains(0)) return 2;
+				else return 0;
+			}
+			case Relation::NEQ: {
+				if (res.isZero()) return 0;
+				else if (res.contains(0)) return 2;
+				else return 3;
+			}
+			case Relation::LESS: {
+				if (res.isNegative()) return 3;
+				else if (res.isSemiPositive()) return 0;
+				else return 2;
+			}
+			case Relation::GREATER: {
+				if (res.isPositive()) return 3;
+				else if (res.isSemiNegative()) return 0;
+				else return 2;
+			}
+			case Relation::LEQ: {
+				if (res.isSemiNegative()) return 3;
+				else if (res.isPositive()) return 0;
+				else if (res.isSemiPositive()) return 1;
+				else return 2;
+			}
+			case Relation::GEQ: {
+				if (res.isSemiPositive()) return 3;
+				else if (res.isNegative()) return 0;
+				else if (res.isSemiNegative()) return 1;
+				else return 2;
+			}
+		}
+		assert(false);
+		return 1;
+	}
+    
+    template<typename Pol>
     bool Constraint<Pol>::hasFinitelyManySolutionsIn( const Variable& _var ) const
     {
         if( variables().find( _var ) == variables().end() )
@@ -281,7 +492,7 @@ namespace carl
                 auto d = varInfoPair->second.coeffs().find( 1 );
                 assert( d != varInfoPair->second.coeffs().end() );
                 _substitutionVariable = varInfoPair->first;
-                _substitutionTerm = Pol( _substitutionVariable ) * d->second - mLhs;
+                _substitutionTerm = makePolynomial<Pol>( _substitutionVariable ) * d->second - mLhs;
                 _substitutionTerm /= d->second.constantPart();
                 return true;
             }
@@ -292,6 +503,7 @@ namespace carl
     template<typename Pol>
     Constraint<Pol>* Constraint<Pol>::simplify() const
     {
+        typedef typename Pol::PolyType PolyT;
         Relation rel = mRelation;
         if( (mLhsDefinitess == Definiteness::POSITIVE_SEMI && rel == Relation::LEQ) || (mLhsDefinitess == Definiteness::NEGATIVE_SEMI && rel == Relation::GEQ) )
             rel = Relation::EQ;
@@ -301,38 +513,38 @@ namespace carl
             switch( rel )
             {
                 case Relation::EQ:
-                    return new Constraint( Pol( *mVariables.begin() ), rel );
+                    return new Constraint( *mVariables.begin(), rel );
                 case Relation::NEQ:
-                    return new Constraint( Pol( *mVariables.begin() ), rel );
+                    return new Constraint( *mVariables.begin(), rel );
                 case Relation::LEQ:
                     if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                        return new Constraint( Pol( typename Pol::NumberType( -1 ) ) * Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel );
+                        return new Constraint( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
                     else
-                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
+                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
                 case Relation::GEQ:
                     if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                        return new Constraint( Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel );
+                        return new Constraint( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
                     else
-                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
+                        return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
                 case Relation::LESS:
                     if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                        return new Constraint( Pol( *mVariables.begin() ), Relation::NEQ );
+                        return new Constraint( *mVariables.begin(), Relation::NEQ );
                     else
                     {
                         if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                            return new Constraint( Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel );
+                            return new Constraint( PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel );
                         else
-                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel );
+                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel );
                     }
                 case Relation::GREATER:
                     if( mLhsDefinitess == Definiteness::POSITIVE_SEMI )
-                        return new Constraint( Pol( *mVariables.begin() ), Relation::NEQ );
+                        return new Constraint( *mVariables.begin(), Relation::NEQ );
                     else
                     {
                         if( mLhsDefinitess == Definiteness::NEGATIVE_SEMI )
-                            return new Constraint( Pol( typename Pol::NumberType( -1 ) ) * Pol( *mVariables.begin() ) * Pol( *mVariables.begin() ), rel ); 
+                            return new Constraint( PolyT( typename Pol::NumberType( -1 ) ) * PolyT( *mVariables.begin() ) * PolyT( *mVariables.begin() ), rel ); 
                         else
-                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? Pol( typename Pol::NumberType( 1 ) ) : Pol( typename Pol::NumberType( -1 ) ) ) * Pol( *mVariables.begin() ), rel ); 
+                            return new Constraint( (mLhs.trailingTerm().coeff() > 0 ? PolyT( typename Pol::NumberType( 1 ) ) : PolyT( typename Pol::NumberType( -1 ) ) ) * PolyT( *mVariables.begin() ), rel ); 
                     }
                 default:
                     assert( false );
@@ -340,23 +552,13 @@ namespace carl
         }
         else if( hasIntegerValuedVariable() && !hasRealValuedVariable() && !lhs().isConstant() )
         {
-            if( lhs().constantPart() != typename Pol::NumberType( 0 ) )
+            typename Pol::NumberType constPart = lhs().constantPart();
+            if( constPart != typename Pol::NumberType( 0 ) )
             {
                 // Find the gcd of the coefficients of the non-constant terms.
-                auto term = lhs().rbegin();
-                assert( !(term)->isConstant() && carl::isInteger( (term)->coeff() ) );
-                typename Pol::NumberType g = carl::abs( (term)->coeff() );
-                ++term;
-                for( ; term != lhs().rend(); ++term )
-                {
-                    if( !(term)->isConstant() )
-                    {
-                        assert( carl::isInteger( (term)->coeff() ) );
-                        g = carl::gcd( carl::getNum( g ), carl::getNum( carl::abs( (term)->coeff() ) ) );
-                    }
-                }
-                assert( g > typename Pol::NumberType( 0 ) );
-                if( carl::mod( carl::getNum( lhs().constantPart() ), carl::getNum( g ) ) != 0 )
+                typename Pol::NumberType g = carl::abs( lhs().coprimeFactorWithoutConstant() );
+                assert( g != typename Pol::NumberType( 0 ) );
+                if( carl::mod( carl::getNum( constPart ), carl::getDenom( g ) ) != 0 )
                 {
                     switch( relation() )
                     {
@@ -366,26 +568,26 @@ namespace carl
                             return new Constraint( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ );
                         case Relation::LEQ:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
-                            newLhs += carl::floor( (lhs().constantPart() / g) ) + typename Pol::NumberType( 1 );
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
                             return new Constraint( newLhs, Relation::LEQ );
                         }
                         case Relation::GEQ:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
-                            newLhs += carl::floor( (lhs().constantPart() / g) );
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) );
                             return new Constraint( newLhs, Relation::GEQ );
                         }
                         case Relation::LESS:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
-                            newLhs += carl::floor( (lhs().constantPart() / g) ) + typename Pol::NumberType( 1 );
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
                             return new Constraint( newLhs, Relation::LEQ );
                         }
                         case Relation::GREATER:
                         {
-                            Pol newLhs = ((lhs() - lhs().constantPart()) * (1 / g));
-                            newLhs += carl::floor( (lhs().constantPart() / g) );
+                            Pol newLhs = ((lhs() - constPart) * (typename Pol::NumberType( 1 ) / g));
+                            newLhs += carl::floor( (constPart / g) );
                             return new Constraint( newLhs, Relation::GEQ );
                         }
                         default:
@@ -404,13 +606,13 @@ namespace carl
         {
             if( relation() == Relation::LESS )
             {
-                mLhs = mLhs + typename Pol::NumberType( 1 );
+                mLhs += carl::constant_one<typename Pol::CoeffType>::get();
                 mRelation = Relation::LEQ;
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
             if( relation() == Relation::GREATER )
             {
-                mLhs = mLhs - typename Pol::NumberType( 1 );
+                mLhs -= carl::constant_one<typename Pol::CoeffType>::get();
                 mRelation = Relation::GEQ;
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
@@ -428,7 +630,9 @@ namespace carl
             && maxDegree() <= MAX_DEGREE_FOR_FACTORIZATION && maxDegree() >= MIN_DEGREE_FOR_FACTORIZATION )
         {
             mFactorization = ginacFactorization( mLhs );
-        }
+        } else {
+			mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
+		}
         #else
         mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
         #endif
@@ -692,70 +896,33 @@ namespace carl
          *                   a_i = g * b_i for all 1<=i<=k 
          *              or   b_i = g * a_i for all 1<=i<=k 
          */
-        auto termA = _constraintA->lhs().rbegin();
-        auto termB = _constraintB->lhs().rbegin();
-        typename Pol::NumberType g = 1;
-        typename Pol::NumberType c = 0;
-        typename Pol::NumberType d = 0;
+        typename Pol::NumberType one_divided_by_a = _constraintA->lhs().coprimeFactorWithoutConstant();
+        typename Pol::NumberType one_divided_by_b = _constraintB->lhs().coprimeFactorWithoutConstant();
+        typename Pol::NumberType c = _constraintA->lhs().constantPart();
+        typename Pol::NumberType d = _constraintB->lhs().constantPart();
+        assert( carl::isOne(carl::getNum(carl::abs(one_divided_by_a))) && carl::isOne(carl::getNum(carl::abs(one_divided_by_b))) );
+        Pol tmpA = (_constraintA->lhs() - c) * one_divided_by_a;
+        Pol tmpB = (_constraintB->lhs() - d) * one_divided_by_b;
+//        std::cout << "tmpA = " << tmpA << std::endl;
+//        std::cout << "tmpB = " << tmpB << std::endl;
+        if( tmpA != tmpB ) return 0;
         bool termACoeffGreater = false;
-        bool termBCoeffGreater = false;
-        // The first two terms are not constant.
-        if( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
+        bool signsDiffer = one_divided_by_a < carl::constant_zero<typename Pol::NumberType>::get() != one_divided_by_b < carl::constant_zero<typename Pol::NumberType>::get();
+        typename Pol::NumberType g;
+        if( carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b) )
         {
-            if( (termA)->monomial() != (termB)->monomial() ) return 0;
-            // Find an appropriate g.
-            typename Pol::NumberType termAcoeffAbs = cln::abs( (termA)->coeff() ); // TODO: use some method of carl instead of cln::abs
-            typename Pol::NumberType termBcoeffAbs = cln::abs( (termB)->coeff() );
-            termACoeffGreater = termAcoeffAbs > termBcoeffAbs; 
-            termBCoeffGreater = termAcoeffAbs < termBcoeffAbs;
-            if( termACoeffGreater ) 
-                g = (termA)->coeff()/(termB)->coeff();
-            else if( termBCoeffGreater ) 
-                g = (termB)->coeff()/(termA)->coeff();
-            else if( (termA)->coeff() == (termB)->coeff() ) 
-                g = typename Pol::NumberType( 1 );
-            else
-            {
-                g = typename Pol::NumberType( -1 );
-                termBCoeffGreater = true;
-            }
-            // Check whether the left-hand sides of the two constraints without their constant part
-            // are equal when one of the left-hand sides is multiplied by g.
-            ++termA;
-            ++termB;
-            while( termA != _constraintA->lhs().rend() && !(termA)->isConstant() && termB != _constraintB->lhs().rend() && !(termB)->isConstant() )
-            {
-                if( (termA)->monomial() != (termB)->monomial() ) return 0;
-                else if( termACoeffGreater )
-                {
-                    if( (termA)->coeff() != g * (termB)->coeff() ) return 0;
-                }
-                else if( termBCoeffGreater )
-                {
-                    if( g * (termA)->coeff() != (termB)->coeff() ) return 0;
-                }
-                else if( (termA)->coeff() != (termB)->coeff() ) return 0;
-                ++termA;
-                ++termB;
-            }
+            g = carl::getDenom(one_divided_by_a)/carl::getDenom(one_divided_by_b);
+            if( signsDiffer )
+                g = -g;
+            termACoeffGreater = true;
+            d *= g;
         }
-        if( termA != _constraintA->lhs().rend() )
+        else
         {
-            if( (termA)->isConstant() )
-            {
-                c = (termBCoeffGreater ? (termA)->coeff() * g : (termA)->coeff());
-            }
-            else
-                return 0;
-        }
-        if( termB != _constraintB->lhs().rend() )
-        {
-            if( (termB)->isConstant() )
-            {
-                d = (termACoeffGreater ? (termB)->coeff() * g : (termB)->coeff());
-            }
-            else
-                return 0;
+            g = carl::getDenom(one_divided_by_b)/carl::getDenom(one_divided_by_a);
+            if( signsDiffer )
+                g = -g;
+            c *= g;
         }
         // Apply the multiplication by a negative g to the according relation symbol, which
         // has to be turned around then.
@@ -763,28 +930,52 @@ namespace carl
         Relation relB = _constraintB->relation();
         if( g < 0 )
         {
-            switch( (termACoeffGreater ? relB : relA ) )
+            if( termACoeffGreater )
             {
-                case Relation::LEQ:
-                    if( termACoeffGreater ) relB = Relation::GEQ; 
-                    else relA = Relation::GEQ;
-                    break;
-                case Relation::GEQ:
-                    if( termACoeffGreater ) relB = Relation::LEQ; 
-                    else relA = Relation::LEQ;
-                    break;
-                case Relation::LESS:
-                    if( termACoeffGreater ) relB = Relation::GREATER;
-                    else relA = Relation::GREATER;
-                    break;
-                case Relation::GREATER:
-                    if( termACoeffGreater )  relB = Relation::LESS;
-                    else relA = Relation::LESS;
-                    break;
-                default:
-                    break;
+                switch( relB )
+                {
+                    case Relation::LEQ:
+                        relB = Relation::GEQ;
+                        break;
+                    case Relation::GEQ:
+                        relB = Relation::LEQ;
+                        break;
+                    case Relation::LESS:
+                        relB = Relation::GREATER;
+                        break;
+                    case Relation::GREATER:
+                        relB = Relation::LESS;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch( relA )
+                {
+                    case Relation::LEQ:
+                        relA = Relation::GEQ;
+                        break;
+                    case Relation::GEQ:
+                        relA = Relation::LEQ;
+                        break;
+                    case Relation::LESS:
+                        relA = Relation::GREATER;
+                        break;
+                    case Relation::GREATER:
+                        relA = Relation::LESS;
+                        break;
+                    default:
+                        break;
+                }   
             }
         }
+//        std::cout << "c = " << c << std::endl;
+//        std::cout << "d = " << d << std::endl;
+//        std::cout << "g = " << g << std::endl;
+//        std::cout << "relA = " << relA << std::endl;
+//        std::cout << "relB = " << relB << std::endl;
         // Compare the adapted constant parts.
         switch( relB )
         {

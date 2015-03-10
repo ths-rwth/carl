@@ -76,7 +76,7 @@ private:
 		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
 		 */
 		inline std::pair<bool, bool> compare(bool l, bool r) const {
-			if (l xor r) return std::make_pair(true, l);
+			if (l xor r) return std::make_pair(true, r);
 			return std::make_pair(false, false);
 		}
 		/**
@@ -178,21 +178,11 @@ public:
 
 	/**
 	 * Insert a new sample into this sample set.
+	 * If a sample of this value was already present, it takes care of updating the sample (in case the new one is numeric or a root).
      * @param r Sample to insert.
-     * @return An iterator to the inserted sample and a flag that indicates if the inserted value was new or already present.
+     * @return An iterator to the inserted sample, a flag that indicates if the insertion changed something and a flag that indicates if a value has been replaced or was new altogether.
      */
-	std::pair<Iterator, bool> insert(RealAlgebraicNumberPtr<Number> r) {
-		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
-		assert(this->isConsistent());
-		auto res = this->mSamples.insert(r);
-		CARL_LOG_TRACE("carl.cad.sampleset", "\tinsert(): " << *res.first << ", " << res.second);
-		if (res.second) {
-			mHeap.push_back(r);
-			std::push_heap(mHeap.begin(), mHeap.end(), mComp);
-		}
-		assert(this->isConsistent());
-		return res;
-	}
+	std::tuple<Iterator, bool, bool> insert(RealAlgebraicNumberPtr<Number> r);
 	
 	/**
 	 * Inserts a range of samples. Actually calls insert(s) for each sample s in the range.

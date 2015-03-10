@@ -181,7 +181,7 @@ Term<Coefficient> Term<Coefficient>::substitute(const std::map<Variable, Term<Co
 
 
 template<typename Coefficient>
-Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
+Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) const
 {
 	Monomial::Arg tmp = monomial()->calcLcmAndDivideBy(m);
 	if(tmp == nullptr)
@@ -194,6 +194,20 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const std::shared_ptr<co
 	}	
 	
 
+}
+
+template<typename Coefficient>
+bool Term<Coefficient>::sqrt(Term<Coefficient>& res) const {
+    Coefficient resCoeff;
+    if (!carl::sqrtp(this->coeff(), resCoeff)) return false;
+    if (this->monomial() == nullptr) {
+        res = Term(resCoeff);
+        return true;
+    }
+    Monomial::Arg resMonomial = this->monomial()->sqrt();
+    if (resMonomial == nullptr) return false;
+    res = Term(resCoeff, resMonomial);
+    return true;
 }
 
 template<typename Coefficient>
@@ -270,7 +284,7 @@ bool operator<(const Term<Coeff>& lhs, const Term<Coeff>& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(const Term<Coeff>& lhs, std::shared_ptr<const carl::Monomial> rhs) {
+bool operator<(const Term<Coeff>& lhs, const Monomial::Arg& rhs) {
 	if (lhs.monomial() == rhs) return lhs.coeff() < carl::constant_one<Coeff>().get();
 	return lhs.monomial() < rhs;
 }
@@ -288,7 +302,7 @@ bool operator<(const Term<Coeff>& lhs, const Coeff& rhs) {
 }
 
 template<typename Coeff>
-bool operator<(std::shared_ptr<const carl::Monomial> lhs, const Term<Coeff>& rhs) {
+bool operator<(const Monomial::Arg& lhs, const Term<Coeff>& rhs) {
 	if (lhs == rhs.monomial()) return carl::constant_one<Coeff>().get() < rhs.coeff();
 	return lhs < rhs.monomial();
 }
@@ -474,7 +488,7 @@ Term<Coefficient> Term<Coefficient>::gcd(const Term<Coefficient>& t1, const Term
 	static_assert(is_field<Coefficient>::value, "Not yet defined for other coefficients");
 	assert(!t1.isZero());
 	assert(!t2.isZero());
-	if(t1.isConstant() || t2.isConstant()) return Term(Coefficient(1));
+	if(t1.isConstant() || t2.isConstant()) return Term(Coefficient(carl::gcd(t1.coeff(), t2.coeff())));
 	return Term(Coefficient(carl::gcd(t1.coeff(), t2.coeff())), Monomial::gcd(t1.monomial(), t2.monomial()));
 }
 

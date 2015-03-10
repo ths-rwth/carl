@@ -417,8 +417,13 @@ public:
 	 * Re-build the lifting position queue just with the polynomials stored as reset state.
 	 * @complexity linear in the number of polynomials stored
 	 */
-	void resetLiftingPositions() {
-		this->mLiftingQueue = this->mLiftingQueueReset;
+	void resetLiftingPositions(bool resetFully) {
+		if (resetFully) {
+			this->mLiftingQueue.assign( this->polynomials.begin(), this->polynomials.end() );
+			this->mLiftingQueue.sort( this->liftingOrder );
+		} else {
+			this->mLiftingQueue = this->mLiftingQueueReset;
+		}
 	}
 
 	/**

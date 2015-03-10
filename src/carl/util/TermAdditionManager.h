@@ -7,6 +7,7 @@
 
 #pragma once 
 
+#include <list>
 #include <mutex>
 #include <unordered_map>
 #include <tuple>
@@ -19,7 +20,7 @@
 namespace carl
 {
 
-template<typename Polynomial>
+template<typename Polynomial, typename Ordering>
 class TermAdditionManager {
 public:
 	typedef unsigned IDType;
@@ -28,31 +29,49 @@ public:
 	typedef TermType TermPtr;
 	typedef std::vector<IDType> TermIDs;
 	typedef std::vector<TermPtr> Terms;
+	/* 0: Maps global IDs to local IDs.
+	 * 1: Actual terms by local IDs.
+	 * 2: Flag if this entry is currently used.
+	 * 3: Constant part.
+	 * 4: Next free local ID.
+	 */
 	typedef std::tuple<TermIDs,Terms,bool,Coeff,IDType> Tuple;
+	typedef typename std::list<Tuple>::iterator TAMId;
 private:
-	std::size_t mNextId;
-	std::vector<Tuple> mData;
+	std::list<Tuple> mData;
+	TAMId mNextId;
 	mutable std::mutex mMutex;
+	
+	TAMId createNewEntry() {
+		TAMId res = mData.emplace(mData.end());
+		std::get<4>(*res) = 1;
+		return res;
+	}
+	
+	bool compare(TAMId id, IDType t1, IDType t2) const {
+		Tuple& data = *id;
+		assert(std::get<2>(data));
+		Terms& t = std::get<1>(data);
+		return Ordering::less(t[t1], t[t2]);
+	}
 public:
-	TermAdditionManager(): mNextId(0)
-	{
+	TermAdditionManager(): mData() {
         MonomialPool::getInstance();
-		mData.emplace_back();
-		std::get<4>(mData.back()) = 1;
+		mNextId = createNewEntry();
 	}
 	
     #define SWAP_TERMS
 	
-	std::size_t getId(std::size_t expectedSize = 0) {
-		//std::lock_guard<std::mutex> lock(mMutex);
-		while (std::get<2>(mData[mNextId])) {
+	TAMId getId(std::size_t expectedSize = 0) {
+		std::lock_guard<std::mutex> lock(mMutex);
+		while (std::get<2>(*mNextId)) {
 			mNextId++;
-			if (mNextId == mData.size()) {
-				mData.emplace_back();
-				std::get<4>(mData.back()) = 1;
+			if (mNextId == mData.end()) {
+				mNextId = mData.emplace(mData.end());
+				std::get<4>(*mNextId) = 1;
 			}
 		}
-        Tuple& data = mData[mNextId];
+        Tuple& data = *mNextId;
 		//std::lock_guard<std::mutex> lock(mMutex);
         Terms& terms = std::get<1>(data);
 		terms.clear();
@@ -60,21 +79,22 @@ public:
         #ifdef SWAP_TERMS
         //memset(&terms[0], 0, sizeof(TermPtr)*terms.size());
         #endif
-        size_t greatestIdPlusOne = MonomialPool::getInstance().nextID();
+        std::size_t greatestIdPlusOne = MonomialPool::getInstance().nextID();
 		if( std::get<0>(data).size() < greatestIdPlusOne ) std::get<0>(data).resize(greatestIdPlusOne);
 		//memset(&std::get<0>(data)[0], 0, sizeof(IDType)*std::get<0>(data).size());
 		std::get<3>(data) = constant_zero<Coeff>::get();
 		std::get<4>(data) = 1;
 		std::get<2>(data) = true;
-		std::size_t result = mNextId;
-		mNextId = (mNextId + 1) % mData.size();
+		TAMId result = mNextId;
+		mNextId++;
+		if (mNextId == mData.end()) mNextId = mData.begin();
 		return result;
 	}
 
     template<bool SizeUnknown, bool NewMonomials = true>
-	void addTerm(std::size_t id, const TermPtr& term) {
+	void addTerm(TAMId id, const TermPtr& term) {
 		assert(!term.isZero());
-        Tuple& data = mData[id];
+        Tuple& data = *id;
 		assert(std::get<2>(data));
 		TermIDs& termIDs = std::get<0>(data);
 		Terms& terms = std::get<1>(data);
@@ -109,9 +129,22 @@ public:
 			std::get<3>(data) += term.coeff();
 		}
 	}
+
+	TermType getMaxTerm(TAMId id) const {
+		Tuple& data = *id;
+		Terms& terms = std::get<1>(data);
+		std::size_t max = 0;
+		assert(terms.size() > 0);
+		for (std::size_t i = 1; i < terms.size(); i++) {
+			if (Ordering::less(terms[max], terms[i])) max = i;
+		}
+		assert(!terms[max].isConstant() || terms[max].isZero());
+		if (terms[max].isZero()) return TermType(std::get<3>(data));
+		else return terms[max];
+	}
     
-	void readTerms(std::size_t id, Terms& terms) {
-        Tuple& data = mData[id];
+	void readTerms(TAMId id, Terms& terms) {
+        Tuple& data = *id;
 		assert(std::get<2>(data));
 		Terms& t = std::get<1>(data);
         TermIDs& termIDs = std::get<0>(data);
@@ -147,6 +180,17 @@ public:
 		}
         #endif
         
+		std::get<2>(data) = false;
+	}
+
+	void dropTerms(TAMId id) {
+		Tuple& data = *id;
+		assert(std::get<2>(data));
+		Terms& t = std::get<1>(data);
+        TermIDs& termIDs = std::get<0>(data);
+		for (auto i = t.begin(); i != t.end(); i++) {
+			if ((*i).monomial()) termIDs[(*i).monomial()->id()] = 0;
+		}
 		std::get<2>(data) = false;
 	}
 };

@@ -11,94 +11,49 @@
 namespace carl 
 {
 
-typedef CompareResult( *MonomialOrderingFc )(const std::shared_ptr<const Monomial>&, const std::shared_ptr<const Monomial>&);
+typedef CompareResult( *MonomialOrderingFunction )(const Monomial::Arg&, const Monomial::Arg&);
 
 /**
  * A class for term orderings.
  * @ingroup multirp
  */
-template<MonomialOrderingFc f, bool degreeOrdered>
+template<MonomialOrderingFunction f, bool degreeOrdered>
 struct MonomialComparator
 {
-    
-    template<typename Coeff>
-    bool operator()(const Term<Coeff>& t1, const Term<Coeff>& t2)
-    {
-        return (compare(t1, t2) == CompareResult::LESS );
-    }
-    
-    template<typename Coeff>
-    bool operator()(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
-    {
-        return compare(t1, t2) == CompareResult::LESS;
-    }
-	
-	
-    bool operator()(const Monomial::Arg& m1, const Monomial::Arg& m2)
-    {
-        return (compare(m1, m2) == CompareResult::LESS );
-    }
-
-	static CompareResult compare(const std::shared_ptr<const Monomial>& m1, const std::shared_ptr<const Monomial>& m2)
-	{
+	static CompareResult compare(const Monomial::Arg& m1, const Monomial::Arg& m2) {
 		return f(m1, m2);
 	}
- 
-	
-	template<typename Coeff>
-    static CompareResult compare( const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2 )
-    {
-		if(!t1 && !t2) return CompareResult::EQUAL;
-		if(!t1) return CompareResult::LESS;
-		if(!t2) return CompareResult::GREATER;
-        return compare(*t1, *t2);
-    }
     
     template<typename Coeff>
-    static CompareResult compare(const Term<Coeff>& t1, const Term<Coeff>& t2)
-    {
+    static CompareResult compare(const Term<Coeff>& t1, const Term<Coeff>& t2) {
         return compare(t1.monomial(), t2.monomial());
     }
     
     template<typename Coeff>
-    static CompareResult compare(const Term<Coeff>& t1, Variable::Arg v)
-    {
-		/// @todo: let f have the template parameter specifying the type of its second argument
-		return f(t1.monomial(), MonomialPool::getInstance().create( v, 1 ));
-    }
-    
-    template<typename Coeff>
-    static bool less(const Term<Coeff>& t1, const Term<Coeff>& t2)
-    {
-        
-        return (compare(t1, t2) == CompareResult::LESS );
-    }
-    
-    template<typename Coeff>
-    static bool less(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
-    {
-        if(t1 == t2) return false;
+    static bool less(const Term<Coeff>& t1, const Term<Coeff>& t2) {
         return (compare(t1, t2) == CompareResult::LESS );
     }
 	
-	static bool less(const Monomial::Arg& m1, const Monomial::Arg& m2)
-    {
+	static bool less(const Monomial::Arg& m1, const Monomial::Arg& m2) {
         return (compare(m1, m2) == CompareResult::LESS );
     }
 	
 	template<typename Coeff>
-    static bool greater(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
-    {
-        if(t1 == t2) return false;
-        return (compare(t1, t2) == CompareResult::GREATER );
-    }
-    
-    template<typename Coeff>
-    static bool equal(const std::shared_ptr<const Term<Coeff>>& t1, const std::shared_ptr<const Term<Coeff>>& t2)
-    {
-        if(t1 == t2) return true;
+    static bool equal(const Term<Coeff>& t1, const Term<Coeff>& t2) {
         return (compare(t1, t2) == CompareResult::EQUAL );
     }
+	
+	static bool equal(const Monomial::Arg& m1, const Monomial::Arg& m2) {
+        return (compare(m1, m2) == CompareResult::EQUAL );
+    }
+	
+	bool operator()(const Monomial::Arg& m1, const Monomial::Arg& m2) const {
+		return less(m1, m2);
+	}
+	template<typename Coeff>
+	bool operator()(const Term<Coeff>& t1, const Term<Coeff>& t2) const {
+		return less(t1, t2);
+	}
 
     static const bool degreeOrder = degreeOrdered;
 };

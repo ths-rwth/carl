@@ -43,12 +43,15 @@
 //#include "../util/tree.h"
 #include "../util/carlTree.h"
 
+#include "CADConstraints.h"
+#include "CADPolynomials.h"
 #include "CADTypes.h"
 #include "CADSettings.h"
 #include "ConflictGraph.h"
 #include "Constraint.h"
 #include "EliminationSet.h"
 #include "SampleSet.h"
+#include "Variables.h"
 
 namespace carl {
 
@@ -56,22 +59,20 @@ namespace carl {
  * This class implements the core of the CAD algorithm.
  */
 template<typename Number>
-class CAD : public carl::cad::PolynomialOwner<Number> {
+class CAD {
 public:
 	/// Type of univariate polynomials.
-	typedef carl::cad::UPolynomial<Number> UPolynomial;
+	typedef typename cad::CADPolynomials<Number>::UPolynomial UPolynomial;
 	/// Type of multivariate polynomials.
-	typedef carl::cad::MPolynomial<Number> MPolynomial;
+	typedef typename cad::CADPolynomials<Number>::MPolynomial MPolynomial;
 
 	/// Type of an iterator over the samples.
 	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
-	typedef std::unordered_map<unsigned, Interval<Number>> BoundMap;
+	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
-	/**
-	 * Fix list of variables for all computations.
-	 */
-	std::vector<Variable> variables;
+	
+	cad::Variables variables;
 	
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
@@ -84,24 +85,9 @@ private:
 	std::vector<cad::EliminationSet<Number>> eliminationSets;
 	
 	/**
-	 * List of all polynomials for elimination.
+	 * Stores the original polynomials and the queue of polynomials that are scheduled.
 	 */
-	std::list<const UPolynomial*> polynomials;
-
-	/**
-	 * Maps multivariate polynomials given as input to the univariate polynomials that are used internally.
-	 */
-	std::unordered_map<const MPolynomial, const UPolynomial*, std::hash<MPolynomial>> polynomialMap;
-
-	/**
-	 * list of polynomials scheduled for elimination
-	 */
-	std::list<const UPolynomial*> scheduledPolynomials;
-	
-	/**
-	 * list of new variables introduced by the scheduled elimination polynomials (mNewvariables and mVeriables are disjoint)
-	 */
-	std::vector<Variable> newVariables;
+	cad::CADPolynomials<Number> polynomials;
 	
 	/**
 	 * flag indicating whether the sample construction is completed or not
@@ -122,6 +108,8 @@ private:
 	 * setting for internal heuristics
 	 */
 	cad::CADSettings setting;
+	
+	cad::CADConstraints<Number> constraints;
 	
 	static unsigned checkCallCount;
 
@@ -191,7 +179,7 @@ public:
 	* @return list of main variables of the polynomials of this cad
 	*/
 	const std::vector<Variable>& getVariables() const {
-		return this->variables;
+		return this->variables.getCurrent();
 	}
 	
 	/**
@@ -222,13 +210,6 @@ public:
 		return this->interrupted;
 	}
 	
-	/** Gives the index of a given variable in the CAD's internal list of variables which is corresponding to the current elimination status.
-	 * @param v variable whose index shall be determined
-	 * @return index of the variable in the list of variables or the number of variables if no such index was found
-	 * @complexity linear in the number of variables
-	 */
-	unsigned indexOf(Variable::Arg v) const;
-	
 	/**
 	 * Collects all samples which were constructed for this sample tree node.
 	 * @return all samples for this sample tree node (all children)
@@ -257,7 +238,7 @@ public:
 	 * @param constraints
 	 * @param filename
 	 */
-	void printConstraints(const std::vector<cad::Constraint<Number>>& constraints, const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
+	void printConstraints(const std::string& filename = cad::DEFAULT_CAD_OUTPUTFILE) const;
 
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const CAD<Num>& cad);
@@ -383,24 +364,10 @@ public:
 	///////////////////////////
 	// PUBLIC STATIC METHODS //
 	///////////////////////////
+
+	template<typename Inserter>
+	static void addSamples(const RealAlgebraicNumberPtr<Number>& left, const RealAlgebraicNumberPtr<Number>& right, VariableType type, Inserter i);
 	
-	/**
-	 * Returns the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point r.
-	 * @param r
-	 * @param constraints
-	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
-	 */
-	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints);
-
-	/**
-	 * Returns the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point r.
-	 * @param r
-	 * @param constraints
-	 * @param conflictGraph See CAD::check for a full description.
-	 * @return the truth value as to whether the conjunction of the constraints is satisfied by the real algebraic point
-	 */
-	static bool satisfies(RealAlgebraicPoint<Number>& r, const std::vector<cad::Constraint<Number>>& constraints, cad::ConflictGraph& conflictGraph);
-
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.
 	 * This method only returns samples which are new, i.e. not contained in currentSamples. The new samples are already added to currentSamples.
@@ -411,7 +378,8 @@ public:
 	 * @return a set of sample points for the given univariate polynomial sorted in ascending order.
 	 * @complexity linear in <code>roots.size()</code>
 	 */
-	static cad::SampleSet<Number> samples(
+	cad::SampleSet<Number> samples(
+			std::size_t openVariableCount,
 			const std::list<RealAlgebraicNumberPtr<Number>>& roots,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
@@ -426,18 +394,16 @@ public:
 	* @param currentSamples samples already present where the new samples shall be integrated. Each new sample is automatically inserted in this list.
 	* @param replacedSamples samples being replaced in currentSamples (due to simplification or root preference) but not added to the new samples
 	* @param bounds the resulting sample set does not contain any samples outside the given bounds (standard: no bounds)
-	* @param settings a setting type for a collection of CAD settings (standard option is the standard option of CADSettings::getSettings( ))
 	* @return a set of sample points for the given univariate polynomial
 	* @complexity linear in the number of roots of <code>p</code> plus the complexity of <code>RealAlgebraicNumberFactory::realRoots( p )</code>
 	*/
-	static cad::SampleSet<Number> samples(
+	cad::SampleSet<Number> samples(
+			std::size_t openVariableCount,
 			const UPolynomial* p,
-			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-			const std::list<Variable>& variables,
+			sampleIterator node,
 			cad::SampleSet<Number>& currentSamples,
 			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
-			const Interval<Number>& bounds = Interval<Number>::unboundedInterval(),
-			cad::CADSettings settings = cad::CADSettings::getSettings()
+			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
 	);
 
 	/**
@@ -453,7 +419,7 @@ public:
 	* @complexity cubic in the number of variables
 	*/
 	template<class VariableIterator, class PolynomialIterator>
-	std::vector<Variable> orderVariablesGreeedily(
+	std::vector<Variable> orderVariablesGreedily(
 			VariableIterator firstVariable,
 			VariableIterator lastVariable,
 			PolynomialIterator firstPolynomial,
@@ -499,7 +465,6 @@ private:
      * @param node
      * @param fullRestart
      * @param excludePrevious
-	 * @param constraints
 	 * @param bounds
 	 * @param r
 	 * @param conflictGraph
@@ -512,13 +477,12 @@ private:
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
-		std::vector<cad::Constraint<Number>>& constraints,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
-		unsigned dim
+		std::size_t dim
 	);
 	
 	/**
@@ -528,7 +492,6 @@ private:
 	 * Phase 2: Search the sample tree for already satisfying samples and lift the samples not yet lifted to the full dimension (all possibly within given bounds).
 	 * Phase 3: Lift at those sample tree nodes where lifting is still possible (possibly within given bounds).
 	 *
-	 * @param constraints
 	 * @param bounds
 	 * @param r
 	 * @param conflictGraph
@@ -539,7 +502,6 @@ private:
 	 */
 public:
 	bool mainCheck(
-			std::vector<cad::Constraint<Number>>& constraints,
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
 			cad::ConflictGraph& conflictGraph,
@@ -559,6 +521,12 @@ public:
      */
 	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
+	bool baseLiftCheck(
+		sampleIterator node,
+		RealAlgebraicPoint<Number>& r,
+		cad::ConflictGraph& conflictGraph
+	);
+
 	/**
 	 * Constructs sample points for the given number of open variables openVariableCount by lifting
 	 * the polynomials available in the lifting queue in the corresponding level of CAD::eliminationSets.
@@ -583,20 +551,20 @@ public:
 	 * @param checkBounds if true, all points are checked against the bounds
 	 * @param r RealAlgebraicPoint which contains the satisfying sample point if the check results true
 	 * @param conflictGraph This is a conflict graph. See CAD::check for a full description.
+	 * @param satPath Indices of regions that lead to a satisfying sample. This is used, if we backtrack due to integrality errors.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
 	bool liftCheck(
 			sampleIterator node,
-			const std::list<RealAlgebraicNumberPtr<Number>>& sample,
-			unsigned openVariableCount,
+			std::size_t openVariableCount,
 			bool restartLifting,
 			const std::list<Variable>& variables,
-			const std::vector<cad::Constraint<Number>>& constraints,
 			const BoundMap& bounds,
 			bool boundsActive,
 			bool checkBounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph
+			cad::ConflictGraph& conflictGraph,
+			std::stack<std::size_t>& satPath
 	);
 	
 	/**
@@ -610,7 +578,7 @@ public:
 	 * @return the level to which at least one new polynomial was added due to elimination;
 	 * or -1 if no more polynomials could be eliminated into the given level or a level before
 	 */
-	int eliminate(unsigned level, const BoundMap& bounds, bool boundsActive);
+	int eliminate(std::size_t level, const BoundMap& bounds, bool boundsActive);
 
 	/**
 	 * Get the boundaries of the cad cell interval defined by the children of the given sample tree node for the given sample.
@@ -628,7 +596,7 @@ public:
 	 * @param bounds
 	 * @param constraints
 	 */
-	void widenBounds(BoundMap& bounds, std::vector<cad::Constraint<Number>>& constraints);
+	void widenBounds(BoundMap& bounds);
 
 	/**
 	 * The given bounds are shrunk to the a value close to the given (satisfying) point for every variable.
@@ -651,7 +619,7 @@ public:
 	 * @param recuperate if true, the polynomials computed are recuperated into this CAD's elimination sets (default: true)
 	 * @return true if p has a root in the given box, false otherwise
 	 */
-	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, unsigned level, bool recuperate = true);
+	bool vanishesInBox(const UPolynomial* p, const BoundMap& box, std::size_t level, bool recuperate = true);
 
 	/**
 	 * Checks whether one of the flags indicating whether to stop a currently running check procedure is set to true.
@@ -677,11 +645,25 @@ public:
 
 	bool isSampleTreeConsistent() const {
 		bool isOk = isSampleConsistent(this->sampleTree.begin());
-        #if defined(LOGGING_CARL) || defined(LOGGING)
-		if (!isOk) CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
-        #endif
+		if (!isOk) {
+			CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
+		}
 		assert(isOk);
 		return isOk;
+	}
+
+	/**
+	 * Check if the sample point represented by a given node in the sample tree matches the integrality constraints imposed by the variables.
+	 * @param node Node in sample tree.
+	 * @return If sample fulfills integrality constraints.
+	 */
+	template<typename It>
+	bool checkIntegrality(It node) const {
+		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
+			Variable var = variables[pit.depth() - 1];
+			if ((var.getType() == VariableType::VT_INT) && (!(*pit)->isIntegral())) return false;
+		}
+		return true;
 	}
 };
 

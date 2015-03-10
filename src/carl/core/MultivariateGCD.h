@@ -10,6 +10,7 @@
 
 #include "MonomialOrdering.h"
 #include "MultivariatePolynomialPolicy.h"
+#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
@@ -77,6 +78,11 @@ struct GCDResult
 template<typename GCDCalculation, typename Coeff, typename Ordering= GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariateGCD : GCDCalculation
 {
+    public:
+    template<typename C, typename O, typename P>
+    friend MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b);
+    
+    private:
 	typedef GCDResult<Coeff,Ordering,Policies> Result;
 	typedef MultivariatePolynomial<Coeff,Ordering,Policies> Polynomial;
 	typedef UnivariatePolynomial<MultivariatePolynomial<Coeff,Ordering,Policies>> UnivReprPol;
@@ -123,7 +129,28 @@ class MultivariateGCD : GCDCalculation
 			return *common.begin();
 		}
 		
-	}	
+	}
+    
+    #ifdef COMPARE_WITH_GINAC
+    bool checkCorrectnessWithGinac()
+    {
+        if(!checkConversion<Polynomial>(mp1))
+        {
+            return false;
+        }
+        if(!checkConversion<Polynomial>(mp2))
+        {
+            return false;
+        }
+        Polynomial result = ginacGcd<Polynomial>(mp1,mp2);
+        Polynomial resultB = calculate();
+        if(result != resultB)
+        {
+            return false;
+        }
+        return true;
+    }
+    #endif
 		
 };
 

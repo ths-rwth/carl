@@ -12,26 +12,56 @@
 #include "FactorizedPolynomial.h"
 
 namespace carl
-{   
+{
     template <typename P>
-    std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization )
+    std::string factorizationToString( const Factorization<P>& _factorization, bool _infix, bool _friendlyVarNames )
     {
         if( _factorization.empty() )
         {
-            _out << "1";
+            return "1";
         }
         else
         {
-            for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )
+            std::string result = "";
+            if( _infix )
             {
-                if( polyExpPair != _factorization.begin() )
-                    _out << " * ";
-                assert( polyExpPair->second > 0 );
-                _out << "(" << polyExpPair->first << ")";
-                if( polyExpPair->second > 1 )
-                    _out << "^" << polyExpPair->second;
+                for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )
+                {
+                    if( polyExpPair != _factorization.begin() )
+                        result += " * ";
+                    assert( polyExpPair->second > 0 );
+                    result += "(" + polyExpPair->first.toString( true, _friendlyVarNames ) + ")";
+                    if( polyExpPair->second > 1 )
+                    {
+                        std::stringstream s;
+                        s << polyExpPair->second;
+                        result += "^" + s.str();
+                    }
+                }
             }
+            else
+            {
+                if( _factorization.size() == 1 && _factorization.begin()->second == 1 )
+                {
+                    return _factorization.begin()->first.toString( true, _friendlyVarNames );
+                }
+                result += "(*";
+                for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )
+                {
+                    assert( polyExpPair->second > 0 );
+                    for( size_t i = 0; i < polyExpPair->second; ++i )
+                        result += " " + polyExpPair->first.toString( true, _friendlyVarNames );
+                }
+                result += ")";
+            }
+            return result;
         }
+    }
+    
+    template <typename P>
+    std::ostream& operator<<( std::ostream& _out, const Factorization<P>& _factorization )
+    {
+        _out << factorizationToString( _factorization );
         return _out;
     }
     
@@ -315,8 +345,15 @@ namespace carl
         assert( exponentA > 0 );
         assert( exponentB > 0 );
         mFactorization.clear();
-        mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
-        mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
+        if( _fpolyA == _fpolyB )
+        {
+            mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA+exponentB ) );
+        }
+        else
+        {   
+            mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyA, exponentA ) );
+            mFactorization.insert ( std::pair<FactorizedPolynomial<P>, carl::exponent>( _fpolyB, exponentB ) );
+        }
         assert( mpPolynomial != nullptr );
         assert( *mpPolynomial == computePolynomial( mFactorization ) );
         assert( assertFactorization() );
@@ -497,18 +534,24 @@ namespace carl
         return result;
     }
     
-    template <typename P>
-    std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
+    template<typename P>
+    std::string PolynomialFactorizationPair<P>::toString( bool _infix, bool _friendlyVarNames ) const
     {
-        if( _pfPair.factorizedTrivially() )
+        if( factorizedTrivially() )
         {
-            assert( _pfPair.mpPolynomial != nullptr );
-            _out << *_pfPair.mpPolynomial;
+            assert( mpPolynomial != nullptr );
+            return mpPolynomial->toString( _infix, _friendlyVarNames );
         }
         else
         {
-            _out << _pfPair.factorization();
+            return factorizationToString( factorization(), _infix, _friendlyVarNames );
         }
+    }
+    
+    template <typename P>
+    std::ostream& operator<<(std::ostream& _out, const PolynomialFactorizationPair<P>& _pfPair)
+    {
+        _out << _pfPair.toString();
         return _out;
     }
     

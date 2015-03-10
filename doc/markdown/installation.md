@@ -6,6 +6,10 @@ Download
 Here are archived versions of CArL for download:
 - [latest](http://ths.informatik.rwth-aachen.de/releases/carl-latest.tgz)
 
+We mirror our master branch to github.com. If you want to use the newest bleeding edge version, you can checkout from https://github.com/nafur/carl.
+Although we try to keep the master branch stable, there is a chance that the current revision is broken.
+You can check [here](https://travis-ci.org/nafur/carl/builds) if the current revision compiles and all the unit tests work.
+
 Quick installation guide
 --------------------------------------------
 - Make sure all @subpage dependencies "dependencies" are available.

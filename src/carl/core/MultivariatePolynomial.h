@@ -38,7 +38,7 @@ class UnivariatePolynomial;
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariatePolynomial : public Polynomial, public Policies
 {
-    template<typename Polynomial>
+    template<typename Polynomial, typename Order>
     friend class TermAdditionManager;
 public:
 	/// The ordering of the terms.
@@ -55,10 +55,15 @@ public:
 	typedef typename UnderlyingNumberType<Coeff>::type NumberType;
 	/// Integer type associated with the number type.
 	typedef typename IntegralType<NumberType>::type IntNumberType;
-protected:
+    ///
+    typedef MultivariatePolynomial<Coeff, Ordering, Policies> PolyType;
+    /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
+    typedef std::vector<int> CACHE;
 	/// Type our terms vector.
 	typedef std::vector<Term<Coeff>> TermsType;
-	
+    
+protected:
+    
 	template <bool gatherCoeff>
 	using VarInfo = VariableInformation<gatherCoeff, MultivariatePolynomial>;
 protected:
@@ -68,7 +73,7 @@ protected:
 	mutable bool mOrdered;
 public:
     ///
-    static TermAdditionManager<MultivariatePolynomial> mTermAdditionManager;
+    static TermAdditionManager<MultivariatePolynomial,Ordering> mTermAdditionManager;
     
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 	
@@ -144,19 +149,64 @@ public:
 	 * @return 
 	 */
 	const Term<Coeff>& lterm() const;
+	Term<Coeff>& lterm();
 	/**
 	 * Returns the coefficient of the leading term.
 	 * Notice that this is not defined for zero polynomials. 
-	 * @return 
+	 * @return Leading coefficient.
 	 */
 	const Coeff& lcoeff() const;
+	/**
+	 * Returns the leading coefficient with respect to the given variable.
+	 * @param var Variable.
+	 * @return Leading coefficient.
+	 */
+	MultivariatePolynomial lcoeff(Variable::Arg var) const {
+		return coeff(var, degree(var));
+	}
 	/**
 	 * Calculates the max. degree over all monomials occurring in the polynomial.
 	 * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
 	 * @see @cite GCL92, page 48
 	 * @return Total degree.
 	 */
-	exponent totalDegree() const;
+	std::size_t totalDegree() const;
+
+	/**
+	 * Calculates the degree of this polynomial with respect to the given variable.
+	 * @param var Variable.
+	 * @return Degree w.r.t. var.
+	 */
+	std::size_t degree(Variable::Arg var) const {
+		std::size_t max = 0;
+		for (const auto& t: mTerms) {
+			if (t.monomial() == nullptr) continue;
+			std::size_t c = t.monomial()->exponentOfVariable(var);
+			if (c > max) max = c;
+		}
+		return max;
+	}
+
+	/**
+	 * Calculates the coefficient of var^exp.
+	 * @param var Variable.
+	 * @param exp Exponent.
+	 * @return Coefficient of var^exp.
+	 */
+	MultivariatePolynomial coeff(Variable::Arg var, std::size_t exp) const {
+		MultivariatePolynomial res;
+		for (const auto& t: mTerms) {
+			if (t.monomial() == nullptr) {
+				if (exp == 0) res.mTerms.push_back(t);
+			} else if (t.monomial()->exponentOfVariable(var) == exp) {
+				Monomial::Arg newMon = t.monomial()->dropVariable(var);
+				res.mTerms.push_back(TermType(t.coeff(), newMon));
+			}
+		}
+		res.mOrdered = false;
+		res.makeMinimallyOrdered<true,true>();
+		return res;
+	}
 
 	/**
 	 * Checks if the polynomial is zero.
@@ -202,11 +252,22 @@ public:
 	{
 		return mTerms.size();
 	}
+    
+    /**
+     * @return A rough estimation of the size of this polynomial being the number of its terms.
+     *         (Note, that this method is required, as it is provided of other polynomials not necessarily being straightforward.)
+     */
+    size_t size() const
+    {
+        return mTerms.size();
+    }
+    
 	/**
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 
 	 */
 	const Term<Coeff>& trailingTerm() const;
+	Term<Coeff>& trailingTerm();
 	/**
 	 * Checks if the polynomial has a constant term that is not zero.
 	 * @return If there is a constant term unequal to zero.
@@ -214,7 +275,7 @@ public:
 	bool hasConstantTerm() const;
 	/**
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
-	 * @reiturn Constant term.
+	 * @return Constant term.
 	 */
 	const Coeff& constantPart() const;
 	
@@ -265,6 +326,32 @@ public:
 	 */
 	///@todo find new lterm
 	MultivariatePolynomial& stripLT();
+    
+    /**
+     * For terms with exactly one variable, get this variable.
+     * @return The only variable occuring in the term.
+     */
+    Variable::Arg getSingleVariable() const
+    {
+        assert( !isConstant() );
+        return lterm().getSingleVariable();
+    }
+    
+    /**
+     * @return Coefficient of the polynomial (this makes only sense for polynomials storing the gcd of all coefficients separately)
+     */
+    const CoeffType& coefficient() const
+    {
+        return constant_one<CoeffType>::get();
+    }
+    
+    /**
+     * @return The coprimeCoefficients of this polyomial, if this is stored internally, otherwise this polynomial.
+     */
+    const PolyType& polynomial() const
+    {
+        return *this;
+    }
 	
 	/**
 	 * Checks whether only one variable occurs.
@@ -300,6 +387,12 @@ public:
 	 * @param p Polynomial.
 	 */
 	void subtractProduct(const Term<Coeff>& factor, const MultivariatePolynomial& p);
+	
+	/**
+	 * Adds a single term without using a TermAdditionManager or changing the ordering status.
+	 * @param term Term.
+	 */
+	void addTerm(const Term<Coeff>& term);
 
 	/**
 	 * Divides the polynomial by the given coefficient.
@@ -346,10 +439,17 @@ public:
 	 * @see MultivariatePolynomial::divideBy
 	 */
 	MultivariatePolynomial remainder(const MultivariatePolynomial& divisor) const;
-	MultivariatePolynomial prem(const MultivariatePolynomial& divisor) const;
+	MultivariatePolynomial prem(const MultivariatePolynomial& divisor, Variable::Arg var) const;
 	
 	
 	MultivariatePolynomial derivative(Variable::Arg v, unsigned nth=1) const;
+    
+    /**
+     * Calculates the square of this multivariate polynomial if it is a square.
+     * @param res Used to store the result in.
+     * @return true, if this multivariate polynomial is a square; false, otherwise.
+     */
+    bool sqrt(MultivariatePolynomial& res) const;
 	
 	/**
 	 * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
@@ -357,6 +457,13 @@ public:
 	 */
 	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coeff coprimeFactor() const;
+    
+    /**
+	 * @return The lcm of the denominators of the coefficients (without the constant one) in p divided by the gcd of numerators 
+	 *		 of the coefficients in p.
+	 */
+	template<typename C = Coeff, EnableIf<is_subset_of_rationals<C>> = dummy>
+	Coeff coprimeFactorWithoutConstant() const;
 	
 	/**
 	 * @return p * p.coprimeFactor()
@@ -420,7 +527,7 @@ public:
 
 	void square();
 
-	MultivariatePolynomial pow(unsigned exp) const;
+	MultivariatePolynomial pow(std::size_t exp) const;
 	
 	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
@@ -585,7 +692,7 @@ public:
 	}
 
 	template<typename C, typename O, typename P>
-	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, unsigned exp)
+	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::size_t exp)
 	{
 		return p.pow(exp);
 	}
@@ -603,7 +710,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
-	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs);
+	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs);
 	template<typename C, typename O, typename P>
 	bool operator==(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
@@ -615,7 +722,7 @@ public:
 		return rhs == lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator==(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator==(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs == lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -654,7 +761,7 @@ public:
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator!=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -670,7 +777,7 @@ public:
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator!=(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator!=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return !(lhs == rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -713,7 +820,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs);
 	template<typename C, typename O, typename P>
-	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs);
+	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs);
 	template<typename C, typename O, typename P>
 	bool operator<(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs);
 	template<typename C, typename O, typename P>
@@ -721,7 +828,7 @@ public:
 	template<typename C, typename O, typename P>
 	bool operator<(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
-	bool operator<(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	bool operator<(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	bool operator<(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
@@ -745,7 +852,7 @@ public:
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator<=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
@@ -761,7 +868,7 @@ public:
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator<=(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator<=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return !(rhs < lhs);
 	}
 	template<typename C, typename O, typename P>
@@ -791,7 +898,7 @@ public:
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -807,7 +914,7 @@ public:
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator>(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -837,7 +944,7 @@ public:
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -853,7 +960,7 @@ public:
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
-	inline bool operator>=(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline bool operator>=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
@@ -883,7 +990,7 @@ public:
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C,O,P> operator+(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) += rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -903,7 +1010,7 @@ public:
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
 	template<typename C>
-	inline MultivariatePolynomial<C> operator+(const Term<C>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C> operator+(const Term<C>& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
 	template<typename C>
@@ -922,7 +1029,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator+(const Monomial::Arg& lhs, const C& rhs) {
 		return std::move(MultivariatePolynomial<C>(lhs) += rhs);
 	}
@@ -946,7 +1053,7 @@ public:
 	inline MultivariatePolynomial<C> operator+(const C& lhs, const Term<C>& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
-	template<typename C>
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
 	inline MultivariatePolynomial<C> operator+(const C& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C>(rhs) += lhs);
 	}
@@ -982,7 +1089,7 @@ public:
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
 	}
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C,O,P> operator-(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
 		return std::move(MultivariatePolynomial<C,O,P>(lhs) -= rhs);
 	}
 	template<typename C, typename O, typename P>
@@ -1002,7 +1109,7 @@ public:
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const Term<C>& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	inline MultivariatePolynomial<C> operator-(const Term<C>& lhs, const Monomial::Arg& rhs) {
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C>
@@ -1014,15 +1121,15 @@ public:
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator-(const std::shared_ptr<const Monomial>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	inline MultivariatePolynomial<C,O,P> operator-(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
 	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const std::shared_ptr<const Monomial>& lhs, const Term<C>& rhs) {
+	inline MultivariatePolynomial<C> operator-(const Monomial::Arg& lhs, const Term<C>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
-	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const std::shared_ptr<const Monomial>& lhs, const C& rhs) {
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
+	inline MultivariatePolynomial<C> operator-(const Monomial::Arg& lhs, const C& rhs) {
 		return std::move( MultivariatePolynomial<C>(lhs) -= rhs );
 	}
 	template<typename C, typename O, typename P>
@@ -1045,8 +1152,8 @@ public:
 	inline MultivariatePolynomial<C> operator-(const C& lhs, const Term<C>& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
-	template<typename C>
-	inline MultivariatePolynomial<C> operator-(const C& lhs, const std::shared_ptr<const Monomial>& rhs) {
+	template<typename C, EnableIf<carl::is_number<C>> = dummy>
+	inline MultivariatePolynomial<C> operator-(const C& lhs, const Monomial::Arg& rhs) {
 		return std::move( -(rhs - lhs) );
 	}
 	template<typename C>

@@ -15,23 +15,30 @@ namespace carl
 {
 
 VariablePool::VariablePool():
-	Singleton(),
-	mNextVarId(1)
+    Singleton(),
+    mNextIDs(),
+    mVariableNames(),
+    mVariablePrefix()
 {
 	CARL_LOG_INFO("carl.varpool", "Constructor called");
+	clear();
+	setPrefix();
 }
 
 Variable VariablePool::getFreshVariable(VariableType type) {
-	unsigned tmp = 0;
+	std::size_t tmp = 0;
 	{
 		std::lock_guard<std::mutex> lock(this->freshVarMutex);
-		tmp = mNextVarId++;
+		tmp = nextID(type)++;
 	}
 	CARL_LOG_DEBUG("carl.varpool", "New variable of type " << type << " with id " << tmp);
 	return Variable(tmp, type);
 }
 
 Variable VariablePool::getFreshVariable(const std::string& name, VariableType type) {
+	if (name.substr(0, mVariablePrefix.size()) == mVariablePrefix) {
+		CARL_LOG_WARN("carl", "The prefix for auxiliary variable names \"" << mVariablePrefix << "\" is a prefix for the variable name \"" << name << "\".");
+	}
 	Variable tmp = this->getFreshVariable(type);
 	this->setName(tmp, name);
 	return tmp;
@@ -39,34 +46,40 @@ Variable VariablePool::getFreshVariable(const std::string& name, VariableType ty
 
 Variable VariablePool::findVariableWithName(const std::string& name) const
 {
-	for(auto v : mFriendlyNames)
-	{
-		if(v.second == name)
-		{
-			return v.first;
-		}
+	for (auto v: mVariableNames) {
+		if (v.second == name) return v.first;
 	}
-	return Variable();
+	return Variable::NO_VARIABLE;
 }
 
-const std::string VariablePool::getName(Variable::Arg v, bool friendly) const {
-	if (v == Variable::NO_VARIABLE) return "NO_VARIABLE";
-	if (friendly) {
-		std::map<Variable, std::string>::const_iterator it = mFriendlyNames.find(v);
-		if (it == mFriendlyNames.end()) {
-			return "x_" + std::to_string(v.getId());
-		} else {
+const std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
+	if (v.getId() == 0) return "NO_VARIABLE";
+	if (variableName) {
+		std::map<Variable, std::string>::const_iterator it = mVariableNames.find(v);
+		if (it != mVariableNames.end()) {
 			return it->second;
 		}
-	} else {
-		return "x_" + std::to_string(v.getId());
+	}
+	switch (v.getType()) {
+		case VariableType::VT_BOOL:
+			return mVariablePrefix + "b_" + std::to_string(v.getId());
+		case VariableType::VT_REAL:
+			return mVariablePrefix + "r_" + std::to_string(v.getId());
+		case VariableType::VT_INT:
+			return mVariablePrefix + "i_" + std::to_string(v.getId());
+		case VariableType::VT_UNINTERPRETED:
+			return mVariablePrefix + "u_" + std::to_string(v.getId());
+		default:
+			CARL_LOG_ERROR("carl", "Variable has invalid type: " << v.getType());
+			assert(false);
+			return "";
 	}
 }
 
 void VariablePool::setName(Variable::Arg v, const std::string& name) {
 	#ifdef CARL_USE_FRIENDLY_VARNAMES
 	std::lock_guard<std::mutex> lock(this->freshVarMutex);
-	mFriendlyNames[v] = name;
+	mVariableNames[v] = name;
 	#endif
 }
 

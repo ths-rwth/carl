@@ -48,6 +48,14 @@ public:
 	{}
 
 	/**
+	 * Creates a real algebraic point with the specified components.
+	 * @param v pointers to real algebraic numbers
+	 */
+	RealAlgebraicPoint(std::vector<RealAlgebraicNumberPtr<Number>>&& v):
+		numbers(std::move(v))
+	{}
+
+	/**
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
@@ -66,7 +74,7 @@ public:
 	/** Gives the number of components of this point.
 	 * @return the dimension of this point
 	 */
-	long unsigned dim() const {
+	std::size_t dim() const {
 		return this->numbers.size();
 	}
 
@@ -89,7 +97,7 @@ public:
 	 * @param index Index.
 	 * @return Value of this point at the given index.
 	 */
-	RealAlgebraicNumberPtr<Number> operator[](unsigned int index) const {
+	RealAlgebraicNumberPtr<Number> operator[](std::size_t index) const {
 		assert(index < this->numbers.size());
 		return this->numbers[index];
 	}

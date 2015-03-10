@@ -3,6 +3,9 @@
 #include "platform.h"
 #include "../core/logging.h"
 
+#include <execinfo.h>
+#include <dlfcn.h>
+#include <cxxabi.h>
 #include <sstream>
 
 namespace carl {
@@ -12,6 +15,32 @@ void printStacktrace(bool interaction) {
 	cmd << "gdb --pid=" << getpid() << " -ex bt";
 	if (!interaction) cmd << " --batch --quiet";
 	system(cmd.str().c_str());
+}
+
+inline std::string demangle(const char* name) {
+	int status = -4;
+	std::unique_ptr<char, void(*)(void*)> res {
+		abi::__cxa_demangle(name, NULL, NULL, &status),
+		std::free
+	};
+	return (status == 0) ? res.get() : name ;
+}
+
+std::string callingFunction() {
+	void* frames[3];
+    int cnt = backtrace(frames, sizeof(frames) / sizeof(void*));
+	if (cnt == 0) return "<unknown, maybe corrupt>";
+	char** symbols = backtrace_symbols(frames, cnt);
+	
+	std::stringstream out;
+	Dl_info info;
+	if (dladdr(frames[2], &info) && info.dli_sname) {
+		out << demangle(info.dli_sname) << std::endl;
+	} else {
+		out << "??? " << demangle(symbols[2]) << std::endl;
+	}
+	free(symbols);
+	return out.str();
 }
 
 std::string last_assertion_string = "";

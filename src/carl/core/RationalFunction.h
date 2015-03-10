@@ -304,6 +304,35 @@ namespace carl
             denominatorAsPolynomial().gatherVariables(vars);
         }
         
+		/**
+		 * Evaluate the polynomial at the point described by substitutions.
+         * @param substitutions A mapping from variable to constant values.
+         * @return The result of the substitution
+         */
+        CoeffType evaluate(const std::map<Variable,CoeffType>& substitutions) const
+        {
+			if( isConstant() )
+			{
+				  return mNumberQuotient;
+			}
+			else{
+				CARL_LOG_INEFFICIENT();
+				return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
+			}            
+        }
+        
+		/**
+		 * Derivative of the rational function with respect to variable x
+         * @param x the main variable
+         * @param nth which derivative one should take
+         * @return 
+		 * 
+		 * @todo Currently only nth = 1 is supported
+		 * @todo Curretnly only factorized polynomials are supported
+         */
+		RationalFunction derivative(const Variable& x, unsigned nth = 1) const;
+		
+		
     private:
         
         /**

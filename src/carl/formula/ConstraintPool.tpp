@@ -8,6 +8,7 @@
  */
 
 #include "ConstraintPool.h"
+#include "../converter/OldGinacConverter.h"
 
 using namespace std;
 
@@ -20,8 +21,16 @@ namespace carl
         mIdAllocator( 1 ),
         mConsistentConstraint( new Constraint<Pol>( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ, 1 ) ),
         mInconsistentConstraint( new Constraint<Pol>( Pol( typename Pol::NumberType( 0 ) ), Relation::LESS, 2 ) ),
-        mConstraints()
+        mConstraints(),
+        mpPolynomialCache(nullptr)
     {
+        if( needs_cache<Pol>::value )
+        {
+            mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
+#ifdef COMPARE_WITH_GINAC
+            setGinacConverterPolynomialCache<Pol>( mpPolynomialCache );
+#endif
+        }
 		/* Make sure that the MonomialPool is created before the ConstraintPool.
 		 * Thereby, the MonomialPool gets destroyed after the ConstraintPool.
 		 * Thereby, destroying the constraints (and the Monomials contained) works correctly.
@@ -84,13 +93,13 @@ namespace carl
     }
 
     template<typename Pol>
-    const Constraint<Pol>* ConstraintPool<Pol>::newConstraint( const Pol& _lhs, const Relation _rel )
+    const Constraint<Pol>* ConstraintPool<Pol>::newConstraint( Pol&& _lhs, const Relation _rel )
     {
         CONSTRAINT_POOL_LOCK_GUARD
         // TODO: Maybe it's better to increment the allocator even if the constraint already exists.
         //       Avoids long waiting for access (mutual exclusion) but increases the allocator to fast.
 //        cout << "create polynomial  " << _lhs << " " << Constraint::relationToString( _rel ) << "0" << endl;
-        Constraint<Pol>* constraint = createNormalizedConstraint( _lhs, _rel );
+        Constraint<Pol>* constraint = createNormalizedConstraint( std::move(_lhs), _rel );
 //        cout << "   " << *constraint << endl;
         if( constraint->variables().empty() )
         {
@@ -229,9 +238,33 @@ namespace carl
     }
 
     template<typename Pol>
+    const Constraint<Pol>* newConstraint( Pol&& _lhs, const Relation _rel )
+    {
+        return ConstraintPool<Pol>::getInstance().newConstraint( std::move(_lhs), _rel );
+    }
+
+    template<typename Pol>
     const Constraint<Pol>* newConstraint( const Pol& _lhs, const Relation _rel )
     {
         return ConstraintPool<Pol>::getInstance().newConstraint( _lhs, _rel );
+    }
+
+    template<typename Pol>
+    const Constraint<Pol>* newConstraint( carl::Variable::Arg _var, Relation _rel )
+    {
+        return ConstraintPool<Pol>::getInstance().newConstraint( _var, _rel );
+    }
+    
+    template<typename Pol, EnableIf<needs_cache<Pol>>>
+    const Constraint<Pol>* newConstraint( const typename Pol::PolyType& _lhs, Relation _rel )
+    {
+        return ConstraintPool<Pol>::getInstance().newConstraint( _lhs, _rel );
+    }
+    
+    template<typename Pol, EnableIf<needs_cache<Pol>>>
+    const Constraint<Pol>* newConstraint( typename Pol::PolyType&& _lhs, Relation _rel )
+    {
+        return ConstraintPool<Pol>::getInstance().newConstraint( std::move(_lhs), _rel );
     }
 
     template<typename Pol>

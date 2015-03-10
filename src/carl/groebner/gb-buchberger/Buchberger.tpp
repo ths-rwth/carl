@@ -44,7 +44,7 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 	}
 
 	bool foundGB = false;
-	for(Polynomial newPol : scheduledForAdding)
+	for(const Polynomial& newPol : scheduledForAdding)
 	{
 		if(addToGb(newPol))
 		{
@@ -58,12 +58,16 @@ void Buchberger<Polynomial, AddingPolicy>::calculate(const std::list<Polynomial>
 	//As long as unprocessed pairs exist..
 	if(!foundGB)
 	{
-		while(!mCritPairs.empty())
+		while(!pCritPairs->empty())
 		{
 			// Takes the next pair scheduled
-			SPolPair critPair = mCritPairs.pop();
+			SPolPair critPair = pCritPairs->pop();
+            assert( critPair.mP1 < pGb->getGenerators().size() );
+            assert( critPair.mP2 < pGb->getGenerators().size() );
 			CARL_LOG_DEBUG("carl.gb.buchberger", "Calculate SPol for: " << pGb->getGenerators()[critPair.mP1] << ", " << pGb->getGenerators()[critPair.mP2]);
 			// Calculates the S-Polynomial
+            assert( pGb->getGenerators()[critPair.mP1].nrTerms() != 0 );
+            assert( pGb->getGenerators()[critPair.mP2].nrTerms() != 0 );
 			Polynomial spol = Polynomial::SPolynomial(pGb->getGenerators()[critPair.mP1], pGb->getGenerators()[critPair.mP2]);
 			spol.setReasons(pGb->getGenerators()[critPair.mP1].getReasons() | pGb->getGenerators()[critPair.mP2].getReasons());
 			CARL_LOG_DEBUG("carl.gb.buchberger", "SPol: " << spol);
@@ -129,8 +133,8 @@ void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 	}
 
 	
-	mCritPairs.elimMultiples(generators[index].lmon(), spairs);
-//	mCritPairs.elimMultiples(generators[index].lmon(), index, spairs);
+	pCritPairs->elimMultiples(generators[index].lmon(), spairs);
+//	pCritPairs->elimMultiples(generators[index].lmon(), index, spairs);
 
 	removeBuchbergerTriples(spairs, primelist);
 
@@ -147,7 +151,7 @@ void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 	{
 		return val.second;
 	});
-	mCritPairs.push(critPairsList);
+	pCritPairs->push(critPairsList);
 
 	std::vector<size_t> tempIndices;
 	jEnd = mGbElementsIndices.end();

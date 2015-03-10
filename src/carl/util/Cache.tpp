@@ -39,7 +39,6 @@ namespace carl
     template<typename T>
     Cache<T>::~Cache()
     {
-        std::cout << __func__ << std::endl;
         mCacheRefs.clear();
         while( !mCache.empty() )
         {
@@ -73,12 +72,14 @@ namespace carl
                 element->first->rehash();
                 auto retB = mCache.insert( element );
                 assert( retB.second );
-                for( Ref ref : element->second.refStoragePositions )
+                for( const Ref& ref : element->second.refStoragePositions )
                     mCacheRefs[ref] = *retB.first;
                 delete newElement;
-                assert( (*retB.first)->second.refStoragePositions.size() > 0);
-                assert( (*retB.first)->second.refStoragePositions.front() > 0 );
-                return std::make_pair( (*retB.first)->second.refStoragePositions.front(), false );
+                Info& info = (*retB.first)->second;
+                assert( info.refStoragePositions.size() > 0);
+                assert( info.refStoragePositions.front() > 0 );
+                info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
+                return std::make_pair( info.refStoragePositions.front(), false );
             }
             else
                 delete newElement;
@@ -98,6 +99,7 @@ namespace carl
                 newElement->second.refStoragePositions.push_back( mUnusedPositionsInCacheRefs.top() );
                 mUnusedPositionsInCacheRefs.pop();
             }
+            assert( mNumOfUnusedEntries < std::numeric_limits<ContentType>::max() );
             ++mNumOfUnusedEntries;
         }
         assert( (*ret.first)->second.refStoragePositions.size() > 0);
@@ -117,6 +119,7 @@ namespace carl
             assert( mNumOfUnusedEntries > 0 );
             --mNumOfUnusedEntries;
         }
+        assert( cacheRef->second.usageCount < std::numeric_limits<ContentType>::max() );
         ++cacheRef->second.usageCount;
     }
     
@@ -131,31 +134,54 @@ namespace carl
         --cacheRef->second.usageCount;
         if( cacheRef->second.usageCount == 0 ) // no more usage
         {
+            assert( mNumOfUnusedEntries < std::numeric_limits<ContentType>::max() );
             ++mNumOfUnusedEntries;
             // If the cache contains more used elements than the maximum desired cache size, remove this entry directly.
             if( mCache.size() - mNumOfUnusedEntries >= mMaxCacheSize )
             {
                 erase( cacheRef );
-            }   
+            }
         }
     }
     
     template<typename T>
     void Cache<T>::rehash( Ref _refStoragePos )
     {
+        size_t tmpSoac = sumOfAllUsageCounts();
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
         assert( cacheRef != nullptr );
         mCache.erase( cacheRef );
         cacheRef->first->rehash();
+        const Info& infoB = cacheRef->second;
         auto ret = mCache.insert( cacheRef );
         if( !ret.second )
         {
-            (*ret.first)->second.usageCount += cacheRef->second.usageCount;
+            Info& info = (*ret.first)->second;
+            if( infoB.usageCount == 0 )
+            {
+                assert( mNumOfUnusedEntries > 0 );
+                --mNumOfUnusedEntries;
+            }
+            else if( info.usageCount == 0 )
+            {
+                assert( mNumOfUnusedEntries > 0 );
+                --mNumOfUnusedEntries;
+            }
+            assert( info.usageCount + infoB.usageCount >= info.usageCount );
+            info.usageCount += infoB.usageCount;
+            assert( tmpSoac == sumOfAllUsageCounts() );
+            info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
+            assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
+            for( const Ref& ref : infoB.refStoragePositions )
+            {
+                assert( mCacheRefs[ref] != *(ret.first) );
+                mCacheRefs[ref] = *(ret.first);
+            }
             delete cacheRef->first;
+            delete cacheRef;
         }
-        mCacheRefs[_refStoragePos] = *(ret.first);
     }
     
     template<typename T>
@@ -236,30 +262,30 @@ namespace carl
     }
     
     template<typename T>
-    void Cache<T>::print() const
+    void Cache<T>::print( std::ostream& _out ) const
     {
-        std::cout << "General cache information:" << std::endl;
-        std::cout << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
-        std::cout << "   number of unused entries                                   : "  << mNumOfUnusedEntries << std::endl;
-        std::cout << "   desired reduction amount when cleaning the cache (not used): "  << mCacheReductionAmount << std::endl;
-        std::cout << "   maximum of all activities                                  : "  << mMaxActivity << std::endl;
-        std::cout << "   the current value of the activity increment                : "  << mActivityIncrement << std::endl;
-        std::cout << "   decay factor for the given activities                      : "  << mDecay << std::endl;
-        std::cout << "   upper bound of the activities                              : "  << mActivityThreshold << std::endl;
-        std::cout << "   scaling factor of the activities                           : "  << mActivityDecrementFactor << std::endl;
-        std::cout << "   current size of the cache                                  : "  << mCache.size() << std::endl;
-        std::cout << "   number of yet involved references                          : "  << mCacheRefs.size() << std::endl;
-        std::cout << "   number of currently freed references                       : "  << mUnusedPositionsInCacheRefs.size() << std::endl;
-        std::cout << "Cache contains:" << std::endl;
+        _out << "General cache information:" << std::endl;
+        _out << "   desired maximum cache size                                 : "  << mMaxCacheSize << std::endl;
+        _out << "   number of unused entries                                   : "  << mNumOfUnusedEntries << std::endl;
+        _out << "   desired reduction amount when cleaning the cache (not used): "  << mCacheReductionAmount << std::endl;
+        _out << "   maximum of all activities                                  : "  << mMaxActivity << std::endl;
+        _out << "   the current value of the activity increment                : "  << mActivityIncrement << std::endl;
+        _out << "   decay factor for the given activities                      : "  << mDecay << std::endl;
+        _out << "   upper bound of the activities                              : "  << mActivityThreshold << std::endl;
+        _out << "   scaling factor of the activities                           : "  << mActivityDecrementFactor << std::endl;
+        _out << "   current size of the cache                                  : "  << mCache.size() << std::endl;
+        _out << "   number of yet involved references                          : "  << mCacheRefs.size() << std::endl;
+        _out << "   number of currently freed references                       : "  << mUnusedPositionsInCacheRefs.size() << std::endl;
+        _out << "Cache contains:" << std::endl;
         for( auto iter = mCache.begin(); iter != mCache.end(); ++iter )
         {
             assert( (*iter)->first != nullptr );
-            std::cout << "   " << *(*iter)->first << std::endl;
-            std::cout << "                       usage count: " << (*iter)->second.usageCount << std::endl;
-            std::cout << "        reference storage positions:";
+            _out << "   " << *(*iter)->first << std::endl;
+            _out << "                       usage count: " << (*iter)->second.usageCount << std::endl;
+            _out << "        reference storage positions:";
             for( Ref ref : (*iter)->second.refStoragePositions )
-                std::cout << "  " << ref;
-            std::cout << "                          activity: " << (*iter)->second.activity << std::endl;
+                _out << "  " << ref;
+            _out << "                          activity: " << (*iter)->second.activity << std::endl;
         }
     }
     

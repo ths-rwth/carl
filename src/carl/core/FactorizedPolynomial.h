@@ -10,6 +10,7 @@
 #include <iostream>
 #include "../numbers/typetraits.h"
 #include "../util/Cache.h"
+#include "DivisionResult.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl
@@ -24,9 +25,28 @@ namespace carl
         template<typename P1>
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _rest2B, bool& _pfPairARefined, bool& _pfPairBRefined );
         
-        typedef Coeff<P> CoeffType;
+        /// The ordering of the terms.
+        typedef typename P::OrderedBy OrderedBy;
+        /// Type of the coefficients.
+        typedef typename P::CoeffType CoeffType;
+        /// Type of the terms.
+        typedef typename P::TermType TermType;
+        /// Type of the monomials within the terms.
+        typedef typename P::MonomType MonomType;
+        /// Policies for this monomial.
+        typedef typename P::Policy Policy;
+        /// Number type within the coefficients.
+        typedef typename UnderlyingNumberType<CoeffType>::type NumberType;
+        /// Integer type associated with the number type.
+        typedef typename IntegralType<NumberType>::type IntNumberType;
+        ///
         typedef P PolyType;
+        ///
+        typedef typename P::TermsType TermsType;
+        ///
         typedef Cache<PolynomialFactorizationPair<P>> CACHE;
+    
+        enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
 
     private:
         // Members
@@ -121,6 +141,7 @@ namespace carl
         explicit FactorizedPolynomial( const CoeffType& );
         explicit FactorizedPolynomial( const P& _polynomial, const std::shared_ptr<CACHE>&, bool = false );
         FactorizedPolynomial( const FactorizedPolynomial<P>& );
+        explicit FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _p);
         
         // Destructor.
         ~FactorizedPolynomial();
@@ -131,6 +152,13 @@ namespace carl
          * @return A reference to the copy of the given factorized polynomial.
          */
         FactorizedPolynomial<P>& operator=( const FactorizedPolynomial<P>& );
+        
+        explicit operator PolyType() const
+        {
+            if( existsFactorization( *this ) )
+                return this->polynomial()*this->mCoefficient;
+            return PolyType( mCoefficient );
+        }
         
         /**
          * @return The reference of the entry in the cache corresponding to this factorized polynomial.
@@ -224,14 +252,6 @@ namespace carl
         }
 
         /**
-         * @return 
-         */
-        CoeffType coprimeFactor() const
-        {
-            return CoeffType(1)/mCoefficient;
-        }
-
-        /**
          * @return true, if the factorized polynomial is constant.
          */
         bool isConstant() const
@@ -255,20 +275,329 @@ namespace carl
             return isConstant() && mCoefficient == 0;
         }
         
-        CoeffType constantPart() const
+        /**
+         * Calculates the number of terms. (Note, that this requires to expand the factorization and, thus, can be expensive in the case that 
+         * the factorization has not yet been expanded.)
+         * @return the number of terms
+         */
+        size_t nrTerms() const
         {
-            CoeffType result( mCoefficient );
-            if ( existsFactorization( *this ) )
-                result *= content().constantPart();
-            return result;
+            return polynomial().nrTerms();
         }
         
+        /**
+         * @return A rough estimation of the size of this factorized polynomial. If it has already been expanded, the number of terms 
+         *         of the expanded form are returned; otherwise the number of terms in the factors.
+         */
+        size_t size() const
+        {
+            if( existsFactorization(*this) )
+            {
+                if( factorizedTrivially() )
+                    return polynomial().size();
+                size_t result = 0;
+                for( const auto& factor : factorization() )
+                    result += factor.first.size();
+                return result;
+            }
+            return 1;
+        }
+        
+        /**
+         * Checks if the polynomial is linear.
+         * @return If this is linear.
+         */
+        bool isLinear() const
+        {
+            if( existsFactorization(*this) )
+            {
+                if( factorizedTrivially() )
+                    return polynomial().isLinear();
+                return false;
+            }
+            return true;
+        }
+        
+        /**
+         * @return The lcm of the denominators of the coefficients in p divided by the gcd of numerators 
+         *		 of the coefficients in p.
+         */
+        template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
+        CoeffType coprimeFactor() const
+        {
+            return constant_one<CoeffType>::get()/mCoefficient;
+        }
+        
+        /**
+         * @return The lcm of the denominators of the coefficients (without the constant one) in p divided by the gcd of numerators 
+         *		 of the coefficients in p.
+         */
+        template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
+        CoeffType coprimeFactorWithoutConstant() const;
+
+        /**
+         * @return p * p.coprimeFactor()
+         * @see coprimeFactor()
+         */
+        FactorizedPolynomial<P> coprimeCoefficients() const
+        {
+            if( existsFactorization(*this) )
+            {
+                FactorizedPolynomial<P> result( *this );
+                result.setCoefficient( constant_one<CoeffType>::get() );
+                return result;
+            }
+            return FactorizedPolynomial<P>( constant_one<CoeffType>::get() );
+        }
+        
+        /**
+         * @return true, if this factorized polynomial, has only itself as factor.
+         */ 
+        bool factorizedTrivially() const
+        {
+            return content().factorizedTrivially();
+        }
+        
+        /**
+         * Iterates through all factors and their terms to find variables occurring in this polynomial.
+         * @param vars Holds the variables occurring in the polynomial at return.
+         */
         void gatherVariables( std::set<carl::Variable>& _vars ) const
         {
             if( mpCache == nullptr )
                 return;
             content().gatherVariables( _vars );
         }
+        
+        std::set<Variable> gatherVariables() const
+        {
+            std::set<Variable> vars;
+            gatherVariables(vars);
+            return vars;
+        }
+        
+        /**
+         * Retrieves the constant term of this polynomial or zero, if there is no constant term.
+         * @reiturn Constant term.
+         */
+        CoeffType constantPart() const;
+        
+        /**
+         * Calculates the max. degree over all monomials occurring in the polynomial.
+         * As the degree of the zero polynomial is \f$-\infty\f$, we assert that this polynomial is not zero. This must be checked by the caller before calling this method.
+         * @see @cite GCL92, page 48
+         * @return Total degree.
+         */
+        size_t totalDegree() const;
+        
+        /**
+         * Returns the coefficient of the leading term.
+         * Notice that this is not defined for zero polynomials. 
+         * @return 
+         */
+        CoeffType lcoeff() const;
+        
+        /**
+	     * The leading term
+	     * @return 
+	     */
+	    TermType lterm() const;
+        
+        /**
+         * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
+         * @return 
+         */
+        TermType trailingTerm() const;
+        
+        /**
+         * For terms with exactly one variable, get this variable.
+         * @return The only variable occuring in the term.
+         */
+        Variable::Arg getSingleVariable() const
+        { 
+            assert( existsFactorization( *this ) );
+            if( factorizedTrivially() )
+                return polynomial().getSingleVariable();
+            return factorization().begin()->first.getSingleVariable();
+        }
+        
+        /**
+         * Checks whether only one variable occurs.
+         * @return 
+         * Notice that it might be better to use the variable information if several pieces of information are requested.
+         */
+        bool isUnivariate() const;
+        
+        UnivariatePolynomial<CoeffType> toUnivariatePolynomial() const
+        {
+            return std::move(polynomial().toUnivariatePolynomial() *= mCoefficient); // In this case it makes sense to expand the polynomial.
+        }
+        
+        UnivariatePolynomial<FactorizedPolynomial<P>> toUnivariatePolynomial( Variable::Arg _var ) const;
+        
+        /**
+         * Checks if the polynomial has a constant term that is not zero.
+         * @return If there is a constant term unequal to zero.
+         */
+        bool hasConstantTerm() const;
+        
+        /**
+         * @param _var The variable to check for its occurrence.
+         * @return true, if the variable occurs in this term.
+         */
+        bool has( Variable::Arg _var ) const;
+    
+        template<bool gatherCoeff>
+        VariableInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo( Variable::Arg _var ) const;
+
+        template<bool gatherCoeff>
+        VariablesInformation<gatherCoeff, FactorizedPolynomial<P>> getVarInfo() const
+        {
+            if( existsFactorization( *this ) )
+            {
+                VariablesInformation<false, P> vi = polynomial().template getVarInfo<false>();
+                std::map<Variable, VariableInformation<false, FactorizedPolynomial<P>>> resultVarInfos;
+                for( const auto& varViPair : vi )
+                {
+                    const auto& varI = varViPair.second;
+                    VariableInformation<false, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence() );
+                    resultVarInfos.insert( resultVarInfos.end(), std::make_pair( varViPair.first, std::move( viFactorized ) ) );
+                }
+                return VariablesInformation<false, FactorizedPolynomial<P>>(std::move(resultVarInfos));
+            }
+            return VariablesInformation<false, FactorizedPolynomial<P>>();
+        }
+        
+        VariablesInformation<true, FactorizedPolynomial<P>> getVarInfo() const
+        {
+            if( existsFactorization( *this ) )
+            {
+                // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
+                VariablesInformation<true, P> vi = polynomial().template getVarInfo<true>();
+                VariablesInformation<true, FactorizedPolynomial<P>> result;
+                for( const auto& varViPair : vi )
+                {
+                    const auto& varI = varViPair.second;
+                    std::map<unsigned,FactorizedPolynomial<P>> coeffs;
+                    for( const auto& expCoeffPair : varI.coeffs() )
+                    {
+                        if( expCoeffPair.second.isConstant() )
+                        {
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() * mCoefficient ) ) );
+                        }
+                        else
+                        {
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
+                        }
+                    }
+                    VariableInformation<true, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence(), std::move( coeffs ) );
+                    result.insert( result.end(), std::make_pair( varViPair.first, std::move( viFactorized ) ) );
+                }
+                return result;
+            }
+            return VariablesInformation<false, FactorizedPolynomial<P>>();
+        }
+        
+        /**
+         * Retrieves information about the definiteness of the polynomial.
+         * @return Definiteness of this.
+         */
+        Definiteness definiteness() const;
+		
+		/**
+		 * Derivative of the factorized polynomial wrt variable x
+		 * @param _var main variable
+		 * @param _nth how often should derivative be applied
+		 * 
+		 * @todo only _nth == 1 is supported
+		 * @todo we do not use factorization currently
+		 */
+		FactorizedPolynomial<P> derivative(const carl::Variable& _var, unsigned _nth = 1) const;
+		
+		/**
+		 * Raise polynomial to the power 
+         * @param _exp the exponent of the power
+         * @return p^exponent
+		 * 
+		 * @todo uses multiplication -> bad idea.
+         */
+		FactorizedPolynomial<P> pow(unsigned _exp) const;
+        
+        /**
+         * Like substitute, but expects substitutions for all variables.
+         * @return For a polynomial p, the function value p(x_1,...,x_n).
+         */
+        template<typename SubstitutionType = CoeffType>
+        CoeffType evaluate(const std::map<Variable, SubstitutionType>& substitutions) const;
+		
+		/**
+         * Replace the given variable by the given value.
+         * @return A new factorized polynomial without resulting from this substitution.
+         */
+        FactorizedPolynomial<P> substitute(Variable::Arg _var, const FactorizedPolynomial<P>& _value) const;
+
+        /**
+         * Replace all variables by a value given in their map.
+         * @return A new factorized polynomial without the variables in map.
+         */
+        FactorizedPolynomial<P> substitute(const std::map<Variable, FactorizedPolynomial<P>>& _substitutions) const;
+
+        /**
+         * Replace all variables by a value given in their map.
+         * @return A new factorized polynomial without the variables in map.
+         */
+        FactorizedPolynomial<P> substitute(const std::map<Variable, FactorizedPolynomial<P>>& _substitutions, const std::map<Variable, P>& _substitutionsAsP) const;
+
+        /**
+         * Replace all variables by a value given in their map.
+         * @return A new factorized polynomial without the variables in map.
+         */
+        template<typename SubstitutionType = CoeffType>
+        FactorizedPolynomial<P> substitute(const std::map<Variable, SubstitutionType>& _substitutions) const;
+        
+        /**
+         * Replace the given variable by the given polynomial within this multivariate polynomial.
+         */
+        void substituteIn(Variable::Arg _var, const FactorizedPolynomial<P>& _value);
+        
+        /**
+         * Calculates the square of this factorized polynomial if it is a square.
+         * @param _result Used to store the result in.
+         * @return true, if this factorized polynomial is a square; false, otherwise.
+         */
+        bool sqrt( FactorizedPolynomial<P>& _result ) const;
+        
+        /**
+         * Divides the polynomial by the given coefficient.
+         * Applies if the coefficients are from a field.
+         * @param _divisor
+         * @return 
+         */
+        template<typename C = CoeffType, EnableIf<is_field<C>> = dummy>
+        FactorizedPolynomial<P> divideBy( const CoeffType& _divisor ) const;
+        
+        /**
+         * Calculating the quotient and the remainder, such that for a given polynomial p we have
+         * p = _divisor * quotient + remainder.
+         * @param _divisor Another polynomial
+         * @return A divisionresult, holding the quotient and the remainder.
+         * @see
+         * @note Division is only defined on fields
+         */
+        DivisionResult<FactorizedPolynomial<P>> divideBy( const FactorizedPolynomial<P>& _divisor ) const;
+        
+        /**
+         * Divides the polynomial by another polynomial.
+         * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
+         * Otherwise, false is returned and the content of quotient remains unchanged.
+         * Applies if the coefficients are from a field.
+         * Note that the quotient must not be *this.
+         * @param _divisor
+         * @param _quotient
+         * @return 
+         */
+        template<typename C = CoeffType, EnableIf<is_field<C>> = dummy>
+        bool divideBy( const FactorizedPolynomial<P>& _divisor, FactorizedPolynomial<P>& _quotient ) const;
 
         /**
          * Choose a non-null cache from two caches.
@@ -287,6 +616,10 @@ namespace carl
             }
         }
         
+        /**
+         * @param _fpoly The factorized polynomial to retrieve the expanded polynomial for.
+         * @return The polynomial (of the underlying polynomial type) when expanding the factorization of the given factorized polynomial.
+         */
         template<typename P1>
         friend P1 computePolynomial(const FactorizedPolynomial<P1>& _fpoly );
         
@@ -294,17 +627,8 @@ namespace carl
          * @param _fpoly The operand.
          * @return The given factorized polynomial times -1.
          */
-        template<typename P1>
-        friend FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpoly);
+        FactorizedPolynomial<P> operator-() const;
         
-        /**
-         * @param _fpolyA The first summand.
-         * @param _fpolyB The second summand.
-         * @return The sum of the two given factorized polynomials.
-         */
-        template<typename P1>
-        friend FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
-
         /**
          * @param _coef The summand to add this factorized polynomial with.
          * @return This factorized polynomial after adding the given summand.
@@ -328,38 +652,6 @@ namespace carl
          * @return This factorized polynomial after adding the given factorized polynomial.
          */
         FactorizedPolynomial<P>& operator-=( const FactorizedPolynomial<P>& _fpoly );
-
-        /**
-         * @param _fpolyA The minuend.
-         * @param _fpolyB The subtrahend.
-         * @return The difference between the two given factorized polynomials.
-         */
-        template<typename P1>
-        friend FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
-        
-        /**
-         * @param _coeff The first factor.
-         * @param _fpoly The second factor.
-         * @return The product of a coefficient type and a factorized polynomials.
-         */
-        template<typename P1>
-        friend FactorizedPolynomial<P1> operator*( const Coeff<P1>& _coeff, const FactorizedPolynomial<P1>& _fpoly );
-        
-        /**
-         * @param _fpoly The first factor.
-         * @param _coeff The second factor.
-         * @return The product of a factorized polynomials and a coefficient type.
-         */
-        template<typename P1>
-        friend FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpoly, const Coeff<P1>& _coeff );
-        
-        /**
-         * @param _fpolyA The first factor.
-         * @param _fpolyB The second factor.
-         * @return The product of the two given factorized polynomials.
-         */
-        template<typename P1>
-        friend FactorizedPolynomial<P1> operator*( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
 
         /**
          * @param _coef The factor to multiply this factorized polynomial with.
@@ -391,6 +683,13 @@ namespace carl
          * @return The quotient
          */
         FactorizedPolynomial<P> quotient( const FactorizedPolynomial<P>& _fdivisor ) const;
+        
+        /**
+         * @param _infix
+         * @param _friendlyVarNames
+         * @return 
+         */
+        std::string toString( bool _infix = true, bool _friendlyVarNames = true ) const;
 
         /**
          * Calculates the quotient of the polynomials. Notice: the second polynomial has to be a factor of the first polynomial.
@@ -434,31 +733,26 @@ namespace carl
          */
         template<typename P1>
         friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        
+        // Operators which need to be friend.
+        template <typename P1>
+        friend FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _lhs, const FactorizedPolynomial<P1>& _rhs);
+
+        template <typename P1>
+        friend FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _lhs, const typename FactorizedPolynomial<P1>::CoeffType& _rhs);
+        
+        template <typename P1>
+        friend FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _lhs, const FactorizedPolynomial<P1>& _rhs);
+
+        template <typename P1>
+        friend FactorizedPolynomial<P1> operator-(const FactorizedPolynomial<P1>& _lhs, const typename FactorizedPolynomial<P1>::CoeffType& _rhs);
+        
+        template <typename P1>
+        friend FactorizedPolynomial<P1> operator*(const FactorizedPolynomial<P1>& _lhs, const FactorizedPolynomial<P1>& _rhs);
+
+        template <typename P1>
+        friend FactorizedPolynomial<P1> operator*(const FactorizedPolynomial<P1>& _lhs, const typename FactorizedPolynomial<P1>::CoeffType& _rhs);
     };
-    
-    /**
-     * @param _fpolyA The first factorized polynomial to compare.
-     * @param _fpolyB The second factorized polynomial to compare.
-     * @return true, if the two given factorized polynomials are equal.
-     */
-    template<typename P>
-    bool operator==(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB);
-    
-    /**
-     * @param _fpolyA The first factorized polynomial to compare.
-     * @param _fpolyB The second factorized polynomial to compare.
-     * @return true, if the first given factorized polynomial is less than the second given factorized polynomial.
-     */
-    template<typename P>
-    bool operator<(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB);
-    
-    /**
-     * @param _fpolyA The first factorized polynomial to compare.
-     * @param _fpolyB The second factorized polynomial to compare.
-     * @return true, if the two given factorized polynomials are not equal.
-     */
-    template<typename P>
-    bool operator!=(const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB);
     
     /**
      * Obtains the polynomial (representation) of this factorized polynomial. Note, that the result won't be stored
@@ -476,9 +770,221 @@ namespace carl
      * @return The output stream after inserting the output.
      */
     template <typename P>
-    std::ostream& operator<<(std::ostream& _out, const FactorizedPolynomial<P>& _fpoly);
+    std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly );
 
     template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
+    
+    template<typename P> struct is_factorized<FactorizedPolynomial<P>>: std::true_type {};
+    
+    /// @name Equality comparison operators
+	/// @{
+	/**
+	 * Checks if the two arguments are equal.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs == _rhs`
+	 */
+	template <typename P>
+	bool operator==(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs);
+    
+	template <typename P>
+	bool operator==(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs);
+    
+	template <typename P>
+	inline bool operator==(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return _rhs == _lhs;
+	}
+	/// @}
+
+	/// @name Inequality comparison operators
+	/// @{
+	/**
+	 * Checks if the two arguments are not equal.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs != _rhs`
+	 */
+	template <typename P>
+	inline bool operator!=(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs);
+    
+	template <typename P>
+	inline bool operator!=(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs)
+    {
+		return !(_lhs == _rhs);
+	}
+    
+	template <typename P>
+	inline bool operator!=(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return !(_lhs == _rhs);
+	}
+	/// @}
+
+	/// @name Less than comparison operators
+	/// @{
+	/**
+	 * Checks if the first arguments is less than the second.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs < _rhs`
+	 */
+	template <typename P>
+	bool operator<(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs);
+    
+	template <typename P>
+	bool operator<(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs);
+    
+	template <typename P>
+	inline bool operator<(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+        return _rhs < _lhs;
+    }
+	/// @}
+
+	/// @name Less or equal comparison operators
+	/// @{
+	/**
+	 * Checks if the first arguments is less or equal than the second.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs <= _rhs`
+	 */
+	template <typename P>
+	inline bool operator<=(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return !(_rhs < _lhs);
+	}
+    
+	template <typename P>
+	inline bool operator<=(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs)
+    {
+		return !(_rhs < _lhs);
+	}
+    
+	template <typename P>
+	inline bool operator<=(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return !(_rhs < _lhs);
+	}
+	/// @}
+
+	/// @name Greater than comparison operators
+	/// @{
+	/**
+	 * Checks if the first arguments is greater than the second.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs > _rhs`
+	 */
+	template <typename P>
+	inline bool operator>(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return _rhs < _lhs;
+	}
+    
+	template <typename P>
+	inline bool operator>(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs)
+    {
+		return _rhs < _lhs;
+	}
+    
+	template <typename P>
+	inline bool operator>(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return _rhs < _lhs;
+	}
+	/// @}
+
+	/// @name Greater or equal comparison operators
+	/// @{
+	/**
+	 * Checks if the first arguments is greater or equal than the second.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs >= _rhs`
+	 */
+	template <typename P>
+	inline bool operator>=(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return _rhs <= _lhs;
+	}
+    
+	template <typename P>
+	inline bool operator>=(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs)
+    {
+		return _rhs <= _lhs;
+	}
+    
+	template <typename P>
+	inline bool operator>=(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return _rhs <= _lhs;
+	}
+	/// @}
+	
+	/// @name Addition operators
+	/// @{
+	/**
+	 * Performs an addition involving a polynomial.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs + _rhs`
+	 */
+	template <typename P>
+	FactorizedPolynomial<P> operator+(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs);
+    
+	template <typename P>
+	FactorizedPolynomial<P> operator+(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs);
+    
+	template <typename P>
+	inline FactorizedPolynomial<P> operator+(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return std::move(_rhs + _lhs);
+	}
+	/// @}
+	
+	/// @name Subtraction operators
+	/// @{
+	/**
+	 * Performs an subtraction involving a polynomial.
+	 * @param _lhs First argument.
+	 * @param _rhs Second argument.
+	 * @return `_lhs - _rhs`
+	 */
+	template <typename P>
+	FactorizedPolynomial<P> operator-(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs);
+    
+	template <typename P>
+	FactorizedPolynomial<P> operator-(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs);
+    
+	template <typename P>
+	inline FactorizedPolynomial<P> operator-(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return std::move( -_rhs + _lhs );
+	}
+	/// @}
+	
+	/// @name Multiplication operators
+	/// @{
+	/**
+	 * Perform a multiplication involving a polynomial.
+	 * @param _lhs Left hand side.
+	 * @param _rhs Right hand side.
+	 * @return `_lhs * _rhs`
+	 */
+	template <typename P>
+	FactorizedPolynomial<P> operator*(const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs);
+    
+	template <typename P>
+	FactorizedPolynomial<P> operator*(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs);
+    
+	template <typename P>
+	inline FactorizedPolynomial<P> operator*(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
+    {
+		return std::move(_rhs * _lhs);
+	}
+	/// @}
     
 } // namespace carl
 

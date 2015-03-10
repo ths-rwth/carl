@@ -139,6 +139,15 @@ public:
 	}
 
 	/**
+	 * Checks if the represented value is integral.
+	 * @return If this is integral.
+	 */
+	virtual bool isIntegral() const {
+		if (this->isNumeric()) return carl::isInteger(this->value());
+		return false;
+	}
+
+	/**
 	 * Selects the polynomial having this real algebraic number as one of its roots.
 	 * @return polynomial having the number as one of its roots
 	 */
@@ -340,9 +349,9 @@ template<typename Number>
 std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumberIR<Number>* n) {
 	if (n == nullptr) return os << "nullptr";
 	if (n->isNumeric()) {
-		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << ")";
+		return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << " = " << n->value() << (n->isRoot() ? " R" : "") << ")";
 	}
-	return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << ")";
+	return os << "(IR " << n->getInterval() << ", " << n->getPolynomial() << (n->isRoot() ? " R" : "") << ")";
 }
 
 }

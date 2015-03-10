@@ -256,7 +256,7 @@ namespace carl
 		bool isSquare() const
 		{
 			if (mTotalDegree % 2 == 1) return false;
-			for (auto it: mExponents)
+			for (const auto& it: mExponents)
 			{
 				if (it.second % 2 == 1) return false;
 			}
@@ -290,19 +290,10 @@ namespace carl
 		 */
 		bool hasNoOtherVariable(Variable::Arg v) const
 		{
-			if(mExponents.size() == 1)
-			{
-				if(mExponents.front().first == v) return true;
-				return false;
+			if(mExponents.size() == 1) {
+				return mExponents.front().first == v;
 			}
-			else if(mExponents.size() == 0) 
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return mExponents.size() == 0;
 		}
 		
 		/**
@@ -415,6 +406,13 @@ namespace carl
 		 */
 		bool divide(const Monomial::Arg& m, Monomial::Arg& res) const;
 		
+		/**
+		 * Calculates and returns the square root of this monomial, iff the monomial is a square as checked by isSquare().
+		 * Otherwise, nullptr is returned.
+		 * @return The square root of this monomial, iff the monomial is a square as checked by isSquare().
+		 */
+		Monomial::Arg sqrt() const;
+
 		/**
 		 * 
 		 * @param m
@@ -731,20 +729,20 @@ namespace carl
 	 * @param rhs Right hand side.
 	 * @return `lhs * rhs`
 	 */
-	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
+	Monomial::Arg operator*(const Monomial::Arg& lhs, const Monomial::Arg& rhs);
 	
-	std::shared_ptr<const carl::Monomial> operator*(const Monomial::Arg& lhs, Variable::Arg rhs);
+	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable::Arg rhs);
 	
-	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, const Monomial::Arg& rhs);
+	Monomial::Arg operator*(Variable::Arg lhs, const Monomial::Arg& rhs);
 	
-	std::shared_ptr<const carl::Monomial> operator*(Variable::Arg lhs, Variable::Arg rhs);
+	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs);
 	/// @}
 
 	struct hashLess {
 		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
 			return lhs.hash() < rhs.hash();
 		}
-		bool operator()(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs) const {
+		bool operator()(const Monomial::Arg& lhs, const Monomial::Arg& rhs) const {
 			if (lhs == rhs) return false;
 			if (lhs && rhs) return (*this)(*lhs, *rhs);
 			return (bool)(rhs);
@@ -755,7 +753,7 @@ namespace carl
 		bool operator()(const Monomial& lhs, const Monomial& rhs) const {
 			return lhs.hash() == rhs.hash();
 		}
-		bool operator()(const std::shared_ptr<const Monomial>& lhs, const std::shared_ptr<const Monomial>& rhs) const {
+		bool operator()(const Monomial::Arg& lhs, const Monomial::Arg& rhs) const {
 			if (lhs == rhs) return true;
 			if (lhs && rhs) return (*this)(*lhs, *rhs);
 			return false;

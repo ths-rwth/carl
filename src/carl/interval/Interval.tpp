@@ -23,18 +23,59 @@ namespace carl
 
 template<typename Number>
 Sign Interval<Number>::sgn() const
-	{
-		assert(this->isConsistent());
-		if (this->isUnbounded()) return Sign::ZERO;
-		if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
-		if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
-		return Sign::ZERO;
-	}
+{
+    assert(this->isConsistent());
+    if (this->isUnbounded()) return Sign::ZERO;
+    if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
+    if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
+    return Sign::ZERO;
+}
 
 template<typename Number>
 Interval<Number> Interval<Number>::integralPart() const
 {
-    return Interval<Number>(BoostInterval(ceil(mContent.lower()), floor(mContent.upper())), mLowerBoundType, mUpperBoundType);
+	if(this->isEmpty())
+		return *this;
+	
+	Number newLowerBound = 0;
+	Number newUpperBound = 0;
+	BoundType newLowerBoundType = mLowerBoundType;
+	BoundType newUpperBoundType = mUpperBoundType;
+	
+	switch(mLowerBoundType) {
+		case BoundType::WEAK:
+			newLowerBound = ceil(mContent.lower());
+			newLowerBoundType = BoundType::WEAK;
+			break;
+		case BoundType::STRICT:
+			newLowerBound = ceil(mContent.lower());
+			newLowerBoundType = BoundType::WEAK;
+			if(newLowerBound == ceil(mContent.lower()))
+				newLowerBound += carl::constant_one<Number>::get();
+			break;
+		default:
+			break;
+	}
+	switch(mUpperBoundType) {
+		case BoundType::WEAK:
+			newUpperBound = floor(mContent.upper());
+			newUpperBoundType = BoundType::WEAK;
+			if(newLowerBoundType == BoundType::INFTY)
+				newLowerBound = newUpperBound;
+			break;
+		case BoundType::STRICT:
+			newUpperBound = floor(mContent.upper());
+			newUpperBoundType = BoundType::WEAK;
+			if(newUpperBound == floor(mContent.upper()))
+				newLowerBound -= carl::constant_one<Number>::get();
+			if(newLowerBoundType == BoundType::INFTY)
+				newLowerBound = newUpperBound;
+		default:
+			if(newLowerBoundType != BoundType::INFTY)
+				newUpperBound = newLowerBound;
+			break;
+	}
+	return Interval<Number>(newLowerBound, newLowerBoundType, newUpperBound, newUpperBoundType);
 }
 
 template<typename Number>
@@ -83,18 +124,6 @@ template<typename Number>
 	}
 
 template<typename Number>
-	Number Interval<Number>::center() const
-	{
-		assert(this->isConsistent());
-		if (this->isUnbounded()) return carl::constant_zero<Number>().get();
-		if (this->mLowerBoundType == BoundType::INFTY)
-            return (Number)carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get();
-		if (this->mUpperBoundType == BoundType::INFTY)
-            return (Number)carl::ceil(this->mContent.lower()) + carl::constant_one<Number>().get();
-		return boost::numeric::median(mContent);
-	}
-
-template<typename Number>
 	void Interval<Number>::center_assign()
 	{
 		this->set(BoostInterval(this->center()));
@@ -127,85 +156,76 @@ template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
 		assert(this->isConsistent());
-            switch( mLowerBoundType )
-            {
+        switch( mLowerBoundType )
+        {
+        case BoundType::INFTY:
+            break;
+        case BoundType::STRICT:
+            if( mContent.lower() >= val )
+                return false;
+            break;
+        case BoundType::WEAK:
+            if( mContent.lower() > val )
+                return false;
+        }
+        // Invariant: n is not conflicting with lower bound
+        switch( mUpperBoundType )
+        {
             case BoundType::INFTY:
                 break;
             case BoundType::STRICT:
-                if( mContent.lower() >= val )
+                if( mContent.upper() <= val )
                     return false;
                 break;
             case BoundType::WEAK:
-                if( mContent.lower() > val )
+                if( mContent.upper() < val )
                     return false;
-            }
-            // Invariant: n is not conflicting with lower bound
-            switch( mUpperBoundType )
-            {
-                case BoundType::INFTY:
-                    break;
-                case BoundType::STRICT:
-                    if( mContent.upper() <= val )
-                        return false;
-                    break;
-                case BoundType::WEAK:
-                    if( mContent.upper() < val )
-                        return false;
-                    break;
-            }
-            return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
+                break;
+        }
+        return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
 	}
 	
 	template<typename Number>
 	bool Interval<Number>::contains(const Interval<Number>& rhs) const
 	{
 		assert(this->isConsistent());
-                // if one bound is totally wrong, we can just return false
-                if (
-                        (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
-                        || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY)
-                    )
-                {
-                    return false;
-                }
-
-                // check the bounds
-                bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
-                bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
-                
-                // if both are ok, return true
+        if( rhs.isEmpty() )
+            return true;
+        // if one bound is totally wrong, we can just return false
+        if((mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY) || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY))
+        {
+            return false;
+        }
+        // check the bounds
+        bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
+        bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
+        // if both are ok, return true
 		if( lowerOk && upperOk )
 		{
-                    return true;
-		}
-                
-                // Note that from this point on at least one bound is equal
-                // to our bounds but no bound is outside of our bounds
-	
-                // check the bound types
-                bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
-                bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
-
-                // if upper bounds are ok and lower bound types are ok, return true
-                if (upperOk && lowerBoundTypesOk)
-                {
-                    return true;
-                }
-
-                // if lower bounds are ok and upper bound types are ok, return true
-                if (lowerOk && upperBoundTypesOk)
-                {
-                    return true;
-                }
-                
-                // if both bound types are ok, return true
-                if (lowerBoundTypesOk && upperBoundTypesOk)
-                {
-                    return true;
-                }
-            
-                // otherwise return false
-                return false; // not less and not equal
+            return true;
+		}       
+        // Note that from this point on at least one bound is equal
+        // to our bounds but no bound is outside of our bounds
+        // check the bound types
+        bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
+        bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
+        // if upper bounds are ok and lower bound types are ok, return true
+        if (upperOk && lowerBoundTypesOk)
+        {
+            return true;
+        }
+        // if lower bounds are ok and upper bound types are ok, return true
+        if (lowerOk && upperBoundTypesOk)
+        {
+            return true;
+        }
+        // if both bound types are ok, return true
+        if (lowerBoundTypesOk && upperBoundTypesOk)
+        {
+            return true;
+        }
+        // otherwise return false
+        return false; // not less and not equal
 	}
 	
 	template<typename Number>
@@ -225,34 +245,46 @@ template<typename Number>
 	template<typename Number>
 	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
 	{
-                return this->isSubset(rhs);
-        }
+        return this->isSubset(rhs);
+    }
 	
-template<typename Number>
-	void Interval<Number>::bloat_by(const Number& width)
-	{
-                this->set(boost::numeric::widen(mContent, width));
+    template<typename Number>
+    void Interval<Number>::bloat_by(const Number& width)
+    {
+	if(!isUnbounded()){
+	    BoundType lowerTmp = mLowerBoundType;
+	    BoundType upperTmp = mUpperBoundType;
+	    this->set(boost::numeric::widen(mContent, width));
+	    mLowerBoundType = lowerTmp;
+	    mUpperBoundType = upperTmp;
+	} else if (mLowerBoundType != BoundType::INFTY) {
+	    this->set(boost::numeric::widen(mContent, width));
+	    mUpperBoundType = BoundType::INFTY;
+	} else if (mUpperBoundType != BoundType::INFTY) {
+	    this->set(boost::numeric::widen(mContent, width));
+	    mLowerBoundType = BoundType::INFTY;
 	}
+    }
 
-template<typename Number>
-void Interval<Number>::shrink_by(const Number& width)
+    template<typename Number>
+    void Interval<Number>::shrink_by(const Number& width)
+    {
+	this->bloat_by(Number(-1)*width);
+    }
+
+    template<typename Number>
+    std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
+    {
+	std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
+	if( this->isEmpty() || this->isPointInterval() )
 	{
-		this->bloat_by(Number(-1)*width);
+	    return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
 	}
+	return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
+    }
 
-template<typename Number>
-std::pair<Interval<Number>, Interval<Number>> Interval<Number>::split() const
-	{
-		std::pair<BoostInterval, BoostInterval> bisection = boost::numeric::bisect(mContent);
-                if( this->isEmpty() || this->isPointInterval() )
-                {
-                    return std::pair<Interval<Number>, Interval<Number> >(Interval<Number>::emptyInterval(), Interval<Number>::emptyInterval());
-                }
-		return std::pair<Interval<Number>, Interval<Number> >(Interval(bisection.first, mLowerBoundType, BoundType::STRICT), Interval(bisection.second, BoundType::WEAK, mUpperBoundType));
-	}
-
-template<typename Number>
-std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
+    template<typename Number>
+    std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
 	{
 		std::list<Interval<Number> > result;
 		if(n == 0)
@@ -272,6 +304,7 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
         for( unsigned i = 1; i < (n-1); ++i )
         {
             tmp.set(diameter*i, diameter*(i+1));
+	    tmp.setUpperBoundType(BoundType::STRICT);
             result.push_back(tmp);
         }
 		
@@ -281,7 +314,7 @@ std::list<Interval<Number>> Interval<Number>::split(unsigned n) const
 		return result;
 	}
 	
-template<typename Number>
+    template<typename Number>
 	std::string Interval<Number>::toString() const
 	{
 		std::ostringstream oss;
@@ -314,57 +347,224 @@ template<typename Number>
 
 template<typename Number>
 Interval<Number> Interval<Number>::add(const Interval<Number>& rhs) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		return Interval<Number>( mContent + rhs.content(),
-                              getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
-                              getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() ) );
-	}
+{
+    assert(this->isConsistent());
+    assert(rhs.isConsistent());
+    return Interval<Number>( mContent + rhs.content(),
+                          getStrictestBoundType( mLowerBoundType, rhs.lowerBoundType() ),
+                          getStrictestBoundType( mUpperBoundType, rhs.upperBoundType() ) );
+}
 
 template<typename Number>
 void Interval<Number>::add_assign(const Interval<Number>& rhs)
-	{
-		*this = this->add(rhs);
-	}
+{
+    *this = this->add(rhs);
+}
 
 template<typename Number>
 Interval<Number> Interval<Number>::sub(const Interval<Number>& rhs) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		return this->add(rhs.inverse());
-	}
+{
+    assert(this->isConsistent());
+    assert(rhs.isConsistent());
+    return this->add(rhs.inverse());
+}
 
 template<typename Number>
 void Interval<Number>::sub_assign(const Interval<Number>& rhs)
-	{
-		*this = this->sub(rhs);
-	}
+{
+    *this = this->sub(rhs);
+}
 
 template<typename Number>
 Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
-	{
-		assert(this->isConsistent());
-		assert(rhs.isConsistent());
-		BoundType lowerBoundType = BoundType::WEAK;
-        BoundType upperBoundType = BoundType::WEAK;
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
-		   || (rhs.upperBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY))) )
+{
+    assert(this->isConsistent());
+    assert(rhs.isConsistent());
+    if( this->isEmpty() || rhs.isEmpty() ) return emptyInterval();
+    BoundType lowerBoundType = BoundType::WEAK;
+    BoundType upperBoundType = BoundType::WEAK;
+    BoostInterval resultInterval;
+    // The following unfortunately copies the content of boost::interval::mul, but we need to get into the case distinction to find the right bound types
+    typename BoostIntervalPolicies::rounding rnd;
+    const Number& xl = this->lower();
+    const Number& xu = this->upper();
+    const Number& yl = rhs.lower();
+    const Number& yu = rhs.upper();
+    const BoundType& xlt = this->lowerBoundType();
+    const BoundType& xut = this->upperBoundType();
+    const BoundType& ylt = rhs.lowerBoundType();
+    const BoundType& yut = rhs.upperBoundType();
+
+    if (xl < carl::constant_zero<Number>().get())
+    {
+        if (xu > carl::constant_zero<Number>().get())
         {
-            lowerBoundType = BoundType::INFTY;
+            if (yl < carl::constant_zero<Number>().get())
+            {
+                if (yu > carl::constant_zero<Number>().get()) // M * M
+                {
+                    Number lowerA = rnd.mul_down(xl, yu);
+                    Number lowerB = rnd.mul_down(xu, yl);
+                    if( lowerA > lowerB )
+                    {
+                        lowerA = lowerB;
+                        lowerBoundType = getStrictestBoundType(xut, ylt);
+                    }
+                    else
+                    {
+                        lowerBoundType = getStrictestBoundType(xlt, yut);
+                    }
+                    Number upperA = rnd.mul_up(xl, yl);
+                    Number upperB = rnd.mul_up(xu, yu);
+                    if( upperA < upperB )
+                    {
+                        upperA = upperB;
+                        upperBoundType = getStrictestBoundType(xut, yut);
+                    }
+                    else
+                    {
+                        upperBoundType = getStrictestBoundType(xlt, ylt);
+                    }
+                    resultInterval = BoostInterval(lowerA, upperA, true);
+                }
+                else // M * N
+                {
+                    lowerBoundType = getStrictestBoundType(xut, ylt);
+                    upperBoundType = getStrictestBoundType(xlt, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yl), rnd.mul_up(xl, yl), true);
+                }
+            }
+            else
+            {
+                if (yu > carl::constant_zero<Number>().get()) // M * P
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, yut);
+                    upperBoundType = getStrictestBoundType(xut, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yu), rnd.mul_up(xu, yu), true);
+                }
+                else // M * Z
+                {
+                    if( ylt != BoundType::INFTY )
+                        lowerBoundType = ylt;
+                    if( yut != BoundType::INFTY )
+                        upperBoundType = yut;
+                    resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+                }
+            }
         }
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < carl::constant_zero<Number>().get() || (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY)))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > carl::constant_zero<Number>().get() || (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY)))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && (mContent.upper() < carl::constant_zero<Number>().get() || (mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY)))
-		   || (rhs.upperBoundType() == BoundType::INFTY && (mContent.lower() > carl::constant_zero<Number>().get() || (mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))) )
+        else
         {
-            upperBoundType = BoundType::INFTY;
+            if (yl < carl::constant_zero<Number>().get())
+            {
+                if (yu > carl::constant_zero<Number>().get()) // N * M
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, yut);
+                    upperBoundType = getStrictestBoundType(xlt, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yu), rnd.mul_up(xl, yl), true);
+                }
+                else // N * N
+                {
+                    lowerBoundType = getStrictestBoundType(xut, yut);
+                    upperBoundType = getStrictestBoundType(xlt, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yu), rnd.mul_up(xl, yl), true);
+                }
+            }
+            else
+            {
+                if (yu > carl::constant_zero<Number>().get()) // N * P
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, yut);
+                    upperBoundType = getStrictestBoundType(xut, ylt);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yu), rnd.mul_up(xu, yl), true);
+                }
+                else // N * Z
+                {
+                    if( ylt != BoundType::INFTY )
+                        lowerBoundType = ylt;
+                    if( yut != BoundType::INFTY )
+                        upperBoundType = yut;
+                    resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+                }
+            }
         }
-        return Interval<Number>(BoostInterval( mContent*rhs.content() ), lowerBoundType, upperBoundType );
-	}
+    }
+    else
+    {
+        if (xu > carl::constant_zero<Number>().get())
+        {
+            if (yl < carl::constant_zero<Number>().get())
+            {
+                if (yu > carl::constant_zero<Number>().get()) // P * M
+                {
+                    lowerBoundType = getStrictestBoundType(xut, ylt);
+                    upperBoundType = getStrictestBoundType(xut, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yl), rnd.mul_up(xu, yu), true);
+                }
+                else // P * N
+                {
+                    lowerBoundType = getStrictestBoundType(xut, ylt);
+                    upperBoundType = getStrictestBoundType(xlt, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xu, yl), rnd.mul_up(xl, yu), true);
+                }
+            }
+            else
+            {
+                if (yu > carl::constant_zero<Number>().get()) // P * P
+                {
+                    lowerBoundType = getStrictestBoundType(xlt, ylt);
+                    upperBoundType = getStrictestBoundType(xut, yut);
+                    resultInterval = BoostInterval(rnd.mul_down(xl, yl), rnd.mul_up(xu, yu), true);
+                }
+                else // P * Z
+                {
+                    if( ylt != BoundType::INFTY )
+                        lowerBoundType = ylt;
+                    if( yut != BoundType::INFTY )
+                        upperBoundType = yut;
+                    resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+                }
+            }
+        }
+        else // Z * ?
+        {
+            if( xlt != BoundType::INFTY )
+                lowerBoundType = xlt;
+            if( xut != BoundType::INFTY )
+                upperBoundType = xut;
+            resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
+        }
+    }
+    unsigned zeroBoundInvolved = 2;
+    if( (xlt == BoundType::INFTY && (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY))
+       || (xut == BoundType::INFTY && (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY))
+       || (ylt == BoundType::INFTY && (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))
+       || (yut == BoundType::INFTY && (xu < carl::constant_zero<Number>().get() || (xl < carl::constant_zero<Number>().get() || xlt == BoundType::INFTY))) )
+    {
+        lowerBoundType = BoundType::INFTY;
+    }
+    else if( resultInterval.lower() == carl::constant_zero<Number>().get() )
+    {
+        if( zeroBoundInvolved == 2 )
+            zeroBoundInvolved = (this->contains( carl::constant_zero<Number>().get() ) || rhs.contains( carl::constant_zero<Number>().get() )) ? 1 : 0;
+        if( zeroBoundInvolved == 1 )
+            lowerBoundType = BoundType::WEAK;
+    }
+    if( (xlt == BoundType::INFTY && (yu < carl::constant_zero<Number>().get() || (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY)))
+       || (xut == BoundType::INFTY && (yl > carl::constant_zero<Number>().get() || (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY)))
+       || (ylt == BoundType::INFTY && (xu < carl::constant_zero<Number>().get() || (xl < carl::constant_zero<Number>().get() || xlt == BoundType::INFTY)))
+       || (yut == BoundType::INFTY && (xl > carl::constant_zero<Number>().get() || (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))) )
+    {
+        upperBoundType = BoundType::INFTY;
+    }
+    else if( resultInterval.upper() == carl::constant_zero<Number>().get() )
+    {
+        if( zeroBoundInvolved == 2 )
+            zeroBoundInvolved = (this->contains( carl::constant_zero<Number>().get() ) || rhs.contains( carl::constant_zero<Number>().get() )) ? 1 : 0;
+        if( zeroBoundInvolved == 1 )
+            upperBoundType = BoundType::WEAK;
+    }
+    return Interval<Number>(std::move(resultInterval), lowerBoundType, upperBoundType );
+}
 
 template<typename Number>
 void Interval<Number>::mul_assign(const Interval<Number>& rhs)
@@ -588,7 +788,7 @@ Interval<Number> Interval<Number>::pow(unsigned exp) const
 	{
 		assert(this->isConsistent());
 		assert(exp <= INT_MAX );
-        if( exp % 2 == carl::constant_zero<Number>().get() )
+        if( exp % 2 == 0 )
         {
             if( mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY )
             {
@@ -872,91 +1072,91 @@ template<typename Number>
 		assert(this->isConsistent());
 		assert(rhs.isConsistent());
 		Number lowerValue;
-                Number upperValue;
-                BoundType maxLowest;
-                BoundType minUppest;
-                // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
-                if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-                {
-                    if ( mContent.lower() < rhs.lower() )
-                    {
-                        lowerValue = rhs.lower();
-                        maxLowest = rhs.lowerBoundType();
-                    }
-                    else if ( rhs.lower() < mContent.lower() )
-                    {
-                        lowerValue = mContent.lower();
-                        maxLowest = mLowerBoundType;
-                    }
-                    else
-                    {
-                        lowerValue = mContent.lower();
-                        maxLowest = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
-                    }
-                }
-                else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
-                {
-                    lowerValue = rhs.lower();
-                    maxLowest = rhs.lowerBoundType();
-                }
-                else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
-                {
-                    lowerValue = mContent.lower();
-                    maxLowest = mLowerBoundType;
-                }
-                else
-                {
-                    lowerValue = carl::constant_zero<Number>().get();
-                    maxLowest = BoundType::INFTY;
-                }
+        Number upperValue;
+        BoundType maxLowest;
+        BoundType minUppest;
+        // determine value first by: LowerValue = max ( lowervalues ) where max considers infty.
+        if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+        {
+            if ( mContent.lower() < rhs.lower() )
+            {
+                lowerValue = rhs.lower();
+                maxLowest = rhs.lowerBoundType();
+            }
+            else if ( rhs.lower() < mContent.lower() )
+            {
+                lowerValue = mContent.lower();
+                maxLowest = mLowerBoundType;
+            }
+            else
+            {
+                lowerValue = mContent.lower();
+                maxLowest = getStrictestBoundType(mLowerBoundType, rhs.lowerBoundType());
+            }
+        }
+        else if ( mLowerBoundType == BoundType::INFTY && rhs.lowerBoundType() != BoundType::INFTY )
+        {
+            lowerValue = rhs.lower();
+            maxLowest = rhs.lowerBoundType();
+        }
+        else if ( mLowerBoundType != BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
+        {
+            lowerValue = mContent.lower();
+            maxLowest = mLowerBoundType;
+        }
+        else
+        {
+            lowerValue = carl::constant_zero<Number>().get();
+            maxLowest = BoundType::INFTY;
+        }
 
-                // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
-                if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-                {
-                    if ( mContent.upper() > rhs.upper() )
-                    {
-                        upperValue = rhs.upper();
-                        minUppest = rhs.upperBoundType();
-                    }
-                    else if ( rhs.upper() > mContent.upper() )
-                    {
-                        upperValue = mContent.upper();
-                        minUppest = mUpperBoundType;
-                    }
-                    else
-                    {
-                        upperValue = mContent.upper();
-                        minUppest = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
-                    }
-                    if( maxLowest == BoundType::INFTY )
-                    {
-                        lowerValue = upperValue;
-                    }
-                }
-                else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
-                {
-                    upperValue = rhs.upper();
-                    minUppest = rhs.upperBoundType();
-                    if( maxLowest == BoundType::INFTY )
-                    {
-                        lowerValue = upperValue;
-                    }
-                }
-                else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-                {
-                    upperValue = mContent.upper();
-                    minUppest = mUpperBoundType;
-                    if( maxLowest == BoundType::INFTY )
-                    {
-                        lowerValue = upperValue;
-                    }
-                }
-                else
-                {
-                    upperValue = lowerValue;
-                    minUppest = BoundType::INFTY;
-                }
-                return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
+        // determine value first by: UpperValue = min ( uppervalues ) where min considers infty.
+        if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+        {
+            if ( mContent.upper() > rhs.upper() )
+            {
+                upperValue = rhs.upper();
+                minUppest = rhs.upperBoundType();
+            }
+            else if ( rhs.upper() > mContent.upper() )
+            {
+                upperValue = mContent.upper();
+                minUppest = mUpperBoundType;
+            }
+            else
+            {
+                upperValue = mContent.upper();
+                minUppest = getStrictestBoundType(mUpperBoundType, rhs.upperBoundType());
+            }
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else if ( mUpperBoundType == BoundType::INFTY && rhs.upperBoundType() != BoundType::INFTY )
+        {
+            upperValue = rhs.upper();
+            minUppest = rhs.upperBoundType();
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else if ( mUpperBoundType != BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+        {
+            upperValue = mContent.upper();
+            minUppest = mUpperBoundType;
+            if( maxLowest == BoundType::INFTY )
+            {
+                lowerValue = upperValue;
+            }
+        }
+        else
+        {
+            upperValue = lowerValue;
+            minUppest = BoundType::INFTY;
+        }
+        return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
 	}
 	
 template<typename Number>

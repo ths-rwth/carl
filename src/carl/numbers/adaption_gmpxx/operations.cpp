@@ -1,26 +1,34 @@
-#include "operations.h"
+#include "../numbers.h"
+#include <limits>
 
 namespace carl
 {
 
-
-    mpq_class pow(const mpq_class& b, unsigned e)
+    bool sqrtp(const mpq_class& a, mpq_class& b)
     {
-        mpz_class den = b.get_den();
-        mpz_class powDen;
-        mpz_pow_ui(powDen.get_mpz_t(), den.get_mpz_t(), e);
-        mpz_class num = b.get_num();
-        mpz_class powNum;
-        mpz_pow_ui(powNum.get_mpz_t(), num.get_mpz_t(), e);
-        mpq_class resNum;
-        mpq_set_z(resNum.get_mpq_t(), powNum.get_mpz_t());
-        mpq_class resDen;
-        mpq_set_z(resDen.get_mpq_t(), powDen.get_mpz_t());
-        mpq_class res;
-        mpq_div(res.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
-            return res;
-    }
+        if( mpq_sgn(a.__get_mp()) < 0 ) return false;
+        mpz_class den = a.get_den();
+        mpz_class num = a.get_num();
+        mpz_class root_den;
+        mpz_class root_den_rem;
+        mpz_sqrtrem(root_den.__get_mp(), root_den_rem.__get_mp(), den.__get_mp());
+        if( !carl::isZero( root_den_rem ) )
+            return false;
 
+        mpz_class root_num;
+        mpz_class root_num_rem;
+        mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
+        if( !carl::isZero( root_num_rem ) )
+            return false;
+        
+        mpq_class resNum;
+        mpq_set_z(resNum.get_mpq_t(), root_num.get_mpz_t());
+        mpq_class resDen;
+        mpq_set_z(resDen.get_mpq_t(), root_den.get_mpz_t());
+        mpq_div(b.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
+        return true;
+    }
+    
     std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a)
     {
         assert( mpq_sgn(a.__get_mp()) > 0 );
@@ -46,6 +54,54 @@ namespace carl
         return std::make_pair(lower,upper);
     }
     
+    std::pair<mpq_class, mpq_class> sqrt_fast(const mpq_class& a)
+    {
+        assert(a >= 0);
+#if 1
+        mpz_class num;
+        mpz_class num_rem;
+        mpz_sqrtrem(num.__get_mp(), num_rem.__get_mp(), a.get_num().__get_mp());
+        mpz_class den;
+        mpz_class den_rem;
+        mpz_sqrtrem(den.__get_mp(), den_rem.__get_mp(), a.get_den().__get_mp());
+        
+        if (carl::isZero(num_rem)) {
+            if (carl::isZero(den_rem)) {
+                mpq_class exact_root = num / den;
+                return std::make_pair(exact_root, exact_root);
+            } else {
+                mpq_class lower = num / (den + 1);
+                mpq_class upper = num / den;
+                return std::make_pair(lower, upper);
+            }
+        } else {
+            if (carl::isZero(den_rem)) {
+                mpq_class lower = num / den;
+                mpq_class upper = (num + 1) / den;
+                return std::make_pair(lower, upper);
+            } else {
+                mpq_class lower = num / (den + 1);
+                mpq_class upper = (num + 1) / den;
+                return std::make_pair(lower, upper);
+            }
+        }
+#else
+        mpq_class exact_root;
+        if (carl::sqrtp(a, exact_root)) {
+            // root can be computed exactly.
+            return std::make_pair(exact_root, exact_root);
+        } else {
+            // compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
+            mpf_class af = sqrt(mpf_class(a));
+            mpq_class lower(af - carl::constant_one<mpf_class>::get());
+            mpq_class upper(af + carl::constant_one<mpf_class>::get());
+            assert(lower * lower < a);
+            assert(upper * upper > a);
+            return std::make_pair(lower, upper);
+        }
+#endif
+    }
+    
     template<>
     mpq_class rationalize<mpq_class>(const std::string& inputstring)
     {
@@ -66,6 +122,24 @@ namespace carl
             //if(strs.back().size() > )
             result += (mpq_class(strs.back())/carl::pow(mpz_class(10),static_cast<unsigned>(strs.back().size())));
         }
+        return result;
+    }
+    
+    template<>
+    mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n) {
+        typedef signed long int IntType;
+        cln::cl_I den = carl::getDenom((cln::cl_RA)n);
+        if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )
+        {
+            cln::cl_I num = carl::getNum((cln::cl_RA)n);
+            if( num <= std::numeric_limits<IntType>::max() && num >= std::numeric_limits<IntType>::min() )
+            {
+                return mpq_class(carl::toInt<IntType>(num))/mpq_class(carl::toInt<IntType>(den));
+            }
+        }
+        std::stringstream s;
+        s << ((cln::cl_RA)n);
+        mpq_class result = rationalize<mpq_class>(s.str());
         return result;
     }
 

@@ -20,6 +20,30 @@
 
 namespace carl {
 
+/*
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l);
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::list<T>& l);
+template<typename Key, typename Value>
+std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m);
+template<typename U, typename V>
+std::ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
+template<typename T, typename C>
+std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s);
+template<std::size_t I, typename... T, typename std::enable_if<I == sizeof...(T), void>::type*>
+std::ostream& operator<<(std::ostream& os, const std::tuple<T...>&);
+template<std::size_t I, typename... T, typename std::enable_if<I < sizeof...(T), void>::type*>
+std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t);
+template<typename Key, typename Value, typename H, typename E, typename A>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m);
+template<typename T, typename H, typename K, typename A>
+std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>& s);
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v);
+*/
+
+
 /**
  * Output a std::forward_list with arbitrary content.
  * The format is `[<item>, <item>, ...]`
@@ -31,7 +55,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l) {
 	os << "[";
 	bool first = true;
-	for (auto it: l) {
+	for (const auto& it: l) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -50,7 +74,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
 	os << "[" << l.size() << ": ";
 	bool first = true;
-	for (auto it: l) {
+	for (const auto& it: l) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -69,7 +93,7 @@ template<typename Key, typename Value>
 std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
 	os << "{";
 	bool first = true;
-	for (auto it: m) {
+	for (const auto& it: m) {
 		if (!first) os << ", ";
 		first = false;
 		os << it.first << " : " << it.second;
@@ -100,7 +124,7 @@ template<typename T, typename C>
 std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
 	os << "{" << s.size() << ": ";
 	bool first = true;
-	for (auto it: s) {
+	for (const auto& it: s) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -140,11 +164,11 @@ std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& t) {
  * @param m map to be printed.
  * @return Output stream.
  */
-template<typename Key, typename Value>
-std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value>& m) {
+template<typename Key, typename Value, typename H, typename E, typename A>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<Key, Value, H, E, A>& m) {
 	os << "{";
 	bool first = true;
-	for (auto it: m) {
+	for (const auto& it: m) {
 		if (!first) os << ", ";
 		first = false;
 		os << it.first << " : " << it.second;
@@ -163,7 +187,7 @@ template<typename T, typename H, typename K, typename A>
 std::ostream& operator<<(std::ostream& os, const std::unordered_set<T, H, K, A>& s) {
 	os << "{" << s.size() << ": ";
 	bool first = true;
-	for (auto it: s) {
+	for (const auto& it: s) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
@@ -182,7 +206,7 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
 	os << "[" << v.size() << ": ";
 	bool first = true;
-	for (auto it: v) {
+	for (const auto& it: v) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;

@@ -10,7 +10,7 @@
 #pragma once
 
 //#define NDEBUG
-//#define CONSTRAINT_WITH_FACTORIZATION
+#define CONSTRAINT_WITH_FACTORIZATION
 
 #include <iostream>
 #include <cstring>
@@ -38,6 +38,30 @@ namespace carl
     
     template<typename Pol>
     using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
+    
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( typename Pol::PolyType&& _poly );
+
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( carl::Variable::Arg _var );
+    
+    template<typename Pol, EnableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( const typename Pol::PolyType& _poly )
+    {
+        return makePolynomial<Pol>(typename Pol::PolyType(_poly));
+    }
+
+    template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( carl::Variable::Arg _var )
+    {
+        return Pol( _var );
+    }
+
+    template<typename Pol, DisableIf<needs_cache<Pol>> = dummy>
+    Pol makePolynomial( const typename Pol::PolyType& _poly )
+    {
+        return _poly;
+    }
     
     /**
      * Class to create a constraint object.
@@ -72,6 +96,21 @@ namespace carl
             
             /**
              * Constructs the constraint:   _lhs _rel 0
+             * @param _var The left-hand side of the constraint to construct being a polynomial.
+             * @param _rel The relation symbol.
+             * @param _id The unique id for this constraint. It should be maintained by a central instance
+             *             as the offered ConstraintPool class, therefore the constructors are private and
+             *             can only be invoked using the constraint pool or more precisely using the 
+             *             method newConstraint( _lhs, _rel )  or
+             *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
+             *             and b is a rational.
+             */
+            Constraint( carl::Variable::Arg _var, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>(_var) ), _rel, _id )
+            {}
+            
+            /**
+             * Constructs the constraint:   _lhs _rel 0
              * @param _lhs The left-hand side of the constraint to construct being a polynomial.
              * @param _rel The relation symbol.
              * @param _id The unique id for this constraint. It should be maintained by a central instance
@@ -81,7 +120,21 @@ namespace carl
              *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
              *             and b is a rational.
              */
-            Constraint( const Pol& _lhs, const Relation _rel, unsigned _id = 0 );
+            Constraint( const Pol& _lhs, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( Pol( _lhs ) ), _rel, _id)
+            {}
+            
+            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
+            Constraint( const typename Pol::PolyType& _lhs, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>( _lhs ) ), _rel, _id )
+            {}
+            
+            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
+            Constraint( typename Pol::PolyType&& _lhs, Relation _rel, unsigned _id = 0 ):
+                Constraint<Pol>::Constraint( std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel, _id )
+            {}
+            
+            Constraint( Pol&& _lhs, Relation _rel, unsigned _id = 0 );
             
             /**
              * Copies the given constraint.
@@ -179,12 +232,9 @@ namespace carl
              */
             typename Pol::NumberType constantPart() const
             {
-                if( mLhs.hasConstantTerm() )
-                    return mLhs.trailingTerm().coeff();
-                else
-                    return typename Pol::NumberType( 0 );
+                return mLhs.constantPart();
             }
-
+            
             /**
              * @param _variable The variable for which to determine the maximal degree.
              * @return The maximal degree of the given variable in this constraint. (Monomial-wise)
@@ -262,6 +312,13 @@ namespace carl
             {
                 return (_rel == Relation::NEQ || _rel == Relation::LESS || _rel == Relation::GREATER);
             }
+			
+			bool relationIsStrict() const {
+				return constraintRelationIsStrict(mRelation);
+			}
+			bool relationIsWeak() const {
+				return !constraintRelationIsStrict(mRelation);
+			}
             
             /**
              * Checks if the given variable occurs in the constraint.
@@ -407,6 +464,32 @@ namespace carl
              */
             unsigned consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval ) const;
             
+            /**
+             * Checks whether this constraint is consistent with the given assignment from 
+             * the its variables to interval domains.
+             * @param _solutionInterval The interval domains of the variables.
+             * @param _stricterRelation This relation is set to a relation R such that this constraint and the given variable bounds
+             *                           imply the constraint formed by R, comparing this constraint's left-hand side to zero.
+             * @return 1, if this constraint is consistent with the given intervals;
+             *          0, if this constraint is not consistent with the given intervals;
+             *          2, if it cannot be decided whether this constraint is consistent with the given intervals.
+             */
+            unsigned consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval, Relation& _stricterRelation ) const;
+
+			/**
+			 * Checks whether the given interval assignment may fulfill the constraint.
+			 * Note that the assignment must be complete.
+			 * There are three possible outcomes:
+			 * - True (4), i.e. all actual assignments satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow True$
+			 * - Maybe (3), i.e. some actual assignments satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow ?$
+			 * - Not null (2), i.e. all assignments that make the constraint evaluate not to zero satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow p \neq 0$
+			 * - Null (1), i.e. only assignments that make the constraint evaluate to zero satisfy the constraint: $p ~_\alpha 0 \Leftrightarrow p_\alpha = 0$
+			 * - False (0), i.e. no actual assignment satisfies the constraint: $p ~_\alpha 0 \Leftrightarrow False$
+			 * @param _assignment Variable assignment.
+			 * @return 0, 1 or 2.
+			 */
+			unsigned evaluate(const EvaluationMap<Interval<typename carl::UnderlyingNumberType<Pol>::type>>& _assignment) const;
+
             /**
              * @param _var The variable to check the size of its solution set for.
              * @return true, if it is easy to decide whether this constraint has a finite solution set
@@ -578,3 +661,4 @@ namespace std
 } // namespace std
 
 #include "Constraint.tpp"
+

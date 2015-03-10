@@ -91,8 +91,8 @@ TEST(DoubleInterval, Getters)
     EXPECT_EQ(test2.lower(), test2.upper());
     
     test1.set(DoubleInterval::BoostInterval(3, 27));
-    EXPECT_EQ(0, test1.lower());
-    EXPECT_EQ(0, test1.upper());
+    EXPECT_EQ(3, test1.lower());
+    EXPECT_EQ(27, test1.upper());
     
     test1 = DoubleInterval();
     test1.set(DoubleInterval::BoostInterval(3, 27));
@@ -569,6 +569,19 @@ TEST(DoubleInterval, Multiplication)
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
     result = c8.mul( d12 );
     EXPECT_EQ( DoubleInterval::unboundedInterval(), result );
+    
+    result  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ).mul(DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ));
+    EXPECT_EQ( DoubleInterval( 1, BoundType::STRICT, 4, BoundType::WEAK ), result );
+    
+    DoubleInterval e1 = DoubleInterval( 0.0, BoundType::INFTY, 0.0, BoundType::STRICT );
+    DoubleInterval e2 = DoubleInterval( 0.0, BoundType::WEAK, 0.0, BoundType::INFTY );
+    DoubleInterval e3 = DoubleInterval( -2.0, BoundType::STRICT, 0.0, BoundType::STRICT );
+    DoubleInterval e4 = DoubleInterval( 0.0, BoundType::WEAK, 2.0, BoundType::STRICT );
+    
+    result = e1.mul( e2 );
+    EXPECT_EQ( DoubleInterval( 0.0, BoundType::INFTY, 0.0, BoundType::WEAK ), result );
+    result = e3.mul( e4 );
+    EXPECT_EQ( DoubleInterval( -4.0, BoundType::STRICT, 0.0, BoundType::WEAK ), result );
 }
 
 

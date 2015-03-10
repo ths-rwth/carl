@@ -6,7 +6,7 @@
  */
 
 #include "FactorizedPolynomial.h"
-#include "UnivariatePolynomial.tpp"
+#include "UnivariatePolynomial.h"
 
 #pragma once
 
@@ -48,8 +48,6 @@ namespace carl
                 poly *= CoeffType(-1);
                 mCoefficient *= CoeffType(-1);
             }
-            
-
             /*
              * The following is not very nice, but we know, that the hash won't change, once the polynomial 
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
@@ -85,6 +83,11 @@ namespace carl
             //pfPair->assertFactorization();
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
+        if(computePolynomial(*this) != _polynomial)
+        {
+            std::cout << "computePolynomial(*this) = " << computePolynomial(*this) << std::endl;
+            std::cout << "_polynomial = " << _polynomial << std::endl;
+        }
         assert(computePolynomial(*this) == _polynomial);
     }
     
@@ -129,6 +132,47 @@ namespace carl
     }
     
     template<typename P>
+    FactorizedPolynomial<P>::FactorizedPolynomial(const std::pair<ConstructorOperation, std::vector<FactorizedPolynomial>>& _pair):
+        FactorizedPolynomial<P>::FactorizedPolynomial()
+    {
+        auto op = _pair.first;
+        auto sub = _pair.second;
+        assert(!sub.empty());
+        auto it = sub.begin();
+        
+        *this = *it;
+        if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
+            // special treatment of unary minus
+            *this = -(*this);
+            return;
+        }
+        if( op == ConstructorOperation::DIV )
+        {
+            // division shall have at least two arguments
+            assert(sub.size() >= 2);
+        }
+        for( ++it; it != sub.end(); ++it)
+        {
+            switch( op )
+            {
+                case ConstructorOperation::ADD: 
+                    *this += *it; 
+                    break;
+                case ConstructorOperation::SUB: 
+                    *this -= *it; 
+                    break;
+                case ConstructorOperation::MUL: 
+                    *this *= *it; 
+                    break;
+                case ConstructorOperation::DIV: 
+                    assert(it->isConstant());
+                    *this /= it->constantPart();
+                    break;
+              }
+        }
+    }
+    
+    template<typename P>
     FactorizedPolynomial<P>::~FactorizedPolynomial()
     {
         if ( mpCache != nullptr )
@@ -170,49 +214,675 @@ namespace carl
         assert(computePolynomial(*this) == computePolynomial(_fpoly));
         return *this;
     }
-        
+    
     template<typename P>
-    bool operator==( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    template<typename C, EnableIf<is_subset_of_rationals<C>>>
+    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::coprimeFactorWithoutConstant() const
     {
-        if( _fpolyA.pCache() == nullptr && _fpolyB.pCache() == nullptr )
+        if( existsFactorization( *this ) )
         {
-            return _fpolyA.coefficient() == _fpolyB.coefficient();
+            if( factorizedTrivially() )
+            {
+                assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / mCoefficient );
+                return polynomial().coprimeFactorWithoutConstant() / mCoefficient;
+            }
+            auto factor = factorization().begin();
+            CoeffType cf = factor->first.coprimeFactorWithoutConstant();
+            auto resultNum = carl::getNum( cf );
+            auto resultDenom = carl::getDenom( cf );
+            ++factor;
+            while( factor != factorization().end() )
+            {
+                cf = factor->first.coprimeFactorWithoutConstant();
+                resultNum = carl::lcm( resultNum, carl::getNum( cf ) );
+                resultDenom = carl::gcd( resultDenom, carl::getDenom( cf ) );
+                ++factor;
+            }
+            assert( computePolynomial(*this).coprimeFactorWithoutConstant() == (resultNum / (mCoefficient*resultDenom)) );
+            return resultNum / (mCoefficient*resultDenom);
         }
-        else if( _fpolyA.pCache() != nullptr && _fpolyB.pCache() != nullptr )
-        {
-            if ( _fpolyA.coefficient() == _fpolyB.coefficient() )
-                return _fpolyA.content() == _fpolyB.content();
-        }
-        return false;
-    }
-        
-    template<typename P>
-    bool operator<( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
-    {
-        ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
-        
-        if( _fpolyA.pCache() == nullptr && _fpolyB.pCache() == nullptr )
-        {
-            return _fpolyA.coefficient() < _fpolyB.coefficient();
-        }
-        else if( _fpolyA.pCache() != nullptr && _fpolyB.pCache() != nullptr )
-        {
-            return _fpolyA.content() < _fpolyB.content();
-        }
-        return _fpolyA.pCache() == nullptr;
+        return constant_zero<CoeffType>::get();
     }
     
     template<typename P>
-    bool operator!=( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
-    {
-        ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
-        if( _fpolyA.pCache() == nullptr && _fpolyB.pCache() == nullptr )
+    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::constantPart() const
+    {   
+        if( existsFactorization( *this ) )
         {
-            return _fpolyA.coefficient() != _fpolyB.coefficient();
+            if( factorizedTrivially() )
+                return polynomial().constantPart() * mCoefficient;
+            CoeffType result( mCoefficient );
+            for( const auto& factor : factorization() )
+            {
+                result *= carl::pow( factor.first.constantPart(), factor.second );
+            }
+            assert( computePolynomial(*this).constantPart() == result );
+            return result;
         }
-        else if( _fpolyA.pCache() != nullptr && _fpolyB.pCache() != nullptr )
+        return mCoefficient;
+    }
+
+    template<typename P>
+    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::lcoeff() const
+    {   
+        if( existsFactorization( *this ) )
         {
-            return !(_fpolyA.content() == _fpolyB.content());
+            if( factorizedTrivially() )
+                return polynomial().lcoeff() * mCoefficient;
+            CoeffType result( mCoefficient );
+            for( const auto& factor : factorization() )
+            {
+                result *= carl::pow( factor.first.lcoeff(), factor.second );
+            }
+            assert( computePolynomial(*this).lcoeff() == result );
+            return result;
+        }
+        return mCoefficient;
+    }
+
+    template<typename P>
+    size_t FactorizedPolynomial<P>::totalDegree() const
+    {
+        if( existsFactorization( *this ) )
+        {
+            if( factorizedTrivially() )
+                return polynomial().totalDegree();
+            exponent result = 0;
+            for( const auto& factor : factorization() )
+            {
+                result += factor.first.totalDegree() * factor.second;
+            }
+            assert( computePolynomial(*this).totalDegree() == result );
+            return result;
+        }
+        assert( mCoefficient != 0 );
+        return 0;
+    }
+
+    template<typename P>
+    typename FactorizedPolynomial<P>::TermType FactorizedPolynomial<P>::lterm() const
+    {   
+        if( existsFactorization( *this ) )
+        {
+            if( factorizedTrivially() )
+                return polynomial().lterm() * mCoefficient;
+            TermType result( mCoefficient );
+            for( const auto& factor : factorization() )
+            {
+                result *= factor.first.lterm().pow( factor.second );
+            }
+            assert( computePolynomial(*this).lterm() == result );
+            return result;
+        }
+        return TermType( mCoefficient );
+    }
+
+    template<typename P>
+    typename FactorizedPolynomial<P>::TermType FactorizedPolynomial<P>::trailingTerm() const
+    {
+        if( existsFactorization( *this ) )
+        {
+            if( factorizedTrivially() )
+            {
+                return polynomial().trailingTerm() * mCoefficient;
+            }
+            TermType result( mCoefficient );
+            for( const auto& factor : factorization() )
+            {
+                result *= factor.first.trailingTerm().pow( factor.second );
+            }
+            assert( computePolynomial(*this).trailingTerm() == result );
+            return result;
+        }
+        return TermType( mCoefficient );
+    }
+    
+    template<typename P>
+    bool FactorizedPolynomial<P>::isUnivariate() const
+    {
+        if( existsFactorization( *this ) )
+        {
+            if( factorizedTrivially() )
+            {
+                return polynomial().isUnivariate();
+            }
+            Variable foundVar = Variable::NO_VARIABLE;
+            for( const auto& factor : factorization() )
+            {
+                if( factor.first.isUnivariate() )
+                {
+                    if( foundVar == Variable::NO_VARIABLE )
+                    {
+                        foundVar = factor.first.getSingleVariable();
+                    }
+                    else if( foundVar != factor.first.getSingleVariable() )
+                    {
+                        return false;
+                    }
+                }
+                else
+                    return false;
+            }
+            return true;
+        }
+        return true;
+    }
+    
+    template<typename P>
+    UnivariatePolynomial<FactorizedPolynomial<P>> FactorizedPolynomial<P>::toUnivariatePolynomial( Variable::Arg _var ) const
+    {
+        // TODO: This should maybe done directly on the factorization.
+        UnivariatePolynomial<P> univPol = polynomial().toUnivariatePolynomial( _var );
+        std::vector<FactorizedPolynomial<P>> resultCoeffs;
+        for( const P& coeff : univPol.coefficients() )
+        {
+            resultCoeffs.push_back( std::move(FactorizedPolynomial<P>( coeff, mpCache ) *= mCoefficient) );
+        }
+        return UnivariatePolynomial<FactorizedPolynomial<P>>( _var, std::move( resultCoeffs ) );
+    }
+    
+    template<typename P>
+    bool FactorizedPolynomial<P>::hasConstantTerm() const
+    {
+        if( existsFactorization( *this ) )
+        {
+            assert( !carl::isZero( mCoefficient ) );
+            if( factorizedTrivially() )
+                return polynomial().hasConstantTerm();
+            TermType result( mCoefficient );
+            for( const auto& factor : factorization() )
+            {
+                if( !factor.first.hasConstantTerm() )
+                {
+                    assert( !computePolynomial(*this).hasConstantTerm() );
+                    return false;
+                }
+            }
+            assert( computePolynomial(*this).hasConstantTerm() );
+            return true;
+        }
+        return !carl::isZero( mCoefficient );
+    }
+
+    template<typename P>
+    bool FactorizedPolynomial<P>::has( Variable::Arg _var ) const
+    {   
+        if( existsFactorization( *this ) )
+        {
+            if( factorizedTrivially() )
+                return polynomial().has( _var );
+            for( const auto& factor : factorization() )
+            {
+                if( factor.first.has( _var ) )
+                    return true;
+            }
+            return false;
+        }
+        return false;
+    }
+    
+    template<typename P>
+    template<bool gatherCoeff>
+    VariableInformation<gatherCoeff, FactorizedPolynomial<P>> FactorizedPolynomial<P>::getVarInfo(Variable::Arg var) const
+    {
+        // TODO: Maybe we should use the factorization for collecting degrees and coefficients.
+        VariableInformation<gatherCoeff, P> vi = polynomial().template getVarInfo<gatherCoeff>( var );
+        if( gatherCoeff )
+        {
+            std::map<unsigned,FactorizedPolynomial<P>> coeffs;
+            for( auto const& expCoeffPair : vi.coeffs() )
+            {
+                if( expCoeffPair.second.isConstant() )
+                {
+                    coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() * mCoefficient ) ) );
+                }
+                else
+                {
+                    coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
+                }
+            }
+            return VariableInformation<gatherCoeff, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence(), std::move( coeffs ) );
+        }
+        return VariableInformation<false, FactorizedPolynomial<P>>( vi.maxDegree(), vi.minDegree(), vi.occurence() );
+
+    }
+    
+    template<typename P>
+    Definiteness FactorizedPolynomial<P>::definiteness() const
+    {
+        if( existsFactorization( *this ) )
+        {
+            if( factorizedTrivially() )
+                return polynomial().definiteness();
+            Definiteness result = Definiteness::POSITIVE;
+            for( const auto& factor : factorization() )
+            {
+                Definiteness factorDefiniteness = factor.first.definiteness();
+                if( factorDefiniteness == Definiteness::NON )
+                    return Definiteness::NON;
+                if( factor.second % 2 == 0 )
+                {
+                    if( factorDefiniteness == Definiteness::NEGATIVE_SEMI )
+                        factorDefiniteness = Definiteness::POSITIVE_SEMI;
+                    if( factorDefiniteness == Definiteness::NEGATIVE )
+                        factorDefiniteness = Definiteness::POSITIVE;
+                }
+                switch( result )
+                {
+                    case Definiteness::POSITIVE:
+                    {
+                        result = factorDefiniteness;
+                        break;
+                    }
+                    case Definiteness::POSITIVE_SEMI:
+                    {
+                        if( result == Definiteness::NEGATIVE_SEMI && factorDefiniteness == Definiteness::NEGATIVE )
+                        {
+                            result = Definiteness::NEGATIVE_SEMI;
+                        }
+                        break;
+                    }
+                    case Definiteness::NEGATIVE:
+                    {
+                        switch( factorDefiniteness )
+                        {
+                            case Definiteness::NEGATIVE_SEMI:
+                            {
+                                result = Definiteness::POSITIVE_SEMI;
+                                break;
+                            }
+                            case Definiteness::NEGATIVE:
+                            {
+                                result = Definiteness::POSITIVE;
+                                break;
+                            }
+                            case Definiteness::POSITIVE:
+                            {
+                                result = Definiteness::NEGATIVE;
+                                break;
+                            }
+                            default:
+                            {
+                                assert( factorDefiniteness == Definiteness::POSITIVE_SEMI );
+                                result = Definiteness::NEGATIVE_SEMI;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        assert( result == Definiteness::NEGATIVE_SEMI );
+                        if( result == Definiteness::NEGATIVE_SEMI && factorDefiniteness == Definiteness::NEGATIVE )
+                        {
+                            result = Definiteness::POSITIVE_SEMI;
+                        }
+                        break;
+                    }
+                }
+            }
+            assert( result == Definiteness::NON || computePolynomial(*this).definiteness() == Definiteness::NON || result == computePolynomial(*this).definiteness() );
+            return result;
+        }
+        return mCoefficient < 0 ? Definiteness::NEGATIVE : (mCoefficient > 0 ? Definiteness::POSITIVE : Definiteness::POSITIVE_SEMI);
+    }    
+    
+	template<typename P>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::derivative( const carl::Variable& _var, unsigned _nth ) const
+    {
+		assert(_nth == 1);
+		// TODO VERY NAIVE
+		return FactorizedPolynomial<P>(computePolynomial(*this).derivative(_var), mpCache);
+	}
+	
+	template<typename P>
+	FactorizedPolynomial<P> FactorizedPolynomial<P>::pow(unsigned _exp) const
+    {
+		if( _exp == 0 )
+            return FactorizedPolynomial<P>( constant_one<CoeffType>::get() );
+        if( isZero() )
+            return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
+        FactorizedPolynomial<P> res( constant_one<CoeffType>::get() );
+        FactorizedPolynomial<P> mult( *this );
+        while( _exp > 0 )
+        {
+            if( _exp & 1 )
+                res *= mult;
+            _exp /= 2;
+            if( _exp > 0 )
+                mult *= mult;
+        }
+        return res;
+	}
+    
+    template<typename P>
+    template<typename SubstitutionType>
+    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::evaluate( const std::map<Variable,SubstitutionType>& _substitutions ) const
+    {
+        if( !existsFactorization( *this ) )
+            return mCoefficient;
+        if( factorizedTrivially() )
+        {
+            return polynomial().evaluate( _substitutions );
+        }
+        else
+        {
+            CoeffType result = mCoefficient;
+            for( const auto& factor : factorization() )
+            {
+                CoeffType subResult = factor.first.evaluate( _substitutions );
+                if( carl::isZero( subResult.isZero() ) )
+                    return constant_zero<CoeffType>::get();
+                result *= carl::pow( subResult, factor.second );
+            }
+            assert( result == computePolynomial( *this ).evaluate( _substitutions ) );
+            return result;
+        }
+    }
+	
+    template<typename P>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute( Variable::Arg _var, const FactorizedPolynomial<P>& _value ) const
+    {
+        if( !existsFactorization( *this ) )
+            return *this;
+        if( factorizedTrivially() )
+        {
+            P subResult = polynomial().substitute( _var, (P) _value );
+            if( subResult.isConstant() )
+            {
+                FactorizedPolynomial<P> result( (subResult.constantPart() * mCoefficient) );
+                assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _var, (P)_value ) );
+                return std::move(result);
+            }
+            FactorizedPolynomial<P> result( std::move( subResult ), mpCache );
+            result *= mCoefficient;
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _var, (P)_value ) );
+            return std::move(result);
+        }
+        else
+        {
+            CoeffType resultCoeff = mCoefficient;
+            Factorization<P> resultFactorization;
+            for( const auto& factor : factorization() )
+            {
+                FactorizedPolynomial<P> subResult = factor.first.substitute( _var, _value );
+                if( subResult.isZero() )
+                    return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
+                if( subResult.isConstant() )
+                {
+                    resultCoeff *= carl::pow( subResult.constantPart(), factor.second );
+                }
+                else
+                {
+                    auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
+                    if( !ret.second )
+                    {
+                        ret.first->second += factor.second;
+                    }
+                }
+            }
+            FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _var, (P)_value ) );
+            return std::move( result );
+        }
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(const std::map<Variable, FactorizedPolynomial<P>>& _substitutions) const
+    {
+        std::map<Variable, P> varPolMap;
+        for( const auto& varFPolPair : _substitutions)
+            varPolMap.insert( varPolMap.end(), std::make_pair( varFPolPair.first, varFPolPair.second.polynomial() ) );
+        return substitute( _substitutions, varPolMap );
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(const std::map<Variable, FactorizedPolynomial<P>>& _substitutions, const std::map<Variable, P>& _substitutionsAsP) const
+    {
+        if( !existsFactorization( *this ) )
+            return *this;
+        if( factorizedTrivially() )
+        {
+            
+            P subResult = polynomial().substitute( _substitutionsAsP );
+            if( subResult.isConstant() )
+            {
+                FactorizedPolynomial<P> result( (subResult.constantPart() * mCoefficient) );
+                assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _substitutionsAsP ) );
+                return std::move(result);
+            }
+            FactorizedPolynomial<P> result( std::move( subResult ), mpCache );
+            result *= mCoefficient;
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _substitutionsAsP ) );
+            return std::move(result);
+        }
+        else
+        {
+            CoeffType resultCoeff = mCoefficient;
+            Factorization<P> resultFactorization;
+            for( const auto& factor : factorization() )
+            {
+                FactorizedPolynomial<P> subResult = factor.first.substitute( _substitutions );
+                if( subResult.isZero() )
+                    return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
+                if( subResult.isConstant() )
+                {
+                    resultCoeff *= carl::pow( subResult.constantPart(), factor.second );
+                }
+                else
+                {
+                    auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
+                    if( !ret.second )
+                    {
+                        ret.first->second += factor.second;
+                    }
+                }
+            }
+            FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _substitutionsAsP ) );
+            return std::move( result );
+        }
+    }
+    
+    template<typename P>
+    template<typename SubstitutionType>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::substitute(const std::map<Variable,SubstitutionType>& _substitutions) const
+    {
+        if( !existsFactorization( *this ) )
+            return *this;
+        if( factorizedTrivially() )
+        {
+            P subResult = polynomial().substitute( _substitutions );
+            if( subResult.isConstant() )
+            {
+                FactorizedPolynomial<P> result( (subResult.constantPart() * mCoefficient) );
+                assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _substitutions ) );
+                return std::move(result);
+            }
+            FactorizedPolynomial<P> result( std::move( subResult ), mpCache );
+            result *= mCoefficient;
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _substitutions ) );
+            return std::move(result);
+        }
+        else
+        {
+            CoeffType resultCoeff = mCoefficient;
+            Factorization<P> resultFactorization;
+            for( const auto& factor : factorization() )
+            {
+                FactorizedPolynomial<P> subResult = factor.first.substitute( _substitutions );
+                if( subResult.isZero() )
+                    return FactorizedPolynomial<P>( constant_zero<CoeffType>::get() );
+                if( subResult.isConstant() )
+                {
+                    resultCoeff *= carl::pow( subResult.constantPart(), factor.second );
+                }
+                else
+                {
+                    auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
+                    if( !ret.second )
+                    {
+                        ret.first->second += factor.second;
+                    }
+                }
+            }
+            FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
+            assert( computePolynomial( result ) == computePolynomial( *this ).substitute( _substitutions ) );
+            return std::move( result );
+        }
+    }
+	
+    template<typename P>
+    void FactorizedPolynomial<P>::substituteIn( Variable::Arg _var, const FactorizedPolynomial<P>& _value )
+    {
+        FactorizedPolynomial<P> res( *this );
+        res.substitute( _var, _value );
+        return res;
+    }
+    
+    template<typename P>
+    bool FactorizedPolynomial<P>::sqrt( FactorizedPolynomial<P>& _result ) const
+    {
+        CoeffType resultCoeff;
+        if( !carl::sqrtp( mCoefficient, resultCoeff ) )
+            return false;
+        if( !existsFactorization( *this ) )
+        {
+            _result = FactorizedPolynomial<P>( resultCoeff );
+            return true;
+        }
+        if( factorizedTrivially() )
+        {
+            PolyType sqrtOfPolynomial;
+            if( polynomial().sqrt( sqrtOfPolynomial ) )
+            {
+                _result = FactorizedPolynomial<P>( std::move( sqrtOfPolynomial ), mpCache );
+                content().setNewFactors( _result, 1, _result, 1 );
+                rehash();
+                _result *= resultCoeff;
+                assert( computePolynomial( _result ).pow( 2 ) == computePolynomial( *this ) );
+                return true;
+            }
+            return false;
+        }
+        Factorization<P> resultFactorization;
+        for( const auto& factor : factorization() )
+        {
+            if( factor.second % 2 == 0 )
+            {
+                auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( factor.first, factor.second/2 ) );
+                if( !ret.second )
+                {
+                    ret.first->second += factor.second/2;
+                }
+            }
+            else
+            {
+                FactorizedPolynomial<P> sqrtOfFactor;
+                if( !factor.first.sqrt( sqrtOfFactor ) )
+                    return false;
+                auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( sqrtOfFactor, factor.second ) );
+                if( !ret.second )
+                {
+                    ret.first->second += factor.second;
+                }
+            }
+        }
+        _result = FactorizedPolynomial<P>( std::move( resultFactorization ), resultCoeff, mpCache );
+        assert( computePolynomial( _result ).pow( 2 ) == computePolynomial( *this ) );
+        return true;
+    }
+    
+    template<typename P>
+    DivisionResult<FactorizedPolynomial<P>> FactorizedPolynomial<P>::divideBy( const FactorizedPolynomial<P>& _divisor ) const
+    {
+        FactorizedPolynomial<P> polyA = lazyDiv( *this, _divisor );
+        FactorizedPolynomial<P> polyB = lazyDiv( _divisor, *this );
+        // TODO: maybe apply gcd, which might make this operation more expensive but a long-term investment
+        DivisionResult<P> dr = polyA.polynomial().divideBy( _divisor.polynomial() );
+        // TODO: Could we calculate the quotient and remainder directly on the factorizations?
+        FactorizedPolynomial<P> q = dr.quotient.isConstant() ? FactorizedPolynomial<P>( dr.quotient.constantPart() ) : FactorizedPolynomial<P>( dr.quotient, mpCache );
+        FactorizedPolynomial<P> r = dr.remainder.isConstant() ? FactorizedPolynomial<P>( dr.remainder.constantPart() ) : FactorizedPolynomial<P>( dr.remainder, mpCache );
+        return DivisionResult<FactorizedPolynomial<P>>( q, r );
+    }
+    
+    template<typename P>
+    template<typename C, EnableIf<is_field<C>>>
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::divideBy( const CoeffType& _divisor ) const
+    {
+        FactorizedPolynomial<P> result( *this );
+        result /= _divisor;
+        return std::move( result );
+    }
+    
+    template<typename P>
+    template<typename C, EnableIf<is_field<C>>>
+    bool FactorizedPolynomial<P>::divideBy( const FactorizedPolynomial<P>& _divisor, FactorizedPolynomial<P>& _quotient ) const
+    {
+        static_assert(is_field<C>::value, "Division only defined for field coefficients");
+        DivisionResult<FactorizedPolynomial<P>> dr = this->divideBy( _divisor );
+        if( dr.remainder.isZero() )
+        {
+            _quotient = dr.quotient;
+            return true;
+        }
+        return false;
+    }
+	
+    template<typename P>
+    bool operator==( const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _fpolyB )
+    {
+        if( _lhs.pCache() == nullptr && _fpolyB.pCache() == nullptr )
+        {
+            return _lhs.coefficient() == _fpolyB.coefficient();
+        }
+        else if( _lhs.pCache() != nullptr && _fpolyB.pCache() != nullptr )
+        {
+            if ( _lhs.coefficient() == _fpolyB.coefficient() )
+                return _lhs.content() == _fpolyB.content();
+        }
+        return false;
+    }
+    
+	template <typename P>
+	bool operator==( const FactorizedPolynomial<P>& _lhs, const typename P::CoeffType& _rhs )
+    {
+        return !existsFactorization( _lhs ) && _lhs.coefficient() == _rhs;
+    }
+    
+    template<typename P>
+    bool operator<( const FactorizedPolynomial<P>& _lhs, const typename P::CoeffType& _rhs )
+    {
+        return !existsFactorization( _lhs ) && _lhs.coefficient() < _rhs;
+    }
+        
+    template<typename P>
+    bool operator<( const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs )
+    {
+        ASSERT_CACHE_EQUAL( _lhs.pCache(), _rhs.pCache() );
+        
+        if( _lhs.pCache() == nullptr && _rhs.pCache() == nullptr )
+        {
+            return _lhs.coefficient() < _rhs.coefficient();
+        }
+        else if( _lhs.pCache() != nullptr && _rhs.pCache() != nullptr )
+        {
+            return _lhs.content() < _rhs.content();
+        }
+        return _lhs.pCache() == nullptr;
+    }
+    
+    template<typename P>
+    bool operator!=( const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs )
+    {
+        ASSERT_CACHE_EQUAL( _lhs.pCache(), _rhs.pCache() );
+        if( _lhs.pCache() == nullptr && _rhs.pCache() == nullptr )
+        {
+            return _lhs.coefficient() != _rhs.coefficient();
+        }
+        else if( _lhs.pCache() != nullptr && _rhs.pCache() != nullptr )
+        {
+            return !(_lhs.content() == _rhs.content());
         }
         return true;
     }
@@ -240,61 +910,61 @@ namespace carl
     }
 
     template<typename P>
-    FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpoly )
+    FactorizedPolynomial<P> FactorizedPolynomial<P>::operator-() const
     {
-        FactorizedPolynomial<P> result( _fpoly );
+        FactorizedPolynomial<P> result( *this );
         result.mCoefficient *= Coeff<P>( -1 );
-        assert( (-computePolynomial( _fpoly )) == computePolynomial( result ) );
+        assert( (-computePolynomial( *this )) == computePolynomial( result ) );
         return std::move( result );
     }
 
     template<typename P>
-    FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs )
     {
-        ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
-        _fpolyA.strengthenActivity();
-        _fpolyB.strengthenActivity();
+        ASSERT_CACHE_EQUAL( _lhs.pCache(), _rhs.pCache() );
+        _lhs.strengthenActivity();
+        _rhs.strengthenActivity();
         
         // Handle cases where one or both are constant
-        if ( !existsFactorization( _fpolyA ) )
+        if( !existsFactorization( _lhs ) )
         {
-            if ( existsFactorization( _fpolyB ) )
+            if( existsFactorization( _rhs ) )
             {
-                FactorizedPolynomial<P> result( _fpolyB.polynomial() * _fpolyB.coefficient() + _fpolyA.coefficient(), _fpolyB.pCache() );
-                assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
+                FactorizedPolynomial<P> result( _rhs.polynomial() * _rhs.coefficient() + _lhs.coefficient(), _rhs.pCache() );
+                assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
                 return std::move( result );
             }
             else
             {
-                FactorizedPolynomial<P> result( _fpolyA.coefficient() + _fpolyB.coefficient() );
-                assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
+                FactorizedPolynomial<P> result( _lhs.coefficient() + _rhs.coefficient() );
+                assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
                 return std::move( result );
             }
         }
-        else if ( !existsFactorization( _fpolyB ) )
+        else if( !existsFactorization( _rhs ) )
         {
-            FactorizedPolynomial<P> result( _fpolyA.polynomial() * _fpolyA.coefficient() + _fpolyB.coefficient(), _fpolyA.pCache() );
-            assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            FactorizedPolynomial<P> result( _lhs.polynomial() * _lhs.coefficient() + _rhs.coefficient(), _lhs.pCache() );
+            assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
 
-        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )) /
-                Coeff<P>(carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) ));
-        Coeff<P> coefficientRestA = _fpolyA.coefficient() / coefficientCommon;
-        Coeff<P> coefficientRestB = _fpolyB.coefficient() / coefficientCommon;
+        Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _lhs.coefficient() ), carl::getNum( _rhs.coefficient() ) )) /
+                Coeff<P>(carl::lcm( carl::getDenom( _lhs.coefficient() ), carl::getDenom( _rhs.coefficient() ) ));
+        Coeff<P> coefficientRestA = _lhs.coefficient() / coefficientCommon;
+        Coeff<P> coefficientRestB = _rhs.coefficient() / coefficientCommon;
 
         if (coefficientCommon == 0)
         {
             FactorizedPolynomial<P> result;
-            assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
 
         Factorization<P> factorizationRestA, factorizationRestB;
-        assert( existsFactorization( _fpolyA ) );
-        const Factorization<P>& factorizationA = _fpolyA.factorization();
-        assert( existsFactorization( _fpolyB ) );
-        const Factorization<P>& factorizationB = _fpolyB.factorization();
+        assert( existsFactorization( _lhs ) );
+        const Factorization<P>& factorizationA = _lhs.factorization();
+        assert( existsFactorization( _rhs ) );
+        const Factorization<P>& factorizationB = _rhs.factorization();
 
         //Compute common divisor as factor of result
         Factorization<P> resultFactorization = commonDivisor( factorizationA, factorizationB, factorizationRestA, factorizationRestB );
@@ -303,8 +973,8 @@ namespace carl
         P sum;
         if( resultFactorization.empty() )
         {
-            sum = _fpolyA.polynomial() * coefficientRestA;
-            sum += _fpolyB.polynomial() * coefficientRestB;
+            sum = _lhs.polynomial() * coefficientRestA;
+            sum += _rhs.polynomial() * coefficientRestB;
         }
         else
         {
@@ -314,7 +984,7 @@ namespace carl
         if ( sum.isZero() )
         {
             FactorizedPolynomial<P> result;
-            assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
         else
@@ -323,7 +993,7 @@ namespace carl
                 coefficientCommon *= sum.constantPart();
             else
             {
-                FactorizedPolynomial<P> fpolySum( sum, _fpolyA.pCache() );
+                FactorizedPolynomial<P> fpolySum( sum, _lhs.pCache() );
                 coefficientCommon *= fpolySum.coefficient();
                 fpolySum.mCoefficient = Coeff<P>(1);
                 auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
@@ -333,9 +1003,16 @@ namespace carl
                 }
             }
         }
-        FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
-        assert( computePolynomial( _fpolyA ) + computePolynomial( _fpolyB ) == computePolynomial( result ) );
+        FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _lhs.pCache(), _rhs.pCache() ) );
+        assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );
         return std::move( result );
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P> operator+( const FactorizedPolynomial<P>& _fpoly, const typename FactorizedPolynomial<P>::CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        return std::move( result += _coef ); 
     }
 
     template<typename P>
@@ -350,6 +1027,13 @@ namespace carl
     {
         FactorizedPolynomial<P> result = *this + _fpoly;
         return *this = result;
+    }
+    
+    template<typename P>
+    FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpoly, const typename FactorizedPolynomial<P>::CoeffType& _coef )
+    {
+        FactorizedPolynomial<P> result( _fpoly );
+        return std::move( result -= _coef ); 
     }
 
     template<typename P>
@@ -368,43 +1052,28 @@ namespace carl
     }
 
     template<typename P>
-    FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> operator-( const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs )
     {
-        ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
-        const Coeff<P>& coefficient = -_fpolyB.coefficient();
-        if ( existsFactorization( _fpolyB ) )
+        ASSERT_CACHE_EQUAL( _lhs.pCache(), _rhs.pCache() );
+        const Coeff<P>& coefficient = -_rhs.coefficient();
+        if ( existsFactorization( _rhs ) )
         {
-            FactorizedPolynomial<P> result = _fpolyA + FactorizedPolynomial<P>( std::move( Factorization<P>( _fpolyB.factorization() ) ), coefficient, _fpolyB.pCache() );
-            assert( computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            FactorizedPolynomial<P> result = _lhs + FactorizedPolynomial<P>( std::move( Factorization<P>( _rhs.factorization() ) ), coefficient, _rhs.pCache() );
+            assert( computePolynomial( _lhs ) - computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
         else
         {
-            FactorizedPolynomial<P> result = _fpolyA + FactorizedPolynomial<P>( coefficient );
-            assert( computePolynomial( _fpolyA ) - computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            FactorizedPolynomial<P> result = _lhs + FactorizedPolynomial<P>( coefficient );
+            assert( computePolynomial( _lhs ) - computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
     }
     
     template<typename P>
-    FactorizedPolynomial<P> operator*( const Coeff<P>& _coeff, const FactorizedPolynomial<P>& _fpoly )
+    FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const typename FactorizedPolynomial<P>::CoeffType& _coeff )
     {
-        if( _coeff == 0 )
-        {
-            FactorizedPolynomial<P> result;
-            assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
-            return std::move( result );
-        }
-        FactorizedPolynomial<P> result( _fpoly );
-        result.mCoefficient *= _coeff;
-        assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
-        return std::move( result );
-    }
-    
-    template<typename P>
-    FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpoly, const Coeff<P>& _coeff )
-    {
-        if( _coeff == 0 )
+        if( carl::isZero( _coeff ) )
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _fpoly ) * _coeff == computePolynomial( result ) );
@@ -417,37 +1086,37 @@ namespace carl
     }
 
     template<typename P>
-    FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _fpolyA, const FactorizedPolynomial<P>& _fpolyB )
+    FactorizedPolynomial<P> operator*( const FactorizedPolynomial<P>& _lhs, const FactorizedPolynomial<P>& _rhs )
     {
-        ASSERT_CACHE_EQUAL( _fpolyA.pCache(), _fpolyB.pCache() );
-        _fpolyA.strengthenActivity();
-        _fpolyB.strengthenActivity();
+        ASSERT_CACHE_EQUAL( _lhs.pCache(), _rhs.pCache() );
+        _lhs.strengthenActivity();
+        _rhs.strengthenActivity();
 
-        if( _fpolyA.isZero() || _fpolyB.isZero() )
+        if( _lhs.isZero() || _rhs.isZero() )
         {
             FactorizedPolynomial<P> result;
-            assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            assert( computePolynomial( _lhs ) * computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
 
-        if( !existsFactorization( _fpolyB ) )
+        if( !existsFactorization( _rhs ) )
         {
-            FactorizedPolynomial<P> result( _fpolyA );
-            result.mCoefficient *= _fpolyB.mCoefficient;
-            assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            FactorizedPolynomial<P> result( _lhs );
+            result.mCoefficient *= _rhs.mCoefficient;
+            assert( computePolynomial( _lhs ) * computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
-        else if( !existsFactorization( _fpolyA ) )
+        else if( !existsFactorization( _lhs ) )
         {
-            FactorizedPolynomial<P> result( _fpolyB );
-            result.mCoefficient *= _fpolyA.mCoefficient;
-            assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
+            FactorizedPolynomial<P> result( _rhs );
+            result.mCoefficient *= _lhs.mCoefficient;
+            assert( computePolynomial( _lhs ) * computePolynomial( _rhs ) == computePolynomial( result ) );
             return std::move( result );
         }
 
         Factorization<P> resultFactorization;
-        const Factorization<P>& factorizationA = _fpolyA.factorization();
-        const Factorization<P>& factorizationB = _fpolyB.factorization();
+        const Factorization<P>& factorizationA = _lhs.factorization();
+        const Factorization<P>& factorizationB = _rhs.factorization();
         auto factorA = factorizationA.begin();
         auto factorB = factorizationB.begin();
         while( factorA != factorizationA.end() && factorB != factorizationB.end() )
@@ -480,18 +1149,18 @@ namespace carl
             factorB++;
         }
 
-        Coeff<P> coefficientResult = _fpolyA.coefficient() * _fpolyB.coefficient();
+        Coeff<P> coefficientResult = _lhs.coefficient() * _rhs.coefficient();
         //TODO needed?
         coefficientResult *= distributeCoefficients( resultFactorization );
-        FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) );
-        assert( computePolynomial( _fpolyA ) * computePolynomial( _fpolyB ) == computePolynomial( result ) );
+        FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _lhs.pCache(), _rhs.pCache() ) );
+        assert( computePolynomial( _lhs ) * computePolynomial( _rhs ) == computePolynomial( result ) );
         return std::move( result );
     }
     
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator*=( const CoeffType& _coef )
     {
-        if( _coef == CoeffType( 0 ) && mpCache != nullptr )
+        if( carl::isZero( _coef ) && mpCache != nullptr )
         {
             mpCache->dereg( mCacheRef );
             mCacheRef = CACHE::NO_REF;
@@ -512,7 +1181,7 @@ namespace carl
     template<typename P>
     FactorizedPolynomial<P>& FactorizedPolynomial<P>::operator/=( const CoeffType& _coef )
     {
-        assert( _coef != 0 );
+        assert( !carl::isZero( _coef ) );
         FactorizedPolynomial<P> tmp = *this;
         this->mCoefficient /= _coef;
         assert(computePolynomial(tmp) * (static_cast<CoeffType>(1)/_coef) == computePolynomial(*this));
@@ -541,6 +1210,44 @@ namespace carl
         FactorizedPolynomial<P> result = lazyDiv( *this, _fdivisor );
         assert( computePolynomial( *this ).quotient( computePolynomial( _fdivisor ) ) == computePolynomial( result ) );
         return std::move( result );
+    }
+    
+    template<typename P>
+    std::string FactorizedPolynomial<P>::toString( bool _infix, bool _friendlyVarNames ) const
+    {
+        if( existsFactorization( *this ) )
+        {
+            std::string result = "";
+            if( _infix )
+            {
+                if( coefficient() != Coeff<P>( 1 ) )
+                {
+                    std::stringstream s;
+                    s << coefficient();
+                    result += s.str() + " * (";
+                }
+                result += content().toString( true, _friendlyVarNames );
+                if( coefficient() != Coeff<P>( 1 ) )
+                    result += ")";
+            }
+            else
+            {
+                bool withCoeff = coefficient() != Coeff<P>( 1 );
+                if( withCoeff )
+                {
+                    std::stringstream s;
+                    s << coefficient();
+                    result += "(* " + s.str() + " ";
+                }
+                result += content().toString( false, _friendlyVarNames );
+                if( withCoeff )
+                    result += ")";
+            }
+            return result;
+        }
+        std::stringstream s;
+        s << coefficient();
+        return s.str();
     }
 
     template<typename P>
@@ -852,8 +1559,6 @@ namespace carl
         assert( !_fpolyA.isZero() && !_fpolyB.isZero() );
         _fpolyA.strengthenActivity();
         _fpolyB.strengthenActivity();
-        bool rehashFPolyA = false;
-        bool rehashFPolyB = false;
 
         Coeff<P> coefficientCommon = Coeff<P>(carl::gcd( carl::getNum( _fpolyA.coefficient() ), carl::getNum( _fpolyB.coefficient() ) )) /
         Coeff<P>(carl::lcm( carl::getDenom( _fpolyA.coefficient() ), carl::getDenom( _fpolyB.coefficient() ) ));
@@ -895,6 +1600,8 @@ namespace carl
         //Both polynomials are not constant
         Factorization<P> restAFactorization, restBFactorization;
         Coeff<P> c( 0 );
+        bool rehashFPolyA = false;
+        bool rehashFPolyB = false;
         Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, c, rehashFPolyA, rehashFPolyB ) );
 
         if( c != Coeff<P>( 0 ) )
@@ -919,16 +1626,7 @@ namespace carl
     template <typename P>
     std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly )
     {
-        if ( existsFactorization( _fpoly ) )
-        {
-            if ( _fpoly.coefficient() != Coeff<P>( 1 ) )
-                _out << _fpoly.coefficient() << " * (";
-            _out << _fpoly.content();
-            if ( _fpoly.coefficient() != Coeff<P>( 1 ) )
-                _out << ")";
-            return _out;
-        }
-        else
-            return ( _out << _fpoly.coefficient() );
+        _out << _fpoly.toString();
+        return _out;
     }
 } // namespace carl

@@ -7,7 +7,7 @@ We assume that you start with a fresh installation and know how to install softw
 - Install the following packages:
  - `git`
  - `cmake` and `cmake-curses-gui`
- - `libcln6` and `libgmp-dev`
+ - `libcln6`, `libcln-dev` and `libgmp-dev`
  - `libeigen3-dev`
  - `g++` or `clang`
  - `libboost-dev`

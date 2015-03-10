@@ -61,7 +61,7 @@ namespace carl
 	
 	enum Str2Double_Error { FLOAT_SUCCESS, FLOAT_OVERFLOW, FLOAT_UNDERFLOW, FLOAT_INCONVERTIBLE };
 
-	static Str2Double_Error str2double (double &d, char const *s)
+	inline Str2Double_Error str2double (double &d, char const *s)
 	{
 		char *end;
 		long double  l;
@@ -80,6 +80,34 @@ namespace carl
 		return FLOAT_SUCCESS;
 	}
     
+	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+	template<typename Number>
+	inline bool AlmostEqual2sComplement(Number A, Number B, int = 1)
+	{
+		return A == B;
+	}
+	
+	template<>
+	inline bool AlmostEqual2sComplement(double A, double B, int maxUlps)
+	{
+		// Make sure maxUlps is non-negative and small enough that the
+		// default NAN won't compare as equal to anything.
+		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
+		long int aInt = *(long int*)&A;
+		// Make aInt lexicographically ordered as a twos-complement int
+		if (aInt < 0)
+			aInt = long(0x8000000000000000) - aInt;
+		// Make bInt lexicographically ordered as a twos-complement int
+		long int bInt = *(long int*)&B;
+		if (bInt < 0)
+			bInt = long(0x8000000000000000) - bInt;
+		long int intDiff = std::abs(aInt - bInt);
+		if (intDiff <= maxUlps)
+			return true;
+
+		return false;
+	}
+	
     /**
      * Templated wrapper class which allows universal usage of different 
      * IEEE 754 implementations.
@@ -261,7 +289,9 @@ namespace carl
          */
         bool operator ==(const FLOAT_T<FloatType>& _rhs) const
         {
-            return mValue == _rhs.mValue;
+			//std::cout << "COMPARISON: " << *this << " == " << _rhs << " : " << (mValue == _rhs.mValue) << std::endl;
+            //return mValue == _rhs.mValue;
+			return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue), 4);
         }
 
         /**
@@ -283,6 +313,17 @@ namespace carl
         {
             return mValue > _rhs.mValue;
         }
+		
+		bool operator>(int _rhs) const
+        {
+            return mValue > _rhs;
+        }
+		
+		bool operator>(unsigned _rhs) const
+        {
+            return mValue > _rhs;
+        }
+		
 
         /**
          * Comparison operator for less than.
@@ -292,6 +333,16 @@ namespace carl
         bool operator<(const FLOAT_T<FloatType> & _rhs) const
         {
             return mValue < _rhs.mValue;
+        }
+		
+		bool operator<(int _rhs) const
+        {
+            return mValue < _rhs;
+        }
+		
+		bool operator<(unsigned _rhs) const
+        {
+            return mValue < _rhs;
         }
 
         /**
@@ -1572,13 +1623,45 @@ namespace carl
     }
 	
 	template<typename FloatType>
-	inline FLOAT_T<FloatType> pow(const FLOAT_T<FloatType>& _in, unsigned _exp)
+	inline FLOAT_T<FloatType> pow(const FLOAT_T<FloatType>& _in, size_t _exp)
 	{
 		FLOAT_T<FloatType> result;
 		_in.pow(result, _exp);
 		return result;
 	}
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> sin(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.sin(result);
+		return result;
+	}
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> cos(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.cos(result);
+		return result;
+	}
     
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> asin(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.asin(result);
+		return result;
+	}
+	
+	template<typename FloatType>
+	inline FLOAT_T<FloatType> acos(const FLOAT_T<FloatType>& _in)
+	{
+		FLOAT_T<FloatType> result;
+		_in.acos(result);
+		return result;
+	}
+	
     /**
      * Method which returns the next smaller integer of this number or the number
      * itself, if it is already an integer.
@@ -1649,4 +1732,4 @@ namespace carl
 #ifdef USE_MPFR_FLOAT
 #include "adaption_float/mpfr_float.tpp"
 #endif
-}
+} // namespace

@@ -334,4 +334,18 @@ struct UnderlyingNumberType<MultivariatePolynomial<C, O, P>>: has_subtype<typena
 namespace carl
 {
 template<typename T> struct needs_cache : std::false_type {};
+
+template<typename T> struct is_factorized : std::true_type {};
+
+template<typename T>
+class PreventConversion
+{
+    private:
+        T mContent;
+    public:
+        explicit PreventConversion( const T& _other ) : mContent( _other ) {}
+//        template<typename O>
+//        PreventConversion( const O& _other ) = delete;
+        operator T () const { return mContent; }
+};
 }

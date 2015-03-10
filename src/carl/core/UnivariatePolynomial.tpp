@@ -274,7 +274,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	Coeff factor(0); // We have to initialize it to prevent a compiler error.
 	if(prefactor != nullptr)
 	{
-		factor = carl::quotient(*prefactor * lcoeff(), divisor.lcoeff());
+		factor = carl::quotient(Coeff(*prefactor * lcoeff()), divisor.lcoeff());
 		// There should be no remainder.
 		assert(factor * divisor.lcoeff() == *prefactor * lcoeff());
 	}
@@ -564,6 +564,21 @@ UnivariatePolynomial<Coefficient> UnivariatePolynomial<Coefficient>::mod(const C
 }
 
 template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::pow(std::size_t exp) const
+{
+	if (exp == 0) return UnivariatePolynomial(mMainVar, constant_one<Coeff>::get());
+	if (isZero()) return UnivariatePolynomial(mMainVar);
+	UnivariatePolynomial<Coeff> res(mMainVar, constant_one<Coeff>::get());
+	UnivariatePolynomial<Coeff> mult(*this);
+	while(exp > 0) {
+		if (exp & 1) res *= mult;
+		exp /= 2;
+		if(exp > 0) mult = mult * mult;
+	}
+	return res;
+}
+
+template<typename Coeff>
 template<typename C, DisableIf<is_number<C>>>
 UnivariatePolynomial<typename UnivariatePolynomial<Coeff>::NumberType> UnivariatePolynomial<Coeff>::toNumberCoefficients(bool check) const {
 	std::vector<NumberType> coeffs;
@@ -774,6 +789,7 @@ bool UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor, UnivariatePolyn
 	assert(divisor.isConsistent());
 	Coeff quo;
 	bool res = Coeff(*this).divideBy(divisor, quo);
+	CARL_LOG_TRACE("carl.core", Coeff(*this) << " / " << divisor << " = " << quo);
 	assert(quo.isConsistent());
 	if (res) quotient = quo.toUnivariatePolynomial(this->mainVar());
 	return res;
@@ -784,11 +800,11 @@ template<typename C, DisableIf<is_field<C>>, DisableIf<is_number<C>>, EnableIf<i
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const typename UnivariatePolynomial<Coeff>::NumberType& divisor) const 
 {
 	UnivariatePolynomial<Coeff> res(*this);
-    assert(res.isConsistent());
+	assert(res.isConsistent());
 	for (unsigned i = 0; i < res.mCoefficients.size(); i++) {
 		res.mCoefficients[i] = res.mCoefficients[i].divideBy(divisor);
 	}
-    assert(res.isConsistent());
+	assert(res.isConsistent());
 	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
 }
 
@@ -822,8 +838,8 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 		num = carl::gcd(num, getNum(tmp));
 		den = carl::lcm(den, getDenom(tmp));
 	}
-	assert(getDenom(max*den/num) == 1);
-	return getNum(max*den/num);
+	assert(getDenom(Coeff(max*den/num)) == 1);
+	return getNum(Coeff(max*den/num));
 }
 
 template<typename Coeff>
@@ -882,11 +898,13 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 	
 	// now, some coefficient * mainDenom is always integral.
 	// we convert such a product to an integral data type by getNum()
-	assert(getDenom(this->numericContent(0) * mainDenom) == 1);
-	IntNumberType res = getNum(this->numericContent(0) * mainDenom);
+	UnivariatePolynomial<Coeff>::NumberType c = this->numericContent(0) * mainDenom;
+	assert(getDenom(c) == 1);
+	IntNumberType res = getNum(c);
 	for (unsigned i = 1; i < this->mCoefficients.size(); i++) {
-		assert(getDenom(this->numericContent(i) * mainDenom) == 1);
-		res = carl::gcd(getNum(this->numericContent(i) * mainDenom), res);
+		c = this->numericContent(i) * mainDenom;
+		assert(getDenom(c) == 1);
+		res = carl::gcd(getNum(c), res);
 	}
 	return NumberType(res) / mainDenom;
 }
@@ -1205,10 +1223,10 @@ LinearFactorRemains:
 		// Add the constant factor to the factors.
 		if( !linearFactors.empty() && linearFactors.begin()->first.isConstant() )
 		{
-            if( linearFactors.begin()->first.isZero() )
-                factor = Coeff( 0 );
-            else
-                factor *= linearFactors.begin()->first.lcoeff();
+			if( linearFactors.begin()->first.isZero() )
+				factor = Coeff( 0 );
+			else
+				factor *= linearFactors.begin()->first.lcoeff();
 			linearFactors.erase(linearFactors.begin());
 		}
 		linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), factor), 1));
@@ -1514,8 +1532,8 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 	UnivariatePolynomial<Coeff> tmp = q;
 	q = p.prem(-q);
 	p = tmp;
-	CARL_LOG_TRACE("carl.core.resultant", "p = q = " << p);
 	CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q) = " << q);
+	CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
 	//CARL_LOG_TRACE("carl.core.resultant", "p = q");
 	//CARL_LOG_TRACE("carl.core.resultant", "q = p.prem(-q)");
 	
@@ -1630,7 +1648,8 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				 * If it was successful, the resulting term is safely added to the list, yielding an optimized resultant.
 				 */
 				UnivariatePolynomial<Coeff> reducedNewB = p.prem(-q);
-				reducedNewB.divideBy(subresLcoeff.pow(delta)*p.lcoeff(), q);
+				bool r = reducedNewB.divideBy(subresLcoeff.pow(delta)*p.lcoeff(), q);
+				assert(r);
 				break;
 			}
 			case SubresultantStrategy::Ducos: {
@@ -1708,7 +1727,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::resultant(
 	assert(p.mainVar() == this->mainVar());
 	if (this->isZero()) return UnivariatePolynomial(this->mainVar());
 	if (p.isZero()) return UnivariatePolynomial(this->mainVar());
-	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
+	UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(this->normalized(), p.normalized(), strategy).front();
+	//UnivariatePolynomial<Coeff> resultant = UnivariatePolynomial<Coeff>::subresultants(*this, p, strategy).front();
 	CARL_LOG_TRACE("carl.core.resultant", "resultant(" << *this << ", " << p << ") = " << resultant);
 	if (resultant.isConstant()) {
 		return resultant;

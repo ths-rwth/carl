@@ -20,6 +20,7 @@
 #include "../core/Variable.h"
 #include "../interval/IntervalEvaluation.h"
 #include "CADSettings.h"
+#include "Variables.h"
 
 namespace carl {
 namespace cad {
@@ -107,10 +108,10 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r) const {
-		assert(this->variables.size() <= r.dim());
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& variables) const {
+		assert(variables.size() == r.dim());
 		
-		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, this->variables);
+		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, variables);
 		if (this->negated) {
 			return res->sgn() != this->sign;
 		} else {
@@ -122,7 +123,7 @@ public:
 	 * Changes the variables of this constraint to start with v, where all other variables are being dropped.
 	 * @param v
 	 */
-	void unifyVariables(const std::vector<Variable>& v) {
+	void unifyVariables(const cad::Variables& v) {
 		this->variables.assign(v.begin(), v.end());
 	}
 	

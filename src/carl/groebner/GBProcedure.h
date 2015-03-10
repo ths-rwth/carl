@@ -86,6 +86,7 @@ public:
 		mOrigGenerators = rhs.mOrigGenerators;
 		mOrigGeneratorsIndices = rhs.mOrigGeneratorsIndices;
 		Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
+        Procedure<Polynomial, AddingPolynomialPolicy>::setCriticalPairs(rhs.pCritPairs);
 		return *this;
 	}
 	
@@ -146,7 +147,7 @@ public:
 	
 	void printScheduledPolynomials(bool breakLines = true, bool printReasons = true, std::ostream& os = std::cout) const
 	{
-		for(Polynomial p : mInputScheduled)
+		for(const Polynomial& p : mInputScheduled)
 		{
 			os << p;
 			if(printReasons)
@@ -287,12 +288,17 @@ private:
 		for(std::vector<size_t>::const_iterator index = toBeReduced.begin(); index != toBeReduced.end(); ++index)
 		{
 			Reductor<Polynomial, Polynomial> reduct(*reduced, mGb->getGenerator(*index));
-			Polynomial res = reduct.fullReduce().normalize();
-			CARL_LOG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);
-			reduced->addGenerator(res);
+			Polynomial res = reduct.fullReduce();
+            if(!res.isZero())
+            {
+                res.normalize();
+                CARL_LOG_DEBUG("carl.gb.gbproc", "GB Reduction, reduced " << mGb->getGenerator(*index) << " to " << res);
+                reduced->addGenerator(res);
+            }
 		}
 
 		mGb = reduced;
+        Procedure<Polynomial, AddingPolynomialPolicy>::setIdeal(mGb);
 	}
 };
 }

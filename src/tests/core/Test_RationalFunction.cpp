@@ -91,6 +91,7 @@ TEST(RationalFunction, Multiplication)
     r4 *= x;
     EXPECT_EQ(sp.parseMultivariatePolynomial<Rational>("x^2"), r4.nominator());
     EXPECT_FALSE(needs_cache<Pol>::value);
+    EXPECT_TRUE(needs_cache<FPol>::value);
     
     std::shared_ptr<CachePol> pCache( new CachePol );
     
@@ -233,4 +234,28 @@ TEST(RationalFunction, Hash)
     FPol fp2(p2, pCache);
 
     FPol tmp = fp2 - fp1;
+}
+
+TEST(RationalFunction, Derivative)
+{
+	carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y", "z"});
+    
+	// from http://de.wikipedia.org/wiki/Quotientenregel#Beispiel
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("1*x^2 + -1");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("2 + -3*x");
+    
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("-3*x^2 + 4*x + -3");
+
+	std::shared_ptr<CachePol> pCache( new CachePol );
+	FPol fp1(p1, pCache);
+	FPol fp2(p2, pCache);
+	FPol fp3(p3, pCache);
+    
+    RFactFunc r1(fp1, fp2);
+    RFactFunc r2(fp3, fp2*fp2);
+	
+	EXPECT_EQ(r2, r1.derivative(sp.variables().at("x")));
+    
 }
