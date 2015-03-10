@@ -822,6 +822,7 @@ public:
 	 */
 	template<typename Iterator>
 	Iterator erase(Iterator position) {
+		assert(this->isConsistent());
 		std::size_t id = position.current;
 		if (id == 0) {
 			clear();
@@ -831,11 +832,16 @@ public:
 		++position;
 		if (nodes[id].nextSibling != MAXINT) {
 			nodes[nodes[id].nextSibling].previousSibling = nodes[id].previousSibling;
+		} else {
+			nodes[nodes[id].parent].lastChild = nodes[id].previousSibling;
 		}
 		if (nodes[id].previousSibling != MAXINT) {
 			nodes[nodes[id].previousSibling].nextSibling = nodes[id].nextSibling;
+		} else {
+			nodes[nodes[id].parent].firstChild = nodes[id].nextSibling;
 		}
 		eraseNode(id);
+		assert(this->isConsistent());
 		return position;
 	}
 	/**
@@ -901,6 +907,7 @@ private:
 		nodes[id].previousSibling = MAXINT;
 	}
 	
+public:
 	bool isConsistent() const {
 		for (auto it = this->begin(); it != this->end(); ++it) {
 			assert(isConsistent(it.current));
