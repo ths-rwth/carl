@@ -112,10 +112,10 @@ class SortManager : public Singleton<SortManager>
 			{
 				if (name != _sc.name) return name < _sc.name;
 				if (interpreted != _sc.interpreted) return interpreted;
-				if (!interpreted) {
+				if (interpreted) {
 					if (type != _sc.type) return type < _sc.type;
 				}
-				if (interpreted) {
+				if (!interpreted) {
 					if (parameters == nullptr && _sc.parameters != nullptr) return true;
 					if (parameters != nullptr && _sc.parameters == nullptr) return false;
 					if (parameters != nullptr && _sc.parameters != nullptr) {
@@ -179,6 +179,11 @@ class SortManager : public Singleton<SortManager>
 		 * @return The name if the given sort.
 		 */
 		const std::string& getName( const Sort& _sort ) const;
+
+		const std::vector<std::size_t>* getIndices(const Sort& _sort ) const {
+			assert(_sort.id() < mSorts.size());
+			return mSorts[_sort.id()]->indices;
+		}
 		
 		/**
 		 * Prints the given sort on the given output stream.
