@@ -48,12 +48,12 @@ private:
 		}
 	};
 	friend std::ostream& operator<<(std::ostream& os, const Node& n) {
-		int id = n.id;
-		int parent = (n.parent == MAXINT ? -1 : n.parent);
-		int firstChild = (n.firstChild == MAXINT ? -1 : n.firstChild);
-		int lastChild = (n.lastChild == MAXINT ? -1 : n.lastChild);
-		int previousSibling = (n.previousSibling == MAXINT ? -1 : n.previousSibling);
-		int nextSibling = (n.nextSibling == MAXINT ? -1 : n.nextSibling);
+		int id = (int)n.id;
+		int parent = (n.parent == MAXINT ? -1 : (int)n.parent);
+		int firstChild = (n.firstChild == MAXINT ? -1 : (int)n.firstChild);
+		int lastChild = (n.lastChild == MAXINT ? -1 : (int)n.lastChild);
+		int previousSibling = (n.previousSibling == MAXINT ? -1 : (int)n.previousSibling);
+		int nextSibling = (n.nextSibling == MAXINT ? -1 : (int)n.nextSibling);
 		os << "(" << n.data << " @ " << id << ", " << parent << ", " << firstChild << ":" << lastChild << ", " << previousSibling << " <-> " << nextSibling << ")\n";
 
 		return os;
