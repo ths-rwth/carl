@@ -25,7 +25,7 @@ namespace carl
         }
         return 0;
     }
-    
+
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(float n)
     {
@@ -50,25 +50,25 @@ namespace carl
         }
         return 0;
     }
-    
+
     bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b)
     {
         if( a < 0 ) return false;
         return cln::sqrtp( a, &b );
     }
-    
+
     std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a)
     {
         assert( a >= 0 );
-        cln::cl_R root = cln::sqrt(toLF(a));
-        cln::cl_RA rroot = cln::rationalize(root);
-        if( rroot == root ) // the result of the sqrt operation is a rational and thus an exact solution -> return a point-Interval
-        {
-            return std::make_pair(rroot, rroot);
-        }
-        else // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
-        {
-                    // Check if root^2 > a
+        cln::cl_RA exact_root;
+        if (cln::sqrtp(a, &exact_root)) {
+            // root can be computed exactly.
+            return std::make_pair(exact_root, exact_root);
+        } else {
+            cln::cl_R root = cln::sqrt(toLF(a));
+            cln::cl_RA rroot = cln::rationalize(root);
+            // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
+            // Check if root^2 > a
             if( cln::expt_pos(rroot,2) > a ) // we need to find the lower bound
             {
                 cln::cl_R lower = cln::sqrt(toLF(a-rroot));
@@ -103,7 +103,7 @@ namespace carl
             }
         }
     }
-    
+
     std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a)
     {
 		assert(a >= 0);
@@ -120,7 +120,7 @@ namespace carl
             return std::make_pair(lower, upper);
         }
     }
-    
+
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring)
     {
@@ -142,7 +142,7 @@ namespace carl
         }
         return result;
     }
-    
+
     template<>
     cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n) {
         typedef signed long int IntType;
@@ -173,7 +173,7 @@ namespace carl
             if(d != cln::cl_I(1)) s << "(/ " << carl::abs(carl::getNum(_number)) << " " << carl::abs(d) << ")";
             else s << carl::abs(_number);
         }
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }
@@ -184,7 +184,7 @@ namespace carl
         bool negative = (_number < cln::cl_I(0));
         if(negative) s << "(-" << (_infix ? "" : " ");
         s << carl::abs(_number);
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }

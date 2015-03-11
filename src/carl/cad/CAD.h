@@ -67,7 +67,7 @@ public:
 	typedef typename cad::CADPolynomials<Number>::MPolynomial MPolynomial;
 
 	/// Type of an iterator over the samples.
-	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
+	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
 	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
@@ -77,7 +77,7 @@ private:
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
-	carl::Tree<RealAlgebraicNumberPtr<Number>> sampleTree;
+	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
 
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)

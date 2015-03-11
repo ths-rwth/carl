@@ -630,3 +630,39 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 
     expectRightOrder(list);
 }
+
+#include "../benchmarks/framework/BenchmarkConversions.h"
+#include "../benchmarks/framework/Common.h"
+#ifdef COMPARE_WITH_Z3
+#include <z3/src/math/polynomial/polynomial.h>
+#endif
+
+TEST(MultivariatePolynomialTest, Resultant)
+{
+	VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x0");
+    Variable y = pool.getFreshVariable("x1");
+	typedef cln::cl_RA T;
+	carl::CIPtr ci = carl::CIPtr(new ConversionInformation());
+	
+	MultivariatePolynomial<cln::cl_RA> p = x*x + x*(y*y+T(4)) + y*y + T(18);
+	MultivariatePolynomial<cln::cl_RA> q = x*x + x*(T(4)*y+T(8)) + T(2)*y*y+y+T(19);
+	//_r_1^2 + (_r_2^2+4)*_r_1^1 + _r_2^2+18
+	//_r_1^2 + (4*_r_2+8)*_r_1^1 + 2*_r_2^3+_r_2+19
+	
+#ifdef COMPARE_WITH_Z3
+	auto pz3 = carl::Conversion::convert<ZMP>(p, ci);
+	auto qz3 = carl::Conversion::convert<ZMP>(q, ci);
+	auto xz3 = carl::Conversion::convert<ZVAR>(x, ci);
+#endif	
+	std::cout << p << ", " << q << std::endl;
+#ifdef COMPARE_WITH_Z3
+	std::cout << "#####  Z3  #####" << std::endl;
+	auto resz3 = resultant(pz3, qz3, xz3);
+	std::cout << "Result: " << resz3 << std::endl;
+#endif
+	
+//	std::cout << "##### CArL #####" << std::endl;
+//	auto res = p.toUnivariatePolynomial(x).resultant_z3(q.toUnivariatePolynomial(x));
+//	std::cout << "Result: " << res << std::endl;
+}

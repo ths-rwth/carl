@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <carl/io/streamingOperators.h>
+
 namespace carl {
 
 typedef std::map<std::string, unsigned> BenchmarkResult;
@@ -31,7 +33,7 @@ public:
 			if (name.second) os << "\t" << name.first;
 		}
 		os << std::endl;
-		for (auto res: data) {
+		for (const auto& res: data) {
 			if (sizeof...(Identifier) == 1) os << std::get<0>(res.first);
 			else os << res.first;
 			for (const auto& name: names) {

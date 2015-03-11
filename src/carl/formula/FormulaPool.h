@@ -62,7 +62,9 @@ namespace carl
             ~FormulaPool();
             
         public:
-            
+            std::size_t size() const {
+                return mPool.size();
+            }
             void print() const
             {
                 std::cout << "Formula pool contains:" << std::endl;
