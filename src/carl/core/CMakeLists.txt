@@ -12,10 +12,12 @@ set(carl_lib_core_headers
     RealAlgebraicNumberSettings.h
     RealAlgebraicNumberEvaluation.h
     RealAlgebraicPoint.h
-	UnivariatePolynomial.h
-	UnivariatePolynomial.tpp
-	MultivariatePolynomial.h
-	MultivariatePolynomial.tpp
+    UnivariatePolynomial.h
+    UnivariatePolynomial.tpp
+    MultivariateFactor.h
+    MultivariateFactor.tpp
+    MultivariatePolynomial.h
+    MultivariatePolynomial.tpp
     VarExpPair.h
     Variable.h
     VariablePool.h

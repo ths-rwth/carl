@@ -7,7 +7,7 @@ using namespace carl;
 
 TEST(Parser, Polynomial)
 {
-	carl::parser::Parser<cln::cl_RA> parser;
+	carl::parser::Parser<MultivariatePolynomial<cln::cl_RA>> parser;
 	carl::Variable x = freshRealVariable("x");
 	carl::Variable y = freshRealVariable("y");
 	parser.addVariable(x);

@@ -22,6 +22,7 @@ set(carl_lib_util_headers
 	Common.h
 	parser/Common.h
 	parser/Parser.h
+	parser/FormulaParser.h
 	parser/PolynomialParser.h
 	parser/RationalFunctionParser.h
 ) 
