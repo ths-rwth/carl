@@ -1802,7 +1802,7 @@ void CAD<Number>::trimVariables() {
 			if (depth <= maxDepth) {
 				// remove the complete layer of samples from the sample tree at the given depth
 				// fix the iterators to be deleted in a separate list independent of merging with the children
-				std::queue<typename Tree<RealAlgebraicNumberPtr<Number>>::iterator> toDelete;
+				std::queue<sampleIterator> toDelete;
 				for (auto node = this->sampleTree.begin_fixed(this->sampleTree.begin(), depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
 					toDelete.push(node);
 				}
