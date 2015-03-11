@@ -49,8 +49,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	// gcd(p, ay + b) is either ay + b or 1.
     
     #ifdef COMPARE_WITH_GINAC
-    typedef MultivariatePolynomial<C,O,P> PolyT;
-    return ginacGcd<PolyT>( mp1, mp2 );
+    return ginacGcd<Polynomial>( mp1, mp2 );
     #else 
 	Variable x = getMainVar(mp1, mp2);
 	if(x == Variable::NO_VARIABLE)

@@ -243,10 +243,10 @@ namespace carl
     P computePolynomial( const Factorization<P>& _factorization )
     {
         P result( 1 );
-        for (auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
+        for (auto ft = _factorization.begin(); ft != _factorization.end(); ft++ )
         {
-            assert( existsFactorization( factor->first ) );
-            result *= computePolynomial( factor->first.content() ).pow( factor->second );
+            assert( existsFactorization( ft->first ) );
+            result *= computePolynomial( ft->first.content() ).pow( ft->second );
         }
         return result;
     }
@@ -268,32 +268,32 @@ namespace carl
             return result;
         }
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        for( auto factor = mFactorization.begin(); factor != mFactorization.end(); )
+        for( auto ft = mFactorization.begin(); ft != mFactorization.end(); )
         {
-            if( factor->first.content().factorizedTrivially() )
+            if( ft->first.content().factorizedTrivially() )
             {
-                if ( factor->first.coefficient() != 1 )
+                if ( ft->first.coefficient() != 1 )
                 {
                     if( result == typename P::CoeffType( 0 ) )
                         result = typename P::CoeffType( 1 );
-                    carl::exponent e = factor->second;
+                    carl::exponent e = ft->second;
                     assert( e != 0 );
-                    result *= carl::pow( factor->first.coefficient(), e );
-                    factor->first.setCoefficient( 1 );
+                    result *= carl::pow( ft->first.coefficient(), e );
+                    ft->first.setCoefficient( 1 );
                 }
-                ++factor;
+                ++ft;
             }
             else
             {
                 // Update factorization
                 if( result == typename P::CoeffType( 0 ) )
                     result = typename P::CoeffType( 1 );
-                const Factorization<P>& partFactorization = factor->first.factorization();
-                assert( factor->first.coefficient() > 0 );
-                carl::exponent e = factor->second;
+                const Factorization<P>& partFactorization = ft->first.factorization();
+                assert( carl::isPositive( ft->first.coefficient() ) );
+                carl::exponent e = ft->second;
                 assert( e != 0 );
-                result *= carl::pow( factor->first.coefficient(), e );
-                factor = mFactorization.erase(factor);
+                result *= carl::pow( ft->first.coefficient(), e );
+                ft = mFactorization.erase(ft);
 
                 for( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
@@ -307,7 +307,6 @@ namespace carl
             }
         }
         assert( assertFactorization() );
-
         return result;
     }
     
@@ -362,6 +361,8 @@ namespace carl
     template<typename P>
     Factorization<P> gcd( const PolynomialFactorizationPair<P>& _pfPairA, const PolynomialFactorizationPair<P>& _pfPairB, Factorization<P>& _restA, Factorization<P>& _restB, typename P::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined )
     {
+//        std::cout << "****************************************************" << std::endl;
+//        std::cout << __func__ << " of " << _pfPairA << " and " << _pfPairB << std::endl;
         if( &_pfPairA == &_pfPairB )
             return _pfPairA.factorization();
 
@@ -399,15 +400,30 @@ namespace carl
             CARL_LOG_TRACE( "carl.core.factorizedpolynomial", "FactorA: (" << factorA << ")^" << exponentA );
             factorizationA.erase( factorizationA.begin() );
             rest = true;
-            assert( factorA.factorization().size() == 1);
+            bool breaked = false;
 
             while ( !factorA.isOne() && !factorizationB.empty() )
             {
+                const Factorization<P>& currentFactorizationA = factorA.factorization();
+                if( currentFactorizationA.size() != 1 )
+                {
+                    factorizationA.insert( currentFactorizationA.begin(), currentFactorizationA.end() );
+                    breaked = true;
+                    break;
+                }
                 FactorizedPolynomial<P> factorB = factorizationB.begin()->first;
                 carl::exponent exponentB = factorizationB.begin()->second;
                 CARL_LOG_TRACE( "carl.core.factorizedpolynomial", "FactorB: (" << factorB << ")^" << exponentB );
                 factorizationB.erase( factorizationB.begin() );
-                assert( factorB.factorization().size() == 1);
+                const Factorization<P>& currentFactorizationB = factorB.factorization();
+                if( currentFactorizationB.size() != 1 )
+                {
+                    factorizationB.insert( currentFactorizationB.begin(), currentFactorizationB.end() );
+                    continue;
+                }
+//                std::cout << "take " << factorA << " where remains " << factorizationA << " and " << _restA << " is finished" << std::endl;
+//                std::cout << "take " << factorB << " where remains " << factorizationB << " and " << _restB << std::endl;
+//                std::cout << "already found gcd is " << result << std::endl;
 
                 if( factorA == factorB )
                 {
@@ -462,14 +478,15 @@ namespace carl
                         {
                             //Set new factorization
                             FactorizedPolynomial<P> polRemainA( remainA, cache );
-                            factorA.content().setNewFactors( gcdResult, exponentA, polRemainA, exponentA );
+                            factorA.content().setNewFactors( gcdResult, 1, polRemainA, 1 );
                             _pfPairARefined = true;
                             CARL_LOG_TRACE( "carl.core.factorizedpolynomial", "RemainderA: " << polRemainA );
                             factorA = polRemainA;
-
                             //Add remaining factorization
                             if (exponentA > exponentCommon)
+                            {
                                 factorizationA.insert( factorizationA.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentA-exponentCommon ) );
+                            }
                         }
                         else
                         {
@@ -484,13 +501,15 @@ namespace carl
                         {
                             //Set new factorization
                             FactorizedPolynomial<P> polRemainB( remainB, cache );
-                            factorB.content().setNewFactors( gcdResult, exponentB, polRemainB, exponentB );
+                            factorB.content().setNewFactors( gcdResult, 1, polRemainB, 1 );
                             _pfPairBRefined = true;
                             CARL_LOG_TRACE( "carl.core.factorizedpolynomial", "RemainderB: " << polRemainB );
 
                             //Add remaining factorization
                             if (exponentB > exponentCommon)
+                            {
                                 factorizationB.insert( factorizationB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon ) );
+                            }
                             _restB.insert( _restB.end(), std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
                         }
                         else if ( exponentB > exponentCommon )
@@ -500,11 +519,13 @@ namespace carl
                     }
                 }
             } //End of inner while
+            if( breaked )
+                continue;
             //Insert remaining factorA into rest
-            if ( !factorA.isOne() && rest )
+            if( !factorA.isOne() && rest )
                 _restA.insert( _restA.begin(), std::pair<FactorizedPolynomial<P>, carl::exponent>( factorA, exponentA ) );
             //Reset factorizationB
-            for ( auto itFactor = _restB.begin(); itFactor != _restB.end(); itFactor++ )
+            for( auto itFactor = _restB.begin(); itFactor != _restB.end(); itFactor++ )
                 factorizationB.insert( factorizationB.end(), *itFactor );
             _restB.clear();
         } //End of outer while
@@ -522,6 +543,14 @@ namespace carl
             _pfPairBRefined = true;
             _coeff *= cB;
         }
+        
+//        std::cout << "###################################################" << std::endl;
+//        std::cout << "result:" << std::endl;
+//        std::cout << "           " << result << std::endl;
+//        std::cout << "_restA:" << std::endl;
+//        std::cout << "           " << _restA << std::endl;
+//        std::cout << "_restB:" << std::endl;
+//        std::cout << "           " << _restB << std::endl;
 
         assert( _coeff == 1 );
         // Check correctness
@@ -531,6 +560,66 @@ namespace carl
         assert( computePolynomial( result ) * computePolynomial( _restA ) == computePolynomial( _pfPairA ) );
         assert( computePolynomial( result ) * computePolynomial( _restB ) == computePolynomial( _pfPairB ) );
 
+        return result;
+    }
+    
+    template<typename P>
+    Factors<FactorizedPolynomial<P>> factor( const PolynomialFactorizationPair<P>& _pfPair )
+    {
+        _pfPair.mMutex.lock();
+        bool allFactorsIrreducible = false;
+        while( !allFactorsIrreducible )
+        {
+            _pfPair.flattenFactorization();
+            allFactorsIrreducible = true;
+            for( auto ft = _pfPair.mFactorization.begin(); ft != _pfPair.mFactorization.end(); )
+            {
+                assert( existsFactorization( ft->first ) );
+                if( ft->first.content().isIrreducible() )
+                {
+                    ++ft;
+                }
+                else
+                {
+                    assert( ft->first.factorization().size() == 1 );
+                    assert( carl::isOne( ft->first.coefficient() ) );
+                    carl::exponent e = ft->second;
+                    assert( e != 0 );
+                    Factors<typename FactorizedPolynomial<P>::PolyType> factorFactorization = carl::factor( ft->first.polynomial() );
+                    Factorization<P> refinement;
+                    for( const auto& pt : factorFactorization )
+                    {
+                        refinement.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( FactorizedPolynomial<P>(pt.first, ft->first.pCache()), pt.second ) );
+                    }
+                    ft = _pfPair.mFactorization.erase(ft);
+
+                    for( auto partFactor = refinement.begin(); partFactor != refinement.end(); partFactor++ )
+                    {
+                        auto insertResult = _pfPair.mFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
+                        if ( !insertResult.second )
+                        {
+                            //Increment exponent for already existing factor
+                            insertResult.first->second += partFactor->second * e;
+                        }
+                        if( insertResult.first->first.factorization().size() > 1 ) // Note that factorization() takes care about the flattening
+                        {
+                            assert( insertResult.first->first.content().mIrreducible == 0 );
+                            allFactorsIrreducible = false;
+                        }
+                        else
+                        {
+                            insertResult.first->first.content().mIrreducible = 1;
+                        }
+                    }
+                }
+            }
+        }
+        _pfPair.mMutex.unlock();
+        Factors<FactorizedPolynomial<P>> result;
+        for( auto ft = _pfPair.mFactorization.begin(); ft != _pfPair.mFactorization.end(); ft++ )
+        {
+            result.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( ft->first, ft->second ) );
+        }
         return result;
     }
     

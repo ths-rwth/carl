@@ -734,6 +734,13 @@ namespace carl
         template<typename P1>
         friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
         
+        /**
+         * @param _fpoly The polynomial to calculate the factorization for.
+         * @return A factorization of this factorized polynomial. (probably finer than the one factorization() returns)
+         */
+        template<typename P1>
+        friend Factors<FactorizedPolynomial<P1>> factor( const FactorizedPolynomial<P1>& _fpoly );
+        
         // Operators which need to be friend.
         template <typename P1>
         friend FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _lhs, const FactorizedPolynomial<P1>& _rhs);

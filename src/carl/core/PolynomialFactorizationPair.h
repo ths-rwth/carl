@@ -188,6 +188,13 @@ namespace carl
         friend Factorization<P1> gcd( const PolynomialFactorizationPair<P1>& _pfPairA, const PolynomialFactorizationPair<P1>& _pfPairB, Factorization<P1>& _restA, Factorization<P1>& _restB, typename P1::CoeffType& _coeff, bool& _pfPairARefined, bool& _pfPairBRefined );
         
         /**
+         * @param _pfPair The polynomial to calculate the factorization for.
+         * @return A factorization of this factorized polynomial. (probably finer than the one factorization() returns)
+         */
+        template<typename P1>
+        friend Factors<FactorizedPolynomial<P1>> factor( const PolynomialFactorizationPair<P1>& _pfPair );
+        
+        /**
          * @param _infix
          * @param _friendlyVarNames
          * @return 

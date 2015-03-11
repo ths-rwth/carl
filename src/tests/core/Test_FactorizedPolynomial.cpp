@@ -108,6 +108,7 @@ TEST(FactorizedPolynomial, Construction)
     Pol c2 = sp.parseMultivariatePolynomial<Rational>("42");
     Pol c3 = sp.parseMultivariatePolynomial<Rational>("-2");
     Pol c4 = sp.parseMultivariatePolynomial<Rational>("0");
+    Pol fx = sp.parseMultivariatePolynomial<Rational>("x");
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
     Pol f1 = sp.parseMultivariatePolynomial<Rational>("-1*x + 3*y");
@@ -123,6 +124,7 @@ TEST(FactorizedPolynomial, Construction)
     FPol fc2( (cln::cl_RA) 42 );
     FPol fc3( (cln::cl_RA) -2 );
     FPol fc4( (cln::cl_RA) 0 );
+    FPol fpx( fx, pCache );
     FPol fpA( fA, pCache );
     FPol fpB( fB, pCache );
     FPol fp2( f2, pCache );
@@ -130,6 +132,8 @@ TEST(FactorizedPolynomial, Construction)
     FPol fp4( f4, pCache );
     FPol fp5( f5, pCache );
     FPol fp7( f7, pCache );
+    FPol fp8 = fpx * fpA;
+    FPol fp9 = fpA * fpA;
 
     //Common divisor
     std::cout << "Common divisor of " << fpA << " and " << fpB;
@@ -145,6 +149,14 @@ TEST(FactorizedPolynomial, Construction)
     EXPECT_EQ( fc1, fpc2B );
     
     //GCD
+//    FPol fpRestA0;
+//    FPol fpRestB0;
+//    std::cout << "GCD of " << fpA << " and " << fpB << ": ";
+//    FPol fpGCD0 = gcd( fp8, fp9, fpRestA0, fpRestB0 );
+//    std::cout << fpGCD0 << " with rest " << fpRestA0 << " and " << fpRestB0 << std::endl;
+//    EXPECT_EQ( fp8, fpRestA0 * fpGCD0 );
+//    EXPECT_EQ( fp9, fpRestB0 * fpGCD0 );
+    
     FPol fpRestA;
     FPol fpRestB;
     std::cout << "GCD of " << fpA << " and " << fpB << ": ";

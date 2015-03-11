@@ -1220,23 +1220,23 @@ namespace carl
             std::string result = "";
             if( _infix )
             {
-                if( coefficient() != Coeff<P>( 1 ) )
+                if( mCoefficient != Coeff<P>( 1 ) )
                 {
                     std::stringstream s;
-                    s << coefficient();
+                    s << mCoefficient;
                     result += s.str() + " * (";
                 }
                 result += content().toString( true, _friendlyVarNames );
-                if( coefficient() != Coeff<P>( 1 ) )
+                if( mCoefficient != Coeff<P>( 1 ) )
                     result += ")";
             }
             else
             {
-                bool withCoeff = coefficient() != Coeff<P>( 1 );
+                bool withCoeff = mCoefficient != Coeff<P>( 1 );
                 if( withCoeff )
                 {
                     std::stringstream s;
-                    s << coefficient();
+                    s << mCoefficient;
                     result += "(* " + s.str() + " ";
                 }
                 result += content().toString( false, _friendlyVarNames );
@@ -1246,7 +1246,7 @@ namespace carl
             return result;
         }
         std::stringstream s;
-        s << coefficient();
+        s << mCoefficient;
         return s.str();
     }
 
@@ -1621,6 +1621,18 @@ namespace carl
         assert( computePolynomial( _fpolyA ) == computePolynomial( result ) * computePolynomial( _fpolyRestA ) );
         assert( computePolynomial( _fpolyB ) == computePolynomial( result ) * computePolynomial( _fpolyRestB ) );
         return std::move( result );
+    }
+    
+    template<typename P>
+    Factors<FactorizedPolynomial<P>> factor( const FactorizedPolynomial<P>& _fpoly )
+    {
+        Factors<FactorizedPolynomial<P>> result = factor( _fpoly.content() );
+        if( existsFactorization( _fpoly ) )
+        {
+            result = factor( _fpoly.content() );
+        }
+        result.insert( std::pair<FactorizedPolynomial<P>, unsigned>( FactorizedPolynomial<P>(_fpoly.coefficient()), 1 ) );
+        return result;
     }
     
     template <typename P>

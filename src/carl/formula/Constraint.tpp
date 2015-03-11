@@ -629,7 +629,7 @@ namespace carl
         if( lhs().nrTerms() <= MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION && mVariables.size() <= MAX_DIMENSION_FOR_FACTORIZATION
             && maxDegree() <= MAX_DEGREE_FOR_FACTORIZATION && maxDegree() >= MIN_DEGREE_FOR_FACTORIZATION )
         {
-            mFactorization = ginacFactorization( mLhs );
+            mFactorization = carl::factor( mLhs );
         } else {
 			mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
 		}
@@ -907,7 +907,7 @@ namespace carl
 //        std::cout << "tmpB = " << tmpB << std::endl;
         if( tmpA != tmpB ) return 0;
         bool termACoeffGreater = false;
-        bool signsDiffer = one_divided_by_a < carl::constant_zero<typename Pol::NumberType>::get() != one_divided_by_b < carl::constant_zero<typename Pol::NumberType>::get();
+        bool signsDiffer = (one_divided_by_a < carl::constant_zero<typename Pol::NumberType>::get()) != (one_divided_by_b < carl::constant_zero<typename Pol::NumberType>::get());
         typename Pol::NumberType g;
         if( carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b) )
         {
