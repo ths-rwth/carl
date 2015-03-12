@@ -25,6 +25,7 @@ template<typename Integer>
 class DiophantineEquations
 {
 	typedef UnivariatePolynomial<GFNumber<Integer>> Polynomial;
+        typedef MultivariatePolynomial<GFNumber<Integer>> MultiPoly;
 	const GaloisField<Integer>* mGf_pk;
 	const GaloisField<Integer>* mGf_p;
 	
@@ -36,26 +37,62 @@ class DiophantineEquations
 		
 	}
 	
-	std::vector<Polynomial> solveMultivariateDiophantine(const std::vector<Polynomial>& a,
-														 const Polynomial&, //c
-														 const std::map<Variable, Integer>& I,
-														 unsigned /*d*/) const
+	std::vector<Polynomial> solveMultivariateDiophantine(
+                        const std::vector<Polynomial>& a, // Type MultiPoly??
+                        const MultiPoly& c,
+			const std::map<Variable, GFNumber<Integer>>& I, // should be  Integer instead of GFNumber<Integer> ??
+			unsigned d) const
 	{
 		assert(a.size() > (unsigned)1);
-		//size_t r = a.size();
-		size_t v = I.size() + 1;
-		//Variable x_v = I.rend()->first;
-		//Integer a_v = I.rend()->second;
-		if(v > 1)
-		{
-			CARL_LOG_NOTIMPLEMENTED();
-		}
-		else
-		{
-			/// @todo implement
-		}
-		//Prvent warning
-		return {};
+                size_t r = a.size();
+                size_t v = I.size() + 1;
+                Variable x_v = I.rend()->first;
+                Integer alpha_v = I.rend()->second;
+                if(v > 1) {
+                        // Multivariate case
+                        CARL_LOG_NOTIMPLEMENTED();
+                        // A = product(a_i, i = 1,...,r)
+                        MultiPoly A;
+                        A = MultiPoly(1);
+                        for(unsigned i = 1; i <= r; i++) {
+                                A = A * a[i];
+                        }
+                        // b_j = A / a_j
+                        std::vector<MultiPoly> b();
+                        for(unsigned j = 1; j <= r; j++) {
+                                b[j] = A / Multipoly(a[j]);
+                        }
+                        // a_new = substitute(x_v = alpha_v, a)
+                        std::vector<Polynomial>& a_new();
+                        for(unsigned i = 1; i <= r; i++) {
+                                a_new.pushBack(a[i].substitute(x_v, alpha_v));
+                        }
+                        // c_new = substitute(x_v = alpha_v, c);
+                        Polynomial c_new = c.substitute(x_v, alpha_v);
+                        // I_new = updated list I with x_v = alpha_v deleted
+                        std::map<Variable, GFNumber<Integer>> I_new(I);
+                        I_new.erase(x_v);
+                        // sigma = MultivariateDiohant(a_new,c_new,I_new,d,p,k)
+                        std::vector<Polynomial> sigma = MultivariateDiophant(a_new, c_new, I_new, d);
+                        // e = (c - sum(sigma_i * b_i, i = 1,...,r))) mod p^k
+                        // note that the mod p^k operation is performed automatically
+                        MultiPoly e(c);
+                        
+                        for(unsigned i = 1; i <= r; i++) {
+                                c -= sigma[i] * b[i];
+                        }
+                        for(unsigned m = 1; m <= d; m++) {
+                                if(e == 0) break;
+                                
+                           
+                        }
+                } 
+                else {
+                        // Univariate Case
+                        /// @todo implement
+                }
+                //Prvent warning
+                return {};
 	}
 	
 	/**
