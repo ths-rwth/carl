@@ -1661,6 +1661,14 @@ namespace carl
 		_in.acos(result);
 		return result;
 	}
+
+            template<typename FloatType>
+            inline FLOAT_T<FloatType> atan(const FLOAT_T<FloatType>& _in)
+            {
+                FLOAT_T<FloatType> result;
+                _in.atan(result);
+                return result;
+            }
 	
     /**
      * Method which returns the next smaller integer of this number or the number
