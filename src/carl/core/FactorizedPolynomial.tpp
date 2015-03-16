@@ -83,11 +83,10 @@ namespace carl
             //pfPair->assertFactorization();
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
-        if(computePolynomial(*this) != _polynomial)
-        {
-            std::cout << "computePolynomial(*this) = " << computePolynomial(*this) << std::endl;
-            std::cout << "_polynomial = " << _polynomial << std::endl;
-        }
+//        if(computePolynomial(*this) != _polynomial)
+//        {
+//            exit(1234);
+//        }
         assert(computePolynomial(*this) == _polynomial);
     }
     
@@ -226,12 +225,12 @@ namespace carl
                 assert( computePolynomial(*this).coprimeFactorWithoutConstant() == polynomial().coprimeFactorWithoutConstant() / mCoefficient );
                 return polynomial().coprimeFactorWithoutConstant() / mCoefficient;
             }
-            auto factor = factorization().begin();
+            auto factor = content().factorization().begin();
             CoeffType cf = factor->first.coprimeFactorWithoutConstant();
             auto resultNum = carl::getNum( cf );
             auto resultDenom = carl::getDenom( cf );
             ++factor;
-            while( factor != factorization().end() )
+            while( factor != content().factorization().end() )
             {
                 cf = factor->first.coprimeFactorWithoutConstant();
                 resultNum = carl::lcm( resultNum, carl::getNum( cf ) );
@@ -252,7 +251,7 @@ namespace carl
             if( factorizedTrivially() )
                 return polynomial().constantPart() * mCoefficient;
             CoeffType result( mCoefficient );
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 result *= carl::pow( factor.first.constantPart(), factor.second );
             }
@@ -270,7 +269,7 @@ namespace carl
             if( factorizedTrivially() )
                 return polynomial().lcoeff() * mCoefficient;
             CoeffType result( mCoefficient );
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 result *= carl::pow( factor.first.lcoeff(), factor.second );
             }
@@ -288,7 +287,7 @@ namespace carl
             if( factorizedTrivially() )
                 return polynomial().totalDegree();
             exponent result = 0;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 result += factor.first.totalDegree() * factor.second;
             }
@@ -307,7 +306,7 @@ namespace carl
             if( factorizedTrivially() )
                 return polynomial().lterm() * mCoefficient;
             TermType result( mCoefficient );
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 result *= factor.first.lterm().pow( factor.second );
             }
@@ -327,7 +326,7 @@ namespace carl
                 return polynomial().trailingTerm() * mCoefficient;
             }
             TermType result( mCoefficient );
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 result *= factor.first.trailingTerm().pow( factor.second );
             }
@@ -347,7 +346,7 @@ namespace carl
                 return polynomial().isUnivariate();
             }
             Variable foundVar = Variable::NO_VARIABLE;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 if( factor.first.isUnivariate() )
                 {
@@ -390,7 +389,7 @@ namespace carl
             if( factorizedTrivially() )
                 return polynomial().hasConstantTerm();
             TermType result( mCoefficient );
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 if( !factor.first.hasConstantTerm() )
                 {
@@ -411,7 +410,7 @@ namespace carl
         {
             if( factorizedTrivially() )
                 return polynomial().has( _var );
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 if( factor.first.has( _var ) )
                     return true;
@@ -455,7 +454,7 @@ namespace carl
             if( factorizedTrivially() )
                 return polynomial().definiteness();
             Definiteness result = Definiteness::POSITIVE;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 Definiteness factorDefiniteness = factor.first.definiteness();
                 if( factorDefiniteness == Definiteness::NON )
@@ -532,7 +531,9 @@ namespace carl
     {
 		assert(_nth == 1);
 		// TODO VERY NAIVE
-		return FactorizedPolynomial<P>(computePolynomial(*this).derivative(_var), mpCache);
+        FactorizedPolynomial<P> result(polynomial().derivative(_var), mpCache);
+        result *= coefficient();
+		return result;
 	}
 	
 	template<typename P>
@@ -568,7 +569,7 @@ namespace carl
         else
         {
             CoeffType result = mCoefficient;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 CoeffType subResult = factor.first.evaluate( _substitutions );
                 if( carl::isZero( subResult.isZero() ) )
@@ -603,7 +604,7 @@ namespace carl
         {
             CoeffType resultCoeff = mCoefficient;
             Factorization<P> resultFactorization;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 FactorizedPolynomial<P> subResult = factor.first.substitute( _var, _value );
                 if( subResult.isZero() )
@@ -660,7 +661,7 @@ namespace carl
         {
             CoeffType resultCoeff = mCoefficient;
             Factorization<P> resultFactorization;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 FactorizedPolynomial<P> subResult = factor.first.substitute( _substitutions );
                 if( subResult.isZero() )
@@ -708,7 +709,7 @@ namespace carl
         {
             CoeffType resultCoeff = mCoefficient;
             Factorization<P> resultFactorization;
-            for( const auto& factor : factorization() )
+            for( const auto& factor : content().factorization() )
             {
                 FactorizedPolynomial<P> subResult = factor.first.substitute( _substitutions );
                 if( subResult.isZero() )
@@ -766,7 +767,7 @@ namespace carl
             return false;
         }
         Factorization<P> resultFactorization;
-        for( const auto& factor : factorization() )
+        for( const auto& factor : content().factorization() )
         {
             if( factor.second % 2 == 0 )
             {
@@ -796,6 +797,15 @@ namespace carl
     template<typename P>
     DivisionResult<FactorizedPolynomial<P>> FactorizedPolynomial<P>::divideBy( const FactorizedPolynomial<P>& _divisor ) const
     {
+        static_assert(is_field<CoeffType>::value, "Division only defined for field coefficients");
+        if( _divisor.isOne() || this->isZero() )
+            return DivisionResult<FactorizedPolynomial<P>>( *this, FactorizedPolynomial<P>() );
+        if( this->isConstant() && _divisor.isConstant() )
+            return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>( this->coefficient()/_divisor.coefficient() ), FactorizedPolynomial<P>() );
+        else if( _divisor.isConstant() )
+            return DivisionResult<FactorizedPolynomial<P>>( *this/_divisor.coefficient(), FactorizedPolynomial<P>() );
+        else if( this->isConstant() )
+            return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>(), *this );
         FactorizedPolynomial<P> polyA = lazyDiv( *this, _divisor );
         FactorizedPolynomial<P> polyB = lazyDiv( _divisor, *this );
         // TODO: maybe apply gcd, which might make this operation more expensive but a long-term investment
@@ -892,9 +902,9 @@ namespace carl
     {
         if( _fpoly.pCache() == nullptr )
             return std::move( P( _fpoly.coefficient() ) );
-        P result( computePolynomial( _fpoly.content() ) );
+        P result = computePolynomial( _fpoly.content() );
         result *= _fpoly.coefficient();
-        return std::move( result );
+        return result;
     }
     
     template<typename P>
@@ -1602,7 +1612,7 @@ namespace carl
         Coeff<P> c( 0 );
         bool rehashFPolyA = false;
         bool rehashFPolyB = false;
-        Factorization<P> gcdFactorization( gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, c, rehashFPolyA, rehashFPolyB ) );
+        Factorization<P> gcdFactorization = gcd( _fpolyA.content(), _fpolyB.content(), restAFactorization, restBFactorization, c, rehashFPolyA, rehashFPolyB );
 
         if( c != Coeff<P>( 0 ) )
             coefficientCommon *= c;
@@ -1626,13 +1636,7 @@ namespace carl
     template<typename P>
     Factors<FactorizedPolynomial<P>> factor( const FactorizedPolynomial<P>& _fpoly )
     {
-        Factors<FactorizedPolynomial<P>> result = factor( _fpoly.content() );
-        if( existsFactorization( _fpoly ) )
-        {
-            result = factor( _fpoly.content() );
-        }
-        result.insert( std::pair<FactorizedPolynomial<P>, unsigned>( FactorizedPolynomial<P>(_fpoly.coefficient()), 1 ) );
-        return result;
+        return factor( _fpoly.content(), _fpoly.coefficient() );
     }
     
     template <typename P>

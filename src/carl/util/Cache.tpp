@@ -64,24 +64,24 @@ namespace carl
         if( !ret.second ) // There is already an equal object in the cache.
         {
             // Try to update the entry in the cache by the information in the given object.
-            if( (*_canBeUpdated)( *((*ret.first)->first), *_toCache ) )
-            {
-                TypeInfoPair<T,Info>* element = *ret.first;
-                mCache.erase( element );
-                (*_update)( *element->first, *_toCache );
-                element->first->rehash();
-                auto retB = mCache.insert( element );
-                assert( retB.second );
-                for( const Ref& ref : element->second.refStoragePositions )
-                    mCacheRefs[ref] = *retB.first;
-                delete newElement;
-                Info& info = (*retB.first)->second;
-                assert( info.refStoragePositions.size() > 0);
-                assert( info.refStoragePositions.front() > 0 );
-                info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
-                return std::make_pair( info.refStoragePositions.front(), false );
-            }
-            else
+//            if( (*_canBeUpdated)( *((*ret.first)->first), *_toCache ) )
+//            {
+//                TypeInfoPair<T,Info>* element = *ret.first;
+//                mCache.erase( ret.first );
+//                (*_update)( *element->first, *_toCache );
+//                element->first->rehash();
+//                auto retB = mCache.insert( element );
+//                assert( retB.second );
+//                for( const Ref& ref : element->second.refStoragePositions )
+//                    mCacheRefs[ref] = *retB.first;
+//                delete newElement;
+//                Info& info = (*retB.first)->second;
+//                assert( info.refStoragePositions.size() > 0);
+//                assert( info.refStoragePositions.front() > 0 );
+//                info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
+//                return std::make_pair( info.refStoragePositions.front(), false );
+//            }
+//            else
                 delete newElement;
         }
         else // Create a new entry in the cache.
@@ -90,6 +90,7 @@ namespace carl
             {
                 assert( mCacheRefs.size() > 0);
                 (*ret.first)->second.refStoragePositions.push_back( mCacheRefs.size() );
+                assert( !hasDuplicates( (*ret.first)->second.refStoragePositions ) );
                 mCacheRefs.push_back( newElement );
             }
             else // Try to take the reference from the stack of old ones.
@@ -97,6 +98,7 @@ namespace carl
                 mCacheRefs[mUnusedPositionsInCacheRefs.top()] = newElement;
                 assert( mUnusedPositionsInCacheRefs.top() > 0);
                 newElement->second.refStoragePositions.push_back( mUnusedPositionsInCacheRefs.top() );
+                assert( !hasDuplicates( newElement->second.refStoragePositions ) );
                 mUnusedPositionsInCacheRefs.pop();
             }
             assert( mNumOfUnusedEntries < std::numeric_limits<ContentType>::max() );
@@ -173,6 +175,7 @@ namespace carl
             info.usageCount += infoB.usageCount;
             assert( tmpSoac == sumOfAllUsageCounts() );
             info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
+            assert( !hasDuplicates( info.refStoragePositions ) );
             assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
             for( const Ref& ref : infoB.refStoragePositions )
             {

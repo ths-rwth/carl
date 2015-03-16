@@ -296,7 +296,7 @@ namespace carl
                 if( factorizedTrivially() )
                     return polynomial().size();
                 size_t result = 0;
-                for( const auto& factor : factorization() )
+                for( const auto& factor : content().factorization() )
                     result += factor.first.size();
                 return result;
             }
@@ -418,7 +418,7 @@ namespace carl
             assert( existsFactorization( *this ) );
             if( factorizedTrivially() )
                 return polynomial().getSingleVariable();
-            return factorization().begin()->first.getSingleVariable();
+            return content().factorization().begin()->first.getSingleVariable();
         }
         
         /**
