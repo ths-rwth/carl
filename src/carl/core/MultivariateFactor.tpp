@@ -24,7 +24,7 @@ Factors<MultivariatePolynomial<C,O,P>> MultivariateFactor<C, O, P>::calculate()
         return factor( mp.lterm() );
     }
     Factors<MultivariatePolynomial<C,O,P>> result;
-    result.insert( pair<Pol, unsigned>( mp, 1 ) );
+    result.insert( std::pair<Poly, unsigned>( mp, 1 ) );
     return result;
     #endif
 
