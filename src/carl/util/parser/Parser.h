@@ -50,6 +50,7 @@ public:
 	Formula<Pol> formula(const std::string& s) {
 		Formula<Pol> res;
 		if (!parse(s, formulaParser, res)) {
+            std::cout << "NOPE!" << std::endl;
 			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a formula failed.");
 		}
 		return res;
