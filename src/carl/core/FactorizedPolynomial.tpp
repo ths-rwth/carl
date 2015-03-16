@@ -803,7 +803,7 @@ namespace carl
         if( this->isConstant() && _divisor.isConstant() )
             return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>( this->coefficient()/_divisor.coefficient() ), FactorizedPolynomial<P>() );
         else if( _divisor.isConstant() )
-            return DivisionResult<FactorizedPolynomial<P>>( *this/_divisor.coefficient(), FactorizedPolynomial<P>() );
+            return DivisionResult<FactorizedPolynomial<P>>( (*this)/_divisor.coefficient(), FactorizedPolynomial<P>() );
         else if( this->isConstant() )
             return DivisionResult<FactorizedPolynomial<P>>( FactorizedPolynomial<P>(), *this );
         FactorizedPolynomial<P> polyA = lazyDiv( *this, _divisor );

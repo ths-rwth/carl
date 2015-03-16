@@ -991,6 +991,12 @@ namespace carl
     {
 		return std::move(_rhs * _lhs);
 	}
+    
+	template <typename P>
+	inline FactorizedPolynomial<P> operator/(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs )
+    {
+		return FactorizedPolynomial<P>(_lhs)/=_rhs;
+	}
 	/// @}
     
 } // namespace carl
