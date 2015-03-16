@@ -18,6 +18,7 @@
 #include "../util/SFINAE.h"
 #include "../numbers/typetraits.h"
 #include "../numbers/numbers.h"
+#include "../util/Common.h"
 
 namespace carl
 {   
