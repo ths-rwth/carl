@@ -169,10 +169,10 @@ namespace carl
     }
 
     template<typename Poly>
-    std::unordered_map<const Poly, unsigned, std::hash<Poly>> OldGinacConverter<Poly>::ginacFactorization(const Poly& poly)
+    Factors<Poly> OldGinacConverter<Poly>::ginacFactorization(const Poly& poly)
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        std::unordered_map<const Poly, unsigned, std::hash<Poly>> result;
+        Factors<Poly> result;
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
         gatherVariables(poly, carlToGinacVarMap, ginacToCarlVarMap);

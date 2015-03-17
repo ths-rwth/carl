@@ -296,7 +296,7 @@ namespace carl
                 if( factorizedTrivially() )
                     return polynomial().size();
                 size_t result = 0;
-                for( const auto& factor : factorization() )
+                for( const auto& factor : content().factorization() )
                     result += factor.first.size();
                 return result;
             }
@@ -418,7 +418,7 @@ namespace carl
             assert( existsFactorization( *this ) );
             if( factorizedTrivially() )
                 return polynomial().getSingleVariable();
-            return factorization().begin()->first.getSingleVariable();
+            return content().factorization().begin()->first.getSingleVariable();
         }
         
         /**
@@ -990,6 +990,12 @@ namespace carl
 	inline FactorizedPolynomial<P> operator*(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
     {
 		return std::move(_rhs * _lhs);
+	}
+    
+	template <typename P>
+	inline FactorizedPolynomial<P> operator/(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs )
+    {
+		return FactorizedPolynomial<P>(_lhs)/=_rhs;
 	}
 	/// @}
     

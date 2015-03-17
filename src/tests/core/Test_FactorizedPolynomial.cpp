@@ -149,13 +149,15 @@ TEST(FactorizedPolynomial, Construction)
     EXPECT_EQ( fc1, fpc2B );
     
     //GCD
-//    FPol fpRestA0;
-//    FPol fpRestB0;
-//    std::cout << "GCD of " << fpA << " and " << fpB << ": ";
-//    FPol fpGCD0 = gcd( fp8, fp9, fpRestA0, fpRestB0 );
-//    std::cout << fpGCD0 << " with rest " << fpRestA0 << " and " << fpRestB0 << std::endl;
-//    EXPECT_EQ( fp8, fpRestA0 * fpGCD0 );
-//    EXPECT_EQ( fp9, fpRestB0 * fpGCD0 );
+    FPol fpRestA0;
+    FPol fpRestB0;
+    std::cout << "GCD of " << fp8 << " and " << fp9 << ": ";
+    FPol fpGCD0 = gcd( fp8, fp9, fpRestA0, fpRestB0 );
+    std::cout << fpGCD0 << " with rest " << fpRestA0 << " and " << fpRestB0 << std::endl;
+    EXPECT_EQ( fp8, fpRestA0 * fpGCD0 );
+    EXPECT_EQ( fp9, fpRestB0 * fpGCD0 );
+    EXPECT_EQ( computePolynomial(fp8), computePolynomial(fpRestA0 * fpGCD0) );
+    EXPECT_EQ( computePolynomial(fp9), computePolynomial(fpRestB0 * fpGCD0) );
     
     FPol fpRestA;
     FPol fpRestB;

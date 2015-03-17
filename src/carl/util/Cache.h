@@ -279,6 +279,19 @@ namespace carl
             return result;
         }
         
+        bool hasDuplicates(const std::vector<Ref>& _vec) const
+        {
+            std::set<Ref> vecEntries;
+            for( const Ref& r : _vec )
+            {
+                if( !vecEntries.insert( r ).second )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         bool checkNumOfUnusedEntries() const
         {
             size_t actualNumOfUnusedEntries = 0;

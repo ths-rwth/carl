@@ -113,7 +113,7 @@ namespace carl
     using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
     template<typename Pol>
-    using Factors = FastMap<Pol,exponent>;
+    using Factors = std::map<Pol,exponent>;
     
     // Constants.
     ///@todo move static variables to own cpp

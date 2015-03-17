@@ -18,7 +18,69 @@ namespace carl
     class FactorizedPolynomial;
     
     template<typename P>
-    using Factorization = std::map<FactorizedPolynomial<P>, carl::exponent>;
+    class Factorization: public std::map<FactorizedPolynomial<P>, carl::exponent>
+    {
+        private:
+            typedef std::map<FactorizedPolynomial<P>, carl::exponent> super;
+            
+            bool checkFactorization() const
+            {
+                for(auto f = super::begin(); f != super::end(); ++f )
+                {
+                    if( !carl::isOne( f->first.coefficient() ) )
+                        return false;
+                }
+                return true;
+            }
+        public:
+            
+            std::pair<typename super::iterator, bool> insert(typename super::const_iterator _hint, const std::pair<FactorizedPolynomial<P>, carl::exponent>& _val)
+            {
+                return insert( _hint, std::move(std::pair<FactorizedPolynomial<P>, carl::exponent>( _val.first, _val.second )) );
+            }
+            
+            typename super::iterator insert(typename super::const_iterator _hint, std::pair<FactorizedPolynomial<P>, carl::exponent>&& _val)
+            {
+                assert( super::find( _val.first ) == super::end() );
+                auto result = super::insert( _hint, std::move(_val) );
+                assert( checkFactorization() );
+                return result;
+            }
+            
+            std::pair<typename super::iterator, bool> insert(const std::pair<FactorizedPolynomial<P>, carl::exponent>& _val)
+            {
+                return insert( std::move(std::pair<FactorizedPolynomial<P>, carl::exponent>( _val.first, _val.second )) );
+            }
+            
+            std::pair<typename super::iterator, bool> insert(std::pair<FactorizedPolynomial<P>, carl::exponent>&& _val)
+            {
+                exponent e = _val.second;
+                std::pair<typename super::iterator, bool> insertResult = super::insert( std::move(_val) );
+                if ( !insertResult.second )
+                {
+                    //Increment exponent for already existing factor
+                    insertResult.first->second += e;
+                }
+                assert( checkFactorization() );
+                return insertResult;
+            }
+            
+            void insert( typename super::const_iterator _first, typename super::const_iterator _last )
+            {
+                if( super::empty() )
+                    super::insert( _first, _last );
+                else
+                {
+                    typename super::iterator lastInserted = super::begin();
+                    while( _first != _last )
+                    {
+                        lastInserted = this->insert( lastInserted, *_first );
+                        ++_first;
+                    }
+                }
+                assert( checkFactorization() );
+            }
+    };
     
     template <typename P>
     std::string factorizationToString( const Factorization<P>& _factorization, bool _infix = true, bool _friendlyVarNames = true );
@@ -74,7 +136,9 @@ namespace carl
          *         false, otherwise.
          */
         typename P::CoeffType flattenFactorization() const;
-
+        
+        bool checkFactorization() const;
+        
         inline bool assertFactorization() const
         {
             return (mpPolynomial == nullptr || computePolynomial( *this ) == *mpPolynomial );
@@ -192,7 +256,7 @@ namespace carl
          * @return A factorization of this factorized polynomial. (probably finer than the one factorization() returns)
          */
         template<typename P1>
-        friend Factors<FactorizedPolynomial<P1>> factor( const PolynomialFactorizationPair<P1>& _pfPair );
+        friend Factors<FactorizedPolynomial<P1>> factor( const PolynomialFactorizationPair<P1>& _pfPair, const typename P1::CoeffType&  );
         
         /**
          * @param _infix
