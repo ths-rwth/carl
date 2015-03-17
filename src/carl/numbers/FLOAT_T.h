@@ -496,7 +496,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            assert(*this >= 0);
+            assert(mValue >= 0);
             _result.mValue = std::sqrt(mValue);
             return _result;
         }
