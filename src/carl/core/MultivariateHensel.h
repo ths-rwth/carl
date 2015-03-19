@@ -36,13 +36,39 @@ class DiophantineEquations
 	{
 		
 	}
-	
+	/**
+         * Solve in the domain Z_(p^k)[x_!,...,x_v] the multivariate polynomial
+         * diophantine equation
+         *      sigma_1 * b_1 + ... sigma_r * b_r = c (mod <I^(d+1), p^k>)
+         * where, in terms of the given list of polynomials a_1,...,a_r
+         * the polynomials b_i, i = 1,...,r, are defined by:
+         *      b_i = a_1 * ... * a_(i-1) * a_(i+1) * ... * a_r.
+         * The unique solution sigma_i, i = 1,...,r, will be computed such that
+         *      degree(sigma_i,x_i) < degree(a_i,x_1).
+         * 
+         * Conditions:
+         * (1) p must not divide lcoeff(a_i mod I), i = 1,...,r;
+         * (2) A_i mod <I,p>, i = 1,...,r, must be pairwise relatively prime
+         * in Z_p[x_1];
+         * (3) degree(c,x_1) < sum(degree(a_i,x_1), i = 1,...,r)
+         *
+         * The prime integer p and the positive integer k must bei specified in
+         * the constructor.
+         * 
+         * @param a A list a of r > 1 polynomials in the domain Z_(p^k)[x_1,...,x_v].
+         * @param c A polynomial c from Z_(p^k)[x_1,...,x_v].
+         * @param I A list of equations [x_2 = alpha_2,...,x_v = alpha_v].
+         * @param d A nonnegative integer d specifying the maximum total degree 
+         * with respect to x_2,...,x_v of the desired result.
+         * @return The list sigma = [sigma_1,...,sigma_r].
+         */
 	std::vector<Polynomial> solveMultivariateDiophantine(
-                        const std::vector<Polynomial>& a, // Type MultiPoly??
+                        const std::vector<Polynomial>& a, // must be of type MultiPoly??
                         const MultiPoly& c,
 			const std::map<Variable, GFNumber<Integer>>& I, // should be  Integer instead of GFNumber<Integer> ??
 			unsigned d) const
 	{
+                // TODO: check the conditions
 		assert(a.size() > (unsigned)1);
                 size_t r = a.size();
                 size_t v = I.size() + 1;
@@ -77,10 +103,10 @@ class DiophantineEquations
                         // e = (c - sum(sigma_i * b_i, i = 1,...,r))) mod p^k
                         // note that the mod p^k operation is performed automatically
                         MultiPoly e(c);
-                        
                         for(unsigned i = 1; i <= r; i++) {
                                 c -= sigma[i] * b[i];
                         }
+                        // monomial = 1
                         for(unsigned m = 1; m <= d; m++) {
                                 if(e == 0) break;
                                 
@@ -90,6 +116,13 @@ class DiophantineEquations
                 else {
                         // Univariate Case
                         /// @todo implement
+                        // the list of equations is empty, a contains univarate polnomials
+                        Variable x_1 = a[0].mainVar();
+                        // sigma = zero lost of length  r
+                        std::vector<Polynomial> sigma(r, Polynomial(0));
+                        for(auto& z : c.getTerms()) {
+                                
+                        }
                 }
                 //Prvent warning
                 return {};
