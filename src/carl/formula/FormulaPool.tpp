@@ -17,8 +17,8 @@ namespace carl
     FormulaPool<Pol>::FormulaPool( unsigned _capacity ):
         Singleton<FormulaPool<Pol>>(),
         mIdAllocator( 3 ),
-        mpTrue( new Element( true, 1 ) ),
-        mpFalse( new Element( false, 2 ) ),
+        mpTrue( new FormulaContent<Pol>( true, 1 ) ),
+        mpFalse( new FormulaContent<Pol>( false, 2 ) ),
         mPool()
     {
         mpTrue->mNegation = mpFalse;
@@ -35,14 +35,14 @@ namespace carl
     {
         while( !mPool.empty() )
         {
-            const Element* ele = *mPool.begin();
+            const FormulaContent<Pol>* ele = *mPool.begin();
             mPool.erase( mPool.begin() );
             delete ele;
         }
     }
     
     template<typename Pol>
-    std::pair<typename FastPointerSet<typename FormulaPool<Pol>::Element>::iterator,bool> FormulaPool<Pol>::insert( ElementSPtr _element, bool _elementNotInPool )
+    std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> FormulaPool<Pol>::insert( FormulaContent<Pol>* _element, bool _elementNotInPool )
     {
         auto iterBoolPair = mPool.insert( _element );
         assert( _elementNotInPool <= iterBoolPair.second );
@@ -60,7 +60,7 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr _element )
+    const FormulaContent<Pol>* FormulaPool<Pol>::add( FormulaContent<Pol>* _element )
     {
         FORMULA_POOL_LOCK_GUARD
         auto iterBoolPair = insert( _element, false );
@@ -69,9 +69,15 @@ namespace carl
             // Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
-            _element->mNegation = new Element(Formula<Pol>( *iterBoolPair.first ));
+            _element->mNegation = new FormulaContent<Pol>(Formula<Pol>( *iterBoolPair.first ));
          	_element->mNegation->mNegation = _element;
             insert(_element->mNegation, true);
+            _element->mUsages = 1;
+            _element->mNegation->mUsages = 1;
+        }
+        else
+        {
+            ++_element->mUsages;
         }
         return *iterBoolPair.first;   
     }
@@ -87,7 +93,7 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::create( FormulaType _type, Formulas<Pol>&& _subformulas )
+    const FormulaContent<Pol>* FormulaPool<Pol>::create( FormulaType _type, Formulas<Pol>&& _subformulas )
     {
         assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
 //        cout << "create new formula with type " << formulaTypeToString( _type ) << endl;
@@ -195,6 +201,6 @@ namespace carl
             if( _subformulas.size() == 1 )
                 return newFormulaWithOneSubformula( _type, *(_subformulas.begin()) );
         }
-        return add( new Element( _type, std::move( _subformulas ) ) );
+        return add( new FormulaContent<Pol>( _type, std::move( _subformulas ) ) );
     }
 }    // namespace carl

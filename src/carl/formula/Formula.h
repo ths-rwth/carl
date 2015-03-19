@@ -160,6 +160,8 @@ namespace carl
             mutable double mActivity;
             /// Some value stating an expected difficulty of solving this formula for satisfiability.
             mutable double mDifficulty;
+            /// The unique id.
+            mutable size_t mUsages;
             /// The type of this formula.
             FormulaType mType;
             /// The content of this formula.
@@ -176,7 +178,7 @@ namespace carl
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
                 Formulas<Pol>* mpSubformulas;
                 /// The constraint, in case this formulas wraps a constraint.
-                const Constraint<Pol>* mpConstraint;
+                Constraint<Pol> mConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
                 carl::Variable mBoolean;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -204,7 +206,7 @@ namespace carl
              * Constructs a formula being a constraint.
              * @param _constraint The pointer to the constraint.
              */
-            FormulaContent( const Constraint<Pol>* _constraint );
+            FormulaContent( const Constraint<Pol>& _constraint );
 
             /**
              * Constructs a formula being an uninterpreted equality.
@@ -342,14 +344,14 @@ namespace carl
             {}
                 
             explicit Formula( const Pol& _pol, Relation _rel ):
-                mpContent( FormulaPool<Pol>::getInstance().create( ConstraintPool<Pol>::getInstance().newConstraint( _pol, _rel ) ) )
+                mpContent( FormulaPool<Pol>::getInstance().create( Constraint<Pol>( _pol, _rel ) ) )
             {}
                 
             explicit Formula( Pol&& _pol, Relation _rel ):
-                mpContent( FormulaPool<Pol>::getInstance().create( ConstraintPool<Pol>::getInstance().newConstraint( std::move( _pol ), _rel ) ) )
+                mpContent( FormulaPool<Pol>::getInstance().create( Constraint<Pol>( std::move( _pol ), _rel ) ) )
             {}
                 
-            explicit Formula( const Constraint<Pol>* _constraint ):
+            explicit Formula( const Constraint<Pol>& _constraint ):
                 mpContent( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
                 
@@ -418,6 +420,11 @@ namespace carl
             explicit Formula( UEquality&& _eq ):
                 mpContent( FormulaPool<Pol>::getInstance().create( std::move( _eq ) ) )
             {}
+            
+            ~Formula()
+            {
+                FormulaPool<Pol>::getInstance().free( mpContent );
+            }
 
             // Methods.
 
@@ -622,23 +629,13 @@ namespace carl
             }
 
             /**
-             * @return A pointer to the constraint represented by this formula. Note, that
-             *          this formula has to be of type CONSTRAINT, if you invoke this method.
-             */
-            const Constraint<Pol>* pConstraint() const
-            {
-                assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
-                return mpContent->mpConstraint;
-            }
-
-            /**
              * @return A constant reference to the constraint represented by this formula. Note, that
              *          this formula has to be of type CONSTRAINT, if you invoke this method.
              */
             const Constraint<Pol>& constraint() const
             {
                 assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
-                return *mpContent->mpConstraint;
+                return mpContent->mConstraint;
             }
 
             /**
@@ -841,10 +838,10 @@ namespace carl
              * Collects all constraint occurring in this formula.
              * @param _constraints The container to insert the constraint into.
              */
-            void getConstraints( std::vector<const Constraint<Pol>*>& _constraints ) const
+            void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
-                    _constraints.push_back( mpContent->mpConstraint );
+                    _constraints.push_back( mpContent->mConstraint );
                 else if( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR || mpContent->mType == FormulaType::NOT 
                         || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR || mpContent->mType == FormulaType::IMPLIES )
                     for( const_iterator subAst = mpContent->mpSubformulas->begin(); subAst != mpContent->mpSubformulas->end(); ++subAst )

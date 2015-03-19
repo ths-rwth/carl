@@ -40,7 +40,7 @@ TEST(Formula, Construction)
     Pol lhsC = Rational(2) * pi1 + Rational(2) * pi2 + Rational(2) * pi3 - Rational(5);
     
     // Constraints can then be constructed as follows:
-    const Constr* constraintA = newConstraint<Pol>( lhsA, Relation::LESS );
+    Constr constraintA = Constr( lhsA, Relation::LESS );
     
     // Uninterpreted functions are 
     

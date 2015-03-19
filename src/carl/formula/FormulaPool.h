@@ -24,32 +24,31 @@ namespace carl
     {
             friend Singleton<FormulaPool>;
         
-            ///
-            typedef FormulaContent<Pol> Element;
-            ///
-            typedef Element* ElementSPtr;
-            ///
-            typedef const Element* ConstElementSPtr;
-        
         private:
             
             // Members:
             /// id allocator
             unsigned mIdAllocator;
             /// The unique formula representing true.
-            ElementSPtr mpTrue;
+            FormulaContent<Pol>* mpTrue;
             /// The unique formula representing false.
-            ElementSPtr mpFalse;
+            FormulaContent<Pol>* mpFalse;
             /// The formula pool.
-            FastPointerSet<Element> mPool;
+            FastPointerSet<FormulaContent<Pol>> mPool;
             /// Mutex to avoid multiple access to the pool
             mutable std::mutex mMutexPool;
             ///
             FastMap<Formula<Pol>,Formula<Pol>> mTseitinVars;
             
+            #ifdef SMTRAT_STRAT_PARALLEL_MODE
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock( mMutexPool );
             #define FORMULA_POOL_LOCK mMutexPool.lock();
             #define FORMULA_POOL_UNLOCK mMutexPool.unlock();
+            #else
+            #define FORMULA_POOL_LOCK_GUARD
+            #define FORMULA_POOL_LOCK
+            #define FORMULA_POOL_UNLOCK
+            #endif
             
         protected:
             
@@ -75,12 +74,12 @@ namespace carl
                 std::cout << std::endl;
             }
     
-            ConstElementSPtr trueFormula()
+            const FormulaContent<Pol>* trueFormula()
             {
                 return mpTrue;
             }
 
-            ConstElementSPtr falseFormula()
+            const FormulaContent<Pol>* falseFormula()
             {
                 return mpFalse;
             }
@@ -89,9 +88,9 @@ namespace carl
              * @param _booleanVar The Boolean variable wrapped by this formula.
              * @return A formula with wrapping the given Boolean variable.
              */
-            ConstElementSPtr create( Variable::Arg _booleanVar )
+            const FormulaContent<Pol>* create( Variable::Arg _booleanVar )
             {
-                return add( new Element( _booleanVar ) );
+                return add( new FormulaContent<Pol>( _booleanVar ) );
             }
             
             Formula<Pol> getTseitinVar( const Formula<Pol>& _formula )
@@ -110,16 +109,15 @@ namespace carl
              * @param _constraint The constraint wrapped by this formula.
              * @return A formula with wrapping the given constraint.
              */
-            ConstElementSPtr create( const Constraint<Pol>* _constraint )
+            const FormulaContent<Pol>* create( const Constraint<Pol>& _constraint )
             {
-				assert(_constraint != nullptr);
                 #ifdef SIMPLIFY_FORMULA
-                if( _constraint == constraintPool<Pol>().consistentConstraint() )
+                if( _constraint == Constraint<Pol>( true ) )
                     return mpTrue;
-                if( _constraint == constraintPool<Pol>().inconsistentConstraint() )
+                if( _constraint == Constraint<Pol>( false ) )
                     return mpFalse;
                 #endif
-                return add( new Element( _constraint ) );
+                return add( new FormulaContent<Pol>( _constraint ) );
             }
             
             /**
@@ -127,7 +125,7 @@ namespace carl
              * @param _subFormula
              * @return 
              */
-            ConstElementSPtr createNegation( const Formula<Pol>& _subFormula )
+            const FormulaContent<Pol>* createNegation( const Formula<Pol>& _subFormula )
             {
                 return _subFormula.mpContent->mNegation;
             }
@@ -138,7 +136,7 @@ namespace carl
              * @param _conclusion
              * @return 
              */
-            ConstElementSPtr createImplication( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion )
+            const FormulaContent<Pol>* createImplication( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion )
             {
                 #ifdef SIMPLIFY_FORMULA
                 if( _premise.mpContent == mpFalse )
@@ -150,7 +148,7 @@ namespace carl
                 if( _conclusion.mpContent == mpFalse )
                     return createNegation( _premise.mpContent );
                 #endif
-                return add( new Element( _premise, _conclusion ) );
+                return add( new FormulaContent<Pol>( _premise, _conclusion ) );
             }
     
             /**
@@ -160,7 +158,7 @@ namespace carl
 			 * @param _else Else.
              * @return
              */
-            ConstElementSPtr createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
+            const FormulaContent<Pol>* createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
             {
                 #ifdef SIMPLIFY_FORMULA
                 if( _condition.mpContent == mpFalse || _then == _else )
@@ -168,7 +166,7 @@ namespace carl
                 if( _condition.mpContent == mpTrue )
                     return _then.mpContent;
                 #endif
-                return add( new Element( _condition, _then, _else ) );
+                return add( new FormulaContent<Pol>( _condition, _then, _else ) );
             }
 
 			/**
@@ -178,11 +176,11 @@ namespace carl
 			 * @param _term
 			 * @return
 			 */
-			ConstElementSPtr create(FormulaType _type, const std::vector<Variable>&& _vars, const Formula<Pol>& _term)
+			const FormulaContent<Pol>* create(FormulaType _type, const std::vector<Variable>&& _vars, const Formula<Pol>& _term)
 			{
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
 				if (_vars.size() > 0) {
-					return add( new Element(_type, std::move(_vars), _term ) );
+					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
 				} else {
 					return _term.mpContent;
 				}
@@ -194,7 +192,7 @@ namespace carl
              * @param _subFormulaB The second sub-formula of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( FormulaType _type, const Formula<Pol>& _subFormulaA, const Formula<Pol>& _subFormulaB )
+            const FormulaContent<Pol>* create( FormulaType _type, const Formula<Pol>& _subFormulaA, const Formula<Pol>& _subFormulaB )
             {
                 Formulas<Pol> subFormulas;
                 subFormulas.insert( _subFormulaA );
@@ -206,7 +204,7 @@ namespace carl
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( const FormulasMulti<Pol>& _subformulas )
+            const FormulaContent<Pol>* create( const FormulasMulti<Pol>& _subformulas )
             {
                 if( _subformulas.empty() ) return mpFalse;
                 if( _subformulas.size() == 1 ) return _subformulas.begin()->mpContent;
@@ -244,20 +242,20 @@ namespace carl
              * @param _subformulas The sub-formulas of the formula to create.
              * @return A formula with the given operator and sub-formulas.
              */
-            ConstElementSPtr create( FormulaType _type, const Formulas<Pol>& _subformulas )
+            const FormulaContent<Pol>* create( FormulaType _type, const Formulas<Pol>& _subformulas )
             {
                 return create( _type, std::move( Formulas<Pol>( _subformulas ) ) );
             }
 
-			ConstElementSPtr create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
+			const FormulaContent<Pol>* create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
 			{
                 #ifdef SIMPLIFY_FORMULA
                 if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
                 {
                     if( boost::get<UVariable>(_lhs) < boost::get<UVariable>(_rhs) )
-                        return add( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) );
+                        return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_lhs), boost::get<UVariable>(_rhs), _negated, true ) ) );
                     if( boost::get<UVariable>(_rhs) < boost::get<UVariable>(_lhs) )
-                        return add( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) );
+                        return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) );
                     else if( _negated )
                         return mpFalse;
                     else
@@ -265,39 +263,45 @@ namespace carl
                 }
 				else if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) )
                 {
-                    return add( new Element( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) );
+                    return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_lhs), boost::get<UFInstance>(_rhs), _negated ) ) );
                 }
                 else if( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUVariable(), _rhs) )
                 {
-                    return add( new Element( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) );
+                    return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_rhs), boost::get<UFInstance>(_lhs), _negated ) ) );
                 }
                 else
                 {
                     assert( boost::apply_visitor(UEquality::IsUFInstance(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) );
                     if( boost::get<UFInstance>(_lhs) < boost::get<UFInstance>(_rhs) )
-                        return add( new Element( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) );
+                        return add( new FormulaContent<Pol>( UEquality( boost::get<UFInstance>(_lhs), boost::get<UFInstance>(_rhs), _negated, true ) ) );
                     if( boost::get<UFInstance>(_rhs) < boost::get<UFInstance>(_lhs) )
-                        return add( new Element( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) );
+                        return add( new FormulaContent<Pol>( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) );
                     else if( _negated )
                         return mpFalse;
                     else
                         return mpTrue;
                 }
                 #else
-                return add( new Element( UEquality( _lhs, _rhs, _negated ) ) );
+                return add( new FormulaContent<Pol>( UEquality( _lhs, _rhs, _negated ) ) );
                 #endif
 			}
 
-			ConstElementSPtr create( UEquality&& eq )
+			const FormulaContent<Pol>* create( UEquality&& eq )
 			{
-				return add( new Element( std::move( eq ) ) );
+				return add( new FormulaContent<Pol>( std::move( eq ) ) );
 			}
+            
+            void free( const FormulaContent<Pol>* _elem ) const
+            {
+                FORMULA_POOL_LOCK_GUARD
+                --_elem->mUsages;
+            }
             
             template<typename ArgType>
             void forallDo( void (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
             {
                 FORMULA_POOL_LOCK_GUARD
-                for( ConstElementSPtr formula : mPool )
+                for( const FormulaContent<Pol>* formula : mPool )
                     (*_func)( _arg, Formula<Pol>( formula ) );
             }
             
@@ -306,7 +310,7 @@ namespace carl
             {
                 FORMULA_POOL_LOCK_GUARD
                 std::map<const Formula<Pol>,ReturnType> result;
-                for( ConstElementSPtr elem : mPool )
+                for( const FormulaContent<Pol>* elem : mPool )
                 {
                     Formula<Pol> form(elem);
                     result[form] = (*_func)( _arg, form );
@@ -327,7 +331,7 @@ namespace carl
              * sub-formula are condensed. You should only use it, if you can exlcude this 
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
-            ConstElementSPtr create( FormulaType _type, Formulas<Pol>&& _subformulas );
+            const FormulaContent<Pol>* create( FormulaType _type, Formulas<Pol>&& _subformulas );
             
     private:
         
@@ -339,7 +343,7 @@ namespace carl
              *         False, if the given type is XOR;
              *         The given sub-formula if the type is AND or OR.
              */
-            ConstElementSPtr newFormulaWithOneSubformula( FormulaType _type, const Formula<Pol>& _subformula )
+            const FormulaContent<Pol>* newFormulaWithOneSubformula( FormulaType _type, const Formula<Pol>& _subformula )
             {
                 assert( FormulaType::OR || FormulaType::AND || FormulaType::XOR || FormulaType::IFF );
                 // We expect that this only happens, if the intended sub-formulas are all the same.
@@ -361,7 +365,7 @@ namespace carl
              * @return The position of the given formula in the pool and true, if it did not yet occur in the pool;
              *         The position of the equivalent formula in the pool and false, otherwise.
              */
-            std::pair<typename FastPointerSet<Element>::iterator,bool> insert( ElementSPtr _formula, bool _elementNotInPool );
+            std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> insert( FormulaContent<Pol>* _formula, bool _elementNotInPool );
             
             /**
              * Adds the given formula to the pool, if it does not yet occur in there.
@@ -370,7 +374,7 @@ namespace carl
              * @return The given formula, if it did not yet occur in the pool;
              *         The equivalent formula already occurring in the pool, otherwise.
              */
-            ConstElementSPtr add( ElementSPtr _formula );
+            const FormulaContent<Pol>* add( FormulaContent<Pol>* _formula );
     };
 }    // namespace carl
 
