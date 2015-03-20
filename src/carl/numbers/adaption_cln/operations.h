@@ -525,6 +525,9 @@ inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return quotient(a,b);
 }
+inline cln::cl_I operator/(const cln::cl_I& lhs, const int& rhs) {
+	return lhs / cln::cl_I(rhs);
+}
 
 std::string toString(const cln::cl_RA& _number, bool _infix);
 
