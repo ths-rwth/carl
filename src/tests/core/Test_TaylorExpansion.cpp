@@ -5,6 +5,9 @@
 using namespace carl;
 
 TEST(TaylorExpansion, ideal_adic_coefficient) {
-    const GaloisField<cln::cl_I>* mGf_pk;
-    mGf_pk(GaloisFieldManager<cln::cl_I>::getInstance().getField(p,k));
+    
+    // the Field Z_5
+    GaloisFieldManager<cln::cl_I>& gfm = GaloisFieldManager<mpz_class>::getInstance();
+    const GaloisField<cln::cl_I>* gf5 = gfm.getField(5,1);
+    
 }
