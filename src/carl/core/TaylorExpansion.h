@@ -44,11 +44,11 @@ namespace carl{
                 // now we iterate: u_k = phi_I[(e_(k-1) - u_(k-1)*(x_v - a)^(k-1)) / (x_v - a)^k],
                 // where phi_I[...] denotes the substitution of x_v by a.
                 MultivariatePolynomial<GFNumber<Integer>> temp;
-                for(unsigned i = 1, i <= k, i++) {
+                for(unsigned i = 1; i <= k; i++) {
                         e = e - u * ideal.pow(i-1);
                         temp = e / ideal.pow(i);
                         u = temp.substitute(x_v, value);
                 }
                 return u;
-        }www
+        }
 }
