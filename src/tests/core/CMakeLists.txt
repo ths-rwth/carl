@@ -14,6 +14,7 @@ add_executable(runCoreTests
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
 	Test_RationalFunction.cpp
+        Test_TaylorExpansion.cpp
         #Test_Constraint.cpp
 )
 cotire(runCoreTests)
