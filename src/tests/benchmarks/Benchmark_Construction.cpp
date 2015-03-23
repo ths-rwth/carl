@@ -4,13 +4,14 @@
 
 #include "framework/Benchmark.h"
 #include "carl/core/MultivariatePolynomial.h"
+#include "carl/core/Resultant.h"
 #include "BenchmarkTest.h"
 #include "framework/BenchmarkGenerator.h"
 
 using namespace carl;
 
 namespace carl {
-	
+
 	//##### Generator
 	template<typename C>
 	struct AdditionGenerator: public BaseGenerator {
@@ -28,6 +29,17 @@ namespace carl {
 			auto p1 = g.newMP<C>(bi.degree / 2);
 			auto p2 = g.newMP<C>(bi.degree - bi.degree / 2);
 			return std::make_tuple(p1*p2, p1);
+		}
+	};
+	template<typename C>
+	struct PremGenerator: public BaseGenerator {
+		typedef std::tuple<CMP<C>,CMP<C>,CVAR> type;
+		PremGenerator(const BenchmarkInformation& bi): BaseGenerator(bi) {}
+		type operator()() const {
+			auto p1 = g.newMP<C>(bi.degree);
+			auto p2 = g.newMP<C>(bi.degree - bi.degree / 4);
+			auto v = g.randomVariable();
+			return std::make_tuple(p1, p2, v);
 		}
 	};
 	template<typename C>
@@ -127,6 +139,23 @@ namespace carl {
 			auto res = exact_div(std::get<0>(args), std::get<1>(args));
 			//res.m().lex_sort(res);
 			return std::forward<const ZMP>(res);
+		}
+        #endif
+	};
+	struct PremExecutor {
+		template<typename Coeff>
+		CMP<Coeff> operator()(const std::tuple<CMP<Coeff>,CMP<Coeff>, CVAR>& args) {
+			CMP<Coeff> res = std::get<0>(args).prem(std::get<1>(args), std::get<2>(args));
+			return std::forward<const CMP<Coeff>>(res);
+		}
+        #ifdef COMPARE_WITH_GINAC
+		GMP operator()(const std::tuple<GMP,GMP,GVAR>& args) {
+			return std::forward<const GMP>(GiNaC::expand(GiNaC::prem(std::get<0>(args), std::get<1>(args), std::get<2>(args))));
+		}
+        #endif
+        #ifdef COMPARE_WITH_Z3
+		ZMP operator()(const std::tuple<ZMP,ZMP,ZVAR>& args) {
+			return std::forward<const ZMP>(resultant(std::get<0>(args), std::get<1>(args), std::get<2>(args)));
 		}
         #endif
 	};
@@ -324,6 +353,22 @@ TEST_F(BenchmarkTest, Division)
         #endif
         #ifdef COMPARE_WITH_Z3
 		bench.compare<ZMP, TupleConverter<ZMP,ZMP>>("Z3");
+        #endif
+		file.push(bench.result(), bi.degree);
+	}
+}
+
+TEST_F(BenchmarkTest, Prem)
+{
+	BenchmarkInformation bi(BenchmarkSelection::Random, 3);
+	bi.n = 100;
+	for (bi.degree = 10; bi.degree < 12; bi.degree++) {
+		Benchmark<PremGenerator<Coeff>, PremExecutor, CMP<Coeff>> bench(bi, "CArL");
+        #ifdef COMPARE_WITH_GINAC
+		bench.compare<GMP, TupleConverter<GMP,GMP,GVAR>>("GiNaC");
+        #endif
+        #ifdef COMPARE_WITH_Z3
+		bench.compare<ZMP, TupleConverter<ZMP,ZVAR,ZVAR>>("Z3");
         #endif
 		file.push(bench.result(), bi.degree);
 	}
