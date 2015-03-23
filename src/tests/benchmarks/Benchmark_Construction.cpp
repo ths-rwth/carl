@@ -222,6 +222,8 @@ namespace carl {
 	struct ResultantExecutor {
 		template<typename Coeff>
 		CUMP<Coeff> operator()(const std::tuple<CUMP<Coeff>,CUMP<Coeff>>& args) {
+			//carl::Resultant calc;
+			//return std::forward<const CUMP<Coeff>>(calc.resultant_z3(std::get<0>(args), std::get<1>(args)));
 			return std::forward<const CUMP<Coeff>>(std::get<0>(args).resultant(std::get<1>(args)));
 		}
         #ifdef COMPARE_WITH_GINAC
@@ -272,7 +274,7 @@ namespace carl {
 		}
         #endif
 	};
-	
+
 	//##### Converter
 	template<typename P, typename V>
 	struct ResultantConverter: public BaseConverter {
@@ -403,7 +405,7 @@ TEST_F(BenchmarkTest, Substitute)
 		file.push(bench.result(), bi.degree);
 	}
 }
-/*
+
 TEST_F(BenchmarkTest, Resultant)
 {
 	BenchmarkInformation bi(BenchmarkSelection::Random, 4);
@@ -414,6 +416,7 @@ TEST_F(BenchmarkTest, Resultant)
 		bench.compare<GMP, ResultantConverter<GMP,GVAR>>("GiNaC");
         #endif
         #ifdef COMPARE_WITH_Z3
+		for (auto v: bi.variables) bench.getCI()->z3(v);
 		bench.compare<ZMP, ResultantConverter<ZMP,ZVAR>>("Z3");
         #endif
 		file.push(bench.result(), bi.degree);
@@ -434,7 +437,7 @@ TEST_F(BenchmarkTest, GCD)
         #endif
 		file.push(bench.result(), bi.degree);
 	}
-}*/
+}
 
 TEST_F(BenchmarkTest, Compare)
 {
