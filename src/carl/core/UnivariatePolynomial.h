@@ -113,7 +113,7 @@ public:
 	 * @param coeff Leading coefficient.
 	 * @param degree Degree.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree = 0);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, std::size_t degree = 0);
 
 	/**
 	 * Construct polynomial with the given coefficients.
