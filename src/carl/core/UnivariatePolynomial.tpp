@@ -676,22 +676,18 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 	if(isZero() || lcoeff() > Coeff(0))
 	{
 		return Coeff(1);
-	}	
+	}
 	else
 	{
 		return Coeff(-1);
 	}
 }
 
-
-
-
-
-	
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
+	assert(!this->isZero());
 	auto it = mCoefficients.begin();
 	IntNumberType num = getNum(*it);
 	IntNumberType den = getDenom(*it);
@@ -700,6 +696,19 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 		den = carl::lcm(den, getDenom(*it));
 	}
 	return Coeff(den)/Coeff(num);
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_subset_of_rationals<C>>>
+typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeFactor() const
+{
+	assert(!this->isZero());
+	auto it = mCoefficients.begin();
+	typename UnderlyingNumberType<Coeff>::type factor = it->coprimeFactor();
+	for (++it; it != mCoefficients.end(); ++it) {
+		factor = carl::gcd(factor, it->coprimeFactor());
+	}
+	return factor;
 }
 
 template<typename Coeff>
@@ -717,6 +726,19 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 	for (const Coeff& coeff: mCoefficients) {
 		assert(getDenom(coeff * factor) == 1);
 		result.mCoefficients.push_back(getNum(coeff * factor));
+	}
+	return result;
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_subset_of_rationals<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficients() const {
+	if (this->isZero()) return *this;
+	UnivariatePolynomial<Coeff> result(mMainVar);
+	result.mCoefficients.reserve(mCoefficients.size());
+	auto factor = this->coprimeFactor();
+	for (const Coeff& c: mCoefficients) {
+		result.mCoefficients.push_back(factor * c);
 	}
 	return result;
 }
@@ -1871,6 +1893,28 @@ template<typename C>
 UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& rhs)
 {
 	return rhs - lhs;
+}
+
+template<typename Coefficient>
+template<typename C, EnableIf<is_number<C>>>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable::Arg rhs) {
+	if (rhs == this->mMainVar) {
+		this->mCoefficients.insert(this->mCoefficients.begin(), Coefficient(0));
+		return *this;
+	}
+	assert(!carl::is_number<Coefficient>::value);
+	return *this;
+}
+template<typename Coefficient>
+template<typename C, DisableIf<is_number<C>>>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable::Arg rhs) {
+	if (rhs == this->mMainVar) {
+		this->mCoefficients.insert(this->mCoefficients.begin(), Coefficient(0));
+		return *this;
+	}
+	assert(!carl::is_number<Coefficient>::value);
+	for (auto& c: this->mCoefficients) c *= rhs;
+	return *this;
 }
 
 template<typename Coefficient>
