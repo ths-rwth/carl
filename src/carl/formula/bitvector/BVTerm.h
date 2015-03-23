@@ -129,6 +129,11 @@ namespace carl
 		{
 			assert(_then.width() == _else.width());
 		}
+
+		bool operator==(const BVITEContent& _other)
+		{
+			return mCondition == _other.mCondition && mThen == _other.mThen && mElse == _other.mElse;
+		}
 	};
 
 	template<typename Pol>
@@ -140,6 +145,11 @@ namespace carl
 		BVUnaryContent(const BVTerm<Pol>& _operand, const size_t _index = 0) :
 		mOperand(_operand), mIndex(_index)
 		{
+		}
+
+		bool operator==(const BVUnaryContent& _other)
+		{
+			return mOperand == _other.mOperand && mIndex == _other.mIndex;
 		}
 	};
 
@@ -153,6 +163,11 @@ namespace carl
 		mFirst(_first), mSecond(_second)
 		{
 		}
+
+		bool operator==(const BVBinaryContent& _other)
+		{
+			return mFirst == _other.mFirst && mSecond == _other.mSecond;
+		}
 	};
 
 	template<typename Pol>
@@ -165,6 +180,11 @@ namespace carl
 		BVExtractContent(const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
 		mOperand(_operand), mFirst(_first), mLast(_last)
 		{
+		}
+
+		bool operator==(const BVExtractContent& _other)
+		{
+			return mOperand == _other.mOperand && mFirst == _other.mFirst && mLast == _other.mLast;
 		}
 	};
 
@@ -378,7 +398,28 @@ namespace carl
 
 		bool operator==(const BVTermContent<Pol>& _other) const
 		{
-			return mId == _other.mId; // TODO: Make sure this also works if any mId is not set
+			if(mId && _other.mId) {
+				return mId == _other.mId;
+			}
+
+			if(mType != _other.mType) {
+				return false;
+			}
+
+			if(mType == BVTermType::CONSTANT) {
+				return mValue == _other.mValue;
+			} else if(mType == BVTermType::VARIABLE) {
+				return mVariable == _other.mVariable;
+			} else if(mType == BVTermType::ITE) {
+				return mIte == _other.mIte;
+			} else if(typeIsUnary(mType)) {
+				return mUnary == _other.mUnary;
+			} else if(typeIsBinary(mType)) {
+				return mBinary == _other.mBinary;
+			} else {
+				assert(false);
+				return false;
+			}
 		}
 
 		/**

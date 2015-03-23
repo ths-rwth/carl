@@ -47,6 +47,10 @@ TEST(BVConstraint, Construction)
 
 	BVTerm<Pol> bvzeroext(BVTermType::EXT_U, bvconcat, 8);
 
+	BVTerm<Pol> bvzeroext2(BVTermType::EXT_U, bvconcat, 8);
+
+	std::cout << "equal? " << (bvzeroext == bvzeroext2) << std::endl;
+
 	// check for copy assignment
 	check_for_default_constructor = bvzeroext;
 

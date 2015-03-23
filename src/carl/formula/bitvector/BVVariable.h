@@ -47,6 +47,11 @@ namespace carl
 			return mVar;
 		}
 
+		bool operator==(const BVVariable& _other)
+		{
+			return mVar == _other.mVar;
+		}
+
 		size_t width() const
 		{
 			return mWidth;
