@@ -1,8 +1,8 @@
 # Add test cpp file
 add_executable(runCoreTests
 	Test_OperatorConcepts.cpp
-        Test_Variable.cpp 
-        Test_VariablePool.cpp 
+        Test_Variable.cpp
+        Test_VariablePool.cpp
         Test_Monomial.cpp
         Test_Term.cpp
         Test_MultivariatePolynomial.cpp
@@ -11,6 +11,7 @@ add_executable(runCoreTests
         Test_MultivariateGCD.cpp
         Test_RealAlgebraicNumber.cpp
         Test_RootFinder.cpp
+		Test_Resultant.cpp
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
 	Test_RationalFunction.cpp

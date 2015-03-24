@@ -23,7 +23,7 @@ before_install:
   - cd installation/ && source setup_travis.sh && cd ../
 
 script:
-  - source ./.travis.build && cd build/ && make -j4 && make test && cd ../
+  - source ./.travis.build && cd build/ && make -j4 && make CTEST_OUTPUT_ON_FAILURE=1 test && cd ../
 
 notifications:
   email:
