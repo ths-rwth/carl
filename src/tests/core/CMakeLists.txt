@@ -1,5 +1,6 @@
 # Add test cpp file
 add_executable(runCoreTests
+        Test_DiophantineEquation.cpp
 	Test_OperatorConcepts.cpp
         Test_Variable.cpp
         Test_VariablePool.cpp
