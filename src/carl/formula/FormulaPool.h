@@ -12,6 +12,7 @@
 #include "Formula.h"
 #include "ConstraintPool.h"
 #include <mutex>
+#include <limits>
 #include <boost/variant.hpp>
 
 #define SIMPLIFY_FORMULA
@@ -38,7 +39,7 @@ namespace carl
             /// Mutex to avoid multiple access to the pool
             mutable std::mutex mMutexPool;
             ///
-            FastMap<Formula<Pol>,Formula<Pol>> mTseitinVars;
+            FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
             
             #ifdef SMTRAT_STRAT_PARALLEL_MODE
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock( mMutexPool );
@@ -59,29 +60,38 @@ namespace carl
             FormulaPool( unsigned _capacity = 10000 );
             
             ~FormulaPool();
+    
+            const FormulaContent<Pol>* trueFormula() const
+            {
+                return mpTrue;
+            }
+
+            const FormulaContent<Pol>* falseFormula() const
+            {
+                return mpFalse;
+            }
             
         public:
             std::size_t size() const {
                 return mPool.size();
             }
+            
             void print() const
             {
                 std::cout << "Formula pool contains:" << std::endl;
                 for( const auto& ele : mPool )
                 {
-                    std::cout << "id " << ele->mId << ":  " << *ele << std::endl;
+                    std::cout << "id " << ele->mId << "[usages=" << ele->mUsages << "]:  " << *ele << std::endl;
                 }
                 std::cout << std::endl;
             }
-    
-            const FormulaContent<Pol>* trueFormula()
-            {
-                return mpTrue;
-            }
 
-            const FormulaContent<Pol>* falseFormula()
+            /**
+             * @return If _true = true, the valid formula True otherwise the invalid formula False.
+             */
+            const FormulaContent<Pol>* create( bool _true )
             {
-                return mpFalse;
+                return _true ? trueFormula() : falseFormula();
             }
 
             /**
@@ -95,14 +105,14 @@ namespace carl
             
             Formula<Pol> getTseitinVar( const Formula<Pol>& _formula )
             {
-                auto iter = mTseitinVars.insert( std::make_pair( _formula, Formula<Pol>() ) );
+                auto iter = mTseitinVars.insert( std::make_pair( _formula.mpContent, nullptr ) );
                 if( iter.second )
                 {
-                    Formula<Pol> hi(carl::freshBooleanVariable());
-                    hi.setDifficulty( _formula.difficulty() );
-                    iter.first->second = std::move( hi );
+                    const FormulaContent<Pol>* hi = create( carl::freshBooleanVariable() );
+                    hi->mDifficulty = _formula.difficulty();
+                    iter.first->second = hi;
                 }
-                return iter.first->second;
+                return Formula<Pol>( iter.first->second );
             }
             
             /**
@@ -113,9 +123,9 @@ namespace carl
             {
                 #ifdef SIMPLIFY_FORMULA
                 if( _constraint == Constraint<Pol>( true ) )
-                    return mpTrue;
+                    return trueFormula();
                 if( _constraint == Constraint<Pol>( false ) )
-                    return mpFalse;
+                    return falseFormula();
                 #endif
                 return add( new FormulaContent<Pol>( _constraint ) );
             }
@@ -140,11 +150,13 @@ namespace carl
             {
                 #ifdef SIMPLIFY_FORMULA
                 if( _premise.mpContent == mpFalse )
-                    return mpTrue;
+                    return trueFormula();
                 if( _premise.mpContent == mpTrue )
+                {
                     return _conclusion.mpContent;
+                }
                 if( _conclusion.mpContent == mpTrue )
-                    return mpTrue;
+                    return trueFormula();
                 if( _conclusion.mpContent == mpFalse )
                     return createNegation( _premise.mpContent );
                 #endif
@@ -162,9 +174,13 @@ namespace carl
             {
                 #ifdef SIMPLIFY_FORMULA
                 if( _condition.mpContent == mpFalse || _then == _else )
+                {
                     return _else.mpContent;
+                }
                 if( _condition.mpContent == mpTrue )
+                {
                     return _then.mpContent;
+                }
                 #endif
                 return add( new FormulaContent<Pol>( _condition, _then, _else ) );
             }
@@ -179,9 +195,12 @@ namespace carl
 			const FormulaContent<Pol>* create(FormulaType _type, const std::vector<Variable>&& _vars, const Formula<Pol>& _term)
 			{
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
-				if (_vars.size() > 0) {
+				if( _vars.size() > 0 )
+                {
 					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
-				} else {
+				}
+                else
+                {
 					return _term.mpContent;
 				}
 			}
@@ -206,8 +225,11 @@ namespace carl
              */
             const FormulaContent<Pol>* create( const FormulasMulti<Pol>& _subformulas )
             {
-                if( _subformulas.empty() ) return mpFalse;
-                if( _subformulas.size() == 1 ) return _subformulas.begin()->mpContent;
+                if( _subformulas.empty() ) return falseFormula();
+                if( _subformulas.size() == 1 )
+                {
+                    return _subformulas.begin()->mpContent;
+                }
                 Formulas<Pol> subFormulas;
                 auto lastSubFormula = _subformulas.begin();
                 auto subFormula = lastSubFormula;
@@ -257,9 +279,9 @@ namespace carl
                     if( boost::get<UVariable>(_rhs) < boost::get<UVariable>(_lhs) )
                         return add( new FormulaContent<Pol>( UEquality( boost::get<UVariable>(_rhs), boost::get<UVariable>(_lhs), _negated, true ) ) );
                     else if( _negated )
-                        return mpFalse;
+                        return falseFormula();
                     else
-                        return mpTrue;
+                        return trueFormula();
                 }
 				else if( boost::apply_visitor(UEquality::IsUVariable(), _lhs) && boost::apply_visitor(UEquality::IsUFInstance(), _rhs) )
                 {
@@ -277,9 +299,9 @@ namespace carl
                     if( boost::get<UFInstance>(_rhs) < boost::get<UFInstance>(_lhs) )
                         return add( new FormulaContent<Pol>( UEquality( boost::get<UFInstance>(_rhs), boost::get<UFInstance>(_lhs), _negated, true ) ) );
                     else if( _negated )
-                        return mpFalse;
+                        return falseFormula();
                     else
-                        return mpTrue;
+                        return trueFormula();
                 }
                 #else
                 return add( new FormulaContent<Pol>( UEquality( _lhs, _rhs, _negated ) ) );
@@ -291,10 +313,28 @@ namespace carl
 				return add( new FormulaContent<Pol>( std::move( eq ) ) );
 			}
             
-            void free( const FormulaContent<Pol>* _elem ) const
+            void free( const FormulaContent<Pol>* _elem )
+            {   
+                FORMULA_POOL_LOCK_GUARD
+                const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
+                assert( tmp->mUsages > 0 );
+                --tmp->mUsages;
+                if( tmp->mUsages == 1 )
+                {
+                    mTseitinVars.erase( tmp );
+                    mTseitinVars.erase( tmp->mNegation );
+                    mPool.erase( tmp );
+                    delete tmp->mNegation;
+                    delete tmp;
+                }
+            }
+            
+            void reg( const FormulaContent<Pol>* _elem ) const
             {
                 FORMULA_POOL_LOCK_GUARD
-                --_elem->mUsages;
+                const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
+                assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
+                ++tmp->mUsages;
             }
             
             template<typename ArgType>
@@ -302,7 +342,13 @@ namespace carl
             {
                 FORMULA_POOL_LOCK_GUARD
                 for( const FormulaContent<Pol>* formula : mPool )
+                {
                     (*_func)( _arg, Formula<Pol>( formula ) );
+                    if( formula != mpFalse )
+                    {
+                        (*_func)( _arg, Formula<Pol>( formula->mNegation ) );
+                    }
+                }
             }
             
             template<typename ReturnType, typename ArgType>
@@ -314,6 +360,11 @@ namespace carl
                 {
                     Formula<Pol> form(elem);
                     result[form] = (*_func)( _arg, form );
+                    if( elem != mpFalse )
+                    {
+                        Formula<Pol> form(elem->mNegation);
+                        result[form] = (*_func)( _arg, form );
+                    }
                 }
                 return result;
             }
@@ -350,22 +401,23 @@ namespace carl
                 switch( _type )
                 {
                     case FormulaType::XOR: // f xor f is false
-                        return mpFalse;
+                        return falseFormula();
                     case FormulaType::IFF: // f iff f is true
-                        return mpTrue;
+                        return trueFormula();
                     default: // f or f = f; f and f = f
+                    {
                         return _subformula.mpContent;
+                    }
                 }
             }
             
             /**
              * Inserts the given formula to the pool, if it does not yet occur in there.
              * @param _formula The formula to add to the pool.
-             * @param _elementNotInPool true, if the element is not yet in the pool; false, if this is not known.
              * @return The position of the given formula in the pool and true, if it did not yet occur in the pool;
              *         The position of the equivalent formula in the pool and false, otherwise.
              */
-            std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> insert( FormulaContent<Pol>* _formula, bool _elementNotInPool );
+            std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> insert( FormulaContent<Pol>* _formula );
             
             /**
              * Adds the given formula to the pool, if it does not yet occur in there.

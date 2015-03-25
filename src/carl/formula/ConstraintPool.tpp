@@ -24,6 +24,7 @@ namespace carl
         mConstraints(),
         mpPolynomialCache(nullptr)
     {
+        VariablePool::getInstance();
         if( needs_cache<Pol>::value )
         {
             mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
@@ -39,38 +40,23 @@ namespace carl
         mConstraints.reserve( _capacity );
         mConstraints.insert( mConsistentConstraint );
         mConstraints.insert( mInconsistentConstraint );
+        mConsistentConstraint->mUsages = 1; // avoids deleting it
+        mInconsistentConstraint->mUsages = 1; // avoids deleting it
         mIdAllocator = 3;
     }
 
     template<typename Pol>
     ConstraintPool<Pol>::~ConstraintPool()
     {
-        mConstraints.erase( mConsistentConstraint );
+        mConstraints.clear();
         delete mConsistentConstraint;
-        mConstraints.erase( mInconsistentConstraint );
         delete mInconsistentConstraint;
-        while( !mConstraints.empty() )
-        {
-            const ConstraintContent<Pol>* pCons = (*mConstraints.begin());
-            mConstraints.erase( mConstraints.begin() );
-            delete pCons;
-        }
     }
 
     template<typename Pol>
     void ConstraintPool<Pol>::clear()
     {
         CONSTRAINT_POOL_LOCK_GUARD
-        mConstraints.erase( mConsistentConstraint );
-        mConstraints.erase( mInconsistentConstraint );
-        while( !mConstraints.empty() )
-        {
-            const ConstraintContent<Pol>* pCons = (*mConstraints.begin());
-            mConstraints.erase( mConstraints.begin() );
-            delete pCons;
-        }
-        mConstraints.insert( mConsistentConstraint );
-        mConstraints.insert( mInconsistentConstraint );
         mIdAllocator = 3;
     }
     
@@ -91,15 +77,16 @@ namespace carl
     }
 
     template<typename Pol>
-    const ConstraintContent<Pol>* ConstraintPool<Pol>::create( Pol&& _lhs, const Relation _rel )
+    const ConstraintContent<Pol>* ConstraintPool<Pol>::create( const Pol& _lhs, const Relation _rel )
     {
         CONSTRAINT_POOL_LOCK_GUARD
-        ConstraintContent<Pol>* constraint = createNormalizedConstraint( std::move(_lhs), _rel );
+        ConstraintContent<Pol>* constraint = createNormalizedConstraint( _lhs, _rel );
         if( constraint->mVariables.empty() )
         {
             bool constraintConsistent = evaluate<Pol>( constraint->mLhs.constantPart(), constraint->mRelation );
             delete constraint;
-            return ( constraintConsistent ? mConsistentConstraint : mInconsistentConstraint );
+            const ConstraintContent<Pol>* result = constraintConsistent ? mConsistentConstraint : mInconsistentConstraint;
+            return result;
         }
         const ConstraintContent<Pol>* result = addConstraintToPool( constraint );
         return result;
@@ -130,7 +117,7 @@ namespace carl
     }
     
     template<typename Pol>
-    ConstraintContent<Pol>* ConstraintPool<Pol>::createNormalizedConstraint( Pol&& _lhs, const Relation _rel ) const
+    ConstraintContent<Pol>* ConstraintPool<Pol>::createNormalizedConstraint( const Pol& _lhs, const Relation _rel ) const
     {
         if( _rel == Relation::GREATER )
         {
@@ -199,6 +186,7 @@ namespace carl
                         constraint->mID = mIdAllocator;
                         ++mIdAllocator;
                     }
+                    assert( (*iterBoolPairB.first)->mUsages < std::numeric_limits<size_t>::max() );
                     ++(*iterBoolPairB.first)->mUsages;
                     return *iterBoolPairB.first;
                 }
@@ -208,14 +196,14 @@ namespace carl
                     ++mIdAllocator;
                 }
             }
-            ++(*iterBoolPair.first)->mUsages;
             return *iterBoolPair.first;
         }
         else // Constraint contains no variables.
         {
             mLastConstructedConstraintWasKnown = true;
             delete _constraint;
-            return (constraintConsistent ? mConsistentConstraint : mInconsistentConstraint );
+            const ConstraintContent<Pol>* result = (constraintConsistent ? mConsistentConstraint : mInconsistentConstraint );
+            return result;
         }
     }
 
@@ -225,7 +213,7 @@ namespace carl
         CONSTRAINT_POOL_LOCK_GUARD
         _out << "Constraint pool:" << endl;
         for( auto constraint = mConstraints.begin(); constraint != mConstraints.end(); ++constraint )
-            _out << "    " << **constraint << "  [id=" << (*constraint)->id() << ", hash=" << (*constraint)->getHash() << "]" << endl;
+            _out << "    " << **constraint << "  [id=" << (*constraint)->mID << ", hash=" << (*constraint)->hash() << ", usages=" << (*constraint)->mUsages << "]" << endl;
         _out << "---------------------------------------------------" << endl;
     }
 
