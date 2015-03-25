@@ -83,14 +83,15 @@ namespace carl
     {}
 
     template<typename Pol>
-    FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _subformula ):
+    FormulaContent<Pol>::FormulaContent( Formula<Pol>&& _subformula ):
         mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
         mId( 0 ),
         mActivity( 0.0 ),
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::NOT ),
-        mSubformula( _subformula ),
+        mSubformula( std::move( _subformula ) ),
+        mNegation( mSubformula.mpContent ),
         mProperties()
     {}
 
@@ -183,7 +184,9 @@ namespace carl
         if( mId == 0 || _content.mId == 0 )
         {
             if( mType != _content.mType )
+            {
                 return false;
+            }
             switch( mType )
             {
                 case FormulaType::BOOL:
