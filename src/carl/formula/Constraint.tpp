@@ -407,9 +407,9 @@ namespace carl
     template<typename Pol>
     Constraint<Pol>& Constraint<Pol>::operator=( const Constraint<Pol>& _constraint )
     {
-        assert( mpContent != nullptr );
         ConstraintPool<Pol>::getInstance().reg( _constraint.mpContent );
-        ConstraintPool<Pol>::getInstance().free( mpContent );
+        if( mpContent != nullptr ) 
+            ConstraintPool<Pol>::getInstance().free( mpContent );
         mpContent = _constraint.mpContent;
         return *this;
     }
@@ -417,8 +417,8 @@ namespace carl
     template<typename Pol>
     Constraint<Pol>& Constraint<Pol>::operator=( Constraint<Pol>&& _constraint )
     {
-        assert( mpContent != nullptr );
-        ConstraintPool<Pol>::getInstance().free( mpContent );
+        if( mpContent != nullptr ) 
+            ConstraintPool<Pol>::getInstance().free( mpContent );
         mpContent = _constraint.mpContent;
         _constraint.mpContent = nullptr;
         return *this;

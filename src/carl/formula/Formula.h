@@ -444,17 +444,17 @@ namespace carl
             
             Formula& operator=( const Formula& _formula )
             {
-                assert( mpContent != nullptr );
                 FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
-                FormulaPool<Pol>::getInstance().free( mpContent );
+                if( mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().free( mpContent );
                 mpContent = _formula.mpContent;
                 return *this;
             }
             
             Formula& operator=( Formula&& _formula )
             {
-                assert( mpContent != nullptr );
-                FormulaPool<Pol>::getInstance().free( mpContent );
+                if( mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().free( mpContent );
                 mpContent = _formula.mpContent;
                 _formula.mpContent = nullptr;
                 return *this;
