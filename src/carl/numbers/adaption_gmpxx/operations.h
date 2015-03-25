@@ -372,10 +372,9 @@ inline mpq_class& div_assign(mpq_class& a, const mpq_class& b) {
 
 inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 {
-	mpq_t res;
-	mpq_init(res);
-	mpq_mul(res, lhs.get_mpq_t(), rhs.get_mpq_t());
-	return mpq_class(res);
+	mpq_class res;
+	mpq_mul(res.get_mpq_t(), lhs.get_mpq_t(), rhs.get_mpq_t());
+	return res;
 }
 
 std::string toString(const mpq_class& _number, bool _infix);

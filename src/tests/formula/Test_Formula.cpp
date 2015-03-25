@@ -34,13 +34,14 @@ TEST(Formula, Construction)
     Pol py( y );
     Pol lhsA = px.pow(2) - py;
     Pol lhsB = Rational(4) * px + py - Rational(8) * py.pow(7);
+    Pol lhsD = px*py;
     Pol pi1( i1 );
     Pol pi2( i2 );
     Pol pi3( i3 );
     Pol lhsC = Rational(2) * pi1 + Rational(2) * pi2 + Rational(2) * pi3 - Rational(5);
     
     // Constraints can then be constructed as follows:
-    Constr constraintA = Constr( lhsA, Relation::LESS );
+    Constr constraintA = Constr( lhsD, Relation::EQ );
     
     // Uninterpreted functions are 
     
