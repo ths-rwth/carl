@@ -1058,13 +1058,9 @@ public:
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs) {
-		return std::move(UnivariatePolynomial<C>(lhs) *= rhs);
-	}
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs) {
-		return std::move(UnivariatePolynomial<C>(rhs) *= lhs);
-	}
+	friend UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>

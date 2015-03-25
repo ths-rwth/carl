@@ -1994,6 +1994,15 @@ UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const Univ
 }
 
 template<typename C>
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs) {
+	return std::move(UnivariatePolynomial<C>(lhs) *= rhs);
+}
+template<typename C>
+UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs) {
+	return std::move(UnivariatePolynomial<C>(rhs) *= lhs);
+}
+
+template<typename C>
 UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const C& rhs)
 {
 	UnivariatePolynomial<C> res(lhs);
