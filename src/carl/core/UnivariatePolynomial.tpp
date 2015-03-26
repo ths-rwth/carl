@@ -373,6 +373,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 
 	std::size_t reductions = 0;
 	while (true) {
+		if (res.isZero()) {
+			assert(res == this->prem_old(divisor));
+			return res;
+		}
 		if (divisor.degree() > res.degree()) {
 			std::size_t degdiff = this->degree() - divisor.degree() + 1;
 			if (reductions < degdiff) {
@@ -394,9 +398,11 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 			}
 		} else {
 			assert(!lc.has(v));
-			for (std::size_t i = 0; i <= reduct.degree(); i++) {
-				newR[res.degree() - divisor.degree() + i] -= lc * reduct.coefficients()[i];
-				assert(!newR[res.degree() - divisor.degree() + i].has(v));
+			if (!reduct.isZero()) {
+				for (std::size_t i = 0; i <= reduct.degree(); i++) {
+					newR[res.degree() - divisor.degree() + i] -= lc * reduct.coefficients()[i];
+					assert(!newR[res.degree() - divisor.degree() + i].has(v));
+				}
 			}
 		}
 		res = UnivariatePolynomial<Coeff>(v, std::move(newR));
