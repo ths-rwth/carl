@@ -378,7 +378,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 			if (reductions < degdiff) {
 				res *= carl::pow(divisor.lcoeff(), degdiff - reductions);
 			}
-			assert(res == this->prem(divisor));
+			assert(res == this->prem_old(divisor));
 			return res;
 		}
 		std::vector<Coeff> newR(res.degree());
