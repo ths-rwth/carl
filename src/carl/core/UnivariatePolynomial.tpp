@@ -392,9 +392,11 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 			assert(!newR[i].has(v));
 		}
 		if (res.degree() == divisor.degree()) {
-			for (std::size_t i = 0; i <= reduct.degree(); i++) {
-				newR[i] -= lc * reduct.coefficients()[i];
-				assert(!newR[i].has(v));
+			if (!reduct.isZero()) {
+				for (std::size_t i = 0; i <= reduct.degree(); i++) {
+					newR[i] -= lc * reduct.coefficients()[i];
+					assert(!newR[i].has(v));
+				}
 			}
 		} else {
 			assert(!lc.has(v));
