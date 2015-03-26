@@ -1,4 +1,4 @@
-Windows 7 64Bit
+Windows 7 64Bit {#windows_7_msvc2014}
 ==========
 
 This is an example how the installation on Windows 7 64Bit looks like.
