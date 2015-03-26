@@ -4,6 +4,8 @@ Windows 7 64Bit
 This is an example how the installation on Windows 7 64Bit looks like.
 We assume that you start with a fresh installation and know how to install software.
 
+Warning: This guide is incomplete!
+
 This guide is for a Visual Studio 2013 (which is Visual Studio 12).
 
 - Install the following software:
