@@ -322,7 +322,7 @@ public:
 		template<typename It>
 		LeafIterator(const BaseIterator<It,reverse>& ii): Base(ii) {}
 		LeafIterator(const LeafIterator& ii): Base(ii) {}
-		LeafIterator(LeafIterator&& ii): Base(this->mTree, ii.current) {}
+		LeafIterator(LeafIterator&& ii): Base(ii) {}
 		LeafIterator& operator=(const LeafIterator& it) {
 			Base::operator=(it);
 			return *this;
