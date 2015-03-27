@@ -47,14 +47,18 @@ public:
 		}
 		return true;
 	}
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& variables, cad::ConflictGraph& conflictGraph) const {
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& variables, cad::ConflictGraph<Number>& conflictGraph) const {
 		bool satisfied = true;
+		std::size_t sampleID = conflictGraph.newSample();
 		std::forward_list<std::size_t> vertices;
 		for (std::size_t i = 0; i < constraints.size(); i++) {
+			std::size_t constraintID = conflictGraph.getConstraint(constraints[i]);
 			if (constraints[i].satisfiedBy(r, variables)) {
 				vertices.push_front(i);
+				conflictGraph.set(constraintID, sampleID, false);
 			} else {
 				satisfied = false;
+				conflictGraph.set(constraintID, sampleID, true);
 			}
 		}
 		// store that the constraints are satisfied by r
