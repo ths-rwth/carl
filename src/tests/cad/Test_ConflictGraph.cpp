@@ -9,5 +9,5 @@ using namespace carl;
 
 TEST(ConflictGraph, BasicOperations)
 {  
-	cad::ConflictGraph cg;
+	cad::ConflictGraph<cln::cl_RA> cg;
 }
