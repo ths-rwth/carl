@@ -932,7 +932,7 @@ namespace carl
         typename Pol::NumberType g;
         if( carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b) )
         {
-            g = carl::getDenom(one_divided_by_a)/carl::getDenom(one_divided_by_b);
+            g = typename Pol::NumberType(carl::getDenom(one_divided_by_a))/carl::getDenom(one_divided_by_b);
             if( signsDiffer )
                 g = -g;
             termACoeffGreater = true;
@@ -940,7 +940,7 @@ namespace carl
         }
         else
         {
-            g = carl::getDenom(one_divided_by_b)/carl::getDenom(one_divided_by_a);
+            g = typename Pol::NumberType(carl::getDenom(one_divided_by_b))/carl::getDenom(one_divided_by_a);
             if( signsDiffer )
                 g = -g;
             c *= g;
