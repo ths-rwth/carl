@@ -345,7 +345,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder(const Univari
  * pseudoremainder
  */
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem_old(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!divisor.isZero());
 	if(isZero() || degree() < divisor.degree())
@@ -359,7 +359,58 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	return remainder(divisor, prefactor);
 }
 
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	assert(this->mainVar() == divisor.mainVar());
+	Variable v = this->mainVar();
+	if (divisor.degree() == 0) return UnivariatePolynomial<Coeff>(v);
+	if (divisor.degree() > this->degree()) return *this;
 
+	UnivariatePolynomial<Coeff> reduct = divisor;
+	reduct.truncate();
+	UnivariatePolynomial<Coeff> res = *this;
+
+	std::size_t reductions = 0;
+	while (true) {
+		if (res.isZero()) {
+			assert(res == this->prem_old(divisor));
+			return res;
+		}
+		if (divisor.degree() > res.degree()) {
+			std::size_t degdiff = this->degree() - divisor.degree() + 1;
+			if (reductions < degdiff) {
+				res *= carl::pow(divisor.lcoeff(), degdiff - reductions);
+			}
+			assert(res == this->prem_old(divisor));
+			return res;
+		}
+		std::vector<Coeff> newR(res.degree());
+		Coeff lc = res.lcoeff();
+		for (std::size_t i = 0; i < res.degree(); i++) {
+			newR[i] = res.coefficients()[i] * divisor.lcoeff();
+			assert(!newR[i].has(v));
+		}
+		if (res.degree() == divisor.degree()) {
+			if (!reduct.isZero()) {
+				for (std::size_t i = 0; i <= reduct.degree(); i++) {
+					newR[i] -= lc * reduct.coefficients()[i];
+					assert(!newR[i].has(v));
+				}
+			}
+		} else {
+			assert(!lc.has(v));
+			if (!reduct.isZero()) {
+				for (std::size_t i = 0; i <= reduct.degree(); i++) {
+					newR[res.degree() - divisor.degree() + i] -= lc * reduct.coefficients()[i];
+					assert(!newR[res.degree() - divisor.degree() + i].has(v));
+				}
+			}
+		}
+		res = UnivariatePolynomial<Coeff>(v, std::move(newR));
+		reductions++;
+	}
+}
 
 /**
  * Signed pseudoremainder.

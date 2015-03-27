@@ -576,6 +576,7 @@ public:
 	 * Calculates the pseudo-remainder.
 	 * @see @cite GCL92, page 55, Pseudo-Division Property
 	 */
+	UnivariatePolynomial prem_old(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 

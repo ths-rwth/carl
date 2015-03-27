@@ -130,7 +130,7 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const Constraint<Num>& s);
 
-	bool operator==(const Constraint<Number>& c) {
+	bool operator==(const Constraint<Number>& c) const {
 		if (this->polynomial != c.polynomial) return false;
 		if (this->sign != c.sign) return false;
 		if (this->negated != c.negated) return false;
@@ -139,6 +139,13 @@ public:
 			if (this->variables[i] != c.variables[i]) return false;
 		}
 		return true;
+	}
+	bool operator<(const Constraint<Number>& c) const {
+		if (this->sign != c.sign) return this->sign < c.sign;
+		if (this->negated != c.negated) return this->negated < c.negated;
+		if (this->variables != c.variables) return this->variables < c.variables;
+		if (this->polynomial != c.polynomial) return this->polynomial < c.polynomial;
+		return false;
 	}
 private:
 	
