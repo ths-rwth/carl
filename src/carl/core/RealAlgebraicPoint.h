@@ -7,6 +7,10 @@
 
 #include <vector>
 
+namespace carl {
+template<typename Number> class RealAlgebraicPoint;
+}
+
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicNumberOperations.h"
 
