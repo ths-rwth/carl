@@ -20,12 +20,13 @@ namespace carl
     
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( bool _true, size_t _id ):
-        mHash( ((size_t)(_true ? ConstraintPool<Pol>::getInstance().consistentConstraint()->id() : ConstraintPool<Pol>::getInstance().inconsistentConstraint()->id())) << (sizeof(size_t)*4) ),
+        mHash( ((size_t)(Constraint<Pol>( _true ).id())) << (sizeof(size_t)*4) ),
         mId( _id ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( _true ? FormulaType::TRUE : FormulaType::FALSE ),
-        mpConstraint( _true ? ConstraintPool<Pol>::getInstance().consistentConstraint() : ConstraintPool<Pol>::getInstance().inconsistentConstraint() ),
+        mConstraint( Constraint<Pol>( _true ) ),
         mProperties()
     {}
 
@@ -33,8 +34,9 @@ namespace carl
     FormulaContent<Pol>::FormulaContent( carl::Variable::Arg _boolean ):
         mHash( (size_t)_boolean.getId() ), // TODO: subtract the id of the boolean variable with the smallest id
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( FormulaType::BOOL ),
         mBoolean( _boolean ),
         mProperties()
@@ -43,23 +45,24 @@ namespace carl
     }
 
     template<typename Pol>
-    FormulaContent<Pol>::FormulaContent( const Constraint<Pol>* _constraint ):
-        mHash( ((size_t) _constraint->id()) << (sizeof(size_t)*4) ),
+    FormulaContent<Pol>::FormulaContent( const Constraint<Pol>& _constraint ):
+        mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( FormulaType::CONSTRAINT ),
-        mpConstraint( _constraint ),
+        mConstraint( _constraint ),
         mProperties()
     {
-        switch( _constraint->isConsistent() )
+        switch( _constraint.isConsistent() )
         {
             case 0: 
-                assert( mpConstraint == constraintPool<Pol>().inconsistentConstraint() );
+                assert( mConstraint == Constraint<Pol>( false ) );
                 mType = FormulaType::FALSE;
                 break;
             case 1: 
-                assert( mpConstraint == constraintPool<Pol>().consistentConstraint() );
+                assert( mConstraint == Constraint<Pol>( true ) );
                 mType = FormulaType::TRUE;
                 break;
             default:
@@ -71,21 +74,24 @@ namespace carl
     FormulaContent<Pol>::FormulaContent( UEquality&& _ueq ):
         mHash( std::hash<UEquality>()( _ueq ) ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( FormulaType::UEQ ),
         mUIEquality( std::move( _ueq ) ),
         mProperties()
     {}
 
     template<typename Pol>
-    FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _subformula ):
+    FormulaContent<Pol>::FormulaContent( Formula<Pol>&& _subformula ):
         mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( FormulaType::NOT ),
-        mSubformula( _subformula ),
+        mSubformula( std::move( _subformula ) ),
+        mNegation( mSubformula.mpContent ),
         mProperties()
     {}
 
@@ -93,8 +99,9 @@ namespace carl
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion ):
         mHash( CIRCULAR_SHIFT(size_t, (((size_t)IMPLIES << 5) ^ _premise.getHash()), 5) ^ _conclusion.getHash() ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( FormulaType::IMPLIES ),
         mProperties()
     {
@@ -105,8 +112,9 @@ namespace carl
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else ):
         mHash( CIRCULAR_SHIFT(size_t, (CIRCULAR_SHIFT(size_t, (((size_t)ITE << 5) ^ _condition.getHash()), 5) ^ _then.getHash()), 5) ^ _else.getHash() ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( FormulaType::ITE ),
         mProperties()
     {
@@ -118,8 +126,9 @@ namespace carl
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( _type ),
         mProperties()
     {
@@ -131,8 +140,9 @@ namespace carl
     FormulaContent<Pol>::FormulaContent( const FormulaType _type, Formulas<Pol>&& _subformulas ):
         mHash( (size_t)_type ),
         mId( 0 ),
-        mActivity( 0 ),
-        mDifficulty( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
         mType( _type ),
         mProperties()
     {
@@ -156,7 +166,7 @@ namespace carl
         }
         else if( mType == FormulaType::CONSTRAINT )
         {
-            mpConstraint = nullptr;
+            mConstraint = Constraint<Pol>();
         }
         else if( mType == FormulaType::IMPLIES )
         {
@@ -174,7 +184,9 @@ namespace carl
         if( mId == 0 || _content.mId == 0 )
         {
             if( mType != _content.mType )
+            {
                 return false;
+            }
             switch( mType )
             {
                 case FormulaType::BOOL:
@@ -184,7 +196,7 @@ namespace carl
                 case FormulaType::FALSE:
                     return true;
                 case FormulaType::CONSTRAINT:
-                    return mpConstraint == _content.mpConstraint;
+                    return mConstraint == _content.mConstraint;
                 case FormulaType::NOT:
                     return mSubformula == _content.mSubformula;
                 case FormulaType::IMPLIES:
@@ -223,7 +235,7 @@ namespace carl
             return (_init + VariablePool::getInstance().getName( mBoolean, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::CONSTRAINT )
-            return (_init + mpConstraint->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+            return (_init + mConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         else if( mType == FormulaType::UEQ )
         {
             return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
@@ -570,13 +582,13 @@ namespace carl
             case FormulaType::TRUE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( *_content.mpConstraint, _content.mProperties );
+                addConstraintProperties( _content.mConstraint, _content.mProperties );
                 break;
             }
             case FormulaType::FALSE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( *_content.mpConstraint, _content.mProperties );
+                addConstraintProperties( _content.mConstraint, _content.mProperties );
                 break;
             }
             case FormulaType::BOOL:
@@ -587,7 +599,7 @@ namespace carl
             case FormulaType::CONSTRAINT:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( *_content.mpConstraint, _content.mProperties );
+                addConstraintProperties( _content.mConstraint, _content.mProperties );
                 break;
             }
             case FormulaType::NOT:
@@ -912,36 +924,36 @@ namespace carl
                 }
             case FormulaType::CONSTRAINT:
             {
-                const Constraint<Pol>* constraint = subformula().pConstraint();
+                const Constraint<Pol>& constraint = subformula().constraint();
                 if( _keepConstraint )
                     return *this;
                 else
                 {
-                    switch( constraint->relation() )
+                    switch( constraint.relation() )
                     {
                         case Relation::EQ:
                         {
-                            return Formula<Pol>( constraint->lhs(), Relation::NEQ );
+                            return Formula<Pol>( constraint.lhs(), Relation::NEQ );
                         }
                         case Relation::LEQ:
                         {
-                            return Formula<Pol>( -constraint->lhs(), Relation::LESS );
+                            return Formula<Pol>( -constraint.lhs(), Relation::LESS );
                         }
                         case Relation::LESS:
                         {
-                            return Formula<Pol>( -constraint->lhs(), Relation::LEQ );
+                            return Formula<Pol>( -constraint.lhs(), Relation::LEQ );
                         }
                         case Relation::GEQ:
                         {
-                            return Formula<Pol>( constraint->lhs(), Relation::LESS );
+                            return Formula<Pol>( constraint.lhs(), Relation::LESS );
                         }
                         case Relation::GREATER:
                         {
-                            return Formula<Pol>( constraint->lhs(), Relation::LEQ );
+                            return Formula<Pol>( constraint.lhs(), Relation::LEQ );
                         }
                         case Relation::NEQ:
                         {
-                            return Formula<Pol>( constraint->lhs(), Relation::EQ );
+                            return Formula<Pol>( constraint.lhs(), Relation::EQ );
                         }
                         default:
                         {
@@ -1586,14 +1598,14 @@ namespace carl
         const Constraint<Pol>& constraint = negated ? _constraint.subformula().constraint() : _constraint.constraint();
         assert( constraint.isConsistent() == 2 );
         typename Pol::NumberType boundValue;
-        Relation relation = negated ? Constraint<Pol>::invertRelation( constraint.relation() ) : constraint.relation();
+        Relation relation = negated ? carl::invertRelation( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
         Pol* poly = nullptr;
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
             boundValue = constraint.constantPart();
-            relation = Constraint<Pol>::turnAroundRelation( relation );
+            relation = carl::turnAroundRelation( relation );
             poly = new Pol( -lhs + boundValue );
         }
         else

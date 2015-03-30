@@ -9,18 +9,20 @@
 
 #include "../../core/logging.h"
 #include "Common.h"
+#include "FormulaParser.h"
 #include "PolynomialParser.h"
 #include "RationalFunctionParser.h"
 
 namespace carl {
 namespace parser {
 
-template<typename Coeff>
+template<typename Pol>
 class Parser {
 private:
 	Skipper skipper;
-	PolynomialParser<Coeff> polynomialParser;
-	RationalFunctionParser<Coeff> ratfunParser;
+	PolynomialParser<Pol> polynomialParser;
+	RationalFunctionParser<Pol> ratfunParser;
+	FormulaParser<Pol> formulaParser;
 	
 	template<typename Result, typename Parser>
 	bool parse(const std::string& s, const Parser& parser, Result& res) {
@@ -29,24 +31,36 @@ private:
 	}
 public:
 	
-	Poly<Coeff> polynomial(const std::string& s) {
-		Poly<Coeff> res;
+	Pol polynomial(const std::string& s) {
+		Pol res;
 		if (!parse(s, polynomialParser, res)) {
 			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a polynomial failed.");
 		}
 		return res;
 	}
 	
-	RatFun<Coeff> rationalFunction(const std::string& s) {
-		RatFun<Coeff> res;
+	RatFun<Pol> rationalFunction(const std::string& s) {
+		RatFun<Pol> res;
 		if (!parse(s, ratfunParser, res)) {
 			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a rational function failed.");
 		}
 		return res;
 	}
 	
+	Formula<Pol> formula(const std::string& s) {
+		Formula<Pol> res;
+		if (!parse(s, formulaParser, res)) {
+            std::cout << "NOPE!" << std::endl;
+			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a formula failed.");
+		}
+		return res;
+	}
+	
 	void addVariable(Variable::Arg v) {
-		polynomialParser.addVariable(v);
+        if( v.getType() == VariableType::VT_BOOL )
+            formulaParser.addVariable(v);
+        else
+            polynomialParser.addVariable(v);
 	}
 };
 

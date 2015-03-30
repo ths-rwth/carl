@@ -18,6 +18,7 @@
 #include "../util/SFINAE.h"
 #include "../numbers/typetraits.h"
 #include "../numbers/numbers.h"
+#include "../util/Common.h"
 
 namespace carl
 {   
@@ -124,7 +125,7 @@ namespace carl
 
         bool ginacDivide(const Poly& polyA, const Poly& polyB, Poly& result);
 
-        std::unordered_map<const Poly, unsigned, std::hash<Poly>> ginacFactorization(const Poly& poly);
+        Factors<Poly> ginacFactorization(const Poly& poly);
 
         bool checkConversion(const Poly& polyA);
     };
@@ -166,7 +167,7 @@ namespace carl
     }
     
     template<typename Poly>
-	std::unordered_map<const Poly, unsigned, std::hash<Poly>> ginacFactorization(const Poly& poly)
+	Factors<Poly> ginacFactorization(const Poly& poly)
     {
         return OldGinacConverter<Poly>::getInstance().ginacFactorization(poly);
     }

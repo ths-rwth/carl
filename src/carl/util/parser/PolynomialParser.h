@@ -22,18 +22,18 @@ namespace boost { namespace spirit { namespace traits {
 namespace carl {
 namespace parser {
 
-template<typename Coeff>
-struct PolynomialParser: public qi::grammar<Iterator, Poly<Coeff>(), Skipper> {
-	PolynomialParser(): PolynomialParser<Coeff>::base_type(main, "polynomial") {
+template<typename Pol>
+struct PolynomialParser: public qi::grammar<Iterator, Pol(), Skipper> {
+	PolynomialParser(): PolynomialParser<Pol>::base_type(main, "polynomial") {
 		operation.add("+", ADD)("-", SUB);
 		varname = qi::lexeme[ (qi::alpha | qi::char_("~!@$%^&*_+=<>.?/-")) > *(qi::alnum | qi::char_("~!@$%^&*_+=<>.?/-"))];
-		variable = (varmap[qi::_val = qi::_1]) | (varname[qi::_val = px::bind(&PolynomialParser<Coeff>::newVariable, px::ref(*this), qi::_1)]);
-		monomial = ((variable >> ("^" >> number | qi::attr(Coeff(1)))) % "*")[qi::_val = px::bind(&PolynomialParser<Coeff>::newMonomial, px::ref(*this), qi::_1)];
-		term = (-number >> -monomial)[qi::_val = px::bind(&PolynomialParser<Coeff>::newTerm, px::ref(*this), qi::_1, qi::_2)];
-		polynomial = (term >> *(operation >> term))[qi::_val = px::bind(&PolynomialParser<Coeff>::addTerms, px::ref(*this), qi::_1, qi::_2)];
+		variable = (varmap[qi::_val = qi::_1]) | (varname[qi::_val = px::bind(&PolynomialParser<Pol>::newVariable, px::ref(*this), qi::_1)]);
+		monomial = ((variable >> ("^" >> number | qi::attr(typename Pol::CoeffType(1)))) % "*")[qi::_val = px::bind(&PolynomialParser<Pol>::newMonomial, px::ref(*this), qi::_1)];
+		term = (-number >> -monomial)[qi::_val = px::bind(&PolynomialParser<Pol>::newTerm, px::ref(*this), qi::_1, qi::_2)];
+		polynomial = (term >> *(operation >> term))[qi::_val = px::bind(&PolynomialParser<Pol>::addTerms, px::ref(*this), qi::_1, qi::_2)];
 		expr = ("(" >> expr_sum >> ")") | polynomial;
-		expr_product = (expr % "*")[qi::_val = px::bind(&PolynomialParser<Coeff>::mul, px::ref(*this), qi::_1)];
-		expr_sum = (expr_product >> *(operation >> expr_product))[qi::_val = px::bind(&PolynomialParser<Coeff>::addPolynomials, px::ref(*this), qi::_1, qi::_2)];
+		expr_product = (expr % "*")[qi::_val = px::bind(&PolynomialParser<Pol>::mul, px::ref(*this), qi::_1)];
+		expr_sum = (expr_product >> *(operation >> expr_product))[qi::_val = px::bind(&PolynomialParser<Pol>::addPolynomials, px::ref(*this), qi::_1, qi::_2)];
 		main = expr_sum;
 	}
 	
@@ -49,22 +49,22 @@ private:
 		varmap.add(s, v);
 		return v;
 	}
-	Monomial::Arg newMonomial(const std::vector<boost::fusion::vector2<Variable,Coeff>>& data) const {
+	Monomial::Arg newMonomial(const std::vector<boost::fusion::vector2<Variable,typename Pol::CoeffType>>& data) const {
 		Monomial::Arg res;
 		for (const auto& term: data) {
 			res = res * createMonomial(boost::fusion::at_c<0>(term), exponent(carl::toInt<std::size_t>(boost::fusion::at_c<1>(term))));
 		}
 		return res;
 	}
-	Term<Coeff> newTerm(const boost::optional<Coeff>& c, const boost::optional<Monomial::Arg>& m) {
-		if (c && m) return Term<Coeff>(c.get(), m.get());
-		else if (c) return Term<Coeff>(c.get());
-		else if (m) return Term<Coeff>(m.get());
+	Term<typename Pol::CoeffType> newTerm(const boost::optional<typename Pol::CoeffType>& c, const boost::optional<Monomial::Arg>& m) {
+		if (c && m) return Term<typename Pol::CoeffType>(c.get(), m.get());
+		else if (c) return Term<typename Pol::CoeffType>(c.get());
+		else if (m) return Term<typename Pol::CoeffType>(m.get());
 		CARL_LOG_ERROR("carl.parser", "Parsed an empty term.");
-		return Term<Coeff>();
+		return Term<typename Pol::CoeffType>();
 	}
-	Poly<Coeff> addTerms(const Term<Coeff>& first, const std::vector<boost::fusion::vector2<Operation,Term<Coeff>>>& ops) {
-		Poly<Coeff> res(first);
+	Pol addTerms(const Term<typename Pol::CoeffType>& first, const std::vector<boost::fusion::vector2<Operation,Term<typename Pol::CoeffType>>>& ops) {
+		Pol res(first);
 		for (const auto& op: ops) {
 			switch (boost::fusion::at_c<0>(op)) {
 			case ADD: res += boost::fusion::at_c<1>(op); break;
@@ -73,13 +73,13 @@ private:
 		}
 		return res;
 	}
-	Poly<Coeff> mul(const std::vector<Poly<Coeff>>& ops) {
-		Poly<Coeff> res(Coeff(1));
+	Pol mul(const std::vector<Pol>& ops) {
+		Pol res(typename Pol::CoeffType(1));
 		for (const auto& op: ops) res *= op;
 		return res;
 	}
-	Poly<Coeff> addPolynomials(const Poly<Coeff>& first, const std::vector<boost::fusion::vector2<Operation,Poly<Coeff>>>& ops) {
-		Poly<Coeff> res = first;
+	Pol addPolynomials(const Pol& first, const std::vector<boost::fusion::vector2<Operation,Pol>>& ops) {
+		Pol res = first;
 		for (const auto& op: ops) {
 			switch (boost::fusion::at_c<0>(op)) {
 			case ADD: res += boost::fusion::at_c<1>(op); break;
@@ -92,15 +92,15 @@ private:
 	qi::symbols<char, Operation> operation;
 	qi::symbols<char, Variable> varmap;
 	qi::rule<Iterator, std::string(), Skipper> varname;
-	qi::real_parser<Coeff,RationalPolicies<Coeff>> number;
+	qi::real_parser<typename Pol::CoeffType,RationalPolicies<typename Pol::CoeffType>> number;
 	qi::rule<Iterator, Variable(), Skipper> variable;
 	qi::rule<Iterator, Monomial::Arg(), Skipper> monomial;
-	qi::rule<Iterator, Term<Coeff>(), Skipper> term;
-	qi::rule<Iterator, Poly<Coeff>(), Skipper, qi::locals<Poly<Coeff>>> polynomial;
-	qi::rule<Iterator, Poly<Coeff>(), Skipper> expr;
-	qi::rule<Iterator, Poly<Coeff>(), Skipper> expr_product;
-	qi::rule<Iterator, Poly<Coeff>(), Skipper, qi::locals<Poly<Coeff>>> expr_sum;
-	qi::rule<Iterator, Poly<Coeff>(), Skipper> main;
+	qi::rule<Iterator, Term<typename Pol::CoeffType>(), Skipper> term;
+	qi::rule<Iterator, Pol(), Skipper, qi::locals<Pol>> polynomial;
+	qi::rule<Iterator, Pol(), Skipper> expr;
+	qi::rule<Iterator, Pol(), Skipper> expr_product;
+	qi::rule<Iterator, Pol(), Skipper, qi::locals<Pol>> expr_sum;
+	qi::rule<Iterator, Pol(), Skipper> main;
 };
 
 

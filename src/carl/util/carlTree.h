@@ -1,5 +1,5 @@
 /**
- * @file Tree.h
+ * @file tree.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
@@ -23,7 +23,7 @@ namespace carl {
  * It tries to stick to the STL style as close as possible.
  */
 template<typename T>
-class Tree {
+class tree {
 private:
 	static constexpr std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
 	struct Node {
@@ -75,37 +75,37 @@ protected:
 	 */
 	template<typename Iterator, bool reverse>
 	struct BaseIterator {
-		friend Tree;
+		friend tree;
 	protected:
-		const Tree<T>* tree;
-		BaseIterator(const Tree<T>* t, std::size_t root): tree(t), current(root) {}
+		const tree<T>* mTree;
+		BaseIterator(const tree<T>* t, std::size_t root): mTree(t), current(root) {}
 	public:
 		std::size_t current;
-		BaseIterator(const BaseIterator& ii): tree(ii.tree), current(ii.current) {}
-		BaseIterator(BaseIterator&& ii): tree(ii.tree), current(ii.current) {}
+		BaseIterator(const BaseIterator& ii): mTree(ii.mTree), current(ii.current) {}
+		BaseIterator(BaseIterator&& ii): mTree(ii.mTree), current(ii.current) {}
 		template<typename It, bool r>
-		BaseIterator(const BaseIterator<It,r>& ii): tree(ii.tree), current(ii.current) {}
+		BaseIterator(const BaseIterator<It,r>& ii): mTree(ii.mTree), current(ii.current) {}
 		BaseIterator& operator=(const BaseIterator& ii) {
-			this->tree = ii.tree;
+			this->mTree = ii.mTree;
 			this->current = ii.current;
 			return *this;
 		}
 		BaseIterator& operator=(BaseIterator&& ii) {
-			this->tree = ii.tree;
+			this->mTree = ii.mTree;
 			this->current = ii.current;
 			return *this;
 		}
 		std::size_t depth() const {
 			assert(current != MAXINT);
-			return tree->nodes[current].depth;
+			return mTree->nodes[current].depth;
 		}
 		T& operator*() {
 			assert(current != MAXINT);
-			return tree->nodes[current].data;
+			return mTree->nodes[current].data;
 		}
 		const T& operator*() const {
 			assert(current != MAXINT);
-			return tree->nodes[current].data;
+			return mTree->nodes[current].data;
 		}
 
 		template<typename I = Iterator>
@@ -159,34 +159,34 @@ public:
 		public BaseIterator<PreorderIterator<reverse>, reverse>,
 		public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 	{
-		friend Tree;
+		friend tree;
 	protected:
 		typedef BaseIterator<PreorderIterator<reverse>, reverse> Base;
-		PreorderIterator(const Tree<T>* t): Base(t, MAXINT) {}
-		PreorderIterator(const Tree<T>* t, std::size_t root): Base(t, root) {}
+		PreorderIterator(const tree<T>* t): Base(t, MAXINT) {}
+		PreorderIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		PreorderIterator& next() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->begin_preorder().current;
-			} else if (this->tree->nodes[this->current].firstChild == MAXINT) {
-				while (this->tree->nodes[this->current].nextSibling == MAXINT) {
-					this->current = this->tree->nodes[this->current].parent;
+				this->current = this->mTree->begin_preorder().current;
+			} else if (this->mTree->nodes[this->current].firstChild == MAXINT) {
+				while (this->mTree->nodes[this->current].nextSibling == MAXINT) {
+					this->current = this->mTree->nodes[this->current].parent;
 					if (this->current == MAXINT) return *this;
 				}
-				this->current = this->tree->nodes[this->current].nextSibling;
+				this->current = this->mTree->nodes[this->current].nextSibling;
 			} else {
-				this->current = this->tree->nodes[this->current].firstChild;
+				this->current = this->mTree->nodes[this->current].firstChild;
 			}
 			return *this;
 		}
 		PreorderIterator& previous() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->rbegin_preorder().current;
-			} else if (this->tree->nodes[this->current].previousSibling == MAXINT) {
-				this->current = this->tree->nodes[this->current].parent;
+				this->current = this->mTree->rbegin_preorder().current;
+			} else if (this->mTree->nodes[this->current].previousSibling == MAXINT) {
+				this->current = this->mTree->nodes[this->current].parent;
 			} else {
-				this->current = this->tree->nodes[this->current].previousSibling;
-				while (this->tree->nodes[this->current].firstChild != MAXINT) {
-					this->current = this->tree->nodes[this->current].lastChild;
+				this->current = this->mTree->nodes[this->current].previousSibling;
+				while (this->mTree->nodes[this->current].firstChild != MAXINT) {
+					this->current = this->mTree->nodes[this->current].lastChild;
 				}
 			}
 			return *this;
@@ -221,39 +221,39 @@ public:
 		public BaseIterator<PostorderIterator<reverse>,reverse>,
 		public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 	{
-		friend Tree;
+		friend tree;
 	protected:
 		typedef BaseIterator<PostorderIterator<reverse>,reverse> Base;
-		PostorderIterator(const Tree<T>* t): Base(t, MAXINT) {}
-		PostorderIterator(const Tree<T>* t, std::size_t root): Base(t, root) {}
+		PostorderIterator(const tree<T>* t): Base(t, MAXINT) {}
+		PostorderIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		PostorderIterator& next() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->begin_postorder().current;
-			} else  if (this->tree->nodes[this->current].nextSibling == MAXINT) {
-				this->current = this->tree->nodes[this->current].parent;
+				this->current = this->mTree->begin_postorder().current;
+			} else  if (this->mTree->nodes[this->current].nextSibling == MAXINT) {
+				this->current = this->mTree->nodes[this->current].parent;
 			} else {
-				this->current = this->tree->nodes[this->current].nextSibling;
-				while (this->tree->nodes[this->current].firstChild != MAXINT) {
-					this->current =	this->tree->nodes[this->current].firstChild;
+				this->current = this->mTree->nodes[this->current].nextSibling;
+				while (this->mTree->nodes[this->current].firstChild != MAXINT) {
+					this->current =	this->mTree->nodes[this->current].firstChild;
 				}
 			}
 			return *this;
 		}
 		PostorderIterator& previous() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->rbegin_postorder().current;
-			} else if (this->tree->nodes[this->current].firstChild == MAXINT) {
-				if (this->tree->nodes[this->current].previousSibling != MAXINT) {
-					this->current = this->tree->nodes[this->current].previousSibling;
+				this->current = this->mTree->rbegin_postorder().current;
+			} else if (this->mTree->nodes[this->current].firstChild == MAXINT) {
+				if (this->mTree->nodes[this->current].previousSibling != MAXINT) {
+					this->current = this->mTree->nodes[this->current].previousSibling;
 				} else {
-					while (this->tree->nodes[this->current].previousSibling == MAXINT) {
-						this->current = this->tree->nodes[this->current].parent;
+					while (this->mTree->nodes[this->current].previousSibling == MAXINT) {
+						this->current = this->mTree->nodes[this->current].parent;
 						if (this->current == MAXINT) return *this;
 					}
-					this->current = this->tree->nodes[this->current].previousSibling;
+					this->current = this->mTree->nodes[this->current].previousSibling;
 				}
 			} else {
-				this->current = this->tree->nodes[this->current].lastChild;
+				this->current = this->mTree->nodes[this->current].lastChild;
 			}
 			return *this;
 		}
@@ -287,33 +287,33 @@ public:
 		public BaseIterator<LeafIterator<reverse>, reverse>,
 		public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 	{
-		friend Tree;
+		friend tree;
 	protected:
 		typedef BaseIterator<LeafIterator<reverse>,reverse> Base;
-		LeafIterator(const Tree<T>* t): Base(t, MAXINT) {}
-		LeafIterator(const Tree<T>* t, std::size_t root): Base(t, root) {}
+		LeafIterator(const tree<T>* t): Base(t, MAXINT) {}
+		LeafIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		LeafIterator& next() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->begin_leaf().current;
+				this->current = this->mTree->begin_leaf().current;
 			} else {
-				PreorderIterator<false> it(this->tree, this->current);
+				PreorderIterator<false> it(this->mTree, this->current);
 				do {
 					++it;
 					if (it.current == MAXINT) break;
-				} while (this->tree->nodes[it.current].firstChild != MAXINT);
+				} while (this->mTree->nodes[it.current].firstChild != MAXINT);
 				this->current = it.current;
 			}
 			return *this;
 		}
 		LeafIterator& previous() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->rbegin_leaf().current;
+				this->current = this->mTree->rbegin_leaf().current;
 			} else {
-				PreorderIterator<false> it(this->tree, this->current);
+				PreorderIterator<false> it(this->mTree, this->current);
 				do {
 					--it;
 					if (it.current == MAXINT) break;
-				} while (this->tree->nodes[it.current].firstChild != MAXINT);
+				} while (this->mTree->nodes[it.current].firstChild != MAXINT);
 				this->current = it.current;
 			}
 			return *this;
@@ -322,7 +322,7 @@ public:
 		template<typename It>
 		LeafIterator(const BaseIterator<It,reverse>& ii): Base(ii) {}
 		LeafIterator(const LeafIterator& ii): Base(ii) {}
-		LeafIterator(LeafIterator&& ii): Base(this->tree, ii.current) {}
+		LeafIterator(LeafIterator&& ii): Base(ii) {}
 		LeafIterator& operator=(const LeafIterator& it) {
 			Base::operator=(it);
 			return *this;
@@ -348,58 +348,58 @@ public:
 		public BaseIterator<DepthIterator<reverse>,reverse>,
 		public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 	{
-		friend Tree;
+		friend tree;
 	protected:
 		typedef BaseIterator<DepthIterator<reverse>,reverse> Base;
 		std::size_t depth;
-		DepthIterator(const Tree<T>* t): Base(t, MAXINT), depth(0) {}
-		DepthIterator(const Tree<T>* t, std::size_t root, std::size_t depth): Base(t, root), depth(depth) {
-			assert(!this->tree->nodes.empty());
+		DepthIterator(const tree<T>* t): Base(t, MAXINT), depth(0) {}
+		DepthIterator(const tree<T>* t, std::size_t root, std::size_t depth): Base(t, root), depth(depth) {
+			assert(!this->mTree->nodes.empty());
 			if (reverse) {
-				PostorderIterator<reverse> it(this->tree, this->current);
+				PostorderIterator<reverse> it(this->mTree, this->current);
 				while (it.current != MAXINT && it.depth() != depth) ++it;
 				this->current = it.current;
 			} else {
-				PreorderIterator<reverse> it(this->tree, this->current);
+				PreorderIterator<reverse> it(this->mTree, this->current);
 				while (it.current != MAXINT && it.depth() != depth) ++it;
 				this->current = it.current;
 			}
 		}
 		DepthIterator& next() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->begin_depth(depth).current;
-			} else if (this->tree->nodes[this->current].nextSibling == MAXINT) {
-				std::size_t target = this->tree->nodes[this->current].depth;
-				while (this->tree->nodes[this->current].nextSibling == MAXINT) {
-					this->current = this->tree->nodes[this->current].parent;
+				this->current = this->mTree->begin_depth(depth).current;
+			} else if (this->mTree->nodes[this->current].nextSibling == MAXINT) {
+				std::size_t target = this->mTree->nodes[this->current].depth;
+				while (this->mTree->nodes[this->current].nextSibling == MAXINT) {
+					this->current = this->mTree->nodes[this->current].parent;
 					if (this->current == MAXINT) return *this;
 				}
-				PreorderIterator<reverse> it(this->tree, this->tree->nodes[this->current].nextSibling);
+				PreorderIterator<reverse> it(this->mTree, this->mTree->nodes[this->current].nextSibling);
 				for (; it.current != MAXINT; ++it) {
 					if (it.depth() == target) break;
 				}
 				this->current = it.current;
 			} else {
-				this->current = this->tree->nodes[this->current].nextSibling;
+				this->current = this->mTree->nodes[this->current].nextSibling;
 			}
 			return *this;
 		}
 		DepthIterator& previous() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->rbegin_depth(depth).current;
-			} else if (this->tree->nodes[this->current].previousSibling == MAXINT) {
-				std::size_t target = this->tree->nodes[this->current].depth;
-				while (this->tree->nodes[this->current].previousSibling == MAXINT) {
-					this->current = this->tree->nodes[this->current].parent;
+				this->current = this->mTree->rbegin_depth(depth).current;
+			} else if (this->mTree->nodes[this->current].previousSibling == MAXINT) {
+				std::size_t target = this->mTree->nodes[this->current].depth;
+				while (this->mTree->nodes[this->current].previousSibling == MAXINT) {
+					this->current = this->mTree->nodes[this->current].parent;
 					if (this->current == MAXINT) return *this;
 				}
-				PostorderIterator<reverse> it(this->tree, this->tree->nodes[this->current].previousSibling);
+				PostorderIterator<reverse> it(this->mTree, this->mTree->nodes[this->current].previousSibling);
 				for (; it.current != MAXINT; ++it) {
 					if (it.depth() == target) break;
 				}
 				this->current = it.current;
 			} else {
-				this->current = this->tree->nodes[this->current].previousSibling;
+				this->current = this->mTree->nodes[this->current].previousSibling;
 			}
 			return *this;
 		}
@@ -435,43 +435,43 @@ public:
 		public BaseIterator<ChildrenIterator<reverse>,reverse>,
 		public std::iterator<std::bidirectional_iterator_tag, T, std::size_t, T*, T&>
 	{
-		friend Tree;
+		friend tree;
 	protected:
 		typedef BaseIterator<ChildrenIterator<reverse>,reverse> Base;
 		std::size_t parent;
-		ChildrenIterator(const Tree<T>* t, std::size_t base, bool end = false): Base(t, base) {
+		ChildrenIterator(const tree<T>* t, std::size_t base, bool end = false): Base(t, base) {
 			parent = base;
 			assert(base != MAXINT);
 			if (end) this->current = MAXINT;
-			else if (this->tree->nodes[this->current].firstChild == MAXINT) this->current = MAXINT;
+			else if (this->mTree->nodes[this->current].firstChild == MAXINT) this->current = MAXINT;
 			else {
 				if (reverse) {
-					this->current = this->tree->nodes[this->current].lastChild;
+					this->current = this->mTree->nodes[this->current].lastChild;
 				} else {
-					this->current = this->tree->nodes[this->current].firstChild;
+					this->current = this->mTree->nodes[this->current].firstChild;
 				}
 			}
 		}
 		ChildrenIterator& next() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->begin_children(PreorderIterator<false>(this->tree, parent)).current;
+				this->current = this->mTree->begin_children(PreorderIterator<false>(this->mTree, parent)).current;
 			} else {
-				this->current = this->tree->nodes[this->current].nextSibling;
+				this->current = this->mTree->nodes[this->current].nextSibling;
 			}
 			return *this;
 		}
 		ChildrenIterator& previous() {
 			if (this->current == MAXINT) {
-				this->current = this->tree->rbegin_children(PreorderIterator<false>(this->tree, parent)).current;
+				this->current = this->mTree->rbegin_children(PreorderIterator<false>(this->mTree, parent)).current;
 			} else {
-				this->current = this->tree->nodes[this->current].previousSibling;
+				this->current = this->mTree->nodes[this->current].previousSibling;
 			}
 			return *this;
 		}
 	public:
 		template<typename It>
 		ChildrenIterator(const BaseIterator<It,reverse>& ii): Base(ii), parent(MAXINT) {
-			if (this->tree->is_valid(ii)) parent = this->tree->nodes[ii.current].parent;
+			if (this->mTree->is_valid(ii)) parent = this->mTree->nodes[ii.current].parent;
 		}
 		ChildrenIterator(const ChildrenIterator& ii): Base(ii), parent(ii.parent) {}
 		ChildrenIterator(ChildrenIterator&& ii): Base(ii), parent(ii.parent) {}
@@ -501,13 +501,13 @@ public:
 		public BaseIterator<PathIterator,false>,
 		public std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
 	{
-		friend Tree;
+		friend tree;
 	protected:
 		typedef BaseIterator<PathIterator,false> Base;
-		PathIterator(const Tree<T>* t, std::size_t root): Base(t, root) {}
+		PathIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		PathIterator& next() {
 			if (this->current != MAXINT) {
-				this->current = this->tree->nodes[this->current].parent;
+				this->current = this->mTree->nodes[this->current].parent;
 			}
 			return *this;
 		}
@@ -532,15 +532,15 @@ public:
 
 	typedef PreorderIterator<false> iterator;
 
-	Tree() {}
-	Tree(const Tree& t): nodes(t.nodes), emptyNodes(t.emptyNodes) {}
-	Tree(Tree&& t): nodes(std::move(t.nodes)), emptyNodes(t.emptyNodes) {}
-	Tree& operator=(const Tree& t) {
+	tree() {}
+	tree(const tree& t): nodes(t.nodes), emptyNodes(t.emptyNodes) {}
+	tree(tree&& t): nodes(std::move(t.nodes)), emptyNodes(t.emptyNodes) {}
+	tree& operator=(const tree& t) {
 		nodes = t.nodes;
 		emptyNodes = t.emptyNodes;
 		return *this;
 	}
-	Tree& operator=(Tree&& t) {
+	tree& operator=(tree&& t) {
 		nodes = std::move(t.nodes);
 		emptyNodes = t.emptyNodes;
 		return *this;
@@ -784,7 +784,7 @@ public:
 	 * @param tree Tree.
 	 * @return Iterator to root of inserted subtree.
 	 */
-	PreorderIterator<> append(Tree&& tree) {
+	PreorderIterator<> append(tree&& tree) {
 		if (nodes.empty()) std::swap(nodes, tree.nodes);
 		return append(PreorderIterator<>(0), std::move(tree));
 	}
@@ -795,7 +795,7 @@ public:
 	 * @return Iterator to root of inserted subtree.
 	 */
 	template<typename Iterator>
-	Iterator append(Iterator position, Tree&& data) {
+	Iterator append(Iterator position, tree&& data) {
 		Node* r = data.root;
 		r->updateDepth(position.depth() + 1);
 		data.root = nullptr;
@@ -853,7 +853,7 @@ public:
 		eraseChildren(position.current);
 	}
 	template<typename TT>
-	friend std::ostream& operator<<(std::ostream& os, const Tree<TT>& tree) {
+	friend std::ostream& operator<<(std::ostream& os, const tree<TT>& tree) {
 		for (auto it = tree.begin_preorder(); it != tree.end_preorder(); it++) {
 			os << std::string(it.depth(), '\t') << *it << std::endl;
 		}
@@ -940,6 +940,6 @@ public:
 };
 
 template<typename T>
-constexpr std::size_t Tree<T>::MAXINT;
+constexpr std::size_t tree<T>::MAXINT;
 
 }

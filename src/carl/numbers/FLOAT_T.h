@@ -496,7 +496,7 @@ namespace carl
          */
         FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
         {
-            assert(*this >= 0);
+            assert(mValue >= 0);
             _result.mValue = std::sqrt(mValue);
             return _result;
         }
@@ -1661,6 +1661,14 @@ namespace carl
 		_in.acos(result);
 		return result;
 	}
+
+            template<typename FloatType>
+            inline FLOAT_T<FloatType> atan(const FLOAT_T<FloatType>& _in)
+            {
+                FLOAT_T<FloatType> result;
+                _in.atan(result);
+                return result;
+            }
 	
     /**
      * Method which returns the next smaller integer of this number or the number
@@ -1729,7 +1737,7 @@ namespace carl
 		return _in.mValue == 0;
 	}	
 	
-#ifdef USE_MPFR_FLOAT
+
 #include "adaption_float/mpfr_float.tpp"
-#endif
+
 } // namespace

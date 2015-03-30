@@ -12,9 +12,10 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 
-
+#include "../../formula/Formula.h"
 #include "../../core/MonomialPool.h"
 #include "../../core/MultivariatePolynomial.h"
+#include "../../core/FactorizedPolynomial.h"
 #include "../../core/RationalFunction.h"
 #include "../../core/Variable.h"
 #include "../../core/VariablePool.h"
@@ -32,11 +33,8 @@ using carl::operator<<;
 typedef std::string::const_iterator Iterator;
 typedef boost::spirit::qi::space_type Skipper;
 
-template<typename Coeff>
-using Poly = MultivariatePolynomial<Coeff>;
-
-template<typename Coeff>
-using RatFun = RationalFunction<Poly<Coeff>>;
+template<typename Pol>
+using RatFun = RationalFunction<Pol>;
 
 template<typename Coeff>
 struct RationalPolicies : qi::ureal_policies<Coeff> {

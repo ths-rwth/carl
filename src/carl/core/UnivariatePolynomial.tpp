@@ -57,7 +57,7 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar)
 	assert(this->isConsistent());
 }
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, exponent e) :
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const Coeff& c, std::size_t e) :
 mMainVar(mainVar),
 mCoefficients(e+1,Coeff(0)) // We would like to use 0 here, but Coeff(0) is not always constructable (some methods need more parameter)
 {
@@ -345,7 +345,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder(const Univari
  * pseudoremainder
  */
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem_old(const UnivariatePolynomial<Coeff>& divisor) const
 {
 	assert(!divisor.isZero());
 	if(isZero() || degree() < divisor.degree())
@@ -359,7 +359,58 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePo
 	return remainder(divisor, prefactor);
 }
 
+template<typename Coeff>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem(const UnivariatePolynomial<Coeff>& divisor) const
+{
+	assert(this->mainVar() == divisor.mainVar());
+	Variable v = this->mainVar();
+	if (divisor.degree() == 0) return UnivariatePolynomial<Coeff>(v);
+	if (divisor.degree() > this->degree()) return *this;
 
+	UnivariatePolynomial<Coeff> reduct = divisor;
+	reduct.truncate();
+	UnivariatePolynomial<Coeff> res = *this;
+
+	std::size_t reductions = 0;
+	while (true) {
+		if (res.isZero()) {
+			assert(res == this->prem_old(divisor));
+			return res;
+		}
+		if (divisor.degree() > res.degree()) {
+			std::size_t degdiff = this->degree() - divisor.degree() + 1;
+			if (reductions < degdiff) {
+				res *= carl::pow(divisor.lcoeff(), degdiff - reductions);
+			}
+			assert(res == this->prem_old(divisor));
+			return res;
+		}
+		std::vector<Coeff> newR(res.degree());
+		Coeff lc = res.lcoeff();
+		for (std::size_t i = 0; i < res.degree(); i++) {
+			newR[i] = res.coefficients()[i] * divisor.lcoeff();
+			assert(!newR[i].has(v));
+		}
+		if (res.degree() == divisor.degree()) {
+			if (!reduct.isZero()) {
+				for (std::size_t i = 0; i <= reduct.degree(); i++) {
+					newR[i] -= lc * reduct.coefficients()[i];
+					assert(!newR[i].has(v));
+				}
+			}
+		} else {
+			assert(!lc.has(v));
+			if (!reduct.isZero()) {
+				for (std::size_t i = 0; i <= reduct.degree(); i++) {
+					newR[res.degree() - divisor.degree() + i] -= lc * reduct.coefficients()[i];
+					assert(!newR[res.degree() - divisor.degree() + i].has(v));
+				}
+			}
+		}
+		res = UnivariatePolynomial<Coeff>(v, std::move(newR));
+		reductions++;
+	}
+}
 
 /**
  * Signed pseudoremainder.
@@ -676,22 +727,18 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 	if(isZero() || lcoeff() > Coeff(0))
 	{
 		return Coeff(1);
-	}	
+	}
 	else
 	{
 		return Coeff(-1);
 	}
 }
 
-
-
-
-
-	
 template<typename Coeff>
 template<typename C, EnableIf<is_subset_of_rationals<C>>>
 Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 {
+	assert(!this->isZero());
 	auto it = mCoefficients.begin();
 	IntNumberType num = getNum(*it);
 	IntNumberType den = getDenom(*it);
@@ -700,6 +747,19 @@ Coeff UnivariatePolynomial<Coeff>::coprimeFactor() const
 		den = carl::lcm(den, getDenom(*it));
 	}
 	return Coeff(den)/Coeff(num);
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_subset_of_rationals<C>>>
+typename UnderlyingNumberType<Coeff>::type UnivariatePolynomial<Coeff>::coprimeFactor() const
+{
+	assert(!this->isZero());
+	auto it = mCoefficients.begin();
+	typename UnderlyingNumberType<Coeff>::type factor = it->coprimeFactor();
+	for (++it; it != mCoefficients.end(); ++it) {
+		factor = carl::gcd(factor, it->coprimeFactor());
+	}
+	return factor;
 }
 
 template<typename Coeff>
@@ -717,6 +777,19 @@ UnivariatePolynomial<typename IntegralType<Coeff>::type> UnivariatePolynomial<Co
 	for (const Coeff& coeff: mCoefficients) {
 		assert(getDenom(coeff * factor) == 1);
 		result.mCoefficients.push_back(getNum(coeff * factor));
+	}
+	return result;
+}
+
+template<typename Coeff>
+template<typename C, DisableIf<is_subset_of_rationals<C>>>
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::coprimeCoefficients() const {
+	if (this->isZero()) return *this;
+	UnivariatePolynomial<Coeff> result(mMainVar);
+	result.mCoefficients.reserve(mCoefficients.size());
+	auto factor = this->coprimeFactor();
+	for (const Coeff& c: mCoefficients) {
+		result.mCoefficients.push_back(factor * c);
 	}
 	return result;
 }
@@ -1874,6 +1947,28 @@ UnivariatePolynomial<C> operator-(const C& lhs, const UnivariatePolynomial<C>& r
 }
 
 template<typename Coefficient>
+template<typename C, EnableIf<is_number<C>>>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable::Arg rhs) {
+	if (rhs == this->mMainVar) {
+		this->mCoefficients.insert(this->mCoefficients.begin(), Coefficient(0));
+		return *this;
+	}
+	assert(!carl::is_number<Coefficient>::value);
+	return *this;
+}
+template<typename Coefficient>
+template<typename C, DisableIf<is_number<C>>>
+UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(Variable::Arg rhs) {
+	if (rhs == this->mMainVar) {
+		this->mCoefficients.insert(this->mCoefficients.begin(), Coefficient(0));
+		return *this;
+	}
+	assert(!carl::is_number<Coefficient>::value);
+	for (auto& c: this->mCoefficients) c *= rhs;
+	return *this;
+}
+
+template<typename Coefficient>
 UnivariatePolynomial<Coefficient>& UnivariatePolynomial<Coefficient>::operator*=(const Coefficient& rhs)
 {
 	if(rhs == Coefficient(0))
@@ -1947,6 +2042,15 @@ UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const Univ
 	UnivariatePolynomial<C> res(lhs);
 	res *= rhs;
 	return res;
+}
+
+template<typename C>
+UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs) {
+	return std::move(UnivariatePolynomial<C>(lhs) *= rhs);
+}
+template<typename C>
+UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs) {
+	return std::move(UnivariatePolynomial<C>(rhs) *= lhs);
 }
 
 template<typename C>

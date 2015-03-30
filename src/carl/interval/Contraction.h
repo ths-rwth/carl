@@ -29,13 +29,13 @@ namespace carl {
 
         }
 
-        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB) {
+        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) {
             typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
             if( it == mDerivatives.end() )
             {
                 it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
             }
-            return Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB);
+            return Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
         }
     };
 
@@ -43,9 +43,9 @@ namespace carl {
     class SimpleNewton {
     public:
         
-        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB) 
+        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false ) 
         {
-            double center = intervals.at(variable).center();
+            double center = useNiceCenter ? intervals.at(variable).sample() : intervals.at(variable).center();
             Interval<double> centerInterval = Interval<double>(center);
             
 			#ifdef CONTRACTION_DEBUG

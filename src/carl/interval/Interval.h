@@ -395,7 +395,7 @@ namespace carl
          * @param n The passed double.
          */
         template<typename N = Number, DisableIf<std::is_same<N, int >> = dummy >
-        explicit Interval(const int& n) :
+        Interval(const int& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
         mUpperBoundType(BoundType::WEAK) { }

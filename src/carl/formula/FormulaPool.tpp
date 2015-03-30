@@ -17,10 +17,11 @@ namespace carl
     FormulaPool<Pol>::FormulaPool( unsigned _capacity ):
         Singleton<FormulaPool<Pol>>(),
         mIdAllocator( 3 ),
-        mpTrue( new Element( true, 1 ) ),
-        mpFalse( new Element( false, 2 ) ),
+        mpTrue( new FormulaContent<Pol>( true, 1 ) ),
+        mpFalse( new FormulaContent<Pol>( false, 2 ) ),
         mPool()
     {
+        ConstraintPool<Pol>::getInstance();
         mpTrue->mNegation = mpFalse;
      	mpFalse->mNegation = mpTrue;
         mPool.reserve( _capacity );
@@ -28,31 +29,23 @@ namespace carl
         mPool.insert( mpFalse );
         Formula<Pol>::init( *mpTrue );
         Formula<Pol>::init( *mpFalse );
+        mpTrue->mUsages = 2; // avoids deleting it
+        mpFalse->mUsages = 2; // avoids deleting it
     }
     
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
-        while( !mPool.empty() )
-        {
-            const Element* ele = *mPool.begin();
-            mPool.erase( mPool.begin() );
-            delete ele;
-        }
+        mPool.clear();
+        delete mpTrue;
+        delete mpFalse;
     }
     
     template<typename Pol>
-    std::pair<typename FastPointerSet<typename FormulaPool<Pol>::Element>::iterator,bool> FormulaPool<Pol>::insert( ElementSPtr _element, bool _elementNotInPool )
+    std::pair<typename FastPointerSet<FormulaContent<Pol>>::iterator,bool> FormulaPool<Pol>::insert( FormulaContent<Pol>* _element )
     {
         auto iterBoolPair = mPool.insert( _element );
-        assert( _elementNotInPool <= iterBoolPair.second );
-        if( _elementNotInPool || iterBoolPair.second ) // Formula has not yet been generated.
-        {
-            _element->mId = mIdAllocator; // id should be set here to avoid conflicts when multi-threading
-            Formula<Pol>::init( *_element );
-            ++mIdAllocator;
-        }
-        else
+        if( !iterBoolPair.second ) // Formula has already been generated.
         {
             delete _element;
         }
@@ -60,20 +53,26 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::add( ElementSPtr _element )
+    const FormulaContent<Pol>* FormulaPool<Pol>::add( FormulaContent<Pol>* _element )
     {
+        assert( _element->mType != FormulaType::NOT );
         FORMULA_POOL_LOCK_GUARD
-        auto iterBoolPair = insert( _element, false );
+        auto iterBoolPair = this->insert( _element );
         if( iterBoolPair.second ) // Formula has not yet been generated.
         {
             // Add also the negation of the formula to the pool in order to ensure that it
             // has the next id and hence would occur next to the formula in a set of sub-formula,
             // which is sorted by the ids.
-            _element->mNegation = new Element(Formula<Pol>( *iterBoolPair.first ));
-         	_element->mNegation->mNegation = _element;
-            insert(_element->mNegation, true);
+            _element->mId = mIdAllocator; 
+            Formula<Pol>::init( *_element );
+            ++mIdAllocator;
+            FormulaContent<Pol>* negation = new FormulaContent<Pol>( std::move( Formula<Pol>( *iterBoolPair.first ) ) );
+            _element->mNegation = negation;
+            negation->mId = mIdAllocator; 
+            Formula<Pol>::init( *negation );
+            ++mIdAllocator;
         }
-        return *iterBoolPair.first;   
+        return *iterBoolPair.first;
     }
     
     template<typename Pol>
@@ -87,7 +86,7 @@ namespace carl
     }
     
     template<typename Pol>
-    typename FormulaPool<Pol>::ConstElementSPtr FormulaPool<Pol>::create( FormulaType _type, Formulas<Pol>&& _subformulas )
+    const FormulaContent<Pol>* FormulaPool<Pol>::create( FormulaType _type, Formulas<Pol>&& _subformulas )
     {
         assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
 //        cout << "create new formula with type " << formulaTypeToString( _type ) << endl;
@@ -123,21 +122,21 @@ namespace carl
                         {
                             case FormulaType::AND:
                             {
-                                return mpFalse;
+                                return falseFormula();
                             }
                             case FormulaType::OR:
                             {
-                                return mpTrue;
+                                return trueFormula();
                             }
                             case FormulaType::IFF:
                             {
-                                return mpFalse;
+                                return falseFormula();
                             }
                             case FormulaType::XOR:
                             {
                                 _subformulas.erase( iterB );
                                 iter = _subformulas.erase( iter );
-                                _subformulas.insert( Formula<Pol>( mpTrue ) );
+                                _subformulas.insert( Formula<Pol>( trueFormula() ) );
                                 break;
                             }
                             default:
@@ -151,7 +150,7 @@ namespace carl
             }
         }
         if( _subformulas.empty() )
-            return mpFalse;
+            return falseFormula();
         else
         {
             #ifdef SIMPLIFY_FORMULA
@@ -174,20 +173,20 @@ namespace carl
                 if( _type == FormulaType::AND )
                 {
                     if( iterToTrue != _subformulas.end() ) _subformulas.erase( iterToTrue );
-                    if( iterToFalse != _subformulas.end() ) return mpFalse;
-                    else if( _subformulas.empty() ) return mpTrue;
+                    if( iterToFalse != _subformulas.end() ) return falseFormula();
+                    else if( _subformulas.empty() ) return trueFormula();
                 }
                 else if( _type == FormulaType::OR )
                 {
                     if( iterToFalse != _subformulas.end() ) _subformulas.erase( iterToFalse );
-                    if( iterToTrue != _subformulas.end() ) return mpTrue;
-                    else if( _subformulas.empty() ) return mpFalse;
+                    if( iterToTrue != _subformulas.end() ) return trueFormula();
+                    else if( _subformulas.empty() ) return falseFormula();
                 }
                 else // _type == FormulaType::IFF
                 {
                     if( iterToFalse != _subformulas.end() && iterToTrue != _subformulas.end() )
                     {
-                        return mpFalse;
+                        return falseFormula();
                     }
                 }
             }
@@ -195,6 +194,6 @@ namespace carl
             if( _subformulas.size() == 1 )
                 return newFormulaWithOneSubformula( _type, *(_subformulas.begin()) );
         }
-        return add( new Element( _type, std::move( _subformulas ) ) );
+        return add( new FormulaContent<Pol>( _type, std::move( _subformulas ) ) );
     }
 }    // namespace carl
