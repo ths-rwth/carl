@@ -14,8 +14,12 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include <unistd.h>
 #include <sstream>
+
+#include "platform.h"
+#if !defined __VS
+#include <unistd.h>
+#endif
 
 namespace carl {
 
