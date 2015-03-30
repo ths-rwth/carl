@@ -45,7 +45,7 @@ namespace dtl
 }
 
 // Support for Clang 3.1.
-constexpr dtl::enabled dummy = {};
+const dtl::enabled dummy = {};
 
 template <typename... Condition>
 using EnableIf = typename std::enable_if<all<Condition...>::value, dtl::enabled>::type;	
@@ -68,8 +68,8 @@ has_method_struct(isPositive)
 
 //http://stackoverflow.com/questions/11251376/how-can-i-check-if-a-type-is-an-instantiation-of-a-given-class-template
 template < template <typename...> class Template, typename T >
-struct is_instantiation_of : std::false_type { static constexpr bool value = false; };
+struct is_instantiation_of : std::false_type { static const bool value = false; };
 template < template <typename...> class Template, typename... Args >
-struct is_instantiation_of< Template, Template<Args...> > : std::true_type { static constexpr bool value = true; };
+struct is_instantiation_of< Template, Template<Args...> > : std::true_type { static const bool value = true; };
 
 }
