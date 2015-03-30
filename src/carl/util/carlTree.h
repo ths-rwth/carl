@@ -25,7 +25,7 @@ namespace carl {
 template<typename T>
 class tree {
 private:
-	static constexpr std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
+	static const std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
 	struct Node {
 		std::size_t id;
 		mutable T data;
@@ -940,6 +940,6 @@ public:
 };
 
 template<typename T>
-constexpr std::size_t tree<T>::MAXINT;
+const std::size_t tree<T>::MAXINT;
 
 }
