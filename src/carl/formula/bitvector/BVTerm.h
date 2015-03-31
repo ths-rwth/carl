@@ -130,7 +130,7 @@ namespace carl
 			assert(_then.width() == _else.width());
 		}
 
-		bool operator==(const BVITEContent& _other)
+		bool operator==(const BVITEContent& _other) const
 		{
 			return mCondition == _other.mCondition && mThen == _other.mThen && mElse == _other.mElse;
 		}
@@ -147,7 +147,7 @@ namespace carl
 		{
 		}
 
-		bool operator==(const BVUnaryContent& _other)
+		bool operator==(const BVUnaryContent& _other) const
 		{
 			return mOperand == _other.mOperand && mIndex == _other.mIndex;
 		}
@@ -164,7 +164,7 @@ namespace carl
 		{
 		}
 
-		bool operator==(const BVBinaryContent& _other)
+		bool operator==(const BVBinaryContent& _other) const
 		{
 			return mFirst == _other.mFirst && mSecond == _other.mSecond;
 		}
@@ -182,7 +182,7 @@ namespace carl
 		{
 		}
 
-		bool operator==(const BVExtractContent& _other)
+		bool operator==(const BVExtractContent& _other) const
 		{
 			return mOperand == _other.mOperand && mFirst == _other.mFirst && mLast == _other.mLast;
 		}

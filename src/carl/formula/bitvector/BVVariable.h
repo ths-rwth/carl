@@ -47,7 +47,7 @@ namespace carl
 			return mVar;
 		}
 
-		bool operator==(const BVVariable& _other)
+		bool operator==(const BVVariable& _other) const
 		{
 			return mVar == _other.mVar;
 		}
