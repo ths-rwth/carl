@@ -94,5 +94,4 @@ template < template <typename...> class Template, typename T >
 struct is_instantiation_of : std::false_type { static const bool value = false; };
 template < template <typename...> class Template, typename... Args >
 struct is_instantiation_of< Template, Template<Args...> > : std::true_type { static const bool value = true; };
-
 }
