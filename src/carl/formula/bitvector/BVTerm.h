@@ -7,7 +7,6 @@
 
 #include "BVVariable.h"
 #include "../Formula.h"
-#include "BVTermPool.h"
 #include <boost/dynamic_bitset.hpp>
 
 /**
