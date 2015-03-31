@@ -8,7 +8,7 @@
 
 #pragma once
 #include <type_traits>
-
+#include "platform.h"
 
 namespace carl
 {
@@ -20,8 +20,8 @@ template <bool B, typename...>
 struct dependent_bool_type : std::integral_constant<bool, B> {};
 // and an alias, just for kicks :)
 template <bool B, typename... T>
-using Bool = typename dependent_bool_type<B, T...>::type;	
-	
+using Bool = typename dependent_bool_type<B, T...>::type;
+
 /// Meta-logical negation
 template <typename T>
 using Not = Bool<!T::value>;
@@ -48,17 +48,29 @@ namespace dtl
 const dtl::enabled dummy = {};
 
 template <typename... Condition>
-using EnableIf = typename std::enable_if<all<Condition...>::value, dtl::enabled>::type;	
+using EnableIf = typename std::enable_if<all<Condition...>::value, dtl::enabled>::type;
 template <typename... Condition>
-using DisableIf = typename std::enable_if<Not<any<Condition...>>::value, dtl::enabled>::type;	
+using DisableIf = typename std::enable_if<Not<any<Condition...>>::value, dtl::enabled>::type;
 
 template<typename> struct Void { typedef void type; };
 
+#ifdef __VS
+#define has_method_struct(methodname) \
+__if_exists(T::methodname) { \
+template<typename T, typename SFINAE = void> \
+struct has_##methodname : std::false_type {}; \
+} \
+__if_not_exists(T::methodname) { \
+template<typename T, typename SFINAE = void> \
+struct has_##methodname : std::true_type {}; \
+}
+#else
 #define has_method_struct(methodname) \
 template<typename T, typename SFINAE = void> \
 struct has_##methodname : std::false_type {}; \
 template<typename T> \
 struct has_##methodname<T, typename Void<decltype( std::declval<T&>().methodname() )>::type> : std::true_type {}; 
+#endif
 
 has_method_struct(normalize)
 has_method_struct(isOne)
