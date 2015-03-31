@@ -84,9 +84,9 @@ struct not_equal_to<std::shared_ptr<T>, mayBeNull> {
  */
 template<typename T, bool mayBeNull = true>
 struct less {
-	std::less<T> less;
+	std::less<T> _less;
 	bool operator()(const T& lhs, const T& rhs) const {
-		return less(lhs, rhs);
+		return _less(lhs, rhs);
 	}
 };
 
@@ -114,9 +114,9 @@ struct less<std::shared_ptr<T>, mayBeNull> {
 
 template<typename T, bool mayBeNull = true>
 struct greater {
-	std::greater<T> greater;
+	std::greater<T> _greater;
 	bool operator()(const T& lhs, const T& rhs) const {
-		return greater(lhs, rhs);
+		return _greater(lhs, rhs);
 	}
 };
 
@@ -141,9 +141,9 @@ struct greater<std::shared_ptr<T>, mayBeNull> {
  */
 template<typename T, bool mayBeNull = true>
 struct hash {
-	std::hash<T> hash;
+	std::hash<T> _hash;
 	bool operator()(const T& lhs, const T& rhs) const {
-		return hash(lhs, rhs);
+		return _hash(lhs, rhs);
 	}
 };
 
