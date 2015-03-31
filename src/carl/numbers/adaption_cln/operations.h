@@ -165,10 +165,15 @@ inline long int toInt<long int>(const cln::cl_I& n) {
     assert(n >= std::numeric_limits<long int>::min());
     return cln::cl_I_to_long(n);
 }
+/**
+* Convert a cln integer to an unsigned longint.
+* @param n An integer.
+* @return n as unsigned long int.
+*/
 template<>
-inline std::size_t toInt<std::size_t>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<std::size_t>::max());
-    assert(n >= std::numeric_limits<std::size_t>::min());
+inline unsigned long int toInt<unsigned long int>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<unsigned long int>::max());
+    assert(n >= std::numeric_limits<unsigned long int>::min());
     return cln::cl_I_to_ulong(n);
 }
 
@@ -193,9 +198,33 @@ template<>
 inline unsigned toInt<unsigned>(const cln::cl_RA& n) {
 	return toInt<unsigned>(toInt<cln::cl_I>(n));
 }
+/**
+* Convert a fraction to an int.
+* @param n A fraction.
+* @return n as int.
+*/
 template<>
-inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
-	return toInt<std::size_t>(toInt<cln::cl_I>(n));
+inline int toInt<int>(const cln::cl_RA& n) {
+	return toInt<int>(toInt<cln::cl_I>(n));
+}
+/**
+* Convert a fraction to a longint.
+* @param n A fraction.
+* @return n as longint.
+*/
+template<>
+inline long int toInt<long int>(const cln::cl_RA& n) {
+	return toInt<long int>(toInt<cln::cl_I>(n));
+}
+
+/**
+* Convert a fraction to an unsigned longint.
+* @param n A fraction.
+* @return n as unsigned longint.
+*/
+template<>
+inline unsigned long int toInt<unsigned long int>(const cln::cl_RA& n) {
+	return toInt<unsigned long int>(toInt<cln::cl_I>(n));
 }
 
 /**
