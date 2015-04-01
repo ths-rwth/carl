@@ -124,7 +124,7 @@ namespace carl
     
     static const unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
-    static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 7;
+    static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
     
     // Macros.
 
