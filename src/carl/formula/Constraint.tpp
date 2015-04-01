@@ -354,41 +354,74 @@ namespace carl
     }
     
     template<typename Pol>
+    Constraint<Pol>::Constraint( const ConstraintContent<Pol>* _content ):
+        mpContent( _content )
+    {
+        ConstraintPool<Pol>::getInstance().reg( mpContent );
+    }
+    
+    template<typename Pol>
     Constraint<Pol>::Constraint( bool _valid ):
-        mpContent( _valid ? ConstraintPool<Pol>::getInstance().consistentConstraint() : ConstraintPool<Pol>::getInstance().inconsistentConstraint() )
+        Constraint( ConstraintPool<Pol>::getInstance().create( _valid ) )
     {}
     
     template<typename Pol>
     Constraint<Pol>::Constraint( carl::Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound ):
-        mpContent( ConstraintPool<Pol>::getInstance().create( _var, _rel, _bound ) )
+        Constraint( ConstraintPool<Pol>::getInstance().create( _var, _rel, _bound ) )
     {}
             
     template<typename Pol>
     Constraint<Pol>::Constraint( const Pol& _lhs, Relation _rel ):
-        mpContent( ConstraintPool<Pol>::getInstance().create( _lhs, _rel ) )
+        Constraint( ConstraintPool<Pol>::getInstance().create( _lhs, _rel ) )
     {}
 
     template<typename Pol>
     template<typename P, EnableIf<needs_cache<P>>>
     Constraint<Pol>::Constraint( const typename P::PolyType& _lhs, Relation _rel ):
-        mpContent( constraintPool<P>().create( _lhs, _rel ) )
+        Constraint( ConstraintPool<Pol>::getInstance().create( _lhs, _rel ) )
     {}
-
+    
     template<typename Pol>
-    template<typename P, EnableIf<needs_cache<P>>>
-    Constraint<Pol>::Constraint( typename P::PolyType&& _lhs, Relation _rel ):
-        mpContent( constraintPool<P>().create( std::move( _lhs ), _rel ) )
-    {}
-
+    Constraint<Pol>::Constraint( const Constraint<Pol>& _constraint ):
+        mpContent( _constraint.mpContent )
+    {
+        ConstraintPool<Pol>::getInstance().reg( mpContent );
+    }
+    
     template<typename Pol>
-    Constraint<Pol>::Constraint( Pol&& _lhs, Relation _rel ):
-        mpContent( ConstraintPool<Pol>::getInstance().create( std::move( _lhs ), _rel ) )
-    {}
+    Constraint<Pol>::Constraint( Constraint<Pol>&& _constraint ):
+        mpContent( _constraint.mpContent )
+    {
+        _constraint.mpContent = nullptr;
+    }
             
     template<typename Pol>
     Constraint<Pol>::~Constraint()
     {
-        ConstraintPool<Pol>::getInstance().free( mpContent );
+        if( mpContent != nullptr )
+        {
+            ConstraintPool<Pol>::getInstance().free( mpContent );
+        }
+    }
+    
+    template<typename Pol>
+    Constraint<Pol>& Constraint<Pol>::operator=( const Constraint<Pol>& _constraint )
+    {
+        ConstraintPool<Pol>::getInstance().reg( _constraint.mpContent );
+        if( mpContent != nullptr ) 
+            ConstraintPool<Pol>::getInstance().free( mpContent );
+        mpContent = _constraint.mpContent;
+        return *this;
+    }
+    
+    template<typename Pol>
+    Constraint<Pol>& Constraint<Pol>::operator=( Constraint<Pol>&& _constraint )
+    {
+        if( mpContent != nullptr ) 
+            ConstraintPool<Pol>::getInstance().free( mpContent );
+        mpContent = _constraint.mpContent;
+        _constraint.mpContent = nullptr;
+        return *this;
     }
     
     template<typename Pol>

@@ -367,7 +367,7 @@ template<typename Number>
 bool CAD<Number>::check(
 	std::vector<cad::Constraint<Number>>& _constraints,
 	RealAlgebraicPoint<Number>& r,
-	cad::ConflictGraph& conflictGraph,
+	cad::ConflictGraph<Number>& conflictGraph,
 	BoundMap& bounds,
 	bool next,
 	bool checkBounds)
@@ -488,7 +488,7 @@ bool CAD<Number>::check(
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
 					exit(123);
 					//std::swap(constraints.back(), constraint);
-					conflictGraph = cad::ConflictGraph();
+					conflictGraph = cad::ConflictGraph<Number>();
 					return false;
 				}
 				// else: no additional check is needed!
@@ -1060,7 +1060,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		bool excludePrevious,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph,
+		cad::ConflictGraph<Number>& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
 		std::size_t dim
@@ -1133,7 +1133,7 @@ template<typename Number>
 bool CAD<Number>::mainCheck(
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph,
+		cad::ConflictGraph<Number>& conflictGraph,
 		bool next,
 		bool boundsNontrivial,
 		bool checkBounds
@@ -1346,7 +1346,7 @@ template<typename Number>
 bool CAD<Number>::baseLiftCheck(
 		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph
+		cad::ConflictGraph<Number>& conflictGraph
 ) {
 	// check whether an interuption flag is set
 	if (this->anAnswerFound()) {
@@ -1378,7 +1378,7 @@ bool CAD<Number>::liftCheck(
 		bool boundsActive,
 		bool checkBounds,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph,
+		cad::ConflictGraph<Number>& conflictGraph,
 		std::stack<std::size_t>& satPath
 ) {
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);

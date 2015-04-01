@@ -12,6 +12,7 @@
 #include "../util/Singleton.h"
 #include "../util/Common.h"
 #include "Constraint.h"
+#include <limits>
 #include <mutex>
 
 namespace carl
@@ -67,7 +68,7 @@ namespace carl
              * @param _rel The relation symbol of the constraint before normalization,
              * @return The constructed constraint.
              */
-            ConstraintContent<Pol>* createNormalizedConstraint( Pol&& _lhs, const Relation _rel ) const;
+            ConstraintContent<Pol>* createNormalizedConstraint( const Pol& _lhs, const Relation _rel ) const;
             
             /**
              * Adds the given constraint to the pool, if it does not yet occur in there.
@@ -78,6 +79,24 @@ namespace carl
              *          The equivalent constraint already occurring in the pool.
              */
             const ConstraintContent<Pol>* addConstraintToPool( ConstraintContent<Pol>* _constraint );
+            
+            /**
+             * @return A pointer to the constraint which represents any constraint for which it is easy to 
+             *          decide, whether it is consistent, e.g. 0=0, -1!=0, x^2+1>0
+             */
+            const ConstraintContent<Pol>* consistentConstraint() const
+            {
+                return mConsistentConstraint;
+            }
+                        
+            /**
+             * @return A pointer to the constraint which represents any constraint for which it is easy to 
+             *          decide, whether it is consistent, e.g. 1=0, 0!=0, x^2+1=0
+            */
+            const ConstraintContent<Pol>* inconsistentConstraint() const
+            {
+                return mInconsistentConstraint;
+            }
 
         protected:
             
@@ -133,24 +152,6 @@ namespace carl
             bool lastConstructedConstraintWasKnown() const
             {
                 return mLastConstructedConstraintWasKnown;
-            }
-            
-            /**
-             * @return A pointer to the constraint which represents any constraint for which it is easy to 
-             *          decide, whether it is consistent, e.g. 0=0, -1!=0, x^2+1>0
-             */
-            const ConstraintContent<Pol>* consistentConstraint() const
-            {
-                return mConsistentConstraint;
-            }
-                        
-            /**
-             * @return A pointer to the constraint which represents any constraint for which it is easy to 
-             *          decide, whether it is consistent, e.g. 1=0, 0!=0, x^2+1=0
-            */
-            const ConstraintContent<Pol>* inconsistentConstraint() const
-            {
-                return mInconsistentConstraint;
             }
             
             const std::shared_ptr<typename Pol::CACHE>& pPolynomialCache() const
@@ -222,33 +223,42 @@ namespace carl
              * @param _rel The relation symbol of the constraint.
              * @return The constructed constraint.
              */
-            const ConstraintContent<Pol>* create( Pol&& _lhs, Relation _rel );
-            
-            const ConstraintContent<Pol>* create( const Pol& _lhs, Relation _rel )
+            const ConstraintContent<Pol>* create( const Pol& _lhs, Relation _rel );
+
+            /**
+             * @return If _true = true, the valid constraint 0=0, otherwise the invalid formula 0<0.
+             */
+            const ConstraintContent<Pol>* create( bool _true )
             {
-                return create(std::move(Pol(_lhs)), _rel );
+                return _true ? consistentConstraint() : inconsistentConstraint();
             }
             
             const ConstraintContent<Pol>* create( carl::Variable::Arg _var, Relation _rel )
             {
-                return create( std::move( makePolynomial<Pol>(_var) ), _rel );
-            }
-            
-            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            const ConstraintContent<Pol>* create( typename Pol::PolyType&& _lhs, Relation _rel )
-            {
-                return create( std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel );
+                return create( makePolynomial<Pol>(_var), _rel );
             }
             
             template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
             const ConstraintContent<Pol>* create( const typename Pol::PolyType& _lhs, Relation _rel )
             {
-                return create( std::move( makePolynomial<Pol>( _lhs ) ), _rel );
+                return create( makePolynomial<Pol>( _lhs ), _rel );
             }
             
-            void free( const ConstraintContent<Pol>* _cc ) const
+            void free( const ConstraintContent<Pol>* _cc )
             {
+                assert( _cc->mUsages > 0 );
                 --_cc->mUsages;
+                if( _cc->mUsages == 0 )
+                {
+                    mConstraints.erase( _cc );
+                    delete _cc;
+                }
+            }
+            
+            void reg( const ConstraintContent<Pol>* _cc ) const
+            {
+                assert( _cc->mUsages < std::numeric_limits<size_t>::max() );
+                ++_cc->mUsages;
             }
             
             /**

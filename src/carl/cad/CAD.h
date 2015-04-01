@@ -312,7 +312,7 @@ public:
 	 */
 	bool check(	std::vector<cad::Constraint<Number>>& constraints,
 				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
+				cad::ConflictGraph<Number>& conflictGraph,
 				BoundMap& bounds,
 				bool next = false,
 				bool checkBounds = true );
@@ -324,7 +324,7 @@ public:
 				bool next = false,
 				bool checkBounds = true)
 	{
-		cad::ConflictGraph cg;
+		cad::ConflictGraph<Number> cg;
 		return this->check(constraints, r, cg, bounds, next, checkBounds);
 	}
 
@@ -479,7 +479,7 @@ private:
 		bool excludePrevious,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph,
+		cad::ConflictGraph<Number>& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
 		std::size_t dim
@@ -504,7 +504,7 @@ public:
 	bool mainCheck(
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph,
+			cad::ConflictGraph<Number>& conflictGraph,
 			bool next,
 			bool boundsNontrivial,
 			bool checkBounds
@@ -524,7 +524,7 @@ public:
 	bool baseLiftCheck(
 		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph
+		cad::ConflictGraph<Number>& conflictGraph
 	);
 
 	/**
@@ -563,7 +563,7 @@ public:
 			bool boundsActive,
 			bool checkBounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph,
+			cad::ConflictGraph<Number>& conflictGraph,
 			std::stack<std::size_t>& satPath
 	);
 	

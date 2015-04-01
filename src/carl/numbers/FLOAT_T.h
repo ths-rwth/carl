@@ -1737,7 +1737,7 @@ namespace carl
 		return _in.mValue == 0;
 	}	
 	
-#ifdef USE_MPFR_FLOAT
+
 #include "adaption_float/mpfr_float.tpp"
-#endif
+
 } // namespace

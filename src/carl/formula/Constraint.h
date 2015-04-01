@@ -439,10 +439,7 @@ namespace carl
             /// The content of this constraint.
             const ConstraintContent<Pol>* mpContent;
             
-            
-            Constraint( const ConstraintContent<Pol>* _content ):
-                mpContent( _content )
-            {}
+            Constraint( const ConstraintContent<Pol>* _content );
             
         public:
             
@@ -455,12 +452,15 @@ namespace carl
             template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
             explicit Constraint( const typename P::PolyType& _lhs, Relation _rel );
             
-            template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            explicit Constraint( typename P::PolyType&& _lhs, Relation _rel );
+            Constraint( const Constraint& _constraint );
             
-            explicit Constraint( Pol&& _lhs, Relation _rel );
+            Constraint( Constraint&& _constraint );
             
             ~Constraint();
+            
+            Constraint& operator=( const Constraint& _constraint );
+            
+            Constraint& operator=( Constraint&& _constraint );
             
             /**
              * @return The considered polynomial being the left-hand side of this constraint.
@@ -932,7 +932,7 @@ namespace carl
         typename Pol::NumberType g;
         if( carl::getDenom(one_divided_by_a) > carl::getDenom(one_divided_by_b) )
         {
-            g = carl::getDenom(one_divided_by_a)/carl::getDenom(one_divided_by_b);
+            g = typename Pol::NumberType(carl::getDenom(one_divided_by_a))/carl::getDenom(one_divided_by_b);
             if( signsDiffer )
                 g = -g;
             termACoeffGreater = true;
@@ -940,7 +940,7 @@ namespace carl
         }
         else
         {
-            g = carl::getDenom(one_divided_by_b)/carl::getDenom(one_divided_by_a);
+            g = typename Pol::NumberType(carl::getDenom(one_divided_by_b))/carl::getDenom(one_divided_by_a);
             if( signsDiffer )
                 g = -g;
             c *= g;

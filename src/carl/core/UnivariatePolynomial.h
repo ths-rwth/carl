@@ -576,6 +576,7 @@ public:
 	 * Calculates the pseudo-remainder.
 	 * @see @cite GCL92, page 55, Pseudo-Division Property
 	 */
+	UnivariatePolynomial prem_old(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
@@ -1058,13 +1059,9 @@ public:
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs) {
-		return std::move(UnivariatePolynomial<C>(lhs) *= rhs);
-	}
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs);
 	template<typename C>
-	friend UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs) {
-		return std::move(UnivariatePolynomial<C>(rhs) *= lhs);
-	}
+	friend UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>

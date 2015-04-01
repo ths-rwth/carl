@@ -185,7 +185,7 @@ namespace carl
                 UEquality mUIEquality;
             };
             /// The negation
-            FormulaContent<Pol> *mNegation;
+            const FormulaContent<Pol> *mNegation;
             /// The propositions of this formula.
             Condition mProperties;
 
@@ -218,7 +218,15 @@ namespace carl
              * Constructs the negation of the given formula: (not _subformula)
              * @param _subformula The sub-formula, which is negated by the constructed formula.
              */
-            FormulaContent( const Formula<Pol>& _subformula );
+            FormulaContent( Formula<Pol>&& _subformula );
+
+            /**
+             * Constructs the negation of the given formula: (not _subformula)
+             * @param _subformula The sub-formula, which is negated by the constructed formula.
+             */
+            FormulaContent( const Formula<Pol>& _subformula ):
+                FormulaContent( std::move(Formula<Pol>( _subformula ) ) )
+            {}
 
             /**
              * Constructs an implication from the first argument to the second: (=> _subformulaA _subformulaB)
@@ -252,7 +260,7 @@ namespace carl
 
             FormulaContent(); // Disabled
             FormulaContent( const FormulaContent& ); // Disabled
-
+            
         public:
 
             /**
@@ -300,6 +308,7 @@ namespace carl
     class Formula
     {
         friend class FormulaPool<Pol>;
+        friend class FormulaContent<Pol>;
         
         public:
             /// A constant iterator to a sub-formula of a formula.
@@ -325,7 +334,9 @@ namespace carl
             
             Formula( const FormulaContent<Pol>* _content ):
                 mpContent( _content )
-            {}
+            {
+                FormulaPool<Pol>::getInstance().reg( mpContent );
+            }
             
         public:
             
@@ -336,42 +347,31 @@ namespace carl
             static void init( FormulaContent<Pol>& _content );
             
             explicit Formula( FormulaType _type = TRUE ):
-                mpContent( _type == TRUE ? FormulaPool<Pol>::getInstance().trueFormula() : FormulaPool<Pol>::getInstance().falseFormula() )
+                Formula( FormulaPool<Pol>::getInstance().create( _type == TRUE ) )
             {}
                 
             explicit Formula( Variable::Arg _booleanVar ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _booleanVar ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _booleanVar ) )
             {}
                 
             explicit Formula( const Pol& _pol, Relation _rel ):
-                mpContent( FormulaPool<Pol>::getInstance().create( Constraint<Pol>( _pol, _rel ) ) )
-            {}
-                
-            explicit Formula( Pol&& _pol, Relation _rel ):
-                mpContent( FormulaPool<Pol>::getInstance().create( Constraint<Pol>( std::move( _pol ), _rel ) ) )
+                Formula( FormulaPool<Pol>::getInstance().create( Constraint<Pol>( _pol, _rel ) ) )
             {}
                 
             explicit Formula( const Constraint<Pol>& _constraint ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _constraint ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
                 
             explicit Formula( FormulaType _type, const Formula& _subformula ):
-                mpContent( FormulaPool<Pol>::getInstance().createNegation( _subformula ) )
+                Formula( FormulaPool<Pol>::getInstance().createNegation( _subformula ) )
             {
                 assert( _type == FormulaType::NOT );
             }
                 
-            explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB )
+            explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB ):
+                Formula( _type == FormulaType::IMPLIES ? FormulaPool<Pol>::getInstance().createImplication( _subformulaA, _subformulaB ) : FormulaPool<Pol>::getInstance().create( _type, _subformulaA, _subformulaB ))
             {
                 assert( _type == FormulaType::AND || _type == FormulaType::IFF || _type == FormulaType::IMPLIES || _type == FormulaType::OR || _type == FormulaType::XOR );
-                if( _type == FormulaType::IMPLIES )
-                {
-                    mpContent = FormulaPool<Pol>::getInstance().createImplication( _subformulaA, _subformulaB );
-                }
-                else
-                {
-                    mpContent = FormulaPool<Pol>::getInstance().create( _type, _subformulaA, _subformulaB );
-                }
             }
             
             explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB, const Formula& _subformulaC )
@@ -380,6 +380,7 @@ namespace carl
                 if( _type == FormulaType::ITE )
                 {
                     mpContent = FormulaPool<Pol>::getInstance().createIte( _subformulaA, _subformulaB, _subformulaC );
+                    FormulaPool<Pol>::getInstance().reg(mpContent);
                 }
                 else
                 {
@@ -388,25 +389,26 @@ namespace carl
                     subFormulas.insert( _subformulaB );
                     subFormulas.insert( _subformulaC );
                     mpContent = FormulaPool<Pol>::getInstance().create( _type, subFormulas );
+                    FormulaPool<Pol>::getInstance().reg(mpContent);
                 }
             }
             
             explicit Formula( FormulaType _type, const FormulasMulti<Pol>& _subformulas ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _subformulas ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _subformulas ) )
             {
                 assert( _type == FormulaType::XOR );
             }
             
             explicit Formula( FormulaType _type, const Formulas<Pol>& _subasts ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
             explicit Formula( FormulaType _type, Formulas<Pol>&& _subasts ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
             {}
             
             explicit Formula( FormulaType _type, const std::vector<Variable>&& _vars, const Formula& _term ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _type, std::move( _vars ), _term ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _type, std::move( _vars ), _term ) )
             {}
             
             explicit Formula( FormulaType _type, const std::vector<Variable>& _vars, const Formula& _term ):
@@ -414,16 +416,48 @@ namespace carl
             {}
             
             explicit Formula( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated ):
-                mpContent( FormulaPool<Pol>::getInstance().create( _lhs, _rhs, _negated ) )
+                Formula( FormulaPool<Pol>::getInstance().create( _lhs, _rhs, _negated ) )
             {}
             
             explicit Formula( UEquality&& _eq ):
-                mpContent( FormulaPool<Pol>::getInstance().create( std::move( _eq ) ) )
+                Formula( FormulaPool<Pol>::getInstance().create( std::move( _eq ) ) )
             {}
+            
+            Formula( const Formula& _formula ):
+                Formula( _formula.mpContent )
+            {
+            }
+            
+            Formula( Formula&& _formula ):
+                mpContent( _formula.mpContent )
+            {
+                _formula.mpContent = nullptr;
+            }
             
             ~Formula()
             {
-                FormulaPool<Pol>::getInstance().free( mpContent );
+                if( mpContent != nullptr )
+                {
+                    FormulaPool<Pol>::getInstance().free( mpContent );
+                }
+            }
+            
+            Formula& operator=( const Formula& _formula )
+            {
+                FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
+                if( mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().free( mpContent );
+                mpContent = _formula.mpContent;
+                return *this;
+            }
+            
+            Formula& operator=( Formula&& _formula )
+            {
+                if( mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().free( mpContent );
+                mpContent = _formula.mpContent;
+                _formula.mpContent = nullptr;
+                return *this;
             }
 
             // Methods.

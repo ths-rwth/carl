@@ -1,8 +1,10 @@
-Windows 7 64Bit
+Windows 7 64Bit {#windows_7_msvc2014}
 ==========
 
 This is an example how the installation on Windows 7 64Bit looks like.
 We assume that you start with a fresh installation and know how to install software.
+
+Warning: This guide is incomplete!
 
 This guide is for a Visual Studio 2013 (which is Visual Studio 12).
 
