@@ -7,7 +7,17 @@
 
 using namespace carl;
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 TEST(ConflictGraph, BasicOperations)
 {  
-	cad::ConflictGraph<cln::cl_RA> cg;
+    cad::ConflictGraph<Rational> cg;
 }

@@ -13,9 +13,17 @@
 #include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <cln/cln.h>
-#include <gmpxx.h>
 #include <iostream>
+
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
@@ -30,7 +38,7 @@ TEST(DoubleInterval, Constructor)
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
 	
-    DoubleInterval test7 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
+    DoubleInterval test7 = DoubleInterval((Rational)-1, BoundType::WEAK, (Rational)1, BoundType::WEAK);
     
 	DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
 	DoubleInterval test9 = DoubleInterval(1);

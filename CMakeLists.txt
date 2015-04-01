@@ -46,6 +46,7 @@ option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are i
 option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
+option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
@@ -170,10 +171,17 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS ${Boost_COMPONENTS})
 set(Boost_STATIC ${Boost_LIBRARIES})
 
+
+if(COMPARE_WITH_GINAC)
+    set(USE_CLN_NUMBERS ON)
+endif()
+
 # CLN
-find_package(CLN REQUIRED)
-find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
-find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
+IF(USE_CLN_NUMBERS)
+    find_package(CLN REQUIRED)
+    find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
+    find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
+endif()
 
 # GMP
 find_package(GMP REQUIRED)
@@ -183,9 +191,23 @@ find_package(GMPXX REQUIRED)
 find_library(GMPXX_DYNAMIC NAMES libgmpxx.${DYNAMIC_EXT})
 find_library(GMPXX_STATIC NAMES libgmpxx.${STATIC_EXT})
 
-include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS} ${CLN_INCLUDE_DIR} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
-set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC} ${CLN_DYNAMIC} ${GMPXX_DYNAMIC} ${GMP_DYNAMIC})
-set(libs_static ${libs_static} ${Boost_STATIC} ${CLN_STATIC} ${GMPXX_STATIC} ${GMP_STATIC})
+include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
+IF(USE_CLN_NUMBERS)
+    include_directories(SYSTEM ${SYSTEM} ${CLN_INCLUDE_DIR})
+endif()
+include_directories(SYSTEM ${SYSTEM} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
+
+set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC})
+IF(USE_CLN_NUMBERS)
+    set(libs_dynamic ${libs_dynamic} ${CLN_DYNAMIC})
+endif()
+set(libs_dynamic ${libs_dynamic} ${GMPXX_DYNAMIC} ${GMP_DYNAMIC})
+
+set(libs_static ${libs_static} ${Boost_STATIC})
+IF(USE_CLN_NUMBERS)
+    set(libs_static ${libs_static} ${CLN_STATIC})
+endif()
+set(libs_static ${libs_static} ${GMPXX_STATIC} ${GMP_STATIC})
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
@@ -238,6 +260,7 @@ if(COMPARE_WITH_GINAC)
 	include_directories(SYSTEM ${include_dirs} ${GINAC_INCLUDE_DIRS})
 	set(libs_dynamic ${libs_dynamic} ${GiNaC_DYNAMIC})
 	set(libs_static ${libs_static} ${GiNaC_STATIC})
+	set(USE_CLN_NUMBERS ON)
 endif()
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h

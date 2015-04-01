@@ -16,14 +16,23 @@
 #include <assert.h>
 #include <math.h>
 #include <cmath>
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+#else
+#include <gmpxx.h>
+#endif
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
 
 #include "typetraits.h"
+#ifdef USE_CLN_NUMBERS
 #include "adaption_cln/typetraits.h"
 #include "adaption_cln/operations.h"
+#else
+#include "adaption_gmpxx/typetraits.h"
+#include "adaption_gmpxx/operations.h"
+#endif
 #include "config.h"
 #include "roundingConversion.h"
 #include "../util/SFINAE.h"
@@ -1710,6 +1719,8 @@ namespace carl
         return FLOAT_T<float>(_in);
     }
     
+    
+    #ifdef USE_CLN_NUMBERS
     /**
      * Implicitly converts the number to a rational and returns the denominator.
      * @param _in Number.
@@ -1731,6 +1742,29 @@ namespace carl
     {
         return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
     }
+    #else
+    /**
+     * Implicitly converts the number to a rational and returns the denominator.
+     * @param _in Number.
+     * @return GMP interger which holds the result.
+     */
+    template<typename FloatType>
+    inline mpz_class getDenom(const FLOAT_T<FloatType>& _in)
+    {
+        return carl::getDenom(carl::rationalize<mpq_class>(_in.toDouble()));
+    }
+    
+    /**
+     * Implicitly converts the number to a rational and returns the nominator.
+     * @param _in Number.
+     * @return GMP interger which holds the result.
+     */
+    template<typename FloatType>
+    inline mpz_class getNum(const FLOAT_T<FloatType>& _in)
+    {
+        return carl::getNum(carl::rationalize<mpq_class>(_in.toDouble()));
+    }
+    #endif
     
 	template<typename FloatType>
 	inline bool isZero(const FLOAT_T<FloatType>& _in) {

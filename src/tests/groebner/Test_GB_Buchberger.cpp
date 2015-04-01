@@ -6,7 +6,15 @@
 #include "carl/groebner/Ideal.h"
 #include "carl/groebner/groebner.h"
 
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
@@ -23,13 +31,13 @@ TEST(GB_Buchberger, T1)
     vpool.setName(y, "y");
 //    Variable z = vpool.getFreshVariable();
     
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x, (cln::cl_RA)-2*x*y} );
-    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)1*x*x*y, (cln::cl_RA)-2*y*y, (cln::cl_RA)1*x});
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
+    MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
     
-    MultivariatePolynomial<cln::cl_RA> F1({(cln::cl_RA)1*x*x} );
-    MultivariatePolynomial<cln::cl_RA> F2({(cln::cl_RA)1*y*y, (cln::cl_RA)-1*(cln::cl_RA)1/2*x} );
-    MultivariatePolynomial<cln::cl_RA> F3({(cln::cl_RA)1*x*y} );
-    GBProcedure<MultivariatePolynomial<cln::cl_RA>, Buchberger, StdAdding> gbobject;
+    MultivariatePolynomial<Rational> F1({(Rational)1*x*x} );
+    MultivariatePolynomial<Rational> F2({(Rational)1*y*y, (Rational)-1*(Rational)1/(Rational)2*x} );
+    MultivariatePolynomial<Rational> F3({(Rational)1*x*y} );
+    GBProcedure<MultivariatePolynomial<Rational>, Buchberger, StdAdding> gbobject;
     EXPECT_TRUE(gbobject.inputEmpty());
     gbobject.addPolynomial(f1);
     gbobject.addPolynomial(f2);
@@ -39,7 +47,7 @@ TEST(GB_Buchberger, T1)
     EXPECT_EQ(F2,gbobject.getIdeal().getGenerator(0));
     EXPECT_EQ(F3,gbobject.getIdeal().getGenerator(1));
     EXPECT_EQ(F1,gbobject.getIdeal().getGenerator(2));
-    GBProcedure<MultivariatePolynomial<cln::cl_RA>, Buchberger, RealRadicalAwareAdding> gb2object;
+    GBProcedure<MultivariatePolynomial<Rational>, Buchberger, RealRadicalAwareAdding> gb2object;
     EXPECT_TRUE(gb2object.inputEmpty());
     gb2object.addPolynomial(f1);
     gb2object.addPolynomial(f2);
@@ -58,15 +66,15 @@ TEST(GB_Buchberger, T1_ReasonSets)
     vpool.setName(y, "y");
 //    Variable z = vpool.getFreshVariable();
     
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x, (cln::cl_RA)-2*x*y} );
-    PolynomialWithReasonSet<cln::cl_RA> f1rs(f1);
-    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)1*x*x*y, (cln::cl_RA)-2*y*y, (cln::cl_RA)1*x});
-    PolynomialWithReasonSet<cln::cl_RA> f2rs(f2);
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
+    PolynomialWithReasonSet<Rational> f1rs(f1);
+    MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
+    PolynomialWithReasonSet<Rational> f2rs(f2);
     
-    PolynomialWithReasonSet<cln::cl_RA> F1({(cln::cl_RA)1*x*x} );
-    PolynomialWithReasonSet<cln::cl_RA> F2({(cln::cl_RA)1*y*y, (cln::cl_RA)-1*(cln::cl_RA)1/2*x} );
-    PolynomialWithReasonSet<cln::cl_RA> F3({(cln::cl_RA)1*x*y} );
-    GBProcedure<PolynomialWithReasonSet<cln::cl_RA>, Buchberger, StdAdding> gbobject;
+    PolynomialWithReasonSet<Rational> F1({(Rational)1*x*x} );
+    PolynomialWithReasonSet<Rational> F2({(Rational)1*y*y, (Rational)-1*(Rational)1/(Rational)2*x} );
+    PolynomialWithReasonSet<Rational> F3({(Rational)1*x*y} );
+    GBProcedure<PolynomialWithReasonSet<Rational>, Buchberger, StdAdding> gbobject;
     EXPECT_TRUE(gbobject.inputEmpty());
     gbobject.addPolynomial(f1rs);
     gbobject.addPolynomial(f2rs);
@@ -76,7 +84,7 @@ TEST(GB_Buchberger, T1_ReasonSets)
     EXPECT_EQ(F2,gbobject.getIdeal().getGenerator(0));
     EXPECT_EQ(F3,gbobject.getIdeal().getGenerator(1));
     EXPECT_EQ(F1,gbobject.getIdeal().getGenerator(2));
-    GBProcedure<PolynomialWithReasonSet<cln::cl_RA>, Buchberger, RealRadicalAwareAdding> gb2object;
+    GBProcedure<PolynomialWithReasonSet<Rational>, Buchberger, RealRadicalAwareAdding> gb2object;
     EXPECT_TRUE(gb2object.inputEmpty());
     gb2object.addPolynomial(f1rs);
     gb2object.addPolynomial(f2rs);

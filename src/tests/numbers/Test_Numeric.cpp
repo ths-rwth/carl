@@ -6,97 +6,107 @@
 
 using namespace carl;
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 TEST(Numeric, constructors)
 {
-    size_t num_of_allocated_elements = Numeric<cln::cl_RA>::mRationalPool.size();
-    Numeric<cln::cl_RA> n0;
-    EXPECT_EQ( cln::cl_RA(0), n0.toRational());
-    Numeric<cln::cl_RA> n1( 2, true );
-    EXPECT_EQ( cln::cl_RA(2), n1.toRational());
-    Numeric<cln::cl_RA> n2( 4 );
-    EXPECT_EQ( cln::cl_RA(4), n2.toRational());
-    Numeric<cln::cl_RA> n3( cln::cl_RA( 5 ) );
-    EXPECT_EQ( num_of_allocated_elements, Numeric<cln::cl_RA>::mRationalPool.size() );
-    EXPECT_EQ( cln::cl_RA(5), n3.toRational());
-    Numeric<cln::cl_RA> n4( n2 );
-    EXPECT_EQ( cln::cl_RA(4), n4.toRational());
-    Numeric<cln::cl_RA> n5( n3 );
-    EXPECT_EQ( num_of_allocated_elements, Numeric<cln::cl_RA>::mRationalPool.size() );
-    EXPECT_EQ( cln::cl_RA( (ContentType) 5 ), n5.toRational());
-    Numeric<cln::cl_RA> n6( (HIGHTEST_INTEGER_VALUE - 1) );
-    EXPECT_EQ( num_of_allocated_elements, Numeric<cln::cl_RA>::mRationalPool.size() );
-    EXPECT_EQ( cln::cl_RA( (HIGHTEST_INTEGER_VALUE - 1) ), n6.toRational());
-    Numeric<cln::cl_RA> n7( HIGHTEST_INTEGER_VALUE );
+    size_t num_of_allocated_elements = Numeric<Rational>::mRationalPool.size();
+    Numeric<Rational> n0;
+    EXPECT_EQ( Rational(0), n0.toRational());
+    Numeric<Rational> n1( 2, true );
+    EXPECT_EQ( Rational(2), n1.toRational());
+    Numeric<Rational> n2( 4 );
+    EXPECT_EQ( Rational(4), n2.toRational());
+    Numeric<Rational> n3( Rational( 5 ) );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
+    EXPECT_EQ( Rational(5), n3.toRational());
+    Numeric<Rational> n4( n2 );
+    EXPECT_EQ( Rational(4), n4.toRational());
+    Numeric<Rational> n5( n3 );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
+    EXPECT_EQ( Rational( (ContentType) 5 ), n5.toRational());
+    Numeric<Rational> n6( (HIGHTEST_INTEGER_VALUE - 1) );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
+    EXPECT_EQ( Rational( (HIGHTEST_INTEGER_VALUE - 1) ), n6.toRational());
+    Numeric<Rational> n7( HIGHTEST_INTEGER_VALUE );
     ++num_of_allocated_elements;
-    EXPECT_EQ( num_of_allocated_elements, Numeric<cln::cl_RA>::mRationalPool.size() );
-    EXPECT_EQ( cln::cl_RA( HIGHTEST_INTEGER_VALUE ), n7.toRational());
-    Numeric<cln::cl_RA> n8( -(HIGHTEST_INTEGER_VALUE - 1) );
-    EXPECT_EQ( cln::cl_RA( -(HIGHTEST_INTEGER_VALUE - 1) ), n8.toRational());
-    Numeric<cln::cl_RA> n9( -HIGHTEST_INTEGER_VALUE );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
+    EXPECT_EQ( Rational( HIGHTEST_INTEGER_VALUE ), n7.toRational());
+    Numeric<Rational> n8( -(HIGHTEST_INTEGER_VALUE - 1) );
+    EXPECT_EQ( Rational( -(HIGHTEST_INTEGER_VALUE - 1) ), n8.toRational());
+    Numeric<Rational> n9( -HIGHTEST_INTEGER_VALUE );
     ++num_of_allocated_elements;
-    EXPECT_EQ( num_of_allocated_elements, Numeric<cln::cl_RA>::mRationalPool.size() );
-    EXPECT_EQ( cln::cl_RA( -HIGHTEST_INTEGER_VALUE ), n9.toRational());
-    Numeric<cln::cl_RA> n10( (cln::cl_RA( 1 )/cln::cl_RA( 3 )) );
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
+    EXPECT_EQ( Rational( -HIGHTEST_INTEGER_VALUE ), n9.toRational());
+    Numeric<Rational> n10( (Rational( 1 )/Rational( 3 )) );
     ++num_of_allocated_elements;
-    EXPECT_EQ( num_of_allocated_elements, Numeric<cln::cl_RA>::mRationalPool.size() );
-    EXPECT_EQ( (cln::cl_RA( 1 )/cln::cl_RA( 3 )), n10.toRational());
+    EXPECT_EQ( num_of_allocated_elements, Numeric<Rational>::mRationalPool.size() );
+    EXPECT_EQ( (Rational( 1 )/Rational( 3 )), n10.toRational());
 }
 
 TEST(Numeric, operations)
 {
-    Numeric<cln::cl_RA> n = Numeric<cln::cl_RA>(1) + Numeric<cln::cl_RA>(5);
-    EXPECT_EQ( cln::cl_RA(1)+cln::cl_RA(5), n.toRational());
+    Numeric<Rational> n = Numeric<Rational>(1) + Numeric<Rational>(5);
+    EXPECT_EQ( Rational(1)+Rational(5), n.toRational());
     
-    n = Numeric<cln::cl_RA>(12) - Numeric<cln::cl_RA>(47);
-    EXPECT_EQ( cln::cl_RA(12)-cln::cl_RA(47), n.toRational());
+    n = Numeric<Rational>(12) - Numeric<Rational>(47);
+    EXPECT_EQ( Rational(12)-Rational(47), n.toRational());
     
-    n = Numeric<cln::cl_RA>(-761) * Numeric<cln::cl_RA>(3);
-    EXPECT_EQ( cln::cl_RA(-761)*cln::cl_RA(3), n.toRational());
+    n = Numeric<Rational>(-761) * Numeric<Rational>(3);
+    EXPECT_EQ( Rational(-761)*Rational(3), n.toRational());
     
-    n = Numeric<cln::cl_RA>(120) / Numeric<cln::cl_RA>(24);
-    EXPECT_EQ( cln::cl_RA(120)/cln::cl_RA(24), n.toRational());
+    n = Numeric<Rational>(120) / Numeric<Rational>(24);
+    EXPECT_EQ( Rational(120)/Rational(24), n.toRational());
     
-    n += Numeric<cln::cl_RA>( 102345 );
-    EXPECT_EQ( cln::cl_RA( 102350 ), n.toRational());
+    n += Numeric<Rational>( 102345 );
+    EXPECT_EQ( Rational( 102350 ), n.toRational());
     
-    n -= Numeric<cln::cl_RA>( 1023452 );
-    EXPECT_EQ( cln::cl_RA( -921102 ), n.toRational());
+    n -= Numeric<Rational>( 1023452 );
+    EXPECT_EQ( Rational( -921102 ), n.toRational());
     
-    n -= Numeric<cln::cl_RA>( (HIGHTEST_INTEGER_VALUE - 1) );
-    EXPECT_EQ( cln::cl_RA( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) ) ), n.toRational());
+    n -= Numeric<Rational>( (HIGHTEST_INTEGER_VALUE - 1) );
+    EXPECT_EQ( Rational( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) ) ), n.toRational());
     
-    Numeric<cln::cl_RA> n2;
-    n2 -= Numeric<cln::cl_RA>( HIGHTEST_INTEGER_VALUE );
-    EXPECT_EQ( cln::cl_RA( ( -HIGHTEST_INTEGER_VALUE ) ), n2.toRational());
+    Numeric<Rational> n2;
+    n2 -= Numeric<Rational>( HIGHTEST_INTEGER_VALUE );
+    EXPECT_EQ( Rational( ( -HIGHTEST_INTEGER_VALUE ) ), n2.toRational());
     
     n -= n2;
-    EXPECT_EQ( cln::cl_RA( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) - (-HIGHTEST_INTEGER_VALUE) ) ), n.toRational());
+    EXPECT_EQ( Rational( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) - (-HIGHTEST_INTEGER_VALUE) ) ), n.toRational());
     
-    Numeric<cln::cl_RA> n3( (HIGHTEST_INTEGER_VALUE - 1) );
-    n3 *= Numeric<cln::cl_RA>( 2 );
-    EXPECT_EQ( cln::cl_RA( (HIGHTEST_INTEGER_VALUE - 1) ) * cln::cl_RA( 2 ), n3.toRational());
+    Numeric<Rational> n3( (HIGHTEST_INTEGER_VALUE - 1) );
+    n3 *= Numeric<Rational>( 2 );
+    EXPECT_EQ( Rational( (HIGHTEST_INTEGER_VALUE - 1) ) * Rational( 2 ), n3.toRational());
     
-    Numeric<cln::cl_RA> n4( (cln::cl_RA(1)/cln::cl_RA(3)) );
-    n4 *= Numeric<cln::cl_RA>( 9 );
-    EXPECT_EQ( cln::cl_RA( 3 ), n4.toRational() );
+    Numeric<Rational> n4( (Rational(1)/Rational(3)) );
+    n4 *= Numeric<Rational>( 9 );
+    EXPECT_EQ( Rational( 3 ), n4.toRational() );
     EXPECT_TRUE( IS_INT( n4.content() ) );
     
-    Numeric<cln::cl_RA> n5( 2 );
-    n5 *= Numeric<cln::cl_RA>( (cln::cl_RA(1)/cln::cl_RA(3)) );
-    EXPECT_EQ( (cln::cl_RA( 2 )/cln::cl_RA( 3 )), n5.toRational() );
+    Numeric<Rational> n5( 2 );
+    n5 *= Numeric<Rational>( (Rational(1)/Rational(3)) );
+    EXPECT_EQ( (Rational( 2 )/Rational( 3 )), n5.toRational() );
     EXPECT_FALSE( IS_INT( n5.content() ) );
     
-    Numeric<cln::cl_RA> n6( HIGHTEST_INTEGER_VALUE + 1 );
-    n6 /= Numeric<cln::cl_RA>( 3 );
-    EXPECT_EQ( (cln::cl_RA( HIGHTEST_INTEGER_VALUE + 1 )/cln::cl_RA( 3 )), n6.toRational() );
+    Numeric<Rational> n6( HIGHTEST_INTEGER_VALUE + 1 );
+    n6 /= Numeric<Rational>( 3 );
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 )/Rational( 3 )), n6.toRational() );
     
-    Numeric<cln::cl_RA> n7( 44 );
-    n7 /= Numeric<cln::cl_RA>( 11 );
-    EXPECT_EQ( cln::cl_RA( 4 ), n7.toRational() );
+    Numeric<Rational> n7( 44 );
+    n7 /= Numeric<Rational>( 11 );
+    EXPECT_EQ( Rational( 4 ), n7.toRational() );
     EXPECT_TRUE( IS_INT( n7.content() ) );
     
-    Numeric<cln::cl_RA> n8( HIGHTEST_INTEGER_VALUE - 3 );
-    EXPECT_EQ( (cln::cl_RA( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n8 ).toRational() ); 
+    Numeric<Rational> n8( HIGHTEST_INTEGER_VALUE - 3 );
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n8 ).toRational() ); 
     ++n8;
     EXPECT_TRUE( IS_INT( n8.content() ) );
     ++n8;
@@ -105,10 +115,10 @@ TEST(Numeric, operations)
     EXPECT_FALSE( IS_INT( n8.content() ) );
     ++n8;
     EXPECT_FALSE( IS_INT( n8.content() ) );
-    EXPECT_EQ( (cln::cl_RA( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n8 ).toRational() ); 
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n8 ).toRational() ); 
     
-    Numeric<cln::cl_RA> n9( -HIGHTEST_INTEGER_VALUE + 3 );
-    EXPECT_EQ( (cln::cl_RA( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n9 ).toRational() ); 
+    Numeric<Rational> n9( -HIGHTEST_INTEGER_VALUE + 3 );
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n9 ).toRational() ); 
     --n9;
     EXPECT_TRUE( IS_INT( n9.content() ) );
     --n9;
@@ -117,16 +127,16 @@ TEST(Numeric, operations)
     EXPECT_FALSE( IS_INT( n9.content() ) );
     --n9;
     EXPECT_FALSE( IS_INT( n9.content() ) );
-    EXPECT_EQ( (cln::cl_RA( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n9 ).toRational() ); 
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n9 ).toRational() ); 
     
-    Numeric<cln::cl_RA> c1;
-    Numeric<cln::cl_RA> c2( 12 );
-    Numeric<cln::cl_RA> c3( -(HIGHTEST_INTEGER_VALUE - 1) );
-    Numeric<cln::cl_RA> c4( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-2 );
-    Numeric<cln::cl_RA> c5( (cln::cl_RA(1)/cln::cl_RA(3)) );
-    Numeric<cln::cl_RA> c6( (cln::cl_RA(-90)/cln::cl_RA(5)) );
+    Numeric<Rational> c1;
+    Numeric<Rational> c2( 12 );
+    Numeric<Rational> c3( -(HIGHTEST_INTEGER_VALUE - 1) );
+    Numeric<Rational> c4( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-2 );
+    Numeric<Rational> c5( (Rational(1)/Rational(3)) );
+    Numeric<Rational> c6( (Rational(-90)/Rational(5)) );
     EXPECT_TRUE( IS_INT( c6.content() ) );
-    Numeric<cln::cl_RA> c7( c4 );
+    Numeric<Rational> c7( c4 );
     EXPECT_FALSE( c1 < c1 );
     EXPECT_TRUE( c1 == c1 );
     EXPECT_TRUE( c1 >= c1 );
@@ -143,31 +153,31 @@ TEST(Numeric, operations)
     EXPECT_FALSE( c7 != c4 );
     EXPECT_FALSE( c7 > c4 );
     
-    Numeric<cln::cl_RA> c8( 144 );
-    Numeric<cln::cl_RA> c9( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-3 );
-    Numeric<cln::cl_RA> c10( 3 );
+    Numeric<Rational> c8( 144 );
+    Numeric<Rational> c9( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-3 );
+    Numeric<Rational> c10( 3 );
     EXPECT_EQ( carl::div( c2, c2 ), (c2 / c2) );
     EXPECT_EQ( carl::div( c8, c2 ), (c8 / c2) );
     EXPECT_EQ( carl::div( c9, c10 ), (c9 / c10) );
     EXPECT_EQ( carl::div( c9, c3 ), (c9 / c3) );
-    Numeric<cln::cl_RA> d1( c2 );
+    Numeric<Rational> d1( c2 );
     EXPECT_EQ( carl::div( c2, c2 ), carl::div_assign( d1, c2 ) );
-    Numeric<cln::cl_RA> d2( c8 );
+    Numeric<Rational> d2( c8 );
     EXPECT_EQ( carl::div( c8, c2 ), carl::div_assign( d2, c2 ) );
-    Numeric<cln::cl_RA> d3( c9 );
+    Numeric<Rational> d3( c9 );
     EXPECT_EQ( carl::div( c9, c10 ), carl::div_assign( d3, c10 ) );
-    Numeric<cln::cl_RA> d4( c9 );
+    Numeric<Rational> d4( c9 );
     EXPECT_EQ( carl::div( c9, c3 ), carl::div_assign( d4, c3 ) );
 }
 
 TEST(Numeric, gcd)
 {
-    Numeric<cln::cl_RA> a( 2*2*3*11*17 );
-    Numeric<cln::cl_RA> b( 2*5*5*11*23 );
-    Numeric<cln::cl_RA> c( 2*11 );
-    Numeric<cln::cl_RA> d( 2*2*3*5*5*11*17*23 );
-    Numeric<cln::cl_RA> e( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-3 );
-    Numeric<cln::cl_RA> f( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-4 );
+    Numeric<Rational> a( 2*2*3*11*17 );
+    Numeric<Rational> b( 2*5*5*11*23 );
+    Numeric<Rational> c( 2*11 );
+    Numeric<Rational> d( 2*2*3*5*5*11*17*23 );
+    Numeric<Rational> e( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-3 );
+    Numeric<Rational> f( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-4 );
     EXPECT_EQ( c, carl::gcd( a, b ) );
     EXPECT_EQ( c, carl::gcd( b, a ) );
     EXPECT_EQ( c, carl::gcd( -a, b ) );
@@ -193,9 +203,9 @@ TEST(Numeric, gcd)
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( e, -d ).toRational() );
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( d, -e ).toRational() );
     
-    Numeric<cln::cl_RA> g( 997002998000 );
-    Numeric<cln::cl_RA> h( 996005994003 );
-    Numeric<cln::cl_RA> j = g * h;
-    Numeric<cln::cl_RA> i( -997002998000 );
+    Numeric<Rational> g( 997002998000 );
+    Numeric<Rational> h( 996005994003 );
+    Numeric<Rational> j = g * h;
+    Numeric<Rational> i( -997002998000 );
     EXPECT_EQ( carl::gcd( j.toRational(), i.toRational() ), carl::gcd( j, i ).toRational() );
 }
