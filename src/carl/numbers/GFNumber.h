@@ -23,6 +23,11 @@ class GFNumber
 	const GaloisField<IntegerType>* mGf;
 	
 	public:
+
+	GFNumber()
+	: mN(carl::constant_zero<IntegerType>::get()), mGf(nullptr)
+	{
+	}
 	GFNumber(IntegerType n, const GaloisField<IntegerType>* gf= nullptr)
 	: mN(gf == nullptr ? n : gf->symmetricModulo(n)), mGf(gf)
 	{
