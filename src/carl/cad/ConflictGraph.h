@@ -70,12 +70,16 @@ private:
 	 */
 	long unsigned mSamplePointVertexCount;
 	
+	/// Maps constraints to IDs used in mData
 	std::map<Constraint<Number>, std::size_t> mConstraints;
+	/// Stores for each constraints, which sample points violate the constraint
 	std::vector<boost::dynamic_bitset<>> mData;
+	/// Stores the number of samples that have been registered
 	std::size_t mSampleCount = 0;
 public:
-	
-	
+	/**
+	 * Returns the constraint ID for the given constraint.
+	 */
 	std::size_t getConstraint(const cad::Constraint<Number>& c) {
 		auto it = mConstraints.find(c);
 		if (it == mConstraints.end()) {
@@ -83,12 +87,18 @@ public:
 		}
 		return it->second;
 	}
+	/**
+	 * Returns the constraint for the given constraint ID.
+	 */
 	const cad::Constraint<Number>& getConstraint(std::size_t id) const {
 		for (const auto& it: mConstraints) {
 			if (it.second == id) return it.first;
 		}
 		assert(false);
 	}
+	/**
+	 * Registers a new sample point and returns its ID.
+	 */
 	std::size_t newSample() {
 		return mSampleCount++;
 	}
@@ -101,6 +111,9 @@ public:
 		}
 		mData[constraint][sample] = value;
 	}
+	/**
+	 * Retrieves the constraint that covers the most samples.
+	 */
 	std::size_t getMaxDegreeConstraint() const {
 		assert(mData.size() > 0);
 		std::size_t maxID = 0;
@@ -114,19 +127,28 @@ public:
 		}
 		return maxID;
 	}
+	/**
+	 * Removes the given constraint and disable all sample points covered by this constraint.
+	 */
 	void selectConstraint(std::size_t id) {
 		assert(mData.size() > id);
+		// Store all samples point IDs
 		std::vector<std::size_t> queue;
 		queue.reserve(mData[id].count());
 		for (std::size_t i = mData[id].find_first(); i != boost::dynamic_bitset<>::npos; i = mData[id].find_next(i)) {
 			assert(mData[id][i]);
 			queue.push_back(i);
 		}
+		// Remove this constraint
 		mData[id].clear();
+		// Disable sample points for other constraints
 		for (auto& d: mData) {
 			for (std::size_t i: queue) d[i] = false;
 		}
 	}
+	/**
+	 * Checks if there are samples still uncovered.
+	 */
 	bool hasRemainingSamples() const {
 		for (const auto& d: mData) {
 			if (!d.none()) return true;
