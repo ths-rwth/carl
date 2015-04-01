@@ -4,12 +4,18 @@
 #include "../../carl/formula/Formula.h"
 #include "../../carl/util/stringparser.h"
 
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
-
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
-typedef cln::cl_RA Rational;
 typedef MultivariatePolynomial<Rational> Pol;
 typedef Constraint<Pol> Constr;
 

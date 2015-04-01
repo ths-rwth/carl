@@ -39,6 +39,7 @@ public:
 	rational operator()(const rational& n) {
 		return n;
 	}
+    #ifdef USE_CLN_NUMBERS
 	rational operator()(const cln::cl_RA& n) {
 		std::stringstream ss1;
 		ss1 << carl::getDenom(n);
@@ -50,6 +51,7 @@ public:
 		mpzm.set(num, ss2.str().c_str());
 		return rational(num / denom);
 	}
+    #endif
 	rational operator()(const mpq_class& n) {
 		std::stringstream ss1;
 		ss1 << n.get_den();

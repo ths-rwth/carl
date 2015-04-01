@@ -1,24 +1,33 @@
-#include <gmpxx.h>
 #include "gtest/gtest.h"
 #include "carl/io/CodeWriter.h"
 #include "carl/core/MultivariatePolynomial.h"
 
 #include <fstream>
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 using namespace carl;
 
 TEST(CodeWriter, Basic)
 {
 		
-    carl::GeneratorWriter<carl::MultivariatePolynomial<cln::cl_RA>, carl::MultivariatePolynomial<cln::cl_RA>> gw("TestAdditionGenerator");
+    carl::GeneratorWriter<carl::MultivariatePolynomial<Rational>, carl::MultivariatePolynomial<Rational>> gw("TestAdditionGenerator");
 	
 	carl::Variable x(1);
 	carl::Variable y(2);
 	carl::Variable z(3);
 	
-	carl::MultivariatePolynomial<cln::cl_RA> p1({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
-	carl::MultivariatePolynomial<cln::cl_RA> p2({(cln::cl_RA)1*x, (cln::cl_RA)-1*y*z, (cln::cl_RA)3*x*z*z});
-	carl::MultivariatePolynomial<cln::cl_RA> p3({(cln::cl_RA)1*z, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*y*x*x});
+	carl::MultivariatePolynomial<Rational> p1({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
+	carl::MultivariatePolynomial<Rational> p2({(Rational)1*x, (Rational)-1*y*z, (Rational)3*x*z*z});
+	carl::MultivariatePolynomial<Rational> p3({(Rational)1*z, (Rational)-1*x*x, (Rational)3*y*x*x});
 	
 	
 	gw.addCall(p1*p2, p2*p3);

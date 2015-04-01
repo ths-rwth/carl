@@ -41,6 +41,7 @@ inline bool Conversion::convert<bool,std::vector<bool>::reference>(const std::ve
 	return b;
 }
 
+#ifdef USE_CLN_NUMBERS
 template<>
 inline CMP<mpq_class> Conversion::convert<CMP<mpq_class>, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& p, const CIPtr& ci) {
 	CMP<mpq_class> res;
@@ -58,6 +59,7 @@ inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const C
 	}
 	return res;
 }
+#endif
 #endif
 #ifdef COMPARE_WITH_GINAC
 template<>
@@ -78,20 +80,22 @@ inline GMP Conversion::convert<GMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m,
 }
 #endif
 #ifdef COMPARE_WITH_Z3
+#ifdef USE_CLN_NUMBERS
 template<>
 ZMP Conversion::convert<ZMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
+template<>
+ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
+	return ci->z3(m);
+}
+#endif
 template<>
 ZMP Conversion::convert<ZMP, CMP<mpq_class>>(const CMP<mpq_class>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
 template<>
 ZMP Conversion::convert<ZMP, CMP<rational>>(const CMP<rational>& m, const CIPtr& ci) {
-	return ci->z3(m);
-}
-template<>
-ZMP Conversion::convert<ZMP, CUMP<cln::cl_RA>>(const CUMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->z3(m);
 }
 #ifdef USE_Z3_NUMBERS

@@ -1,19 +1,29 @@
 #include "gtest/gtest.h"
-
+#include "carl/numbers/numbers.h"
 #include "carl/core/Variable.h"
 #include "carl/util/parser/Parser.h"
+
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
 TEST(Parser, Polynomial)
 {
-	carl::parser::Parser<MultivariatePolynomial<cln::cl_RA>> parser;
+	carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
 	carl::Variable x = freshRealVariable("x");
 	carl::Variable y = freshRealVariable("y");
 	parser.addVariable(x);
 	parser.addVariable(y);
 	
-	EXPECT_EQ(cln::cl_RA(1), parser.polynomial("1"));
+	EXPECT_EQ(Rational(1), parser.polynomial("1"));
 	EXPECT_EQ(x, parser.polynomial("x"));
 	EXPECT_EQ(x*y, parser.polynomial("x*y"));
 	EXPECT_EQ(x*x, parser.polynomial("x*x"));
@@ -23,8 +33,8 @@ TEST(Parser, Polynomial)
 TEST(Parser, Formula)
 {
     using carl::VariableType;
-    typedef Formula<MultivariatePolynomial<cln::cl_RA>> FT;
-    carl::parser::Parser<MultivariatePolynomial<cln::cl_RA>> parser;
+    typedef Formula<MultivariatePolynomial<Rational>> FT;
+    carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
     carl::Variable b1 = freshBooleanVariable("O4853");
     carl::Variable b2 = freshBooleanVariable("O3838");
     carl::Variable b3 = freshBooleanVariable("O4848");

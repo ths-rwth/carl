@@ -15,12 +15,20 @@ CLANG_WARNING_RESET
 #include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
+
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
 #include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
-typedef Interval<cln::cl_RA> clRA_Interval;
+typedef Interval<Rational> clRA_Interval;
 
 TEST(clRA_Interval, Constructor)
 {
@@ -102,7 +110,7 @@ TEST(clRA_Interval, Getters)
     
     test2 = clRA_Interval();
     clRA_Interval::BoostInterval bi(0, 1);
-    bi = boost::numeric::widen(bi, cln::cl_RA(-3)); // create an invalid interval by this hack
+    bi = boost::numeric::widen(bi, Rational(-3)); // create an invalid interval by this hack
     test2.set(bi);
     EXPECT_EQ(0, test2.lower());
     EXPECT_EQ(0, test2.upper());
@@ -1022,9 +1030,9 @@ TEST(clRA_Interval, Properties)
     EXPECT_EQ(8, i4.diameter());
     
     // Diameter ratio
-    EXPECT_EQ("+1/2", i1.diameterRatio(i2));
+    EXPECT_EQ((Rational)1/(Rational)2, i1.diameterRatio(i2));
     EXPECT_EQ(2, i2.diameterRatio(i1));
-    EXPECT_EQ("+1/2", i3.diameterRatio(i2));
+    EXPECT_EQ((Rational)1/(Rational)2, i3.diameterRatio(i2));
     EXPECT_EQ(2, i4.diameterRatio(i1));
     
     // Magnitude
@@ -1052,35 +1060,35 @@ TEST(clRA_Interval, Contains)
     clRA_Interval i8(3, BoundType::WEAK, 3, BoundType::INFTY);
     
     // Contains number
-    EXPECT_TRUE(i1.contains(cln::cl_RA(4)));
-    EXPECT_FALSE(i1.contains(cln::cl_RA(2)));
-    EXPECT_FALSE(i1.contains(cln::cl_RA(12)));
-    EXPECT_FALSE(i1.contains(cln::cl_RA(3)));
-    EXPECT_FALSE(i1.contains(cln::cl_RA(7)));
+    EXPECT_TRUE(i1.contains(Rational(4)));
+    EXPECT_FALSE(i1.contains(Rational(2)));
+    EXPECT_FALSE(i1.contains(Rational(12)));
+    EXPECT_FALSE(i1.contains(Rational(3)));
+    EXPECT_FALSE(i1.contains(Rational(7)));
     
-    EXPECT_TRUE(i2.contains(cln::cl_RA(-1)));
-    EXPECT_FALSE(i2.contains(cln::cl_RA(-13)));
-    EXPECT_FALSE(i2.contains(cln::cl_RA(6)));
-    EXPECT_FALSE(i2.contains(cln::cl_RA(-5)));
-    EXPECT_TRUE(i2.contains(cln::cl_RA(3)));
+    EXPECT_TRUE(i2.contains(Rational(-1)));
+    EXPECT_FALSE(i2.contains(Rational(-13)));
+    EXPECT_FALSE(i2.contains(Rational(6)));
+    EXPECT_FALSE(i2.contains(Rational(-5)));
+    EXPECT_TRUE(i2.contains(Rational(3)));
     
-    EXPECT_TRUE(i3.contains(cln::cl_RA(4)));
-    EXPECT_FALSE(i3.contains(cln::cl_RA(2)));
-    EXPECT_FALSE(i3.contains(cln::cl_RA(12)));
-    EXPECT_TRUE(i3.contains(cln::cl_RA(3)));
-    EXPECT_FALSE(i3.contains(cln::cl_RA(7)));
+    EXPECT_TRUE(i3.contains(Rational(4)));
+    EXPECT_FALSE(i3.contains(Rational(2)));
+    EXPECT_FALSE(i3.contains(Rational(12)));
+    EXPECT_TRUE(i3.contains(Rational(3)));
+    EXPECT_FALSE(i3.contains(Rational(7)));
     
-    EXPECT_TRUE(i4.contains(cln::cl_RA(-1)));
-    EXPECT_FALSE(i4.contains(cln::cl_RA(-13)));
-    EXPECT_FALSE(i4.contains(cln::cl_RA(6)));
-    EXPECT_TRUE(i4.contains(cln::cl_RA(-5)));
-    EXPECT_TRUE(i4.contains(cln::cl_RA(3)));
+    EXPECT_TRUE(i4.contains(Rational(-1)));
+    EXPECT_FALSE(i4.contains(Rational(-13)));
+    EXPECT_FALSE(i4.contains(Rational(6)));
+    EXPECT_TRUE(i4.contains(Rational(-5)));
+    EXPECT_TRUE(i4.contains(Rational(3)));
     
-    EXPECT_FALSE(i8.contains(cln::cl_RA(1)));
-    EXPECT_TRUE(i8.contains(cln::cl_RA(3)));
-    EXPECT_TRUE(i8.contains(cln::cl_RA(4)));
-    EXPECT_TRUE(i8.contains(cln::cl_RA(100)));
-    EXPECT_FALSE(i8.contains(cln::cl_RA(-2)));
+    EXPECT_FALSE(i8.contains(Rational(1)));
+    EXPECT_TRUE(i8.contains(Rational(3)));
+    EXPECT_TRUE(i8.contains(Rational(4)));
+    EXPECT_TRUE(i8.contains(Rational(100)));
+    EXPECT_FALSE(i8.contains(Rational(-2)));
     
     // Contains interval
     EXPECT_FALSE(i1.contains(i2));

@@ -131,7 +131,9 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	std::vector<Number> res;
 	res.reserve(roots.size() + 3);
 	
+    #ifdef USE_CLN_NUMBERS
 	try {
+    #endif
 		res.push_back(interval.lower());
 		if (roots.size() == 1) {
 			Number tmp = carl::floor(roots[0]);
@@ -156,10 +158,12 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 		}
 		res.push_back(interval.upper());
 	///@todo Add carl::floating_point_exception and use this here.
+    #ifdef USE_CLN_NUMBERS
 	} catch (cln::floating_point_exception) {
 		finder.addQueue(interval, SplittingStrategy::BINARYSAMPLE);
 		return;
 	}
+    #endif
 
 	assert(res[0] <= res[1]);
 	if (res[0] < res[1]) {

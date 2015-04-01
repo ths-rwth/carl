@@ -291,11 +291,6 @@ namespace carl {
 	};
 }
 
-
-typedef cln::cl_RA Coeff;
-
-
-
 TEST_F(BenchmarkTest, ReleaseCheck)
 {
 #ifndef NDEBUG
@@ -305,6 +300,9 @@ TEST_F(BenchmarkTest, ReleaseCheck)
 	std::cout << "Warning: You have compiled with LOGGING enabled." << std::endl;
 #endif
 }
+
+#ifdef USE_CLN_NUMBERS
+typedef cln::cl_RA Coeff;
 
 TEST_F(BenchmarkTest, Addition)
 {
@@ -454,6 +452,7 @@ TEST_F(BenchmarkTest, Compare)
 		file.push(bench.result(), bi.degree);
 	}
 }
+#endif
 
 TEST(Benchmark, BuildPDF)
 {
