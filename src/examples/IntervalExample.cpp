@@ -12,32 +12,40 @@
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
-#include <gmpxx.h>
+
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 int main (int argc, char** argv)
 {
 	carl::Interval<double> doubleInterval(2.0);
 	carl::Interval<double> result;
 	
-	mpq_class a = 2;
-	mpq_class b = 4;
-	mpq_class c = 6;
-	mpq_class d = 3;
+	Rational a = 2;
+	Rational b = 4;
+	Rational c = 6;
+	Rational d = 3;
 	
-	cln::cl_RA e = 2;
-	cln::cl_RA f = 4;
-	cln::cl_RA g = 6;
-	cln::cl_RA h = 3;
+	Rational e = 2;
+	Rational f = 4;
+	Rational g = 6;
+	Rational h = 3;
 	
-	carl::Interval<mpq_class> mpqInterval( a/b, carl::BoundType::WEAK, c/d, carl::BoundType::STRICT );
-	carl::Interval<cln::cl_RA> clnInterval( e/f, carl::BoundType::WEAK, g/h, carl::BoundType::STRICT );
+	carl::Interval<Rational> mpqInterval( a/b, carl::BoundType::WEAK, c/d, carl::BoundType::STRICT );
+	carl::Interval<Rational> clnInterval( e/f, carl::BoundType::WEAK, g/h, carl::BoundType::STRICT );
 	
 	double mag = doubleInterval.magnitude();
 	
-	mpq_class magMpq = mpqInterval.magnitude();
+	Rational magMpq = mpqInterval.magnitude();
 	
-	cln::cl_RA magCln = clnInterval.magnitude();
+	Rational magCln = clnInterval.magnitude();
 	
 	std::cout << "Magnitudes: " << mag << " MPQ: " << mpqInterval << " -> "<< magMpq << " CLN:" << clnInterval << " -> " << magCln << std::endl;
 #ifdef USE_MPFR_FLOAT

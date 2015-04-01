@@ -9,6 +9,16 @@
 
 using namespace carl;
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 TEST(EliminationSet, BasicOperations)
 {
 	///@todo reformulate test case such that the polynomials are all consistent with x as main variable.
@@ -17,21 +27,21 @@ TEST(EliminationSet, BasicOperations)
 	Variable x = vpool.getFreshVariable();
 	Variable y = vpool.getFreshVariable();
 	Variable z = vpool.getFreshVariable();
-	cad::PolynomialOwner<cln::cl_RA> owner;
+	cad::PolynomialOwner<Rational> owner;
 
-	cad::EliminationSet<cln::cl_RA> s(&owner);
+	cad::EliminationSet<Rational> s(&owner);
 	
-	cad::MPolynomial<cln::cl_RA> mpz({z});
-	cad::MPolynomial<cln::cl_RA> mpxz2({(cln::cl_RA)-1*x*z});
-	cad::MPolynomial<cln::cl_RA> mpxz({(cln::cl_RA)-1*x*z, Term<cln::cl_RA>(2)});
-	cad::MPolynomial<cln::cl_RA> mpzero;
-	cad::MPolynomial<cln::cl_RA> mpone({1});
+	cad::MPolynomial<Rational> mpz({z});
+	cad::MPolynomial<Rational> mpxz2({(Rational)-1*x*z});
+	cad::MPolynomial<Rational> mpxz({(Rational)-1*x*z, Term<Rational>(2)});
+	cad::MPolynomial<Rational> mpzero;
+	cad::MPolynomial<Rational> mpone({1});
 
-	cad::UPolynomial<cln::cl_RA>* one = new cad::UPolynomial<cln::cl_RA>(x, mpone);
-	cad::UPolynomial<cln::cl_RA>* p = new cad::UPolynomial<cln::cl_RA>(x, {(cln::cl_RA)-2*mpone,mpzero,mpone});
-	cad::UPolynomial<cln::cl_RA>* q = new cad::UPolynomial<cln::cl_RA>(x, (cln::cl_RA)-3*mpone + mpone*y*y*y);
-	cad::UPolynomial<cln::cl_RA>* r = new cad::UPolynomial<cln::cl_RA>(x, mpz + mpxz2*y*y);
-	cad::UPolynomial<cln::cl_RA>* w = new cad::UPolynomial<cln::cl_RA>(x, mpz + mpxz*y*y);
+	cad::UPolynomial<Rational>* one = new cad::UPolynomial<Rational>(x, mpone);
+	cad::UPolynomial<Rational>* p = new cad::UPolynomial<Rational>(x, {(Rational)-2*mpone,mpzero,mpone});
+	cad::UPolynomial<Rational>* q = new cad::UPolynomial<Rational>(x, (Rational)-3*mpone + mpone*y*y*y);
+	cad::UPolynomial<Rational>* r = new cad::UPolynomial<Rational>(x, mpz + mpxz2*y*y);
+	cad::UPolynomial<Rational>* w = new cad::UPolynomial<Rational>(x, mpz + mpxz*y*y);
 	
 	s.insert(p);
 	s.insert(q, {one, p});
@@ -56,13 +66,13 @@ TEST(EliminationSet, SetProperty)
 {
 	VariablePool& vpool = VariablePool::getInstance();
 	Variable x = vpool.getFreshVariable();
-	cad::PolynomialOwner<cln::cl_RA> owner;
-	cad::EliminationSet<cln::cl_RA> s(&owner);
+	cad::PolynomialOwner<Rational> owner;
+	cad::EliminationSet<Rational> s(&owner);
 	
-	cad::MPolynomial<cln::cl_RA> mpone({1});
+	cad::MPolynomial<Rational> mpone({1});
 	
 	for (unsigned int i = 0; i < 10; i++) {
-		cad::UPolynomial<cln::cl_RA>* p = new cad::UPolynomial<cln::cl_RA>(x, {mpone, mpone, mpone});
+		cad::UPolynomial<Rational>* p = new cad::UPolynomial<Rational>(x, {mpone, mpone, mpone});
 		s.insert(p);
 	}
 	EXPECT_EQ((unsigned)1, s.size());

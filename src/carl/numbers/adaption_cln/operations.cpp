@@ -1,6 +1,7 @@
 #include "../numbers.h"
 #include <limits>
 
+#ifdef USE_CLN_NUMBERS
 namespace carl
 {
     template<>
@@ -189,3 +190,4 @@ namespace carl
         return s.str();
     }
 }
+#endif

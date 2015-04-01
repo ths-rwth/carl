@@ -4,6 +4,16 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/numbers/numbers.h"
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 int main() {
 	carl::VariablePool& pool = carl::VariablePool::getInstance();
 	carl::Variable x = pool.getFreshVariable();
@@ -15,6 +25,6 @@ int main() {
 	 * a carl::Monomial and a coefficient.
      */
 	
-	carl::MultivariatePolynomial<cln::cl_RA> p(x*y);
+	carl::MultivariatePolynomial<Rational> p(x*y);
 	std::cout << p << std::endl;
 }

@@ -5,6 +5,8 @@
 
 using namespace carl;
 
+typedef mpq_class Rational;
+
 TEST(MultivariateGCD, test1)
 {
     VariablePool& vpool = VariablePool::getInstance();
@@ -14,16 +16,16 @@ TEST(MultivariateGCD, test1)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    typedef MultivariatePolynomial<cln::cl_RA> P;
-    P f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x*y});
-    P g1({(cln::cl_RA)1*x*x*x*x*y, (cln::cl_RA)3*x*y*y});
+    typedef MultivariatePolynomial<Rational> P;
+    P f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x*y});
+    P g1({(Rational)1*x*x*x*x*y, (Rational)3*x*y*y});
 
-    MultivariateGCD<PrimitiveEuclidean, cln::cl_RA> gcd(f1,g1);
+    MultivariateGCD<PrimitiveEuclidean, Rational> gcd(f1,g1);
     std::cout << gcd.calculate() << std::endl;
 
-    P fxy({(cln::cl_RA)1*x*y});
-    P fz({(cln::cl_RA)1*z});
-    MultivariateGCD<PrimitiveEuclidean, cln::cl_RA> gcd2(fxy, fz);
+    P fxy({(Rational)1*x*y});
+    P fz({(Rational)1*z});
+    MultivariateGCD<PrimitiveEuclidean, Rational> gcd2(fxy, fz);
     std::cout << gcd2.calculate() << std::endl;
 
 //    UnivariatePolynomial<mpz_class> A1(x, {(mpz_class)1, (mpz_class)1, (mpz_class)0, (mpz_class)1});

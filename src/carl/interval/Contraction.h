@@ -131,6 +131,6 @@ namespace carl {
         }
     };
 
-    typedef Contraction<SimpleNewton, MultivariatePolynomial<cln::cl_RA>> SimpleNewtonContraction;
+    typedef Contraction<SimpleNewton, Polynomial> SimpleNewtonContraction;
 
 }

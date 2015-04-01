@@ -2,13 +2,11 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/util/stringparser.h"
-
-#include <cln/cln.h>
-
+#include <gmpxx.h>
 
 using namespace carl;
 
-typedef cln::cl_RA Rational;
+typedef mpq_class Rational;
 typedef MultivariatePolynomial<Rational> Pol;
 typedef FactorizedPolynomial<Pol> FPol;
 typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
@@ -120,10 +118,10 @@ TEST(FactorizedPolynomial, Construction)
     Pol f7 = f6 - c1;
     
     std::shared_ptr<CachePol> pCache( new CachePol );
-    FPol fc1( (cln::cl_RA) 1 );
-    FPol fc2( (cln::cl_RA) 42 );
-    FPol fc3( (cln::cl_RA) -2 );
-    FPol fc4( (cln::cl_RA) 0 );
+    FPol fc1( (Rational) 1 );
+    FPol fc2( (Rational) 42 );
+    FPol fc3( (Rational) -2 );
+    FPol fc4( (Rational) 0 );
     FPol fpx( fx, pCache );
     FPol fpA( fA, pCache );
     FPol fpB( fB, pCache );

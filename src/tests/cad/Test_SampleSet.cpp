@@ -1,22 +1,31 @@
 #include "gtest/gtest.h"
 
 #include <list>
-#include <cln/cln.h>
 
 #include "../../carl/core/RealAlgebraicNumber.h"
 #include "carl/cad/SampleSet.h"
 
 using namespace carl;
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 TEST(SampleSet, BasicOperations)
 {  
-	cad::SampleSet<cln::cl_RA> s;
+	cad::SampleSet<Rational> s;
 
-	auto pos = s.insert(RealAlgebraicNumberNR<cln::cl_RA>::create(0));
+	auto pos = s.insert(RealAlgebraicNumberNR<Rational>::create(0));
 
-	std::list<RealAlgebraicNumberPtr<cln::cl_RA>> nums;
-	nums.push_back(RealAlgebraicNumberNR<cln::cl_RA>::create(1));
-	nums.push_back(RealAlgebraicNumberNR<cln::cl_RA>::create(2));
+	std::list<RealAlgebraicNumberPtr<Rational>> nums;
+	nums.push_back(RealAlgebraicNumberNR<Rational>::create(1));
+	nums.push_back(RealAlgebraicNumberNR<Rational>::create(2));
 	s.insert(nums.begin(), nums.end());
 
 	ASSERT_NO_THROW(s.remove(std::get<0>(pos)));
