@@ -26,8 +26,13 @@ public:
 		data.emplace_back(std::make_tuple(identifier...), res);
 		for (const auto& it: res) names[it.first] = true;
 	}
+	void writeMain(std::ostream& os, const std::string& benchmark) {
+		os << "\\input{benchmark_" << benchmark << "_table.tex" << "}" << std::endl;
+		os << "\\input{benchmark_" << benchmark << "_plot.tex" << "}" << std::endl;
+		os << "\\newpage" << std::endl;
+	}
 	void writePlotData(std::ostream& os, const std::string& benchmark) {
-		os << "\\begin{filecontents}{benchmarks/plot_" << benchmark << ".data}" << std::endl;
+		os << "\\begin{filecontents}{benchmark_" << benchmark << ".data}" << std::endl;
 		os << "# degree";
 		for (const auto& name: names) {
 			if (name.second) os << "\t" << name.first;
@@ -48,18 +53,18 @@ public:
 		os << "\\end{filecontents}" << std::endl;
 	}
 	void writePlot(std::ostream& os, const std::string& benchmark) {
-		os << "%\\begin{tikzpicture}[scale=0.5]" << std::endl;
+		os << "\\begin{tikzpicture}[scale=0.5]" << std::endl;
 		os << "\\begin{axis}[grid=major, ymin=0, legend pos=north west, xtick=data, y tick label style={/pgf/number format/.cd, fixed, precision=2, /tikz/.cd}]" << std::endl;
 		unsigned row = 1;
 		for (const auto& name: names) {
 			if (name.second) {
-				os << "\\addplot[mark=" << tikzMarks[row-1] << ", " << tikzColors[row-1] << "] table[x index=0,y index=" << row << "] {benchmarks/plot_" << benchmark << ".data};" << std::endl;
+				os << "\\addplot[mark=" << tikzMarks[row-1] << ", " << tikzColors[row-1] << "] table[x index=0,y index=" << row << "] {benchmark_" << benchmark << ".data};" << std::endl;
 				os << "\\addlegendentry{" << name.first << "}" << std::endl;
 				row++;
 			}
 		}
 		os << "\\end{axis}" << std::endl;
-		os << "%\\end{tikzpicture}" << std::endl;
+		os << "\\end{tikzpicture}" << std::endl;
 	}
 	void writeTable(std::ostream& os) {
 		os << "\\begin{tabular}{|r";
