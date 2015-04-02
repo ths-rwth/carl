@@ -24,11 +24,14 @@ namespace carl
 		assert( _sort.id() < mSorts.size() );
 		const SortContent& sc = *mSorts[_sort.id()];
 		if (sc.indices != nullptr) _out << "(_ ";
-		if (sc.parameters != nullptr) _out << "(";
-		_out << getName(_sort);
-		if (sc.parameters != nullptr) {
-			for (const Sort& s: *sc.parameters) _out << " " << s;
-			_out << ")";
+		if (sc.interpreted) _out << getName(_sort);
+		else {
+			if (sc.parameters != nullptr) _out << "(";
+			_out << getName(_sort);
+			if (sc.parameters != nullptr) {
+				for (const Sort& s: *sc.parameters) _out << " " << s;
+				_out << ")";
+			}
 		}
 		if (sc.indices != nullptr) {
 			for (std::size_t i: *sc.indices) _out << " " << i;
@@ -51,7 +54,7 @@ namespace carl
 		return getSort(new SortContent( sc.name, std::move( v ) ));
 	}
 	
-	bool SortManager::declare( const string& _name, unsigned _arity )
+	bool SortManager::declare( const string& _name, std::size_t _arity )
 	{
 		if (mDeclarations.count(_name) > 0) return false;
 		mDeclarations[_name] = _arity;
