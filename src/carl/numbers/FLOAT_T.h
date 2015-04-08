@@ -17,9 +17,11 @@
 #include <math.h>
 #include <cmath>
 #ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
+	#include <cln/cln.h>
+#elif defined(__VS)
+	#include <mpirxx.h>
 #else
-#include <gmpxx.h>
+	#include <gmpxx.h>
 #endif
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
