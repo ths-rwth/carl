@@ -109,6 +109,7 @@ public:
 	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
+    explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
 	virtual ~MultivariatePolynomial() {}
