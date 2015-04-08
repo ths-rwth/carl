@@ -9,8 +9,11 @@
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
 
-cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
-
+if (WIN32)
+	cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
+else()
+	cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
+endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
@@ -107,6 +110,8 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	endif()
 	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} -O3")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} -O1")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	message("-- Using Visual Studio C++")
 else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
@@ -124,9 +129,12 @@ message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
 set(DYNAMIC_EXT "so")
 set(STATIC_EXT "a")
-if(APPLE)
+if (APPLE)
 	set(DYNAMIC_EXT "dylib")
 	set(STATIC_EXT "a")
+elseif (WIN32)
+	set(DYNAMIC_EXT "dll")
+	set(STATIC_EXT "lib")
 endif()
 message("-- Assuming extension for shared libraries: .${DYNAMIC_EXT}")
 message("-- Assuming extension for static libraries: .${STATIC_EXT}")
