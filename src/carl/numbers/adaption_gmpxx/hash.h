@@ -9,7 +9,11 @@
 #pragma once
 #include <functional>
 #include <cstddef>
-#include <gmpxx.h>
+#ifdef __VS
+	#include <mpirxx.h>
+#else
+	#include <gmpxx.h>
+#endif
 
 namespace std
 {
