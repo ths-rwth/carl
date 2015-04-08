@@ -1,5 +1,6 @@
 # Add test cpp file
 add_executable(runCoreTests
+        Test_DiophantineEquation.cpp
 	Test_OperatorConcepts.cpp
         Test_Variable.cpp
         Test_VariablePool.cpp
@@ -15,6 +16,7 @@ add_executable(runCoreTests
         Test_Sign.cpp
         Test_FactorizedPolynomial.cpp
 	Test_RationalFunction.cpp
+        Test_TaylorExpansion.cpp
         #Test_Constraint.cpp
 )
 cotire(runCoreTests)

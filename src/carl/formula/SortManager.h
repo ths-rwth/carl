@@ -142,7 +142,7 @@ class SortManager : public Singleton<SortManager>
 		/// Maps the unique ids to the sort content.
 		std::vector<const SortContent*> mSorts;
 		/// Stores all sort declarations invoked by a declare-sort.
-		std::map<std::string, unsigned> mDeclarations;
+		std::map<std::string, std::size_t> mDeclarations;
 		/// Stores all sort definitions invoked by a define-sort.
 		std::map<std::string, SortTemplate> mDefinitions;
 		/// Stores all interpreted sorts.
@@ -203,7 +203,7 @@ class SortManager : public Singleton<SortManager>
 		 * @return true, if the given sort declaration has not been added before;
 		 *		 false, otherwise.
 		 */
-		bool declare( const std::string& _name, unsigned _arity );
+		bool declare( const std::string& _name, std::size_t _arity );
 
 		/**
 		 * Adds a sort template definitions.

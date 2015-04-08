@@ -142,6 +142,9 @@ namespace carl
                 return "";
         }
     }
+    inline std::ostream& operator<<(std::ostream& os, FormulaType t) {
+        return os << formulaTypeToString(t);
+    }
     
     template<typename Pol>
     class FormulaContent
