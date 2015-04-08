@@ -1,12 +1,21 @@
 #include "gtest/gtest.h"
 
-#include <cln/cln.h>
 #include "carl/core/rootfinder/RootFinder.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/RealAlgebraicNumber.h"
 
-typedef carl::UnivariatePolynomial<cln::cl_RA> UPolynomial;
-typedef carl::MultivariatePolynomial<cln::cl_RA> MPolynomial;
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
+typedef carl::UnivariatePolynomial<Rational> UPolynomial;
+typedef carl::MultivariatePolynomial<Rational> MPolynomial;
 typedef carl::UnivariatePolynomial<MPolynomial> UMPolynomial;
 
 template<typename Number>
@@ -26,34 +35,34 @@ TEST(RootFinder, realRoots)
 	carl::Variable y = vpool.getFreshVariable();
 
 	{
-		UPolynomial p(x, {(cln::cl_RA)-1, (cln::cl_RA)0, (cln::cl_RA)0, (cln::cl_RA)1});
+		UPolynomial p(x, {(Rational)-1, (Rational)0, (Rational)0, (Rational)1});
 		auto roots = carl::rootfinder::realRoots(p);
 		ASSERT_TRUE(roots.size() == 1);
-		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)1));
+		ASSERT_TRUE(represents(roots.front(), (Rational)1));
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(0), MPolynomial(1)});
 		auto roots = carl::rootfinder::realRoots(p);
 		ASSERT_TRUE(roots.size() == 1);
-		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)1));
+		ASSERT_TRUE(represents(roots.front(), (Rational)1));
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(1)});
 		auto roots = carl::rootfinder::realRoots(p);
 		ASSERT_TRUE(roots.size() == 2);
-		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)-1));
-		ASSERT_TRUE(represents(roots.back(), (cln::cl_RA)1));
+		ASSERT_TRUE(represents(roots.front(), (Rational)-1));
+		ASSERT_TRUE(represents(roots.back(), (Rational)1));
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(y), MPolynomial(0), MPolynomial(1)});
-		std::map<carl::Variable, carl::RealAlgebraicNumberPtr<cln::cl_RA>> m;
-		m[y] = carl::RealAlgebraicNumberNR<cln::cl_RA>::create(-1);
+		std::map<carl::Variable, carl::RealAlgebraicNumberPtr<Rational>> m;
+		m[y] = carl::RealAlgebraicNumberNR<Rational>::create(-1);
 		auto roots = carl::rootfinder::realRoots(p, m);
 		ASSERT_TRUE(roots.size() == 2);
-		ASSERT_TRUE(represents(roots.front(), (cln::cl_RA)-1));
-		ASSERT_TRUE(represents(roots.back(), (cln::cl_RA)1));
+		ASSERT_TRUE(represents(roots.front(), (Rational)-1));
+		ASSERT_TRUE(represents(roots.back(), (Rational)1));
 	}
 }

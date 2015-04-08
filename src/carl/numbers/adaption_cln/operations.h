@@ -7,7 +7,6 @@
  * @warning This file should never be included directly but only via operations.h
  * 
  */
-
 #pragma once
 #include "../../util/platform.h"
 #include <cassert>
@@ -332,6 +331,12 @@ inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b) {
 inline cln::cl_I& gcd_assign(cln::cl_I& a, const cln::cl_I& b) {
     a = cln::gcd(a,b);
 	return a;
+}
+
+inline void divide(const cln::cl_I& dividend, const cln::cl_I& divisor, cln::cl_I& quotient, cln::cl_I& remainder) {
+	cln::cl_I_div_t res = cln::floor2(dividend, divisor);
+    quotient = res.quotient;
+    remainder = res.remainder;
 }
 
 /**

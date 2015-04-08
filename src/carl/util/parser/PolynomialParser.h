@@ -6,7 +6,9 @@
 #pragma once
 
 #include "Common.h"
+#include "carl/numbers/numbers.h"
 
+#ifdef USE_CLN_NUMBERS
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, cln::cl_RA& r) {
         if (exp >= 0)
@@ -18,6 +20,19 @@ namespace boost { namespace spirit { namespace traits {
         return value == 1;
     }
 }}}
+#else
+namespace boost { namespace spirit { namespace traits {
+    template<> inline void scale(int exp, mpq_class& r) {
+        if (exp >= 0)
+            r *= carl::pow(mpq_class(10), (unsigned)exp);
+        else
+            r /= carl::pow(mpq_class(10), (unsigned)(-exp));
+    }
+    template<> inline bool is_equal_to_one(const mpq_class& value) {
+        return value == 1;
+    }
+}}}
+#endif
 
 namespace carl {
 namespace parser {

@@ -125,6 +125,7 @@ namespace carl
         return result;
     }
     
+    #ifdef USE_CLN_NUMBERS
     template<>
     mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n) {
         typedef signed long int IntType;
@@ -142,6 +143,7 @@ namespace carl
         mpq_class result = rationalize<mpq_class>(s.str());
         return result;
     }
+    #endif
 
     std::string toString(const mpq_class& _number, bool _infix)
     {

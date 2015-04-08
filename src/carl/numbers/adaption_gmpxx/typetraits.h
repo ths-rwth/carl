@@ -13,7 +13,9 @@
 #include <cstddef>
 CLANG_WARNING_DISABLE("-Wmismatched-tags")
 CLANG_WARNING_DISABLE("-Wsign-conversion")
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+#endif
 #include <gmpxx.h>
 CLANG_WARNING_RESET
 

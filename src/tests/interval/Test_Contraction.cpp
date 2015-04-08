@@ -2,14 +2,23 @@
 #include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <cln/cln.h>
 #include "carl/interval/IntervalEvaluation.h"
 #include "carl/interval/Contraction.h"
+
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
 template<template<typename> class Operator>
-using PolynomialContraction = Contraction<Operator, MultivariatePolynomial<cln::cl_RA>>;
+using PolynomialContraction = Contraction<Operator, MultivariatePolynomial<Rational>>;
 
 TEST(Contraction, SimpleNewton)
 {
@@ -34,13 +43,13 @@ TEST(Contraction, SimpleNewton)
     map[c] = ic;
     map[d] = id;
 
-    MultivariatePolynomial<cln::cl_RA> e1({(cln::cl_RA)1*a,(cln::cl_RA)1*b,(cln::cl_RA)1*c,(cln::cl_RA)1*d});
-    MultivariatePolynomial<cln::cl_RA> e2({(cln::cl_RA)1*a*b,(cln::cl_RA)1*c*d});
-    MultivariatePolynomial<cln::cl_RA> e3({(cln::cl_RA)1*a*b*c,(cln::cl_RA)1*d});
-    MultivariatePolynomial<cln::cl_RA> e4({(cln::cl_RA)1*a,(cln::cl_RA)1*b,(cln::cl_RA)-1*c,(cln::cl_RA)-1*d});
-    MultivariatePolynomial<cln::cl_RA> e5({(cln::cl_RA)1*a,(cln::cl_RA)1*b,Term<cln::cl_RA>(7)});
-    MultivariatePolynomial<cln::cl_RA> e6({(cln::cl_RA)12*a,(cln::cl_RA)3*b, (cln::cl_RA)1*c*c,(cln::cl_RA)-1*d*d*d});
-    MultivariatePolynomial<cln::cl_RA> e7({a,c});
+    MultivariatePolynomial<Rational> e1({(Rational)1*a,(Rational)1*b,(Rational)1*c,(Rational)1*d});
+    MultivariatePolynomial<Rational> e2({(Rational)1*a*b,(Rational)1*c*d});
+    MultivariatePolynomial<Rational> e3({(Rational)1*a*b*c,(Rational)1*d});
+    MultivariatePolynomial<Rational> e4({(Rational)1*a,(Rational)1*b,(Rational)-1*c,(Rational)-1*d});
+    MultivariatePolynomial<Rational> e5({(Rational)1*a,(Rational)1*b,Term<Rational>(7)});
+    MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*c*c,(Rational)-1*d*d*d});
+    MultivariatePolynomial<Rational> e7({a,c});
     e7 = e7.pow(2)*b*d+a;
     
     Interval<double> resultA, resultB, overapprox;
@@ -52,7 +61,7 @@ TEST(Contraction, SimpleNewton)
     PolynomialContraction<SimpleNewton> e6_contractor(e6);
     PolynomialContraction<SimpleNewton> e7_contractor(e7);
 	
-	MultivariatePolynomial<cln::cl_RA> test((cln::cl_RA)1*c*c);
+	MultivariatePolynomial<Rational> test((Rational)1*c*c);
     
     bool split;
     

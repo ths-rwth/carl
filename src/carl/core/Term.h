@@ -11,6 +11,7 @@
 #include "Monomial.h"
 #include "VariablesInformation.h"
 #include "Definiteness.h"
+#include "../numbers/numbers.h"
 #include "../interval/Interval.h"
 #include "../util/pointerOperations.h"
 
@@ -25,7 +26,7 @@ template<typename Coefficient>
 class Term
 {
 	private:
-		Coefficient mCoeff = Coefficient(0);
+		Coefficient mCoeff = constant_zero<Coefficient>::get();
 		Monomial::Arg mMonomial;
 
 	public:

@@ -126,9 +126,62 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
     assert(n >= std::numeric_limits<unsigned long int>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
+template<>
+inline int toInt<int>(const mpz_class& n) {
+    std::cout << "mpz_class to int" << std::endl;
+    assert(n <= std::numeric_limits<int>::max());
+    assert(n >= std::numeric_limits<int>::min());
+    return (int)mpz_get_si(n.get_mpz_t());
+}
+template<>
+inline unsigned toInt<unsigned>(const mpz_class& n) {
+    assert(n <= std::numeric_limits<unsigned>::max());
+    assert(n >= std::numeric_limits<unsigned>::min());
+    return (unsigned)mpz_get_ui(n.get_mpz_t());
+}
+template<typename Integer>
+inline Integer toInt(const mpq_class& n);
+
+/**
+ * Convert a fraction to an integer.
+ * This method assert, that the given fraction is an integer, i.e. that the denominator is one.
+ * @param n A fraction.
+ * @return An integer.
+ */
+template<>
+inline mpz_class toInt<mpz_class>(const mpq_class& n) {
+	assert(isInteger(n));
+	return getNum(n);
+}
+
+/**
+ * Convert a fraction to an unsigned.
+ * @param n A fraction.
+ * @return n as unsigned.
+ */
+template<>
+inline unsigned toInt<unsigned>(const mpq_class& n) {
+	return toInt<unsigned>(toInt<mpz_class>(n));
+}
+template<>
+inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
+	return toInt<unsigned long int>(toInt<mpz_class>(n));
+}
+template<>
+inline int toInt<int>(const mpq_class& n) {
+    std::cout << "mpq_class to int" << std::endl;
+	return toInt<int>(toInt<mpz_class>(n));
+}
+template<>
+inline signed long int toInt<signed long int>(const mpq_class& n) {
+	return toInt<signed long int>(toInt<mpz_class>(n));
+}
 
 template<typename T>
 inline T rationalize(double n);
+
+template<typename T>
+inline T rationalize(float n);
 
 template<typename T>
 inline T rationalize(int n);
@@ -139,11 +192,18 @@ inline T rationalize(size_t n);
 template<typename T>
 inline T rationalize(const std::string& n);
 
+#ifdef USE_CLN_NUMBERS
 template<typename T>
 inline T rationalize(const PreventConversion<cln::cl_RA>&);
+#endif
 
 template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
+
+template<>
+inline mpq_class rationalize<mpq_class>(float f) {
+	return mpq_class(f);
+}
 
 template<>
 inline mpq_class rationalize<mpq_class>(double d) {
@@ -168,8 +228,10 @@ inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
 }
 
+#ifdef USE_CLN_NUMBERS
 template<>
 mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n);
+#endif
 
 /**
  * Basic Operators
@@ -290,16 +352,24 @@ std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a);
 std::pair<mpq_class,mpq_class> sqrt_fast(const mpq_class& a);
 
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
+    // TODO: In order to have the same result as division of native signed integer we have to 
+    //       make it that complicated, as mpz_mod always returns positive integer. Maybe there is a better way.
 	mpz_class res;
-	mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
-	return res;
+	mpz_mod(res.get_mpz_t(), abs(n).get_mpz_t(), m.get_mpz_t());
+	return isNegative(n) ? -res : res;
+}
+
+inline mpz_class remainder(const mpz_class& n, const mpz_class& m) {
+	return mod(n,m);
 }
 
 inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
 {
+    // TODO: In order to have the same result as division of native signed integer we have to 
+    //       make it that complicated, as mpz_div does round differently. Maybe there is a better way.
 	mpz_class res;
-	mpz_div(res.get_mpz_t(), n.get_mpz_t(), d.get_mpz_t());
-	return res;
+	mpz_div(res.get_mpz_t(), abs(n).get_mpz_t(), abs(d).get_mpz_t());
+	return isNegative(n) == isNegative(d) ? res : -res;
 }
 
 inline mpz_class operator/(const mpz_class& n, const mpz_class& d)

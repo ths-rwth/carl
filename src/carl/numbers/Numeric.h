@@ -11,7 +11,6 @@
 #include <iostream>
 #include <assert.h>
 #include <vector>
-#include <cln/cln.h>
 #include <limits>
 #include "numbers.h"
 
@@ -228,11 +227,11 @@ namespace carl
             return carl::isInteger( Numeric<T>::mRationalPool[(size_t)_value.content()-(size_t)HIGHTEST_INTEGER_VALUE] );
     }
     
-    template<>
-    inline void reserve<Numeric<cln::cl_RA>>( size_t _expectedNumOfElements )
-    {
-        Numeric<cln::cl_RA>::mRationalPool.reserve( Numeric<cln::cl_RA>::mRationalPool.capacity() + _expectedNumOfElements );
-    }
+//    template<>
+//    inline void reserve<Numeric<cln::cl_RA>>( size_t _expectedNumOfElements )
+//    {
+//        Numeric<cln::cl_RA>::mRationalPool.reserve( Numeric<cln::cl_RA>::mRationalPool.capacity() + _expectedNumOfElements );
+//    }
 } // namespace carl
 
 

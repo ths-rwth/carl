@@ -14,7 +14,11 @@ namespace carl
     template<typename F>
     struct IntegralType<carl::FLOAT_T<F> >
     {
+        #ifdef USE_CLN_NUMBERS
         typedef cln::cl_I type;
+        #else
+        typedef mpz_class type;
+        #endif
     };
 
     template<typename C>

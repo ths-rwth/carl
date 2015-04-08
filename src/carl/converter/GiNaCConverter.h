@@ -6,6 +6,7 @@
 #pragma once
 
 #include "carl/numbers/numbers.h"
+#ifdef COMPARE_WITH_GINAC
 #include <ginac/ginac.h>
 
 namespace carl {
@@ -63,3 +64,5 @@ public:
 };
 
 }
+
+#endif
