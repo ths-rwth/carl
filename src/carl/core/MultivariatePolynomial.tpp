@@ -181,8 +181,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+#ifdef __VS
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(TermsType&& terms, bool duplicates, bool ordered) :
+#else
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType&& terms, bool duplicates, bool ordered):
-	mTerms(std::move(terms)),
+#endif
+mTerms(std::move(terms)),
 	mOrdered(ordered)
 {
 	if( duplicates ) {
@@ -200,7 +204,11 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered):
+#ifdef __VS
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const TermsType& terms, bool duplicates, bool ordered) :
+#else
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered) :
+#endif
 	mTerms(terms),
 	mOrdered(ordered)
 {
