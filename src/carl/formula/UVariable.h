@@ -36,9 +36,9 @@ namespace carl
             UVariable(): mVar(Variable::NO_VARIABLE) {
 			}
 
-			UVariable( Variable::Arg _var):
-                mVar( _var ),
-				mDomain( SortManager::getInstance().interpretedSort(_var.getType()) )
+			UVariable(Variable::Arg var):
+                mVar(var),
+				mDomain(SortManager::getInstance().getInterpreted(var.getType()))
             {
 			}
             
