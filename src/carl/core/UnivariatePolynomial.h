@@ -30,6 +30,8 @@ template<typename Coefficient> class UnivariatePolynomial;
 template<typename Coefficient>
 using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
+template<typename Coefficient>
+using FactorMap = std::map<UnivariatePolynomial<Coefficient>, unsigned>;
 }
 
 #include "DivisionResult.h"
@@ -854,11 +856,10 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-
-	std::map<UnivariatePolynomial, unsigned> factorization() const;
+	FactorMap<Coefficient> factorization() const;
 
 	template<typename Integer>
-	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum = 0 );
+	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
 
 	Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
