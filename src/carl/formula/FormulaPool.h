@@ -268,6 +268,11 @@ namespace carl
             {
                 return create( _type, std::move( Formulas<Pol>( _subformulas ) ) );
             }
+            
+            const FormulaContent<Pol>* create( FormulaType _type, const std::vector<Formula<Pol>>& _subformulas )
+            {
+                return create( _type, std::move( Formulas<Pol>( _subformulas.begin(), _subformulas.end() ) ) );
+            }
 
 			const FormulaContent<Pol>* create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
 			{

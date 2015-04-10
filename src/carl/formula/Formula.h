@@ -406,6 +406,10 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
+            explicit Formula( FormulaType _type, const std::vector<Formula<Pol>>& _subasts ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
+            {}
+            
             explicit Formula( FormulaType _type, Formulas<Pol>&& _subasts ):
                 Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
             {}
