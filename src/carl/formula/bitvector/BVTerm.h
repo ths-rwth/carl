@@ -84,6 +84,9 @@ namespace carl
 		assert(false);
 		return "";
 	}
+	inline std::ostream& operator<<(std::ostream& os, BVTermType type) {
+		return os << toString(type);
+	}
 
 	inline std::size_t typeId(const BVTermType _type)
 	{
@@ -133,6 +136,13 @@ namespace carl
 		{
 			return mCondition == _other.mCondition && mThen == _other.mThen && mElse == _other.mElse;
 		}
+		bool operator<(const BVITEContent& _other) const
+		{
+			if (mCondition != _other.mCondition) return mCondition < _other.mCondition;
+			if (!(mThen == _other.mThen)) return mThen < _other.mThen;
+			if (!(mElse == _other.mElse)) return mElse < _other.mElse;
+			return false;
+		}
 	};
 
 	template<typename Pol>
@@ -149,6 +159,12 @@ namespace carl
 		bool operator==(const BVUnaryContent& _other) const
 		{
 			return mOperand == _other.mOperand && mIndex == _other.mIndex;
+		}
+		bool operator<(const BVUnaryContent& _other) const
+		{
+			if (!(mOperand == _other.mOperand)) return mOperand < _other.mOperand;
+			if (mIndex != _other.mIndex) return mIndex < _other.mIndex;
+			return false;
 		}
 	};
 
@@ -167,6 +183,12 @@ namespace carl
 		{
 			return mFirst == _other.mFirst && mSecond == _other.mSecond;
 		}
+		bool operator<(const BVBinaryContent& _other) const
+		{
+			if (!(mFirst == _other.mFirst)) return mFirst < _other.mFirst;
+			if (!(mSecond == _other.mSecond)) return mSecond < _other.mSecond;
+			return false;
+		}
 	};
 
 	template<typename Pol>
@@ -184,6 +206,13 @@ namespace carl
 		bool operator==(const BVExtractContent& _other) const
 		{
 			return mOperand == _other.mOperand && mFirst == _other.mFirst && mLast == _other.mLast;
+		}
+		bool operator<(const BVExtractContent& _other) const
+		{
+			if (!(mOperand == _other.mOperand)) return mOperand < _other.mOperand;
+			if (mFirst != _other.mFirst) return mFirst < _other.mFirst;
+			if (mLast != _other.mLast) return mLast < _other.mLast;
+			return false;
 		}
 	};
 
@@ -420,6 +449,25 @@ namespace carl
 				return false;
 			}
 		}
+		bool operator<(const BVTermContent<Pol>& rhs) const {
+			if(mId && rhs.mId) return mId < rhs.mId;
+			if(mType != rhs.mType) return mType < rhs.mType;
+
+			if(mType == BVTermType::CONSTANT) {
+				return mValue < rhs.mValue;
+			} else if(mType == BVTermType::VARIABLE) {
+				return mVariable < rhs.mVariable;
+			} else if(mType == BVTermType::ITE) {
+				return mIte < rhs.mIte;
+			} else if(typeIsUnary(mType)) {
+				return mUnary < rhs.mUnary;
+			} else if(typeIsBinary(mType)) {
+				return mBinary < rhs.mBinary;
+			} else {
+				assert(false);
+				return false;
+			}
+		}
 
 		/**
 		 * The output operator of a term.
@@ -509,6 +557,9 @@ namespace carl
 		bool operator==(const BVTerm<Pol>& _other) const
 		{
 			return mpContent == _other.mpContent;
+		}
+		bool operator<(const BVTerm<Pol>& rhs) const {
+			return *(this->mpContent) < *(rhs.mpContent);
 		}
 	};
 }

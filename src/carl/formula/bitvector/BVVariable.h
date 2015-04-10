@@ -28,8 +28,7 @@ namespace carl
 		BVVariable(Variable::Arg _variable, const Sort& _sort) :
 		mVar(_variable), mSort(_sort)
 		{
-			assert(SortManager::getInstance().isInterpreted(_sort));
-			assert(SortManager::getInstance().interpretedType(_sort) == VariableType::VT_BITVECTOR);
+			assert(SortManager::getInstance().getType(_sort) == VariableType::VT_BITVECTOR);
 
 			const std::vector<std::size_t>* indices = SortManager::getInstance().getIndices(_sort);
 			assert(indices != nullptr && indices->size() == 1 && indices->front() > 0);
@@ -37,10 +36,10 @@ namespace carl
 			mWidth = indices->front();
 		}
 
-		BVVariable(Variable::Arg _variable, size_t _width = 1) :
+		/*BVVariable(Variable::Arg _variable, size_t _width = 1) :
 		BVVariable(_variable, SortManager::getInstance().index(SortManager::getInstance().interpretedSort(VariableType::VT_BITVECTOR), {_width}))
 		{
-		}
+		}*/
 
 		Variable operator()() const
 		{
@@ -50,6 +49,10 @@ namespace carl
 		bool operator==(const BVVariable& _other) const
 		{
 			return mVar == _other.mVar;
+		}
+		bool operator<(const BVVariable& _other) const
+		{
+			return mVar < _other.mVar;
 		}
 
 		size_t width() const
