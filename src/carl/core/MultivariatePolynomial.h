@@ -1208,9 +1208,9 @@ public:
 	}
 
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	inline const MultivariatePolynomial<C, O, P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, O, P>& rhs);
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	inline const MultivariatePolynomial<C, O, P> operator*(const MultivariatePolynomial<C, O, P>& lhs, const UnivariatePolynomial<C>& rhs);
 	/// @}
 	
 } // namespace carl
