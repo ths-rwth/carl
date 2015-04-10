@@ -145,6 +145,7 @@ class SortManager : public Singleton<SortManager>
 			mIndexable()
 		{
 			mSorts.emplace_back(nullptr); // default value
+			mSortTypes.emplace_back(VariableType::VT_UNINTERPRETED);
 		}
 		
 		const SortContent& getContent(const Sort& sort) const {
@@ -173,8 +174,8 @@ class SortManager : public Singleton<SortManager>
 		std::size_t addSortContent(SortContent* content, VariableType type) {
 			mSorts.push_back(content);
 			mSortTypes.push_back(type);
-			mSortMap[content] = mSorts.size();
-			return mSorts.size();
+			mSortMap[content] = mSorts.size() - 1;
+			return mSorts.size() - 1;
 		}
 		
 		VariableType checkIndices(SortContent* content, std::size_t count) const{
@@ -209,6 +210,9 @@ class SortManager : public Singleton<SortManager>
 		VariableType getType(const Sort& sort) const {
 			assert(sort.id() > 0);
 			assert(sort.id() < mSortTypes.size());
+			std::cout << mSorts << std::endl;
+			std::cout << mSortTypes << std::endl;
+			std::cout << sort.id() << std::endl;
 			return mSortTypes.at(sort.id());
 		}
 		
@@ -220,11 +224,6 @@ class SortManager : public Singleton<SortManager>
 		 */
 		std::ostream& print(std::ostream& os, const Sort& sort) const;
 		
-		bool registerInterpreted(VariableType type, const Sort& sort) {
-			if (mInterpreted.find(type) != mInterpreted.end()) return false;
-			mInterpreted[type] = sort;
-			return true;
-		}
 		Sort getInterpreted(VariableType type) const {
 			assert(mInterpreted.find(type) != mInterpreted.end());
 			return mInterpreted.at(type);
@@ -269,6 +268,17 @@ class SortManager : public Singleton<SortManager>
 		 */
 		std::size_t getArity(const Sort& sort) const;
 		
+		Sort addInterpretedMapping(const Sort& sort, VariableType type) {
+			assert(mInterpreted.find(type) == mInterpreted.end());
+			mInterpreted[type] = sort;
+			return sort;
+		}
+		Sort addInterpretedSort(const std::string& name, VariableType type) {
+			return addInterpretedMapping(addSort(name, type), type);
+		}
+		Sort addInterpretedSort(const std::string& name, const std::vector<Sort>& parameters, VariableType type) {
+			return addInterpretedMapping(addSort(name, parameters, type), type);
+		}
 		Sort addSort(const std::string& name, VariableType type = VariableType::VT_UNINTERPRETED);
 		Sort addSort(const std::string& name, const std::vector<Sort>& parameters, VariableType type = VariableType::VT_UNINTERPRETED);
 		void makeSortIndexable(const Sort& sort, std::size_t indices, VariableType type);
