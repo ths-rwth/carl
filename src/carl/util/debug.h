@@ -55,6 +55,10 @@ extern int last_assertion_code;
  * REGISTER_ASSERT; assert( ... );
  * @endcode
  */
+#ifdef __VS
+#define __func__ __FUNCTION__
+#endif
+
 #define REGISTER_ASSERT {\
 	std::stringstream ss; \
 	ss << __FILE__ << ":" << __LINE__ << " in " << __func__ << "()"; \
