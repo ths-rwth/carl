@@ -21,7 +21,8 @@ TEST(BVConstraint, Construction)
 	Variable a = VariablePool::getInstance().getFreshVariable("a", VariableType::VT_BITVECTOR);
 	Variable b = VariablePool::getInstance().getFreshVariable("b", VariableType::VT_BITVECTOR);
 
-	Sort bvSort = SortManager::getInstance().interpretedSort("BitVec", VariableType::VT_BITVECTOR);
+	Sort bvSort = SortManager::getInstance().addSort("BitVec");
+	SortManager::getInstance().makeSortIndexable(bvSort, 1, VariableType::VT_BITVECTOR);
 	Sort bv16Sort = SortManager::getInstance().index(bvSort, {16});
 
 	BVTerm<Pol> a_t(BVTermType::VARIABLE, BVVariable(a, bv16Sort));
