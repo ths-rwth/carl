@@ -1176,7 +1176,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 			}
 			if(shiftedTc == shiftedTcs.end())
 			{
-				Coeff posRatZero = positive ? (Coeff(*tcFactor) / Coeff(*lcFactor)) : -(Coeff(*tcFactor) / Coeff(*lcFactor));
+				Coeff posRatZero = positive ? (Coeff(*tcFactor) / Coeff(*lcFactor)) : Coeff(-(Coeff(*tcFactor) / Coeff(*lcFactor)));
 				CARL_LOG_TRACE("carl.core", "UnivELF: consider possible non zero rational factor  " << posRatZero);
 				Coeff image = result.syntheticDivision(posRatZero);
 				if(image == 0)
