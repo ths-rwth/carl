@@ -165,25 +165,55 @@ namespace carl
             /// The type of this formula.
             FormulaType mType;
             /// The content of this formula.
-            union //TODO matthias: unrestricted unions come not till VS2015 -> find workaround
+            union
             {
-                /// The only sub-formula, in case this formula is an negation.
-                Formula<Pol> mSubformula;
-                /// The premise and conclusion, in case this formula is an implication.
-                IMPLIESContent<Pol>* mpImpliesContent;
-                /// The condition, then- and else-case, in case this formula is an ite-expression of formulas.
-                ITEContent<Pol>* mpIteContent;
-                /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-                QuantifierContent<Pol>* mpQuantifierContent;
-                /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                Formulas<Pol>* mpSubformulas;
-                /// The constraint, in case this formulas wraps a constraint.
-                Constraint<Pol> mConstraint;
-                /// The Boolean variable, in case this formula wraps a Boolean variable.
-                carl::Variable mBoolean;
-                /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-                UEquality mUIEquality;
-            };
+#ifdef __VS
+				// Workaround with unnamed structs, because VS can't handle unrestricted unions
+				/// The only sub-formula, in case this formula is an negation.
+				struct {
+					Formula<Pol> mSubformula;
+				};
+				/// The premise and conclusion, in case this formula is an implication.
+				IMPLIESContent<Pol>* mpImpliesContent;
+				/// The condition, then- and else-case, in case this formula is an ite-expression of formulas.
+				ITEContent<Pol>* mpIteContent;
+				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
+				struct {
+					QuantifierContent<Pol>* mpQuantifierContent;
+				};
+				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
+				Formulas<Pol>* mpSubformulas;
+				/// The constraint, in case this formulas wraps a constraint.
+				struct {
+					Constraint<Pol> mConstraint;
+				};
+				/// The Boolean variable, in case this formula wraps a Boolean variable.
+				struct {
+					carl::Variable mBoolean;
+				};
+				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
+				struct {
+					UEquality mUIEquality;
+				};
+#else
+				/// The only sub-formula, in case this formula is an negation.
+				Formula<Pol> mSubformula;
+				/// The premise and conclusion, in case this formula is an implication.
+				IMPLIESContent<Pol>* mpImpliesContent;
+				/// The condition, then- and else-case, in case this formula is an ite-expression of formulas.
+				ITEContent<Pol>* mpIteContent;
+				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
+				QuantifierContent<Pol>* mpQuantifierContent;
+				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
+				Formulas<Pol>* mpSubformulas;
+				/// The constraint, in case this formulas wraps a constraint.
+				Constraint<Pol> mConstraint;
+				/// The Boolean variable, in case this formula wraps a Boolean variable.
+				carl::Variable mBoolean;
+				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
+				UEquality mUIEquality;
+#endif
+			};
             /// The negation
             const FormulaContent<Pol> *mNegation;
             /// The propositions of this formula.
