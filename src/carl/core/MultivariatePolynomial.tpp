@@ -2025,7 +2025,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs)
+MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs)
 {
 	MultivariatePolynomial<C,O,P> result;
 	for (const auto& t: lhs.mTerms) {
