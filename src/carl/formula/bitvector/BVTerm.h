@@ -244,7 +244,7 @@ namespace carl
 	public:
 
 		BVTermContent() :
-		mType(BVTermType::CONSTANT), mValue(), mWidth(0)
+		mType(BVTermType::CONSTANT), mValue(), mWidth(0), mHash(0)
 		{
 		}
 
