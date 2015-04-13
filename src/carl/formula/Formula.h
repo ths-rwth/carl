@@ -165,7 +165,7 @@ namespace carl
             /// The type of this formula.
             FormulaType mType;
             /// The content of this formula.
-            union //TODO matthias: unrestricted unions come not till VS2015 -> find workaround
+            union
             {
 #ifdef __VS
 				// Workaround with unnamed structs, because VS can't handle unrestricted unions
