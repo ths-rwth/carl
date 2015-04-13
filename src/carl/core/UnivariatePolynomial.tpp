@@ -719,9 +719,13 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 	}
 }
 
-
+#ifdef __VS
+template<typename Coeff>
+template<typename C, EnableIfBool<!is_field<C>::value && is_number<C>::value >>
+#else
 template<typename Coeff>
 template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
+#endif
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
 	if(isZero() || lcoeff() > Coeff(0))

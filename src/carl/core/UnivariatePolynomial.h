@@ -545,9 +545,13 @@ public:
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
+#ifdef __VS
+	template<typename C = Coefficient, EnableIfBool<!is_field<C>::value && is_number<C>::value> = dummy>
+	Coefficient unitPart() const;
+#else
 	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
 	Coefficient unitPart() const;
-	
+#endif
 	
 	/**
 	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
