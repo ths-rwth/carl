@@ -47,10 +47,19 @@ namespace dtl
 // Support for Clang 3.1.
 const dtl::enabled dummy = {};
 
+#ifdef __VS
+template <typename Condition>
+using EnableIf = typename std::enable_if<Condition::value, dtl::enabled>::type;
+template <typename Condition>
+using DisableIf = typename std::enable_if<!Condition::value, dtl::enabled>::type;
+template <bool Condition>
+using EnableIfBool = typename std::enable_if<Condition, dtl::enabled>::type;
+#else
 template <typename... Condition>
 using EnableIf = typename std::enable_if<all<Condition...>::value, dtl::enabled>::type;
 template <typename... Condition>
 using DisableIf = typename std::enable_if<Not<any<Condition...>>::value, dtl::enabled>::type;
+#endif
 
 template<typename> struct Void { typedef void type; };
 
