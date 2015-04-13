@@ -110,6 +110,7 @@ class SortManager : public Singleton<SortManager>
 			}
 			
 			SortContent* getUnindexed() const {
+				if (parameters == nullptr) return new SortContent(name);
 				return new SortContent(name, *parameters);
 			}
 		};
@@ -210,9 +211,6 @@ class SortManager : public Singleton<SortManager>
 		VariableType getType(const Sort& sort) const {
 			assert(sort.id() > 0);
 			assert(sort.id() < mSortTypes.size());
-			std::cout << mSorts << std::endl;
-			std::cout << mSortTypes << std::endl;
-			std::cout << sort.id() << std::endl;
 			return mSortTypes.at(sort.id());
 		}
 		
@@ -352,7 +350,6 @@ class SortManager : public Singleton<SortManager>
  */
 template<typename... Args>
 inline Sort getSort(Args&&... args) {
-	std::cout << "getSort... " << sizeof...(Args) << std::endl;
 	return SortManager::getInstance().getSort(std::forward<Args>(args)...);
 }
 

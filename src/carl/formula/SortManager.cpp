@@ -123,7 +123,8 @@ namespace carl
 	
 	Sort SortManager::getSort( const std::string& _name, const std::vector<std::size_t>& _indices )
 	{
-		return index(getSort(_name), _indices);
+		auto r = index(getSort(_name), _indices);
+		return r;
 	}
 	
 	Sort SortManager::getSort( const std::string& _name, const std::vector<std::size_t>& _indices, const std::vector<Sort>& _params )
