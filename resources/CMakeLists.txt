@@ -42,8 +42,11 @@ else()
 	# Specify MainTest's link libraries
 	ExternalProject_Get_Property(googletest binary_dir)
 	
-	set(GTEST_LIBRARIES ${binary_dir}/libgtest.a ${binary_dir}/libgtest_main.a PARENT_SCOPE)
-
+	if (WIN32)
+		set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
+	else()
+		set(GTEST_LIBRARIES ${binary_dir}/libgtest.a ${binary_dir}/libgtest_main.a PARENT_SCOPE)
+	endif()
 	add_dependencies(resources googletest)
 endif()
 
