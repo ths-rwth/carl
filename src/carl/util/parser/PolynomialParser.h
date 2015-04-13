@@ -20,7 +20,7 @@ namespace boost { namespace spirit { namespace traits {
         return value == 1;
     }
 }}}
-#else
+#endif
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, mpq_class& r) {
         if (exp >= 0)
@@ -31,8 +31,10 @@ namespace boost { namespace spirit { namespace traits {
     template<> inline bool is_equal_to_one(const mpq_class& value) {
         return value == 1;
     }
+    template<> inline mpq_class negate(bool neg, const mpq_class& n) {
+        return neg ? mpq_class(-n) : n;
+    }
 }}}
-#endif
 
 namespace carl {
 namespace parser {
