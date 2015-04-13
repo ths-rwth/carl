@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <math.h>
 #include <cmath>
+#include <cstddef>
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
 #else
