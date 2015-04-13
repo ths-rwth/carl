@@ -61,7 +61,7 @@ endif()
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
 set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
-#set(SYSCONFIG_INSTALL_DIR etc/carl/  CACHE PATH "Instalation for system configuration files)
+#set(SYSCONFIG_INSTALL_DIR etc/carl/  CACHE PATH "Installation for system configuration files)
 set(BIN_INSTALL_DIR lib/ CACHE PATH "Installation directory for executables")
 
 
@@ -114,6 +114,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} -O1")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	message("-- Using Visual Studio C++")
+	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} /MTd")
 else()
 	message("-- Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
@@ -205,7 +206,7 @@ include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
 IF(USE_CLN_NUMBERS)
     include_directories(SYSTEM ${SYSTEM} ${CLN_INCLUDE_DIR})
 endif()
-include_directories(SYSTEM ${SYSTEM} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
+include_directories(SYSTEM ${SYSTEM} ${EIGEN3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
 
 set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC})
 IF(USE_CLN_NUMBERS)
@@ -258,7 +259,7 @@ if(NOT FORCE_SHIPPED_RESOURCES)
 	find_package(Eigen3)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
-include_directories(SYSTEM ${Eigen3_INCLUDE_DIR})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 
 enable_testing()
@@ -274,8 +275,10 @@ if(COMPARE_WITH_GINAC)
 endif()
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
-set(libs_dynamic ${libs_dynamic} pthread dl)
-set(libs_static ${libs_static} pthread dl)
+if (NOT WIN32)
+	set(libs_dynamic ${libs_dynamic} pthread dl)
+	set(libs_static ${libs_static} pthread dl)
+endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files
