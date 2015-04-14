@@ -25,12 +25,14 @@ set(carl_lib_util_headers
 	parser/FormulaParser.h
 	parser/PolynomialParser.h
 	parser/RationalFunctionParser.h
+	WrapperExternal.h
 ) 
 # Source files in here
 set(carl_lib_util_sources 
 	util/BitVector.cpp
 	util/debug.cpp
 	util/CMakeOptions.cpp
+	util/WrapperExternal.cpp
 	
 PARENT_SCOPE)
 
