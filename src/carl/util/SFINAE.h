@@ -13,6 +13,7 @@
 namespace carl
 {
 
+#ifndef __VS
 // from flamingdangerzone.com/cxx11/2012/05/29/type-traits-galore.html
 template <bool If, typename Then, typename Else>
 using Conditional = typename std::conditional<If, Then, Else>::type;
@@ -37,6 +38,7 @@ template <typename... T>
 struct all : Bool<true> {};
 template <typename Head, typename... Tail>
 struct all<Head, Tail...> : Conditional<Head::value, all<Tail...>, Bool<false>> {};
+#endif
 
 // http://flamingdangerzone.com/cxx11/2012/06/01/almost-static-if.html	
 namespace dtl
