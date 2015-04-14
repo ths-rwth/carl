@@ -7,6 +7,7 @@
 #include "carl/numbers/GaloisField.h"
 #include "carl/util/debug.h"
 #include "carl/interval/Interval.h"
+#include "carl/util/platform.h"
 
 #include <random>
 #include <cmath>
@@ -16,6 +17,10 @@ using namespace carl;
 #include <cln/cln.h>
 typedef cln::cl_RA Rational;
 typedef cln::cl_I Integer;
+#elif defined(__VS)
+#include <mpirxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
 #else
 #include <gmpxx.h>
 typedef mpq_class Rational;

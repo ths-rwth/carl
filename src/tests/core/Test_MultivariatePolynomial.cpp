@@ -1,18 +1,18 @@
 #include "gtest/gtest.h"
-#include "../numbers/config.h"
+#include "tests/numbers/config.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
-#ifdef COMPARE_WITH_CLN
-#include <cln/cln.h>
-#endif
-#include <gmpxx.h>
 #include "Util.cpp"
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
 #include "carl/util/stringparser.h"
+#include "carl/util/platform.h"
 
+#ifdef COMPARE_WITH_CLN
+#include <cln/cln.h>
+#endif
 
 using namespace carl;
 
@@ -20,6 +20,10 @@ using namespace carl;
 #include <cln/cln.h>
 typedef cln::cl_RA Rational;
 typedef cln::cl_I Integer;
+#elif defined(__VS)
+#include <mpirxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
 #else
 #include <gmpxx.h>
 typedef mpq_class Rational;

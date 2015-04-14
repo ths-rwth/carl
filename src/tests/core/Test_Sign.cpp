@@ -1,4 +1,6 @@
 #include "gtest/gtest.h"
+#include "carl/core/Sign.h"
+#include "carl/util/platform.h"
 
 #include <list>
 #include <initializer_list>
@@ -7,8 +9,11 @@
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
 #endif
+#ifdef __VS
+#include <mpirxx.h>
+#else
 #include <gmpxx.h>
-#include "carl/core/Sign.h"
+#endif
 
 using namespace carl;
 
