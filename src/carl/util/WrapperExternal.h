@@ -21,3 +21,4 @@ namespace carl {
 		DLL_EXPORT const char* getResult();
 	};
 }
+
