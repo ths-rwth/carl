@@ -3,10 +3,14 @@
 #include "carl/core/VariablePool.h"
 #include "carl/util/stringparser.h"
 #include "carl/core/FactorizedPolynomial.h"
+#include "carl/util/platform.h"
 
 #ifdef COMPARE_WITH_GINAC
 #include <cln/cln.h>
 typedef cln::cl_RA Rational;
+#elif defined(__VS)
+#include <mpirxx.h>
+typedef mpq_class Rational;
 #else
 #include <gmpxx.h>
 typedef mpq_class Rational;

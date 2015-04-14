@@ -8,11 +8,11 @@
  * @version 2014-11-11
  */
 
-#include "../../carl/util/platform.h"
+#include "carl/util/platform.h"
 CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
 CLANG_WARNING_RESET
-#include "../../carl/interval/Interval.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
 
@@ -20,6 +20,10 @@ CLANG_WARNING_RESET
 #include <cln/cln.h>
 typedef cln::cl_RA Rational;
 typedef cln::cl_I Integer;
+#elif defined(__VS)
+#include <mpirxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
 #else
 #include <gmpxx.h>
 typedef mpq_class Rational;
