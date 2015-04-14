@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/core/Sign.h"
+#include "carl/util/platform.h"
 
 #include <list>
 #include <initializer_list>
