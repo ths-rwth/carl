@@ -1,7 +1,13 @@
 #include "gtest/gtest.h"
-#include "../../carl/core/MultivariateHensel.h"
-#include "../../carl/core/VariablePool.h"
+#include "carl/core/MultivariateHensel.h"
+#include "carl/core/VariablePool.h"
+#include "carl/util/platform.h"
+
+#ifdef __VS
+#include <mpirxx.h>
+#else
 #include <gmpxx.h>
+#endif
 
 using namespace carl;
 /*

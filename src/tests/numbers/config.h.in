@@ -4,14 +4,18 @@
 
 #cmakedefine USE_MPFR_FLOAT
 
+#include "carl/interval/Interval.h"
+#include "carl/util/platform.h"
+
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+#elif defined(__VS)
+#include <mpirxx.h>
 #else
 #include <gmpxx.h>
 #endif
-#include "../../carl/interval/Interval.h"
 #ifdef USE_MPFR_FLOAT
-#include "../../carl/numbers/FLOAT_T.h"
+#include "carl/numbers/FLOAT_T.h"
 #endif
 
 #ifdef USE_CLN_NUMBERS
