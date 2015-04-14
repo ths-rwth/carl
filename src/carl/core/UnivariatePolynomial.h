@@ -537,8 +537,13 @@ public:
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
+#ifdef __VS
+	template<typename C = Coefficient, EnableIfBool<!is_number<C>::value > = dummy>
+	Coefficient unitPart() const;
+#else
 	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
+#endif
 	/**
 	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
 	 * and one for zero polynomials.
