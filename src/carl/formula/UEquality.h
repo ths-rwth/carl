@@ -86,9 +86,12 @@ namespace carl
             Arg mRhs;
 
         public:
-            
-            UEquality(); // No default constructor.
-            
+#ifdef __VS
+			UEquality() {} // Needed for union initialization in Formula.h
+#else
+			UEquality(); // No default constructor.
+#endif
+
 			/**
              * Constructs an uninterpreted equality.
              * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.

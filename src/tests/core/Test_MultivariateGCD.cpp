@@ -1,7 +1,13 @@
 #include "gtest/gtest.h"
 #include "carl/core/MultivariateGCD.h"
 #include "carl/core/PrimitiveEuclideanAlgorithm.h"
+#include "carl/util/platform.h"
+
+#ifdef __VS
+#include <mpirxx.h>
+#else
 #include <gmpxx.h>
+#endif
 
 using namespace carl;
 

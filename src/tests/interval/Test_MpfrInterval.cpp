@@ -9,16 +9,21 @@
 
 
 #include "gtest/gtest.h"
-#include "../../carl/numbers/FLOAT_T.h"
-#include "../../carl/interval/Interval.h"
+#include "carl/numbers/FLOAT_T.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include <iostream>
+#include "carl/util/platform.h"
 
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
 typedef cln::cl_RA Rational;
 typedef cln::cl_I Integer;
+#elif defined(__VS)
+#include <mpirxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
 #else
 #include <gmpxx.h>
 typedef mpq_class Rational;

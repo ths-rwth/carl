@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <math.h>
 #include <cmath>
+#include "../util/platform.h"
 #ifdef USE_CLN_NUMBERS
 	#include <cln/cln.h>
 #elif defined(__VS)
