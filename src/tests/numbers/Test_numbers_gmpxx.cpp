@@ -1,8 +1,13 @@
 #include "gtest/gtest.h"
 
-#include "../../carl/numbers/numbers.h"
+#include "carl/numbers/numbers.h"
+#include "carl/util/platform.h"
 
+#ifdef __VS
+#include <mpirxx.h>
+#else
 #include <gmpxx.h>
+#endif
 
 using namespace carl;
 

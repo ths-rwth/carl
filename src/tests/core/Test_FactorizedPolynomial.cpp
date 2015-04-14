@@ -2,7 +2,13 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/util/stringparser.h"
+#include "carl/util/platform.h"
+
+#ifdef __VS
+#include <mpirxx.h>
+#else
 #include <gmpxx.h>
+#endif
 
 using namespace carl;
 
