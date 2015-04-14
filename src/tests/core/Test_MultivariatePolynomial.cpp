@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "carl/numbers/config.h"
+#include "tests/numbers/config.h"
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
