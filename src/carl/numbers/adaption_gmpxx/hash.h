@@ -10,9 +10,9 @@
 #include <functional>
 #include <cstddef>
 #ifdef __WIN
-#include <mpirxx.h>
+	#include <mpirxx.h>
 #else
-#include <gmpxx.h>
+	#include <gmpxx.h>
 #endif
 
 namespace std
