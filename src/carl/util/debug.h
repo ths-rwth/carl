@@ -17,7 +17,7 @@
 #include <sstream>
 
 #include "platform.h"
-#if !defined __VS
+#ifndef __VS
 #include <unistd.h>
 #endif
 
