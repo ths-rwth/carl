@@ -44,9 +44,9 @@ inline std::ostream& operator<<(std::ostream& os, SampleOrdering so) {
 }
 
 template<typename Coeff>
-using MPolynomial = carl::MultivariatePolynomial<Coeff>;
+using MultiPolynomial = carl::MultivariatePolynomial<Coeff>;
 template<typename Coeff>
-using UPolynomial = carl::UnivariatePolynomial<MPolynomial<Coeff>>;
+using UniPolynomial = carl::UnivariatePolynomial<MultiPolynomial<Coeff>>;
 
 /** Predefined settings for the CAD procedure.
  * Implementation of the types is located in CAD.h. Each setting is defined as a power of two in order to use several flags at a time.
