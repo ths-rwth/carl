@@ -20,7 +20,7 @@ CLANG_WARNING_RESET
 #include <cln/cln.h>
 typedef cln::cl_RA Rational;
 typedef cln::cl_I Integer;
-#elif defined(__VS)
+#elif defined(__WIN)
 #include <mpirxx.h>
 typedef mpq_class Rational;
 typedef mpz_class Integer;
