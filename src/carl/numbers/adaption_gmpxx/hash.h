@@ -9,7 +9,7 @@
 #pragma once
 #include <functional>
 #include <cstddef>
-#ifdef __VS
+#ifdef __WIN
 	#include <mpirxx.h>
 #else
 	#include <gmpxx.h>
