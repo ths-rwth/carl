@@ -310,11 +310,11 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
-		mType(_type), mExtract(_operand, _first, _last), mWidth(_last - _first + 1), mId(0),
+		mType(_type), mExtract(_operand, _first, _last), mWidth(_first - _last + 1), mId(0),
 		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::EXTRACT);
-			assert(_first >= 0 && _last >= _first && _last < _operand.width());
+			assert(_first < _operand.width() && _first >= _last && _last >= 0);
 		}
 
 		~BVTermContent()

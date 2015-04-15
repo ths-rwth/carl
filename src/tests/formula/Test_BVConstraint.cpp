@@ -43,7 +43,7 @@ TEST(BVConstraint, Construction)
 	BVTerm<Pol> oxa(BVTermType::CONSTANT, BVValue(4, 10));
 	BVTerm<Pol> oxaa(BVTermType::REPEAT, oxa, 2);
 
-	BVTerm<Pol> bvextract(BVTermType::EXTRACT, bvnot, 6, 8);
+	BVTerm<Pol> bvextract(BVTermType::EXTRACT, bvnot, 8, 6);
 	BVTerm<Pol> bvconcat(BVTermType::CONCAT, bvextract, bvextract);
 
 	BVTerm<Pol> bvzeroext(BVTermType::EXT_U, bvconcat, 8);
