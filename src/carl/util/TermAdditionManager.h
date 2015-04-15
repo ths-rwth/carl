@@ -152,7 +152,7 @@ public:
 		if (!isZero(std::get<3>(data))) {
 			t[0] = std::move(TermType(std::move(std::get<3>(data)), nullptr));
 		}
-		for (auto i = t.begin(); !t.empty() && i != t.end();) {
+		for (auto i = t.begin(); i != t.end();) {
 			if (i->isZero()) {
 				//Avoid invalidating pointer for last element
 				if (i == --t.end()) {
