@@ -9,7 +9,7 @@
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
 #endif
-#ifdef __VS
+#ifdef __WIN
 #include <mpirxx.h>
 #else
 #include <gmpxx.h>
