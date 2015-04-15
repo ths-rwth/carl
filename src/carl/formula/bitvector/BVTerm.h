@@ -123,9 +123,9 @@ namespace carl
 	template<typename Pol>
 	struct BVITEContent
 	{
-		const Formula<Pol>& mCondition;
-		const BVTerm<Pol>& mThen;
-		const BVTerm<Pol>& mElse;
+		Formula<Pol> mCondition;
+		BVTerm<Pol> mThen;
+		BVTerm<Pol> mElse;
 
 		BVITEContent(const Formula<Pol>& _condition, const BVTerm<Pol>& _then, const BVTerm<Pol>& _else) :
 		mCondition(_condition), mThen(_then), mElse(_else)
@@ -149,7 +149,7 @@ namespace carl
 	template<typename Pol>
 	struct BVUnaryContent
 	{
-		const BVTerm<Pol>& mOperand;
+		BVTerm<Pol> mOperand;
 		size_t mIndex;
 
 		BVUnaryContent(const BVTerm<Pol>& _operand, const size_t _index = 0) :
@@ -172,8 +172,8 @@ namespace carl
 	template<typename Pol>
 	struct BVBinaryContent
 	{
-		const BVTerm<Pol>& mFirst;
-		const BVTerm<Pol>& mSecond;
+		BVTerm<Pol> mFirst;
+		BVTerm<Pol> mSecond;
 
 		BVBinaryContent(const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
 		mFirst(_first), mSecond(_second)
@@ -195,7 +195,7 @@ namespace carl
 	template<typename Pol>
 	struct BVExtractContent
 	{
-		const BVTerm<Pol>& mOperand;
+		BVTerm<Pol> mOperand;
 		size_t mFirst;
 		size_t mLast;
 

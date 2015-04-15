@@ -81,7 +81,7 @@ namespace carl
 		std::pair<typename FastPointerSet<Element>::iterator, bool> insert(ElementPtr _element, bool _assertFreshness = false)
 		{
 			POOL_LOCK_GUARD
-				auto iterBoolPair = mPool.insert(_element);
+			auto iterBoolPair = mPool.insert(_element);
 			assert(iterBoolPair.second || !_assertFreshness);
 
 			if(iterBoolPair.second) { // Element has just been inserted
