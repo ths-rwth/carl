@@ -3,7 +3,7 @@
 #include "carl/core/VariablePool.h"
 #include "carl/util/platform.h"
 
-#ifdef __VS
+#ifdef __WIN
 #include <mpirxx.h>
 #else
 #include <gmpxx.h>

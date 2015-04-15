@@ -19,7 +19,7 @@
 #include "../util/platform.h"
 #ifdef USE_CLN_NUMBERS
 	#include <cln/cln.h>
-#elif defined(__VS)
+#elif defined(__WIN)
 	#include <mpirxx.h>
 #else
 	#include <gmpxx.h>
