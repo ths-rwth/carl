@@ -109,11 +109,11 @@ namespace carl
 		long long aInt = *(long long*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
-			aInt = long long(0x8000000000000000) - aInt;
+			aInt = (long long)(0x8000000000000000) - aInt;
 		// Make bInt lexicographically ordered as a twos-complement int
 		long long bInt = *(long long*)&B;
 		if (bInt < 0)
-			bInt = long long(0x8000000000000000) - bInt;
+			bInt = (long long)(0x8000000000000000) - bInt;
 		long long intDiff = std::abs(aInt - bInt);
 		if (intDiff <= maxUlps)
 			return true;
