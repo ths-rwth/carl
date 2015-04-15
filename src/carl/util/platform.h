@@ -36,11 +36,6 @@
 
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
-#elif _MSC_VER
-	#define __VS
-
-	#define CLANG_WARNING_DISABLE(warning)
-	#define CLANG_WARNING_RESET
 #else
 	#warning "You are using an unsupported compiler."
 	#define __UNSUPPORTED
