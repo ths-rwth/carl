@@ -23,7 +23,7 @@
 		_Pragma("clang diagnostic pop")
 #elif __GNUC__
 	#define __GCC
-	
+
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
 #elif _MSC_VER
@@ -36,3 +36,6 @@
 	#define __UNSUPPORTED
 #endif
 
+#ifdef _WIN32
+	#define __WIN
+#endif

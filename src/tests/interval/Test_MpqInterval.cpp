@@ -15,7 +15,7 @@ CLANG_WARNING_RESET
 #include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#ifdef __VS
+#ifdef __WIN
 #include <mpirxx.h>
 #else
 #include <gmpxx.h>
