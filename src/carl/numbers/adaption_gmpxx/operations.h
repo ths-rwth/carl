@@ -356,7 +356,15 @@ inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
     //       make it that complicated, as mpz_mod always returns positive integer. Maybe there is a better way.
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), abs(n).get_mpz_t(), m.get_mpz_t());
+#ifdef __VS
+	if (isNegative(n)) {
+		return -res;
+	} else {
+		return res;
+	}
+#else
 	return isNegative(n) ? -res : res;
+#endif
 }
 
 inline mpz_class remainder(const mpz_class& n, const mpz_class& m) {
