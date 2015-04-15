@@ -80,6 +80,7 @@ namespace carl
 		case BVTermType::EXT_U: return "zero_extend";
 		case BVTermType::EXT_S: return "sign_extend";
 		case BVTermType::REPEAT: return "repeat";
+		default: return "invalid";
 		}
 		assert(false);
 		return "";
@@ -244,26 +245,26 @@ namespace carl
 	public:
 
 		BVTermContent() :
-		mType(BVTermType::CONSTANT), mValue(), mWidth(0), mHash(0)
+		mType(BVTermType::CONSTANT), mValue(), mWidth(0), mId(0), mHash(0)
 		{
 		}
 
 		BVTermContent(BVTermType _type, BVValue _value) :
-		mType(_type), mValue(_value), mWidth(_value.size()),
+		mType(_type), mValue(_value), mWidth(_value.size()), mId(0),
 		mHash((boost::hash_value(_value) << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::CONSTANT);
 		}
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
-		mType(_type), mVariable(_variable), mWidth(_variable.width()) //,
+		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0), mHash(0) //,
 		// TODO: Hash - mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::VARIABLE);
 		}
 
 		BVTermContent(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
-		mType(_type), mIte(_booleanFormula, _subtermA, _subtermB), mWidth(_subtermA.width()),
+		mType(_type), mIte(_booleanFormula, _subtermA, _subtermB), mWidth(_subtermA.width()), mId(0),
 		mHash((_booleanFormula.getHash() << 15) ^ (_subtermA.hash() << 10) ^ (_subtermB.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::ITE);
@@ -271,7 +272,7 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
-		mType(_type), mUnary(_operand, _index),
+		mType(_type), mUnary(_operand, _index), mWidth(0), mId(0),
 		mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
 			assert(typeIsUnary(_type));
@@ -294,7 +295,7 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
-		mType(_type), mBinary(_first, _second),
+		mType(_type), mBinary(_first, _second), mWidth(0), mId(0),
 		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
 		{
 			assert(typeIsBinary(_type));
@@ -309,12 +310,11 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
-		mType(_type), mExtract(_operand, _first, _last),
+		mType(_type), mExtract(_operand, _first, _last), mWidth(_last - _first + 1), mId(0),
 		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::EXTRACT);
 			assert(_first >= 0 && _last >= _first && _last < _operand.width());
-			mWidth = _last - _first + 1;
 		}
 
 		~BVTermContent()
@@ -426,7 +426,7 @@ namespace carl
 
 		bool operator==(const BVTermContent<Pol>& _other) const
 		{
-			if(mId && _other.mId) {
+			if(mId != 0 && _other.mId != 0) {
 				return mId == _other.mId;
 			}
 
@@ -450,7 +450,7 @@ namespace carl
 			}
 		}
 		bool operator<(const BVTermContent<Pol>& rhs) const {
-			if(mId && rhs.mId) return mId < rhs.mId;
+			if(mId != 0 && rhs.mId != 0) return mId < rhs.mId;
 			if(mType != rhs.mType) return mType < rhs.mType;
 
 			if(mType == BVTermType::CONSTANT) {
