@@ -105,15 +105,15 @@ namespace carl
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
 		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		long int aInt = *(long int*)&A;
+		long long aInt = *(long long*)&A;
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
-			aInt = long(0x8000000000000000) - aInt;
+			aInt = long long(0x8000000000000000) - aInt;
 		// Make bInt lexicographically ordered as a twos-complement int
-		long int bInt = *(long int*)&B;
+		long long bInt = *(long long*)&B;
 		if (bInt < 0)
-			bInt = long(0x8000000000000000) - bInt;
-		long int intDiff = std::abs(aInt - bInt);
+			bInt = long long(0x8000000000000000) - bInt;
+		long long intDiff = std::abs(aInt - bInt);
 		if (intDiff <= maxUlps)
 			return true;
 
