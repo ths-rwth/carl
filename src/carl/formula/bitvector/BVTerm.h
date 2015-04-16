@@ -357,7 +357,7 @@ namespace carl
 				if(mWidth == 0) {
 					return _init + "%invalid%";
 				} else {
-					string valueStr;
+					std::string valueStr;
 					boost::to_string(mValue, valueStr);
 					return _init + "0b" + valueStr;
 				}
@@ -441,11 +441,14 @@ namespace carl
 				return mVariable == _other.mVariable;
 			} else if(mType == BVTermType::ITE) {
 				return mIte == _other.mIte;
+			} else if(mType == BVTermType::EXTRACT) {
+				return mExtract == _other.mExtract;
 			} else if(typeIsUnary(mType)) {
 				return mUnary == _other.mUnary;
 			} else if(typeIsBinary(mType)) {
 				return mBinary == _other.mBinary;
 			} else {
+				std::cerr << "Type is " << mType << std::endl;
 				assert(false);
 				return false;
 			}
@@ -460,6 +463,8 @@ namespace carl
 				return mVariable < rhs.mVariable;
 			} else if(mType == BVTermType::ITE) {
 				return mIte < rhs.mIte;
+			} else if(mType == BVTermType::EXTRACT) {
+				return mExtract < rhs.mExtract;
 			} else if(typeIsUnary(mType)) {
 				return mUnary < rhs.mUnary;
 			} else if(typeIsBinary(mType)) {
