@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Common.h"
-#include "carl/numbers/numbers.h"
+#include "../../numbers/numbers.h"
 
 #ifdef USE_CLN_NUMBERS
 namespace boost { namespace spirit { namespace traits {
