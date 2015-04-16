@@ -69,6 +69,19 @@ namespace carl
             {}
         }
     }
+    
+    template<typename Pol>
+    FormulaContent<Pol>::FormulaContent( const BVConstraint<Pol>& _constraint ):
+        mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
+        mId( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
+        mType( FormulaType::BITVECTOR ),
+        mBVConstraint( _constraint ),
+        mProperties()
+    {
+    }
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( UEquality&& _ueq ):
@@ -2168,4 +2181,3 @@ namespace carl
 		return newFormula;
 	}
 }    // namespace carl
-

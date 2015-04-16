@@ -26,9 +26,9 @@ namespace carl
 
 	private:
 		/// The hash value.
-		size_t mHash;
+		std::size_t mHash;
 		/// The unique id.
-		size_t mId;
+		std::size_t mId;
 
 		/// The relation for comparing left- and right-hand side.
 		BVCompareRelation mRelation;
@@ -97,7 +97,7 @@ namespace carl
 		/**
 		 * @return The unique id of this constraint.
 		 */
-		unsigned id() const
+		std::size_t id() const
 		{
 			return mId;
 		}
@@ -105,7 +105,7 @@ namespace carl
 		/**
 		 * @return A hash value for this constraint.
 		 */
-		size_t getHash() const
+		std::size_t getHash() const
 		{
 			return mHash;
 		}
@@ -179,7 +179,7 @@ namespace carl
 			return false;
 		}
 
-		size_t hash() const
+		std::size_t hash() const
 		{
 			return mHash;
 		}

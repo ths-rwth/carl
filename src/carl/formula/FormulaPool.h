@@ -14,6 +14,8 @@
 #include <mutex>
 #include <limits>
 #include <boost/variant.hpp>
+#include "bitvector/BVConstraintPool.h"
+#include "bitvector/BVConstraint.h"
 
 #define SIMPLIFY_FORMULA
 
@@ -127,6 +129,11 @@ namespace carl
                 if( _constraint == Constraint<Pol>( false ) )
                     return falseFormula();
                 #endif
+                return add( new FormulaContent<Pol>( _constraint ) );
+            }
+            
+            const FormulaContent<Pol>* create( const BVConstraint<Pol>& _constraint )
+            {
                 return add( new FormulaContent<Pol>( _constraint ) );
             }
             

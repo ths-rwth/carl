@@ -17,6 +17,8 @@
 #include "Condition.h"
 #include "Constraint.h"
 #include "UEquality.h"
+#include "bitvector/BVConstraintPool.h"
+#include "bitvector/BVConstraint.h"
 
 namespace carl
 {
@@ -110,7 +112,7 @@ namespace carl
     
     
     /// The possible types of a formula.
-    enum FormulaType { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, TRUE, FALSE, EXISTS, FORALL, UEQ };
+    enum FormulaType { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, BITVECTOR, TRUE, FALSE, EXISTS, FORALL, UEQ };
             
     /**
      * @param _type The formula type to get the string representation for.
@@ -182,6 +184,8 @@ namespace carl
                 Formulas<Pol>* mpSubformulas;
                 /// The constraint, in case this formulas wraps a constraint.
                 Constraint<Pol> mConstraint;
+                /// The bitvector constraint.
+                BVConstraint<Pol> mBVConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
                 carl::Variable mBoolean;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -210,6 +214,12 @@ namespace carl
              * @param _constraint The pointer to the constraint.
              */
             FormulaContent( const Constraint<Pol>& _constraint );
+            
+            /**
+             * Constructs a formula being a bitvector constraint.
+             * @param _constraint The pointer to the constraint.
+             */
+            FormulaContent( const BVConstraint<Pol>& _constraint );
 
             /**
              * Constructs a formula being an uninterpreted equality.
@@ -362,6 +372,10 @@ namespace carl
             {}
                 
             explicit Formula( const Constraint<Pol>& _constraint ):
+                Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
+            {}
+            
+            explicit Formula( const BVConstraint<Pol>& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
                 
@@ -677,6 +691,12 @@ namespace carl
             {
                 assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
                 return mpContent->mConstraint;
+            }
+            
+            const BVConstraint<Pol>& bvConstraint() const
+            {
+                assert( mpContent->mType == FormulaType::BITVECTOR );
+                return mpContent->mBVConstraint;
             }
 
             /**

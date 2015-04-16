@@ -6,7 +6,6 @@
 #pragma once
 
 #include "BVVariable.h"
-#include "../Formula.h"
 #include <boost/dynamic_bitset.hpp>
 
 /**
@@ -119,6 +118,8 @@ namespace carl
 	// forward declaration
 	template<typename Pol>
 	class BVTerm;
+	template<typename Pol>
+	class Formula;
 
 	template<typename Pol>
 	struct BVITEContent
@@ -196,8 +197,8 @@ namespace carl
 	struct BVExtractContent
 	{
 		BVTerm<Pol> mOperand;
-		size_t mFirst;
-		size_t mLast;
+		std::size_t mFirst;
+		std::size_t mLast;
 
 		BVExtractContent(const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
 		mOperand(_operand), mFirst(_first), mLast(_last)
@@ -238,9 +239,9 @@ namespace carl
 			BVBinaryContent<Pol> mBinary;
 			BVExtractContent<Pol> mExtract;
 		};
-		size_t mWidth;
-		size_t mId;
-		size_t mHash;
+		std::size_t mWidth;
+		std::size_t mId;
+		std::size_t mHash;
 
 	public:
 
@@ -419,7 +420,7 @@ namespace carl
 			}
 		}
 
-		size_t hash() const
+		std::size_t hash() const
 		{
 			return this->mHash;
 		}
@@ -539,12 +540,12 @@ namespace carl
 			return(_out << _term.toString());
 		}
 
-		size_t hash() const
+		std::size_t hash() const
 		{
 			return mpContent->hash();
 		}
 
-		size_t width() const
+		std::size_t width() const
 		{
 			return mpContent->width();
 		}
