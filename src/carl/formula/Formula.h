@@ -693,8 +693,12 @@ namespace carl
             const Constraint<Pol>& constraint() const
             {
                 assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
-                return mpContent->mConstraint;
-            }
+#ifdef __VS
+				return *mpContent->mpConstraintVS;
+#else
+				return mpContent->mConstraint;
+#endif
+			}
 
             /**
              * @return The name of the Boolean variable represented by this formula. Note, that
@@ -703,8 +707,12 @@ namespace carl
             carl::Variable::Arg boolean() const
             {
                 assert( mpContent->mType == FormulaType::BOOL );
-                return mpContent->mBoolean;
-            }
+#ifdef __VS
+				return *mpContent->mpBooleanVS;
+#else
+				return mpContent->mBoolean;
+#endif
+			}
             
             /**
              * @return A constant reference to the uninterpreted equality represented by this formula. Note, that
@@ -713,7 +721,11 @@ namespace carl
             const UEquality& uequality() const
             {
                 assert( mpContent->mType == FormulaType::UEQ );
-                return mpContent->mUIEquality;
+#ifdef __VS
+                return *mpContent->mpUIEqualityVS;
+#else
+				return mpContent->mUIEquality;
+#endif
             }
 
             /**
