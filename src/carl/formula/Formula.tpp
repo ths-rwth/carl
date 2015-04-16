@@ -26,9 +26,15 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( _true ? FormulaType::TRUE : FormulaType::FALSE ),
+#ifndef __VS
         mConstraint( Constraint<Pol>( _true ) ),
+#endif
         mProperties()
-    {}
+    {
+#ifdef __VS
+		mpConstraintVS = new Constraint<Pol>(_true);
+#endif
+	}
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( carl::Variable::Arg _boolean ):
@@ -38,9 +44,14 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::BOOL ),
+#ifndef __VS
         mBoolean( _boolean ),
+#endif
         mProperties()
     {
+#ifdef __VS
+		mpBooleanVS = new carl::Variable(_boolean);
+#endif
         assert( _boolean.getType() == VariableType::VT_BOOL );
     }
 
@@ -52,17 +63,30 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::CONSTRAINT ),
+#ifndef __VS
         mConstraint( _constraint ),
+#endif
         mProperties()
     {
+#ifdef __VS
+		mpConstraintVS = new Constraint<Pol>(_constraint);
+#endif
         switch( _constraint.isConsistent() )
         {
             case 0: 
-                assert( mConstraint == Constraint<Pol>( false ) );
+#ifdef __VS
+                assert( *mpConstraintVS == Constraint<Pol>( false ) );
+#else
+				assert( mConstraint == Constraint<Pol>( false ) );
+#endif
                 mType = FormulaType::FALSE;
                 break;
             case 1: 
-                assert( mConstraint == Constraint<Pol>( true ) );
+#ifdef __VS
+                assert( *mpConstraintVS == Constraint<Pol>( true ) );
+#else
+				assert( mConstraint == Constraint<Pol>( true ) );
+#endif
                 mType = FormulaType::TRUE;
                 break;
             default:
@@ -90,10 +114,17 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::NOT ),
-        mSubformula( std::move( _subformula ) ),
-        mNegation( mSubformula.mpContent ),
+#ifndef __VS
+		mSubformula(std::move(_subformula)),
+		mNegation( mSubformula.mpContent ),
+#endif
         mProperties()
-    {}
+    {
+#ifdef __VS
+		mpSubformulaVS = new Formula<Pol>(std::move(_subformula));
+		mNegation = mpSubformulaVS->mpContent;
+#endif
+	}
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion ):
@@ -166,8 +197,12 @@ namespace carl
         }
         else if( mType == FormulaType::CONSTRAINT )
         {
-            mConstraint = Constraint<Pol>();
-        }
+#ifdef __VS
+            mpConstraintVS = new Constraint<Pol>();
+#else
+			mConstraint = Constraint<Pol>();
+#endif
+		}
         else if( mType == FormulaType::IMPLIES )
         {
             delete mpImpliesContent;
@@ -189,16 +224,17 @@ namespace carl
             }
             switch( mType )
             {
+#ifdef __VS
                 case FormulaType::BOOL:
-                    return mBoolean == _content.mBoolean;
+                    return (*mpBooleanVS == *_content.mpBooleanVS);
                 case FormulaType::TRUE:
                     return true;
                 case FormulaType::FALSE:
                     return true;
                 case FormulaType::CONSTRAINT:
-                    return mConstraint == _content.mConstraint;
+                    return (*mpConstraintVS == *_content.mpConstraintVS);
                 case FormulaType::NOT:
-                    return mSubformula == _content.mSubformula;
+                    return (*mpSubformulaVS == *_content.mpSubformulaVS);
                 case FormulaType::IMPLIES:
                     return mpImpliesContent->mPremise == _content.mpImpliesContent->mPremise 
                             && mpImpliesContent->mConclusion == _content.mpImpliesContent->mConclusion;
@@ -211,7 +247,32 @@ namespace carl
                 case FormulaType::FORALL:
                     return (*mpQuantifierContent == *_content.mpQuantifierContent);
                 case FormulaType::UEQ:
-                    return mUIEquality == _content.mUIEquality;
+                    return (*mpUIEqualityVS == *_content.mpUIEqualityVS);
+#else
+				case FormulaType::BOOL:
+					return mBoolean == _content.mBoolean;
+				case FormulaType::TRUE:
+					return true;
+				case FormulaType::FALSE:
+					return true;
+				case FormulaType::CONSTRAINT:
+					return mConstraint == _content.mConstraint;
+				case FormulaType::NOT:
+					return mSubformula == _content.mSubformula;
+				case FormulaType::IMPLIES:
+					return mpImpliesContent->mPremise == _content.mpImpliesContent->mPremise
+						&& mpImpliesContent->mConclusion == _content.mpImpliesContent->mConclusion;
+				case FormulaType::ITE:
+					return mpIteContent->mCondition == _content.mpIteContent->mCondition
+						&& mpIteContent->mThen == _content.mpIteContent->mThen
+						&& mpIteContent->mElse == _content.mpIteContent->mElse;
+				case FormulaType::EXISTS:
+					return (*mpQuantifierContent == *_content.mpQuantifierContent);
+				case FormulaType::FORALL:
+					return (*mpQuantifierContent == *_content.mpQuantifierContent);
+				case FormulaType::UEQ:
+					return mUIEquality == _content.mUIEquality;
+#endif
                 default:
                     return (*mpSubformulas) == (*_content.mpSubformulas);
             }
@@ -230,15 +291,16 @@ namespace carl
             s << " [" << mDifficulty << ":" << mActivity << "]";
             activity += s.str();
         }
+#ifdef __VS
         if( mType == FormulaType::BOOL )
         {
-            return (_init + VariablePool::getInstance().getName( mBoolean, _friendlyNames ) + activity);
+            return (_init + VariablePool::getInstance().getName( *mpBooleanVS, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::CONSTRAINT )
-            return (_init + mConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+            return (_init + mpConstraintVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         else if( mType == FormulaType::UEQ )
         {
-            return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
+            return (_init + mpUIEqualityVS->toString( _infix, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
             return (_init + formulaTypeToString( mType ) + activity);
@@ -255,10 +317,41 @@ namespace carl
                 result += "(not";
                 result += (_oneline ? " " : "\n");
             }
-            result += mSubformula.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames );
+            result += mpSubformulaVS->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames );
             result += (_oneline ? "" : "\n") + _init + ")";
             return result;
         }
+#else
+		if (mType == FormulaType::BOOL)
+		{
+			return (_init + VariablePool::getInstance().getName(mBoolean, _friendlyNames) + activity);
+		}
+		else if (mType == FormulaType::CONSTRAINT)
+			return (_init + mConstraint.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+		else if (mType == FormulaType::UEQ)
+		{
+			return (_init + mUIEquality.toString(_infix, _friendlyNames) + activity);
+		}
+		else if (mType == FormulaType::FALSE || mType == FormulaType::TRUE)
+			return (_init + formulaTypeToString(mType) + activity);
+		else if (mType == FormulaType::NOT)
+		{
+			string result = _init;
+			if (_infix)
+			{
+				result += "not(";
+				if (!_oneline) result += "\n";
+			}
+			else
+			{
+				result += "(not";
+				result += (_oneline ? " " : "\n");
+			}
+			result += mSubformula.toString(_withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames);
+			result += (_oneline ? "" : "\n") + _init + ")";
+			return result;
+		}
+#endif
         else if( mType == FormulaType::IMPLIES )
         {
             string result = _init + "(";
@@ -579,16 +672,17 @@ namespace carl
         _content.mProperties = Condition();
         switch( _content.mType )
         {
+#ifdef __VS
             case FormulaType::TRUE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( _content.mConstraint, _content.mProperties );
+                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
                 break;
             }
             case FormulaType::FALSE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( _content.mConstraint, _content.mProperties );
+                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
                 break;
             }
             case FormulaType::BOOL:
@@ -599,12 +693,12 @@ namespace carl
             case FormulaType::CONSTRAINT:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( _content.mConstraint, _content.mProperties );
+                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
                 break;
             }
             case FormulaType::NOT:
             {
-                Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
+                Condition subFormulaConds = _content.mpSubformulaVS->mpContent->mProperties;
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
                     _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION;
                 _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_THREE);
@@ -613,107 +707,143 @@ namespace carl
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
                 break;
             }
-            case FormulaType::OR:
-            {
-                _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
-                for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
-                {
-                    Condition subFormulaConds = subFormula->properties();
-                    if( !(PROP_IS_A_LITERAL<=subFormulaConds) )
-                    {
-                        _content.mProperties &= ~PROP_IS_A_CLAUSE;
-                        _content.mProperties &= ~PROP_IS_IN_CNF;
-                    }
-                    if( !(PROP_IS_IN_NNF<=subFormulaConds) )
-                        _content.mProperties &= ~PROP_IS_IN_NNF;
-                    _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
-                }
-                break;
-            }
-            case FormulaType::AND:
-            {
-                _content.mProperties |= PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
-                for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
-                {
-                    Condition subFormulaConds = subFormula->properties();
-                    if( !(PROP_IS_A_CLAUSE<=subFormulaConds) )
-                    {
-                        _content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
-                        _content.mProperties &= ~PROP_IS_IN_CNF;
-                    }
-                    else if( !(PROP_IS_A_LITERAL<=subFormulaConds) )
-                        _content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
-                    if( !(PROP_IS_IN_NNF<=subFormulaConds) )
-                        _content.mProperties &= ~PROP_IS_IN_NNF;
-                    _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
-                }
-                break;
-            }
-            case FormulaType::IMPLIES:
-            {
-                _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
-                Condition subFormulaCondsA = _content.mpImpliesContent->mPremise.properties();
-                if( !(PROP_IS_IN_NNF<=subFormulaCondsA) )
-                    _content.mProperties &= ~PROP_IS_IN_NNF;
-                _content.mProperties |= (subFormulaCondsA & WEAK_CONDITIONS);
-                Condition subFormulaCondsB = _content.mpImpliesContent->mConclusion.properties();
-                if( !(PROP_IS_IN_NNF<=subFormulaCondsB) )
-                    _content.mProperties &= ~PROP_IS_IN_NNF;
-                _content.mProperties |= (subFormulaCondsB & WEAK_CONDITIONS);
-                break;
-            }
-            case FormulaType::ITE:
-            {
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
-                _content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
-                _content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
-                _content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
-                break;
-            }
-            case FormulaType::IFF:
-            {
-                _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
-                for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
-                {
-                    Condition subFormulaConds = subFormula->properties();
-                    if( !(PROP_IS_IN_NNF<=subFormulaConds) )
-                        _content.mProperties &= ~PROP_IS_IN_NNF;
-                    _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
-                }
-                break;
-            }
-            case FormulaType::XOR:
-            {
-                _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
-                for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
-                {
-                    Condition subFormulaConds = subFormula->properties();
-                    if( !(PROP_IS_IN_NNF<=subFormulaConds) )
-                        _content.mProperties &= ~PROP_IS_IN_NNF;
-                    _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
-                }
-                break;
-            }
-            case FormulaType::EXISTS:
-            {
-                ///@todo do something here
-                break;
-            }
-            case FormulaType::FORALL:
-            {
-                ///@todo do something here
-                break;
-            }
-            case FormulaType::UEQ:
-            {
-                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_UNINTERPRETED_EQUATIONS;
-                break;
-            }
+#else
+			case FormulaType::TRUE:
+			{
+				_content.mProperties |= STRONG_CONDITIONS;
+				addConstraintProperties(_content.mConstraint, _content.mProperties);
+				break;
+			}
+			case FormulaType::FALSE:
+			{
+				_content.mProperties |= STRONG_CONDITIONS;
+				addConstraintProperties(_content.mConstraint, _content.mProperties);
+				break;
+			}
+			case FormulaType::BOOL:
+			{
+				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BOOLEAN;
+				break;
+			}
+			case FormulaType::CONSTRAINT:
+			{
+				_content.mProperties |= STRONG_CONDITIONS;
+				addConstraintProperties(_content.mConstraint, _content.mProperties);
+				break;
+			}
+			case FormulaType::NOT:
+			{
+				Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
+				if (PROP_IS_AN_ATOM <= subFormulaConds)
+					_content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION;
+				_content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_THREE);
+				_content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_FOUR);
+				_content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_FIVE);
+				_content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+				break;
+			}
+#endif
+			case FormulaType::OR:
+			{
+				_content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
+				_content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+				for (auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula)
+				{
+					Condition subFormulaConds = subFormula->properties();
+					if (!(PROP_IS_A_LITERAL <= subFormulaConds))
+					{
+						_content.mProperties &= ~PROP_IS_A_CLAUSE;
+						_content.mProperties &= ~PROP_IS_IN_CNF;
+					}
+					if (!(PROP_IS_IN_NNF <= subFormulaConds))
+						_content.mProperties &= ~PROP_IS_IN_NNF;
+					_content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+				}
+				break;
+			}
+			case FormulaType::AND:
+			{
+				_content.mProperties |= PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
+				_content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+				for (auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula)
+				{
+					Condition subFormulaConds = subFormula->properties();
+					if (!(PROP_IS_A_CLAUSE <= subFormulaConds))
+					{
+						_content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
+						_content.mProperties &= ~PROP_IS_IN_CNF;
+					}
+					else if (!(PROP_IS_A_LITERAL <= subFormulaConds))
+						_content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
+					if (!(PROP_IS_IN_NNF <= subFormulaConds))
+						_content.mProperties &= ~PROP_IS_IN_NNF;
+					_content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+				}
+				break;
+			}
+			case FormulaType::IMPLIES:
+			{
+				_content.mProperties |= PROP_IS_IN_NNF;
+				_content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+				Condition subFormulaCondsA = _content.mpImpliesContent->mPremise.properties();
+				if (!(PROP_IS_IN_NNF <= subFormulaCondsA))
+					_content.mProperties &= ~PROP_IS_IN_NNF;
+				_content.mProperties |= (subFormulaCondsA & WEAK_CONDITIONS);
+				Condition subFormulaCondsB = _content.mpImpliesContent->mConclusion.properties();
+				if (!(PROP_IS_IN_NNF <= subFormulaCondsB))
+					_content.mProperties &= ~PROP_IS_IN_NNF;
+				_content.mProperties |= (subFormulaCondsB & WEAK_CONDITIONS);
+				break;
+			}
+			case FormulaType::ITE:
+			{
+				_content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+				_content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
+				_content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
+				_content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
+				break;
+			}
+			case FormulaType::IFF:
+			{
+				_content.mProperties |= PROP_IS_IN_NNF;
+				_content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+				for (auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula)
+				{
+					Condition subFormulaConds = subFormula->properties();
+					if (!(PROP_IS_IN_NNF <= subFormulaConds))
+						_content.mProperties &= ~PROP_IS_IN_NNF;
+					_content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+				}
+				break;
+			}
+			case FormulaType::XOR:
+			{
+				_content.mProperties |= PROP_IS_IN_NNF;
+				_content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+				for (auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula)
+				{
+					Condition subFormulaConds = subFormula->properties();
+					if (!(PROP_IS_IN_NNF <= subFormulaConds))
+						_content.mProperties &= ~PROP_IS_IN_NNF;
+					_content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
+				}
+				break;
+			}
+			case FormulaType::EXISTS:
+			{
+				///@todo do something here
+				break;
+			}
+			case FormulaType::FORALL:
+			{
+				///@todo do something here
+				break;
+			}
+			case FormulaType::UEQ:
+			{
+				_content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_UNINTERPRETED_EQUATIONS;
+				break;
+			}
             default:
             {
                 assert( false );
