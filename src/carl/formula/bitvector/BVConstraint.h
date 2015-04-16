@@ -12,17 +12,15 @@ namespace carl
 {
 
 	// Forward declaration
-	template<typename Pol>
 	class BVConstraintPool;
 
-	template<typename Pol>
 	class BVConstraint
 	{
-		// TODO: Assigning mId requires Pool<BVConstraint<Pol>> to be a friend,
-		// using the private constructors requires BVConstraintPool<Pol> to be
+		// TODO: Assigning mId requires Pool<BVConstraint> to be a friend,
+		// using the private constructors requires BVConstraintPool to be
 		// a friend. Should we move mId assignment to subclass?
-		friend class Pool<BVConstraint<Pol>>;
-		friend class BVConstraintPool<Pol>;
+		friend class Pool<BVConstraint>;
+		friend class BVConstraintPool;
 
 	private:
 		/// The hash value.
@@ -33,9 +31,9 @@ namespace carl
 		/// The relation for comparing left- and right-hand side.
 		BVCompareRelation mRelation;
 		/// The left-hand side of the (in)equality.
-		BVTerm<Pol> mLhs;
+		BVTerm mLhs;
 		/// The right-hand size of the (in)equality.
-		BVTerm<Pol> mRhs;
+		BVTerm mRhs;
 
 
 		BVConstraint(bool _consistent = true) :
@@ -50,7 +48,7 @@ namespace carl
 		 * @param _relation The relation symbol to be used for the constraint.
 		 */
 		BVConstraint(const BVCompareRelation& _relation,
-			const BVTerm<Pol>& _lhs, const BVTerm<Pol>& _rhs) :
+			const BVTerm& _lhs, const BVTerm& _rhs) :
 		mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash()), mId(0),
 		mRelation(_relation), mLhs(_lhs), mRhs(_rhs)
 		{
@@ -59,21 +57,21 @@ namespace carl
 
 	public:
 
-		static BVConstraint<Pol> create(bool _consistent = true)
+		static BVConstraint create(bool _consistent = true)
 		{
-			return *(BVConstraintPool<Pol>::getInstance().create(_consistent));
+			return *(BVConstraintPool::getInstance().create(_consistent));
 		}
 
-		static BVConstraint<Pol> create(const BVCompareRelation& _relation,
-			const BVTerm<Pol>& _lhs, const BVTerm<Pol>& _rhs)
+		static BVConstraint create(const BVCompareRelation& _relation,
+			const BVTerm& _lhs, const BVTerm& _rhs)
 		{
-			return *(BVConstraintPool<Pol>::getInstance().create(_relation, _lhs, _rhs));
+			return *(BVConstraintPool::getInstance().create(_relation, _lhs, _rhs));
 		}
 
 		/**
 		 * @return The bit-vector term being the left-hand side of this constraint.
 		 */
-		const BVTerm<Pol>& lhs() const
+		const BVTerm& lhs() const
 		{
 			return mLhs;
 		}
@@ -81,7 +79,7 @@ namespace carl
 		/**
 		 * @return The bit-vector term being the right-hand side of this constraint.
 		 */
-		const BVTerm<Pol>& rhs() const
+		const BVTerm& rhs() const
 		{
 			return mRhs;
 		}
@@ -112,11 +110,6 @@ namespace carl
 
 		/**
 		 * Gives the string representation of this bit vector constraint.
-		 * @param _withActivity A flag which indicates whether to add the formulas' activity to the result.
-		 *                      (not yet supported for bit vector objects, but is passed to subformulae)
-		 * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal.
-		 *                        (Again, only applies to non-bitvector parts of the constraint.
-		 *                        For further description see documentation of Formula::toString( .. ))
 		 * @param _init The initial string of every row of the result.
 		 * @param _oneline A flag indicating whether the constraint shall be printed on one line.
 		 * @param _infix A flag indicating whether to print the constraint in infix or prefix notation.
@@ -124,7 +117,7 @@ namespace carl
 		 *                        or with their dedicated names.
 		 * @return The resulting string representation of this constraint.
 		 */
-		std::string toString(bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
+		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
 			std::string out = _init + "(";
 
@@ -134,13 +127,13 @@ namespace carl
 			if(!_oneline)
 				out += "\n";
 
-			out += mLhs.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+			out += mLhs.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 			out += (_oneline ? " " : "\n");
 
 			if(_infix)
 				out += _init + carl::toString(mRelation) + (_oneline ? " " : "\n");
 
-			out += mRhs.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+			out += mRhs.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 			out += ")";
 
 			return out;
@@ -151,13 +144,12 @@ namespace carl
 		 * @param _out The stream to print on.
 		 * @param _constraint The constraint to be printed.
 		 */
-		template<typename P>
-		friend std::ostream& operator<<(std::ostream& _out, const BVConstraint<P>& _constraint)
+		friend std::ostream& operator<<(std::ostream& _out, const BVConstraint& _constraint)
 		{
 			return(_out << _constraint.toString());
 		}
 
-		bool operator==(const BVConstraint<Pol>& _other) const
+		bool operator==(const BVConstraint& _other) const
 		{
 			if(mId != 0 && _other.mId != 0) {
 				return mId == _other.mId;
@@ -168,7 +160,7 @@ namespace carl
 				&& mLhs == _other.mLhs
 				&& mRhs == _other.mRhs;
 		}
-		bool operator<(const BVConstraint<Pol>& _other) const
+		bool operator<(const BVConstraint& _other) const
 		{
 			if (mId != 0 && _other.mId != 0) {
 				return mId < _other.mId;
@@ -192,8 +184,8 @@ namespace std
 	/**
 	 * Implements std::hash for bit-vector constraints.
 	 */
-	template<typename Pol>
-	struct hash<carl::BVConstraint<Pol>>
+    template <>
+	struct hash<carl::BVConstraint>
 	{
 		public:
 
@@ -201,7 +193,7 @@ namespace std
 		 * @param _constraint The bit-vector constraint to get the hash for.
 		 * @return The hash of the given constraint.
 		 */
-		size_t operator()(const carl::BVConstraint<Pol>& _constraint) const
+		size_t operator()(const carl::BVConstraint& _constraint) const
 		{
 			return _constraint.hash();
 		}

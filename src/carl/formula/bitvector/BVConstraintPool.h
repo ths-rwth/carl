@@ -1,5 +1,5 @@
 /* 
- * File:   BVPools.h
+ * File:   BVConstraintPool.h
  * Author: Andreas Krueger <andreas.krueger@rwth-aachen.de>
  */
 
@@ -10,12 +10,11 @@
 
 namespace carl
 {
-	template<typename Pol>
-	class BVConstraintPool : public Singleton<BVConstraintPool<Pol>>, public Pool<BVConstraint<Pol>>
+	class BVConstraintPool : public Singleton<BVConstraintPool>, public Pool<BVConstraint>
 	{
 		friend Singleton<BVConstraintPool>;
 
-		typedef BVConstraint<Pol> Constraint;
+		typedef BVConstraint Constraint;
 		typedef Constraint* ConstraintPtr;
 		typedef const Constraint* ConstConstraintPtr;
 
@@ -27,11 +26,11 @@ namespace carl
 		}
 
 		ConstConstraintPtr create(const BVCompareRelation& _relation,
-			const BVTerm<Pol>& _lhs, const BVTerm<Pol>& _rhs)
+			const BVTerm& _lhs, const BVTerm& _rhs)
 		{
 			return this->add(new Constraint(_relation, _lhs, _rhs));
 		}
 	};
 }
 
-#define BV_CONSTRAINT_POOL BVConstraintPool<Pol>::getInstance()
+#define BV_CONSTRAINT_POOL BVConstraintPool::getInstance()

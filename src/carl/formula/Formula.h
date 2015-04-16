@@ -185,7 +185,7 @@ namespace carl
                 /// The constraint, in case this formulas wraps a constraint.
                 Constraint<Pol> mConstraint;
                 /// The bitvector constraint.
-                BVConstraint<Pol> mBVConstraint;
+                BVConstraint mBVConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
                 carl::Variable mBoolean;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -219,7 +219,7 @@ namespace carl
              * Constructs a formula being a bitvector constraint.
              * @param _constraint The pointer to the constraint.
              */
-            FormulaContent( const BVConstraint<Pol>& _constraint );
+            FormulaContent( const BVConstraint& _constraint );
 
             /**
              * Constructs a formula being an uninterpreted equality.
@@ -375,7 +375,7 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
             
-            explicit Formula( const BVConstraint<Pol>& _constraint ):
+            explicit Formula( const BVConstraint& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
                 
@@ -693,7 +693,7 @@ namespace carl
                 return mpContent->mConstraint;
             }
             
-            const BVConstraint<Pol>& bvConstraint() const
+            const BVConstraint& bvConstraint() const
             {
                 assert( mpContent->mType == FormulaType::BITVECTOR );
                 return mpContent->mBVConstraint;

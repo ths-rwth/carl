@@ -132,7 +132,7 @@ namespace carl
                 return add( new FormulaContent<Pol>( _constraint ) );
             }
             
-            const FormulaContent<Pol>* create( const BVConstraint<Pol>& _constraint )
+            const FormulaContent<Pol>* create( const BVConstraint& _constraint )
             {
                 return add( new FormulaContent<Pol>( _constraint ) );
             }

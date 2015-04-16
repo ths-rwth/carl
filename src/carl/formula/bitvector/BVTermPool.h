@@ -10,13 +10,12 @@
 
 namespace carl
 {
-	template<typename Pol>
-	class BVTermPool : public Singleton<BVTermPool<Pol>>, public Pool<BVTermContent<Pol>>
+	class BVTermPool : public Singleton<BVTermPool>, public Pool<BVTermContent>
 	{
 		friend Singleton<BVTermPool>;
 	public:
 
-		typedef BVTermContent<Pol> Term;
+		typedef BVTermContent Term;
 		typedef Term* TermPtr;
 		typedef const Term* ConstTermPtr;
 	private:
@@ -25,7 +24,7 @@ namespace carl
 
 	public:
 
-		BVTermPool() : Singleton<BVTermPool<Pol>> (), Pool<BVTermContent<Pol>> ()
+		BVTermPool() : Singleton<BVTermPool> (), Pool<BVTermContent> ()
 		{
 			this->mpInvalid = this->add(new Term);
 		}
@@ -45,26 +44,21 @@ namespace carl
 			return this->add(new Term(_type, _variable));
 		}
 
-		ConstTermPtr create(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB)
-		{
-			return this->add(new Term(_type, _booleanFormula, _subtermA, _subtermB));
-		}
-
-		ConstTermPtr create(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0)
+		ConstTermPtr create(BVTermType _type, const BVTerm& _operand, const size_t _index = 0)
 		{
 			return this->add(new Term(_type, _operand, _index));
 		}
 
-		ConstTermPtr create(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second)
+		ConstTermPtr create(BVTermType _type, const BVTerm& _first, const BVTerm& _second)
 		{
 			return this->add(new Term(_type, _first, _second));
 		}
 
-		ConstTermPtr create(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last)
+		ConstTermPtr create(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last)
 		{
 			return this->add(new Term(_type, _operand, _first, _last));
 		}
 	};
 }
 
-#define BV_TERM_POOL BVTermPool<Pol>::getInstance()
+#define BV_TERM_POOL BVTermPool::getInstance()

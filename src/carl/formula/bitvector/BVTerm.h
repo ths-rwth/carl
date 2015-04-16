@@ -33,7 +33,6 @@ namespace carl
 	{
 		CONSTANT,
 		VARIABLE,
-		ITE,
 		CONCAT, EXTRACT,
 		NOT,
 		NEG,
@@ -51,7 +50,6 @@ namespace carl
 		switch(_type) {
 		case BVTermType::CONSTANT: return "CONSTANT";
 		case BVTermType::VARIABLE: return "VARIABLE";
-		case BVTermType::ITE: return "ite";
 		case BVTermType::CONCAT: return "concat";
 		case BVTermType::EXTRACT: return "extract";
 		case BVTermType::NOT: return "bvnot";
@@ -116,44 +114,14 @@ namespace carl
 	}
 
 	// forward declaration
-	template<typename Pol>
 	class BVTerm;
-	template<typename Pol>
-	class Formula;
 
-	template<typename Pol>
-	struct BVITEContent
-	{
-		Formula<Pol> mCondition;
-		BVTerm<Pol> mThen;
-		BVTerm<Pol> mElse;
-
-		BVITEContent(const Formula<Pol>& _condition, const BVTerm<Pol>& _then, const BVTerm<Pol>& _else) :
-		mCondition(_condition), mThen(_then), mElse(_else)
-		{
-			assert(_then.width() == _else.width());
-		}
-
-		bool operator==(const BVITEContent& _other) const
-		{
-			return mCondition == _other.mCondition && mThen == _other.mThen && mElse == _other.mElse;
-		}
-		bool operator<(const BVITEContent& _other) const
-		{
-			if (mCondition != _other.mCondition) return mCondition < _other.mCondition;
-			if (!(mThen == _other.mThen)) return mThen < _other.mThen;
-			if (!(mElse == _other.mElse)) return mElse < _other.mElse;
-			return false;
-		}
-	};
-
-	template<typename Pol>
 	struct BVUnaryContent
 	{
-		BVTerm<Pol> mOperand;
+		BVTerm mOperand;
 		size_t mIndex;
 
-		BVUnaryContent(const BVTerm<Pol>& _operand, const size_t _index = 0) :
+		BVUnaryContent(const BVTerm& _operand, const size_t _index = 0) :
 		mOperand(_operand), mIndex(_index)
 		{
 		}
@@ -170,13 +138,12 @@ namespace carl
 		}
 	};
 
-	template<typename Pol>
 	struct BVBinaryContent
 	{
-		BVTerm<Pol> mFirst;
-		BVTerm<Pol> mSecond;
+		BVTerm mFirst;
+		BVTerm mSecond;
 
-		BVBinaryContent(const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
+		BVBinaryContent(const BVTerm& _first, const BVTerm& _second) :
 		mFirst(_first), mSecond(_second)
 		{
 		}
@@ -193,14 +160,13 @@ namespace carl
 		}
 	};
 
-	template<typename Pol>
 	struct BVExtractContent
 	{
-		BVTerm<Pol> mOperand;
+		BVTerm mOperand;
 		std::size_t mFirst;
 		std::size_t mLast;
 
-		BVExtractContent(const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
+		BVExtractContent(const BVTerm& _operand, const size_t _first, const size_t _last) :
 		mOperand(_operand), mFirst(_first), mLast(_last)
 		{
 		}
@@ -222,10 +188,9 @@ namespace carl
 	template<typename Element>
 	class Pool;
 
-	template<typename Pol>
 	class BVTermContent
 	{
-		friend class Pool<BVTermContent<Pol>>;
+		friend class Pool<BVTermContent>;
 
 	private:
 		BVTermType mType;
@@ -234,10 +199,9 @@ namespace carl
 		{
 			BVVariable mVariable;
 			BVValue mValue;
-			BVITEContent<Pol> mIte;
-			BVUnaryContent<Pol> mUnary;
-			BVBinaryContent<Pol> mBinary;
-			BVExtractContent<Pol> mExtract;
+			BVUnaryContent mUnary;
+			BVBinaryContent mBinary;
+			BVExtractContent mExtract;
 		};
 		std::size_t mWidth;
 		std::size_t mId;
@@ -264,15 +228,7 @@ namespace carl
 			assert(_type == BVTermType::VARIABLE);
 		}
 
-		BVTermContent(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
-		mType(_type), mIte(_booleanFormula, _subtermA, _subtermB), mWidth(_subtermA.width()), mId(0),
-		mHash((_booleanFormula.getHash() << 15) ^ (_subtermA.hash() << 10) ^ (_subtermB.hash() << 5) ^ typeId(_type))
-		{
-			assert(_type == BVTermType::ITE);
-			assert(_subtermA.width() == _subtermB.width());
-		}
-
-		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
+		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
 		mType(_type), mUnary(_operand, _index), mWidth(0), mId(0),
 		mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
@@ -295,7 +251,7 @@ namespace carl
 			}
 		}
 
-		BVTermContent(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
+		BVTermContent(BVTermType _type, const BVTerm& _first, const BVTerm& _second) :
 		mType(_type), mBinary(_first, _second), mWidth(0), mId(0),
 		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
 		{
@@ -310,7 +266,7 @@ namespace carl
 			}
 		}
 
-		BVTermContent(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
+		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last) :
 		mType(_type), mExtract(_operand, _first, _last), mWidth(_first - _last + 1), mId(0),
 		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
@@ -339,11 +295,6 @@ namespace carl
 
 		/**
 		 * Gives the string representation of this bit vector term.
-		 * @param _withActivity A flag which indicates whether to add the formulas' activity to the result.
-		 *                      (not yet supported for bit vector objects, but is passed to subformulae)
-		 * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal.
-		 *                        (Again, only applies to non-bitvector parts of the term.
-		 *                        For further description see documentation of Formula::toString( .. ))
 		 * @param _init The initial string of every row of the result.
 		 * @param _oneline A flag indicating whether the term shall be printed on one line.
 		 * @param _infix A flag indicating whether to print the term in infix or prefix notation.
@@ -351,7 +302,7 @@ namespace carl
 		 *                        or with their dedicated names.
 		 * @return The resulting string representation of this term.
 		 */
-		std::string toString(bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
+		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
 			if(mType == BVTermType::CONSTANT) {
 				if(mWidth == 0) {
@@ -383,17 +334,13 @@ namespace carl
 				}
 
 				// Fill arg* variables
-				if(mType == BVTermType::ITE) {
-					argFirst = mIte.mCondition.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-					argSecond = mIte.mThen.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-					argThird = mIte.mElse.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else if(mType == BVTermType::EXTRACT) {
-					argFirst = mExtract.mOperand.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+				if(mType == BVTermType::EXTRACT) {
+					argFirst = mExtract.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				} else if(typeIsUnary(mType)) {
-					argFirst = mUnary.mOperand.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = mUnary.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				} else if(typeIsBinary(mType)) {
-					argFirst = mBinary.mFirst.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-					argSecond = mBinary.mSecond.toString(_withActivity, _resolveUnequal, (_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = mBinary.mFirst.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argSecond = mBinary.mSecond.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				} else {
 					assert(false);
 				}
@@ -425,7 +372,7 @@ namespace carl
 			return this->mHash;
 		}
 
-		bool operator==(const BVTermContent<Pol>& _other) const
+		bool operator==(const BVTermContent& _other) const
 		{
 			if(mId != 0 && _other.mId != 0) {
 				return mId == _other.mId;
@@ -439,8 +386,6 @@ namespace carl
 				return mValue == _other.mValue;
 			} else if(mType == BVTermType::VARIABLE) {
 				return mVariable == _other.mVariable;
-			} else if(mType == BVTermType::ITE) {
-				return mIte == _other.mIte;
 			} else if(mType == BVTermType::EXTRACT) {
 				return mExtract == _other.mExtract;
 			} else if(typeIsUnary(mType)) {
@@ -453,7 +398,7 @@ namespace carl
 				return false;
 			}
 		}
-		bool operator<(const BVTermContent<Pol>& rhs) const {
+		bool operator<(const BVTermContent& rhs) const {
 			if(mId != 0 && rhs.mId != 0) return mId < rhs.mId;
 			if(mType != rhs.mType) return mType < rhs.mType;
 
@@ -461,8 +406,6 @@ namespace carl
 				return mValue < rhs.mValue;
 			} else if(mType == BVTermType::VARIABLE) {
 				return mVariable < rhs.mVariable;
-			} else if(mType == BVTermType::ITE) {
-				return mIte < rhs.mIte;
 			} else if(mType == BVTermType::EXTRACT) {
 				return mExtract < rhs.mExtract;
 			} else if(typeIsUnary(mType)) {
@@ -480,67 +423,58 @@ namespace carl
 		 * @param _out The stream to print on.
 		 * @param _term The term to be printed.
 		 */
-		template<typename P>
-		friend std::ostream& operator<<(std::ostream& _out, const BVTermContent<P>& _term)
+		friend std::ostream& operator<<(std::ostream& _out, const BVTermContent& _term)
 		{
 			return(_out << _term.toString());
 		}
 	};
 
 	// Forward declaration
-	template<typename Pol>
 	class BVTermPool;
 
-	template<typename Pol>
 	class BVTerm
 	{
 	private:
-		const BVTermContent<Pol> * mpContent;
+		const BVTermContent * mpContent;
 
 	public:
 
 		BVTerm() :
-		mpContent(BVTermPool<Pol>::getInstance().create())
+		mpContent(BVTermPool::getInstance().create())
 		{
 		}
 
 		BVTerm(BVTermType _type, BVValue _value) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _value))
+		mpContent(BVTermPool::getInstance().create(_type, _value))
 		{
 		}
 
 		BVTerm(BVTermType _type, const BVVariable& _variable) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _variable))
+		mpContent(BVTermPool::getInstance().create(_type, _variable))
 		{
 		}
 
-		BVTerm(BVTermType _type, const Formula<Pol>& _booleanFormula, const BVTerm<Pol>& _subtermA, const BVTerm<Pol>& _subtermB) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _booleanFormula, _subtermA, _subtermB))
+		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
+		mpContent(BVTermPool::getInstance().create(_type, _operand, _index))
 		{
 		}
 
-		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _index = 0) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _operand, _index))
+		BVTerm(BVTermType _type, const BVTerm& _first, const BVTerm& _second) :
+		mpContent(BVTermPool::getInstance().create(_type, _first, _second))
 		{
 		}
 
-		BVTerm(BVTermType _type, const BVTerm<Pol>& _first, const BVTerm<Pol>& _second) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _first, _second))
+		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last) :
+		mpContent(BVTermPool::getInstance().create(_type, _operand, _first, _last))
 		{
 		}
 
-		BVTerm(BVTermType _type, const BVTerm<Pol>& _operand, const size_t _first, const size_t _last) :
-		mpContent(BVTermPool<Pol>::getInstance().create(_type, _operand, _first, _last))
+		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
+			return mpContent->toString(_init, _oneline, _infix, _friendlyNames);
 		}
 
-		std::string toString(bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
-		{
-			return mpContent->toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
-		}
-
-		template<typename P>
-		friend std::ostream& operator<<(std::ostream& _out, const BVTerm<P>& _term)
+		friend std::ostream& operator<<(std::ostream& _out, const BVTerm& _term)
 		{
 			return(_out << _term.toString());
 		}
@@ -560,11 +494,11 @@ namespace carl
 			return mpContent->type();
 		}
 
-		bool operator==(const BVTerm<Pol>& _other) const
+		bool operator==(const BVTerm& _other) const
 		{
 			return mpContent == _other.mpContent;
 		}
-		bool operator<(const BVTerm<Pol>& rhs) const {
+		bool operator<(const BVTerm& rhs) const {
 			return *(this->mpContent) < *(rhs.mpContent);
 		}
 	};
@@ -575,8 +509,7 @@ namespace std
 	/**
 	 * Implements std::hash for bit vector terms.
 	 */
-	template<typename Pol>
-	struct hash<carl::BVTermContent<Pol>>
+	struct hash<carl::BVTermContent>
 	{
 		public:
 
@@ -584,7 +517,7 @@ namespace std
 		 * @param _formula The bit vector term to get the hash for.
 		 * @return The hash of the given bit vector term.
 		 */
-		size_t operator()(const carl::BVTermContent<Pol>& _term) const
+		size_t operator()(const carl::BVTermContent& _term) const
 		{
 			return _term.hash();
 		}

@@ -71,7 +71,7 @@ namespace carl
     }
     
     template<typename Pol>
-    FormulaContent<Pol>::FormulaContent( const BVConstraint<Pol>& _constraint ):
+    FormulaContent<Pol>::FormulaContent( const BVConstraint& _constraint ):
         mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
         mId( 0 ),
         mActivity( 0.0 ),
@@ -250,7 +250,7 @@ namespace carl
         else if( mType == FormulaType::CONSTRAINT )
             return (_init + mConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         else if (mType == FormulaType::BITVECTOR) {
-            return (_init + mBVConstraint.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames) + activity);
+            return (_init + mBVConstraint.toString(_init, _oneline, _infix, _friendlyNames) + activity);
         }
         else if( mType == FormulaType::UEQ )
         {
