@@ -288,8 +288,8 @@ namespace carl
 				assert(_index > 0);
 				mWidth = _operand.width() * _index;
 			} else if(_type == BVTermType::EXT_U || _type == BVTermType::EXT_S) {
-				assert(_index >= _operand.width());
-				mWidth = _index;
+				assert(_index >= 0);
+				mWidth = _operand.width() + _index;
 			} else {
 				assert(false);
 			}
@@ -357,7 +357,7 @@ namespace carl
 				if(mWidth == 0) {
 					return _init + "%invalid%";
 				} else {
-					string valueStr;
+					std::string valueStr;
 					boost::to_string(mValue, valueStr);
 					return _init + "0b" + valueStr;
 				}

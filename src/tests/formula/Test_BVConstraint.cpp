@@ -46,9 +46,9 @@ TEST(BVConstraint, Construction)
 	BVTerm<Pol> bvextract(BVTermType::EXTRACT, bvnot, 8, 6);
 	BVTerm<Pol> bvconcat(BVTermType::CONCAT, bvextract, bvextract);
 
-	BVTerm<Pol> bvzeroext(BVTermType::EXT_U, bvconcat, 8);
+	BVTerm<Pol> bvzeroext(BVTermType::EXT_U, bvconcat, 2);
 
-	BVTerm<Pol> bvzeroext2(BVTermType::EXT_U, bvconcat, 8);
+	BVTerm<Pol> bvzeroext2(BVTermType::EXT_U, bvconcat, 2);
 
 	std::cout << "equal? " << (bvzeroext == bvzeroext2) << std::endl;
 
