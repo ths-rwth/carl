@@ -2021,6 +2021,14 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename C, typename O, typename P>
+const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	MultivariatePolynomial<C,O,P> res;
+	bool flag = lhs.divideBy(rhs, res);
+	assert(flag);
+	return res;
+}
+
+template<typename C, typename O, typename P>
 const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs)
 {
 	MultivariatePolynomial<C,O,P> result;
