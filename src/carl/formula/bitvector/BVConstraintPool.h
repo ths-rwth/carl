@@ -6,10 +6,14 @@
 #pragma once
 
 #include "Pool.h"
-#include "BVConstraint.h"
 
 namespace carl
 {
+	// Forward declaration
+	class BVConstraint;
+	enum class BVCompareRelation : unsigned;
+	class BVTerm;
+
 	class BVConstraintPool : public Singleton<BVConstraintPool>, public Pool<BVConstraint>
 	{
 		friend Singleton<BVConstraintPool>;
@@ -20,16 +24,10 @@ namespace carl
 
 		public:
 
-		ConstConstraintPtr create(bool _consistent = true)
-		{
-			return this->add(new Constraint(_consistent));
-		}
+		ConstConstraintPtr create(bool _consistent = true);
 
 		ConstConstraintPtr create(const BVCompareRelation& _relation,
-			const BVTerm& _lhs, const BVTerm& _rhs)
-		{
-			return this->add(new Constraint(_relation, _lhs, _rhs));
-		}
+			const BVTerm& _lhs, const BVTerm& _rhs);
 	};
 }
 

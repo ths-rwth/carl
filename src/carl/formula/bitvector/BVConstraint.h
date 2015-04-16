@@ -57,16 +57,10 @@ namespace carl
 
 	public:
 
-		static BVConstraint create(bool _consistent = true)
-		{
-			return *(BVConstraintPool::getInstance().create(_consistent));
-		}
+		static BVConstraint create(bool _consistent = true);
 
 		static BVConstraint create(const BVCompareRelation& _relation,
-			const BVTerm& _lhs, const BVTerm& _rhs)
-		{
-			return *(BVConstraintPool::getInstance().create(_relation, _lhs, _rhs));
-		}
+			const BVTerm& _lhs, const BVTerm& _rhs);
 
 		/**
 		 * @return The bit-vector term being the left-hand side of this constraint.
@@ -184,7 +178,7 @@ namespace std
 	/**
 	 * Implements std::hash for bit-vector constraints.
 	 */
-    template <>
+	template <>
 	struct hash<carl::BVConstraint>
 	{
 		public:

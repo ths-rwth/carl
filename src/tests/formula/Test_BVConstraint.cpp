@@ -28,9 +28,6 @@ TEST(BVConstraint, Construction)
 	BVTerm check_for_default_constructor;
 
 	BVTerm oxfff0(BVTermType::CONSTANT, BVValue(16, 65520));
-	const Formula trueFormula = Formula(FormulaType::TRUE);
-
-	BVTerm ite(BVTermType::ITE, trueFormula, a_t, b_t);
 
 	BVTerm bvand(BVTermType::AND, a_t, oxfff0);
 	BVTerm bvmul(BVTermType::MUL, bvand, b_t);
@@ -55,7 +52,7 @@ TEST(BVConstraint, Construction)
 	BVConstraint constraint = BVConstraint::create(BVCompareRelation::SLT, oxaa, bvzeroext);
 	BVConstraint inconsistentConstraint = BVConstraint::create(false);
 
-	std::cout << constraint.toString(false, 0, "", false, false, true) << std::endl;
+	std::cout << constraint.toString("", false, false, true) << std::endl;
 
 	BV_TERM_POOL.print();
 	BV_CONSTRAINT_POOL.print();

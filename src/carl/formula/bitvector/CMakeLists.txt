@@ -11,6 +11,10 @@ set(carl_lib_formula_bitvector_headers
 
 # Source files in here
 set(carl_lib_formula_bitvector_sources
+    formula/bitvector/BVConstraint.cpp
+    formula/bitvector/BVConstraintPool.cpp
+    formula/bitvector/BVTerm.cpp
+    formula/bitvector/BVTermPool.cpp
     PARENT_SCOPE
 )
 

@@ -114,7 +114,49 @@ namespace carl
 	}
 
 	// forward declaration
-	class BVTerm;
+	class BVTermContent;
+
+	// Forward declaration
+	class BVTermPool;
+
+	class BVTerm
+	{
+	private:
+		const BVTermContent * mpContent;
+
+	public:
+
+		BVTerm();
+
+		BVTerm(BVTermType _type, BVValue _value);
+
+		BVTerm(BVTermType _type, const BVVariable& _variable);
+
+		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _index = 0);
+
+		BVTerm(BVTermType _type, const BVTerm& _first, const BVTerm& _second);
+
+		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last);
+
+		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const;
+
+		friend std::ostream& operator<<(std::ostream& _out, const BVTerm& _term)
+		{
+			return(_out << _term.toString());
+		}
+
+		std::size_t hash() const;
+
+		std::size_t width() const;
+
+		BVTermType type() const;
+
+		bool operator==(const BVTerm& _other) const
+		{
+			return mpContent == _other.mpContent;
+		}
+		bool operator<(const BVTerm& rhs) const;
+	};
 
 	struct BVUnaryContent
 	{
@@ -428,80 +470,6 @@ namespace carl
 			return(_out << _term.toString());
 		}
 	};
-
-	// Forward declaration
-	class BVTermPool;
-
-	class BVTerm
-	{
-	private:
-		const BVTermContent * mpContent;
-
-	public:
-
-		BVTerm() :
-		mpContent(BVTermPool::getInstance().create())
-		{
-		}
-
-		BVTerm(BVTermType _type, BVValue _value) :
-		mpContent(BVTermPool::getInstance().create(_type, _value))
-		{
-		}
-
-		BVTerm(BVTermType _type, const BVVariable& _variable) :
-		mpContent(BVTermPool::getInstance().create(_type, _variable))
-		{
-		}
-
-		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
-		mpContent(BVTermPool::getInstance().create(_type, _operand, _index))
-		{
-		}
-
-		BVTerm(BVTermType _type, const BVTerm& _first, const BVTerm& _second) :
-		mpContent(BVTermPool::getInstance().create(_type, _first, _second))
-		{
-		}
-
-		BVTerm(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last) :
-		mpContent(BVTermPool::getInstance().create(_type, _operand, _first, _last))
-		{
-		}
-
-		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
-		{
-			return mpContent->toString(_init, _oneline, _infix, _friendlyNames);
-		}
-
-		friend std::ostream& operator<<(std::ostream& _out, const BVTerm& _term)
-		{
-			return(_out << _term.toString());
-		}
-
-		std::size_t hash() const
-		{
-			return mpContent->hash();
-		}
-
-		std::size_t width() const
-		{
-			return mpContent->width();
-		}
-
-		BVTermType type() const
-		{
-			return mpContent->type();
-		}
-
-		bool operator==(const BVTerm& _other) const
-		{
-			return mpContent == _other.mpContent;
-		}
-		bool operator<(const BVTerm& rhs) const {
-			return *(this->mpContent) < *(rhs.mpContent);
-		}
-	};
 }
 
 namespace std
@@ -509,6 +477,7 @@ namespace std
 	/**
 	 * Implements std::hash for bit vector terms.
 	 */
+	template <>
 	struct hash<carl::BVTermContent>
 	{
 		public:
