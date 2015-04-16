@@ -249,6 +249,9 @@ namespace carl
         }
         else if( mType == FormulaType::CONSTRAINT )
             return (_init + mConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+        else if (mType == FormulaType::BITVECTOR) {
+            return (_init + mBVConstraint.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames) + activity);
+        }
         else if( mType == FormulaType::UEQ )
         {
             return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
@@ -613,6 +616,12 @@ namespace carl
             {
                 _content.mProperties |= STRONG_CONDITIONS;
                 addConstraintProperties( _content.mConstraint, _content.mProperties );
+                break;
+            }
+            case FormulaType::BITVECTOR:
+            {
+                _content.mProperties |= STRONG_CONDITIONS;
+                ///@todo Anything to do here?
                 break;
             }
             case FormulaType::NOT:
