@@ -5,14 +5,14 @@
 namespace carl {
 	void WrapperExternal::sendTest(const char* s) {
 		std::cout << "Parsing in carl:" << std::endl;
+		std::cout << s << std::endl;
 
-		StringParser sp;
-		sp.setImplicitMultiplicationMode(false);
-		sp.setVariables({ "x", "y", "z" });
-		Term<mpq_class> term1 = sp.parseTerm<mpq_class>("x*y^3*z^2");
-		std::cout << term1 << std::endl;
-		Term<mpq_class> term2 = sp.parseTerm<mpq_class>(s);
-		std::cout << term2 << std::endl;
+		carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
+		FT result = parser.formula(s);
+		std::cout << "Parsing result: " << result << std::endl;
+		Variables vars;
+		result.booleanVars(vars);
+		std::cout << "Vars: " << vars << std::endl;
 	}
 
 	const char* WrapperExternal::getResult() {
