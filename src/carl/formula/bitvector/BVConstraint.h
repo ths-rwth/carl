@@ -159,7 +159,7 @@ namespace carl
 
 		bool operator==(const BVConstraint<Pol>& _other) const
 		{
-			if(mId && _other.mId) {
+			if(mId != 0 && _other.mId != 0) {
 				return mId == _other.mId;
 			}
 
@@ -167,6 +167,16 @@ namespace carl
 				mRelation == _other.mRelation
 				&& mLhs == _other.mLhs
 				&& mRhs == _other.mRhs;
+		}
+		bool operator<(const BVConstraint<Pol>& _other) const
+		{
+			if (mId != 0 && _other.mId != 0) {
+				return mId < _other.mId;
+			}
+			if (mRelation != _other.mRelation) return mRelation < _other.mRelation;
+			if (!(mLhs == _other.mLhs)) return mLhs < _other.mLhs;
+			if (!(mRhs == _other.mRhs)) return mRhs < _other.mRhs;
+			return false;
 		}
 
 		size_t hash() const
