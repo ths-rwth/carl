@@ -168,33 +168,23 @@ namespace carl
             union
             {
 #ifdef __VS
-				// Workaround with unnamed structs, because VS can't handle unrestricted unions
+				// Workaround with pointers, because VS can't handle unrestricted unions
 				/// The only sub-formula, in case this formula is an negation.
-				struct {
-					Formula<Pol> mSubformula;
-				};
+				Formula<Pol>* mpSubformulaVS;
 				/// The premise and conclusion, in case this formula is an implication.
 				IMPLIESContent<Pol>* mpImpliesContent;
 				/// The condition, then- and else-case, in case this formula is an ite-expression of formulas.
 				ITEContent<Pol>* mpIteContent;
 				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-				struct {
-					QuantifierContent<Pol>* mpQuantifierContent;
-				};
+				QuantifierContent<Pol>* mpQuantifierContent;
 				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
 				Formulas<Pol>* mpSubformulas;
 				/// The constraint, in case this formulas wraps a constraint.
-				struct {
-					Constraint<Pol> mConstraint;
-				};
+				Constraint<Pol>* mpConstraintVS;
 				/// The Boolean variable, in case this formula wraps a Boolean variable.
-				struct {
-					carl::Variable mBoolean;
-				};
+				carl::Variable* mpBooleanVS;
 				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-				struct {
-					UEquality mUIEquality;
-				};
+				UEquality* mpUIEqualityVS;
 #else
 				/// The only sub-formula, in case this formula is an negation.
 				Formula<Pol> mSubformula;
@@ -616,7 +606,11 @@ namespace carl
             const Formula& subformula() const
             {
                 assert( mpContent->mType == NOT );
-                return mpContent->mSubformula;
+#ifdef __VS
+                return *mpContent->mpSubformulaVS;
+#else
+				return mpContent->mSubformula;
+#endif
             }
             
             /**
