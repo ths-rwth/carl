@@ -995,13 +995,13 @@ namespace carl
                 }
             }
             case FormulaType::BITVECTOR: {
-                BVCompareRelation rel = inverse(bvConstraint().relation());
-                return Formula<Pol>( BVConstraint::create(rel, bvConstraint().lhs(), bvConstraint().rhs()));
+                BVCompareRelation rel = inverse(subformula().bvConstraint().relation());
+                return Formula<Pol>( BVConstraint::create(rel, subformula().bvConstraint().lhs(), subformula().bvConstraint().rhs()));
             }
             case FormulaType::TRUE: // (not true)  ->  false
-                return Formula<Pol>( FormulaType::TRUE );
-            case FormulaType::FALSE: // (not false)  ->  true
                 return Formula<Pol>( FormulaType::FALSE );
+            case FormulaType::FALSE: // (not false)  ->  true
+                return Formula<Pol>( FormulaType::TRUE );
             case FormulaType::NOT: // (not (not phi))  ->  phi
                 return subformula().subformula();
             case FormulaType::IMPLIES:
@@ -1223,6 +1223,11 @@ namespace carl
                     }
                     else
                         resultSubformulas.insert( currentFormula );
+                    break;
+                }
+                case FormulaType::BITVECTOR:
+                {
+                    resultSubformulas.insert( currentFormula );
                     break;
                 }
                 case FormulaType::TRUE: // Remove it.
@@ -1464,6 +1469,12 @@ namespace carl
                                 {
                                     subsubformulas.insert( currentSubformula );
                                 }
+                                break;
+                            }
+                            case FormulaType::BITVECTOR:
+                            {
+                                ///@todo Anything more to do here?
+                                subsubformulas.insert( currentSubformula );
                                 break;
                             }
                             case FormulaType::IFF: // (iff phi_1 .. phi_n) -> (and phi_1 .. phi_n) and (and (not phi_1) .. (not phi_n)) are added to the queue
