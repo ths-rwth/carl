@@ -280,13 +280,11 @@ namespace carl
 				assert(_index == 0);
 				mWidth = _operand.width();
 			} else if(_type == BVTermType::LROTATE || _type == BVTermType::RROTATE) {
-				assert(_index >= 0);
 				mWidth = _operand.width();
 			} else if(_type == BVTermType::REPEAT) {
 				assert(_index > 0);
 				mWidth = _operand.width() * _index;
 			} else if(_type == BVTermType::EXT_U || _type == BVTermType::EXT_S) {
-				assert(_index >= 0);
 				mWidth = _operand.width() + _index;
 			} else {
 				assert(false);
@@ -313,7 +311,7 @@ namespace carl
 		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::EXTRACT);
-			assert(_first < _operand.width() && _first >= _last && _last >= 0);
+			assert(_first < _operand.width() && _first >= _last);
 		}
 
 		~BVTermContent()
