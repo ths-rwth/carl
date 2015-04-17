@@ -142,18 +142,6 @@ inline int toInt<int>(const cln::cl_I& n) {
 }
 
 /**
- * Convert a cln integer to an unsigned.
- * @param n An integer.
- * @return n as unsigned.
- */
-template<>
-inline unsigned toInt<unsigned>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<unsigned>::max());
-	assert(n >= std::numeric_limits<unsigned>::min());
-    return cln::cl_I_to_uint(n);
-}
-
-/**
  * Convert a cln integer to a longint.
  * @param n An integer.
  * @return n as long int.
@@ -188,10 +176,6 @@ inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
  * @param n A fraction.
  * @return n as unsigned.
  */
-template<>
-inline unsigned toInt<unsigned>(const cln::cl_RA& n) {
-	return toInt<unsigned>(toInt<cln::cl_I>(n));
-}
 template<>
 inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
 	return toInt<std::size_t>(toInt<cln::cl_I>(n));
