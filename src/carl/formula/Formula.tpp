@@ -210,6 +210,8 @@ namespace carl
                     return true;
                 case FormulaType::CONSTRAINT:
                     return mConstraint == _content.mConstraint;
+                case FormulaType::BITVECTOR:
+                    return mBVConstraint == _content.mBVConstraint;
                 case FormulaType::NOT:
                     return mSubformula == _content.mSubformula;
                 case FormulaType::IMPLIES:
@@ -453,6 +455,12 @@ namespace carl
             case FormulaType::CONSTRAINT:
             {
                 return constraint().satisfiedBy( _assignment );
+            }
+            case FormulaType::BITVECTOR:
+            {
+                assert(false);
+                std::cerr << "Implement BVConstraint::satisfiedBy()" << std::endl;
+                //return bvConstraint().satisfiedBy( _assignment );
             }
             case FormulaType::NOT:
             {
@@ -985,6 +993,10 @@ namespace carl
                         }
                     }
                 }
+            }
+            case FormulaType::BITVECTOR: {
+                BVCompareRelation rel = inverse(bvConstraint().relation());
+                return Formula<Pol>( BVConstraint::create(rel, bvConstraint().lhs(), bvConstraint().rhs()));
             }
             case FormulaType::TRUE: // (not true)  ->  false
                 return Formula<Pol>( FormulaType::TRUE );
