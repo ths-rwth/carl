@@ -2139,6 +2139,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case BITVECTOR:
 		case TRUE:
 		case FALSE:
 		case UEQ:
@@ -2197,6 +2198,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case BITVECTOR:
 		case TRUE:
 		case FALSE:
 		case UEQ:

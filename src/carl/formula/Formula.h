@@ -725,7 +725,8 @@ namespace carl
             size_t size() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE 
-                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ )
+                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ
+                        || mpContent->mType == FormulaType::BITVECTOR )
                     return 1;
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return 2;
@@ -740,7 +741,8 @@ namespace carl
             bool empty() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT 
-                        || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE )
+                        || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE
+                        || mpContent->mType == FormulaType::BITVECTOR )
                     return false;
                 else
                     return mpContent->mpSubformulas->empty();
