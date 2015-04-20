@@ -76,6 +76,15 @@ public:
     static TermAdditionManager<MultivariatePolynomial,Ordering> mTermAdditionManager;
     
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
+    friend inline std::ostream& operator<<(std::ostream& os, ConstructorOperation op) {
+        switch (op) {
+            case ConstructorOperation::ADD: return os << "+";
+            case ConstructorOperation::SUB: return os << "-";
+            case ConstructorOperation::MUL: return os << "*";
+            case ConstructorOperation::DIV: return os << "/";
+        }
+        return os << "?";
+    }
 	
 	/// @name Constructors
 	/// @{
@@ -100,6 +109,7 @@ public:
 	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
+    explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
 	virtual ~MultivariatePolynomial() {}

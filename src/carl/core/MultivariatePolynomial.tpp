@@ -242,13 +242,17 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p)
+	: MultivariatePolynomial(p.first, p.second)
 {
-	auto op = p.first;
-	auto sub = p.second;
-	assert(!sub.empty());
-	auto it = sub.begin();
+}
+	
+template<typename Coeff, typename Ordering, typename Policies>
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands)
+{
+	assert(!operands.empty());
+	auto it = operands.begin();
 	*this = *it;
-	if ((op == ConstructorOperation::SUB) && (sub.size() == 1)) {
+	if ((op == ConstructorOperation::SUB) && (operands.size() == 1)) {
 		// special treatment of unary minus
 		*this *= -1;
         assert(this->isConsistent());
@@ -256,9 +260,9 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	}
 	if (op == ConstructorOperation::DIV) {
 		// division shall have at least two arguments
-		assert(sub.size() >= 2);
+		assert(operands.size() >= 2);
 	}
-	for (it++; it != sub.end(); it++) {
+	for (it++; it != operands.end(); it++) {
 	switch (op) {
 		case ConstructorOperation::ADD: *this += *it; break;
 		case ConstructorOperation::SUB: *this -= *it; break;
@@ -2039,7 +2043,15 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename C, typename O, typename P>
-const MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs)
+MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
+	MultivariatePolynomial<C,O,P> res;
+	bool flag = lhs.divideBy(rhs, res);
+	assert(flag);
+	return res;
+}
+
+template<typename C, typename O, typename P>
+MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs)
 {
 	MultivariatePolynomial<C,O,P> result;
 	for (const auto& t: lhs.mTerms) {
