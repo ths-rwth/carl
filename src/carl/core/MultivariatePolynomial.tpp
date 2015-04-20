@@ -11,7 +11,6 @@
 #include <mutex>
 #include <list>
 #include <type_traits>
-#include <eigen3/Eigen/Eigenvalues>
 
 #include "Term.h"
 #include "UnivariatePolynomial.h"
@@ -373,16 +372,13 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
 {
 	auto term = mTerms.rbegin();
 	if( term == mTerms.rend() ) return Definiteness::NON;
-    bool bivariate = true;
 	Definiteness result = term->definiteness();
-    if( term->tdeg() != 2 ) bivariate = false;
 	++term;
 	if( term == mTerms.rend() ) return result;
 	if( result > Definiteness::NON )
 	{
 		for( ; term != mTerms.rend(); ++term )
 		{
-            if( bivariate && term->tdeg() != 2 ) bivariate = false;
 			Definiteness termDefin = (term)->definiteness();
 			if( termDefin > Definiteness::NON )
 			{
@@ -399,7 +395,6 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
 	{
 		for( ; term != mTerms.rend(); ++term )
 		{
-            if( bivariate && term->tdeg() != 2 ) bivariate = false;
 			Definiteness termDefin = (term)->definiteness();
 			if( termDefin < Definiteness::NON )
 			{
@@ -412,16 +407,112 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
             }
 		}
 	}
-//    if( result == Definiteness::NON && bivariate )
-//    {
-//        MultivariatePolynomial<Coeff,Ordering,Policies> rem = *this;
-//        while( !rem.lterm()->isConstant() )
-//        {
-//            Variable var = (*rem.lterm()->monomial())[0].first;
-//            VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> varInfos = rem.getVarInfo(var);
-//        }
-//    }
+    if( result == Definiteness::NON && totalDegree() == 2 )
+    {
+        assert( !isConstant() );
+        bool lTermNegative = carl::isNegative( lterm().coeff() );
+        MultivariatePolynomial<Coeff,Ordering,Policies> tmp = *this;
+        if( hasConstantTerm() )
+        {
+            bool constPartNegative = carl::isNegative( constantPart() );
+            if( constPartNegative != lTermNegative ) return Definiteness::NON;
+            result = lTermNegative ? Definiteness::NEGATIVE : Definiteness::POSITIVE;
+            tmp -= constantPart();
+        }
+        else
+        {
+            result = lTermNegative ? Definiteness::NEGATIVE_SEMI : Definiteness::POSITIVE_SEMI;
+        }
+        if( lTermNegative )
+            tmp = -tmp;
+        if( !tmp.sosDecomposition( true ).empty() ) return result;
+        return Definiteness::NON;
+    }
 	return result;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
+std::vector<std::pair<Coeff,MultivariatePolynomial<Coeff,Ordering,Policies>>> MultivariatePolynomial<Coeff,Ordering,Policies>::sosDecomposition( bool _notTrivial ) const
+{
+    std::vector<std::pair<Coeff,MultivariatePolynomial>> result;
+    if( carl::isNegative( lterm().coeff() ) )
+        return result;
+    if( !_notTrivial )
+    {
+        for( auto term = mTerms.rbegin(); term != mTerms.rend(); ++term )
+        {
+            if( !carl::isNegative( term->coeff() ) )
+            {
+                assert( !carl::isZero( term->coeff() ) );
+                if( term->isConstant() )
+                {
+                    result.push_back( std::pair<Coeff,MultivariatePolynomial>( term->coeff(), MultivariatePolynomial( constant_one<Coeff>::get() ) ) );
+                }
+                else
+                {
+                    Monomial::Arg resMonomial = term->monomial()->sqrt();
+                    if( resMonomial == nullptr ) break;
+                    result.push_back( std::pair<Coeff,MultivariatePolynomial>( term->coeff(), MultivariatePolynomial( resMonomial ) ) );
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        result.clear();
+    }
+    // TODO: If cheap, find substitution of monomials to variables such that applied to this polynomial a quadratic form is achieved.
+    // Only compute sos for quadratic forms.
+    if( totalDegree() != 2 )
+        return result;
+    MultivariatePolynomial rem = *this;
+    while( !rem.isConstant() )
+    {
+        CARL_LOG_TRACE("carl.core.sos_decomposition", "Consider " << rem );
+        assert( rem.totalDegree() <= 2 );
+        Variable var = (*rem.lterm().monomial())[0].first;
+        // Complete the square for var
+        CARL_LOG_TRACE("carl.core.sos_decomposition", "Complete the square for " << var );
+        VariableInformation<true, MultivariatePolynomial> varInfos = rem.template getVarInfo<true>(var);
+        auto lcoeffIter = varInfos.coeffs().find( 2 );
+        if( lcoeffIter == varInfos.coeffs().end() )
+        {
+            CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__ );
+            return std::vector<std::pair<Coeff,MultivariatePolynomial>>();
+        }
+        assert( lcoeffIter->second.isConstant() );
+        if( carl::isNegative( lcoeffIter->second.constantPart() ) )
+        {
+            CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__ );
+            return std::vector<std::pair<Coeff,MultivariatePolynomial>>();
+        }
+        assert( !carl::isZero( lcoeffIter->second.constantPart() ) );
+        auto constCoeffIter = varInfos.coeffs().find( 0 );
+        rem = constCoeffIter != varInfos.coeffs().end() ? constCoeffIter->second : MultivariatePolynomial();
+        CARL_LOG_TRACE("carl.core.sos_decomposition", "Constant part is " << rem );
+        auto coeffIter = varInfos.coeffs().find( 1 );
+        if( coeffIter != varInfos.coeffs().end() )
+        {
+            MultivariatePolynomial qr = coeffIter->second/(Coeff(2)*lcoeffIter->second.constantPart());
+            result.push_back( std::make_pair( lcoeffIter->second.constantPart(), MultivariatePolynomial(var)+qr ) );
+            rem -= qr.pow(2)*lcoeffIter->second.constantPart();
+        }
+        else
+        {
+            result.push_back( std::make_pair( lcoeffIter->second.constantPart(), MultivariatePolynomial(var) ) );
+        }
+        CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2" );
+    }
+    if( carl::isNegative( rem.constantPart() ) )
+    {
+        CARL_LOG_TRACE("carl.core.sos_decomposition", "Cannot construct sos due to line " << __LINE__ );
+        return std::vector<std::pair<Coeff,MultivariatePolynomial>>();
+    }
+    else if( !carl::isZero( rem.constantPart() ) )
+        result.push_back( std::make_pair( rem.constantPart(), MultivariatePolynomial( constant_one<Coeff>::get() ) ) );
+    CARL_LOG_TRACE("carl.core.sos_decomposition", "Add " << result.back().first << " * (" << result.back().second << ")^2");
+    return result;
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

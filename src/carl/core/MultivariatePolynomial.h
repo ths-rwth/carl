@@ -253,6 +253,13 @@ public:
 	 * @return Definiteness of this.
 	 */
 	Definiteness definiteness() const;
+    
+    /**
+     * @param _notTrivial If this flag is true, this polynomial is not yet in form of a sos (the method than avoids checking this).
+     * @return The sum-of-squares (sos) decomposition ((q1,p1), .., (qn,pn)) with this = q1*p1^2+..+qn*pn^2, qi being positive rational numbers and pi being polynomials.
+     *          If the result is empty, no sos could be found (which does not mean, that there exists no one).
+     */
+    std::vector<std::pair<Coeff,MultivariatePolynomial<Coeff,Ordering,Policies>>> sosDecomposition( bool _notTrivial = false ) const;
 
 	/**
 	 * Calculates the number of terms.
@@ -636,6 +643,11 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	template<typename C, typename O, typename P>
+	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const Coeff& rhs)
+    {
+        return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
+    }
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs);
 	/// @}
