@@ -11,6 +11,7 @@
 #include <mutex>
 #include <list>
 #include <type_traits>
+#include <eigen3/Eigen/Eigenvalues>
 
 #include "Term.h"
 #include "UnivariatePolynomial.h"
@@ -376,33 +377,54 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
 {
 	auto term = mTerms.rbegin();
 	if( term == mTerms.rend() ) return Definiteness::NON;
+    bool bivariate = true;
 	Definiteness result = term->definiteness();
+    if( term->tdeg() != 2 ) bivariate = false;
 	++term;
 	if( term == mTerms.rend() ) return result;
 	if( result > Definiteness::NON )
 	{
 		for( ; term != mTerms.rend(); ++term )
 		{
+            if( bivariate && term->tdeg() != 2 ) bivariate = false;
 			Definiteness termDefin = (term)->definiteness();
 			if( termDefin > Definiteness::NON )
 			{
 				if( termDefin > result ) result = termDefin;
 			}
-			else return Definiteness::NON;
+			else
+            {
+                result = Definiteness::NON;
+                break;
+            }
 		}
 	}
 	else if( result < Definiteness::NON )
 	{
 		for( ; term != mTerms.rend(); ++term )
 		{
+            if( bivariate && term->tdeg() != 2 ) bivariate = false;
 			Definiteness termDefin = (term)->definiteness();
 			if( termDefin < Definiteness::NON )
 			{
 				if( termDefin > result ) result = termDefin;
 			}
-			else return Definiteness::NON;
+			else
+            {
+                result = Definiteness::NON;
+                break;
+            }
 		}
 	}
+//    if( result == Definiteness::NON && bivariate )
+//    {
+//        MultivariatePolynomial<Coeff,Ordering,Policies> rem = *this;
+//        while( !rem.lterm()->isConstant() )
+//        {
+//            Variable var = (*rem.lterm()->monomial())[0].first;
+//            VariableInformation<gatherCoeff, MultivariatePolynomial<Coeff,Ordering,Policies>> varInfos = rem.getVarInfo(var);
+//        }
+//    }
 	return result;
 }
 
