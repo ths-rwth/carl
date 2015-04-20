@@ -17,7 +17,7 @@ namespace carl
 	private:
 		Variable mVar;
 		Sort mSort;
-		size_t mWidth;
+		std::size_t mWidth;
 
 	public:
 
@@ -36,11 +36,6 @@ namespace carl
 			mWidth = indices->front();
 		}
 
-		/*BVVariable(Variable::Arg _variable, size_t _width = 1) :
-		BVVariable(_variable, SortManager::getInstance().index(SortManager::getInstance().interpretedSort(VariableType::VT_BITVECTOR), {_width}))
-		{
-		}*/
-
 		Variable operator()() const
 		{
 			return mVar;
@@ -55,7 +50,7 @@ namespace carl
 			return mVar < _other.mVar;
 		}
 
-		size_t width() const
+		std::size_t width() const
 		{
 			return mWidth;
 		}

@@ -58,6 +58,50 @@ namespace carl
         return mpContent->type();
     }
 
+    const BVTerm& BVTerm::operand() const
+    {
+        if(mpContent->type() == BVTermType::EXTRACT) {
+            return mpContent->mExtract.mOperand;
+        } else {
+            return mpContent->mUnary.mOperand;
+        }
+    }
+
+    std::size_t BVTerm::index() const
+    {
+        return mpContent->mUnary.mIndex;
+    }
+
+    const BVTerm& BVTerm::first() const
+    {
+        return mpContent->mBinary.mFirst;
+    }
+
+    const BVTerm& BVTerm::second() const
+    {
+        return mpContent->mBinary.mSecond;
+    }
+
+    std::size_t BVTerm::highest() const
+    {
+        return mpContent->mExtract.mHighest;
+    }
+
+    std::size_t BVTerm::lowest() const
+    {
+        return mpContent->mExtract.mLowest;
+    }
+
+    const BVVariable& BVTerm::variable() const
+    {
+        return mpContent->mVariable;
+    }
+
+    const BVValue& BVTerm::value() const
+    {
+        return mpContent->mValue;
+    }
+
     bool BVTerm::operator<(const BVTerm& rhs) const {
         return *(this->mpContent) < *(rhs.mpContent);
     }

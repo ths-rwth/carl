@@ -156,6 +156,22 @@ namespace carl
 			return mpContent == _other.mpContent;
 		}
 		bool operator<(const BVTerm& rhs) const;
+
+		const BVTerm& operand() const;
+
+		std::size_t index() const;
+
+		const BVTerm& first() const;
+
+		const BVTerm& second() const;
+
+		std::size_t highest() const;
+
+		std::size_t lowest() const;
+
+		const BVVariable& variable() const;
+
+		const BVValue& value() const;
 	};
 
 	struct BVUnaryContent
@@ -205,23 +221,23 @@ namespace carl
 	struct BVExtractContent
 	{
 		BVTerm mOperand;
-		std::size_t mFirst;
-		std::size_t mLast;
+		std::size_t mHighest;
+		std::size_t mLowest;
 
-		BVExtractContent(const BVTerm& _operand, const size_t _first, const size_t _last) :
-		mOperand(_operand), mFirst(_first), mLast(_last)
+		BVExtractContent(const BVTerm& _operand, const size_t _highest, const size_t _lowest) :
+		mOperand(_operand), mHighest(_highest), mLowest(_lowest)
 		{
 		}
 
 		bool operator==(const BVExtractContent& _other) const
 		{
-			return mOperand == _other.mOperand && mFirst == _other.mFirst && mLast == _other.mLast;
+			return mOperand == _other.mOperand && mHighest == _other.mHighest && mLowest == _other.mLowest;
 		}
 		bool operator<(const BVExtractContent& _other) const
 		{
 			if (!(mOperand == _other.mOperand)) return mOperand < _other.mOperand;
-			if (mFirst != _other.mFirst) return mFirst < _other.mFirst;
-			if (mLast != _other.mLast) return mLast < _other.mLast;
+			if (mHighest != _other.mHighest) return mHighest < _other.mHighest;
+			if (mLowest != _other.mLowest) return mLowest < _other.mLowest;
 			return false;
 		}
 	};
@@ -233,6 +249,7 @@ namespace carl
 	class BVTermContent
 	{
 		friend class Pool<BVTermContent>;
+		friend class BVTerm;
 
 	private:
 		BVTermType mType;
@@ -306,12 +323,12 @@ namespace carl
 			}
 		}
 
-		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last) :
-		mType(_type), mExtract(_operand, _first, _last), mWidth(_first - _last + 1), mId(0),
-		mHash((_first << 15) ^ (_last << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
+		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _highest, const size_t _lowest) :
+		mType(_type), mExtract(_operand, _highest, _lowest), mWidth(_highest - _lowest + 1), mId(0),
+		mHash((_highest << 15) ^ (_lowest << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::EXTRACT);
-			assert(_first < _operand.width() && _first >= _last);
+			assert(_highest < _operand.width() && _highest >= _lowest);
 		}
 
 		~BVTermContent()
@@ -365,8 +382,8 @@ namespace carl
 
 				// Rewrite operator strings for indexed (parameterized) operators
 				if(mType == BVTermType::EXTRACT) {
-					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mExtract.mFirst) + " " + std::to_string(mExtract.mLast) + ")";
-					operatorInfix = operatorStr + "_{" + std::to_string(mExtract.mFirst) + "," + std::to_string(mExtract.mLast) + "}";
+					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mExtract.mHighest) + " " + std::to_string(mExtract.mLowest) + ")";
+					operatorInfix = operatorStr + "_{" + std::to_string(mExtract.mHighest) + "," + std::to_string(mExtract.mLowest) + "}";
 				} else if(mType == BVTermType::LROTATE || mType == BVTermType::RROTATE
 					|| mType == BVTermType::EXT_U || mType == BVTermType::EXT_S || mType == BVTermType::REPEAT) {
 					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mUnary.mIndex) + ")";
