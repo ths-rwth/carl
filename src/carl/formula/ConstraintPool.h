@@ -33,14 +33,14 @@ namespace carl
             /// The constraint (0>0) representing an inconsistent constraint.
             const ConstraintContent<Pol>* mInconsistentConstraint;
             /// Mutex to avoid multiple access to the pool
-            mutable std::mutex mMutexPool;
+            mutable std::recursive_mutex mMutexPool;
             /// The constraint pool.
             FastPointerSet<ConstraintContent<Pol>> mConstraints;
             /// Pointer to the polynomial cache, if cache is needed of the polynomial type, otherwise, it is nullptr.
             std::shared_ptr<typename Pol::CACHE> mpPolynomialCache;
             
             #ifdef SMTRAT_STRAT_PARALLEL_MODE
-            #define CONSTRAINT_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock1( mMutexPool );
+            #define CONSTRAINT_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock1( mMutexPool );
             #define CONSTRAINT_POOL_LOCK mMutexPool.lock();
             #define CONSTRAINT_POOL_UNLOCK mMutexPool.unlock();
             #else
