@@ -643,11 +643,7 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	template<typename C, typename O, typename P>
-	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const Coeff& rhs)
-    {
-        return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
-    }
+	
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs);
 	/// @}
@@ -1233,6 +1229,20 @@ public:
 	inline MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	/// @}
+    
+    /// @name Division operators
+	/// @{
+	/**
+	 * Perform a division involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs / rhs`
+	 */
+	template<typename C, typename O, typename P>
+	inline MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
+        return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
+    }
 	/// @}
 	
 } // namespace carl
