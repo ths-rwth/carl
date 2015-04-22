@@ -1726,7 +1726,7 @@ void CAD<Number>::widenBounds(BoundMap&) {
 template<typename Number>
 void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number>& r) {
 	// the size of variables should be compatible to the dimension of the given point
-	assert(this->variables.size() == r.dim());
+	assert(this->anAnswerFound() || this->variables.size() == r.dim());
 
 	for (unsigned level = 0; level < r.dim(); level++) {
 		// shrink the bounds in each level
