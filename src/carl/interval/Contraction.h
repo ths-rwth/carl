@@ -34,7 +34,7 @@ namespace carl {
              * Constructs the solution formula for the given variable x in the equation p = 0, where p is the given polynomial.
              * The polynomial p must have one of the following forms: 
              *      1.) ax+h, with a being a rational number and h a linear polynomial not containing x and not having a constant part
-             *      2.) x^i*m-y, with i being a positive integer, m being a monomial not containt x and y being a variable different from x
+             *      2.) x^i*m-y, with i being a positive integer, m being a monomial not contains x and y being a variable different from x
              * @param p The polynomial containing the given variable to construct a solution formula for.
              * @param x The variable to construct a solution formula for.
              */
@@ -43,11 +43,11 @@ namespace carl {
                 mNumerator(),
                 mDenominator(nullptr)
             {
-                assert(p.hasVariable(x));
+                assert(p.has(x));
                 assert(!p.hasConstantTerm());
                 assert(p.isLinear() || (p.nrTerms() == 2 && carl::isOne(p.begin()->coeff()) && carl::isOne(p.rbegin()->coeff()) 
-                                        && ((p.begin()->has(x) && !p.rbegin()->has(x) && p.rbegin()->isLinear) 
-                                            || (p.rbegin()->has(x) && !p.begin()->has(x) && p.begin()->isLinear))));
+                                        && ((p.begin()->has(x) && !p.rbegin()->has(x) && p.rbegin()->isLinear()) 
+                                            || (p.rbegin()->has(x) && !p.begin()->has(x) && p.begin()->isLinear()))));
                 // Construct the solution formula for x in p = 0
                 // @todo fill out
             }
@@ -104,20 +104,20 @@ namespace carl {
                     }
                     else if( splitOccurredInContraction )
                     {
-                        assert( resultPropagation2.empty() );
+                        assert( resultPropagation2.isEmpty() );
                         resA = resA.intersect( resultPropagation1 );
                         resB = resB.intersect( resultPropagation1 );
                     }
                     else if( splitOccurredInEvaluation )
                     {
-                        assert( resB.empty() );
+                        assert( resB.isEmpty() );
                         resA = resA.intersect( resultPropagation1 );
                         resB = resA.intersect( resultPropagation2 );
                     }
                     else // no split occurred
                     {
-                        assert( resultPropagation2.empty() );
-                        assert( resB.empty() );
+                        assert( resultPropagation2.isEmpty() );
+                        assert( resB.isEmpty() );
                         resA = resA.intersect( resultPropagation1 );
                     }
                     if( resA.isEmpty() || resB.isEmpty() )
