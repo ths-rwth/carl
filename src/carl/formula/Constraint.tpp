@@ -75,18 +75,6 @@ namespace carl
         mLhsDefinitess = mLhs.definiteness();
     }
 
-//    template<typename Pol>
-//    Constraint<Pol>::Constraint( const Constraint& _constraint, bool _rehash ):
-//        mID( _constraint.id() ),
-//        mHash( _rehash ? CONSTRAINT_HASH( _constraint.lhs(), _constraint.relation(), Pol ) : _constraint.getHash() ),
-//        mRelation( _constraint.relation() ),
-//        mLhs( _constraint.mLhs ),
-//        mFactorization( _constraint.mFactorization ),
-//        mVariables( _constraint.variables() ),
-//        mVarInfoMap( _constraint.mVarInfoMap ),
-//        mLhsDefinitess( _constraint.mLhsDefinitess )
-//    {}
-
     template<typename Pol>
     ConstraintContent<Pol>::~ConstraintContent()
     {}
