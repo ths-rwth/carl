@@ -80,14 +80,9 @@ namespace carl
     const ConstraintContent<Pol>* ConstraintPool<Pol>::create( const Pol& _lhs, const Relation _rel )
     {
         CONSTRAINT_POOL_LOCK_GUARD
+        if( _lhs.isConstant() )
+            return evaluate<Pol>( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
         ConstraintContent<Pol>* constraint = createNormalizedConstraint( _lhs, _rel );
-        if( constraint->mVariables.empty() )
-        {
-            bool constraintConsistent = evaluate<Pol>( constraint->mLhs.constantPart(), constraint->mRelation );
-            delete constraint;
-            const ConstraintContent<Pol>* result = constraintConsistent ? mConsistentConstraint : mInconsistentConstraint;
-            return result;
-        }
         const ConstraintContent<Pol>* result = addConstraintToPool( constraint );
         return result;
     }
