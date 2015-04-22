@@ -242,7 +242,12 @@ public:
 	 * @param i Interval.
 	 * @return If the interval of this number is contained in i.
 	 */
-	virtual bool containedIn(const Interval<Number>& i) const {
+	virtual bool containedIn(const Interval<Number>& i) {
+		if (this->isNumeric()) {
+			return i.contains(this->value());
+		}
+		this->refineAvoiding(i.lower());
+		this->refineAvoiding(i.upper());
 		return i.contains(this->getInterval());
 	}
 
