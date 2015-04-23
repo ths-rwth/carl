@@ -26,7 +26,8 @@ template<typename T>
 class tree {
 private:
 #ifdef __VS
-	static const std::size_t MAXINT = (size_t)-1;
+	//Warning: might lead to problem when using 64bit
+	static const std::size_t MAXINT = UINT_MAX;
 #else
 	static const std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
 #endif
