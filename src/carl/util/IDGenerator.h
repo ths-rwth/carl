@@ -7,6 +7,7 @@
 
 #include <queue>
 #include <stack>
+#include <mutex>
 
 namespace carl {
 
@@ -17,9 +18,11 @@ class IDGenerator {
 private:
 	std::size_t mNext;
 	std::priority_queue<std::size_t> mFree;
+	mutable std::mutex mMutex;
 public:
 	IDGenerator(): mNext(1) {}
 	std::size_t get() {
+		std::lock_guard<std::mutex> lock(mMutex);
 		std::size_t res = mNext;
 		if (mFree.empty()) mNext++;
 		else {
@@ -31,6 +34,7 @@ public:
 
 	void free(std::size_t id) {
 		assert(id > 0);
+		std::lock_guard<std::mutex> lock(mMutex);
 		if (id == mNext-1) {
 			mNext--;
 			while (!mFree.empty()) {
@@ -43,6 +47,7 @@ public:
 		}
 	}
 	std::size_t nextID() const {
+		std::lock_guard<std::mutex> lock(mMutex);
 		return mNext;
 	}
 };
