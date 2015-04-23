@@ -179,7 +179,7 @@ public:
             }
 		}
         #endif
-        
+		std::lock_guard<std::mutex> lock(mMutex);
 		std::get<2>(data) = false;
 	}
 
@@ -191,9 +191,9 @@ public:
 		for (auto i = t.begin(); i != t.end(); i++) {
 			if ((*i).monomial()) termIDs[(*i).monomial()->id()] = 0;
 		}
+		std::lock_guard<std::mutex> lock(mMutex);
 		std::get<2>(data) = false;
 	}
 };
 
 }
-
