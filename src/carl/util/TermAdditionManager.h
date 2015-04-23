@@ -72,7 +72,7 @@ public:
 			}
 		}
         Tuple& data = *mNextId;
-		//std::lock_guard<std::mutex> lock(mMutex);
+		std::lock_guard<std::mutex> lock(mMutex);
         Terms& terms = std::get<1>(data);
 		terms.clear();
         terms.resize(expectedSize + 1);
