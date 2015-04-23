@@ -915,9 +915,18 @@ private:
 	
 public:
 	bool isConsistent() const {
+#ifdef __VS
+		//Workaround for VS as the latter code produces an internal compiler error
+		auto it = this->begin();
+		while (it != this->end()) {
+			assert(isConsistent(it.current));
+			it++;
+		}
+#else
 		for (auto it = this->begin(); it != this->end(); ++it) {
 			assert(isConsistent(it.current));
 		}
+#endif
 		return true;
 	}
 	bool isConsistent(std::size_t node) const {
