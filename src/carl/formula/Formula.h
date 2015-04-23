@@ -798,8 +798,12 @@ namespace carl
             const Formula& back() const
             {
                 assert( isBooleanCombination() );
-                if( mpContent->mType == FormulaType::NOT )
+				if (mpContent->mType == FormulaType::NOT)
+#ifdef __VS
+					return *mpContent->mpSubformulaVS;
+#else
                     return mpContent->mSubformula;
+#endif
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return mpContent->mpImpliesContent->mConclusion;
                 else if( mpContent->mType == FormulaType::ITE )
@@ -895,7 +899,11 @@ namespace carl
                 if( isAtom() )
                     return false;
                 if( mpContent->mType == FormulaType::NOT )
-                    return mpContent->mSubformula == _formula;
+#ifdef __VS
+                    return (*mpContent->mpSubformulaVS) == _formula;
+#else
+					return mpContent->mSubformula == _formula;
+#endif
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return (mpContent->mpImpliesContent->mPremise == _formula || mpContent->mpImpliesContent->mConclusion == _formula);
                 else if( mpContent->mType == FormulaType::ITE )
@@ -911,7 +919,11 @@ namespace carl
             void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
-                    _constraints.push_back( mpContent->mConstraint );
+#ifdef __VS
+                    _constraints.push_back( *mpContent->mpConstraintVS );
+#else
+					_constraints.push_back(mpContent->mConstraint);
+#endif
                 else if( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR || mpContent->mType == FormulaType::NOT 
                         || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR || mpContent->mType == FormulaType::IMPLIES )
                     for( const_iterator subAst = mpContent->mpSubformulas->begin(); subAst != mpContent->mpSubformulas->end(); ++subAst )

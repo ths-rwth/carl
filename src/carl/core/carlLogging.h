@@ -20,6 +20,7 @@
 #include "../util/Timer.h"
 #include "../io/streamingOperators.h"
 #include "carlLoggingHelper.h"
+#include "../util/platform.h"
 
 namespace carl {
 
@@ -403,6 +404,10 @@ public:
 inline Logger& logger() {
 	return Logger::getInstance();
 }
+
+#ifdef __VS
+#define __func__ __FUNCTION__
+#endif
 
 /// Create a record info.
 #define __CARL_LOG_RECORD ::carl::logging::RecordInfo(__FILE__, __func__, __LINE__)
