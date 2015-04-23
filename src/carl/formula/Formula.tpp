@@ -102,9 +102,15 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::UEQ ),
+#ifndef __VS
         mUIEquality( std::move( _ueq ) ),
+#endif
         mProperties()
-    {}
+    {
+#ifdef __VS
+		mpUIEqualityVS = new UEquality(std::move(_ueq));
+#endif
+	}
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( Formula<Pol>&& _subformula ):
