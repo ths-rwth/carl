@@ -25,7 +25,11 @@ namespace carl {
 template<typename T>
 class tree {
 private:
+#ifdef __VS
+	static const std::size_t MAXINT = (size_t)-1;
+#else
 	static const std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
+#endif
 	struct Node {
 		std::size_t id;
 		mutable T data;
