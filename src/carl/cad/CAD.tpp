@@ -1274,7 +1274,12 @@ bool CAD<Number>::mainCheck(
 		unsigned depth = (unsigned)((int)dim - level - 1);
 		assert(depth >= 0 && depth < dim);
 		assert(depth <= (unsigned)this->sampleTree.max_depth());
+#ifdef __VS
+		auto node = this->sampleTree.begin_depth(depth);
+		while (node != this->sampleTree.end_depth()) {
+#else
 		for (auto node = this->sampleTree.begin_depth(depth); node != this->sampleTree.end_depth(); ++node) {
+#endif
 			// traverse all nodes at depth, i.e., sample points of dimension dim - level - 1 equaling the number of coefficient variables of the lifting position at level
 			std::list<RealAlgebraicNumberPtr<Number>> sampleList = this->constructSampleAt(node, sampleTreeRoot);
 			// no degenerate sample points are considered here because they were already discarded in Phase 2
@@ -1312,6 +1317,9 @@ bool CAD<Number>::mainCheck(
 				// lifting yields a satisfying sample
 				return true;
 			}
+#ifdef __VS
+			node++;
+#endif
 		}
 		this->eliminationSets[(unsigned)level].setLiftingPositionsReset();
 	}
