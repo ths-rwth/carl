@@ -209,7 +209,11 @@ public:
 	 * @param position Valid iterator to a sample.
 	 * @return Iterator to the next position in the container.
 	 */
+#ifdef __VS
+	typename SampleSet::Iterator remove(typename SampleSet::Iterator position) {
+#else
 	SampleSet::Iterator remove(SampleSet::Iterator position) {
+#endif
 		assert(position != mSamples.end());
 		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
 		auto it = std::find(mHeap.begin(), mHeap.end(), *position);
@@ -225,14 +229,22 @@ public:
 	 * Returns an iterator to the first sample in this sample set.
 	 * @return Iterator to first sample.
 	 */
+#ifdef __VS
+	typename SampleSet::Iterator begin() {
+#else
 	SampleSet::Iterator begin() {
+#endif
 		return this->mSamples.begin();
 	}
 	/**
 	 * Returns an iterator to the first sample in this sample set.
 	 * @return Iterator to first sample.
 	 */
+#ifdef __VS
+	const typename SampleSet::Iterator begin() const {
+#else
 	const SampleSet::Iterator begin() const {
+#endif
 		return this->mSamples.begin();
 	}
 
@@ -240,14 +252,22 @@ public:
 	 * Returns an iterator to the element after the last sample in this sample set.
 	 * @return Iterator to end.
 	 */
+#ifdef __VS
+	typename SampleSet::Iterator end() {
+#else
 	SampleSet::Iterator end() {
+#endif
 		return this->mSamples.end();
 	}
 	/**
 	 * Returns an iterator to the element after the last sample in this sample set.
 	 * @return Iterator to end.
 	 */
+#ifdef __VS
+	const typename SampleSet::Iterator end() const {
+#else
 	const SampleSet::Iterator end() const {
+#endif
 		return this->mSamples.end();
 	}
 
@@ -334,7 +354,11 @@ public:
 	 * @see std::set::swap
 	 */
 	template<typename Num>
+#ifdef __VS
+	friend void swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
+#else
 	friend void std::swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
+#endif
 
 private:
 	/**

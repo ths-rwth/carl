@@ -573,7 +573,11 @@ public:
 	 * @see std::set::swap
 	 */
 	template<typename Coeff>
+#ifdef __VS
+	friend void swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
+#else
 	friend void std::swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
+#endif
 
 	//////////////////////////////
 	// STATIC AUXILIARY METHODS //

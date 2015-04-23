@@ -272,8 +272,13 @@ void CAD<Number>::clearElimination() {
 	this->eliminationSets.front().insert(this->polynomials.begin(), this->polynomials.end());
 }
 
+#ifdef __VS
+template<typename Number>
+void CAD<Number>::completeElimination(const typename CAD<Number>::BoundMap& bounds) {
+#else
 template<typename Number>
 void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
+#endif
 	this->prepareElimination();
 	bool useBounds = !bounds.empty();
 	for (const auto& b: bounds) {
