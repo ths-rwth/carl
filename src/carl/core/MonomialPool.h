@@ -112,6 +112,7 @@ namespace carl{
 			void free(const Monomial* m) {
 				if (m == nullptr) return;
 				if (m->id() == 0) return;
+				MONOMIAL_POOL_LOCK_GUARD;
 				PoolEntry pe(m->mHash, m->mExponents);
 				auto it = mPool.find(pe);
 				if (it != mPool.end()) {
