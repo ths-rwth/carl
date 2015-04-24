@@ -303,7 +303,7 @@ public:
 			} else {
 				PreorderIterator<false> it(this->mTree, this->current);
 				do {
-					++it;
+					it++;
 					if (it.current == MAXINT) break;
 				} while (this->mTree->nodes[it.current].firstChild != MAXINT);
 				this->current = it.current;
@@ -362,11 +362,11 @@ public:
 			assert(!this->mTree->nodes.empty());
 			if (reverse) {
 				PostorderIterator<reverse> it(this->mTree, this->current);
-				while (it.current != MAXINT && it.depth() != depth) ++it;
+				while (it.current != MAXINT && it.depth() != depth) it++;
 				this->current = it.current;
 			} else {
 				PreorderIterator<reverse> it(this->mTree, this->current);
-				while (it.current != MAXINT && it.depth() != depth) ++it;
+				while (it.current != MAXINT && it.depth() != depth) it++;
 				this->current = it.current;
 			}
 		}
@@ -380,7 +380,7 @@ public:
 					if (this->current == MAXINT) return *this;
 				}
 				PreorderIterator<reverse> it(this->mTree, this->mTree->nodes[this->current].nextSibling);
-				for (; it.current != MAXINT; ++it) {
+				for (; it.current != MAXINT; it++) {
 					if (it.depth() == target) break;
 				}
 				this->current = it.current;
@@ -655,7 +655,7 @@ public:
 	 */
 	std::size_t max_depth() const {
 		std::size_t max = 0;
-		for (auto it = begin_leaf(); it != end_leaf(); ++it) {
+		for (auto it = begin_leaf(); it != end_leaf(); it++) {
 			if (it.depth() > max) max = it.depth();
 		}
 		return max;
@@ -663,7 +663,7 @@ public:
 	template<typename Iterator>
 	std::size_t max_depth(const Iterator& it) const {
 		std::size_t max = 0;
-		for (auto i = begin_children(it); i != end_children(it); ++i) {
+		for (auto i = begin_children(it); i != end_children(it); i++) {
 			std::size_t d = max_depth(i);
 			if (d + 1 > max) max = d + 1;
 		}
@@ -831,10 +831,10 @@ public:
 		std::size_t id = position.current;
 		if (id == 0) {
 			clear();
-			++position;
+			position++;
 			return position;
 		}
-		++position;
+		position++;
 		if (nodes[id].nextSibling != MAXINT) {
 			nodes[nodes[id].nextSibling].previousSibling = nodes[id].previousSibling;
 		} else {
@@ -915,18 +915,9 @@ private:
 	
 public:
 	bool isConsistent() const {
-#ifdef __VS
-		//Workaround for VS as the latter code produces an internal compiler error
-		auto it = this->begin();
-		while (it != this->end()) {
-			assert(isConsistent(it.current));
-			it++;
-		}
-#else
-		for (auto it = this->begin(); it != this->end(); ++it) {
+		for (auto it = this->begin(); it != this->end(); it++) {
 			assert(isConsistent(it.current));
 		}
-#endif
 		return true;
 	}
 	bool isConsistent(std::size_t node) const {
