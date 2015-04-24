@@ -693,6 +693,7 @@ public:
 }
 }
 
+#ifndef __VS
 namespace std {
 /**
  * Swaps two elimination sets.
@@ -702,5 +703,6 @@ namespace std {
 template<typename Coeff>
 void swap(carl::cad::EliminationSet<Coeff>& lhs, carl::cad::EliminationSet<Coeff>& rhs);
 }
+#endif
 
 #include "EliminationSet.tpp"
