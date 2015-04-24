@@ -375,6 +375,7 @@ private:
 }
 }
 
+#ifndef __VS
 namespace std {
 /**
  * Swaps the contents of two SampleSet objects.
@@ -384,5 +385,6 @@ namespace std {
 template<typename Num>
 void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs);
 }
+#endif
 
 #include "SampleSet.tpp"

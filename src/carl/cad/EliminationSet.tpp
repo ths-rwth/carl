@@ -613,9 +613,26 @@ void EliminationSet<Coeff>::elimination(
 	DOT_HYPEREDGE("elimination", std::initializer_list<const UPolynomial*>({p, q}), p->resultant(*q).switchVariable(variable));
 }
 
+#ifdef __VS
+template<typename Coefficient>
+void swap(carl::cad::EliminationSet<Coefficient>& lhs, carl::cad::EliminationSet<Coefficient>& rhs) {
+	using std::swap;
+	std::swap(lhs.polynomials, rhs.polynomials);
+	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
+	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
+	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
+	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
+	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
+	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
+	std::swap(lhs.liftingOrder, rhs.liftingOrder);
+	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
+	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
+}
+#endif
 }
 }
 
+#ifndef __VS
 namespace std {
 
 template<typename Coefficient>
@@ -632,3 +649,4 @@ void swap(carl::cad::EliminationSet<Coefficient>& lhs, carl::cad::EliminationSet
 	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
 }
 }
+#endif
