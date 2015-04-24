@@ -659,7 +659,7 @@ public:
 	 */
 	template<typename It>
 	bool checkIntegrality(It node) const {
-		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
+		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; pit++) {
 			Variable var = variables[pit.depth() - 1];
 			if ((var.getType() == VariableType::VT_INT) && (!(*pit)->isIntegral())) return false;
 		}
