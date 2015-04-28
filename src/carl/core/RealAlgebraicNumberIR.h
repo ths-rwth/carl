@@ -23,6 +23,8 @@ protected:
 	 */
 	UnivariatePolynomial<Number> polynomial;
 	
+	std::list<UnivariatePolynomial<Number>> sturmSequence;
+	
 	/**
 	 * Isolating interval of this interval representation.
 	 * 
@@ -65,6 +67,7 @@ private:
 	 */
 	RealAlgebraicNumberIR(
 			const UnivariatePolynomial<Number>& p,
+			const std::list<UnivariatePolynomial<Number>>& seq,
 			const Interval<Number>& i,
 			const bool normalize = true,
 			const bool isRoot = true );
@@ -87,7 +90,20 @@ public:
 			const bool normalize = true,
 			const bool isRoot = true) {
 		assert(i.isOpenInterval() || i.isPointInterval());
-		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, normalize, isRoot));
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, p.standardSturmSequence(), i, normalize, isRoot));
+		CARL_LOG_TRACE("carl.core", "Creating " << res);
+		res->pThis = res;
+		return res;
+	}
+	
+	static std::shared_ptr<RealAlgebraicNumberIR> create(
+			const UnivariatePolynomial<Number>& p,
+			const std::list<UnivariatePolynomial<Number>>& seq,
+			const Interval<Number>& i,
+			const bool normalize = true,
+			const bool isRoot = true) {
+		assert(i.isOpenInterval() || i.isPointInterval());
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, seq, i, normalize, isRoot));
 		CARL_LOG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
@@ -193,7 +209,7 @@ public:
 	 */
 	const std::list<UnivariatePolynomial<Number>>& getSturmSequence() const
 	{
-		return this->polynomial.standardSturmSequence();
+		return this->sturmSequence;
 	}
 
 	/** Returns how often one of the refine methods was called before.
