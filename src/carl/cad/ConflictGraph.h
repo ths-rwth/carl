@@ -95,6 +95,7 @@ public:
 			if (it.second == id) return it.first;
 		}
 		assert(false);
+		return mConstraints.begin()->first;
 	}
 	/**
 	 * Registers a new sample point and returns its ID.
