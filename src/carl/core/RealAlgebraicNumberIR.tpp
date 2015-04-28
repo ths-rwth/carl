@@ -19,6 +19,7 @@ template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(Variable::Arg var) :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(var),
+		sturmSequence(polynomial.standardSturmSequence()),
 		interval(Interval<Number>::zeroInterval()),
 		refinementCount(0)
 {
@@ -27,12 +28,13 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(Variable::Arg var) :
 template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		const UnivariatePolynomial<Number>& p,
+		const std::list<UnivariatePolynomial<Number>>& seq,
 		const Interval<Number>& i,
 		const bool normalize,
 		const bool isRoot ) :
 		RealAlgebraicNumber<Number>(isRoot, false, 0),
-		//polynomial(p.squareFreePart().template convert<Number>()),
 		polynomial(p),
+		sturmSequence(seq),
 		interval(i),
 		refinementCount(0)
 {
@@ -75,7 +77,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 		n->refine();
 		i = this->getInterval() + n->getInterval();
 	}
-	return RealAlgebraicNumberIR<Number>::create(p, i);
+	return RealAlgebraicNumberIR<Number>::create(p, seq, i);
 }
 
 template<typename Number>
