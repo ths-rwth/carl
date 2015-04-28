@@ -79,7 +79,7 @@ void setInitialLogLevel();
 inline void configureLogging() {
 #ifdef LOGGING
 	#if defined NDEBUG
-		std::cerr << "You are running in release mode with logging enabled. Are you sure, that this is what you want?" << std::endl;
+		std::cerr << "CArL: You are running in release mode with logging enabled. Are you sure, that this is what you want?" << std::endl;
 	#endif
 #endif
 #ifdef LOGGING_CARL

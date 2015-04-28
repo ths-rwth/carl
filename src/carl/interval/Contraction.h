@@ -124,7 +124,7 @@ namespace carl {
              * @param resB The second interval of the result.
              * @return true, if the second interval is not empty. (the first interval must then be also nonempty)
              */
-            bool evaluate(const Interval<double>::evalintervalmap& intervals, Interval<double>& resA, Interval<double>& resB) const
+            bool evaluate(const Interval<double>::evalintervalmap&, Interval<double>&, Interval<double>&) const
             {
                 // evaluate momnomes
                 //std::cout << "[PreAll] resA: " << resA << "resB: " << resB << std::endl;

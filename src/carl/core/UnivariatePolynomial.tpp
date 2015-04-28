@@ -1456,7 +1456,6 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 template<typename Coeff>
 std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
 	assert(this->mainVar() == polynomial.mainVar());
-
 	std::list<UnivariatePolynomial<Coeff>> seq;
 
 	UnivariatePolynomial<Coeff> p = *this;
