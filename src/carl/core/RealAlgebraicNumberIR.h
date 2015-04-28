@@ -32,11 +32,6 @@ protected:
 	mutable Interval<Number> interval;
 	
 	/**
-	 * Standard Sturm sequence of the polynomial and its derivative.
-	 */
-	std::list<UnivariatePolynomial<Number>> sturmSequence;
-	
-	/**
 	 * Number of refinements executed to the isolating interval.
 	 */
 	mutable unsigned int refinementCount;
@@ -71,7 +66,6 @@ private:
 	RealAlgebraicNumberIR(
 			const UnivariatePolynomial<Number>& p,
 			const Interval<Number>& i,
-			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true );
 
@@ -90,11 +84,10 @@ public:
 	static std::shared_ptr<RealAlgebraicNumberIR> create(
 			const UnivariatePolynomial<Number>& p,
 			const Interval<Number>& i,
-			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true) {
 		assert(i.isOpenInterval() || i.isPointInterval());
-		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, s, normalize, isRoot));
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, normalize, isRoot));
 		CARL_LOG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
@@ -105,7 +98,7 @@ public:
 	 * @return Copy of this.
 	 */
 	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
-		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
+		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, false, this->isRoot());
 	}
 
 	/**
@@ -200,7 +193,7 @@ public:
 	 */
 	const std::list<UnivariatePolynomial<Number>>& getSturmSequence() const
 	{
-		return this->sturmSequence;
+		return this->polynomial.standardSturmSequence();
 	}
 
 	/** Returns how often one of the refine methods was called before.
