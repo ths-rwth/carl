@@ -23,13 +23,13 @@ namespace carl
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(const UnivariatePolynomial& p)
-: mMainVar(p.mMainVar), mCoefficients(p.mCoefficients), mCachedSturmSequence(p.mCachedSturmSequence) {
+: mMainVar(p.mMainVar), mCoefficients(p.mCoefficients) {
 	assert(this->isConsistent());
 }
 
 template<typename Coeff>
 UnivariatePolynomial<Coeff>::UnivariatePolynomial(UnivariatePolynomial&& p)
-: mMainVar(p.mMainVar), mCachedSturmSequence(std::move(p.mCachedSturmSequence)) {
+: mMainVar(p.mMainVar) {
 	std::swap(this->mCoefficients, p.mCoefficients);
 	assert(this->isConsistent());
 }
@@ -38,7 +38,6 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(const UnivariatePolynomial& p) {
 	this->mMainVar = p.mMainVar;
 	this->mCoefficients = p.mCoefficients;
-	this->mCachedSturmSequence = p.mCachedSturmSequence;
 	assert(this->isConsistent());
 	return *this;
 }
@@ -47,7 +46,6 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator=(UnivariatePolynomial&& p) {
 	std::swap(this->mMainVar, p.mMainVar);
 	std::swap(this->mCoefficients, p.mCoefficients);
-	std::swap(this->mCachedSturmSequence, p.mCachedSturmSequence);
 	assert(this->isConsistent());
 	return *this;
 }
@@ -1451,17 +1449,13 @@ void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 }
 
 template<typename Coeff>
-const std::list<UnivariatePolynomial<Coeff>>& UnivariatePolynomial<Coeff>::standardSturmSequence() const {
-	if (mCachedSturmSequence == nullptr) {
-		mCachedSturmSequence = std::make_shared<std::list<UnivariatePolynomial>>(this->standardSturmSequence(this->derivative()));
-	}
-	return *mCachedSturmSequence;
+std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence() const {
+	return this->standardSturmSequence(this->derivative());
 }
 
 template<typename Coeff>
 std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardSturmSequence(const UnivariatePolynomial<Coeff>& polynomial) const {
 	assert(this->mainVar() == polynomial.mainVar());
-
 	std::list<UnivariatePolynomial<Coeff>> seq;
 
 	UnivariatePolynomial<Coeff> p = *this;

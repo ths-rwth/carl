@@ -69,8 +69,6 @@ private:
 	Variable mMainVar;
 	/// The coefficients.
 	std::vector<Coefficient> mCoefficients;
-	/// Cached sturm sequence.
-	mutable std::shared_ptr<std::list<UnivariatePolynomial>> mCachedSturmSequence;
 
 public:
 	/**
@@ -888,7 +886,7 @@ public:
 	void eliminateRoot(const Coefficient& root);
 	
 public:
-	const std::list<UnivariatePolynomial>& standardSturmSequence() const;
+	std::list<UnivariatePolynomial> standardSturmSequence() const;
 	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 
 	/**
