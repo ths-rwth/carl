@@ -593,8 +593,8 @@ namespace carl
             }
             
             /**
-             * Collects all arithmetic variables occurring in this formula.
-             * @param _booleanVars The container to collect the arithmetic variables in.
+             * Collects all boolean variables occurring in this formula.
+             * @param _booleanVars The container to collect the boolean variables in.
              */
             void booleanVars( Variables& _booleanVars ) const
             {

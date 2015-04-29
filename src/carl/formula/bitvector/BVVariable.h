@@ -41,6 +41,14 @@ namespace carl
 			return mVar;
 		}
 
+        /**
+        * @return The sort (domain) of this uninterpreted variable.
+        */
+        const Sort& sort() const
+        {
+            return mSort;
+        }
+
 		bool operator==(const BVVariable& _other) const
 		{
 			return mVar == _other.mVar;
