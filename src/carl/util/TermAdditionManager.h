@@ -13,6 +13,7 @@
 #include <tuple>
 #include <vector>
 
+#include "../config.h"
 #include "pointerOperations.h"
 #include "../core/Term.h"
 #include "../io/streamingOperators.h"
@@ -41,6 +42,16 @@ private:
 	std::list<Tuple> mData;
 	TAMId mNextId;
 	mutable std::mutex mMutex;
+    
+    #ifdef THREAD_SAFE
+    #define TAM_LOCK_GUARD std::lock_guard<std::mutex> lock( mMutex );
+    #define TAM_LOCK mMutex.lock();
+    #define TAM_UNLOCK mMutex.unlock();
+    #else
+    #define TAM_LOCK_GUARD
+    #define TAM_LOCK
+    #define TAM_UNLOCK
+    #endif
 	
 	TAMId createNewEntry() {
 		TAMId res = mData.emplace(mData.end());
@@ -63,7 +74,7 @@ public:
     #define SWAP_TERMS
 	
 	TAMId getId(std::size_t expectedSize = 0) {
-		std::lock_guard<std::mutex> lock(mMutex);
+		TAM_LOCK_GUARD
 		while (std::get<2>(*mNextId)) {
 			mNextId++;
 			if (mNextId == mData.end()) {
@@ -178,7 +189,7 @@ public:
             }
 		}
         #endif
-		std::lock_guard<std::mutex> lock(mMutex);
+		TAM_LOCK_GUARD
 		std::get<2>(data) = false;
 	}
 
@@ -190,7 +201,7 @@ public:
 		for (auto i = t.begin(); i != t.end(); i++) {
 			if ((*i).monomial()) termIDs[(*i).monomial()->id()] = 0;
 		}
-		std::lock_guard<std::mutex> lock(mMutex);
+		TAM_LOCK_GUARD
 		std::get<2>(data) = false;
 	}
 };

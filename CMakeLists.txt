@@ -49,6 +49,7 @@ option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
+option( THREAD_SAFE "Use mutexing to assure thread safety" ON )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 
 if (NOT CMAKE_BUILD_TYPE)
