@@ -95,6 +95,7 @@ public:
 			if (it.second == id) return it.first;
 		}
 		assert(false);
+		return mConstraints.begin()->first;
 	}
 	/**
 	 * Registers a new sample point and returns its ID.
@@ -143,7 +144,10 @@ public:
 		mData[id].clear();
 		// Disable sample points for other constraints
 		for (auto& d: mData) {
-			for (std::size_t i: queue) d[i] = false;
+			for (std::size_t i: queue) {
+				if (i >= d.size()) continue;
+				d[i] = false;
+			}
 		}
 	}
 	/**

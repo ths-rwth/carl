@@ -1381,7 +1381,7 @@ namespace carl
          * @param deg Degree.
          * @return Result.
          */
-        Interval<Number> root(unsigned deg) const;
+        Interval<Number> root(int deg) const;
         
         /**
          * Calculates and assigns the nth root of the interval with respect to natural interval arithmetic.
@@ -1600,10 +1600,21 @@ namespace carl
         {
             return this->lower() <= this->upper();
         }
+    /**
+    * Calculates the distance between two Intervals.
+    * @param intervalA Interval to wich we want to know the distance.
+    * @return distance to intervalA
+    */
+    Number distance(const Interval<Number>& intervalA);
+
+    Interval<Number> convexHull(const Interval<Number>& interval);
+
     };
 
 	template<typename T>
 	struct is_number<Interval<T>> : std::true_type {};
+  
+
 
     /*
      * Overloaded arithmetics operators

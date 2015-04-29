@@ -23,6 +23,8 @@ protected:
 	 */
 	UnivariatePolynomial<Number> polynomial;
 	
+	std::list<UnivariatePolynomial<Number>> sturmSequence;
+	
 	/**
 	 * Isolating interval of this interval representation.
 	 * 
@@ -30,11 +32,6 @@ protected:
 	 * However, all methods must make sure, that the interval always includes the same root.
 	 */
 	mutable Interval<Number> interval;
-	
-	/**
-	 * Standard Sturm sequence of the polynomial and its derivative.
-	 */
-	std::list<UnivariatePolynomial<Number>> sturmSequence;
 	
 	/**
 	 * Number of refinements executed to the isolating interval.
@@ -70,8 +67,8 @@ private:
 	 */
 	RealAlgebraicNumberIR(
 			const UnivariatePolynomial<Number>& p,
+			const std::list<UnivariatePolynomial<Number>>& seq,
 			const Interval<Number>& i,
-			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true );
 
@@ -90,11 +87,23 @@ public:
 	static std::shared_ptr<RealAlgebraicNumberIR> create(
 			const UnivariatePolynomial<Number>& p,
 			const Interval<Number>& i,
-			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true) {
 		assert(i.isOpenInterval() || i.isPointInterval());
-		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, s, normalize, isRoot));
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, p.standardSturmSequence(), i, normalize, isRoot));
+		CARL_LOG_TRACE("carl.core", "Creating " << res);
+		res->pThis = res;
+		return res;
+	}
+	
+	static std::shared_ptr<RealAlgebraicNumberIR> create(
+			const UnivariatePolynomial<Number>& p,
+			const std::list<UnivariatePolynomial<Number>>& seq,
+			const Interval<Number>& i,
+			const bool normalize = true,
+			const bool isRoot = true) {
+		assert(i.isOpenInterval() || i.isPointInterval());
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, seq, i, normalize, isRoot));
 		CARL_LOG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
@@ -105,7 +114,7 @@ public:
 	 * @return Copy of this.
 	 */
 	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
-		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
+		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, false, this->isRoot());
 	}
 
 	/**

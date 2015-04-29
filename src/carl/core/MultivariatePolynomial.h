@@ -47,7 +47,7 @@ public:
 	typedef Term<Coeff> TermType;
 	/// Type of the monomials within the terms.
 	typedef Monomial MonomType;
-	/// Type of the coefficients.
+	/// Type of the coefficients. 	
 	typedef Coeff CoeffType;
 	/// Policies for this monomial.
 	typedef Policies Policy;
@@ -59,7 +59,7 @@ public:
     typedef MultivariatePolynomial<Coeff, Ordering, Policies> PolyType;
     /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
     typedef std::vector<int> CACHE;
-	/// Type our terms vector.
+	/// Type our terms vector.f
 	typedef std::vector<Term<Coeff>> TermsType;
     
 protected:

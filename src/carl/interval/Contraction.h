@@ -43,13 +43,78 @@ namespace carl {
                 mNumerator(),
                 mDenominator(nullptr)
             {
+                //std::cout << "[p] " << p << "[x]" << x << std::endl;
+                //std::cout << "[nrTerms] " << p.nrTerms() << std::endl;
+                //std::cout << "[isOne] " << carl::isOne(p.begin()->coeff()) << std::endl;
+                //std::cout << "[isOne] " << carl::isOne(p.rbegin()->coeff()) << std::endl;
+                //std::cout << "[begLin] " << p.begin()->isLinear() << std::endl;
+                //std::cout << "[endLin] " << p.rbegin()->isLinear() << std::endl;
+
                 assert(p.has(x));
                 assert(!p.hasConstantTerm());
-                assert(p.isLinear() || (p.nrTerms() == 2 && carl::isOne(p.begin()->coeff()) && carl::isOne(p.rbegin()->coeff()) 
-                                        && ((p.begin()->has(x) && !p.rbegin()->has(x) && p.rbegin()->isLinear()) 
-                                            || (p.rbegin()->has(x) && !p.begin()->has(x) && p.begin()->isLinear()))));
+                assert(p.isLinear() || (p.nrTerms() == 2 && (carl::isOne(p.begin()->coeff()) || carl::isOne(p.rbegin()->coeff()))
+                                        && ((p.begin()->has(x) && !p.rbegin()->has(x)) 
+                                        || (p.rbegin()->has(x) && !p.begin()->has(x)))));
+                
                 // Construct the solution formula for x in p = 0
-                // @todo fill out
+                typename Polynomial::TermsType::const_iterator yIter;
+                typename Polynomial::TermsType::const_iterator xIter;
+
+                //std::cout << "[propagation]:";
+                // Case 1.):
+                if (p.isLinear())
+                {
+                    //std::cout << "[Case 1]" << std::endl;
+                    Polynomial (t1);
+                    yIter = p.begin();
+                    
+                    for (const auto& t: p) {
+                        assert(t.monomial() != nullptr);
+                        if (t.has(x)) {
+                            
+                            mNumerator = p / t.coeff();
+                            mNumerator -= x;
+                            mNumerator *= (-1);
+                            //std::cout << "[mNumerator]" << mNumerator << std::endl;
+                            break;
+                        }
+                    }                    
+                }
+
+                // Case 2.)
+                else
+                {   
+                    assert(p.nrTerms() == 2);
+
+                    if (p.begin()->has(x))
+                    {
+                        xIter = p.begin();   
+                        yIter = xIter;
+                        ++yIter;
+                    } 
+                    else
+                    {
+                        yIter = p.begin();   
+                        xIter = yIter;
+                        ++xIter;
+                    }
+
+                    assert(xIter->monomial() != nullptr);
+                    assert(!xIter->isLinear() || xIter->coeff() == (-1));
+                    //std::cout << "[Case 2]" << std::endl;
+                    if (!xIter->isLinear()) 
+                    {
+                        mRoot = xIter->monomial()->exponentOfVariable(x);
+                        //std::cout << "[mRoot]" << mRoot << std::endl;                  
+                        mDenominator = xIter->monomial()->dropVariable(x);
+                        //std::cout << "[mDenominator]" << mDenominator << std::endl;
+                    }
+
+                    mNumerator = Polynomial ( *yIter );
+                    //std::cout << "[mNumerator]" << mNumerator << std::endl;
+
+                    
+                }
             }
             
             /**
@@ -61,7 +126,39 @@ namespace carl {
              */
             bool evaluate(const Interval<double>::evalintervalmap& intervals, Interval<double>& resA, Interval<double>& resB) const
             {
-                // @todo fill out
+                // evaluate momnomes
+                //std::cout << "[PreAll] resA: " << resA << "resB: " << resB << std::endl;
+                Interval<double> numerator = IntervalEvaluation::evaluate(mNumerator, intervals);
+                //std::cout << "[numerator] " << numerator << std::endl;
+                if (mDenominator == nullptr)
+                {
+                    resA = std::move(numerator);
+                    //std::cout << "[postMove] " << resA << std::endl;
+                    resB = Interval<double>::emptyInterval();
+                    return false;
+                }
+                
+                Interval<double> denominator = IntervalEvaluation::evaluate(*mDenominator, intervals);        
+                Interval<double> result1, result2;
+
+                // divide:
+                //std::cout << "[PreDiv] numerator: " << numerator << "denominator: " << denominator << std::endl;
+                bool split = numerator.div_ext(denominator, result1, result2);
+
+                // extract root:
+                assert(mRoot <= std::numeric_limits<int>::max());
+
+                //std::cout << "[PreRoot] Res1: " << result1 << "Res2: " << result2 << std::endl;
+                result1.root((int) mRoot);
+                resA = result1;
+                if (split)
+                {
+                    result2.root((int) mRoot);
+                    resB = result2;
+                }
+
+                //std::cout << "[PreRoot] resA: " << resA << "resB: " << resB << std::endl;
+                if (split && !result2.isEmpty()) return true;
                 return false;
             }
     };
@@ -97,36 +194,113 @@ namespace carl {
                 if (withPropagation) {
                     Interval<double> resultPropagation1, resultPropagation2;
                     bool splitOccurredInEvaluation = itB->second.evaluate( intervals, resultPropagation1, resultPropagation2 );
+                    //std::cout << "[splitOccurred in Eval] "<< splitOccurredInEvaluation << " [splitOccurredInContraction] " << splitOccurredInContraction << std::endl;
                     if( splitOccurredInContraction && splitOccurredInEvaluation )
                     {
                         // @todo here we could get three intervals, e.g., resA = [0,2], resB = [3,7], resultPropagation1 = [1,4] and resultPropagation2 = [6,7] results in [1,2],[3,4],[6,7]
                         // we could merge two of them, e.g., those with the least gap between them, in given example we would then get [1,4],[6,7]
+                        //std::cout << "[res1][1] " << resultPropagation1 << "[res2][1] " << resultPropagation2 << std::endl;
+
+                        std::vector<Interval<double>> resultingIntervals;
+                        Interval<double> tempInterval;
+                        
+                        //intersecting resulting intervals and adding them to a vector in case they are non-empty
+                        tempInterval = resA.intersect( resultPropagation1 );
+                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
+                        //std::cout << "[resA][1] " << resA << "[resB][1] " << resB << std::endl;
+            
+                        tempInterval = resA.intersect( resultPropagation2 );
+                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
+                        //std::cout << "[resA][2] " << resA << "[resB][2] " << resB << std::endl;
+
+                        tempInterval = resB.intersect( resultPropagation1 );
+                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
+                        //std::cout << "[resA][3] " << resA << "[resB][3] " << resB << std::endl;
+                        
+                        tempInterval = resB.intersect( resultPropagation2 );
+                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
+                        //std::cout << "[resA][4] " << resA << "[resB][4] " << resB << std::endl;
+
+                        //std::cout << "[resultingIntervals size] " << resultingIntervals.size() << std::endl;
+                        assert (resultingIntervals.size() < 4);
+
+                        //checking how many intervals were generated
+                        if (resultingIntervals.size() >= 1)
+                        {
+                            resA = resultingIntervals[0];
+                        }
+
+                        if (resultingIntervals.size() == 2)
+                        {
+                            resB = resultingIntervals[1];
+                        }
+
+                        if (resultingIntervals.size() == 3)
+                        {
+                            size_t indexA = 0;
+                            size_t indexB = 0;
+                            double bestDistance = resultingIntervals[0].distance(resultingIntervals[1]);
+                            double currentDistance = bestDistance;
+
+                            for (size_t i = 0; i < 3; i++)
+                            {
+                                for (size_t j = 0; j < 3; j++)
+                                {
+                                    if(j != i)
+                                    {
+                                        currentDistance = resultingIntervals[i].distance(resultingIntervals[j]);
+                                        if (currentDistance <= bestDistance)   
+                                        {
+                                            bestDistance = currentDistance;
+                                            indexA = i;
+                                            indexB = j;
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                            Interval<double> mergeCandidateA = resultingIntervals[indexA];
+                            Interval<double> mergeCandidateB = resultingIntervals[indexB];
+
+                            // merge the two Intervals which are closest to each other
+                            resA = mergeCandidateA.convexHull(mergeCandidateB);
+
+                            //finding the non-merged interval
+                            resB = resultingIntervals[(indexA+indexB-1)%3];    
+                            //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;                    
+                        }
                     }
                     else if( splitOccurredInContraction )
                     {
                         assert( resultPropagation2.isEmpty() );
                         resA = resA.intersect( resultPropagation1 );
                         resB = resB.intersect( resultPropagation1 );
+                        //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;
+
                     }
                     else if( splitOccurredInEvaluation )
                     {
                         assert( resB.isEmpty() );
                         resA = resA.intersect( resultPropagation1 );
                         resB = resA.intersect( resultPropagation2 );
+                        //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;
                     }
                     else // no split occurred
                     {
                         assert( resultPropagation2.isEmpty() );
                         assert( resB.isEmpty() );
+
                         resA = resA.intersect( resultPropagation1 );
+                        //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;
                     }
-                    if( resA.isEmpty() || resB.isEmpty() )
+                    if( resA.isEmpty() && !resB.isEmpty() )
                     {
                         resA = resB;
                         resB = Interval<double>::emptyInterval();
+                        //std::cout << "[resA][6] " << resA << "[resB][6] " << resB << std::endl;
                         return false;
                     }
-                    return true;
+                    return !resB.isEmpty();
                 }
             }
             return splitOccurredInContraction;

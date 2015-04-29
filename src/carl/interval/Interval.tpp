@@ -341,6 +341,24 @@ template<typename Number>
 		return oss.str();
 	}
 
+ 
+/**
+* Calculates the distance between two Intervals.
+* @param intervalA Interval to wich we want to know the distance.
+* @return distance to intervalA
+*/
+template<typename Number>
+Number Interval<Number>::distance(const Interval<Number>& intervalA)
+{
+    return std::min(carl::abs(intervalA.upper() - this->lower()), carl::abs(intervalA.lower() - this->upper()));
+}
+
+template<typename Number>
+Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval)
+{
+    return Interval(std::min(interval.lower(), this->lower()),std::min(interval.upper(), this->upper()));
+}
+
 /*******************************************************************************
  * Arithmetic functions
  ******************************************************************************/
@@ -884,7 +902,7 @@ void Interval<Number>::sqrt_assign()
 
 	
 template<typename Number>
-Interval<Number> Interval<Number>::root(unsigned deg) const
+Interval<Number> Interval<Number>::root(int deg) const
 	{
 		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::nth_root(mContent, deg), mLowerBoundType, mUpperBoundType);
@@ -1400,6 +1418,8 @@ template<typename Number>
 		resultB = rhs;
 		return true;
 	}
+
+
 	
 /*******************************************************************************
  * Overloaded arithmetics operators
