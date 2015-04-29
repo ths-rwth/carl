@@ -17,6 +17,7 @@
 #include <sstream>
 #include <assert.h>
 #include "Relation.h"
+#include "../config.h"
 #include "../core/VariableInformation.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
@@ -228,6 +229,8 @@ namespace carl
             mutable VarInfoMap<Pol> mVarInfoMap;
             /// Definiteness of the polynomial in this constraint.
             mutable Definiteness mLhsDefinitess;
+            /// Mutex for access to variable information map.
+            mutable std::mutex mVarInfoMapMutex;
 
             /**
              * Default constructor. (0=0)
@@ -275,15 +278,6 @@ namespace carl
             {}
             
             ConstraintContent( Pol&& _lhs, Relation _rel, unsigned _id = 0 );
-            
-//            /**
-//             * Copies the given constraint.
-//             * @param _constraint The constraint to copy.
-//             * @param _rehash A flag indicating whether to recalculate the hash value of the constraint to 
-//             *                 construct. This might be necessary in case the given constraint has been 
-//             *                 simplified but kept its hash value.
-//             */
-//            Constraint( const Constraint& _constraint, bool _rehash = false );
             
             /**
              * Initializes some basic information of the constraint, such as the definiteness of the left-hand 
@@ -441,6 +435,12 @@ namespace carl
             
             Constraint( const ConstraintContent<Pol>* _content );
             
+            #ifdef THREAD_SAFE
+            #define VARINFOMAP_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mVarInfoMapMutex );
+            #else
+            #define VARINFOMAP_LOCK_GUARD
+            #endif
+            
         public:
             
             Constraint( bool _valid = true );
@@ -537,7 +537,8 @@ namespace carl
              * @return The maximal degree of the given variable in this constraint. (Monomial-wise)
              */
             unsigned maxDegree( const Variable& _variable ) const
-            {
+            {   
+                VARINFOMAP_LOCK_GUARD
                 return mpContent->maxDegree( _variable );
             }
 
@@ -546,6 +547,7 @@ namespace carl
              */
             unsigned maxDegree() const
             {
+                VARINFOMAP_LOCK_GUARD
                 return mpContent->maxDegree();
             }
 
@@ -555,6 +557,7 @@ namespace carl
              */
             unsigned minDegree( const Variable& _variable ) const
             {
+                VARINFOMAP_LOCK_GUARD
                 auto varInfo = mpContent->mVarInfoMap.find( _variable );
                 if( varInfo == mpContent->mVarInfoMap.end() ) return 0;
                 return varInfo->second.minDegree();
@@ -567,6 +570,7 @@ namespace carl
              */
             unsigned occurences( const Variable& _variable ) const
             {
+                VARINFOMAP_LOCK_GUARD
                 auto varInfo = mpContent->mVarInfoMap.find( _variable );
                 if( varInfo == mpContent->mVarInfoMap.end() ) return 0;
                 return varInfo->second.occurence();
@@ -582,6 +586,7 @@ namespace carl
              */
             const VarInfo<Pol>& varInfo( const Variable& _variable, bool _withCoefficients = false ) const
             {
+                VARINFOMAP_LOCK_GUARD
                 auto varInfo = mpContent->mVarInfoMap.find( _variable );
                 assert( varInfo != mpContent->mVarInfoMap.end() );
                 if( _withCoefficients && !varInfo->second.hasCoeff() )
