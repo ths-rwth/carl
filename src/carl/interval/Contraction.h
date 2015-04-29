@@ -43,7 +43,7 @@ namespace carl {
                 mNumerator(),
                 mDenominator(nullptr)
             {
-                //std::cout << "[p] " << p << "[x]" << x << std::endl;
+//                std::cout << "[p] " << p << "[x]" << x << std::endl;
                 //std::cout << "[nrTerms] " << p.nrTerms() << std::endl;
                 //std::cout << "[isOne] " << carl::isOne(p.begin()->coeff()) << std::endl;
                 //std::cout << "[isOne] " << carl::isOne(p.rbegin()->coeff()) << std::endl;
@@ -75,7 +75,7 @@ namespace carl {
                             mNumerator = p / t.coeff();
                             mNumerator -= x;
                             mNumerator *= (-1);
-                            //std::cout << "[mNumerator]" << mNumerator << std::endl;
+//                            std::cout << "[mNumerator]" << mNumerator << std::endl;
                             break;
                         }
                     }                    
@@ -102,18 +102,19 @@ namespace carl {
                     assert(xIter->monomial() != nullptr);
                     assert(!xIter->isLinear() || xIter->coeff() == (-1));
                     //std::cout << "[Case 2]" << std::endl;
-                    if (!xIter->isLinear()) 
+                    if (xIter->isLinear()) 
+                    {
+                        mNumerator = Polynomial ( *yIter );
+                    }
+                    else
                     {
                         mRoot = xIter->monomial()->exponentOfVariable(x);
-                        //std::cout << "[mRoot]" << mRoot << std::endl;                  
+//                        std::cout << "[mRoot]" << mRoot << std::endl;                  
                         mDenominator = xIter->monomial()->dropVariable(x);
-                        //std::cout << "[mDenominator]" << mDenominator << std::endl;
+//                        std::cout << "[mDenominator]" << mDenominator << std::endl;
+                        mNumerator = -Polynomial ( *yIter );
                     }
-
-                    mNumerator = Polynomial ( *yIter );
-                    //std::cout << "[mNumerator]" << mNumerator << std::endl;
-
-                    
+//                    std::cout << "[mNumerator]" << mNumerator << std::endl;                    
                 }
             }
             
@@ -126,13 +127,13 @@ namespace carl {
              */
             bool evaluate(const Interval<double>::evalintervalmap& intervals, Interval<double>& resA, Interval<double>& resB) const
             {
-                // evaluate momnomes
+                // evaluate monomial
                 //std::cout << "[PreAll] resA: " << resA << "resB: " << resB << std::endl;
                 Interval<double> numerator = IntervalEvaluation::evaluate(mNumerator, intervals);
                 //std::cout << "[numerator] " << numerator << std::endl;
                 if (mDenominator == nullptr)
                 {
-                    resA = std::move(numerator);
+                    resA = std::move(numerator.root((int) mRoot));
                     //std::cout << "[postMove] " << resA << std::endl;
                     resB = Interval<double>::emptyInterval();
                     return false;
@@ -149,16 +150,14 @@ namespace carl {
                 assert(mRoot <= std::numeric_limits<int>::max());
 
                 //std::cout << "[PreRoot] Res1: " << result1 << "Res2: " << result2 << std::endl;
-                result1.root((int) mRoot);
-                resA = result1;
+                resA = result1.root((int) mRoot);
                 if (split)
                 {
-                    result2.root((int) mRoot);
-                    resB = result2;
+                    resB = result2.root((int) mRoot);
                 }
 
                 //std::cout << "[PreRoot] resA: " << resA << "resB: " << resB << std::endl;
-                if (split && !result2.isEmpty()) return true;
+                if (split && !resB.isEmpty()) return true;
                 return false;
             }
     };
@@ -183,7 +182,11 @@ namespace carl {
             {
                 it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
             }
+//            std::cout << "contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
             bool splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+//            std::cout << "  after contraction: " << resA;
+//            if( splitOccurredInContraction ) std::cout << " and " << resB;
+//            std::cout << std::endl;
             if( withPropagation )
             {
                 typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator itB = mVarSolutionFormulas.find(variable);
@@ -194,6 +197,9 @@ namespace carl {
                 if (withPropagation) {
                     Interval<double> resultPropagation1, resultPropagation2;
                     bool splitOccurredInEvaluation = itB->second.evaluate( intervals, resultPropagation1, resultPropagation2 );
+//                    std::cout << "  after propagation: " << resultPropagation1;
+//                    if( splitOccurredInEvaluation ) std::cout << " and " << resultPropagation2;
+//                    std::cout << std::endl;
                     //std::cout << "[splitOccurred in Eval] "<< splitOccurredInEvaluation << " [splitOccurredInContraction] " << splitOccurredInContraction << std::endl;
                     if( splitOccurredInContraction && splitOccurredInEvaluation )
                     {
@@ -298,8 +304,12 @@ namespace carl {
                         resA = resB;
                         resB = Interval<double>::emptyInterval();
                         //std::cout << "[resA][6] " << resA << "[resB][6] " << resB << std::endl;
+//                        std::cout << "  after both: " << resA << std::endl;
                         return false;
                     }
+//                    std::cout << "  after both: " << resA;
+//                    if( !resB.isEmpty() ) std::cout << " and " << resB;
+//                    std::cout << std::endl;
                     return !resB.isEmpty();
                 }
             }
