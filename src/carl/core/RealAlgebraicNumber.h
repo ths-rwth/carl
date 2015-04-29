@@ -144,7 +144,7 @@ public:
 		return mValue;
 	}
 
-	virtual bool containedIn(const Interval<Number>& i) const {
+	virtual bool containedIn(const Interval<Number>& i) {
 		return i.contains(this->value());
 	}
 

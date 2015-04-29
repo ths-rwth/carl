@@ -39,12 +39,12 @@ namespace carl
             /// The formula pool.
             FastPointerSet<FormulaContent<Pol>> mPool;
             /// Mutex to avoid multiple access to the pool
-            mutable std::mutex mMutexPool;
+            mutable std::recursive_mutex mMutexPool;
             ///
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
             
             #ifdef SMTRAT_STRAT_PARALLEL_MODE
-            #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock( mMutexPool );
+            #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock( mMutexPool );
             #define FORMULA_POOL_LOCK mMutexPool.lock();
             #define FORMULA_POOL_UNLOCK mMutexPool.unlock();
             #else

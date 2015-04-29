@@ -47,7 +47,7 @@ public:
 	typedef Term<Coeff> TermType;
 	/// Type of the monomials within the terms.
 	typedef Monomial MonomType;
-	/// Type of the coefficients.
+	/// Type of the coefficients. 	
 	typedef Coeff CoeffType;
 	/// Policies for this monomial.
 	typedef Policies Policy;
@@ -59,7 +59,7 @@ public:
     typedef MultivariatePolynomial<Coeff, Ordering, Policies> PolyType;
     /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
     typedef std::vector<int> CACHE;
-	/// Type our terms vector.
+	/// Type our terms vector.f
 	typedef std::vector<Term<Coeff>> TermsType;
     
 protected:
@@ -253,6 +253,13 @@ public:
 	 * @return Definiteness of this.
 	 */
 	Definiteness definiteness() const;
+    
+    /**
+     * @param _notTrivial If this flag is true, this polynomial is not yet in form of a sos (the method than avoids checking this).
+     * @return The sum-of-squares (sos) decomposition ((q1,p1), .., (qn,pn)) with this = q1*p1^2+..+qn*pn^2, qi being positive rational numbers and pi being polynomials.
+     *          If the result is empty, no sos could be found (which does not mean, that there exists no one).
+     */
+    std::vector<std::pair<Coeff,MultivariatePolynomial<Coeff,Ordering,Policies>>> sosDecomposition( bool _notTrivial = false ) const;
 
 	/**
 	 * Calculates the number of terms.
@@ -636,6 +643,7 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs);
 	/// @}
@@ -1221,6 +1229,20 @@ public:
 	inline MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	/// @}
+    
+    /// @name Division operators
+	/// @{
+	/**
+	 * Perform a division involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs / rhs`
+	 */
+	template<typename C, typename O, typename P>
+	inline MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
+        return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
+    }
 	/// @}
 	
 } // namespace carl

@@ -341,6 +341,24 @@ template<typename Number>
 		return oss.str();
 	}
 
+ 
+/**
+* Calculates the distance between two Intervals.
+* @param intervalA Interval to wich we want to know the distance.
+* @return distance to intervalA
+*/
+template<typename Number>
+Number Interval<Number>::distance(const Interval<Number>& intervalA)
+{
+    return std::min(carl::abs(intervalA.upper() - this->lower()), carl::abs(intervalA.lower() - this->upper()));
+}
+
+template<typename Number>
+Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval)
+{
+    return Interval(std::min(interval.lower(), this->lower()),std::min(interval.upper(), this->upper()));
+}
+
 /*******************************************************************************
  * Arithmetic functions
  ******************************************************************************/
@@ -579,26 +597,34 @@ Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
 		assert(rhs.isConsistent());
 		BoundType lowerBoundType = BoundType::WEAK;
         BoundType upperBoundType = BoundType::WEAK;
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && ( mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
-		   || (rhs.upperBoundType() == BoundType::INFTY && ( mContent.upper() < carl::constant_zero<Number>().get() || ( mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY))) )
-        {
-            lowerBoundType = BoundType::INFTY;
-        }
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < carl::constant_zero<Number>().get() || (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY)))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > carl::constant_zero<Number>().get() || (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY)))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && ( mContent.upper() < carl::constant_zero<Number>().get() || ( mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY)))
-		   || (rhs.upperBoundType() == BoundType::INFTY && ( mContent.lower() > carl::constant_zero<Number>().get() || ( mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))) )
-        {
-            upperBoundType = BoundType::INFTY;
-        }
 		///@todo Correctly determine if bounds are strict or weak.
 		if (this->isOpenInterval() || rhs.isOpenInterval()) {
 			// just a quick heuristic, by no means complete.
             lowerBoundType = BoundType::STRICT;
             upperBoundType = BoundType::STRICT;
 		}
+        const Number& xl = mContent.lower();
+        const Number& xu = mContent.upper();
+        const Number& yl = rhs.lower();
+        const Number& yu = rhs.upper();
+        const BoundType& xlt = mLowerBoundType;
+        const BoundType& xut = mUpperBoundType;
+        const BoundType& ylt = rhs.lowerBoundType();
+        const BoundType& yut = rhs.upperBoundType();
+        if( (xlt == BoundType::INFTY && (carl::isPositive(yu) || yut == BoundType::INFTY))
+		   || (xut == BoundType::INFTY && (carl::isNegative(yl) || ylt == BoundType::INFTY))
+		   || (ylt == BoundType::INFTY && (carl::isPositive(xl) || xut == BoundType::INFTY))
+		   || (yut == BoundType::INFTY && (carl::isNegative(xl) || (carl::isNegative(xl) || xlt == BoundType::INFTY))) )
+        {
+            lowerBoundType = BoundType::INFTY;
+        }
+        if( (xlt == BoundType::INFTY && (carl::isNegative(yu) || (carl::isNegative(yl) || ylt == BoundType::INFTY)))
+		   || (xut == BoundType::INFTY && (carl::isPositive(yl) || (carl::isPositive(yu) || yut == BoundType::INFTY)))
+		   || (ylt == BoundType::INFTY && (carl::isNegative(xl) || (carl::isNegative(xl) || xlt == BoundType::INFTY)))
+		   || (yut == BoundType::INFTY && (carl::isPositive(xl) || (carl::isPositive(xl) || xut == BoundType::INFTY))) )
+        {
+            upperBoundType = BoundType::INFTY;
+        }
         return Interval<Number>(BoostInterval( mContent/rhs.content() ), lowerBoundType, upperBoundType );
 	}
 
@@ -876,7 +902,7 @@ void Interval<Number>::sqrt_assign()
 
 	
 template<typename Number>
-Interval<Number> Interval<Number>::root(unsigned deg) const
+Interval<Number> Interval<Number>::root(int deg) const
 	{
 		assert(this->isConsistent());
 		return Interval<Number>(boost::numeric::nth_root(mContent, deg), mLowerBoundType, mUpperBoundType);
@@ -1392,6 +1418,8 @@ template<typename Number>
 		resultB = rhs;
 		return true;
 	}
+
+
 	
 /*******************************************************************************
  * Overloaded arithmetics operators

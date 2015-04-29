@@ -884,7 +884,8 @@ public:
 	 * @param root Root to be eliminated.
 	 */
 	void eliminateRoot(const Coefficient& root);
-
+	
+public:
 	std::list<UnivariatePolynomial> standardSturmSequence() const;
 	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 

@@ -241,7 +241,7 @@ public:
 	 */
 	IncrementalRootFinder(
 			const UnivariatePolynomial<Number>& polynomial,
-			const Interval<Number>& interval = Interval<Number>::unboundedExactInterval(),
+			const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 			SplittingStrategy splittingStrategy = SplittingStrategy::DEFAULT,
 			bool tryTrivialSolver = true
 			);
