@@ -11,7 +11,7 @@
 #include "IntervalEvaluation.h"
 #include <algorithm>
 
-//#define CONTRACTION_DEBUG
+#define CONTRACTION_DEBUG
 
 namespace carl {
     
@@ -45,12 +45,11 @@ namespace carl {
                 mNumerator(),
                 mDenominator(nullptr)
             {
-//                std::cout << "[p] " << p << "[x]" << x << std::endl;
-                //std::cout << "[nrTerms] " << p.nrTerms() << std::endl;
-                //std::cout << "[isOne] " << carl::isOne(p.begin()->coeff()) << std::endl;
-                //std::cout << "[isOne] " << carl::isOne(p.rbegin()->coeff()) << std::endl;
-                //std::cout << "[begLin] " << p.begin()->isLinear() << std::endl;
-                //std::cout << "[endLin] " << p.rbegin()->isLinear() << std::endl;
+        
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": [Polynome]: " << p << " [#Terms]: " << p.nrTerms() << std::endl;     
+                #endif
+
 
                 assert(p.has(x));
                 assert(!p.hasConstantTerm());
@@ -59,11 +58,17 @@ namespace carl {
                                         || (p.rbegin()->has(x) && !p.begin()->has(x)))));
                 
                 // Construct the solution formula for x in p = 0
-                //std::cout << "[propagation]:";
+
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": Propagating... " << std::endl;     
+                #endif
+
                 // Case 1.):
                 if (p.isLinear())
                 {
-                    //std::cout << "[Case 1]" << std::endl;
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << __func__ << ": Case 1. (linear)... " << std::endl;     
+                    #endif
                     for (const auto& t: p) {
                         assert(t.monomial() != nullptr);
                         if (t.has(x)) {
@@ -71,7 +76,11 @@ namespace carl {
                             mNumerator = p / t.coeff();
                             mNumerator -= x;
                             mNumerator *= (-1);
-//                            std::cout << "[mNumerator]" << mNumerator << std::endl;
+                            
+                            #ifdef CONTRACTION_DEBUG
+                            std::cout << __func__ << ": Setting mNumerator:" << mNumerator << std::endl;     
+                            #endif
+
                             return;
                         }
                     }                    
@@ -80,6 +89,10 @@ namespace carl {
                 // Case 2.)
                 else
                 {   
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << __func__ << ": Case 2. (non-linear)... " << std::endl;     
+                    #endif
+
                     assert(p.nrTerms() == 2);
                     typename Polynomial::TermsType::const_iterator yIter;
                     typename Polynomial::TermsType::const_iterator xIter;
@@ -106,12 +119,19 @@ namespace carl {
                     else
                     {
                         mRoot = xIter->monomial()->exponentOfVariable(x);
-//                        std::cout << "[mRoot]" << mRoot << std::endl;                  
+                        #ifdef CONTRACTION_DEBUG
+                        std::cout << __func__ << ": Setting mRoot:" << mRoot << std::endl;     
+                        #endif
+              
                         mDenominator = xIter->monomial()->dropVariable(x);
-//                        std::cout << "[mDenominator]" << mDenominator << std::endl;
+                        #ifdef CONTRACTION_DEBUG
+                        std::cout << __func__ << ": Setting mDenominator:" << mDenominator << std::endl;     
+                        #endif
                         mNumerator = -Polynomial ( *yIter );
                     }
-//                    std::cout << "[mNumerator]" << mNumerator << std::endl;                    
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << __func__ << ": Setting mNumerator:" << mNumerator << std::endl;     
+                    #endif                         
                 }
             }
             
@@ -189,11 +209,19 @@ namespace carl {
             {
                 it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
             }
-//            std::cout << "contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
+
+            #ifdef CONTRACTION_DEBUG
+            std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
+            #endif
+
             bool splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
-//            std::cout << "  after contraction: " << resA;
-//            if( splitOccurredInContraction ) std::cout << " and " << resB;
-//            std::cout << std::endl;
+
+            #ifdef CONTRACTION_DEBUG
+            std::cout << "  after contraction: " << resA;
+            if( splitOccurredInContraction ) std::cout << " and " << resB;
+            std::cout << std::endl;                            
+            #endif
+
             if( withPropagation )
             {
                 typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator itB = mVarSolutionFormulas.find(variable);
