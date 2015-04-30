@@ -5,12 +5,11 @@
  * Created on August 30, 2013, 4:55 PM
  */
 
+#pragma once
 #include "Interval.h"
 #include "../core/Sign.h"
 #include "IntervalEvaluation.h"
-
-
-#pragma once
+#include <algorithm>
 
 //#define CONTRACTION_DEBUG
 
@@ -20,6 +19,8 @@ namespace carl {
     class VarSolutionFormula
     {
         private:
+            /// The variable, for which to solve.
+            Variable mVar;
             /// Stores n, if the nth root has to be taken of mNumerator/mDenominator
             unsigned mRoot;
             /// Stores the numerator
@@ -39,6 +40,7 @@ namespace carl {
              * @param x The variable to construct a solution formula for.
              */
             VarSolutionFormula(const Polynomial& p, Variable::Arg x):
+                mVar(x),
                 mRoot(1),
                 mNumerator(),
                 mDenominator(nullptr)
@@ -57,17 +59,11 @@ namespace carl {
                                         || (p.rbegin()->has(x) && !p.begin()->has(x)))));
                 
                 // Construct the solution formula for x in p = 0
-                typename Polynomial::TermsType::const_iterator yIter;
-                typename Polynomial::TermsType::const_iterator xIter;
-
                 //std::cout << "[propagation]:";
                 // Case 1.):
                 if (p.isLinear())
                 {
                     //std::cout << "[Case 1]" << std::endl;
-                    Polynomial (t1);
-                    yIter = p.begin();
-                    
                     for (const auto& t: p) {
                         assert(t.monomial() != nullptr);
                         if (t.has(x)) {
@@ -76,7 +72,7 @@ namespace carl {
                             mNumerator -= x;
                             mNumerator *= (-1);
 //                            std::cout << "[mNumerator]" << mNumerator << std::endl;
-                            break;
+                            return;
                         }
                     }                    
                 }
@@ -85,7 +81,8 @@ namespace carl {
                 else
                 {   
                     assert(p.nrTerms() == 2);
-
+                    typename Polynomial::TermsType::const_iterator yIter;
+                    typename Polynomial::TermsType::const_iterator xIter;
                     if (p.begin()->has(x))
                     {
                         xIter = p.begin();   
@@ -118,6 +115,26 @@ namespace carl {
                 }
             }
             
+            void addRoot( const Interval<double>& _interv, const Interval<double>& _varInterval, std::vector<Interval<double>>& _result ) const
+            {
+                Interval<double> tmp = _interv.root((int) mRoot);
+                if( mRoot % 2 == 0 )
+                {
+                    Interval<double> rootA, rootB;
+                    if( tmp.unite( -tmp, rootA, rootB ) )
+                    {
+                        rootB.intersect_assign(_varInterval);
+                        if( !rootB.isEmpty() )
+                            _result.push_back(std::move(rootB));
+                    }
+                    rootA.intersect_assign(_varInterval);
+                    if( !rootA.isEmpty() )
+                        _result.push_back(std::move(rootA));
+                }
+                else
+                    _result.push_back( std::move(tmp) );
+            }
+            
             /**
              * Evaluates this solution formula for the given mapping of the variables occurring in the solution formula to double intervals.
              * @param intervals The mapping of the variables occurring in the solution formula to double intervals
@@ -125,40 +142,30 @@ namespace carl {
              * @param resB The second interval of the result.
              * @return true, if the second interval is not empty. (the first interval must then be also nonempty)
              */
-            bool evaluate(const Interval<double>::evalintervalmap& intervals, Interval<double>& resA, Interval<double>& resB) const
+            std::vector<Interval<double>> evaluate(const Interval<double>::evalintervalmap& intervals) const
             {
                 // evaluate monomial
-                //std::cout << "[PreAll] resA: " << resA << "resB: " << resB << std::endl;
+                std::vector<Interval<double>> result;
+                assert( intervals.find(mVar) != intervals.end() );
+                const Interval<double>& varInterval = intervals.at(mVar);
                 Interval<double> numerator = IntervalEvaluation::evaluate(mNumerator, intervals);
-                //std::cout << "[numerator] " << numerator << std::endl;
                 if (mDenominator == nullptr)
                 {
-                    resA = std::move(numerator.root((int) mRoot));
-                    //std::cout << "[postMove] " << resA << std::endl;
-                    resB = Interval<double>::emptyInterval();
-                    return false;
+                    addRoot( numerator, varInterval, result );
+                    return result;
                 }
-                
                 Interval<double> denominator = IntervalEvaluation::evaluate(*mDenominator, intervals);        
                 Interval<double> result1, result2;
-
                 // divide:
-                //std::cout << "[PreDiv] numerator: " << numerator << "denominator: " << denominator << std::endl;
                 bool split = numerator.div_ext(denominator, result1, result2);
-
                 // extract root:
                 assert(mRoot <= std::numeric_limits<int>::max());
-
-                //std::cout << "[PreRoot] Res1: " << result1 << "Res2: " << result2 << std::endl;
-                resA = result1.root((int) mRoot);
+                addRoot( result1, varInterval, result );
                 if (split)
                 {
-                    resB = result2.root((int) mRoot);
+                    addRoot( result2, varInterval, result );
                 }
-
-                //std::cout << "[PreRoot] resA: " << resA << "resB: " << resB << std::endl;
-                if (split && !resB.isEmpty()) return true;
-                return false;
+                return result;
             }
     };
 
@@ -195,122 +202,107 @@ namespace carl {
                     itB = mVarSolutionFormulas.emplace(variable, std::move(VarSolutionFormula<Polynomial>(mConstraint,variable))).first;
                 }
                 if (withPropagation) {
-                    Interval<double> resultPropagation1, resultPropagation2;
-                    bool splitOccurredInEvaluation = itB->second.evaluate( intervals, resultPropagation1, resultPropagation2 );
-//                    std::cout << "  after propagation: " << resultPropagation1;
-//                    if( splitOccurredInEvaluation ) std::cout << " and " << resultPropagation2;
-//                    std::cout << std::endl;
-                    //std::cout << "[splitOccurred in Eval] "<< splitOccurredInEvaluation << " [splitOccurredInContraction] " << splitOccurredInContraction << std::endl;
-                    if( splitOccurredInContraction && splitOccurredInEvaluation )
+                    // calculate result of propagation
+                    std::vector<Interval<double>> resultPropagation = itB->second.evaluate( intervals );
+                    if( resultPropagation.empty() )
                     {
-                        // @todo here we could get three intervals, e.g., resA = [0,2], resB = [3,7], resultPropagation1 = [1,4] and resultPropagation2 = [6,7] results in [1,2],[3,4],[6,7]
-                        // we could merge two of them, e.g., those with the least gap between them, in given example we would then get [1,4],[6,7]
-                        //std::cout << "[res1][1] " << resultPropagation1 << "[res2][1] " << resultPropagation2 << std::endl;
-
-                        std::vector<Interval<double>> resultingIntervals;
-                        Interval<double> tempInterval;
-                        
-                        //intersecting resulting intervals and adding them to a vector in case they are non-empty
-                        tempInterval = resA.intersect( resultPropagation1 );
-                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
-                        //std::cout << "[resA][1] " << resA << "[resB][1] " << resB << std::endl;
-            
-                        tempInterval = resA.intersect( resultPropagation2 );
-                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
-                        //std::cout << "[resA][2] " << resA << "[resB][2] " << resB << std::endl;
-
-                        tempInterval = resB.intersect( resultPropagation1 );
-                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
-                        //std::cout << "[resA][3] " << resA << "[resB][3] " << resB << std::endl;
-                        
-                        tempInterval = resB.intersect( resultPropagation2 );
-                        if (!tempInterval.isEmpty()) resultingIntervals.push_back(tempInterval);
-                        //std::cout << "[resA][4] " << resA << "[resB][4] " << resB << std::endl;
-
-                        //std::cout << "[resultingIntervals size] " << resultingIntervals.size() << std::endl;
-                        assert (resultingIntervals.size() < 4);
-
-                        //checking how many intervals were generated
-                        if (resultingIntervals.size() >= 1)
-                        {
-                            resA = resultingIntervals[0];
-                        }
-
-                        if (resultingIntervals.size() == 2)
-                        {
-                            resB = resultingIntervals[1];
-                        }
-
-                        if (resultingIntervals.size() == 3)
-                        {
-                            size_t indexA = 0;
-                            size_t indexB = 0;
-                            double bestDistance = resultingIntervals[0].distance(resultingIntervals[1]);
-                            double currentDistance = bestDistance;
-
-                            for (size_t i = 0; i < 3; i++)
-                            {
-                                for (size_t j = 0; j < 3; j++)
-                                {
-                                    if(j != i)
-                                    {
-                                        currentDistance = resultingIntervals[i].distance(resultingIntervals[j]);
-                                        if (currentDistance <= bestDistance)   
-                                        {
-                                            bestDistance = currentDistance;
-                                            indexA = i;
-                                            indexB = j;
-                                            
-                                        }
-                                    }
-                                }
-                            }
-                            Interval<double> mergeCandidateA = resultingIntervals[indexA];
-                            Interval<double> mergeCandidateB = resultingIntervals[indexB];
-
-                            // merge the two Intervals which are closest to each other
-                            resA = mergeCandidateA.convexHull(mergeCandidateB);
-
-                            //finding the non-merged interval
-                            resB = resultingIntervals[(indexA+indexB-1)%3];    
-                            //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;                    
-                        }
-                    }
-                    else if( splitOccurredInContraction )
-                    {
-                        assert( resultPropagation2.isEmpty() );
-                        resA = resA.intersect( resultPropagation1 );
-                        resB = resB.intersect( resultPropagation1 );
-                        //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;
-
-                    }
-                    else if( splitOccurredInEvaluation )
-                    {
-                        assert( resB.isEmpty() );
-                        resA = resA.intersect( resultPropagation1 );
-                        resB = resA.intersect( resultPropagation2 );
-                        //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;
-                    }
-                    else // no split occurred
-                    {
-                        assert( resultPropagation2.isEmpty() );
-                        assert( resB.isEmpty() );
-
-                        resA = resA.intersect( resultPropagation1 );
-                        //std::cout << "[resA][5] " << resA << "[resB][5] " << resB << std::endl;
-                    }
-                    if( resA.isEmpty() && !resB.isEmpty() )
-                    {
-                        resA = resB;
+                        resA = Interval<double>::emptyInterval();
                         resB = Interval<double>::emptyInterval();
-                        //std::cout << "[resA][6] " << resA << "[resB][6] " << resB << std::endl;
-//                        std::cout << "  after both: " << resA << std::endl;
                         return false;
                     }
-//                    std::cout << "  after both: " << resA;
-//                    if( !resB.isEmpty() ) std::cout << " and " << resB;
-//                    std::cout << std::endl;
-                    return !resB.isEmpty();
+                    // intersect with result of contraction
+                    std::vector<Interval<double>> resultingIntervals;
+                    if( splitOccurredInContraction )
+                    {   
+                        Interval<double> tmp;
+                        for( const auto& i : resultPropagation )
+                        {
+                            tmp = i.intersect( resA );
+                            if( !tmp.isEmpty() )
+                                resultingIntervals.push_back(tmp);
+                            tmp = i.intersect( resB );
+                            if( !tmp.isEmpty() )
+                                resultingIntervals.push_back(tmp);
+                        }
+                    }
+                    else 
+                    {
+                        Interval<double> tmp;
+                        for( const auto& i : resultPropagation )
+                        {
+                            tmp = i.intersect( resA );
+                            if( !tmp.isEmpty() )
+                                resultingIntervals.push_back(tmp);
+                        }
+                    }
+                    if( resultingIntervals.empty() )
+                    {
+                        resA = Interval<double>::emptyInterval();
+                        resB = Interval<double>::emptyInterval();
+                        return false;
+                    }
+                    if( resultingIntervals.size() == 1 )
+                    {
+                        resA = resultingIntervals[0];
+                        resB = Interval<double>::emptyInterval();
+                        return false;
+                    }
+                    if( resultingIntervals.size() == 2 )
+                    {
+                        if( resultingIntervals[0] < resultingIntervals[1] )
+                        {
+                            resA = resultingIntervals[0];
+                            resB = resultingIntervals[1];
+                        }
+                        else
+                        {
+                            assert(resultingIntervals[1] < resultingIntervals[0]);
+                            resA = resultingIntervals[1];
+                            resB = resultingIntervals[0];
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        std::sort( resultPropagation.begin(), resultPropagation.end(), 
+                                  (*[](const Interval<double>& i,const Interval<double> j) 
+                                  { if(i<j){return true;} else { assert(j<i); return false; } })
+                                 );
+                        auto intervalBeforeBiggestGap = resultPropagation.begin();
+                        auto iter = resultPropagation.begin();
+                        ++iter;
+                        double bestDistance = intervalBeforeBiggestGap->distance(*iter);
+                        for( ; iter != resultPropagation.end(); ++iter )
+                        {
+                            auto jter = iter;
+                            ++jter;
+                            if( jter == resultPropagation.end() )
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                double distance = iter->distance(*jter);
+                                if( bestDistance < distance )
+                                {
+                                    bestDistance = distance;
+                                    intervalBeforeBiggestGap = iter;
+                                }
+                            }
+                        }
+                        resA = *intervalBeforeBiggestGap;
+                        for( iter = resultPropagation.begin(); iter != intervalBeforeBiggestGap; ++iter )
+                        {
+                            resA = resA.convexHull( *iter );
+                        }
+                        ++iter;
+                        resB = *iter;
+                        for( ; iter != resultPropagation.end(); ++iter )
+                        {
+                            resB = resB.convexHull( *iter );
+                        }
+                        return true;
+                    }
                 }
             }
             return splitOccurredInContraction;
