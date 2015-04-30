@@ -11,7 +11,7 @@
 #include "IntervalEvaluation.h"
 #include <algorithm>
 
-#define CONTRACTION_DEBUG
+//#define CONTRACTION_DEBUG
 
 namespace carl {
     
