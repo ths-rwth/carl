@@ -1112,31 +1112,55 @@ void Interval<Number>::atanh_assign()
 template<typename Number>
 bool Interval<Number>::intersectsWith(const Interval<Number>& rhs) const
 {
-    if( this->isEmpty() || rhs.isEmpty() )
-        return false;
-    if( this->lowerBoundType() == BoundType::INFTY && this->upperBoundType() == BoundType::INFTY )
-        return true;
-    if( rhs.lowerBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-        return true;
-    if( this->lowerBoundType() == BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
-        return true;
-    if( this->upperBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
-        return true;
-    if( this->lowerBoundType() == BoundType::INFTY )
-    {
-        assert( rhs.lowerBoundType() != BoundType::INFTY );
-        if( rhs.lower() < this->upper() )
-            return true;
-        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
-            return true;
-        return false;
-    }
-    assert( rhs.upperBoundType() != BoundType::INFTY );
-    if( this->lower() < rhs.upper() )
-        return true;
-    else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
-        return true;
-    return false;
+    return !this->intersect(rhs).isEmpty();
+    // TODO: make this working
+//    if( this->isEmpty() || rhs.isEmpty() )
+//        return false;
+//    if( this->lowerBoundType() == BoundType::INFTY && this->upperBoundType() == BoundType::INFTY )
+//        return true;
+//    if( rhs.lowerBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+//        return true;
+//    if( this->lowerBoundType() == BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
+//        return true;
+//    if( this->upperBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+//        return true;
+//    if( this->lowerBoundType() == BoundType::INFTY )
+//    {
+//        assert( rhs.lowerBoundType() != BoundType::INFTY );
+//        if( rhs.lower() < this->upper() )
+//            return true;
+//        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    if( this->upperBoundType() == BoundType::INFTY )
+//    {
+//        assert( rhs.upperBoundType() != BoundType::INFTY );
+//        if( this->lower() < rhs.upper() )
+//            return true;
+//        else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    if( rhs.lowerBoundType() == BoundType::INFTY )
+//    {
+//        assert( this->lowerBoundType() != BoundType::INFTY );
+//        if( this->lower() < rhs.upper() )
+//            return true;
+//        else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    if( this->upperBoundType() == BoundType::INFTY )
+//    {
+//        assert( this->upperBoundType() != BoundType::INFTY );
+//        if( rhs.lower() < this->upper() )
+//            return true;
+//        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    return rhs.upper() < this->lower() || this->upper() < rhs.lower();
 }
 
 template<typename Number>
