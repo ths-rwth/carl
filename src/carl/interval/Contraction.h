@@ -265,8 +265,8 @@ namespace carl {
                     else
                     {
                         std::sort( resultPropagation.begin(), resultPropagation.end(), 
-                                  (*[](const Interval<double>& i,const Interval<double> j) 
-                                  { if(i<j){return true;} else { assert(j<i); return false; } })
+                                  [](const Interval<double>& i,const Interval<double> j) 
+                                  { if(i<j){return true;} else { assert(j<i); return false; } }
                                  );
                         auto intervalBeforeBiggestGap = resultPropagation.begin();
                         auto iter = resultPropagation.begin();
