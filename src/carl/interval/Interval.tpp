@@ -922,6 +922,22 @@ template<typename Number>
 Interval<Number> Interval<Number>::root(int deg) const
 	{
 		assert(this->isConsistent());
+        if( deg % 2 == 0 )
+        {
+            if( mUpperBoundType != BoundType::INFTY &&  mContent.upper() < carl::constant_zero<Number>().get() )
+                return Interval<Number>::emptyInterval();
+            if( mLowerBoundType == BoundType::INFTY || mContent.lower() < carl::constant_zero<Number>().get() )
+            {
+                if( mUpperBoundType == BoundType::INFTY )
+                {
+                    return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), mLowerBoundType, mUpperBoundType);
+                }
+                else
+                {
+                    return Interval<Number>(boost::numeric::nth_root(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper()), deg), mLowerBoundType, mUpperBoundType);
+                }
+            }
+        }
 		return Interval<Number>(boost::numeric::nth_root(mContent, deg), mLowerBoundType, mUpperBoundType);
 	}
 
