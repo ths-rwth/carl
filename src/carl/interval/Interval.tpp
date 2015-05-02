@@ -1287,14 +1287,16 @@ template<typename Number>
 		if( !this->intersectsWith(rhs) )
 		{
             // special case: [a;b] U (b;c]
-            if( (mContent.lower() == rhs.upper() && (rhs.upperBoundType() == BoundType::WEAK || mLowerBoundType == BoundType::WEAK) ) ||
-                (mContent.upper() == rhs.lower() && (mUpperBoundType == BoundType::WEAK || rhs.lowerBoundType() == BoundType::WEAK) ) ) 
+            if( this->lower() == rhs.upper() && (rhs.upperBoundType() == BoundType::WEAK || mLowerBoundType == BoundType::WEAK) )
             {
-                Number lower = rhs.lower() <= mContent.lower() ? rhs.lower() : mContent.lower();
-                Number upper = rhs.upper() >= mContent.upper() ? rhs.upper() : mContent.upper();
-                BoundType lowerBoundType = lower == mContent.lower() ? mLowerBoundType : rhs.lowerBoundType();
-                BoundType upperBoundType = upper == mContent.upper() ? mUpperBoundType : rhs.upperBoundType();
-                resultA = Interval<Number>(lower, lowerBoundType, upper, upperBoundType);
+                resultA = Interval<Number>(rhs.lower(), rhs.lowerBoundType(), this->upper(), this->upperBoundType());
+                resultB = emptyInterval();
+                return false;
+            }
+            else if( this->upper() == rhs.lower() && (mUpperBoundType == BoundType::WEAK || rhs.lowerBoundType() == BoundType::WEAK) )
+            {
+                resultA = Interval<Number>(this->lower(), this->lowerBoundType(), rhs.upper(), rhs.upperBoundType());
+                resultB = emptyInterval();
                 return false;
             }
             else
