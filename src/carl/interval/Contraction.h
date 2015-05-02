@@ -142,17 +142,37 @@ namespace carl {
                 {
                     Interval<double> rootA, rootB;
                     if( tmp.unite( -tmp, rootA, rootB ) )
-                    {
+                    {   
+                        if (mVar.getType() == VariableType::VT_INT) {
+                            rootA = rootA.integralPart();
+                        }
+                        rootA.intersect_assign(_varInterval);
+                        if( !rootA.isEmpty() )
+                            _result.push_back(std::move(rootA));
+                        if (mVar.getType() == VariableType::VT_INT) {
+                            rootB = rootB.integralPart();
+                        }
                         rootB.intersect_assign(_varInterval);
                         if( !rootB.isEmpty() )
                             _result.push_back(std::move(rootB));
                     }
-                    rootA.intersect_assign(_varInterval);
-                    if( !rootA.isEmpty() )
-                        _result.push_back(std::move(rootA));
+                    else
+                    {
+                        if (mVar.getType() == VariableType::VT_INT) {
+                            rootA = rootA.integralPart();
+                        }
+                        rootA.intersect_assign(_varInterval);
+                        if( !rootA.isEmpty() )
+                            _result.push_back(std::move(rootA));
+                    }
                 }
                 else
+                {
+                    if (mVar.getType() == VariableType::VT_INT) {
+                        tmp = tmp.integralPart();
+                    }
                     _result.push_back( std::move(tmp) );
+                }
             }
             
             /**
@@ -180,10 +200,23 @@ namespace carl {
                 bool split = numerator.div_ext(denominator, result1, result2);
                 // extract root:
                 assert(mRoot <= std::numeric_limits<int>::max());
-                addRoot( result1, varInterval, result );
-                if (split)
+                if( split )
                 {
-                    addRoot( result2, varInterval, result );
+                    // TODO: division returns two intervals, which might be united to one interval
+                    Interval<double> tmpA, tmpB;
+                    if( result1.unite( result2, tmpA, tmpB ) )
+                    {
+                        addRoot( tmpA, varInterval, result );
+                        addRoot( tmpB, varInterval, result );
+                    }
+                    else
+                    {
+                        addRoot( tmpA, varInterval, result );
+                    }
+                }
+                else
+                {
+                    addRoot( result1, varInterval, result );
                 }
                 return result;
             }
@@ -231,7 +264,12 @@ namespace carl {
                 }
                 if (withPropagation) {
                     // calculate result of propagation
+//            std::cout << __func__ << ": propagation of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
                     std::vector<Interval<double>> resultPropagation = itB->second.evaluate( intervals );
+//            std::cout << "  after propagation: ";
+//            for( auto& i : resultPropagation )
+//                std::cout << " " << i;
+//            std::cout << std::endl;    
                     if( resultPropagation.empty() )
                     {
                         resA = Interval<double>::emptyInterval();
