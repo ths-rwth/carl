@@ -1381,6 +1381,10 @@ bool CAD<Number>::liftCheck(
 		cad::ConflictGraph<Number>& conflictGraph,
 		std::stack<std::size_t>& satPath
 ) {
+	if (this->anAnswerFound()) {
+		this->interrupted = true;
+		return true;
+	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
 	assert(this->sampleTree.is_valid(node));
 	if (checkBounds && boundsActive && (*node != nullptr)) {
@@ -1453,6 +1457,7 @@ bool CAD<Number>::liftCheck(
 	}
 
 	while (true) {
+		if (this->anAnswerFound()) break;
 		CARL_LOG_TRACE("carl.cad", __func__ << ": Phase 1");
 		/* Phase 1
 		 * Lifting position choice and corresponding sample construction.
