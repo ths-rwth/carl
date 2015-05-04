@@ -738,6 +738,7 @@ namespace carl
     template<typename Pol>
     Pol Constraint<Pol>::coefficient( const Variable& _var, unsigned _degree ) const
     {
+        VARINFOMAP_LOCK_GUARD
         auto varInfo = mpContent->mVarInfoMap.find( _var );
         assert( varInfo != mpContent->mVarInfoMap.end() );
         if( !varInfo->second.hasCoeff() )
@@ -753,6 +754,7 @@ namespace carl
     {
         if( relation() != Relation::EQ )
             return false;
+        VARINFOMAP_LOCK_GUARD
         for( typename map<Variable, VarInfo<Pol>>::iterator varInfoPair = mpContent->mVarInfoMap.begin(); varInfoPair != mpContent->mVarInfoMap.end(); ++varInfoPair )
         {
             if( varInfoPair->second.maxDegree() == 1 )
