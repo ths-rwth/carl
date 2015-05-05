@@ -26,8 +26,12 @@ namespace carl {
 	private:
 		typedef Formula<MultivariatePolynomial<Rational>> FT;
 	public:
-		DLL_EXPORT void sendTest(const char* s);
-
-		DLL_EXPORT const char* getResult();
+        /**
+         * Parse formula.
+         * @param input String to parse
+         * @param buffer Buffer for resulting string
+         * @param bufferSize Size of buffer
+         */
+        DLL_EXPORT void parseFormula(const char* input, char* buffer, int bufferSize);
 	};
 }

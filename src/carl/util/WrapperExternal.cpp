@@ -3,22 +3,10 @@
 #include <iostream>
 
 namespace carl {
-	void WrapperExternal::sendTest(const char* s) {
-		std::cout << "Parsing in carl:" << std::endl;
-		std::cout << s << std::endl;
-
+	void WrapperExternal::parseFormula(const char* input, char* buffer, int bufferSize) {
 		carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
-		FT result = parser.formula(s);
-		std::cout << "Parsing result: " << result << std::endl;
-		Variables vars;
-		result.booleanVars(vars);
-		std::cout << "Vars: " << vars << std::endl;
-	}
-
-	const char* WrapperExternal::getResult() {
-		std::cout << "Getting result:" << std::endl;
-		const char* result = "unknown";
-		std::cout << result << std::endl;
-		return result;
-	}
+		FT parseResult = parser.formula(input);
+		// Copy result in buffer for external program
+		strcpy_s(buffer, bufferSize, parseResult.toString().c_str());
+    }
 }
