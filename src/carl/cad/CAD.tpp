@@ -1357,6 +1357,7 @@ bool CAD<Number>::baseLiftCheck(
 	if (this->anAnswerFound()) {
 		// interrupt the check procedure
 		this->interrupted = true;
+		assert(this->sampleTree.isConsistent());
 		CARL_LOG_TRACE("carl.cad", "Returning true as an answer was found");
 		return true;
 	}
@@ -1388,6 +1389,7 @@ bool CAD<Number>::liftCheck(
 ) {
 	if (this->anAnswerFound()) {
 		this->interrupted = true;
+		assert(this->sampleTree.isConsistent());
 		return true;
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
