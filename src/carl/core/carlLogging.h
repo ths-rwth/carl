@@ -430,7 +430,7 @@ inline Logger& logger() {
 #define __CARL_LOG_FATAL(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_FATAL, channel, expr)
 
 /// Log and assert the given condition, if the condition evaluates to false.
-#define __CARL_LOG_ASSERT(channel, condition, expr) if (!condition) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
+#define __CARL_LOG_ASSERT(channel, condition, expr) if (!(condition)) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
 
 }
 }
