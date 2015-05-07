@@ -231,6 +231,8 @@ namespace carl
             mutable Definiteness mLhsDefinitess;
             /// Mutex for access to variable information map.
             mutable std::mutex mVarInfoMapMutex;
+            /// Mutex for access to the factorization.
+            mutable std::mutex mFactorizationMutex;
 
             /**
              * Default constructor. (0=0)
@@ -437,8 +439,14 @@ namespace carl
             
             #ifdef THREAD_SAFE
             #define VARINFOMAP_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mVarInfoMapMutex );
+            #define FACTORIZATION_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mFactorizationMutex );
+            #define FACTORIZATION_LOCK mpContent->mFactorizationMutex.lock();
+            #define FACTORIZATION_UNLOCK mpContent->mFactorizationMutex.unlock();
             #else
             #define VARINFOMAP_LOCK_GUARD
+            #define FACTORIZATION_LOCK_GUARD
+            #define FACTORIZATION_LOCK
+            #define FACTORIZATION_UNLOCK
             #endif
             
         public:
@@ -509,8 +517,10 @@ namespace carl
              */
             bool hasFactorization() const
             {
+                FACTORIZATION_LOCK
                 if( mpContent->mFactorization.empty() )
                     mpContent->initFactorization();
+                FACTORIZATION_UNLOCK
                 return (mpContent->mFactorization.size() > 1);
             }
 
@@ -519,8 +529,10 @@ namespace carl
              */
             const Factors<Pol>& factorization() const
             {
+                FACTORIZATION_LOCK
                 if( mpContent->mFactorization.empty() )
                     mpContent->initFactorization();
+                FACTORIZATION_UNLOCK
                 return mpContent->mFactorization;
             }
 
@@ -926,7 +938,7 @@ namespace carl
         typename Pol::NumberType one_divided_by_b = _constraintB.lhs().coprimeFactorWithoutConstant();
         typename Pol::NumberType c = _constraintA.lhs().constantPart();
         typename Pol::NumberType d = _constraintB.lhs().constantPart();
-        assert( carl::isOne(carl::getNum(carl::abs(one_divided_by_a))) && carl::isOne(carl::getNum(carl::abs(one_divided_by_b))) );
+        assert( carl::isOne(carl::getNum(carl::abs(one_divided_by_b))) );
         Pol tmpA = (_constraintA.lhs() - c) * one_divided_by_a;
         Pol tmpB = (_constraintB.lhs() - d) * one_divided_by_b;
 //        std::cout << "tmpA = " << tmpA << std::endl;
