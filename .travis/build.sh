@@ -4,7 +4,7 @@ mkdir build || return 1
 cd build/ || return 1
 cmake -D DEVELOPER=ON ../ || return 1
 
-if [[ ${USE} == "doxygen" ]]; then
+if [[ ${TASK} == "doxygen" ]]; then
 	make doc
 	
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
