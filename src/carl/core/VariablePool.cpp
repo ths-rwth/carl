@@ -5,8 +5,6 @@
 
 #include "VariablePool.h"
 
-#include <mutex>
-
 #include "initialize.h"
 #include "config.h"
 #include "logging.h"
@@ -28,7 +26,7 @@ VariablePool::VariablePool():
 Variable VariablePool::getFreshVariable(VariableType type) {
 	std::size_t tmp = 0;
 	{
-		std::lock_guard<std::mutex> lock(this->freshVarMutex);
+		FRESHVAR_LOCK_GUARD
 		tmp = nextID(type)++;
 	}
 	CARL_LOG_DEBUG("carl.varpool", "New variable of type " << type << " with id " << tmp);
@@ -55,6 +53,7 @@ Variable VariablePool::findVariableWithName(const std::string& name) const
 const std::string VariablePool::getName(Variable::Arg v, bool variableName) const {
 	if (v.getId() == 0) return "NO_VARIABLE";
 	if (variableName) {
+        SETNAME_LOCK_GUARD
 		std::map<Variable, std::string>::const_iterator it = mVariableNames.find(v);
 		if (it != mVariableNames.end()) {
 			return it->second;
@@ -80,7 +79,7 @@ const std::string VariablePool::getName(Variable::Arg v, bool variableName) cons
 
 void VariablePool::setName(Variable::Arg v, const std::string& name) {
 	#ifdef CARL_USE_FRIENDLY_VARNAMES
-	std::lock_guard<std::mutex> lock(this->freshVarMutex);
+	SETNAME_LOCK_GUARD
 	mVariableNames[v] = name;
 	#endif
 }

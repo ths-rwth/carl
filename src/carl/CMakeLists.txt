@@ -68,6 +68,11 @@ endif()
 
 cotire(carl)
 
+# Write config.h 
+configure_file( ${CMAKE_SOURCE_DIR}/src/carl/config.h.in 
+    ${CMAKE_SOURCE_DIR}/src/carl/config.h
+)  
+
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

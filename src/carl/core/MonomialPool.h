@@ -11,6 +11,7 @@
 #include <memory.h>
 #include <unordered_set>
 
+#include "../config.h"
 #include "../util/Common.h"
 #include "../util/IDGenerator.h"
 #include "../util/Singleton.h"
@@ -72,11 +73,18 @@ namespace carl{
 			/// The pool.
 			std::unordered_set<PoolEntry, MonomialPool::hash, MonomialPool::equal> mPool;
 			/// Mutex to avoid multiple access to the pool
-			mutable std::mutex mMutex;
+			mutable std::recursive_mutex mMutex;
 			
-			#define MONOMIAL_POOL_LOCK_GUARD std::lock_guard<std::mutex> lock( mMutex );
-			#define MONOMIAL_POOL_LOCK mMutexPool.lock();
-			#define MONOMIAL_POOL_UNLOCK mMutexPool.unlock();
+            #ifdef THREAD_SAFE
+			#define MONOMIAL_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock( mMutex );
+			#define MONOMIAL_POOL_LOCK mMutex.lock();
+			#define MONOMIAL_POOL_UNLOCK mMutex.unlock();
+            #else
+			#define MONOMIAL_POOL_LOCK_GUARD
+			#define MONOMIAL_POOL_LOCK
+			#define MONOMIAL_POOL_UNLOCK
+            #endif
+
 			
 		protected:
 			

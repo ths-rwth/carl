@@ -1539,6 +1539,8 @@ namespace carl
         /*
          * Boolean Operations
          */
+        
+        bool intersectsWith(const Interval<Number>& rhs) const;
 
         /**
          * Intersects two intervals in a set-theoretic manner.

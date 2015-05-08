@@ -6,6 +6,8 @@
  * Created on 2014-03-11
  */
 
+// WARNING: THIS CLASS IS NOT YET THREAD SAFE!!!
+
 #pragma once
 
 #include <iostream>
@@ -232,6 +234,18 @@ namespace carl
 //    {
 //        Numeric<cln::cl_RA>::mRationalPool.reserve( Numeric<cln::cl_RA>::mRationalPool.capacity() + _expectedNumOfElements );
 //    }
+    
+    template<typename T>
+    struct IntegralType<Numeric<T>> {
+        typedef typename carl::IntegralType<T>::type type;
+    };
+    
+    template<typename Integer, typename T>
+    inline Integer toInt(const Numeric<T>& n)
+    {
+        return carl::toInt<Integer>((T)n); // TODO: this could be more efficient for native integer types
+    }
+    
 } // namespace carl
 
 
