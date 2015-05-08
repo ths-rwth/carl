@@ -22,10 +22,10 @@ matrix:
       env: USE=clang++-3.4
 
 before_install:
-  - cd installation/ && source setup_travis.sh && cd ../
+  - cd .travis/ && source setup_travis.sh && cd ../
 
 script:
-  - source ./.travis.build && cd build/ && make -j4 && make CTEST_OUTPUT_ON_FAILURE=1 test && cd ../
+  - source .travis/build.sh
 
 notifications:
   email:
