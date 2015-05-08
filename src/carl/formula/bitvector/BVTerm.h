@@ -6,29 +6,10 @@
 #pragma once
 
 #include "BVVariable.h"
-#include <boost/dynamic_bitset.hpp>
-
-/**
- * Implementation of boost::hash_value for dynamic bitsets.
- * TODO: Make more efficient (currently uses convertion to string).
- * See also: https://stackoverflow.com/q/3896357
- */
-namespace boost
-{
-
-	template <typename B, typename A>
-	std::size_t hash_value(const boost::dynamic_bitset<B, A>& bs)
-	{
-		std::string stringRepresentation;
-		boost::to_string(bs, stringRepresentation);
-		return std::hash<std::string>()(stringRepresentation);
-	}
-}
+#include "BVValue.h"
 
 namespace carl
 {
-	typedef boost::dynamic_bitset<> BVValue;
-
 	enum class BVTermType : unsigned
 	{
 		CONSTANT,
@@ -274,8 +255,8 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, BVValue _value) :
-		mType(_type), mValue(_value), mWidth(_value.size()), mId(0),
-		mHash((boost::hash_value(_value) << 5) ^ typeId(_type))
+		mType(_type), mValue(_value), mWidth(_value.width()), mId(0),
+		mHash((std::hash<BVValue>()(_value) << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::CONSTANT);
 		}
@@ -365,9 +346,7 @@ namespace carl
 				if(mWidth == 0) {
 					return _init + "%invalid%";
 				} else {
-					std::string valueStr;
-					boost::to_string(mValue, valueStr);
-					return _init + "0b" + valueStr;
+					return _init + mValue.toString();
 				}
 			} else if(mType == BVTermType::VARIABLE) {
 				return _init + mVariable.toString(_friendlyNames);
