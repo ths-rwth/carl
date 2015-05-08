@@ -15,7 +15,7 @@ if [[ ${TASK} == "doxygen" ]]; then
 	
 	git rm -rf carl/
 	mkdir -p carl/
-	cp doc/html/* carl/
+	cp ../doc/html/* carl/
 	git add carl/
 	git commit -m "Updated documentation for carl"
 	git push origin master
