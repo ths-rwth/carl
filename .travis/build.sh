@@ -11,7 +11,7 @@ if [[ ${TASK} == "doxygen" ]]; then
 	git config --global user.name "Travis doxygen daemon"
 	
 	git clone https://219fc41efb80a7a8f102f5ca9147baf58514d734@github.com/smtrat/smtrat.github.io.git
-	cd smtrat.github.io.git/
+	cd smtrat.github.io/
 	
 	git rm -rf carl/
 	mkdir -p carl/
