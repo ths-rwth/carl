@@ -20,7 +20,7 @@ if [[ ${USE} == "doxygen" ]]; then
 	git commit -m "Updated documentation for carl"
 	git push origin master
 
-elif
+else
 	make resources || return 1
 	make -j4 lib_carl || return 1
 	make -j4 || return 1
