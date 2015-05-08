@@ -14,7 +14,6 @@
 
 #include <boost/dynamic_bitset.hpp>
 
-#include "../core/RealAlgebraicPoint.h"
 #include "Constraint.h"
 
 namespace carl {

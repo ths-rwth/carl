@@ -2,10 +2,7 @@
  * Auto generated file config.h from config.h.in.
  */ 
 #pragma once
-
-#cmakedefine LOGGING
-#cmakedefine LOGGING_CARL
-#cmakedefine LOGGING_DISABLE_INEFFICIENT
+#include "../config.h"
 #cmakedefine VARIABLE_PASS_BY_VALUE
 #cmakedefine PRUNE_MONOMIAL_POOL
 #define CARL_USE_FRIENDLY_VARNAMES

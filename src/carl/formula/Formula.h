@@ -195,6 +195,10 @@ namespace carl
             const FormulaContent<Pol> *mNegation;
             /// The propositions of this formula.
             Condition mProperties;
+            /// Mutex for access to activity.
+            mutable std::mutex mActivityMutex;
+            /// Mutex for access to difficulty.
+            mutable std::mutex mDifficultyMutex;
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
@@ -351,6 +355,14 @@ namespace carl
                 FormulaPool<Pol>::getInstance().reg( mpContent );
             }
             
+            #ifdef THREAD_SAFE
+            #define ACTIVITY_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mActivityMutex );
+            #define DIFFICULTY_LOCK_GUARD std::lock_guard<std::mutex> lock2( mpContent->mDifficultyMutex );
+            #else
+            #define ACTIVITY_LOCK_GUARD
+            #define DIFFICULTY_LOCK_GUARD
+            #endif
+            
         public:
             
             /**
@@ -484,27 +496,11 @@ namespace carl
             // Methods.
 
             /**
-             * @return Some value stating an expected difficulty of solving this formula for satisfiability.
-             */
-            const double& difficulty() const
-            {
-                return mpContent->mDifficulty;
-            }
-
-            /**
-             * Sets the difficulty to the given value.
-             * @param difficulty The value to set the difficulty to.
-             */
-            void setDifficulty( double difficulty ) const
-            {
-                mpContent->mDifficulty = difficulty;
-            }
-
-            /**
              * @return The activity for this formula, which means, how much is this formula involved in the solving procedure.
              */
             double activity() const
             {
+                ACTIVITY_LOCK_GUARD
                 return mpContent->mActivity;
             }
 
@@ -514,7 +510,27 @@ namespace carl
              */
             void setActivity( double _activity ) const
             {
+                ACTIVITY_LOCK_GUARD
                 mpContent->mActivity = _activity;
+            }
+
+            /**
+             * @return Some value stating an expected difficulty of solving this formula for satisfiability.
+             */
+            double difficulty() const
+            {
+                DIFFICULTY_LOCK_GUARD
+                return mpContent->mDifficulty;
+            }
+
+            /**
+             * Sets the difficulty to the given value.
+             * @param difficulty The value to set the difficulty to.
+             */
+            void setDifficulty( double difficulty ) const
+            {
+                DIFFICULTY_LOCK_GUARD
+                mpContent->mDifficulty = difficulty;
             }
 
             /**
