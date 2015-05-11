@@ -43,7 +43,7 @@ option( LOGGING "Enable logging within the carl library" OFF )
 option( LOGGING_CARL "Compile with the logging facility of the carl library" OFF )
 option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" OFF )
 option( FORCE_SHIPPED_RESOURCES "Do not look in system for resources which are included" OFF )
-option( COMPARE_WITH_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
+option( USE_GINAC "Compile with testing with the runtime and result comparisons of carl to ginac" OFF )
 option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
@@ -173,7 +173,7 @@ find_package(Boost REQUIRED COMPONENTS ${Boost_COMPONENTS})
 set(Boost_STATIC ${Boost_LIBRARIES})
 
 
-if(COMPARE_WITH_GINAC)
+if(USE_GINAC)
     set(USE_CLN_NUMBERS ON)
 endif()
 
@@ -254,7 +254,7 @@ include_directories(SYSTEM ${Eigen3_INCLUDE_DIR})
 
 enable_testing()
 
-if(COMPARE_WITH_GINAC)
+if(USE_GINAC)
 	find_package( GiNaC 1.5.8 REQUIRED )
 	find_library(GiNaC_DYNAMIC NAMES libginac.${DYNAMIC_EXT})
 	find_library(GiNaC_STATIC NAMES libginac.${STATIC_EXT})
