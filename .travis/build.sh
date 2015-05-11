@@ -13,8 +13,6 @@ if [[ ${TASK} == "doxygen" ]]; then
 	git clone https://219fc41efb80a7a8f102f5ca9147baf58514d734@github.com/smtrat/smtrat.github.io.git
 	cd smtrat.github.io/
 	
-	git rm -qrf carl/
-	mkdir -p carl/
 	cp ../doc/html/* carl/
 	git add carl/
 	git commit -m "Updated documentation for carl"
