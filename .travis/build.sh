@@ -5,18 +5,18 @@ cd build/ || return 1
 cmake -D DEVELOPER=ON ../ || return 1
 
 if [[ ${TASK} == "doxygen" ]]; then
-	make doc
+	make doc || return 1
 	
 	git config --global user.email "gereon.kremer@cs.rwth-aachen.de"
 	git config --global user.name "Travis doxygen daemon"
 	
 	git clone https://219fc41efb80a7a8f102f5ca9147baf58514d734@github.com/smtrat/smtrat.github.io.git
-	cd smtrat.github.io/
+	cd smtrat.github.io/ || return 1
 	
-	cp ../doc/html/* carl/
-	git add carl/
-	git commit -m "Updated documentation for carl"
-	git push origin master
+	cp ../doc/html/* carl/ || return 1
+	git add carl/ || return 1
+	git commit -m "Updated documentation for carl" || return 1
+	git push origin master || return 1
 
 else
 	make resources || return 1
