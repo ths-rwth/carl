@@ -458,6 +458,10 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( std::move( _eq ) ) )
             {}
             
+            explicit Formula( const UEquality& _eq ):
+                Formula( FormulaPool<Pol>::getInstance().create( std::move( UEquality( _eq ) ) ) )
+            {}
+            
             Formula( const Formula& _formula ):
                 Formula( _formula.mpContent )
             {
