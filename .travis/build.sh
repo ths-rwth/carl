@@ -22,8 +22,8 @@ if [[ ${TASK} == "doxygen" ]]; then
 
 else
 	make resources || return 1
-	make -j4 lib_carl || return 1
-	make -j4 || return 1
+	make -j1 lib_carl || return 1
+	make -j1 || return 1
 	make CTEST_OUTPUT_ON_FAILURE=1 test || return 1
 fi
 
