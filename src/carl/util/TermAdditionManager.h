@@ -162,10 +162,16 @@ public:
 		if (!isZero(std::get<3>(data))) {
 			t[0] = std::move(TermType(std::move(std::get<3>(data)), nullptr));
 		}
-		for (auto i = t.begin(); i != t.end();) {
+        for (auto i = t.begin(); i != t.end();) {
 			if (i->isZero()) {
-				std::swap(*i, *t.rbegin());
-				t.pop_back();
+				//Avoid invalidating pointer for last element
+				if (i == --t.end()) {
+					t.pop_back();
+					break;
+				} else {
+					std::swap(*i, *t.rbegin());
+					t.pop_back();
+				}
 			} else {
 				if ((*i).monomial()) termIDs[(*i).monomial()->id()] = 0;
                 ++i;

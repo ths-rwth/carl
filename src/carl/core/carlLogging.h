@@ -14,6 +14,7 @@
 #include <mutex>
 #include <sstream>
 #include <string.h>
+#include <thread>
 #include <utility>
 
 #include "../util/Singleton.h"
@@ -263,7 +264,7 @@ struct Formatter {
      */
 	virtual void prefix(std::ostream& os, const Timer& timer, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		os.fill(' ');
-		os << "[" << std::right << std::setw(5) << timer << "] " << level << " ";
+		os << "[" << std::right << std::setw(5) << timer << "] " << std::this_thread::get_id() << " " << level << " ";
 		std::string filename(carl::basename(info.filename));
 		unsigned long spacing = 1;
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
@@ -318,6 +319,7 @@ public:
      * @param sink Sink.
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
+		std::lock_guard<std::mutex> lock(mutex);
 		this->data[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
 	}
 	/**
@@ -430,7 +432,7 @@ inline Logger& logger() {
 #define __CARL_LOG_FATAL(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_FATAL, channel, expr)
 
 /// Log and assert the given condition, if the condition evaluates to false.
-#define __CARL_LOG_ASSERT(channel, condition, expr) if (!condition) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
+#define __CARL_LOG_ASSERT(channel, condition, expr) if (!(condition)) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
 
 }
 }
