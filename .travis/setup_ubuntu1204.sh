@@ -7,7 +7,7 @@ function install {
 }
 
 if [[ ${TASK} == "doxygen" ]]; then
-	sudo apt-add-repository "deb http://ppa.launchpad.net/techzilla/doxygen-backport/ubuntu trusty main"
+	sudo apt-add-repository "deb http://ppa.launchpad.net/kedazo/doxygen-updates-precise/ubuntu precise main"
 fi
 sudo add-apt-repository -y ppa:kalakris/cmake
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
