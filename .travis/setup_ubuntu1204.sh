@@ -30,3 +30,8 @@ elif [[ ${USE} == "clang++-3.5" ]]; then
 	install clang-3.5
 	defCXX clang-3.5 clang++-3.5
 fi
+
+sudo service postgresql stop
+sudo service mysql stop
+
+ps aux --cols 120
