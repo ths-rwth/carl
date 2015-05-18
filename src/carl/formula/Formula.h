@@ -456,6 +456,10 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( std::move( _eq ) ) )
             {}
             
+            explicit Formula( const UEquality& _eq ):
+                Formula( FormulaPool<Pol>::getInstance().create( std::move( UEquality( _eq ) ) ) )
+            {}
+            
             Formula( const Formula& _formula ):
                 Formula( _formula.mpContent )
             {
@@ -1027,10 +1031,7 @@ namespace carl
              *                        or with their dedicated names.
              * @return The resulting string representation of this formula.
              */
-            inline std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const
-            {
-                return mpContent->toString( _withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames );
-            }
+            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true, bool _withVariableDefinition = false ) const;
             
             /**
              * The output operator of a formula.
