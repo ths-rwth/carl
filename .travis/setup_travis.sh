@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
 
 	source setup_ubuntu1204.sh
