@@ -139,6 +139,28 @@ namespace carl
         return result;
     }
 
+    void UEquality::collectUVariables( std::set<UVariable>& _uvars ) const
+    {
+        if( lhsIsUV() )
+        {
+            _uvars.insert( lhsAsUV() );
+        }
+        else
+        {
+            for( const auto& arg : lhsAsUF().args() )
+                _uvars.insert( arg );
+        }
+        if( rhsIsUV() )
+        {
+            _uvars.insert( rhsAsUV() );
+        }
+        else
+        {
+            for( const auto& arg : rhsAsUF().args() )
+                _uvars.insert( arg );
+        }
+    }
+
     std::ostream& operator<<( std::ostream& _os, const UEquality& _ueq )
     {
         if( _ueq.negated() )
