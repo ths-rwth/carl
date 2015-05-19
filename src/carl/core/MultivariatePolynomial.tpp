@@ -1527,7 +1527,11 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
 	static std::vector<const C*> coeffs;
+#ifdef __VS
+    coeffs.resize(MonomialPool::getInstance().nextID());
+#else
 	coeffs.reserve(MonomialPool::getInstance().nextID());
+#endif
 	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
 	for (const auto& t: lhs.mTerms) {
 		std::size_t id = 0;
