@@ -1207,7 +1207,7 @@ namespace carl
 		 * @param formula Formula to visit.
 		 * @param func Function to call.
 		 */
-		void visit(const Formula& formula, const std::function<void(Formula)>& func);
+		void visitVoid(const Formula& formula, const std::function<void(Formula)>& func);
 		/**
 		 * Recursively calls func on every subformula and return a new formula.
 		 * On every call of func, the passed formula is replaced by the result.
@@ -1215,7 +1215,7 @@ namespace carl
 		 * @param func Function to call.
 		 * @return New formula.
 		 */
-		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
+		Formula visitResult(const Formula& formula, const std::function<Formula(Formula)>& func);
 	};
 
 }    // namespace carl

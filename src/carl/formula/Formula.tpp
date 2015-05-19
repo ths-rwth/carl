@@ -935,7 +935,7 @@ namespace carl
             carl::FormulaVisitor<Formula<Pol>> visitor;
             Variables vars;
             std::set<UVariable> uvars;
-            visitor.visit(*this, 
+            visitor.visitVoid(*this,
                     [&](const Formula& _f) 
                     {
                         switch(_f.getType())
@@ -2244,29 +2244,29 @@ namespace carl
     }
 
 	template<typename Formula>
-	void FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<void(Formula)>& func) {
+	void FormulaVisitor<Formula>::visitVoid(const Formula& formula, const std::function<void(Formula)>& func) {
 		func(formula);
 		switch (formula.getType()) {
 		case AND:
 		case OR:
 		case IFF:
 		case XOR: {
-			for (const auto& cur: formula.subformulas()) visit(cur, func);
+			for (const auto& cur: formula.subformulas()) visitVoid(cur, func);
 			break;
 		}
 		case NOT: {
-			visit(formula.subformula(), func);
+            visitVoid(formula.subformula(), func);
 			break;
 		}
 		case IMPLIES: {
-			visit(formula.premise(), func);
-			visit(formula.conclusion(), func);
+            visitVoid(formula.premise(), func);
+            visitVoid(formula.conclusion(), func);
 			break;
 		}
 		case ITE: {
-			visit(formula.condition(), func);
-			visit(formula.firstCase(), func);
-			visit(formula.secondCase(), func);
+            visitVoid(formula.condition(), func);
+            visitVoid(formula.firstCase(), func);
+            visitVoid(formula.secondCase(), func);
 			break;
 		}
 		case BOOL:
@@ -2277,14 +2277,14 @@ namespace carl
 			break;
 		case EXISTS:
 		case FORALL: {
-			visit(formula.quantifiedFormula(), func);
+            visitVoid(formula.quantifiedFormula(), func);
 			break;
 		}
 		}
 	}
 
 	template<typename Formula>
-	Formula FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<Formula(Formula)>& func) {
+	Formula FormulaVisitor<Formula>::visitResult(const Formula& formula, const std::function<Formula(Formula)>& func) {
 		Formula newFormula = func(formula);
 		switch (newFormula.getType()) {
 		case AND:
@@ -2294,7 +2294,7 @@ namespace carl
 			Formulas<typename Formula::PolynomialType> newSubformulas;
 			bool changed = false;
 			for (const auto& cur: newFormula.subformulas()) {
-				Formula newCur = visit(cur, func);
+                Formula newCur = visitResult(cur, func);
 				if (newCur != cur) changed = true;
 				newSubformulas.insert(newCur);
 			}
@@ -2304,24 +2304,24 @@ namespace carl
 			break;
 		}
 		case NOT: {
-			Formula cur = visit(newFormula.subformula(), func);
+            Formula cur = visitResult(newFormula.subformula(), func);
 			if (cur != newFormula.subformula()) {
 				return Formula(NOT, cur);
 			}
 			break;
 		}
 		case IMPLIES: {
-			Formula prem = visit(newFormula.premise(), func);
-			Formula conc = visit(newFormula.conclusion(), func);
+            Formula prem = visitResult(newFormula.premise(), func);
+            Formula conc = visitResult(newFormula.conclusion(), func);
 			if ((prem != newFormula.premise()) || (conc != newFormula.conclusion())) {
 				return Formula(IMPLIES, prem, conc);
 			}
 			break;
 		}
 		case ITE: {
-			Formula cond = visit(newFormula.condition(), func);
-			Formula fCase = visit(newFormula.firstCase(), func);
-			Formula sCase = visit(newFormula.secondCase(), func);
+            Formula cond = visitResult(newFormula.condition(), func);
+            Formula fCase = visitResult(newFormula.firstCase(), func);
+            Formula sCase = visitResult(newFormula.secondCase(), func);
 			if ((cond != newFormula.condition()) || (fCase != newFormula.firstCase()) || (sCase != newFormula.secondCase())) {
 				return Formula(ITE, cond, fCase, sCase);
 			}
@@ -2335,7 +2335,7 @@ namespace carl
 			break;
 		case EXISTS:
 		case FORALL: {
-			Formula sub = visit(newFormula.quantifiedFormula(), func);
+            Formula sub = visitResult(newFormula.quantifiedFormula(), func);
 			if (sub != newFormula.quantifiedFormula()) {
 				return Formula(newFormula.getType(), newFormula.quantifiedVariables(), sub);
 			}
