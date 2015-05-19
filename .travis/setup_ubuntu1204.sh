@@ -33,5 +33,6 @@ fi
 
 sudo service postgresql stop
 sudo service mysql stop
+sudo service cron stop
 
 ps aux --cols 120
