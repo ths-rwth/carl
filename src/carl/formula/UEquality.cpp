@@ -102,14 +102,16 @@ namespace carl
         return false;
     }
 
-    std::string UEquality::toString( bool _infix, bool _friendlyNames ) const
+    std::string UEquality::toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const
     {
         std::string result = "";
         if( !_infix )
         {
-            if( negated() )
-                result += "(!= ";
-            else
+            if( negated() ) {
+                if (_unequalSwitch == 0) result += "(<> ";
+                else if (_unequalSwitch == 1) result += "(not (= ";
+                else  result += "(!= ";
+            } else
                 result += "(= ";
         }
         if( lhsIsUV() )
@@ -134,6 +136,9 @@ namespace carl
         }
         if( !_infix )
         {
+            if (negated()) {
+                if (_unequalSwitch == 1) result += ")";
+            }
             result += ")";
         }
         return result;
