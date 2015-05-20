@@ -256,7 +256,7 @@ namespace carl
         }
         else if( mType == FormulaType::UEQ )
         {
-            return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
+            return (_init + mUIEquality.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
             return (_init + formulaTypeToString( mType ) + activity);
@@ -628,8 +628,7 @@ namespace carl
             }
             case FormulaType::BITVECTOR:
             {
-                _content.mProperties |= STRONG_CONDITIONS;
-                ///@todo Anything to do here?
+                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;
                 break;
             }
             case FormulaType::NOT:
@@ -826,6 +825,9 @@ namespace carl
         if( _withVariableDefinition )
         {
             std::stringstream os;
+            
+            carl::SortManager::getInstance().exportDefinitions(os);
+            
             carl::FormulaVisitor<Formula<Pol>> visitor;
             Variables vars;
             std::set<UVariable> uvars;
