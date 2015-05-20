@@ -1088,11 +1088,11 @@ namespace carl
                 newType = FormulaType::AND;
                 break;
             case FormulaType::EXISTS: // (not (exists (vars) phi)) -> (forall (vars) (not phi))
-                break;
                 newType = FormulaType::FORALL;
-            case FormulaType::FORALL: // (not (forall (vars) phi)) -> (exists (vars) (not phi))
                 break;
+            case FormulaType::FORALL: // (not (forall (vars) phi)) -> (exists (vars) (not phi))
                 newType = FormulaType::EXISTS;
+                break;
             default:
                 assert( false );
                 cerr << "Unexpected type of formula!" << endl;
