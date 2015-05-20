@@ -222,6 +222,8 @@ class SortManager : public Singleton<SortManager>
 		 */
 		std::ostream& print(std::ostream& os, const Sort& sort) const;
 		
+		void exportDefinitions(std::ostream& os) const;
+		
 		Sort getInterpreted(VariableType type) const {
 			assert(mInterpreted.find(type) != mInterpreted.end());
 			return mInterpreted.at(type);

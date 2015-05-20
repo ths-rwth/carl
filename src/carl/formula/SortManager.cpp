@@ -29,6 +29,16 @@ namespace carl
 		return os;
 	}
 	
+	void SortManager::exportDefinitions(std::ostream& os) const {
+		for (const auto& decl: mDeclarations) {
+			os << "(declare-sort " << decl.first << " " << decl.second << ")" << std::endl;
+		}
+		for (const auto& def: mDeclarations) {
+			///@todo fix this
+			//os << "(define-sort " << decl.first << " " << decl.second << ")" << std::endl;
+		}
+	}
+	
 	Sort SortManager::replace(const Sort& sort, const std::map<std::string, Sort>& parameters) {
 		const SortContent& sc = getContent(sort);
 		auto pIter = parameters.find(sc.name);
