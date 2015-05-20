@@ -84,6 +84,6 @@ namespace carl
                                              | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_NONLINEAR_POLYNOMIAL
                                              | PROP_CONTAINS_MULTIVARIATE_POLYNOMIAL | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_BOOLEAN
                                              | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS
-                                             | PROP_CONTAINS_UNINTERPRETED_EQUATIONS;
+                                             | PROP_CONTAINS_UNINTERPRETED_EQUATIONS | PROP_CONTAINS_BITVECTOR;
 
 }     // namespace carl
