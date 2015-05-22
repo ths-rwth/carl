@@ -77,7 +77,7 @@ struct not_equal_to<std::shared_ptr<T>, mayBeNull> {
 };
 
 /**
- * Alternative specialization of std::equal_to for pointer types.
+ * Alternative specialization of std::less for pointer types.
  *
  * We consider two pointers equal, if they point to the same memory location or the objects they point to are equal.
  * Note that the memory location may also be zero.
@@ -92,23 +92,25 @@ struct less {
 
 template<typename T, bool mayBeNull>
 struct less<T*, mayBeNull> {
+	std::less<T> less;
 	bool operator()(const T* lhs, const T* rhs) const {
 		if (lhs == rhs) return false;
 		if (mayBeNull) {
 			if (lhs == nullptr || rhs == nullptr) return lhs == nullptr;
 		}
-		return std::less<T>()(*lhs, *rhs);
+		return less(*lhs, *rhs);
 	}
 };
 
 template<typename T, bool mayBeNull>
 struct less<std::shared_ptr<T>, mayBeNull> {
+	std::less<T> less;
 	bool operator()(const std::shared_ptr<const T>& lhs, const std::shared_ptr<const T>& rhs) const {
 		if (lhs == rhs) return false;
 		if (mayBeNull) {
 			if (lhs == nullptr || rhs == nullptr) return lhs == nullptr;
 		}
-		return std::less<T>()(*lhs, *rhs);
+		return less(*lhs, *rhs);
 	}
 };
 

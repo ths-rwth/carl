@@ -69,6 +69,19 @@ namespace carl
             {}
         }
     }
+    
+    template<typename Pol>
+    FormulaContent<Pol>::FormulaContent( const BVConstraint& _constraint ):
+        mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
+        mId( 0 ),
+        mActivity( 0.0 ),
+        mDifficulty( 0.0 ),
+        mUsages( 0 ),
+        mType( FormulaType::BITVECTOR ),
+        mBVConstraint( _constraint ),
+        mProperties()
+    {
+    }
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent( UEquality&& _ueq ):
@@ -197,6 +210,8 @@ namespace carl
                     return true;
                 case FormulaType::CONSTRAINT:
                     return mConstraint == _content.mConstraint;
+                case FormulaType::BITVECTOR:
+                    return mBVConstraint == _content.mBVConstraint;
                 case FormulaType::NOT:
                     return mSubformula == _content.mSubformula;
                 case FormulaType::IMPLIES:
@@ -236,9 +251,12 @@ namespace carl
         }
         else if( mType == FormulaType::CONSTRAINT )
             return (_init + mConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+        else if (mType == FormulaType::BITVECTOR) {
+            return (_init + mBVConstraint.toString(_init, _oneline, _infix, _friendlyNames) + activity);
+        }
         else if( mType == FormulaType::UEQ )
         {
-            return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
+            return (_init + mUIEquality.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
             return (_init + formulaTypeToString( mType ) + activity);
@@ -438,6 +456,12 @@ namespace carl
             {
                 return constraint().satisfiedBy( _assignment );
             }
+            case FormulaType::BITVECTOR:
+            {
+                assert(false);
+                std::cerr << "Implement BVConstraint::satisfiedBy()" << std::endl;
+                //return bvConstraint().satisfiedBy( _assignment );
+            }
             case FormulaType::NOT:
             {
                 switch( subformula().satisfiedBy( _assignment ) )
@@ -600,6 +624,11 @@ namespace carl
             {
                 _content.mProperties |= STRONG_CONDITIONS;
                 addConstraintProperties( _content.mConstraint, _content.mProperties );
+                break;
+            }
+            case FormulaType::BITVECTOR:
+            {
+                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;
                 break;
             }
             case FormulaType::NOT:
@@ -796,6 +825,9 @@ namespace carl
         if( _withVariableDefinition )
         {
             std::stringstream os;
+            
+            carl::SortManager::getInstance().exportDefinitions(os);
+            
             carl::FormulaVisitor<Formula<Pol>> visitor;
             Variables vars;
             std::set<UVariable> uvars;
@@ -1005,10 +1037,14 @@ namespace carl
                     }
                 }
             }
+            case FormulaType::BITVECTOR: {
+                BVCompareRelation rel = inverse(subformula().bvConstraint().relation());
+                return Formula<Pol>( BVConstraint::create(rel, subformula().bvConstraint().lhs(), subformula().bvConstraint().rhs()));
+            }
             case FormulaType::TRUE: // (not true)  ->  false
-                return Formula<Pol>( FormulaType::TRUE );
-            case FormulaType::FALSE: // (not false)  ->  true
                 return Formula<Pol>( FormulaType::FALSE );
+            case FormulaType::FALSE: // (not false)  ->  true
+                return Formula<Pol>( FormulaType::TRUE );
             case FormulaType::NOT: // (not (not phi))  ->  phi
                 return subformula().subformula();
             case FormulaType::IMPLIES:
@@ -1052,11 +1088,11 @@ namespace carl
                 newType = FormulaType::AND;
                 break;
             case FormulaType::EXISTS: // (not (exists (vars) phi)) -> (forall (vars) (not phi))
-                break;
                 newType = FormulaType::FORALL;
-            case FormulaType::FORALL: // (not (forall (vars) phi)) -> (exists (vars) (not phi))
                 break;
+            case FormulaType::FORALL: // (not (forall (vars) phi)) -> (exists (vars) (not phi))
                 newType = FormulaType::EXISTS;
+                break;
             default:
                 assert( false );
                 cerr << "Unexpected type of formula!" << endl;
@@ -1230,6 +1266,11 @@ namespace carl
                     }
                     else
                         resultSubformulas.insert( currentFormula );
+                    break;
+                }
+                case FormulaType::BITVECTOR:
+                {
+                    resultSubformulas.insert( currentFormula );
                     break;
                 }
                 case FormulaType::TRUE: // Remove it.
@@ -1471,6 +1512,12 @@ namespace carl
                                 {
                                     subsubformulas.insert( currentSubformula );
                                 }
+                                break;
+                            }
+                            case FormulaType::BITVECTOR:
+                            {
+                                ///@todo Anything more to do here?
+                                subsubformulas.insert( currentSubformula );
                                 break;
                             }
                             case FormulaType::IFF: // (iff phi_1 .. phi_n) -> (and phi_1 .. phi_n) and (and (not phi_1) .. (not phi_n)) are added to the queue
@@ -2135,6 +2182,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case BITVECTOR:
 		case TRUE:
 		case FALSE:
 		case UEQ:
@@ -2193,6 +2241,7 @@ namespace carl
 		}
 		case BOOL:
 		case CONSTRAINT:
+		case BITVECTOR:
 		case TRUE:
 		case FALSE:
 		case UEQ:
@@ -2209,4 +2258,3 @@ namespace carl
 		return newFormula;
 	}
 }    // namespace carl
-

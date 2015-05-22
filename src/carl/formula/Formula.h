@@ -17,6 +17,8 @@
 #include "Condition.h"
 #include "Constraint.h"
 #include "UEquality.h"
+#include "bitvector/BVConstraintPool.h"
+#include "bitvector/BVConstraint.h"
 
 namespace carl
 {
@@ -110,7 +112,7 @@ namespace carl
     
     
     /// The possible types of a formula.
-    enum FormulaType { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, TRUE, FALSE, EXISTS, FORALL, UEQ };
+    enum FormulaType { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, BITVECTOR, TRUE, FALSE, EXISTS, FORALL, UEQ };
             
     /**
      * @param _type The formula type to get the string representation for.
@@ -182,6 +184,8 @@ namespace carl
                 Formulas<Pol>* mpSubformulas;
                 /// The constraint, in case this formulas wraps a constraint.
                 Constraint<Pol> mConstraint;
+                /// The bitvector constraint.
+                BVConstraint mBVConstraint;
                 /// The Boolean variable, in case this formula wraps a Boolean variable.
                 carl::Variable mBoolean;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
@@ -214,6 +218,12 @@ namespace carl
              * @param _constraint The pointer to the constraint.
              */
             FormulaContent( const Constraint<Pol>& _constraint );
+            
+            /**
+             * Constructs a formula being a bitvector constraint.
+             * @param _constraint The pointer to the constraint.
+             */
+            FormulaContent( const BVConstraint& _constraint );
 
             /**
              * Constructs a formula being an uninterpreted equality.
@@ -376,6 +386,10 @@ namespace carl
             explicit Formula( const Constraint<Pol>& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
+            
+            explicit Formula( const BVConstraint& _constraint ):
+                Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
+            {}
                 
             explicit Formula( FormulaType _type, const Formula& _subformula ):
                 Formula( FormulaPool<Pol>::getInstance().createNegation( _subformula ) )
@@ -415,6 +429,10 @@ namespace carl
             }
             
             explicit Formula( FormulaType _type, const Formulas<Pol>& _subasts ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
+            {}
+            
+            explicit Formula( FormulaType _type, const std::vector<Formula<Pol>>& _subasts ):
                 Formula( FormulaPool<Pol>::getInstance().create( _type, _subasts ) )
             {}
             
@@ -595,8 +613,8 @@ namespace carl
             }
             
             /**
-             * Collects all arithmetic variables occurring in this formula.
-             * @param _booleanVars The container to collect the arithmetic variables in.
+             * Collects all boolean variables occurring in this formula.
+             * @param _booleanVars The container to collect the boolean variables in.
              */
             void booleanVars( Variables& _booleanVars ) const
             {
@@ -694,6 +712,12 @@ namespace carl
                 assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
                 return mpContent->mConstraint;
             }
+            
+            const BVConstraint& bvConstraint() const
+            {
+                assert( mpContent->mType == FormulaType::BITVECTOR );
+                return mpContent->mBVConstraint;
+            }
 
             /**
              * @return The name of the Boolean variable represented by this formula. Note, that
@@ -721,7 +745,8 @@ namespace carl
             size_t size() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE 
-                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ )
+                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ
+                        || mpContent->mType == FormulaType::BITVECTOR )
                     return 1;
                 else if( mpContent->mType == FormulaType::IMPLIES )
                     return 2;
@@ -736,7 +761,8 @@ namespace carl
             bool empty() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT 
-                        || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE )
+                        || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE
+                        || mpContent->mType == FormulaType::BITVECTOR )
                     return false;
                 else
                     return mpContent->mpSubformulas->empty();

@@ -214,6 +214,10 @@ class UFManager : public Singleton<UFManager>
 
     public:
         
+        const FastPointerMap<UFContent, UninterpretedFunction::IDType>& ufIDMap() const {
+            return mUFIdMap;
+        }
+        
         /**
          * @param _uf An uninterpreted function.
          * @return The name of the uninterpreted function of the given uninterpreted function.
