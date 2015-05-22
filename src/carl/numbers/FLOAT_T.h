@@ -1593,6 +1593,13 @@ namespace carl
         return result;
     }
     
+    template<typename FloatType>
+    inline double toDouble(const FLOAT_T<FloatType>& _float)
+    {
+        double result = (double)_float;
+        return result;
+    }
+
     /**
      * Method which returns the absolute value of the passed number.
      * @param _in Number.
