@@ -6,7 +6,9 @@
 #pragma once
 
 #include <boost/dynamic_bitset.hpp>
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
+#endif
 #include <gmpxx.h>
 #include <limits.h>
 
@@ -26,7 +28,7 @@ namespace carl
         mValue(_width, _value)
         {
         }
-
+#ifdef USE_CLN_NUMBERS
         BVValue(std::size_t _width, const cln::cl_I _value) :
         mValue(_width)
         {
@@ -34,7 +36,7 @@ namespace carl
                 mValue[i] = cln::logbitp(i, _value);
             }
         }
-
+#endif
         BVValue(std::size_t _width, const mpz_class _value) :
         mValue()
         {
@@ -164,4 +166,3 @@ namespace std
         }
     };
 }
-
