@@ -58,6 +58,11 @@ namespace carl
         return mpContent->type();
     }
 
+    bool BVTerm::isInvalid() const
+    {
+        return mpContent->isInvalid();
+    }
+
     const BVTerm& BVTerm::operand() const
     {
         if(mpContent->type() == BVTermType::EXTRACT) {

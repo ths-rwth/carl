@@ -136,6 +136,8 @@ namespace carl
 			return type() == BVTermType::CONSTANT;
 		}
 
+		bool isInvalid() const;
+
 		bool operator==(const BVTerm& _other) const
 		{
 			return mpContent == _other.mpContent;
@@ -337,6 +339,11 @@ namespace carl
 			return mType;
 		}
 
+        bool isInvalid() const
+        {
+            return (mType == BVTermType::CONSTANT && mWidth == 0);
+        }
+
 		/**
 		 * Gives the string representation of this bit vector term.
 		 * @param _init The initial string of every row of the result.
@@ -348,12 +355,10 @@ namespace carl
 		 */
 		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
-			if(mType == BVTermType::CONSTANT) {
-				if(mWidth == 0) {
-					return _init + "%invalid%";
-				} else {
-					return _init + mValue.toString();
-				}
+            if(isInvalid()) {
+                return _init + "%invalid%";
+            } else if(mType == BVTermType::CONSTANT) {
+                return _init + mValue.toString();
 			} else if(mType == BVTermType::VARIABLE) {
 				return _init + mVariable.toString(_friendlyNames);
 			} else {

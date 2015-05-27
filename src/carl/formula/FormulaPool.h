@@ -134,6 +134,12 @@ namespace carl
             
             const FormulaContent<Pol>* create( const BVConstraint& _constraint )
             {
+                #ifdef SIMPLIFY_FORMULA
+                if( _constraint.isAlwaysConsistent() )
+                    return trueFormula();
+                if( _constraint.isAlwaysInconsistent() )
+                    return falseFormula();
+                #endif
                 return add( new FormulaContent<Pol>( _constraint ) );
             }
             

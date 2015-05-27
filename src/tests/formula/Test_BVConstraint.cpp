@@ -40,18 +40,23 @@ TEST(BVConstraint, Construction)
     BVTerm bvconcat(BVTermType::CONCAT, bvextract, bvextract);
 
     BVTerm bvzeroext(BVTermType::EXT_U, bvconcat, 2);
-
     BVTerm bvzeroext2(BVTermType::EXT_U, bvconcat, 2);
-
-    std::cout << "equal? " << (bvzeroext == bvzeroext2) << std::endl;
+    assert(bvzeroext == bvzeroext2);
 
     // check for copy assignment
     check_for_default_constructor = bvzeroext;
 
     BVConstraint constraint = BVConstraint::create(BVCompareRelation::SLT, oxaa, bvzeroext);
-    BVConstraint inconsistentConstraint = BVConstraint::create(false);
-
     std::cout << constraint.toString("", false, false, true) << std::endl;
+
+    // check for simplification of terms (division)
+    BVTerm oxaa33(BVTermType::CONSTANT, BVValue(16, 43571));
+    BVTerm simplifyMe(BVTermType::DIV_U, oxfff0, BVTerm(BVTermType::CONSTANT, BVValue(16, 235)));
+    assert(simplifyMe == BVTerm(BVTermType::CONSTANT, BVValue(16, (65520 / 235))));
+
+    // check for simplification of constraints
+    BVConstraint simplifyMeToo = BVConstraint::create(BVCompareRelation::SGT, oxfff0, oxaa33);
+    assert(simplifyMeToo == BVConstraint::create(true));
 
 #ifdef USE_CLN_NUMBERS
     // Test BVValue construction from CLN / GMP objects
