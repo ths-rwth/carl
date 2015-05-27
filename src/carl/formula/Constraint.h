@@ -876,7 +876,7 @@ namespace carl
              * @return true, if this constraints represents a substitution;
              *         false, otherwise.
              */
-            bool getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm ) const;
+            bool getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated = false ) const;
             
             /**
              * Gives the string representation of this constraint.
