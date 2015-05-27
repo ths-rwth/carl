@@ -24,6 +24,10 @@ namespace carl
         {
         }
 
+        BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
+        {
+        }
+
         BVValue(std::size_t _width, unsigned long _value = 0) :
         mValue(_width, _value)
         {
@@ -98,7 +102,7 @@ namespace carl
         {
         }
 
-        boost::dynamic_bitset<> operator()() const
+        const boost::dynamic_bitset<>& operator()() const
         {
             return mValue;
         }
