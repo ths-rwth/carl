@@ -20,12 +20,12 @@ namespace carl
     private:
         boost::dynamic_bitset<> mValue;
 
-    public:
-        BVValue() : mValue()
+        BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
         {
         }
 
-        BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
+    public:
+        BVValue() : mValue()
         {
         }
 
@@ -120,7 +120,7 @@ namespace carl
             return "#b" + output;
         }
 
-        bool zero() const
+        bool isZero() const
         {
             return (*this)().none();
         }
@@ -278,42 +278,6 @@ namespace carl
             return divideUnsigned(_other);
         }
 
-        BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const
-        {
-            assert(width() == _other.width());
-            assert(_other() != boost::dynamic_bitset<>(_other.width(), 0));
-
-            boost::dynamic_bitset<> quotient(width());
-            std::size_t quotientIndex = 0;
-            boost::dynamic_bitset<> divisor(_other());
-            boost::dynamic_bitset<> remainder((*this)());
-
-            while(! divisor[divisor.size()-1] && remainder > divisor) {
-                ++quotientIndex;
-                divisor <<= 1;
-            }
-
-            while(true) {
-                if(remainder >= divisor) {
-                    quotient[quotientIndex] = true;
-                    // substract divisor from remainder
-                    bool carry = false;
-                    for(std::size_t i=divisor.find_first();i<remainder.size();++i) {
-                        bool newRemainderI = (remainder[i] != divisor[i]) != carry;
-                        carry = (remainder[i] && carry && divisor[i]) || (! remainder[i] && (carry || divisor[i]));
-                        remainder[i] = newRemainderI;
-                    }
-                }
-                if(quotientIndex == 0) {
-                    break;
-                }
-                divisor >>= 1;
-                --quotientIndex;
-            }
-
-            return BVValue(_returnRemainder ? std::move(remainder) : std::move(quotient));
-        }
-
         BVValue divideSigned(const BVValue& _other) const
         {
             assert(width() == _other.width());
@@ -362,7 +326,7 @@ namespace carl
 
             BVValue u = absFirst % absSecond;
 
-            if(u.zero()) {
+            if(u.isZero()) {
                 return u;
             } else if(! firstNegative && ! secondNegative) {
                 return u;
@@ -390,6 +354,19 @@ namespace carl
             return shift(_other, false, true);
         }
 
+        BVValue extract(std::size_t _highest, std::size_t _lowest) const
+        {
+            assert(_highest < width() && _highest >= _lowest);
+            BVValue extraction(_highest - _lowest + 1);
+
+            for(std::size_t i=0;i<extraction.width();++i) {
+                extraction[i] = (*this)[_lowest + i];
+            }
+
+            return extraction;
+        }
+
+    private:
         BVValue shift(const BVValue& _other, bool _left, bool _arithmetic = false) const
         {
             std::size_t firstSize = width() - 1;
@@ -424,18 +401,41 @@ namespace carl
             return (fillWithOnes ? ~shifted : shifted);
         }
 
-        BVValue extract(std::size_t _highest, std::size_t _lowest) const
+        BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const
         {
-            assert(_highest < width() && _highest >= _lowest);
-            BVValue extraction(_highest - _lowest + 1);
+            assert(width() == _other.width());
+            assert(_other() != boost::dynamic_bitset<>(_other.width(), 0));
 
-            for(std::size_t i=0;i<extraction.width();++i) {
-                extraction[i] = (*this)[_lowest + i];
+            boost::dynamic_bitset<> quotient(width());
+            std::size_t quotientIndex = 0;
+            boost::dynamic_bitset<> divisor(_other());
+            boost::dynamic_bitset<> remainder((*this)());
+
+            while(! divisor[divisor.size()-1] && remainder > divisor) {
+                ++quotientIndex;
+                divisor <<= 1;
             }
 
-            return extraction;
-        }
+            while(true) {
+                if(remainder >= divisor) {
+                    quotient[quotientIndex] = true;
+                    // substract divisor from remainder
+                    bool carry = false;
+                    for(std::size_t i=divisor.find_first();i<remainder.size();++i) {
+                        bool newRemainderI = (remainder[i] != divisor[i]) != carry;
+                        carry = (remainder[i] && carry && divisor[i]) || (! remainder[i] && (carry || divisor[i]));
+                        remainder[i] = newRemainderI;
+                    }
+                }
+                if(quotientIndex == 0) {
+                    break;
+                }
+                divisor >>= 1;
+                --quotientIndex;
+            }
 
+            return BVValue(_returnRemainder ? std::move(remainder) : std::move(quotient));
+        }
     };
 }
 
