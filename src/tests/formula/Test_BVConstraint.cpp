@@ -5,8 +5,9 @@
 #include "../../carl/core/VariablePool.h"
 #include "../../carl/formula/FormulaPool.h"
 #include "../../carl/formula/SortManager.h"
+#ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
-
+#endif
 
 using namespace carl;
 
@@ -51,6 +52,7 @@ TEST(BVConstraint, Construction)
 
     std::cout << constraint.toString("", false, false, true) << std::endl;
 
+#ifdef USE_CLN_NUMBERS
     // Test BVValue construction from CLN / GMP objects
     // (every 8-bit value)
     for(int i=-256;i<=256;++i) {
@@ -74,7 +76,7 @@ TEST(BVConstraint, Construction)
     BVValue hugeVal(512, hugeNumber);
     BVValue hugeClnVal(512, hugeClnNumber);
     assert(hugeVal == hugeClnVal);
-
+#endif
     BV_TERM_POOL.print();
     BV_CONSTRAINT_POOL.print();
 }

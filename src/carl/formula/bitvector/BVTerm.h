@@ -131,6 +131,10 @@ namespace carl
 		std::size_t width() const;
 
 		BVTermType type() const;
+		
+		bool isConstant() const {
+			return type() == BVTermType::CONSTANT;
+		}
 
 		bool operator==(const BVTerm& _other) const
 		{
@@ -153,6 +157,8 @@ namespace carl
 		const BVVariable& variable() const;
 
 		const BVValue& value() const;
+		
+		BVTerm substitute(const std::map<BVVariable,BVTerm>&) const;
 	};
 
 	struct BVUnaryContent
