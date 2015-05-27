@@ -157,6 +157,8 @@ namespace carl
 		const BVVariable& variable() const;
 
 		const BVValue& value() const;
+		
+		BVTerm substitute(const std::map<BVVariable,BVTerm>&) const;
 	};
 
 	struct BVUnaryContent
