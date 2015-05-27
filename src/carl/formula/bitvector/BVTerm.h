@@ -131,6 +131,10 @@ namespace carl
 		std::size_t width() const;
 
 		BVTermType type() const;
+		
+		bool isConstant() const {
+			return type() == BVTermType::CONSTANT;
+		}
 
 		bool operator==(const BVTerm& _other) const
 		{
