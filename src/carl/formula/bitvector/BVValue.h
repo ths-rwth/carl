@@ -256,13 +256,13 @@ namespace carl
         BVValue operator*(const BVValue& _other) const
         {
             BVValue product(width());
-            BVValue summand(*this);
+            boost::dynamic_bitset<> summand((*this)());
 
             for(std::size_t i=0;i<width();++i) {
                 if(_other[i]) {
-                    product = product + summand;
+                    product = product + BVValue(boost::dynamic_bitset<>(summand));
                 }
-                summand = summand << 1;
+                summand <<= 1;
             }
 
             return product;

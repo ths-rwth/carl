@@ -54,6 +54,11 @@ TEST(BVConstraint, Construction)
     BVTerm simplifyMe(BVTermType::DIV_U, oxfff0, BVTerm(BVTermType::CONSTANT, BVValue(16, 235)));
     assert(simplifyMe == BVTerm(BVTermType::CONSTANT, BVValue(16, (65520 / 235))));
 
+    BVTerm factor1(BVTermType::CONSTANT, BVValue(16, 43 /* 00101011 */));
+    BVTerm factor2(BVTermType::CONSTANT, BVValue(16, 9 /* 00001001 */));
+    BVTerm product(BVTermType::MUL, factor1, factor2);
+    assert(product == BVTerm(BVTermType::CONSTANT, BVValue(16, 43*9)));
+
     // check for simplification of constraints
     BVConstraint simplifyMeToo = BVConstraint::create(BVCompareRelation::SGT, oxfff0, oxaa33);
     assert(simplifyMeToo == BVConstraint::create(true));
