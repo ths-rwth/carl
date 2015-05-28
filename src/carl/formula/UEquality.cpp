@@ -102,14 +102,16 @@ namespace carl
         return false;
     }
 
-    std::string UEquality::toString( bool _infix, bool _friendlyNames ) const
+    std::string UEquality::toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const
     {
         std::string result = "";
         if( !_infix )
         {
-            if( negated() )
-                result += "(!= ";
-            else
+            if( negated() ) {
+                if (_unequalSwitch == 0) result += "(<> ";
+                else if (_unequalSwitch == 1) result += "(not (= ";
+                else  result += "(!= ";
+            } else
                 result += "(= ";
         }
         if( lhsIsUV() )
@@ -134,9 +136,34 @@ namespace carl
         }
         if( !_infix )
         {
+            if (negated()) {
+                if (_unequalSwitch == 1) result += ")";
+            }
             result += ")";
         }
         return result;
+    }
+
+    void UEquality::collectUVariables( std::set<UVariable>& _uvars ) const
+    {
+        if( lhsIsUV() )
+        {
+            _uvars.insert( lhsAsUV() );
+        }
+        else
+        {
+            for( const auto& arg : lhsAsUF().args() )
+                _uvars.insert( arg );
+        }
+        if( rhsIsUV() )
+        {
+            _uvars.insert( rhsAsUV() );
+        }
+        else
+        {
+            for( const auto& arg : rhsAsUF().args() )
+                _uvars.insert( arg );
+        }
     }
 
     std::ostream& operator<<( std::ostream& _os, const UEquality& _ueq )

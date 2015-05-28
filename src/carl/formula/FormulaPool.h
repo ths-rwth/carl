@@ -42,6 +42,7 @@ namespace carl
             mutable std::recursive_mutex mMutexPool;
             ///
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
+            FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinToFormulaMap;
             
             #ifdef THREAD_SAFE
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock( mMutexPool );
@@ -105,7 +106,27 @@ namespace carl
                 return add( new FormulaContent<Pol>( _booleanVar ) );
             }
             
+            Formula<Pol> getTseitinFormula( const Formula<Pol>& _formula )
+            {
+                auto iter = mTseitinToFormulaMap.find( _formula.mpContent );
+                if( iter != mTseitinToFormulaMap.end() )
+                {
+                    return Formula<Pol>( iter->second );
+                }
+                return trueFormula();
+            }
+            
             Formula<Pol> getTseitinVar( const Formula<Pol>& _formula )
+            {
+                auto iter = mTseitinVars.find( _formula.mpContent );
+                if( iter != mTseitinVars.end() )
+                {
+                    return Formula<Pol>( iter->second );
+                }
+                return trueFormula();
+            }
+            
+            Formula<Pol> createTseitinVar( const Formula<Pol>& _formula )
             {
                 auto iter = mTseitinVars.insert( std::make_pair( _formula.mpContent, nullptr ) );
                 if( iter.second )
@@ -113,6 +134,8 @@ namespace carl
                     const FormulaContent<Pol>* hi = create( carl::freshBooleanVariable() );
                     hi->mDifficulty = _formula.difficulty();
                     iter.first->second = hi;
+                    assert( mTseitinToFormulaMap.find( hi ) == mTseitinToFormulaMap.end() );
+                    mTseitinToFormulaMap.emplace( hi, _formula.mpContent );
                 }
                 return Formula<Pol>( iter.first->second );
             }
@@ -134,6 +157,12 @@ namespace carl
             
             const FormulaContent<Pol>* create( const BVConstraint& _constraint )
             {
+                #ifdef SIMPLIFY_FORMULA
+                if( _constraint.isAlwaysConsistent() )
+                    return trueFormula();
+                if( _constraint.isAlwaysInconsistent() )
+                    return falseFormula();
+                #endif
                 return add( new FormulaContent<Pol>( _constraint ) );
             }
             
@@ -180,7 +209,7 @@ namespace carl
             const FormulaContent<Pol>* createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
             {
                 #ifdef SIMPLIFY_FORMULA
-                if( _condition.mpContent == mpFalse || _then == _else )
+                if( _condition.mpContent == mpFalse )
                 {
                     return _else.mpContent;
                 }
@@ -188,8 +217,24 @@ namespace carl
                 {
                     return _then.mpContent;
                 }
-                #endif
+                Formula<Pol> thenFormula = _then;
+                Formula<Pol> elseFormula = _else;
+                if( _condition == elseFormula )
+                    elseFormula = falseFormula();
+                else if( _condition.mpContent == elseFormula.mpContent->mNegation )
+                    elseFormula = trueFormula();
+                if( _condition.mpContent == thenFormula.mpContent->mNegation )
+                    thenFormula = falseFormula();
+                else if( _condition == thenFormula )
+                    thenFormula = trueFormula();
+                if( thenFormula == elseFormula )
+                    return _then.mpContent;
+                if( _condition.getType() == FormulaType::NOT )
+                    return add( new FormulaContent<Pol>( _condition.subformula(), elseFormula, thenFormula ) );
+                return add( new FormulaContent<Pol>( _condition, thenFormula, elseFormula ) );
+                #else
                 return add( new FormulaContent<Pol>( _condition, _then, _else ) );
+                #endif
             }
 
 			/**

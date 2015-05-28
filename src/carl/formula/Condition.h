@@ -79,10 +79,11 @@ namespace carl
     static const Condition PROP_CONTAINS_INTEGER_VALUED_VARS     = Condition( 23 );
     static const Condition PROP_CONTAINS_REAL_VALUED_VARS        = Condition( 24 );
     static const Condition PROP_CONTAINS_UNINTERPRETED_EQUATIONS = Condition( 25 );
+    static const Condition PROP_CONTAINS_BITVECTOR               = Condition( 26 );
     static const Condition WEAK_CONDITIONS                       = PROP_CONTAINS_EQUATION | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_STRICT_INEQUALITY
                                              | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_LINEAR_POLYNOMIAL | PROP_CONTAINS_NONLINEAR_POLYNOMIAL
                                              | PROP_CONTAINS_MULTIVARIATE_POLYNOMIAL | PROP_CONTAINS_INEQUALITY | PROP_CONTAINS_BOOLEAN
                                              | PROP_CONTAINS_REAL_VALUED_VARS | PROP_CONTAINS_INTEGER_VALUED_VARS
-                                             | PROP_CONTAINS_UNINTERPRETED_EQUATIONS;
+                                             | PROP_CONTAINS_UNINTERPRETED_EQUATIONS | PROP_CONTAINS_BITVECTOR;
 
 }     // namespace carl

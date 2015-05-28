@@ -27,7 +27,8 @@ namespace carl
         mUsages( 0 ),
         mType( _true ? FormulaType::TRUE : FormulaType::FALSE ),
         mConstraint( Constraint<Pol>( _true ) ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {}
 
     template<typename Pol>
@@ -39,7 +40,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::BOOL ),
         mBoolean( _boolean ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         assert( _boolean.getType() == VariableType::VT_BOOL );
     }
@@ -53,7 +55,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::CONSTRAINT ),
         mConstraint( _constraint ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         switch( _constraint.isConsistent() )
         {
@@ -79,7 +82,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::BITVECTOR ),
         mBVConstraint( _constraint ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
     }
 
@@ -92,7 +96,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::UEQ ),
         mUIEquality( std::move( _ueq ) ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {}
 
     template<typename Pol>
@@ -105,7 +110,8 @@ namespace carl
         mType( FormulaType::NOT ),
         mSubformula( std::move( _subformula ) ),
         mNegation( mSubformula.mpContent ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {}
 
     template<typename Pol>
@@ -116,7 +122,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::IMPLIES ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         mpImpliesContent = new IMPLIESContent<Pol>( _premise, _conclusion );
     }
@@ -129,7 +136,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::ITE ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         mpIteContent = new ITEContent<Pol>( _condition, _then, _else );
     }
@@ -143,7 +151,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( _type ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
         mpQuantifierContent = new QuantifierContent<Pol>(std::move(_vars), _term);
@@ -157,7 +166,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( _type ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         assert( _subformulas.size() > 1 );
         assert( mType == FormulaType::AND || mType == FormulaType::OR || mType == FormulaType::IFF || mType == FormulaType::XOR );
@@ -256,7 +266,7 @@ namespace carl
         }
         else if( mType == FormulaType::UEQ )
         {
-            return (_init + mUIEquality.toString( _infix, _friendlyNames ) + activity);
+            return (_init + mUIEquality.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
             return (_init + formulaTypeToString( mType ) + activity);
@@ -628,8 +638,7 @@ namespace carl
             }
             case FormulaType::BITVECTOR:
             {
-                _content.mProperties |= STRONG_CONDITIONS;
-                ///@todo Anything to do here?
+                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;
                 break;
             }
             case FormulaType::NOT:
@@ -817,6 +826,50 @@ namespace carl
             _properties |= PROP_CONTAINS_INTEGER_VALUED_VARS;
         if( _constraint.hasRealValuedVariable() )
             _properties |= PROP_CONTAINS_REAL_VALUED_VARS;
+    }
+    
+    template<typename Pol>
+    std::string Formula<Pol>::toString( bool _withActivity, unsigned _resolveUnequal, const std::string _init, bool _oneline, bool _infix, bool _friendlyNames, bool _withVariableDefinition ) const
+    {
+        std::string result = "";
+        if( _withVariableDefinition )
+        {
+            std::stringstream os;
+            
+            carl::SortManager::getInstance().exportDefinitions(os);
+            
+            carl::FormulaVisitor<Formula<Pol>> visitor;
+            Variables vars;
+            std::set<UVariable> uvars;
+            visitor.visit(*this, 
+                    [&](const Formula& _f) 
+                    {
+                        switch(_f.getType())
+                        {
+                            case FormulaType::BOOL:
+                                vars.insert( _f.boolean() );
+                                break;
+                            case FormulaType::CONSTRAINT:
+                                for( auto var : _f.constraint().variables() ) vars.insert( var );
+                                break;
+                            case FormulaType::UEQ:
+                                _f.uequality().collectUVariables( uvars );
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+            for( auto var : vars )
+                os << "(declare-fun " << var << " () " << var.getType() << ")\n";
+            for( const auto& uvar : uvars )
+                os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
+            result += os.str();
+            result += "(assert ";
+        }
+        result += mpContent->toString( _withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames );
+        if( _withVariableDefinition )
+            result += ")\n";
+        return result;
     }
     
     template<typename Pol>
@@ -1045,11 +1098,11 @@ namespace carl
                 newType = FormulaType::AND;
                 break;
             case FormulaType::EXISTS: // (not (exists (vars) phi)) -> (forall (vars) (not phi))
-                break;
                 newType = FormulaType::FORALL;
-            case FormulaType::FORALL: // (not (forall (vars) phi)) -> (exists (vars) (not phi))
                 break;
+            case FormulaType::FORALL: // (not (forall (vars) phi)) -> (exists (vars) (not phi))
                 newType = FormulaType::EXISTS;
+                break;
             default:
                 assert( false );
                 cerr << "Unexpected type of formula!" << endl;
@@ -1183,7 +1236,6 @@ namespace carl
         }
         else if( isAtom() )
             return *this;
-        std::map<Formula, pair<Formula<Pol>, Formula<Pol>>*> tseitinVars;
         Formulas<Pol> resultSubformulas;
         ConstraintBounds constraintBoundsAnd;
         std::vector<Formula<Pol>> subformulasToTransform;
@@ -1441,9 +1493,13 @@ namespace carl
                                     break;
                                 if( _simplifyConstraintCombinations && swapConstraintBounds( constraintBoundsOrAnd, tmpSubSubformulas, true ) )
                                     break;
-                                Formula<Pol> tseitinVar = FormulaPool<Pol>::getInstance().getTseitinVar( currentSubformula );
+                                Formula<Pol> tseitinVar = FormulaPool<Pol>::getInstance().createTseitinVar( currentSubformula );
                                 for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
+                                {
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
+                                    assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == Formula<Pol>( FormulaType::NOT, tseitinVar ) );
+                                    subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
+                                }
                                 if( _tseitinWithEquivalence )
                                 {
                                     Formulas<Pol> tmpSubformulas;
@@ -1451,6 +1507,8 @@ namespace carl
                                     for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                         tmpSubformulas.insert( Formula<Pol>( NOT, subsubformula ) );
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
+                                    subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
+                                    assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == tseitinVar );
                                 }
                                 subsubformulas.insert( tseitinVar );
                                 break;
@@ -2127,7 +2185,7 @@ namespace carl
 			break;
 		}
 		case IMPLIES: {
-			visit(formula.premise());
+			visit(formula.premise(), func);
 			visit(formula.conclusion(), func);
 			break;
 		}

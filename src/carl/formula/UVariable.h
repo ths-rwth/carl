@@ -76,6 +76,9 @@ namespace carl
             {
                 return mVar == _uvar();
             }
+            bool operator==(Variable::Arg var) const {
+                return mVar == var;
+            }
             
             /**
              * @param _uvar The uninterpreted variable to compare with.

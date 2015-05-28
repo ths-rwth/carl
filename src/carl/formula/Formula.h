@@ -199,6 +199,8 @@ namespace carl
             mutable std::mutex mActivityMutex;
             /// Mutex for access to difficulty.
             mutable std::mutex mDifficultyMutex;
+            ///
+            mutable bool mTseitinClause;
 
             /**
              * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
@@ -584,6 +586,11 @@ namespace carl
             {
                 return mpContent->mProperties;
             }
+            
+            bool isTseitinClause() const
+            {
+                return mpContent->mTseitinClause;
+            }
 
             /**
              * Collects all real valued variables occurring in this formula.
@@ -838,6 +845,7 @@ namespace carl
             bool isAtom() const
             {
                 return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::BOOL 
+                        || mpContent->mType == FormulaType::UEQ || mpContent->mType == FormulaType::BITVECTOR
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
 
@@ -1031,10 +1039,7 @@ namespace carl
              *                        or with their dedicated names.
              * @return The resulting string representation of this formula.
              */
-            inline std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const
-            {
-                return mpContent->toString( _withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames );
-            }
+            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true, bool _withVariableDefinition = false ) const;
             
             /**
              * The output operator of a formula.
@@ -1105,6 +1110,20 @@ namespace carl
              *                                which is also valid, as the current formula context is in NNF.
              */
             Formula toCNF( bool _keepConstraints = true, bool _simplifyConstraintCombinations = false, bool _tseitinWithEquivalence = true ) const;
+            
+            /**
+             * Substitutes all occurrences of the given variable in this formula by the given polynomial.
+             * @param _var The variable to substitute.
+             * @param _var The polynomial to substitute the variable for.
+             * @return The resulting formula after substitution.
+             */
+            Formula substitute( carl::Variable::Arg _var, const Pol& _pol ) const
+            {
+                std::map<carl::Variable, Formula> booleanSubstitutions;
+                std::map<carl::Variable, Pol> arithmeticSubstitutions;
+                arithmeticSubstitutions.emplace( _var, _pol );
+                return substitute( booleanSubstitutions, arithmeticSubstitutions );
+            }
             
             /**
              * Substitutes all occurrences of the given arithmetic variables in this formula by the given polynomials.
