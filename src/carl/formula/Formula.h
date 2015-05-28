@@ -1217,6 +1217,52 @@ namespace carl
 		 */
 		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
 	};
+    
+    template<typename Formula>
+    struct FormulaSubstitutor {
+    private:
+        FormulaVisitor<Formula> visitor;
+        
+        struct PolynomialSubstitutor {
+            const std::map<Variable,typename Formula::PolynomialType>& replacements;
+            PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+                if (formula.getType() != FormulaType::CONSTRAINT) return formula;
+                return Formula(formula.constraint().lhs().substitute(replacements), formula.constraint().relation());
+            }
+        };
+        
+        struct BitvectorSubstitutor {
+            const std::map<BVVariable,BVTerm>& replacements;
+            BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+                if (formula.getType() != FormulaType::BITVECTOR) return formula;
+                BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
+                BVTerm rhs = formula.bvConstraint().rhs().substitute(replacements);
+                return Formula(BVConstraint::create(formula.bvConstraint().relation(), lhs, rhs));
+            }
+        };
+        
+        struct UninterpretedSubstitutor {
+            const std::map<UVariable,UFInstance>& replacements;
+            UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+                if (formula.getType() != FormulaType::UEQ) return formula;
+                
+            }
+        };
+    public:
+        template<typename Source, typename Target>
+        Formula substitute(const Formula& formula, const Source& source, const Target& target) {
+            std::map<Source,Target> tmp;
+            tmp.emplace(source, target);
+            return substitute(formula, tmp);
+        }
+        
+        Formula substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements);
+        Formula substitute(const Formula& formula, const std::map<BVVariable,BVTerm>& replacements);
+        Formula substitute(const Formula& formula, const std::map<UVariable,UFInstance>& replacements);
+    };
 
 }    // namespace carl
 
