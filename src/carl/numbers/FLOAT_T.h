@@ -203,6 +203,18 @@ namespace carl
         }
 
         /**
+         * Constructor, which takes an unsigned long as input and optional rounding, which
+         * can be used, if the underlying fp implementation allows this.
+         * @param _long Value to be initialized.
+         * @param N Possible rounding direction.
+         */
+        FLOAT_T<FloatType>(const unsigned long _long, const CARL_RND=CARL_RND::N)
+        {
+            assert(std::is_floating_point<FloatType>::value);
+            mValue = _long;
+        }
+
+        /**
          * Copyconstructor which takes a FLOAT_T<FloatType>  and optional rounding 
          * as input, which can be used, if the underlying fp implementation 
          * allows this.

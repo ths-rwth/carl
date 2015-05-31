@@ -750,9 +750,9 @@ namespace carl
     }
 
     template<typename Pol>
-    bool Constraint<Pol>::getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm ) const
+    bool Constraint<Pol>::getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated ) const
     {
-        if( relation() != Relation::EQ )
+        if( (!_negated && relation() != Relation::EQ) || (_negated && relation() != Relation::NEQ) )
             return false;
         VARINFOMAP_LOCK_GUARD
         for( typename map<Variable, VarInfo<Pol>>::iterator varInfoPair = mpContent->mVarInfoMap.begin(); varInfoPair != mpContent->mVarInfoMap.end(); ++varInfoPair )

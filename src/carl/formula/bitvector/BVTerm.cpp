@@ -58,6 +58,11 @@ namespace carl
         return mpContent->type();
     }
 
+    bool BVTerm::isInvalid() const
+    {
+        return mpContent->isInvalid();
+    }
+
     const BVTerm& BVTerm::operand() const
     {
         if(mpContent->type() == BVTermType::EXTRACT) {
@@ -100,6 +105,39 @@ namespace carl
     const BVValue& BVTerm::value() const
     {
         return mpContent->mValue;
+    }
+
+    BVTerm BVTerm::substitute(const std::map<BVVariable,BVTerm>& _substitutions) const
+    {
+        BVTermType type = this->type();
+
+        if(type == BVTermType::CONSTANT) {
+            return *this;
+        }
+        if(type == BVTermType::VARIABLE) {
+            auto iter = _substitutions.find(variable());
+            if(iter != _substitutions.end())
+            {
+                return iter->second;
+            }
+            return *this;
+        }
+        if(typeIsUnary(type)) {
+            BVTerm operandSubstituted = operand().substitute(_substitutions);
+            return BVTerm(type, operandSubstituted, index());
+        }
+        if(typeIsBinary(type)) {
+            BVTerm firstSubstituted = first().substitute(_substitutions);
+            BVTerm secondSubstituted = second().substitute(_substitutions);
+            return BVTerm(type, firstSubstituted, secondSubstituted);
+        }
+        if(type == BVTermType::EXTRACT) {
+            BVTerm operandSubstituted = operand().substitute(_substitutions);
+            return BVTerm(type, operandSubstituted, highest(), lowest());
+        }
+
+        assert(false);
+        return BVTerm();
     }
 
     bool BVTerm::operator<(const BVTerm& rhs) const {
