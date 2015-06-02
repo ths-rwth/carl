@@ -14,6 +14,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
+#include "../core/RealAlgebraicPoint.h"
 #include "Constraint.h"
 
 namespace carl {
@@ -143,10 +144,14 @@ public:
 		mData[id].clear();
 		// Disable sample points for other constraints
 		for (auto& d: mData) {
+<<<<<<< HEAD
 			for (std::size_t i: queue) {
 				if (i >= d.size()) continue;
 				d[i] = false;
 			}
+=======
+			for (std::size_t i: queue) d[i] = false;
+>>>>>>> ed57f8187c6c06af3a8cb33386c230d9b974568d
 		}
 	}
 	/**

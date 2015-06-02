@@ -5,13 +5,17 @@
 #include <fstream>
 
 #ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
+	#include <cln/cln.h>
+	typedef cln::cl_RA Rational;
+	typedef cln::cl_I Integer;
+#elif defined(__WIN)
+	#include <mpirxx.h>
+	typedef mpq_class Rational;
+	typedef mpz_class Integer;
 #else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
+	#include <gmpxx.h>
+	typedef mpq_class Rational;
+	typedef mpz_class Integer;
 #endif
 
 using namespace carl;

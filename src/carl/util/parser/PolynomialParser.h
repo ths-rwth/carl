@@ -21,6 +21,7 @@ namespace boost { namespace spirit { namespace traits {
     }
 }}}
 #endif
+
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, mpq_class& r) {
         if (exp >= 0)

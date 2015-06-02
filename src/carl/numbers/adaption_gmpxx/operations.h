@@ -399,7 +399,11 @@ inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
     //       make it that complicated, as mpz_div does round differently. Maybe there is a better way.
 	mpz_class res;
 	mpz_div(res.get_mpz_t(), abs(n).get_mpz_t(), abs(d).get_mpz_t());
+<<<<<<< HEAD
 	return isNegative(n) == isNegative(d) ? res : mpz_class(-res);
+=======
+	return isNegative(n) == isNegative(d) ? res : -res;
+>>>>>>> ed57f8187c6c06af3a8cb33386c230d9b974568d
 }
 
 inline mpz_class operator/(const mpz_class& n, const mpz_class& d)

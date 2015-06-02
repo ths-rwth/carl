@@ -643,7 +643,6 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
-	
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs);
 	/// @}
