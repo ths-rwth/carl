@@ -1703,31 +1703,27 @@ namespace carl
         typename Pol::NumberType boundValue;
         Relation relation = negated ? carl::invertRelation( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
-        Pol* poly = nullptr;
+        Pol poly;
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
             boundValue = constraint.constantPart();
             relation = carl::turnAroundRelation( relation );
-            poly = new Pol( -lhs + boundValue );
+            poly = Pol( -lhs + boundValue );
         }
         else
         {
             boundValue = -constraint.constantPart();
-            poly = new Pol( lhs + boundValue );
+            poly = Pol( lhs + boundValue );
         }
-        typename Pol::NumberType cf( poly->coprimeFactor() );
+        typename Pol::NumberType cf( poly.coprimeFactor() );
         assert( cf > 0 );
         boundValue *= cf;
-        (*poly) *= cf;
+        poly *= cf;
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "try to add the bound  " << Constraint<Pol>::relationToString( relation ) << boundValue << "  for the polynomial  " << *poly << endl; 
+        cout << "try to add the bound  " << Constraint<Pol>::relationToString( relation ) << boundValue << "  for the polynomial  " << poly << endl; 
         #endif
-        auto resA = _constraintBounds.insert( make_pair( poly, std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
-        if( !resA.second )
-        {
-            delete poly;
-        }
+        auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
         auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
         if( resB.second || resB.first->second.first == relation )
             return resB.first->second.second;
@@ -1994,7 +1990,7 @@ namespace carl
         while( !_constraintBounds.empty() )
         {
             #ifdef CONSTRAINT_BOUND_DEBUG
-            cout << "for the bounds of  " << *_constraintBounds.begin()->first << endl;
+            cout << "for the bounds of  " << _constraintBounds.begin()->first << endl;
             #endif
             const map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>& bounds = _constraintBounds.begin()->second;
             assert( !bounds.empty() );
@@ -2143,9 +2139,7 @@ namespace carl
                     _intoFormulas.insert( lessSignificantCases.begin(), lessSignificantCases.end() );
                 }
             }
-            const Pol* poly = _constraintBounds.begin()->first;
             _constraintBounds.erase( _constraintBounds.begin() );
-            delete poly;
         }
         if( _constraintBounds.empty() )
         {
@@ -2156,12 +2150,7 @@ namespace carl
         }
         else
         {
-            while( !_constraintBounds.empty() )
-            {
-                const Pol* poly = _constraintBounds.begin()->first;
-                _constraintBounds.erase( _constraintBounds.begin() );
-                delete poly;
-            }
+            _constraintBounds.clear();
             #ifdef CONSTRAINT_BOUND_DEBUG
             cout << "is " << (_inConjunction ? "invalid" : "valid") << endl << endl;
             #endif

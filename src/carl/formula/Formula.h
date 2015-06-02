@@ -1156,7 +1156,7 @@ namespace carl
             Formula substitute( const std::map<carl::Variable, Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
             
             /// A map from formula pointers to a map of rationals to a pair of a constraint relation and a formula pointer. (internally used)
-            typedef FastPointerMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
+            typedef FastMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
             
             /**
              * Adds the bound to the bounds of the polynomial specified by this constraint. E.g., if the constraint is p+b~0, where p is a sum 
