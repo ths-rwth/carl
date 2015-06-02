@@ -127,6 +127,12 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
     return mpz_get_ui(n.get_mpz_t());
 }
 template<>
+inline unsigned long long int toInt<unsigned long long int>(const mpz_class& n) {
+	assert(n <= std::numeric_limits<unsigned long long int>::max());
+	assert(n >= std::numeric_limits<unsigned long long int>::min());
+	return mpz_get_ui(n.get_mpz_t());
+}
+template<>
 inline int toInt<int>(const mpz_class& n) {
     std::cout << "mpz_class to int" << std::endl;
     assert(n <= std::numeric_limits<int>::max());
@@ -166,6 +172,10 @@ inline unsigned toInt<unsigned>(const mpq_class& n) {
 template<>
 inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
 	return toInt<unsigned long int>(toInt<mpz_class>(n));
+}
+template<>
+inline unsigned long long int toInt<unsigned long long int>(const mpq_class& n) {
+	return toInt<unsigned long long int>(toInt<mpz_class>(n));
 }
 template<>
 inline int toInt<int>(const mpq_class& n) {
