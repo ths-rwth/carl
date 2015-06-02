@@ -10,7 +10,9 @@
 #include <functional>
 #include <cstddef>
 #ifdef __WIN
+	#pragma warning(push, 0)
 	#include <mpirxx.h>
+	#pragma warning(pop)
 #else
 	#include <gmpxx.h>
 #endif

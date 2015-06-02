@@ -6,14 +6,16 @@
 #include "carl/util/platform.h"
 
 #ifdef COMPARE_WITH_GINAC
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
+	#include <cln/cln.h>
+	typedef cln::cl_RA Rational;
 #elif defined(__WIN)
-#include <mpirxx.h>
-typedef mpq_class Rational;
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
+	typedef mpq_class Rational;
 #else
-#include <gmpxx.h>
-typedef mpq_class Rational;
+	#include <gmpxx.h>
+	typedef mpq_class Rational;
 #endif
 
 using namespace carl;

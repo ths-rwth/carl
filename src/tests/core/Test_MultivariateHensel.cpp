@@ -4,9 +4,11 @@
 #include "carl/util/platform.h"
 
 #ifdef __WIN
-#include <mpirxx.h>
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
 #else
-#include <gmpxx.h>
+	#include <gmpxx.h>
 #endif
 
 using namespace carl;

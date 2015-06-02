@@ -9,15 +9,17 @@
 #include "platform.h"
 
 #ifdef __WIN
-#include <mpirxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#define DLL_EXPORT __declspec(dllexport)
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
+	typedef mpq_class Rational;
+	typedef mpz_class Integer;
+	#define DLL_EXPORT __declspec(dllexport)
 #else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#define DLL_EXPORT 
+	#include <gmpxx.h>
+	typedef mpq_class Rational;
+	typedef mpz_class Integer;
+	#define DLL_EXPORT 
 #endif
 
 namespace carl {

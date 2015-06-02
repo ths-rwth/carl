@@ -21,7 +21,9 @@
 #ifdef USE_CLN_NUMBERS
 	#include <cln/cln.h>
 #elif defined(__WIN)
+	#pragma warning(push, 0)
 	#include <mpirxx.h>
+	#pragma warning(pop)
 #else
 	#include <gmpxx.h>
 #endif

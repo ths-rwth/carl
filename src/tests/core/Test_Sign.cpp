@@ -7,12 +7,13 @@
 #include <functional>
 #include <typeinfo>
 #ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-#endif
-#ifdef __WIN
-#include <mpirxx.h>
+	#include <cln/cln.h>
+#elif defined(__WIN)
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
 #else
-#include <gmpxx.h>
+	#include <gmpxx.h>
 #endif
 
 using namespace carl;

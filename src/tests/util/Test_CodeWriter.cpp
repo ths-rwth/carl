@@ -9,7 +9,9 @@
 	typedef cln::cl_RA Rational;
 	typedef cln::cl_I Integer;
 #elif defined(__WIN)
+	#pragma warning(push, 0)
 	#include <mpirxx.h>
+	#pragma warning(pop)
 	typedef mpq_class Rational;
 	typedef mpz_class Integer;
 #else
