@@ -135,6 +135,8 @@ namespace carl
 		bool isConstant() const {
 			return type() == BVTermType::CONSTANT;
 		}
+		
+		void collectVariables(std::set<BVVariable>& vars) const;
 
 		bool isInvalid() const;
 
@@ -343,6 +345,22 @@ namespace carl
         {
             return (mType == BVTermType::CONSTANT && mWidth == 0);
         }
+		void collectVariables(std::set<BVVariable>& vars) const {
+			if(mType == BVTermType::CONSTANT) {
+			} else if(mType == BVTermType::VARIABLE) {
+				vars.insert(mVariable);
+			} else if(mType == BVTermType::EXTRACT) {
+				mExtract.mOperand.collectVariables(vars);
+			} else if(typeIsUnary(mType)) {
+				mUnary.mOperand.collectVariables(vars);
+			} else if(typeIsBinary(mType)) {
+				mBinary.mFirst.collectVariables(vars);
+				mBinary.mSecond.collectVariables(vars);
+			} else {
+				std::cerr << "Type is " << mType << std::endl;
+				assert(false);
+			}
+		}
 
 		/**
 		 * Gives the string representation of this bit vector term.

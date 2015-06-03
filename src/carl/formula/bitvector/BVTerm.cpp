@@ -57,6 +57,10 @@ namespace carl
     {
         return mpContent->type();
     }
+    
+    void BVTerm::collectVariables(std::set<BVVariable>& vars) const {
+        mpContent->collectVariables(vars);
+    }
 
     bool BVTerm::isInvalid() const
     {

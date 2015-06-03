@@ -93,6 +93,11 @@ namespace carl
 		{
 			return mId;
 		}
+		
+		void collectVariables(std::set<BVVariable>& vars) const {
+			mLhs.collectVariables(vars);
+			mRhs.collectVariables(vars);
+		}
 
 		/**
 		 * @return A hash value for this constraint.
