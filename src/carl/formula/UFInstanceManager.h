@@ -180,6 +180,11 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
         {
             mUFInstances.emplace_back( nullptr ); // default value
         }
+        ~UFInstanceManager() {
+            mUFInstanceIdMap.clear();
+            for (auto& ptr: mUFInstances) delete ptr;
+            mUFInstances.clear();
+        }
         
         /**
          * Tries to add the given uninterpreted function instance's content to the so far stored uninterpreted function instance's 
