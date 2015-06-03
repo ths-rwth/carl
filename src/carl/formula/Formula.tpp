@@ -841,6 +841,7 @@ namespace carl
             carl::FormulaVisitor<Formula<Pol>> visitor;
             Variables vars;
             std::set<UVariable> uvars;
+            std::set<BVVariable> bvvars;
             visitor.visit(*this, 
                     [&](const Formula& _f) 
                     {
@@ -855,6 +856,8 @@ namespace carl
                             case FormulaType::UEQ:
                                 _f.uequality().collectUVariables( uvars );
                                 break;
+                            case FormulaType::BITVECTOR:
+                                _f.bvConstraint().collectVariables(bvvars);
                             default:
                                 break;
                         }
@@ -863,6 +866,8 @@ namespace carl
                 os << "(declare-fun " << var << " () " << var.getType() << ")\n";
             for( const auto& uvar : uvars )
                 os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
+            for( const auto& bvvar : bvvars )
+                os << "(declare-fun " << bvvar() << " () " << bvvar.sort() << ")\n";
             for (const auto& ufc: UFManager::getInstance().ufContents()) {
                 if (ufc == nullptr) continue;
                 os << "(declare-fun " << ufc->name() << " (";
