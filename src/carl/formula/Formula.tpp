@@ -863,6 +863,12 @@ namespace carl
                 os << "(declare-fun " << var << " () " << var.getType() << ")\n";
             for( const auto& uvar : uvars )
                 os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
+            for (const auto& ufc: UFManager::getInstance().ufContents()) {
+                if (ufc == nullptr) continue;
+                os << "(declare-fun " << ufc->name() << " (";
+                for (const auto& s: ufc->domain()) os << s << " ";
+                os << ") " << ufc->codomain() << ")\n";
+            }
             result += os.str();
             result += "(assert ";
         }

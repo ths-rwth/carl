@@ -17,6 +17,7 @@
 #include "Condition.h"
 #include "Constraint.h"
 #include "UEquality.h"
+#include "UFManager.h"
 #include "bitvector/BVConstraintPool.h"
 #include "bitvector/BVConstraint.h"
 
