@@ -38,4 +38,7 @@
 
 #ifdef _WIN32
 	#define __WIN
+	#ifdef _WIN64
+	#define __WIN64
+	#endif
 #endif

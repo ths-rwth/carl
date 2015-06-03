@@ -267,7 +267,11 @@ struct Formatter {
 		os.fill(' ');
 		os << "[" << std::right << std::setw(5) << timer << "] " << std::this_thread::get_id() << " " << level << " ";
 		std::string filename(carl::basename(info.filename));
+#ifdef __WIN64
+		unsigned long long spacing = 1;
+#else
 		unsigned long spacing = 1;
+#endif
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
 		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
 		if (!info.func.empty()) os << info.func << "(): ";
