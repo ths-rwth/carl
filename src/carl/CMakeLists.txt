@@ -1,9 +1,9 @@
 # include directories.
-include_directories( 
+include_directories(
 	${include_dirs}
 )
 
-# include core in library. 
+# include core in library.
 add_subdirectory(core)
 add_subdirectory(formula)
 add_subdirectory(util)
@@ -18,8 +18,23 @@ add_subdirectory(interval)
 
 
 
+# resume the subdirectory CmakeLists.txt
+foreach(name converter interval)
+	file(GLOB headers "./name/*.h" "./name/*.tpp" LIST_DIRECTORIES true)
+	set(car_lib_${name}_headers ${headers})
+
+	file(GLOB sources "./name/*.cpp" LIST_DIRECTORIES true)
+	set(car_lib_${name}_sources ${name}/${sources} PARENT_SCOPE)
+
+	configure_file(${CMAKE_SOURCE_DIR}/src/carl/${name}/config.h.in ${CMAKE_SOURCE_DIR}/src/carl/${name}/config.h})
+
+	install(FILES			${carl_lib_${name}_headers}
+			DESTINATION		include/carl/${name})
+endforeach()
+
+
 # Compose all the sources for the aritmetic library.
-set(carl_lib_sources 
+set(carl_lib_sources
     ${carl_lib_cad_sources}
 	${carl_lib_converter_sources}
 	${carl_lib_core_sources}
@@ -68,10 +83,10 @@ endif()
 
 cotire(carl)
 
-# Write config.h 
-configure_file( ${CMAKE_SOURCE_DIR}/src/carl/config.h.in 
+# Write config.h
+configure_file( ${CMAKE_SOURCE_DIR}/src/carl/config.h.in
     ${CMAKE_SOURCE_DIR}/src/carl/config.h
-)  
+)
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -86,5 +101,3 @@ install( TARGETS ${CARL_TARGETS}
 		GROUP_READ GROUP_EXECUTE
 		WORLD_READ WORLD_EXECUTE
 )
-
-
