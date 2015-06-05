@@ -18,18 +18,26 @@ add_subdirectory(interval)
 
 
 
-# resume the subdirectory CmakeLists.txt
+# simplify the CMakeLists.txt src/carl/*
 foreach(name converter interval)
-	file(GLOB headers "./name/*.h" "./name/*.tpp" LIST_DIRECTORIES true)
-	set(car_lib_${name}_headers ${headers})
+	file(GLOB headers  LIST_DIRECTORIES true ${name}/*.h ${name}/*.tpp ${name}/*/*.h ${name}/*/*.tpp)
+	foreach(header ${headers})
+		get_filename_component(reduced_header ${header} NAME)
+		list(APPEND car_lib_${name}_headers ${reduced_header} " ")
+	endforeach()
 
-	file(GLOB sources "./name/*.cpp" LIST_DIRECTORIES true)
-	set(car_lib_${name}_sources ${name}/${sources} PARENT_SCOPE)
+	file(GLOB sources ${name}/*.cpp LIST_DIRECTORIES true)
+	foreach(source ${sources})
+		get_filename_component(reduced_source ${source} NAME)
+		list(APPEND car_lib_${name}_sources ${name}/${reduced_source} " ")
+	endforeach()
 
 	configure_file(${CMAKE_SOURCE_DIR}/src/carl/${name}/config.h.in ${CMAKE_SOURCE_DIR}/src/carl/${name}/config.h})
 
 	install(FILES			${carl_lib_${name}_headers}
 			DESTINATION		include/carl/${name})
+	#message(STATUS ${name} " display headers: " ${car_lib_${name}_headers})
+	#message(STATUS ${name} " display sources: " ${car_lib_${name}_sources})
 endforeach()
 
 
