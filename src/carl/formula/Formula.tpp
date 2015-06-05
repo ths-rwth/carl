@@ -409,17 +409,31 @@ namespace carl
             case FormulaType::FALSE:
                 break;
             case FormulaType::CONSTRAINT:
-                if( !(_ofThisType && _type == VariableType::VT_BOOL) ) // NOTE: THIS ASSUMES THAT THE VARIABLES IN THE CONSTRAINT HAVE INFINTE DOMAINS
+                for( auto var : constraint().variables() )
                 {
-                    for( auto var : constraint().variables() )
-                    {
-                        if( _ofThisType == (var.getType() == VariableType::VT_INT) )
-                            _vars.insert( var );
-                        if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
-                            _vars.insert( var );
-                    }
+                    if( _ofThisType == (var.getType() == VariableType::VT_INT) )
+                        _vars.insert( var );
+                    if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
+                        _vars.insert( var );
                 }
                 break;
+            case FormulaType::BITVECTOR: {
+                if (_ofThisType == (_type == VariableType::VT_BITVECTOR)) {
+                    std::set<BVVariable> vars;
+                    bvConstraint().collectVariables(vars);
+                    for (const auto& v: vars) _vars.insert(v());
+                }
+                break;
+            }
+            case FormulaType::UEQ: {
+                std::set<UVariable> vars;
+                uequality().collectUVariables(vars);
+                for (const auto& v: vars) {
+                    if (_ofThisType == (SortManager::getInstance().getType(v.domain()) == _type))
+                        _vars.insert(v());
+                }
+                break;
+            }
             case FormulaType::NOT:
                 subformula().collectVariables( _vars, _type, _ofThisType );
                 break;
