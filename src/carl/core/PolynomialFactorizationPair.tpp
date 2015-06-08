@@ -494,7 +494,6 @@ namespace carl
                         std::shared_ptr<Cache<PolynomialFactorizationPair<P>>> cache = factorA.pCache();
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
-                        std::cout << "gcdResult = " << gcdResult << std::endl;
                         result.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
                         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << gcdResult << ")^" << exponentCommon << " to gcd: " << result );
                         if (remainA.isOne())
