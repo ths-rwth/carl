@@ -26,9 +26,9 @@ struct ComparisonOperator {
 	}
 };
 
-template<typename... T>
-void expectRightOrder(const ComparisonList<T...>& list) {
-	ComparisonOperator<typename ComparisonList<T...>::const_iterator> c;
+template<typename List>
+void expectRightOrder(const List& list) {
+	ComparisonOperator<typename List::const_iterator> c;
 	for (auto it1 = list.begin(); it1 != list.end(); it1++) {
 		for (auto it2 = list.begin(); it2 != list.end(); it2++) {
 			c.set(it1, it2);
