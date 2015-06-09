@@ -239,19 +239,18 @@ namespace carl
         // The factorization of the PolynomialFactorizationPair to update which can be empty, if constructed freshly by a polynomial.
         if( _toUpdate.factorizedTrivially() && !_updateWith.factorizedTrivially() )
         {
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             _toUpdate.mFactorization = _updateWith.mFactorization;
         }
-//        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
-//        {
-//            // Calculating the gcd refines both factorizations to the same factorization
-//            bool refineA = false;
-//            bool refineB = false;
-//            Factorization<P> restA, restB;
-//            typename P::CoeffType c( 0 );
-//            gcd( _toUpdate, _updateWith, restA, restB, c, refineA, refineB );
-//            assert( c == typename P::CoeffType( 0 ) || c == typename P::CoeffType( 1 ) );
-//        }
+        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
+        {
+            // Calculating the gcd refines both factorizations to the same factorization
+            bool refineA = false;
+            bool refineB = false;
+            Factorization<P> restA, restB;
+            typename P::CoeffType c( 0 );
+            gcd( _toUpdate, _updateWith, restA, restB, c, refineA, refineB );
+            assert( c == typename P::CoeffType( 0 ) || c == typename P::CoeffType( 1 ) );
+        }
     }
 
     template<typename P>
