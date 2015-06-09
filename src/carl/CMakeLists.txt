@@ -19,25 +19,65 @@ add_subdirectory(interval)
 
 
 # simplify the CMakeLists.txt src/carl/*
-foreach(name converter interval)
+foreach(name converter core interval formula)
+
+	#Subdir Headers - Sources -Install
+	foreach(subname bitvector)
+
+		if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/${name}/${subname})
+			#Header Subdir
+			file(GLOB subheaders  LIST_DIRECTORIES true ${name}/${subname}/*.h ${name}/${subname}/*.tpp)
+			foreach(subheader ${subheaders})
+				get_filename_component(reduced_subheader ${subheader} NAME)
+				list(APPEND carl_lib_${name}_${subname}_headers ${reduced_subheader})
+			endforeach()
+
+			#Sources Subdir
+			file(GLOB subsources ${name}/${subname}/*.cpp LIST_DIRECTORIES true)
+			foreach(subsource ${subsources})
+				get_filename_component(reduced_subsource ${subsource} NAME)
+				list(APPEND carl_lib_${name}_${subname}_sources ${name}/${subname}/${reduced_subsource})
+			endforeach()
+
+			#Install Subdir
+			install(FILES			${carl_lib_${name}_${subname}_headers}
+					DESTINATION		include/carl/${name}/${subname})
+
+			#Update upper carl_lib
+			list(APPEND carl_lib_${name}_headers ${carl_lib_${name}_${subname}_headers})
+			list(APPEND carl_lib_${name}_sources ${carl_lib_${name}_${subname}_sources})
+
+			#HELP
+			#message(STATUS ${name} " display subheaders: " ${carl_lib_${name}_${subname}_headers})
+			#message(STATUS ${name} " display subsources: " ${carl_lib_${name}_${subname}_sources})
+		endif()
+	endforeach()
+
+	#Headers
 	file(GLOB headers  LIST_DIRECTORIES true ${name}/*.h ${name}/*.tpp ${name}/*/*.h ${name}/*/*.tpp)
 	foreach(header ${headers})
 		get_filename_component(reduced_header ${header} NAME)
-		list(APPEND car_lib_${name}_headers ${reduced_header} " ")
+		list(APPEND carl_lib_${name}_headers ${reduced_header})
 	endforeach()
 
+
+	#Sources
 	file(GLOB sources ${name}/*.cpp LIST_DIRECTORIES true)
 	foreach(source ${sources})
 		get_filename_component(reduced_source ${source} NAME)
-		list(APPEND car_lib_${name}_sources ${name}/${reduced_source} " ")
+		list(APPEND carl_lib_${name}_sources ${name}/${reduced_source})
 	endforeach()
 
+	#Configure
 	configure_file(${CMAKE_SOURCE_DIR}/src/carl/${name}/config.h.in ${CMAKE_SOURCE_DIR}/src/carl/${name}/config.h})
 
+	#Install
 	install(FILES			${carl_lib_${name}_headers}
 			DESTINATION		include/carl/${name})
-	#message(STATUS ${name} " display headers: " ${car_lib_${name}_headers})
-	#message(STATUS ${name} " display sources: " ${car_lib_${name}_sources})
+
+	#HELP
+	#message(STATUS ${name} " display headers: " ${carl_lib_${name}_headers})
+	#message(STATUS ${name} " display sources: " ${carl_lib_${name}_sources})
 endforeach()
 
 

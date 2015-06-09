@@ -1,3 +1,4 @@
+if(FALSE)
 # Header files in here (only headers from this directory!)
 set(carl_lib_formula_bitvector_headers
     BVCompareRelation.h
@@ -22,4 +23,4 @@ set(carl_lib_formula_bitvector_sources
 install(FILES ${carl_lib_formula_bitvector_headers}
 	DESTINATION include/carl/formula/bitvector
 )
-
+endif()
