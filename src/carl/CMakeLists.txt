@@ -19,7 +19,7 @@ add_subdirectory(interval)
 
 
 # simplify the CMakeLists.txt src/carl/*
-foreach(name converter core interval formula)
+foreach(name cad converter core interval formula util)
 
 	#Subdir Headers - Sources -Install
 	foreach(subname bitvector)
