@@ -51,7 +51,7 @@ namespace carl
     }
     
     template<typename T>
-    std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache ) //, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
+    std::pair<typename Cache<T>::Ref,bool> Cache<T>::cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ), void (*_update)( T&, T& ) )
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         if( mCache.size() >= mMaxCacheSize ) // Clean, if the number of elements in the cache exceeds the threshold.
@@ -64,24 +64,24 @@ namespace carl
         if( !ret.second ) // There is already an equal object in the cache.
         {
             // Try to update the entry in the cache by the information in the given object.
-//            if( (*_canBeUpdated)( *((*ret.first)->first), *_toCache ) )
-//            {
-//                TypeInfoPair<T,Info>* element = *ret.first;
-//                mCache.erase( ret.first );
-//                (*_update)( *element->first, *_toCache );
-//                element->first->rehash();
-//                auto retB = mCache.insert( element );
-//                assert( retB.second );
-//                for( const Ref& ref : element->second.refStoragePositions )
-//                    mCacheRefs[ref] = *retB.first;
-//                delete newElement;
-//                Info& info = (*retB.first)->second;
-//                assert( info.refStoragePositions.size() > 0);
-//                assert( info.refStoragePositions.front() > 0 );
-//                info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
-//                return std::make_pair( info.refStoragePositions.front(), false );
-//            }
-//            else
+            if( (*_canBeUpdated)( *((*ret.first)->first), *_toCache ) )
+            {
+                TypeInfoPair<T,Info>* element = *ret.first;
+                (*_update)( *element->first, *_toCache );
+                mCache.erase( ret.first );
+                element->first->rehash();
+                auto retB = mCache.insert( element );
+                assert( retB.second );
+                for( const Ref& ref : element->second.refStoragePositions )
+                    mCacheRefs[ref] = *retB.first;
+                delete newElement;
+                Info& info = (*retB.first)->second;
+                assert( info.refStoragePositions.size() > 0);
+                assert( info.refStoragePositions.front() > 0 );
+                info.refStoragePositions.insert( info.refStoragePositions.end(), element->second.refStoragePositions.begin(), element->second.refStoragePositions.end() );
+                return std::make_pair( info.refStoragePositions.front(), false );
+            }
+            else
                 delete newElement;
         }
         else // Create a new entry in the cache.
