@@ -1,4 +1,4 @@
-#if(FALSE)
+if(FALSE)
 set(carl_lib_number_headers
 	GF.h
 	PrimeFactory.h
@@ -36,4 +36,4 @@ install(FILES			${carl_lib_interval_headers}
 #        DESTINATION             include/carl/numbers)
 #install(FILES                   ${float_t_headers}
 #        DESTINATION             include/carl/numbers/floatTypes)
-#endif()
+endif()
