@@ -409,17 +409,31 @@ namespace carl
             case FormulaType::FALSE:
                 break;
             case FormulaType::CONSTRAINT:
-                if( !(_ofThisType && _type == VariableType::VT_BOOL) ) // NOTE: THIS ASSUMES THAT THE VARIABLES IN THE CONSTRAINT HAVE INFINTE DOMAINS
+                for( auto var : constraint().variables() )
                 {
-                    for( auto var : constraint().variables() )
-                    {
-                        if( _ofThisType == (var.getType() == VariableType::VT_INT) )
-                            _vars.insert( var );
-                        if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
-                            _vars.insert( var );
-                    }
+                    if( _ofThisType == (var.getType() == VariableType::VT_INT) )
+                        _vars.insert( var );
+                    if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
+                        _vars.insert( var );
                 }
                 break;
+            case FormulaType::BITVECTOR: {
+                if (_ofThisType == (_type == VariableType::VT_BITVECTOR)) {
+                    std::set<BVVariable> vars;
+                    bvConstraint().collectVariables(vars);
+                    for (const auto& v: vars) _vars.insert(v());
+                }
+                break;
+            }
+            case FormulaType::UEQ: {
+                std::set<UVariable> vars;
+                uequality().collectUVariables(vars);
+                for (const auto& v: vars) {
+                    if (_ofThisType == (SortManager::getInstance().getType(v.domain()) == _type))
+                        _vars.insert(v());
+                }
+                break;
+            }
             case FormulaType::NOT:
                 subformula().collectVariables( _vars, _type, _ofThisType );
                 break;
@@ -2209,6 +2223,47 @@ namespace carl
 		}
 		}
 	}
+    
+    template<typename Formula>
+	void FormulaVisitor<Formula>::rvisit(const Formula& formula, const std::function<void(Formula)>& func) {
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			for (const auto& cur: formula.subformulas()) rvisit(cur, func);
+			break;
+		}
+		case NOT: {
+			rvisit(formula.subformula(), func);
+			break;
+		}
+		case IMPLIES: {
+			rvisit(formula.premise(), func);
+			rvisit(formula.conclusion(), func);
+			break;
+		}
+		case ITE: {
+			rvisit(formula.condition(), func);
+			rvisit(formula.firstCase(), func);
+			rvisit(formula.secondCase(), func);
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case BITVECTOR:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			rvisit(formula.quantifiedFormula(), func);
+			break;
+		}
+		func(formula);
+		}
+	}
 
 	template<typename Formula>
 	Formula FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<Formula(Formula)>& func) {
@@ -2271,6 +2326,69 @@ namespace carl
 		}
 		}
 		return newFormula;
+	}
+
+	template<typename Formula>
+	Formula FormulaVisitor<Formula>::rvisit(const Formula& formula, const std::function<Formula(Formula)>& func) {
+		Formula newFormula = formula;
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			Formulas<typename Formula::PolynomialType> newSubformulas;
+			bool changed = false;
+			for (const auto& cur: formula.subformulas()) {
+				Formula newCur = rvisit(cur, func);
+				if (newCur != cur) changed = true;
+				newSubformulas.insert(newCur);
+			}
+			if (changed) {
+				newFormula = Formula(formula.getType(), newSubformulas);
+			}
+			break;
+		}
+		case NOT: {
+			Formula cur = rvisit(formula.subformula(), func);
+			if (cur != formula.subformula()) {
+				newFormula = Formula(NOT, cur);
+			}
+			break;
+		}
+		case IMPLIES: {
+			Formula prem = rvisit(formula.premise(), func);
+			Formula conc = rvisit(formula.conclusion(), func);
+			if ((prem != formula.premise()) || (conc != formula.conclusion())) {
+				newFormula = Formula(IMPLIES, prem, conc);
+			}
+			break;
+		}
+		case ITE: {
+			Formula cond = rvisit(formula.condition(), func);
+			Formula fCase = rvisit(formula.firstCase(), func);
+			Formula sCase = rvisit(formula.secondCase(), func);
+			if ((cond != formula.condition()) || (fCase != formula.firstCase()) || (sCase != formula.secondCase())) {
+				newFormula = Formula(ITE, cond, fCase, sCase);
+			}
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case BITVECTOR:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			Formula sub = rvisit(formula.quantifiedFormula(), func);
+			if (sub != formula.quantifiedFormula()) {
+				newFormula = Formula(formula.getType(), formula.quantifiedVariables(), sub);
+			}
+			break;
+		}
+		} 
+		return func(newFormula);
 	}
     
     template<typename Formula>

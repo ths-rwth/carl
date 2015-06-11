@@ -50,7 +50,7 @@ Interval<Number> Interval<Number>::integralPart() const
 		case BoundType::STRICT:
 			newLowerBound = ceil(mContent.lower());
 			newLowerBoundType = BoundType::WEAK;
-			if(newLowerBound == ceil(mContent.lower()))
+			if(newLowerBound == mContent.lower())
 				newLowerBound += carl::constant_one<Number>::get();
 			break;
 		default:
@@ -66,7 +66,7 @@ Interval<Number> Interval<Number>::integralPart() const
 		case BoundType::STRICT:
 			newUpperBound = floor(mContent.upper());
 			newUpperBoundType = BoundType::WEAK;
-			if(newUpperBound == floor(mContent.upper()))
+			if(newUpperBound == mContent.upper())
 				newLowerBound -= carl::constant_one<Number>::get();
 			if(newLowerBoundType == BoundType::INFTY)
 				newLowerBound = newUpperBound;
