@@ -40,24 +40,25 @@ MACRO(SUBDIRLIST result curdir)
 ENDMACRO()
 
 #FUNCTION compute_install FOR RECURSION - input "no_subdir
-function(compute_install dir subdir)
+function(compute_install dir_name dir_path subdir)
 	#determine if the are in the dir or subdir
 	if(NOT ${subdir} STREQUAL no_subdir)
-		set(path ${${dir}}/${${subdir}})
-		set(name ${${dir}}_${${subdir}})
+		set(path ${dir_path}/${subdir})
+		set(name ${dir_name}_${subdir})
 	else()
-		set(path ${${dir}})
-		set(name ${${dir}})
+		set(path ${dir_path})
+		set(name ${dir_name})
 	endif()
 
 	#Recursion for subdirectories
 	SUBDIRLIST(subdir ${CMAKE_CURRENT_SOURCE_DIR}/${path})
 
-	#Subdir Headers - Sources -Install
+	message(STATUS "now we are in " ${name} " and have path : " ${path})
+
 	foreach(subname ${subdir})
 		message(STATUS "next we compute the help-function for " ${name} " with focus on " ${subname})
 
-		compute_install(name subname)
+		compute_install(${name} ${path} ${subname})
 
 		#Update upper carl_lib
 		list(APPEND carl_lib_${name}_headers ${carl_lib_${name}_${subname}_headers})
@@ -97,7 +98,7 @@ endfunction(compute_install)
 # # # # # # # # # # # # # # # # # # # # # #
 
 foreach(name cad converter core formula groebner interval numbers util)
-	compute_install(name no_subdir)
+	compute_install(${name} ${name} no_subdir)
 endforeach()
 
 # # # # # # # # # # # # # # # # # # # # # #
