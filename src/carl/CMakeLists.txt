@@ -19,20 +19,20 @@ add_subdirectory(interval)
 
 # Simplified access to *.h and *.cpp
 foreach(name cad converter core formula groebner interval numbers util)
-	collect_files(${name} ${name} no_subdir)
+	collect_files(carl ${name} ${name} no_subdir)
 endforeach()
 
 
 # Compose all the sources for the aritmetic library.
 set(carl_lib_sources
-    ${carl_lib_cad_sources}
-	${carl_lib_converter_sources}
-	${carl_lib_core_sources}
-	${carl_lib_formula_sources}
-	${carl_lib_numbers_sources}
-	${carl_lib_util_sources}
-	${carl_lib_interval_sources}
-	${carl_lib_groebner_sources}
+    ${carl_cad_sources}
+	${carl_converter_sources}
+	${carl_core_sources}
+	${carl_formula_sources}
+	${carl_numbers_sources}
+	${carl_util_sources}
+	${carl_interval_sources}
+	${carl_groebner_sources}
 )
 
 add_library(lib_carl SHARED ${carl_lib_sources})

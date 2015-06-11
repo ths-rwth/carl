@@ -19,7 +19,7 @@ MACRO(ListSubDirs result curdir)
 ENDMACRO()
 
 #FUNCTION collect_files FOR RECURSION - input "no_subdir"
-function(collect_files dir_name dir_path subdir)
+function(collect_files prefix dir_name dir_path subdir)
 	#determine if the are in the dir or subdir
 	if(NOT ${subdir} STREQUAL no_subdir)
 		set(path ${dir_path}/${subdir})
@@ -34,37 +34,37 @@ function(collect_files dir_name dir_path subdir)
 
 	foreach(subname ${subdir})
 
-		collect_files(${name} ${path} ${subname})
+		collect_files(${prefix} ${name} ${path} ${subname})
 
-		#Update upper carl_lib
-		list(APPEND carl_lib_${name}_headers ${carl_lib_${name}_${subname}_headers})
-		list(APPEND carl_lib_${name}_sources ${carl_lib_${name}_${subname}_sources})
+		#Update upper prefix_name_...
+		list(APPEND ${prefix}_${name}_headers ${${prefix}_${name}_${subname}_headers})
+		list(APPEND ${prefix}_${name}_sources ${${prefix}_${name}_${subname}_sources})
 	endforeach()
 
 	#Headers
 	file(GLOB headers  LIST_DIRECTORIES true ${path}/*.h ${path}/*.tpp)
 	foreach(header ${headers})
 		get_filename_component(reduced_header ${header} NAME)
-		list(APPEND carl_lib_${name}_headers ${path}/${reduced_header})
+		list(APPEND ${prefix}_${name}_headers ${path}/${reduced_header})
 	endforeach()
 
 	#Sources
 	file(GLOB sources ${path}/*.cpp LIST_DIRECTORIES true)
 	foreach(source ${sources})
 		get_filename_component(reduced_source ${source} NAME)
-		list(APPEND carl_lib_${name}_sources ${path}/${reduced_source})
+		list(APPEND ${prefix}_${name}_sources ${path}/${reduced_source})
 	endforeach()
 
 	#Configure only if it exists
-	if(EXISTS ${CMAKE_SOURCE_DIR}/src/carl/${path}/config.h.in)
-		configure_file(${CMAKE_SOURCE_DIR}/src/carl/${path}/config.h.in ${CMAKE_SOURCE_DIR}/src/carl/${path}/config.h)
+	if(EXISTS ${CMAKE_SOURCE_DIR}/src/${prefix}/${path}/config.h.in)
+		configure_file(${CMAKE_SOURCE_DIR}/src/${prefix}/${path}/config.h.in ${CMAKE_SOURCE_DIR}/src/${prefix}/${path}/config.h)
 	endif()
 
 	#Install
-	install(FILES			${carl_lib_${name}_headers}
-			DESTINATION		include/carl/${path})
+	install(FILES			${${prefix}_${name}_headers}
+			DESTINATION		include/${prefix}/${path})
 
-	#SET the scope of carl_lib_...
-	set(carl_lib_${name}_headers ${carl_lib_${name}_headers} PARENT_SCOPE)
-	set(carl_lib_${name}_sources ${carl_lib_${name}_sources} PARENT_SCOPE)
+	#SET the scope
+	set(${prefix}_${name}_headers ${${prefix}_${name}_headers} PARENT_SCOPE)
+	set(${prefix}_${name}_sources ${${prefix}_${name}_sources} PARENT_SCOPE)
 endfunction(collect_files)
