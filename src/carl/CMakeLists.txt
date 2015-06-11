@@ -23,6 +23,10 @@ add_subdirectory(interval)
 # SIMPLIFY
 # # # # # # # # # # # # # # # # # # # # # #
 
+# # # # # # # # # # # # # # # # # # # # # #
+# HELP
+# # # # # # # # # # # # # # # # # # # # # #
+
 #MACRO from Stackoverflow (http://stackoverflow.com/questions/7787823/cmake-how-to-get-the-name-of-all-subdirectories-of-a-directory) 10.6.15
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -35,8 +39,8 @@ MACRO(SUBDIRLIST result curdir)
   SET(${result} ${dirlist})
 ENDMACRO()
 
-#FUNCTION FOR RECURSION - input "no_subdir
-function(compute_subdir dir subdir)
+#FUNCTION compute_install FOR RECURSION - input "no_subdir
+function(compute_install dir subdir)
 	#determine if the are in the dir or subdir
 	if(NOT ${subdir} STREQUAL no_subdir)
 		set(path ${${dir}}/${${subdir}})
@@ -45,6 +49,20 @@ function(compute_subdir dir subdir)
 		set(path ${${dir}})
 		set(name ${${dir}})
 	endif()
+
+	#Recursion for subdirectories
+	SUBDIRLIST(subdir ${CMAKE_CURRENT_SOURCE_DIR}/${path})
+
+	#Subdir Headers - Sources -Install
+	foreach(subname ${subdir})
+		message(STATUS "next we compute the help-function for " ${name} " with focus on " ${subname})
+
+		compute_install(name subname)
+
+		#Update upper carl_lib
+		list(APPEND carl_lib_${name}_headers ${carl_lib_${name}_${subname}_headers})
+		list(APPEND carl_lib_${name}_sources ${carl_lib_${name}_${subname}_sources})
+	endforeach()
 
 	#Headers
 	file(GLOB headers  LIST_DIRECTORIES true ${path}/*.h ${path}/*.tpp)
@@ -72,26 +90,14 @@ function(compute_subdir dir subdir)
 	#SET the scope of carl_lib_...
 	set(carl_lib_${name}_headers ${carl_lib_${name}_headers} PARENT_SCOPE)
 	set(carl_lib_${name}_sources ${carl_lib_${name}_sources} PARENT_SCOPE)
-endfunction(compute_subdir)
+endfunction(compute_install)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # SIMPLIFY
 # # # # # # # # # # # # # # # # # # # # # #
 
 foreach(name cad converter core formula groebner interval numbers util)
-
-	SUBDIRLIST(subdir ${CMAKE_CURRENT_SOURCE_DIR}/${name})
-
-	#Subdir Headers - Sources -Install
-	foreach(subname ${subdir})
-		compute_subdir(name subname)
-
-		#Update upper carl_lib
-		list(APPEND carl_lib_${name}_headers ${carl_lib_${name}_${subname}_headers})
-		list(APPEND carl_lib_${name}_sources ${carl_lib_${name}_${subname}_sources})
-	endforeach()
-
-	compute_subdir(name no_subdir)
+	compute_install(name no_subdir)
 endforeach()
 
 # # # # # # # # # # # # # # # # # # # # # #
