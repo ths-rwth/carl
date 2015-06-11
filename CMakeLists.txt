@@ -30,8 +30,8 @@ set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-# for cmake 2.8.7 
-include(FindPackageHandleStandardArgs) 
+# for cmake 2.8.7
+include(FindPackageHandleStandardArgs)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options
@@ -55,6 +55,9 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
+
+# Include own macros.
+include( carlmacros )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -222,7 +225,7 @@ IF(USE_MPFR_FLOAT)
 	find_package(MPFR REQUIRED)
 	find_library(MPFR_DYNAMIC NAMES libmpfr.${DYNAMIC_EXT})
 	find_library(MPFR_STATIC NAMES libmpfr.${STATIC_EXT})
-	
+
 	include_directories(SYSTEM ${include_dirs} ${MPFR_INCLUDE_DIRS})
 	set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
 	set(libs_static ${libs_static} ${MPFR_STATIC})
@@ -291,11 +294,11 @@ add_subdirectory(src)
 
 # Add all targets to the build-tree export set
 export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
- 
+
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE carl)
- 
+
 include(CMakePackageConfigHelpers)
 # Create the carlConfig.cmake and carlConfigVersion files
 file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
@@ -316,7 +319,7 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.c
 								 COMPATIBILITY SameMajorVersion )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 		DESTINATION ${CMAKE_INSTALL_DIR} )
- 
+
 # Install the export set for use with the install-tree
 install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 
