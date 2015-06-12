@@ -142,6 +142,16 @@ class Term
 		{
 			return !mMonomial;
 		}
+        
+        /**
+         * @return true, if the image of this term is integer-valued.
+         */
+        inline bool integerValued() const
+        {
+            if(!carl::isInteger(mCoeff)) return false;
+            return (!mMonomial || mMonomial->integerValued());
+        }
+        
 		/**
 		 * Checks whether the monomial has exactly the degree one.
 		 * @return 
