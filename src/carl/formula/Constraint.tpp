@@ -765,10 +765,13 @@ namespace carl
                 }
                 auto d = varInfoPair->second.coeffs().find( 1 );
                 assert( d != varInfoPair->second.coeffs().end() );
-                _substitutionVariable = varInfoPair->first;
-                _substitutionTerm = makePolynomial<Pol>( _substitutionVariable ) * d->second - lhs();
-                _substitutionTerm /= d->second.constantPart();
-                return true;
+                if( d->second.isConstant() )
+                {
+                    _substitutionVariable = varInfoPair->first;
+                    _substitutionTerm = makePolynomial<Pol>( _substitutionVariable ) * d->second - lhs();
+                    _substitutionTerm /= d->second.constantPart();
+                    return true;
+                }
             }
         }
         return false;

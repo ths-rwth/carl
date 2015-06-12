@@ -196,6 +196,10 @@ namespace carl
             const FormulaContent<Pol>* createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
             {
                 #ifdef SIMPLIFY_FORMULA
+                if( _then == _else )
+                {
+                    return _then.mpContent;
+                }
                 if( _condition.mpContent == mpFalse )
                 {
                     return _else.mpContent;
@@ -203,6 +207,38 @@ namespace carl
                 if( _condition.mpContent == mpTrue )
                 {
                     return _then.mpContent;
+                }
+                if( _then.mpContent == mpFalse )
+                {
+                    // (ite c false b) = (~c or false) and (c or b) = ~c and (c or b) = (~c and b)
+                    Formulas<Pol> subFormulas;
+                    subFormulas.insert( Formula<Pol>( FormulaType::NOT, _condition ) );
+                    subFormulas.insert( _else );
+                    return add( new FormulaContent<Pol>( FormulaType::AND, std::move(subFormulas) ) );
+                }
+                if( _then.mpContent == mpTrue )
+                {
+                    // (ite c false b) = (~c or true) and (c or b) = (c or b)
+                    Formulas<Pol> subFormulas;
+                    subFormulas.insert( _condition );
+                    subFormulas.insert( _else );
+                    return add( new FormulaContent<Pol>( FormulaType::OR, std::move(subFormulas) ) );
+                }
+                if( _else.mpContent == mpFalse )
+                {
+                    // (ite c false b) = (~c or a) and (c or false) = (~c or a) and c = (c and a)
+                    Formulas<Pol> subFormulas;
+                    subFormulas.insert( _condition );
+                    subFormulas.insert( _then );
+                    return add( new FormulaContent<Pol>( FormulaType::AND, std::move(subFormulas) ) );
+                }
+                if( _else.mpContent == mpTrue )
+                {
+                    // (ite c false b) = (~c or a) and (c or true) = (~c or a)
+                    Formulas<Pol> subFormulas;
+                    subFormulas.insert( Formula<Pol>( FormulaType::NOT, _condition ) );
+                    subFormulas.insert( _then );
+                    return add( new FormulaContent<Pol>( FormulaType::OR, std::move(subFormulas) ) );
                 }
                 Formula<Pol> thenFormula = _then;
                 Formula<Pol> elseFormula = _else;
