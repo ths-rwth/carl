@@ -750,9 +750,9 @@ namespace carl
     }
 
     template<typename Pol>
-    bool Constraint<Pol>::getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm ) const
+    bool Constraint<Pol>::getSubstitution( Variable& _substitutionVariable, Pol& _substitutionTerm, bool _negated ) const
     {
-        if( relation() != Relation::EQ )
+        if( (!_negated && relation() != Relation::EQ) || (_negated && relation() != Relation::NEQ) )
             return false;
         VARINFOMAP_LOCK_GUARD
         for( typename map<Variable, VarInfo<Pol>>::iterator varInfoPair = mpContent->mVarInfoMap.begin(); varInfoPair != mpContent->mVarInfoMap.end(); ++varInfoPair )
@@ -765,10 +765,13 @@ namespace carl
                 }
                 auto d = varInfoPair->second.coeffs().find( 1 );
                 assert( d != varInfoPair->second.coeffs().end() );
-                _substitutionVariable = varInfoPair->first;
-                _substitutionTerm = makePolynomial<Pol>( _substitutionVariable ) * d->second - lhs();
-                _substitutionTerm /= d->second.constantPart();
-                return true;
+                if( d->second.isConstant() && (varInfoPair->first.getType() != carl::VariableType::VT_INT || carl::isOne(carl::abs( d->second.constantPart() ))) )
+                {
+                    _substitutionVariable = varInfoPair->first;
+                    _substitutionTerm = makePolynomial<Pol>( _substitutionVariable ) * d->second - lhs();
+                    _substitutionTerm /= d->second.constantPart();
+                    return true;
+                }
             }
         }
         return false;

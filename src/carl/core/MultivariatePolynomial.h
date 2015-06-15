@@ -290,6 +290,12 @@ public:
 	 * @return If there is a constant term unequal to zero.
 	 */
 	bool hasConstantTerm() const;
+    
+    /**
+     * @return true, if the image of this polynomial is integer-valued.
+     */
+    bool integerValued() const;
+    
 	/**
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
 	 * @return Constant term.

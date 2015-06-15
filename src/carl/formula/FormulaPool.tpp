@@ -188,6 +188,24 @@ namespace carl
                     {
                         return falseFormula();
                     }
+                    else if( iterToFalse != _subformulas.end() )
+                    {
+                        if( _subformulas.size() == 2 )
+                        {
+                            if( iterToFalse == _subformulas.begin() )
+                                return (++iterToFalse)->mpContent->mNegation;
+                            return _subformulas.begin()->mpContent->mNegation;
+                        }
+                    }
+                    else if( iterToTrue != _subformulas.end() )
+                    {
+                        if( _subformulas.size() == 2 )
+                        {
+                            if( iterToTrue == _subformulas.begin() )
+                                return (++iterToTrue)->mpContent;
+                            return _subformulas.begin()->mpContent;
+                        }
+                    }
                 }
             }
             #endif

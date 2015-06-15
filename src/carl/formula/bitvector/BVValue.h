@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../../numbers/config.h"
 #include <boost/dynamic_bitset.hpp>
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
@@ -18,6 +19,10 @@ namespace carl
     {
     private:
         boost::dynamic_bitset<> mValue;
+
+        BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
+        {
+        }
 
     public:
         BVValue() : mValue()
@@ -98,7 +103,7 @@ namespace carl
         {
         }
 
-        boost::dynamic_bitset<> operator()() const
+        const boost::dynamic_bitset<>& operator()() const
         {
             return mValue;
         }
@@ -113,6 +118,62 @@ namespace carl
             std::string output;
             boost::to_string(mValue, output);
             return "#b" + output;
+        }
+
+        bool isZero() const
+        {
+            return (*this)().none();
+        }
+
+        BVValue operator-() const
+        {
+            return ~(*this) + BVValue(width(), 1);
+        }
+
+        BVValue operator~() const
+        {
+            return BVValue(~(*this)());
+        }
+
+        BVValue rotateLeft(std::size_t _n) const
+        {
+            boost::dynamic_bitset<> lowerPart((*this)());
+            boost::dynamic_bitset<> upperPart((*this)());
+
+            lowerPart <<= _n % width();
+            upperPart >>= width() - (_n % width());
+
+            return BVValue(lowerPart ^ upperPart);
+        }
+
+        BVValue rotateRight(std::size_t _n) const
+        {
+            return rotateLeft(_n - (_n % width()));
+        }
+
+        BVValue repeat(std::size_t _n) const
+        {
+            assert(_n > 0);
+            BVValue repeated(_n * width());
+
+            for(std::size_t i=0;i<repeated.width();++i) {
+                repeated[i] = (*this)[i % width()];
+            }
+            return repeated;
+        }
+
+        BVValue extendUnsignedBy(std::size_t _n) const
+        {
+            boost::dynamic_bitset<> copy((*this)());
+            copy.resize(width() + _n);
+            return BVValue(std::move(copy));
+        }
+
+        BVValue extendSignedBy(std::size_t _n) const
+        {
+            boost::dynamic_bitset<> copy((*this)());
+            copy.resize(width() + _n, (*this)[width()-1]);
+            return BVValue(std::move(copy));
         }
 
         friend std::ostream& operator<<(std::ostream& _out, const BVValue& _value)
@@ -140,6 +201,240 @@ namespace carl
         {
             assert(_index < width());
             return mValue[_index];
+        }
+
+        BVValue operator+(const BVValue& _other) const
+        {
+            assert(_other.width() == width());
+
+            bool carry = false;
+            boost::dynamic_bitset<> sum(width());
+
+            for(std::size_t i=0;i<width();++i) {
+                sum[i] = ((*this)[i] != _other[i]) != carry;
+                carry = ((*this)[i] && _other[i]) || (carry && ((*this)[i] || _other[i]));
+            }
+
+            return BVValue(std::move(sum));
+        }
+
+        BVValue operator-(const BVValue& _other) const
+        {
+            assert(_other.width() == width());
+            return (*this) + (-_other);
+        }
+
+        BVValue operator&(const BVValue& _other) const
+        {
+            assert(_other.width() == width());
+            return BVValue((*this)() & _other());
+        }
+
+        BVValue operator|(const BVValue& _other) const
+        {
+            assert(_other.width() == width());
+            return BVValue((*this)() | _other());
+        }
+
+        BVValue operator^(const BVValue& _other) const
+        {
+            assert(_other.width() == width());
+            return BVValue((*this)() ^ _other());
+        }
+
+        BVValue concat(const BVValue& _other) const
+        {
+            boost::dynamic_bitset<> concatenation((*this)());
+            concatenation.resize(width() + _other.width());
+            concatenation <<= _other.width();
+            boost::dynamic_bitset<> otherResized(_other());
+            otherResized.resize(concatenation.size());
+            concatenation |= otherResized;
+            return BVValue(std::move(concatenation));
+        }
+
+        BVValue operator*(const BVValue& _other) const
+        {
+            BVValue product(width());
+            boost::dynamic_bitset<> summand((*this)());
+
+            for(std::size_t i=0;i<width();++i) {
+                if(_other[i]) {
+                    product = product + BVValue(boost::dynamic_bitset<>(summand));
+                }
+                summand <<= 1;
+            }
+
+            return product;
+        }
+
+        BVValue operator%(const BVValue& _other) const
+        {
+            return divideUnsigned(_other, true);
+        }
+
+        BVValue operator/(const BVValue& _other) const
+        {
+            return divideUnsigned(_other);
+        }
+
+        BVValue divideSigned(const BVValue& _other) const
+        {
+            assert(width() == _other.width());
+
+            bool firstNegative = (*this)[width()-1];
+            bool secondNegative = _other[_other.width()-1];
+
+            if(! firstNegative && ! secondNegative) {
+                return (*this) / _other;
+            } else if(firstNegative && ! secondNegative) {
+                return -(-(*this) / _other);
+            } else if(! firstNegative && secondNegative) {
+                return -((*this) / -_other);
+            } else {
+                return -(*this) / -_other;
+            }
+        }
+
+        BVValue remSigned(const BVValue& _other) const
+        {
+            assert(width() == _other.width());
+
+            bool firstNegative = (*this)[width()-1];
+            bool secondNegative = _other[_other.width()-1];
+
+            if(! firstNegative && ! secondNegative) {
+                return (*this) % _other;
+            } else if(firstNegative && ! secondNegative) {
+                return -(-(*this) % _other);
+            } else if(! firstNegative && secondNegative) {
+                return (*this) % -_other;
+            } else {
+                return -((*this) % -_other);
+            }
+        }
+
+        BVValue modSigned(const BVValue& _other) const
+        {
+            assert(width() == _other.width());
+
+            bool firstNegative = (*this)[width()-1];
+            bool secondNegative = _other[_other.width()-1];
+
+            BVValue absFirst(firstNegative ? -(*this) : (*this));
+            BVValue absSecond(secondNegative ? -_other : _other);
+
+            BVValue u = absFirst % absSecond;
+
+            if(u.isZero()) {
+                return u;
+            } else if(! firstNegative && ! secondNegative) {
+                return u;
+            } else if(firstNegative && ! secondNegative) {
+                return -u + _other;
+            } else if(! firstNegative && secondNegative) {
+                return (*this) + _other;
+            } else {
+                return -u;
+            }
+        }
+
+        BVValue operator<<(const BVValue& _other) const
+        {
+            return shift(_other, true);
+        }
+
+        BVValue operator>>(const BVValue& _other) const
+        {
+            return shift(_other, false, false);
+        }
+
+        BVValue rightShiftArithmetic(const BVValue& _other) const
+        {
+            return shift(_other, false, true);
+        }
+
+        BVValue extract(std::size_t _highest, std::size_t _lowest) const
+        {
+            assert(_highest < width() && _highest >= _lowest);
+            BVValue extraction(_highest - _lowest + 1);
+
+            for(std::size_t i=0;i<extraction.width();++i) {
+                extraction[i] = (*this)[_lowest + i];
+            }
+
+            return extraction;
+        }
+
+    private:
+        BVValue shift(const BVValue& _other, bool _left, bool _arithmetic = false) const
+        {
+            std::size_t firstSize = width() - 1;
+            std::size_t highestRelevantPos = 0;
+
+            bool fillWithOnes = !_left && _arithmetic && (*this)[width()-1];
+
+            while((firstSize >>= 1) != 0)
+                ++highestRelevantPos;
+
+            for(std::size_t i=highestRelevantPos+1;i<_other.width();++i) {
+                if(_other[i]) {
+                    boost::dynamic_bitset<> allZero(width());
+                    return fillWithOnes ? ~allZero : allZero;
+                }
+            }
+
+            boost::dynamic_bitset<> shifted(fillWithOnes ? ~(*this)() : (*this)());
+            std::size_t shiftBy = 1;
+
+            for(std::size_t i=0;i<=highestRelevantPos && i < _other.width();++i) {
+                if(_other[i]) {
+                    if(_left) {
+                        shifted <<= shiftBy;
+                    } else {
+                        shifted >>= shiftBy;
+                    }
+                }
+                shiftBy *= 2;
+            }
+
+            return (fillWithOnes ? ~shifted : shifted);
+        }
+
+        BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const
+        {
+            assert(width() == _other.width());
+            assert(_other() != boost::dynamic_bitset<>(_other.width(), 0));
+
+            boost::dynamic_bitset<> quotient(width());
+            std::size_t quotientIndex = 0;
+            boost::dynamic_bitset<> divisor(_other());
+            boost::dynamic_bitset<> remainder((*this)());
+
+            while(! divisor[divisor.size()-1] && remainder > divisor) {
+                ++quotientIndex;
+                divisor <<= 1;
+            }
+
+            while(true) {
+                if(remainder >= divisor) {
+                    quotient[quotientIndex] = true;
+                    // substract divisor from remainder
+                    bool carry = false;
+                    for(std::size_t i=divisor.find_first();i<remainder.size();++i) {
+                        bool newRemainderI = (remainder[i] != divisor[i]) != carry;
+                        carry = (remainder[i] && carry && divisor[i]) || (! remainder[i] && (carry || divisor[i]));
+                        remainder[i] = newRemainderI;
+                    }
+                }
+                if(quotientIndex == 0) {
+                    break;
+                }
+                divisor >>= 1;
+                --quotientIndex;
+            }
+
+            return BVValue(_returnRemainder ? std::move(remainder) : std::move(quotient));
         }
     };
 }

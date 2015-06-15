@@ -27,7 +27,8 @@ namespace carl
         mUsages( 0 ),
         mType( _true ? FormulaType::TRUE : FormulaType::FALSE ),
         mConstraint( Constraint<Pol>( _true ) ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {}
 
     template<typename Pol>
@@ -39,7 +40,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::BOOL ),
         mBoolean( _boolean ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         assert( _boolean.getType() == VariableType::VT_BOOL );
     }
@@ -53,7 +55,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::CONSTRAINT ),
         mConstraint( _constraint ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         switch( _constraint.isConsistent() )
         {
@@ -79,7 +82,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::BITVECTOR ),
         mBVConstraint( _constraint ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
     }
 
@@ -92,7 +96,8 @@ namespace carl
         mUsages( 0 ),
         mType( FormulaType::UEQ ),
         mUIEquality( std::move( _ueq ) ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {}
 
     template<typename Pol>
@@ -105,7 +110,8 @@ namespace carl
         mType( FormulaType::NOT ),
         mSubformula( std::move( _subformula ) ),
         mNegation( mSubformula.mpContent ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {}
 
     template<typename Pol>
@@ -116,7 +122,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::IMPLIES ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         mpImpliesContent = new IMPLIESContent<Pol>( _premise, _conclusion );
     }
@@ -129,7 +136,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( FormulaType::ITE ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         mpIteContent = new ITEContent<Pol>( _condition, _then, _else );
     }
@@ -143,7 +151,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( _type ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
         mpQuantifierContent = new QuantifierContent<Pol>(std::move(_vars), _term);
@@ -157,7 +166,8 @@ namespace carl
         mDifficulty( 0.0 ),
         mUsages( 0 ),
         mType( _type ),
-        mProperties()
+        mProperties(),
+        mTseitinClause( false )
     {
         assert( _subformulas.size() > 1 );
         assert( mType == FormulaType::AND || mType == FormulaType::OR || mType == FormulaType::IFF || mType == FormulaType::XOR );
@@ -399,17 +409,31 @@ namespace carl
             case FormulaType::FALSE:
                 break;
             case FormulaType::CONSTRAINT:
-                if( !(_ofThisType && _type == VariableType::VT_BOOL) ) // NOTE: THIS ASSUMES THAT THE VARIABLES IN THE CONSTRAINT HAVE INFINTE DOMAINS
+                for( auto var : constraint().variables() )
                 {
-                    for( auto var : constraint().variables() )
-                    {
-                        if( _ofThisType == (var.getType() == VariableType::VT_INT) )
-                            _vars.insert( var );
-                        if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
-                            _vars.insert( var );
-                    }
+                    if( _ofThisType == (var.getType() == VariableType::VT_INT) )
+                        _vars.insert( var );
+                    if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
+                        _vars.insert( var );
                 }
                 break;
+            case FormulaType::BITVECTOR: {
+                if (_ofThisType == (_type == VariableType::VT_BITVECTOR)) {
+                    std::set<BVVariable> vars;
+                    bvConstraint().collectVariables(vars);
+                    for (const auto& v: vars) _vars.insert(v());
+                }
+                break;
+            }
+            case FormulaType::UEQ: {
+                std::set<UVariable> vars;
+                uequality().collectUVariables(vars);
+                for (const auto& v: vars) {
+                    if (_ofThisType == (SortManager::getInstance().getType(v.domain()) == _type))
+                        _vars.insert(v());
+                }
+                break;
+            }
             case FormulaType::NOT:
                 subformula().collectVariables( _vars, _type, _ofThisType );
                 break;
@@ -624,6 +648,7 @@ namespace carl
             {
                 _content.mProperties |= STRONG_CONDITIONS;
                 addConstraintProperties( _content.mConstraint, _content.mProperties );
+                
                 break;
             }
             case FormulaType::BITVECTOR:
@@ -636,16 +661,12 @@ namespace carl
                 Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
                     _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION;
-                _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_THREE);
-                _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_FOUR);
-                _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_FIVE);
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
                 break;
             }
             case FormulaType::OR:
             {
                 _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -663,7 +684,6 @@ namespace carl
             case FormulaType::AND:
             {
                 _content.mProperties |= PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -683,7 +703,6 @@ namespace carl
             case FormulaType::IMPLIES:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 Condition subFormulaCondsA = _content.mpImpliesContent->mPremise.properties();
                 if( !(PROP_IS_IN_NNF<=subFormulaCondsA) )
                     _content.mProperties &= ~PROP_IS_IN_NNF;
@@ -696,7 +715,6 @@ namespace carl
             }
             case FormulaType::ITE:
             {
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 _content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
                 _content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
                 _content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
@@ -705,7 +723,6 @@ namespace carl
             case FormulaType::IFF:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -718,7 +735,6 @@ namespace carl
             case FormulaType::XOR:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -773,19 +789,16 @@ namespace carl
                     break;
                 case 3:
                     _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
-                    _properties &= ~PROP_VARIABLE_DEGREE_LESS_THAN_THREE;
+                    _properties |= PROP_VARIABLE_DEGREE_GREATER_THAN_TWO;
                     break;
                 case 4:
                     _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
-                    _properties &= ~PROP_VARIABLE_DEGREE_LESS_THAN_FOUR;
-                    break;
-                case 5:
-                    _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
-                    _properties &= ~PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+                    _properties |= PROP_VARIABLE_DEGREE_GREATER_THAN_THREE;
                     break;
                 default:
-                {
-                }
+                    _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
+                    _properties |= PROP_VARIABLE_DEGREE_GREATER_THAN_FOUR;
+                    break;
             }
         }
         switch( _constraint.relation() )
@@ -831,6 +844,7 @@ namespace carl
             carl::FormulaVisitor<Formula<Pol>> visitor;
             Variables vars;
             std::set<UVariable> uvars;
+            std::set<BVVariable> bvvars;
             visitor.visit(*this, 
                     [&](const Formula& _f) 
                     {
@@ -845,6 +859,8 @@ namespace carl
                             case FormulaType::UEQ:
                                 _f.uequality().collectUVariables( uvars );
                                 break;
+                            case FormulaType::BITVECTOR:
+                                _f.bvConstraint().collectVariables(bvvars);
                             default:
                                 break;
                         }
@@ -853,6 +869,14 @@ namespace carl
                 os << "(declare-fun " << var << " () " << var.getType() << ")\n";
             for( const auto& uvar : uvars )
                 os << "(declare-fun " << uvar() << " () " << uvar.domain() << ")\n";
+            for( const auto& bvvar : bvvars )
+                os << "(declare-fun " << bvvar() << " () " << bvvar.sort() << ")\n";
+            for (const auto& ufc: UFManager::getInstance().ufContents()) {
+                if (ufc == nullptr) continue;
+                os << "(declare-fun " << ufc->name() << " (";
+                for (const auto& s: ufc->domain()) os << s << " ";
+                os << ") " << ufc->codomain() << ")\n";
+            }
             result += os.str();
             result += "(assert ";
         }
@@ -1226,7 +1250,6 @@ namespace carl
         }
         else if( isAtom() )
             return *this;
-        std::map<Formula, pair<Formula<Pol>, Formula<Pol>>*> tseitinVars;
         Formulas<Pol> resultSubformulas;
         ConstraintBounds constraintBoundsAnd;
         std::vector<Formula<Pol>> subformulasToTransform;
@@ -1484,9 +1507,13 @@ namespace carl
                                     break;
                                 if( _simplifyConstraintCombinations && swapConstraintBounds( constraintBoundsOrAnd, tmpSubSubformulas, true ) )
                                     break;
-                                Formula<Pol> tseitinVar = FormulaPool<Pol>::getInstance().getTseitinVar( currentSubformula );
+                                Formula<Pol> tseitinVar = FormulaPool<Pol>::getInstance().createTseitinVar( currentSubformula );
                                 for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
+                                {
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
+                                    assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == Formula<Pol>( FormulaType::NOT, tseitinVar ) );
+                                    subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
+                                }
                                 if( _tseitinWithEquivalence )
                                 {
                                     Formulas<Pol> tmpSubformulas;
@@ -1494,6 +1521,8 @@ namespace carl
                                     for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                         tmpSubformulas.insert( Formula<Pol>( NOT, subsubformula ) );
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
+                                    subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
+                                    assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == tseitinVar );
                                 }
                                 subsubformulas.insert( tseitinVar );
                                 break;
@@ -1688,31 +1717,27 @@ namespace carl
         typename Pol::NumberType boundValue;
         Relation relation = negated ? carl::invertRelation( constraint.relation() ) : constraint.relation();
         const Pol& lhs = constraint.lhs();
-        Pol* poly = nullptr;
+        Pol poly;
         bool multipliedByMinusOne = lhs.lterm().coeff() < typename Pol::NumberType( 0 );
         if( multipliedByMinusOne )
         {
             boundValue = constraint.constantPart();
             relation = carl::turnAroundRelation( relation );
-            poly = new Pol( -lhs + boundValue );
+            poly = Pol( -lhs + boundValue );
         }
         else
         {
             boundValue = -constraint.constantPart();
-            poly = new Pol( lhs + boundValue );
+            poly = Pol( lhs + boundValue );
         }
-        typename Pol::NumberType cf( poly->coprimeFactor() );
+        typename Pol::NumberType cf( poly.coprimeFactor() );
         assert( cf > 0 );
         boundValue *= cf;
-        (*poly) *= cf;
+        poly *= cf;
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "try to add the bound  " << Constraint<Pol>::relationToString( relation ) << boundValue << "  for the polynomial  " << *poly << endl; 
+        cout << "try to add the bound  " << Constraint<Pol>::relationToString( relation ) << boundValue << "  for the polynomial  " << poly << endl; 
         #endif
-        auto resA = _constraintBounds.insert( make_pair( poly, std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
-        if( !resA.second )
-        {
-            delete poly;
-        }
+        auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
         auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
         if( resB.second || resB.first->second.first == relation )
             return resB.first->second.second;
@@ -1979,7 +2004,7 @@ namespace carl
         while( !_constraintBounds.empty() )
         {
             #ifdef CONSTRAINT_BOUND_DEBUG
-            cout << "for the bounds of  " << *_constraintBounds.begin()->first << endl;
+            cout << "for the bounds of  " << _constraintBounds.begin()->first << endl;
             #endif
             const map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>& bounds = _constraintBounds.begin()->second;
             assert( !bounds.empty() );
@@ -2128,9 +2153,7 @@ namespace carl
                     _intoFormulas.insert( lessSignificantCases.begin(), lessSignificantCases.end() );
                 }
             }
-            const Pol* poly = _constraintBounds.begin()->first;
             _constraintBounds.erase( _constraintBounds.begin() );
-            delete poly;
         }
         if( _constraintBounds.empty() )
         {
@@ -2141,12 +2164,7 @@ namespace carl
         }
         else
         {
-            while( !_constraintBounds.empty() )
-            {
-                const Pol* poly = _constraintBounds.begin()->first;
-                _constraintBounds.erase( _constraintBounds.begin() );
-                delete poly;
-            }
+            _constraintBounds.clear();
             #ifdef CONSTRAINT_BOUND_DEBUG
             cout << "is " << (_inConjunction ? "invalid" : "valid") << endl << endl;
             #endif
@@ -2192,6 +2210,47 @@ namespace carl
 			visit(formula.quantifiedFormula(), func);
 			break;
 		}
+		}
+	}
+    
+    template<typename Formula>
+	void FormulaVisitor<Formula>::rvisit(const Formula& formula, const std::function<void(Formula)>& func) {
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			for (const auto& cur: formula.subformulas()) rvisit(cur, func);
+			break;
+		}
+		case NOT: {
+			rvisit(formula.subformula(), func);
+			break;
+		}
+		case IMPLIES: {
+			rvisit(formula.premise(), func);
+			rvisit(formula.conclusion(), func);
+			break;
+		}
+		case ITE: {
+			rvisit(formula.condition(), func);
+			rvisit(formula.firstCase(), func);
+			rvisit(formula.secondCase(), func);
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case BITVECTOR:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			rvisit(formula.quantifiedFormula(), func);
+			break;
+		}
+		func(formula);
 		}
 	}
 
@@ -2257,4 +2316,83 @@ namespace carl
 		}
 		return newFormula;
 	}
+
+	template<typename Formula>
+	Formula FormulaVisitor<Formula>::rvisit(const Formula& formula, const std::function<Formula(Formula)>& func) {
+		Formula newFormula = formula;
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: {
+			Formulas<typename Formula::PolynomialType> newSubformulas;
+			bool changed = false;
+			for (const auto& cur: formula.subformulas()) {
+				Formula newCur = rvisit(cur, func);
+				if (newCur != cur) changed = true;
+				newSubformulas.insert(newCur);
+			}
+			if (changed) {
+				newFormula = Formula(formula.getType(), newSubformulas);
+			}
+			break;
+		}
+		case NOT: {
+			Formula cur = rvisit(formula.subformula(), func);
+			if (cur != formula.subformula()) {
+				newFormula = Formula(NOT, cur);
+			}
+			break;
+		}
+		case IMPLIES: {
+			Formula prem = rvisit(formula.premise(), func);
+			Formula conc = rvisit(formula.conclusion(), func);
+			if ((prem != formula.premise()) || (conc != formula.conclusion())) {
+				newFormula = Formula(IMPLIES, prem, conc);
+			}
+			break;
+		}
+		case ITE: {
+			Formula cond = rvisit(formula.condition(), func);
+			Formula fCase = rvisit(formula.firstCase(), func);
+			Formula sCase = rvisit(formula.secondCase(), func);
+			if ((cond != formula.condition()) || (fCase != formula.firstCase()) || (sCase != formula.secondCase())) {
+				newFormula = Formula(ITE, cond, fCase, sCase);
+			}
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case BITVECTOR:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			Formula sub = rvisit(formula.quantifiedFormula(), func);
+			if (sub != formula.quantifiedFormula()) {
+				newFormula = Formula(formula.getType(), formula.quantifiedVariables(), sub);
+			}
+			break;
+		}
+		} 
+		return func(newFormula);
+	}
+    
+    template<typename Formula>
+    Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements) {
+        PolynomialSubstitutor subs(replacements);
+        return visitor.visit(formula, std::function<Formula(Formula)>(subs));
+    }
+    template<typename Formula>
+    Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<BVVariable,BVTerm>& replacements) {
+        BitvectorSubstitutor subs(replacements);
+        return visitor.visit(formula, std::function<Formula(Formula)>(subs));
+    }
+    template<typename Formula>
+    Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<UVariable,UFInstance>& replacements) {
+        UninterpretedSubstitutor subs(replacements);
+        return visitor.visit(formula, std::function<Formula(Formula)>(subs));
+    }
 }    // namespace carl

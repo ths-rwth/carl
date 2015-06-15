@@ -93,6 +93,11 @@ namespace carl
 		{
 			return mId;
 		}
+		
+		void collectVariables(std::set<BVVariable>& vars) const {
+			mLhs.collectVariables(vars);
+			mRhs.collectVariables(vars);
+		}
 
 		/**
 		 * @return A hash value for this constraint.
@@ -101,6 +106,21 @@ namespace carl
 		{
 			return mHash;
 		}
+
+		bool isConstant() const
+		{
+            return mLhs.isInvalid() && mRhs.isInvalid();
+        }
+
+		bool isAlwaysConsistent() const
+		{
+            return isConstant() && mRelation == BVCompareRelation::EQ;
+        }
+
+        bool isAlwaysInconsistent() const
+        {
+            return isConstant() && mRelation == BVCompareRelation::NEQ;
+        }
 
 		/**
 		 * Gives the string representation of this bit vector constraint.
@@ -113,24 +133,30 @@ namespace carl
 		 */
 		std::string toString(const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true) const
 		{
-			std::string out = _init + "(";
+            if(isAlwaysConsistent()) {
+                return _init + "TRUE";
+            } else if(isAlwaysInconsistent()) {
+                return _init + "FALSE";
+            } else {
+                std::string out = _init + "(";
 
-			if(!_infix)
-				out += carl::toString(mRelation) + (_oneline ? " " : "");
+                if(!_infix)
+                    out += carl::toString(mRelation) + (_oneline ? " " : "");
 
-			if(!_oneline)
-				out += "\n";
+                if(!_oneline)
+                    out += "\n";
 
-			out += mLhs.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-			out += (_oneline ? " " : "\n");
+                out += mLhs.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+                out += (_oneline ? " " : "\n");
 
-			if(_infix)
-				out += _init + carl::toString(mRelation) + (_oneline ? " " : "\n");
+                if(_infix)
+                    out += _init + carl::toString(mRelation) + (_oneline ? " " : "\n");
 
-			out += mRhs.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-			out += ")";
+                out += mRhs.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+                out += ")";
 
-			return out;
+                return out;
+            }
 		}
 
 		/**

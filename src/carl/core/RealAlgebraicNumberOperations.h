@@ -16,7 +16,7 @@ namespace carl {
  * Specialization of `std::equal_to` for RealAlgebraicNumberPtr.
  */
 template<typename Number>
-struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
+struct equal_to<std::shared_ptr<carl::RealAlgebraicNumber<Number>>> {
 	/**
 	 * Checks lhs and rhs for equality.
 	 * @param lhs First number.
@@ -53,7 +53,7 @@ struct equal_to<carl::RealAlgebraicNumberPtr<Number>> {
  * Specialization of `std::equal_to` for RealAlgebraicNumberIRPtr.
  */
 template<typename Number>
-struct equal_to<carl::RealAlgebraicNumberIRPtr<Number>> {
+struct equal_to<std::shared_ptr<carl::RealAlgebraicNumberIR<Number>>> {
 	/// Equality operator for RealAlgebraicNumberPtr.
 	equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
 	/**
@@ -71,7 +71,7 @@ struct equal_to<carl::RealAlgebraicNumberIRPtr<Number>> {
  * Specialization of `std::equal_to` for RealAlgebraicNumberNRPtr.
  */
 template<typename Number>
-struct equal_to<carl::RealAlgebraicNumberNRPtr<Number>> {
+struct equal_to<std::shared_ptr<carl::RealAlgebraicNumberNR<Number>>> {
 	/// Equality operator for RealAlgebraicNumberPtr.
 	equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
 	/**
@@ -89,7 +89,7 @@ struct equal_to<carl::RealAlgebraicNumberNRPtr<Number>> {
  * Specialization of `std::less` for RealAlgebraicNumberPtr.
  */
 template<typename Number>
-struct less<carl::RealAlgebraicNumberPtr<Number>> {
+struct less<std::shared_ptr<carl::RealAlgebraicNumber<Number>>> {
 	/// Equality operator for RealAlgebraicNumberPtr.
 	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
 	/**
