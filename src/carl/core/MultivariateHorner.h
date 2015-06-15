@@ -6,12 +6,13 @@
 
 #pragma once
 #include <vector>
-
-
+#include "Variable.h"
+#include <set>
 
 namespace carl{
 
-class MultivariateHorner{
+template< typename PolynomialType >
+class MultivariateHorner { 
 
 /**
 * Datastructure to save Polynomes once they are transformed into a horner scheme:
@@ -20,47 +21,50 @@ class MultivariateHorner{
 *
 */
 
-public: 
+public:
+	/// Type of the coefficients. 	
+	typedef typename PolynomialType::CoeffType CoeffType;
+
 	Variable mVariable;
 	std::size_t mExponent;
 	std::vector<MultivariateHorner> mDependent;
 	std::vector<MultivariateHorner> mIndependent;
-	Number mConstant;
+	CoeffType mConstant;
 
 	//Constuctor
-	MultivariateHorner(MultivariatePolynomial inPut);
+	MultivariateHorner (const PolynomialType& inPut);
 
 	//getter and setters
 	Variable getVariable(){
 		return mVariable;
 	}
 
-	void setVariable(Variable var){
+	void setVariable(Variable::Arg var){
 		mVariable = var;
 	}
 
-	std::vector<MultivariateHorner> getDependent(){
+	const std::vector<MultivariateHorner>& getDependent(){
 		return mDependent;
 	}
 
-	void setDependent(std::vector<MultivariateHorner> dependent){
+	void setDependent(const std::vector<MultivariateHorner>& dependent){
 		mDependent = dependent;
 	}
 
 	//Restriced use: Execute only on 4th of july
-	std::vector<MultivariateHorner> getIndependent(){
+	const std::vector<MultivariateHorner>& getIndependent(){
 		return mIndependent;
 	}
 
-	void setIndependent(std::vector<MultivariateHorner> independent){
+	void setIndependent(const std::vector<MultivariateHorner>& independent){
 		mIndependent = independent;
 	}
 
-	Number getConstant(){
+	const CoeffType& getConstant(){
 		return mConstant;
 	}
 
-	void setConstant(Number num){
+	void setConstant(const CoeffType& num){
 		mConstant = num;
 	}
 
@@ -68,3 +72,5 @@ public:
 };
 
 }//namespace carl
+
+#include "MultivariateHorner.tpp"
