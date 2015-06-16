@@ -8,9 +8,9 @@ foreach (variableName ${variableNames})
 		set(VARLIST "${VARLIST}\n\t p(\"${variableName}\", R\"VAR(${${variableName}})VAR\");")
 	endif()
 endforeach()
-configure_file( ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp.in ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp )
 
 if(FALSE)
+configure_file( ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp.in ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp )
 set(carl_lib_util_headers
 	BitVector.h
 	CompactTree.h

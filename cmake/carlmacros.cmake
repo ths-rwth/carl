@@ -47,10 +47,8 @@ function(collect_files prefix name)
 
   foreach(subfile ${subfiles})
     if(${subfile} MATCHES ".*([.]in)")
-      get_filename_component(subfile_name ${subfile} NAME_WE)
-      if(subfile_name STREQUAL "config")
-        configure_file(${CMAKE_SOURCE_DIR}/src/${prefix}/${name}/${subfile} ${CMAKE_SOURCE_DIR}/src/${prefix}/${name}/${subfile_name}.h)
-      endif()
+      string(REGEX REPLACE ".in" "" subfile_name ${subfile})
+      configure_file(${CMAKE_SOURCE_DIR}/src/${prefix}/${name}/${subfile} ${CMAKE_SOURCE_DIR}/src/${prefix}/${name}/${subfile_name})
 
     elseif((${subfile} MATCHES ".*([.]h)") OR (${subfile} MATCHES ".*([.]tpp)"))
       get_filename_component(subdir ${subfile} DIRECTORY)
