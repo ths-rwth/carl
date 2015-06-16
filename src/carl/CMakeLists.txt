@@ -19,7 +19,7 @@ add_subdirectory(interval)
 
 # Simplified access to *.h and *.cpp
 foreach(name cad converter core formula groebner interval numbers util)
-	collect_files(carl ${name} ${name} no_subdir)
+	collect_files(carl ${name})
 endforeach()
 
 
