@@ -3,19 +3,8 @@ include_directories(
 	${include_dirs}
 )
 
-# include core in library.
-add_subdirectory(core)
-add_subdirectory(formula)
+# include util in library.
 add_subdirectory(util)
-add_subdirectory(converter)
-add_subdirectory(numbers)
-
-
-#include groebner and cad modules in library.
-add_subdirectory(groebner)
-add_subdirectory(cad)
-add_subdirectory(interval)
-
 
 # Simplified access to *.h and *.cpp
 foreach(name cad converter core formula groebner interval numbers util)
