@@ -25,7 +25,7 @@ template<typename Number>
 Sign Interval<Number>::sgn() const
 {
     assert(this->isConsistent());
-    if (this->isUnbounded()) return Sign::ZERO;
+    if (this->isInfinite()) return Sign::ZERO;
     if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
     if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
     return Sign::ZERO;
@@ -251,7 +251,7 @@ template<typename Number>
     template<typename Number>
     void Interval<Number>::bloat_by(const Number& width)
     {
-	if(!isUnbounded()){
+	if(!isInfinite()){
 	    BoundType lowerTmp = mLowerBoundType;
 	    BoundType upperTmp = mUpperBoundType;
 	    this->set(boost::numeric::widen(mContent, width));
@@ -679,7 +679,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
             }
             else
             {
-                if( rhs.isUnbounded() )
+                if( rhs.isInfinite() )
                 {
                     a = unboundedInterval();
                     return false;
@@ -752,7 +752,7 @@ void Interval<Number>::inverse_assign()
 template<typename Number>
 bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const
 	{
-		if( this->isUnbounded() )
+		if( this->isInfinite() )
         {
             a = emptyInterval();
             return false;

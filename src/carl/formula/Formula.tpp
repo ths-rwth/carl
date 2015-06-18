@@ -648,6 +648,7 @@ namespace carl
             {
                 _content.mProperties |= STRONG_CONDITIONS;
                 addConstraintProperties( _content.mConstraint, _content.mProperties );
+                
                 break;
             }
             case FormulaType::BITVECTOR:
@@ -660,16 +661,12 @@ namespace carl
                 Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
                     _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION;
-                _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_THREE);
-                _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_FOUR);
-                _content.mProperties |= (subFormulaConds & PROP_VARIABLE_DEGREE_LESS_THAN_FIVE);
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
                 break;
             }
             case FormulaType::OR:
             {
                 _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -687,7 +684,6 @@ namespace carl
             case FormulaType::AND:
             {
                 _content.mProperties |= PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -707,7 +703,6 @@ namespace carl
             case FormulaType::IMPLIES:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 Condition subFormulaCondsA = _content.mpImpliesContent->mPremise.properties();
                 if( !(PROP_IS_IN_NNF<=subFormulaCondsA) )
                     _content.mProperties &= ~PROP_IS_IN_NNF;
@@ -720,7 +715,6 @@ namespace carl
             }
             case FormulaType::ITE:
             {
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 _content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
                 _content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
                 _content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
@@ -729,7 +723,6 @@ namespace carl
             case FormulaType::IFF:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -742,7 +735,6 @@ namespace carl
             case FormulaType::XOR:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                _content.mProperties |= PROP_VARIABLE_DEGREE_LESS_THAN_THREE | PROP_VARIABLE_DEGREE_LESS_THAN_FOUR | PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
                 for( auto subFormula = _content.mpSubformulas->begin(); subFormula != _content.mpSubformulas->end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
@@ -797,19 +789,16 @@ namespace carl
                     break;
                 case 3:
                     _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
-                    _properties &= ~PROP_VARIABLE_DEGREE_LESS_THAN_THREE;
+                    _properties |= PROP_VARIABLE_DEGREE_GREATER_THAN_TWO;
                     break;
                 case 4:
                     _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
-                    _properties &= ~PROP_VARIABLE_DEGREE_LESS_THAN_FOUR;
-                    break;
-                case 5:
-                    _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
-                    _properties &= ~PROP_VARIABLE_DEGREE_LESS_THAN_FIVE;
+                    _properties |= PROP_VARIABLE_DEGREE_GREATER_THAN_THREE;
                     break;
                 default:
-                {
-                }
+                    _properties |= PROP_CONTAINS_NONLINEAR_POLYNOMIAL;
+                    _properties |= PROP_VARIABLE_DEGREE_GREATER_THAN_FOUR;
+                    break;
             }
         }
         switch( _constraint.relation() )

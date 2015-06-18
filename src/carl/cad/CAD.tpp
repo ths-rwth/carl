@@ -277,7 +277,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 	this->prepareElimination();
 	bool useBounds = !bounds.empty();
 	for (const auto& b: bounds) {
-		useBounds = useBounds && !b.second.isUnbounded();
+		useBounds = useBounds && !b.second.isInfinite();
 	}
 
 	if (useBounds) {
@@ -443,7 +443,7 @@ bool CAD<Number>::check(
 	bool useBounds = false;
 	bool onlyStrictBounds = true;
 	for (const auto& b: bounds) {
-		if (!b.second.isUnbounded() && !b.second.isEmpty()) {
+		if (!b.second.isInfinite() && !b.second.isEmpty()) {
 			useBounds = true;
 		}
 		if (b.second.lowerBoundType() == BoundType::WEAK || b.second.upperBoundType() == BoundType::WEAK) {
@@ -858,7 +858,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		assert(!first->isRoot());
 	}
 
-	bool boundsActive = !bounds.isEmpty() && !bounds.isUnbounded();
+	bool boundsActive = !bounds.isEmpty() && !bounds.isInfinite();
 
 	for (const auto& i: roots) {
 		if (!i->containedIn(bounds)) continue;
