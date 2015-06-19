@@ -121,7 +121,7 @@ namespace carl
 //        for( auto f : _subformulas )
 //            cout << *f << endl;
         std::sort(_subformulas.begin(), _subformulas.end());
-        _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()));
+        _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
         for( auto iter = _subformulas.begin(); iter != _subformulas.end(); )
         {
             if( iter->getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
@@ -132,8 +132,9 @@ namespace carl
                 // That means, that a1 .. an are inserted into the given set of sub formulas before the position of
                 // b (=iter).
                 // Note also that the operator of a1 to an cannot be oper, as they where also created with this pool.
+                Formula<Pol> tmp = *iter;
                 iter = _subformulas.erase( iter );
-                _subformulas.insert(iter, iter->subformulas().begin(), iter->subformulas().end() );
+                iter = _subformulas.insert(iter, tmp.subformulas().begin(), tmp.subformulas().end() );
             }
             else
             {
@@ -166,7 +167,7 @@ namespace carl
                             {
                                 _subformulas.erase( iterB );
                                 iter = _subformulas.erase( iter );
-                                _subformulas.push_back( Formula<Pol>( trueFormula() ) );
+                                iter = _subformulas.insert( _subformulas.end(), Formula<Pol>( trueFormula() ) );
                                 break;
                             }
                             default:
