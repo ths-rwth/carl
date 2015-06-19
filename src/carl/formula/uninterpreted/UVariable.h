@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../util/Common.h"
-#include "../core/VariablePool.h"
-#include "Sort.h"
-#include "SortManager.h"
+#include "../../util/Common.h"
+#include "../../core/VariablePool.h"
+#include "../Sort.h"
+#include "../SortManager.h"
 
 namespace carl
 {
