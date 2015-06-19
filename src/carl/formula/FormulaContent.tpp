@@ -66,7 +66,7 @@ namespace carl {
         mType( _type ),
 		mSubformulas( std::move(_subformulas) )
     {
-        assert( mType == FormulaType::AND || mType == FormulaType::OR || mType == FormulaType::IFF || mType == FormulaType::XOR );
+        assert( isNary() );
         for (const auto& subformula: mSubformulas) {
             mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
             mHash ^= subformula.getHash();
