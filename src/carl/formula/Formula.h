@@ -561,8 +561,23 @@ namespace carl
              */
             bool isNary() const
             {
-                return (mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR 
-                        || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR);
+                switch (mpContent->mType) {
+                    case FormulaType::TRUE: return false;
+                    case FormulaType::FALSE: return false;
+                    case FormulaType::BOOL: return false;
+                    case FormulaType::NOT: return false;
+                    case FormulaType::IMPLIES: return true;
+                    case FormulaType::AND: return true;
+                    case FormulaType::OR: return true;
+                    case FormulaType::XOR: return true;
+                    case FormulaType::IFF: return true;
+                    case FormulaType::ITE: return true;
+                    case FormulaType::EXISTS: return false;
+                    case FormulaType::FORALL: return false;
+                    case FormulaType::CONSTRAINT: return false;
+                    case FormulaType::BITVECTOR: return false;
+                    case FormulaType::UEQ: return false;
+                }
             }
             
             /**
