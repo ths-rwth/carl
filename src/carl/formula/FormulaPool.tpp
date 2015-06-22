@@ -122,6 +122,9 @@ namespace carl
 //            cout << *f << endl;
         std::sort(_subformulas.begin(), _subformulas.end());
         _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
+        if (_subformulas.size() == 1) {
+            return _subformulas[0].mpContent;
+        }
         for( auto iter = _subformulas.begin(); iter != _subformulas.end(); )
         {
             if( iter->getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
