@@ -125,9 +125,9 @@ namespace carl
         if (_subformulas.size() == 1) {
             return _subformulas[0].mpContent;
         }
-        for( auto iter = _subformulas.begin(); iter != _subformulas.end(); )
+        for( size_t pos = 0; pos < _subformulas.size(); )
         {
-            if( iter->getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
+            if( _subformulas[pos].getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
             {
                 // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
                 // Note, that a1 to an are definitely created before b, as they were sub-formulas
@@ -135,51 +135,52 @@ namespace carl
                 // That means, that a1 .. an are inserted into the given set of sub formulas before the position of
                 // b (=iter).
                 // Note also that the operator of a1 to an cannot be oper, as they where also created with this pool.
-                Formula<Pol> tmp = *iter;
-                iter = _subformulas.erase( iter );
-                iter = _subformulas.insert(iter, tmp.subformulas().begin(), tmp.subformulas().end() );
+                Formula<Pol> tmp = _subformulas[pos];
+                _subformulas[pos] = _subformulas.back();
+                _subformulas.pop_back();
+                _subformulas.insert(_subformulas.end(), tmp.subformulas().begin(), tmp.subformulas().end() );
             }
             else
             {
-                auto iterB = iter; 
-                ++iter;
                 // Check if the sub-formula at iter is the negation of the sub-formula at iterB
                 // Note, that the negation of a formula would by construction always be right after the formula
                 // in a set of formulas whose comparison operator is based on the one of formulas This is due to
                 // them comparing just the ids and we construct the negation of a formula right after the formula
                 // itself and assign the next id to it.
-                if( iter != _subformulas.end() )
+                if( pos < _subformulas.size() - 1 && formulasInverse( _subformulas[pos], _subformulas[pos+1] ) )
                 {
-                    if( formulasInverse( *iterB, *iter ) )
+                    switch( _type )
                     {
-                        switch( _type )
+                        case FormulaType::AND:
                         {
-                            case FormulaType::AND:
-                            {
-                                return falseFormula();
-                            }
-                            case FormulaType::OR:
-                            {
-                                return trueFormula();
-                            }
-                            case FormulaType::IFF:
-                            {
-                                return falseFormula();
-                            }
-                            case FormulaType::XOR:
-                            {
-                                _subformulas.erase( iterB );
-                                iter = _subformulas.erase( iter );
-                                iter = _subformulas.insert( _subformulas.end(), Formula<Pol>( trueFormula() ) );
-                                break;
-                            }
-                            default:
-                            {
-                                assert( false );
-                                break;
-                            }
+                            return falseFormula();
+                        }
+                        case FormulaType::OR:
+                        {
+                            return trueFormula();
+                        }
+                        case FormulaType::IFF:
+                        {
+                            return falseFormula();
+                        }
+                        case FormulaType::XOR:
+                        {
+                            _subformulas[pos] = Formula<Pol>( trueFormula() );
+                            ++pos;
+                            _subformulas[pos] = _subformulas.back();
+                            _subformulas.pop_back();
+                            break;
+                        }
+                        default:
+                        {
+                            assert( false );
+                            break;
                         }
                     }
+                }
+                else
+                {
+                    ++pos;
                 }
             }
         }
@@ -206,14 +207,14 @@ namespace carl
                 }
                 if( _type == FormulaType::AND )
                 {
-                    if( iterToTrue != _subformulas.end() ) _subformulas.erase( iterToTrue );
                     if( iterToFalse != _subformulas.end() ) return falseFormula();
+                    if( iterToTrue != _subformulas.end() ) _subformulas.erase( iterToTrue );
                     else if( _subformulas.empty() ) return trueFormula();
                 }
                 else if( _type == FormulaType::OR )
                 {
-                    if( iterToFalse != _subformulas.end() ) _subformulas.erase( iterToFalse );
                     if( iterToTrue != _subformulas.end() ) return trueFormula();
+                    if( iterToFalse != _subformulas.end() ) _subformulas.erase( iterToFalse );
                     else if( _subformulas.empty() ) return falseFormula();
                 }
                 else // _type == FormulaType::IFF
