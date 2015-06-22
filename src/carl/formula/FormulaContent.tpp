@@ -160,63 +160,6 @@ namespace carl {
             result += (_oneline ? "" : "\n") + _init + ")";
             return result;
         }
-        else if( mType == FormulaType::IMPLIES )
-        {
-            string result = _init + "(";
-            if( _infix )
-            {
-                if( !_oneline ) 
-                    result += "\n";
-                //result += mpImpliesContent->mPremise.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-                result += " " + formulaTypeToString( FormulaType::IMPLIES ) + " ";
-                if( !_oneline ) 
-                    result += "\n";
-                //result += mpImpliesContent->mConclusion.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-            }
-            else
-            {
-                result += formulaTypeToString( FormulaType::IMPLIES );
-                result += (_oneline ? " " : "\n");
-                //result += mpImpliesContent->mPremise.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-                result += (_oneline ? " " : "\n");
-				//result += mpImpliesContent->mConclusion.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-            }
-            result += ")";
-            if( _withActivity )
-                result += activity;
-            return result;
-        }
-        else if( mType == FormulaType::ITE )
-        {
-            string result = _init + "(";
-            if( _infix )
-            {
-                if( !_oneline ) 
-                    result += "\n";
-                //result += mpIteContent->mCondition.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-                result += " " + formulaTypeToString( FormulaType::ITE ) + " ";
-                if( !_oneline ) 
-                    result += "\n";
-				//result += mpIteContent->mThen.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-                if( !_oneline ) 
-                    result += "\n";
-				//result += mpIteContent->mElse.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, true, _friendlyNames );
-            }
-            else
-            {
-                result += formulaTypeToString( FormulaType::ITE );
-                result += (_oneline ? " " : "\n");
-				//result += mpIteContent->mCondition.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-                result += (_oneline ? " " : "\n");
-				//result += mpIteContent->mThen.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-                result += (_oneline ? " " : "\n");
-				//result += mpIteContent->mElse.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );
-            }
-            result += ")";
-            if( _withActivity )
-                result += activity;
-            return result;
-        }
         else if (mType == FormulaType::EXISTS)
         {
             string result = _init + "(exists ";
@@ -237,7 +180,7 @@ namespace carl {
             result += ")";
             return result;
         }
-        assert( mType == FormulaType::AND || mType == FormulaType::OR || mType == FormulaType::IFF || mType == FormulaType::XOR );
+        assert( isNary() );
         string stringOfType = formulaTypeToString( mType );
         string result = _init + "(";
         if( _infix )
