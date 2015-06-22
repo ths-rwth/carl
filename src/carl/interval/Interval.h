@@ -1871,6 +1871,64 @@ namespace carl
      */
     template<typename Number>
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the righthand side has maximal one intersection with the lefthand side
+     * at the upper bound of lhs.
+     */
+    template<typename Number>
+    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs);
+    template<typename Number>
+    inline bool operator <=(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs>=lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side has maximal one intersection with the righthand side
+     * at the lower bound of lhs.
+     */
+    template<typename Number>
+    inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator >=(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs<=lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side is smaller than the righthand side.
+     */
+    template<typename Number>
+    inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator <(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs>lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side is larger than the righthand side.
+     */
+    template<typename Number>
+    inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator >(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs<lhs;
+    }
 
     
         template<typename Number>

@@ -1711,4 +1711,56 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return rhs < lhs;
 	}
+
+    template<typename Number>
+    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.upperBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            default:
+                return lhs.upper() <= rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator >=(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.lowerBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            default:
+                return lhs.lower() >= rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator <(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.upperBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            case BoundType::STRICT:
+                return lhs.upper() <= rhs;
+            default:
+                return lhs.upper() < rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator >(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.lowerBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            case BoundType::STRICT:
+                return lhs.upper() >= rhs;
+            default:
+                return lhs.upper() > rhs;
+        }
+    }
 }
