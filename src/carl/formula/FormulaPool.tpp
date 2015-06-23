@@ -117,11 +117,9 @@ namespace carl
     const FormulaContent<Pol>* FormulaPool<Pol>::createNAry(FormulaType _type, Formulas<Pol>&& _subformulas)
     {
         assert(_type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF);
-//        cout << "create new formula with type " << formulaTypeToString( _type ) << endl;
-//        for( auto f : _subformulas )
-//            cout << *f << endl;
-        std::sort(_subformulas.begin(), _subformulas.end());
-        _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
+        //cout << "create new formula with type " << _type << endl;
+        //for( auto f : _subformulas )
+        //    cout << "\t" << f << endl;
         if (_subformulas.size() == 1) {
             return _subformulas[0].mpContent;
         }
@@ -184,6 +182,8 @@ namespace carl
                 }
             }
         }
+        std::sort(_subformulas.begin(), _subformulas.end());
+        _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
         if( _subformulas.empty() )
             return falseFormula();
         else
