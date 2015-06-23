@@ -8,6 +8,7 @@ Basic concepts
 ---------------------
 - @subpage numbers
 - @subpage polynomials
+- @subpage formulas
 
 
 Tutorial
