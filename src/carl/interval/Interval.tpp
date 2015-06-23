@@ -1758,9 +1758,9 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
             case BoundType::INFTY:
                 return false;
             case BoundType::STRICT:
-                return lhs.upper() >= rhs;
+                return lhs.lower() >= rhs;
             default:
-                return lhs.upper() > rhs;
+                return lhs.lower() > rhs;
         }
     }
 }
