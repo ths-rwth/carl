@@ -263,6 +263,7 @@ namespace carl
         if (thencase == elsecase) return thencase.mpContent;
         
         if (condition.getType() == FormulaType::NOT) {
+            _subformulas[0] = condition.subformula();
             std::swap(_subformulas[1], _subformulas[2]);
             return createITE(std::move(_subformulas));
         }
