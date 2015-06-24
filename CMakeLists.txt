@@ -204,6 +204,21 @@ IF(USE_CLN_NUMBERS)
 endif()
 include_directories(SYSTEM ${SYSTEM} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
 
+
+#Alternate Version
+if(TRUE)
+	set(libs_dynamic ${libs_static} ${Boost_LIBRARIES} gmp gmpxx)
+	IF(USE_CLN_NUMBERS)
+	    set(libs_dynamic ${libs_dynamic} cln)
+	endif()
+
+	set(libs_static ${libs_static} ${Boost_LIBRARIES} gmpxx gmp)
+	IF(USE_CLN_NUMBERS)
+	    set(libs_static ${libs_dynamic} cln)
+	endif()
+endif()
+
+if(FALSE)
 set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC})
 IF(USE_CLN_NUMBERS)
     set(libs_dynamic ${libs_dynamic} ${CLN_DYNAMIC})
@@ -215,6 +230,12 @@ IF(USE_CLN_NUMBERS)
     set(libs_static ${libs_static} ${CLN_STATIC})
 endif()
 set(libs_static ${libs_static} ${GMPXX_STATIC} ${GMP_STATIC})
+endif()
+
+
+	message("Dnymaic Libs : ${libs_dynamic}")
+	message("Static Libs : ${libs_static}")
+
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
@@ -227,8 +248,10 @@ IF(USE_MPFR_FLOAT)
 	find_library(MPFR_STATIC NAMES libmpfr.${STATIC_EXT})
 
 	include_directories(SYSTEM ${include_dirs} ${MPFR_INCLUDE_DIRS})
-	set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
-	set(libs_static ${libs_static} ${MPFR_STATIC})
+	#set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
+	#set(libs_static ${libs_static} ${MPFR_STATIC})
+	set(libs_static ${libs_static} mpfr)
+	set(libs_dynamic ${libs_dynamic} mpfr)
 endif()
 
 if(COMPARE_WITH_Z3)
@@ -265,8 +288,8 @@ if(USE_GINAC)
 	find_library(GiNaC_DYNAMIC NAMES libginac.${DYNAMIC_EXT})
 	find_library(GiNaC_STATIC NAMES libginac.${STATIC_EXT})
 	include_directories(SYSTEM ${include_dirs} ${GINAC_INCLUDE_DIRS})
-	set(libs_dynamic ${libs_dynamic} ${GiNaC_DYNAMIC})
-	set(libs_static ${libs_static} ${GiNaC_STATIC})
+	set(libs_dynamic ${libs_dynamic} ginac)
+	set(libs_static ${libs_static} ginac)
 	set(USE_CLN_NUMBERS ON)
 endif()
 

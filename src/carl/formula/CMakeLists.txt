@@ -25,6 +25,7 @@ set(carl_lib_formula_headers
 # Source files in here
 set(carl_lib_formula_sources
     ${carl_lib_formula_bitvector_sources}
+<<<<<<< HEAD
     formula/UEquality.cpp
     formula/Sort.cpp
     formula/SortManager.cpp
@@ -32,6 +33,15 @@ set(carl_lib_formula_sources
     formula/UFInstanceManager.cpp
     formula/UFManager.cpp
     formula/UninterpretedFunction.cpp
+=======
+    formula/uninterpreted/UEquality.cpp
+    formula/Sort.cpp
+    formula/SortManager.cpp
+    formula/uninterpreted/UFInstance.cpp
+    formula/uninterpreted/UFInstanceManager.cpp
+    formula/uninterpreted/UFManager.cpp
+    formula/uninterpreted/UninterpretedFunction.cpp
+>>>>>>> master
     PARENT_SCOPE
 )
 
@@ -44,4 +54,7 @@ configure_file( ${CMAKE_SOURCE_DIR}/src/carl/formula/config.h.in
 install(FILES ${carl_lib_formula_headers}
 	DESTINATION include/carl/formula
 )
+<<<<<<< HEAD
 endif()
+=======
+>>>>>>> master

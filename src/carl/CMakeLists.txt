@@ -53,6 +53,15 @@ if(BUILD_STATIC)
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
+
+	message("-- linking static")
+	if (APPLE)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.7")
+	else()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+	endif()
+	
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
 	target_link_libraries( lib_carl_static ${libs_static} )
 	set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
 else()
