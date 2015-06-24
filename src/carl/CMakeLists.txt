@@ -37,7 +37,7 @@ set_target_properties( lib_carl PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 )
-target_link_libraries( lib_carl ${libs_dynamic} )
+target_link_libraries( lib_carl ${libs} )
 
 if(BUILD_STATIC)
 	add_library(lib_carl_static STATIC ${carl_lib_sources})
@@ -54,15 +54,16 @@ if(BUILD_STATIC)
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
 
+	# Options for static linking
 	message("-- linking static")
 	if (APPLE)
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.7")
 	else()
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 	endif()
-	
+
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
-	target_link_libraries( lib_carl_static ${libs_static} )
+	target_link_libraries( lib_carl_static ${libs} )
 	set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
 else()
 	set(CARL_TARGETS lib_carl CACHE STRING INTERNAL FORCE)

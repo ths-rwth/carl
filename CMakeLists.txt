@@ -192,11 +192,7 @@ endif()
 
 # GMP
 find_package(GMP REQUIRED)
-find_library(GMP_DYNAMIC NAMES libgmp.${DYNAMIC_EXT})
-find_library(GMP_STATIC NAMES libgmp.${STATIC_EXT})
 find_package(GMPXX REQUIRED)
-find_library(GMPXX_DYNAMIC NAMES libgmpxx.${DYNAMIC_EXT})
-find_library(GMPXX_STATIC NAMES libgmpxx.${STATIC_EXT})
 
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
 IF(USE_CLN_NUMBERS)
@@ -205,37 +201,18 @@ endif()
 include_directories(SYSTEM ${SYSTEM} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
 
 
-#Alternate Version
+#Alternate Version --- TODO --- only use libs for -- delete find_library
 if(TRUE)
-	set(libs_dynamic ${libs_static} ${Boost_LIBRARIES} gmp gmpxx)
+	set(libs ${libs} ${Boost_LIBRARIES} gmp gmpxx)
 	IF(USE_CLN_NUMBERS)
-	    set(libs_dynamic ${libs_dynamic} cln)
+	    set(libs ${libs} cln)
 	endif()
 
-	set(libs_static ${libs_static} ${Boost_LIBRARIES} gmpxx gmp)
+	set(libs ${libs} ${Boost_LIBRARIES} gmpxx gmp)
 	IF(USE_CLN_NUMBERS)
-	    set(libs_static ${libs_dynamic} cln)
+	    set(libs ${libs} cln)
 	endif()
 endif()
-
-if(FALSE)
-set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC})
-IF(USE_CLN_NUMBERS)
-    set(libs_dynamic ${libs_dynamic} ${CLN_DYNAMIC})
-endif()
-set(libs_dynamic ${libs_dynamic} ${GMPXX_DYNAMIC} ${GMP_DYNAMIC})
-
-set(libs_static ${libs_static} ${Boost_STATIC})
-IF(USE_CLN_NUMBERS)
-    set(libs_static ${libs_static} ${CLN_STATIC})
-endif()
-set(libs_static ${libs_static} ${GMPXX_STATIC} ${GMP_STATIC})
-endif()
-
-
-	message("Dnymaic Libs : ${libs_dynamic}")
-	message("Static Libs : ${libs_static}")
-
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
@@ -244,14 +221,8 @@ endif()
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
 	find_package(MPFR REQUIRED)
-	find_library(MPFR_DYNAMIC NAMES libmpfr.${DYNAMIC_EXT})
-	find_library(MPFR_STATIC NAMES libmpfr.${STATIC_EXT})
-
 	include_directories(SYSTEM ${include_dirs} ${MPFR_INCLUDE_DIRS})
-	#set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
-	#set(libs_static ${libs_static} ${MPFR_STATIC})
-	set(libs_static ${libs_static} mpfr)
-	set(libs_dynamic ${libs_dynamic} mpfr)
+	set(libs ${libs} mpfr)
 endif()
 
 if(COMPARE_WITH_Z3)
@@ -285,17 +256,13 @@ enable_testing()
 
 if(USE_GINAC)
 	find_package( GiNaC 1.5.8 REQUIRED )
-	find_library(GiNaC_DYNAMIC NAMES libginac.${DYNAMIC_EXT})
-	find_library(GiNaC_STATIC NAMES libginac.${STATIC_EXT})
 	include_directories(SYSTEM ${include_dirs} ${GINAC_INCLUDE_DIRS})
-	set(libs_dynamic ${libs_dynamic} ginac)
-	set(libs_static ${libs_static} ginac)
+	set(libs ${libs} ginac)
 	set(USE_CLN_NUMBERS ON)
 endif()
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
-set(libs_dynamic ${libs_dynamic} pthread dl)
-set(libs_static ${libs_static} pthread dl)
+set(libs ${libs} pthread dl)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files
