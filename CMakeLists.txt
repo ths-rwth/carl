@@ -186,8 +186,6 @@ endif()
 # CLN
 IF(USE_CLN_NUMBERS)
     find_package(CLN REQUIRED)
-    find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
-    find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
 endif()
 
 # GMP
@@ -201,18 +199,11 @@ endif()
 include_directories(SYSTEM ${SYSTEM} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
 
 
-#Alternate Version --- TODO --- only use libs for -- delete find_library
-if(TRUE)
-	set(libs ${libs} ${Boost_LIBRARIES} gmp gmpxx)
-	IF(USE_CLN_NUMBERS)
-	    set(libs ${libs} cln)
-	endif()
-
-	set(libs ${libs} ${Boost_LIBRARIES} gmpxx gmp)
-	IF(USE_CLN_NUMBERS)
-	    set(libs ${libs} cln)
-	endif()
+set(libs ${libs} ${Boost_LIBRARIES} gmp gmpxx)
+IF(USE_CLN_NUMBERS)
+    set(libs ${libs} cln)
 endif()
+
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
