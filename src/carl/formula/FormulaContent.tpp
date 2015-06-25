@@ -9,6 +9,7 @@ namespace carl {
         mConstraint( Constraint<Pol>(_type == FormulaType::TRUE) )
     {
 		assert(_type == FormulaType::TRUE || _type == FormulaType::FALSE);
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type);
 	}
 
     template<typename Pol>
@@ -23,6 +24,7 @@ namespace carl {
 			default:
 				assert(false);
 		}
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _variable);
     }
 
 	template<typename Pol>
@@ -30,14 +32,18 @@ namespace carl {
         mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
         mType( FormulaType::CONSTRAINT ),
         mConstraint(std::move(_constraint))
-    {}
+    {
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mConstraint);
+	}
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(BVConstraint&& _constraint):
         mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
         mType( FormulaType::BITVECTOR ),
         mBVConstraint(std::move(_constraint))
-    {}
+    {
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mBVConstraint);
+	}
 
 
 	template<typename Pol>
@@ -45,7 +51,9 @@ namespace carl {
         mHash( std::hash<UEquality>()( _ueq ) ),
         mType( FormulaType::UEQ ),
         mUIEquality( std::move( _ueq ) )
-    {}
+    {
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mUIEquality);
+	}
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formula<Pol>&& _subformula):
@@ -53,6 +61,7 @@ namespace carl {
         mType( _type ),
         mSubformula( std::move(_subformula) )
     {
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformula);
 	}
 	
 	template<typename Pol>
@@ -71,6 +80,7 @@ namespace carl {
             mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
             mHash ^= subformula.getHash();
         }
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformulas);
     }
 
     template<typename Pol>

@@ -43,7 +43,7 @@ namespace logging {
 	#define CARL_LOG_NOTIMPLEMENTED() __CARL_LOG_ERROR("", "Not implemented method-stub called.")
 	#define CARL_LOG_INEFFICIENT() __CARL_LOG_WARN("", "Inefficient method called.")
 #elif defined LOGGING
-	#define CARL_LOG_BASIC(level, channel, msg) std::cerr << level << " " << channel << " " << __FILE__ << ":" << __LINE__ << " " << msg
+	#define CARL_LOG_BASIC(level, channel, msg) std::cerr << level << " " << channel << " " << __FILE__ << ":" << __LINE__ << " " << msg << std::endl
 	#define CARL_LOG_FATAL(channel, msg) CARL_LOG_BASIC("FATAL", channel, msg)
 	#define CARL_LOG_ERROR(channel, msg) CARL_LOG_BASIC("ERROR", channel, msg)
 	#define CARL_LOG_WARN(channel, msg) CARL_LOG_BASIC("WARN", channel, msg)
