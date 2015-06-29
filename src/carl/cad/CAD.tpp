@@ -1523,6 +1523,19 @@ cad::Answer CAD<Number>::liftCheck(
 				break;
 			}
 			RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
+			if (this->setting.splitInteger) {
+				CARL_LOG_TRACE("carl.cad", "Trying to split at integer: ");
+				if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
+					if (!newSample->isIntegral()) {
+						std::cout << "Split!" << std::endl;
+						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+						sample.pop_back();
+						sample.push_back(newSample);
+						r = RealAlgebraicPoint<Number>(std::move(sample));
+						return cad::Answer::Unknown;
+					}
+				}
+			}
 
 			// Sample storage
 			auto newNode = this->storeSampleInTree(newSample, node);
