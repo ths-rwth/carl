@@ -14,14 +14,14 @@ namespace rootfinder {
 
 template<typename Number>
 AbstractRootFinder<Number>::AbstractRootFinder(
-		const UnivariatePolynomial<Number>& polynomial,
-		const Interval<Number>& interval,
+		const UnivariatePolynomial<Number>& _polynomial,
+		const Interval<Number>& _interval,
 		bool tryTrivialSolver
 	) :
-		originalPolynomial(polynomial),
-		polynomial(polynomial.squareFreePart()),
+		originalPolynomial(_polynomial),
+		polynomial(_polynomial.squareFreePart()),
 		//polynomial(polynomial),
-		interval(interval),
+		interval(_interval),
 		finished(false)
 {
 #ifdef ROOTFINDER_CACHE
@@ -106,8 +106,8 @@ void AbstractRootFinder<Number>::addRoot(RealAlgebraicNumberPtr<Number> root, bo
 }
 
 template<typename Number>
-void AbstractRootFinder<Number>::addRoot(const Interval<Number>& interval) {
-	this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, interval));
+void AbstractRootFinder<Number>::addRoot(const Interval<Number>& _interval) {
+	this->addRoot(RealAlgebraicNumberIR<Number>::create(this->polynomial, _interval));
 }
 
 template<typename Number>

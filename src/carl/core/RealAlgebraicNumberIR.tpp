@@ -403,7 +403,7 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 	while (this->getPolynomial().countRealRoots(this->getInterval()) == 0) {
 		if (isLeft) {
 			Number oldBound = this->lower();
-			Number newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
+			newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
 			if (this->getPolynomial().isRoot(newBound)) {
 				this->mValue = newBound;
 				this->mIsNumeric = true;
@@ -414,7 +414,7 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 			this->setLower(newBound);
 		} else {
 			Number oldBound = this->upper();
-			Number newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
+			newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
 			if (this->getPolynomial().isRoot(newBound)) {
 				this->mValue = newBound;
 				this->mIsNumeric = true;
