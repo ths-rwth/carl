@@ -310,7 +310,7 @@ public:
 	 * @param checkBounds
 	 * @return true if the constraints are satisfied by a cell in the cad or no constraint is given and the bounds are not conflicting, false otherwise
 	 */
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
+	cad::Answer check(	std::vector<cad::Constraint<Number>>& constraints,
 				RealAlgebraicPoint<Number>& r,
 				cad::ConflictGraph<Number>& conflictGraph,
 				BoundMap& bounds,
@@ -318,14 +318,14 @@ public:
 				bool checkBounds = true );
 
 	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
+	cad::Answer check(	std::vector<cad::Constraint<Number>>& _constraints,
 				RealAlgebraicPoint<Number>& r,
 				BoundMap& bounds,
 				bool next = false,
 				bool checkBounds = true)
 	{
 		cad::ConflictGraph<Number> cg;
-		return this->check(constraints, r, cg, bounds, next, checkBounds);
+		return this->check(_constraints, r, cg, bounds, next, checkBounds);
 	}
 
 	/**
@@ -501,7 +501,7 @@ private:
 	 * @return
 	 */
 public:
-	bool mainCheck(
+	cad::Answer mainCheck(
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
 			cad::ConflictGraph<Number>& conflictGraph,
@@ -521,7 +521,7 @@ public:
      */
 	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
-	bool baseLiftCheck(
+	cad::Answer baseLiftCheck(
 		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph<Number>& conflictGraph
@@ -554,7 +554,7 @@ public:
 	 * @param satPath Indices of regions that lead to a satisfying sample. This is used, if we backtrack due to integrality errors.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
-	bool liftCheck(
+	cad::Answer liftCheck(
 			sampleIterator node,
 			std::size_t openVariableCount,
 			bool restartLifting,
