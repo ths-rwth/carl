@@ -86,6 +86,31 @@ template<typename Number>
 }
 
 template<typename Number>
+bool Interval<Number>::containsInteger() const
+	{
+		assert(this->isConsistent());
+		switch (mLowerBoundType) {
+			case BoundType::INFTY:
+				return true;
+			case BoundType::STRICT:
+				break;
+			case BoundType::WEAK: 
+				if (carl::isInteger(mContent.lower())) return true;
+		}
+		switch (mUpperBoundType) {
+			case BoundType::INFTY:
+				return true;
+			case BoundType::STRICT:
+				break;
+			case BoundType::WEAK: 
+				if (carl::isInteger(mContent.upper())) return true;
+		}
+		if (carl::ceil(mContent.lower()) < mContent.upper()) return true;
+		return false;
+	}
+
+
+template<typename Number>
 Number Interval<Number>::diameter() const
 	{
 		assert(this->isConsistent());

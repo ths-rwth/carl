@@ -1101,6 +1101,12 @@ namespace carl
         void integralPart_assign();
         
         /**
+         * Checks if the interval contains at least one integer value.
+         * @return true, if the interval contains an integer.
+         */
+        bool containsInteger() const;
+        
+        /**
          * Returns the diameter of the interval.
          * @return Diameter.
          */
