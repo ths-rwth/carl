@@ -86,9 +86,9 @@ namespace carl {
          * @param _vars The quantified variables.
          * @param _formula The formula bound by this quantifier.
          */
-        QuantifierContent( const std::vector<carl::Variable>&& _vars, const Formula<Pol>& _formula ):
-            mVariables( _vars ), 
-            mFormula( _formula )
+        QuantifierContent( std::vector<carl::Variable>&& _vars, Formula<Pol>&& _formula ):
+            mVariables( std::move(_vars) ), 
+            mFormula( std::move(_formula) )
         {}
         ~QuantifierContent() {}
 
