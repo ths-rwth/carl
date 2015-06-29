@@ -23,8 +23,8 @@ class CADConstraints {
 private:
 	std::vector<cad::Constraint<Number>> constraints;
 public:
-	CADConstraints<Number>& operator=(const std::vector<cad::Constraint<Number>>& constraints) {
-		this->constraints = constraints;
+	CADConstraints<Number>& operator=(const std::vector<cad::Constraint<Number>>& _constraints) {
+		this->constraints = _constraints;
 		return *this;
 	}
 	

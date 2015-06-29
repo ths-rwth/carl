@@ -75,16 +75,16 @@ public:
 		auto up = it->second;
 		map.erase(it);
 		
-		for (auto it = scheduled.begin(); it != scheduled.end(); ++it) {
-			if (**it == *up) {
-				scheduled.erase(it);
+		for (auto sit = scheduled.begin(); sit != scheduled.end(); ++sit) {
+			if (**sit == *up) {
+				scheduled.erase(sit);
 				return up;
 			}
 		}
 		
-		for (auto it = polynomials.begin(); it != polynomials.end(); ++it) {
-			if (**it == *up) {
-				polynomials.erase(it);
+		for (auto pit = polynomials.begin(); pit != polynomials.end(); ++pit) {
+			if (**pit == *up) {
+				polynomials.erase(pit);
 				return up;
 			}
 		}
