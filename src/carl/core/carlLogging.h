@@ -143,7 +143,7 @@ struct StreamSink: public Sink {
 	 * Create a StreamSink from some output stream.
      * @param os Output stream.
      */
-	StreamSink(std::ostream& os): os(os.rdbuf()) {}
+	StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
 	virtual ~StreamSink() {}
 	virtual std::ostream& log() { return os; }
 };
@@ -235,8 +235,8 @@ struct RecordInfo {
      * @param func Function name.
      * @param line Line number.
      */
-	RecordInfo(const std::string& filename, const std::string& func, unsigned line): 
-		filename(filename), func(func), line(line) {}
+	RecordInfo(const std::string& _filename, const std::string& _func, unsigned _line): 
+		filename(_filename), func(_func), line(_line) {}
 };
 
 /**
@@ -245,6 +245,8 @@ struct RecordInfo {
 struct Formatter {
 	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
+	
+	virtual ~Formatter() {}
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
      * @param f Filter.

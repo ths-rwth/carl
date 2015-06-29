@@ -485,6 +485,7 @@ namespace carl
                                 break;
                             case FormulaType::BITVECTOR:
                                 _f.bvConstraint().collectVariables(bvvars);
+                                break;
                             default:
                                 break;
                         }

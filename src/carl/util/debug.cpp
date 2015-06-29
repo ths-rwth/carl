@@ -50,7 +50,7 @@ int last_assertion_code = 23;
 /**
  * Actual signal handler.
  */
-void handle_signal(int signal) {
+[[noreturn]] static void handle_signal(int signal) {
 	//printStacktrace(false);
 	std::cerr << std::endl << "Catched SIGABRT " << signal << ", exiting with " << (last_assertion_code%256) << std::endl;
 	if (last_assertion_string.size() != 0) {
@@ -62,7 +62,7 @@ void handle_signal(int signal) {
 /**
  * Installs the signal handler.
  */
-bool install_signal_handler() {
+static bool install_signal_handler() {
 	CARL_LOG_INFO("carl.util", "Installing signal handler for SIGABRT");
 	std::signal(SIGABRT, handle_signal);
 	return true;

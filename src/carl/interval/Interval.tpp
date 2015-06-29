@@ -70,6 +70,7 @@ Interval<Number> Interval<Number>::integralPart() const
 				newLowerBound -= carl::constant_one<Number>::get();
 			if(newLowerBoundType == BoundType::INFTY)
 				newLowerBound = newUpperBound;
+			break;
 		default:
 			if(newLowerBoundType != BoundType::INFTY)
 				newUpperBound = newLowerBound;
