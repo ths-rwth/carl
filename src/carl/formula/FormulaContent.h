@@ -28,13 +28,15 @@ namespace carl {
      * - Additional functions (not specified, but used in the wild)
      */
     enum FormulaType {
+        // Generic
+        ITE, EXISTS, FORALL,
+        
         // Core Theory
         TRUE, FALSE,
         BOOL,
         NOT, IMPLIES, AND, OR, XOR,
         IFF, 
-        
-        ITE, EXISTS, FORALL,
+
 		// Arithmetic Theory
 		CONSTRAINT,
 		
