@@ -84,12 +84,12 @@ class DiophantineEquations
                                 A = A * a[i];
                         }
                         // b_j = A / a_j
-                        std::vector<MultiPoly> b();
+                        std::vector<MultiPoly> b;
                         for(unsigned j = 1; j <= r; j++) {
                                 b[j] = A / Multipoly(a[j]);
                         }
                         // a_new = substitute(x_v = alpha_v, a)
-                        std::vector<Polynomial>& a_new();
+                        std::vector<Polynomial> a_new;
                         for(unsigned i = 1; i <= r; i++) {
                                 a_new.pushBack(a[i].substitute(x_v, alpha_v));
                         }
