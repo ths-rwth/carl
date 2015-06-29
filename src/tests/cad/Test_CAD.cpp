@@ -186,6 +186,22 @@ TEST_F(CADTest, Check6)
 	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
 }
 
+TEST_F(CADTest, CheckInt)
+{
+	RealAlgebraicPoint<Rational> r;
+	std::vector<Constraint> cons;
+	carl::Variable i = carl::freshIntegerVariable("i");
+
+	this->cad.addPolynomial(Polynomial(i), {i});
+	this->cad.addPolynomial(Polynomial(Rational(1)-i), {i});
+	this->cad.prepareElimination();
+	cons.assign({
+		Constraint(Polynomial(i), Sign::ZERO, {i}),
+		Constraint(Polynomial(Rational(1)-i), Sign::ZERO, {i})
+	});
+	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
+}
+
 template<typename T>
 inline std::shared_ptr<carl::RealAlgebraicNumberNR<Rational>> NR(T t, bool b) {
 	return carl::RealAlgebraicNumberNR<Rational>::create(t, b);
