@@ -169,8 +169,13 @@ namespace carl
              * @param _subFormula Formula representing the function argument.
              * @return A formula representing the given function call.
              */
-            const FormulaContent<Pol>* create(FormulaType _type, const Formula<Pol>& _subFormula) {
+            const FormulaContent<Pol>* create(FormulaType _type, Formula<Pol>&& _subFormula) {
                 switch (_type) {
+                    case ITE:
+                    case EXISTS:
+                    case FORALL:
+                        assert(false); break;
+
                     // Core Theory
                     case TRUE:
                     case FALSE:
@@ -186,12 +191,12 @@ namespace carl
                         return _subFormula.mpContent;
                     case IFF:
                         return create(TRUE);
-                    
-                    case ITE:
+
+                    // Arithmetic Theory
                     case CONSTRAINT:
+                        assert(false); break;
+
                     case BITVECTOR:
-                    case EXISTS:
-                    case FORALL:
                     case UEQ:
                         assert(false); break;
                 }
@@ -212,6 +217,10 @@ namespace carl
             }
             const FormulaContent<Pol>* create(FormulaType _type, Formulas<Pol>&& _subformulas) {
                 switch (_type) {
+                    case ITE:
+                        return createITE(std::move(_subformulas));
+                    case EXISTS:
+                    case FORALL:
                     // Core Theory
                     case TRUE:
                     case FALSE:
@@ -225,10 +234,6 @@ namespace carl
                     case XOR:
                     case IFF:
                         return createNAry(_type, std::move(_subformulas));
-                    case ITE:
-                        return createITE(std::move(_subformulas));
-                    case EXISTS:
-                    case FORALL:
                     // Arithmetic Theory
                     case CONSTRAINT:
                     // Bitvector Theory

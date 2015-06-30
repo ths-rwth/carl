@@ -38,9 +38,6 @@ namespace carl {
         IFF, 
 
 		// Arithmetic Theory
-        A_NUMBER, A_VARIABLE,
-        A_NEGATION, A_PLUS, A_MINUS, A_MULT, A_DIV,
-        A_RELATION,
 		CONSTRAINT,
 		
 		// Bitvector Theory
@@ -153,7 +150,7 @@ namespace carl {
                 /// The polynomial, in case this formula wraps a polynomial.
                 Pol mPolynomial;
                 /// The arithmetic constraint over a formula.
-                ArithmeticConstraintContent mArithmetic;
+                ArithmeticConstraintContent<Pol> mArithmetic;
                 /// The constraint, in case this formula wraps a constraint.
                 Constraint<Pol> mConstraint;
                 /// The bitvector constraint.

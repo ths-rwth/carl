@@ -34,7 +34,7 @@ namespace carl
     class FormulaPool;
     
     /**
-     * The formula class.
+     * The formula class representing a SMT formula.
      */
     template<typename Pol>
     class Formula
@@ -105,9 +105,13 @@ namespace carl
             explicit Formula( const BVConstraint& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
-                
+            
+            explicit Formula( FormulaType _type, Formula&& _subformula ):
+                Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(_subformula)))
+            {}
+                        
             explicit Formula( FormulaType _type, const Formula& _subformula ):
-                Formula(FormulaPool<Pol>::getInstance().create(_type, _subformula))
+                Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(Formula(_subformula))))
             {}
                 
             explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB ):
@@ -562,6 +566,37 @@ namespace carl
             bool isNary() const
             {
                 return mpContent->isNary();
+            }
+            
+            bool isBoolean() const {
+                return 
+                    (mpContent->mType == FormulaType::EXISTS) ||
+                    (mpContent->mType == FormulaType::FORALL) ||
+                    (mpContent->mType == FormulaType::ITE && firstCase().isBoolean()) ||
+                    (mpContent->mType == FormulaType::TRUE) ||
+                    (mpContent->mType == FormulaType::FALSE) ||
+                    (mpContent->mType == FormulaType::BOOL) ||
+                    (mpContent->mType == FormulaType::NOT) ||
+                    (mpContent->mType == FormulaType::IMPLIES) ||
+                    (mpContent->mType == FormulaType::AND) ||
+                    (mpContent->mType == FormulaType::OR) ||
+                    (mpContent->mType == FormulaType::XOR) ||
+                    (mpContent->mType == FormulaType::IFF) ||
+                    (mpContent->mType == FormulaType::A_RELATION) ||
+                    (mpContent->mType == FormulaType::CONSTRAINT)
+                ;
+            }
+            bool isArithmetic() const {
+                return 
+                    (mpContent->mType == FormulaType::ITE && firstCase().isArithmetic()) ||
+                    (mpContent->mType == FormulaType::A_VARIABLE) ||
+                    (mpContent->mType == FormulaType::A_POLYNOMIAL) ||
+                    (mpContent->mType == FormulaType::A_NEGATION) ||
+                    (mpContent->mType == FormulaType::A_PLUS) ||
+                    (mpContent->mType == FormulaType::A_MINUS) ||
+                    (mpContent->mType == FormulaType::A_MULT) ||
+                    (mpContent->mType == FormulaType::A_DIV)
+                ;
             }
             
             /**

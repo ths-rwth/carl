@@ -101,7 +101,7 @@ namespace carl {
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
         mType( _type ),
-		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), _term))
+		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term))))
     {
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
     }
