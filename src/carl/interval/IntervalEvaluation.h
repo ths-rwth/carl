@@ -82,7 +82,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, cons
 template<typename Coeff, typename Numeric, DisableIf<std::is_same<Numeric, Coeff>>>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
 {
-	Interval<Numeric> result(carl::toDouble(t.coeff()));
+	Interval<Numeric> result(t.coeff());
 	if (t.monomial()) {
 		const Monomial& m = *t.monomial();
 		// TODO use iterator.
