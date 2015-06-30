@@ -21,10 +21,6 @@ namespace carl {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
 				break;
-			case VariableType::VT_INT:
-			case VariableType::VT_REAL:
-				mType = A_VARIABLE;
-				break;
 			default:
 				assert(false);
 		}
@@ -101,7 +97,7 @@ namespace carl {
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
         mType( _type ),
-		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), _term))
+		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term))))
     {
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
     }

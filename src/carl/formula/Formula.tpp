@@ -251,6 +251,23 @@ namespace carl
         _content.mProperties = Condition();
         switch( _content.mType )
         {
+            case FormulaType::ITE:
+            {
+                //_content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
+                //_content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
+                //_content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
+                break;
+            }
+            case FormulaType::EXISTS:
+            {
+                ///@todo do something here
+                break;
+            }
+            case FormulaType::FORALL:
+            {
+                ///@todo do something here
+                break;
+            }
             case FormulaType::TRUE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
@@ -266,18 +283,6 @@ namespace carl
             case FormulaType::BOOL:
             {
                 _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BOOLEAN;
-                break;
-            }
-            case FormulaType::CONSTRAINT:
-            {
-                _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( _content.mConstraint, _content.mProperties );
-                
-                break;
-            }
-            case FormulaType::BITVECTOR:
-            {
-                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;
                 break;
             }
             case FormulaType::NOT:
@@ -337,13 +342,6 @@ namespace carl
                 //_content.mProperties |= (subFormulaCondsB & WEAK_CONDITIONS);
                 break;
             }
-            case FormulaType::ITE:
-            {
-                //_content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
-                //_content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
-                //_content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
-                break;
-            }
             case FormulaType::IFF:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
@@ -368,14 +366,16 @@ namespace carl
                 }
                 break;
             }
-            case FormulaType::EXISTS:
+            case FormulaType::CONSTRAINT:
             {
-                ///@todo do something here
+                _content.mProperties |= STRONG_CONDITIONS;
+                addConstraintProperties( _content.mConstraint, _content.mProperties );
+                
                 break;
             }
-            case FormulaType::FORALL:
+            case FormulaType::BITVECTOR:
             {
-                ///@todo do something here
+                _content.mProperties |= STRONG_CONDITIONS | PROP_CONTAINS_BITVECTOR;
                 break;
             }
             case FormulaType::UEQ:
