@@ -40,13 +40,13 @@ protected:
 	/**
 	 * Protected default constructor.
 	 */
-	Singleton() {};
+	Singleton() {}
 
 public:
 	/**
 	 * Virtual destructor.
      */
-	virtual ~Singleton() {};
+	virtual ~Singleton() {}
 	/**
 	 * Returns the single instance of this class by reference.
 	 * If there is no instance yet, a new one is created.

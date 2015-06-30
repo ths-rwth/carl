@@ -49,14 +49,6 @@ class Sort
         {}
 
         /**
-         * Constructs a sort by copying the given sort.
-         * @param _sort The sort to copy.
-         */
-        Sort( const Sort& _sort ):
-            mId( _sort.id() )
-        {}
-
-        /**
          * @return The aritiy of this sort.
          */
         std::size_t arity() const;

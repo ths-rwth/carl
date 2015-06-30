@@ -26,10 +26,19 @@ namespace carl {
 		}
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _variable);
     }
+	
+	template<typename Pol>
+	FormulaContent<Pol>::FormulaContent(Formula<Pol>&& _lhs, Relation _rel):
+	///@todo use sensible hash.
+		mHash(_lhs.mHash),
+		mArithmetic(std::move(_lhs), _rel)
+	{
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mArithmetic.mLhs << " " << _rel);
+	}
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(Constraint<Pol>&& _constraint):
-        mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
+        mHash( _constraint.id() << (sizeof(size_t)*4) ),
         mType( FormulaType::CONSTRAINT ),
         mConstraint(std::move(_constraint))
     {
@@ -88,7 +97,7 @@ namespace carl {
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
         mType( _type ),
-		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), _term))
+		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term))))
     {
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
     }

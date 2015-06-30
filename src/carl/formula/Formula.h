@@ -34,7 +34,7 @@ namespace carl
     class FormulaPool;
     
     /**
-     * The formula class.
+     * The formula class representing a SMT formula.
      */
     template<typename Pol>
     class Formula
@@ -105,9 +105,13 @@ namespace carl
             explicit Formula( const BVConstraint& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
-                
+            
+            explicit Formula( FormulaType _type, Formula&& _subformula ):
+                Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(_subformula)))
+            {}
+                        
             explicit Formula( FormulaType _type, const Formula& _subformula ):
-                Formula(FormulaPool<Pol>::getInstance().create(_type, _subformula))
+                Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(Formula(_subformula))))
             {}
                 
             explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB ):

@@ -33,10 +33,10 @@ namespace carl
 		for (const auto& decl: mDeclarations) {
 			os << "(declare-sort " << decl.first << " " << decl.second << ")" << std::endl;
 		}
-		for (const auto& def: mDeclarations) {
-			///@todo fix this
-			//os << "(define-sort " << decl.first << " " << decl.second << ")" << std::endl;
-		}
+		///@todo fix this
+		//for (const auto& def: mDeclarations) {
+		//	os << "(define-sort " << decl.first << " " << decl.second << ")" << std::endl;
+		//}
 	}
 	
 	Sort SortManager::replace(const Sort& sort, const std::map<std::string, Sort>& parameters) {

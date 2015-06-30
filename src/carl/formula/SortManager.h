@@ -51,8 +51,8 @@ class SortManager : public Singleton<SortManager>
 			 * @param _name The name of the sort content to construct.
 			 * @param _type The carl variable type of the sort content to construct.
 			 */
-			explicit SortContent(const std::string& name):
-				name(name),
+			explicit SortContent(const std::string& _name):
+				name(_name),
 				parameters(nullptr),
 				indices(nullptr)
 			{}
@@ -62,14 +62,14 @@ class SortManager : public Singleton<SortManager>
 			 * @param _name The name  of the sort content to construct.
 			 * @param _parameters The sorts of the arguments of the sort content to construct.
 			 */
-			explicit SortContent(const std::string& name, const std::vector<Sort>& parameters):
-				name(name),
-				parameters(new std::vector<Sort>(parameters)),
+			explicit SortContent(const std::string& _name, const std::vector<Sort>& _parameters):
+				name(_name),
+				parameters(new std::vector<Sort>(_parameters)),
 				indices(nullptr)
 			{}
-			explicit SortContent(const std::string& name, std::vector<Sort>&& parameters):
-				name(name),
-				parameters(new std::vector<Sort>(std::move(parameters))),
+			explicit SortContent(const std::string& _name, std::vector<Sort>&& _parameters):
+				name(_name),
+				parameters(new std::vector<Sort>(std::move(_parameters))),
 				indices(nullptr)
 			{}
 			
