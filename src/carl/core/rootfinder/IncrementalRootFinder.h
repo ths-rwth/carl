@@ -78,6 +78,7 @@ inline std::ostream& operator<<(std::ostream& os, const SplittingStrategy& s) {
 template<typename Number>
 class RootFinder {
 public:
+	virtual ~RootFinder() {}
 	/**
 	 * Retrieves the polynomial that is processed.
 	 * @return Polynomial.

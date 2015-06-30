@@ -21,15 +21,28 @@ namespace carl {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
 				break;
+			case VariableType::VT_INT:
+			case VariableType::VT_REAL:
+				mType = A_VARIABLE;
+				break;
 			default:
 				assert(false);
 		}
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _variable);
     }
+	
+	template<typename Pol>
+	FormulaContent<Pol>::FormulaContent(Formula<Pol>&& _lhs, Relation _rel):
+	///@todo use sensible hash.
+		mHash(_lhs.mHash),
+		mArithmetic(std::move(_lhs), _rel)
+	{
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mArithmetic.mLhs << " " << _rel);
+	}
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(Constraint<Pol>&& _constraint):
-        mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
+        mHash( _constraint.id() << (sizeof(size_t)*4) ),
         mType( FormulaType::CONSTRAINT ),
         mConstraint(std::move(_constraint))
     {

@@ -36,14 +36,6 @@ public:
 	{}
 
 	/**
-	 * Copy constructor.
-	 * @param r
-	 */
-	RealAlgebraicPoint(const RealAlgebraicPoint& r):
-		numbers(r.numbers)
-	{}
-
-	/**
 	 * Creates a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */

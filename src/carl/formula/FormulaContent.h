@@ -28,14 +28,19 @@ namespace carl {
      * - Additional functions (not specified, but used in the wild)
      */
     enum FormulaType {
+        // Generic
+        ITE, EXISTS, FORALL,
+        
         // Core Theory
         TRUE, FALSE,
         BOOL,
         NOT, IMPLIES, AND, OR, XOR,
         IFF, 
-        
-        ITE, EXISTS, FORALL,
+
 		// Arithmetic Theory
+        A_NUMBER, A_VARIABLE,
+        A_NEGATION, A_PLUS, A_MINUS, A_MULT, A_DIV,
+        A_RELATION,
 		CONSTRAINT,
 		
 		// Bitvector Theory
@@ -86,9 +91,9 @@ namespace carl {
          * @param _vars The quantified variables.
          * @param _formula The formula bound by this quantifier.
          */
-        QuantifierContent( const std::vector<carl::Variable>&& _vars, const Formula<Pol>& _formula ):
-            mVariables( _vars ), 
-            mFormula( _formula )
+        QuantifierContent( std::vector<carl::Variable>&& _vars, Formula<Pol>&& _formula ):
+            mVariables( std::move(_vars) ), 
+            mFormula( std::move(_formula) )
         {}
         ~QuantifierContent() {}
 
@@ -100,6 +105,21 @@ namespace carl {
         bool operator==(const QuantifierContent& _qc) const
         {
             return (mFormula == _qc.mFormula) && (mVariables == _qc.mVariables);
+        }
+    };
+    
+    template<typename Pol>
+    struct ArithmeticConstraintContent
+    {
+        Formula<Pol> mLhs;
+        Relation mRelation;
+        
+        ArithmeticConstraintContent(Formula<Pol>&& _lhs, Relation _rel):
+            mLhs(std::move(_lhs)),
+            mRelation(_rel)
+        {}
+        bool operator==(const ArithmeticConstraintContent& _acc) const {
+            return (mLhs == _acc.mLhs) && (mRelation == _acc.mRelation);
         }
     };
 	
@@ -130,7 +150,11 @@ namespace carl {
             {
                 /// The variable, in case this formula wraps a variable.
                 carl::Variable mVariable;
-                /// The constraint, in case this formulas wraps a constraint.
+                /// The polynomial, in case this formula wraps a polynomial.
+                Pol mPolynomial;
+                /// The arithmetic constraint over a formula.
+                ArithmeticConstraintContent mArithmetic;
+                /// The constraint, in case this formula wraps a constraint.
                 Constraint<Pol> mConstraint;
                 /// The bitvector constraint.
                 BVConstraint mBVConstraint;
@@ -170,6 +194,8 @@ namespace carl {
              * @param _variable 
              */
             FormulaContent(carl::Variable::Arg _variable);
+            
+            FormulaContent(Formula<Pol>&& _lhs, Relation _rel);
 
             /**
              * Constructs a formula being a constraint.

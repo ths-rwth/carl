@@ -58,11 +58,11 @@ public:
 	 * @param v the variables of the polynomial
 	 * @param negated if set to <code>true</code>, <code>satisfiedBy</code> checks the negation of the specified sign condition. If otherwise <code>false</code> is specified (standard value), <code>satisfiedBy</code> checks the sign condition as specified.
 	 */
-	Constraint(const cad::MPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool negated = false):
+	Constraint(const cad::MPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool _negated = false):
 		polynomial(p),
 		sign(s),
 		variables(checkVariables(p, v)),
-		negated(negated)
+		negated(_negated)
 	{
 		assert(this->polynomial.isConsistent());
 	}
@@ -108,10 +108,10 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& variables) const {
-		assert(variables.size() == r.dim());
+	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
+		assert(_variables.size() == r.dim());
 		
-		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, variables);
+		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, _variables);
 		if (this->negated) {
 			return res->sgn() != this->sign;
 		} else {

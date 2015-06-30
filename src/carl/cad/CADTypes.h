@@ -16,6 +16,8 @@ namespace carl {
 namespace cad {
 using carl::operator<<;
 
+enum Answer { True = 0, False = 1, Unknown = 2 };
+
 template<typename Coeff>
 using MPolynomial = carl::MultivariatePolynomial<Coeff>;
 

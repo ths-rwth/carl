@@ -139,19 +139,25 @@ public:
 		return false;
 	}
 
-	virtual Number branchingPoint() const {
-		Number m = this->interval.sample();
-		while (isInteger(m)) {
-			m = Interval<Number>(this->interval.lower(), m).sample();
-		}
-		return m;
+	/**
+	 * Computes a point that can be used for branching. The interval may be refined in the process.
+	 * If the represented value is an integer, zero is returned.
+	 */
+	virtual Number branchingPoint() {
+		// Call isIntegral to refine such that sample() returns a rational.
+		if (this->isIntegral()) return Number(0);
+		if (this->isNumeric()) return this->value();
+		return interval.sample();
 	}
 
 	/**
-	 * Checks if the represented value is integral.
+	 * Checks if the represented value is integral. The interval may be refined in the process.
 	 * @return If this is integral.
 	 */
-	virtual bool isIntegral() const {
+	virtual bool isIntegral() {
+		while (!this->isNumeric() && this->interval.containsInteger()) {
+			this->refine();
+		}
 		if (this->isNumeric()) return carl::isInteger(this->value());
 		return false;
 	}
