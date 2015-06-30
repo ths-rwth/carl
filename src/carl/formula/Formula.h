@@ -568,37 +568,6 @@ namespace carl
                 return mpContent->isNary();
             }
             
-            bool isBoolean() const {
-                return 
-                    (mpContent->mType == FormulaType::EXISTS) ||
-                    (mpContent->mType == FormulaType::FORALL) ||
-                    (mpContent->mType == FormulaType::ITE && firstCase().isBoolean()) ||
-                    (mpContent->mType == FormulaType::TRUE) ||
-                    (mpContent->mType == FormulaType::FALSE) ||
-                    (mpContent->mType == FormulaType::BOOL) ||
-                    (mpContent->mType == FormulaType::NOT) ||
-                    (mpContent->mType == FormulaType::IMPLIES) ||
-                    (mpContent->mType == FormulaType::AND) ||
-                    (mpContent->mType == FormulaType::OR) ||
-                    (mpContent->mType == FormulaType::XOR) ||
-                    (mpContent->mType == FormulaType::IFF) ||
-                    (mpContent->mType == FormulaType::A_RELATION) ||
-                    (mpContent->mType == FormulaType::CONSTRAINT)
-                ;
-            }
-            bool isArithmetic() const {
-                return 
-                    (mpContent->mType == FormulaType::ITE && firstCase().isArithmetic()) ||
-                    (mpContent->mType == FormulaType::A_VARIABLE) ||
-                    (mpContent->mType == FormulaType::A_POLYNOMIAL) ||
-                    (mpContent->mType == FormulaType::A_NEGATION) ||
-                    (mpContent->mType == FormulaType::A_PLUS) ||
-                    (mpContent->mType == FormulaType::A_MINUS) ||
-                    (mpContent->mType == FormulaType::A_MULT) ||
-                    (mpContent->mType == FormulaType::A_DIV)
-                ;
-            }
-            
             /**
              * @return true, if this formula is a conjunction of constraints;
              *          false, otherwise.

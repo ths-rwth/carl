@@ -21,10 +21,6 @@ namespace carl {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
 				break;
-			case VariableType::VT_INT:
-			case VariableType::VT_REAL:
-				mType = A_VARIABLE;
-				break;
 			default:
 				assert(false);
 		}
