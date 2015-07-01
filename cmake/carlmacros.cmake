@@ -5,9 +5,9 @@
 #
 # This file contains several macros which are used in this project. Notice that several are copied straight from web ressources.
 
-# ===================================
-# List handling macros http://www.cmake.org/pipermail/cmake/2004-June/005187.html 12.6.2015
-# ===================================
+# Macro
+# List handling macros
+# Source: http://www.cmake.org/pipermail/cmake/2004-June/005187.html 12.6.2015
 
 MACRO(LIST_PREPEND var value)
      SET(${var} ${value} ${${var}})
@@ -41,7 +41,10 @@ MACRO(LIST_APPEND_UNIQUE var value)
      ENDIF(NOT LIST_ADD_UNIQUE_FLAG)
 ENDMACRO(LIST_APPEND_UNIQUE)
 
-#FUNCTION collect_files - notice that carl uses ${prefix}_${name}_sources (SOURCES)
+# Function
+# collect_files in subdirectories and save them into variables
+# Igor Bongartz 06.2015
+
 function(collect_files prefix name)
   file(GLOB_RECURSE subfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${name} ${name}/*)
 
