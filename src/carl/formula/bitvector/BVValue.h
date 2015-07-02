@@ -84,11 +84,6 @@ namespace carl
             }
         }
 
-        BVValue(const BVValue& _other) :
-        mValue(_other())
-        {
-        }
-
         template <typename BlockInputIterator>
         explicit BVValue(BlockInputIterator _first, BlockInputIterator _last) :
         mValue(_first, _last)

@@ -99,7 +99,6 @@ namespace carl
         {
             return rhsAsUF() < _ueq.rhsAsUF();
         }
-        return false;
     }
 
     std::string UEquality::toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const

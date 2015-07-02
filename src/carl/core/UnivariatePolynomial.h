@@ -1203,7 +1203,7 @@ struct hash<carl::UnivariatePolynomial<Coefficient>> {
 template<typename Coefficient>
 struct less<carl::UnivariatePolynomial<Coefficient>> {
 	carl::PolynomialComparisonOrder order;
-	less(carl::PolynomialComparisonOrder order = carl::PolynomialComparisonOrder::Default) : order(order) {};
+	less(carl::PolynomialComparisonOrder _order = carl::PolynomialComparisonOrder::Default) : order(_order) {}
 	/**
 	 * Compares two univariate polynomials.
 	 * @param lhs First polynomial.

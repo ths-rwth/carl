@@ -9,7 +9,7 @@
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
 
-cmake_minimum_required (VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required (VERSION 2.8.12 FATAL_ERROR)
 
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -30,8 +30,8 @@ set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-# for cmake 2.8.7 
-include(FindPackageHandleStandardArgs) 
+# for cmake 2.8.7
+include(FindPackageHandleStandardArgs)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # B. Options
@@ -39,6 +39,7 @@ include(FindPackageHandleStandardArgs)
 
 # options
 option( DEVELOPER "Compile with extra warnings" OFF )
+option( ALLWARNINGS "Compile with even more warnings" OFF )
 option( LOGGING "Enable logging within the carl library" OFF )
 option( LOGGING_CARL "Compile with the logging facility of the carl library" OFF )
 option( LOGGING_DISABLE_INEFFICIENT "Disable log messages about inefficient methods" OFF )
@@ -55,6 +56,9 @@ option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
+
+# Include own macros.
+include( carlmacros )
 
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
@@ -115,6 +119,27 @@ endif()
 if(DEVELOPER)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wno-deprecated-declarations")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -ftemplate-backtrace-limit=0")
+
+	if (ALLWARNINGS)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat -Wno-c++98-compat-pedantic")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-id-macro")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-newline-eof")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-enum")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-padded")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-float-equal")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedef")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-variable-declarations")
+	endif()
+	endif()
+
 	set(CMAKE_BUILD_TYPE "DEBUG")
 endif()
 
@@ -183,17 +208,11 @@ endif()
 # CLN
 IF(USE_CLN_NUMBERS)
     find_package(CLN REQUIRED)
-    find_library(CLN_DYNAMIC NAMES libcln.${DYNAMIC_EXT})
-    find_library(CLN_STATIC NAMES libcln.${STATIC_EXT})
 endif()
 
 # GMP
 find_package(GMP REQUIRED)
-find_library(GMP_DYNAMIC NAMES libgmp.${DYNAMIC_EXT})
-find_library(GMP_STATIC NAMES libgmp.${STATIC_EXT})
 find_package(GMPXX REQUIRED)
-find_library(GMPXX_DYNAMIC NAMES libgmpxx.${DYNAMIC_EXT})
-find_library(GMPXX_STATIC NAMES libgmpxx.${STATIC_EXT})
 
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
 IF(USE_CLN_NUMBERS)
@@ -201,17 +220,12 @@ IF(USE_CLN_NUMBERS)
 endif()
 include_directories(SYSTEM ${SYSTEM} ${Eigen3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
 
-set(libs_dynamic ${libs_dynamic} ${Boost_DYNAMIC})
-IF(USE_CLN_NUMBERS)
-    set(libs_dynamic ${libs_dynamic} ${CLN_DYNAMIC})
-endif()
-set(libs_dynamic ${libs_dynamic} ${GMPXX_DYNAMIC} ${GMP_DYNAMIC})
 
-set(libs_static ${libs_static} ${Boost_STATIC})
+set(libs ${libs} ${Boost_LIBRARIES} gmpxx gmp)
 IF(USE_CLN_NUMBERS)
-    set(libs_static ${libs_static} ${CLN_STATIC})
+    set(libs ${libs} cln)
 endif()
-set(libs_static ${libs_static} ${GMPXX_STATIC} ${GMP_STATIC})
+
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
@@ -220,12 +234,8 @@ set(libs_static ${libs_static} ${GMPXX_STATIC} ${GMP_STATIC})
 OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
 	find_package(MPFR REQUIRED)
-	find_library(MPFR_DYNAMIC NAMES libmpfr.${DYNAMIC_EXT})
-	find_library(MPFR_STATIC NAMES libmpfr.${STATIC_EXT})
-	
 	include_directories(SYSTEM ${include_dirs} ${MPFR_INCLUDE_DIRS})
-	set(libs_dynamic ${libs_dynamic} ${MPFR_DYNAMIC})
-	set(libs_static ${libs_static} ${MPFR_STATIC})
+	set(libs ${libs} mpfr)
 endif()
 
 if(COMPARE_WITH_Z3)
@@ -259,17 +269,13 @@ enable_testing()
 
 if(USE_GINAC)
 	find_package( GiNaC 1.5.8 REQUIRED )
-	find_library(GiNaC_DYNAMIC NAMES libginac.${DYNAMIC_EXT})
-	find_library(GiNaC_STATIC NAMES libginac.${STATIC_EXT})
 	include_directories(SYSTEM ${include_dirs} ${GINAC_INCLUDE_DIRS})
-	set(libs_dynamic ${libs_dynamic} ${GiNaC_DYNAMIC})
-	set(libs_static ${libs_static} ${GiNaC_STATIC})
+	set(libs ${libs} ginac)
 	set(USE_CLN_NUMBERS ON)
 endif()
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
-set(libs_dynamic ${libs_dynamic} pthread dl)
-set(libs_static ${libs_static} pthread dl)
+set(libs ${libs} pthread dl)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files
@@ -291,11 +297,11 @@ add_subdirectory(src)
 
 # Add all targets to the build-tree export set
 export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
- 
+
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE carl)
- 
+
 include(CMakePackageConfigHelpers)
 # Create the carlConfig.cmake and carlConfigVersion files
 file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
@@ -316,7 +322,7 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.c
 								 COMPATIBILITY SameMajorVersion )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 		DESTINATION ${CMAKE_INSTALL_DIR} )
- 
+
 # Install the export set for use with the install-tree
 install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 

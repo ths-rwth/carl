@@ -25,7 +25,7 @@ template<typename Number>
 Sign Interval<Number>::sgn() const
 {
     assert(this->isConsistent());
-    if (this->isUnbounded()) return Sign::ZERO;
+    if (this->isInfinite()) return Sign::ZERO;
     if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
     if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
     return Sign::ZERO;
@@ -70,6 +70,7 @@ Interval<Number> Interval<Number>::integralPart() const
 				newLowerBound -= carl::constant_one<Number>::get();
 			if(newLowerBoundType == BoundType::INFTY)
 				newLowerBound = newUpperBound;
+			break;
 		default:
 			if(newLowerBoundType != BoundType::INFTY)
 				newUpperBound = newLowerBound;
@@ -83,6 +84,31 @@ template<typename Number>
 {
     *this = integralPart();
 }
+
+template<typename Number>
+bool Interval<Number>::containsInteger() const
+	{
+		assert(this->isConsistent());
+		switch (mLowerBoundType) {
+			case BoundType::INFTY:
+				return true;
+			case BoundType::STRICT:
+				break;
+			case BoundType::WEAK: 
+				if (carl::isInteger(mContent.lower())) return true;
+		}
+		switch (mUpperBoundType) {
+			case BoundType::INFTY:
+				return true;
+			case BoundType::STRICT:
+				break;
+			case BoundType::WEAK: 
+				if (carl::isInteger(mContent.upper())) return true;
+		}
+		if (carl::ceil(mContent.lower()) < mContent.upper()) return true;
+		return false;
+	}
+
 
 template<typename Number>
 Number Interval<Number>::diameter() const
@@ -251,7 +277,7 @@ template<typename Number>
     template<typename Number>
     void Interval<Number>::bloat_by(const Number& width)
     {
-	if(!isUnbounded()){
+	if(!isInfinite()){
 	    BoundType lowerTmp = mLowerBoundType;
 	    BoundType upperTmp = mUpperBoundType;
 	    this->set(boost::numeric::widen(mContent, width));
@@ -679,7 +705,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
             }
             else
             {
-                if( rhs.isUnbounded() )
+                if( rhs.isInfinite() )
                 {
                     a = unboundedInterval();
                     return false;
@@ -752,7 +778,7 @@ void Interval<Number>::inverse_assign()
 template<typename Number>
 bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const
 	{
-		if( this->isUnbounded() )
+		if( this->isInfinite() )
         {
             a = emptyInterval();
             return false;
@@ -1711,4 +1737,56 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return rhs < lhs;
 	}
+
+    template<typename Number>
+    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.upperBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            default:
+                return lhs.upper() <= rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator >=(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.lowerBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            default:
+                return lhs.lower() >= rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator <(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.upperBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            case BoundType::STRICT:
+                return lhs.upper() <= rhs;
+            default:
+                return lhs.upper() < rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator >(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.lowerBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            case BoundType::STRICT:
+                return lhs.lower() >= rhs;
+            default:
+                return lhs.lower() > rhs;
+        }
+    }
 }

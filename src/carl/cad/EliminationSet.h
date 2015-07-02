@@ -72,7 +72,7 @@ private:
 		 * Constructor.
          * @param p Polynomial to search for.
          */
-		PolynomialPairContains(const UPolynomial* p) : p(p) {
+		PolynomialPairContains(const UPolynomial* _p) : p(_p) {
 		}
 		/**
 		 * Checks if the PolynomialPair contains the polynomial that was passed to the constructor.

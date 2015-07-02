@@ -25,7 +25,8 @@ namespace carl
     template<typename Pol>
     class FormulaPool : public Singleton<FormulaPool<Pol>>
     {
-            friend Singleton<FormulaPool>;
+        friend Singleton<FormulaPool>;
+        friend Formula<Pol>;
         
         private:
             
@@ -87,23 +88,6 @@ namespace carl
                 }
                 std::cout << std::endl;
             }
-
-            /**
-             * @return If _true = true, the valid formula True otherwise the invalid formula False.
-             */
-            const FormulaContent<Pol>* create( bool _true )
-            {
-                return _true ? trueFormula() : falseFormula();
-            }
-
-            /**
-             * @param _booleanVar The Boolean variable wrapped by this formula.
-             * @return A formula with wrapping the given Boolean variable.
-             */
-            const FormulaContent<Pol>* create( Variable::Arg _booleanVar )
-            {
-                return add( new FormulaContent<Pol>( _booleanVar ) );
-            }
             
             Formula<Pol> getTseitinVar( const Formula<Pol>& _formula )
             {
@@ -127,139 +111,151 @@ namespace carl
                 return Formula<Pol>( iter.first->second );
             }
             
+        private:
+            // ##### Core Theory
+
+            /**
+             * Create formula representing a boolean value.
+             * @param _type Formula type, may be either TRUE or FALSE.
+             * @return A formula representing the given bool.
+             */
+            const FormulaContent<Pol>* create(FormulaType _type) {
+                assert(_type == TRUE || _type == FALSE);
+                return (_type == TRUE) ? trueFormula() : falseFormula();
+            }
+
+            /**
+             * Create formula representing a boolean variable.
+             * @param _booleanVar The Boolean variable wrapped by this formula.
+             * @return A formula with wrapping the given Boolean variable.
+             */
+            const FormulaContent<Pol>* create(Variable::Arg _variable) {
+                return add(new FormulaContent<Pol>(_variable));
+            }
+            
             /**
              * @param _constraint The constraint wrapped by this formula.
              * @return A formula with wrapping the given constraint.
              */
-            const FormulaContent<Pol>* create( const Constraint<Pol>& _constraint )
-            {
+            const FormulaContent<Pol>* create(Constraint<Pol>&& _constraint) {
                 #ifdef SIMPLIFY_FORMULA
-                if( _constraint == Constraint<Pol>( true ) )
-                    return trueFormula();
-                if( _constraint == Constraint<Pol>( false ) )
-                    return falseFormula();
+                switch (_constraint.isConsistent()) {
+                    case 0: return falseFormula();
+                    case 1: return trueFormula();
+                    default: ;
+                }
                 #endif
-                return add( new FormulaContent<Pol>( _constraint ) );
+                return add(new FormulaContent<Pol>(std::move(_constraint)));
+            }
+            const FormulaContent<Pol>* create(const Constraint<Pol>& _constraint) {
+                return create(std::move(Constraint<Pol>(_constraint)));
             }
             
-            const FormulaContent<Pol>* create( const BVConstraint& _constraint )
-            {
+            const FormulaContent<Pol>* create(BVConstraint&& _constraint) {
                 #ifdef SIMPLIFY_FORMULA
-                if( _constraint.isAlwaysConsistent() )
-                    return trueFormula();
-                if( _constraint.isAlwaysInconsistent() )
-                    return falseFormula();
+                if (_constraint.isAlwaysConsistent()) return trueFormula();
+                if (_constraint.isAlwaysInconsistent()) return falseFormula();
                 #endif
-                return add( new FormulaContent<Pol>( _constraint ) );
+                return add(new FormulaContent<Pol>(std::move(_constraint)));
+            }
+            const FormulaContent<Pol>* create(const BVConstraint& _constraint) {
+                return create(std::move(BVConstraint(_constraint)));
             }
             
+            
             /**
-             * 
-             * @param _subFormula
-             * @return 
+             * Create formula representing a unary function.
+             * @param _type Formula type specifying the function.
+             * @param _subFormula Formula representing the function argument.
+             * @return A formula representing the given function call.
              */
-            const FormulaContent<Pol>* createNegation( const Formula<Pol>& _subFormula )
-            {
-                return _subFormula.mpContent->mNegation;
-            }
-    
-            /**
-             * 
-             * @param _premise
-             * @param _conclusion
-             * @return 
-             */
-            const FormulaContent<Pol>* createImplication( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion )
-            {
-                #ifdef SIMPLIFY_FORMULA
-                if( _premise.mpContent == mpFalse )
-                    return trueFormula();
-                if( _premise.mpContent == mpTrue )
-                {
-                    return _conclusion.mpContent;
-                }
-                if( _conclusion.mpContent == mpTrue )
-                    return trueFormula();
-                if( _conclusion.mpContent == mpFalse )
-                    return createNegation( _premise.mpContent );
-                #endif
-                return add( new FormulaContent<Pol>( _premise, _conclusion ) );
-            }
-    
-            /**
-             * Create a formula representing an if-then-else.
-             * @param _condition Condition.
-             * @param _then Then.
-			 * @param _else Else.
-             * @return
-             */
-            const FormulaContent<Pol>* createIte( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else )
-            {
-                #ifdef SIMPLIFY_FORMULA
-                if( _then == _else )
-                {
-                    return _then.mpContent;
-                }
-                if( _condition.mpContent == mpFalse )
-                {
-                    return _else.mpContent;
-                }
-                if( _condition.mpContent == mpTrue )
-                {
-                    return _then.mpContent;
-                }
-                if( _then.mpContent == mpFalse )
-                {
-                    // (ite c false b) = (~c or false) and (c or b) = ~c and (c or b) = (~c and b)
-                    Formulas<Pol> subFormulas;
-                    subFormulas.insert( Formula<Pol>( FormulaType::NOT, _condition ) );
-                    subFormulas.insert( _else );
-                    return add( new FormulaContent<Pol>( FormulaType::AND, std::move(subFormulas) ) );
-                }
-                if( _then.mpContent == mpTrue )
-                {
-                    // (ite c false b) = (~c or true) and (c or b) = (c or b)
-                    Formulas<Pol> subFormulas;
-                    subFormulas.insert( _condition );
-                    subFormulas.insert( _else );
-                    return add( new FormulaContent<Pol>( FormulaType::OR, std::move(subFormulas) ) );
-                }
-                if( _else.mpContent == mpFalse )
-                {
-                    // (ite c false b) = (~c or a) and (c or false) = (~c or a) and c = (c and a)
-                    Formulas<Pol> subFormulas;
-                    subFormulas.insert( _condition );
-                    subFormulas.insert( _then );
-                    return add( new FormulaContent<Pol>( FormulaType::AND, std::move(subFormulas) ) );
-                }
-                if( _else.mpContent == mpTrue )
-                {
-                    // (ite c false b) = (~c or a) and (c or true) = (~c or a)
-                    Formulas<Pol> subFormulas;
-                    subFormulas.insert( Formula<Pol>( FormulaType::NOT, _condition ) );
-                    subFormulas.insert( _then );
-                    return add( new FormulaContent<Pol>( FormulaType::OR, std::move(subFormulas) ) );
-                }
-                Formula<Pol> thenFormula = _then;
-                Formula<Pol> elseFormula = _else;
-                if( _condition == elseFormula )
-                    elseFormula = falseFormula();
-                else if( _condition.mpContent == elseFormula.mpContent->mNegation )
-                    elseFormula = trueFormula();
-                if( _condition.mpContent == thenFormula.mpContent->mNegation )
-                    thenFormula = falseFormula();
-                else if( _condition == thenFormula )
-                    thenFormula = trueFormula();
-                if( thenFormula == elseFormula )
-                    return _then.mpContent;
-                if( _condition.getType() == FormulaType::NOT )
-                    return add( new FormulaContent<Pol>( _condition.subformula(), elseFormula, thenFormula ) );
-                return add( new FormulaContent<Pol>( _condition, thenFormula, elseFormula ) );
-                #else
-                return add( new FormulaContent<Pol>( _condition, _then, _else ) );
-                #endif
-            }
+            const FormulaContent<Pol>* create(FormulaType _type, Formula<Pol>&& _subFormula) {
+                switch (_type) {
+                    case ITE:
+                    case EXISTS:
+                    case FORALL:
+                        assert(false); break;
 
+                    // Core Theory
+                    case TRUE:
+                    case FALSE:
+                    case BOOL:
+                        assert(false); break;
+                    case NOT:
+                        return _subFormula.mpContent->mNegation;
+                    case IMPLIES:
+                        assert(false); break;
+                    case AND:
+                    case OR:
+                    case XOR:
+                        return _subFormula.mpContent;
+                    case IFF:
+                        return create(TRUE);
+
+                    // Arithmetic Theory
+                    case CONSTRAINT:
+                        assert(false); break;
+
+                    case BITVECTOR:
+                    case UEQ:
+                        assert(false); break;
+                }
+                return nullptr;
+            }
+            
+            /**
+             * Create formula representing a nary function.
+             * @param _type Formula type specifying the function.
+             * @param _subformulas Formula representing the function arguments.
+             * @return A formula representing the given function call.
+             */
+            const FormulaContent<Pol>* create(FormulaType _type, const Formulas<Pol>& _subformulas) {
+                return create(_type, std::move(Formulas<Pol>(_subformulas)));
+            }
+            const FormulaContent<Pol>* create(FormulaType _type, const std::initializer_list<Formula<Pol>>& _subformulas) {
+                return create(_type, std::move(Formulas<Pol>(_subformulas.begin(), _subformulas.end())));
+            }
+            const FormulaContent<Pol>* create(FormulaType _type, Formulas<Pol>&& _subformulas) {
+                switch (_type) {
+                    case ITE:
+                        return createITE(std::move(_subformulas));
+                    case EXISTS:
+                    case FORALL:
+                    // Core Theory
+                    case TRUE:
+                    case FALSE:
+                    case BOOL:
+                    case NOT:
+                        assert(false); break;
+                    case IMPLIES:
+                        return createImplication(std::move(_subformulas));
+                    case AND:
+                    case OR:
+                    case XOR:
+                    case IFF:
+                        return createNAry(_type, std::move(_subformulas));
+                    // Arithmetic Theory
+                    case CONSTRAINT:
+                    // Bitvector Theory
+                    case BITVECTOR:
+                    // Uninterpreted Theory
+                    case UEQ:
+                        assert(false); break;
+                }
+                return nullptr;
+            }
+    
+            /**
+             * Create formula representing an implication.
+             * @param _subformulas
+             * @return 
+             */
+            const FormulaContent<Pol>* createImplication(Formulas<Pol>&& _subformulas);
+            
+            const FormulaContent<Pol>* createNAry(FormulaType _type, Formulas<Pol>&& _subformulas);
+
+            const FormulaContent<Pol>* createITE(Formulas<Pol>&& _subformulas);
+            
 			/**
 			 *
 			 * @param _type
@@ -267,32 +263,14 @@ namespace carl
 			 * @param _term
 			 * @return
 			 */
-			const FormulaContent<Pol>* create(FormulaType _type, const std::vector<Variable>&& _vars, const Formula<Pol>& _term)
-			{
+			const FormulaContent<Pol>* create(FormulaType _type, std::vector<Variable>&& _vars, const Formula<Pol>& _term) {
 				assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
-				if( _vars.size() > 0 )
-                {
+				if (_vars.size() > 0) {
 					return add( new FormulaContent<Pol>(_type, std::move(_vars), _term ) );
-				}
-                else
-                {
+				} else {
 					return _term.mpContent;
 				}
 			}
-            
-            /**
-             * @param _type The type of the n-ary operator (n>1) of the formula to create.
-             * @param _subFormulaA The first sub-formula of the formula to create.
-             * @param _subFormulaB The second sub-formula of the formula to create.
-             * @return A formula with the given operator and sub-formulas.
-             */
-            const FormulaContent<Pol>* create( FormulaType _type, const Formula<Pol>& _subFormulaA, const Formula<Pol>& _subFormulaB )
-            {
-                Formulas<Pol> subFormulas;
-                subFormulas.insert( _subFormulaA );
-                subFormulas.insert( _subFormulaB );
-                return create( _type, std::move( subFormulas ) );
-            }
             
             /**
              * @param _subformulas The sub-formulas of the formula to create.
@@ -334,21 +312,6 @@ namespace carl
                 return create( FormulaType::XOR, std::move( subFormulas ) );
             }
             
-            /**
-             * @param _type The type of the n-ary operator (n>1) of the formula to create.
-             * @param _subformulas The sub-formulas of the formula to create.
-             * @return A formula with the given operator and sub-formulas.
-             */
-            const FormulaContent<Pol>* create( FormulaType _type, const Formulas<Pol>& _subformulas )
-            {
-                return create( _type, std::move( Formulas<Pol>( _subformulas ) ) );
-            }
-            
-            const FormulaContent<Pol>* create( FormulaType _type, const std::vector<Formula<Pol>>& _subformulas )
-            {
-                return create( _type, std::move( Formulas<Pol>( _subformulas.begin(), _subformulas.end() ) ) );
-            }
-
 			const FormulaContent<Pol>* create( const UEquality::Arg& _lhs, const UEquality::Arg& _rhs, bool _negated )
 			{
                 #ifdef SIMPLIFY_FORMULA
@@ -413,10 +376,12 @@ namespace carl
             {
                 FORMULA_POOL_LOCK_GUARD
                 const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
+                assert( tmp != nullptr );
                 assert( tmp->mUsages < std::numeric_limits<size_t>::max() );
                 ++tmp->mUsages;
             }
             
+        public:
             template<typename ArgType>
             void forallDo( void (*_func)( ArgType*, const Formula<Pol>& ), ArgType* _arg ) const
             {
@@ -462,7 +427,7 @@ namespace carl
              * sub-formula are condensed. You should only use it, if you can exlcude this 
              * possibility. Otherwise use the method newExclusiveDisjunction.
              */
-            const FormulaContent<Pol>* create( FormulaType _type, Formulas<Pol>&& _subformulas );
+            //const FormulaContent<Pol>* create( FormulaType _type, Formulas<Pol>&& _subformulas );
             
     private:
         
