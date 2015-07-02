@@ -8,6 +8,7 @@
 #include <vector>
 #include "Variable.h"
 #include <set>
+#include "carl/core/MultivariatePolynomial.h"
 
 namespace carl{
 
@@ -20,17 +21,15 @@ class MultivariateHorner {
 * h = Variable^(Exponent) * SUM(h_dependent) + SUM(h_independent) + constant
 *
 */
-
 public:
 	/// Type of the coefficients. 	
+	
 	typedef typename PolynomialType::CoeffType CoeffType;
-
+	CoeffType mCoeff = constant_zero<CoeffType>::get();
 	Variable mVariable;
-	std::size_t mExponent;
-	std::vector<MultivariateHorner> mDependent;
-	std::vector<MultivariateHorner> mIndependent;
-	CoeffType mConstant;
-
+	MultivariateHorner *mDependent;
+	MultivariateHorner *mIndependent;
+	
 	//Constuctor
 	MultivariateHorner (const PolynomialType& inPut);
 
@@ -43,32 +42,42 @@ public:
 		mVariable = var;
 	}
 
-	const std::vector<MultivariateHorner>& getDependent(){
-		return mDependent;
+	const MultivariateHorner& getDependent(){
+		return *mDependent;
 	}
 
-	void setDependent(const std::vector<MultivariateHorner>& dependent){
-		mDependent = dependent;
+	void setDependent(const MultivariateHorner& dependent){
+		mDependent = *dependent;
 	}
 
-	//Restriced use: Execute only on 4th of july
-	const std::vector<MultivariateHorner>& getIndependent(){
-		return mIndependent;
+	const MultivariateHorner& getIndependent(){
+		return *mIndependent;
 	}
 
-	void setIndependent(const std::vector<MultivariateHorner>& independent){
-		mIndependent = independent;
+	void setIndependent(const MultivariateHorner& independent){
+		*mIndependent = independent;
 	}
 
-	const CoeffType& getConstant(){
-		return mConstant;
+	CoeffType& getConstant(){
+		return mCoeff;
 	}
 
-	void setConstant(const CoeffType& num){
-		mConstant = num;
+	void setConstant(const CoeffType& constant){
+		mCoeff = constant;
+	}	
+
+	MultivariateHorner& operator=(const MultivariateHorner& mh) {
+
+		mCoeff = mh.mCoeff;
+		std::cout << "A" << std::endl;
+	 	mDependent = mh.mDependent;
+	 	std::cout << "B" << std::endl;
+	 	mIndependent = mh.mIndependent;		
+	 	std::cout << "C" << std::endl;
+	 	mVariable = mh.mVariable;
+		
+		return *this;
 	}
-
-
 };
 
 }//namespace carl
