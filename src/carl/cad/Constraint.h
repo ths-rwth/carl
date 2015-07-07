@@ -58,7 +58,7 @@ public:
 	 * @param v the variables of the polynomial
 	 * @param negated if set to <code>true</code>, <code>satisfiedBy</code> checks the negation of the specified sign condition. If otherwise <code>false</code> is specified (standard value), <code>satisfiedBy</code> checks the sign condition as specified.
 	 */
-	Constraint(const cad::MPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool _negated = false):
+	Constraint(const cad::MultiPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool _negated = false):
 		polynomial(p),
 		sign(s),
 		variables(checkVariables(p, v)),
