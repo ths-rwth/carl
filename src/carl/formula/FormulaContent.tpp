@@ -82,9 +82,15 @@ namespace carl {
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent( UEquality&& _ueq ):
         mHash( std::hash<UEquality>()( _ueq ) ),
-        mType( FormulaType::UEQ ),
-        mUIEquality( std::move( _ueq ) )
+#ifdef __VS
+        mType( FormulaType::UEQ )
     {
+		mpUIEqualityVS = new UEquality(std::move(_ueq));
+#else
+		mType(FormulaType::UEQ),
+		mUIEquality(std::move(_ueq))
+	{
+#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mUIEquality);
 	}
 

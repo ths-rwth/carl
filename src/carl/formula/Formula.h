@@ -355,7 +355,11 @@ namespace carl
             const Formula& premise() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mSubformulas[0];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(0);
+#else
+				return mpContent->mSubformulas[0];
+#endif
             }
             
             /**
@@ -364,7 +368,11 @@ namespace carl
             const Formula& conclusion() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mSubformulas[1];
+#ifdef __VS
+                return mpContent->mpSubformulasVS->at(1);
+#else
+				return mpContent->mSubformulas[1];
+#endif
             }
             
             /**
@@ -373,7 +381,11 @@ namespace carl
             const Formula& condition() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mSubformulas[0];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(0);
+#else
+				return mpContent->mSubformulas[0];
+#endif
             }
             
             /**
@@ -382,7 +394,11 @@ namespace carl
             const Formula& firstCase() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mSubformulas[1];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(1);
+#else
+				return mpContent->mSubformulas[1];
+#endif
             }
             
             /**
@@ -391,7 +407,11 @@ namespace carl
             const Formula& secondCase() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mSubformulas[2];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(2);
+#else
+				return mpContent->mSubformulas[2];
+#endif
             }
 
             /**
@@ -400,7 +420,11 @@ namespace carl
 			const std::vector<carl::Variable>& quantifiedVariables() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
+#ifdef __VS
+				return mpContent->mpQuantifierContentVS->mVariables;
+#else
 				return mpContent->mQuantifierContent.mVariables;
+#endif
 			}
 
             /**
@@ -409,7 +433,11 @@ namespace carl
 			const Formula& quantifiedFormula() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
+#ifdef __VS
+				return mpContent->mpQuantifierContentVS->mFormula;
+#else
 				return mpContent->mQuantifierContent.mFormula;
+#endif
 			}
 
             /**
@@ -488,7 +516,11 @@ namespace carl
                         || mpContent->mType == FormulaType::BITVECTOR )
                     return 1;
                 else
-                    return mpContent->mSubformulas.size();
+#ifdef __VS
+                    return mpContent->mpSubformulasVS->size();
+#else
+					return mpContent->mSubformulas.size();
+#endif
             }
 
             /**
@@ -502,7 +534,11 @@ namespace carl
                         || mpContent->mType == FormulaType::BITVECTOR )
                     return false;
                 else
-                    return mpContent->mSubformulas.empty();
+#ifdef __VS
+                    return mpContent->mpSubformulasVS->empty();
+#else
+					return mpContent->mSubformulas.empty();
+#endif
             }
 
             /**
@@ -511,7 +547,11 @@ namespace carl
             const_iterator begin() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas.begin();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->begin();
+#else
+				return mpContent->mSubformulas.begin();
+#endif
             }
 
             /**
@@ -521,7 +561,11 @@ namespace carl
             {
                 assert( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR 
                         || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR );
-                return mpContent->mSubformulas.end();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->end();
+#else
+				return mpContent->mSubformulas.end();
+#endif
             }
 
             /**
@@ -530,7 +574,11 @@ namespace carl
             const_reverse_iterator rbegin() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas.rbegin();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->rbegin();
+#else
+				return mpContent->mSubformulas.rbegin();
+#endif
             }
 
             /**
@@ -539,7 +587,11 @@ namespace carl
             const_reverse_iterator rend() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas.rend();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->rend();
+#else
+				return mpContent->mSubformulas.rend();
+#endif
             }
 
             /**
@@ -548,14 +600,17 @@ namespace carl
             const Formula& back() const
             {
                 assert( isBooleanCombination() );
-				if (mpContent->mType == FormulaType::NOT)
 #ifdef __VS
+				if (mpContent->mType == FormulaType::NOT)
 					return *mpContent->mpSubformulaVS;
+				else
+					return *(--(mpContent->mpSubformulasVS->end()));
 #else
+				if (mpContent->mType == FormulaType::NOT)
                     return mpContent->mSubformula;
+				else
+					return *(--(mpContent->mSubformulas.end()));
 #endif
-                else
-                    return *(--(mpContent->mSubformulas.end()));
             }
             
             /**
@@ -647,11 +702,13 @@ namespace carl
                 if( mpContent->mType == FormulaType::NOT )
 #ifdef __VS
                     return (*mpContent->mpSubformulaVS) == _formula;
+				else
+					return std::find(mpContent->mpSubformulasVS->begin(), mpContent->mpSubformulasVS->end(), _formula) != mpContent->mpSubformulasVS->end();
 #else
 					return mpContent->mSubformula == _formula;
+				else
+					return std::find(mpContent->mSubformulas.begin(), mpContent->mSubformulas.end(), _formula) != mpContent->mSubformulas.end();
 #endif
-                else
-                    return std::find(mpContent->mSubformulas.begin(), mpContent->mSubformulas.end(), _formula ) != mpContent->mSubformulas.end();
             }
             
             /**
