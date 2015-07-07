@@ -1796,39 +1796,6 @@ namespace carl
             return true;
         }
     }
-
-	template<typename Formula>
-	void FormulaVisitor<Formula>::visitVoid(const Formula& formula, const std::function<void(Formula)>& func) {
-		func(formula);
-		switch (formula.getType()) {
-		case AND:
-		case OR:
-		case IFF:
-		case XOR: 
-		case IMPLIES:
-        case ITE:
-        {
-			for (const auto& cur: formula.subformulas()) visit(cur, func);
-			break;
-		}
-		case NOT: {
-            visitVoid(formula.subformula(), func);
-			break;
-		}
-		case BOOL:
-		case CONSTRAINT:
-		case BITVECTOR:
-		case TRUE:
-		case FALSE:
-		case UEQ:
-			break;
-		case EXISTS:
-		case FORALL: {
-			visit(formula.quantifiedFormula(), func);
-			break;
-		}
-		}
-	}
     
     template<typename Formula>
 	void FormulaVisitor<Formula>::rvisit(const Formula& formula, const std::function<void(Formula)>& func) {
@@ -1861,55 +1828,6 @@ namespace carl
 		}
 		func(formula);
 		}
-	}
-
-	template<typename Formula>
-	Formula FormulaVisitor<Formula>::visitResult(const Formula& formula, const std::function<Formula(Formula)>& func) {
-		Formula newFormula = func(formula);
-		switch (newFormula.getType()) {
-		case AND:
-		case OR:
-		case IFF:
-		case XOR:
-        case IMPLIES:
-        case ITE:
-        {
-			Formulas<typename Formula::PolynomialType> newSubformulas;
-			bool changed = false;
-			for (const auto& cur: newFormula.subformulas()) {
-                Formula newCur = visitResult(cur, func);
-				if (newCur != cur) changed = true;
-				newSubformulas.push_back(newCur);
-			}
-			if (changed) {
-				return Formula(newFormula.getType(), newSubformulas);
-			}
-			break;
-		}
-		case NOT: {
-            Formula cur = visitResult(newFormula.subformula(), func);
-			if (cur != newFormula.subformula()) {
-				return Formula(NOT, cur);
-			}
-			break;
-		}
-		case BOOL:
-		case CONSTRAINT:
-		case BITVECTOR:
-		case TRUE:
-		case FALSE:
-		case UEQ:
-			break;
-		case EXISTS:
-		case FORALL: {
-			Formula sub = visit(newFormula.quantifiedFormula(), func);
-			if (sub != newFormula.quantifiedFormula()) {
-				return Formula(newFormula.getType(), newFormula.quantifiedVariables(), sub);
-			}
-			break;
-		}
-		}
-		return newFormula;
 	}
 
 	template<typename Formula>
