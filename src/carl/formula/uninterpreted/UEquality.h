@@ -301,9 +301,7 @@ namespace carl
             std::string toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const;
             
             void collectUVariables( std::set<UVariable>& _uvars ) const;
-            
-            void collectUVariables( std::set<UVariable>& _uvars ) const;
-            
+
             /**
              * Prints the given uninterpreted equality on the given output stream.
              * @param _os The output stream to print on.
