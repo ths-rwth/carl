@@ -143,9 +143,15 @@ namespace carl {
     FormulaContent<Pol>::FormulaContent(FormulaType _type, std::vector<carl::Variable>&& _vars, const Formula<Pol>& _term):
         ///@todo Construct reasonable hash
         mHash( _term.getHash() ),
-        mType( _type ),
-		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term))))
+#ifdef __VS
+        mType( _type )
     {
+		mpQuantifierContentVS = new QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term)));
+#else
+		mType(_type),
+		mQuantifierContent(QuantifierContent<Pol>(std::move(_vars), std::move(Formula<Pol>(_term))))
+	{
+#endif
         assert(_type == FormulaType::EXISTS || _type == FormulaType::FORALL);
     }
 
