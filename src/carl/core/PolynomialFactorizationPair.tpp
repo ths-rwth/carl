@@ -43,14 +43,14 @@ namespace carl
             {
                 if( _factorization.size() == 1 && _factorization.begin()->second == 1 )
                 {
-                    return _factorization.begin()->first.toString( true, _friendlyVarNames );
+                    return _factorization.begin()->first.toString( false, _friendlyVarNames );
                 }
                 result += "(*";
                 for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )
                 {
                     assert( polyExpPair->second > 0 );
                     for( size_t i = 0; i < polyExpPair->second; ++i )
-                        result += " " + polyExpPair->first.toString( true, _friendlyVarNames );
+                        result += " " + polyExpPair->first.toString( false, _friendlyVarNames );
                 }
                 result += ")";
             }
