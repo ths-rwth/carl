@@ -443,7 +443,11 @@ namespace carl
             const BVConstraint& bvConstraint() const
             {
                 assert( mpContent->mType == FormulaType::BITVECTOR );
-                return mpContent->mBVConstraint;
+#ifdef __VS
+                return *mpContent->mpBVConstraintVS;
+#else
+				return mpContent->mBVConstraint;
+#endif
             }
 
             /**
@@ -453,7 +457,11 @@ namespace carl
             carl::Variable::Arg boolean() const
             {
                 assert( mpContent->mType == FormulaType::BOOL );
-                return mpContent->mVariable;
+#ifdef __VS
+                return *mpContent->mpVariableVS;
+#else
+				return mpContent->mVariable;
+#endif
             }
             
             /**
@@ -932,7 +940,7 @@ namespace carl
 		 * @param formula Formula to visit.
 		 * @param func Function to call.
 		 */
-		void visit(const Formula& formula, const std::function<void(Formula)>& func);
+		void visitVoid(const Formula& formula, const std::function<void(Formula)>& func);
 		void rvisit(const Formula& formula, const std::function<void(Formula)>& func);
 		/**
 		 * Recursively calls func on every subformula and return a new formula.
@@ -941,7 +949,7 @@ namespace carl
 		 * @param func Function to call.
 		 * @return New formula.
 		 */
-		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
+		Formula visitResult(const Formula& formula, const std::function<Formula(Formula)>& func);
 		Formula rvisit(const Formula& formula, const std::function<Formula(Formula)>& func);
 	};
     

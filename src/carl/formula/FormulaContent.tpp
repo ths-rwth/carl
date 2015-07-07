@@ -51,18 +51,30 @@ namespace carl {
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(Constraint<Pol>&& _constraint):
         mHash( _constraint.id() << (sizeof(size_t)*4) ),
-        mType( FormulaType::CONSTRAINT ),
-        mConstraint(std::move(_constraint))
+#ifdef __VS
+        mType( FormulaType::CONSTRAINT )
     {
+		mpConstraintVS = new Constraint<Pol>(std::move(_constraint));
+#else
+		mType(FormulaType::CONSTRAINT),
+		mConstraint(std::move(_constraint))
+	{
+#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mConstraint);
 	}
 
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(BVConstraint&& _constraint):
         mHash( ((size_t) _constraint.id()) << (sizeof(size_t)*4) ),
-        mType( FormulaType::BITVECTOR ),
-        mBVConstraint(std::move(_constraint))
+#ifdef __VS
+        mType( FormulaType::BITVECTOR )
     {
+		mpBVConstraintVS = new BVConstraint(std::move(_constraint));
+#else
+		mType(FormulaType::BITVECTOR),
+		mBVConstraint(std::move(_constraint))
+	{
+#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mBVConstraint);
 	}
 
@@ -198,19 +210,35 @@ namespace carl {
             s << " [" << mDifficulty << ":" << mActivity << "]";
             activity += s.str();
         }
+#ifdef __VS
         if( mType == FormulaType::BOOL )
         {
-            return (_init + VariablePool::getInstance().getName( mVariable, _friendlyNames ) + activity);
+            return (_init + VariablePool::getInstance().getName( *mpVariableVS, _friendlyNames ) + activity);
         }
         else if( mType == FormulaType::CONSTRAINT )
-            return (_init + mConstraint.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+            return (_init + mpConstraintVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         else if (mType == FormulaType::BITVECTOR) {
-            return (_init + mBVConstraint.toString(_init, _oneline, _infix, _friendlyNames) + activity);
+            return (_init + mpBVConstraintVS->toString(_init, _oneline, _infix, _friendlyNames) + activity);
         }
         else if( mType == FormulaType::UEQ )
         {
-            return (_init + mUIEquality.toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
+            return (_init + mpUIEqualityVS->toString( _resolveUnequal, _infix, _friendlyNames ) + activity);
         }
+#else
+		if (mType == FormulaType::BOOL)
+		{
+			return (_init + VariablePool::getInstance().getName(mVariable, _friendlyNames) + activity);
+		}
+		else if (mType == FormulaType::CONSTRAINT)
+			return (_init + mConstraint.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+		else if (mType == FormulaType::BITVECTOR) {
+			return (_init + mBVConstraint.toString(_init, _oneline, _infix, _friendlyNames) + activity);
+		}
+		else if (mType == FormulaType::UEQ)
+		{
+			return (_init + mUIEquality.toString(_resolveUnequal, _infix, _friendlyNames) + activity);
+		}
+#endif
         else if( mType == FormulaType::FALSE || mType == FormulaType::TRUE )
             return (_init + formulaTypeToString( mType ) + activity);
         else if( mType == FormulaType::NOT )
@@ -226,27 +254,45 @@ namespace carl {
                 result += "(not";
                 result += (_oneline ? " " : "\n");
             }
-            result += mSubformula.toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames );
-            result += (_oneline ? "" : "\n") + _init + ")";
+#ifdef __VS
+            result += mpSubformulaVS->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames );
+#else
+			result += mSubformula.toString(_withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, _infix, _friendlyNames);
+#endif
+			result += (_oneline ? "" : "\n") + _init + ")";
             return result;
         }
         else if (mType == FormulaType::EXISTS)
         {
             string result = _init + "(exists ";
-            for (auto v: mQuantifierContent.mVariables) {
+#ifdef __VS
+            for (auto v: mpQuantifierContentVS->mVariables) {
                 result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
             }
-            result += mQuantifierContent.mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+            result += mpQuantifierContentVS->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+#else
+			for (auto v : mQuantifierContent.mVariables) {
+				result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
+			}
+			result += mQuantifierContent.mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+#endif
             result += ")";
             return result;
         }
         else if (mType == FormulaType::FORALL)
         {
             string result = _init + "(forall ";
-            for (auto v: mQuantifierContent.mVariables) {
+#ifdef __VS
+            for (auto v: mpQuantifierContentVS->mVariables) {
                 result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
             }
-            result += mQuantifierContent.mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+            result += mpQuantifierContentVS->mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+#else
+			for (auto v : mQuantifierContent.mVariables) {
+				result += VariablePool::getInstance().getName(v, _friendlyNames) + " ";
+			}
+			result += mQuantifierContent.mFormula.toString(_withActivity, _resolveUnequal, _init, _oneline, _infix, _friendlyNames);
+#endif
             result += ")";
             return result;
         }
@@ -255,9 +301,15 @@ namespace carl {
         string result = _init + "(";
         if( _infix )
         {
-            for( auto subFormula = mSubformulas.begin(); subFormula != mSubformulas.end(); ++subFormula )
+#ifdef __VS
+            for( auto subFormula = mpSubformulasVS->begin(); subFormula != mpSubformulasVS->end(); ++subFormula )
             {
-                if( subFormula != mSubformulas.begin() )
+                if( subFormula != mpSubformulasVS->begin() )
+#else
+			for (auto subFormula = mSubformulas.begin(); subFormula != mSubformulas.end(); ++subFormula)
+			{
+				if (subFormula != mSubformulas.begin())
+#endif
                     result += " " + stringOfType + " ";
                 if( !_oneline ) 
                     result += "\n";
@@ -267,7 +319,11 @@ namespace carl {
         else
         {
             result += stringOfType;
-            for( auto subFormula = mSubformulas.begin(); subFormula != mSubformulas.end(); ++subFormula )
+#ifdef __VS
+			for (auto subFormula = mpSubformulasVS->begin(); subFormula != mpSubformulasVS->end(); ++subFormula)
+#else
+			for (auto subFormula = mSubformulas.begin(); subFormula != mSubformulas.end(); ++subFormula)
+#endif
             {
                 result += (_oneline ? " " : "\n");
                 result += subFormula->toString( _withActivity, _resolveUnequal, _oneline ? "" : (_init + "   "), _oneline, false, _friendlyNames );

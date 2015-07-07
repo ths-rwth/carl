@@ -488,7 +488,7 @@ namespace carl
             Variables vars;
             std::set<UVariable> uvars;
             std::set<BVVariable> bvvars;
-            visitor.visit(*this, 
+            visitor.visitVoid(*this, 
                     [&](const Formula& _f) 
                     {
                         switch(_f.getType())
@@ -1915,16 +1915,16 @@ namespace carl
     template<typename Formula>
     Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements) {
         PolynomialSubstitutor subs(replacements);
-        return visitor.visit(formula, std::function<Formula(Formula)>(subs));
+        return visitor.visitResult(formula, std::function<Formula(Formula)>(subs));
     }
     template<typename Formula>
     Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<BVVariable,BVTerm>& replacements) {
         BitvectorSubstitutor subs(replacements);
-        return visitor.visit(formula, std::function<Formula(Formula)>(subs));
+        return visitor.visitResult(formula, std::function<Formula(Formula)>(subs));
     }
     template<typename Formula>
     Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<UVariable,UFInstance>& replacements) {
         UninterpretedSubstitutor subs(replacements);
-        return visitor.visit(formula, std::function<Formula(Formula)>(subs));
+        return visitor.visitResult(formula, std::function<Formula(Formula)>(subs));
     }
 }    // namespace carl
