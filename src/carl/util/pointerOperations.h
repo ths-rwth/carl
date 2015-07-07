@@ -92,25 +92,25 @@ struct less {
 
 template<typename T, bool mayBeNull>
 struct less<T*, mayBeNull> {
-	std::less<T> less;
+	std::less<T> _less;
 	bool operator()(const T* lhs, const T* rhs) const {
 		if (lhs == rhs) return false;
 		if (mayBeNull) {
 			if (lhs == nullptr || rhs == nullptr) return lhs == nullptr;
 		}
-		return less(*lhs, *rhs);
+		return _less(*lhs, *rhs);
 	}
 };
 
 template<typename T, bool mayBeNull>
 struct less<std::shared_ptr<T>, mayBeNull> {
-	std::less<T> less;
+	std::less<T> _less;
 	bool operator()(const std::shared_ptr<const T>& lhs, const std::shared_ptr<const T>& rhs) const {
 		if (lhs == rhs) return false;
 		if (mayBeNull) {
 			if (lhs == nullptr || rhs == nullptr) return lhs == nullptr;
 		}
-		return less(*lhs, *rhs);
+		return _less(*lhs, *rhs);
 	}
 };
 
