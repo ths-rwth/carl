@@ -70,7 +70,11 @@ int last_assertion_code = 23;
 /**
  * Actual signal handler.
  */
+#ifdef __VS
+__declspec(noreturn) static void handle_signal(int signal) {
+#else
 [[noreturn]] static void handle_signal(int signal) {
+#endif
 	//printStacktrace(false);
 	std::cerr << std::endl << "Catched SIGABRT " << signal << ", exiting with " << (last_assertion_code%256) << std::endl;
 	if (last_assertion_string.size() != 0) {
