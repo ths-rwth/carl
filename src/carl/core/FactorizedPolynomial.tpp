@@ -615,11 +615,7 @@ namespace carl
                 }
                 else
                 {
-                    auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
-                    if( !ret.second )
-                    {
-                        ret.first->second += factor.second;
-                    }
+                    resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
                 }
             }
             FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
@@ -672,11 +668,7 @@ namespace carl
                 }
                 else
                 {
-                    auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
-                    if( !ret.second )
-                    {
-                        ret.first->second += factor.second;
-                    }
+                    resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
                 }
             }
             FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
@@ -720,11 +712,7 @@ namespace carl
                 }
                 else
                 {
-                    auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
-                    if( !ret.second )
-                    {
-                        ret.first->second += factor.second;
-                    }
+                    resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( subResult, factor.second ) );
                 }
             }
             FactorizedPolynomial<P> result( std::move( resultFactorization ), resultCoeff, mpCache );
@@ -771,22 +759,14 @@ namespace carl
         {
             if( factor.second % 2 == 0 )
             {
-                auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( factor.first, factor.second/2 ) );
-                if( !ret.second )
-                {
-                    ret.first->second += factor.second/2;
-                }
+                resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( factor.first, factor.second/2 ) );
             }
             else
             {
                 FactorizedPolynomial<P> sqrtOfFactor;
                 if( !factor.first.sqrt( sqrtOfFactor ) )
                     return false;
-                auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( sqrtOfFactor, factor.second ) );
-                if( !ret.second )
-                {
-                    ret.first->second += factor.second;
-                }
+                resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( sqrtOfFactor, factor.second ) );
             }
         }
         _result = FactorizedPolynomial<P>( std::move( resultFactorization ), resultCoeff, mpCache );
@@ -1006,11 +986,7 @@ namespace carl
                 FactorizedPolynomial<P> fpolySum( sum, _lhs.pCache() );
                 coefficientCommon *= fpolySum.coefficient();
                 fpolySum.mCoefficient = Coeff<P>(1);
-                auto ret = resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
-                if( !ret.second )
-                {
-                    ++ret.first->second;
-                }
+                resultFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( fpolySum, 1 ) );
             }
         }
         FactorizedPolynomial<P> result( std::move( resultFactorization ), coefficientCommon, FactorizedPolynomial<P>::chooseCache( _lhs.pCache(), _rhs.pCache() ) );
@@ -1373,12 +1349,7 @@ namespace carl
             lcmFactorization.insert( _fpolyA.factorization().begin(), _fpolyA.factorization().end() );
         for ( auto factor = restBFactorization.begin(); factor != restBFactorization.end(); factor++ )
         {
-            auto result = lcmFactorization.insert( *factor );
-            if ( !result.second )
-            {
-                //Increment exponent for already existing factor
-                result.first->second += factor->second;
-            }
+            lcmFactorization.insert( *factor );
         }
 
         coefficientLCM *= distributeCoefficients( lcmFactorization );

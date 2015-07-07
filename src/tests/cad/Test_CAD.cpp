@@ -99,12 +99,12 @@ TEST_F(CADTest, Check1)
 		Constraint(this->p[1], Sign::ZERO, {x,y})
 	});
 	this->cad.prepareElimination();
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
-	ASSERT_TRUE((hasNRValue(r[0], -1) && hasNRValue(r[1], 0)) || (hasNRValue(r[0], 0) && hasNRValue(r[1], 1)));
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
-	ASSERT_TRUE((hasNRValue(r[0], -1) && hasNRValue(r[1], 0)) || (hasNRValue(r[0], 0) && hasNRValue(r[1], 1)));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_TRUE((hasNRValue(r[0], -1) && hasNRValue(r[1], 0)) || (hasNRValue(r[0], 0) && hasNRValue(r[1], 1)));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_TRUE((hasNRValue(r[0], -1) && hasNRValue(r[1], 0)) || (hasNRValue(r[0], 0) && hasNRValue(r[1], 1)));
 }
 
 TEST_F(CADTest, Check2)
@@ -120,11 +120,11 @@ TEST_F(CADTest, Check2)
 		Constraint(this->p[0], Sign::ZERO, {x,y}),
 		Constraint(this->p[2], Sign::ZERO, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
-	ASSERT_TRUE((hasSqrtValue(r[0], -half) && hasSqrtValue(r[1], -half)) || (hasSqrtValue(r[0], half) && hasSqrtValue(r[1], half)));
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_TRUE((hasSqrtValue(r[0], -half) && hasSqrtValue(r[1], -half)) || (hasSqrtValue(r[0], half) && hasSqrtValue(r[1], half)));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
 }
 
 TEST_F(CADTest, Check3)
@@ -139,8 +139,8 @@ TEST_F(CADTest, Check3)
 		Constraint(this->p[0], Sign::POSITIVE, {x,y}),
 		Constraint(this->p[2], Sign::NEGATIVE, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
 }
 
 TEST_F(CADTest, Check4)
@@ -155,8 +155,8 @@ TEST_F(CADTest, Check4)
 		Constraint(this->p[0], Sign::NEGATIVE, {x,y}),
 		Constraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
 }
 
 TEST_F(CADTest, Check5)
@@ -171,8 +171,8 @@ TEST_F(CADTest, Check5)
 		Constraint(this->p[0], Sign::ZERO, {x,y}),
 		Constraint(this->p[2], Sign::POSITIVE, {x,y})
 	});
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
 }
 
 TEST_F(CADTest, Check6)
@@ -189,8 +189,24 @@ TEST_F(CADTest, Check6)
 		Constraint(this->p[4], Sign::POSITIVE, {x,y,z}),
 		Constraint(this->p[5], Sign::POSITIVE, {x,y,z})
 	});
-	ASSERT_TRUE(cad.check(cons, r, this->bounds));
-	for (auto c: cons) ASSERT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+	EXPECT_EQ(carl::cad::Answer::True, cad.check(cons, r, this->bounds));
+	for (auto c: cons) EXPECT_TRUE(c.satisfiedBy(r, cad.getVariables()));
+}
+
+TEST_F(CADTest, CheckInt)
+{
+	RealAlgebraicPoint<Rational> r;
+	std::vector<Constraint> cons;
+	carl::Variable i = carl::freshIntegerVariable("i");
+
+	this->cad.addPolynomial(Polynomial(i), {i});
+	this->cad.addPolynomial(Polynomial(Rational(1)-i), {i});
+	this->cad.prepareElimination();
+	cons.assign({
+		Constraint(Polynomial(i), Sign::ZERO, {i}),
+		Constraint(Polynomial(Rational(1)-i), Sign::ZERO, {i})
+	});
+	EXPECT_EQ(carl::cad::Answer::False, cad.check(cons, r, this->bounds));
 }
 
 template<typename T>
@@ -216,5 +232,5 @@ TEST(CAD, Samples)
 	//carl::cad::SampleSet<Rational> res = cad.samples(0, roots, currentSamples, replacedSamples, bounds);
 
 	//std::cout << res << std::endl;
-	//ASSERT_TRUE(!res.empty());
+	//EXPECT_TRUE(!res.empty());
 }

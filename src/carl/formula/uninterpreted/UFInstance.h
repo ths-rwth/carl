@@ -48,14 +48,6 @@ namespace carl
             {}
             
             /**
-             * Constructs a uninterpreted function instance by copying the given uninterpreted function instance.
-             * @param _ufi The uninterpreted function instance to copy.
-             */
-            UFInstance( const UFInstance& _ufi ):
-                mId( _ufi.id() )
-            {}
-            
-            /**
              * @return The unique id of this uninterpreted function instance.
              */
             IDType id() const

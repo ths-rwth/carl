@@ -40,8 +40,8 @@ private:
 		std::size_t firstChild = MAXINT;
 		std::size_t lastChild = MAXINT;
 		std::size_t depth;
-		Node(std::size_t id, const T& data, std::size_t parent, std::size_t depth):
-			id(id), data(data), parent(parent), depth(depth)
+		Node(std::size_t _id, const T& _data, std::size_t _parent, std::size_t _depth):
+			id(_id), data(_data), parent(_parent), depth(_depth)
 		{
 		}
 		bool operator==(const Node& n) {
@@ -358,15 +358,15 @@ public:
 		typedef BaseIterator<DepthIterator<reverse>,reverse> Base;
 		std::size_t depth;
 		DepthIterator(const tree<T>* t): Base(t, MAXINT), depth(0) {}
-		DepthIterator(const tree<T>* t, std::size_t root, std::size_t depth): Base(t, root), depth(depth) {
+		DepthIterator(const tree<T>* t, std::size_t root, std::size_t _depth): Base(t, root), depth(_depth) {
 			assert(!this->mTree->nodes.empty());
 			if (reverse) {
 				PostorderIterator<reverse> it(this->mTree, this->current);
-				while (it.current != MAXINT && it.depth() != depth) it++;
+				while (it.current != MAXINT && it.depth() != _depth) ++it;
 				this->current = it.current;
 			} else {
 				PreorderIterator<reverse> it(this->mTree, this->current);
-				while (it.current != MAXINT && it.depth() != depth) it++;
+				while (it.current != MAXINT && it.depth() != _depth) ++it;
 				this->current = it.current;
 			}
 		}

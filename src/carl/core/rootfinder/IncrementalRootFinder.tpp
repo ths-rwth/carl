@@ -26,11 +26,11 @@ template<typename Number, typename C>
 IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		const UnivariatePolynomial<Number>& polynomial,
 		const Interval<Number>& interval,
-		SplittingStrategy splittingStrategy,
+		SplittingStrategy _splittingStrategy,
 		bool tryTrivialSolver
 		) :
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),
-		splittingStrategy(splittingStrategy),
+		splittingStrategy(_splittingStrategy),
 		nextRoot(this->roots.end())
 {
 	if (!this->interval.isEmpty()) {
@@ -122,8 +122,8 @@ template<typename Number>
 void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& interval, RootFinder<Number>& finder) {
 	assert(interval.lower() < interval.upper());
 	std::sort(doubleRoots.begin(), doubleRoots.end());
-	auto it = std::unique(doubleRoots.begin(), doubleRoots.end());
-	doubleRoots.resize((size_t)std::distance(doubleRoots.begin(), it));
+	auto uniqueIt = std::unique(doubleRoots.begin(), doubleRoots.end());
+	doubleRoots.resize(size_t(std::distance(doubleRoots.begin(), uniqueIt)));
 	std::vector<Number> roots;
 	for (auto it = doubleRoots.begin(); it != doubleRoots.end(); it++) {
 		if (!isNumber(*it)) continue;
@@ -152,8 +152,8 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 				if (interval.contains(roots[i]) && finder.getPolynomial().evaluate(roots[i]) == 0) {
 					res.push_back(roots[i]);
 				}
-				Number tmp = Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample();
-				if (interval.contains(tmp)) res.push_back(tmp);
+				Number tmpSample = Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample();
+				if (interval.contains(tmpSample)) res.push_back(tmpSample);
 			}
 			if (interval.contains(roots.back()) && finder.getPolynomial().evaluate(roots.back()) == 0) {
 				res.push_back(roots.back());

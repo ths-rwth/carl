@@ -382,7 +382,13 @@ namespace carl {
         bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) 
         {
             bool splitOccurred = false;
+            
             double center = useNiceCenter ? intervals.at(variable).sample() : intervals.at(variable).center();
+            if( center == std::numeric_limits<double>::infinity() || center == -std::numeric_limits<double>::infinity() )
+            {
+                resA = intervals.at(variable);
+                return false;
+            }
             Interval<double> centerInterval = Interval<double>(center);
             
 			#ifdef CONTRACTION_DEBUG

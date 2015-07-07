@@ -68,9 +68,9 @@ TEST(Formula, Construction)
     
     // and the Ast itself:
     Formulas<Pol> subAstsA;
-    subAstsA.insert( Formula<Pol>( FormulaType::NOT, atomC ) );
-    subAstsA.insert( atomA );
-    subAstsA.insert( atomB );
+    subAstsA.push_back( Formula<Pol>( FormulaType::NOT, atomC ) );
+    subAstsA.push_back( atomA );
+    subAstsA.push_back( atomB );
     const Formula<Pol> phiA( FormulaType::AND, subAstsA );
     const Formula<Pol> phiC( FormulaType::OR, Formula<Pol>( FormulaType::NOT, atomA ), atomC );
     const Formula<Pol> phiE( FormulaType::IMPLIES, phiA, phiC );

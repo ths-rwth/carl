@@ -72,11 +72,11 @@ private:
                 if( first.getType() == FormulaType::FALSE )
                     return Formula<Pol>( FormulaType::FALSE );
                 Formulas<Pol> subFormulas;
-                subFormulas.insert( first );
+                subFormulas.push_back( first );
                 for (const auto& op: ops) {
                     if( op.getType() == FormulaType::FALSE )
                         return Formula<Pol>( FormulaType::FALSE );
-                    subFormulas.insert( op );
+                    subFormulas.push_back( op );
                 }
                 return Formula<Pol>( FormulaType::AND, subFormulas );
             }
@@ -84,11 +84,11 @@ private:
                 if( first.getType() == FormulaType::TRUE )
                     return Formula<Pol>( FormulaType::TRUE );
                 Formulas<Pol> subFormulas;
-                subFormulas.insert( first );
+                subFormulas.push_back( first );
                 for (const auto& op: ops) {
                     if( op.getType() == FormulaType::TRUE )
                         return Formula<Pol>( FormulaType::TRUE );
-                    subFormulas.insert( op );
+                    subFormulas.push_back( op );
                 }
                 return Formula<Pol>( FormulaType::OR, subFormulas );
             }
@@ -104,11 +104,11 @@ private:
 		if( first.getType() == FormulaType::FALSE )
             return Formula<Pol>( FormulaType::FALSE );
         Formulas<Pol> subFormulas;
-        subFormulas.insert( first );
+        subFormulas.push_back( first );
 		for (const auto& op: ops) {
 			if( op.getType() == FormulaType::FALSE )
                 return Formula<Pol>( FormulaType::FALSE );
-            subFormulas.insert( op );
+            subFormulas.push_back( op );
 		}
 //        std::cout << __func__ << ":" << __LINE__ << std::endl;
 		return Formula<Pol>( FormulaType::AND, subFormulas );
@@ -120,11 +120,11 @@ private:
 		if( first.getType() == FormulaType::TRUE )
             return Formula<Pol>( FormulaType::TRUE );
         Formulas<Pol> subFormulas;
-        subFormulas.insert( first );
+        subFormulas.push_back( first );
 		for (const auto& op: ops) {
 			if( op.getType() == FormulaType::TRUE )
                 return Formula<Pol>( FormulaType::TRUE );
-            subFormulas.insert( op );
+            subFormulas.push_back( op );
 		}
 //        std::cout << __func__ << ":" << __LINE__ << std::endl;
 		return Formula<Pol>( FormulaType::OR, subFormulas );

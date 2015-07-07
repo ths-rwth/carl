@@ -10,7 +10,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "Sort.h"
+#include "../Sort.h"
 
 namespace carl
 {

@@ -14,11 +14,11 @@
 #include <utility>
 #include <vector>
 
-#include "../util/Singleton.h"
-#include "../util/Common.h"
+#include "../../util/Singleton.h"
+#include "../../util/Common.h"
 #include <vector>
 #include <string.h>
-#include "Sort.h"
+#include "../Sort.h"
 #include "UninterpretedFunction.h"
 
 namespace carl
@@ -202,6 +202,11 @@ class UFManager : public Singleton<UFManager>
         {
             mUFs.emplace_back( nullptr ); // default value
         }
+        ~UFManager() {
+            mUFIdMap.clear();
+            for (auto& ptr: mUFs) delete ptr;
+            mUFs.clear();
+        }
         
         /**
          * Tries to add the given uninterpreted function's content to the so far stored uninterpreted function's 
@@ -213,6 +218,13 @@ class UFManager : public Singleton<UFManager>
         UninterpretedFunction newUF( const UFContent* _sc );
 
     public:
+        
+        const std::vector<const UFContent*>& ufContents() const {
+            return mUFs;
+        }
+        const FastPointerMap<UFContent, UninterpretedFunction::IDType>& ufIDMap() const {
+            return mUFIdMap;
+        }
         
         /**
          * @param _uf An uninterpreted function.

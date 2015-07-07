@@ -16,320 +16,25 @@
 #include <boost/dynamic_bitset.hpp>
 #include "Condition.h"
 #include "Constraint.h"
-#include "UEquality.h"
+#include "uninterpreted/UEquality.h"
+#include "uninterpreted/UFManager.h"
+#include "bitvector/BVConstraintPool.h"
+#include "bitvector/BVConstraint.h"
+
+#include "FormulaContent.h"
 
 namespace carl
 {
     // Forward definition.
     template<typename Pol>
     class Formula;
-
-    template<typename Poly>
-    using Formulas = std::set<Formula<Poly>, carl::less<Formula<Poly>, false>>;
-	template<typename Poly>
-    using FormulasMulti = std::multiset<Formula<Poly>, carl::less<Formula<Poly>, false>>;
-    
-    /**
-     * Stores the sub-formulas of a formula being an implication.
-     */
-    template<typename Pol>
-    struct IMPLIESContent
-    {
-        /// The premise of the implication.
-        Formula<Pol> mPremise;
-        /// The conclusion of the implication.
-        Formula<Pol> mConclusion;
-
-        /**
-         * Constructs the content of a formula being an implication.
-         * @param _premise The premise of the implication.
-         * @param _conclusion The conclusion of the implication.
-         */
-        IMPLIESContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion): 
-            mPremise( _premise ), mConclusion( _conclusion ) {}
-    };
-
-    /**
-     * Stores the sub-formulas of a formulas being an if-then-else expression of formulas.
-     */
-    template<typename Pol>
-    struct ITEContent
-    {
-        /// The condition of the if-then-else expression.
-        Formula<Pol> mCondition;
-        /// The then-case of the if-then-else expression.
-        Formula<Pol> mThen;
-        /// The else-case of if-then-else expression.
-        Formula<Pol> mElse;
-
-        /**
-         * Constructs the content of a formula being an implication.
-         * @param _condition The condition of the if-then-else expression.
-         * @param _then The then-case of the if-then-else expression.
-         * @param _else The else-case of if-then-else expression.
-         */
-        ITEContent( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else ): 
-            mCondition( _condition ), mThen( _then ), mElse( _else ) {}
-    };
-
-    /**
-     * Stores the variables and the formula bound by a quantifier.
-     */
-    template<typename Pol>
-    struct QuantifierContent
-    {
-        /// The quantified variables.
-        std::vector<carl::Variable> mVariables;
-        /// The formula bound by this quantifier.
-        Formula<Pol> mFormula;
-
-        /**
-         * Constructs the content of a quantified formula.
-         * @param _vars The quantified variables.
-         * @param _formula The formula bound by this quantifier.
-         */
-        QuantifierContent( const std::vector<carl::Variable>&& _vars, const Formula<Pol>& _formula ):
-            mVariables( _vars ), 
-            mFormula( _formula )
-        {}
-
-        /**
-         * Checks this content of a quantified formula and the given content of a quantified formula is equal.
-         * @param _qc The content of a quantified formula to check for equality.
-         * @return true, if this content of a quantified formula and the given content of a quantified formula is equal.
-         */
-        bool operator==( const QuantifierContent& _qc )
-        {
-            return (mFormula == _qc.mFormula) && (mVariables == _qc.mVariables);
-        }
-    };
     
     // Forward declaration
     template<typename Pol>
     class FormulaPool;
     
-    
-    /// The possible types of a formula.
-    enum FormulaType { AND, OR, NOT, IFF, XOR, IMPLIES, ITE, BOOL, CONSTRAINT, TRUE, FALSE, EXISTS, FORALL, UEQ };
-            
     /**
-     * @param _type The formula type to get the string representation for.
-     * @return The string representation of the given type.
-     */
-    inline std::string formulaTypeToString( FormulaType _type )
-    {
-        switch( _type )
-        {
-            case FormulaType::AND:
-                return "and";
-            case FormulaType::OR:
-                return "or";
-            case FormulaType::NOT:
-                return "not";
-            case FormulaType::IFF:
-                return "=";
-            case FormulaType::XOR:
-                return "xor";
-            case FormulaType::IMPLIES:
-                return "=>";
-            case FormulaType::ITE:
-                return "ite";
-            case FormulaType::TRUE:
-                return "true";
-            case FormulaType::FALSE:
-                return "false";
-            default:
-                return "";
-        }
-    }
-    inline std::ostream& operator<<(std::ostream& os, FormulaType t) {
-        return os << formulaTypeToString(t);
-    }
-    
-    template<typename Pol>
-    class FormulaContent
-    {
-            friend class Formula<Pol>;
-            friend class FormulaPool<Pol>;
-        
-        private:
-            
-            // Member.
-            /// The hash value.
-            size_t mHash;
-            /// The unique id.
-            size_t mId;
-            /// The activity for this formula, which means, how much is this formula involved in the solving procedure.
-            mutable double mActivity;
-            /// Some value stating an expected difficulty of solving this formula for satisfiability.
-            mutable double mDifficulty;
-            /// The unique id.
-            mutable size_t mUsages;
-            /// The type of this formula.
-            FormulaType mType;
-            /// The content of this formula.
-            union
-            {
-#ifdef __VS
-				// Workaround with pointers, because VS can't handle unrestricted unions
-				/// The only sub-formula, in case this formula is an negation.
-				Formula<Pol>* mpSubformulaVS;
-				/// The premise and conclusion, in case this formula is an implication.
-				IMPLIESContent<Pol>* mpImpliesContent;
-				/// The condition, then- and else-case, in case this formula is an ite-expression of formulas.
-				ITEContent<Pol>* mpIteContent;
-				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-				QuantifierContent<Pol>* mpQuantifierContent;
-				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-				Formulas<Pol>* mpSubformulas;
-				/// The constraint, in case this formulas wraps a constraint.
-				Constraint<Pol>* mpConstraintVS;
-				/// The Boolean variable, in case this formula wraps a Boolean variable.
-				carl::Variable* mpBooleanVS;
-				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-				UEquality* mpUIEqualityVS;
-#else
-				/// The only sub-formula, in case this formula is an negation.
-				Formula<Pol> mSubformula;
-				/// The premise and conclusion, in case this formula is an implication.
-				IMPLIESContent<Pol>* mpImpliesContent;
-				/// The condition, then- and else-case, in case this formula is an ite-expression of formulas.
-				ITEContent<Pol>* mpIteContent;
-				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-				QuantifierContent<Pol>* mpQuantifierContent;
-				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-				Formulas<Pol>* mpSubformulas;
-				/// The constraint, in case this formulas wraps a constraint.
-				Constraint<Pol> mConstraint;
-				/// The Boolean variable, in case this formula wraps a Boolean variable.
-				carl::Variable mBoolean;
-				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-				UEquality mUIEquality;
-#endif
-			};
-            /// The negation
-            const FormulaContent<Pol> *mNegation;
-            /// The propositions of this formula.
-            Condition mProperties;
-            /// Mutex for access to activity.
-            mutable std::mutex mActivityMutex;
-            /// Mutex for access to difficulty.
-            mutable std::mutex mDifficultyMutex;
-
-            /**
-             * Constructs the formula (true), if the given bool is true and the formula (false) otherwise.
-             * @param _true Specifies whether to create the formula (true) or (false).
-             * @param _id A unique id of the formula to create.
-             */
-            FormulaContent( bool _true, size_t _id = 0 );
-
-            /**
-             * Constructs a formula being a Boolean variable.
-             * @param _boolean The pointer to the string representing the name of the Boolean variable.
-             */
-            FormulaContent( carl::Variable::Arg _boolean );
-
-            /**
-             * Constructs a formula being a constraint.
-             * @param _constraint The pointer to the constraint.
-             */
-            FormulaContent( const Constraint<Pol>& _constraint );
-
-            /**
-             * Constructs a formula being an uninterpreted equality.
-             * @param _ueq The pointer to the constraint.
-             */
-            FormulaContent( UEquality&& _ueq );
-
-            /**
-             * Constructs the negation of the given formula: (not _subformula)
-             * @param _subformula The sub-formula, which is negated by the constructed formula.
-             */
-            FormulaContent( Formula<Pol>&& _subformula );
-
-            /**
-             * Constructs the negation of the given formula: (not _subformula)
-             * @param _subformula The sub-formula, which is negated by the constructed formula.
-             */
-            FormulaContent( const Formula<Pol>& _subformula ):
-                FormulaContent( std::move(Formula<Pol>( _subformula ) ) )
-            {}
-
-            /**
-             * Constructs an implication from the first argument to the second: (=> _subformulaA _subformulaB)
-             * @param _premise The premise of the formula to create.
-             * @param _conclusion The conclusion of the formula to create.
-             */
-            FormulaContent( const Formula<Pol>& _premise, const Formula<Pol>& _conclusion );
-
-            /**
-             * Constructs an if-then-else (ITE) expression: (ite _condition _then _else)
-             * @param _condition The condition of the ITE expression to create.
-             * @param _then The first case of the ITE expression to create.
-             * @param _else The second case of the ITE expression to create.
-             */
-            FormulaContent( const Formula<Pol>& _condition, const Formula<Pol>& _then, const Formula<Pol>& _else );
-
-            /**
-             * Constructs a quantifier expression: (exists (vars) term) or (forall (vars) term)
-             * @param _type The type of the quantifier to construct.
-             * @param _vars The variables that are bound.
-             * @param _term The term in which the variables are bound.
-             */
-            FormulaContent(const FormulaType _type, const std::vector<carl::Variable>&& _vars, const Formula<Pol>& _term);
-
-            /**
-             * Constructs the formula of the given type. 
-             * @param _type The type of the formula to construct.
-             * @param _subformulas The sub-formulas of the formula to construct.
-             */
-            FormulaContent( const FormulaType _type, Formulas<Pol>&& _subformulas );
-
-            FormulaContent(); // Disabled
-            FormulaContent( const FormulaContent& ); // Disabled
-            
-        public:
-
-            /**
-             * Destructor.
-             */
-            ~FormulaContent();
-
-            size_t hash() const
-            {
-                return mHash;
-            }
-
-            bool operator==( const FormulaContent& _content ) const;
-            
-            /**
-             * Gives the string representation of this formula content.
-             * @param _withActivity A flag which indicates whether to add the formula's activity to the result.
-             * @param _resolveUnequal A switch which indicates how to represent the relation symbol for unequal. 
-             *                         (for further description see documentation of Constraint::toString( .. ))
-             * @param _init The initial string of every row of the result.
-             * @param _oneline A flag indicating whether the formula shall be printed on one line.
-             * @param _infix A flag indicating whether to print the formula in infix or prefix notation.
-             * @param _friendlyNames A flag that indicates whether to print the variables with their internal representation (false)
-             *                        or with their dedicated names.
-             * @return The resulting string representation of this formula.
-             */
-            std::string toString( bool _withActivity = false, unsigned _resolveUnequal = 0, const std::string _init = "", bool _oneline = true, bool _infix = false, bool _friendlyNames = true ) const; 
-            
-            /**
-             * The output operator of a formula.
-             * @param _out The stream to print on.
-             * @param _formula
-             */
-            template<typename P>
-            friend std::ostream& operator<<( std::ostream& _out, const FormulaContent<P>& _formula )
-            {
-                return (_out << _formula.toString());
-            }
-    };
-    
-    /**
-     * The formula class.
+     * The formula class representing a SMT formula.
      */
     template<typename Pol>
     class Formula
@@ -381,8 +86,8 @@ namespace carl
              */
             static void init( FormulaContent<Pol>& _content );
             
-            explicit Formula( FormulaType _type = TRUE ):
-                Formula( FormulaPool<Pol>::getInstance().create( _type == TRUE ) )
+            explicit Formula( FormulaType _type = FALSE ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type ) )
             {}
                 
             explicit Formula( Variable::Arg _booleanVar ):
@@ -396,37 +101,28 @@ namespace carl
             explicit Formula( const Constraint<Pol>& _constraint ):
                 Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
             {}
-                
+            
+            explicit Formula( const BVConstraint& _constraint ):
+                Formula( FormulaPool<Pol>::getInstance().create( _constraint ) )
+            {}
+            
+            explicit Formula( FormulaType _type, Formula&& _subformula ):
+                Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(_subformula)))
+            {}
+                        
             explicit Formula( FormulaType _type, const Formula& _subformula ):
-                Formula( FormulaPool<Pol>::getInstance().createNegation( _subformula ) )
-            {
-                assert( _type == FormulaType::NOT );
-            }
+                Formula(FormulaPool<Pol>::getInstance().create(_type, std::move(Formula(_subformula))))
+            {}
                 
             explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB ):
-                Formula( _type == FormulaType::IMPLIES ? FormulaPool<Pol>::getInstance().createImplication( _subformulaA, _subformulaB ) : FormulaPool<Pol>::getInstance().create( _type, _subformulaA, _subformulaB ))
+                Formula( FormulaPool<Pol>::getInstance().create( _type, {_subformulaA, _subformulaB} ))
             {
                 assert( _type == FormulaType::AND || _type == FormulaType::IFF || _type == FormulaType::IMPLIES || _type == FormulaType::OR || _type == FormulaType::XOR );
             }
             
-            explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB, const Formula& _subformulaC )
-            {
-                assert( _type == FormulaType::AND || _type == FormulaType::IFF || _type == FormulaType::ITE || _type == FormulaType::OR || _type == FormulaType::XOR );
-                if( _type == FormulaType::ITE )
-                {
-                    mpContent = FormulaPool<Pol>::getInstance().createIte( _subformulaA, _subformulaB, _subformulaC );
-                    FormulaPool<Pol>::getInstance().reg(mpContent);
-                }
-                else
-                {
-                    Formulas<Pol> subFormulas;
-                    subFormulas.insert( _subformulaA );
-                    subFormulas.insert( _subformulaB );
-                    subFormulas.insert( _subformulaC );
-                    mpContent = FormulaPool<Pol>::getInstance().create( _type, subFormulas );
-                    FormulaPool<Pol>::getInstance().reg(mpContent);
-                }
-            }
+            explicit Formula( FormulaType _type, const Formula& _subformulaA, const Formula& _subformulaB, const Formula& _subformulaC):
+                Formula( FormulaPool<Pol>::getInstance().create(_type, {_subformulaA, _subformulaB, _subformulaC}))
+            {}
             
             explicit Formula( FormulaType _type, const FormulasMulti<Pol>& _subformulas ):
                 Formula( FormulaPool<Pol>::getInstance().create( _subformulas ) )
@@ -441,8 +137,20 @@ namespace carl
             explicit Formula( FormulaType _type, Formulas<Pol>&& _subasts ):
                 Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(_subasts) ) )
             {}
+                
+            explicit Formula( FormulaType _type, const std::initializer_list<Formula<Pol>>& _subasts ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(Formulas<Pol>(_subasts.begin(), _subasts.end()) ) ))
+            {}
+                
+            explicit Formula( FormulaType _type, const FormulaSet<Pol>& _subasts ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(Formulas<Pol>(_subasts.begin(), _subasts.end()) ) ))
+            {}
             
-            explicit Formula( FormulaType _type, const std::vector<Variable>&& _vars, const Formula& _term ):
+            explicit Formula( FormulaType _type, FormulaSet<Pol>&& _subasts ):
+                Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(Formulas<Pol>(_subasts.begin(), _subasts.end()) ) ))
+            {}
+            
+            explicit Formula( FormulaType _type, std::vector<Variable>&& _vars, const Formula& _term ):
                 Formula( FormulaPool<Pol>::getInstance().create( _type, std::move( _vars ), _term ) )
             {}
             
@@ -586,6 +294,11 @@ namespace carl
             {
                 return mpContent->mProperties;
             }
+            
+            bool isTseitinClause() const
+            {
+                return mpContent->mTseitinClause;
+            }
 
             /**
              * Collects all real valued variables occurring in this formula.
@@ -615,8 +328,8 @@ namespace carl
             }
             
             /**
-             * Collects all arithmetic variables occurring in this formula.
-             * @param _booleanVars The container to collect the arithmetic variables in.
+             * Collects all boolean variables occurring in this formula.
+             * @param _booleanVars The container to collect the boolean variables in.
              */
             void booleanVars( Variables& _booleanVars ) const
             {
@@ -642,7 +355,7 @@ namespace carl
             const Formula& premise() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mpImpliesContent->mPremise;
+                return mpContent->mSubformulas[0];
             }
             
             /**
@@ -651,7 +364,7 @@ namespace carl
             const Formula& conclusion() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mpImpliesContent->mConclusion;
+                return mpContent->mSubformulas[1];
             }
             
             /**
@@ -660,7 +373,7 @@ namespace carl
             const Formula& condition() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mpIteContent->mCondition;
+                return mpContent->mSubformulas[0];
             }
             
             /**
@@ -669,7 +382,7 @@ namespace carl
             const Formula& firstCase() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mpIteContent->mThen;
+                return mpContent->mSubformulas[1];
             }
             
             /**
@@ -678,7 +391,7 @@ namespace carl
             const Formula& secondCase() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mpIteContent->mElse;
+                return mpContent->mSubformulas[2];
             }
 
             /**
@@ -687,7 +400,7 @@ namespace carl
 			const std::vector<carl::Variable>& quantifiedVariables() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
-				return mpContent->mpQuantifierContent->mVariables;
+				return mpContent->mQuantifierContent.mVariables;
 			}
 
             /**
@@ -696,7 +409,7 @@ namespace carl
 			const Formula& quantifiedFormula() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
-				return mpContent->mpQuantifierContent->mFormula;
+				return mpContent->mQuantifierContent.mFormula;
 			}
 
             /**
@@ -706,7 +419,7 @@ namespace carl
             const Formulas<Pol>& subformulas() const
             {
                 assert( isNary() );
-                return *mpContent->mpSubformulas;
+                return mpContent->mSubformulas;
             }
 
             /**
@@ -717,11 +430,17 @@ namespace carl
             {
                 assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
 #ifdef __VS
-				return *mpContent->mpConstraintVS;
+		return *mpContent->mpConstraintVS;
 #else
-				return mpContent->mConstraint;
+		return mpContent->mConstraint;
 #endif
-			}
+            }
+            
+            const BVConstraint& bvConstraint() const
+            {
+                assert( mpContent->mType == FormulaType::BITVECTOR );
+                return mpContent->mBVConstraint;
+            }
 
             /**
              * @return The name of the Boolean variable represented by this formula. Note, that
@@ -730,12 +449,8 @@ namespace carl
             carl::Variable::Arg boolean() const
             {
                 assert( mpContent->mType == FormulaType::BOOL );
-#ifdef __VS
-				return *mpContent->mpBooleanVS;
-#else
-				return mpContent->mBoolean;
-#endif
-			}
+                return mpContent->mVariable;
+            }
             
             /**
              * @return A constant reference to the uninterpreted equality represented by this formula. Note, that
@@ -757,12 +472,11 @@ namespace carl
             size_t size() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE 
-                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ )
+                        || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::NOT || mpContent->mType == FormulaType::UEQ
+                        || mpContent->mType == FormulaType::BITVECTOR )
                     return 1;
-                else if( mpContent->mType == FormulaType::IMPLIES )
-                    return 2;
                 else
-                    return mpContent->mpSubformulas->size();
+                    return mpContent->mSubformulas.size();
             }
 
             /**
@@ -772,10 +486,11 @@ namespace carl
             bool empty() const
             {
                 if( mpContent->mType == FormulaType::BOOL || mpContent->mType == FormulaType::CONSTRAINT 
-                        || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE )
+                        || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE
+                        || mpContent->mType == FormulaType::BITVECTOR )
                     return false;
                 else
-                    return mpContent->mpSubformulas->empty();
+                    return mpContent->mSubformulas.empty();
             }
 
             /**
@@ -784,7 +499,7 @@ namespace carl
             const_iterator begin() const
             {
                 assert( isNary() );
-                return mpContent->mpSubformulas->begin();
+                return mpContent->mSubformulas.begin();
             }
 
             /**
@@ -794,7 +509,7 @@ namespace carl
             {
                 assert( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR 
                         || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR );
-                return mpContent->mpSubformulas->end();
+                return mpContent->mSubformulas.end();
             }
 
             /**
@@ -803,7 +518,7 @@ namespace carl
             const_reverse_iterator rbegin() const
             {
                 assert( isNary() );
-                return mpContent->mpSubformulas->rbegin();
+                return mpContent->mSubformulas.rbegin();
             }
 
             /**
@@ -812,7 +527,7 @@ namespace carl
             const_reverse_iterator rend() const
             {
                 assert( isNary() );
-                return mpContent->mpSubformulas->rend();
+                return mpContent->mSubformulas.rend();
             }
 
             /**
@@ -827,12 +542,8 @@ namespace carl
 #else
                     return mpContent->mSubformula;
 #endif
-                else if( mpContent->mType == FormulaType::IMPLIES )
-                    return mpContent->mpImpliesContent->mConclusion;
-                else if( mpContent->mType == FormulaType::ITE )
-                    return mpContent->mpIteContent->mElse;
                 else
-                    return *(--(mpContent->mpSubformulas->end()));
+                    return *(--(mpContent->mSubformulas.end()));
             }
             
             /**
@@ -852,6 +563,7 @@ namespace carl
             bool isAtom() const
             {
                 return (mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::BOOL 
+                        || mpContent->mType == FormulaType::UEQ || mpContent->mType == FormulaType::BITVECTOR
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
 
@@ -869,8 +581,7 @@ namespace carl
              */
             bool isNary() const
             {
-                return (mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR 
-                        || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR);
+                return mpContent->isNary();
             }
             
             /**
@@ -927,12 +638,8 @@ namespace carl
 #else
 					return mpContent->mSubformula == _formula;
 #endif
-                else if( mpContent->mType == FormulaType::IMPLIES )
-                    return (mpContent->mpImpliesContent->mPremise == _formula || mpContent->mpImpliesContent->mConclusion == _formula);
-                else if( mpContent->mType == FormulaType::ITE )
-                    return (mpContent->mpIteContent->mCondition == _formula || mpContent->mpIteContent->mThen == _formula || mpContent->mpIteContent->mElse == _formula);
                 else
-                    return mpContent->mpSubformulas->find( _formula ) != mpContent->mpSubformulas->end();
+                    return std::find(mpContent->mSubformulas.begin(), mpContent->mSubformulas.end(), _formula ) != mpContent->mSubformulas.end();
             }
             
             /**
@@ -949,7 +656,7 @@ namespace carl
 #endif
                 else if( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR || mpContent->mType == FormulaType::NOT 
                         || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR || mpContent->mType == FormulaType::IMPLIES )
-                    for( const_iterator subAst = mpContent->mpSubformulas->begin(); subAst != mpContent->mpSubformulas->end(); ++subAst )
+                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
                         (*subAst)->getConstraints( _constraints );
             }
 
@@ -1126,6 +833,20 @@ namespace carl
             Formula toCNF( bool _keepConstraints = true, bool _simplifyConstraintCombinations = false, bool _tseitinWithEquivalence = true ) const;
             
             /**
+             * Substitutes all occurrences of the given variable in this formula by the given polynomial.
+             * @param _var The variable to substitute.
+             * @param _var The polynomial to substitute the variable for.
+             * @return The resulting formula after substitution.
+             */
+            Formula substitute( carl::Variable::Arg _var, const Pol& _pol ) const
+            {
+                std::map<carl::Variable, Formula> booleanSubstitutions;
+                std::map<carl::Variable, Pol> arithmeticSubstitutions;
+                arithmeticSubstitutions.emplace( _var, _pol );
+                return substitute( booleanSubstitutions, arithmeticSubstitutions );
+            }
+            
+            /**
              * Substitutes all occurrences of the given arithmetic variables in this formula by the given polynomials.
              * @param _arithmeticSubstitutions A substitution-mapping of arithmetic variables to polynomials.
              * @return The resulting formula after substitution.
@@ -1156,7 +877,7 @@ namespace carl
             Formula substitute( const std::map<carl::Variable, Formula>& _booleanSubstitutions, const std::map<carl::Variable,Pol>& _arithmeticSubstitutions ) const;
             
             /// A map from formula pointers to a map of rationals to a pair of a constraint relation and a formula pointer. (internally used)
-            typedef FastPointerMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
+            typedef FastMap<Pol, std::map<typename Pol::NumberType, std::pair<Relation,Formula>>> ConstraintBounds;
             
             /**
              * Adds the bound to the bounds of the polynomial specified by this constraint. E.g., if the constraint is p+b~0, where p is a sum 
@@ -1207,7 +928,8 @@ namespace carl
 		 * @param formula Formula to visit.
 		 * @param func Function to call.
 		 */
-		void visitVoid(const Formula& formula, const std::function<void(Formula)>& func);
+		void visit(const Formula& formula, const std::function<void(Formula)>& func);
+		void rvisit(const Formula& formula, const std::function<void(Formula)>& func);
 		/**
 		 * Recursively calls func on every subformula and return a new formula.
 		 * On every call of func, the passed formula is replaced by the result.
@@ -1215,8 +937,55 @@ namespace carl
 		 * @param func Function to call.
 		 * @return New formula.
 		 */
-		Formula visitResult(const Formula& formula, const std::function<Formula(Formula)>& func);
+		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
+		Formula rvisit(const Formula& formula, const std::function<Formula(Formula)>& func);
 	};
+    
+    template<typename Formula>
+    struct FormulaSubstitutor {
+    private:
+        FormulaVisitor<Formula> visitor;
+        
+        struct PolynomialSubstitutor {
+            const std::map<Variable,typename Formula::PolynomialType>& replacements;
+            PolynomialSubstitutor(const std::map<Variable,typename Formula::PolynomialType>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+                if (formula.getType() != FormulaType::CONSTRAINT) return formula;
+                return Formula(formula.constraint().lhs().substitute(replacements), formula.constraint().relation());
+            }
+        };
+        
+        struct BitvectorSubstitutor {
+            const std::map<BVVariable,BVTerm>& replacements;
+            BitvectorSubstitutor(const std::map<BVVariable,BVTerm>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+                if (formula.getType() != FormulaType::BITVECTOR) return formula;
+                BVTerm lhs = formula.bvConstraint().lhs().substitute(replacements);
+                BVTerm rhs = formula.bvConstraint().rhs().substitute(replacements);
+                return Formula(BVConstraint::create(formula.bvConstraint().relation(), lhs, rhs));
+            }
+        };
+        
+        struct UninterpretedSubstitutor {
+            const std::map<UVariable,UFInstance>& replacements;
+            UninterpretedSubstitutor(const std::map<UVariable,UFInstance>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+                if (formula.getType() != FormulaType::UEQ) return formula;
+                
+            }
+        };
+    public:
+        template<typename Source, typename Target>
+        Formula substitute(const Formula& formula, const Source& source, const Target& target) {
+            std::map<Source,Target> tmp;
+            tmp.emplace(source, target);
+            return substitute(formula, tmp);
+        }
+        
+        Formula substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements);
+        Formula substitute(const Formula& formula, const std::map<BVVariable,BVTerm>& replacements);
+        Formula substitute(const Formula& formula, const std::map<UVariable,UFInstance>& replacements);
+    };
 
 }    // namespace carl
 

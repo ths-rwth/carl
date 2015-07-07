@@ -926,7 +926,7 @@ namespace carl
          */
         inline void set(const Number& lower, const Number& upper)
         {
-			if(isUnbounded()) {
+			if(isInfinite()) {
 				mContent = BoostInterval(lower, upper);
 				mLowerBoundType = BoundType::WEAK;
 				mUpperBoundType = BoundType::WEAK;
@@ -940,13 +940,33 @@ namespace carl
         }
 
         /**
-         * Function which determines, if the interval is unbounded.
+         * Function which determines, if the interval is (-oo,oo).
          * @return True if both bounds are INFTY.
+         */
+        inline bool isInfinite() const
+        {
+            assert(this->isConsistent());
+            return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
+        }
+
+        /**
+         * Function which determines, if the interval is unbounded.
+         * @return True if at least one bound is INFTY.
          */
         inline bool isUnbounded() const
         {
             assert(this->isConsistent());
-            return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
+            return mLowerBoundType == BoundType::INFTY || mUpperBoundType == BoundType::INFTY;
+        }
+
+        /**
+         * Function which determines, if the interval is half-bounded.
+         * @return True if exactly one bound is INFTY.
+         */
+        inline bool isHalfBounded() const
+        {
+            assert(this->isConsistent());
+            return (mLowerBoundType == BoundType::INFTY) != (mUpperBoundType == BoundType::INFTY);
         }
 
         /**
@@ -971,7 +991,7 @@ namespace carl
         inline bool isPointInterval() const
         {
             assert(this->isConsistent());
-            return (mContent.lower() == mContent.upper() && this->isClosedInterval());
+            return (this->isClosedInterval() && mContent.lower() == mContent.upper());
         }
 
         /**
@@ -1081,6 +1101,12 @@ namespace carl
         void integralPart_assign();
         
         /**
+         * Checks if the interval contains at least one integer value.
+         * @return true, if the interval contains an integer.
+         */
+        bool containsInteger() const;
+        
+        /**
          * Returns the diameter of the interval.
          * @return Diameter.
          */
@@ -1123,7 +1149,7 @@ namespace carl
 		Number center() const
 		{
 			assert(this->isConsistent());
-			if (this->isUnbounded()) return carl::constant_zero<Number>().get();
+			if (this->isInfinite()) return carl::constant_zero<Number>().get();
 			if (this->mLowerBoundType == BoundType::INFTY)
 				return (Number)(carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get());
 			if (this->mUpperBoundType == BoundType::INFTY)
@@ -1135,7 +1161,7 @@ namespace carl
 		N center() const
 		{
 			assert(this->isConsistent());
-			if (this->isUnbounded()) return carl::constant_zero<N>().get();
+			if (this->isInfinite()) return carl::constant_zero<N>().get();
 			if (this->mLowerBoundType == BoundType::INFTY)
 				return (N)(std::nextafter(this->mContent.upper(), -INFINITY));
 			if (this->mUpperBoundType == BoundType::INFTY)
@@ -1851,6 +1877,64 @@ namespace carl
      */
     template<typename Number>
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the righthand side has maximal one intersection with the lefthand side
+     * at the upper bound of lhs.
+     */
+    template<typename Number>
+    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs);
+    template<typename Number>
+    inline bool operator <=(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs>=lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side has maximal one intersection with the righthand side
+     * at the lower bound of lhs.
+     */
+    template<typename Number>
+    inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator >=(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs<=lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side is smaller than the righthand side.
+     */
+    template<typename Number>
+    inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator <(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs>lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side is larger than the righthand side.
+     */
+    template<typename Number>
+    inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator >(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs<lhs;
+    }
 
     
         template<typename Number>

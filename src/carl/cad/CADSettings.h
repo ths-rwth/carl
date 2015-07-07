@@ -113,6 +113,7 @@ public:
 	/// given bounds to the check method, the bounds are widened after determining unsatisfiability by check, or shrunk after determining satisfiability by check
 	bool improveBounds;
 	bool exploreInteger;
+	bool splitInteger;
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
 	/// standard strategy to be used for real root isolation
@@ -189,6 +190,7 @@ public:
 		}
 		if (setting & EXPLOREINTEGER) {
 			cadSettings.exploreInteger = true;
+			cadSettings.splitInteger = true;
 		}
 
 		return cadSettings;
@@ -260,6 +262,7 @@ private:
 		simplifyEliminationByBounds( true ),
 		improveBounds( true ),
 		exploreInteger(false),
+		splitInteger(true),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
@@ -284,6 +287,7 @@ public:
 		simplifyEliminationByBounds( s.simplifyEliminationByBounds ),
 		improveBounds( s.improveBounds ),
 		exploreInteger(s.exploreInteger),
+		splitInteger(s.splitInteger),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}

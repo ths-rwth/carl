@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../util/Common.h"
-#include "../core/VariablePool.h"
-#include "Sort.h"
-#include "SortManager.h"
+#include "../../util/Common.h"
+#include "../../core/VariablePool.h"
+#include "../Sort.h"
+#include "../SortManager.h"
 
 namespace carl
 {
@@ -36,9 +36,9 @@ namespace carl
             UVariable(): mVar(Variable::NO_VARIABLE) {
 			}
 
-			UVariable( Variable::Arg _var):
-                mVar( _var ),
-				mDomain( SortManager::getInstance().interpretedSort(_var.getType()) )
+			UVariable(Variable::Arg var):
+                mVar(var),
+				mDomain(SortManager::getInstance().getInterpreted(var.getType()))
             {
 			}
             
@@ -75,6 +75,9 @@ namespace carl
             bool operator==( const UVariable& _uvar ) const
             {
                 return mVar == _uvar();
+            }
+            bool operator==(Variable::Arg var) const {
+                return mVar == var;
             }
             
             /**

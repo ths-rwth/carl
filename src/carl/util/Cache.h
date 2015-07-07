@@ -167,7 +167,7 @@ namespace carl
          *                After this function has been applied, the corresponding entry in the cache will be reinserted in it after been rehashed.
          * @return The reference of the entry, which can be used outside this class to access the entry.
          */
-        std::pair<Ref,bool> cache( T* _toCache );//), bool (*_canBeUpdated)( const T&, const T& ) = &returnFalse<T>, void (*_update)( T&, T& ) = &doNothing<T> );
+        std::pair<Ref,bool> cache( T* _toCache, bool (*_canBeUpdated)( const T&, const T& ) = &returnFalse<T>, void (*_update)( T&, T& ) = &doNothing<T> );
         
         /**
          * Registers the entry to the given reference. It mainly increases the usage counter of this entry in the cache.

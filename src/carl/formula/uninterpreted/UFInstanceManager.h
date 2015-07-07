@@ -14,11 +14,11 @@
 #include <utility>
 #include <vector>
 
-#include "../util/Singleton.h"
-#include "../util/Common.h"
+#include "../../util/Singleton.h"
+#include "../../util/Common.h"
 #include <vector>
 #include <string.h>
-#include "Sort.h"
+#include "../Sort.h"
 #include "UFInstance.h"
 #include "UVariable.h"
 
@@ -179,6 +179,11 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
             mUFInstances()
         {
             mUFInstances.emplace_back( nullptr ); // default value
+        }
+        ~UFInstanceManager() {
+            mUFInstanceIdMap.clear();
+            for (auto& ptr: mUFInstances) delete ptr;
+            mUFInstances.clear();
         }
         
         /**

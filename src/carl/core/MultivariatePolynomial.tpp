@@ -534,6 +534,16 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::hasConstantTerm() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+bool MultivariatePolynomial<Coeff,Ordering,Policies>::integerValued() const
+{
+    for(const auto& term : mTerms)
+	{
+		if(!term.integerValued()) return false;
+	}
+	return true;
+}
+
+template<typename Coeff, typename Ordering, typename Policies>
 const Term<Coeff>& MultivariatePolynomial<Coeff,Ordering,Policies>::operator[](unsigned index) const
 {
 	assert(index < nrTerms());
@@ -589,7 +599,7 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 	}
 	
 	Variable v = lterm().getSingleVariable();
-	for (auto term : mTerms) {
+	for (const auto& term : mTerms) {
 		if (!term.hasNoOtherVariable(v)) return false;
 	}
 	return true;

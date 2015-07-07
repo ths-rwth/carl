@@ -22,7 +22,7 @@ using namespace carl;
 
 typedef MultivariatePolynomial<Rational> Pol;
 typedef FactorizedPolynomial<Pol> FPol;
-const bool AutoSimplify = true;
+const bool AutoSimplify = false;
 typedef RationalFunction<Pol,AutoSimplify> RFunc;
 typedef RationalFunction<FPol,AutoSimplify> RFactFunc;
 typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
@@ -30,7 +30,8 @@ typedef Cache<PolynomialFactorizationPair<Pol>> CachePol;
 TEST(RationalFunction, Construction)
 {
     StringParser sp;
-    sp.setVariables({"x", "y", "z"});
+    std::shared_ptr<CachePol> pCacheA( new CachePol );
+    sp.setVariables({"x", "y", "z", "t", "u"});
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x*y + x");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("5*y + 3*x");
     Pol p3 = sp.parseMultivariatePolynomial<Rational>("x");
@@ -39,6 +40,15 @@ TEST(RationalFunction, Construction)
     p4 += Pol::CoeffType(1);
     Pol p5 = sp.parseMultivariatePolynomial<Rational>("2184*x^17+15708*x+(-126672)*x^2+643384*x^3+(-2306444)*x^4+4162512*x^13+(-10186920)*x^12+18820800*x^11+(-27118448)*x^10+31123477*x^9+6199788*x^5+(-12956461)*x^6+21524503*x^7+(-28784511)*x^8+(-1226048)*x^14+245224*x^15+(-31192)*x^16+(-924)");
     Pol p6 = sp.parseMultivariatePolynomial<Rational>("3360*x^16+(-33600)*x^13+33600*x^14+(-16800)*x^15+16800*x^12+(-3360)*x^11");
+    Pol p7 = sp.parseMultivariatePolynomial<Rational>("t^3*u^6+(-1)*u^6+(-3)*t^2*u^6+3*t*u^6+(-1)*t^3*u^5+(-1)*t^3+(-3)*t+3*t^2+(-3)*u+3*t^3*u+9*t*u+(-9)*t^2*u+5*u^2+(-5)*t^3*u^2+(-15)*t*u^2+15*t^2*u^2+3*t^2*u^4+(-3)*t*u^4+(-1)*t^3*u^4+(-4)*u^3+u^4+(-12)*t^2*u^3+12*t*u^3+4*t^3*u^3+u^5+3*t^2*u^5+(-3)*t*u^5+1");
+    FPol fp7(p7, pCacheA);
+    Pol p8 = sp.parseMultivariatePolynomial<Rational>("u^2+(-1)*u+1");
+    FPol fp8(p8, pCacheA);
+    Pol p9 = sp.parseMultivariatePolynomial<Rational>("2*u^2+(-2)*u+1");
+    FPol fp9(p9, pCacheA);
+    Pol p10 = sp.parseMultivariatePolynomial<Rational>("2*t^2+(-2)*t+1");
+    FPol fp10(p10, pCacheA);
+    FPol fpDenom = fp8 * fp9 * fp10;
     
     RFunc r1(p1, p2);
     EXPECT_EQ(p1, r1.nominator());
@@ -69,6 +79,11 @@ TEST(RationalFunction, Construction)
     EXPECT_EQ(p4, computePolynomial(rf2.nominator()));
     
     RFactFunc rf3(fp5, fp6);
+    
+    RFactFunc rf4(fp7, fpDenom);
+    std::cout << rf4 << std::endl;
+    rf4.simplify();
+    std::cout << rf4 << std::endl;
 }
 
 TEST(RationalFunction, Multiplication)

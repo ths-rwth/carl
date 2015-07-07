@@ -43,14 +43,14 @@ namespace carl
             {
                 if( _factorization.size() == 1 && _factorization.begin()->second == 1 )
                 {
-                    return _factorization.begin()->first.toString( true, _friendlyVarNames );
+                    return _factorization.begin()->first.toString( false, _friendlyVarNames );
                 }
                 result += "(*";
                 for( auto polyExpPair = _factorization.begin(); polyExpPair != _factorization.end(); ++polyExpPair )
                 {
                     assert( polyExpPair->second > 0 );
                     for( size_t i = 0; i < polyExpPair->second; ++i )
-                        result += " " + polyExpPair->first.toString( true, _friendlyVarNames );
+                        result += " " + polyExpPair->first.toString( false, _friendlyVarNames );
                 }
                 result += ")";
             }
@@ -239,19 +239,18 @@ namespace carl
         // The factorization of the PolynomialFactorizationPair to update which can be empty, if constructed freshly by a polynomial.
         if( _toUpdate.factorizedTrivially() && !_updateWith.factorizedTrivially() )
         {
-            std::cout << __func__ << ":" << __LINE__ << std::endl;
             _toUpdate.mFactorization = _updateWith.mFactorization;
         }
-//        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
-//        {
-//            // Calculating the gcd refines both factorizations to the same factorization
-//            bool refineA = false;
-//            bool refineB = false;
-//            Factorization<P> restA, restB;
-//            typename P::CoeffType c( 0 );
-//            gcd( _toUpdate, _updateWith, restA, restB, c, refineA, refineB );
-//            assert( c == typename P::CoeffType( 0 ) || c == typename P::CoeffType( 1 ) );
-//        }
+        if( !factorizationsEqual( _toUpdate.factorization(), _updateWith.factorization() ) )
+        {
+            // Calculating the gcd refines both factorizations to the same factorization
+            bool refineA = false;
+            bool refineB = false;
+            Factorization<P> restA, restB;
+            typename P::CoeffType c( 0 );
+            gcd( _toUpdate, _updateWith, restA, restB, c, refineA, refineB );
+            assert( c == typename P::CoeffType( 0 ) || c == typename P::CoeffType( 1 ) );
+        }
     }
 
     template<typename P>
@@ -494,7 +493,6 @@ namespace carl
                         std::shared_ptr<Cache<PolynomialFactorizationPair<P>>> cache = factorA.pCache();
                         //Set new part of GCD
                         FactorizedPolynomial<P> gcdResult( polGCD, cache );
-                        std::cout << "gcdResult = " << gcdResult << std::endl;
                         result.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult,  exponentCommon ) );
                         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << gcdResult << ")^" << exponentCommon << " to gcd: " << result );
                         if (remainA.isOne())

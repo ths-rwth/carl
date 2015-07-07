@@ -298,7 +298,9 @@ namespace carl
              */
             bool operator<( const UEquality& _ueq ) const;
             
-            std::string toString( bool _infix, bool _friendlyNames ) const;
+            std::string toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const;
+            
+            void collectUVariables( std::set<UVariable>& _uvars ) const;
             
             void collectUVariables( std::set<UVariable>& _uvars ) const;
             
@@ -333,4 +335,3 @@ namespace std
         }
     };
 }
-
