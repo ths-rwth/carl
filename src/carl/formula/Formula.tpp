@@ -296,9 +296,13 @@ namespace carl
             case FormulaType::OR:
             {
                 _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                for( auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula )
-                {
-                    Condition subFormulaConds = subFormula->properties();
+#ifdef __VS
+				for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
+#else
+				for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
+#endif
+				{
+					Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_A_LITERAL<=subFormulaConds) )
                     {
                         _content.mProperties &= ~PROP_IS_A_CLAUSE;
@@ -313,7 +317,11 @@ namespace carl
             case FormulaType::AND:
             {
                 _content.mProperties |= PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
-                for( auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula )
+#ifdef __VS
+				for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
+#else
+				for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
+#endif
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_A_CLAUSE<=subFormulaConds) )
@@ -345,7 +353,11 @@ namespace carl
             case FormulaType::IFF:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                for( auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula )
+#ifdef __VS
+				for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
+#else
+				for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
+#endif
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
@@ -357,7 +369,11 @@ namespace carl
             case FormulaType::XOR:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
-                for( auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula )
+#ifdef __VS
+				for (auto subFormula = _content.mpSubformulasVS->begin(); subFormula != _content.mpSubformulasVS->end(); ++subFormula)
+#else
+				for (auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula)
+#endif
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
@@ -369,8 +385,11 @@ namespace carl
             case FormulaType::CONSTRAINT:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
-                addConstraintProperties( _content.mConstraint, _content.mProperties );
-                
+#ifdef __VS
+                addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
+#else
+				addConstraintProperties(_content.mConstraint, _content.mProperties);
+#endif
                 break;
             }
             case FormulaType::BITVECTOR:

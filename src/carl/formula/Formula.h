@@ -419,7 +419,11 @@ namespace carl
             const Formulas<Pol>& subformulas() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas;
+#ifdef __VS
+                return *mpContent->mpSubformulasVS;
+#else
+				return mpContent->mSubformulas;
+#endif
             }
 
             /**

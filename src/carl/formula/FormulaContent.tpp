@@ -5,18 +5,30 @@ namespace carl {
     FormulaContent<Pol>::FormulaContent(FormulaType _type, size_t _id):
         mHash(((size_t)(Constraint<Pol>(_type == FormulaType::TRUE).id())) << (sizeof(size_t)*4)),
         mId( _id ),
-        mType( _type ),
-        mConstraint( Constraint<Pol>(_type == FormulaType::TRUE) )
+#ifdef __VS
+        mType( _type )
     {
+		mpConstraintVS = new Constraint<Pol>(Constraint<Pol>(_type == FormulaType::TRUE));
+#else
+		mType(_type),
+		mConstraint(Constraint<Pol>(_type == FormulaType::TRUE))
+	{
+#endif
 		assert(_type == FormulaType::TRUE || _type == FormulaType::FALSE);
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type);
 	}
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(carl::Variable::Arg _variable):
-        mHash((std::size_t)_variable.getId()), // TODO: subtract the id of the boolean variable with the smallest id
-        mVariable( _variable )
-    {
+#ifdef __VS
+		mHash((std::size_t)_variable.getId()) // TODO: subtract the id of the boolean variable with the smallest id
+		{
+		mpVariableVS = new carl::Variable(_variable);
+#else
+		mHash((std::size_t)_variable.getId()), // TODO: subtract the id of the boolean variable with the smallest id
+		mVariable(_variable)
+	{
+#endif
 		switch (_variable.getType()) {
 			case VariableType::VT_BOOL:
 				mType = BOOL;
@@ -67,9 +79,15 @@ namespace carl {
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formula<Pol>&& _subformula):
         mHash( ((size_t)NOT << 5) ^ _subformula.getHash() ),
-        mType( _type ),
-        mSubformula( std::move(_subformula) )
+#ifdef __VS
+        mType( _type )
     {
+		mpSubformulaVS = new Formula<Pol>(std::move(_subformula));
+#else
+		mType(_type),
+		mSubformula(std::move(_subformula))
+	{
+#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformula);
 	}
 	
@@ -81,14 +99,25 @@ namespace carl {
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formulas<Pol>&& _subformulas):
         mHash( (size_t)_type ),
-        mType( _type ),
-		mSubformulas( std::move(_subformulas) )
+#ifdef __VS
+		mType( _type )
     {
-        assert( isNary() );
-        for (const auto& subformula: mSubformulas) {
-            mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
-            mHash ^= subformula.getHash();
-        }
+		mpSubformulasVS = new Formulas<Pol>(std::move(_subformulas));
+		assert( isNary() );
+		for (const auto& subformula: *mpSubformulasVS) {
+			mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
+			mHash ^= subformula.getHash();
+	}
+#else
+		mType(_type),
+		mSubformulas(std::move(_subformulas))
+	{
+		assert(isNary());
+		for (const auto& subformula : mSubformulas) {
+			mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
+			mHash ^= subformula.getHash();
+		}
+#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformulas);
     }
 
@@ -106,32 +135,54 @@ namespace carl {
     bool FormulaContent<Pol>::operator==(const FormulaContent& _content) const {
 		if (mId != 0 && _content.mId != 0) return mId == _content.mId;
         if (mType != _content.mType) return false;
-        switch (mType) {
-            case FormulaType::TRUE:
-                return true;
-            case FormulaType::FALSE:
-                return true;
-            case FormulaType::BOOL:
-                return mVariable == _content.mVariable;
-            case FormulaType::NOT:
-                return mSubformula == _content.mSubformula;
+		switch (mType) {
+		case FormulaType::TRUE:
+			return true;
+		case FormulaType::FALSE:
+			return true;
+#ifdef __VS
+		case FormulaType::BOOL:
+			return *mpVariableVS == *_content.mpVariableVS;
+		case FormulaType::NOT:
+			return *mpSubformulaVS == *_content.mpSubformulaVS;
+#else
+		case FormulaType::BOOL:
+			return mVariable == _content.mVariable;
+		case FormulaType::NOT:
+			return mSubformula == _content.mSubformula;
+#endif
 			case FormulaType::IMPLIES:
 			case FormulaType::AND:
 			case FormulaType::OR:
 			case FormulaType::XOR:
 			case FormulaType::IFF:
+#ifdef __VS
+			case FormulaType::ITE:
+				return *mpSubformulasVS == *_content.mpSubformulasVS;
+			case FormulaType::CONSTRAINT:
+				return *mpConstraintVS == *_content.mpConstraintVS;
+			case FormulaType::BITVECTOR:
+				return *mpBVConstraintVS == *_content.mpBVConstraintVS;
+			case FormulaType::UEQ:
+				return *mpUIEqualityVS == *_content.mpUIEqualityVS;
+			case FormulaType::EXISTS:
+				return (*mpQuantifierContentVS == *_content.mpQuantifierContentVS);
+			case FormulaType::FORALL:
+				return (*mpQuantifierContentVS == *_content.mpQuantifierContentVS);
+#else
 			case FormulaType::ITE:
 				return mSubformulas == _content.mSubformulas;
-            case FormulaType::CONSTRAINT:
-                return mConstraint == _content.mConstraint;
-            case FormulaType::BITVECTOR:
-                return mBVConstraint == _content.mBVConstraint;
-            case FormulaType::UEQ:
-                return mUIEquality == _content.mUIEquality;
-            case FormulaType::EXISTS:
-                return (mQuantifierContent == _content.mQuantifierContent);
-            case FormulaType::FORALL:
-                return (mQuantifierContent == _content.mQuantifierContent);
+			case FormulaType::CONSTRAINT:
+				return mConstraint == _content.mConstraint;
+			case FormulaType::BITVECTOR:
+				return mBVConstraint == _content.mBVConstraint;
+			case FormulaType::UEQ:
+				return mUIEquality == _content.mUIEquality;
+			case FormulaType::EXISTS:
+				return (mQuantifierContent == _content.mQuantifierContent);
+			case FormulaType::FORALL:
+				return (mQuantifierContent == _content.mQuantifierContent);
+#endif
         }
 		assert(false);
 		return false;
