@@ -1135,16 +1135,23 @@ namespace carl
                                 Formula<Pol> tseitinVar = FormulaPool<Pol>::getInstance().createTseitinVar( currentSubformula );
                                 for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                 {
-                                    subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
-                                    assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == Formula<Pol>( FormulaType::NOT, tseitinVar ) );
-                                    subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
+                                    assert( !subsubformula.isFalse() );
+                                    if( !subsubformula.isTrue() )
+                                    {
+                                        subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
+                                        assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == Formula<Pol>( FormulaType::NOT, tseitinVar ) );
+                                        subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
+                                    }
                                 }
                                 if( _tseitinWithEquivalence )
                                 {
                                     Formulas<Pol> tmpSubformulas;
                                     tmpSubformulas.push_back( tseitinVar );
                                     for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
-                                        tmpSubformulas.push_back( Formula<Pol>( NOT, subsubformula ) );
+                                    {
+                                        if( !subsubformula.isTrue() )
+                                            tmpSubformulas.push_back( Formula<Pol>( NOT, subsubformula ) );
+                                    }
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
                                     subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
                                     assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == tseitinVar );
