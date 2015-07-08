@@ -219,14 +219,14 @@ namespace carl
 		if (infix) {
 			for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
 				if (vp != mExponents.begin()) ss << "*";
-				ss << vp->first;
+				ss << VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 				if (vp->second > 1) ss << "^" << vp->second;
 			}
 		} else {
 			if (mExponents.size() > 1) ss << "(* ";
 			for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
 				if (vp != mExponents.begin()) ss << " ";
-				if (vp->second == 1) ss << vp->first;
+				if (vp->second == 1) ss << VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 				else {
 					std::string varName = VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 					ss << "(*";
