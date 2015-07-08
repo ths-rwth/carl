@@ -271,13 +271,21 @@ namespace carl
             case FormulaType::TRUE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
+#ifdef __VS
                 addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
-                break;
+#else                
+		addConstraintProperties( _content.mConstraint, _content.mProperties );
+#endif
+		break;
             }
             case FormulaType::FALSE:
             {
                 _content.mProperties |= STRONG_CONDITIONS;
+#ifdef __VS
                 addConstraintProperties( *_content.mpConstraintVS, _content.mProperties );
+#else                
+		addConstraintProperties( _content.mConstraint, _content.mProperties );
+#endif
                 break;
             }
             case FormulaType::BOOL:
@@ -287,7 +295,11 @@ namespace carl
             }
             case FormulaType::NOT:
             {
+#ifdef __VS
                 Condition subFormulaConds = _content.mpSubformulaVS->mpContent->mProperties;
+#else                
+                Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
+#endif
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
                     _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION;
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
@@ -1815,6 +1827,39 @@ namespace carl
             return true;
         }
     }
+
+	template<typename Formula>
+	void FormulaVisitor<Formula>::visitVoid(const Formula& formula, const std::function<void(Formula)>& func) {
+		func(formula);
+		switch (formula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR: 
+		case IMPLIES:
+        case ITE:
+        {
+		for (const auto& cur: formula.subformulas()) visitVoid(cur, func);
+			break;
+		}
+		case NOT: {
+			visitVoid(formula.subformula(), func);
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case BITVECTOR:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			visitVoid(formula.quantifiedFormula(), func);
+			break;
+		}
+		}
+	}
     
     template<typename Formula>
 	void FormulaVisitor<Formula>::rvisit(const Formula& formula, const std::function<void(Formula)>& func) {
@@ -1847,6 +1892,55 @@ namespace carl
 		}
 		func(formula);
 		}
+	}
+
+	template<typename Formula>
+	Formula FormulaVisitor<Formula>::visitResult(const Formula& formula, const std::function<Formula(Formula)>& func) {
+		Formula newFormula = func(formula);
+		switch (newFormula.getType()) {
+		case AND:
+		case OR:
+		case IFF:
+		case XOR:
+        case IMPLIES:
+        case ITE:
+        {
+			Formulas<typename Formula::PolynomialType> newSubformulas;
+			bool changed = false;
+			for (const auto& cur: newFormula.subformulas()) {
+				Formula newCur = visitResult(cur, func);
+				if (newCur != cur) changed = true;
+				newSubformulas.push_back(newCur);
+			}
+			if (changed) {
+				return Formula(newFormula.getType(), newSubformulas);
+			}
+			break;
+		}
+		case NOT: {
+			Formula cur = visitResult(newFormula.subformula(), func);
+			if (cur != newFormula.subformula()) {
+				return Formula(NOT, cur);
+			}
+			break;
+		}
+		case BOOL:
+		case CONSTRAINT:
+		case BITVECTOR:
+		case TRUE:
+		case FALSE:
+		case UEQ:
+			break;
+		case EXISTS:
+		case FORALL: {
+			Formula sub = visitResult(newFormula.quantifiedFormula(), func);
+			if (sub != newFormula.quantifiedFormula()) {
+				return Formula(newFormula.getType(), newFormula.quantifiedVariables(), sub);
+			}
+			break;
+		}
+		}
+		return newFormula;
 	}
 
 	template<typename Formula>
