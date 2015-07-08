@@ -209,13 +209,13 @@ namespace carl
                 {
                     if( iterToFalse != _subformulas.end() ) return falseFormula();
                     if( iterToTrue != _subformulas.end() ) _subformulas.erase( iterToTrue );
-                    else if( _subformulas.empty() ) return trueFormula();
+                    if( _subformulas.empty() ) return trueFormula();
                 }
                 else if( _type == FormulaType::OR )
                 {
                     if( iterToTrue != _subformulas.end() ) return trueFormula();
                     if( iterToFalse != _subformulas.end() ) _subformulas.erase( iterToFalse );
-                    else if( _subformulas.empty() ) return falseFormula();
+                    if( _subformulas.empty() ) return falseFormula();
                 }
                 else // _type == FormulaType::IFF
                 {
@@ -247,6 +247,7 @@ namespace carl
             if( _subformulas.size() == 1 )
                 return newFormulaWithOneSubformula( _type, *(_subformulas.begin()) );
         }
+        assert( !_subformulas.empty() );
         return add( new FormulaContent<Pol>( _type, std::move( _subformulas ) ) );
     }
     
