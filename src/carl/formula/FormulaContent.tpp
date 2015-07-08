@@ -55,12 +55,13 @@ namespace carl {
         mType( FormulaType::CONSTRAINT )
     {
 		mpConstraintVS = new Constraint<Pol>(std::move(_constraint));
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mpConstraintVS);
 #else
 		mType(FormulaType::CONSTRAINT),
 		mConstraint(std::move(_constraint))
 	{
-#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mConstraint);
+#endif
 	}
 
 	template<typename Pol>
@@ -70,12 +71,13 @@ namespace carl {
         mType( FormulaType::BITVECTOR )
     {
 		mpBVConstraintVS = new BVConstraint(std::move(_constraint));
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mpBVConstraintVS);
 #else
 		mType(FormulaType::BITVECTOR),
 		mBVConstraint(std::move(_constraint))
 	{
-#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mBVConstraint);
+#endif
 	}
 
 
@@ -86,12 +88,13 @@ namespace carl {
         mType( FormulaType::UEQ )
     {
 		mpUIEqualityVS = new UEquality(std::move(_ueq));
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << *mpUIEqualityVS);
 #else
 		mType(FormulaType::UEQ),
 		mUIEquality(std::move(_ueq))
 	{
-#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mUIEquality);
+#endif
 	}
 
     template<typename Pol>
@@ -101,12 +104,13 @@ namespace carl {
         mType( _type )
     {
 		mpSubformulaVS = new Formula<Pol>(std::move(_subformula));
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << *mpSubformulaVS);
 #else
 		mType(_type),
 		mSubformula(std::move(_subformula))
 	{
-#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformula);
+#endif
 	}
 	
 	template<typename Pol>
@@ -126,6 +130,7 @@ namespace carl {
 			mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
 			mHash ^= subformula.getHash();
 	}
+		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << *mpSubformulasVS);
 #else
 		mType(_type),
 		mSubformulas(std::move(_subformulas))
@@ -135,8 +140,8 @@ namespace carl {
 			mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
 			mHash ^= subformula.getHash();
 		}
-#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformulas);
+#endif
     }
 
     template<typename Pol>
