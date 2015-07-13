@@ -61,6 +61,8 @@ template <typename... Condition>
 using EnableIf = typename std::enable_if<all<Condition...>::value, dtl::enabled>::type;
 template <typename... Condition>
 using DisableIf = typename std::enable_if<Not<any<Condition...>>::value, dtl::enabled>::type;
+template <bool Condition>
+using EnableIfBool = typename std::enable_if<Condition, dtl::enabled>::type;
 #endif
 
 template<typename> struct Void { typedef void type; };
