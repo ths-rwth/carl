@@ -103,8 +103,13 @@ namespace carl
         // Premises
         for (it++; it != _subformulas.rend(); ) {
             if (it->mpContent == mpFalse) return create(TRUE);
-            if (it->mpContent == mpTrue) _subformulas.erase(it.base());
-            it++;
+			if (it->mpContent == mpTrue)
+			{
+				Formulas<Pol>::iterator tempIter = _subformulas.erase(--it.base());
+				it = Formulas<Pol>::reverse_iterator(tempIter);
+			}
+			else
+				++it;
         }
         #endif
         Formula<Pol> conclusion = _subformulas.back();
