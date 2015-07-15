@@ -42,9 +42,15 @@ namespace carl {
 	template<typename Pol>
 	FormulaContent<Pol>::FormulaContent(Formula<Pol>&& _lhs, Relation _rel):
 	///@todo use sensible hash.
+#ifdef __VS
+		mHash(_lhs.mHash)
+	{
+		mpArithmeticVS = new ArithmeticConstraintContent<Pol>(std::move(_lhs), _rel);
+#else
 		mHash(_lhs.mHash),
 		mArithmetic(std::move(_lhs), _rel)
 	{
+#endif
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << mArithmetic.mLhs << " " << _rel);
 	}
 
