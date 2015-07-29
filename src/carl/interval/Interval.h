@@ -38,6 +38,7 @@
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
+#include <boost/functional/hash.hpp>
 CLANG_WARNING_RESET
 #include <cmath>
 
@@ -2058,14 +2059,13 @@ namespace std
 		 */
 		size_t operator()(const carl::Interval<Number>& interval) const
         {
-            size_t result = interval.lowerBoundType();
-            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-            result ^= interval.upperBoundType();
-            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-			std::hash<Number> h;
-			result ^= h( interval.lowerBound() );
-            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-			result ^= h( interval.upperBound() );
+        	size_t result = 0;
+        	boost::hash_combine(result, static_cast<size_t>(interval.lowerBoundType()));
+        	boost::hash_combine(result, static_cast<size_t>(interval.upperBoundType()));
+        	std::hash<Number> h;
+        	boost::hash_combine(result, h(interval.upper()));
+        	boost::hash_combine(result, h(interval.lower()));
+
             return result;
 		}
 	};
