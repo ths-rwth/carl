@@ -26,6 +26,14 @@ inline bool isInteger(const int&) {
 	return true;
 }
 
+inline bool isNegative(const double& d) {
+	return d < 0;
+}
+
+inline bool isPositive(const double& d) {
+	return d > 0;
+}
+
 inline std::size_t bitsize(unsigned) {
 	return sizeof(unsigned) * 8;
 }
