@@ -46,6 +46,26 @@ TEST(DoubleInterval, Constructor)
     SUCCEED();
 }
 
+TEST(DoubleInterval, Hash)
+{
+    DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
+    std::hash<DoubleInterval> hashFkt;
+    size_t hash1 = hashFkt(test1);
+    /*DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::emptyInterval());
+    DoubleInterval test5 = DoubleInterval::unboundedInterval();
+    DoubleInterval test6 = DoubleInterval::emptyInterval();
+	
+    DoubleInterval test7 = DoubleInterval((Rational)-1, BoundType::WEAK, (Rational)1, BoundType::WEAK);
+    
+	DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
+	DoubleInterval test9 = DoubleInterval(1);
+	DoubleInterval test10 = DoubleInterval(0);
+	*/
+    SUCCEED();
+}
+
 TEST(DoubleInterval, Getters)
 {
     DoubleInterval test1 = DoubleInterval(-1.0, BoundType::WEAK, 1.0, BoundType::STRICT);
