@@ -87,7 +87,11 @@ namespace carl
 
         public:
             
-            UEquality(); // No default constructor.
+            UEquality():
+                mNegated( false ),
+                mLhs( UVariable(Variable::NO_VARIABLE, Sort()) ),
+                mRhs( UVariable(Variable::NO_VARIABLE, Sort()) )
+            {}
             
 			/**
              * Constructs an uninterpreted equality.
