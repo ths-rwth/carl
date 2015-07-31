@@ -1139,7 +1139,6 @@ namespace carl
                                     if( !subsubformula.isTrue() )
                                     {
                                         subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
-                                        assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == Formula<Pol>( FormulaType::NOT, tseitinVar ) );
                                         subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
                                     }
                                 }
@@ -1154,7 +1153,6 @@ namespace carl
                                     }
                                     subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
                                     subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
-                                    assert( *(--(subformulasToTransformTmp.back().subformulas().end())) == tseitinVar );
                                 }
                                 subsubformulas.push_back( tseitinVar );
                                 break;

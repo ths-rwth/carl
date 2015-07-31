@@ -81,6 +81,7 @@ namespace carl
     {
         if( _subformulaA.mpContent == mpTrue && _subformulaB.mpContent == mpFalse )
             return true;
+        assert( !( _subformulaA.getType() == FormulaType::NOT && _subformulaA.subformula() == _subformulaB ) );
         if( _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA )
             return true;
         return false;
@@ -123,6 +124,7 @@ namespace carl
         if (_subformulas.size() == 1) {
             return _subformulas[0].mpContent;
         }
+        std::sort(_subformulas.begin(), _subformulas.end());
         for( size_t pos = 0; pos < _subformulas.size(); )
         {
             if( _subformulas[pos].getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
@@ -182,7 +184,6 @@ namespace carl
                 }
             }
         }
-        std::sort(_subformulas.begin(), _subformulas.end());
         _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
         if( _subformulas.empty() )
             return falseFormula();
