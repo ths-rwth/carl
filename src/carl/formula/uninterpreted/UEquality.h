@@ -87,7 +87,7 @@ namespace carl
 
         public:
             
-            UEquality(); // No default constructor.
+            UEquality() = delete; // No default constructor.
             
 			/**
              * Constructs an uninterpreted equality.
