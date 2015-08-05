@@ -48,6 +48,11 @@ namespace carl
                 {
                     return false;
                 }
+                
+                bool operator()(const Arg& arg) const
+                {
+                    return boost::apply_visitor(*this, arg);
+                }
             };
 
             /**
@@ -71,6 +76,11 @@ namespace carl
                 bool operator()(const UFInstance&) const 
                 {
                     return true;
+                }
+                
+                bool operator()(const Arg& arg) const
+                {
+                    return boost::apply_visitor(*this, arg);
                 }
             };
 
