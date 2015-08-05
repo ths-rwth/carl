@@ -194,7 +194,7 @@ endif()
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Boost
-load_library(carl Boost 1.0 REQUIRED COMPONENTS program_options)
+load_library(carl Boost 1.0 REQUIRED)
 
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
 list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_DYNAMIC})
