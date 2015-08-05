@@ -1,5 +1,5 @@
 /** 
- * @file core/Constraint.h
+ * @file core/SimpeConstraint.h
  * @author Sebastian Junges
  * @ingroup constraints
  * @since April 4, 2014
@@ -11,11 +11,11 @@ namespace carl
 {
 
 template<typename LhsType>
-class Constraint
+class SimpleConstraint
 {
 	public:
-		Constraint(bool v) : mLhs(v ? 0 : 1), mRelation(CompareRelation::EQ) {}
-		Constraint(const LhsType& lhs, CompareRelation rel) : mLhs(lhs), mRelation(rel)
+		SimpleConstraint(bool v) : mLhs(v ? 0 : 1), mRelation(CompareRelation::EQ) {}
+		SimpleConstraint(const LhsType& lhs, CompareRelation rel) : mLhs(lhs), mRelation(rel)
 		{}
 	
 		const LhsType& lhs() const {return mLhs;}
@@ -59,19 +59,19 @@ class Constraint
 };
 
 template<typename LhsT>
-bool operator==(const Constraint<LhsT>& lhs, const Constraint<LhsT>& rhs)
+bool operator==(const SimpleConstraint<LhsT>& lhs, const SimpleConstraint<LhsT>& rhs)
 {
 	return lhs.rel() == rhs.rel() && lhs.lhs() == rhs.lhs();
 }
 
 template<typename LhsT>
-bool operator!=(const Constraint<LhsT>& lhs, const Constraint<LhsT>& rhs)
+bool operator!=(const SimpleConstraint<LhsT>& lhs, const SimpleConstraint<LhsT>& rhs)
 {
 	return !(lhs == rhs);
 }
 
 template<typename LhsT>
-std::ostream& operator<<(std::ostream& os, const Constraint<LhsT>& rhs)
+std::ostream& operator<<(std::ostream& os, const SimpleConstraint<LhsT>& rhs)
 {
 	return os << rhs.lhs() << " " << rhs.rel() << " 0";
 }
@@ -83,9 +83,9 @@ std::ostream& operator<<(std::ostream& os, const Constraint<LhsT>& rhs)
 namespace std {
 
 template<typename LhsType>
-struct hash<carl::Constraint<LhsType>> 
+struct hash<carl::SimpleConstraint<LhsType>> 
 {
-	std::size_t operator()(const carl::Constraint<LhsType>& c) const {
+	std::size_t operator()(const carl::SimpleConstraint<LhsType>& c) const {
 		std::hash<LhsType> h1;
 		std::hash<carl::CompareRelation> h2;
 		return h1(c.lhs()) << 2 | h2(c.rel());
