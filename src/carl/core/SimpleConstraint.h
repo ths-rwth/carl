@@ -44,10 +44,10 @@ class SimpleConstraint
 				if(cp == 0) {
 					return relationIsStrict(mRelation);
 				} else if(cp > 0) {
-					return mRelation == CompareRelation::LEQ || mRelation == CompareRelation::LESS || mRelation == CompareRelation::EQ;
+					return mRelation == Relation::LEQ || mRelation == Relation::LESS || mRelation == Relation::EQ;
 				} else {
 					assert(cp < 0);
-					return mRelation == CompareRelation::GEQ || mRelation == CompareRelation::GREATER || mRelation == CompareRelation::EQ;
+					return mRelation == Relation::GEQ || mRelation == Relation::GREATER || mRelation == Relation::EQ;
 				}
 			}
 			return false;
@@ -55,7 +55,7 @@ class SimpleConstraint
 				
 	private:
 		LhsType mLhs;
-		CompareRelation mRelation;
+		Relation mRelation;
 };
 
 template<typename LhsT>
@@ -87,7 +87,7 @@ struct hash<carl::SimpleConstraint<LhsType>>
 {
 	std::size_t operator()(const carl::SimpleConstraint<LhsType>& c) const {
 		std::hash<LhsType> h1;
-		std::hash<carl::CompareRelation> h2;
+		std::hash<carl::Relation> h2;
 		return h1(c.lhs()) << 2 | h2(c.rel());
 	}
 };
