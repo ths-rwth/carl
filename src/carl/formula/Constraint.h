@@ -16,7 +16,7 @@
 #include <cstring>
 #include <sstream>
 #include <assert.h>
-#include "Relation.h"
+#include "../core/Relation.h"
 #include "../config.h"
 #include "../core/VariableInformation.h"
 #include "../interval/Interval.h"
