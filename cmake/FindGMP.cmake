@@ -1,6 +1,9 @@
-FIND_PATH(GMP_INCLUDE_DIR gmp.h $ENV{HOME}/.local/include)
+FIND_PATH(GMP_INCLUDE_DIR 
+            gmp.h )
 
-FIND_LIBRARY(GMP_LIBRARIES NAMES gmp PATH $ENV{HOME}/.local/include)
+FIND_LIBRARY(GMP_LIBRARIES
+             NAMES gmp 
+             HINTS /usr/local/lib )
 
 IF (GMP_INCLUDE_DIR AND GMP_LIBRARIES)
    SET(GMP_FOUND TRUE)
