@@ -252,6 +252,7 @@ if(USE_GINAC)
 	load_library(carl GiNaC 1.5.8 REQUIRED )
 endif()
 
+message(STATUS "include: ${carl_INCLUDE_DIRS}")
 message(STATUS "dynamic: ${carl_LIBRARIES_DYNAMIC}")
 message(STATUS "static: ${carl_LIBRARIES_STATIC}")
 include_directories(SYSTEM ${SYSTEM} ${carl_INCLUDE_DIRS})
