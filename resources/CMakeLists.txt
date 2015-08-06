@@ -48,9 +48,9 @@ else()
 endif()
 
 if(EIGEN3_FOUND)
-	message("-- Use system version of Eigen3")
+	message(STATUS "Use system version of Eigen3")
 else()
-	message("-- Use shipped version of Eigen3")
+	message(STATUS "Use shipped version of Eigen3")
 	ExternalProject_Add(
 		eigen
 		DOWNLOAD_COMMAND ""
@@ -63,8 +63,10 @@ else()
 		LOG_BUILD ON)
 
 
-	set( Eigen3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
+	set( Eigen3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include")
 	#set( Eigen3_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
+	message(STATUS "Found Eigen3: ${Eigen3_INCLUDE_DIR}")
+	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${Eigen3_INCLUDE_DIR}" PARENT_SCOPE)
 	add_dependencies(resources eigen)
 endif()
 
