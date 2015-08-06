@@ -152,7 +152,7 @@ public:
 	 * Checks if the represented value is integral.
 	 * @return If this is integral.
 	 */
-	virtual bool isIntegral() const {
+	virtual bool isIntegral() {
 		return carl::isInteger(mValue);
 	}
 
