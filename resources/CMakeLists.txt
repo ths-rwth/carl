@@ -66,6 +66,7 @@ else()
 	#set( Eigen3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE )
         #list(APPEND ${group}_LIBRARIES_DYNAMIC ${${LIBNAME}_LIBRARIES})
         list(APPEND carl_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include" PARENT_SCOPE)
+
 	#set( Eigen3_LIBRARY "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/lib/" PARENT_SCOPE )
 	add_dependencies(resources eigen)
 endif()
