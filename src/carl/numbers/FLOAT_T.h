@@ -267,8 +267,7 @@ namespace carl
          * Getter for the raw value contained.
          * @return Raw value.
          */
-        const FloatType& value() const
-        {
+        const FloatType& value() const {
             return mValue;
         }
 
@@ -1788,10 +1787,21 @@ namespace carl
     
 	template<typename FloatType>
 	inline bool isZero(const FLOAT_T<FloatType>& _in) {
-		return _in.mValue == 0;
-	}	
-	
+		return _in.value() == 0;
+	}
+
+	template<typename FloatType>
+	inline bool isInfinity(const FLOAT_T<FloatType>& _in) {
+		return _in.value() == std::numeric_limits<FloatType>::infinity();
+	}
+
+	template<typename FloatType>
+	inline bool isNan(const FLOAT_T<FloatType>& _in) {
+		return _in.value() == std::numeric_limits<FloatType>::quiet_NaN();
+	}
+
+} // namespace
 
 #include "adaption_float/mpfr_float.tpp"
 
-} // namespace
+

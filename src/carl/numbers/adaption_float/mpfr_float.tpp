@@ -2,6 +2,7 @@
 
 
 #ifdef USE_MPFR_FLOAT
+namespace carl {
 template<>
 class FLOAT_T<mpfr_t>
 {
@@ -71,8 +72,8 @@ class FLOAT_T<mpfr_t>
 
         FLOAT_T(const FLOAT_T<mpfr_t>& _float)
         {
-            mpfr_init2(mValue, mpfr_get_prec(_float.mValue));
-            mpfr_set(mValue, _float.mValue, MPFR_RNDN);
+            mpfr_init2(mValue, mpfr_get_prec(_float.value()));
+            mpfr_set(mValue, _float.value(), MPFR_RNDN);
         }
 		
 		FLOAT_T(const std::string& _string)
@@ -121,8 +122,10 @@ class FLOAT_T<mpfr_t>
 		{
 			if(this == &_rhs)
 				return *this;
-				
-			mpfr_set(mValue, _rhs.mValue, MPFR_RNDN);
+
+			mpfr_clear(mValue);
+			mpfr_init2(mValue,_rhs.precision());
+			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
 			return *this;
 		}
 		
@@ -748,4 +751,17 @@ class FLOAT_T<mpfr_t>
 			return _prec;
 		}
 };
+
+template<>
+inline bool isInfinity(const FLOAT_T<mpfr_t>& _in) {
+	return (mpfr_inf_p(_in.value()) != 0);
+}
+
+template<>
+inline bool isNan(const FLOAT_T<mpfr_t>& _in) {
+	return (mpfr_nan_p(_in.value()) != 0);
+}
+
+}// namespace
+
 #endif
