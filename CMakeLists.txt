@@ -219,11 +219,11 @@ load_library(carl GMPXX 0.0 REQUIRED)
 # # # # # # # # # # # # # # # # # # # # # #
 
 IF(USE_MPFR_FLOAT)
-	load_library(MPFR 0.0 REQUIRED)
+	load_library(carl MPFR 0.0 REQUIRED)
 endif()
 
 if(COMPARE_WITH_Z3)
-    load_library(Z3 4.0)
+    load_library(carl Z3 4.0)
 endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
