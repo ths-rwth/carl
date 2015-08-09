@@ -13,7 +13,7 @@
 
 namespace carl{
 
-template<typename PolynomialType >
+template< typename PolynomialType >
 class MultivariateHorner { 
 
 /**
@@ -25,7 +25,7 @@ class MultivariateHorner {
 public:
 	/// Type of the coefficients. 	
 	
-	typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
+	typedef typename PolynomialType::CoeffType CoeffType;
 
 	CoeffType mConst_dependent = constant_zero<CoeffType>::get();
 	CoeffType mConst_independent = constant_zero<CoeffType>::get();
@@ -47,7 +47,6 @@ public:
 		return *this;
 	}
 
-
 /*
 	MultivariateHorner& operator=(MultivariateHorner&& mh) {
 		mConst_dependent = std::move(mh.mConst_dependent);
@@ -65,7 +64,7 @@ public:
 		return mVariable;
 	}
 
-	void setVariable(const Variable::Arg& var){
+	void setVariable(Variable::Arg var){
 		mVariable = var;
 	}
 
@@ -89,7 +88,7 @@ public:
 		return mConst_dependent;
 	}
 
-	void setDepConstant(CoeffType constant){
+	void setDepConstant(const CoeffType& constant){
 		mConst_dependent = constant;
 	}	
 
@@ -100,14 +99,8 @@ public:
 	void setIndepConstant(const CoeffType& constant){
 		mConst_independent = constant;
 	}	
-
-//
-//	template<typename Number>
-//	static Interval<Number> evaluate(const MultivariateHorner<PolynomialType> mvH, std::map<Variable, Interval<Number>>& map);
-
-}; //Class MultivarHorner
+};
 
 }//namespace carl
+
 #include "MultivariateHorner.tpp"
-
-

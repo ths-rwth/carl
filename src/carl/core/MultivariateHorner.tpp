@@ -17,7 +17,8 @@ namespace carl
 	MultivariateHorner< PolynomialType >::MultivariateHorner (const PolynomialType& inPut) {
 
 		if (HORNER_Minimize_arithmetic_operations)
-		{		
+		{
+			
 			std::set<Variable>::iterator variableIt;
 			std::set<Variable>::iterator selectedVariable;
 			std::set<Variable> allVariablesinPolynome;
@@ -48,7 +49,7 @@ namespace carl
 				}
 
 				//Setting the choosen Variable for the current Hornerscheme iterartion
-				this->setVariable(*selectedVariable); 
+				this->setVariable(*selectedVariable);			
 
 				#ifdef DEBUG_HORNER
 				std::cout << "Polynome: " << inPut << std::endl;
@@ -87,7 +88,7 @@ namespace carl
 				else 
 				{
 					mH_dependent = NULL;
-					mConst_dependent = (PolynomialType) h_dependentPart.constantPart();
+					mConst_dependent = h_dependentPart.constantPart();
 				}			
 
 				//If independent Polynome contains Variables - continue with recursive Horner
@@ -100,7 +101,7 @@ namespace carl
 				else
 				{
 					mH_independent = NULL;
-					mConst_independent = (PolynomialType) h_independentPart.constantPart();
+					mConst_independent = h_independentPart.constantPart();
 				}					
 			} 
 						
@@ -109,7 +110,7 @@ namespace carl
 			{		
 				mH_independent = NULL;
 				mH_dependent = NULL;
-				mConst_independent = (PolynomialType) inPut.constantPart();
+				mConst_independent = inPut.constantPart();
 				this->setVariable( Variable::NO_VARIABLE );
 			}
 			
@@ -285,42 +286,20 @@ MultivariateHorner<PolynomialType> simplify( MultivariateHorner<PolynomialType>&
 		return(mvH);
 	}
 	
+
+	
 	return(mvH);
 }
 
-//template<typename PolynomialType>
-//typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
-template<typename PolynomialType, typename Number>
-static Interval<Number> evaluate(const MultivariateHorner<PolynomialType> mvH, std::map<Variable, Interval<Number>>& map)
-{
-	Interval<Number> result(1);
 
-	assert (map.find(mvH.mVariable) != map.end() );
+
+template<typename PolynomialType>
+Interval<PolynomialType> evaluate( MultivariateHorner<PolynomialType>& mvH, const std::map<Variable, Interval<PolynomialType>>&, Variable* previousVariable)
+{
+	unsigned exponentOfpreviousVariable;
+	Interval<PolynomialType> result(1);
 	
-	//Case 1: no further Horner schemes in mvH
-	if (mvH.mH_dependent == NULL && mvH.mH_independent == NULL)
-	{
-		result = map.find(mvH.mVariable)->second.pow(mvH.mExponent) * mvH.mConst_dependent.constantPart() + mvH.mConst_independent.constantPart();
-		return result;
-	}
-	//Case 2: dependent part contains a Horner Scheme
-	else if (mvH.mH_dependent != NULL && mvH.mH_independent == NULL)
-	{
-		result = map.find(mvH.mVariable)->second.pow(mvH.mExponent) * evaluate(*mvH.mH_dependent, map) + mvH.mConst_independent.constantPart();
-		return result;
-	}
-	//Case 3: independent part contains a Horner Scheme
-	else if (mvH.mH_dependent == NULL && mvH.mH_independent != NULL)
-	{
-		result = map.find(mvH.mVariable)->second.pow(mvH.mExponent) * mvH.mConst_dependent.constantPart() +  evaluate(*mvH.mH_independent, map);
-		return result;
-	}
-	//Case 4: both independent part and dependent part 
-	else if (mvH.mH_dependent != NULL && mvH.mH_independent != NULL)
-	{
-		result = map.find(mvH.mVariable)->second.pow(mvH.mExponent) * evaluate(*mvH.mH_dependent, map) + evaluate(*mvH.mH_independent, map);
-		return result;
-	}
+
 
 	return result;
 }
