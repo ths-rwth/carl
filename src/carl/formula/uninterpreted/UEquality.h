@@ -48,6 +48,11 @@ namespace carl
                 {
                     return false;
                 }
+                
+                bool operator()(const Arg& arg) const
+                {
+                    return boost::apply_visitor(*this, arg);
+                }
             };
 
             /**
@@ -72,6 +77,11 @@ namespace carl
                 {
                     return true;
                 }
+                
+                bool operator()(const Arg& arg) const
+                {
+                    return boost::apply_visitor(*this, arg);
+                }
             };
 
         private:
@@ -87,7 +97,11 @@ namespace carl
 
         public:
             
-            UEquality(); // No default constructor.
+            UEquality():
+                mNegated( false ),
+                mLhs( UVariable(Variable::NO_VARIABLE, Sort()) ),
+                mRhs( UVariable(Variable::NO_VARIABLE, Sort()) )
+            {}
             
 			/**
              * Constructs an uninterpreted equality.

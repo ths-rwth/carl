@@ -18,6 +18,7 @@ using namespace carl;
 
 typedef MultivariatePolynomial<Rational> Pol;
 typedef Constraint<Pol> Constr;
+typedef Formula<Pol> FormulaT;
 
 TEST(Formula, Construction)
 {
@@ -68,4 +69,29 @@ TEST(Formula, Construction)
     const Formula<Pol> phiC( FormulaType::OR, Formula<Pol>( FormulaType::NOT, atomA ), atomC );
     const Formula<Pol> phiE( FormulaType::IMPLIES, phiA, phiC );
     std::cout << phiE << std::endl;
+}
+
+TEST(Formula, BooleanConstructors)
+{
+    Variable b1 = freshBooleanVariable("b1");
+    Variable b2 = freshBooleanVariable("b2");
+    
+    FormulaT True = FormulaT(FormulaType::TRUE);
+    EXPECT_TRUE(True.isTrue());
+    FormulaT False = FormulaT(FormulaType::FALSE);
+    EXPECT_TRUE(False.isFalse());
+
+    FormulaT fb1 = FormulaT(b1);
+    EXPECT_EQ(FormulaType::BOOL, fb1.getType());
+    FormulaT fb2 = FormulaT(b2);
+    EXPECT_EQ(FormulaType::BOOL, fb2.getType());
+    
+    FormulaT nb1 = FormulaT(FormulaType::NOT, fb1);
+    EXPECT_EQ(FormulaType::NOT, nb1.getType());
+    
+    FormulaT Fimpl = FormulaT(FormulaType::IMPLIES, nb1, fb2);
+    FormulaT Fand = FormulaT(FormulaType::AND, nb1, fb2);
+    FormulaT For = FormulaT(FormulaType::OR, nb1, fb2);
+    FormulaT Fxor = FormulaT(FormulaType::XOR, nb1, fb2);
+    FormulaT Fiff = FormulaT(FormulaType::IFF, nb1, fb2);
 }

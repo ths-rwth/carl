@@ -9,8 +9,8 @@ foreach (variableName ${variableNames})
 	endif()
 endforeach()
 
-if(FALSE)
 configure_file( ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp.in ${CMAKE_SOURCE_DIR}/src/carl/util/CMakeOptions.cpp )
+if(FALSE)
 set(carl_lib_util_headers
 	BitVector.h
 	CompactTree.h

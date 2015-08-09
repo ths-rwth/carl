@@ -389,53 +389,6 @@ cad::Answer CAD<Number>::check(
 	assert(this->isSampleTreeConsistent());
 	assert(this->sampleTree.isConsistent());
 
-#ifdef CAD_CHECK_REDIRECT
-	CAD<Number>::checkCallCount++;
-	this->setting.trimVariables = false;
-	this->prepareElimination();
-	std::string filename = "cad";
-	std::stringstream stream;
-	stream << this;
-	filename += stream.str() + "_constraints";
-	stream.str("");
-	stream << CAD<Number>::checkCallCount;
-	filename += stream.str() + ".smt2";
-	CARL_LOG_INFO("carl.cad", "Redirecting call to file " << filename << "...");
-
-	// add bounds to the constraints
-	for (const auto& b: bounds) {
-		if (b.first >= this->variables.size()) continue;
-
-		switch (b.second.lowerBoundType()) {
-			case BoundType::INFTY:
-				break;
-			case BoundType::STRICT:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.lower()), MPolynomial(1)}), Sign::POSITIVE, this->variables);
-				break;
-			case BoundType::WEAK:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.lower()), MPolynomial(1)}), Sign::NEGATIVE, this->variables, true);
-				break;
-			default:
-				assert(false);
-		}
-
-		switch (b.second.upperBoundType()) {
-			case BoundType::INFTY:
-				break;
-			case BoundType::STRICT:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.upper()), MPolynomial(1)}), Sign::NEGATIVE, this->variables);
-				break;
-			case BoundType::WEAK:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.upper()), MPolynomial(1)}), Sign::POSITIVE, this->variables, true);
-				break;
-			default:
-				assert(false);
-		}
-	}
-	this->printConstraints(filename);
-	CARL_LOG_INFO("carl.cad", "done.");
-#endif
-
 	//////////////////////
 	// Initialization
 
@@ -486,6 +439,7 @@ cad::Answer CAD<Number>::check(
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
+					CARL_LOG_FATAL("carl.cad", "Exiting. Why?");
 					exit(123);
 					//std::swap(constraints.back(), constraint);
 					conflictGraph = cad::ConflictGraph<Number>();
@@ -1168,22 +1122,12 @@ cad::Answer CAD<Number>::mainCheck(
 	////////////
 	// Main search strategy
 
-	/* Three phases are preformed:
-	 * Phase 1: Try to lift every sample ending in a node of the trace starting from the topmost node.
+	/* 
 	 * Phase 2: Search the sample tree for already satisfying samples and lift the samples not yet lifted to the full dimension
 	 *          (all possibly within given bounds).
 	 *          Note that next == true skips...
 	 * Phase 3: Lift at those sample tree nodes where lifting is still possible (possibly within given bounds).
 	 */
-
-	/* Phase 1
-	 * Check or lift the possibly stored last sample point first.
-	 *
-	 * If the sample tree is non-trivial (maxDepth != 0), check the given sample point first.
-	 * This can be, e.g., the sample which satisfied the last set of constraints.
-	 */
-
-	CARL_LOG_DEBUG("carl.cad", "mainCheck: Entering Phase 1...");
 
 	/* Phase 2
 	 * Invariant: There might be nodes in the sample tree which are not at the final depth and still need to be lifted.

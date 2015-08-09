@@ -42,7 +42,7 @@ namespace carl
 		return t.isPositive();
 	}
 	
-	template<typename T, DisableIf<has_isZero<T>>>
+	template<typename T, DisableIf<has_isPositive<T>>>
 	bool isPositive(const T& t)
 	{
 		return t > 0;
@@ -54,7 +54,7 @@ namespace carl
 		return t.isNegative();
 	}
 	
-	template<typename T, DisableIf<has_isOne<T>>>
+	template<typename T, DisableIf<has_isNegative<T>>>
 	bool isNegative(const T& t) 
 	{
 		return t < 0;
