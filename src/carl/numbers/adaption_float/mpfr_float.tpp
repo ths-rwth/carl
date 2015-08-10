@@ -3,6 +3,8 @@
 
 #ifdef USE_MPFR_FLOAT
 namespace carl {
+
+
 template<>
 class FLOAT_T<mpfr_t>
 {
@@ -749,7 +751,7 @@ class FLOAT_T<mpfr_t>
 //            std::string out;
 			char out[30];
 //            str << mpfr_get_d(mValue, MPFR_RNDN);
-			mpfr_sprintf(out, "%.10RDe", mValue);
+			mpfr_sprintf(out, "%.20RDe", mValue);
 			return std::string(out);
 		}
 		
@@ -769,6 +771,34 @@ inline bool isInfinity(const FLOAT_T<mpfr_t>& _in) {
 template<>
 inline bool isNan(const FLOAT_T<mpfr_t>& _in) {
 	return (mpfr_nan_p(_in.value()) != 0);
+}
+
+template<>
+inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(FLOAT_T<mpfr_t> A, FLOAT_T<mpfr_t> B, int maxUlps)
+{
+	assert(maxUlps > 0);
+
+	//std::cout << __func__ << ": " << A << " and " << B << std::endl;
+	
+	mpz_t significandA;
+	mpz_init(significandA);
+	mpz_t significandB;
+	mpz_init(significandB);
+
+	mpfr_get_z_exp(significandA,A.value());
+	mpfr_get_z_exp(significandB,B.value());
+
+	//std::cout << __func__ << ": " << mpz_get_si(significandA) << " and " << mpz_get_si(significandB) << std::endl;
+
+	mpz_t diff;
+	mpz_init(diff);
+
+	mpz_sub(diff, significandA, significandB);
+	mpz_abs(diff,diff);
+
+	//std::cout << __func__ << ": " << (mpz_cmp_si(diff,maxUlps) <= 0) << std::endl;
+
+	return (mpz_cmp_si(diff,maxUlps) <= 0);
 }
 
 }// namespace
