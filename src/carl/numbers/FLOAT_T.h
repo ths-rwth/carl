@@ -98,7 +98,7 @@ namespace carl
 	}
 	
 	template<>
-	inline bool AlmostEqual2sComplement(double A, double B, int maxUlps)
+	inline bool AlmostEqual2sComplement<double>(double A, double B, int maxUlps)
 	{
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.

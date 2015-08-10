@@ -8,6 +8,7 @@ class FLOAT_T<mpfr_t>
 {
 	private:
 		mpfr_t mValue;
+		static precision_t mDefaultPrecision;
 
 	public:
 
@@ -22,28 +23,28 @@ class FLOAT_T<mpfr_t>
 		}
 
 		// Default precision is initially set to 53 bits in mpfr implementation
-		FLOAT_T(const double _double, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+		FLOAT_T(const double _double, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
 			mpfr_init2(mValue,_prec);
 			mpfr_set_d(mValue,_double,mpfr_rnd_t(_rnd));
 		}
 
 		// Default precision is initially set to 53 bits in mpfr implementation
-		FLOAT_T(const float _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53 )
+		FLOAT_T(const float _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
-			mpfr_init2(mValue, _prec);
+			mpfr_init2(mValue,_prec);
 			mpfr_set_flt(mValue, _float, mpfr_rnd_t(_rnd));
 		}
 
 		// Default precision is initially set to 53 bits in mpfr implementation
-		FLOAT_T(const int _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+		FLOAT_T(const int _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
 			mpfr_init2(mValue,_prec);
 			mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
 		}
 		
 		// Default precision is initially set to 53 bits in mpfr implementation
-		FLOAT_T(const unsigned _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+		FLOAT_T(const unsigned _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
 			mpfr_init2(mValue,_prec);
 			mpfr_set_ui(mValue,_int,mpfr_rnd_t(_rnd));
@@ -51,14 +52,14 @@ class FLOAT_T<mpfr_t>
 		
 		// Default precision is initially set to 53 bits in mpfr implementation
 
-        FLOAT_T(const long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+        FLOAT_T(const long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_si(mValue,_long,mpfr_rnd_t(_rnd));
         }
 
         // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const unsigned long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+        FLOAT_T(const unsigned long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
         {
             mpfr_init2(mValue,_prec);
             mpfr_set_ui(mValue,_long,mpfr_rnd_t(_rnd));
@@ -82,7 +83,7 @@ class FLOAT_T<mpfr_t>
 		}
 		
 		template<typename F, DisableIf< std::is_same<F, mpfr_t> > = dummy>
-		FLOAT_T(const FLOAT_T<F>& _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=53)
+		FLOAT_T(const FLOAT_T<F>& _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
 			mpfr_init2(mValue,_prec);
 			mpfr_set_d(mValue,_float.toDouble(),mpfr_rnd_t(_rnd));
@@ -100,6 +101,14 @@ class FLOAT_T<mpfr_t>
 		const mpfr_t& value() const
 		{
 			return mValue;
+		}
+
+		static void setDefaultPrecision(precision_t _prec) {
+			mDefaultPrecision = _prec;
+		}
+
+		static precision_t defaultPrecision () {
+			return mDefaultPrecision;
 		}
 		
 		precision_t precision() const
