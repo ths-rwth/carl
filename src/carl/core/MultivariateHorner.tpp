@@ -17,8 +17,7 @@ namespace carl
 	MultivariateHorner< PolynomialType >::MultivariateHorner (const PolynomialType& inPut) {
 
 		if (HORNER_Minimize_arithmetic_operations)
-		{
-			
+		{		
 			std::set<Variable>::iterator variableIt;
 			std::set<Variable>::iterator selectedVariable;
 			std::set<Variable> allVariablesinPolynome;
@@ -49,7 +48,7 @@ namespace carl
 				}
 
 				//Setting the choosen Variable for the current Hornerscheme iterartion
-				this->setVariable(*selectedVariable);			
+				this->setVariable(*selectedVariable); 
 
 				#ifdef DEBUG_HORNER
 				std::cout << "Polynome: " << inPut << std::endl;
@@ -80,37 +79,37 @@ namespace carl
 				//If Dependent Polynome contains Variables - continue with recursive Horner
 				if ( !h_dependentPart.isNumber() )
 				{
-					mH_dependent = new MultivariateHorner< PolynomialType >(h_dependentPart);
-					mConst_dependent = constant_zero<CoeffType>::get();			
+					mH_dependent = std::move(MultivariateHorner< PolynomialType >(h_dependentPart));
+					mConst_dependent = constant_zero<CoeffType>::get();	
 				}
 				
 				//Dependent Polynome is a Constant (Number) - save to memberVar
 				else 
 				{
-					mH_dependent = NULL;
-					mConst_dependent = h_dependentPart.constantPart();
+					removeDependent();
+					mConst_dependent = (PolynomialType) h_dependentPart.constantPart();
 				}			
 
 				//If independent Polynome contains Variables - continue with recursive Horner
 				if ( !h_independentPart.isNumber() )
 				{
-					mH_independent = new MultivariateHorner< PolynomialType >(h_independentPart);
+					mH_independent = std::move(MultivariateHorner< PolynomialType >(h_independentPart));
 					mConst_independent = constant_zero<CoeffType>::get();
 				}
 				//Independent Polynome is a Constant (Number) - save to memberVar
 				else
 				{
-					mH_independent = NULL;
-					mConst_independent = h_independentPart.constantPart();
+					removeIndepenent();
+					mConst_independent = (PolynomialType) h_independentPart.constantPart();
 				}					
 			} 
 						
 			//If there are no Variables in the polynome
 			else 
 			{		
-				mH_independent = NULL;
-				mH_dependent = NULL;
-				mConst_independent = inPut.constantPart();
+				removeIndepenent();
+				removeDependent();
+				mConst_independent = (PolynomialType) inPut.constantPart();
 				this->setVariable( Variable::NO_VARIABLE );
 			}
 			
@@ -119,6 +118,21 @@ namespace carl
 	};
 
 
+/*
+	template< typename PolynomialType > 
+	MultivariateHorner< PolynomialType >::~MultivariateHorner()
+	{
+		if (mH_dependent != NULL) 
+		{
+			delete mH_dependent;
+		}
+		if (mH_independent != NULL)
+		{
+			delete mH_independent;
+		}
+	}
+*/
+
 /**
 	 * Streaming operator for multivariate HornerSchemes.
 	 * @param os Output stream.
@@ -126,109 +140,108 @@ namespace carl
 	 * @return `os`.
 	 */
 template< typename PolynomialType > 
-std::ostream& operator<<(std::ostream& os, MultivariateHorner<PolynomialType>& mvH)
+std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialType>& mvH)
 {
-	if (mvH.mH_dependent != NULL && mvH.mH_independent != NULL)
+
+	if (mvH.getDependent() != NULL && mvH.getIndependent() != NULL)
 	{
-		if (mvH.mExponent != 1)
+		if (mvH.getExponent() != 1)
 		{
-			return (os << mvH.mVariable <<"^"<< mvH.mExponent << " * (" << *mvH.mH_dependent << ") + " << *mvH.mH_independent);		
+			return (os << mvH.getVariable() <<"^"<< mvH.getExponent() << " * (" << *mvH.getDependent() << ") + " << *mvH.getIndependent());		
 		}
 		else
 		{
-			return (os << mvH.mVariable << " * (" << *mvH.mH_dependent << ") + " << *mvH.mH_independent);			
+			return (os << mvH.getVariable() << " * (" << *mvH.getDependent() << ") + " << *mvH.getIndependent());			
 		}
 		
 	}
-	else if (mvH.mH_dependent != NULL && mvH.mH_independent == NULL)
+	else if (mvH.getDependent() != NULL && mvH.getIndependent() == NULL)
 	{
-		if (mvH.mConst_independent == 0)
+		if (mvH.getIndepConstant() == 0)
 		{
-			if (mvH.mExponent != 1)
+			if (mvH.getExponent() != 1)
 			{
-				return (os << mvH.mVariable <<"^"<< mvH.mExponent << " * (" << *mvH.mH_dependent << ")" );			
+				return (os << mvH.getVariable() <<"^"<< mvH.getExponent() << " * (" << *mvH.getDependent() << ")" );			
 			}
 			else
 			{
-				return (os << mvH.mVariable << " * (" << *mvH.mH_dependent << ")" );				
+				return (os << mvH.getVariable() << " * (" << *mvH.getDependent() << ")" );				
 			}
 		}
 		else
 		{
-			if (mvH.mExponent != 1)
+			if (mvH.getExponent() != 1)
 			{
-				return (os << mvH.mVariable <<"^"<< mvH.mExponent << " * (" << *mvH.mH_dependent << ") + " << mvH.mConst_independent);	
+				return (os << mvH.getVariable() <<"^"<< mvH.getExponent() << " * (" << *mvH.getDependent() << ") + " << mvH.getIndepConstant());	
 			}
 			else
 			{
-				return (os << mvH.mVariable << " * (" << *mvH.mH_dependent << ") + " << mvH.mConst_independent);		
+				return (os << mvH.getVariable() << " * (" << *mvH.getDependent() << ") + " << mvH.getIndepConstant());		
 			}
-		}
-		
+		}	
 	}
-	else if (mvH.mH_dependent == NULL && mvH.mH_independent != NULL)
+	else if (mvH.getDependent() == NULL && mvH.getIndependent() != NULL)
 	{
-		if (mvH.mConst_dependent == 1)
-		{
-			if (mvH.mExponent != 1)
+		if (mvH.getDepConstant() == 1)
+		{	
+			if (mvH.getExponent() != 1)
 			{
-				return (os << mvH.mVariable <<"^"<< mvH.mExponent << " + " << *mvH.mH_independent );			
+				return (os << mvH.getVariable() <<"^"<< mvH.getExponent() << " + " << *mvH.getIndependent() );			
 			}
 			else
 			{
-				return (os << mvH.mVariable << " + " << *mvH.mH_independent );		
-			}
-			
+				return (os << mvH.getVariable() << " + " << *mvH.getIndependent() );		
+			}			
 		}
 		else
-		{
-			if (mvH.mExponent != 1)
+		{	
+			if (mvH.getExponent() != 1)
 			{
-				return (os << mvH.mConst_dependent << mvH.mVariable <<"^"<< mvH.mExponent << " + " << *mvH.mH_independent );		
+				return (os << mvH.getDepConstant() << mvH.getVariable() <<"^"<< mvH.getExponent() << " + " << *mvH.getIndependent() );		
 			}
 			else
 			{
-				return (os << mvH.mConst_dependent << mvH.mVariable <<" + " << *mvH.mH_independent );			
+				return (os << mvH.getDepConstant() << mvH.getVariable() <<" + " << *mvH.getIndependent() );			
 			}
 		}
 	}	
-	else //if (mvH.mH_dependent == NULL && mvH.mH_independent == NULL)
+	else //if (mvH.getDependent() == NULL && mvH.getIndependent() == NULL)
 	{
-		if (mvH.mConst_independent == 0)
+		if (mvH.getIndepConstant() == 0)
 		{
-			if (mvH.mConst_dependent == 1)
+			if (mvH.getDepConstant() == 1)
 			{
-				if (mvH.mExponent != 1)
+				if (mvH.getExponent() != 1)
 				{
-					return (os << mvH.mVariable <<"^"<< mvH.mExponent );	
+					return (os << mvH.getVariable() <<"^"<< mvH.getExponent() );	
 				}
 				else
 				{
-					return (os << mvH.mVariable);	
+					return (os << mvH.getVariable());	
 				}
 				
 			}
 			else
 			{
-				if (mvH.mExponent != 1)
+				if (mvH.getExponent() != 1)
 				{
-					return (os << mvH.mConst_dependent << mvH.mVariable <<"^"<< mvH.mExponent);	
+					return (os << mvH.getDepConstant() << mvH.getVariable() <<"^"<< mvH.getExponent());	
 				}
 				else
 				{
-					return (os << mvH.mConst_dependent << mvH.mVariable);	
+					return (os << mvH.getDepConstant() << mvH.getVariable());	
 				}
 			}
 		}
 		else
 		{
-			if (mvH.mExponent != 1)
+			if (mvH.getExponent() != 1)
 			{
-				return (os << mvH.mConst_dependent << mvH.mVariable <<"^"<< mvH.mExponent << " + " << mvH.mConst_independent);	
+				return (os << mvH.getDepConstant() << mvH.getVariable() <<"^"<< mvH.getExponent() << " + " << mvH.getIndepConstant());	
 			}
 			else
 			{
-				return (os << mvH.mConst_dependent << mvH.mVariable <<" + " << mvH.mConst_independent);	
+				return (os << mvH.getDepConstant() << mvH.getVariable() <<" + " << mvH.getIndepConstant());	
 			}
 
 		}
@@ -236,70 +249,93 @@ std::ostream& operator<<(std::ostream& os, MultivariateHorner<PolynomialType>& m
 }
 
 template<typename PolynomialType>
-MultivariateHorner<PolynomialType> simplify( MultivariateHorner<PolynomialType>& mvH)
+MultivariateHorner<PolynomialType> simplify( MultivariateHorner<PolynomialType> mvH)
 {
 	#ifdef DEBUG_HORNER
 	std::cout << mvH << std::endl;	
 	#endif
-
-	if (mvH.mH_dependent != NULL && (mvH.mH_dependent->mH_dependent != NULL || mvH.mH_dependent->mConst_dependent != 0) && mvH.mH_dependent->mH_independent == NULL && mvH.mH_dependent->mConst_independent == 0 )
+	
+	if (mvH->getDependent() != NULL && (mvH->getDependent()->getDependent() != NULL || mvH->getDependent()->getDepConstant() != 0) && mvH->getDependent()->getIndependent() == NULL && mvH->getDependent()->getIndepConstant() == 0 )
 	{
-		if (mvH.mVariable == mvH.mH_dependent->mVariable)
-		{
-			mvH.mExponent += mvH.mH_dependent->mExponent;
 
-			if (mvH.mH_dependent->mH_dependent != NULL)
+		if (mvH->getVariable() == mvH->getDependent()->getVariable())
+		{
+			mvH->setExponent (mvH->getExponent() + mvH->getDependent()->getExponent()) ;
+
+			if (mvH->getDependent()->getDependent() != NULL)
 			{
-				*mvH.mH_dependent = simplify(*mvH.mH_dependent->mH_dependent);	
+				mvH->setDependent(simplify(mvH->getDependent()->getDependent()) );	
 			} 
-			else if (mvH.mH_dependent->mConst_dependent != 0)
+			else if (mvH->getDependent()->getDepConstant() != 0)
 			{
-				mvH.mConst_dependent = mvH.mH_dependent->mConst_dependent;
-				mvH.mH_dependent = NULL;
+				mvH->setDepConstant(mvH->getDependent()->getDepConstant() );
+				mvH->removeDependent();
 			}
 
-			if (mvH.mH_independent != NULL)
+			if (mvH->getIndependent() != NULL)
 			{	
-				*mvH.mH_independent = simplify( *mvH.mH_independent );
+				mvH->setIndependent(simplify(mvH->getIndependent() ));
 			}
 	
 			return ( simplify(mvH) );	
 		}
 	}
 
-	else if (mvH.mH_dependent == NULL && mvH.mH_independent != NULL)
+	else if (mvH->getDependent() == NULL && mvH->getIndependent() != NULL)
 	{
-		*mvH.mH_independent = simplify (*mvH.mH_independent);
-		return(mvH);
+		mvH->setIndependent(simplify (mvH->getIndependent()));
+		return mvH;
 	}
 
-	else if (mvH.mH_dependent != NULL && mvH.mH_independent == NULL)
+	else if (mvH->getDependent() != NULL && mvH->getIndependent() == NULL)
 	{
-		*mvH.mH_dependent = simplify (*mvH.mH_dependent);
-		return(mvH);
+		mvH->setDependent(simplify (mvH->getDependent()));
+		return mvH;
 	}
 	
-	else if (mvH.mH_dependent != NULL && mvH.mH_independent != NULL)
+	else if (mvH->getDependent() != NULL && mvH->getIndependent() != NULL)
 	{
-		*mvH.mH_dependent   = simplify(*mvH.mH_dependent);
-		*mvH.mH_independent = simplify (*mvH.mH_independent);
-		return(mvH);
+		mvH->setDependent(simplify(mvH->getDependent()));
+		mvH->setIndependent(simplify (mvH->getIndependent()));
+		return mvH;
 	}
-	
-
 	
 	return(mvH);
 }
 
-
-
-template<typename PolynomialType>
-Interval<PolynomialType> evaluate( MultivariateHorner<PolynomialType>& mvH, const std::map<Variable, Interval<PolynomialType>>&, Variable* previousVariable)
+//template<typename PolynomialType>
+//typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
+template<typename PolynomialType, typename Number>
+static Interval<Number> evaluate(const MultivariateHorner<PolynomialType> mvH, std::map<Variable, Interval<Number>>& map)
 {
-	unsigned exponentOfpreviousVariable;
-	Interval<PolynomialType> result(1);
-	
+	Interval<Number> result(1);
 
+	assert (map.find(mvH.getVariable()) != map.end() );
+	
+	//Case 1: no further Horner schemes in mvH
+	if (mvH.getDependent() == NULL && mvH.getIndependent() == NULL)
+	{
+		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * mvH.getDepConstant().constantPart() + mvH.getIndepConstant().constantPart();
+		return result;
+	}
+	//Case 2: dependent part contains a Horner Scheme
+	else if (mvH.getDependent() != NULL && mvH.getIndependent() == NULL)
+	{
+		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + mvH.getIndepConstant().constantPart();
+		return result;
+	}
+	//Case 3: independent part contains a Horner Scheme
+	else if (mvH.getDependent() == NULL && mvH.getIndependent() != NULL)
+	{
+		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * mvH.getDepConstant().constantPart() +  evaluate(*mvH.getIndependent(), map);
+		return result;
+	}
+	//Case 4: both independent part and dependent part 
+	else if (mvH.getDependent() != NULL && mvH.getIndependent() != NULL)
+	{
+		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
+		return result;
+	}
 
 	return result;
 }

@@ -13,7 +13,7 @@
 
 namespace carl{
 
-template< typename PolynomialType >
+template<typename PolynomialType >
 class MultivariateHorner { 
 
 /**
@@ -22,85 +22,125 @@ class MultivariateHorner {
 * h = Variable * h_dependent + h_independent || Variable * const_dependent + const_independent || Variable * h_dependent + const_independent
 *
 */
-public:
-	/// Type of the coefficients. 	
-	
-	typedef typename PolynomialType::CoeffType CoeffType;
+
+private:
+	typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
 
 	CoeffType mConst_dependent = constant_zero<CoeffType>::get();
 	CoeffType mConst_independent = constant_zero<CoeffType>::get();
 	Variable mVariable = Variable::NO_VARIABLE;
 	unsigned mExponent = 1;
-	MultivariateHorner* mH_dependent = NULL;
-	MultivariateHorner* mH_independent = NULL;
+	MultivariateHorner mH_dependent;
+	MultivariateHorner mH_independent;
 	
+public:
+		
 	//Constuctor
 	MultivariateHorner (const PolynomialType& inPut);
 
-	MultivariateHorner& operator=(const MultivariateHorner& mh) {
+	~MultivariateHorner ();
+	
+	MultivariateHorner& operator=(const MultivariateHorner& mh)
+	{
 		mConst_dependent = mh.mConst_dependent;
 		mConst_independent = mh.mConst_independent;
+
 	 	mH_dependent = mh.mH_dependent;
-	 	mH_independent = mh.mH_independent;		
+	 	mH_independent = mh.mH_independent;	
+
 	 	mVariable = mh.mVariable;
 	 	mExponent = mh.mExponent;		
 		return *this;
 	}
 
-/*
-	MultivariateHorner& operator=(MultivariateHorner&& mh) {
+
+
+	MultivariateHorner& operator=(MultivariateHorner&& mh) 
+	{
 		mConst_dependent = std::move(mh.mConst_dependent);
-		mConst_independent = std::move(mh.mConst_independent);
+		mConst_independent = std::move(mh.mConst_independent);	 	
+	 
 	 	mH_dependent = std::move(mh.mH_dependent);
 	 	mH_independent = std::move(mh.mH_independent);		
-	 	mVariable = std::move(mh.mVariable);		
-	 	mExponent = std::move(mh.mExponent);
+	 
+	 	mVariable = mh.mVariable;		
+	 	mExponent = mh.mExponent;
 		return *this;
 	}
-*/
+
 
 	//getter and setters
-	Variable getVariable(){
+	Variable getVariable() const
+	{
 		return mVariable;
 	}
 
-	void setVariable(Variable::Arg var){
+	void setVariable(const Variable::Arg& var) 
+	{
 		mVariable = var;
 	}
 
-	MultivariateHorner* getDependent(){
+	const MultivariateHorner& getDependent() const
+	{
 		return mH_dependent;
 	}
 
-	void setDependent( MultivariateHorner* dependent){
+	void removeDependent()
+	{
+		mH_dependent = NULL;
+	}
+
+	void removeIndepenent() 
+	{
+		mH_independent = NULL;
+	}
+
+	void setDependent(const MultivariateHorner& dependent)
+	{
 		mH_dependent = dependent;
 	}
 
-	MultivariateHorner* getIndependent(){
+	const MultivariateHorner& getIndependent() const
+	{
 		return mH_independent;
 	}
 
-	void setIndependent( MultivariateHorner* independent){
+	void setIndependent(const MultivariateHorner& independent)
+	{
 		mH_independent = independent;
 	}
 
-	CoeffType& getDepConstant(){
+	const CoeffType& getDepConstant() const
+	{
 		return mConst_dependent;
 	}
 
-	void setDepConstant(const CoeffType& constant){
+	void setDepConstant(const CoeffType& constant)
+	{
 		mConst_dependent = constant;
 	}	
 
-	CoeffType& getIndepConstant(){
+	const CoeffType& getIndepConstant() const
+	{
 		return mConst_independent;
 	}
 
 	void setIndepConstant(const CoeffType& constant){
 		mConst_independent = constant;
-	}	
-};
+	}
+
+	unsigned getExponent() const
+	{
+		return mExponent;
+	}
+
+	void setExponent(const unsigned& exp){
+		mExponent = exp;
+	}
+
+}; //Class MultivarHorner
 
 }//namespace carl
-
 #include "MultivariateHorner.tpp"
+
+

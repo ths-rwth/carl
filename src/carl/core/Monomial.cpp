@@ -1,3 +1,4 @@
+
 /**
  * @file MonomialPool.cpp
  * @author Florian Corzilius <corzilius@cs.rwth-aachen.de>
@@ -50,7 +51,15 @@ namespace carl
 				newExps.assign(mExponents.begin(), mExponents.end());
 				newExps[(unsigned)(it - mExponents.begin())].second -= 1;
 			}
-			res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			if (newExps.empty())
+			{
+				res = nullptr;	
+			}
+			else
+			{
+				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			}
+			
 			return true;
 		}
 	}
