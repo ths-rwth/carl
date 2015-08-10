@@ -19,8 +19,8 @@ int main (int argc, char** argv)
 {
 	StringParser sp;
 	sp.setVariables({"x", "y", "z"});
-	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
-	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2+y");
+	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
+	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2+y");
 
 	std::set<Variable> allVarInPolynome;
 	p1.gatherVariables(allVarInPolynome);
@@ -48,14 +48,10 @@ int main (int argc, char** argv)
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("2*x^4+8*x^7+5*x^2+2*x+3*y^3+2*y^2+4*z^5+2*z^1+8*z^12");
 
 	std::cout << "\n Polynom       :" << p1 << std::endl;
-	MultivariateHorner< Pol > peterPolynom (p1);
+	MultivariateHorner< Pol, GREEDY_I > peterPolynom (p1);
 
 	std::cout << "\n Horner        :" << peterPolynom << std::endl;
-	std::cout << " [!]" << std::endl;
-	peterPolynom = *simplify(&peterPolynom);
-	std::cout << " [!]" << std::endl;
 	
-
 	std::cout << "\n Simple Horner :" <<peterPolynom << std::endl;
 
 	Interval<Rational> testInterval = evaluate(peterPolynom , map);

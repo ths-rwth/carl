@@ -13,10 +13,43 @@
 
 namespace carl
 {
-	template< typename PolynomialType > 
-	MultivariateHorner< PolynomialType >::MultivariateHorner (const PolynomialType& inPut) {
+	template< typename PolynomialType, Strategy Strat> 
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType& inPut) {
 
-		if (HORNER_Minimize_arithmetic_operations)
+	//Create Horner Scheme Recursivly
+	MultivariateHorner< PolynomialType, Strat > root (inPut, Strat);
+	*this = root;
+	
+ 	//Part afte recursion
+ 	
+ 	if (Strat == GREEDY_Is)
+ 	{
+ 		*this = *simplify(this);	
+ 	}
+	
+		
+	};
+
+
+/*
+	template< typename PolynomialType > 
+	MultivariateHorner< PolynomialType >::~MultivariateHorner()
+	{
+		if (mH_dependent != NULL) 
+		{
+			delete mH_dependent;
+		}
+		if (mH_independent != NULL)
+		{
+			delete mH_independent;
+		}
+	}
+*/
+
+template< typename PolynomialType, Strategy Strat >
+MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType& inPut, Strategy s) 
+{
+	if (Strat == GREEDY_I || Strat == GREEDY_Is)
 		{		
 			std::set<Variable>::iterator variableIt;
 			std::set<Variable>::iterator selectedVariable;
@@ -79,7 +112,7 @@ namespace carl
 				//If Dependent Polynome contains Variables - continue with recursive Horner
 				if ( !h_dependentPart.isNumber() )
 				{
-					mH_dependent = new MultivariateHorner< PolynomialType >(h_dependentPart);
+					mH_dependent = new MultivariateHorner< PolynomialType, Strat >(h_dependentPart,s);
 					mConst_dependent = constant_zero<CoeffType>::get();	
 				}
 				
@@ -93,7 +126,7 @@ namespace carl
 				//If independent Polynome contains Variables - continue with recursive Horner
 				if ( !h_independentPart.isNumber() )
 				{
-					mH_independent = new MultivariateHorner< PolynomialType >(h_independentPart);
+					mH_independent = new MultivariateHorner< PolynomialType, Strat >(h_independentPart,s);
 					mConst_independent = constant_zero<CoeffType>::get();
 				}
 				//Independent Polynome is a Constant (Number) - save to memberVar
@@ -115,23 +148,9 @@ namespace carl
 			
 
 		}//minimize arithmatic operations
-	};
+}
 
 
-/*
-	template< typename PolynomialType > 
-	MultivariateHorner< PolynomialType >::~MultivariateHorner()
-	{
-		if (mH_dependent != NULL) 
-		{
-			delete mH_dependent;
-		}
-		if (mH_independent != NULL)
-		{
-			delete mH_independent;
-		}
-	}
-*/
 
 /**
 	 * Streaming operator for multivariate HornerSchemes.
@@ -139,8 +158,8 @@ namespace carl
 	 * @param rhs HornerScheme.
 	 * @return `os`.
 	 */
-template< typename PolynomialType > 
-std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialType>& mvH)
+template< typename PolynomialType, Strategy Strat > 
+std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialType, Strat>& mvH)
 {
 	if (mvH.getDependent() != NULL && mvH.getIndependent() != NULL)
 	{
@@ -247,8 +266,8 @@ std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialTyp
 	}
 }
 
-template<typename PolynomialType>
-MultivariateHorner<PolynomialType>* simplify( MultivariateHorner<PolynomialType>* mvH)
+template<typename PolynomialType, Strategy Strat>
+MultivariateHorner<PolynomialType, Strat>* simplify( MultivariateHorner<PolynomialType, Strat>* mvH)
 {		
 	if (mvH->getDependent() != NULL && (mvH->getDependent()->getDependent() != NULL || mvH->getDependent()->getDepConstant() != 0) && mvH->getDependent()->getIndependent() == NULL && mvH->getDependent()->getIndepConstant() == 0 )
 	{
@@ -279,7 +298,6 @@ MultivariateHorner<PolynomialType>* simplify( MultivariateHorner<PolynomialType>
 	else if (mvH->getDependent() == NULL && mvH->getIndependent() != NULL)
 	{		
 		mvH->setIndependent(simplify ( mvH->getIndependent() ));
-		std::cout << *mvH->getIndependent() << std::endl;
 		mvH->removeDependent();
 		return mvH;
 	}
@@ -303,8 +321,8 @@ MultivariateHorner<PolynomialType>* simplify( MultivariateHorner<PolynomialType>
 
 //template<typename PolynomialType>
 //typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
-template<typename PolynomialType, typename Number>
-static Interval<Number> evaluate(const MultivariateHorner<PolynomialType> mvH, std::map<Variable, Interval<Number>>& map)
+template<typename PolynomialType, typename Number, Strategy Strat>
+static Interval<Number> evaluate(const MultivariateHorner<PolynomialType, Strat> mvH, std::map<Variable, Interval<Number>>& map)
 {
 	Interval<Number> result(1);
 

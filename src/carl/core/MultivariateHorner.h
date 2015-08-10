@@ -13,7 +13,14 @@
 
 namespace carl{
 
-template<typename PolynomialType >
+enum Strategy {
+	GREEDY_I = 0, 
+	GREEDY_Is = 1,
+	GREEDY_II = 2,
+	GREEDY_IIs = 3
+};
+
+template<typename PolynomialType, Strategy Strat>
 class MultivariateHorner { 
 
 /**
@@ -22,6 +29,7 @@ class MultivariateHorner {
 * h = Variable * h_dependent + h_independent || Variable * const_dependent + const_independent || Variable * h_dependent + const_independent
 *
 */
+
 
 private:
 	typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
@@ -32,11 +40,13 @@ private:
 	unsigned mExponent = 1;
 	MultivariateHorner* mH_dependent = NULL;
 	MultivariateHorner* mH_independent = NULL;
+
 	
 public:
 		
 	//Constuctor
 	MultivariateHorner (const PolynomialType& inPut);
+	MultivariateHorner (const PolynomialType& inPut, Strategy s);
 
 	
 	//TODO Why does Destructor not work ??
