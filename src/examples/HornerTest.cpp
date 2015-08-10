@@ -20,7 +20,7 @@ int main (int argc, char** argv)
 	StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
-	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x+y");
+	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2+y");
 
 	std::set<Variable> allVarInPolynome;
 	p1.gatherVariables(allVarInPolynome);
@@ -51,9 +51,10 @@ int main (int argc, char** argv)
 	MultivariateHorner< Pol > peterPolynom (p1);
 
 	std::cout << "\n Horner        :" << peterPolynom << std::endl;
-	peterPolynom = simplify(peterPolynom);
-
 	std::cout << " [!]" << std::endl;
+	peterPolynom = *simplify(&peterPolynom);
+	std::cout << " [!]" << std::endl;
+	
 
 	std::cout << "\n Simple Horner :" <<peterPolynom << std::endl;
 

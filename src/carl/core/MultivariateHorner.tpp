@@ -79,7 +79,7 @@ namespace carl
 				//If Dependent Polynome contains Variables - continue with recursive Horner
 				if ( !h_dependentPart.isNumber() )
 				{
-					mH_dependent = std::move(MultivariateHorner< PolynomialType >(h_dependentPart));
+					mH_dependent = new MultivariateHorner< PolynomialType >(h_dependentPart);
 					mConst_dependent = constant_zero<CoeffType>::get();	
 				}
 				
@@ -93,7 +93,7 @@ namespace carl
 				//If independent Polynome contains Variables - continue with recursive Horner
 				if ( !h_independentPart.isNumber() )
 				{
-					mH_independent = std::move(MultivariateHorner< PolynomialType >(h_independentPart));
+					mH_independent = new MultivariateHorner< PolynomialType >(h_independentPart);
 					mConst_independent = constant_zero<CoeffType>::get();
 				}
 				//Independent Polynome is a Constant (Number) - save to memberVar
@@ -142,7 +142,6 @@ namespace carl
 template< typename PolynomialType > 
 std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialType>& mvH)
 {
-
 	if (mvH.getDependent() != NULL && mvH.getIndependent() != NULL)
 	{
 		if (mvH.getExponent() != 1)
@@ -249,22 +248,18 @@ std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialTyp
 }
 
 template<typename PolynomialType>
-MultivariateHorner<PolynomialType> simplify( MultivariateHorner<PolynomialType> mvH)
-{
-	#ifdef DEBUG_HORNER
-	std::cout << mvH << std::endl;	
-	#endif
-	
+MultivariateHorner<PolynomialType>* simplify( MultivariateHorner<PolynomialType>* mvH)
+{		
 	if (mvH->getDependent() != NULL && (mvH->getDependent()->getDependent() != NULL || mvH->getDependent()->getDepConstant() != 0) && mvH->getDependent()->getIndependent() == NULL && mvH->getDependent()->getIndepConstant() == 0 )
 	{
-
+		
 		if (mvH->getVariable() == mvH->getDependent()->getVariable())
 		{
 			mvH->setExponent (mvH->getExponent() + mvH->getDependent()->getExponent()) ;
 
 			if (mvH->getDependent()->getDependent() != NULL)
-			{
-				mvH->setDependent(simplify(mvH->getDependent()->getDependent()) );	
+			{	
+				mvH->setDependent( simplify( mvH->getDependent()->getDependent()) );	
 			} 
 			else if (mvH->getDependent()->getDepConstant() != 0)
 			{
@@ -274,29 +269,32 @@ MultivariateHorner<PolynomialType> simplify( MultivariateHorner<PolynomialType> 
 
 			if (mvH->getIndependent() != NULL)
 			{	
-				mvH->setIndependent(simplify(mvH->getIndependent() ));
+				mvH->setIndependent( simplify( mvH->getIndependent() ));
 			}
 	
-			return ( simplify(mvH) );	
+			return ( simplify(mvH));	
 		}
 	}
 
 	else if (mvH->getDependent() == NULL && mvH->getIndependent() != NULL)
-	{
-		mvH->setIndependent(simplify (mvH->getIndependent()));
+	{		
+		mvH->setIndependent(simplify ( mvH->getIndependent() ));
+		std::cout << *mvH->getIndependent() << std::endl;
+		mvH->removeDependent();
 		return mvH;
 	}
 
 	else if (mvH->getDependent() != NULL && mvH->getIndependent() == NULL)
 	{
-		mvH->setDependent(simplify (mvH->getDependent()));
+		mvH->setDependent( simplify ( mvH->getDependent()));
+		mvH->removeIndepenent();
 		return mvH;
 	}
 	
 	else if (mvH->getDependent() != NULL && mvH->getIndependent() != NULL)
-	{
-		mvH->setDependent(simplify(mvH->getDependent()));
-		mvH->setIndependent(simplify (mvH->getIndependent()));
+	{	
+		mvH->setDependent( simplify( mvH->getDependent()));
+		mvH->setIndependent( simplify ( mvH->getIndependent()));
 		return mvH;
 	}
 	

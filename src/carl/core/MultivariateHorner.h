@@ -30,15 +30,17 @@ private:
 	CoeffType mConst_independent = constant_zero<CoeffType>::get();
 	Variable mVariable = Variable::NO_VARIABLE;
 	unsigned mExponent = 1;
-	MultivariateHorner mH_dependent;
-	MultivariateHorner mH_independent;
+	MultivariateHorner* mH_dependent = NULL;
+	MultivariateHorner* mH_independent = NULL;
 	
 public:
 		
 	//Constuctor
 	MultivariateHorner (const PolynomialType& inPut);
 
-	~MultivariateHorner ();
+	
+	//TODO Why does Destructor not work ??
+	//~MultivariateHorner ();
 	
 	MultivariateHorner& operator=(const MultivariateHorner& mh)
 	{
@@ -54,7 +56,7 @@ public:
 	}
 
 
-
+/*
 	MultivariateHorner& operator=(MultivariateHorner&& mh) 
 	{
 		mConst_dependent = std::move(mh.mConst_dependent);
@@ -67,7 +69,7 @@ public:
 	 	mExponent = mh.mExponent;
 		return *this;
 	}
-
+*/
 
 	//getter and setters
 	Variable getVariable() const
@@ -80,7 +82,7 @@ public:
 		mVariable = var;
 	}
 
-	const MultivariateHorner& getDependent() const
+	MultivariateHorner* getDependent() const
 	{
 		return mH_dependent;
 	}
@@ -95,17 +97,17 @@ public:
 		mH_independent = NULL;
 	}
 
-	void setDependent(const MultivariateHorner& dependent)
+	void setDependent(MultivariateHorner* dependent)
 	{
 		mH_dependent = dependent;
 	}
 
-	const MultivariateHorner& getIndependent() const
+	MultivariateHorner* getIndependent() const
 	{
 		return mH_independent;
 	}
 
-	void setIndependent(const MultivariateHorner& independent)
+	void setIndependent(MultivariateHorner* independent)
 	{
 		mH_independent = independent;
 	}
