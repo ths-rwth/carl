@@ -10,18 +10,23 @@
 #include <set>
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/interval/Interval.h"
+#include "carl/interval/IntervalEvaluation.h"
 
 namespace carl{
 
 enum Strategy {
 	GREEDY_I = 0, 
+	//GREEDY_I minimizes the amount of arithmetic operations as fast as possible
 	GREEDY_Is = 1,
+	//GREEDY_Is does the same as GREEDY_I, but adds a simplifyer at the end.
 	GREEDY_II = 2,
+	//GREEDY_II minimizes the solution space, by evaluating each monome.
 	GREEDY_IIs = 3
+	//GREEDY_IIs does the same as GREEDY_II, but adds a simplifyer at the end.
 };
 
 template<typename PolynomialType, Strategy Strat>
-class MultivariateHorner { 
+class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, Strat>> { 
 
 /**
 * Datastructure to save Polynomes once they are transformed into a horner scheme:
@@ -32,24 +37,30 @@ class MultivariateHorner {
 
 
 private:
-	typedef typename MultivariatePolynomial<PolynomialType>::CoeffType CoeffType;
+	std::weak_ptr<MultivariateHorner> pThis;
+	std::shared_ptr<MultivariateHorner> thisPtr() const {
+		return std::shared_ptr<MultivariateHorner>(this->pThis);
+	}
+
+
+	typedef typename PolynomialType::CoeffType CoeffType;
 
 	CoeffType mConst_dependent = constant_zero<CoeffType>::get();
 	CoeffType mConst_independent = constant_zero<CoeffType>::get();
 	Variable mVariable = Variable::NO_VARIABLE;
 	unsigned mExponent = 1;
-	MultivariateHorner* mH_dependent = NULL;
-	MultivariateHorner* mH_independent = NULL;
+	std::shared_ptr<MultivariateHorner> mH_dependent;
+	std::shared_ptr<MultivariateHorner> mH_independent;
 
 	
 public:
 		
 	//Constuctor
 	MultivariateHorner (const PolynomialType& inPut);
-	MultivariateHorner (const PolynomialType& inPut, Strategy s);
+	MultivariateHorner (const PolynomialType& inPut, std::map<Variable, Interval<CoeffType>>& map);
+	MultivariateHorner (const PolynomialType& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
 
-	
-	//TODO Why does Destructor not work ??
+
 	//~MultivariateHorner ();
 	
 	MultivariateHorner& operator=(const MultivariateHorner& mh)
@@ -64,7 +75,6 @@ public:
 	 	mExponent = mh.mExponent;		
 		return *this;
 	}
-
 
 /*
 	MultivariateHorner& operator=(MultivariateHorner&& mh) 
@@ -92,32 +102,33 @@ public:
 		mVariable = var;
 	}
 
-	MultivariateHorner* getDependent() const
+	std::shared_ptr<MultivariateHorner> getDependent() const
 	{
 		return mH_dependent;
 	}
 
 	void removeDependent()
 	{
-		mH_dependent = NULL;
+			mH_dependent = NULL;
 	}
 
 	void removeIndepenent() 
 	{
-		mH_independent = NULL;
+			mH_independent = NULL;
 	}
 
-	void setDependent(MultivariateHorner* dependent)
+	void setDependent(std::shared_ptr <MultivariateHorner> dependent)
 	{
+
 		mH_dependent = dependent;
 	}
 
-	MultivariateHorner* getIndependent() const
+	std::shared_ptr<MultivariateHorner> getIndependent() const
 	{
 		return mH_independent;
 	}
 
-	void setIndependent(MultivariateHorner* independent)
+	void setIndependent(std::shared_ptr <MultivariateHorner> independent)
 	{
 		mH_independent = independent;
 	}
