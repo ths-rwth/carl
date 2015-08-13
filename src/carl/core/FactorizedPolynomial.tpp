@@ -857,6 +857,8 @@ namespace carl
         }
         else if( _lhs.pCache() != nullptr && _rhs.pCache() != nullptr )
         {
+            if( _lhs.content() == _rhs.content() )
+                return _lhs.coefficient() < _rhs.coefficient(); 
             return _lhs.content() < _rhs.content();
         }
         return _lhs.pCache() == nullptr;
