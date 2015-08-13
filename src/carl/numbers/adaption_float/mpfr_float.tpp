@@ -771,7 +771,7 @@ class FLOAT_T<mpfr_t>
 		 * @details This function converts a mpfr float to a corresponding integer representation. This is done as follows:
 		 * We can use a transformation similar to the one used for c++ doubles (with modifications). We use the mantissa and extend 
 		 * it by the exponent (we left-shift the exponent in front of the mantissa) and add the sign. This can be interpreted as an
-		 * integer.
+		 * integer. Note that zero is a special case, which should be handled separately.
 		 * 
 		 * @param intRep Parameter where we write the integer to.
 		 * @param a input mpfr float.
@@ -786,10 +786,10 @@ class FLOAT_T<mpfr_t>
 			//std::cout << "Exponent is " << a->_mpfr_exp << std::endl;
 			//std::cout << "Min Exponent is " << mpfr_get_emin() << std::endl;
 			//std::cout << "Min Exponent is " << carl::binary(mpfr_get_emin()) << std::endl;
-
 			//std::cout << "Scaled exponent: " << (a->_mpfr_exp + std::abs(mpfr_get_emin())) << std::endl;
 			//std::cout << "Scaled exponent: " << carl::binary((a->_mpfr_exp + std::abs(mpfr_get_emin()))) << std::endl;
 			
+			// mpfr mantissa is stored in limbs (usually 64-bit words) - the number of those depends on the precision.
 			int limbs = std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
 			/*
 			std::cout << "Mantissa is ";
@@ -804,10 +804,13 @@ class FLOAT_T<mpfr_t>
 			mpz_t tmp;
 			mpz_init(mant);
 			mpz_init(tmp);
+			// as mpfr uses whole limbs (64-bit) we can cut away the additional zeroes (offset), if there are any
 			unsigned offset = mp_bits_per_limb - (a->_mpfr_prec % mp_bits_per_limb);
 			//std::cout << "Offset is " << offset << " bits" << std::endl;
 			//std::cout << "Mantissa is ";
-			char outStr[1024];
+			//char outStr[1024];
+
+			// assemble the integer representation of the mantissa. The limbs are stored in reversed order, least significant first.
 			while( limbs > 0 ){
 				mpz_set_ui(tmp, a->_mpfr_d[limbs-1]);
 				//std::cout << "Shift: " << (mp_bits_per_limb*(limbs-1)) << " bits" << std::endl;
@@ -815,13 +818,19 @@ class FLOAT_T<mpfr_t>
 				mpz_add(mant, mant, tmp);
 				--limbs;
 			}
+			// cut away unnecessary zeroes at the end (divide by 2^offset -> left-shift).
 			mpz_cdiv_q_2exp(mant, mant, offset);
-			mpz_get_str(outStr, 2,mant);
+
+			//mpz_get_str(outStr, 2,mant);
 			//std::cout << "Mantissa: " << std::string(outStr) << std::endl;
 
+			// set the exponent (8-bit), as it is in 2s complement, subtract the minimum to shift the exponent and get exponents ordered,
+			// right shift to put it before the mantissa later.
 			mpz_set_ui(tmp, (a->_mpfr_exp + std::abs(mpfr_get_emin())));
 			//std::cout << "Shift by " << (std::ceil(double(h->_mpfr_prec)/double(mp_bits_per_limb))*64+64-offset) << " bits" << std::endl;
 			mpz_mul_2exp(tmp,tmp,a->_mpfr_prec);
+
+			// assemble the whole representation by addition and finally add sign.
 			mpz_add(mant,mant,tmp);
 			mpz_mul_si(mant,mant,a->_mpfr_sign);
 			mpz_set(intRep, mant);
@@ -831,6 +840,8 @@ class FLOAT_T<mpfr_t>
 			mpz_get_str(outStr, 10,mant);
 			std::cout << std::string(outStr) << std::endl;
 			*/
+
+			// cleanup.
 			mpz_clear(mant);
 			mpz_clear(tmp);
 		}
@@ -856,20 +867,21 @@ class FLOAT_T<mpfr_t>
 			long offset = a->_mpfr_exp - b->_mpfr_exp;
 			//std::cout << "Offset " << offset << std::endl;
 
+			// get integer representations, we use absolute values for simplicity.
 			toInt(intRepA, a);
 			toInt(intRepB, b);
-
 			mpz_abs(intRepA, intRepA);
 			mpz_abs(intRepB, intRepB);
 
 			mpz_t distance;
 			mpz_init(distance);
 
+			// case distinction to cope with zero.
 			if(mpfr_zero_p(a) != 0) { // a is zero
 				if(mpfr_zero_p(b) != 0) // b is also zero
 					return 0;
 
-				// b is not zero
+				// b is not zero -> we compute the distance from close to zero to b and add 1.
 				mpfr_t zero;
 				mpfr_init2(zero,mpfr_get_prec(a));
 				mpfr_set_ui(zero,0, MPFR_RNDZ);
@@ -906,7 +918,7 @@ class FLOAT_T<mpfr_t>
 			} else if(a->_mpfr_sign == b->_mpfr_sign) { // both are not zero and at the same side
 				mpz_sub(distance, intRepA, intRepB);
 				mpz_abs(distance,distance);
-			} else { // both are not zero and one is larger, the other one is less zero
+			} else { // both are not zero and one is larger, the other one is less zero, compute both distances to zero and add 2.
 				mpfr_t zeroA;
 				mpfr_init2(zeroA,mpfr_get_prec(a));
 				mpfr_set_ui(zeroA,0, MPFR_RNDZ);
@@ -941,7 +953,11 @@ class FLOAT_T<mpfr_t>
 				mpz_clear(d2);
 			}
 			//std::cout << "Modify by " << 2*std::abs(offset)*a->_mpfr_prec << std::endl;
+
+			// shift by offset (exponent differences).
 			unsigned result = mpz_get_ui(distance) - 2*std::abs(offset)*a->_mpfr_prec;
+
+			// cleanup.
 			mpz_clear(distance);
 			mpz_clear(intRepA);
 			mpz_clear(intRepB);
