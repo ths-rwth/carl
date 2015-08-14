@@ -134,8 +134,6 @@ class FLOAT_T<mpfr_t>
 			if(this == &_rhs)
 				return *this;
 
-			mpfr_clear(mValue);
-			mpfr_init2(mValue,_rhs.precision());
 			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
 			return *this;
 		}
@@ -776,7 +774,7 @@ class FLOAT_T<mpfr_t>
 		 * @param intRep Parameter where we write the integer to.
 		 * @param a input mpfr float.
 		 */
-		static void toInt(mpz_t intRep, const mpfr_t a) {
+		static void toInt(mpz_t& intRep, const mpfr_t a) {
 	
 			//std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
 			//std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
@@ -804,6 +802,8 @@ class FLOAT_T<mpfr_t>
 			mpz_t tmp;
 			mpz_init(mant);
 			mpz_init(tmp);
+			mpz_set_ui(mant,0);
+			mpz_set_ui(tmp,0);
 			// as mpfr uses whole limbs (64-bit) we can cut away the additional zeroes (offset), if there are any
 			unsigned offset = mp_bits_per_limb - (a->_mpfr_prec % mp_bits_per_limb);
 			//std::cout << "Offset is " << offset << " bits" << std::endl;
@@ -856,12 +856,14 @@ class FLOAT_T<mpfr_t>
 		 * 
 		 * @return [description]
 		 */
-		static unsigned distance(const mpfr_t a, const mpfr_t b) {
+		static unsigned distance(const mpfr_t& a, const mpfr_t& b) {
 			// initialize variables
 			mpz_t intRepA;
 			mpz_t intRepB;
 			mpz_init(intRepA);
 			mpz_init(intRepB);
+			mpz_t distance;
+			mpz_init(distance);
 
 			// the offset is used to cope with the exponent differences
 			long offset = a->_mpfr_exp - b->_mpfr_exp;
@@ -873,46 +875,56 @@ class FLOAT_T<mpfr_t>
 			mpz_abs(intRepA, intRepA);
 			mpz_abs(intRepB, intRepB);
 
-			mpz_t distance;
-			mpz_init(distance);
+			
 
 			// case distinction to cope with zero.
 			if(mpfr_zero_p(a) != 0) { // a is zero
-				if(mpfr_zero_p(b) != 0) // b is also zero
+				if(mpfr_zero_p(b) != 0){ // b is also zero
+					mpz_clear(distance);
+					mpz_clear(intRepA);
+					mpz_clear(intRepB);
 					return 0;
+				}
 
 				// b is not zero -> we compute the distance from close to zero to b and add 1.
 				mpfr_t zero;
+				mpz_t intRepZero;
 				mpfr_init2(zero,mpfr_get_prec(a));
+				mpz_init(intRepZero);
+
 				mpfr_set_ui(zero,0, MPFR_RNDZ);
 				if(b->_mpfr_sign > 0) {
 					mpfr_nextabove(zero);
 				}else{
 					mpfr_nextbelow(zero);
 				}
-				mpz_t intRepZero;
-				mpz_init(intRepZero);
+				
 				toInt(intRepZero, zero);
 				mpz_abs(intRepZero, intRepZero);
 				mpz_sub(distance, intRepB,intRepZero);
 				mpz_add_ui(distance,distance, 1);
+
 				mpfr_clear(zero);
 				mpz_clear(intRepZero);
 			} else if(mpfr_zero_p(b) != 0) { // a is not zero, b is zero
 				mpfr_t zero;
+				mpz_t intRepZero;
 				mpfr_init2(zero,mpfr_get_prec(a));
+				mpz_init(intRepZero);
+
 				mpfr_set_ui(zero,0, MPFR_RNDZ);
 				if(a->_mpfr_sign > 0) {
 					mpfr_nextabove(zero);
 				}else{
 					mpfr_nextbelow(zero);
 				}
-				mpz_t intRepZero;
-				mpz_init(intRepZero);
+				
+				
 				toInt(intRepZero, zero);
 				mpz_abs(intRepZero, intRepZero);
 				mpz_sub(distance, intRepA,intRepZero);
 				mpz_add_ui(distance,distance, 1);
+
 				mpfr_clear(zero);
 				mpz_clear(intRepZero);
 			} else if(a->_mpfr_sign == b->_mpfr_sign) { // both are not zero and at the same side
@@ -921,10 +933,12 @@ class FLOAT_T<mpfr_t>
 			} else { // both are not zero and one is larger, the other one is less zero, compute both distances to zero and add 2.
 				mpfr_t zeroA;
 				mpfr_init2(zeroA,mpfr_get_prec(a));
-				mpfr_set_ui(zeroA,0, MPFR_RNDZ);
 				mpfr_t zeroB;
 				mpfr_init2(zeroB,mpfr_get_prec(a));
+
+				mpfr_set_ui(zeroA,0, MPFR_RNDZ);
 				mpfr_set_ui(zeroB,0, MPFR_RNDZ);
+
 				if(a->_mpfr_sign > 0) {
 					mpfr_nextabove(zeroA);
 					mpfr_nextbelow(zeroB);
@@ -934,21 +948,24 @@ class FLOAT_T<mpfr_t>
 				}
 				mpz_t intRepZeroA;
 				mpz_init(intRepZeroA);
-				toInt(intRepZeroA, zeroA);
-				mpz_abs(intRepZeroA, intRepZeroA);
 				mpz_t intRepZeroB;
 				mpz_init(intRepZeroB);
-				toInt(intRepZeroB, zeroB);
-				mpz_abs(intRepZeroB, intRepZeroB);
 				mpz_t d2;
 				mpz_init(d2);
+
+				toInt(intRepZeroA, zeroA);
+				mpz_abs(intRepZeroA, intRepZeroA);
+				toInt(intRepZeroB, zeroB);
+				mpz_abs(intRepZeroB, intRepZeroB);
+				
 				mpz_sub(distance, intRepA,intRepZeroA);
 				mpz_sub(d2, intRepB,intRepZeroB);
 				mpz_add(distance, distance, d2);
 				mpz_add_ui(distance,distance, 2);
+				
 				mpfr_clear(zeroA);
-				mpz_clear(intRepZeroA);
 				mpfr_clear(zeroB);
+				mpz_clear(intRepZeroA);
 				mpz_clear(intRepZeroB);
 				mpz_clear(d2);
 			}
@@ -976,7 +993,7 @@ inline bool isNan(const FLOAT_T<mpfr_t>& _in) {
 }
 
 template<>
-inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(FLOAT_T<mpfr_t> A, FLOAT_T<mpfr_t> B, int maxUlps)
+inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(const FLOAT_T<mpfr_t>& A, const FLOAT_T<mpfr_t>& B, unsigned maxUlps)
 {
 	return (FLOAT_T<mpfr_t>::integerDistance(A,B) <= maxUlps);
 }

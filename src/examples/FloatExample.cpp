@@ -14,7 +14,6 @@
 
 
 void toInt(mpz_t intRep, mpfr_t a) {
-	
 	//std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
 	//std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
 	//std::cout << "Precision is " << a->_mpfr_prec << std::endl;
@@ -23,10 +22,10 @@ void toInt(mpz_t intRep, mpfr_t a) {
 	//std::cout << "Exponent is " << a->_mpfr_exp << std::endl;
 	//std::cout << "Min Exponent is " << mpfr_get_emin() << std::endl;
 	//std::cout << "Min Exponent is " << carl::binary(mpfr_get_emin()) << std::endl;
-
 	//std::cout << "Scaled exponent: " << (a->_mpfr_exp + std::abs(mpfr_get_emin())) << std::endl;
 	//std::cout << "Scaled exponent: " << carl::binary((a->_mpfr_exp + std::abs(mpfr_get_emin()))) << std::endl;
 	
+	// mpfr mantissa is stored in limbs (usually 64-bit words) - the number of those depends on the precision.
 	int limbs = std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
 	/*
 	std::cout << "Mantissa is ";
@@ -41,10 +40,15 @@ void toInt(mpz_t intRep, mpfr_t a) {
 	mpz_t tmp;
 	mpz_init(mant);
 	mpz_init(tmp);
+	mpz_set_ui(mant,0);
+	mpz_set_ui(tmp,0);
+	// as mpfr uses whole limbs (64-bit) we can cut away the additional zeroes (offset), if there are any
 	unsigned offset = mp_bits_per_limb - (a->_mpfr_prec % mp_bits_per_limb);
 	//std::cout << "Offset is " << offset << " bits" << std::endl;
 	//std::cout << "Mantissa is ";
-	char outStr[1024];
+	//char outStr[1024];
+
+	// assemble the integer representation of the mantissa. The limbs are stored in reversed order, least significant first.
 	while( limbs > 0 ){
 		mpz_set_ui(tmp, a->_mpfr_d[limbs-1]);
 		//std::cout << "Shift: " << (mp_bits_per_limb*(limbs-1)) << " bits" << std::endl;
@@ -52,13 +56,19 @@ void toInt(mpz_t intRep, mpfr_t a) {
 		mpz_add(mant, mant, tmp);
 		--limbs;
 	}
+	// cut away unnecessary zeroes at the end (divide by 2^offset -> left-shift).
 	mpz_cdiv_q_2exp(mant, mant, offset);
-	mpz_get_str(outStr, 2,mant);
-	std::cout << "Mantissa: " << std::string(outStr) << std::endl;
 
+	//mpz_get_str(outStr, 2,mant);
+	//std::cout << "Mantissa: " << std::string(outStr) << std::endl;
+
+	// set the exponent (8-bit), as it is in 2s complement, subtract the minimum to shift the exponent and get exponents ordered,
+	// right shift to put it before the mantissa later.
 	mpz_set_ui(tmp, (a->_mpfr_exp + std::abs(mpfr_get_emin())));
 	//std::cout << "Shift by " << (std::ceil(double(h->_mpfr_prec)/double(mp_bits_per_limb))*64+64-offset) << " bits" << std::endl;
 	mpz_mul_2exp(tmp,tmp,a->_mpfr_prec);
+
+	// assemble the whole representation by addition and finally add sign.
 	mpz_add(mant,mant,tmp);
 	mpz_mul_si(mant,mant,a->_mpfr_sign);
 	mpz_set(intRep, mant);
@@ -68,69 +78,95 @@ void toInt(mpz_t intRep, mpfr_t a) {
 	mpz_get_str(outStr, 10,mant);
 	std::cout << std::string(outStr) << std::endl;
 	*/
+
+	// cleanup.
+	mpz_clear(mant);
+	mpz_clear(tmp);
 }
 
 unsigned distance(mpfr_t a, mpfr_t b) {
+	// initialize variables
 	mpz_t intRepA;
 	mpz_t intRepB;
 	mpz_init(intRepA);
 	mpz_init(intRepB);
-	long offset = a->_mpfr_exp - b->_mpfr_exp;
-	std::cout << "Offset " << offset << std::endl;
-
-	toInt(intRepA, a);
-	toInt(intRepB, b);
-
-	mpz_abs(intRepA, intRepA);
-	mpz_abs(intRepB, intRepB);
-
 	mpz_t distance;
 	mpz_init(distance);
 
-	if(mpfr_zero_p(a) != 0) { // a is zero
-		if(mpfr_zero_p(b) != 0) // b is also zero
-			return 0;
+	// the offset is used to cope with the exponent differences
+	long offset = a->_mpfr_exp - b->_mpfr_exp;
+	//std::cout << "Offset " << offset << std::endl;
 
-		// b is not zero
+	// get integer representations, we use absolute values for simplicity.
+	toInt(intRepA, a);
+	toInt(intRepB, b);
+	mpz_abs(intRepA, intRepA);
+	mpz_abs(intRepB, intRepB);
+
+	
+
+	// case distinction to cope with zero.
+	if(mpfr_zero_p(a) != 0) { // a is zero
+		if(mpfr_zero_p(b) != 0){ // b is also zero
+			mpz_clear(distance);
+			mpz_clear(intRepA);
+			mpz_clear(intRepB);
+			return 0;
+		}
+
+		// b is not zero -> we compute the distance from close to zero to b and add 1.
 		mpfr_t zero;
+		mpz_t intRepZero;
 		mpfr_init2(zero,mpfr_get_prec(a));
+		mpz_init(intRepZero);
+
 		mpfr_set_ui(zero,0, MPFR_RNDZ);
 		if(b->_mpfr_sign > 0) {
 			mpfr_nextabove(zero);
 		}else{
 			mpfr_nextbelow(zero);
 		}
-		mpz_t intRepZero;
-		mpz_init(intRepZero);
+		
 		toInt(intRepZero, zero);
 		mpz_abs(intRepZero, intRepZero);
 		mpz_sub(distance, intRepB,intRepZero);
 		mpz_add_ui(distance,distance, 1);
+
+		mpfr_clear(zero);
+		mpz_clear(intRepZero);
 	} else if(mpfr_zero_p(b) != 0) { // a is not zero, b is zero
 		mpfr_t zero;
+		mpz_t intRepZero;
 		mpfr_init2(zero,mpfr_get_prec(a));
+		mpz_init(intRepZero);
+
 		mpfr_set_ui(zero,0, MPFR_RNDZ);
 		if(a->_mpfr_sign > 0) {
 			mpfr_nextabove(zero);
 		}else{
 			mpfr_nextbelow(zero);
 		}
-		mpz_t intRepZero;
-		mpz_init(intRepZero);
+		
+		
 		toInt(intRepZero, zero);
 		mpz_abs(intRepZero, intRepZero);
 		mpz_sub(distance, intRepA,intRepZero);
 		mpz_add_ui(distance,distance, 1);
+
+		mpfr_clear(zero);
+		mpz_clear(intRepZero);
 	} else if(a->_mpfr_sign == b->_mpfr_sign) { // both are not zero and at the same side
 		mpz_sub(distance, intRepA, intRepB);
 		mpz_abs(distance,distance);
-	} else { // both are not zero and one is larger, the other one is less zero
+	} else { // both are not zero and one is larger, the other one is less zero, compute both distances to zero and add 2.
 		mpfr_t zeroA;
 		mpfr_init2(zeroA,mpfr_get_prec(a));
-		mpfr_set_ui(zeroA,0, MPFR_RNDZ);
 		mpfr_t zeroB;
 		mpfr_init2(zeroB,mpfr_get_prec(a));
+
+		mpfr_set_ui(zeroA,0, MPFR_RNDZ);
 		mpfr_set_ui(zeroB,0, MPFR_RNDZ);
+
 		if(a->_mpfr_sign > 0) {
 			mpfr_nextabove(zeroA);
 			mpfr_nextbelow(zeroB);
@@ -140,22 +176,37 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 		}
 		mpz_t intRepZeroA;
 		mpz_init(intRepZeroA);
-		toInt(intRepZeroA, zeroA);
-		mpz_abs(intRepZeroA, intRepZeroA);
 		mpz_t intRepZeroB;
 		mpz_init(intRepZeroB);
-		toInt(intRepZeroB, zeroB);
-		mpz_abs(intRepZeroB, intRepZeroB);
 		mpz_t d2;
 		mpz_init(d2);
+
+		toInt(intRepZeroA, zeroA);
+		mpz_abs(intRepZeroA, intRepZeroA);
+		toInt(intRepZeroB, zeroB);
+		mpz_abs(intRepZeroB, intRepZeroB);
+		
 		mpz_sub(distance, intRepA,intRepZeroA);
 		mpz_sub(d2, intRepB,intRepZeroB);
 		mpz_add(distance, distance, d2);
 		mpz_add_ui(distance,distance, 2);
+		
+		mpfr_clear(zeroA);
+		mpfr_clear(zeroB);
+		mpz_clear(intRepZeroA);
+		mpz_clear(intRepZeroB);
+		mpz_clear(d2);
 	}
+	//std::cout << "Modify by " << 2*std::abs(offset)*a->_mpfr_prec << std::endl;
 
-	std::cout << "Modify by " << 2*std::abs(offset)*a->_mpfr_prec << std::endl;
-	return (mpz_get_ui(distance) - 2*std::abs(offset)*a->_mpfr_prec);
+	// shift by offset (exponent differences).
+	unsigned result = mpz_get_ui(distance) - 2*std::abs(offset)*a->_mpfr_prec;
+
+	// cleanup.
+	mpz_clear(distance);
+	mpz_clear(intRepA);
+	mpz_clear(intRepB);
+	return result;
 }
 
 int main (int argc, char** argv)
@@ -189,6 +240,7 @@ int main (int argc, char** argv)
 	//mpfr_nextbelow(f);
 	//mpfr_nextbelow(f);
 	//mpfr_nextbelow(f);
+
 	
 	char out1[120];
 	char out2[120];
@@ -208,8 +260,8 @@ int main (int argc, char** argv)
 		mpfr_clear(g);
 		std::cout << "##############################" << std::endl;
 	}
-
 	
+	mpfr_clear(f);
 
 	/*
 	std::cout << "F" << std::endl;
