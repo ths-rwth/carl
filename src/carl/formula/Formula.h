@@ -64,10 +64,11 @@ namespace carl
             const FormulaContent<Pol>* mpContent;
             
             
-            Formula( const FormulaContent<Pol>* _content ):
+            explicit Formula( const FormulaContent<Pol>* _content ):
                 mpContent( _content )
             {
-                FormulaPool<Pol>::getInstance().reg( mpContent );
+                if( _content != nullptr )
+                    FormulaPool<Pol>::getInstance().reg( _content );
             }
             
             #ifdef THREAD_SAFE
@@ -171,8 +172,10 @@ namespace carl
             {}
             
             Formula( const Formula& _formula ):
-                Formula( _formula.mpContent )
+                mpContent( _formula.mpContent )
             {
+                if( _formula.mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
             }
             
             Formula( Formula&& _formula ):
@@ -191,7 +194,8 @@ namespace carl
             
             Formula& operator=( const Formula& _formula )
             {
-                FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
+                if( _formula.mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
                 if( mpContent != nullptr )
                     FormulaPool<Pol>::getInstance().free( mpContent );
                 mpContent = _formula.mpContent;
