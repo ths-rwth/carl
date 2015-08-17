@@ -134,8 +134,6 @@ class FLOAT_T<mpfr_t>
 			if(this == &_rhs)
 				return *this;
 
-			mpfr_clear(mValue);
-			mpfr_init2(mValue,_rhs.precision());
 			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
 			return *this;
 		}
@@ -755,11 +753,232 @@ class FLOAT_T<mpfr_t>
 			return std::string(out);
 		}
 		
+		static unsigned integerDistance(const FLOAT_T<mpfr_t>& a, const FLOAT_T<mpfr_t>& b) {
+			return (distance(a.value(), b.value()));
+		}
+
 	private:
 		
 		mpfr_prec_t convPrec(precision_t _prec) const
 		{
 			return _prec;
+		}
+
+		/**
+		 * @brief Converts a given float to its integer representation
+		 * @details This function converts a mpfr float to a corresponding integer representation. This is done as follows:
+		 * We can use a transformation similar to the one used for c++ doubles (with modifications). We use the mantissa and extend 
+		 * it by the exponent (we left-shift the exponent in front of the mantissa) and add the sign. This can be interpreted as an
+		 * integer. Note that zero is a special case, which should be handled separately.
+		 * 
+		 * @param intRep Parameter where we write the integer to.
+		 * @param a input mpfr float.
+		 */
+		static void toInt(mpz_t& intRep, const mpfr_t a) {
+	
+			//std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
+			//std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
+			//std::cout << "Precision is " << a->_mpfr_prec << std::endl;
+			//std::cout << "Sign is " << a->_mpfr_sign << std::endl;
+			//std::cout << "Exponent is " << carl::binary(a->_mpfr_exp) << std::endl;
+			//std::cout << "Exponent is " << a->_mpfr_exp << std::endl;
+			//std::cout << "Min Exponent is " << mpfr_get_emin() << std::endl;
+			//std::cout << "Min Exponent is " << carl::binary(mpfr_get_emin()) << std::endl;
+			//std::cout << "Scaled exponent: " << (a->_mpfr_exp + std::abs(mpfr_get_emin())) << std::endl;
+			//std::cout << "Scaled exponent: " << carl::binary((a->_mpfr_exp + std::abs(mpfr_get_emin()))) << std::endl;
+			
+			// mpfr mantissa is stored in limbs (usually 64-bit words) - the number of those depends on the precision.
+			int limbs = std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
+			/*
+			std::cout << "Mantissa is ";
+			while( limbs > 0 ){
+				std::cout << carl::binary(h->_mpfr_d[limbs-1]) << " " << std::endl;
+				--limbs;
+			}
+			std::cout << std::endl;
+			limbs = std::ceil(double(h->_mpfr_prec)/double(mp_bits_per_limb));
+			*/
+			mpz_t mant;
+			mpz_t tmp;
+			mpz_init(mant);
+			mpz_init(tmp);
+			mpz_set_ui(mant,0);
+			mpz_set_ui(tmp,0);
+			// as mpfr uses whole limbs (64-bit) we can cut away the additional zeroes (offset), if there are any
+			unsigned offset = mp_bits_per_limb - (a->_mpfr_prec % mp_bits_per_limb);
+			//std::cout << "Offset is " << offset << " bits" << std::endl;
+			//std::cout << "Mantissa is ";
+			//char outStr[1024];
+
+			// assemble the integer representation of the mantissa. The limbs are stored in reversed order, least significant first.
+			while( limbs > 0 ){
+				mpz_set_ui(tmp, a->_mpfr_d[limbs-1]);
+				//std::cout << "Shift: " << (mp_bits_per_limb*(limbs-1)) << " bits" << std::endl;
+		 		mpz_mul_2exp(tmp, tmp, (mp_bits_per_limb*(limbs-1)));
+				mpz_add(mant, mant, tmp);
+				--limbs;
+			}
+			// cut away unnecessary zeroes at the end (divide by 2^offset -> left-shift).
+			mpz_cdiv_q_2exp(mant, mant, offset);
+
+			//mpz_get_str(outStr, 2,mant);
+			//std::cout << "Mantissa: " << std::string(outStr) << std::endl;
+
+			// set the exponent (8-bit), as it is in 2s complement, subtract the minimum to shift the exponent and get exponents ordered,
+			// right shift to put it before the mantissa later.
+			mpz_set_ui(tmp, (a->_mpfr_exp + std::abs(mpfr_get_emin())));
+			//std::cout << "Shift by " << (std::ceil(double(h->_mpfr_prec)/double(mp_bits_per_limb))*64+64-offset) << " bits" << std::endl;
+			mpz_mul_2exp(tmp,tmp,a->_mpfr_prec);
+
+			// assemble the whole representation by addition and finally add sign.
+			mpz_add(mant,mant,tmp);
+			mpz_mul_si(mant,mant,a->_mpfr_sign);
+			mpz_set(intRep, mant);
+			/*
+			mpz_get_str(outStr, 2,mant);
+			std::cout << std::string(outStr) << std::endl;
+			mpz_get_str(outStr, 10,mant);
+			std::cout << std::string(outStr) << std::endl;
+			*/
+
+			// cleanup.
+			mpz_clear(mant);
+			mpz_clear(tmp);
+		}
+
+		/**
+		 * @brief Calculates the distance in ULPs between two mpfr floats a and b.
+		 * @details We use an integer representation for calculating the distance. Special cases are whenever we reach or cross
+		 * zero. TODO: Include cases for NaN and INFTY.
+		 * 
+		 * @param a 
+		 * @param b
+		 * 
+		 * @return [description]
+		 */
+		static unsigned distance(const mpfr_t& a, const mpfr_t& b) {
+			// initialize variables
+			mpz_t intRepA;
+			mpz_t intRepB;
+			mpz_init(intRepA);
+			mpz_init(intRepB);
+			mpz_t distance;
+			mpz_init(distance);
+
+			// the offset is used to cope with the exponent differences
+			long offset = a->_mpfr_exp - b->_mpfr_exp;
+			//std::cout << "Offset " << offset << std::endl;
+
+			// get integer representations, we use absolute values for simplicity.
+			toInt(intRepA, a);
+			toInt(intRepB, b);
+			mpz_abs(intRepA, intRepA);
+			mpz_abs(intRepB, intRepB);
+
+			
+
+			// case distinction to cope with zero.
+			if(mpfr_zero_p(a) != 0) { // a is zero
+				if(mpfr_zero_p(b) != 0){ // b is also zero
+					mpz_clear(distance);
+					mpz_clear(intRepA);
+					mpz_clear(intRepB);
+					return 0;
+				}
+
+				// b is not zero -> we compute the distance from close to zero to b and add 1.
+				mpfr_t zero;
+				mpz_t intRepZero;
+				mpfr_init2(zero,mpfr_get_prec(a));
+				mpz_init(intRepZero);
+
+				mpfr_set_ui(zero,0, MPFR_RNDZ);
+				if(b->_mpfr_sign > 0) {
+					mpfr_nextabove(zero);
+				}else{
+					mpfr_nextbelow(zero);
+				}
+				
+				toInt(intRepZero, zero);
+				mpz_abs(intRepZero, intRepZero);
+				mpz_sub(distance, intRepB,intRepZero);
+				mpz_add_ui(distance,distance, 1);
+
+				mpfr_clear(zero);
+				mpz_clear(intRepZero);
+			} else if(mpfr_zero_p(b) != 0) { // a is not zero, b is zero
+				mpfr_t zero;
+				mpz_t intRepZero;
+				mpfr_init2(zero,mpfr_get_prec(a));
+				mpz_init(intRepZero);
+
+				mpfr_set_ui(zero,0, MPFR_RNDZ);
+				if(a->_mpfr_sign > 0) {
+					mpfr_nextabove(zero);
+				}else{
+					mpfr_nextbelow(zero);
+				}
+				
+				
+				toInt(intRepZero, zero);
+				mpz_abs(intRepZero, intRepZero);
+				mpz_sub(distance, intRepA,intRepZero);
+				mpz_add_ui(distance,distance, 1);
+
+				mpfr_clear(zero);
+				mpz_clear(intRepZero);
+			} else if(a->_mpfr_sign == b->_mpfr_sign) { // both are not zero and at the same side
+				mpz_sub(distance, intRepA, intRepB);
+				mpz_abs(distance,distance);
+			} else { // both are not zero and one is larger, the other one is less zero, compute both distances to zero and add 2.
+				mpfr_t zeroA;
+				mpfr_init2(zeroA,mpfr_get_prec(a));
+				mpfr_t zeroB;
+				mpfr_init2(zeroB,mpfr_get_prec(a));
+
+				mpfr_set_ui(zeroA,0, MPFR_RNDZ);
+				mpfr_set_ui(zeroB,0, MPFR_RNDZ);
+
+				if(a->_mpfr_sign > 0) {
+					mpfr_nextabove(zeroA);
+					mpfr_nextbelow(zeroB);
+				}else{
+					mpfr_nextbelow(zeroA);
+					mpfr_nextabove(zeroB);
+				}
+				mpz_t intRepZeroA;
+				mpz_init(intRepZeroA);
+				mpz_t intRepZeroB;
+				mpz_init(intRepZeroB);
+				mpz_t d2;
+				mpz_init(d2);
+
+				toInt(intRepZeroA, zeroA);
+				mpz_abs(intRepZeroA, intRepZeroA);
+				toInt(intRepZeroB, zeroB);
+				mpz_abs(intRepZeroB, intRepZeroB);
+				
+				mpz_sub(distance, intRepA,intRepZeroA);
+				mpz_sub(d2, intRepB,intRepZeroB);
+				mpz_add(distance, distance, d2);
+				mpz_add_ui(distance,distance, 2);
+				
+				mpfr_clear(zeroA);
+				mpfr_clear(zeroB);
+				mpz_clear(intRepZeroA);
+				mpz_clear(intRepZeroB);
+				mpz_clear(d2);
+			}
+			//std::cout << "Modify by " << 2*std::abs(offset)*a->_mpfr_prec << std::endl;
+
+			// shift by offset (exponent differences).
+			unsigned result = mpz_get_ui(distance) - 2*std::abs(offset)*a->_mpfr_prec;
+
+			// cleanup.
+			mpz_clear(distance);
+			mpz_clear(intRepA);
+			mpz_clear(intRepB);
+			return result;
 		}
 };
 
@@ -774,31 +993,9 @@ inline bool isNan(const FLOAT_T<mpfr_t>& _in) {
 }
 
 template<>
-inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(FLOAT_T<mpfr_t> A, FLOAT_T<mpfr_t> B, int maxUlps)
+inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(const FLOAT_T<mpfr_t>& A, const FLOAT_T<mpfr_t>& B, unsigned maxUlps)
 {
-	assert(maxUlps > 0);
-
-	//std::cout << __func__ << ": " << A << " and " << B << std::endl;
-	
-	mpz_t significandA;
-	mpz_init(significandA);
-	mpz_t significandB;
-	mpz_init(significandB);
-
-	mpfr_get_z_exp(significandA,A.value());
-	mpfr_get_z_exp(significandB,B.value());
-
-	//std::cout << __func__ << ": " << mpz_get_si(significandA) << " and " << mpz_get_si(significandB) << std::endl;
-
-	mpz_t diff;
-	mpz_init(diff);
-
-	mpz_sub(diff, significandA, significandB);
-	mpz_abs(diff,diff);
-
-	//std::cout << __func__ << ": " << (mpz_cmp_si(diff,maxUlps) <= 0) << std::endl;
-
-	return (mpz_cmp_si(diff,maxUlps) <= 0);
+	return (FLOAT_T<mpfr_t>::integerDistance(A,B) <= maxUlps);
 }
 
 }// namespace
