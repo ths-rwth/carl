@@ -8,6 +8,7 @@
  */
 #include "../carl/interval/rounding.h"
 #include "../carl/numbers/roundingConversion.h"
+ #include "../carl/numbers/FLOAT_T.h"
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
@@ -231,7 +232,7 @@ int main (int argc, char** argv)
 	
 	mpfr_clears(numberA, numberB, result);
 	*/
-
+	/*
 	mpfr_t f;
 	mpfr_init2(f,100);
 	mpfr_set_d(f, 0, MPFR_RNDN);
@@ -262,6 +263,12 @@ int main (int argc, char** argv)
 	}
 	
 	mpfr_clear(f);
+	*/
+
+	carl::FLOAT_T<mpfr_t> a(1);
+	carl::FLOAT_T<mpfr_t> b(2);
+
+	carl::AlmostEqual2sComplement(a,b);
 
 	/*
 	std::cout << "F" << std::endl;

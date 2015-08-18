@@ -111,7 +111,7 @@ namespace carl
 		long long bInt = *(long long*)&B;
 		if (bInt < 0)
 			bInt = (long long)(0x8000000000000000) - bInt;
-		unsigned long long intDiff = std::abs(aInt - bInt);
+		unsigned long long intDiff = (unsigned long long)std::abs(aInt - bInt);
 		if (intDiff <= maxUlps)
 			return true;
 
