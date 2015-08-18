@@ -36,6 +36,7 @@ namespace carl
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
+        assert( mPool.size() == 2 );
         mPool.clear();
         delete mpTrue;
         delete mpFalse;
@@ -273,10 +274,10 @@ namespace carl
             std::swap(_subformulas[1], _subformulas[2]);
             return createITE(std::move(_subformulas));
         }
-        if (condition == elsecase) elsecase = falseFormula();
-        if (condition == elsecase.mpContent->mNegation) elsecase = trueFormula();
-        if (condition == thencase) thencase = trueFormula();
-        if (condition == thencase.mpContent->mNegation) thencase = falseFormula();
+        if (condition == elsecase) elsecase = Formula<Pol>(falseFormula());
+        if (condition.mpContent == elsecase.mpContent->mNegation) elsecase = Formula<Pol>(trueFormula());
+        if (condition == thencase) thencase = Formula<Pol>(trueFormula());
+        if (condition.mpContent == thencase.mpContent->mNegation) thencase = Formula<Pol>(falseFormula());
         
         if (thencase.isFalse()) {
             // (ite c false b) = (~c or false) and (c or b) = ~c and (c or b) = (~c and b)
