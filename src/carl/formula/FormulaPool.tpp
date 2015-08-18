@@ -36,7 +36,7 @@ namespace carl
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
-        assert( mPool.size() == 2 );
+//        assert( mPool.size() == 2 );
         mPool.clear();
         delete mpTrue;
         delete mpFalse;
@@ -92,25 +92,35 @@ namespace carl
     const FormulaContent<Pol>* FormulaPool<Pol>::createImplication(Formulas<Pol>&& _subformulas) {
         assert(_subformulas.size() >= 2);
         #ifdef SIMPLIFY_FORMULA
-        auto it = _subformulas.rbegin();
         // Conclusion
-        if (it->mpContent == mpTrue) return create(TRUE);
-        if (it->mpContent == mpFalse) {
+        if (_subformulas.back().mpContent == mpTrue)
+            return create(TRUE);
+        if (_subformulas.back().mpContent == mpFalse) {
             _subformulas.pop_back();
             for (auto& f: _subformulas) {
                 f = Formula<Pol>(NOT, f);
             }
             return create(OR, std::move(_subformulas));
         }
-        // Premises
-        for (it++; it != _subformulas.rend(); ) {
-            if (it->mpContent == mpFalse) return create(TRUE);
-            if (it->mpContent == mpTrue) _subformulas.erase(it.base());
-            it++;
-        }
-        #endif
         Formula<Pol> conclusion = _subformulas.back();
         _subformulas.pop_back();
+        // Premises
+        for (auto it = _subformulas.begin(); it != _subformulas.end(); ) {
+            if (it->mpContent == mpFalse) return create(TRUE);
+            if (it->mpContent == mpTrue) {
+                auto jt = it;
+                ++jt;
+                if( jt != _subformulas.end() )
+                    *it = _subformulas.back();
+                _subformulas.pop_back();
+            }
+            else
+                ++it;
+        }
+        #endif
+        if (_subformulas.empty()) {
+            return conclusion.mpContent;
+        }
         Formula<Pol> premise(AND, std::move(_subformulas));
         return add(new FormulaContent<Pol>(IMPLIES, {premise, conclusion}));
     }
