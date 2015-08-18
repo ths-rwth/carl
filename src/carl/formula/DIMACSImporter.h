@@ -36,16 +36,9 @@ private:
 	std::ifstream in;
 	std::vector<Variable> variables;
 	regex headerRegex;
-	regex clauseRegex;
-	
-	Formula<Pol> parseVariable(long long vid) const {
-		Formula<Pol> v(variables.at(std::abs(vid)-1));
-		if (vid > 0) return v;
-		else return Formula<Pol>(NOT, v);
-	}
 	
 	Formula<Pol> parseLine(const std::string& line) const {
-		std::vector<Formula<Pol>> vars;
+		std::vector<Formula<Pol>> vars;//(std::count(line.begin(), line.end(), ' '));
 		const char* begin = line.c_str();
 		char* end = nullptr;
 		long long id;
@@ -53,9 +46,11 @@ private:
 			id = std::strtoll(begin, &end, 10);
 			begin = end;
 			if (id == 0) break;
-			vars.emplace_back(parseVariable(id));
+			Variable v = variables.at(std::abs(id)-1);
+			if (id > 0) vars.emplace_back(v);
+			else vars.emplace_back(NOT, Formula<Pol>(v));
 		}
-		return Formula<Pol>(OR, std::move(vars));
+		return std::move(Formula<Pol>(OR, std::move(vars)));
 	}
 	
 	Formula<Pol> parseFormula() {
@@ -85,8 +80,7 @@ private:
 public:
 	DIMACSImporter(const std::string& filename):
 		in(filename),
-		headerRegex("p cnf (\\d+) (\\d+)"),
-		clauseRegex("(?:(-?\\d+) )*0")
+		headerRegex("p cnf (\\d+) (\\d+)")
 	{}
 	
 	bool hasNext() const {
