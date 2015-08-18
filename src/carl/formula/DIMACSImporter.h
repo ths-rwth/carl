@@ -34,11 +34,11 @@ template<typename Pol>
 class DIMACSImporter {
 private:
 	std::ifstream in;
-	std::vector<Variable> variables;
+	std::vector<Formula<Pol>> variables;
 	regex headerRegex;
 	
 	Formula<Pol> parseLine(const std::string& line) const {
-		std::vector<Formula<Pol>> vars;//(std::count(line.begin(), line.end(), ' '));
+		std::vector<Formula<Pol>> vars;
 		const char* begin = line.c_str();
 		char* end = nullptr;
 		long long id;
@@ -46,9 +46,9 @@ private:
 			id = std::strtoll(begin, &end, 10);
 			begin = end;
 			if (id == 0) break;
-			Variable v = variables.at(std::abs(id)-1);
+			Formula<Pol> v = variables.at(std::abs(id)-1);
 			if (id > 0) vars.emplace_back(v);
-			else vars.emplace_back(NOT, Formula<Pol>(v));
+			else vars.emplace_back(NOT, v);
 		}
 		return std::move(Formula<Pol>(OR, std::move(vars)));
 	}
@@ -67,8 +67,9 @@ private:
 					CARL_LOG_ERROR("carl.formula", "DIMACS line starting with \"p\" does not match header format: \"" << line << "\".");
 				}
 				std::size_t varCount = std::stoull(m[1]);
+				variables.reserve(varCount);
 				while (variables.size() < varCount) {
-					variables.push_back(freshBooleanVariable());
+					variables.emplace_back(freshBooleanVariable());
 				}
 				continue;
 			}
