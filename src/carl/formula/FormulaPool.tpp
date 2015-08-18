@@ -36,6 +36,7 @@ namespace carl
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
+        assert( mPool.size() == 2 );
         mPool.clear();
         delete mpTrue;
         delete mpFalse;
@@ -124,7 +125,6 @@ namespace carl
         if (_subformulas.size() == 1) {
             return _subformulas[0].mpContent;
         }
-        std::sort(_subformulas.begin(), _subformulas.end());
         for( size_t pos = 0; pos < _subformulas.size(); )
         {
             if( _subformulas[pos].getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
@@ -142,46 +142,51 @@ namespace carl
             }
             else
             {
-                // Check if the sub-formula at iter is the negation of the sub-formula at iterB
-                // Note, that the negation of a formula would by construction always be right after the formula
-                // in a set of formulas whose comparison operator is based on the one of formulas This is due to
-                // them comparing just the ids and we construct the negation of a formula right after the formula
-                // itself and assign the next id to it.
-                if( pos < _subformulas.size() - 1 && formulasInverse( _subformulas[pos], _subformulas[pos+1] ) )
+                ++pos;
+            }
+        }
+        std::sort(_subformulas.begin(), _subformulas.end());
+        for( size_t pos = 0; pos < _subformulas.size(); )
+        {
+            // Check if the sub-formula at iter is the negation of the sub-formula at iterB
+            // Note, that the negation of a formula would by construction always be right after the formula
+            // in a set of formulas whose comparison operator is based on the one of formulas This is due to
+            // them comparing just the ids and we construct the negation of a formula right after the formula
+            // itself and assign the next id to it.
+            if( pos < _subformulas.size() - 1 && formulasInverse( _subformulas[pos], _subformulas[pos+1] ) )
+            {
+                switch( _type )
                 {
-                    switch( _type )
+                    case FormulaType::AND:
                     {
-                        case FormulaType::AND:
-                        {
-                            return falseFormula();
-                        }
-                        case FormulaType::OR:
-                        {
-                            return trueFormula();
-                        }
-                        case FormulaType::IFF:
-                        {
-                            return falseFormula();
-                        }
-                        case FormulaType::XOR:
-                        {
-                            _subformulas[pos] = Formula<Pol>( trueFormula() );
-                            ++pos;
-                            _subformulas[pos] = _subformulas.back();
-                            _subformulas.pop_back();
-                            break;
-                        }
-                        default:
-                        {
-                            assert( false );
-                            break;
-                        }
+                        return falseFormula();
+                    }
+                    case FormulaType::OR:
+                    {
+                        return trueFormula();
+                    }
+                    case FormulaType::IFF:
+                    {
+                        return falseFormula();
+                    }
+                    case FormulaType::XOR:
+                    {
+                        _subformulas[pos] = Formula<Pol>( trueFormula() );
+                        ++pos;
+                        _subformulas[pos] = _subformulas.back();
+                        _subformulas.pop_back();
+                        break;
+                    }
+                    default:
+                    {
+                        assert( false );
+                        break;
                     }
                 }
-                else
-                {
-                    ++pos;
-                }
+            }
+            else
+            {
+                ++pos;
             }
         }
         _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
@@ -269,10 +274,10 @@ namespace carl
             std::swap(_subformulas[1], _subformulas[2]);
             return createITE(std::move(_subformulas));
         }
-        if (condition == elsecase) elsecase = falseFormula();
-        if (condition == elsecase.mpContent->mNegation) elsecase = trueFormula();
-        if (condition == thencase) thencase = trueFormula();
-        if (condition == thencase.mpContent->mNegation) thencase = falseFormula();
+        if (condition == elsecase) elsecase = Formula<Pol>(falseFormula());
+        if (condition.mpContent == elsecase.mpContent->mNegation) elsecase = Formula<Pol>(trueFormula());
+        if (condition == thencase) thencase = Formula<Pol>(trueFormula());
+        if (condition.mpContent == thencase.mpContent->mNegation) thencase = Formula<Pol>(falseFormula());
         
         if (thencase.isFalse()) {
             // (ite c false b) = (~c or false) and (c or b) = ~c and (c or b) = (~c and b)
