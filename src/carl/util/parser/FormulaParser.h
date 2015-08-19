@@ -20,11 +20,11 @@ struct FormulaParser: public qi::grammar<Iterator, Formula<Pol>(), Skipper> {
         naryop.add("or", FormulaType::OR);
         
 		varname = qi::lexeme[ (qi::alpha | qi::char_("~!@$%^&*_+=<>.?/-")) > *(qi::alnum | qi::char_("~!@$%^&*_+=<>.?/-"))];
-        formula.name("varname");
+        varname.name("varname");
 //        qi::debug(varname);
         
 		variable = (varmap[qi::_val = qi::_1]) | (varname[qi::_val = px::bind(&FormulaParser<Pol>::newVariable, px::ref(*this), qi::_1)]);
-        formula.name("variable");
+        variable.name("variable");
 //        qi::debug(variable);
         
         formula_op = 

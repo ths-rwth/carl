@@ -95,3 +95,12 @@ TEST(Formula, BooleanConstructors)
     FormulaT Fxor = FormulaT(FormulaType::XOR, nb1, fb2);
     FormulaT Fiff = FormulaT(FormulaType::IFF, nb1, fb2);
 }
+
+TEST(Formula, FormulaPoolDestructor)
+{
+    using carl::VariableType;
+    typedef Formula<MultivariatePolynomial<Rational>> FT;
+    carl::Variable b1 = freshBooleanVariable("b1");
+    carl::Variable b2 = freshBooleanVariable("b2");
+    FT test(AND, FT(b1), FT(b2));
+}

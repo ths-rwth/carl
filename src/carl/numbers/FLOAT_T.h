@@ -92,13 +92,13 @@ namespace carl
     
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	template<typename Number>
-	inline bool AlmostEqual2sComplement(Number A, Number B, int = 1)
+	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned = 128)
 	{
 		return A == B;
 	}
 	
 	template<>
-	inline bool AlmostEqual2sComplement<double>(double A, double B, int maxUlps)
+	inline bool AlmostEqual2sComplement<double>(const double& A, const double& B, unsigned maxUlps)
 	{
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
@@ -111,7 +111,7 @@ namespace carl
 		long long bInt = *(long long*)&B;
 		if (bInt < 0)
 			bInt = (long long)(0x8000000000000000) - bInt;
-		long long intDiff = std::abs(aInt - bInt);
+		unsigned long long intDiff = (unsigned long long)std::abs(aInt - bInt);
 		if (intDiff <= maxUlps)
 			return true;
 
@@ -1798,6 +1798,12 @@ namespace carl
 	template<typename FloatType>
 	inline bool isNan(const FLOAT_T<FloatType>& _in) {
 		return _in.value() == std::numeric_limits<FloatType>::quiet_NaN();
+	}
+
+	template<>
+	inline bool AlmostEqual2sComplement<FLOAT_T<double>>(const FLOAT_T<double>& A, const FLOAT_T<double>& B, unsigned maxUlps)
+	{
+		return AlmostEqual2sComplement<double>(A.value(), B.value(), maxUlps);
 	}
 
 } // namespace
