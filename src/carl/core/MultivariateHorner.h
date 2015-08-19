@@ -37,16 +37,10 @@ class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorne
 
 
 private:
-	std::weak_ptr<MultivariateHorner> pThis;
-	std::shared_ptr<MultivariateHorner> thisPtr() const {
-		return std::shared_ptr<MultivariateHorner>(this->pThis);
-	}
-
-
 	typedef typename PolynomialType::CoeffType CoeffType;
 
-	CoeffType mConst_dependent = constant_zero<CoeffType>::get();
-	CoeffType mConst_independent = constant_zero<CoeffType>::get();
+	CoeffType mConst_dependent = static_cast<CoeffType>(0);
+	CoeffType mConst_independent = static_cast<CoeffType>(0);
 	Variable mVariable = Variable::NO_VARIABLE;
 	unsigned mExponent = 1;
 	std::shared_ptr<MultivariateHorner> mH_dependent;
@@ -56,9 +50,9 @@ private:
 public:
 		
 	//Constuctor
-	MultivariateHorner (const PolynomialType& inPut);
-	MultivariateHorner (const PolynomialType& inPut, std::map<Variable, Interval<CoeffType>>& map);
-	MultivariateHorner (const PolynomialType& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
+	MultivariateHorner (PolynomialType&& inPut);
+	MultivariateHorner (PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map);
+	MultivariateHorner (PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
 
 
 	//~MultivariateHorner ();
