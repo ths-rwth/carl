@@ -75,14 +75,12 @@ class FLOAT_T<mpfr_t>
 
         FLOAT_T(const FLOAT_T<mpfr_t>& _float)
         {
-        	std::cout << "Copy" << std::endl;
             mpfr_init2(mValue, mpfr_get_prec(_float.value()));
             mpfr_set(mValue, _float.value(), MPFR_RNDN);
         }
 
         FLOAT_T(FLOAT_T<mpfr_t>&& _float)
         {
-        	std::cout << "Move" << std::endl;
             mpfr_init2(mValue, mpfr_get_prec(_float.value()));
             mpfr_set(mValue, _float.value(), MPFR_RNDN);
         }
@@ -868,13 +866,6 @@ class FLOAT_T<mpfr_t>
 		 * @return [description]
 		 */
 		static void distance(const mpfr_t& a, const mpfr_t& b, mpz_t& dist) {
-
-			char out[30];
-			mpfr_sprintf(out, "%.20RDe", a);
-			std::cout << std::string(out) << std::endl;
-			mpfr_sprintf(out, "%.20RDe", b);
-			std::cout << std::string(out) << std::endl;
-
 			// initialize variables
 			mpz_t intRepA;
 			mpz_t intRepB;
@@ -890,12 +881,6 @@ class FLOAT_T<mpfr_t>
 			toInt(intRepB, b);
 			mpz_abs(intRepA, intRepA);
 			mpz_abs(intRepB, intRepB);
-
-			char outStr[1024];
-			mpz_get_str(outStr, 10,intRepA);
-			std::cout << "IntrepA " << std::string(outStr) << std::endl;
-			mpz_get_str(outStr, 10,intRepB);
-			std::cout << "IntrepB " << std::string(outStr) << std::endl;
 
 			// case distinction to cope with zero.
 			if(mpfr_zero_p(a) != 0) { // a is zero
