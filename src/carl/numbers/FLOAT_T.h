@@ -226,6 +226,11 @@ namespace carl
             assert(std::is_floating_point<FloatType>::value);
         }
 
+        FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, const CARL_RND=CARL_RND::N) : mValue(_float.value())
+        {
+            assert(std::is_floating_point<FloatType>::value);
+        }
+
         /**
          * Constructor, which takes an arbitrary fp type as input and optional rounding, which
          * can be used, if the underlying fp implementation allows this.
