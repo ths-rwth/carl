@@ -886,8 +886,6 @@ class FLOAT_T<mpfr_t>
 			if(mpfr_zero_p(a) != 0) { // a is zero
 				if(mpfr_zero_p(b) != 0){ // b is also zero
 					mpz_set_ui(dist,0);
-					mpz_clear(intRepA);
-					mpz_clear(intRepB);
 				}else{
 
 					// b is not zero -> we compute the distance from close to zero to b and add 1.
