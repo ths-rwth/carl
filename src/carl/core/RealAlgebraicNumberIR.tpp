@@ -95,11 +95,32 @@ bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() && n->isZero()) return true;
 	if (this->upper() <= n->lower()) return false;
 	if (this->lower() >= n->upper()) return false;
+	if ((this->lower() <= n->lower()) && (n->upper() <= this->upper())) return true;
+	if ((this->lower() >= n->lower()) && (n->upper() >= this->upper())) return true;
 	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) {
 		n = this->thisPtr();
 		return true;
 	}
-	return this->add(n->minus())->isZero();
+	
+	if (this->polynomial != n->polynomial) {
+		auto g = UnivariatePolynomial<Number>::gcd(polynomial, n->polynomial);
+		if (!this->isRootOf(g)) return false;
+		this->polynomial = g;
+		this->sturmSequence = g.standardSturmSequence();
+		if (!n->isRootOf(g)) return false;
+		n->polynomial = g;
+		n->sturmSequence = this->sturmSequence;
+		return this->equal(n);
+	}
+	
+	while (true) {
+		if (this->upper() <= n->lower()) return false;
+		if (this->lower() >= n->upper()) return false;
+		if (this->interval == n->interval) return true;
+		// containedIn performs refinement
+		if (this->containedIn(n->interval)) return true;
+		if (n->containedIn(this->interval)) return true;
+	}
 }
 
 template<typename Number>
