@@ -92,13 +92,13 @@ namespace carl
     
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	template<typename Number>
-	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned = 128)
+	inline bool AlmostEqual2sComplement(const Number A, const Number B, unsigned = 128)
 	{
 		return A == B;
 	}
 	
 	template<>
-	inline bool AlmostEqual2sComplement<double>(const double& A, const double& B, unsigned maxUlps)
+	inline bool AlmostEqual2sComplement<double>(const double A, const double B, unsigned maxUlps)
 	{
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
@@ -1806,7 +1806,7 @@ namespace carl
 	}
 
 	template<>
-	inline bool AlmostEqual2sComplement<FLOAT_T<double>>(const FLOAT_T<double>& A, const FLOAT_T<double>& B, unsigned maxUlps)
+	inline bool AlmostEqual2sComplement<FLOAT_T<double>>(const FLOAT_T<double> A, const FLOAT_T<double> B, unsigned maxUlps)
 	{
 		return AlmostEqual2sComplement<double>(A.value(), B.value(), maxUlps);
 	}
