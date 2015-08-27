@@ -62,7 +62,7 @@ namespace carl
     
     typedef std::set<Variable> Variables;
 
-	typedef std::vector<Variables> QuantifiedVariables;
+    typedef std::vector<Variables> QuantifiedVariables;
     
     template<typename T> 
     using PointerSet = std::set<const T*, pointerLess<T>>;
@@ -133,7 +133,5 @@ namespace carl
 	#define CIRCULAR_SHIFT(_intType, _value, _shift) ((_value << _shift) | (_value >> (sizeof(_intType)*8 - _shift)))
 	
 }	// namespace carl
-
-
 
 

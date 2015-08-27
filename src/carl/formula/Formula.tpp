@@ -577,9 +577,9 @@ namespace carl
                     result += "( ";
                 typename Formulas<Pol>::const_iterator it = subformulas().begin();
                 // do not quantify variables again.
-                result += (*it)->toRedlogFormat( false );
+                result += it->toRedlogFormat( false );
                 for( ++it; it != subformulas().end(); ++it ) // do not quantify variables again.
-                    result += " " + oper + " " + (*it)->toRedlogFormat( false );
+                    result += " " + oper + " " + it->toRedlogFormat( false );
                 if( _withVariables )
                     result += " ) )";
                 result += " )";
@@ -787,13 +787,13 @@ namespace carl
                 if (!negated) {
                     Formulas<Pol> subs;
                     for (auto& sub: subformulas()) {
-                        subs.insert(sub->toQF(variables, level, false));
+                        subs.push_back(sub.toQF(variables, level, false));
                     }
                     return Formula<Pol>( getType(), std::move(subs) );
                 } else if (getType() == FormulaType::AND || getType() == FormulaType::OR) {
                     Formulas<Pol> subs;
                     for (auto& sub: subformulas()) {
-                        subs.insert(sub->toQF(variables, level, true));
+                        subs.push_back(sub.toQF(variables, level, true));
                     }
                     if (getType() == FormulaType::AND) return Formula<Pol>(FormulaType::OR, std::move(subs));
                     else return Formula<Pol>(FormulaType::AND, std::move(subs));
@@ -801,13 +801,13 @@ namespace carl
                     Formulas<Pol> sub1;
                     Formulas<Pol> sub2;
                     for (auto& sub: subformulas()) {
-                        sub1.insert(sub->toQF(variables, level, true));
-                        sub2.insert(sub->toQF(variables, level, false));
+                        sub1.push_back(sub.toQF(variables, level, true));
+                        sub2.push_back(sub.toQF(variables, level, false));
                     }
                     return Formula<Pol>(FormulaType::AND, Formula<Pol>(FormulaType::OR, std::move(sub1)), Formula<Pol>(FormulaType::OR, std::move(sub2)));
                 } else if (getType() == FormulaType::XOR) {
-                    auto lhs = back()->toQF(variables, level, false);
-                    auto rhs = connectPrecedingSubformulas()->toQF(variables, level, true);
+                    auto lhs = back().toQF(variables, level, false);
+                    auto rhs = connectPrecedingSubformulas().toQF(variables, level, true);
                     return Formula<Pol>(FormulaType::IFF, lhs, rhs);
                 }
                 assert(false);
@@ -816,6 +816,7 @@ namespace carl
             case FormulaType::CONSTRAINT:
             case FormulaType::FALSE:
             case FormulaType::UEQ:
+            case FormulaType::BITVECTOR:
             case FormulaType::TRUE:
             {
                 if (negated) return Formula<Pol>( NOT, *this );
@@ -828,15 +829,15 @@ namespace carl
                 if ((level % 2 == (getType() == FormulaType::EXISTS ? (unsigned)0 : (unsigned)1)) xor negated) cur = level;
                 else cur = level+1;
                 Variables vars(quantifiedVariables().begin(), quantifiedVariables().end());
-                const Formula<Pol>& f = quantifiedFormula();
+                Formula<Pol> f = quantifiedFormula();
                 for (auto it = vars.begin(); it != vars.end();) {
                     if (it->getType() == VariableType::VT_BOOL) {
                         // Just leave boolean variables at the base level up to the SAT solver.
                         if (cur > 0) {
                             f = Formula<Pol>(
                                 (getType() == FormulaType::EXISTS ? FormulaType::OR : FormulaType::AND),
-                                f->substitute({{*it, Formula<Pol>( FormulaType::TRUE )}}),
-                                f->substitute({{*it, Formula<Pol>( FormulaType::FALSE )}})
+                                f.substitute({{*it, Formula<Pol>( FormulaType::TRUE )}}),
+                                f.substitute({{*it, Formula<Pol>( FormulaType::FALSE )}})
                             );
                         }
                         it = vars.erase(it);
@@ -847,7 +848,7 @@ namespace carl
                     while (variables.size() <= cur) variables.emplace_back();
                     variables[cur].insert(vars.begin(), vars.end());
                 }
-                return f->toQF(variables, cur, negated);
+                return f.toQF(variables, cur, negated);
             }
             case FormulaType::IMPLIES:
                 if (negated) return Formula<Pol>(FormulaType::AND, premise().toQF(variables, level, false), conclusion().toQF(variables, level, true));
