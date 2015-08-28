@@ -13,7 +13,7 @@
 #include <algorithm>
 
 #define CONTRACTION_DEBUG
-#define USE_HORNER
+//#define USE_HORNER
 
 namespace carl {
     
@@ -411,7 +411,6 @@ namespace carl {
             Interval<double> denominator(0);
             
             #ifdef USE_HORNER
-                std::cout << "Hier ist der Ping!" << std::endl;
                 typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_constraint = mHornerSchemes.find(constraint);
                 if( it_constraint == mHornerSchemes.end() )
                 {

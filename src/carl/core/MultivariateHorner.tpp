@@ -388,7 +388,6 @@ std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> simplify( std::shared
 template<typename PolynomialType, typename Number, Strategy Strat>
 static Interval<Number> evaluate(const MultivariateHorner<PolynomialType, Strat>& mvH, const std::map<Variable, Interval<Number>>& map)
 {
-	typedef typename PolynomialType::CoeffType CoeffType;
 	Interval<Number> result(1);
 
 	assert (map.find(mvH.getVariable()) != map.end() );
