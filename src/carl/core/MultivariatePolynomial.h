@@ -99,7 +99,6 @@ public:
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
 	explicit MultivariatePolynomial(const std::shared_ptr<const Monomial>& m);
-	explicit MultivariatePolynomial(const std::shared_ptr<const Term<Coeff >>& t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<class OtherPolicies, DisableIf<std::is_same<Policies,OtherPolicies>> = dummy>
@@ -327,11 +326,13 @@ public:
 		assert(false);
 		return mTerms.erase(pos);
 	}
-	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
-		///@todo find new lterm or constant term
-		assert(false);
-		return mTerms.erase(pos);
-	}
+    
+    //TODO: This cannot be compiled with gcc 4.8.1
+//	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
+//		///@todo find new lterm or constant term
+//		assert(false);
+//		return mTerms.erase(pos);
+//	}
 	TermsType& getTerms() {
 		return mTerms;
 	}
@@ -687,12 +688,6 @@ private:
 	 * @param cterm Iterator to constant term.
 	 */
 	void makeMinimallyOrdered(typename TermsType::iterator& lterm, typename TermsType::iterator& cterm) const;
-	/**
-	 * Replaces the current terms by the given new terms.
-	 * Takes care of trailing zero terms.
-	 * @param newTerms
-	 */
-	void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
 public:
 	/**

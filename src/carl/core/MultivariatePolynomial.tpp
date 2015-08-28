@@ -120,18 +120,6 @@ mTerms(1,t)
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const std::shared_ptr<const Term<Coeff>>& t) :
-Policies(),
-mTerms(1,t)
-{
-	if (t->isZero()) {
-		this->mTerms.clear();
-	}
-	mOrdered = true;
-	assert(this->isConsistent());
-}
-
-template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering, Policies>>& p) :
 Policies()
 {
@@ -2246,72 +2234,6 @@ void MultivariatePolynomial<Coeff, Ordering, Policies>::makeMinimallyOrdered(typ
 		std::swap(*cterm, mTerms.front());
 	}
 	std::swap(*lterm, mTerms.back());
-}
-
-
-template<typename Coeff, typename Ordering, typename Policies>
-void MultivariatePolynomial<Coeff, Ordering, Policies>::setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms)
-{
-	///@todo make this obsolete
-	while ((newTerms.size() > 0) && newTerms.back()->isZero()) {
-		newTerms.pop_back();
-	}
-
-	mTerms.clear();
-	if(newTerms.empty())
-	{
-        assert(this->isConsistent());
-		return;
-	}
-	else if(newTerms.size() == 1)
-	{
-		mTerms.push_back(newTerms.back());
-        assert(this->isConsistent());
-		return;
-	}
-	// Sort the entries from newterms.
-	// As automatic template deduction will not work (Ordering::less is overloaded), we give an explicit function pointer cast.
-	std::sort(newTerms.begin(), newTerms.end(), (bool (&)(std::shared_ptr<const Term<Coeff>> const&, std::shared_ptr<const Term<Coeff>> const&))Ordering::less);
-	// remove duplicates by adding their coefficients.
-	// list.unique() fails because it does not handle coefficient updates.
-	std::shared_ptr<const Term<Coeff>> frontTerm = newTerms.front();
-	Coeff frontCoeff(frontTerm->coeff());
-	
-	for(auto it = ++newTerms.begin(); it != newTerms.end(); ++it)
-	{
-		if(Ordering::compare(*frontTerm, **it) == CompareResult::EQUAL)
-		{
-			// Do not add yet, but simply add the coefficient.
-			frontCoeff += (*it)->coeff();
-		}
-		else
-		{
-			if (!carl::isZero(frontCoeff)) {
-				if(frontCoeff == frontTerm->coeff())
-				{
-					mTerms.push_back(frontTerm);
-				}
-				else if(frontCoeff != (Coeff)0)
-				{
-					mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-				}
-			}
-			frontTerm = *it;
-			frontCoeff = (*it)->coeff();
-		}
-	}
-	
-	if(frontCoeff == frontTerm->coeff())
-	{
-		assert(!carl::isZero(frontCoeff));
-		mTerms.push_back(frontTerm);
-	}
-	else if (!carl::isZero(frontCoeff))
-	{
-		mTerms.emplace_back(std::make_shared<const Term<Coeff>>(frontCoeff, frontTerm->monomial()));
-	}
-//	assert( newTerms.empty() );
-    assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>

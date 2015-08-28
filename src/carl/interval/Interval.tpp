@@ -772,7 +772,7 @@ void Interval<Number>::inverse_assign()
         template<typename Number>
         void Interval<Number>::abs_assign()
         {
-            *this = abs(*this);
+            *this = this->abs();
         }
 
 template<typename Number>
@@ -914,10 +914,11 @@ Interval<Number> Interval<Number>::pow(unsigned exp) const
 template<typename Number>
 void Interval<Number>::pow_assign(unsigned exp)
 	{
-		*this = this->power(exp);
+		*this = this->pow(exp);
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::sqrt() const
 	{
 		assert(this->isConsistent());
@@ -938,13 +939,14 @@ Interval<Number> Interval<Number>::sqrt() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::sqrt_assign()
 	{
 		*this = this->sqrt();
 	}
 
-	
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::root(int deg) const
 	{
 		assert(this->isConsistent());
@@ -968,12 +970,14 @@ Interval<Number> Interval<Number>::root(int deg) const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::root_assign(unsigned deg)
 	{
 		*this = this->root(deg);
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::log() const
 	{
 		assert(this->isConsistent());
@@ -982,6 +986,7 @@ Interval<Number> Interval<Number>::log() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::log_assign()
 	{
 		this->set(boost::numeric::log(mContent));
@@ -992,6 +997,7 @@ void Interval<Number>::log_assign()
  ******************************************************************************/
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::sin() const
 	{
 		assert(this->isConsistent());
@@ -999,12 +1005,14 @@ Interval<Number> Interval<Number>::sin() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::sin_assign()
 	{
 		this->set(boost::numeric::sin(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::cos() const
 	{
 		assert(this->isConsistent());
@@ -1012,12 +1020,14 @@ Interval<Number> Interval<Number>::cos() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::cos_assign()
 	{
 		this->set(boost::numeric::cos(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::tan() const
 	{
 		assert(this->isConsistent());
@@ -1025,12 +1035,14 @@ Interval<Number> Interval<Number>::tan() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::tan_assign()
 	{
 		this->set(boost::numeric::tan(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::asin() const
 	{
 		assert(this->isConsistent());
@@ -1038,12 +1050,14 @@ Interval<Number> Interval<Number>::asin() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::asin_assign()
 	{
 		this->set(boost::numeric::asin(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::acos() const
 	{
 		assert(this->isConsistent());
@@ -1051,12 +1065,14 @@ Interval<Number> Interval<Number>::acos() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::acos_assign()
 	{
 		this->set(boost::numeric::acos(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::atan() const
 	{
 		assert(this->isConsistent());
@@ -1064,12 +1080,14 @@ Interval<Number> Interval<Number>::atan() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::atan_assign()
 	{
 		this->set(boost::numeric::atan(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::sinh() const
 	{
 		assert(this->isConsistent());
@@ -1077,12 +1095,14 @@ Interval<Number> Interval<Number>::sinh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::sinh_assign()
 	{
 		this->set(boost::numeric::sinh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::cosh() const
 	{
 		assert(this->isConsistent());
@@ -1090,12 +1110,14 @@ Interval<Number> Interval<Number>::cosh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::cosh_assign()
 	{
 		this->set(boost::numeric::cosh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::tanh() const
 	{
 		assert(this->isConsistent());
@@ -1103,12 +1125,14 @@ Interval<Number> Interval<Number>::tanh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::tanh_assign()
 	{
 		this->set(boost::numeric::tanh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::asinh() const
 	{
 		assert(this->isConsistent());
@@ -1116,12 +1140,14 @@ Interval<Number> Interval<Number>::asinh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::asinh_assign()
 	{
 		this->set(boost::numeric::asinh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::acosh() const
 	{
 		assert(this->isConsistent());
@@ -1129,12 +1155,14 @@ Interval<Number> Interval<Number>::acosh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::acosh_assign()
 	{
 		this->set(boost::numeric::acosh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::atanh() const
 	{
 		assert(this->isConsistent());
@@ -1142,6 +1170,7 @@ Interval<Number> Interval<Number>::atanh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::atanh_assign()
 	{
 		this->set(boost::numeric::atanh(mContent));

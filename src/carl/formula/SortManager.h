@@ -147,8 +147,6 @@ class SortManager : public Singleton<SortManager>
 		{
 			mSorts.emplace_back(nullptr); // default value
 			mSortTypes.emplace_back(VariableType::VT_UNINTERPRETED);
-			addInterpretedSort("Int", VariableType::VT_INT);
-			addInterpretedSort("Real", VariableType::VT_REAL);
 		}
 		
 		const SortContent& getContent(const Sort& sort) const {
