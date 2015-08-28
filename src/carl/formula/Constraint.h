@@ -698,7 +698,7 @@ namespace carl
                 if( isBound() )
                 {
                     if( mpContent->mRelation == Relation::EQ ) return true;
-                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm()->coeff();
+                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm().coeff();
                     if( coeff < 0 )
                         return (mpContent->mRelation == Relation::LEQ || mpContent->mRelation == Relation::LESS );
                     else
@@ -718,7 +718,7 @@ namespace carl
                 if( isBound() )
                 {
                     if( mpContent->mRelation == Relation::EQ ) return true;
-                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm()->coeff();
+                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm().coeff();
                     if( coeff > 0 )
                         return (mpContent->mRelation == Relation::LEQ || mpContent->mRelation == Relation::LESS );
                     else

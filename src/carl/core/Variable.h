@@ -75,7 +75,7 @@ private:
 public:
 #ifdef VARIABLE_PASS_BY_VALUE
 	/// Argument type for variables being function arguments.
-	typedef VariableByValue Arg;
+	typedef VariableByValue Arg;		
 #else
 	/// Argument type for variables being function arguments.
 	typedef ByRef Arg;

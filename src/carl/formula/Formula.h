@@ -634,10 +634,11 @@ namespace carl
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( mpContent->mConstraint );
-                else if( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR || mpContent->mType == FormulaType::NOT 
-                        || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR || mpContent->mType == FormulaType::IMPLIES )
+                else if( isNary() )
+                {
                     for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
-                        (*subAst)->getConstraints( _constraints );
+                        subAst->getConstraints( _constraints );
+                }
             }
 
             /**

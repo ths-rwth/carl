@@ -8,10 +8,12 @@
 #pragma once
 #include "Interval.h"
 #include "../core/Sign.h"
+#include <carl/core/MultivariateHorner.h>
 #include "IntervalEvaluation.h"
 #include <algorithm>
 
-//#define CONTRACTION_DEBUG
+#define CONTRACTION_DEBUG
+//#define USE_HORNER
 
 namespace carl {
     
@@ -35,10 +37,11 @@ namespace carl {
              * Constructs the solution formula for the given variable x in the equation p = 0, where p is the given polynomial.
              * The polynomial p must have one of the following forms: 
              *      1.) ax+h, with a being a rational number and h a linear polynomial not containing x and not having a constant part
-             *      2.) x^i*m-y, with i being a positive integer, m being a monomial not contains x and y being a variable different from x
+             *      2.) x^i*m-y, with i being a positive integer, m being a monomial not containing x and y being a variable different from x
              * @param p The polynomial containing the given variable to construct a solution formula for.
              * @param x The variable to construct a solution formula for.
              */
+
             VarSolutionFormula(const Polynomial& p, Variable::Arg x):
                 mVar(x),
                 mRoot(1),
@@ -263,13 +266,12 @@ namespace carl {
                     itB = mVarSolutionFormulas.emplace(variable, std::move(VarSolutionFormula<Polynomial>(mConstraint,variable))).first;
                 }
                 if (withPropagation) {
+
+                
+
                     // calculate result of propagation
-//            std::cout << __func__ << ": propagation of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
                     std::vector<Interval<double>> resultPropagation = itB->second.evaluate( intervals );
-//            std::cout << "  after propagation: ";
-//            for( auto& i : resultPropagation )
-//                std::cout << " " << i;
-//            std::cout << std::endl;    
+
                     if( resultPropagation.empty() )
                     {
                         resA = Interval<double>::emptyInterval();
@@ -291,6 +293,7 @@ namespace carl {
                                 resultingIntervals.push_back(tmp);
                         }
                     }
+
                     else 
                     {
                         Interval<double> tmp;
@@ -377,6 +380,8 @@ namespace carl {
 
     template<typename Polynomial>
     class SimpleNewton {
+    private:
+        std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>> mHornerSchemes;
     public:
         
         bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) 
@@ -402,9 +407,37 @@ namespace carl {
             typename Interval<double>::evalintervalmap substitutedIntervalMap = intervals;
             substitutedIntervalMap[variable] = centerInterval;
 
+            Interval<double> numerator (0);
+            Interval<double> denominator(0);
+            
+            #ifdef USE_HORNER
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_constraint = mHornerSchemes.find(constraint);
+                if( it_constraint == mHornerSchemes.end() )
+                {
+                    Polynomial constraint_tmp (constraint);
+                    MultivariateHorner<Polynomial, GREEDY_Is> constraint_asHornerScheme (std::move( constraint_tmp ));
+                    it_constraint = mHornerSchemes.emplace(constraint, constraint_asHornerScheme).first;
+                }
+
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_denominator = mHornerSchemes.find(derivative);
+                if( it_denominator == mHornerSchemes.end() )
+                {
+                    Polynomial derivative_tmp (derivative);
+                    MultivariateHorner<Polynomial, GREEDY_Is> derivative_asHornerScheme (std::move( derivative_tmp ));
+                    it_denominator = mHornerSchemes.emplace(constraint, derivative_asHornerScheme).first;
+                }
+            
+                numerator = evaluate((*it_constraint).second, substitutedIntervalMap);
+                denominator = evaluate((*it_denominator).second, intervals);
+
+            #endif 
+            
+            #ifndef USE_HORNER
             // Create Newton Operator
-            Interval<double> numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
-            Interval<double> denominator = IntervalEvaluation::evaluate(derivative, intervals);
+            numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
+            denominator = IntervalEvaluation::evaluate(derivative, intervals);
+            #endif
+
             Interval<double> result1, result2;
 			
 			#ifdef CONTRACTION_DEBUG

@@ -91,7 +91,7 @@ public:
 		return mVariable;
 	}
 
-	void setVariable(const Variable::Arg& var) 
+	void setVariable(Variable::Arg& var) 
 	{
 		mVariable = var;
 	}
