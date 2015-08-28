@@ -20,7 +20,7 @@ class FLOAT_T<mpfr_t>
 
 		FLOAT_T()
 		{
-			mpfr_init(mValue);
+			mpfr_init2(mValue, mDefaultPrecision);
 			mpfr_set_zero(mValue, 1);
 		}
 
@@ -75,21 +75,15 @@ class FLOAT_T<mpfr_t>
 
         FLOAT_T(const FLOAT_T<mpfr_t>& _float)
         {
-        	char out[30];
-			mpfr_sprintf(out, "%.20RDe", _float.value());
-			std::cout << std::string(out) << std::endl;
-
             mpfr_init2(mValue, mpfr_get_prec(_float.value()));
             mpfr_set(mValue, _float.value(), MPFR_RNDN);
-
-            mpfr_sprintf(out, "%.20RDe", mValue);
-			std::cout << std::string(out) << std::endl;
         }
 
         FLOAT_T(FLOAT_T<mpfr_t>&& _float)
         {
             mpfr_init2(mValue, mpfr_get_prec(_float.value()));
-            mpfr_set(mValue, _float.value(), MPFR_RNDN);
+            //mpfr_set(mValue, _float.value(), MPFR_RNDN);
+            mpfr_swap(mValue,_float.mValue);
         }
 		
 		FLOAT_T(const std::string& _string)
@@ -143,7 +137,7 @@ class FLOAT_T<mpfr_t>
 		
 		FLOAT_T<mpfr_t>& operator = (const FLOAT_T<mpfr_t>& _rhs)
 		{
-			if(this == &_rhs)
+			if(this->mValue == _rhs.value())
 				return *this;
 
 			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
@@ -176,7 +170,7 @@ class FLOAT_T<mpfr_t>
 			return mpfr_greater_p(mValue, _rhs.mValue) != 0;
 		}
 		
-		bool operator > ( int _rhs) const
+	bool operator > ( int _rhs) const
 		{
 			return mpfr_cmp_si(mValue, _rhs) > 0;
 		}
@@ -663,7 +657,7 @@ class FLOAT_T<mpfr_t>
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
 			FLOAT_T<mpfr_t> res;
 			mpfr_div(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
-			return res;
+			return std::move(res);
 		}
 		
 		friend FLOAT_T<mpfr_t> operator /(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
@@ -830,8 +824,7 @@ class FLOAT_T<mpfr_t>
 			while( limbs > 0 ){
 				mpz_set_ui(tmp, a->_mpfr_d[limbs-1]);
 				//std::cout << "Shift: " << (mp_bits_per_limb*(limbs-1)) << " bits" << std::endl;
-				unsigned bitcount = (mp_bits_per_limb*(limbs-1));
-		 		mpz_mul_2exp(tmp, tmp, bitcount);
+		 		mpz_mul_2exp(tmp, tmp, (mp_bits_per_limb*(limbs-1)));
 				mpz_add(mant, mant, tmp);
 				--limbs;
 			}
@@ -1001,7 +994,7 @@ inline bool isNan(const FLOAT_T<mpfr_t>& _in) {
 }
 
 template<>
-inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(const FLOAT_T<mpfr_t> A, const FLOAT_T<mpfr_t> B, unsigned maxUlps)
+inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(const FLOAT_T<mpfr_t>& A, const FLOAT_T<mpfr_t>& B, unsigned maxUlps)
 {
 	//std::cout << "Distance: " << FLOAT_T<mpfr_t>::integerDistance(A,B) << std::endl;
 	mpz_t distance;
