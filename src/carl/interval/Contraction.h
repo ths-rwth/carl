@@ -325,6 +325,14 @@ namespace carl {
                         }
                         else
                         {
+                            if( !(resultingIntervals[1] < resultingIntervals[0]) )
+                            {
+                                std::cout << "resultPropagation = " << resultPropagation << std::endl;
+                                std::cout << "resA = " << resA << std::endl;
+                                std::cout << "resB = " << resB << std::endl;
+                                std::cout << "resultingIntervals[1] = " << resultingIntervals[1] << std::endl;
+                                std::cout << "resultingIntervals[0] = " << resultingIntervals[0] << std::endl;
+                            }
                             assert(resultingIntervals[1] < resultingIntervals[0]);
                             resA = resultingIntervals[1];
                             resB = resultingIntervals[0];
@@ -453,42 +461,35 @@ namespace carl {
                 if(result1 >= result2) {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result2));
-					if (variable.getType() == VariableType::VT_INT) {
-						resA = resA.integralPart();
-						resB = resB.integralPart();
-					}
-					#ifdef CONTRACTION_DEBUG
-					std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
-					#endif
-                    if( resB.isEmpty() )
-                    {
-                        splitOccurred = false;
-                    }
-                    else if( resA.isEmpty() ) // resB is not empty at this state
-                    {
-                        resA = resB;
-                        resB = Interval<double>::emptyInterval();
-                        splitOccurred = false;
-                    }
                 }
                 else
                 {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result2));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result1));
-					if (variable.getType() == VariableType::VT_INT) {
-						resA = resA.integralPart();
-						resB = resB.integralPart();
-					}
-					#ifdef CONTRACTION_DEBUG
-					std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
-					#endif
-                    if( resB.isEmpty() )
+                }
+                if (variable.getType() == VariableType::VT_INT) {
+                    resA = resA.integralPart();
+                    resB = resB.integralPart();
+                }
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
+                #endif
+                if( resB.isEmpty() )
+                {
+                    splitOccurred = false;
+                }
+                else if( resA.isEmpty() ) // resB is not empty at this state
+                {
+                    resA = resB;
+                    resB = Interval<double>::emptyInterval();
+                    splitOccurred = false;
+                }
+                else
+                {
+                    Interval<double> tmpA, tmpB;
+                    if( !resA.unite( resB, tmpA, tmpB ) )
                     {
-                        splitOccurred = false;
-                    }
-                    else if( resA.isEmpty() ) // resB is not empty at this state
-                    {
-                        resA = resB;
+                        resA = std::move(tmpA);
                         resB = Interval<double>::emptyInterval();
                         splitOccurred = false;
                     }
