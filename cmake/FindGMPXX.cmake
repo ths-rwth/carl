@@ -27,6 +27,9 @@ if(GMP_FOUND)
                PATHS ${GMP_LIBRARIES_DIR_SEARCH}
                DOC "Path to the GMPXX library"
                )
+    if (SMPXX_INCLUDE_DIR AND GMPXX_LIBRARIES)
+        set(GMPXX_FOUND TRUE)
+    endif()
 else()
     message(warning "Did not search for GMPXX as GMP was not found")
 endif()
