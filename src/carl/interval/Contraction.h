@@ -325,14 +325,6 @@ namespace carl {
                         }
                         else
                         {
-                            if( !(resultingIntervals[1] < resultingIntervals[0]) )
-                            {
-                                std::cout << "resultPropagation = " << resultPropagation << std::endl;
-                                std::cout << "resA = " << resA << std::endl;
-                                std::cout << "resB = " << resB << std::endl;
-                                std::cout << "resultingIntervals[1] = " << resultingIntervals[1] << std::endl;
-                                std::cout << "resultingIntervals[0] = " << resultingIntervals[0] << std::endl;
-                            }
                             assert(resultingIntervals[1] < resultingIntervals[0]);
                             resA = resultingIntervals[1];
                             resB = resultingIntervals[0];
