@@ -13,7 +13,8 @@
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-//#define USE_HORNER
+#define USE_HORNER
+#define HORMER_SCHEME_STRATEGY GREEDY_I
 
 namespace carl {
     
@@ -381,7 +382,7 @@ namespace carl {
     template<typename Polynomial>
     class SimpleNewton {
     private:
-        std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>> mHornerSchemes;
+        std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>> mHornerSchemes;
     public:
         
         bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) 
@@ -411,24 +412,42 @@ namespace carl {
             Interval<double> denominator(0);
             
             #ifdef USE_HORNER
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_constraint = mHornerSchemes.find(constraint);
+                #ifdef DEBUG_HORNER
+                    std::cout << "\n" <<__func__  << "USE_HORNER Constraint " << constraint << " Derivative " << derivative << std::endl;
+                #endif
+
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_constraint = mHornerSchemes.find(constraint);
                 if( it_constraint == mHornerSchemes.end() )
                 {
                     Polynomial constraint_tmp (constraint);
-                    MultivariateHorner<Polynomial, GREEDY_Is> constraint_asHornerScheme (std::move( constraint_tmp ));
+                    MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> constraint_asHornerScheme (std::move( constraint_tmp ));
                     it_constraint = mHornerSchemes.emplace(constraint, constraint_asHornerScheme).first;
+                    #ifdef DEBUG_HORNER
+                        std::cout << __func__  <<  " >> constraint: "<< constraint_asHornerScheme  << std::endl;
+                    #endif
                 }
-
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_denominator = mHornerSchemes.find(derivative);
-                if( it_denominator == mHornerSchemes.end() )
+             
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_derivative = mHornerSchemes.find(derivative);
+                if( it_derivative == mHornerSchemes.end() )
                 {
                     Polynomial derivative_tmp (derivative);
-                    MultivariateHorner<Polynomial, GREEDY_Is> derivative_asHornerScheme (std::move( derivative_tmp ));
-                    it_denominator = mHornerSchemes.emplace(constraint, derivative_asHornerScheme).first;
+                    MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> derivative_asHornerScheme (std::move( derivative_tmp ));
+                    it_derivative = mHornerSchemes.emplace(derivative, derivative_asHornerScheme).first;
+                     #ifdef DEBUG_HORNER
+                        std::cout << __func__  <<  " >> derivative: "<< derivative_asHornerScheme << std::endl;
+                    #endif
                 }
-            
+                
+                #ifdef DEBUG_HORNER
+                    std::cout << __func__  <<  " >> evaluate "<< it_constraint->second << std::endl;
+                #endif
                 numerator = evaluate((*it_constraint).second, substitutedIntervalMap);
-                denominator = evaluate((*it_denominator).second, intervals);
+                
+                #ifdef DEBUG_HORNER
+                    std::cout << __func__  <<  " >> evaluate "<< it_derivative->second << std::endl;
+                #endif
+                denominator = evaluate((*it_derivative).second, intervals);
+
 
             #endif 
             
