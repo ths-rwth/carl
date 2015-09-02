@@ -2,6 +2,7 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/util/stringparser.h"
+#include "../interval/IntervalEvaluation.h"
 
 #ifdef COMPARE_WITH_GINAC
 #include <cln/cln.h>
@@ -56,7 +57,7 @@ int main (int argc, char** argv)
 	std::cout << "\n GREEDY_Is        :" << peterPolynom << std::endl;
   //std::cout << " GREEDY_IIs       :" << peterPolynom2 << std::endl;
 
-	Interval<Rational> testInterval = evaluate(peterPolynom , map);
+	Interval<Rational> testInterval = IntervalEvaluation::evaluate(peterPolynom , map);
   //Interval<Rational> testInterval2 = evaluate(peterPolynom2 , map);
 
 	std::cout << "\n Evaluate Horner :" << testInterval << std::endl;
