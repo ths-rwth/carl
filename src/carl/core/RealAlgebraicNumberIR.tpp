@@ -90,18 +90,25 @@ std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::mi
 
 template<typename Number>
 bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
+	CARL_LOG_FUNC("carl.cad", this->thisPtr() << ", " << n);
 	if (this == n.get()) return true;
 	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
 	if (this->upper() <= n->lower()) return false;
 	if (this->lower() >= n->upper()) return false;
-	if ((this->lower() <= n->lower()) && (n->upper() <= this->upper())) return true;
-	if ((this->lower() >= n->lower()) && (n->upper() >= this->upper())) return true;
-	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) {
-		n = this->thisPtr();
-		return true;
+	if (this->polynomial == n->polynomial) {
+		if ((this->lower() >= n->lower()) && (n->upper() >= this->upper())) {
+			n = this->thisPtr();
+			return true;
+		}
+		if ((this->lower() <= n->lower()) && (n->upper() <= this->upper())) {
+			this->pThis = n;
+			return true;
+		}
 	}
 	
+	CARL_LOG_TRACE("carl.cad", "\tNot trivially equal or different");
+
 	if (this->polynomial != n->polynomial) {
 		auto g = UnivariatePolynomial<Number>::gcd(polynomial, n->polynomial);
 		if (!this->isRootOf(g)) return false;
