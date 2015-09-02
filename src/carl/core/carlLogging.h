@@ -413,9 +413,9 @@ inline Logger& logger() {
 /// Create a record info without function name.
 #define __CARL_LOG_RECORD_NOFUNC ::carl::logging::RecordInfo(__FILE__, "", __LINE__)
 /// Basic logging macro.
-#define __CARL_LOG(level, channel, expr) { std::stringstream ss; ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD); }
+#define __CARL_LOG(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD); }
 /// Basic logging macro without function name.
-#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD_NOFUNC); }
+#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD_NOFUNC); }
 
 /// Intended to be called when entering a function. Format: `<function name>(<args>)`.
 #define __CARL_LOG_FUNC(channel, args) __CARL_LOG_NOFUNC(::carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");

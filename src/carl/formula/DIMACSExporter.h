@@ -18,7 +18,7 @@ private:
 	long long id(carl::Variable::Arg v) {
 		auto it = mVariables.find(v);
 		if (it != mVariables.end()) return it->second;
-		long long res = mVariables.size() + 1;
+		std::size_t res = mVariables.size() + 1;
 		mVariables.emplace(v, res);
 		return res;
 	}
