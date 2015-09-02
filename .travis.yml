@@ -22,7 +22,7 @@ matrix:
     - os: osx
       env: USE=clang++-3.4
     - os: osx
-      env: USE=doxygen TASK=doxygen
+      env: USE=clang++-3.5 TASK=doxygen
 
 before_install:
   - cd .travis/ && source setup_travis.sh && cd ../
