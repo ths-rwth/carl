@@ -13,7 +13,7 @@
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-//#define USE_HORNER
+#define USE_HORNER
 #define HORMER_SCHEME_STRATEGY GREEDY_I
 
 namespace carl {
@@ -30,6 +30,8 @@ namespace carl {
             Polynomial mNumerator;
             /// Stores the denominator, which is one, if mDenominator == nullptr
             std::shared_ptr<const typename Polynomial::MonomType> mDenominator;
+
+
             
         public:
             VarSolutionFormula() = delete;
@@ -233,147 +235,155 @@ namespace carl {
         const Polynomial mConstraint; // Todo: Should be a reference.
         std::map<Variable, Polynomial> mDerivatives;
         std::map<Variable, VarSolutionFormula<Polynomial>> mVarSolutionFormulas;
+        std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>> mHornerSchemes;
+    
     public:
-
         Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
         mConstraint(constraint),
         mDerivatives(),
-        mVarSolutionFormulas() {}
+        mVarSolutionFormulas(),
+        mHornerSchemes(){}
 
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
-            typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
-            if( it == mDerivatives.end() )
+            bool splitOccurredInContraction = false;
+            if( !withPropagation || !mConstraint.isLinear() )
             {
-                it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                if( it == mDerivatives.end() )
+                {
+                    it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                }
+
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
+                #endif
+
+                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, mHornerSchemes, useNiceCenter);
+            }
+            else
+            {
+                resA = intervals.at(variable);
+                resB = Interval<double>::emptyInterval();
             }
 
             #ifdef CONTRACTION_DEBUG
-            std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
-            #endif
-
-            bool splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
-
-            #ifdef CONTRACTION_DEBUG
-            std::cout << "  after contraction: " << resA;
-            if( splitOccurredInContraction ) std::cout << " and " << resB;
-            std::cout << std::endl;                            
+                std::cout << "  after contraction: " << resA;
+                if( splitOccurredInContraction ) std::cout << " and " << resB;
+                std::cout << std::endl;                            
             #endif
 
             if( withPropagation )
             {
-                typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator itB = mVarSolutionFormulas.find(variable);
-                if( itB == mVarSolutionFormulas.end() )
+                typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator const_iterator_VarSolutionFormula = mVarSolutionFormulas.find(variable);
+                if( const_iterator_VarSolutionFormula == mVarSolutionFormulas.end() )
                 {
-                    itB = mVarSolutionFormulas.emplace(variable, std::move(VarSolutionFormula<Polynomial>(mConstraint,variable))).first;
+                    const_iterator_VarSolutionFormula = mVarSolutionFormulas.emplace(variable, std::move(VarSolutionFormula<Polynomial>(mConstraint,variable))).first;
                 }
-                if (withPropagation) {
-
                 
+                // calculate result of propagation
+                std::vector<Interval<double>> resultPropagation = const_iterator_VarSolutionFormula->second.evaluate( intervals );
 
-                    // calculate result of propagation
-                    std::vector<Interval<double>> resultPropagation = itB->second.evaluate( intervals );
+                if( resultPropagation.empty() )
+                {
+                    resA = Interval<double>::emptyInterval();
+                    resB = Interval<double>::emptyInterval();
+                    return false;
+                }
 
-                    if( resultPropagation.empty() )
+                // intersect with result of contraction
+                std::vector<Interval<double>> resultingIntervals;
+                if( splitOccurredInContraction )
+                {   
+                    Interval<double> tmp;
+                    for( const auto& i : resultPropagation )
                     {
-                        resA = Interval<double>::emptyInterval();
-                        resB = Interval<double>::emptyInterval();
-                        return false;
+                        tmp = i.intersect( resA );
+                        if( !tmp.isEmpty() )
+                            resultingIntervals.push_back(tmp);
+                        tmp = i.intersect( resB );
+                        if( !tmp.isEmpty() )
+                            resultingIntervals.push_back(tmp);
                     }
-                    // intersect with result of contraction
-                    std::vector<Interval<double>> resultingIntervals;
-                    if( splitOccurredInContraction )
-                    {   
-                        Interval<double> tmp;
-                        for( const auto& i : resultPropagation )
-                        {
-                            tmp = i.intersect( resA );
-                            if( !tmp.isEmpty() )
-                                resultingIntervals.push_back(tmp);
-                            tmp = i.intersect( resB );
-                            if( !tmp.isEmpty() )
-                                resultingIntervals.push_back(tmp);
-                        }
-                    }
+                }
 
-                    else 
+                else 
+                {
+                    Interval<double> tmp;
+                    for( const auto& i : resultPropagation )
                     {
-                        Interval<double> tmp;
-                        for( const auto& i : resultPropagation )
-                        {
-                            tmp = i.intersect( resA );
-                            if( !tmp.isEmpty() )
-                                resultingIntervals.push_back(tmp);
-                        }
+                        tmp = i.intersect( resA );
+                        if( !tmp.isEmpty() )
+                            resultingIntervals.push_back(tmp);
                     }
-                    if( resultingIntervals.empty() )
-                    {
-                        resA = Interval<double>::emptyInterval();
-                        resB = Interval<double>::emptyInterval();
-                        return false;
-                    }
-                    if( resultingIntervals.size() == 1 )
+                }
+                if( resultingIntervals.empty() )
+                {
+                    resA = Interval<double>::emptyInterval();
+                    resB = Interval<double>::emptyInterval();
+                    return false;
+                }
+                if( resultingIntervals.size() == 1 )
+                {
+                    resA = resultingIntervals[0];
+                    resB = Interval<double>::emptyInterval();
+                    return false;
+                }
+                if( resultingIntervals.size() == 2 )
+                {
+                    if( resultingIntervals[0] < resultingIntervals[1] )
                     {
                         resA = resultingIntervals[0];
-                        resB = Interval<double>::emptyInterval();
-                        return false;
-                    }
-                    if( resultingIntervals.size() == 2 )
-                    {
-                        if( resultingIntervals[0] < resultingIntervals[1] )
-                        {
-                            resA = resultingIntervals[0];
-                            resB = resultingIntervals[1];
-                        }
-                        else
-                        {
-                            assert(resultingIntervals[1] < resultingIntervals[0]);
-                            resA = resultingIntervals[1];
-                            resB = resultingIntervals[0];
-                        }
-                        return true;
+                        resB = resultingIntervals[1];
                     }
                     else
                     {
-                        std::sort( resultPropagation.begin(), resultPropagation.end(), 
-                                  [](const Interval<double>& i,const Interval<double> j) 
-                                  { if(i<j){return true;} else { assert(j<i); return false; } }
-                                 );
-                        auto intervalBeforeBiggestGap = resultPropagation.begin();
-                        auto iter = resultPropagation.begin();
-                        ++iter;
-                        double bestDistance = intervalBeforeBiggestGap->distance(*iter);
-                        for( ; iter != resultPropagation.end(); ++iter )
-                        {
-                            auto jter = iter;
-                            ++jter;
-                            if( jter == resultPropagation.end() )
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                double distance = iter->distance(*jter);
-                                if( bestDistance < distance )
-                                {
-                                    bestDistance = distance;
-                                    intervalBeforeBiggestGap = iter;
-                                }
-                            }
-                        }
-                        resA = *intervalBeforeBiggestGap;
-                        for( iter = resultPropagation.begin(); iter != intervalBeforeBiggestGap; ++iter )
-                        {
-                            resA = resA.convexHull( *iter );
-                        }
-                        ++iter;
-                        resB = *iter;
-                        for( ; iter != resultPropagation.end(); ++iter )
-                        {
-                            resB = resB.convexHull( *iter );
-                        }
-                        return true;
+                        assert(resultingIntervals[1] < resultingIntervals[0]);
+                        resA = resultingIntervals[1];
+                        resB = resultingIntervals[0];
                     }
+                    return true;
                 }
+                else
+                {
+                    std::sort( resultPropagation.begin(), resultPropagation.end(), 
+                              [](const Interval<double>& i,const Interval<double> j) 
+                              { if(i<j){return true;} else { assert(j<i); return false; } }
+                             );
+                    auto intervalBeforeBiggestGap = resultPropagation.begin();
+                    auto iter = resultPropagation.begin();
+                    ++iter;
+                    double bestDistance = intervalBeforeBiggestGap->distance(*iter);
+                    for( ; iter != resultPropagation.end(); ++iter )
+                    {
+                        auto jter = iter;
+                        ++jter;
+                        if( jter == resultPropagation.end() )
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            double distance = iter->distance(*jter);
+                            if( bestDistance < distance )
+                            {
+                                bestDistance = distance;
+                                intervalBeforeBiggestGap = iter;
+                            }
+                        }
+                    }
+                    resA = *intervalBeforeBiggestGap;
+                    for( iter = resultPropagation.begin(); iter != intervalBeforeBiggestGap; ++iter )
+                    {
+                        resA = resA.convexHull( *iter );
+                    }
+                    ++iter;
+                    resB = *iter;
+                    for( ; iter != resultPropagation.end(); ++iter )
+                    {
+                        resB = resB.convexHull( *iter );
+                    }
+                    return true;
+                }              
             }
             return splitOccurredInContraction;
         }
@@ -381,11 +391,15 @@ namespace carl {
 
     template<typename Polynomial>
     class SimpleNewton {
-    private:
-        std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>> mHornerSchemes;
     public:
         
-        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) 
+        bool contract(const Interval<double>::evalintervalmap& intervals, 
+            Variable::Arg variable, const Polynomial& constraint, 
+            const Polynomial& derivative, 
+            Interval<double>& resA, 
+            Interval<double>& resB, 
+            std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>& hornerMap,
+            bool useNiceCenter = false) 
         {
             bool splitOccurred = false;
             
@@ -416,23 +430,23 @@ namespace carl {
                     std::cout << "\n" <<__func__  << "USE_HORNER Constraint " << constraint << " Derivative " << derivative << std::endl;
                 #endif
 
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_constraint = mHornerSchemes.find(constraint);
-                if( it_constraint == mHornerSchemes.end() )
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_constraint = hornerMap.find(constraint);
+                if( it_constraint == hornerMap.end() )
                 {
                     Polynomial constraint_tmp (constraint);
                     MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> constraint_asHornerScheme (std::move( constraint_tmp ));
-                    it_constraint = mHornerSchemes.emplace(constraint, constraint_asHornerScheme).first;
+                    it_constraint = hornerMap.emplace(constraint, constraint_asHornerScheme).first;
                     #ifdef DEBUG_HORNER
                         std::cout << __func__  <<  " >> constraint: "<< constraint_asHornerScheme  << std::endl;
                     #endif
                 }
              
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_derivative = mHornerSchemes.find(derivative);
-                if( it_derivative == mHornerSchemes.end() )
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_derivative = hornerMap.find(derivative);
+                if( it_derivative == hornerMap.end() )
                 {
                     Polynomial derivative_tmp (derivative);
                     MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> derivative_asHornerScheme (std::move( derivative_tmp ));
-                    it_derivative = mHornerSchemes.emplace(derivative, derivative_asHornerScheme).first;
+                    it_derivative = hornerMap.emplace(derivative, derivative_asHornerScheme).first;
                      #ifdef DEBUG_HORNER
                         std::cout << __func__  <<  " >> derivative: "<< derivative_asHornerScheme << std::endl;
                     #endif
