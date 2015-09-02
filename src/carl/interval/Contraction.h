@@ -241,17 +241,26 @@ namespace carl {
         mVarSolutionFormulas() {}
 
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
-            typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
-            if( it == mDerivatives.end() )
+            bool splitOccurredInContraction = false;
+            if( !withPropagation || !mConstraint.isLinear() )
             {
-                it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                if( it == mDerivatives.end() )
+                {
+                    it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                }
+
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
+                #endif
+
+                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
             }
-
-            #ifdef CONTRACTION_DEBUG
-            std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
-            #endif
-
-            bool splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+            else
+            {
+                resA = intervals.at(variable);
+                resB = Interval<double>::emptyInterval();
+            }
 
             #ifdef CONTRACTION_DEBUG
             std::cout << "  after contraction: " << resA;
