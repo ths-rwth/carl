@@ -1865,8 +1865,8 @@ namespace carl
 			rvisit(formula.quantifiedFormula(), func);
 			break;
 		}
-		func(formula);
 		}
+		func(formula);
 	}
 
 	template<typename Formula>
