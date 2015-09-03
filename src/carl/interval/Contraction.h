@@ -288,9 +288,9 @@ namespace carl {
             }
 
             #ifdef CONTRACTION_DEBUG
-                std::cout << "  after contraction: " << resA;
-                if( splitOccurredInContraction ) std::cout << " and " << resB;
-                std::cout << std::endl;                            
+            std::cout << "  after contraction: " << resA;
+            if( splitOccurredInContraction ) std::cout << " and " << resB;
+            std::cout << std::endl;                            
             #endif
 
             if( withPropagation )
@@ -303,11 +303,18 @@ namespace carl {
                 
                 // calculate result of propagation
                 std::vector<Interval<double>> resultPropagation = const_iterator_VarSolutionFormula->second.evaluate( intervals );
+                
+                #ifdef CONTRACTION_DEBUG
+                std::cout << "  propagation result: " << resultPropagation << std::endl;                            
+                #endif
 
                 if( resultPropagation.empty() )
                 {
                     resA = Interval<double>::emptyInterval();
                     resB = Interval<double>::emptyInterval();
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
                     return false;
                 }
 
@@ -341,12 +348,18 @@ namespace carl {
                 {
                     resA = Interval<double>::emptyInterval();
                     resB = Interval<double>::emptyInterval();
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
                     return false;
                 }
                 if( resultingIntervals.size() == 1 )
                 {
                     resA = resultingIntervals[0];
                     resB = Interval<double>::emptyInterval();
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
                     return false;
                 }
                 if( resultingIntervals.size() == 2 )
@@ -362,6 +375,9 @@ namespace carl {
                         resA = resultingIntervals[1];
                         resB = resultingIntervals[0];
                     }
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
                     return true;
                 }
                 else
@@ -403,6 +419,9 @@ namespace carl {
                     {
                         resB = resB.convexHull( *iter );
                     }
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
                     return true;
                 }              
             }
