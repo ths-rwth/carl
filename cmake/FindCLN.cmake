@@ -13,10 +13,6 @@ find_library(CLN_LIBRARIES
 )
 if(CLN_INCLUDE_DIR AND CLN_LIBRARIES)
     set(CLN_FOUND TRUE)
-else()
-    if (CLN_FIND_REQUIRED)
-        message(FATAL_ERROR "Could not find CLN")
-    endif()
 endif()
 
 MARK_AS_ADVANCED(
