@@ -8,22 +8,13 @@
 #include <vector>
 #include "Variable.h"
 #include <set>
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/interval/Interval.h"
-#include "carl/interval/IntervalEvaluation.h"
+#include "MultivariatePolynomial.h"
+#include "../interval/Interval.h"
+#include "../interval/IntervalEvaluation.h"
+
+#include "Term.h"
 
 namespace carl{
-
-enum Strategy {
-	GREEDY_I = 0, 
-	//GREEDY_I minimizes the amount of arithmetic operations as fast as possible
-	GREEDY_Is = 1,
-	//GREEDY_Is does the same as GREEDY_I, but adds a simplifyer at the end.
-	GREEDY_II = 2,
-	//GREEDY_II minimizes the solution space, by evaluating each monome.
-	GREEDY_IIs = 3
-	//GREEDY_IIs does the same as GREEDY_II, but adds a simplifyer at the end.
-};
 
 template<typename PolynomialType, Strategy Strat>
 class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, Strat>> { 
@@ -50,9 +41,9 @@ private:
 public:
 		
 	//Constuctor
-	MultivariateHorner (PolynomialType&& inPut);
-	MultivariateHorner (PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map);
-	MultivariateHorner (PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
+	MultivariateHorner (const PolynomialType&& inPut);
+	MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map);
+	MultivariateHorner (const PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
 
 
 	//~MultivariateHorner ();

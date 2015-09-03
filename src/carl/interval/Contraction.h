@@ -8,12 +8,12 @@
 #pragma once
 #include "Interval.h"
 #include "../core/Sign.h"
-#include <carl/core/MultivariateHorner.h>
+#include "../core/MultivariateHorner.h"
 #include "IntervalEvaluation.h"
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-#define USE_HORNER
+//#define USE_HORNER
 #define HORMER_SCHEME_STRATEGY GREEDY_I
 
 namespace carl {
@@ -229,36 +229,57 @@ namespace carl {
     };
 
     template <template<typename> class Operator, typename Polynomial>
-    class Contraction : private Operator<Polynomial> {
+    class Contraction : private Operator<Polynomial> { 
 
     private:
-        const Polynomial mConstraint; // Todo: Should be a reference.
-        std::map<Variable, Polynomial> mDerivatives;
-        std::map<Variable, VarSolutionFormula<Polynomial>> mVarSolutionFormulas;
-        std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>> mHornerSchemes;
-    
+        Polynomial mConstraint; // Todo: Should be a reference.
+        #ifdef USE_HORNER
+            MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> mHornerForm;
+            std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mDerivatives;
+        #else
+            std::map<Variable, Polynomial> mDerivatives;
+        #endif
+            std::map<Variable, VarSolutionFormula<Polynomial>>mVarSolutionFormulas;
+            std::map<Polynomial, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mHornerSchemes;
+
     public:
         Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
         mConstraint(constraint),
+        #ifdef USE_HORNER
+            mHornerForm(std::move(constraint)),
+        #endif
         mDerivatives(),
-        mVarSolutionFormulas(),
-        mHornerSchemes(){}
+        mVarSolutionFormulas() {}
 
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
             bool splitOccurredInContraction = false;
             if( !withPropagation || !mConstraint.isLinear() )
             {
-                typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                #ifdef USE_HORNER
+                    typename std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>>::const_iterator it = mDerivatives.find(variable);
+                #else
+                    typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                #endif
+
                 if( it == mDerivatives.end() )
                 {
-                    it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                    #ifdef USE_HORNER
+                        //Deriviate and convert to Horner
+                        it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>( std::move(mConstraint.derivative(variable)))).first;
+                    #else
+                        it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                    #endif
                 }
 
                 #ifdef CONTRACTION_DEBUG
                 std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
                 #endif
 
-                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, mHornerSchemes, useNiceCenter);
+                #ifdef USE_HORNER
+                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>( std::move(mConstraint) ), (*it).second, resA, resB, useNiceCenter);
+                #else
+                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+                #endif
             }
             else
             {
@@ -393,12 +414,13 @@ namespace carl {
     class SimpleNewton {
     public:
         
+        template <typename evalType>
         bool contract(const Interval<double>::evalintervalmap& intervals, 
-            Variable::Arg variable, const Polynomial& constraint, 
-            const Polynomial& derivative, 
+            Variable::Arg variable, 
+            const evalType& constraint, 
+            const evalType& derivative, 
             Interval<double>& resA, 
             Interval<double>& resB, 
-            std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>& hornerMap,
             bool useNiceCenter = false) 
         {
             bool splitOccurred = false;
@@ -425,6 +447,7 @@ namespace carl {
             Interval<double> numerator (0);
             Interval<double> denominator(0);
             
+            /*
             #ifdef USE_HORNER
                 #ifdef DEBUG_HORNER
                     std::cout << "\n" <<__func__  << "USE_HORNER Constraint " << constraint << " Derivative " << derivative << std::endl;
@@ -461,15 +484,13 @@ namespace carl {
                     std::cout << __func__  <<  " >> evaluate "<< it_derivative->second << std::endl;
                 #endif
                 denominator = evaluate((*it_derivative).second, intervals);
-
-
             #endif 
+            */
             
-            #ifndef USE_HORNER
             // Create Newton Operator
-            numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
+            numerator =   IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
             denominator = IntervalEvaluation::evaluate(derivative, intervals);
-            #endif
+
 
             Interval<double> result1, result2;
 			

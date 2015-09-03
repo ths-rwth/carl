@@ -4,20 +4,16 @@
  *
  */
 
-#pragma once
-#include "carl/core/Term.h"
-
 //#define DEBUG_HORNER 
 
 namespace carl
 {
 	//Constructor for Greedy I
 	template< typename PolynomialType, Strategy Strat> 
-	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (PolynomialType&& inPut) {
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType&& inPut) {
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << " (GreedyI constr) P: " << inPut << std::endl;
 	#endif
-
 	static_assert(!(Strat==GREEDY_II)&&!(Strat==GREEDY_IIs), "Strategy requires Interval map");
 
 	Interval<CoeffType> dummy(0);
@@ -44,7 +40,7 @@ namespace carl
 
 	//Constructor for Greedy II and Greedy I
 	template< typename PolynomialType, Strategy Strat> 
-	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map) {
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map) {
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << " (GreedyII constr) P: " << inPut << std::endl;
 	#endif
@@ -67,7 +63,7 @@ namespace carl
 
 	//Constructor for Greedy I/II creates recursive Datastruckture
 	template< typename PolynomialType, Strategy Strat >
-	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map) 
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map) 
 	{
 
 
@@ -407,50 +403,5 @@ std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> simplify( std::shared
 	
 	return(mvH);
 }
-
-template<typename PolynomialType, typename Number, Strategy Strat>
-static Interval<Number> evaluate(const MultivariateHorner<PolynomialType, Strat>& mvH, const std::map<Variable, Interval<Number>>& map)
-{
-	#ifdef DEBUG_HORNER
-		std::cout << __func__ << "   " << mvH << std::endl;
-	#endif
-	Interval<Number> result(1);
-	Interval<Number> variable(0);
-
-	if (mvH.getVariable() != Variable::NO_VARIABLE)
-	{
-		variable = Interval<Number> (map.find(mvH.getVariable())->second);
-	}
-
-	assert (map.find(mvH.getVariable()) != map.end() );
-	
-	//Case 1: no further Horner schemes in mvH
-	if (!mvH.getDependent() && !mvH.getIndependent())
-	{
-		result = ( variable.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) ) + Interval<Number> (mvH.getIndepConstant());
-		return result;
-	}
-	//Case 2: dependent part contains a Horner Scheme
-	else if (mvH.getDependent() && !mvH.getIndependent())
-	{
-		result = variable.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + Interval<Number> (mvH.getIndepConstant());
-		return result;
-	}
-	//Case 3: independent part contains a Horner Scheme
-	else if (!mvH.getDependent() && mvH.getIndependent())
-	{
-		result = variable.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) +  evaluate(*mvH.getIndependent(), map);
-		return result;
-	}
-	//Case 4: both independent part and dependent part 
-	else if (mvH.getDependent()  && mvH.getIndependent())
-	{
-		result = variable.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
-		return result;
-	}
-
-	return result;
-}
-
 
 }//namespace carl
