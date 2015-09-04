@@ -98,11 +98,11 @@ bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->lower() >= n->upper()) return false;
 	if (this->polynomial == n->polynomial) {
 		if ((this->lower() >= n->lower()) && (n->upper() >= this->upper())) {
-			n = this->thisPtr();
+			//n = this->thisPtr();
 			return true;
 		}
 		if ((this->lower() <= n->lower()) && (n->upper() <= this->upper())) {
-			this->pThis = n;
+			//this->pThis = n;
 			return true;
 		}
 	}

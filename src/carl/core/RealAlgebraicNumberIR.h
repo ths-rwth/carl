@@ -41,6 +41,7 @@ protected:
 private:
 	std::weak_ptr<RealAlgebraicNumberIR> pThis;
 	std::shared_ptr<RealAlgebraicNumberIR> thisPtr() const {
+		assert(!pThis.expired());
 		return std::shared_ptr<RealAlgebraicNumberIR>(this->pThis);
 	}
 	
