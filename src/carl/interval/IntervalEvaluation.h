@@ -180,38 +180,41 @@ inline Interval<Number> IntervalEvaluation::evaluate(const MultivariateHorner<Po
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << "   " << mvH << std::endl;
 	#endif
+
+	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
+	assert(map.count(mvH.getVariable()) > 0);
+	Interval<Number> res = Interval<Number>::emptyInterval();
+	const Interval<Number> varValue = map.at(mvH.getVariable());
+
 	Interval<Number> result(1);
-	Interval<Number> variable(0);
 
 	if (mvH.getVariable() != Variable::NO_VARIABLE)
 	{
-		variable = Interval<Number> (map.find(mvH.getVariable())->second);
+		varValue = Interval<Number> (map.find(mvH.getVariable())->second);
 	}
-
-	assert (map.find(mvH.getVariable()) != map.end() );
 	
 	//Case 1: no further Horner schemes in mvH
 	if (!mvH.getDependent() && !mvH.getIndependent())
 	{
-		result = ( variable.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) ) + Interval<Number> (mvH.getIndepConstant());
+		result = ( varValue.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) ) + Interval<Number> (mvH.getIndepConstant());
 		return result;
 	}
 	//Case 2: dependent part contains a Horner Scheme
 	else if (mvH.getDependent() && !mvH.getIndependent())
 	{
-		result = variable.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + Interval<Number> (mvH.getIndepConstant());
+		result = varValue.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + Interval<Number> (mvH.getIndepConstant());
 		return result;
 	}
 	//Case 3: independent part contains a Horner Scheme
 	else if (!mvH.getDependent() && mvH.getIndependent())
 	{
-		result = variable.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) +  evaluate(*mvH.getIndependent(), map);
+		result = varValue.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) +  evaluate(*mvH.getIndependent(), map);
 		return result;
 	}
 	//Case 4: both independent part and dependent part 
 	else if (mvH.getDependent()  && mvH.getIndependent())
 	{
-		result = variable.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
+		result = varValue.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
 		return result;
 	}
 
