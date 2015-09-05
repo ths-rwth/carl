@@ -4,21 +4,16 @@
  *
  */
 
-#pragma once
-#include "carl/core/Term.h"
-
-
- #ifndef HORNER_Minimize_arithmetic_operations
- #define HORNER_Minimize_arithmetic_operations 1
- //#define DEBUG_HORNER 1 
- #endif
+//#define DEBUG_HORNER 
 
 namespace carl
 {
 	//Constructor for Greedy I
 	template< typename PolynomialType, Strategy Strat> 
-	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (PolynomialType&& inPut) {
-
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType&& inPut) {
+	#ifdef DEBUG_HORNER
+		std::cout << __func__ << " (GreedyI constr) P: " << inPut << std::endl;
+	#endif
 	static_assert(!(Strat==GREEDY_II)&&!(Strat==GREEDY_IIs), "Strategy requires Interval map");
 
 	Interval<CoeffType> dummy(0);
@@ -45,7 +40,10 @@ namespace carl
 
 	//Constructor for Greedy II and Greedy I
 	template< typename PolynomialType, Strategy Strat> 
-	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map) {
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map) {
+	#ifdef DEBUG_HORNER
+		std::cout << __func__ << " (GreedyII constr) P: " << inPut << std::endl;
+	#endif
 
 	//Create Horner Scheme Recursivly
 	MultivariateHorner< PolynomialType, Strat > root (std::move(inPut), Strat, map);
@@ -65,8 +63,10 @@ namespace carl
 
 	//Constructor for Greedy I/II creates recursive Datastruckture
 	template< typename PolynomialType, Strategy Strat >
-	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map) 
+	MultivariateHorner< PolynomialType, Strat>::MultivariateHorner (const PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map) 
 	{
+
+
 		std::set<Variable>::iterator variableIt;
 		std::set<Variable>::iterator selectedVariable;
 		std::set<Variable> allVariablesinPolynome;
@@ -130,14 +130,15 @@ namespace carl
 					
 					if (delta > bestDelta )
 					{
-						std::cout << "update Delta...";
+						#ifdef DEBUG_HORNER
+							std::cout << "update Delta...";
+						#endif
+
 						bestDelta = delta;
 						selectedVariable = variableIt;
 					}
 					//std::cout << *variableIt << " D: "<< delta  << " BD: "<< bestDelta << "\n" << std::endl;
-	 			}	
-
-				
+	 			}			
 			}
 
 			//Setting the choosen Variable for the current Hornerscheme iterartion
@@ -149,8 +150,8 @@ namespace carl
 			this->setVariable(*selectedVariable); 
 
 			#ifdef DEBUG_HORNER
-			std::cout << "Polynome: " << inPut << std::endl;
-			std::cout << "  Choosen Var: " << *selectedVariable << std::endl;
+			std::cout << __func__ << "    Polynome: " << inPut << std::endl;
+			//std::cout << "Choosen Var: " << *selectedVariable << std::endl;
 			#endif
 			
 			typename PolynomialType::TermsType::const_iterator polynomialIt;
@@ -178,6 +179,9 @@ namespace carl
 			//If Dependent Polynome contains Variables - continue with recursive Horner
 			if ( !h_dependentPart.isNumber() )
 			{
+				#ifdef DEBUG_HORNER
+					std::cout << __func__ << "    DEP->new Horner " << h_dependentPart << std::endl;
+				#endif
 				std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> new_dependent (new MultivariateHorner< PolynomialType, Strat >(std::move(h_dependentPart),s,map));
 				setDependent(new_dependent);
 				mConst_dependent = constant_zero<CoeffType>::get();	
@@ -193,6 +197,9 @@ namespace carl
 			//If independent Polynome contains Variables - continue with recursive Horner
 			if ( !h_independentPart.isNumber() )
 			{
+				#ifdef DEBUG_HORNER
+					std::cout << __func__ << "    INDEP->new Horner " << h_independentPart << std::endl;
+				#endif
 				std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> new_independent ( new MultivariateHorner< PolynomialType, Strat >(std::move(h_independentPart),s,map));
 				setIndependent(new_independent);
 				mConst_independent = constant_zero<CoeffType>::get();
@@ -208,6 +215,9 @@ namespace carl
 		//If there are no Variables in the polynome
 		else 
 		{		
+			#ifdef DEBUG_HORNER
+				std::cout << __func__ << " [CONSTANT TERM w/o Variables]  " << inPut << std::endl;
+			#endif
 			removeIndepenent();
 			removeDependent();
 			mConst_independent = inPut.constantPart();
@@ -290,8 +300,12 @@ std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialTyp
 	}	
 	else //if (mvH.getDependent() == NULL && mvH.getIndependent() == NULL)
 	{
+		if (mvH.getVariable() == Variable::NO_VARIABLE)
+		{
+			return (os << mvH.getIndepConstant());
+		}
 
-		if (mvH.getIndepConstant() == 0)
+		else if (mvH.getIndepConstant() == 0)
 		{
 			if (mvH.getDepConstant() == 1)
 			{
@@ -317,7 +331,7 @@ std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialTyp
 				}
 			}
 		}
-		else
+		else 
 		{
 			if (mvH.getExponent() != 1)
 			{
@@ -335,6 +349,11 @@ std::ostream& operator<<(std::ostream& os,const MultivariateHorner<PolynomialTyp
 template<typename PolynomialType, Strategy Strat>
 std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> simplify( std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> mvH)
 {		
+
+	#ifdef DEBUG_HORNER
+		std::cout << __func__ << " Polynome: " << *mvH << std::endl;
+	#endif
+
 	if (mvH->getDependent() && (mvH->getDependent()->getDependent() || mvH->getDependent()->getDepConstant() != 0) && !mvH->getDependent()->getIndependent()  && mvH->getDependent()->getIndepConstant() == 0 )
 	{
 		
@@ -384,41 +403,5 @@ std::shared_ptr<MultivariateHorner<PolynomialType, Strat>> simplify( std::shared
 	
 	return(mvH);
 }
-
-template<typename PolynomialType, typename Number, Strategy Strat>
-static Interval<Number> evaluate(const MultivariateHorner<PolynomialType, Strat>& mvH, const std::map<Variable, Interval<Number>>& map)
-{
-	Interval<Number> result(1);
-
-	assert (map.find(mvH.getVariable()) != map.end() );
-	
-	//Case 1: no further Horner schemes in mvH
-	if (!mvH.getDependent() && !mvH.getIndependent())
-	{
-		result = ( map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) ) + Interval<Number> (mvH.getIndepConstant());
-		return result;
-	}
-	//Case 2: dependent part contains a Horner Scheme
-	else if (mvH.getDependent() && !mvH.getIndependent())
-	{
-		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + Interval<Number> (mvH.getIndepConstant());
-		return result;
-	}
-	//Case 3: independent part contains a Horner Scheme
-	else if (!mvH.getDependent() && mvH.getIndependent())
-	{
-		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * Interval<Number> (mvH.getDepConstant()) +  evaluate(*mvH.getIndependent(), map);
-		return result;
-	}
-	//Case 4: both independent part and dependent part 
-	else if (mvH.getDependent()  && mvH.getIndependent())
-	{
-		result = map.find(mvH.getVariable())->second.pow(mvH.getExponent()) * evaluate(*mvH.getDependent(), map) + evaluate(*mvH.getIndependent(), map);
-		return result;
-	}
-
-	return result;
-}
-
 
 }//namespace carl

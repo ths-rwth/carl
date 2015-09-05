@@ -73,10 +73,10 @@ private:
                     return Formula<Pol>( FormulaType::FALSE );
                 Formulas<Pol> subFormulas;
                 subFormulas.push_back( first );
-                for (const auto& op: ops) {
-                    if( op.getType() == FormulaType::FALSE )
+                for (const auto& subop: ops) {
+                    if( subop.getType() == FormulaType::FALSE )
                         return Formula<Pol>( FormulaType::FALSE );
-                    subFormulas.push_back( op );
+                    subFormulas.push_back( subop );
                 }
                 return Formula<Pol>( FormulaType::AND, subFormulas );
             }
@@ -85,10 +85,10 @@ private:
                     return Formula<Pol>( FormulaType::TRUE );
                 Formulas<Pol> subFormulas;
                 subFormulas.push_back( first );
-                for (const auto& op: ops) {
-                    if( op.getType() == FormulaType::TRUE )
+                for (const auto& subop: ops) {
+                    if( subop.getType() == FormulaType::TRUE )
                         return Formula<Pol>( FormulaType::TRUE );
-                    subFormulas.push_back( op );
+                    subFormulas.push_back( subop );
                 }
                 return Formula<Pol>( FormulaType::OR, subFormulas );
             }

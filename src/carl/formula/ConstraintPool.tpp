@@ -67,7 +67,10 @@ namespace carl
         ConstraintContent<Pol>* constraint = createNormalizedBound( _var, _rel, _bound );
         auto iterBoolPair = mConstraints.insert( constraint );
         if( iterBoolPair.second )
+        {
+            ++mIdAllocator;
             mLastConstructedConstraintWasKnown = false;
+        }
         else
         {
             mLastConstructedConstraintWasKnown = true;
@@ -176,7 +179,7 @@ namespace carl
                         delete constraint;
                     }
                     else // Simplified version has not been generated before.
-                    {
+                    { 
                         constraint->init();
                         constraint->mID = mIdAllocator;
                         ++mIdAllocator;

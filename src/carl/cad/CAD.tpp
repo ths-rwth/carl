@@ -815,18 +815,26 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	bool boundsActive = !bounds.isEmpty() && !bounds.isInfinite();
 
 	for (const auto& root: roots) {
-		if (!root->containedIn(bounds)) continue;
+		CARL_LOG_TRACE("carl.cad", "\tWorking on " << root);
+		if (!root->containedIn(bounds)) {
+			CARL_LOG_TRACE("carl.cad", "\tout of bounds " << bounds << " -> ignoring");
+			continue;
+		}
 		auto insertValue = currentSamples.insert(root);
 		auto insertIt = std::get<0>(insertValue);
 		if (!std::get<1>(insertValue)) {
 			if (std::get<2>(insertValue)) {
 				newSampleSet.insert(*insertIt);
 				replacedSamples.push_front(*insertIt);
+				CARL_LOG_TRACE("carl.cad", "\treplaced another sample");
+			} else {
+				CARL_LOG_TRACE("carl.cad", "\tsample already exists as " << *insertIt);
 			}
 		} else {
 			// we found a new sample
 			// add the root to new samples (with root switch on)
 			newSampleSet.insert(*insertIt);
+			CARL_LOG_TRACE("carl.cad", "\tadded as new sample");
 		}
 		// local set storing the elements which shall be added to currentSampleSet and newSampleSet in the end
 		std::list<RealAlgebraicNumberNRPtr<Number>> newSamples;
@@ -1215,6 +1223,8 @@ cad::Answer CAD<Number>::mainCheck(
 
 		// lift all nodes at the corresponding tree depth according to the found lifting positions
 		unsigned depth = (unsigned)((int)dim - level - 1);
+		CARL_LOG_TRACE("carl.cad", "Current depth = " << depth);
+		CARL_LOG_TRACE("carl.cad", this->sampleTree);
 		assert(depth >= 0 && depth < dim);
 		assert(depth <= (unsigned)this->sampleTree.max_depth());
 		for (auto node = this->sampleTree.begin_depth(depth); node != this->sampleTree.end_depth(); ++node) {

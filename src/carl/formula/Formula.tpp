@@ -1366,7 +1366,7 @@ namespace carl
         boundValue *= cf;
         poly *= cf;
         #ifdef CONSTRAINT_BOUND_DEBUG
-        cout << "try to add the bound  " << Constraint<Pol>::relationToString( relation ) << boundValue << "  for the polynomial  " << poly << endl; 
+        cout << "try to add the bound  " << relationToString( relation ) << boundValue << "  for the polynomial  " << poly << endl; 
         #endif
         auto resA = _constraintBounds.insert( make_pair( std::move(poly), std::move( map<typename Pol::NumberType, pair<Relation, Formula<Pol>>>() ) ) );
         auto resB = resA.first->second.insert( make_pair( boundValue, make_pair( relation, _constraint ) ) );
@@ -1656,7 +1656,7 @@ namespace carl
                 for( ; iter != bounds.end(); ++iter )
                 {
                     #ifdef CONSTRAINT_BOUND_DEBUG
-                    cout << "   bound is  " << Constraint<Pol>::relationToString( iter->second.first ) << iter->first << endl;
+                    cout << "   bound is  " << relationToString( iter->second.first ) << iter->first << endl;
                     #endif
                     if( (_inConjunction && iter->second.first == Relation::NEQ)
                         || (!_inConjunction && iter->second.first == Relation::EQ) )
@@ -1865,8 +1865,8 @@ namespace carl
 			rvisit(formula.quantifiedFormula(), func);
 			break;
 		}
-		func(formula);
 		}
+		func(formula);
 	}
 
 	template<typename Formula>

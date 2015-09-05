@@ -192,6 +192,11 @@ class Term
 			return mMonomial->hasNoOtherVariable(v);
 		}
 		
+        bool isSingleVariable() const
+        {
+            if (!mMonomial) return false;
+            return mMonomial->isLinear();
+        }
 		/**
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.

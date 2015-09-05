@@ -8,12 +8,13 @@
 #pragma once
 #include "Interval.h"
 #include "../core/Sign.h"
-#include <carl/core/MultivariateHorner.h>
+#include "../core/MultivariateHorner.h"
 #include "IntervalEvaluation.h"
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
 //#define USE_HORNER
+#define HORMER_SCHEME_STRATEGY GREEDY_I
 
 namespace carl {
     
@@ -29,6 +30,8 @@ namespace carl {
             Polynomial mNumerator;
             /// Stores the denominator, which is one, if mDenominator == nullptr
             std::shared_ptr<const typename Polynomial::MonomType> mDenominator;
+
+
             
         public:
             VarSolutionFormula() = delete;
@@ -226,31 +229,63 @@ namespace carl {
     };
 
     template <template<typename> class Operator, typename Polynomial>
-    class Contraction : private Operator<Polynomial> {
+    class Contraction : private Operator<Polynomial> { 
 
     private:
-        const Polynomial mConstraint; // Todo: Should be a reference.
-        std::map<Variable, Polynomial> mDerivatives;
-        std::map<Variable, VarSolutionFormula<Polynomial>> mVarSolutionFormulas;
-    public:
+        Polynomial mConstraint; // Todo: Should be a reference.
+        #ifdef USE_HORNER
+            MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> mHornerForm;
+            std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mDerivatives;
+        #else
+            std::map<Variable, Polynomial> mDerivatives;
+        #endif
+            std::map<Variable, VarSolutionFormula<Polynomial>>mVarSolutionFormulas;
+            std::map<Polynomial, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mHornerSchemes;
 
+    public:
         Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
         mConstraint(constraint),
+        #ifdef USE_HORNER
+            mHornerForm(std::move(constraint)),
+        #endif
         mDerivatives(),
         mVarSolutionFormulas() {}
 
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
-            typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
-            if( it == mDerivatives.end() )
+            bool splitOccurredInContraction = false;
+            if( !withPropagation || !mConstraint.isLinear() )
             {
-                it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                #ifdef USE_HORNER
+                    typename std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>>::const_iterator it = mDerivatives.find(variable);
+                #else
+                    typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                #endif
+
+                if( it == mDerivatives.end() )
+                {
+                    #ifdef USE_HORNER
+                        //Deriviate and convert to Horner
+                        it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>( std::move(mConstraint.derivative(variable)))).first;
+                    #else
+                        it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                    #endif
+                }
+
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
+                #endif
+
+                #ifdef USE_HORNER
+                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>( std::move(mConstraint) ), (*it).second, resA, resB, useNiceCenter);
+                #else
+                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+                #endif
             }
-
-            #ifdef CONTRACTION_DEBUG
-            std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
-            #endif
-
-            bool splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+            else
+            {
+                resA = intervals.at(variable);
+                resB = Interval<double>::emptyInterval();
+            }
 
             #ifdef CONTRACTION_DEBUG
             std::cout << "  after contraction: " << resA;
@@ -260,119 +295,135 @@ namespace carl {
 
             if( withPropagation )
             {
-                typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator itB = mVarSolutionFormulas.find(variable);
-                if( itB == mVarSolutionFormulas.end() )
+                typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator const_iterator_VarSolutionFormula = mVarSolutionFormulas.find(variable);
+                if( const_iterator_VarSolutionFormula == mVarSolutionFormulas.end() )
                 {
-                    itB = mVarSolutionFormulas.emplace(variable, std::move(VarSolutionFormula<Polynomial>(mConstraint,variable))).first;
+                    const_iterator_VarSolutionFormula = mVarSolutionFormulas.emplace(variable, std::move(VarSolutionFormula<Polynomial>(mConstraint,variable))).first;
                 }
-                if (withPropagation) {
-
                 
+                // calculate result of propagation
+                std::vector<Interval<double>> resultPropagation = const_iterator_VarSolutionFormula->second.evaluate( intervals );
+                
+                #ifdef CONTRACTION_DEBUG
+                std::cout << "  propagation result: " << resultPropagation << std::endl;                            
+                #endif
 
-                    // calculate result of propagation
-                    std::vector<Interval<double>> resultPropagation = itB->second.evaluate( intervals );
+                if( resultPropagation.empty() )
+                {
+                    resA = Interval<double>::emptyInterval();
+                    resB = Interval<double>::emptyInterval();
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
+                    return false;
+                }
 
-                    if( resultPropagation.empty() )
+                // intersect with result of contraction
+                std::vector<Interval<double>> resultingIntervals;
+                if( splitOccurredInContraction )
+                {   
+                    Interval<double> tmp;
+                    for( const auto& i : resultPropagation )
                     {
-                        resA = Interval<double>::emptyInterval();
-                        resB = Interval<double>::emptyInterval();
-                        return false;
+                        tmp = i.intersect( resA );
+                        if( !tmp.isEmpty() )
+                            resultingIntervals.push_back(tmp);
+                        tmp = i.intersect( resB );
+                        if( !tmp.isEmpty() )
+                            resultingIntervals.push_back(tmp);
                     }
-                    // intersect with result of contraction
-                    std::vector<Interval<double>> resultingIntervals;
-                    if( splitOccurredInContraction )
-                    {   
-                        Interval<double> tmp;
-                        for( const auto& i : resultPropagation )
-                        {
-                            tmp = i.intersect( resA );
-                            if( !tmp.isEmpty() )
-                                resultingIntervals.push_back(tmp);
-                            tmp = i.intersect( resB );
-                            if( !tmp.isEmpty() )
-                                resultingIntervals.push_back(tmp);
-                        }
-                    }
+                }
 
-                    else 
+                else 
+                {
+                    Interval<double> tmp;
+                    for( const auto& i : resultPropagation )
                     {
-                        Interval<double> tmp;
-                        for( const auto& i : resultPropagation )
-                        {
-                            tmp = i.intersect( resA );
-                            if( !tmp.isEmpty() )
-                                resultingIntervals.push_back(tmp);
-                        }
+                        tmp = i.intersect( resA );
+                        if( !tmp.isEmpty() )
+                            resultingIntervals.push_back(tmp);
                     }
-                    if( resultingIntervals.empty() )
-                    {
-                        resA = Interval<double>::emptyInterval();
-                        resB = Interval<double>::emptyInterval();
-                        return false;
-                    }
-                    if( resultingIntervals.size() == 1 )
+                }
+                if( resultingIntervals.empty() )
+                {
+                    resA = Interval<double>::emptyInterval();
+                    resB = Interval<double>::emptyInterval();
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
+                    return false;
+                }
+                if( resultingIntervals.size() == 1 )
+                {
+                    resA = resultingIntervals[0];
+                    resB = Interval<double>::emptyInterval();
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
+                    return false;
+                }
+                if( resultingIntervals.size() == 2 )
+                {
+                    if( resultingIntervals[0] < resultingIntervals[1] )
                     {
                         resA = resultingIntervals[0];
-                        resB = Interval<double>::emptyInterval();
-                        return false;
-                    }
-                    if( resultingIntervals.size() == 2 )
-                    {
-                        if( resultingIntervals[0] < resultingIntervals[1] )
-                        {
-                            resA = resultingIntervals[0];
-                            resB = resultingIntervals[1];
-                        }
-                        else
-                        {
-                            assert(resultingIntervals[1] < resultingIntervals[0]);
-                            resA = resultingIntervals[1];
-                            resB = resultingIntervals[0];
-                        }
-                        return true;
+                        resB = resultingIntervals[1];
                     }
                     else
                     {
-                        std::sort( resultPropagation.begin(), resultPropagation.end(), 
-                                  [](const Interval<double>& i,const Interval<double> j) 
-                                  { if(i<j){return true;} else { assert(j<i); return false; } }
-                                 );
-                        auto intervalBeforeBiggestGap = resultPropagation.begin();
-                        auto iter = resultPropagation.begin();
-                        ++iter;
-                        double bestDistance = intervalBeforeBiggestGap->distance(*iter);
-                        for( ; iter != resultPropagation.end(); ++iter )
-                        {
-                            auto jter = iter;
-                            ++jter;
-                            if( jter == resultPropagation.end() )
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                double distance = iter->distance(*jter);
-                                if( bestDistance < distance )
-                                {
-                                    bestDistance = distance;
-                                    intervalBeforeBiggestGap = iter;
-                                }
-                            }
-                        }
-                        resA = *intervalBeforeBiggestGap;
-                        for( iter = resultPropagation.begin(); iter != intervalBeforeBiggestGap; ++iter )
-                        {
-                            resA = resA.convexHull( *iter );
-                        }
-                        ++iter;
-                        resB = *iter;
-                        for( ; iter != resultPropagation.end(); ++iter )
-                        {
-                            resB = resB.convexHull( *iter );
-                        }
-                        return true;
+                        assert(resultingIntervals[1] < resultingIntervals[0]);
+                        resA = resultingIntervals[1];
+                        resB = resultingIntervals[0];
                     }
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
+                    return true;
                 }
+                else
+                {
+                    std::sort( resultPropagation.begin(), resultPropagation.end(), 
+                              [](const Interval<double>& i,const Interval<double> j) 
+                              { if(i<j){return true;} else { assert(j<i); return false; } }
+                             );
+                    auto intervalBeforeBiggestGap = resultPropagation.begin();
+                    auto iter = resultPropagation.begin();
+                    ++iter;
+                    double bestDistance = intervalBeforeBiggestGap->distance(*iter);
+                    for( ; iter != resultPropagation.end(); ++iter )
+                    {
+                        auto jter = iter;
+                        ++jter;
+                        if( jter == resultPropagation.end() )
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            double distance = iter->distance(*jter);
+                            if( bestDistance < distance )
+                            {
+                                bestDistance = distance;
+                                intervalBeforeBiggestGap = iter;
+                            }
+                        }
+                    }
+                    resA = *intervalBeforeBiggestGap;
+                    for( iter = resultPropagation.begin(); iter != intervalBeforeBiggestGap; ++iter )
+                    {
+                        resA = resA.convexHull( *iter );
+                    }
+                    ++iter;
+                    resB = *iter;
+                    for( ; iter != resultPropagation.end(); ++iter )
+                    {
+                        resB = resB.convexHull( *iter );
+                    }
+                    #ifdef CONTRACTION_DEBUG
+                    std::cout << "  after propagation: " << resA; if( !resB.isEmpty() ) { std::cout << " and " << resB; } std::cout << std::endl;                            
+                    #endif
+                    return true;
+                }              
             }
             return splitOccurredInContraction;
         }
@@ -380,11 +431,16 @@ namespace carl {
 
     template<typename Polynomial>
     class SimpleNewton {
-    private:
-        std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>> mHornerSchemes;
     public:
         
-        bool contract(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, const Polynomial& constraint, const Polynomial& derivative, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) 
+        template <typename evalType>
+        bool contract(const Interval<double>::evalintervalmap& intervals, 
+            Variable::Arg variable, 
+            const evalType& constraint, 
+            const evalType& derivative, 
+            Interval<double>& resA, 
+            Interval<double>& resB, 
+            bool useNiceCenter = false) 
         {
             bool splitOccurred = false;
             
@@ -410,33 +466,50 @@ namespace carl {
             Interval<double> numerator (0);
             Interval<double> denominator(0);
             
+            /*
             #ifdef USE_HORNER
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_constraint = mHornerSchemes.find(constraint);
-                if( it_constraint == mHornerSchemes.end() )
+                #ifdef DEBUG_HORNER
+                    std::cout << "\n" <<__func__  << "USE_HORNER Constraint " << constraint << " Derivative " << derivative << std::endl;
+                #endif
+
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_constraint = hornerMap.find(constraint);
+                if( it_constraint == hornerMap.end() )
                 {
                     Polynomial constraint_tmp (constraint);
-                    MultivariateHorner<Polynomial, GREEDY_Is> constraint_asHornerScheme (std::move( constraint_tmp ));
-                    it_constraint = mHornerSchemes.emplace(constraint, constraint_asHornerScheme).first;
+                    MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> constraint_asHornerScheme (std::move( constraint_tmp ));
+                    it_constraint = hornerMap.emplace(constraint, constraint_asHornerScheme).first;
+                    #ifdef DEBUG_HORNER
+                        std::cout << __func__  <<  " >> constraint: "<< constraint_asHornerScheme  << std::endl;
+                    #endif
                 }
-
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, GREEDY_Is>>::const_iterator it_denominator = mHornerSchemes.find(derivative);
-                if( it_denominator == mHornerSchemes.end() )
+             
+                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_derivative = hornerMap.find(derivative);
+                if( it_derivative == hornerMap.end() )
                 {
                     Polynomial derivative_tmp (derivative);
-                    MultivariateHorner<Polynomial, GREEDY_Is> derivative_asHornerScheme (std::move( derivative_tmp ));
-                    it_denominator = mHornerSchemes.emplace(constraint, derivative_asHornerScheme).first;
+                    MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> derivative_asHornerScheme (std::move( derivative_tmp ));
+                    it_derivative = hornerMap.emplace(derivative, derivative_asHornerScheme).first;
+                     #ifdef DEBUG_HORNER
+                        std::cout << __func__  <<  " >> derivative: "<< derivative_asHornerScheme << std::endl;
+                    #endif
                 }
-            
+                
+                #ifdef DEBUG_HORNER
+                    std::cout << __func__  <<  " >> evaluate "<< it_constraint->second << std::endl;
+                #endif
                 numerator = evaluate((*it_constraint).second, substitutedIntervalMap);
-                denominator = evaluate((*it_denominator).second, intervals);
-
+                
+                #ifdef DEBUG_HORNER
+                    std::cout << __func__  <<  " >> evaluate "<< it_derivative->second << std::endl;
+                #endif
+                denominator = evaluate((*it_derivative).second, intervals);
             #endif 
+            */
             
-            #ifndef USE_HORNER
             // Create Newton Operator
-            numerator = IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
+            numerator =   IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);
             denominator = IntervalEvaluation::evaluate(derivative, intervals);
-            #endif
+
 
             Interval<double> result1, result2;
 			
@@ -453,42 +526,35 @@ namespace carl {
                 if(result1 >= result2) {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result1));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result2));
-					if (variable.getType() == VariableType::VT_INT) {
-						resA = resA.integralPart();
-						resB = resB.integralPart();
-					}
-					#ifdef CONTRACTION_DEBUG
-					std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
-					#endif
-                    if( resB.isEmpty() )
-                    {
-                        splitOccurred = false;
-                    }
-                    else if( resA.isEmpty() ) // resB is not empty at this state
-                    {
-                        resA = resB;
-                        resB = Interval<double>::emptyInterval();
-                        splitOccurred = false;
-                    }
                 }
                 else
                 {
                     resA = intervals.at(variable).intersect(centerInterval.sub(result2));
                     resB = intervals.at(variable).intersect(centerInterval.sub(result1));
-					if (variable.getType() == VariableType::VT_INT) {
-						resA = resA.integralPart();
-						resB = resB.integralPart();
-					}
-					#ifdef CONTRACTION_DEBUG
-					std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
-					#endif
-                    if( resB.isEmpty() )
+                }
+                if (variable.getType() == VariableType::VT_INT) {
+                    resA = resA.integralPart();
+                    resB = resB.integralPart();
+                }
+                #ifdef CONTRACTION_DEBUG
+                std::cout << __func__ << ": result after intersection: " << resA << " and " << resB << std::endl;
+                #endif
+                if( resB.isEmpty() )
+                {
+                    splitOccurred = false;
+                }
+                else if( resA.isEmpty() ) // resB is not empty at this state
+                {
+                    resA = resB;
+                    resB = Interval<double>::emptyInterval();
+                    splitOccurred = false;
+                }
+                else
+                {
+                    Interval<double> tmpA, tmpB;
+                    if( !resA.unite( resB, tmpA, tmpB ) )
                     {
-                        splitOccurred = false;
-                    }
-                    else if( resA.isEmpty() ) // resB is not empty at this state
-                    {
-                        resA = resB;
+                        resA = std::move(tmpA);
                         resB = Interval<double>::emptyInterval();
                         splitOccurred = false;
                     }

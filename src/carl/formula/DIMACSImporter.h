@@ -46,7 +46,7 @@ private:
 			id = std::strtoll(begin, &end, 10);
 			begin = end;
 			if (id == 0) break;
-			Formula<Pol> v = variables.at(std::abs(id)-1);
+			Formula<Pol> v = variables.at(std::size_t(std::abs(id)-1));
 			if (id > 0) vars.emplace_back(v);
 			else vars.emplace_back(NOT, v);
 		}

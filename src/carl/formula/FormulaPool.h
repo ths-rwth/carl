@@ -407,8 +407,8 @@ namespace carl
                     result[form] = (*_func)( _arg, form );
                     if( elem != mpFalse )
                     {
-                        Formula<Pol> form(elem->mNegation);
-                        result[form] = (*_func)( _arg, form );
+                        Formula<Pol> form2(elem->mNegation);
+                        result[form2] = (*_func)( _arg, form2 );
                     }
                 }
                 return result;

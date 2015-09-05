@@ -12,20 +12,20 @@ namespace carl {
 template<typename Pol>
 class DIMACSExporter {
 private:
-	std::map<carl::Variable, long long> mVariables;
+	std::map<carl::Variable, std::size_t> mVariables;
 	std::vector<std::vector<long long>> mClauses;
 	
-	long long id(carl::Variable::Arg v) {
+	std::size_t id(carl::Variable::Arg v) {
 		auto it = mVariables.find(v);
 		if (it != mVariables.end()) return it->second;
-		long long res = mVariables.size() + 1;
+		std::size_t res = mVariables.size() + 1;
 		mVariables.emplace(v, res);
 		return res;
 	}
 	
 	long long getLiteral(const Formula<Pol>& f) {
 		if (f.getType() == BOOL) {
-			return id(f.boolean());
+			return (long long)(id(f.boolean()));
 		}
 		if (f.getType() == NOT) {
 			return -getLiteral(f.subformula());
