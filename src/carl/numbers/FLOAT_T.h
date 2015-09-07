@@ -1,7 +1,7 @@
 /**
  * General class for floating point numbers with different formats. Extend to
  * other types if necessary.
- * 
+ *
  * @file FLOAT_T.h
  * @author  Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
  * @since   2013-10-14
@@ -48,7 +48,7 @@ namespace carl
 	class FLOAT_T;
 
 	/**
-	 * Struct which holds the conversion operator for any two instanciations of 
+	 * Struct which holds the conversion operator for any two instanciations of
 	 * FLOAT_T with different underlying floating point implementations. Note
 	 * that this conversion introduces loss of precision, as it uses the toDouble()
 	 * method and the corresponding double constructor from the target type.
@@ -57,7 +57,7 @@ namespace carl
 	struct FloatConv
 	{
 		/**
-		 * Conversion operator for conversion of two instanciations of FLOAT_T 
+		 * Conversion operator for conversion of two instanciations of FLOAT_T
 		 * with different underlying floating point implementations.
 		 * @param _op2 The source instanciation (T2)
 		 * @return returns an instanciation with different floating point implementation (T1)
@@ -67,8 +67,8 @@ namespace carl
 			return FLOAT_T<T1>(_op2.toDouble());
 		}
 	};
-	
-	
+
+
 	enum Str2Double_Error { FLOAT_SUCCESS, FLOAT_OVERFLOW, FLOAT_UNDERFLOW, FLOAT_INCONVERTIBLE };
 
 	inline Str2Double_Error str2double (double &d, char const *s)
@@ -89,14 +89,14 @@ namespace carl
 		d = double(l);
 		return FLOAT_SUCCESS;
 	}
-	
+
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	template<typename Number>
 	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned = 128)
 	{
 		return A == B;
 	}
-	
+
 	template<>
 	inline bool AlmostEqual2sComplement<double>(const double& A, const double& B, unsigned maxUlps)
 	{
@@ -117,9 +117,9 @@ namespace carl
 
 		return false;
 	}
-	
+
 	/**
-	 * Templated wrapper class which allows universal usage of different 
+	 * Templated wrapper class which allows universal usage of different
 	 * IEEE 754 implementations.
 	 * For each implementation intended to use it is necessary to implement the
 	 * according specialization of this class.
@@ -177,7 +177,7 @@ namespace carl
 			assert(std::is_floating_point<FloatType>::value);
 			mValue = _int;
 		}
-		
+
 		/**
 		 * Constructor, which takes an unsigned integer as input and optional rounding, which
 		 * can be used, if the underlying fp implementation allows this.
@@ -189,7 +189,7 @@ namespace carl
 			assert(std::is_floating_point<FloatType>::value);
 			mValue = _int;
 		}
-		
+
 		/**
 		 * Constructor, which takes a long as input and optional rounding, which
 		 * can be used, if the underlying fp implementation allows this.
@@ -215,8 +215,8 @@ namespace carl
 		}
 
 		/**
-		 * Copyconstructor which takes a FLOAT_T<FloatType>  and optional rounding 
-		 * as input, which can be used, if the underlying fp implementation 
+		 * Copyconstructor which takes a FLOAT_T<FloatType>  and optional rounding
+		 * as input, which can be used, if the underlying fp implementation
 		 * allows this.
 		 * @param _float Value to be initialized.
 		 * @param N Possible rounding direction.
@@ -242,10 +242,10 @@ namespace carl
 		{
 			mValue = val;
 		}
-		
+
 		/**
 		 * Constructor, which takes a FLOAT_T instanciation with different fp implementation
-		 * as input and optional rounding, which can be used, if the underlying 
+		 * as input and optional rounding, which can be used, if the underlying
 		 * fp implementation allows this.
 		 * @param _float Value to be initialized.
 		 * @param N Possible rounding direction.
@@ -255,7 +255,7 @@ namespace carl
 		{
 			mValue = _float.toDouble();
 		}
-		
+
 		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
 		{
 			str2double (mValue, _string);
@@ -287,7 +287,7 @@ namespace carl
 		}
 
 		/**
-		 * Allows to set the desired precision. Note: If the value is already 
+		 * Allows to set the desired precision. Note: If the value is already
 		 * initialized this can change the internal value.
 		 * @param Precision in bits.
 		 * @return Reference to this.
@@ -339,17 +339,17 @@ namespace carl
 		{
 			return mValue > _rhs.mValue;
 		}
-		
+
 		bool operator>(int _rhs) const
 		{
 			return mValue > _rhs;
 		}
-		
+
 		bool operator>(unsigned _rhs) const
 		{
 			return mValue > _rhs;
 		}
-		
+
 
 		/**
 		 * Comparison operator for less than.
@@ -360,12 +360,12 @@ namespace carl
 		{
 			return mValue < _rhs.mValue;
 		}
-		
+
 		bool operator<(int _rhs) const
 		{
 			return mValue < _rhs;
 		}
-		
+
 		bool operator<(unsigned _rhs) const
 		{
 			return mValue < _rhs;
@@ -392,7 +392,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for addition of two numbers, which assigns the result to the 
+		 * Function for addition of two numbers, which assigns the result to the
 		 * calling number.
 		 * @param _op2 Righthand side of the operation
 		 * @param N Possible rounding direction.
@@ -418,7 +418,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for subtraction of two numbers, which assigns the result to the 
+		 * Function for subtraction of two numbers, which assigns the result to the
 		 * calling number.
 		 * @param _op2 Righthand side of the operation
 		 * @param N Possible rounding direction.
@@ -445,7 +445,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for multiplication of two numbers, which assigns the result to the 
+		 * Function for multiplication of two numbers, which assigns the result to the
 		 * calling number.
 		 * @param _op2 Righthand side of the operation
 		 * @param N Possible rounding direction.
@@ -458,7 +458,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which multiplicates two numbers and puts the result in a 
+		 * Function which multiplicates two numbers and puts the result in a
 		 * third number passed as parameter.
 		 * @param _result Result of the operation.
 		 * @param _op2 Righthand side of the operation.
@@ -472,7 +472,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for division of two numbers, which assigns the result to the 
+		 * Function for division of two numbers, which assigns the result to the
 		 * calling number.
 		 * @param _op2 Righthand side of the operation
 		 * @param N Possible rounding direction.
@@ -486,7 +486,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which divides this number by the righthand side and puts the 
+		 * Function which divides this number by the righthand side and puts the
 		 * result in a third number passed as parameter.
 		 * @param _result Result of the operation.
 		 * @param _op2 Righthand side of the operation.
@@ -501,7 +501,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for the square root of the number, which assigns the result to the 
+		 * Function for the square root of the number, which assigns the result to the
 		 * calling number.
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
@@ -528,7 +528,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for the cubic root of the number, which assigns the result to the 
+		 * Function for the cubic root of the number, which assigns the result to the
 		 * calling number.
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
@@ -555,7 +555,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for the nth root of the number, which assigns the result to the 
+		 * Function for the nth root of the number, which assigns the result to the
 		 * calling number.
 		 * @param Degree of the root.
 		 * @param N Possible rounding direction.
@@ -585,7 +585,7 @@ namespace carl
 		}
 
 		/**
-		 * Function for the nth power of the number, which assigns the result to the 
+		 * Function for the nth power of the number, which assigns the result to the
 		 * calling number.
 		 * @param _exp Exponent.
 		 * @param N Possible rounding direction.
@@ -623,7 +623,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the absolute value of this number and puts 
+		 * Function which calculates the absolute value of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -647,7 +647,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the exponential of this number and puts 
+		 * Function which calculates the exponential of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -671,7 +671,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the sine of this number and puts 
+		 * Function which calculates the sine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -695,7 +695,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the cosine of this number and puts 
+		 * Function which calculates the cosine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -719,7 +719,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the logarithm of this number and puts 
+		 * Function which calculates the logarithm of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -730,7 +730,7 @@ namespace carl
 			_result.mValue = std::log(mValue);
 			return _result;
 		}
-		
+
 		/**
 		 * Assigns the number the tangent of this number.
 		 * @param N Possible rounding direction.
@@ -743,7 +743,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the tangent of this number and puts 
+		 * Function which calculates the tangent of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -767,7 +767,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the arcus sine of this number and puts 
+		 * Function which calculates the arcus sine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -791,7 +791,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the arcus cosine of this number and puts 
+		 * Function which calculates the arcus cosine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -815,7 +815,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the arcus tangent of this number and puts 
+		 * Function which calculates the arcus tangent of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -839,7 +839,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the hyperbolic sine of this number and puts 
+		 * Function which calculates the hyperbolic sine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -863,7 +863,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the hyperbolic cosine of this number and puts 
+		 * Function which calculates the hyperbolic cosine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -887,7 +887,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the hyperbolic tangent of this number and puts 
+		 * Function which calculates the hyperbolic tangent of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -911,7 +911,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the hyperbolic arcus sine of this number and puts 
+		 * Function which calculates the hyperbolic arcus sine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -935,7 +935,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the hyperbolic arcus cosine of this number and puts 
+		 * Function which calculates the hyperbolic arcus cosine of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -959,7 +959,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the hyperbolic arcus tangent of this number and puts 
+		 * Function which calculates the hyperbolic arcus tangent of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -972,7 +972,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the floor of this number and puts 
+		 * Function which calculates the floor of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -996,7 +996,7 @@ namespace carl
 		}
 
 		/**
-		 * Function which calculates the ceiling of this number and puts 
+		 * Function which calculates the ceiling of this number and puts
 		 * it into a passed result parameter.
 		 * @param _result Result.
 		 * @param N Possible rounding direction.
@@ -1019,7 +1019,7 @@ namespace carl
 			return *this;
 		}
 
-		
+
 		/**
 		 * Function which converts the number to a double value.
 		 * @param N Possible rounding direction.
@@ -1030,7 +1030,7 @@ namespace carl
 			return (double) mValue;
 		}
 
-		
+
 		/**
 		 * Explicit typecast operator to integer.
 		 * @return Integer representation of this.
@@ -1039,7 +1039,7 @@ namespace carl
 		{
 			return (int) mValue;
 		}
-		
+
 		/**
 		 * Explicit typecast operator to long.
 		 * @return Long representation of this.
@@ -1048,7 +1048,7 @@ namespace carl
 		{
 			return (long) mValue;
 		}
-		
+
 		/**
 		 * Explicit typecast operator to double.
 		 * @return Double representation of this.
@@ -1057,7 +1057,7 @@ namespace carl
 		{
 			return (double) mValue;
 		}
-		
+
 		/**
 		 * Output stream operator for numbers of type FLOAT_T.
 		 * @param ostr Output stream.
@@ -1137,7 +1137,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the complex conjugate.
 		 * @param x The passed number.
 		 * @return Reference to x.
@@ -1148,7 +1148,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the real part.
 		 * @param x The passed number.
 		 * @return Reference to x.
@@ -1159,7 +1159,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the imaginary part.
 		 * @param x The passed number.
 		 * @return Zero.
@@ -1170,7 +1170,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the absolute value.
 		 * @param x The passed number.
 		 * @return Number which holds the absolute value of x.
@@ -1183,7 +1183,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the absolute value (special Eigen3
 		 * version).
 		 * @param x The passed number.
@@ -1197,7 +1197,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the square root.
 		 * @param x The passed number.
 		 * @return Number which holds the square root of x.
@@ -1210,7 +1210,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the exponential.
 		 * @param x The passed number.
 		 * @return Number which holds the exponential of x.
@@ -1223,7 +1223,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the logarithm.
 		 * @param x The passed number.
 		 * @return Number which holds the logarithm of x.
@@ -1236,7 +1236,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the sine.
 		 * @param x The passed number.
 		 * @return Number which holds the sine of x.
@@ -1249,7 +1249,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the cosine.
 		 * @param x The passed number.
 		 * @return Number which holds the cosine of x.
@@ -1262,7 +1262,7 @@ namespace carl
 		}
 
 		/**
-		 * Function required for extension of Eigen3 with FLOAT_T as 
+		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the power.
 		 * @param x The passed number.
 		 * @param y Degree.
@@ -1344,7 +1344,7 @@ namespace carl
 		{
 			return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
 		}
-		
+
 		/**
 		 * Operator for unary negation of a number.
 		 * @param _lhs Lefthand side.
@@ -1365,7 +1365,7 @@ namespace carl
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue * _rhs.mValue);
 		}
-		
+
 		/**
 		 * Operator for multiplication of two numbers, the righthand side is the underlying
 		 * type.
@@ -1377,7 +1377,7 @@ namespace carl
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
 		}
-		
+
 		/**
 		 * Operator for addition of two numbers, the lefthand side is the underlying
 		 * type.
@@ -1425,13 +1425,12 @@ namespace carl
 		friend FLOAT_T<FloatType> operator /(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			assert(_rhs != 0);
-			std::cout << "Ping. " << std::endl;
 			return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
 		}
 
 		/**
 		 * Operator which increments this number by one.
-		 * @param _num 
+		 * @param _num
 		 * @return Reference to _num.
 		 */
 		friend FLOAT_T<FloatType>& operator ++(FLOAT_T<FloatType>& _num)
@@ -1442,7 +1441,7 @@ namespace carl
 
 		/**
 		 * Operator which decrements this number by one.
-		 * @param _num 
+		 * @param _num
 		 * @return Reference to _num.
 		 */
 		friend FLOAT_T<FloatType>& operator --(FLOAT_T<FloatType>& _num)
@@ -1494,7 +1493,7 @@ namespace carl
 			mValue = mValue - _rhs;
 			return *this;
 		}
-		
+
 		/**
 		 * Operator for unary negation of this number.
 		 * @return Number which holds the negated original number.
@@ -1551,7 +1550,7 @@ namespace carl
 			mValue = mValue / _rhs;
 			return *this;
 		}
-		
+
 		/**
 		 * Method which converts this number to a string.
 		 * @return String representation of this number.
@@ -1561,15 +1560,15 @@ namespace carl
 			return std::to_string(mValue);
 		}
 	};
-	
+
 	template<typename FloatType>
 	inline bool isInteger(const FLOAT_T<FloatType>&) {
 	return false;
 	}
-	
+
 	/**
 	 * Implements the division which assumes that there is no remainder.
-	 * @param _lhs 
+	 * @param _lhs
 	 * @param _rhs
 	 * @return Number which holds the result.
 	 */
@@ -1581,7 +1580,7 @@ namespace carl
 		result = _lhs / _rhs;
 		return result;
 	}
-	
+
 	/**
 	 * Implements the division with remainder.
 	 * @param _lhs
@@ -1596,7 +1595,7 @@ namespace carl
 		result = _lhs / _rhs;
 		return result;
 	}
-	
+
 	/**
 	 * Casts the FLOAT_T to an arbitrary integer type which has a constructor for
 	 * a native int.
@@ -1609,7 +1608,7 @@ namespace carl
 		Integer result = (int)_float;
 		return result;
 	}
-	
+
 	template<typename FloatType>
 	inline double toDouble(const FLOAT_T<FloatType>& _float)
 	{
@@ -1629,7 +1628,7 @@ namespace carl
 		_in.abs(result);
 		return result;
 	}
-	
+
 	/**
 	 * Method which returns the logarithm of the passed number.
 	 * @param _in Number.
@@ -1642,7 +1641,7 @@ namespace carl
 		_in.log(result);
 		return result;
 	}
-	
+
 	/**
 	 * Method which returns the square root of the passed number.
 	 * @param _in Number.
@@ -1655,7 +1654,7 @@ namespace carl
 		_in.sqrt(result);
 		return result;
 	}
-	
+
 	template<typename FloatType>
 	inline FLOAT_T<FloatType> pow(const FLOAT_T<FloatType>& _in, size_t _exp)
 	{
@@ -1663,7 +1662,7 @@ namespace carl
 		_in.pow(result, _exp);
 		return result;
 	}
-	
+
 	template<typename FloatType>
 	inline FLOAT_T<FloatType> sin(const FLOAT_T<FloatType>& _in)
 	{
@@ -1671,7 +1670,7 @@ namespace carl
 		_in.sin(result);
 		return result;
 	}
-	
+
 	template<typename FloatType>
 	inline FLOAT_T<FloatType> cos(const FLOAT_T<FloatType>& _in)
 	{
@@ -1679,7 +1678,7 @@ namespace carl
 		_in.cos(result);
 		return result;
 	}
-	
+
 	template<typename FloatType>
 	inline FLOAT_T<FloatType> asin(const FLOAT_T<FloatType>& _in)
 	{
@@ -1687,7 +1686,7 @@ namespace carl
 		_in.asin(result);
 		return result;
 	}
-	
+
 	template<typename FloatType>
 	inline FLOAT_T<FloatType> acos(const FLOAT_T<FloatType>& _in)
 	{
@@ -1703,7 +1702,7 @@ namespace carl
 		_in.atan(result);
 		return result;
 	}
-	
+
 	/**
 	 * Method which returns the next smaller integer of this number or the number
 	 * itself, if it is already an integer.
@@ -1717,7 +1716,7 @@ namespace carl
 		_in.floor(result);
 		return result;
 	}
-	
+
 	/**
 	 * Method which returns the next larger integer of the passed number or the
 	 * number itself, if it is already an integer.
@@ -1731,20 +1730,20 @@ namespace carl
 		_in.ceil(result);
 		return result;
 	}
-	
+
 	template<>
 	inline FLOAT_T<double> rationalize<FLOAT_T<double>>(double _in)
 	{
 		return FLOAT_T<double>(_in);
 	}
-	
+
 	template<>
 	inline FLOAT_T<float> rationalize<FLOAT_T<float>>(float _in)
 	{
 		return FLOAT_T<float>(_in);
 	}
-	
-	
+
+
 	#ifdef USE_CLN_NUMBERS
 	/**
 	 * Implicitly converts the number to a rational and returns the denominator.
@@ -1756,7 +1755,7 @@ namespace carl
 	{
 		return carl::getDenom(carl::rationalize<cln::cl_RA>(_in.toDouble()));
 	}
-	
+
 	/**
 	 * Implicitly converts the number to a rational and returns the nominator.
 	 * @param _in Number.
@@ -1778,7 +1777,7 @@ namespace carl
 	{
 		return carl::getDenom(carl::rationalize<mpq_class>(_in.toDouble()));
 	}
-	
+
 	/**
 	 * Implicitly converts the number to a rational and returns the nominator.
 	 * @param _in Number.
@@ -1790,7 +1789,7 @@ namespace carl
 		return carl::getNum(carl::rationalize<mpq_class>(_in.toDouble()));
 	}
 	#endif
-	
+
 	template<typename FloatType>
 	inline bool isZero(const FLOAT_T<FloatType>& _in) {
 		return _in.value() == 0;
@@ -1815,5 +1814,3 @@ namespace carl
 } // namespace
 
 #include "adaption_float/mpfr_float.tpp"
-
-
