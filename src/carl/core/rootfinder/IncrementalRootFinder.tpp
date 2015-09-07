@@ -21,11 +21,11 @@ template<typename Number, typename C>
 IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 		const UnivariatePolynomial<Number>& polynomial,
 		const Interval<Number>& interval,
-		SplittingStrategy splittingStrategy,
+		SplittingStrategy _splittingStrategy,
 		bool tryTrivialSolver
 		) :
 		AbstractRootFinder<Number>(polynomial, interval, tryTrivialSolver),
-		splittingStrategy(splittingStrategy),
+		splittingStrategy(_splittingStrategy),
 		nextRoot(this->roots.end())
 {
 	if (!this->interval.isEmpty()) {
@@ -117,8 +117,8 @@ template<typename Number>
 void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& interval, RootFinder<Number>& finder) {
 	assert(interval.lower() < interval.upper());
 	std::sort(doubleRoots.begin(), doubleRoots.end());
-	auto it = std::unique(doubleRoots.begin(), doubleRoots.end());
-	doubleRoots.resize((size_t)std::distance(doubleRoots.begin(), it));
+	auto uniqueIt = std::unique(doubleRoots.begin(), doubleRoots.end());
+	doubleRoots.resize(size_t(std::distance(doubleRoots.begin(), uniqueIt)));
 	std::vector<Number> roots;
 	for (auto it = doubleRoots.begin(); it != doubleRoots.end(); it++) {
 		if (!isNumber(*it)) continue;
@@ -131,7 +131,9 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	std::vector<Number> res;
 	res.reserve(roots.size() + 3);
 	
+    #ifdef USE_CLN_NUMBERS
 	try {
+    #endif
 		res.push_back(interval.lower());
 		if (roots.size() == 1) {
 			Number tmp = carl::floor(roots[0]);
@@ -145,8 +147,8 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 				if (interval.contains(roots[i]) && finder.getPolynomial().evaluate(roots[i]) == 0) {
 					res.push_back(roots[i]);
 				}
-				Number tmp = Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample();
-				if (interval.contains(tmp)) res.push_back(tmp);
+				Number tmpSample = Interval<Number>(roots[i], BoundType::STRICT, roots[i+1], BoundType::STRICT).sample();
+				if (interval.contains(tmpSample)) res.push_back(tmpSample);
 			}
 			if (interval.contains(roots.back()) && finder.getPolynomial().evaluate(roots.back()) == 0) {
 				res.push_back(roots.back());
@@ -156,10 +158,12 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 		}
 		res.push_back(interval.upper());
 	///@todo Add carl::floating_point_exception and use this here.
+    #ifdef USE_CLN_NUMBERS
 	} catch (cln::floating_point_exception) {
 		finder.addQueue(interval, SplittingStrategy::BINARYSAMPLE);
 		return;
 	}
+    #endif
 
 	assert(res[0] <= res[1]);
 	if (res[0] < res[1]) {

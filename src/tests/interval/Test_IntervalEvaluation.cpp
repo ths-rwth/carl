@@ -2,19 +2,28 @@
 #include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <cln/cln.h>
 #include "carl/interval/IntervalEvaluation.h"
+
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
 TEST(IntervalEvaluation, Monomial)
 {
-    Interval<cln::cl_RA> ia( 1, 4 );
-    Interval<cln::cl_RA> ib( 2, 5 );
-    Interval<cln::cl_RA> ic( -2, 3 );
-    Interval<cln::cl_RA> id( 0, 2 );
+    Interval<Rational> ia( 1, 4 );
+    Interval<Rational> ib( 2, 5 );
+    Interval<Rational> ic( -2, 3 );
+    Interval<Rational> id( 0, 2 );
 
-    std::map<Variable, Interval<cln::cl_RA>> map;
+    std::map<Variable, Interval<Rational>> map;
     VariablePool& vpool = VariablePool::getInstance();
     Variable a = vpool.getFreshVariable();
     vpool.setName(a, "a");
@@ -30,38 +39,38 @@ TEST(IntervalEvaluation, Monomial)
     map[c] = ic;
     map[d] = id;
 
-    MultivariatePolynomial<cln::cl_RA> e1({(cln::cl_RA)1*a,(cln::cl_RA)1*b,(cln::cl_RA)1*c,(cln::cl_RA)1*d});
-    MultivariatePolynomial<cln::cl_RA> e2({(cln::cl_RA)1*a*b,(cln::cl_RA)1*c*d});
-    MultivariatePolynomial<cln::cl_RA> e3({(cln::cl_RA)1*a*b*c,(cln::cl_RA)1*d});
-    MultivariatePolynomial<cln::cl_RA> e4({(cln::cl_RA)1*a,(cln::cl_RA)1*b,(cln::cl_RA)-1*c,(cln::cl_RA)-1*d});
-    MultivariatePolynomial<cln::cl_RA> e5({(cln::cl_RA)1*a,(cln::cl_RA)1*b,Term<cln::cl_RA>(7)});
-    MultivariatePolynomial<cln::cl_RA> e6({(cln::cl_RA)12*a,(cln::cl_RA)3*b, (cln::cl_RA)1*c*c,(cln::cl_RA)-1*d*d*d});
-//    MultivariatePolynomial<cln::cl_RA> e7({(cln::cl_RA)1*a,(cln::cl_RA)1*b*, Monomial(c,2),(cln::cl_RA)-1*Monomial(d,3)});
-    MultivariatePolynomial<cln::cl_RA> e7({a,c});
+    MultivariatePolynomial<Rational> e1({(Rational)1*a,(Rational)1*b,(Rational)1*c,(Rational)1*d});
+    MultivariatePolynomial<Rational> e2({(Rational)1*a*b,(Rational)1*c*d});
+    MultivariatePolynomial<Rational> e3({(Rational)1*a*b*c,(Rational)1*d});
+    MultivariatePolynomial<Rational> e4({(Rational)1*a,(Rational)1*b,(Rational)-1*c,(Rational)-1*d});
+    MultivariatePolynomial<Rational> e5({(Rational)1*a,(Rational)1*b,Term<Rational>(7)});
+    MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*c*c,(Rational)-1*d*d*d});
+//    MultivariatePolynomial<Rational> e7({(Rational)1*a,(Rational)1*b*, Monomial(c,2),(Rational)-1*Monomial(d,3)});
+    MultivariatePolynomial<Rational> e7({a,c});
     e7 = e7.pow(2)*b*d+a;
     
 //    e7     = a + b * pow( c + a, 2 ) * d;
     
-    Interval<cln::cl_RA> result = IntervalEvaluation::evaluate( e1, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( 1, 14 ), result );
+    Interval<Rational> result = IntervalEvaluation::evaluate( e1, map );
+    EXPECT_EQ( Interval<Rational>( 1, 14 ), result );
 
     result = IntervalEvaluation::evaluate( e2, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( -2, 26 ), result );
+    EXPECT_EQ( Interval<Rational>( -2, 26 ), result );
 
     result = IntervalEvaluation::evaluate( e3, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( -40, 62 ), result );
+    EXPECT_EQ( Interval<Rational>( -40, 62 ), result );
 
     result = IntervalEvaluation::evaluate( e4, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( -2, 11 ), result );
+    EXPECT_EQ( Interval<Rational>( -2, 11 ), result );
 
     result = IntervalEvaluation::evaluate( e5, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( 10, 16 ), result );
+    EXPECT_EQ( Interval<Rational>( 10, 16 ), result );
 
     result = IntervalEvaluation::evaluate( e6, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( 10,72 ), result );
+    EXPECT_EQ( Interval<Rational>( 10,72 ), result );
 
     result = IntervalEvaluation::evaluate( e7, map );
-    EXPECT_EQ( Interval<cln::cl_RA>( -159, 494 ), result );
+    EXPECT_EQ( Interval<Rational>( -159, 494 ), result );
 }
 
 

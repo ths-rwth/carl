@@ -3,4 +3,5 @@
  */
 
 #cmakedefine USE_MPFR_FLOAT
+#cmakedefine USE_CLN_NUMBERS
 #cmakedefine USE_Z3_NUMBERS

@@ -22,8 +22,21 @@ inline bool isNumber(const double& d) {
 	return (d == d) && !std::isinf(d);
 }
 
+inline bool isInteger(const double& d) {
+	double tmp;
+	return std::modf(d, &tmp) == 0.0;
+}
+
 inline bool isInteger(const int&) {
 	return true;
+}
+
+inline bool isNegative(const double& d) {
+	return d < 0;
+}
+
+inline bool isPositive(const double& d) {
+	return d > 0;
 }
 
 inline std::size_t bitsize(unsigned) {

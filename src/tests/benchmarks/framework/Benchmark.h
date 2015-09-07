@@ -177,6 +177,9 @@ public:
 	BenchmarkResult result() const {
 		return runtimes;
 	}
+	CIPtr& getCI() {
+		return ci;
+	}
 };
 
 }

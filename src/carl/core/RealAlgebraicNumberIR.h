@@ -23,6 +23,8 @@ protected:
 	 */
 	UnivariatePolynomial<Number> polynomial;
 	
+	std::list<UnivariatePolynomial<Number>> sturmSequence;
+	
 	/**
 	 * Isolating interval of this interval representation.
 	 * 
@@ -32,11 +34,6 @@ protected:
 	mutable Interval<Number> interval;
 	
 	/**
-	 * Standard Sturm sequence of the polynomial and its derivative.
-	 */
-	std::list<UnivariatePolynomial<Number>> sturmSequence;
-	
-	/**
 	 * Number of refinements executed to the isolating interval.
 	 */
 	mutable unsigned int refinementCount;
@@ -44,6 +41,7 @@ protected:
 private:
 	std::weak_ptr<RealAlgebraicNumberIR> pThis;
 	std::shared_ptr<RealAlgebraicNumberIR> thisPtr() const {
+		assert(!pThis.expired());
 		return std::shared_ptr<RealAlgebraicNumberIR>(this->pThis);
 	}
 	
@@ -70,8 +68,8 @@ private:
 	 */
 	RealAlgebraicNumberIR(
 			const UnivariatePolynomial<Number>& p,
+			const std::list<UnivariatePolynomial<Number>>& seq,
 			const Interval<Number>& i,
-			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true );
 
@@ -90,11 +88,24 @@ public:
 	static std::shared_ptr<RealAlgebraicNumberIR> create(
 			const UnivariatePolynomial<Number>& p,
 			const Interval<Number>& i,
-			const std::list<UnivariatePolynomial<Number>>& s = std::list<UnivariatePolynomial<Number>>(),
 			const bool normalize = true,
 			const bool isRoot = true) {
 		assert(i.isOpenInterval() || i.isPointInterval());
-		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, i, s, normalize, isRoot));
+		UnivariatePolynomial<Number> pn = p.normalized();
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(pn, pn.standardSturmSequence(), i, normalize, isRoot));
+		CARL_LOG_TRACE("carl.core", "Creating " << res);
+		res->pThis = res;
+		return res;
+	}
+	
+	static std::shared_ptr<RealAlgebraicNumberIR> create(
+			const UnivariatePolynomial<Number>& p,
+			const std::list<UnivariatePolynomial<Number>>& seq,
+			const Interval<Number>& i,
+			const bool normalize = true,
+			const bool isRoot = true) {
+		assert(i.isOpenInterval() || i.isPointInterval());
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, seq, i, normalize, isRoot));
 		CARL_LOG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
@@ -105,7 +116,7 @@ public:
 	 * @return Copy of this.
 	 */
 	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
-		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, sturmSequence, false, this->isRoot());
+		return RealAlgebraicNumberIR<Number>::create(polynomial, interval, false, this->isRoot());
 	}
 
 	/**
@@ -130,19 +141,25 @@ public:
 		return false;
 	}
 
-	virtual Number branchingPoint() const {
-		Number m = this->interval.sample();
-		while (isInteger(m)) {
-			m = Interval<Number>(this->interval.lower(), m).sample();
-		}
-		return m;
+	/**
+	 * Computes a point that can be used for branching. The interval may be refined in the process.
+	 * If the represented value is an integer, zero is returned.
+	 */
+	virtual Number branchingPoint() {
+		// Call isIntegral to refine such that sample() returns a rational.
+		if (this->isIntegral()) return Number(0);
+		if (this->isNumeric()) return this->value();
+		return interval.sample();
 	}
 
 	/**
-	 * Checks if the represented value is integral.
+	 * Checks if the represented value is integral. The interval may be refined in the process.
 	 * @return If this is integral.
 	 */
-	virtual bool isIntegral() const {
+	virtual bool isIntegral() {
+		while (!this->isNumeric() && this->interval.containsInteger()) {
+			this->refine();
+		}
 		if (this->isNumeric()) return carl::isInteger(this->value());
 		return false;
 	}
@@ -242,7 +259,12 @@ public:
 	 * @param i Interval.
 	 * @return If the interval of this number is contained in i.
 	 */
-	virtual bool containedIn(const Interval<Number>& i) const {
+	virtual bool containedIn(const Interval<Number>& i) {
+		if (this->isNumeric()) {
+			return i.contains(this->value());
+		}
+		this->refineAvoiding(i.lower());
+		this->refineAvoiding(i.upper());
 		return i.contains(this->getInterval());
 	}
 
@@ -281,6 +303,10 @@ private:
 	 * @return If a refinement was done.
 	 */
 	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
+	
+	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
+		return p.countRealRoots(this->interval) == 1;
+	}
 
 public:	
 	/**

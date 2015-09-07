@@ -62,7 +62,7 @@ namespace carl
     
     typedef std::set<Variable> Variables;
 
-	typedef std::vector<Variables> QuantifiedVariables;
+    typedef std::vector<Variables> QuantifiedVariables;
     
     template<typename T> 
     using PointerSet = std::set<const T*, pointerLess<T>>;
@@ -113,7 +113,7 @@ namespace carl
     using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
     template<typename Pol>
-    using Factors = FastMap<Pol,exponent>;
+    using Factors = std::map<Pol,exponent>;
     
     // Constants.
     ///@todo move static variables to own cpp
@@ -124,7 +124,7 @@ namespace carl
     
     static const unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
-    static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 7;
+    static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
     
     // Macros.
 
@@ -133,7 +133,5 @@ namespace carl
 	#define CIRCULAR_SHIFT(_intType, _value, _shift) ((_value << _shift) | (_value >> (sizeof(_intType)*8 - _shift)))
 	
 }	// namespace carl
-
-
 
 

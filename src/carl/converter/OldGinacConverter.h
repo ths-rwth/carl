@@ -17,6 +17,8 @@
 #include "../util/Singleton.h"
 #include "../util/SFINAE.h"
 #include "../numbers/typetraits.h"
+#include "../numbers/numbers.h"
+#include "../util/Common.h"
 
 namespace carl
 {   
@@ -45,7 +47,7 @@ namespace carl
         }
 
         template<typename P = Poly, EnableIf<needs_cache<P>> = dummy>
-        P createPolynomial( const Variable::Arg _var )
+        P createPolynomial( Variable::Arg _var )
         {
             return P( std::move(typename P::PolyType(_var)), mpPolynomialCache );
         }
@@ -57,14 +59,50 @@ namespace carl
         }
 
         template<typename P = Poly, DisableIf<needs_cache<P>> = dummy>
-        P createPolynomial( const Variable::Arg _var )
+        P createPolynomial( Variable::Arg _var )
         {
             return P( _var );
         }
         
         bool similar( const GiNaC::ex& a, const GiNaC::ex& b);
 
-        GiNaC::ex convertToGinac(const Poly& poly, const std::map<carl::Variable, GiNaC::ex>& vars);
+        GiNaC::ex convertToGinac(const typename Poly::PolyType& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
+        {
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
+            GiNaC::ex result = 0;
+            for(auto term = poly.begin(); term != poly.end(); ++term)
+            {
+                GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>(term->coeff())) ) );
+                if((*term).monomial())
+                {
+                    for (auto it: *(term->monomial())) {
+                        auto carlToGinacVar = vars.find(it.first);
+                        assert(carlToGinacVar != vars.end());
+                        factor *= GiNaC::pow(carlToGinacVar->second, it.second);
+                    }
+                }
+                result += factor;
+            }
+            return result;
+        }
+
+        template<typename P = Poly, EnableIf<is_factorized<P>> = dummy>
+        GiNaC::ex convertToGinac(const P& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
+        {
+            std::lock_guard<std::recursive_mutex> lock( mMutex );
+            if( existsFactorization( poly ) )
+            {
+                if( poly.factorizedTrivially() )
+                    return convertToGinac( poly.polynomial(), vars );
+                GiNaC::ex result = GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>( poly.coefficient() ))));
+                for( const auto& factor : poly.factorization() )
+                {
+                    result *= GiNaC::pow(convertToGinac( factor.first, vars ), factor.second );
+                }
+                return result;
+            }
+            return GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>( poly.coefficient() ))));
+        }
 
         Poly convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars);
 
@@ -87,7 +125,7 @@ namespace carl
 
         bool ginacDivide(const Poly& polyA, const Poly& polyB, Poly& result);
 
-        std::unordered_map<const Poly, unsigned, std::hash<Poly>> ginacFactorization(const Poly& poly);
+        Factors<Poly> ginacFactorization(const Poly& poly);
 
         bool checkConversion(const Poly& polyA);
     };
@@ -129,7 +167,7 @@ namespace carl
     }
     
     template<typename Poly>
-	std::unordered_map<const Poly, unsigned, std::hash<Poly>> ginacFactorization(const Poly& poly)
+	Factors<Poly> ginacFactorization(const Poly& poly)
     {
         return OldGinacConverter<Poly>::getInstance().ginacFactorization(poly);
     }
@@ -141,9 +179,9 @@ namespace carl
     }
 	
 	template<typename Poly>
-	bool setGinacConverterPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
+	void setGinacConverterPolynomialCache( const std::shared_ptr<typename Poly::CACHE>& _cache )
     {
-        return OldGinacConverter<Poly>::getInstance().setGinacConverterPolynomialCache( _cache );
+        OldGinacConverter<Poly>::getInstance().setPolynomialCache( _cache );
     }
 }
 

@@ -10,6 +10,7 @@
 #include <iostream>
 #include "../numbers/typetraits.h"
 #include "../util/Cache.h"
+#include "DivisionResult.h"
 #include "PolynomialFactorizationPair.h"
 
 namespace carl
@@ -155,7 +156,7 @@ namespace carl
         explicit operator PolyType() const
         {
             if( existsFactorization( *this ) )
-                return this->polynomial();
+                return this->polynomial()*this->mCoefficient;
             return PolyType( mCoefficient );
         }
         
@@ -251,14 +252,6 @@ namespace carl
         }
 
         /**
-         * @return 
-         */
-        CoeffType coprimeFactor() const
-        {
-            return CoeffType(1)/mCoefficient;
-        }
-
-        /**
          * @return true, if the factorized polynomial is constant.
          */
         bool isConstant() const
@@ -292,26 +285,6 @@ namespace carl
             return polynomial().nrTerms();
         }
         
-        typename TermsType::const_iterator begin() const
-        {
-            return polynomial().begin();
-        }
-
-        typename TermsType::const_iterator end() const
-        {
-            return polynomial().end();
-        }
-
-        typename TermsType::const_reverse_iterator rbegin() const
-        {
-            return polynomial().rbegin();
-        }
-
-        typename TermsType::const_reverse_iterator rend() const
-        {
-            return polynomial().rend();
-        }
-        
         /**
          * @return A rough estimation of the size of this factorized polynomial. If it has already been expanded, the number of terms 
          *         of the expanded form are returned; otherwise the number of terms in the factors.
@@ -323,7 +296,7 @@ namespace carl
                 if( factorizedTrivially() )
                     return polynomial().size();
                 size_t result = 0;
-                for( const auto& factor : factorization() )
+                for( const auto& factor : content().factorization() )
                     result += factor.first.size();
                 return result;
             }
@@ -352,7 +325,7 @@ namespace carl
         template<typename C = CoeffType, EnableIf<is_subset_of_rationals<C>> = dummy>
         CoeffType coprimeFactor() const
         {
-            return mCoefficient;
+            return constant_one<CoeffType>::get()/mCoefficient;
         }
         
         /**
@@ -370,7 +343,9 @@ namespace carl
         {
             if( existsFactorization(*this) )
             {
-                return FactorizedPolynomial<P>( std::move(Factorization<P>( factorization() )), constant_one<CoeffType>::get(), mpCache );
+                FactorizedPolynomial<P> result( *this );
+                result.setCoefficient( constant_one<CoeffType>::get() );
+                return result;
             }
             return FactorizedPolynomial<P>( constant_one<CoeffType>::get() );
         }
@@ -413,7 +388,7 @@ namespace carl
          * @see @cite GCL92, page 48
          * @return Total degree.
          */
-        exponent totalDegree() const;
+        size_t totalDegree() const;
         
         /**
          * Returns the coefficient of the leading term.
@@ -443,7 +418,7 @@ namespace carl
             assert( existsFactorization( *this ) );
             if( factorizedTrivially() )
                 return polynomial().getSingleVariable();
-            return factorization().begin()->first.getSingleVariable();
+            return content().factorization().begin()->first.getSingleVariable();
         }
         
         /**
@@ -508,11 +483,11 @@ namespace carl
                     {
                         if( expCoeffPair.second.isConstant() )
                         {
-                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() ) ) );
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second.constantPart() * mCoefficient ) ) );
                         }
                         else
                         {
-                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) ) );
+                            coeffs.insert( coeffs.end(), std::make_pair( expCoeffPair.first, FactorizedPolynomial<P>( expCoeffPair.second, mpCache ) * mCoefficient ) );
                         }
                     }
                     VariableInformation<true, FactorizedPolynomial<P>> viFactorized( varI.maxDegree(), varI.minDegree(), varI.occurence(), std::move( coeffs ) );
@@ -759,6 +734,13 @@ namespace carl
         template<typename P1>
         friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
         
+        /**
+         * @param _fpoly The polynomial to calculate the factorization for.
+         * @return A factorization of this factorized polynomial. (probably finer than the one factorization() returns)
+         */
+        template<typename P1>
+        friend Factors<FactorizedPolynomial<P1>> factor( const FactorizedPolynomial<P1>& _fpoly );
+        
         // Operators which need to be friend.
         template <typename P1>
         friend FactorizedPolynomial<P1> operator+(const FactorizedPolynomial<P1>& _lhs, const FactorizedPolynomial<P1>& _rhs);
@@ -798,6 +780,8 @@ namespace carl
     std::ostream& operator<<( std::ostream& _out, const FactorizedPolynomial<P>& _fpoly );
 
     template<typename P> struct needs_cache<FactorizedPolynomial<P>>: std::true_type {};
+    
+    template<typename P> struct is_factorized<FactorizedPolynomial<P>>: std::true_type {};
     
     /// @name Equality comparison operators
 	/// @{
@@ -1006,6 +990,12 @@ namespace carl
 	inline FactorizedPolynomial<P> operator*(const typename FactorizedPolynomial<P>::CoeffType& _lhs, const FactorizedPolynomial<P>& _rhs)
     {
 		return std::move(_rhs * _lhs);
+	}
+    
+	template <typename P>
+	inline FactorizedPolynomial<P> operator/(const FactorizedPolynomial<P>& _lhs, const typename FactorizedPolynomial<P>::CoeffType& _rhs )
+    {
+		return FactorizedPolynomial<P>(_lhs)/=_rhs;
 	}
 	/// @}
     

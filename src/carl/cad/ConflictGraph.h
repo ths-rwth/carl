@@ -9,7 +9,12 @@
 #pragma once
 
 #include <iostream>
+#include <map>
 #include <vector>
+
+#include <boost/dynamic_bitset.hpp>
+
+#include "Constraint.h"
 
 namespace carl {
 namespace cad {
@@ -37,6 +42,7 @@ enum ConflictType
  * 
  */
 
+template<typename Number>
 class ConflictGraph {
 public:
 	/// type for constraint and sample-point index vertices in a conflict graph
@@ -63,7 +69,103 @@ private:
 	 */
 	long unsigned mSamplePointVertexCount;
 	
+	/// Maps constraints to IDs used in mData
+	std::map<Constraint<Number>, std::size_t> mConstraints;
+	/// Stores for each constraints, which sample points violate the constraint
+	std::vector<boost::dynamic_bitset<>> mData;
+	/// Stores the number of samples that have been registered
+	std::size_t mSampleCount = 0;
 public:
+	/**
+	 * Returns the constraint ID for the given constraint.
+	 */
+	std::size_t getConstraint(const cad::Constraint<Number>& c) {
+		auto it = mConstraints.find(c);
+		if (it == mConstraints.end()) {
+			it = mConstraints.insert(std::make_pair(c, mConstraints.size())).first;
+		}
+		return it->second;
+	}
+	/**
+	 * Returns the constraint for the given constraint ID.
+	 */
+	const cad::Constraint<Number>& getConstraint(std::size_t id) const {
+		for (const auto& it: mConstraints) {
+			if (it.second == id) return it.first;
+		}
+		assert(false);
+		return mConstraints.begin()->first;
+	}
+	/**
+	 * Registers a new sample point and returns its ID.
+	 */
+	std::size_t newSample() {
+		return mSampleCount++;
+	}
+	void set(std::size_t constraint, std::size_t sample, bool value) {
+		if (constraint >= mData.size()) {
+			mData.resize(constraint+1);
+		}
+		if (sample >= mData[constraint].size()) {
+			mData[constraint].resize(sample+1);
+		}
+		mData[constraint][sample] = value;
+	}
+	/**
+	 * Retrieves the constraint that covers the most samples.
+	 */
+	std::size_t getMaxDegreeConstraint() const {
+		assert(mData.size() > 0);
+		std::size_t maxID = 0;
+		std::size_t maxDegree = mData[0].count();
+		for (std::size_t id = 1; id < mData.size(); id++) {
+			std::size_t deg = mData[id].count();
+			if (deg > maxDegree) {
+				maxDegree = deg;
+				maxID = id;
+			}
+		}
+		return maxID;
+	}
+	/**
+	 * Removes the given constraint and disable all sample points covered by this constraint.
+	 */
+	void selectConstraint(std::size_t id) {
+		assert(mData.size() > id);
+		// Store all samples point IDs
+		std::vector<std::size_t> queue;
+		queue.reserve(mData[id].count());
+		for (std::size_t i = mData[id].find_first(); i != boost::dynamic_bitset<>::npos; i = mData[id].find_next(i)) {
+			assert(mData[id][i]);
+			queue.push_back(i);
+		}
+		// Remove this constraint
+		mData[id].clear();
+		// Disable sample points for other constraints
+		for (auto& d: mData) {
+			for (std::size_t i: queue) {
+				if (i >= d.size()) continue;
+				d[i] = false;
+			}
+		}
+	}
+	/**
+	 * Checks if there are samples still uncovered.
+	 */
+	bool hasRemainingSamples() const {
+		for (const auto& d: mData) {
+			if (!d.none()) return true;
+		}
+		return false;
+	}
+	void print() const {
+		std::cout << "Print CG with " << mData.size() << " constraints" << std::endl;
+		for (std::size_t i = 0; i < mData.size(); i++) {
+			std::cout << getConstraint(i) << ":" << std::endl;
+			std::cout << "\t" << mData[i] << std::endl;
+		}
+	}
+	
 	/**
 	 * Constructs an empty graph.
 	 */
@@ -190,7 +292,8 @@ public:
 	 * @param g the conflict graph
 	 * @return output stream containing the graph representation
 	 */
-	friend std::ostream& operator<<(std::ostream& os, const ConflictGraph& g);
+	template<typename Num>
+	friend std::ostream& operator<<(std::ostream& os, const ConflictGraph<Num>& g);
 };
 
 }

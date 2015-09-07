@@ -6,3 +6,4 @@ nbproject/
 **/CompileInfo.cpp
 **/CMakeOptions.cpp
 /resources/
+/src/carl/config.h

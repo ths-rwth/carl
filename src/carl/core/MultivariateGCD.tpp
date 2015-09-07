@@ -49,8 +49,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	// gcd(p, ay + b) is either ay + b or 1.
     
     #ifdef COMPARE_WITH_GINAC
-    typedef MultivariatePolynomial<C,O,P> PolyT;
-    return ginacGcd<PolyT>( mp1, mp2 );
+    return ginacGcd<Polynomial>( mp1, mp2 );
     #else 
 	Variable x = getMainVar(mp1, mp2);
 	if(x == Variable::NO_VARIABLE)
@@ -60,8 +59,13 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	UnivReprPol A = mp1.toUnivariatePolynomial(x);
 	UnivReprPol B = mp2.toUnivariatePolynomial(x);
 	UnivReprPol GCD = (*static_cast<GCDCalculation*>(this))(A.normalized(),B.normalized());
-	
-	return Polynomial(GCD);
+    Polynomial result = Polynomial(GCD);
+    // TODO: prevent the following case in the given algorithm GCDCalculation
+    if( carl::isNegative( result.lcoeff() ) && !(carl::isNegative( mp1.lcoeff() ) && carl::isNegative( mp2.lcoeff() )) )
+    {
+        result = -result;
+    }
+	return result;
 	//return Result()
 //		return Result(GCD, A/GCD, B/GCD);
     #endif

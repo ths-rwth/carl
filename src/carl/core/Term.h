@@ -11,6 +11,7 @@
 #include "Monomial.h"
 #include "VariablesInformation.h"
 #include "Definiteness.h"
+#include "../numbers/numbers.h"
 #include "../interval/Interval.h"
 #include "../util/pointerOperations.h"
 
@@ -25,7 +26,7 @@ template<typename Coefficient>
 class Term
 {
 	private:
-		Coefficient mCoeff = Coefficient(0);
+		Coefficient mCoeff = constant_zero<Coefficient>::get();
 		Monomial::Arg mMonomial;
 
 	public:
@@ -141,6 +142,16 @@ class Term
 		{
 			return !mMonomial;
 		}
+        
+        /**
+         * @return true, if the image of this term is integer-valued.
+         */
+        inline bool integerValued() const
+        {
+            if(!carl::isInteger(mCoeff)) return false;
+            return (!mMonomial || mMonomial->integerValued());
+        }
+        
 		/**
 		 * Checks whether the monomial has exactly the degree one.
 		 * @return 
@@ -181,6 +192,11 @@ class Term
 			return mMonomial->hasNoOtherVariable(v);
 		}
 		
+        bool isSingleVariable() const
+        {
+            if (!mMonomial) return false;
+            return mMonomial->isLinear();
+        }
 		/**
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.

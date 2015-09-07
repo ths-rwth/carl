@@ -14,6 +14,7 @@
 #include <mutex>
 #include <sstream>
 #include <string.h>
+#include <thread>
 #include <utility>
 
 #include "../util/Singleton.h"
@@ -142,7 +143,7 @@ struct StreamSink: public Sink {
 	 * Create a StreamSink from some output stream.
      * @param os Output stream.
      */
-	StreamSink(std::ostream& os): os(os.rdbuf()) {}
+	StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
 	virtual ~StreamSink() {}
 	virtual std::ostream& log() { return os; }
 };
@@ -234,8 +235,8 @@ struct RecordInfo {
      * @param func Function name.
      * @param line Line number.
      */
-	RecordInfo(const std::string& filename, const std::string& func, unsigned line): 
-		filename(filename), func(func), line(line) {}
+	RecordInfo(const std::string& _filename, const std::string& _func, unsigned _line): 
+		filename(_filename), func(_func), line(_line) {}
 };
 
 /**
@@ -244,6 +245,8 @@ struct RecordInfo {
 struct Formatter {
 	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
+	
+	virtual ~Formatter() {}
 	/**
 	 * Extracts the maximum width of a channel to optimize the formatting.
      * @param f Filter.
@@ -263,7 +266,7 @@ struct Formatter {
      */
 	virtual void prefix(std::ostream& os, const Timer& timer, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		os.fill(' ');
-		os << "[" << std::right << std::setw(5) << timer << "] " << level << " ";
+		os << "[" << std::right << std::setw(5) << timer << "] " << std::this_thread::get_id() << " " << level << " ";
 		std::string filename(carl::basename(info.filename));
 		unsigned long spacing = 1;
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
@@ -318,6 +321,7 @@ public:
      * @param sink Sink.
      */
 	void configure(const std::string& id, std::shared_ptr<Sink> sink) {
+		std::lock_guard<std::mutex> lock(mutex);
 		this->data[id] = std::make_tuple(sink, Filter(), std::make_shared<Formatter>());
 	}
 	/**
@@ -409,9 +413,9 @@ inline Logger& logger() {
 /// Create a record info without function name.
 #define __CARL_LOG_RECORD_NOFUNC ::carl::logging::RecordInfo(__FILE__, "", __LINE__)
 /// Basic logging macro.
-#define __CARL_LOG(level, channel, expr) { std::stringstream ss; ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD); }
+#define __CARL_LOG(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD); }
 /// Basic logging macro without function name.
-#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream ss; ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, ss, __CARL_LOG_RECORD_NOFUNC); }
+#define __CARL_LOG_NOFUNC(level, channel, expr) { std::stringstream __ss; __ss << expr; ::carl::logging::Logger::getInstance().log(level, channel, __ss, __CARL_LOG_RECORD_NOFUNC); }
 
 /// Intended to be called when entering a function. Format: `<function name>(<args>)`.
 #define __CARL_LOG_FUNC(channel, args) __CARL_LOG_NOFUNC(::carl::logging::LogLevel::LVL_TRACE, channel, __func__ << "(" << args << ")");
@@ -430,7 +434,7 @@ inline Logger& logger() {
 #define __CARL_LOG_FATAL(channel, expr) __CARL_LOG(::carl::logging::LogLevel::LVL_FATAL, channel, expr)
 
 /// Log and assert the given condition, if the condition evaluates to false.
-#define __CARL_LOG_ASSERT(channel, condition, expr) if (!condition) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
+#define __CARL_LOG_ASSERT(channel, condition, expr) if (!(condition)) { __CARL_LOG_FATAL(channel, expr); assert(condition); }
 
 }
 }

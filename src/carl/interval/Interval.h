@@ -38,6 +38,7 @@
 CLANG_WARNING_DISABLE("-Wunused-parameter")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
+#include <boost/functional/hash.hpp>
 CLANG_WARNING_RESET
 #include <cmath>
 
@@ -395,7 +396,7 @@ namespace carl
          * @param n The passed double.
          */
         template<typename N = Number, DisableIf<std::is_same<N, int >> = dummy >
-        explicit Interval(const int& n) :
+        Interval(const int& n) :
         mContent(carl::Interval<Number>::BoostInterval(n, n)),
         mLowerBoundType(BoundType::WEAK),
         mUpperBoundType(BoundType::WEAK) { }
@@ -926,7 +927,7 @@ namespace carl
          */
         inline void set(const Number& lower, const Number& upper)
         {
-			if(isUnbounded()) {
+			if(isInfinite()) {
 				mContent = BoostInterval(lower, upper);
 				mLowerBoundType = BoundType::WEAK;
 				mUpperBoundType = BoundType::WEAK;
@@ -940,13 +941,33 @@ namespace carl
         }
 
         /**
-         * Function which determines, if the interval is unbounded.
+         * Function which determines, if the interval is (-oo,oo).
          * @return True if both bounds are INFTY.
+         */
+        inline bool isInfinite() const
+        {
+            assert(this->isConsistent());
+            return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
+        }
+
+        /**
+         * Function which determines, if the interval is unbounded.
+         * @return True if at least one bound is INFTY.
          */
         inline bool isUnbounded() const
         {
             assert(this->isConsistent());
-            return mLowerBoundType == BoundType::INFTY && mUpperBoundType == BoundType::INFTY;
+            return mLowerBoundType == BoundType::INFTY || mUpperBoundType == BoundType::INFTY;
+        }
+
+        /**
+         * Function which determines, if the interval is half-bounded.
+         * @return True if exactly one bound is INFTY.
+         */
+        inline bool isHalfBounded() const
+        {
+            assert(this->isConsistent());
+            return (mLowerBoundType == BoundType::INFTY) != (mUpperBoundType == BoundType::INFTY);
         }
 
         /**
@@ -971,7 +992,7 @@ namespace carl
         inline bool isPointInterval() const
         {
             assert(this->isConsistent());
-            return (mContent.lower() == mContent.upper() && this->isClosedInterval());
+            return (this->isClosedInterval() && mContent.lower() == mContent.upper());
         }
 
         /**
@@ -1081,6 +1102,12 @@ namespace carl
         void integralPart_assign();
         
         /**
+         * Checks if the interval contains at least one integer value.
+         * @return true, if the interval contains an integer.
+         */
+        bool containsInteger() const;
+        
+        /**
          * Returns the diameter of the interval.
          * @return Diameter.
          */
@@ -1123,7 +1150,7 @@ namespace carl
 		Number center() const
 		{
 			assert(this->isConsistent());
-			if (this->isUnbounded()) return carl::constant_zero<Number>().get();
+			if (this->isInfinite()) return carl::constant_zero<Number>().get();
 			if (this->mLowerBoundType == BoundType::INFTY)
 				return (Number)(carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get());
 			if (this->mUpperBoundType == BoundType::INFTY)
@@ -1135,7 +1162,7 @@ namespace carl
 		N center() const
 		{
 			assert(this->isConsistent());
-			if (this->isUnbounded()) return carl::constant_zero<N>().get();
+			if (this->isInfinite()) return carl::constant_zero<N>().get();
 			if (this->mLowerBoundType == BoundType::INFTY)
 				return (N)(std::nextafter(this->mContent.upper(), -INFINITY));
 			if (this->mUpperBoundType == BoundType::INFTY)
@@ -1369,11 +1396,13 @@ namespace carl
          * Calculates the square root of the interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> sqrt() const;
         
         /**
          * Calculates and assigns the square root of the interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void sqrt_assign();
 
         /**
@@ -1381,23 +1410,27 @@ namespace carl
          * @param deg Degree.
          * @return Result.
          */
-        Interval<Number> root(unsigned deg) const;
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
+        Interval<Number> root(int deg) const;
         
         /**
          * Calculates and assigns the nth root of the interval with respect to natural interval arithmetic.
          * @param deg Degree.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void root_assign(unsigned deg);
 
         /**
          * Calculates the logarithm of the interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> log() const;
         
         /**
          * Calculates and assigns the logarithm of the interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void log_assign();
 
         /*
@@ -1408,137 +1441,163 @@ namespace carl
          * Calculates the sine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> sin() const;
         
         /**
          * Calculates and assigns the sine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void sin_assign();
 
         /**
          * Calculates the cosine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> cos() const;
         
         /**
          * Calculates and assigns the cosine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void cos_assign();
 
         /**
          * Calculates the tangent of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> tan() const;
         
         /**
          * Calculates and assigns the tangent of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void tan_assign();
 
         /**
          * Calculates the arcus sine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> asin() const;
         
         /**
          * Calculates and assigns the arcus sine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void asin_assign();
 
         /**
          * Calculates the arcus cosine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> acos() const;
         
         /**
          * Calculates and assigns the arcus cosine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void acos_assign();
 
         /**
          * Calculates the arcus tangent of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> atan() const;
         
         /**
          * Calculates and assigns the arcus tangent of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void atan_assign();
 
         /**
          * Calculates the hyperbolic sine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> sinh() const;
         
         /**
          * Calculates and assigns the hyperbolic sine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void sinh_assign();
 
         /**
          * Calculates the hyperbolic cosine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> cosh() const;
         
         /**
          * Calculates and assigns the hyperbolic cosine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void cosh_assign();
 
         /**
          * Calculates the hyperbolic tangent of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> tanh() const;
         
         /**
          * Calculates and assigns the hyperbolic tangent of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void tanh_assign();
 
         /**
          * Calculates the hyperbolic arcus sine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> asinh() const;
         
         /**
          * Calculates and assigns the hyperbolic arcus sine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void asinh_assign();
 
         /**
          * Calculates the hyperbolic arcus cosine of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> acosh() const;
         
         /**
          * Calculates and assigns the hyperbolic arcus cosine of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void acosh_assign();
 
         /**
          * Calculates the hyperbolic arcus tangent of the given interval with respect to natural interval arithmetic.
          * @return Result.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> atanh() const;
         
         /**
          * Calculates and assigns the hyperbolic arcus tangent of the given interval with respect to natural interval arithmetic.
          */
+        template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         void atanh_assign();
 
         /*
          * Boolean Operations
          */
+        
+        bool intersectsWith(const Interval<Number>& rhs) const;
 
         /**
          * Intersects two intervals in a set-theoretic manner.
@@ -1600,10 +1659,21 @@ namespace carl
         {
             return this->lower() <= this->upper();
         }
+    /**
+    * Calculates the distance between two Intervals.
+    * @param intervalA Interval to wich we want to know the distance.
+    * @return distance to intervalA
+    */
+    Number distance(const Interval<Number>& intervalA);
+
+    Interval<Number> convexHull(const Interval<Number>& interval);
+
     };
 
 	template<typename T>
 	struct is_number<Interval<T>> : std::true_type {};
+  
+
 
     /*
      * Overloaded arithmetics operators
@@ -1838,6 +1908,64 @@ namespace carl
      */
     template<typename Number>
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the righthand side has maximal one intersection with the lefthand side
+     * at the upper bound of lhs.
+     */
+    template<typename Number>
+    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs);
+    template<typename Number>
+    inline bool operator <=(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs>=lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side has maximal one intersection with the righthand side
+     * at the lower bound of lhs.
+     */
+    template<typename Number>
+    inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator >=(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs<=lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side is smaller than the righthand side.
+     */
+    template<typename Number>
+    inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator <(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs>lhs;
+    }
+    
+    /**
+     * Operator for the comparison of two intervals.
+     * @param lhs Lefthand side.
+     * @param rhs Righthand side.
+     * @return True if the lefthand side is larger than the righthand side.
+     */
+    template<typename Number>
+    inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    template<typename Number>
+    inline bool operator >(const Number& lhs, const Interval<Number>& rhs)
+    {
+        return rhs<lhs;
+    }
 
     
         template<typename Number>
@@ -1961,14 +2089,13 @@ namespace std
 		 */
 		size_t operator()(const carl::Interval<Number>& interval) const
         {
-            size_t result = interval.lowerBoundType();
-            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-            result ^= interval.upperBoundType();
-            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-			std::hash<Number> h;
-			result ^= h( interval.lowerBound() );
-            result = (result << 5) | (result >> (sizeof(size_t)*8 - 5));
-			result ^= h( interval.upperBound() );
+        	size_t result = 0;
+        	boost::hash_combine(result, static_cast<size_t>(interval.lowerBoundType()));
+        	boost::hash_combine(result, static_cast<size_t>(interval.upperBoundType()));
+        	std::hash<Number> h;
+        	boost::hash_combine(result, h(interval.upper()));
+        	boost::hash_combine(result, h(interval.lower()));
+
             return result;
 		}
 	};

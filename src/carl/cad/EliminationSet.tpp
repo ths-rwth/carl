@@ -589,7 +589,7 @@ void EliminationSet<Coeff>::elimination(
 	CARL_LOG_FUNC("carl.cad.eliminationset", *p << ", " << variable << ", " << avoidSingle);
 	std::list<const UPolynomial*> parents({p});
 	// add all coefficients of p
-	for (auto coeff: p->coefficients()) {
+	for (const auto& coeff: p->coefficients()) {
 		if (coeff.isNumber()) continue;
 		eliminated.insert(coeff.toUnivariatePolynomial(variable), parents, avoidSingle);
 		DOT_EDGE("elimination", p, coeff.toUnivariatePolynomial(variable), "label=\"coefficient\"");

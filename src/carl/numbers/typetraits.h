@@ -335,6 +335,8 @@ namespace carl
 {
 template<typename T> struct needs_cache : std::false_type {};
 
+template<typename T> struct is_factorized : std::true_type {};
+
 template<typename T>
 class PreventConversion
 {

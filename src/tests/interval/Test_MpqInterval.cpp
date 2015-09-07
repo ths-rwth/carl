@@ -84,7 +84,7 @@ TEST(MpqInterval, Getters)
     
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
-    EXPECT_TRUE(test1.isUnbounded());
+    EXPECT_TRUE(test1.isInfinite());
 
     test2.setUpperBoundType(BoundType::INFTY);
     EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
@@ -130,7 +130,7 @@ TEST(MpqInterval, StaticCreators)
     EXPECT_EQ(0, i1.lower());
     EXPECT_EQ(0, i1.upper());
     
-    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_TRUE(i2.isInfinite());
     EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
     EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 	

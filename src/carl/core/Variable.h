@@ -75,7 +75,7 @@ private:
 public:
 #ifdef VARIABLE_PASS_BY_VALUE
 	/// Argument type for variables being function arguments.
-	typedef VariableByValue Arg;
+	typedef VariableByValue Arg;		
 #else
 	/// Argument type for variables being function arguments.
 	typedef ByRef Arg;
@@ -108,7 +108,7 @@ public:
 		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | (unsigned)type)
 	{
 		assert(rank < (1 << RESERVED_FOR_RANK));
-		assert(0 < id && id < ((std::size_t)1 << AVAILABLE));
+		assert(0 < id && id < (std::size_t(1) << AVAILABLE));
 		assert(VariableType::MIN_TYPE <= type && type <= VariableType::MAX_TYPE);
 	}
 	
@@ -117,7 +117,7 @@ public:
 	 * @return Variable id.
 	 */
 	std::size_t getId() const {
-		return (mContent >> RESERVED_FOR_TYPE) % ((std::size_t)1 << AVAILABLE);
+		return (mContent >> RESERVED_FOR_TYPE) % (std::size_t(1) << AVAILABLE);
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public:
 	 * @return Variable type.
 	 */
 	VariableType getType() const {
-		return (VariableType)(mContent % ((std::size_t)1 << RESERVED_FOR_TYPE));
+		return VariableType(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
 	}
 	
 	/**
@@ -217,9 +217,3 @@ namespace std {
 		}
 	};
 } // namespace std
-
-
-
-
-
-

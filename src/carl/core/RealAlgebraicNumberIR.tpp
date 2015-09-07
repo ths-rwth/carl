@@ -19,8 +19,8 @@ template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(Variable::Arg var) :
 		RealAlgebraicNumber<Number>(true, true, 0),
 		polynomial(var),
+		sturmSequence(polynomial.standardSturmSequence()),
 		interval(Interval<Number>::zeroInterval()),
-		sturmSequence(this->polynomial.standardSturmSequence()),
 		refinementCount(0)
 {
 }
@@ -28,15 +28,14 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(Variable::Arg var) :
 template<typename Number>
 RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 		const UnivariatePolynomial<Number>& p,
-		const Interval<Number>& i,
 		const std::list<UnivariatePolynomial<Number>>& seq,
+		const Interval<Number>& i,
 		const bool normalize,
 		const bool isRoot ) :
 		RealAlgebraicNumber<Number>(isRoot, false, 0),
-		//polynomial(p.squareFreePart().template convert<Number>()),
 		polynomial(p),
+		sturmSequence(seq),
 		interval(i),
-		sturmSequence( seq.empty() ? polynomial.standardSturmSequence() : seq ),
 		refinementCount(0)
 {
 	assert(!this->polynomial.isConstant());
@@ -78,29 +77,57 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 		n->refine();
 		i = this->getInterval() + n->getInterval();
 	}
-	return RealAlgebraicNumberIR<Number>::create(p, i, seq);
+	return RealAlgebraicNumberIR<Number>::create(p, seq, i);
 }
 
 template<typename Number>
 std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() const {
 	if (this->isZero()) {
-		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval, this->sturmSequence);
+		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval);
 	}
 	return RealAlgebraicNumberIR<Number>::create(this->polynomial.negateVariable(), this->interval.inverse());
 }
 
 template<typename Number>
 bool RealAlgebraicNumberIR<Number>::equal(RealAlgebraicNumberIRPtr<Number>& n) {
+	CARL_LOG_FUNC("carl.cad", this->thisPtr() << ", " << n);
 	if (this == n.get()) return true;
 	if (n.get() == nullptr) return false;
 	if (this->isZero() && n->isZero()) return true;
 	if (this->upper() <= n->lower()) return false;
 	if (this->lower() >= n->upper()) return false;
-	if ((this->interval == n->interval) && (this->polynomial == n->polynomial)) {
-		n = this->thisPtr();
-		return true;
+	if (this->polynomial == n->polynomial) {
+		if ((this->lower() >= n->lower()) && (n->upper() >= this->upper())) {
+			//n = this->thisPtr();
+			return true;
+		}
+		if ((this->lower() <= n->lower()) && (n->upper() <= this->upper())) {
+			//this->pThis = n;
+			return true;
+		}
 	}
-	return this->add(n->minus())->isZero();
+	
+	CARL_LOG_TRACE("carl.cad", "\tNot trivially equal or different");
+
+	if (this->polynomial != n->polynomial) {
+		auto g = UnivariatePolynomial<Number>::gcd(polynomial, n->polynomial);
+		if (!this->isRootOf(g)) return false;
+		this->polynomial = g;
+		this->sturmSequence = g.standardSturmSequence();
+		if (!n->isRootOf(g)) return false;
+		n->polynomial = g;
+		n->sturmSequence = this->sturmSequence;
+		return this->equal(n);
+	}
+	
+	while (true) {
+		if (this->upper() <= n->lower()) return false;
+		if (this->lower() >= n->upper()) return false;
+		if (this->interval == n->interval) return true;
+		// containedIn performs refinement
+		if (this->containedIn(n->interval)) return true;
+		if (n->containedIn(this->interval)) return true;
+	}
 }
 
 template<typename Number>
@@ -404,7 +431,7 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 	while (this->getPolynomial().countRealRoots(this->getInterval()) == 0) {
 		if (isLeft) {
 			Number oldBound = this->lower();
-			Number newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
+			newBound = Interval<Number>(n, BoundType::STRICT, oldBound, BoundType::STRICT).sample();
 			if (this->getPolynomial().isRoot(newBound)) {
 				this->mValue = newBound;
 				this->mIsNumeric = true;
@@ -415,7 +442,7 @@ bool RealAlgebraicNumberIR<Number>::refineAvoiding(const Number& n) {
 			this->setLower(newBound);
 		} else {
 			Number oldBound = this->upper();
-			Number newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
+			newBound = Interval<Number>(oldBound, BoundType::STRICT, n, BoundType::STRICT).sample();
 			if (this->getPolynomial().isRoot(newBound)) {
 				this->mValue = newBound;
 				this->mIsNumeric = true;

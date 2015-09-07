@@ -13,9 +13,17 @@
 #include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <cln/cln.h>
-#include <gmpxx.h>
 #include <iostream>
+
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 using namespace carl;
 
@@ -30,11 +38,31 @@ TEST(DoubleInterval, Constructor)
     DoubleInterval test5 = DoubleInterval::unboundedInterval();
     DoubleInterval test6 = DoubleInterval::emptyInterval();
 	
-    DoubleInterval test7 = DoubleInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
+    DoubleInterval test7 = DoubleInterval((Rational)-1, BoundType::WEAK, (Rational)1, BoundType::WEAK);
     
 	DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
 	DoubleInterval test9 = DoubleInterval(1);
 	DoubleInterval test10 = DoubleInterval(0);
+    SUCCEED();
+}
+
+TEST(DoubleInterval, Hash)
+{
+    DoubleInterval test1 = DoubleInterval(-1, BoundType::WEAK, 1, BoundType::WEAK);
+    std::hash<DoubleInterval> hashFkt;
+    size_t hash1 = hashFkt(test1);
+    /*DoubleInterval test2 = DoubleInterval(-1, BoundType::STRICT, 1, BoundType::STRICT);
+    DoubleInterval test3 = DoubleInterval(-1, BoundType::INFTY, 1, BoundType::INFTY);
+    EXPECT_EQ(DoubleInterval(1, BoundType::WEAK, -1, BoundType::WEAK), DoubleInterval::emptyInterval());
+    DoubleInterval test5 = DoubleInterval::unboundedInterval();
+    DoubleInterval test6 = DoubleInterval::emptyInterval();
+	
+    DoubleInterval test7 = DoubleInterval((Rational)-1, BoundType::WEAK, (Rational)1, BoundType::WEAK);
+    
+	DoubleInterval test8 = DoubleInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
+	DoubleInterval test9 = DoubleInterval(1);
+	DoubleInterval test10 = DoubleInterval(0);
+	*/
     SUCCEED();
 }
 
@@ -84,7 +112,7 @@ TEST(DoubleInterval, Getters)
     
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
-    EXPECT_TRUE(test1.isUnbounded());
+    EXPECT_TRUE(test1.isInfinite());
 
     test2.setUpperBoundType(BoundType::INFTY);
     EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
@@ -130,7 +158,7 @@ TEST(DoubleInterval, StaticCreators)
     EXPECT_EQ(0, i1.lower());
     EXPECT_EQ(0, i1.upper());
     
-    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_TRUE(i2.isInfinite());
     EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
     EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 	
@@ -572,6 +600,16 @@ TEST(DoubleInterval, Multiplication)
     
     result  = DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ).mul(DoubleInterval( -2, BoundType::WEAK, -1, BoundType::STRICT ));
     EXPECT_EQ( DoubleInterval( 1, BoundType::STRICT, 4, BoundType::WEAK ), result );
+    
+    DoubleInterval e1 = DoubleInterval( 0.0, BoundType::INFTY, 0.0, BoundType::STRICT );
+    DoubleInterval e2 = DoubleInterval( 0.0, BoundType::WEAK, 0.0, BoundType::INFTY );
+    DoubleInterval e3 = DoubleInterval( -2.0, BoundType::STRICT, 0.0, BoundType::STRICT );
+    DoubleInterval e4 = DoubleInterval( 0.0, BoundType::WEAK, 2.0, BoundType::STRICT );
+    
+    result = e1.mul( e2 );
+    EXPECT_EQ( DoubleInterval( 0.0, BoundType::INFTY, 0.0, BoundType::WEAK ), result );
+    result = e3.mul( e4 );
+    EXPECT_EQ( DoubleInterval( -4.0, BoundType::STRICT, 0.0, BoundType::WEAK ), result );
 }
 
 

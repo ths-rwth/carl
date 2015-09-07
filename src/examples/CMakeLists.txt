@@ -15,6 +15,8 @@ add_executable( IntervalCoefficientExample
 		IntervalCoefficientExample.cpp		)
 add_executable( IntervalExample
 		IntervalExample.cpp		)
+add_executable( HornerTest
+		HornerTest.cpp		)
 add_executable( MpqIntervalExample
 		MpqIntervalExample.cpp		)
 add_executable( example_smt2
@@ -22,9 +24,9 @@ add_executable( example_smt2
 )
 
 
-
 target_link_libraries(IntervalContractionExample lib_carl ${libraries} )
 target_link_libraries(FloatExample lib_carl ${libraries} )
+target_link_libraries(HornerTest lib_carl ${libraries} )
 target_link_libraries(GroebnerExample lib_carl ${libraries} )
 target_link_libraries(IntervalExample lib_carl ${libraries} )
 target_link_libraries(IntervalCoefficientExample lib_carl ${libraries} )

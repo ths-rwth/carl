@@ -113,7 +113,7 @@ public:
 	 * @param coeff Leading coefficient.
 	 * @param degree Degree.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, unsigned degree = 0);
+	UnivariatePolynomial(Variable::Arg mainVar, const Coefficient& coeff, std::size_t degree = 0);
 
 	/**
 	 * Construct polynomial with the given coefficients.
@@ -492,7 +492,9 @@ public:
 	 */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	Coefficient coprimeFactor() const;
-	
+	template<typename C = Coefficient, DisableIf<is_subset_of_rationals<C>> = dummy>
+	typename UnderlyingNumberType<Coefficient>::type coprimeFactor() const;
+
 	/**
 	 * Constructs a new polynomial that is scaled such that the coefficients are coprime.
 	 * It is calculated by multiplying it with the coprime factor.
@@ -501,6 +503,9 @@ public:
 	 */
 	template<typename C = Coefficient, EnableIf<is_subset_of_rationals<C>> = dummy>
 	UnivariatePolynomial<typename IntegralType<Coefficient>::type> coprimeCoefficients() const;
+
+	template<typename C = Coefficient, DisableIf<is_subset_of_rationals<C>> = dummy>
+	UnivariatePolynomial<Coefficient> coprimeCoefficients() const;
 
 	/**
 	 * Checks whether the polynomial is unit normal.
@@ -567,6 +572,11 @@ public:
 
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor) const;
+	/**
+	 * Calculates the pseudo-remainder.
+	 * @see @cite GCL92, page 55, Pseudo-Division Property
+	 */
+	UnivariatePolynomial prem_old(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial prem(const UnivariatePolynomial& divisor) const;
 	UnivariatePolynomial sprem(const UnivariatePolynomial& divisor) const;
 
@@ -874,7 +884,8 @@ public:
 	 * @param root Root to be eliminated.
 	 */
 	void eliminateRoot(const Coefficient& root);
-
+	
+public:
 	std::list<UnivariatePolynomial> standardSturmSequence() const;
 	std::list<UnivariatePolynomial> standardSturmSequence(const UnivariatePolynomial& polynomial) const;
 
@@ -1028,12 +1039,16 @@ public:
 	 * @param rhs Right hand side.
 	 * @return Changed polynomial.
 	 */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	UnivariatePolynomial& operator*=(Variable::Arg rhs);
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	UnivariatePolynomial& operator*=(Variable::Arg rhs);
 	UnivariatePolynomial& operator*=(const Coefficient& rhs);
 	template<typename I = Coefficient, DisableIf<std::is_same<Coefficient, I>>...>
 	UnivariatePolynomial& operator*=(const typename IntegralType<Coefficient>::type& rhs);
 	UnivariatePolynomial& operator*=(const UnivariatePolynomial& rhs);
 	/// @}
-	
+
 	/// @name Multiplication operators
 	/// @{
 	/**
@@ -1044,6 +1059,10 @@ public:
 	 */
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, const UnivariatePolynomial<C>& rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(const UnivariatePolynomial<C>& lhs, Variable::Arg rhs);
+	template<typename C>
+	friend UnivariatePolynomial<C> operator*(Variable::Arg lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
 	friend UnivariatePolynomial<C> operator*(const C& lhs, const UnivariatePolynomial<C>& rhs);
 	template<typename C>
@@ -1184,7 +1203,7 @@ struct hash<carl::UnivariatePolynomial<Coefficient>> {
 template<typename Coefficient>
 struct less<carl::UnivariatePolynomial<Coefficient>> {
 	carl::PolynomialComparisonOrder order;
-	less(carl::PolynomialComparisonOrder order = carl::PolynomialComparisonOrder::Default) : order(order) {};
+	less(carl::PolynomialComparisonOrder _order = carl::PolynomialComparisonOrder::Default) : order(_order) {}
 	/**
 	 * Compares two univariate polynomials.
 	 * @param lhs First polynomial.

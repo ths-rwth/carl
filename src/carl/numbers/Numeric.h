@@ -6,12 +6,13 @@
  * Created on 2014-03-11
  */
 
+// WARNING: THIS CLASS IS NOT YET THREAD SAFE!!!
+
 #pragma once
 
 #include <iostream>
 #include <assert.h>
 #include <vector>
-#include <cln/cln.h>
 #include <limits>
 #include "numbers.h"
 
@@ -228,11 +229,23 @@ namespace carl
             return carl::isInteger( Numeric<T>::mRationalPool[(size_t)_value.content()-(size_t)HIGHTEST_INTEGER_VALUE] );
     }
     
-    template<>
-    inline void reserve<Numeric<cln::cl_RA>>( size_t _expectedNumOfElements )
+//    template<>
+//    inline void reserve<Numeric<cln::cl_RA>>( size_t _expectedNumOfElements )
+//    {
+//        Numeric<cln::cl_RA>::mRationalPool.reserve( Numeric<cln::cl_RA>::mRationalPool.capacity() + _expectedNumOfElements );
+//    }
+    
+    template<typename T>
+    struct IntegralType<Numeric<T>> {
+        typedef typename carl::IntegralType<T>::type type;
+    };
+    
+    template<typename Integer, typename T>
+    inline Integer toInt(const Numeric<T>& n)
     {
-        Numeric<cln::cl_RA>::mRationalPool.reserve( Numeric<cln::cl_RA>::mRationalPool.capacity() + _expectedNumOfElements );
+        return carl::toInt<Integer>((T)n); // TODO: this could be more efficient for native integer types
     }
+    
 } // namespace carl
 
 

@@ -25,7 +25,7 @@ template<typename Number>
 Sign Interval<Number>::sgn() const
 {
     assert(this->isConsistent());
-    if (this->isUnbounded()) return Sign::ZERO;
+    if (this->isInfinite()) return Sign::ZERO;
     if ((mLowerBoundType == BoundType::STRICT && mContent.lower() >= carl::constant_zero<Number>().get()) || (mLowerBoundType == BoundType::WEAK && mContent.lower() > carl::constant_zero<Number>().get())) return Sign::POSITIVE;
     if ((mUpperBoundType == BoundType::STRICT && mContent.upper() <= carl::constant_zero<Number>().get()) || (mUpperBoundType == BoundType::WEAK && mContent.upper() < carl::constant_zero<Number>().get())) return Sign::NEGATIVE;
     return Sign::ZERO;
@@ -50,7 +50,7 @@ Interval<Number> Interval<Number>::integralPart() const
 		case BoundType::STRICT:
 			newLowerBound = ceil(mContent.lower());
 			newLowerBoundType = BoundType::WEAK;
-			if(newLowerBound == ceil(mContent.lower()))
+			if(newLowerBound == mContent.lower())
 				newLowerBound += carl::constant_one<Number>::get();
 			break;
 		default:
@@ -66,10 +66,11 @@ Interval<Number> Interval<Number>::integralPart() const
 		case BoundType::STRICT:
 			newUpperBound = floor(mContent.upper());
 			newUpperBoundType = BoundType::WEAK;
-			if(newUpperBound == floor(mContent.upper()))
+			if(newUpperBound == mContent.upper())
 				newLowerBound -= carl::constant_one<Number>::get();
 			if(newLowerBoundType == BoundType::INFTY)
 				newLowerBound = newUpperBound;
+			break;
 		default:
 			if(newLowerBoundType != BoundType::INFTY)
 				newUpperBound = newLowerBound;
@@ -83,6 +84,31 @@ template<typename Number>
 {
     *this = integralPart();
 }
+
+template<typename Number>
+bool Interval<Number>::containsInteger() const
+	{
+		assert(this->isConsistent());
+		switch (mLowerBoundType) {
+			case BoundType::INFTY:
+				return true;
+			case BoundType::STRICT:
+				break;
+			case BoundType::WEAK: 
+				if (carl::isInteger(mContent.lower())) return true;
+		}
+		switch (mUpperBoundType) {
+			case BoundType::INFTY:
+				return true;
+			case BoundType::STRICT:
+				break;
+			case BoundType::WEAK: 
+				if (carl::isInteger(mContent.upper())) return true;
+		}
+		if (carl::ceil(mContent.lower()) < mContent.upper()) return true;
+		return false;
+	}
+
 
 template<typename Number>
 Number Interval<Number>::diameter() const
@@ -156,33 +182,33 @@ template<typename Number>
 	bool Interval<Number>::contains(const Number& val) const
 	{
 		assert(this->isConsistent());
-            switch( mLowerBoundType )
-            {
+        switch( mLowerBoundType )
+        {
+        case BoundType::INFTY:
+            break;
+        case BoundType::STRICT:
+            if( mContent.lower() >= val )
+                return false;
+            break;
+        case BoundType::WEAK:
+            if( mContent.lower() > val )
+                return false;
+        }
+        // Invariant: n is not conflicting with lower bound
+        switch( mUpperBoundType )
+        {
             case BoundType::INFTY:
                 break;
             case BoundType::STRICT:
-                if( mContent.lower() >= val )
+                if( mContent.upper() <= val )
                     return false;
                 break;
             case BoundType::WEAK:
-                if( mContent.lower() > val )
+                if( mContent.upper() < val )
                     return false;
-            }
-            // Invariant: n is not conflicting with lower bound
-            switch( mUpperBoundType )
-            {
-                case BoundType::INFTY:
-                    break;
-                case BoundType::STRICT:
-                    if( mContent.upper() <= val )
-                        return false;
-                    break;
-                case BoundType::WEAK:
-                    if( mContent.upper() < val )
-                        return false;
-                    break;
-            }
-            return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
+                break;
+        }
+        return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
 	}
 	
 	template<typename Number>
@@ -192,51 +218,40 @@ template<typename Number>
         if( rhs.isEmpty() )
             return true;
         // if one bound is totally wrong, we can just return false
-        if (
-                (mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY)
-                || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY)
-            )
+        if((mContent.lower() > rhs.lower() && mLowerBoundType != BoundType::INFTY) || (mContent.upper() < rhs.upper() && mUpperBoundType != BoundType::INFTY))
         {
             return false;
         }
-
         // check the bounds
         bool lowerOk = mContent.lower() < rhs.lower() && rhs.lowerBoundType() != BoundType::INFTY;
         bool upperOk = mContent.upper() > rhs.upper() && rhs.upperBoundType() != BoundType::INFTY;
-                
-                // if both are ok, return true
+        // if both are ok, return true
 		if( lowerOk && upperOk )
 		{
-                    return true;
-		}
-                
-                // Note that from this point on at least one bound is equal
-                // to our bounds but no bound is outside of our bounds
-	
-                // check the bound types
-                bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
-                bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
-
-                // if upper bounds are ok and lower bound types are ok, return true
-                if (upperOk && lowerBoundTypesOk)
-                {
-                    return true;
-                }
-
-                // if lower bounds are ok and upper bound types are ok, return true
-                if (lowerOk && upperBoundTypesOk)
-                {
-                    return true;
-                }
-                
-                // if both bound types are ok, return true
-                if (lowerBoundTypesOk && upperBoundTypesOk)
-                {
-                    return true;
-                }
-            
-                // otherwise return false
-                return false; // not less and not equal
+            return true;
+		}       
+        // Note that from this point on at least one bound is equal
+        // to our bounds but no bound is outside of our bounds
+        // check the bound types
+        bool lowerBoundTypesOk = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType()) == mLowerBoundType;
+        bool upperBoundTypesOk = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType()) == mUpperBoundType;
+        // if upper bounds are ok and lower bound types are ok, return true
+        if (upperOk && lowerBoundTypesOk)
+        {
+            return true;
+        }
+        // if lower bounds are ok and upper bound types are ok, return true
+        if (lowerOk && upperBoundTypesOk)
+        {
+            return true;
+        }
+        // if both bound types are ok, return true
+        if (lowerBoundTypesOk && upperBoundTypesOk)
+        {
+            return true;
+        }
+        // otherwise return false
+        return false; // not less and not equal
 	}
 	
 	template<typename Number>
@@ -262,7 +277,7 @@ template<typename Number>
     template<typename Number>
     void Interval<Number>::bloat_by(const Number& width)
     {
-	if(!isUnbounded()){
+	if(!isInfinite()){
 	    BoundType lowerTmp = mLowerBoundType;
 	    BoundType upperTmp = mUpperBoundType;
 	    this->set(boost::numeric::widen(mContent, width));
@@ -351,6 +366,42 @@ template<typename Number>
 		}
 		return oss.str();
 	}
+
+ 
+/**
+* Calculates the distance between two Intervals.
+* @param intervalA Interval to which we want to know the distance.
+* @return distance to intervalA
+*/
+template<typename Number>
+Number Interval<Number>::distance(const Interval<Number>& intervalA)
+{
+    if( this->intersectsWith(intervalA) )
+        return carl::constant_zero<Number>::get();
+    if( intervalA.upperBoundType() == BoundType::INFTY || this->lowerBoundType() == BoundType::INFTY )
+    {
+        assert( this->upperBoundType() != BoundType::INFTY );
+        assert( intervalA.lowerBoundType() != BoundType::INFTY );
+        return carl::abs(intervalA.lower() - this->upper());
+    }
+    else if( intervalA.lowerBoundType() == BoundType::INFTY || this->upperBoundType() == BoundType::INFTY )
+    {
+        assert( this->lowerBoundType() != BoundType::INFTY );
+        assert( intervalA.upperBoundType() != BoundType::INFTY );
+        return carl::abs(intervalA.upper() - this->lower());
+    }
+    Number distA = carl::abs(intervalA.upper() - this->lower());
+    Number distB = carl::abs(intervalA.lower() - this->upper());
+    if( distA < distB )
+        return distA;
+    return distB;
+}
+
+template<typename Number>
+Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval)
+{
+    return Interval(std::min(interval.lower(), this->lower()),std::min(interval.upper(), this->upper()));
+}
 
 /*******************************************************************************
  * Arithmetic functions
@@ -545,6 +596,7 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
             resultInterval = BoostInterval(static_cast<Number>(0), static_cast<Number>(0), true);
         }
     }
+    unsigned zeroBoundInvolved = 2;
     if( (xlt == BoundType::INFTY && (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY))
        || (xut == BoundType::INFTY && (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY))
        || (ylt == BoundType::INFTY && (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))
@@ -552,12 +604,26 @@ Interval<Number> Interval<Number>::mul(const Interval<Number>& rhs) const
     {
         lowerBoundType = BoundType::INFTY;
     }
+    else if( resultInterval.lower() == carl::constant_zero<Number>().get() )
+    {
+        if( zeroBoundInvolved == 2 )
+            zeroBoundInvolved = (this->contains( carl::constant_zero<Number>().get() ) || rhs.contains( carl::constant_zero<Number>().get() )) ? 1 : 0;
+        if( zeroBoundInvolved == 1 )
+            lowerBoundType = BoundType::WEAK;
+    }
     if( (xlt == BoundType::INFTY && (yu < carl::constant_zero<Number>().get() || (yl < carl::constant_zero<Number>().get() || ylt == BoundType::INFTY)))
        || (xut == BoundType::INFTY && (yl > carl::constant_zero<Number>().get() || (yu > carl::constant_zero<Number>().get() || yut == BoundType::INFTY)))
        || (ylt == BoundType::INFTY && (xu < carl::constant_zero<Number>().get() || (xl < carl::constant_zero<Number>().get() || xlt == BoundType::INFTY)))
        || (yut == BoundType::INFTY && (xl > carl::constant_zero<Number>().get() || (xu > carl::constant_zero<Number>().get() || xut == BoundType::INFTY))) )
     {
         upperBoundType = BoundType::INFTY;
+    }
+    else if( resultInterval.upper() == carl::constant_zero<Number>().get() )
+    {
+        if( zeroBoundInvolved == 2 )
+            zeroBoundInvolved = (this->contains( carl::constant_zero<Number>().get() ) || rhs.contains( carl::constant_zero<Number>().get() )) ? 1 : 0;
+        if( zeroBoundInvolved == 1 )
+            upperBoundType = BoundType::WEAK;
     }
     return Interval<Number>(std::move(resultInterval), lowerBoundType, upperBoundType );
 }
@@ -575,26 +641,33 @@ Interval<Number> Interval<Number>::div(const Interval<Number>& rhs) const
 		assert(rhs.isConsistent());
 		BoundType lowerBoundType = BoundType::WEAK;
         BoundType upperBoundType = BoundType::WEAK;
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && ( mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))
-		   || (rhs.upperBoundType() == BoundType::INFTY && ( mContent.upper() < carl::constant_zero<Number>().get() || ( mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY))) )
-        {
-            lowerBoundType = BoundType::INFTY;
-        }
-        if( (mLowerBoundType == BoundType::INFTY && (rhs.upper() < carl::constant_zero<Number>().get() || (rhs.lower() < carl::constant_zero<Number>().get() || rhs.lowerBoundType() == BoundType::INFTY)))
-		   || (mUpperBoundType == BoundType::INFTY && (rhs.lower() > carl::constant_zero<Number>().get() || (rhs.upper() > carl::constant_zero<Number>().get() || rhs.upperBoundType() == BoundType::INFTY)))
-		   || (rhs.lowerBoundType() == BoundType::INFTY && ( mContent.upper() < carl::constant_zero<Number>().get() || ( mContent.lower() < carl::constant_zero<Number>().get() || mLowerBoundType == BoundType::INFTY)))
-		   || (rhs.upperBoundType() == BoundType::INFTY && ( mContent.lower() > carl::constant_zero<Number>().get() || ( mContent.upper() > carl::constant_zero<Number>().get() || mUpperBoundType == BoundType::INFTY))) )
-        {
-            upperBoundType = BoundType::INFTY;
-        }
 		///@todo Correctly determine if bounds are strict or weak.
 		if (this->isOpenInterval() || rhs.isOpenInterval()) {
 			// just a quick heuristic, by no means complete.
             lowerBoundType = BoundType::STRICT;
             upperBoundType = BoundType::STRICT;
 		}
+        const Number& xl = mContent.lower();
+        const Number& yl = rhs.lower();
+        const Number& yu = rhs.upper();
+        const BoundType& xlt = mLowerBoundType;
+        const BoundType& xut = mUpperBoundType;
+        const BoundType& ylt = rhs.lowerBoundType();
+        const BoundType& yut = rhs.upperBoundType();
+        if( (xlt == BoundType::INFTY && (carl::isPositive(yu) || yut == BoundType::INFTY))
+		   || (xut == BoundType::INFTY && (carl::isNegative(yl) || ylt == BoundType::INFTY))
+		   || (ylt == BoundType::INFTY && (carl::isPositive(xl) || xut == BoundType::INFTY))
+		   || (yut == BoundType::INFTY && (carl::isNegative(xl) || (carl::isNegative(xl) || xlt == BoundType::INFTY))) )
+        {
+            lowerBoundType = BoundType::INFTY;
+        }
+        if( (xlt == BoundType::INFTY && (carl::isNegative(yu) || (carl::isNegative(yl) || ylt == BoundType::INFTY)))
+		   || (xut == BoundType::INFTY && (carl::isPositive(yl) || (carl::isPositive(yu) || yut == BoundType::INFTY)))
+		   || (ylt == BoundType::INFTY && (carl::isNegative(xl) || (carl::isNegative(xl) || xlt == BoundType::INFTY)))
+		   || (yut == BoundType::INFTY && (carl::isPositive(xl) || (carl::isPositive(xl) || xut == BoundType::INFTY))) )
+        {
+            upperBoundType = BoundType::INFTY;
+        }
         return Interval<Number>(BoostInterval( mContent/rhs.content() ), lowerBoundType, upperBoundType );
 	}
 
@@ -632,7 +705,7 @@ bool Interval<Number>::div_ext(const Interval<Number>& rhs, Interval<Number>& a,
             }
             else
             {
-                if( rhs.isUnbounded() )
+                if( rhs.isInfinite() )
                 {
                     a = unboundedInterval();
                     return false;
@@ -699,13 +772,13 @@ void Interval<Number>::inverse_assign()
         template<typename Number>
         void Interval<Number>::abs_assign()
         {
-            *this = abs(*this);
+            *this = this->abs();
         }
 
 template<typename Number>
 bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) const
 	{
-		if( this->isUnbounded() )
+		if( this->isInfinite() )
         {
             a = emptyInterval();
             return false;
@@ -841,10 +914,11 @@ Interval<Number> Interval<Number>::pow(unsigned exp) const
 template<typename Number>
 void Interval<Number>::pow_assign(unsigned exp)
 	{
-		*this = this->power(exp);
+		*this = this->pow(exp);
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::sqrt() const
 	{
 		assert(this->isConsistent());
@@ -865,26 +939,45 @@ Interval<Number> Interval<Number>::sqrt() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::sqrt_assign()
 	{
 		*this = this->sqrt();
 	}
 
-	
 template<typename Number>
-Interval<Number> Interval<Number>::root(unsigned deg) const
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
+Interval<Number> Interval<Number>::root(int deg) const
 	{
 		assert(this->isConsistent());
+        if( deg % 2 == 0 )
+        {
+            if( mUpperBoundType != BoundType::INFTY &&  mContent.upper() < carl::constant_zero<Number>().get() )
+                return Interval<Number>::emptyInterval();
+            if( mLowerBoundType == BoundType::INFTY || mContent.lower() < carl::constant_zero<Number>().get() )
+            {
+                if( mUpperBoundType == BoundType::INFTY )
+                {
+                    return Interval<Number>(BoostInterval(carl::constant_zero<Number>().get()), mLowerBoundType, mUpperBoundType);
+                }
+                else
+                {
+                    return Interval<Number>(boost::numeric::nth_root(BoostInterval(carl::constant_zero<Number>().get(),mContent.upper()), deg), mLowerBoundType, mUpperBoundType);
+                }
+            }
+        }
 		return Interval<Number>(boost::numeric::nth_root(mContent, deg), mLowerBoundType, mUpperBoundType);
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::root_assign(unsigned deg)
 	{
 		*this = this->root(deg);
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::log() const
 	{
 		assert(this->isConsistent());
@@ -893,6 +986,7 @@ Interval<Number> Interval<Number>::log() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::log_assign()
 	{
 		this->set(boost::numeric::log(mContent));
@@ -903,6 +997,7 @@ void Interval<Number>::log_assign()
  ******************************************************************************/
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::sin() const
 	{
 		assert(this->isConsistent());
@@ -910,12 +1005,14 @@ Interval<Number> Interval<Number>::sin() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::sin_assign()
 	{
 		this->set(boost::numeric::sin(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::cos() const
 	{
 		assert(this->isConsistent());
@@ -923,12 +1020,14 @@ Interval<Number> Interval<Number>::cos() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::cos_assign()
 	{
 		this->set(boost::numeric::cos(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::tan() const
 	{
 		assert(this->isConsistent());
@@ -936,12 +1035,14 @@ Interval<Number> Interval<Number>::tan() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::tan_assign()
 	{
 		this->set(boost::numeric::tan(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::asin() const
 	{
 		assert(this->isConsistent());
@@ -949,12 +1050,14 @@ Interval<Number> Interval<Number>::asin() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::asin_assign()
 	{
 		this->set(boost::numeric::asin(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::acos() const
 	{
 		assert(this->isConsistent());
@@ -962,12 +1065,14 @@ Interval<Number> Interval<Number>::acos() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::acos_assign()
 	{
 		this->set(boost::numeric::acos(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::atan() const
 	{
 		assert(this->isConsistent());
@@ -975,12 +1080,14 @@ Interval<Number> Interval<Number>::atan() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::atan_assign()
 	{
 		this->set(boost::numeric::atan(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::sinh() const
 	{
 		assert(this->isConsistent());
@@ -988,12 +1095,14 @@ Interval<Number> Interval<Number>::sinh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::sinh_assign()
 	{
 		this->set(boost::numeric::sinh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::cosh() const
 	{
 		assert(this->isConsistent());
@@ -1001,12 +1110,14 @@ Interval<Number> Interval<Number>::cosh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::cosh_assign()
 	{
 		this->set(boost::numeric::cosh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::tanh() const
 	{
 		assert(this->isConsistent());
@@ -1014,12 +1125,14 @@ Interval<Number> Interval<Number>::tanh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::tanh_assign()
 	{
 		this->set(boost::numeric::tanh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::asinh() const
 	{
 		assert(this->isConsistent());
@@ -1027,12 +1140,14 @@ Interval<Number> Interval<Number>::asinh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::asinh_assign()
 	{
 		this->set(boost::numeric::asinh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::acosh() const
 	{
 		assert(this->isConsistent());
@@ -1040,12 +1155,14 @@ Interval<Number> Interval<Number>::acosh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::acosh_assign()
 	{
 		this->set(boost::numeric::acosh(mContent));
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 Interval<Number> Interval<Number>::atanh() const
 	{
 		assert(this->isConsistent());
@@ -1053,6 +1170,7 @@ Interval<Number> Interval<Number>::atanh() const
 	}
 
 template<typename Number>
+template<typename Num, EnableIf<std::is_floating_point<Num>>>
 void Interval<Number>::atanh_assign()
 	{
 		this->set(boost::numeric::atanh(mContent));
@@ -1061,7 +1179,61 @@ void Interval<Number>::atanh_assign()
 /*******************************************************************************
  * Boolean operations
  ******************************************************************************/
-	
+
+template<typename Number>
+bool Interval<Number>::intersectsWith(const Interval<Number>& rhs) const
+{
+    return !this->intersect(rhs).isEmpty();
+    // TODO: make this working
+//    if( this->isEmpty() || rhs.isEmpty() )
+//        return false;
+//    if( this->lowerBoundType() == BoundType::INFTY && this->upperBoundType() == BoundType::INFTY )
+//        return true;
+//    if( rhs.lowerBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+//        return true;
+//    if( this->lowerBoundType() == BoundType::INFTY && rhs.lowerBoundType() == BoundType::INFTY )
+//        return true;
+//    if( this->upperBoundType() == BoundType::INFTY && rhs.upperBoundType() == BoundType::INFTY )
+//        return true;
+//    if( this->lowerBoundType() == BoundType::INFTY )
+//    {
+//        assert( rhs.lowerBoundType() != BoundType::INFTY );
+//        if( rhs.lower() < this->upper() )
+//            return true;
+//        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    if( this->upperBoundType() == BoundType::INFTY )
+//    {
+//        assert( rhs.upperBoundType() != BoundType::INFTY );
+//        if( this->lower() < rhs.upper() )
+//            return true;
+//        else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    if( rhs.lowerBoundType() == BoundType::INFTY )
+//    {
+//        assert( this->lowerBoundType() != BoundType::INFTY );
+//        if( this->lower() < rhs.upper() )
+//            return true;
+//        else if( rhs.upper() == this->lower() && rhs.upperBoundType() == BoundType::WEAK && this->lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    if( this->upperBoundType() == BoundType::INFTY )
+//    {
+//        assert( this->upperBoundType() != BoundType::INFTY );
+//        if( rhs.lower() < this->upper() )
+//            return true;
+//        else if( this->upper() == rhs.lower() && this->upperBoundType() == BoundType::WEAK && rhs.lowerBoundType() == BoundType::WEAK )
+//            return true;
+//        return false;
+//    }
+//    return rhs.upper() < this->lower() || this->upper() < rhs.lower();
+}
+
 template<typename Number>
 	Interval<Number> Interval<Number>::intersect(const Interval<Number>& rhs) const
 	{
@@ -1159,6 +1331,7 @@ template<typename Number>
 	Interval<Number>& Interval<Number>::intersect_assign(const Interval<Number>& rhs)
 	{
 		*this = this->intersect(rhs);
+        return *this;
 	}
 	
 	template<typename Number>
@@ -1166,80 +1339,84 @@ template<typename Number>
 	{
 		assert(this->isConsistent());
 		assert(rhs.isConsistent());
-		if( this->intersect(rhs).isEmpty() )
+		if( !this->intersectsWith(rhs) )
 		{
-                    // special case: [a;b] U (b;c]
-                    if( (mContent.lower() == rhs.upper() && (rhs.upperBoundType() == BoundType::WEAK || mLowerBoundType == BoundType::WEAK) ) ||
-                        (mContent.upper() == rhs.lower() && (mUpperBoundType == BoundType::WEAK || rhs.lowerBoundType() == BoundType::WEAK) ) ) 
-                    {
-                        Number lower = rhs.lower() <= mContent.lower() ? rhs.lower() : mContent.lower();
-                        Number upper = rhs.upper() >= mContent.upper() ? rhs.upper() : mContent.upper();
-                        BoundType lowerBoundType = lower == mContent.lower() ? mLowerBoundType : rhs.lowerBoundType();
-                        BoundType upperBoundType = upper == mContent.upper() ? mUpperBoundType : rhs.upperBoundType();
-                        resultA = Interval<Number>(lower, lowerBoundType, upper, upperBoundType);
-                        return false;
-                    }
-                    else
-                    {
-                        resultA = *this;
-			resultB = rhs;
-			return true;
-                    }		
+            // special case: [a;b] U (b;c]
+            if( this->lower() == rhs.upper() && (rhs.upperBoundType() == BoundType::WEAK || mLowerBoundType == BoundType::WEAK) )
+            {
+                resultA = Interval<Number>(rhs.lower(), rhs.lowerBoundType(), this->upper(), this->upperBoundType());
+                resultB = emptyInterval();
+                return false;
+            }
+            else if( this->upper() == rhs.lower() && (mUpperBoundType == BoundType::WEAK || rhs.lowerBoundType() == BoundType::WEAK) )
+            {
+                resultA = Interval<Number>(this->lower(), this->lowerBoundType(), rhs.upper(), rhs.upperBoundType());
+                resultB = emptyInterval();
+                return false;
+            }
+            else
+            {
+                resultA = *this;
+                resultB = rhs;
+                return true;
+            }		
 		}
 		else
 		{
-			Number lower;
-			Number upper;
+            resultB = emptyInterval();
 			BoundType lowerType = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
 			BoundType upperType = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
 			// calculate lowerBound and lowerBoundType
-                        if( lowerType != BoundType::INFTY )
-                        {
-                            if( mContent.lower() < rhs.lower() )
-                            {
-                                    lower = mContent.lower();
-                                    lowerType = mLowerBoundType;
-                            }
-                            else if ( mContent.lower() == rhs.lower() )
-                            {
-                                    lower = mContent.lower();
-                                    lowerType = getWeakestBoundType(mLowerBoundType, rhs.lowerBoundType());
-                            }
-                            else
-                            {
-                                    lower = rhs.lower();
-                                    lowerType = rhs.lowerBoundType();
-                            }
-                        }
-                        else
-                        {
-                            lower = mContent.upper();
-                        }
-			
+            if( lowerType == BoundType::INFTY && upperType == BoundType::INFTY )
+            {
+                resultA = unboundedInterval();
+                return false;
+            }
+			Number lower;
+			Number upper;
+            if( lowerType != BoundType::INFTY )
+            {
+                if( this->lower() < rhs.lower() )
+                {
+                    lower = this->lower();
+                    lowerType = mLowerBoundType;
+                }
+                else if ( this->lower() == rhs.lower() )
+                {
+                    lower = this->lower();
+                }
+                else
+                {
+                    lower = rhs.lower();
+                    lowerType = rhs.lowerBoundType();
+                }
+            }
+            else
+            {
+                lower = this->upper();
+            }
 			// calculate upperBound and upperBoundType
-                        if( upperType != BoundType::INFTY )
-                        {
-                            if( mContent.upper() > rhs.upper() )
-                            {
-                                    upper = mContent.upper();
-                                    upperType = mUpperBoundType;
-                            }
-                            else if ( mContent.upper() == rhs.upper() )
-                            {
-                                    upper = mContent.upper();
-                                    upperType = getWeakestBoundType(mUpperBoundType, rhs.upperBoundType());
-                            }
-                            else
-                            {
-                                    upper = rhs.upper();
-                                    upperType = rhs.upperBoundType();
-                            }
-                        }
-                        else
-                        {
-                            upper = lower;
-                        }
-			
+            if( upperType != BoundType::INFTY )
+            {
+                if( this->upper() > rhs.upper() )
+                {
+                    upper = this->upper();
+                    upperType = mUpperBoundType;
+                }
+                else if ( this->upper() == rhs.upper() )
+                {
+                    upper = this->upper();
+                }
+                else
+                {
+                    upper = rhs.upper();
+                    upperType = rhs.upperBoundType();
+                }
+            }
+            else
+            {
+                upper = lower;
+            }
 			resultA = Interval<Number>(lower, lowerType, upper, upperType);
 			return false;
 		}
@@ -1388,6 +1565,8 @@ template<typename Number>
 		resultB = rhs;
 		return true;
 	}
+
+
 	
 /*******************************************************************************
  * Overloaded arithmetics operators
@@ -1587,4 +1766,56 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return rhs < lhs;
 	}
+
+    template<typename Number>
+    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.upperBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            default:
+                return lhs.upper() <= rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator >=(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.lowerBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            default:
+                return lhs.lower() >= rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator <(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.upperBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            case BoundType::STRICT:
+                return lhs.upper() <= rhs;
+            default:
+                return lhs.upper() < rhs;
+        }
+    }
+
+    template<typename Number>
+    inline bool operator >(const Interval<Number>& lhs, const Number& rhs)
+    {
+        switch( lhs.lowerBoundType() )
+        {
+            case BoundType::INFTY:
+                return false;
+            case BoundType::STRICT:
+                return lhs.lower() >= rhs;
+            default:
+                return lhs.lower() > rhs;
+        }
+    }
 }

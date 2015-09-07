@@ -16,7 +16,7 @@ enum class RefinementStrategy : unsigned {
 	BINARYSAMPLE,
 	/// Newton's iteration is applied for finding the a root first. If no root was found, the value is used to dissect the interval.
 	BINARYNEWTON,
-	DEFAULT = GENERIC
+	DEFAULT = BINARYSAMPLE
 };
 
 /// Maximum number of refinements in which the sample() value should be computed for splitting. Otherwise the midpoint is taken.

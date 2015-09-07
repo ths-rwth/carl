@@ -42,6 +42,21 @@ inline bool isOne(const mpq_class& n) {
 	return constant_one<mpz_class>::get() == n;
 }
 
+inline bool isPositive(const mpz_class& n) {
+	return n > carl::constant_zero<mpz_class>().get();
+}	
+	
+inline bool isPositive(const mpq_class& n) {
+	return n > carl::constant_zero<mpq_class>().get();
+}
+
+inline bool isNegative(const mpz_class& n) {
+	return n < carl::constant_zero<mpz_class>().get();
+}	
+
+inline bool isNegative(const mpq_class& n) {
+	return n < carl::constant_zero<mpq_class>().get();
+}
 	
 inline mpz_class getNum(const mpq_class& n) {
 	return n.get_num();
@@ -111,9 +126,62 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
     assert(n >= std::numeric_limits<unsigned long int>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
+template<>
+inline int toInt<int>(const mpz_class& n) {
+    std::cout << "mpz_class to int" << std::endl;
+    assert(n <= std::numeric_limits<int>::max());
+    assert(n >= std::numeric_limits<int>::min());
+    return (int)mpz_get_si(n.get_mpz_t());
+}
+template<>
+inline unsigned toInt<unsigned>(const mpz_class& n) {
+    assert(n <= std::numeric_limits<unsigned>::max());
+    assert(n >= std::numeric_limits<unsigned>::min());
+    return (unsigned)mpz_get_ui(n.get_mpz_t());
+}
+template<typename Integer>
+inline Integer toInt(const mpq_class& n);
+
+/**
+ * Convert a fraction to an integer.
+ * This method assert, that the given fraction is an integer, i.e. that the denominator is one.
+ * @param n A fraction.
+ * @return An integer.
+ */
+template<>
+inline mpz_class toInt<mpz_class>(const mpq_class& n) {
+	assert(isInteger(n));
+	return getNum(n);
+}
+
+/**
+ * Convert a fraction to an unsigned.
+ * @param n A fraction.
+ * @return n as unsigned.
+ */
+template<>
+inline unsigned toInt<unsigned>(const mpq_class& n) {
+	return toInt<unsigned>(toInt<mpz_class>(n));
+}
+template<>
+inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
+	return toInt<unsigned long int>(toInt<mpz_class>(n));
+}
+template<>
+inline int toInt<int>(const mpq_class& n) {
+    std::cout << "mpq_class to int" << std::endl;
+	return toInt<int>(toInt<mpz_class>(n));
+}
+template<>
+inline signed long int toInt<signed long int>(const mpq_class& n) {
+	return toInt<signed long int>(toInt<mpz_class>(n));
+}
 
 template<typename T>
 inline T rationalize(double n);
+
+template<typename T>
+inline T rationalize(float n);
 
 template<typename T>
 inline T rationalize(int n);
@@ -124,11 +192,18 @@ inline T rationalize(size_t n);
 template<typename T>
 inline T rationalize(const std::string& n);
 
+#ifdef USE_CLN_NUMBERS
 template<typename T>
 inline T rationalize(const PreventConversion<cln::cl_RA>&);
+#endif
 
 template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
+
+template<>
+inline mpq_class rationalize<mpq_class>(float f) {
+	return mpq_class(f);
+}
 
 template<>
 inline mpq_class rationalize<mpq_class>(double d) {
@@ -153,8 +228,10 @@ inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
 }
 
+#ifdef USE_CLN_NUMBERS
 template<>
 mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n);
+#endif
 
 /**
  * Basic Operators
@@ -221,11 +298,41 @@ inline mpq_class gcd(const mpq_class& a, const mpq_class& b) {
 	return res;
 }
 
-inline mpz_class lcm(const mpq_class& a, const mpq_class& b) {
-    assert( isInteger(a) );
-    assert( isInteger(b) );
-	mpz_class res;
-	mpz_lcm(res.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+/**
+ * Calculate the greatest common divisor of two integers.
+ * Stores the result in the first argument.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return Updated a.
+ */
+inline mpz_class& gcd_assign(mpz_class& a, const mpz_class& b) {
+    a = carl::gcd(a,b);
+	return a;
+}
+
+/**
+ * Calculate the greatest common divisor of two integers.
+ * Stores the result in the first argument.
+ * @param a First argument.
+ * @param b Second argument.
+ * @return Updated a.
+ */
+inline mpq_class& gcd_assign(mpq_class& a, const mpq_class& b) {
+    a = carl::gcd(a,b);
+	return a;
+}
+
+inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
+    mpz_class resNum;
+	mpz_lcm(resNum.get_mpz_t(), getNum(a).get_mpz_t(), getNum(b).get_mpz_t());
+	mpz_class resDen;
+	mpz_gcd(resDen.get_mpz_t(), getDenom(a).get_mpz_t(), getDenom(b).get_mpz_t());
+	mpq_class resqNum;
+	mpq_set_z(resqNum.get_mpq_t(), resNum.get_mpz_t());
+	mpq_class resqDen;
+	mpq_set_z(resqDen.get_mpq_t(), resDen.get_mpz_t());
+	mpq_class res;
+	mpq_div(res.get_mpq_t(), resqNum.get_mpq_t(), resqDen.get_mpq_t());
 	return res;
 }
 
@@ -275,16 +382,24 @@ std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a);
 std::pair<mpq_class,mpq_class> sqrt_fast(const mpq_class& a);
 
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
+    // TODO: In order to have the same result as division of native signed integer we have to 
+    //       make it that complicated, as mpz_mod always returns positive integer. Maybe there is a better way.
 	mpz_class res;
-	mpz_mod(res.get_mpz_t(), n.get_mpz_t(), m.get_mpz_t());
-	return res;
+	mpz_mod(res.get_mpz_t(), abs(n).get_mpz_t(), m.get_mpz_t());
+	return isNegative(n) ? mpz_class(-res) : res;
+}
+
+inline mpz_class remainder(const mpz_class& n, const mpz_class& m) {
+	return mod(n,m);
 }
 
 inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
 {
+    // TODO: In order to have the same result as division of native signed integer we have to 
+    //       make it that complicated, as mpz_div does round differently. Maybe there is a better way.
 	mpz_class res;
-	mpz_div(res.get_mpz_t(), n.get_mpz_t(), d.get_mpz_t());
-	return res;
+	mpz_div(res.get_mpz_t(), abs(n).get_mpz_t(), abs(d).get_mpz_t());
+	return isNegative(n) == isNegative(d) ? res : mpz_class(-res);
 }
 
 inline mpz_class operator/(const mpz_class& n, const mpz_class& d)
@@ -363,10 +478,9 @@ inline mpq_class reciprocal(const mpq_class& a) {
 
 inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 {
-	mpq_t res;
-	mpq_init(res);
-	mpq_mul(res, lhs.get_mpq_t(), rhs.get_mpq_t());
-	return mpq_class(res);
+	mpq_class res;
+	mpq_mul(res.get_mpq_t(), lhs.get_mpq_t(), rhs.get_mpq_t());
+	return res;
 }
 
 std::string toString(const mpq_class& _number, bool _infix);

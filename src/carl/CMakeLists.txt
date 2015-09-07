@@ -1,34 +1,27 @@
 # include directories.
-include_directories( 
+include_directories(
 	${include_dirs}
 )
 
-# include core in library. 
-add_subdirectory(core)
-add_subdirectory(formula)
+# include util in library.
 add_subdirectory(util)
-add_subdirectory(converter)
-add_subdirectory(numbers)
 
-
-#include groebner and cad modules in library.
-add_subdirectory(groebner)
-add_subdirectory(cad)
-add_subdirectory(interval)
-
+# Simplified access to *.h and *.cpp
+foreach(name cad converter core formula groebner interval numbers util)
+	collect_files(carl ${name})
+endforeach()
 
 
 # Compose all the sources for the aritmetic library.
-set(carl_lib_sources 
-    ${carl_lib_cad_sources}
-	${carl_lib_converter_sources}
-	${carl_lib_core_sources}
-	${carl_lib_formula_sources}
-	${carl_lib_number_sources}
-	${carl_lib_util_sources}
-	${carl_lib_number_sources}
-	${carl_lib_interval_sources}
-	${carl_lib_groebner_sources}
+set(carl_lib_sources
+    ${carl_cad_sources}
+	${carl_converter_sources}
+	${carl_core_sources}
+	${carl_formula_sources}
+	${carl_numbers_sources}
+	${carl_util_sources}
+	${carl_interval_sources}
+	${carl_groebner_sources}
 )
 
 add_library(lib_carl SHARED ${carl_lib_sources})
@@ -44,7 +37,7 @@ set_target_properties( lib_carl PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 )
-target_link_libraries( lib_carl ${libs_dynamic} )
+target_link_libraries( lib_carl ${carl_LIBRARIES_DYNAMIC} )
 
 if(BUILD_STATIC)
 	add_library(lib_carl_static STATIC ${carl_lib_sources})
@@ -60,13 +53,27 @@ if(BUILD_STATIC)
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
-	target_link_libraries( lib_carl_static ${libs_static} )
+
+	# Options for static linking
+	message("-- linking static")
+	if (APPLE)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mmacosx-version-min=10.7")
+	else()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+	endif()
+
+	target_link_libraries( lib_carl_static ${carl_LIBRARIES_STATIC} )
 	set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
 else()
 	set(CARL_TARGETS lib_carl CACHE STRING INTERNAL FORCE)
 endif()
 
 cotire(carl)
+
+# Write config.h
+configure_file( ${CMAKE_SOURCE_DIR}/src/carl/config.h.in
+    ${CMAKE_SOURCE_DIR}/src/carl/config.h
+)
 
 # Install destination and permissions for the library
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -81,5 +88,3 @@ install( TARGETS ${CARL_TARGETS}
 		GROUP_READ GROUP_EXECUTE
 		WORLD_READ WORLD_EXECUTE
 )
-
-

@@ -4,7 +4,9 @@
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
+#ifdef COMPARE_WITH_CLN
 #include <cln/cln.h>
+#endif
 #include <gmpxx.h>
 #include "Util.cpp"
 #include <list>
@@ -14,6 +16,16 @@
 
 using namespace carl;
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
 template<typename T>
 class MultivariatePolynomialTest: public testing::Test {};
 
@@ -22,10 +34,10 @@ TYPED_TEST_CASE(MultivariatePolynomialTest, RationalTypes); // TODO should use N
 TEST(MultivariatePolynomial, Constructor)
 {
     Variable v0(1);
-    Term<mpz_class> t0(v0);
-    MultivariatePolynomial<mpz_class> p0(t0);
+    Term<Integer> t0(v0);
+    MultivariatePolynomial<Integer> p0(t0);
     
-    MultivariatePolynomial<mpz_class> p1(3);
+    MultivariatePolynomial<Integer> p1(3);
     EXPECT_EQ((unsigned)1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
 }
@@ -33,9 +45,9 @@ TEST(MultivariatePolynomial, Constructor)
 TEST(MultivariatePolynomial, Operators)
 {
     Variable v0(1);
-    Term<mpz_class> t0(v0);
-    MultivariatePolynomial<mpz_class> p0a(t0);
-    MultivariatePolynomial<mpz_class> p0b(v0);
+    Term<Integer> t0(v0);
+    MultivariatePolynomial<Integer> p0a(t0);
+    MultivariatePolynomial<Integer> p0b(v0);
     EXPECT_EQ(p0a, p0b);
     
     EXPECT_TRUE(p0a.isUnivariate());
@@ -44,11 +56,11 @@ TEST(MultivariatePolynomial, Operators)
 TEST(MultivariatePolynomial, getTerms)
 {
     Variable v0(1);
-	MultivariatePolynomial<cln::cl_RA> p;
-	p += cln::cl_RA(1);
+	MultivariatePolynomial<Rational> p;
+	p += Rational(1);
 	p += v0;
 	p *= v0;
-	MultivariatePolynomial<cln::cl_RA> p2 = p + cln::cl_RA(1);
+	MultivariatePolynomial<Rational> p2 = p + Rational(1);
 	
 	auto& t = p2.getTerms();
 	t.erase(t.begin());
@@ -60,10 +72,10 @@ TEST(MultivariatePolynomial, remainder)
 {
     Variable x(1);
     Variable y(2);
-    MultivariatePolynomial<cln::cl_RA> px( x );
-    MultivariatePolynomial<cln::cl_RA> py( y );
-    MultivariatePolynomial<cln::cl_RA> p( px - cln::cl_RA(3) );
-    MultivariatePolynomial<cln::cl_RA> p4( p * p * p * p );
+    MultivariatePolynomial<Rational> px( x );
+    MultivariatePolynomial<Rational> py( y );
+    MultivariatePolynomial<Rational> p( px - Rational(3) );
+    MultivariatePolynomial<Rational> p4( p * p * p * p );
     EXPECT_TRUE( p4.remainder( p ).isZero() );
 }
 
@@ -75,18 +87,18 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
     Variable x = vpool.getFreshVariable();
 	Variable y = vpool.getFreshVariable();
 	{
-		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
-		UnivariatePolynomial<cln::cl_RA> res(x, {(cln::cl_RA)0, (cln::cl_RA)1, (cln::cl_RA)-1, (cln::cl_RA)3});
+		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
+		UnivariatePolynomial<Rational> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
 		ASSERT_EQ(p.toUnivariatePolynomial(), res);
 	}
 	{
-		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
-		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> res(x, {(cln::cl_RA)0, (cln::cl_RA)1, (cln::cl_RA)-1, (cln::cl_RA)3});
+		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
+		UnivariatePolynomial<MultivariatePolynomial<Rational>> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
 		ASSERT_EQ(p.toUnivariatePolynomial(x), res);
 	}
 	{
-		MultivariatePolynomial<cln::cl_RA> p({(cln::cl_RA)1*x*y, (cln::cl_RA)-1*x*x, (cln::cl_RA)3*x*x*x});
-		UnivariatePolynomial<MultivariatePolynomial<cln::cl_RA>> res(x, {MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0), MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1*y), MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)-1), MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)3)});
+		MultivariatePolynomial<Rational> p({(Rational)1*x*y, (Rational)-1*x*x, (Rational)3*x*x*x});
+		UnivariatePolynomial<MultivariatePolynomial<Rational>> res(x, {MultivariatePolynomial<Rational>((Rational)0), MultivariatePolynomial<Rational>((Rational)1*y), MultivariatePolynomial<Rational>((Rational)-1), MultivariatePolynomial<Rational>((Rational)3)});
 		ASSERT_EQ(res, p.toUnivariatePolynomial(x));
 	}
 }
@@ -95,8 +107,8 @@ TEST(MultivariatePolynomial, Addition)
 {
 	VariablePool::getInstance().clear();
     Variable v0((unsigned)1);
-    Term<mpz_class> t0(v0);
-    MultivariatePolynomial<mpz_class> p0(v0);
+    Term<Integer> t0(v0);
+    MultivariatePolynomial<Integer> p0(v0);
     p0 += 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 += 3;
@@ -111,21 +123,21 @@ TEST(MultivariatePolynomial, Addition)
     EXPECT_EQ((unsigned)3,p0.nrTerms());
     p0 += createMonomial(v2, (exponent) 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += Term<mpz_class>(-2,v2,1);
+    p0 += Term<Integer>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     
-    MultivariatePolynomial<mpz_class> p1(v0);
+    MultivariatePolynomial<Integer> p1(v0);
     p1 += v1;
     p0 += p1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());   
-    MultivariatePolynomial<mpz_class> mp2(v0);
-    mp2 += (mpz_class)2 * v1;
+    MultivariatePolynomial<Integer> mp2(v0);
+    mp2 += (Integer)2 * v1;
     EXPECT_EQ(v0, mp2.lterm());
-    MultivariatePolynomial<mpz_class> p10a;
+    MultivariatePolynomial<Integer> p10a;
     p10a += v0*v0;
     p10a += v1;
     EXPECT_EQ(v0*v0, p10a.lterm());
-    MultivariatePolynomial<mpz_class> p10b;
+    MultivariatePolynomial<Integer> p10b;
     p10b += v1;
     p10b += v0*v0;
     EXPECT_EQ(v0*v0, p10b.lterm());
@@ -143,7 +155,7 @@ TEST(MultivariatePolynomial, Addition)
 TEST(MultivariatePolynomial, Substraction)
 {
     Variable v0((unsigned)1);
-    MultivariatePolynomial<mpz_class> p0(v0);
+    MultivariatePolynomial<Integer> p0(v0);
     p0 -= 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 -= 3;
@@ -159,10 +171,10 @@ TEST(MultivariatePolynomial, Substraction)
     p0 -= createMonomial(v2, (exponent) 1);
     
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= Term<mpz_class>(-2,v2,1);
+    p0 -= Term<Integer>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
     
-    MultivariatePolynomial<mpz_class> p1(v0);
+    MultivariatePolynomial<Integer> p1(v0);
     p1 -= v1;
     p0 -= p1;
     EXPECT_EQ((unsigned)0,p0.nrTerms());
@@ -172,15 +184,15 @@ TEST(MultivariatePolynomial, Multiplication)
 {
     Variable v0(1);
     Variable v1(2);
-    MultivariatePolynomial<mpz_class> p0(v0);
+    MultivariatePolynomial<Integer> p0(v0);
     
     p0 *= v0;
-    EXPECT_EQ(Term<mpz_class>((unsigned)1,v0,2), p0.lterm());
+    EXPECT_EQ(Term<Integer>((unsigned)1,v0,2), p0.lterm());
     
-    MultivariatePolynomial<mpz_class> q({mpz_class(2)*v0*v0, mpz_class(1)*v0*v1});
-    Term<mpz_class> t(1, v0,2);
-    MultivariatePolynomial<mpz_class> res = q * t;
-    EXPECT_EQ(MultivariatePolynomial<mpz_class>({mpz_class(2)*v0*v0*v0*v0, mpz_class(1)*v0*v0*v0*v1}), res);
+    MultivariatePolynomial<Integer> q({Integer(2)*v0*v0, Integer(1)*v0*v1});
+    Term<Integer> t(1, v0,2);
+    MultivariatePolynomial<Integer> res = q * t;
+    EXPECT_EQ(MultivariatePolynomial<Integer>({Integer(2)*v0*v0*v0*v0, Integer(1)*v0*v0*v0*v1}), res);
     
     p0 += v1;
     p0 += 1;
@@ -199,22 +211,22 @@ TEST(MultivariatePolynomial, Normalize)
     Variable v0(1);
     Variable v1(2);
     Variable v2(3);
-    MultivariatePolynomial<cln::cl_RA> mp;
+    MultivariatePolynomial<Rational> mp;
     mp += v0;
-    MultivariatePolynomial<cln::cl_RA> mp2 = mp * (cln::cl_RA)2;
+    MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
     EXPECT_EQ(mp, mp.normalize());
     EXPECT_EQ(mp, mp2.normalize());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
-    mp += (cln::cl_RA)2 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
+    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
+    mp += (Rational)2 * v1;
+    mp2 = MultivariatePolynomial<Rational>(v0);
     mp2 += v1;
     EXPECT_EQ(mp2, mp.normalize());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
-    mp += (cln::cl_RA)4 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
-    mp2 += (cln::cl_RA)2 * v1;
+    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
+    mp += (Rational)4 * v1;
+    mp2 = MultivariatePolynomial<Rational>(v0);
+    mp2 += (Rational)2 * v1;
     EXPECT_EQ(mp2, mp.normalize());
 }
 
@@ -222,33 +234,33 @@ TEST(MultivariatePolynomial, Coprime)
 {
     Variable v0(1);
     Variable v1(2);
-    MultivariatePolynomial<cln::cl_RA> mp;
+    MultivariatePolynomial<Rational> mp;
     mp += v0;
-    MultivariatePolynomial<cln::cl_RA> mp2 = mp * (cln::cl_RA)2;
+    MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
     EXPECT_EQ(mp, mp.coprimeCoefficients());
     
-    mp = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
-    mp += (cln::cl_RA)4 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>(v0);
-    mp2 += (cln::cl_RA)2 * v1;
+    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
+    mp += (Rational)4 * v1;
+    mp2 = MultivariatePolynomial<Rational>(v0);
+    mp2 += (Rational)2 * v1;
     EXPECT_EQ(mp2, mp.coprimeCoefficients());
     
-    mp = MultivariatePolynomial<cln::cl_RA>(((cln::cl_RA)1)/6 * v0);
-    mp += (cln::cl_RA)4 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1 * v0);
-    mp2 += (cln::cl_RA)24 * v1;
+    mp = MultivariatePolynomial<Rational>(((Rational)1)/(Rational)6 * v0);
+    mp += (Rational)4 * v1;
+    mp2 = MultivariatePolynomial<Rational>((Rational)1 * v0);
+    mp2 += (Rational)24 * v1;
     EXPECT_EQ(mp2, mp.coprimeCoefficients());
     
-    mp = MultivariatePolynomial<cln::cl_RA>(((cln::cl_RA)1)/6 * v0);
-    mp += ((cln::cl_RA)1)/4 * v1;
-    mp2 = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)2 * v0);
-    mp2 += (cln::cl_RA)3 * v1;
+    mp = MultivariatePolynomial<Rational>(((Rational)1)/(Rational)6 * v0);
+    mp += ((Rational)1)/(Rational)4 * v1;
+    mp2 = MultivariatePolynomial<Rational>((Rational)2 * v0);
+    mp2 += (Rational)3 * v1;
     EXPECT_EQ(mp2, mp.coprimeCoefficients());
     
-    MultivariatePolynomial<mpq_class> mpG = MultivariatePolynomial<mpq_class>(mpq_class(1,6) * v0);
-    mpG += mpq_class(1,4) * v1;
-    MultivariatePolynomial<mpq_class> mp2G = MultivariatePolynomial<mpq_class>(mpq_class(2) * v0);
-    mp2G += mpq_class(3) * v1;
+    MultivariatePolynomial<Rational> mpG = MultivariatePolynomial<Rational>(Rational(1)/Rational(6) * v0);
+    mpG += Rational(1)/Rational(4) * v1;
+    MultivariatePolynomial<Rational> mp2G = MultivariatePolynomial<Rational>(Rational(2) * v0);
+    mp2G += Rational(3) * v1;
     EXPECT_EQ(mp2G, mpG.coprimeCoefficients());
     
     
@@ -259,19 +271,19 @@ TEST(MultivariatePolynomial, Substitute)
     Variable v0(1);
     Variable v1(2);
 	{
-		MultivariatePolynomial<cln::cl_RA> p(v0);
-		p.substituteIn(v0, MultivariatePolynomial<cln::cl_RA>(-1));
-		ASSERT_EQ(p, MultivariatePolynomial<cln::cl_RA>(-1));
+		MultivariatePolynomial<Rational> p(v0);
+		p.substituteIn(v0, MultivariatePolynomial<Rational>(-1));
+		ASSERT_EQ(p, MultivariatePolynomial<Rational>(-1));
 	}
-    MultivariatePolynomial<cln::cl_RA> mp((cln::cl_RA)1/6 * v0);
-    mp += (cln::cl_RA)4 * v1;
-    MultivariatePolynomial<cln::cl_RA> mp2((cln::cl_RA)2);
-    mp2 += (cln::cl_RA)4 * v1;
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions;
-    substitutions[v0] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)12);
+    MultivariatePolynomial<Rational> mp((Rational)1/(Rational)6 * v0);
+    mp += (Rational)4 * v1;
+    MultivariatePolynomial<Rational> mp2((Rational)2);
+    mp2 += (Rational)4 * v1;
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions;
+    substitutions[v0] = MultivariatePolynomial<Rational>((Rational)12);
     EXPECT_EQ(mp2, mp.substitute(substitutions));
-    substitutions[v0] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
-    EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)4 * v1), mp.substitute(substitutions));
+    substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
+    EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), mp.substitute(substitutions));
     #ifdef COMPARE_WITH_GINAC
     VariablePool& vpool = VariablePool::getInstance();
     Variable v = vpool.getFreshVariable();
@@ -290,68 +302,68 @@ TEST(MultivariatePolynomial, Substitute)
     vars.insert(std::pair<GiNaC::ex, Variable>(yg, y));
     vars.insert(std::pair<GiNaC::ex, Variable>(zg, z));
     
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*v*x*y*y, (cln::cl_RA)-2*x*x*y*y*y, (cln::cl_RA)312347*v*v*x, (cln::cl_RA)3*y*v*z*z*x, Term<cln::cl_RA>((cln::cl_RA)1)});
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*v*x*y*y, (Rational)-2*x*x*y*y*y, (Rational)312347*v*v*x, (Rational)3*y*v*z*z*x, Term<Rational>((Rational)1)});
     GiNaC::ex f1g = xg*xg*vg*xg*yg*yg-2*xg*xg*yg*yg*yg+312347*vg*vg*xg+3*yg*vg*zg*zg*xg+1;
-    EXPECT_EQ(f1, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g, vars));
-    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)7*x*x*x*x*y*y, (cln::cl_RA)191*x*x*x*x*z*z*z ,(cln::cl_RA)-3*x*x*y, (cln::cl_RA)1*z*z*x*v*v, (cln::cl_RA)2*z*y*v*v, Term<cln::cl_RA>((cln::cl_RA)4)});
+    EXPECT_EQ(f1, convertToCarl<MultivariatePolynomial<Rational>>(f1g, vars));
+    MultivariatePolynomial<Rational> f2({(Rational)7*x*x*x*x*y*y, (Rational)191*x*x*x*x*z*z*z ,(Rational)-3*x*x*y, (Rational)1*z*z*x*v*v, (Rational)2*z*y*v*v, Term<Rational>((Rational)4)});
     GiNaC::ex f2g = 7*xg*xg*xg*xg*yg*yg+191*xg*xg*xg*xg*zg*zg*zg-3*xg*xg*yg+zg*zg*xg*vg*vg+2*zg*yg*vg*vg+4;
-    EXPECT_EQ(f2, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g, vars));
+    EXPECT_EQ(f2, convertToCarl<MultivariatePolynomial<Rational>>(f2g, vars));
     
-    MultivariatePolynomial<cln::cl_RA> sy({(cln::cl_RA)-2*y*y*y, (cln::cl_RA)-9*y, Term<cln::cl_RA>((cln::cl_RA)15)});
+    MultivariatePolynomial<Rational> sy({(Rational)-2*y*y*y, (Rational)-9*y, Term<Rational>((Rational)15)});
     GiNaC::ex syg = -2*yg*yg*yg-9*yg+15;
-    EXPECT_EQ(sy, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(syg, vars));
-    MultivariatePolynomial<cln::cl_RA> sxy1({(cln::cl_RA)1*x*y*y, (cln::cl_RA)-5*y*y*y, Term<cln::cl_RA>((cln::cl_RA)3377)});
+    EXPECT_EQ(sy, convertToCarl<MultivariatePolynomial<Rational>>(syg, vars));
+    MultivariatePolynomial<Rational> sxy1({(Rational)1*x*y*y, (Rational)-5*y*y*y, Term<Rational>((Rational)3377)});
     GiNaC::ex sxy1g = xg*yg*yg-5*yg*yg*yg+3377;
-    EXPECT_EQ(sxy1, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(sxy1g, vars));
-    MultivariatePolynomial<cln::cl_RA> sx({(cln::cl_RA)1*x, Term<cln::cl_RA>((cln::cl_RA)-1)});
+    EXPECT_EQ(sxy1, convertToCarl<MultivariatePolynomial<Rational>>(sxy1g, vars));
+    MultivariatePolynomial<Rational> sx({(Rational)1*x, Term<Rational>((Rational)-1)});
     GiNaC::ex sxg = xg-1;
-    EXPECT_EQ(sx, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(sxg, vars));
-    MultivariatePolynomial<cln::cl_RA> svyz({(cln::cl_RA)8*v*v*y, (cln::cl_RA)1*y*z*y, (cln::cl_RA)29*z*z*z*z*z});
+    EXPECT_EQ(sx, convertToCarl<MultivariatePolynomial<Rational>>(sxg, vars));
+    MultivariatePolynomial<Rational> svyz({(Rational)8*v*v*y, (Rational)1*y*z*y, (Rational)29*z*z*z*z*z});
     GiNaC::ex svyzg = 8*vg*vg*yg+yg*zg*yg+29*zg*zg*zg*zg*zg;
-    EXPECT_EQ(svyz, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(svyzg, vars));
-    MultivariatePolynomial<cln::cl_RA> svz({(cln::cl_RA)1*v*v, (cln::cl_RA)-1*z, (cln::cl_RA)-2*v*z, Term<cln::cl_RA>((cln::cl_RA)10)});
+    EXPECT_EQ(svyz, convertToCarl<MultivariatePolynomial<Rational>>(svyzg, vars));
+    MultivariatePolynomial<Rational> svz({(Rational)1*v*v, (Rational)-1*z, (Rational)-2*v*z, Term<Rational>((Rational)10)});
     GiNaC::ex svzg = vg*vg-zg-2*vg*zg+10;
-    EXPECT_EQ(svz, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(svzg, vars));
-    MultivariatePolynomial<cln::cl_RA> sxy2({(cln::cl_RA)2*x*y*y});
+    EXPECT_EQ(svz, convertToCarl<MultivariatePolynomial<Rational>>(svzg, vars));
+    MultivariatePolynomial<Rational> sxy2({(Rational)2*x*y*y});
     GiNaC::ex sxy2g = 2*xg*yg*yg;
-    EXPECT_EQ(sxy2, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(sxy2g, vars));
-    MultivariatePolynomial<cln::cl_RA> sv({(cln::cl_RA)1*v*v*v*v});
+    EXPECT_EQ(sxy2, convertToCarl<MultivariatePolynomial<Rational>>(sxy2g, vars));
+    MultivariatePolynomial<Rational> sv({(Rational)1*v*v*v*v});
     GiNaC::ex svg = vg*vg*vg*vg;
-    EXPECT_EQ(sv, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(svg, vars));
-    MultivariatePolynomial<cln::cl_RA> sz({(cln::cl_RA)1*z});
+    EXPECT_EQ(sv, convertToCarl<MultivariatePolynomial<Rational>>(svg, vars));
+    MultivariatePolynomial<Rational> sz({(Rational)1*z});
     GiNaC::ex szg = zg;
-    EXPECT_EQ(sz, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(szg, vars));
-    MultivariatePolynomial<cln::cl_RA> sxz({(cln::cl_RA)8*x*z*z*z, (cln::cl_RA)-5*x*x*x, Term<cln::cl_RA>((cln::cl_RA)7)});
+    EXPECT_EQ(sz, convertToCarl<MultivariatePolynomial<Rational>>(szg, vars));
+    MultivariatePolynomial<Rational> sxz({(Rational)8*x*z*z*z, (Rational)-5*x*x*x, Term<Rational>((Rational)7)});
     GiNaC::ex sxzg = 8*xg*zg*zg*zg-5*xg*xg*xg+7;
-    EXPECT_EQ(sxz, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(sxzg, vars));
-    MultivariatePolynomial<cln::cl_RA> sxv({(cln::cl_RA)3*x, (cln::cl_RA)1*v*v, (cln::cl_RA)2*v*v*v*v});
+    EXPECT_EQ(sxz, convertToCarl<MultivariatePolynomial<Rational>>(sxzg, vars));
+    MultivariatePolynomial<Rational> sxv({(Rational)3*x, (Rational)1*v*v, (Rational)2*v*v*v*v});
     GiNaC::ex sxvg = 3*xg+vg*vg+2*vg*vg*vg*vg;
-    EXPECT_EQ(sxv, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(sxvg, vars));
-    MultivariatePolynomial<cln::cl_RA> svy({(cln::cl_RA)13*v*y, (cln::cl_RA)-3*y*y*y*v, Term<cln::cl_RA>((cln::cl_RA)100)});
+    EXPECT_EQ(sxv, convertToCarl<MultivariatePolynomial<Rational>>(sxvg, vars));
+    MultivariatePolynomial<Rational> svy({(Rational)13*v*y, (Rational)-3*y*y*y*v, Term<Rational>((Rational)100)});
     GiNaC::ex svyg = 13*vg*yg-3*yg*yg*yg*vg+100;
-    EXPECT_EQ(svy, convertToCarl<MultivariatePolynomial<cln::cl_RA>>(svyg, vars));
+    EXPECT_EQ(svy, convertToCarl<MultivariatePolynomial<Rational>>(svyg, vars));
     
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions0;
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions0;
     substitutions0[v] = sy;
     substitutions0[x] = svy;
-    substitutions0[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    substitutions0[y] = MultivariatePolynomial<Rational>((Rational)0);
     substitutions0[z] = sy;
     GiNaC::exmap substitutions0g;
     substitutions0g[vg] = syg;
     substitutions0g[xg] = svyg;
     substitutions0g[yg] = 0;
     substitutions0g[zg] = syg;
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions1;
-    substitutions1[v] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions1;
+    substitutions1[v] = MultivariatePolynomial<Rational>((Rational)0);
     substitutions1[x] = svyz;
-    substitutions1[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)1289);
+    substitutions1[y] = MultivariatePolynomial<Rational>((Rational)1289);
     substitutions1[z] = sxv;
     GiNaC::exmap substitutions1g;
     substitutions1g[vg] = 0;
     substitutions1g[xg] = svyzg;
     substitutions1g[yg] = 1289;
     substitutions1g[zg] = sxvg;
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions2;
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions2;
     substitutions2[v] = sx;
     substitutions2[x] = sv;
     substitutions2[y] = sxz;
@@ -359,44 +371,44 @@ TEST(MultivariatePolynomial, Substitute)
     substitutions2g[vg] = sxg;
     substitutions2g[xg] = svg;
     substitutions2g[yg] = sxzg;
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions3;
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions3;
     substitutions3[v] = sxy1;
     substitutions3[x] = svz;
-    substitutions3[y] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)0);
+    substitutions3[y] = MultivariatePolynomial<Rational>((Rational)0);
     GiNaC::exmap substitutions3g;
     substitutions3g[vg] = sxy1g;
     substitutions3g[xg] = svzg;
     substitutions3g[yg] = 0;
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions4;
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions4;
     substitutions4[v] = sxy2;
-    substitutions4[x] = MultivariatePolynomial<cln::cl_RA>((cln::cl_RA)12246789);
+    substitutions4[x] = MultivariatePolynomial<Rational>((Rational)12246789);
     GiNaC::exmap substitutions4g;
     substitutions4g[vg] = sxy2g;
     substitutions4g[xg] = 12246789;
-    std::map<Variable, MultivariatePolynomial<cln::cl_RA>> substitutions5;
+    std::map<Variable, MultivariatePolynomial<Rational>> substitutions5;
     substitutions5[y] = sz;
     substitutions5[z] = svy;
     GiNaC::exmap substitutions5g;
     substitutions5g[yg] = szg;
     substitutions5g[zg] = svyg;
     
-    EXPECT_EQ(f1.substitute(substitutions0), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g.subs(substitutions0g), vars));
-    EXPECT_EQ(f1.substitute(substitutions1), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g.subs(substitutions1g), vars));
-    EXPECT_EQ(f1.substitute(substitutions2), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g.subs(substitutions2g), vars));
-    EXPECT_EQ(f1.substitute(substitutions3), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g.subs(substitutions3g), vars));
-    EXPECT_EQ(f1.substitute(substitutions4), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g.subs(substitutions4g), vars));
-    EXPECT_EQ(f1.substitute(substitutions5), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f1g.subs(substitutions5g), vars));
+    EXPECT_EQ(f1.substitute(substitutions0), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions0g), vars));
+    EXPECT_EQ(f1.substitute(substitutions1), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions1g), vars));
+    EXPECT_EQ(f1.substitute(substitutions2), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions2g), vars));
+    EXPECT_EQ(f1.substitute(substitutions3), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions3g), vars));
+    EXPECT_EQ(f1.substitute(substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions4g), vars));
+    EXPECT_EQ(f1.substitute(substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f1g.subs(substitutions5g), vars));
     
-    EXPECT_EQ(f2.substitute(substitutions0), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g.subs(substitutions0g), vars));
-    EXPECT_EQ(f2.substitute(substitutions1), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g.subs(substitutions1g), vars));
-    EXPECT_EQ(f2.substitute(substitutions2), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g.subs(substitutions2g), vars));
-    EXPECT_EQ(f2.substitute(substitutions3), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g.subs(substitutions3g), vars));
-    EXPECT_EQ(f2.substitute(substitutions4), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g.subs(substitutions4g), vars));
-    EXPECT_EQ(f2.substitute(substitutions5), convertToCarl<MultivariatePolynomial<cln::cl_RA>>(f2g.subs(substitutions5g), vars));
+    EXPECT_EQ(f2.substitute(substitutions0), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions0g), vars));
+    EXPECT_EQ(f2.substitute(substitutions1), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions1g), vars));
+    EXPECT_EQ(f2.substitute(substitutions2), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions2g), vars));
+    EXPECT_EQ(f2.substitute(substitutions3), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions3g), vars));
+    EXPECT_EQ(f2.substitute(substitutions4), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions4g), vars));
+    EXPECT_EQ(f2.substitute(substitutions5), convertToCarl<MultivariatePolynomial<Rational>>(f2g.subs(substitutions5g), vars));
     #endif
 }
 
-//typedef cln::cl_RA Rat;
+//typedef Rational Rat;
 //typedef MultivariatePolynomial<Rat> Pol;
 //
 //TEST(MultivariatePolynomial, VSRules)
@@ -439,17 +451,17 @@ TEST(MultivariatePolynomial, SPolynomial)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
-    MultivariatePolynomial<cln::cl_RA> g1({(cln::cl_RA)3*x*x*x*x*y, (cln::cl_RA)1*y*y});
-    EXPECT_EQ((unsigned)3,MultivariatePolynomial<cln::cl_RA>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
-    //MultivariatePolynomial<cln::cl_RA> s1({(cln::cl_RA)-1*x*x});
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
+    MultivariatePolynomial<Rational> g1({(Rational)3*x*x*x*x*y, (Rational)1*y*y});
+    EXPECT_EQ((unsigned)3,MultivariatePolynomial<Rational>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
+    //MultivariatePolynomial<Rational> s1({(Rational)-1*x*x});
     //EXPECT_EQ(s1, MultivariatePolynomial::SPolynomial(f1.normalize(), g1.normalize()));
     
     
-    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)1*x*x*x, (cln::cl_RA)-2*x*y} );
-    MultivariatePolynomial<cln::cl_RA> g2({(cln::cl_RA)1*x*x*y, (cln::cl_RA)-2*y*y, (cln::cl_RA)1*x});
-    MultivariatePolynomial<cln::cl_RA> s2({(cln::cl_RA)-1*x*x});
-    EXPECT_EQ(s2, MultivariatePolynomial<cln::cl_RA>::SPolynomial(f2, g2));
+    MultivariatePolynomial<Rational> f2({(Rational)1*x*x*x, (Rational)-2*x*y} );
+    MultivariatePolynomial<Rational> g2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
+    MultivariatePolynomial<Rational> s2({(Rational)-1*x*x});
+    EXPECT_EQ(s2, MultivariatePolynomial<Rational>::SPolynomial(f2, g2));
 }
 
 TEST(MultivariatePolynomial, GatherVariables)
@@ -461,7 +473,7 @@ TEST(MultivariatePolynomial, GatherVariables)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     std::set<Variable> vars;
     f1.gatherVariables(vars);
     EXPECT_EQ(y, *vars.begin());
@@ -477,14 +489,14 @@ TEST(MultivariatePolynomial, Derivative)
     vpool.setName(y, "y");
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
-    MultivariatePolynomial<cln::cl_RA> fx({x});
-    EXPECT_EQ((cln::cl_RA)1, fx.derivative(x));
-    EXPECT_EQ((cln::cl_RA)0, fx.derivative(y));
-    MultivariatePolynomial<cln::cl_RA> f2x({(cln::cl_RA)2*x});
-    EXPECT_EQ((cln::cl_RA)2, f2x.derivative(x));
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
-    MultivariatePolynomial<cln::cl_RA> f1dx({(cln::cl_RA)3*x*x*y*y, (cln::cl_RA)-2*x*y*y*y, Term<cln::cl_RA>((cln::cl_RA)1)});
-    MultivariatePolynomial<cln::cl_RA> f1dy({(cln::cl_RA)2*x*x*x*y, (cln::cl_RA)-3*x*x*y*y});
+    MultivariatePolynomial<Rational> fx({x});
+    EXPECT_EQ((Rational)1, fx.derivative(x));
+    EXPECT_EQ((Rational)0, fx.derivative(y));
+    MultivariatePolynomial<Rational> f2x({(Rational)2*x});
+    EXPECT_EQ((Rational)2, f2x.derivative(x));
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
+    MultivariatePolynomial<Rational> f1dx({(Rational)3*x*x*y*y, (Rational)-2*x*y*y*y, Term<Rational>((Rational)1)});
+    MultivariatePolynomial<Rational> f1dy({(Rational)2*x*x*x*y, (Rational)-3*x*x*y*y});
     EXPECT_EQ(f1dx, f1.derivative(x));
     EXPECT_EQ(f1dy, f1.derivative(y));
     EXPECT_EQ(f1.derivative(x).derivative(y), f1.derivative(y).derivative(x));
@@ -500,9 +512,9 @@ TEST(MultivariatePolynomial, varInfo)
     Variable z = vpool.getFreshVariable();
     vpool.setName(z, "z");
     
-    MultivariatePolynomial<cln::cl_RA> f1({(cln::cl_RA)1*x*x*x*y*y, (cln::cl_RA)-1*x*x*y*y*y, (cln::cl_RA)1*x});
+    MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     
-    VariablesInformation<false, MultivariatePolynomial<cln::cl_RA>> vi = f1.getVarInfo<false>();
+    VariablesInformation<false, MultivariatePolynomial<Rational>> vi = f1.getVarInfo<false>();
     EXPECT_EQ((unsigned)3, vi.getVarInfo(x)->maxDegree());
     EXPECT_EQ((unsigned)1, vi.getVarInfo(x)->minDegree());
     EXPECT_EQ((unsigned)3, vi.getVarInfo(x)->occurence());
@@ -511,24 +523,24 @@ TEST(MultivariatePolynomial, varInfo)
     EXPECT_EQ((unsigned)2, vi.getVarInfo(y)->occurence());
     EXPECT_EQ(nullptr, vi.getVarInfo(z));
     
-    MultivariatePolynomial<cln::cl_RA> f2({(cln::cl_RA)1*x*x*x*x*y*y, (cln::cl_RA)1*x*x*x*x*z*z ,(cln::cl_RA)-1*x*y, (cln::cl_RA)1*z});
-    VariablesInformation<true, MultivariatePolynomial<cln::cl_RA>> vi2 = f2.getVarInfo<true>();
+    MultivariatePolynomial<Rational> f2({(Rational)1*x*x*x*x*y*y, (Rational)1*x*x*x*x*z*z ,(Rational)-1*x*y, (Rational)1*z});
+    VariablesInformation<true, MultivariatePolynomial<Rational>> vi2 = f2.getVarInfo<true>();
     EXPECT_EQ((unsigned)4, vi2.getVarInfo(x)->maxDegree());
     EXPECT_EQ((unsigned)1, vi2.getVarInfo(x)->minDegree());
     EXPECT_EQ((unsigned)3, vi2.getVarInfo(x)->occurence());
     EXPECT_EQ((unsigned)0, vi2.getVarInfo(x)->coeffs().count(0));
     EXPECT_EQ((unsigned)0, vi2.getVarInfo(x)->coeffs().count(2));
     EXPECT_EQ((unsigned)0, vi2.getVarInfo(x)->coeffs().count(3));
-    EXPECT_EQ(MultivariatePolynomial<cln::cl_RA>({(cln::cl_RA)1*y*y, (cln::cl_RA)1*z*z}), vi2.getVarInfo(x)->coeffs().at(4)); 
+    EXPECT_EQ(MultivariatePolynomial<Rational>({(Rational)1*y*y, (Rational)1*z*z}), vi2.getVarInfo(x)->coeffs().at(4)); 
     EXPECT_EQ((unsigned)2, vi2.getVarInfo(y)->maxDegree());
     EXPECT_EQ((unsigned)1, vi2.getVarInfo(y)->minDegree());
     EXPECT_EQ((unsigned)2, vi2.getVarInfo(y)->occurence());
-    EXPECT_EQ((cln::cl_RA)-1*x, vi2.getVarInfo(y)->coeffs().at(1)); 
-    EXPECT_EQ((cln::cl_RA)1*x*x*x*x, vi2.getVarInfo(y)->coeffs().at(2)); 
+    EXPECT_EQ((Rational)-1*x, vi2.getVarInfo(y)->coeffs().at(1)); 
+    EXPECT_EQ((Rational)1*x*x*x*x, vi2.getVarInfo(y)->coeffs().at(2)); 
     EXPECT_EQ((unsigned)2, vi2.getVarInfo(z)->maxDegree());
     EXPECT_EQ((unsigned)1, vi2.getVarInfo(z)->minDegree());
     EXPECT_EQ((unsigned)2, vi2.getVarInfo(z)->occurence());
-    EXPECT_EQ((cln::cl_RA)1, vi2.getVarInfo(z)->coeffs().at(1));
+    EXPECT_EQ((Rational)1, vi2.getVarInfo(z)->coeffs().at(1));
 }
 
 TEST(MultivariatePolynomial, Quotient)
@@ -536,10 +548,10 @@ TEST(MultivariatePolynomial, Quotient)
     VariablePool& vpool = VariablePool::getInstance();
     Variable x = vpool.getFreshVariable();
     vpool.setName(x, "x");
-	MultivariatePolynomial<cln::cl_RA> one(cln::cl_RA(1));
-	MultivariatePolynomial<cln::cl_RA> m1 = x*x - one;
-	MultivariatePolynomial<cln::cl_RA> m2 = x - one;
-	MultivariatePolynomial<cln::cl_RA> res = x + one;
+	MultivariatePolynomial<Rational> one(Rational(1));
+	MultivariatePolynomial<Rational> m1 = x*x - one;
+	MultivariatePolynomial<Rational> m2 = x - one;
+	MultivariatePolynomial<Rational> res = x + one;
 	EXPECT_EQ(res, m1.quotient(m2));
 }
 
@@ -629,4 +641,68 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
     list.push_back((TypeParam)7 * x * x * y + (TypeParam)2);
 
     expectRightOrder(list);
+}
+
+#include "../benchmarks/framework/BenchmarkConversions.h"
+#include "../benchmarks/framework/Common.h"
+#ifdef COMPARE_WITH_Z3
+#include <z3/src/math/polynomial/polynomial.h>
+#endif
+
+TEST(MultivariatePolynomialTest, Resultant)
+{
+	VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x0");
+    Variable y = pool.getFreshVariable("x1");
+	typedef Rational T;
+	carl::CIPtr ci = carl::CIPtr(new ConversionInformation());
+	
+	MultivariatePolynomial<Rational> p = x*x + x*(y*y+T(4)) + y*y + T(18);
+	MultivariatePolynomial<Rational> q = x*x + x*(T(4)*y+T(8)) + T(2)*y*y+y+T(19);
+	//_r_1^2 + (_r_2^2+4)*_r_1^1 + _r_2^2+18
+	//_r_1^2 + (4*_r_2+8)*_r_1^1 + 2*_r_2^3+_r_2+19
+	
+#ifdef COMPARE_WITH_Z3
+	auto pz3 = carl::Conversion::convert<ZMP>(p, ci);
+	auto qz3 = carl::Conversion::convert<ZMP>(q, ci);
+	auto xz3 = carl::Conversion::convert<ZVAR>(x, ci);
+#endif	
+	std::cout << p << ", " << q << std::endl;
+#ifdef COMPARE_WITH_Z3
+	std::cout << "#####  Z3  #####" << std::endl;
+	auto resz3 = resultant(pz3, qz3, xz3);
+	std::cout << "Result: " << resz3 << std::endl;
+#endif
+	
+//	std::cout << "##### CArL #####" << std::endl;
+//	auto res = p.toUnivariatePolynomial(x).resultant_z3(q.toUnivariatePolynomial(x));
+//	std::cout << "Result: " << res << std::endl;
+}
+
+TEST(MultivariatePolynomialTest, Definiteness)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable w = pool.getFreshVariable("w");
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    Variable z = pool.getFreshVariable("z");
+    MultivariatePolynomial<Rational> p1({(Rational)6*x*x, (Rational)49*y*y, (Rational)51*z*z, (Rational)-82*y*z, (Rational)20*x*z, (Rational)-4*x*y});
+    EXPECT_TRUE(p1.definiteness() == Definiteness::POSITIVE_SEMI);
+    MultivariatePolynomial<Rational> p2 = p1 + Rational(1);
+    EXPECT_TRUE(p2.definiteness() == Definiteness::POSITIVE);
+    MultivariatePolynomial<Rational> p3 = -p1 - Rational(1);
+    EXPECT_TRUE(p3.definiteness() == Definiteness::NEGATIVE);
+    MultivariatePolynomial<Rational> p4 = -p1;
+    EXPECT_TRUE(p4.definiteness() == Definiteness::NEGATIVE_SEMI);
+    MultivariatePolynomial<Rational> p5({(Rational)30156*w*w, 
+                                         (Rational)-79766*w*x, 
+                                         (Rational)62266*w*y, 
+                                         (Rational)61172*w*z, 
+                                         (Rational)100000*x*x, 
+                                         (Rational)-80312*x*y, 
+                                         (Rational)-100000*x*z, 
+                                         (Rational)33867*y*y, 
+                                         (Rational)55312*y*z, 
+                                         (Rational)100000*z*z});
+    EXPECT_TRUE(p5.definiteness() == Definiteness::POSITIVE_SEMI);
 }

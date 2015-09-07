@@ -38,7 +38,7 @@ class UnivariatePolynomial;
 template<typename Coeff, typename Ordering = GrLexOrdering, typename Policies = StdMultivariatePolynomialPolicies<>>
 class MultivariatePolynomial : public Polynomial, public Policies
 {
-    template<typename Polynomial>
+    template<typename Polynomial, typename Order>
     friend class TermAdditionManager;
 public:
 	/// The ordering of the terms.
@@ -47,7 +47,7 @@ public:
 	typedef Term<Coeff> TermType;
 	/// Type of the monomials within the terms.
 	typedef Monomial MonomType;
-	/// Type of the coefficients.
+	/// Type of the coefficients. 	
 	typedef Coeff CoeffType;
 	/// Policies for this monomial.
 	typedef Policies Policy;
@@ -59,7 +59,7 @@ public:
     typedef MultivariatePolynomial<Coeff, Ordering, Policies> PolyType;
     /// The type of the cache. Multivariate polynomials do not need a cache, we set it to something.
     typedef std::vector<int> CACHE;
-	/// Type our terms vector.
+	/// Type our terms vector.f
 	typedef std::vector<Term<Coeff>> TermsType;
     
 protected:
@@ -73,9 +73,18 @@ protected:
 	mutable bool mOrdered;
 public:
     ///
-    static TermAdditionManager<MultivariatePolynomial> mTermAdditionManager;
+    static TermAdditionManager<MultivariatePolynomial,Ordering> mTermAdditionManager;
     
 	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
+    friend inline std::ostream& operator<<(std::ostream& os, ConstructorOperation op) {
+        switch (op) {
+            case ConstructorOperation::ADD: return os << "+";
+            case ConstructorOperation::SUB: return os << "-";
+            case ConstructorOperation::MUL: return os << "*";
+            case ConstructorOperation::DIV: return os << "/";
+        }
+        return os << "?";
+    }
 	
 	/// @name Constructors
 	/// @{
@@ -90,7 +99,6 @@ public:
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Term<Coeff>& t);
 	explicit MultivariatePolynomial(const std::shared_ptr<const Monomial>& m);
-	explicit MultivariatePolynomial(const std::shared_ptr<const Term<Coeff >>& t);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<MultivariatePolynomial<Coeff, Ordering,Policy>> &pol);
 	explicit MultivariatePolynomial(const UnivariatePolynomial<Coeff>& pol);
 	template<class OtherPolicies, DisableIf<std::is_same<Policies,OtherPolicies>> = dummy>
@@ -100,6 +108,7 @@ public:
 	explicit MultivariatePolynomial(const std::initializer_list<Term<Coeff>>& terms);
 	explicit MultivariatePolynomial(const std::initializer_list<Variable>& terms);
 	explicit MultivariatePolynomial(const std::pair<ConstructorOperation, std::vector<MultivariatePolynomial>>& p);
+    explicit MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands);
 	/// @}
 	
 	virtual ~MultivariatePolynomial() {}
@@ -170,7 +179,7 @@ public:
 	 * @see @cite GCL92, page 48
 	 * @return Total degree.
 	 */
-	exponent totalDegree() const;
+	std::size_t totalDegree() const;
 
 	/**
 	 * Calculates the degree of this polynomial with respect to the given variable.
@@ -193,7 +202,7 @@ public:
 	 * @param exp Exponent.
 	 * @return Coefficient of var^exp.
 	 */
-	MultivariatePolynomial coeff(Variable::Arg var, exponent exp) const {
+	MultivariatePolynomial coeff(Variable::Arg var, std::size_t exp) const {
 		MultivariatePolynomial res;
 		for (const auto& t: mTerms) {
 			if (t.monomial() == nullptr) {
@@ -243,6 +252,13 @@ public:
 	 * @return Definiteness of this.
 	 */
 	Definiteness definiteness() const;
+    
+    /**
+     * @param _notTrivial If this flag is true, this polynomial is not yet in form of a sos (the method than avoids checking this).
+     * @return The sum-of-squares (sos) decomposition ((q1,p1), .., (qn,pn)) with this = q1*p1^2+..+qn*pn^2, qi being positive rational numbers and pi being polynomials.
+     *          If the result is empty, no sos could be found (which does not mean, that there exists no one).
+     */
+    std::vector<std::pair<Coeff,MultivariatePolynomial<Coeff,Ordering,Policies>>> sosDecomposition( bool _notTrivial = false ) const;
 
 	/**
 	 * Calculates the number of terms.
@@ -273,6 +289,12 @@ public:
 	 * @return If there is a constant term unequal to zero.
 	 */
 	bool hasConstantTerm() const;
+    
+    /**
+     * @return true, if the image of this polynomial is integer-valued.
+     */
+    bool integerValued() const;
+    
 	/**
 	 * Retrieves the constant term of this polynomial or zero, if there is no constant term.
 	 * @return Constant term.
@@ -304,11 +326,13 @@ public:
 		assert(false);
 		return mTerms.erase(pos);
 	}
-	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
-		///@todo find new lterm or constant term
-		assert(false);
-		return mTerms.erase(pos);
-	}
+    
+    //TODO: This cannot be compiled with gcc 4.8.1
+//	typename TermsType::const_iterator eraseTerm(typename TermsType::const_iterator pos) {
+//		///@todo find new lterm or constant term
+//		assert(false);
+//		return mTerms.erase(pos);
+//	}
 	TermsType& getTerms() {
 		return mTerms;
 	}
@@ -335,6 +359,22 @@ public:
     {
         assert( !isConstant() );
         return lterm().getSingleVariable();
+    }
+    
+    /**
+     * @return Coefficient of the polynomial (this makes only sense for polynomials storing the gcd of all coefficients separately)
+     */
+    const CoeffType& coefficient() const
+    {
+        return constant_one<CoeffType>::get();
+    }
+    
+    /**
+     * @return The coprimeCoefficients of this polyomial, if this is stored internally, otherwise this polynomial.
+     */
+    const PolyType& polynomial() const
+    {
+        return *this;
     }
 	
 	/**
@@ -511,7 +551,7 @@ public:
 
 	void square();
 
-	MultivariatePolynomial pow(unsigned exp) const;
+	MultivariatePolynomial pow(std::size_t exp) const;
 	
 	MultivariatePolynomial naive_pow(unsigned exp) const;
 	
@@ -610,6 +650,7 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	
 	template<typename C, typename O, typename P>
 	friend MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, unsigned long rhs);
 	/// @}
@@ -647,12 +688,6 @@ private:
 	 * @param cterm Iterator to constant term.
 	 */
 	void makeMinimallyOrdered(typename TermsType::iterator& lterm, typename TermsType::iterator& cterm) const;
-	/**
-	 * Replaces the current terms by the given new terms.
-	 * Takes care of trailing zero terms.
-	 * @param newTerms
-	 */
-	void setTerms(std::vector<std::shared_ptr<const Term<Coeff>>>& newTerms);
 
 public:
 	/**
@@ -676,7 +711,7 @@ public:
 	}
 
 	template<typename C, typename O, typename P>
-	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, unsigned exp)
+	MultivariatePolynomial<C,O,P> pow(const MultivariatePolynomial<C,O,P>& p, std::size_t exp)
 	{
 		return p.pow(exp);
 	}
@@ -1196,6 +1231,20 @@ public:
 	template<typename C, typename O, typename P>
 	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
 	/// @}
+    
+    /// @name Division operators
+	/// @{
+	/**
+	 * Perform a division involving a polynomial.
+	 * @param lhs Left hand side.
+	 * @param rhs Right hand side.
+	 * @return `lhs / rhs`
+	 */
+	template<typename C, typename O, typename P>
+	inline MultivariatePolynomial<C,O,P> operator/(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
+        return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
+    }
+	/// @}
 	
 } // namespace carl
 
@@ -1236,4 +1285,6 @@ namespace std
 	};
 } // namespace std
 
+#include "MultivariateGCD.h"
+#include "MultivariateFactor.h"
 #include "MultivariatePolynomial.tpp"

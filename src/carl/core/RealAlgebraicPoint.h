@@ -7,6 +7,10 @@
 
 #include <vector>
 
+namespace carl {
+template<typename Number> class RealAlgebraicPoint;
+}
+
 #include "RealAlgebraicNumber.h"
 #include "RealAlgebraicNumberOperations.h"
 
@@ -29,14 +33,6 @@ public:
 	 */
 	RealAlgebraicPoint():
 		numbers()
-	{}
-
-	/**
-	 * Copy constructor.
-	 * @param r
-	 */
-	RealAlgebraicPoint(const RealAlgebraicPoint& r):
-		numbers(r.numbers)
 	{}
 
 	/**

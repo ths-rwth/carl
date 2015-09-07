@@ -1,3 +1,4 @@
+
 /**
  * @file MonomialPool.cpp
  * @author Florian Corzilius <corzilius@cs.rwth-aachen.de>
@@ -50,7 +51,15 @@ namespace carl
 				newExps.assign(mExponents.begin(), mExponents.end());
 				newExps[(unsigned)(it - mExponents.begin())].second -= 1;
 			}
-			res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			if (newExps.empty())
+			{
+				res = nullptr;	
+			}
+			else
+			{
+				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			}
+			
 			return true;
 		}
 	}
@@ -219,14 +228,14 @@ namespace carl
 		if (infix) {
 			for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
 				if (vp != mExponents.begin()) ss << "*";
-				ss << vp->first;
+				ss << VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 				if (vp->second > 1) ss << "^" << vp->second;
 			}
 		} else {
 			if (mExponents.size() > 1) ss << "(* ";
 			for (auto vp = mExponents.begin(); vp != mExponents.end(); ++vp) {
 				if (vp != mExponents.begin()) ss << " ";
-				if (vp->second == 1) ss << vp->first;
+				if (vp->second == 1) ss << VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 				else {
 					std::string varName = VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 					ss << "(*";
@@ -362,38 +371,30 @@ namespace carl
 	
 	CompareResult Monomial::lexicalCompare(const Monomial& lhs, const Monomial& rhs)
 	{
-		if (&lhs == &rhs) {
-			return CompareResult::EQUAL;
-		}
-		if ((lhs.id() != 0) && (rhs.id() != 0)) {
-			if (lhs.id() == rhs.id()) return CompareResult::EQUAL;
-		}
+		assert( (&lhs != &rhs) || (lhs.id() == rhs.id()) );
+		assert((lhs.id() != 0) && (rhs.id() != 0));
+		if (lhs.id() == rhs.id()) return CompareResult::EQUAL;
 		auto lhsit = lhs.mExponents.begin();
 		auto rhsit = rhs.mExponents.begin();
 		auto lhsend = lhs.mExponents.end();
 		auto rhsend = rhs.mExponents.end();
-		while( lhsit != lhsend )
-		{
-			if( rhsit == rhsend )
+		while (lhsit != lhsend) {
+			if (rhsit == rhsend)
 				return CompareResult::GREATER;
 			//which variable occurs first
-			if( lhsit->first == rhsit->first )
-			{
+			if (lhsit->first == rhsit->first) {
 				//equal variables
-				if( lhsit->second < rhsit->second )
+				if (lhsit->second < rhsit->second)
 					return CompareResult::LESS;
-				if( lhsit->second > rhsit->second )
+				if (lhsit->second > rhsit->second)
 					return CompareResult::GREATER;
-			}
-			else
-			{
-				return (lhsit->first < rhsit->first ) ? CompareResult::LESS : CompareResult::GREATER;
+			} else {
+				return (lhsit->first < rhsit->first) ? CompareResult::LESS : CompareResult::GREATER;
 			}
 			++lhsit;
 			++rhsit;
 		}
-		if( rhsit == rhsend )
-			return CompareResult::EQUAL;
+		assert(rhsit != rhsend);
 		return CompareResult::LESS;
 	}
 	

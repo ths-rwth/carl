@@ -8,44 +8,58 @@
 #include <sstream>
 
 #include "../../core/logging.h"
-#include "Common.h"
-#include "ExpressionParser.h"
+#include "FormulaParser.h"
+#include "PolynomialParser.h"
+#include "RationalFunctionParser.h"
 
 namespace carl {
 namespace parser {
 
-template<typename Coeff>
+template<typename Pol>
 class Parser {
 private:
 	Skipper skipper;
-	ExpressionParser<Coeff> expressionParser;
-	typedef typename ExpressionParser<Coeff>::expr_type expr_type;
+	PolynomialParser<Pol> polynomialParser;
+	RationalFunctionParser<Pol> ratfunParser;
+	FormulaParser<Pol> formulaParser;
 	
-	void parse(const std::string& s, expr_type& res) {
+	template<typename Result, typename Parser>
+	bool parse(const std::string& s, const Parser& parser, Result& res) {
 		auto begin = s.begin();
-		bool parseResult = qi::phrase_parse(begin, s.end(), expressionParser, skipper, res);
-		if (!parseResult) {
-			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" failed.");
-			throw std::runtime_error("Unable to parse expression");
-		}
-		//boost::apply_visitor(typename ExpressionParser<Coeff>::print_expr_type(), res);
+		return qi::phrase_parse(begin, s.end(), parser, skipper, res);
 	}
 public:
 	
-	Poly<Coeff> polynomial(const std::string& s) {
-		expr_type res;
-		parse(s, res);
-		return boost::apply_visitor(typename ExpressionParser<Coeff>::to_poly(), res);
+	Pol polynomial(const std::string& s) {
+		Pol res;
+		if (!parse(s, polynomialParser, res)) {
+			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a polynomial failed.");
+		}
+		return res;
 	}
 	
-	RatFun<Coeff> rationalFunction(const std::string& s) {
-		expr_type res;
-		parse(s, res);
-		return boost::apply_visitor(typename ExpressionParser<Coeff>::to_ratfun(), res);
+	RatFun<Pol> rationalFunction(const std::string& s) {
+		RatFun<Pol> res;
+		if (!parse(s, ratfunParser, res)) {
+			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a rational function failed.");
+		}
+		return res;
+	}
+	
+	Formula<Pol> formula(const std::string& s) {
+		Formula<Pol> res;
+		if (!parse(s, formulaParser, res)) {
+            std::cout << "NOPE!" << std::endl;
+			CARL_LOG_ERROR("carl.parser", "Parsing \"" << s << "\" to a formula failed.");
+		}
+		return res;
 	}
 	
 	void addVariable(Variable::Arg v) {
-		expressionParser.addVariable(v);
+        if( v.getType() == VariableType::VT_BOOL )
+            formulaParser.addVariable(v);
+        else
+            polynomialParser.addVariable(v);
 	}
 };
 

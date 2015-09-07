@@ -13,9 +13,17 @@
 #include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <cln/cln.h>
-#include <gmpxx.h>
 #include <iostream>
+
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
 
 #ifdef USE_MPFR_FLOAT
 
@@ -32,7 +40,7 @@ TEST(mpfrInterval, Constructor)
     mpfrInterval test5 = mpfrInterval::unboundedInterval();
     mpfrInterval test6 = mpfrInterval::emptyInterval();
 	/*
-    mpfrInterval test7 = mpfrInterval((mpq_class)-1, BoundType::WEAK, (mpq_class)1, BoundType::WEAK);
+    mpfrInterval test7 = mpfrInterval((Rational)-1, BoundType::WEAK, (Rational)1, BoundType::WEAK);
     */
 	mpfrInterval test8 = mpfrInterval(2, BoundType::STRICT, 0, BoundType::INFTY);
 	mpfrInterval test9 = mpfrInterval(1);
@@ -86,7 +94,7 @@ TEST(mpfrInterval, Getters)
     
     test1.setLowerBoundType(BoundType::INFTY);
     test1.setUpperBoundType(BoundType::INFTY);
-    EXPECT_TRUE(test1.isUnbounded());
+    EXPECT_TRUE(test1.isInfinite());
 
     test2.setUpperBoundType(BoundType::INFTY);
     EXPECT_EQ(BoundType::INFTY, test2.upperBoundType());
@@ -132,7 +140,7 @@ TEST(mpfrInterval, StaticCreators)
     EXPECT_EQ(0, i1.lower());
     EXPECT_EQ(0, i1.upper());
     
-    EXPECT_TRUE(i2.isUnbounded());
+    EXPECT_TRUE(i2.isInfinite());
     EXPECT_EQ(BoundType::INFTY, i2.lowerBoundType());
     EXPECT_EQ(BoundType::INFTY, i2.upperBoundType());
 	

@@ -7,7 +7,6 @@
  * @warning This file should never be included directly but only via operations.h
  * 
  */
-
 #pragma once
 #include "../../util/platform.h"
 #include <cassert>
@@ -36,6 +35,22 @@ inline bool isOne(const cln::cl_I& n) {
 	
 inline bool isOne(const cln::cl_RA& n) {
 	return n  == carl::constant_one<cln::cl_RA>().get();
+}
+
+inline bool isPositive(const cln::cl_I& n) {
+	return n > carl::constant_zero<cln::cl_RA>().get();
+}	
+	
+inline bool isPositive(const cln::cl_RA& n) {
+	return n > carl::constant_zero<cln::cl_RA>().get();
+}
+
+inline bool isNegative(const cln::cl_I& n) {
+	return n < carl::constant_zero<cln::cl_RA>().get();
+}	
+	
+inline bool isNegative(const cln::cl_RA& n) {
+	return n < carl::constant_zero<cln::cl_RA>().get();
 }
 	
 /**
@@ -127,18 +142,6 @@ inline int toInt<int>(const cln::cl_I& n) {
 }
 
 /**
- * Convert a cln integer to an unsigned.
- * @param n An integer.
- * @return n as unsigned.
- */
-template<>
-inline unsigned toInt<unsigned>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<unsigned>::max());
-	assert(n >= std::numeric_limits<unsigned>::min());
-    return cln::cl_I_to_uint(n);
-}
-
-/**
  * Convert a cln integer to a longint.
  * @param n An integer.
  * @return n as long int.
@@ -173,10 +176,6 @@ inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
  * @param n A fraction.
  * @return n as unsigned.
  */
-template<>
-inline unsigned toInt<unsigned>(const cln::cl_RA& n) {
-	return toInt<unsigned>(toInt<cln::cl_I>(n));
-}
 template<>
 inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
 	return toInt<std::size_t>(toInt<cln::cl_I>(n));
@@ -316,6 +315,12 @@ inline cln::cl_I gcd(const cln::cl_I& a, const cln::cl_I& b) {
 inline cln::cl_I& gcd_assign(cln::cl_I& a, const cln::cl_I& b) {
     a = cln::gcd(a,b);
 	return a;
+}
+
+inline void divide(const cln::cl_I& dividend, const cln::cl_I& divisor, cln::cl_I& quotient, cln::cl_I& remainder) {
+	cln::cl_I_div_t res = cln::floor2(dividend, divisor);
+    quotient = res.quotient;
+    remainder = res.remainder;
 }
 
 /**
@@ -508,6 +513,9 @@ inline cln::cl_I remainder(const cln::cl_I& a, const cln::cl_I& b) {
 inline cln::cl_I operator/(const cln::cl_I& a, const cln::cl_I& b)
 {
 	return quotient(a,b);
+}
+inline cln::cl_I operator/(const cln::cl_I& lhs, const int& rhs) {
+	return lhs / cln::cl_I(rhs);
 }
 
 std::string toString(const cln::cl_RA& _number, bool _infix);

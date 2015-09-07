@@ -50,7 +50,7 @@ namespace carl
 			mInputString = inputString;
 		}
 		
-		virtual cstring what() const throw() override
+		virtual cstring what() const noexcept override
 		{
 			std::stringstream strstr;
 			strstr << std::runtime_error::what() << " at " << mSubstring << " in " << mInputString;

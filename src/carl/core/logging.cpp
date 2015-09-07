@@ -24,6 +24,7 @@ void setInitialLogLevel()
 	carl::logging::logger().configure("stdout", std::cout);
 	carl::logging::logger().filter("stdout")
 		("carl", carl::logging::LogLevel::LVL_WARN)
+		("carl.formula", carl::logging::LogLevel::LVL_DEBUG)
 	;
 	carl::logging::logger().resetFormatter();
 }

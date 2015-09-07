@@ -8,16 +8,26 @@
 #include "carl/interval/DoubleInterval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <cln/cln.h>
 #include "carl/interval/IntervalEvaluation.h"
 #include "carl/interval/Contraction.h"
 #include <chrono>
 #include <set>
 
+#ifdef USE_CLN_NUMBERS
+#include <cln/cln.h>
+typedef cln::cl_RA Rational;
+typedef cln::cl_I Integer;
+#else
+#include <gmpxx.h>
+typedef mpq_class Rational;
+typedef mpz_class Integer;
+#endif
+
+
 using namespace carl;
 
 template<template<typename> class Operator>
-using PolynomialContraction = Contraction<Operator, MultivariatePolynomial<cln::cl_RA>>;
+using PolynomialContraction = Contraction<Operator, MultivariatePolynomial<Rational>>;
 
 /*
  * 
@@ -46,7 +56,7 @@ int main(int argc, char** argv) {
     map[c] = ic;
     map[d] = id;
 
-    MultivariatePolynomial<cln::cl_RA> e6({(cln::cl_RA)12*a,(cln::cl_RA)3*b, (cln::cl_RA)1*Monomial(c,2),(cln::cl_RA)-1*Monomial(d,3)});
+    MultivariatePolynomial<Rational> e6({(Rational)12*a,(Rational)3*b, (Rational)1*Monomial(c,2),(Rational)-1*Monomial(d,3)});
     PolynomialContraction<SimpleNewton> contractor(e6);
     
     std::set<Variable> variables = {a,b,c,d};

@@ -29,6 +29,12 @@ protected:
 	}
 	~BenchmarkTest() {
 		auto info = ::testing::UnitTest::GetInstance()->current_test_info();
+        {
+            std::stringstream ss;
+            ss << "benchmarks/benchmark_" << info->name() << ".tex";
+            std::ofstream out(ss.str(), std::ios_base::out);
+			file.writeMain(out, info->name());
+        }
 		{
 			std::stringstream ss;
 			ss << "benchmarks/benchmark_" << info->name() << "_plot.tex";

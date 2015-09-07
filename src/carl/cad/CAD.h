@@ -67,7 +67,7 @@ public:
 	typedef typename cad::CADPolynomials<Number>::MPolynomial MPolynomial;
 
 	/// Type of an iterator over the samples.
-	typedef typename Tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
+	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
 	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
@@ -77,7 +77,7 @@ private:
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
-	carl::Tree<RealAlgebraicNumberPtr<Number>> sampleTree;
+	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
 
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)
@@ -310,22 +310,22 @@ public:
 	 * @param checkBounds
 	 * @return true if the constraints are satisfied by a cell in the cad or no constraint is given and the bounds are not conflicting, false otherwise
 	 */
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
+	cad::Answer check(	std::vector<cad::Constraint<Number>>& constraints,
 				RealAlgebraicPoint<Number>& r,
-				cad::ConflictGraph& conflictGraph,
+				cad::ConflictGraph<Number>& conflictGraph,
 				BoundMap& bounds,
 				bool next = false,
 				bool checkBounds = true );
 
 	/// Reduced-parameter version of CAD::check.
-	bool check(	std::vector<cad::Constraint<Number>>& constraints,
+	cad::Answer check(	std::vector<cad::Constraint<Number>>& _constraints,
 				RealAlgebraicPoint<Number>& r,
 				BoundMap& bounds,
 				bool next = false,
 				bool checkBounds = true)
 	{
-		cad::ConflictGraph cg;
-		return this->check(constraints, r, cg, bounds, next, checkBounds);
+		cad::ConflictGraph<Number> cg;
+		return this->check(_constraints, r, cg, bounds, next, checkBounds);
 	}
 
 	/**
@@ -479,7 +479,7 @@ private:
 		bool excludePrevious,
 		BoundMap& bounds,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph,
+		cad::ConflictGraph<Number>& conflictGraph,
 		bool boundsNontrivial,
 		bool checkBounds,
 		std::size_t dim
@@ -501,10 +501,10 @@ private:
 	 * @return
 	 */
 public:
-	bool mainCheck(
+	cad::Answer mainCheck(
 			BoundMap& bounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph,
+			cad::ConflictGraph<Number>& conflictGraph,
 			bool next,
 			bool boundsNontrivial,
 			bool checkBounds
@@ -521,10 +521,10 @@ public:
      */
 	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
 	
-	bool baseLiftCheck(
+	cad::Answer baseLiftCheck(
 		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
-		cad::ConflictGraph& conflictGraph
+		cad::ConflictGraph<Number>& conflictGraph
 	);
 
 	/**
@@ -554,7 +554,7 @@ public:
 	 * @param satPath Indices of regions that lead to a satisfying sample. This is used, if we backtrack due to integrality errors.
 	 * @return <code>true</code> if from <code>node</code> a path in the sample tree can be constructed so that the corresponding sample satisfies the <code>c</code>, <code>false</code> otherwise.
 	 */
-	bool liftCheck(
+	cad::Answer liftCheck(
 			sampleIterator node,
 			std::size_t openVariableCount,
 			bool restartLifting,
@@ -563,7 +563,7 @@ public:
 			bool boundsActive,
 			bool checkBounds,
 			RealAlgebraicPoint<Number>& r,
-			cad::ConflictGraph& conflictGraph,
+			cad::ConflictGraph<Number>& conflictGraph,
 			std::stack<std::size_t>& satPath
 	);
 	

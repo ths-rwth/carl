@@ -1,28 +1,5 @@
-#include "../numbers/numbers.h"
-
 namespace carl
 {
-    template<typename Poly>
-    GiNaC::ex OldGinacConverter<Poly>::convertToGinac(const Poly& poly, const std::map<carl::Variable, GiNaC::ex>& vars)
-    {
-        std::lock_guard<std::recursive_mutex> lock( mMutex );
-        GiNaC::ex result = 0;
-        for(auto term = poly.begin(); term != poly.end(); ++term)
-        {
-            GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::CoeffType>(term->coeff())) ) );
-            if((*term).monomial())
-            {
-                for (auto it: *(term->monomial())) {
-                    auto carlToGinacVar = vars.find(it.first);
-                    assert(carlToGinacVar != vars.end());
-                    factor *= GiNaC::pow(carlToGinacVar->second, it.second);
-                }
-            }
-            result += factor;
-        }
-        return result;
-    }
-
     template<typename Poly>
     Poly OldGinacConverter<Poly>::convertToCarl(const GiNaC::ex& _toConvert, const std::map<GiNaC::ex, carl::Variable, GiNaC::ex_is_less>& vars)
     {
@@ -192,10 +169,10 @@ namespace carl
     }
 
     template<typename Poly>
-    std::unordered_map<const Poly, unsigned, std::hash<Poly>> OldGinacConverter<Poly>::ginacFactorization(const Poly& poly)
+    Factors<Poly> OldGinacConverter<Poly>::ginacFactorization(const Poly& poly)
     {
         std::lock_guard<std::recursive_mutex> lock( mMutex );
-        std::unordered_map<const Poly, unsigned, std::hash<Poly>> result;
+        Factors<Poly> result;
         std::map<Variable, GiNaC::ex> carlToGinacVarMap;
         std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> ginacToCarlVarMap;
         gatherVariables(poly, carlToGinacVarMap, ginacToCarlVarMap);

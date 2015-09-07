@@ -231,6 +231,19 @@ namespace carl
 		{
 			return mTotalDegree == 0;
 		}
+        
+        /**
+         * @return true, if the image of this monomial is integer-valued.
+         */
+        inline bool integerValued() const
+        {
+            for (const auto& it: mExponents)
+			{
+				if (it.first.getType() != VariableType::VT_INT) return false;
+			}
+            return true;
+        }
+        
 		/**
 		 * Checks whether the monomial has exactly degree one.
 		 * @return If monomial is linear.

@@ -2,9 +2,9 @@
 
 #include "../../carl/numbers/numbers.h"
 
-#include <cln/cln.h>
-
 using namespace carl;
+
+#ifdef USE_CLN_NUMBERS
 
 TEST(NumbersCLN, constructors)
 {
@@ -52,3 +52,14 @@ TEST(NumbersCLN, rationalize)
 	EXPECT_EQ(cln::cl_RA(3)/cln::cl_RA(2), rationalize<cln::cl_RA>("1.5"));
 	EXPECT_EQ(cln::cl_RA(1234567890), rationalize<cln::cl_RA>("1234567890"));
 }
+
+TEST(NumbersCLN, division)
+{
+    cln::cl_I quot;
+    cln::cl_I rema;
+    carl::divide(cln::cl_I(10), cln::cl_I(3), quot, rema);
+    EXPECT_EQ(cln::cl_I(3),quot);
+    EXPECT_EQ(cln::cl_I(1),rema);
+}
+
+#endif

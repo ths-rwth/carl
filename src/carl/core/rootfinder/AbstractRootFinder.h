@@ -77,8 +77,8 @@ public:
 	 * @param tryTrivialSolver Flag indicating if the trivialSolve() method should be used.
      */
 	AbstractRootFinder(
-		const UnivariatePolynomial<Number>& polynomial,
-		const Interval<Number>& interval = Interval<Number>(),
+		const UnivariatePolynomial<Number>& _polynomial,
+		const Interval<Number>& _interval = Interval<Number>(),
 		bool tryTrivialSolver = true
 	);
 	
