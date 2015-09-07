@@ -184,15 +184,10 @@ inline Interval<Number> IntervalEvaluation::evaluate(const MultivariateHorner<Po
 	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
 	assert(map.count(mvH.getVariable()) > 0);
 	Interval<Number> res = Interval<Number>::emptyInterval();
-	const Interval<Number> varValue = map.at(mvH.getVariable());
+	const Interval<Number> varValue = map.find(mvH.getVariable())->second;
 
 	Interval<Number> result(1);
 
-	if (mvH.getVariable() != Variable::NO_VARIABLE)
-	{
-		varValue = Interval<Number> (map.find(mvH.getVariable())->second);
-	}
-	
 	//Case 1: no further Horner schemes in mvH
 	if (!mvH.getDependent() && !mvH.getIndependent())
 	{

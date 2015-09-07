@@ -2,7 +2,7 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/util/stringparser.h"
-#include "../interval/IntervalEvaluation.h"
+#include "carl/interval/IntervalEvaluation.h"
 
 #ifdef COMPARE_WITH_GINAC
 #include <cln/cln.h>
@@ -18,7 +18,7 @@ typedef MultivariatePolynomial<Rational> Pol;
 
 int main (int argc, char** argv)
 {
-	
+	/*
   StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
@@ -62,9 +62,9 @@ int main (int argc, char** argv)
 
 	std::cout << "\n Evaluate Horner :" << testInterval << std::endl;
   //std::cout << " Evaluate Horner2:" << testInterval2 << std::endl;
+  */
   
   
-  /*
   Rational u_a;
   Rational l_a;
   Rational u_b;
@@ -81,6 +81,8 @@ int main (int argc, char** argv)
   Variable c = vpool.getFreshVariable();
   vpool.setName(c, "c");
 
+  int l = 0;
+  int n = 0;
 
   for (int i = 1; i <= 6; i++)
   {
@@ -88,33 +90,51 @@ int main (int argc, char** argv)
     switch (i) 
       {
         case 1 : l_a = -200; u_a = -100;
+        break;
         case 2 : l_a = -100; u_a = 0;
+        break;
         case 3 : l_a = -100; u_a = 100;
+        break;
         case 4 : l_a = 0; u_a = 0;
+        break;
         case 5 : l_a = 0; u_a = 100;
+        break;
         case 6 : l_a = 100; u_a = 200;
+        break;
       }
     for (int j = 1; j <= 6; j++)
     {
       switch (j) 
         {
-          case 1 : l_b = -200; u_b = -100;
-          case 2 : l_b = -100; u_b = 0;
-          case 3 : l_b = -100; u_b = 100;
+          case 1 : l_b = -201; u_b = -101;
+          break;
+          case 2 : l_b = -101; u_b = 0;
+          break;
+          case 3 : l_b = -101; u_b = 101;
+          break;
           case 4 : l_b = 0; u_b = 0;
-          case 5 : l_b = 0; u_b = 100;
-          case 6 : l_b = 100; u_b = 200;
+          break;
+          case 5 : l_b = 0; u_b = 101;
+          break;
+          case 6 : l_b = 101; u_b = 201;
+          break;
         }
       for (int k = 1; k <= 6; k++)
       {
         switch (k) 
         {
-          case 1 : l_c = -200; u_c = -100;
-          case 2 : l_c = -100; u_c = 0;
-          case 3 : l_c = -100; u_c = 100;
+          case 1 : l_c = -202; u_c = -102;
+          break;
+          case 2 : l_c = -102; u_c = 0;
+          break;
+          case 3 : l_c = -102; u_c = 102;
+          break;
           case 4 : l_c = 0; u_c = 0;
-          case 5 : l_c = 0; u_c = 100;
-          case 6 : l_c = 100; u_c = 200; 
+          break;
+          case 5 : l_c = 0; u_c = 102;
+          break;
+          case 6 : l_c = 102; u_c = 202; 
+          break;
         }
 
         Interval<Rational> ia( l_a, u_a );
@@ -128,7 +148,21 @@ int main (int argc, char** argv)
         Interval<Rational> iR3 = ia * ic;
         iR2 += iR3;
 
-        std::cout << "[" << i << j << k << "] : "<< iR1 << " - " << iR2 << std::endl;
+        //std::cout << "[" << i << j << k << "] : "<< iR1 << " - " << iR2;
+        n++;
+        std::cout << n;
+        if (iR1.diameter() < iR2.diameter()) {
+          l++;
+          std::cout << "[" << i << j << k << "] : "<< iR1 << " - " << iR2;
+          std::cout << "\t\t\t\t\tSMALLER : [" << l << "] " << std::endl;
+        }
+        if (iR1.diameter() == iR2.diameter()) {
+          std::cout << "\t\t\t\t SAME" << std::endl;
+        }
+        if (iR1.diameter() > iR2.diameter()) {
+          std::cout << "\t\t\t\t GREATER" << std::endl;
+        }
+
 
         assert (iR1 == iR2);
 
@@ -136,5 +170,5 @@ int main (int argc, char** argv)
       }
     }
   }
-  */
+
 } 
