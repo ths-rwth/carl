@@ -29,22 +29,22 @@ int main (int argc, char** argv)
 
 	std::set<Variable> allVarInPolynome;
 	p1.gatherVariables(allVarInPolynome);
-	std::map<Variable, Interval<Rational>> map;
+	std::map<Variable, Interval<double>> map;
 
 	for(auto i : allVarInPolynome) {
   	  if (i.getId() == 1)
   	  {
-  	  	Interval<Rational> ix (-2, 2);
+  	  	Interval<double> ix (-2, 2);
   	  	map[i] = ix;
   	  }
   	  if (i.getId() == 2)
   	  {
-  	  	Interval<Rational> iy (0, 1);
+  	  	Interval<double> iy (0, 1);
   	  	map[i] = iy;
   	  }
   	  if (i.getId() == 3)
   	  {
-  	  	Interval<Rational> iz (0, 1);
+  	  	Interval<double> iz (0, 1);
   	  	map[i] = iz;
   	  }
   	}
@@ -57,7 +57,7 @@ int main (int argc, char** argv)
 	std::cout << "\n GREEDY_Is        :" << peterPolynom << std::endl;
   //std::cout << " GREEDY_IIs       :" << peterPolynom2 << std::endl;
 
-	Interval<Rational> testInterval = IntervalEvaluation::evaluate(peterPolynom , map);
+	Interval<double> testInterval = IntervalEvaluation::evaluate(peterPolynom , map);
   //Interval<Rational> testInterval2 = evaluate(peterPolynom2 , map);
 
 	std::cout << "\n Evaluate Horner :" << testInterval << std::endl;
