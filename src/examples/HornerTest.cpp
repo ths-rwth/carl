@@ -18,12 +18,12 @@ typedef MultivariatePolynomial<Rational> Pol;
 
 int main (int argc, char** argv)
 {
-	/*
+	
   StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x*y + x*z");
-  Pol p1 = sp.parseMultivariatePolynomial<Rational>("12");
+  Pol p1 = sp.parseMultivariatePolynomial<Rational>("12*x +13 ");
   //Pol p1 = sp.parseMultivariatePolynomial<Rational>("2184*x^17+15708*z+(-126672)*x^2+643384*z^3+(-2306444)*z^4+4162512*x^13+(-10186920)*z^12+18820800*x^11+(-27118448)*x^10+31123477*x^9+6199788*x^5+(-12956461)*x^6+21524503*x^7+(-28784511)*x^8+(-1226048)*x^14+245224*y^15+(-31192)*y^16+(-924)");
 
 
@@ -51,7 +51,7 @@ int main (int argc, char** argv)
 
 	std::cout << "\n Polynom       :" << p1 << std::endl;
 
-	MultivariateHorner< Pol, GREEDY_Is > peterPolynom (std::move(p1),map);
+	MultivariateHorner< Pol, strategy > peterPolynom (std::move(p1),map);
   //MultivariateHorner< Pol, GREEDY_IIs > peterPolynom2 (p1,map);
 
 	std::cout << "\n GREEDY_Is        :" << peterPolynom << std::endl;
@@ -62,9 +62,9 @@ int main (int argc, char** argv)
 
 	std::cout << "\n Evaluate Horner :" << testInterval << std::endl;
   //std::cout << " Evaluate Horner2:" << testInterval2 << std::endl;
-  */
   
   
+  /*
   Rational u_a;
   Rational l_a;
   Rational u_b;
@@ -150,17 +150,73 @@ int main (int argc, char** argv)
 
         //std::cout << "[" << i << j << k << "] : "<< iR1 << " - " << iR2;
         n++;
-        std::cout << n;
+        //std::cout << n;
         if (iR1.diameter() < iR2.diameter()) {
           l++;
-          std::cout << "[" << i << j << k << "] : "<< iR1 << " - " << iR2;
-          std::cout << "\t\t\t\t\tSMALLER : [" << l << "] " << std::endl;
+          //std::cout << "[" << i << j << k << "] : "<< iR1 << " - " << iR2;
+          
+          std::cout << l << " &   $";
+
+          switch (i) 
+          {
+            case 1 : std::cout << "a_1 < a_2 < 0";
+            break;
+            case 2 : std::cout << "a_1 < a_2 = 0";
+            break;
+            case 3 : std::cout << "a_1 < 0 < a_2";
+            break;
+            case 4 : std::cout << "a_1 = a_2 = 0";
+            break;
+            case 5 : std::cout << "a_1 = 0 < a_2";
+            break;
+            case 6 : std::cout << "0 < a_1 < a_2";
+            break;
+          }
+
+          std::cout << " $ &  $ ";
+
+          switch (j) 
+          {
+            case 1 : std::cout << "b_1 < b_2 < 0";
+            break;
+            case 2 : std::cout << "b_1 < b_2 = 0";
+            break;
+            case 3 : std::cout << "b_1 < 0 < b_2";
+            break;
+            case 4 : std::cout << "b_1 = b_2 = 0";
+            break;
+            case 5 : std::cout << "b_1 = 0 < b_2";
+            break;
+            case 6 : std::cout << "0 < b_1 < b_2";
+            break;
+          }
+
+          std::cout << "$  &  $";
+
+          switch (k) 
+          {
+            case 1 : std::cout << "c_1 < c_2 < 0";
+            break;
+            case 2 : std::cout << "c_1 < c_2 = 0";
+            break;
+            case 3 : std::cout << "c_1 < 0 < c_2";
+            break;
+            case 4 : std::cout << "c_1 = c_2 = 0";
+            break;
+            case 5 : std::cout << "c_1 = 0 < c_2";
+            break;
+            case 6 : std::cout << "0 < c_1 < c_2";
+            break;
+          }
+
+
+          std::cout << " $ \\\\ " << std::endl;
         }
         if (iR1.diameter() == iR2.diameter()) {
-          std::cout << "\t\t\t\t SAME" << std::endl;
+          //std::cout << "& SAME" << std::endl;
         }
         if (iR1.diameter() > iR2.diameter()) {
-          std::cout << "\t\t\t\t GREATER" << std::endl;
+          // std::cout << "& GREATER" << std::endl;
         }
 
 
@@ -170,5 +226,5 @@ int main (int argc, char** argv)
       }
     }
   }
-
+*/
 } 

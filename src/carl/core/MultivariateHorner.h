@@ -11,13 +11,16 @@
 #include "MultivariatePolynomial.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
+ #include "MultivariateHornerSettings.h"
 
 #include "Term.h"
 
 namespace carl{
 
-template<typename PolynomialType, Strategy Strat>
-class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, Strat>> { 
+static std::map<Variable, Interval<double>> mMap = {{ Variable::NO_VARIABLE , Interval<double>(0)}};
+
+template<typename PolynomialType, class strategy >
+class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, strategy >> { 
 
 /**
 * Datastructure to save Polynomes once they are transformed into a horner scheme:
@@ -42,8 +45,8 @@ public:
 		
 	//Constuctor
 	MultivariateHorner (const PolynomialType&& inPut);
-	MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map);
-	MultivariateHorner (const PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
+	MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<double>>& map);
+	MultivariateHorner (const PolynomialType&& inPut, bool dummy, std::map<Variable, Interval<double>>& map);
 
 
 	//~MultivariateHorner ();
