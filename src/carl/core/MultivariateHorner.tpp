@@ -8,12 +8,31 @@
 
 namespace carl
 {
-	//Constructor for Greedy I
+	//Constructor 
 	template< typename PolynomialType, class strategy > 
 	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut) {
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << " (GreedyI constr) P: " << inPut << std::endl;
 	#endif
+	
+	int arithmeticOperationsCounter = 0;
+	if (strategy::use_arithmeticOperationsCounter)
+ 	{
+ 		//Sum of monomials 
+ 		arithmeticOperationsCounter = inPut.nrTerms() - 1;
+
+ 		typename PolynomialType::TermsType::const_iterator polynomialIt;
+		for (polynomialIt = inPut.begin(); polynomialIt != inPut.end(); polynomialIt++)
+		{
+			arithmeticOperationsCounter += polynomialIt->getNrVariables() - 1;
+			arithmeticOperationsCounter += polynomialIt->tdeg() - polynomialIt->getNrVariables();
+			if (polynomialIt->coeff() > 1) arithmeticOperationsCounter++;
+			if (polynomialIt->isConstant()) arithmeticOperationsCounter++;
+
+		}
+
+ 	}
+
 
 	//static_assert(!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_II)&&!(strategy::variableSelectionHeurisics == variableSelectionHeurisics::GREEDY_IIs), "Strategy requires Interval map");
 
@@ -32,8 +51,10 @@ namespace carl
 		}
 	}
 
+	int arithmeticOperationsReductionCounter = 0;
+
 	//Create Horner Scheme Recursivly
-	MultivariateHorner< PolynomialType, strategy > root ( std::move(inPut), true, mMap );
+	MultivariateHorner< PolynomialType, strategy > root ( std::move(inPut), true, mMap, arithmeticOperationsReductionCounter );
 	
  	//Part after recursion
  	if (strategy::selectionType == variableSelectionHeurisics::GREEDY_Is || strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs)
@@ -45,11 +66,17 @@ namespace carl
 
  	//Apply all changes
  	*this = root;
+
+ 	if (strategy::use_arithmeticOperationsCounter)
+ 	{
+ 		std::cout <<"Total AO: "<< arithmeticOperationsCounter << " Reduced by " << arithmeticOperationsReductionCounter <<  " arithmetic operations" << std::endl;
+ 	}
 	};
+
 
 	//Constructor for Greedy II and Greedy I
 	template< typename PolynomialType, typename strategy > 
-	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<double>>& map) {
+	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<double>>& map, int& counter) {
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << " (GreedyII constr) P: " << inPut << std::endl;
 	#endif
@@ -72,7 +99,7 @@ namespace carl
 
 	//Constructor for Greedy I/II creates recursive Datastruckture
 	template< typename PolynomialType, typename strategy >
-	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut, bool dummy, std::map<Variable, Interval<double>>& map) 
+	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut, bool dummy, std::map<Variable, Interval<double>>& map, int& counter) 
 	{
 	int s = strategy::selectionType;
 
@@ -107,7 +134,7 @@ namespace carl
 					//saving most promising Variable for later 
 					if ( monomialCounter >= monomials_containingChoosenVar ) {
 						monomials_containingChoosenVar = monomialCounter;
-						selectedVariable = variableIt;					
+						selectedVariable = variableIt;		
 					}
 				}
 
@@ -131,7 +158,6 @@ namespace carl
 							accMonomEval += IntervalEvaluation::evaluate( currentTerm, map ).diameter();
 							accMonomDivEval += currentInterval.diameter();
 
-							//std::cout << "[!]cT: "<< currentTerm << " | " << IntervalEvaluation::evaluate( currentTerm, map ).diameter() << ", " << accMonomEval << " D: " << currentInterval.diameter() << "," << accMonomDivEval << std::endl;
 						}
 					}		
 					accMonomDivEval *= map.find(*variableIt)->second.diameter();
@@ -152,7 +178,8 @@ namespace carl
 
 			//Setting the choosen Variable for the current Hornerscheme iterartion
 
-			if (*selectedVariable == NULL || bestDelta == constant_zero<CoeffType>::get() )
+			if (*selectedVariable == NULL && (strategy::selectionType == variableSelectionHeurisics::GREEDY_Is || strategy::selectionType == variableSelectionHeurisics::GREEDY_I)
+				|| bestDelta == constant_zero<CoeffType>::get() && (strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs || strategy::selectionType == variableSelectionHeurisics::GREEDY_II) )		
 			{
 				selectedVariable = allVariablesinPolynome.begin();
 			}
@@ -160,7 +187,7 @@ namespace carl
 
 			#ifdef DEBUG_HORNER
 			std::cout << __func__ << "    Polynome: " << inPut << std::endl;
-			//std::cout << "Choosen Var: " << *selectedVariable << std::endl;
+			std::cout << "Choosen Var: " << *selectedVariable << std::endl;
 			#endif
 			
 			typename PolynomialType::TermsType::const_iterator polynomialIt;
@@ -177,6 +204,7 @@ namespace carl
 					//divide dependent terms by choosen Variable
 					
 					polynomialIt->divide(*selectedVariable, tempTerm);
+					counter++;
 					h_dependentPart.addTerm( tempTerm );
 				}
 				else 
@@ -185,13 +213,15 @@ namespace carl
 				}
 			}
 
+			counter = counter - 1;
+
 			//If Dependent Polynome contains Variables - continue with recursive Horner
 			if ( !h_dependentPart.isNumber() )
 			{
 				#ifdef DEBUG_HORNER
 					std::cout << __func__ << "    DEP->new Horner " << h_dependentPart << std::endl;
 				#endif
-				std::shared_ptr<MultivariateHorner<PolynomialType, strategy>> new_dependent (new MultivariateHorner< PolynomialType, strategy >(std::move(h_dependentPart), true ,map));
+				std::shared_ptr<MultivariateHorner<PolynomialType, strategy>> new_dependent (new MultivariateHorner< PolynomialType, strategy >(std::move(h_dependentPart), true, map, counter));
 				setDependent(new_dependent);
 				mConst_dependent = constant_zero<CoeffType>::get();	
 			}
@@ -209,7 +239,7 @@ namespace carl
 				#ifdef DEBUG_HORNER
 					std::cout << __func__ << "    INDEP->new Horner " << h_independentPart << std::endl;
 				#endif
-				std::shared_ptr<MultivariateHorner<PolynomialType, strategy>> new_independent ( new MultivariateHorner< PolynomialType, strategy >(std::move(h_independentPart),true ,map));
+				std::shared_ptr<MultivariateHorner<PolynomialType, strategy>> new_independent ( new MultivariateHorner< PolynomialType, strategy >(std::move(h_independentPart),true ,map, counter));
 				setIndependent(new_independent);
 				mConst_independent = constant_zero<CoeffType>::get();
 			}

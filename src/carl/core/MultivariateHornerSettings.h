@@ -14,9 +14,11 @@ enum variableSelectionHeurisics {
 
 struct strategy
 {
-	static constexpr variableSelectionHeurisics selectionType = GREEDY_I;
+	static constexpr variableSelectionHeurisics selectionType = GREEDY_Is;
 
 	static constexpr double targetDiameter = 0.1;
+
+	static constexpr bool use_arithmeticOperationsCounter = false;
 };
 
 

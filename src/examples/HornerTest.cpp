@@ -22,8 +22,8 @@ int main (int argc, char** argv)
   StringParser sp;
 	sp.setVariables({"x", "y", "z"});
 	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x^2*y^4*z^5*3 + x^3*10*y^4 + 20*z^6*y^2 + 21*x^9*z^2 + 4*x*y");
-	//Pol p1 = sp.parseMultivariatePolynomial<Rational>("x*y + x*z");
-  Pol p1 = sp.parseMultivariatePolynomial<Rational>("12*x +13 ");
+	Pol p1 = sp.parseMultivariatePolynomial<Rational>("x*y + x*z + 2*x");
+  //Pol p1 = sp.parseMultivariatePolynomial<Rational>("12*x +13*x^2+3*x ");
   //Pol p1 = sp.parseMultivariatePolynomial<Rational>("2184*x^17+15708*z+(-126672)*x^2+643384*z^3+(-2306444)*z^4+4162512*x^13+(-10186920)*z^12+18820800*x^11+(-27118448)*x^10+31123477*x^9+6199788*x^5+(-12956461)*x^6+21524503*x^7+(-28784511)*x^8+(-1226048)*x^14+245224*y^15+(-31192)*y^16+(-924)");
 
 
@@ -51,13 +51,13 @@ int main (int argc, char** argv)
 
 	std::cout << "\n Polynom       :" << p1 << std::endl;
 
-	MultivariateHorner< Pol, strategy > peterPolynom (std::move(p1),map);
+	MultivariateHorner< Pol, strategy > peterPolynom (std::move(p1));
   //MultivariateHorner< Pol, GREEDY_IIs > peterPolynom2 (p1,map);
 
 	std::cout << "\n GREEDY_Is        :" << peterPolynom << std::endl;
   //std::cout << " GREEDY_IIs       :" << peterPolynom2 << std::endl;
 
-	Interval<double> testInterval = IntervalEvaluation::evaluate(peterPolynom , map);
+	Interval<double> testInterval = IntervalEvaluation::evaluate(peterPolynom ,map);
   //Interval<Rational> testInterval2 = evaluate(peterPolynom2 , map);
 
 	std::cout << "\n Evaluate Horner :" << testInterval << std::endl;

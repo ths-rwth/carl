@@ -45,8 +45,8 @@ public:
 		
 	//Constuctor
 	MultivariateHorner (const PolynomialType&& inPut);
-	MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<double>>& map);
-	MultivariateHorner (const PolynomialType&& inPut, bool dummy, std::map<Variable, Interval<double>>& map);
+	MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<double>>& map, int& counter);
+	MultivariateHorner (const PolynomialType&& inPut, bool dummy, std::map<Variable, Interval<double>>& map, int& counter);
 
 
 	//~MultivariateHorner ();
