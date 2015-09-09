@@ -155,12 +155,12 @@ namespace carl
 
 							currentInterval = IntervalEvaluation::evaluate( currentTerm_div, map );
 
-							accMonomEval += IntervalEvaluation::evaluate( currentTerm, map ).diameter();
-							accMonomDivEval += currentInterval.diameter();
+							accMonomEval += carl::rationalize<CoeffType>(IntervalEvaluation::evaluate( currentTerm, map ).diameter());
+							accMonomDivEval += carl::rationalize<CoeffType>(currentInterval.diameter());
 
 						}
 					}		
-					accMonomDivEval *= map.find(*variableIt)->second.diameter();
+					accMonomDivEval *= carl::rationalize<CoeffType>(map.find(*variableIt)->second.diameter());
 					delta = accMonomDivEval - accMonomEval;
 					
 					if (delta > bestDelta )
