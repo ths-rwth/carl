@@ -53,7 +53,7 @@ option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
-option( PYTHON3 "Build python bindings for python3 instead of 2" OFF )
+option( CARL_PYTHON "Build Python bindings" ON)
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
@@ -195,7 +195,11 @@ endif()
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Boost
-load_library(carl Boost 1.29 REQUIRED)
+if(CARL_PYTHON)
+	load_library(carl Boost 1.49 REQUIRED COMPONENTS python3)
+else()
+	load_library(carl Boost 1.49 REQUIRED)
+endif()
 
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
 list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_DYNAMIC})
@@ -260,6 +264,18 @@ include_directories(SYSTEM ${SYSTEM} ${carl_INCLUDE_DIRS})
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
 list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
+
+# # # # # # # # # # # # # # # # # # # # # #
+# C.4 For Python
+# # # # # # # # # # # # # # # # # # # # # #
+
+if(CARL_PYTHON)
+	set(Python_ADDITIONAL_VERSIONS 3.4)
+	FIND_PACKAGE(PythonInterp REQUIRED)
+	FIND_PACKAGE(PythonLibs 3.4 REQUIRED)
+	include_directories(${PYTHON_INCLUDE_DIR})
+endif()
+
 
 # # # # # # # # # # # # # # # # # # # # # #
 # D. Writen information files

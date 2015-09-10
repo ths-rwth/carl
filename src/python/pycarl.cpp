@@ -239,19 +239,19 @@ std::string rational_str(const Rational& rat) {
 }
 
 Polynomial parsePolynomial(const std::string& text) {
-	carl::parser::Parser<Rational> p;
+	carl::parser::Parser<Polynomial> p;
 	return p.polynomial(text);
 }
 
 RationalFunction parseRationalFunction(const std::string& text) {
-	carl::parser::Parser<Rational> p;
+	carl::parser::Parser<Polynomial> p;
 	return p.rationalFunction(text);
 }
 
 /**
  * The actual module definition
  */
-BOOST_PYTHON_MODULE(libpycarl)
+BOOST_PYTHON_MODULE(pycarl)
 {
 	using namespace boost::python;
 
@@ -321,10 +321,10 @@ BOOST_PYTHON_MODULE(libpycarl)
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<carl::parser::Parser<Rational>, boost::noncopyable>("Parser")
-		.def("polynomial", &carl::parser::Parser<Rational>::polynomial)
-		.def("rationalFunction", &carl::parser::Parser<Rational>::rationalFunction)
-		.def("addVariable", &carl::parser::Parser<Rational>::addVariable)
+	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")
+		.def("polynomial", &carl::parser::Parser<Polynomial>::polynomial)
+		.def("rationalFunction", &carl::parser::Parser<Polynomial>::rationalFunction)
+		.def("addVariable", &carl::parser::Parser<Polynomial>::addVariable)
 		;
 
 	// Global string parser functions (no variable management)
