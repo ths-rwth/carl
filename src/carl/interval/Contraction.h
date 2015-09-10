@@ -233,6 +233,7 @@ namespace carl {
 
     private:
         Polynomial mConstraint; // Todo: Should be a reference.
+        Polynomial* mOriginal;
         #ifdef USE_HORNER
             MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> mHornerForm;
             std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mDerivatives;
@@ -245,8 +246,20 @@ namespace carl {
     public:
         Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
         mConstraint(constraint),
+        mOriginal(nullptr),
         #ifdef USE_HORNER
             mHornerForm(std::move(constraint)),
+        #endif
+        mDerivatives(),
+        mVarSolutionFormulas() {}
+
+        Contraction(const Polynomial& constraint, const Polynomial& _original) : Operator<Polynomial>(),
+        mConstraint(constraint),
+        #ifdef USE_HORNER
+        	mOriginal(new Polynomial(_original)),
+            mHornerForm(std::move(constraint)),
+        #else
+            mOriginal(nullptr),
         #endif
         mDerivatives(),
         mVarSolutionFormulas() {}
