@@ -178,8 +178,8 @@ namespace carl
 
 			//Setting the choosen Variable for the current Hornerscheme iterartion
 
-			if (*selectedVariable == NULL && (strategy::selectionType == variableSelectionHeurisics::GREEDY_Is || strategy::selectionType == variableSelectionHeurisics::GREEDY_I)
-				|| bestDelta == constant_zero<CoeffType>::get() && (strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs || strategy::selectionType == variableSelectionHeurisics::GREEDY_II) )		
+			if ((*selectedVariable == NULL && (strategy::selectionType == variableSelectionHeurisics::GREEDY_Is || strategy::selectionType == variableSelectionHeurisics::GREEDY_I))
+				|| (bestDelta == constant_zero<CoeffType>::get() && (strategy::selectionType == variableSelectionHeurisics::GREEDY_IIs || strategy::selectionType == variableSelectionHeurisics::GREEDY_II)) )		
 			{
 				selectedVariable = allVariablesinPolynome.begin();
 			}
