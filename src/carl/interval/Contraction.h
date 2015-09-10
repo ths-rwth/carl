@@ -263,6 +263,13 @@ namespace carl {
         mDerivatives(),
         mVarSolutionFormulas() {}
 
+        ~Contraction() {
+        	#ifdef USE_HORNER
+        		if(mOriginal != nullptr)
+        			delete mOriginal;
+        	#endif
+        }
+
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
             bool splitOccurredInContraction = false;
             if( !withPropagation || !mConstraint.isLinear() )
@@ -277,7 +284,10 @@ namespace carl {
                 {
                     #ifdef USE_HORNER
                         //Deriviate and convert to Horner
-                        it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, strategy>( std::move(mConstraint.derivative(variable)))).first;
+                		if( mOriginal == nullptr )
+                        	it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, strategy>( std::move(mConstraint.derivative(variable)))).first;
+                        else
+                        	it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, strategy>( *mOriginal)).first;
                     #else
                         it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
                     #endif
@@ -288,7 +298,10 @@ namespace carl {
                 #endif
 
                 #ifdef USE_HORNER
-                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, strategy>( std::move(mConstraint) ), (*it).second, resA, resB, useNiceCenter);
+                	if( mOriginal == nullptr )
+                		splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, strategy>( std::move(mConstraint) ), (*it).second, resA, resB, useNiceCenter);
+                	else
+                    	splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, strategy>( *mOriginal ), (*it).second, resA, resB, useNiceCenter);
                 #else
                     splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
                 #endif
