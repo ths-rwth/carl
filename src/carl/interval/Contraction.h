@@ -13,7 +13,7 @@
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-//#define USE_HORNER
+#define USE_HORNER
 
 namespace carl {
     
@@ -232,77 +232,93 @@ namespace carl {
 
     private:
         Polynomial mConstraint; // Todo: Should be a reference.
-        std::shared_ptr<Polynomial> mOriginal;
         #ifdef USE_HORNER
-            MultivariateHorner<Polynomial, strategy> mHornerForm;
-            std::map<Variable, MultivariateHorner<Polynomial,strategy>> mDerivatives;
+        Polynomial* mpOriginal;
+        MultivariateHorner<Polynomial, strategy> mHornerForm;
+        std::map<Variable, MultivariateHorner<Polynomial,strategy>> mDerivatives;
         #else
-            std::map<Variable, Polynomial> mDerivatives;
+        std::map<Variable, Polynomial> mDerivatives;
         #endif
-            std::map<Variable, VarSolutionFormula<Polynomial>>mVarSolutionFormulas;
-            std::map<Polynomial, MultivariateHorner<Polynomial,strategy>> mHornerSchemes;
+        std::map<Variable, VarSolutionFormula<Polynomial>> mVarSolutionFormulas;
+        std::map<Polynomial, MultivariateHorner<Polynomial,strategy>> mHornerSchemes;
 
     public:
+        Contraction() = delete;
         Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
             mConstraint(constraint),
-            mOriginal(NULL),
             #ifdef USE_HORNER
-                mHornerForm(constraint),
+            mpOriginal(nullptr),
+            mHornerForm(constraint),
             #endif
             mDerivatives(),
-            mVarSolutionFormulas() {
-                std::cout << "NULL::Contraction: C: " << constraint << "  O: " << mOriginal << std::endl;
-            }
+            mVarSolutionFormulas() 
+        {}
 
         Contraction(const Polynomial& constraint, const Polynomial& _original) : Operator<Polynomial>(),
             mConstraint(constraint),
             #ifdef USE_HORNER
-            	mOriginal (new Polynomial(_original)),
-                mHornerForm(constraint),
-            #else
-                mOriginal(NULL),
+            mpOriginal (_original.isLinear() ? nullptr : new Polynomial(_original)),
+            mHornerForm( mpOriginal == nullptr ? constraint :  _original ),
             #endif
             mDerivatives(),
-            mVarSolutionFormulas() {
-                std::cout << "NOT NILL::Contraction: C: " << constraint << "  O: " << *mOriginal << std::endl;
-            }
+            mVarSolutionFormulas() 
+        {}
+        Contraction(const Contraction&) = delete;
+        
+        Contraction(Contraction&& _contraction ): Operator<Polynomial>(),
+            mConstraint(std::move(_contraction.mConstraint)),
+            #ifdef USE_HORNER
+            mpOriginal(_contraction.mpOriginal),
+            mHornerForm(std::move(_contraction.mHornerForm)),
+            #endif
+            mDerivatives(std::move(_contraction.mDerivatives)),
+            mVarSolutionFormulas(std::move(_contraction.mVarSolutionFormulas)) 
+        {
+            _contraction.mpOriginal = nullptr;
+        }
+        
+        Contraction& operator=(const Contraction&) = delete;
+        Contraction& operator=(Contraction&&) = delete;
 
-        ~Contraction() {}
+        ~Contraction()
+        {
+            #ifdef USE_HORNER
+            if( mpOriginal != nullptr )
+                delete mpOriginal;
+            #endif
+        }
 
         bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
             bool splitOccurredInContraction = false;
             if( !withPropagation || !mConstraint.isLinear() )
             {
                 #ifdef USE_HORNER
-                    typename std::map<Variable, MultivariateHorner<Polynomial,strategy>>::const_iterator it = mDerivatives.find(variable);
+                typename std::map<Variable, MultivariateHorner<Polynomial,strategy>>::const_iterator it = mDerivatives.find(variable);
                 #else
-                    typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
                 #endif
 
                 if( it == mDerivatives.end() )
                 {
                     #ifdef USE_HORNER
-                        //Deriviate and convert to Horner
-                		if( mOriginal == NULL )
-                        	it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, strategy>( mConstraint.derivative(variable))).first;
-                        else
-                            it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, strategy>( mOriginal->derivative(variable))).first;
-                        #else
-                        it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                    //Deriviate and convert to Horner
+                    if( mpOriginal == nullptr )
+                        it = mDerivatives.emplace(variable, std::move(MultivariateHorner<Polynomial, strategy>( mConstraint.derivative(variable)))).first;
+                    else
+                        it = mDerivatives.emplace(variable, std::move(MultivariateHorner<Polynomial, strategy>( mpOriginal->derivative(variable)))).first;
+                    #else
+                    it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
                     #endif
                 }
 
                 #ifdef CONTRACTION_DEBUG
-                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << " mOriginal: " << mOriginal << std::endl;
+                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << " mpOriginal: " << mpOriginal << std::endl;
                 #endif
 
                 #ifdef USE_HORNER
-                	if( mOriginal == NULL )
-                		splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, strategy>( mConstraint ), (*it).second, resA, resB, useNiceCenter);
-                	else
-                    	splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, strategy>( *mOriginal), (*it).second, resA, resB, useNiceCenter);
+                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mHornerForm, (*it).second, resA, resB, useNiceCenter);
                 #else
-                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
                 #endif
             }
             else

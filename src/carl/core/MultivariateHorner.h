@@ -44,25 +44,18 @@ private:
 public:
 		
 	//Constuctor
+    MultivariateHorner () = delete;
 	MultivariateHorner (const PolynomialType& inPut);
-	MultivariateHorner (const PolynomialType& inPut, std::map<Variable, Interval<double>>& map, int& counter);
-	MultivariateHorner (const PolynomialType& inPut, bool dummy, std::map<Variable, Interval<double>>& map, int& counter);
+	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map);
+	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map, int& counter);
+    MultivariateHorner ( const MultivariateHorner& ) = default;
+    MultivariateHorner ( MultivariateHorner&& ) = default;
+//    MultivariateHorner& operator=(MultivariateHorner&& mh) = delete;
 
 
 	//~MultivariateHorner ();
 	
-	MultivariateHorner& operator=(const MultivariateHorner& mh)
-	{
-		mConst_dependent = mh.mConst_dependent;
-		mConst_independent = mh.mConst_independent;
-
-	 	mH_dependent = mh.mH_dependent;
-	 	mH_independent = mh.mH_independent;	
-
-	 	mVariable = mh.mVariable;
-	 	mExponent = mh.mExponent;		
-		return *this;
-	}
+	MultivariateHorner& operator=(const MultivariateHorner& mh) = default;
 
 /*
 	MultivariateHorner& operator=(MultivariateHorner&& mh) 
