@@ -18,7 +18,7 @@ struct strategy
 
 	static constexpr double targetDiameter = 0.1;
 
-	static constexpr bool use_arithmeticOperationsCounter = false;
+	static constexpr bool use_arithmeticOperationsCounter = fasle;
 };
 
 

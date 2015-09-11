@@ -10,7 +10,7 @@ namespace carl
 {
 	//Constructor 
 	template< typename PolynomialType, class strategy > 
-	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut) {
+	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType& inPut) {
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << " (GreedyI constr) P: " << inPut << std::endl;
 	#endif
@@ -30,7 +30,6 @@ namespace carl
 			if (polynomialIt->isConstant()) arithmeticOperationsCounter++;
 
 		}
-
  	}
 
 
@@ -69,14 +68,19 @@ namespace carl
 
  	if (strategy::use_arithmeticOperationsCounter)
  	{
- 		std::cout <<"Total AO: "<< arithmeticOperationsCounter << " Reduced by " << arithmeticOperationsReductionCounter <<  " arithmetic operations" << std::endl;
+ 		std::cout <<"Total AO: "<< arithmeticOperationsCounter << " rAO: " << arithmeticOperationsReductionCounter <<  " inPut: " << inPut << "  Output: " << root << std::endl;
+
+ 		if (arithmeticOperationsReductionCounter > 0)
+ 		{
+ 			std::cout << "\n\n\n\n\n                                           IT WORKED !!!  \n\n\n\n\n" << std::endl;
+ 		}
  	}
 	};
 
 
 	//Constructor for Greedy II and Greedy I
 	template< typename PolynomialType, typename strategy > 
-	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<double>>& map, int& counter) {
+	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType& inPut, std::map<Variable, Interval<double>>& map, int& counter) {
 	#ifdef DEBUG_HORNER
 		std::cout << __func__ << " (GreedyII constr) P: " << inPut << std::endl;
 	#endif
@@ -99,7 +103,7 @@ namespace carl
 
 	//Constructor for Greedy I/II creates recursive Datastruckture
 	template< typename PolynomialType, typename strategy >
-	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType&& inPut, bool dummy, std::map<Variable, Interval<double>>& map, int& counter) 
+	MultivariateHorner< PolynomialType, strategy>::MultivariateHorner (const PolynomialType& inPut, bool dummy, std::map<Variable, Interval<double>>& map, int& counter) 
 	{
 	int s = strategy::selectionType;
 
