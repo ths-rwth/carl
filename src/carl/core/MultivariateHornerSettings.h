@@ -14,11 +14,25 @@ enum variableSelectionHeurisics {
 
 struct strategy
 {
+	/*
+	* selectionType determines which variable selcetion heuristic is used to create a horner scheme.
+	*/
 	static constexpr variableSelectionHeurisics selectionType = GREEDY_Is;
 
+	/*
+	* defines for GREEDY_II/IIs the default value used to evaluate variables (x = [-targetDiameter,+targetDiameter])
+	*/
 	static constexpr double targetDiameter = 0.1;
 
+	/*
+	* Toggles a counter, that monitors the reduction of arithmetic operations by Horner schemes.
+	*/
 	static constexpr bool use_arithmeticOperationsCounter = false;
+
+	/*
+	* Toggles contraction via the propagation method on/off
+	*/
+	static constexpr bool use_propagation = false;
 };
 
 

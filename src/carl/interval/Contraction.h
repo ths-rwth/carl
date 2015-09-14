@@ -13,7 +13,7 @@
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-#define USE_HORNER
+//#define USE_HORNER
 
 namespace carl {
     
@@ -288,9 +288,9 @@ namespace carl {
             #endif
         }
 
-        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
+        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false) {
             bool splitOccurredInContraction = false;
-            if( !withPropagation || !mConstraint.isLinear() )
+            if( !strategy::use_propagation || !mConstraint.isLinear() )
             {
                 #ifdef USE_HORNER
                 typename std::map<Variable, MultivariateHorner<Polynomial,strategy>>::const_iterator it = mDerivatives.find(variable);
@@ -333,7 +333,7 @@ namespace carl {
             std::cout << std::endl;                            
             #endif
 
-            if( withPropagation )
+            if( strategy::use_propagation )
             {
                 typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator const_iterator_VarSolutionFormula = mVarSolutionFormulas.find(variable);
                 if( const_iterator_VarSolutionFormula == mVarSolutionFormulas.end() )
