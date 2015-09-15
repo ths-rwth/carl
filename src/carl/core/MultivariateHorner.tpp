@@ -65,7 +65,7 @@ namespace carl
 
  	//Apply all changes
  	*this = root;
-
+ 	
  	if (strategy::use_arithmeticOperationsCounter)
  	{
  		std::cout <<"Total AO: "<< arithmeticOperationsCounter << " rAO: " << arithmeticOperationsReductionCounter <<  " inPut: " << inPut << "  Output: " << root << std::endl;
