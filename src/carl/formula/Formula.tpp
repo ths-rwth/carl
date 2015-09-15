@@ -251,13 +251,6 @@ namespace carl
         _content.mProperties = Condition();
         switch( _content.mType )
         {
-            case FormulaType::ITE:
-            {
-                //_content.mProperties |= (_content.mpIteContent->mCondition.properties() & WEAK_CONDITIONS);
-                //_content.mProperties |= (_content.mpIteContent->mThen.properties() & WEAK_CONDITIONS);
-                //_content.mProperties |= (_content.mpIteContent->mElse.properties() & WEAK_CONDITIONS);
-                break;
-            }
             case FormulaType::EXISTS:
             {
                 ///@todo do something here
@@ -329,31 +322,9 @@ namespace carl
                 }
                 break;
             }
+            case FormulaType::ITE:
             case FormulaType::IMPLIES:
-            {
-                _content.mProperties |= PROP_IS_IN_NNF;
-                //Condition subFormulaCondsA = _content.mpImpliesContent->mPremise.properties();
-                //if( !(PROP_IS_IN_NNF<=subFormulaCondsA) )
-                //    _content.mProperties &= ~PROP_IS_IN_NNF;
-                //_content.mProperties |= (subFormulaCondsA & WEAK_CONDITIONS);
-                //Condition subFormulaCondsB = _content.mpImpliesContent->mConclusion.properties();
-                //if( !(PROP_IS_IN_NNF<=subFormulaCondsB) )
-                //    _content.mProperties &= ~PROP_IS_IN_NNF;
-                //_content.mProperties |= (subFormulaCondsB & WEAK_CONDITIONS);
-                break;
-            }
             case FormulaType::IFF:
-            {
-                _content.mProperties |= PROP_IS_IN_NNF;
-                for( auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula )
-                {
-                    Condition subFormulaConds = subFormula->properties();
-                    if( !(PROP_IS_IN_NNF<=subFormulaConds) )
-                        _content.mProperties &= ~PROP_IS_IN_NNF;
-                    _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
-                }
-                break;
-            }
             case FormulaType::XOR:
             {
                 _content.mProperties |= PROP_IS_IN_NNF;
