@@ -13,7 +13,7 @@
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-#define USE_HORNER
+//#define USE_HORNER
 
 namespace carl {
     
@@ -274,7 +274,9 @@ namespace carl {
             mDerivatives(std::move(_contraction.mDerivatives)),
             mVarSolutionFormulas(std::move(_contraction.mVarSolutionFormulas)) 
         {
+            #ifdef USE_HORNER
             _contraction.mpOriginal = nullptr;
+            #endif
         }
         
         Contraction& operator=(const Contraction&) = delete;
