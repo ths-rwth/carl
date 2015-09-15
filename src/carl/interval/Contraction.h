@@ -254,7 +254,11 @@ namespace carl {
             mVarSolutionFormulas() 
         {}
 
-        Contraction(const Polynomial& constraint, const Polynomial& _original) : Operator<Polynomial>(),
+        Contraction(const Polynomial& constraint, const Polynomial&
+            #ifdef USE_HORNER
+            _original
+            #endif
+        ) : Operator<Polynomial>(),
             mConstraint(constraint),
             #ifdef USE_HORNER
             mpOriginal (_original.isLinear() ? nullptr : new Polynomial(_original)),
