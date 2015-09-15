@@ -13,7 +13,7 @@
 #include <algorithm>
 
 //#define CONTRACTION_DEBUG
-//#define USE_HORNER
+#define USE_HORNER
 
 namespace carl {
     
