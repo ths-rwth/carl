@@ -54,37 +54,37 @@ class FLOAT_T<mpfr_t>
 		
 		// Default precision is initially set to 53 bits in mpfr implementation
 
-        FLOAT_T(const long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
-        {
-            mpfr_init2(mValue,_prec);
-            mpfr_set_si(mValue,_long,mpfr_rnd_t(_rnd));
-        }
+		FLOAT_T(const long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
+		{
+			mpfr_init2(mValue,_prec);
+			mpfr_set_si(mValue,_long,mpfr_rnd_t(_rnd));
+		}
 
-        // Default precision is initially set to 53 bits in mpfr implementation
-        FLOAT_T(const unsigned long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
-        {
-            mpfr_init2(mValue,_prec);
-            mpfr_set_ui(mValue,_long,mpfr_rnd_t(_rnd));
-        }
-        
-        FLOAT_T(const mpfr_t& _mpfrNumber)
-        {
-            mpfr_init2(mValue,mpfr_get_prec(_mpfrNumber));
-            mpfr_set(mValue, _mpfrNumber, MPFR_RNDN);
-        }
+		// Default precision is initially set to 53 bits in mpfr implementation
+		FLOAT_T(const unsigned long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
+		{
+			mpfr_init2(mValue,_prec);
+			mpfr_set_ui(mValue,_long,mpfr_rnd_t(_rnd));
+		}
+		
+		FLOAT_T(const mpfr_t& _mpfrNumber)
+		{
+			mpfr_init2(mValue,mpfr_get_prec(_mpfrNumber));
+			mpfr_set(mValue, _mpfrNumber, MPFR_RNDN);
+		}
 
-        FLOAT_T(const FLOAT_T<mpfr_t>& _float)
-        {
-            mpfr_init2(mValue, mpfr_get_prec(_float.value()));
-            mpfr_set(mValue, _float.value(), MPFR_RNDN);
-        }
+		FLOAT_T(const FLOAT_T<mpfr_t>& _float)
+		{
+			mpfr_init2(mValue, mpfr_get_prec(_float.value()));
+			mpfr_set(mValue, _float.value(), MPFR_RNDN);
+		}
 
-        FLOAT_T(FLOAT_T<mpfr_t>&& _float)
-        {
-            mpfr_init2(mValue, mpfr_get_prec(_float.value()));
-            //mpfr_set(mValue, _float.value(), MPFR_RNDN);
-            mpfr_swap(mValue,_float.mValue);
-        }
+		FLOAT_T(FLOAT_T<mpfr_t>&& _float)
+		{
+			mpfr_init2(mValue, mpfr_get_prec(_float.value()));
+			//mpfr_set(mValue, _float.value(), MPFR_RNDN);
+			mpfr_swap(mValue,_float.mValue);
+		}
 		
 		FLOAT_T(const std::string& _string)
 		{
@@ -103,6 +103,68 @@ class FLOAT_T<mpfr_t>
 			mpfr_clear(mValue);
 		}
 		
+		static inline const FLOAT_T<mpfr_t> const_infinity(){
+			mpfr_t tmp;
+			mpfr_init2(tmp, FLOAT_T<mpfr_t>::defaultPrecision());
+			mpfr_set_inf(tmp,1); 
+			return FLOAT_T<mpfr_t>(tmp);
+		}
+
+		inline const FLOAT_T<mpfr_t> setNan(){
+			mpfr_set_nan(mValue);
+			return *this;
+		}
+
+		inline FLOAT_T<mpfr_t> increment() const {
+			FLOAT_T<mpfr_t> tmp(*this);
+			mpfr_nextabove(tmp.mValue);
+			return tmp;
+		}
+
+		inline FLOAT_T<mpfr_t> decrement() const {
+			FLOAT_T<mpfr_t> tmp(*this);
+			mpfr_nextbelow(tmp.mValue);
+			return tmp;
+		}
+
+		static inline FLOAT_T<mpfr_t> machine_epsilon(precision_t prec)
+		{
+			/* the smallest eps such that 1 + eps != 1 */
+			return machine_epsilon(FLOAT_T<mpfr_t>(1,CARL_RND::N, prec));
+		}
+
+		static inline FLOAT_T<mpfr_t> machine_epsilon(const FLOAT_T<mpfr_t>& x)
+		{    
+			/* the smallest eps such that x + eps != x */
+			FLOAT_T<mpfr_t> tmp(x);
+			if( x < 0)
+			{
+				return -tmp.increment() + tmp;
+			}else{
+				return tmp.increment() - tmp;
+			}
+		}
+
+		static inline carl::FLOAT_T<mpfr_t> minval(const CARL_RND _rnd=CARL_RND::N, precision_t prec=FLOAT_T<mpfr_t>::defaultPrecision()) {
+			/* min = 1/2 * 2^emin = 2^(emin - 1) */
+			mpfr_t tmp;
+			mpfr_init2(tmp,prec);
+			mpfr_set_ui(tmp,1,mpfr_rnd_t(_rnd));
+			mpfr_mul_2ui(tmp,tmp,mpfr_get_emin()-1,mpfr_rnd_t(_rnd));
+			return FLOAT_T<mpfr_t>(tmp);
+		}
+
+		static inline FLOAT_T<mpfr_t> maxval(const CARL_RND _rnd=CARL_RND::N, precision_t prec=FLOAT_T<mpfr_t>::defaultPrecision())
+		{
+			/* max = (1 - eps) * 2^emax, eps is machine epsilon */
+			mpfr_t tmp;
+			mpfr_init2(tmp,prec);
+			mpfr_set_ui(tmp,1, mpfr_rnd_t(_rnd));
+			mpfr_sub(tmp,tmp,machine_epsilon(prec).value(), mpfr_rnd_t(_rnd));
+			mpfr_mul_2ui(tmp,tmp,mpfr_get_emax(),mpfr_rnd_t(_rnd));
+			return (FLOAT_T<mpfr_t>(tmp)); 
+		}
+
 		/*******************
 		 * Getter & Setter *
 		 *******************/
@@ -763,6 +825,11 @@ class FLOAT_T<mpfr_t>
 			distance(a.value(), b.value(), dist);
 		}
 
+		inline static int bits2digits(precision_t b) {
+			const double LOG10_2 = 0.30102999566398119;
+			return int(std::floor( b * LOG10_2 ));
+		}
+
 	private:
 
 		void clear() {
@@ -824,7 +891,7 @@ class FLOAT_T<mpfr_t>
 			while( limbs > 0 ){
 				mpz_set_ui(tmp, a->_mpfr_d[limbs-1]);
 				//std::cout << "Shift: " << (mp_bits_per_limb*(limbs-1)) << " bits" << std::endl;
-		 		mpz_mul_2exp(tmp, tmp, (mp_bits_per_limb*(limbs-1)));
+				mpz_mul_2exp(tmp, tmp, (mp_bits_per_limb*(limbs-1)));
 				mpz_add(mant, mant, tmp);
 				--limbs;
 			}
@@ -1007,5 +1074,71 @@ inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(const FLOAT_T<mpfr_t>& A, c
 }
 
 }// namespace
+
+namespace std{
+
+	template<>
+	class numeric_limits<carl::FLOAT_T<mpfr_t>>
+	{
+	public:
+		static const bool is_specialized	= true;
+		static const bool is_signed			= true;
+		static const bool is_integer		= false;
+		static const bool is_exact			= false;
+		static const int  radix				= 2;    
+
+		static const bool has_infinity		= true;
+		static const bool has_quiet_NaN		= true;
+		static const bool has_signaling_NaN	= true;
+
+		static const bool is_iec559			= true;	// = IEEE 754
+		static const bool is_bounded		= true;
+		static const bool is_modulo			= false;
+		static const bool traps				= true;
+		static const bool tinyness_before	= true;
+
+		static const float_denorm_style has_denorm  = denorm_absent;
+
+		
+		inline static carl::FLOAT_T<mpfr_t> (min) (carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return  carl::FLOAT_T<mpfr_t>::minval(_rnd, precision); }
+		inline static carl::FLOAT_T<mpfr_t> (max) (carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return  carl::FLOAT_T<mpfr_t>::maxval(_rnd, precision); }
+		inline static carl::FLOAT_T<mpfr_t> lowest (carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return -carl::FLOAT_T<mpfr_t>::maxval(_rnd, precision); }
+
+		// Returns smallest eps such that 1 + eps != 1 (classic machine epsilon)
+		inline static carl::FLOAT_T<mpfr_t> epsilon(carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) {  return  carl::FLOAT_T<mpfr_t>::machine_epsilon(precision); }
+		
+		// Returns smallest eps such that x + eps != x (relative machine epsilon)
+		inline static carl::FLOAT_T<mpfr_t> epsilon(const carl::FLOAT_T<mpfr_t>& x) { return carl::FLOAT_T<mpfr_t>::machine_epsilon(x); }
+
+		inline static carl::FLOAT_T<mpfr_t> round_error(carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return carl::FLOAT_T<mpfr_t>(0.5, _rnd, precision); }
+		
+		inline static const carl::FLOAT_T<mpfr_t> infinity() { return carl::FLOAT_T<mpfr_t>::const_infinity(); }
+		
+		inline static const carl::FLOAT_T<mpfr_t> quiet_NaN() { return carl::FLOAT_T<mpfr_t>().setNan(); }
+		inline static const carl::FLOAT_T<mpfr_t> signaling_NaN() { return carl::FLOAT_T<mpfr_t>().setNan(); }
+		inline static const carl::FLOAT_T<mpfr_t> denorm_min() { return (min)(); }
+
+		// Please note, exponent range is not fixed in MPFR
+		static const int min_exponent = MPFR_EMIN_DEFAULT;
+		static const int max_exponent = MPFR_EMAX_DEFAULT;
+		static const int min_exponent10 = (int) (MPFR_EMIN_DEFAULT * 0.3010299956639811);
+		static const int max_exponent10 = (int) (MPFR_EMAX_DEFAULT * 0.3010299956639811);
+
+		// Following members should be constant according to standard, but they can be variable in MPFR
+		// So we define them as functions here. 
+		//
+		// This is preferable way for std::numeric_limits<carl::FLOAT_T<mpfr_t>> specialization.
+		// But it is incompatible with standard std::numeric_limits and might not work with other libraries, e.g. boost. 
+		// See below for compatible implementation. 
+		inline static float_round_style round_style() { return round_to_nearest; }
+
+		inline static int digits() { return int(carl::FLOAT_T<mpfr_t>::defaultPrecision()); }
+		inline static int digits( const carl::FLOAT_T<mpfr_t>& x ) { return x.precision(); }
+
+		inline static int digits10( carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision() ) { return carl::FLOAT_T<mpfr_t>::bits2digits(precision); }
+		inline static int digits10( const carl::FLOAT_T<mpfr_t>& x ) { return carl::FLOAT_T<mpfr_t>::bits2digits(x.precision()); }
+		inline static int max_digits10( carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision() ) { return digits10(precision); }
+	};
+}
 
 #endif
