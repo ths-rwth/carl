@@ -196,14 +196,13 @@ endif()
 
 # Boost
 if(CARL_PYTHON)
-	load_library(carl Boost 1.49 REQUIRED COMPONENTS python3)
-else()
 	load_library(carl Boost 1.49 REQUIRED)
+	load_library(pycarl Boost 1.49 REQUIRED COMPONENTS python3)
+else()
+	load_library(carl Boost 1.29 REQUIRED)
 endif()
-
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
-list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_DYNAMIC})
-list(APPEND carl_LIBRARIES_STATIC ${Boost_STATIC})
+
 
 
 if(USE_GINAC)
