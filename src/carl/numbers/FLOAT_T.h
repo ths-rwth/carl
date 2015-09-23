@@ -1861,7 +1861,7 @@ namespace std{
 
 		inline static int digits() { return std::numeric_limits<Number>::digits; }
 		inline static int digits10() { return std::numeric_limits<Number>::digits10; }
-		inline static int max_digits10(mp_prec_t precision = carl::FLOAT_T<Number>::get_default_prec()) { return std::numeric_limits<Number>::max_digits10; }
+		inline static int max_digits10() { return std::numeric_limits<Number>::max_digits10; }
 	};
 }
 
