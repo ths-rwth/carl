@@ -19,8 +19,8 @@ struct RationalFunctionParser: public qi::grammar<Iterator, RatFun<Pol>(), Skipp
 	}
 private:
 	RatFun<Pol> construct(const Pol& lhs, const boost::optional<Pol>& rhs) {
-		if (rhs) return RatFun<Pol>(lhs);
-		return RatFun<Pol>(lhs, rhs.get());
+		if (rhs) return RatFun<Pol>(lhs, *rhs);
+		return RatFun<Pol>(lhs);
 	}
 	PolynomialParser<Pol> polynomial;
 	qi::rule<Iterator, RatFun<Pol>(), Skipper> main;

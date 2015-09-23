@@ -30,6 +30,15 @@ TEST(Parser, Polynomial)
 	EXPECT_EQ(x*x, parser.polynomial("x^2"));
 }
 
+TEST(Parser, RationalFunction)
+{
+	typedef RationalFunction<MultivariatePolynomial<Rational>> RF;
+	carl::parser::Parser<MultivariatePolynomial<Rational>> parser;
+	
+	RF f = parser.rationalFunction("2*x / x^2");
+	std::cout << f << std::endl;
+}
+
 TEST(Parser, Formula)
 {
     using carl::VariableType;
