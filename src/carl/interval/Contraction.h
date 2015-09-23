@@ -14,7 +14,6 @@
 
 //#define CONTRACTION_DEBUG
 //#define USE_HORNER
-#define HORMER_SCHEME_STRATEGY GREEDY_I
 
 namespace carl {
     
@@ -233,52 +232,100 @@ namespace carl {
 
     private:
         Polynomial mConstraint; // Todo: Should be a reference.
+        Polynomial* mpOriginal;
         #ifdef USE_HORNER
-            MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> mHornerForm;
-            std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mDerivatives;
+        MultivariateHorner<Polynomial, strategy> mHornerForm;
+        std::map<Variable, MultivariateHorner<Polynomial,strategy>> mDerivatives;
         #else
-            std::map<Variable, Polynomial> mDerivatives;
+        std::map<Variable, Polynomial> mDerivatives;
         #endif
-            std::map<Variable, VarSolutionFormula<Polynomial>>mVarSolutionFormulas;
-            std::map<Polynomial, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>> mHornerSchemes;
+        std::map<Variable, VarSolutionFormula<Polynomial>> mVarSolutionFormulas;
+        std::map<Polynomial, MultivariateHorner<Polynomial,strategy>> mHornerSchemes;
 
     public:
+        Contraction() = delete;
         Contraction(const Polynomial& constraint) : Operator<Polynomial>(),
-        mConstraint(constraint),
-        #ifdef USE_HORNER
-            mHornerForm(std::move(constraint)),
-        #endif
-        mDerivatives(),
-        mVarSolutionFormulas() {}
+            mConstraint(constraint),
+            mpOriginal(nullptr),
+            #ifdef USE_HORNER
+            mHornerForm(constraint),
+            #endif
+            mDerivatives(),
+            mVarSolutionFormulas() 
+        {}
 
-        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool withPropagation = false) {
+        Contraction(const Polynomial& constraint, const Polynomial& _original ) : Operator<Polynomial>(),
+            mConstraint(constraint),
+            mpOriginal (_original.isLinear() ? nullptr : new Polynomial(_original)),
+            #ifdef USE_HORNER
+            mHornerForm( mpOriginal == nullptr ? constraint :  _original ),
+            #endif
+            mDerivatives(),
+            mVarSolutionFormulas() 
+        {}
+        Contraction(const Contraction&) = delete;
+        
+        Contraction(Contraction&& _contraction ): Operator<Polynomial>(),
+            mConstraint(std::move(_contraction.mConstraint)),
+            mpOriginal(_contraction.mpOriginal),
+            #ifdef USE_HORNER
+            mHornerForm(std::move(_contraction.mHornerForm)),
+            #endif
+            mDerivatives(std::move(_contraction.mDerivatives)),
+            mVarSolutionFormulas(std::move(_contraction.mVarSolutionFormulas)) 
+        {
+            _contraction.mpOriginal = nullptr;
+        }
+        
+        Contraction& operator=(const Contraction&) = delete;
+        Contraction& operator=(Contraction&&) = delete;
+
+        ~Contraction()
+        {
+            if( mpOriginal != nullptr )
+                delete mpOriginal;
+        }
+        
+        const Polynomial& polynomial() const
+        {
+            return mpOriginal == nullptr ? mConstraint : *mpOriginal;
+        }
+
+        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool usePropagation = false) {
             bool splitOccurredInContraction = false;
-            if( !withPropagation || !mConstraint.isLinear() )
+            if( !usePropagation || mpOriginal == nullptr || !mConstraint.isLinear() )
             {
                 #ifdef USE_HORNER
-                    typename std::map<Variable, MultivariateHorner<Polynomial,HORMER_SCHEME_STRATEGY>>::const_iterator it = mDerivatives.find(variable);
+                typename std::map<Variable, MultivariateHorner<Polynomial,strategy>>::const_iterator it = mDerivatives.find(variable);
                 #else
-                    typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
+                typename std::map<Variable, Polynomial>::const_iterator it = mDerivatives.find(variable);
                 #endif
 
                 if( it == mDerivatives.end() )
                 {
                     #ifdef USE_HORNER
-                        //Deriviate and convert to Horner
-                        it = mDerivatives.emplace(variable, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>( std::move(mConstraint.derivative(variable)))).first;
+                    //Deriviate and convert to Horner
+                    if( mpOriginal == nullptr )
+                        it = mDerivatives.emplace(variable, std::move(MultivariateHorner<Polynomial, strategy>( mConstraint.derivative(variable)))).first;
+                    else
+                        it = mDerivatives.emplace(variable, std::move(MultivariateHorner<Polynomial, strategy>( mpOriginal->derivative(variable)))).first;
                     #else
+                    it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                    if( mpOriginal == nullptr )
                         it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
+                    else
+                        it = mDerivatives.emplace(variable, mpOriginal->derivative(variable)).first;
                     #endif
                 }
 
                 #ifdef CONTRACTION_DEBUG
-                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << std::endl;
+                std::cout << __func__ << ": contraction of " << variable << " with " << intervals << " in " << mConstraint << " mpOriginal: " << mpOriginal << std::endl;
                 #endif
 
                 #ifdef USE_HORNER
-                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>( std::move(mConstraint) ), (*it).second, resA, resB, useNiceCenter);
+                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mHornerForm, (*it).second, resA, resB, useNiceCenter);
                 #else
-                    splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, mConstraint, (*it).second, resA, resB, useNiceCenter);
+                splitOccurredInContraction = Operator<Polynomial>::contract(intervals, variable, (mpOriginal == nullptr ? mConstraint : *mpOriginal), (*it).second, resA, resB, useNiceCenter);
                 #endif
             }
             else
@@ -293,7 +340,7 @@ namespace carl {
             std::cout << std::endl;                            
             #endif
 
-            if( withPropagation )
+            if( usePropagation )
             {
                 typename std::map<Variable, VarSolutionFormula<Polynomial>>::const_iterator const_iterator_VarSolutionFormula = mVarSolutionFormulas.find(variable);
                 if( const_iterator_VarSolutionFormula == mVarSolutionFormulas.end() )
@@ -466,45 +513,7 @@ namespace carl {
             Interval<double> numerator (0);
             Interval<double> denominator(0);
             
-            /*
-            #ifdef USE_HORNER
-                #ifdef DEBUG_HORNER
-                    std::cout << "\n" <<__func__  << "USE_HORNER Constraint " << constraint << " Derivative " << derivative << std::endl;
-                #endif
-
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_constraint = hornerMap.find(constraint);
-                if( it_constraint == hornerMap.end() )
-                {
-                    Polynomial constraint_tmp (constraint);
-                    MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> constraint_asHornerScheme (std::move( constraint_tmp ));
-                    it_constraint = hornerMap.emplace(constraint, constraint_asHornerScheme).first;
-                    #ifdef DEBUG_HORNER
-                        std::cout << __func__  <<  " >> constraint: "<< constraint_asHornerScheme  << std::endl;
-                    #endif
-                }
-             
-                typename  std::map<Polynomial, MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY>>::const_iterator it_derivative = hornerMap.find(derivative);
-                if( it_derivative == hornerMap.end() )
-                {
-                    Polynomial derivative_tmp (derivative);
-                    MultivariateHorner<Polynomial, HORMER_SCHEME_STRATEGY> derivative_asHornerScheme (std::move( derivative_tmp ));
-                    it_derivative = hornerMap.emplace(derivative, derivative_asHornerScheme).first;
-                     #ifdef DEBUG_HORNER
-                        std::cout << __func__  <<  " >> derivative: "<< derivative_asHornerScheme << std::endl;
-                    #endif
-                }
-                
-                #ifdef DEBUG_HORNER
-                    std::cout << __func__  <<  " >> evaluate "<< it_constraint->second << std::endl;
-                #endif
-                numerator = evaluate((*it_constraint).second, substitutedIntervalMap);
-                
-                #ifdef DEBUG_HORNER
-                    std::cout << __func__  <<  " >> evaluate "<< it_derivative->second << std::endl;
-                #endif
-                denominator = evaluate((*it_derivative).second, intervals);
-            #endif 
-            */
+     
             
             // Create Newton Operator
             numerator =   IntervalEvaluation::evaluate(constraint, substitutedIntervalMap);

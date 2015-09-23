@@ -1813,4 +1813,57 @@ namespace carl
 
 } // namespace
 
+namespace std{
+
+	template<typename Number>
+	class numeric_limits<carl::FLOAT_T<Number>>
+	{
+	public:
+		static const bool is_specialized	= true;
+		static const bool is_signed			= true;
+		static const bool is_integer		= false;
+		static const bool is_exact			= false;
+		static const int  radix				= 2;    
+
+		static const bool has_infinity		= true;
+		static const bool has_quiet_NaN		= true;
+		static const bool has_signaling_NaN	= true;
+
+		static const bool is_iec559			= true;	// = IEEE 754
+		static const bool is_bounded		= true;
+		static const bool is_modulo			= false;
+		static const bool traps				= true;
+		static const bool tinyness_before	= true;
+
+		static const float_denorm_style has_denorm  = denorm_absent;
+		
+		inline static carl::FLOAT_T<Number> (min)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::min()); }
+		inline static carl::FLOAT_T<Number> (max)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::max()); }
+		inline static carl::FLOAT_T<Number> lowest() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::lowest()); }
+
+		// Returns smallest eps such that 1 + eps != 1 (classic machine epsilon)
+		inline static carl::FLOAT_T<Number> epsilon() {  return carl::FLOAT_T<Number>(std::numeric_limits<Number>::epsilon()); }
+
+		inline static carl::FLOAT_T<Number> round_error() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::round_error()); }
+		
+		inline static const carl::FLOAT_T<Number> infinity() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::infinity()); }
+		
+		inline static const carl::FLOAT_T<Number> quiet_NaN() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::quiet_NaN()); }
+		inline static const carl::FLOAT_T<Number> signaling_NaN() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::signaling_NaN()); }
+		inline static const carl::FLOAT_T<Number> denorm_min() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::denorm_min()); }
+
+		static const int min_exponent = std::numeric_limits<Number>::min_exponent;
+		static const int max_exponent = std::numeric_limits<Number>::max_exponent;
+		static const int min_exponent10 = std::numeric_limits<Number>::min_exponent10; 
+		static const int max_exponent10 = std::numeric_limits<Number>::max_exponent10; 
+
+		inline static float_round_style round_style() { return std::numeric_limits<Number>::round_style; }
+
+		inline static int digits() { return std::numeric_limits<Number>::digits; }
+		inline static int digits10() { return std::numeric_limits<Number>::digits10; }
+		inline static int max_digits10() { return std::numeric_limits<Number>::max_digits10; }
+	};
+}
+
+
 #include "adaption_float/mpfr_float.tpp"

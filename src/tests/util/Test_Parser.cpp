@@ -24,10 +24,24 @@ TEST(Parser, Polynomial)
 	parser.addVariable(y);
 	
 	EXPECT_EQ(Rational(1), parser.polynomial("1"));
+	EXPECT_EQ(Rational(2)*x, parser.polynomial("2*x"));
 	EXPECT_EQ(x, parser.polynomial("x"));
 	EXPECT_EQ(x*y, parser.polynomial("x*y"));
 	EXPECT_EQ(x*x, parser.polynomial("x*x"));
 	EXPECT_EQ(x*x, parser.polynomial("x^2"));
+}
+
+TEST(Parser, RationalFunction)
+{
+	typedef MultivariatePolynomial<Rational> MP;
+	typedef RationalFunction<MP> RF;
+	carl::parser::Parser<MP> parser;
+	carl::Variable x = freshRealVariable("x");
+	parser.addVariable(x);
+	
+	EXPECT_EQ(RF(MP(Rational(2)*x)), parser.rationalFunction("2*x"));
+	EXPECT_EQ(RF(MP(x*x)), parser.rationalFunction("x^2"));
+	EXPECT_EQ(RF(MP(Rational(2)*x), MP(x*x)), parser.rationalFunction("2*x / x^2"));
 }
 
 TEST(Parser, Formula)

@@ -58,8 +58,10 @@ public:
 	void addVariable(Variable::Arg v) {
         if( v.getType() == VariableType::VT_BOOL )
             formulaParser.addVariable(v);
-        else
+        else {
             polynomialParser.addVariable(v);
+			ratfunParser.addVariable(v);
+		}
 	}
 };
 

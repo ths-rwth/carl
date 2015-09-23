@@ -11,13 +11,16 @@
 #include "MultivariatePolynomial.h"
 #include "../interval/Interval.h"
 #include "../interval/IntervalEvaluation.h"
+ #include "MultivariateHornerSettings.h"
 
 #include "Term.h"
 
 namespace carl{
 
-template<typename PolynomialType, Strategy Strat>
-class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, Strat>> { 
+static std::map<Variable, Interval<double>> mMap = {{ Variable::NO_VARIABLE , Interval<double>(0)}};
+
+template<typename PolynomialType, class strategy >
+class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, strategy >> { 
 
 /**
 * Datastructure to save Polynomes once they are transformed into a horner scheme:
@@ -41,25 +44,18 @@ private:
 public:
 		
 	//Constuctor
-	MultivariateHorner (const PolynomialType&& inPut);
-	MultivariateHorner (const PolynomialType&& inPut, std::map<Variable, Interval<CoeffType>>& map);
-	MultivariateHorner (const PolynomialType&& inPut, Strategy s, std::map<Variable, Interval<CoeffType>>& map);
+    MultivariateHorner () = delete;
+	MultivariateHorner (const PolynomialType& inPut);
+	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map);
+	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map, int& counter);
+    MultivariateHorner ( const MultivariateHorner& ) = default;
+    MultivariateHorner ( MultivariateHorner&& ) = default;
+//    MultivariateHorner& operator=(MultivariateHorner&& mh) = delete;
 
 
 	//~MultivariateHorner ();
 	
-	MultivariateHorner& operator=(const MultivariateHorner& mh)
-	{
-		mConst_dependent = mh.mConst_dependent;
-		mConst_independent = mh.mConst_independent;
-
-	 	mH_dependent = mh.mH_dependent;
-	 	mH_independent = mh.mH_independent;	
-
-	 	mVariable = mh.mVariable;
-	 	mExponent = mh.mExponent;		
-		return *this;
-	}
+	MultivariateHorner& operator=(const MultivariateHorner& mh) = default;
 
 /*
 	MultivariateHorner& operator=(MultivariateHorner&& mh) 
