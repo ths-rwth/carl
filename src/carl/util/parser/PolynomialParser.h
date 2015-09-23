@@ -43,7 +43,7 @@ template<typename Pol>
 struct PolynomialParser: public qi::grammar<Iterator, Pol(), Skipper> {
 	PolynomialParser(): PolynomialParser<Pol>::base_type(main, "polynomial") {
 		operation.add("+", ADD)("-", SUB);
-		varname = qi::lexeme[ (qi::alpha | qi::char_("~!@$%^&*_+=<>.?/-")) > *(qi::alnum | qi::char_("~!@$%^&*_+=<>.?/-"))];
+		varname = qi::lexeme[ (qi::alpha | qi::char_("~!@$%^&_=<>.?/")) > *(qi::alnum | qi::char_("~!@$%^&_=<>.?/"))];
 		variable = (varmap[qi::_val = qi::_1]) | (varname[qi::_val = px::bind(&PolynomialParser<Pol>::newVariable, px::ref(*this), qi::_1)]);
 		monomial = ((variable >> ("^" >> number | qi::attr(typename Pol::CoeffType(1)))) % "*")[qi::_val = px::bind(&PolynomialParser<Pol>::newMonomial, px::ref(*this), qi::_1)];
 		term = (-number >> -monomial)[qi::_val = px::bind(&PolynomialParser<Pol>::newTerm, px::ref(*this), qi::_1, qi::_2)];
