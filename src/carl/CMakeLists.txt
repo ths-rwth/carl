@@ -33,8 +33,8 @@ set_target_properties( lib_carl PROPERTIES
 		CLEAN_DIRECT_OUTPUT 1
 		# avoid conflicts between library and binary target names
 		OUTPUT_NAME carl
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+        LIBRARY_OUTPUT_DIRECTORY  ${CARL_LIBRARIES_DIR}
+        ARCHIVE_OUTPUT_DIRECTORY  ${CARL_LIBRARIES_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 )
 target_link_libraries( lib_carl ${carl_LIBRARIES_DYNAMIC} )
@@ -49,8 +49,8 @@ if(BUILD_STATIC)
 		CLEAN_DIRECT_OUTPUT 1
 		# avoid conflicts between library and binary target names
 		OUTPUT_NAME carl
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+        LIBRARY_OUTPUT_DIRECTORY ${CARL_LIBRARIES_DIR}
+        ARCHIVE_OUTPUT_DIRECTORY ${CARL_LIBRARIES_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
 

@@ -62,6 +62,8 @@ endif()
 # Include own macros.
 include( carlmacros )
 
+set(CARL_LIBRARIES_DIR "${PROJECT_BINARY_DIR}/lib")
+
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
 set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")

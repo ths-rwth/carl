@@ -251,7 +251,7 @@ RationalFunction parseRationalFunction(const std::string& text) {
 /**
  * The actual module definition
  */
-BOOST_PYTHON_MODULE(pycarl)
+BOOST_PYTHON_MODULE(_core)
 {
 	using namespace boost::python;
 
@@ -318,6 +318,8 @@ BOOST_PYTHON_MODULE(pycarl)
 	class_<RationalFunction>("RationalFunction", init<Polynomial, Polynomial>())
 		.def("evaluate", &RationalFunction::evaluate)
 		.def("gatherVariables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
+		.add_property("numerator", &RationalFunction::nominator)
+		.add_property("denominator", &RationalFunction::denominator)
 		.def(self_ns::str(self_ns::self))
 		;
 
