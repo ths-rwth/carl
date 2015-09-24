@@ -498,7 +498,7 @@ namespace carl
 namespace std
 {
 	/**
-	 * Implements std::hash for bit vector terms.
+	 * Implements std::hash for bit vector term contents.
 	 */
 	template <>
 	struct hash<carl::BVTermContent>
@@ -506,12 +506,30 @@ namespace std
 		public:
 
 		/**
-		 * @param _formula The bit vector term to get the hash for.
-		 * @return The hash of the given bit vector term.
+		 * @param _termContent The bit vector term content to get the hash for.
+		 * @return The hash of the given bit vector term content.
 		 */
-		size_t operator()(const carl::BVTermContent& _term) const
+		size_t operator()(const carl::BVTermContent& _termContent) const
 		{
-			return _term.hash();
+			return _termContent.hash();
 		}
 	};
-}
+
+    /**
+     * Implements std::hash for bit vector terms.
+     */
+    template <>
+    struct hash<carl::BVTerm>
+    {
+        public:
+
+        /**
+         * @param _term The bit vector term to get the hash for.
+         * @return The hash of the given bit vector term.
+         */
+        size_t operator()(const carl::BVTerm& _term) const
+        {
+            return _term.hash();
+        }
+    };
+}    // namespace std
