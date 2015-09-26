@@ -102,8 +102,10 @@ namespace carl
             }
             return create(OR, std::move(_subformulas));
         }
+        #endif
         Formula<Pol> conclusion = _subformulas.back();
         _subformulas.pop_back();
+        #ifdef SIMPLIFY_FORMULA
         // Premises
         for (auto it = _subformulas.begin(); it != _subformulas.end(); ) {
             if (it->mpContent == mpFalse) return create(TRUE);

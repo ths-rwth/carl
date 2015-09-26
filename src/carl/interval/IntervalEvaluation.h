@@ -182,7 +182,7 @@ inline Interval<Number> IntervalEvaluation::evaluate(const MultivariateHorner<Po
 	#endif
 
 	Interval<Number> result(1);
-	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
+	CARL_LOG_FUNC("carl.core.monomial", mvH << ", " << map);
 
 	if (mvH.getVariable() != Variable::NO_VARIABLE){
 		assert(map.count(mvH.getVariable()) > 0);
@@ -224,5 +224,3 @@ inline Interval<Number> IntervalEvaluation::evaluate(const MultivariateHorner<Po
 }
 
 } //Namespace carl
-
-
