@@ -443,17 +443,7 @@ namespace carl
             {
                 assert( FormulaType::OR || FormulaType::AND || FormulaType::XOR || FormulaType::IFF );
                 // We expect that this only happens, if the intended sub-formulas are all the same.
-                switch( _type )
-                {
-                    case FormulaType::XOR: // f xor f is false
-                        return falseFormula();
-                    case FormulaType::IFF: // f iff f is true
-                        return trueFormula();
-                    default: // f or f = f; f and f = f
-                    {
-                        return _subformula.mpContent;
-                    }
-                }
+                return _subformula.mpContent;
             }
             
             /**

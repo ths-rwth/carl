@@ -99,8 +99,76 @@ TEST(Formula, BooleanConstructors)
 TEST(Formula, FormulaPoolDestructor)
 {
     using carl::VariableType;
-    typedef Formula<MultivariatePolynomial<Rational>> FT;
     carl::Variable b1 = freshBooleanVariable("b1");
     carl::Variable b2 = freshBooleanVariable("b2");
-    FT test(AND, FT(b1), FT(b2));
+    FormulaT test(AND, FormulaT(b1), FormulaT(b2));
+}
+
+TEST(Formula, XORConstruction)
+{
+    FormulaT a( VariablePool::getInstance().getFreshVariable( "a", VariableType::VT_BOOL ) );
+    FormulaT na( FormulaType::NOT, a );
+    FormulaT b( VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL ) );
+    FormulaT nb( FormulaType::NOT, b );
+    FormulaT t( FormulaType::TRUE );
+    FormulaT f( FormulaType::FALSE );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, f} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, t} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, t} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, a} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {a, f} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, f, t} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, t, f} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f, f} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, t, f} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f, t} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, t, t} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, t, t} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, f, f} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, t, a} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f, a} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, a, f} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {a, f, t} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {f, f, a} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, t, a} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, a, t} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {a, f, f} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {a, a, a} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f, b, f, t, f, na, a, t, nb} ), FormulaT( FormulaType::NOT, FormulaT( FormulaType::XOR, na, nb ) ) );
+}
+
+TEST(Formula, IFFConstruction)
+{
+    FormulaT a( VariablePool::getInstance().getFreshVariable( "a", VariableType::VT_BOOL ) );
+    FormulaT na( FormulaType::NOT, a );
+    FormulaT b( VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL ) );
+    FormulaT nb( FormulaType::NOT, b );
+    FormulaT t( FormulaType::TRUE );
+    FormulaT f( FormulaType::FALSE );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, f} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, t} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, t} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, a} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {a, t} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, f, t} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, t, f} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f, f} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, t, f} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f, t} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, t, t} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, t, t} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, f, f} ), f );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, t, a} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f, a} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, a, f} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {a, f, t} ), na );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {f, f, a} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, t, a} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, a, t} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {a, f, f} ), a );
+    std::cout << "start" << std::endl;
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {a, a, a} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f, b, f, t, f, na, a, t, nb} ), FormulaT( FormulaType::NOT, FormulaT( FormulaType::IFF, na, nb ) ) );   
 }
