@@ -291,7 +291,8 @@ namespace carl {
             return mpOriginal == nullptr ? mConstraint : *mpOriginal;
         }
 
-        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool usePropagation = false) {
+        bool operator()(const Interval<double>::evalintervalmap& intervals, Variable::Arg variable, Interval<double>& resA, Interval<double>& resB, bool useNiceCenter = false, bool usePropagation = false)
+        {
             bool splitOccurredInContraction = false;
             if( !usePropagation || mpOriginal == nullptr || !mConstraint.isLinear() )
             {
@@ -310,7 +311,6 @@ namespace carl {
                     else
                         it = mDerivatives.emplace(variable, std::move(MultivariateHorner<Polynomial, strategy>( mpOriginal->derivative(variable)))).first;
                     #else
-                    it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
                     if( mpOriginal == nullptr )
                         it = mDerivatives.emplace(variable, mConstraint.derivative(variable)).first;
                     else
