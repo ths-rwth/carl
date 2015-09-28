@@ -118,6 +118,8 @@ TEST(Formula, XORConstruction)
     EXPECT_EQ( FormulaT( FormulaType::XOR, {f, t} ), t );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {t, a} ), na );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {a, f} ), a );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {na,a} ), t );
+    EXPECT_EQ( FormulaT( FormulaType::XOR, {a, na}), t );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {f, f, t} ), t );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {f, t, f} ), t );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f, f} ), t );
