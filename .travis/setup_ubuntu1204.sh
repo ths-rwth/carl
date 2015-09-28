@@ -13,6 +13,8 @@ sudo add-apt-repository -y ppa:smspillaz/cmake-2.8.12
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.4 main" 
 sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.5 main" 
+sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.6 main" 
+sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main" 
 sudo apt-get -qq update
 
 sudo apt-get purge cmake
@@ -29,12 +31,21 @@ if [[ ${USE} == "g++-4.8" ]]; then
 elif [[ ${USE} == "g++-4.9" ]]; then
 	install gcc-4.9 g++-4.9
 	defCXX gcc-4.9 g++-4.9
+elif [[ ${USE} == "g++-5.1" ]]; then
+	install gcc-5 g++-5
+	defCXX gcc-5 g++-5
 elif [[ ${USE} == "clang++-3.4" ]]; then
 	install clang-3.4
 	defCXX clang-3.4 clang++-3.4
 elif [[ ${USE} == "clang++-3.5" ]]; then
 	install clang-3.5
 	defCXX clang-3.5 clang++-3.5
+elif [[ ${USE} == "clang++-3.6" ]]; then
+	install clang-3.6
+	defCXX clang-3.6 clang++-3.6
+elif [[ ${USE} == "clang++-3.7" ]]; then
+	install clang-3.7
+	defCXX clang-3.7 clang++-3.7
 fi
 
 sudo service postgresql stop
