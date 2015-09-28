@@ -435,25 +435,13 @@ namespace carl
              * Creates a formula of the given type but with only one sub-formula.
              * @param _type
              * @param _subformula
-             * @return True, if the given type is IFF;
-             *         False, if the given type is XOR;
-             *         The given sub-formula if the type is AND or OR.
+             * @return The given sub-formula.
              */
             const FormulaContent<Pol>* newFormulaWithOneSubformula( FormulaType _type, const Formula<Pol>& _subformula )
             {
-                assert( FormulaType::OR || FormulaType::AND || FormulaType::XOR || FormulaType::IFF );
+                assert( _type == FormulaType::OR || _type == FormulaType::AND || _type == FormulaType::XOR || _type == FormulaType::IFF );
                 // We expect that this only happens, if the intended sub-formulas are all the same.
-                switch( _type )
-                {
-                    case FormulaType::XOR: // f xor f is false
-                        return falseFormula();
-                    case FormulaType::IFF: // f iff f is true
-                        return trueFormula();
-                    default: // f or f = f; f and f = f
-                    {
-                        return _subformula.mpContent;
-                    }
-                }
+                return _subformula.mpContent;
             }
             
             /**

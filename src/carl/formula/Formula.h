@@ -640,6 +640,21 @@ namespace carl
                         subAst->getConstraints( _constraints );
                 }
             }
+            
+            /**
+             * Collects all constraint occurring in this formula.
+             * @param _constraints The container to insert the constraint into.
+             */
+            void getConstraints( std::vector<Formula>& _constraints ) const
+            {
+                if( mpContent->mType == FormulaType::CONSTRAINT )
+                    _constraints.push_back( *this );
+                else if( isNary() )
+                {
+                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
+                        subAst->getConstraints( _constraints );
+                }
+            }
 
             /**
              * Collects all Boolean variables occurring in this formula.
