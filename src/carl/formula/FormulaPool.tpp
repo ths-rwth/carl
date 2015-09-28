@@ -155,21 +155,19 @@ namespace carl
         std::sort(_subformulas.begin(), _subformulas.end());
         std::vector<Formula<Pol>> subformulas;
         subformulas.reserve( _subformulas.size() );
-        size_t addTrue = 0;
-        size_t addFalse = 0;
+        bool negateResult = false;
         size_t pos = 0;
         while( pos < _subformulas.size() && _subformulas[pos].isTrue() )
         {
             switch( _type )
             {
-                case FormulaType::IFF:
                 case FormulaType::XOR:
-                    ++addTrue;
+                    negateResult = ! negateResult;
                     break;
                 case FormulaType::OR:
                     return trueFormula();
                 default:
-                    assert( _type == FormulaType::AND );
+                    assert( _type == FormulaType::AND || _type == FormulaType::IFF );
             }
             ++pos;
         }
@@ -178,13 +176,12 @@ namespace carl
             switch( _type )
             {
                 case FormulaType::IFF:
-                case FormulaType::XOR:
-                    ++addFalse;
+                    negateResult = ! negateResult;
                     break;
                 case FormulaType::AND:
                     return falseFormula();
                 default:
-                    assert( _type == FormulaType::OR );
+                    assert( _type == FormulaType::OR || _type == FormulaType::XOR );
             }
             ++pos;   
         }
@@ -214,14 +211,11 @@ namespace carl
                             return falseFormula();
                         case FormulaType::OR:
                             return trueFormula();
-                        case FormulaType::IFF:
-                            ++addFalse;
-                            break;
                         default:
-                            assert( _type == FormulaType::XOR );
-                            ++addTrue;
-                            break;
+                            assert( _type == FormulaType::IFF || _type == FormulaType::XOR );
+                            negateResult = ! negateResult;
                     }
+                    ++pos;
                     ++pos;
                 }
                 else
@@ -236,32 +230,17 @@ namespace carl
                 ++pos;
             }
         }
-        bool negateResult = false;
-        if( _type == FormulaType::XOR && addTrue % 2 != 0 )
-        {
-            if( subformulas.empty() )
-                return trueFormula();
-            negateResult = true;
-        }
-        else if( _type == FormulaType::IFF )
-        {
-            if( addFalse % 2 == 0 )
-            {
-                if( subformulas.empty() )
-                    return trueFormula();
-            }
-            else
-            {
-                negateResult = true;
-            }
-        }
         if( subformulas.empty() )
+        {
+            if( ! negateResult && ( _type == FormulaType::AND || _type == FormulaType::IFF ) )
+                return trueFormula();
+            else if( negateResult && ( _type == FormulaType::OR || _type == FormulaType::XOR ) )
+                return trueFormula();
             return falseFormula();
+        }
         const FormulaContent<Pol>* result;
         if( subformulas.size() == 1 )
-        {
             result = newFormulaWithOneSubformula( _type, *(subformulas.begin()) );
-        }
         else
             result = add( new FormulaContent<Pol>( _type, std::move( subformulas ) ) );
         return negateResult ? result->mNegation : result;
