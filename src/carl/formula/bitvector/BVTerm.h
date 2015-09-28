@@ -41,7 +41,7 @@ namespace carl
 		case BVTermType::NAND: return "bvnand";
 		case BVTermType::NOR: return "bvnor";
 		case BVTermType::XNOR: return "bvxnor";
-		case BVTermType::ADD: return "bvplus";
+		case BVTermType::ADD: return "bvadd";
 		case BVTermType::SUB: return "bvsub";
 		case BVTermType::MUL: return "bvmul";
 		case BVTermType::DIV_U: return "bvudiv";
