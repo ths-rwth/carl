@@ -27,6 +27,7 @@
 #endif
 
 #include "typetraits.h"
+#include "../util/hash.h"
 #ifdef USE_CLN_NUMBERS
 #include "adaption_cln/typetraits.h"
 #include "adaption_cln/operations.h"
