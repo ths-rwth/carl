@@ -60,7 +60,7 @@ private:
 	
 	/**
 	 * Contains the degrees of all constraint vertices.
-	 * The degree of a constraint vertex is the number of true entries in the adjacency matrix.
+	 * The degree of a constraint vertex is the number of entries set to true in the adjacency matrix.
 	 */
 	std::vector<unsigned int> mDegrees;
 	
@@ -218,7 +218,7 @@ public:
 	 * @param first constraint node to be connected Make sure that i does not exceed the maximum index of the constraint nodes.
 	 *      Otherwise you have to use addConstraintVertex in advance.
 	 * @param last constraint node to be connected Make sure that i does not exceed the maximum index of the constraint nodes.
-	 *      Otherwise you have to use addConstraintVertex in advance.
+	 *      Otherwise you have to useP addConstraintVertex in advance.
 	 * @complexity amortized linear in the number of constraints plus the constraints added
 	 */
 	template<class InputIterator>
@@ -238,7 +238,7 @@ public:
 	 * @param i constraint vertex index
 	 * @complexity constant
 	 */
-	void removeConstraintVertex(const Vertex& i);
+	void removeConstraint(const cad::Constraint<Number>& c);
 	
 	/**
 	 * Remove all sample point vertices while keeping the constraint vertices, in particular, remove all edges.

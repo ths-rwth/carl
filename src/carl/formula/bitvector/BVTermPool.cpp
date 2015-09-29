@@ -61,6 +61,18 @@ namespace carl
 
     BVTermPool::ConstTermPtr BVTermPool::create(BVTermType _type, const BVTerm& _first, const BVTerm& _second)
     {
+        // Catch expressions leading to an "undefined" result (i.e., division by zero)
+        if (_second.isConstant() && _second.value().isZero()) {
+            if(_type == BVTermType::DIV_U || _type == BVTermType::DIV_S || _type == BVTermType::MOD_U || _type == BVTermType::MOD_S1 || _type == BVTermType::MOD_S2) {
+                // Return a fresh bitvector variable that can take an arbitrary value
+                carl::Variable var = carl::VariablePool::getInstance().getFreshVariable(carl::VariableType::VT_BITVECTOR);
+                carl::Sort bvSort = carl::SortManager::getInstance().getSort("BitVec", std::vector<std::size_t>({_first.width()}));
+                carl::BVVariable bvVar(var, bvSort);
+                return create(BVTermType::VARIABLE, bvVar);
+            }
+        }
+
+        // Evaluate term if both terms arguments are constant
         if (_first.isConstant() && _second.isConstant()) {
             switch (_type) {
                 case BVTermType::CONCAT: {

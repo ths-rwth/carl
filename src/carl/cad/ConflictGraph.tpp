@@ -61,17 +61,26 @@ ConflictGraph<Number>::ConflictGraph(unsigned int m) :
 
 template<typename Number>
 typename ConflictGraph<Number>::Vertex ConflictGraph<Number>::addConstraintVertex() {
+	CARL_LOG_FUNC("carl.cad.cg", "");
 	this->data.push_back(AdjacencyArray(mSamplePointVertexCount, ConflictType::UNSATISFIED));
 	mDegrees.push_back(0);
 	return this->data.size()-1;
 }
 
 template<typename Number>
-void ConflictGraph<Number>::removeConstraintVertex(const Vertex& i) {
-	assert(this->data.size() > i);
-	assert(mDegrees.size() > i);
-	this->data.erase(this->data.begin() + (long)i); // erase the i-th element
-	mDegrees.erase(mDegrees.begin() + (long)i);
+void ConflictGraph<Number>::removeConstraint(const cad::Constraint<Number>& c) {
+	CARL_LOG_FUNC("carl.cad.cg", c);
+	std::size_t cid = mConstraints[c];
+	mConstraints.erase(c);
+	assert(this->data.size() > cid);
+	assert(mDegrees.size() > cid);
+	this->data.erase(this->data.begin() + (long)cid); // erase the i-th element
+	mDegrees.erase(mDegrees.begin() + (long)cid);
+	mData.erase(mData.begin() + (long)cid);
+	
+	for (auto& it: mConstraints) {
+		if (it.second > cid) it.second--;
+	}
 }
 
 template<typename Number>

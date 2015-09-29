@@ -41,7 +41,7 @@ namespace carl
 		case BVTermType::NAND: return "bvnand";
 		case BVTermType::NOR: return "bvnor";
 		case BVTermType::XNOR: return "bvxnor";
-		case BVTermType::ADD: return "bvplus";
+		case BVTermType::ADD: return "bvadd";
 		case BVTermType::SUB: return "bvsub";
 		case BVTermType::MUL: return "bvmul";
 		case BVTermType::DIV_U: return "bvudiv";
@@ -272,8 +272,8 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
-		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0), mHash(0) //,
-		// TODO: Hash - mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
+		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0),
+		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::VARIABLE);
 		}
