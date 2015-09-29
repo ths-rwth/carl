@@ -130,29 +130,33 @@ namespace carl
     template<typename Pol>
     const FormulaContent<Pol>* FormulaPool<Pol>::createNAry(FormulaType _type, Formulas<Pol>&& _subformulas)
     {
-        assert(_type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF);
-        if (_subformulas.size() == 1) {
+        assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
+        if( _subformulas.size() == 1 )
+        {
             return _subformulas[0].mpContent;
         }
-        for( size_t pos = 0; pos < _subformulas.size(); )
+        if( _type != FormulaType::IFF )
         {
-            if( _subformulas[pos].getType() == _type )
+            for( size_t pos = 0; pos < _subformulas.size(); )
             {
-                // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
-                // Note, that a1 to an are definitely created before b, as they were sub-formulas
-                // of it, hence, the ids of a1 to an are smaller than the one of b and therefore a1<b .. an<b.
-                // That means, that a1 .. an are inserted into the given set of sub formulas before the position of
-                // b (=iter).
-                // Note also that the operator of a1 to an cannot be oper, as they where also created with this pool.
-                Formula<Pol> tmp = _subformulas[pos];
-                _subformulas[pos] = _subformulas.back();
-                _subformulas.pop_back();
-                _subformulas.insert(_subformulas.end(), tmp.subformulas().begin(), tmp.subformulas().end() );
+                if( _subformulas[pos].getType() == _type )
+                {
+                    // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
+                    // Note, that a1 to an are definitely created before b, as they were sub-formulas
+                    // of it, hence, the ids of a1 to an are smaller than the one of b and therefore a1<b .. an<b.
+                    // That means, that a1 .. an are inserted into the given set of sub formulas before the position of
+                    // b (=iter).
+                    // Note also that the operator of a1 to an cannot be oper, as they where also created with this pool.
+                    Formula<Pol> tmp = _subformulas[pos];
+                    _subformulas[pos] = _subformulas.back();
+                    _subformulas.pop_back();
+                    _subformulas.insert(_subformulas.end(), tmp.subformulas().begin(), tmp.subformulas().end() );
+                }
+                else
+                    ++pos;
             }
-            else
-                ++pos;
         }
-        std::sort(_subformulas.begin(), _subformulas.end());
+        std::sort( _subformulas.begin(), _subformulas.end() );
         std::vector<Formula<Pol>> subformulas;
         subformulas.reserve( _subformulas.size() );
         bool negateResult = false;
@@ -162,7 +166,7 @@ namespace carl
             switch( _type )
             {
                 case FormulaType::XOR:
-                    negateResult = ! negateResult;
+                    negateResult = !negateResult;
                     break;
                 case FormulaType::OR:
                     return trueFormula();
@@ -176,7 +180,9 @@ namespace carl
             switch( _type )
             {
                 case FormulaType::IFF:
-                    negateResult = ! negateResult;
+                    if( _subformulas[0].isTrue() )
+                        return falseFormula();
+                    negateResult = true;
                     break;
                 case FormulaType::AND:
                     return falseFormula();
@@ -195,12 +201,12 @@ namespace carl
                     ++pos;
                     while( pos < _subformulas.size() - 1 && _subformulas[pos] == _subformulas[pos+1] )
                         ++pos;
-                    if( (_type == FormulaType::IFF || _type == FormulaType::XOR) && (pos + 1 - numOfEqualSubformulas) % 2 == 0 )
+                    if( _type == FormulaType::XOR && (pos + 1 - numOfEqualSubformulas) % 2 == 0 )
                         ++pos;
                 }
                 else if( formulasInverse( _subformulas[pos], _subformulas[pos+1] ) )
                 {
-                    // Check if the sub-formula at iter is the negation of the sub-formula at iterB
+                    // Check if the sub-formula at pos is the negation of the sub-formula at pos+1
                     // Note, that the negation of a formula would by construction always be right after the formula
                     // in a set of formulas whose comparison operator is based on the one of formulas This is due to
                     // them comparing just the ids and we construct the negation of a formula right after the formula
@@ -211,9 +217,11 @@ namespace carl
                             return falseFormula();
                         case FormulaType::OR:
                             return trueFormula();
+                        case FormulaType::IFF:
+                            return falseFormula();
                         default:
-                            assert( _type == FormulaType::IFF || _type == FormulaType::XOR );
-                            negateResult = ! negateResult;
+                            assert( _type == FormulaType::XOR );
+                            negateResult = !negateResult;
                     }
                     ++pos;
                     ++pos;
@@ -232,15 +240,17 @@ namespace carl
         }
         if( subformulas.empty() )
         {
-            if( ! negateResult && ( _type == FormulaType::AND || _type == FormulaType::IFF ) )
-                return trueFormula();
-            else if( negateResult && ( _type == FormulaType::OR || _type == FormulaType::XOR ) )
+            if( negateResult || _type == FormulaType::AND || _type == FormulaType::IFF )
                 return trueFormula();
             return falseFormula();
         }
         const FormulaContent<Pol>* result;
         if( subformulas.size() == 1 )
-            result = newFormulaWithOneSubformula( _type, *(subformulas.begin()) );
+        {
+            if( _type == FormulaType::IFF && _subformulas[0] == *subformulas.begin() )
+                return trueFormula();
+            result = subformulas.begin()->mpContent;
+        }
         else
             result = add( new FormulaContent<Pol>( _type, std::move( subformulas ) ) );
         return negateResult ? result->mNegation : result;

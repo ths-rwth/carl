@@ -430,19 +430,6 @@ namespace carl
             //const FormulaContent<Pol>* create( FormulaType _type, Formulas<Pol>&& _subformulas );
             
     private:
-        
-            /**
-             * Creates a formula of the given type but with only one sub-formula.
-             * @param _type
-             * @param _subformula
-             * @return The given sub-formula.
-             */
-            const FormulaContent<Pol>* newFormulaWithOneSubformula( FormulaType _type, const Formula<Pol>& _subformula )
-            {
-                assert( _type == FormulaType::OR || _type == FormulaType::AND || _type == FormulaType::XOR || _type == FormulaType::IFF );
-                // We expect that this only happens, if the intended sub-formulas are all the same.
-                return _subformula.mpContent;
-            }
             
             /**
              * Inserts the given formula to the pool, if it does not yet occur in there.
