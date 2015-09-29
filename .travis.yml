@@ -46,3 +46,10 @@ notifications:
   email:
     on_failure: always
     on_success: change
+  irc:
+    channels:
+      - "irc.de.euirc.net#ths"
+    template:
+      - "Commit to %{repository_name}/%{branch} from %{author}"
+      - "%{commit_message}"
+      - "Build: %{message} %{duration} %{build_url}"
