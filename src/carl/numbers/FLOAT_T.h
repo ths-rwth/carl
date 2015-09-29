@@ -1816,6 +1816,15 @@ namespace carl
 namespace std{
 
 	template<typename Number>
+	struct hash<carl::FLOAT_T<Number>> {
+		size_t operator()(const carl::FLOAT_T<Number>& _in) const {
+			return hasher(_in.value());
+		}
+	private:
+		std::hash<Number> hasher;
+	};
+
+	template<typename Number>
 	class numeric_limits<carl::FLOAT_T<Number>>
 	{
 	public:
@@ -1834,14 +1843,11 @@ namespace std{
 		static const bool is_modulo			= false;
 		static const bool traps				= true;
 		static const bool tinyness_before	= true;
-
-		static const float_denorm_style has_denorm  = denorm_absent;
 		
 		inline static carl::FLOAT_T<Number> (min)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::min()); }
 		inline static carl::FLOAT_T<Number> (max)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::max()); }
 		inline static carl::FLOAT_T<Number> lowest() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::lowest()); }
 
-		// Returns smallest eps such that 1 + eps != 1 (classic machine epsilon)
 		inline static carl::FLOAT_T<Number> epsilon() {  return carl::FLOAT_T<Number>(std::numeric_limits<Number>::epsilon()); }
 
 		inline static carl::FLOAT_T<Number> round_error() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::round_error()); }
