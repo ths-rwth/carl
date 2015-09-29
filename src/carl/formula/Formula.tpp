@@ -1205,6 +1205,35 @@ namespace carl
                         {
                             resultSubformulas.push_back( *subsubformulas.begin() );
                         }
+                        else if( subsubformulas.size() >= sizeof(uint32_t) )
+                        {
+                            size_t clauseBeginPos = 0;
+                            size_t clauseEndPos = 0;
+                            Formula<Pol> tseitinVar = Formula<Pol>( TRUE );
+                            while( true )
+                            {
+                                clauseEndPos = clauseBeginPos + sizeof(uint32_t) - 2;
+                                if( clauseEndPos > subsubformulas.size() )
+                                {
+                                    std::vector<Formula<Pol>> partOfSubformulas;
+                                    partOfSubformulas.reserve(subsubformulas.size()-clauseBeginPos);
+                                    assert( !tseitinVar.isTrue() );
+                                    partOfSubformulas.emplace_back( NOT, tseitinVar );
+                                    std::move( subsubformulas.begin()+clauseBeginPos, subsubformulas.end(), std::back_inserter(partOfSubformulas));
+                                    resultSubformulas.push_back( Formula<Pol>( OR, std::move( partOfSubformulas ) ) );
+                                    break;
+                                }
+                                std::vector<Formula<Pol>> partOfSubformulas;
+                                partOfSubformulas.reserve(sizeof(uint32_t));
+                                if( !tseitinVar.isTrue() )
+                                    partOfSubformulas.emplace_back( NOT, tseitinVar );
+                                std::move( subsubformulas.begin()+clauseBeginPos, subsubformulas.begin()+clauseEndPos, std::back_inserter(partOfSubformulas));
+                                tseitinVar = Formula<Pol>( freshBooleanVariable() );
+                                partOfSubformulas.push_back( tseitinVar );
+                                resultSubformulas.push_back( Formula<Pol>( OR, std::move( partOfSubformulas ) ) );
+                                clauseBeginPos = clauseEndPos;
+                            }
+                        }
                         else
                         {
                             resultSubformulas.push_back( Formula<Pol>( OR, std::move( subsubformulas ) ) );
