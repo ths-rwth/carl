@@ -1078,6 +1078,25 @@ inline bool AlmostEqual2sComplement<FLOAT_T<mpfr_t>>(const FLOAT_T<mpfr_t>& A, c
 namespace std{
 
 	template<>
+	struct hash<carl::FLOAT_T<mpfr_t>> {
+		size_t operator()(const carl::FLOAT_T<mpfr_t>& _in) const {
+
+			__mpfr_struct numStruct = *_in.value();
+			int limbs = std::ceil(double(numStruct._mpfr_prec)/double(mp_bits_per_limb));
+
+			size_t seed = 0;
+			while(limbs > 0) {
+			    carl::hash_combine(seed,numStruct._mpfr_d[limbs-1]);
+			    --limbs;
+			}
+			carl::hash_combine(seed, size_t(numStruct._mpfr_sign));
+			carl::hash_combine(seed, size_t(numStruct._mpfr_prec));
+			carl::hash_combine(seed, size_t(numStruct._mpfr_exp));
+			return seed;
+		}
+	};
+
+	template<>
 	class numeric_limits<carl::FLOAT_T<mpfr_t>>
 	{
 	public:

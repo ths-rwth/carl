@@ -50,6 +50,14 @@ TEST(mpfrFloatTest, Constructor)
     SUCCEED();
 }
 
+TEST(mpfrFloatTest, Hash)
+{
+	std::hash<carl::FLOAT_T<mpfr_t>> hasher;
+	hasher(carl::FLOAT_T<mpfr_t>(10));
+	hasher(carl::FLOAT_T<mpfr_t>(-12.23648192394727230203828));
+	SUCCEED();
+}
+
 /*
  * Test the following operations
  * 7 > 2
