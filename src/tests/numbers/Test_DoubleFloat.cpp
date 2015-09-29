@@ -34,6 +34,13 @@ TEST(doubleFloatTest, Constructor)
     //ASSERT_EQ(hf1, carl::FLOAT_T<double>(hf1));
 }
 
+TEST(doubleFloatTest, Hash)
+{
+	std::hash<carl::FLOAT_T<double>> hasher;
+	hasher(carl::FLOAT_T<double>(2));
+	SUCCEED();
+}
+
 /*
  * Test the following operations
  * 7 > 2
