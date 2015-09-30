@@ -17,7 +17,7 @@ sudo apt-get purge cmake
 install cmake libboost1.48-all-dev libcln-dev libeigen3-dev libgtest-dev libstdc++-4.9-dev
 
 if [[ ${TASK} == "doxygen" ]]; then
-	install doxygen
+	install doxygen biblatex
 fi
 
 
