@@ -48,7 +48,7 @@ notifications:
     on_success: change
   irc:
     channels:
-      - "irc.de.euirc.net#ths"
+      - "chat.freenode.net#carl"
     template:
       - "Commit to %{repository_name}/%{branch} from %{author}"
       - "%{commit_message}"
