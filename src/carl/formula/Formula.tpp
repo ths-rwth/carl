@@ -1207,16 +1207,16 @@ namespace carl
                         }
                         else if( subsubformulas.size() >= sizeof(uint32_t) )
                         {
-                            size_t clauseBeginPos = 0;
-                            size_t clauseEndPos = 0;
+                            int clauseBeginPos = 0;
+                            int clauseEndPos = 0;
                             Formula<Pol> tseitinVar = Formula<Pol>( TRUE );
                             while( true )
                             {
-                                clauseEndPos = clauseBeginPos + sizeof(uint32_t) - 2;
-                                if( clauseEndPos > subsubformulas.size() )
+                                clauseEndPos = clauseBeginPos + (int)sizeof(uint32_t) - 2;
+                                if( (size_t) clauseEndPos > subsubformulas.size() )
                                 {
                                     std::vector<Formula<Pol>> partOfSubformulas;
-                                    partOfSubformulas.reserve(subsubformulas.size()-clauseBeginPos);
+                                    partOfSubformulas.reserve(subsubformulas.size()-(size_t)clauseBeginPos);
                                     assert( !tseitinVar.isTrue() );
                                     partOfSubformulas.emplace_back( NOT, tseitinVar );
                                     std::move( subsubformulas.begin()+clauseBeginPos, subsubformulas.end(), std::back_inserter(partOfSubformulas));
