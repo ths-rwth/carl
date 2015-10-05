@@ -153,6 +153,11 @@ namespace carl
         }
         return this->add(new Term(_type, _operand, _highest, _lowest));
     }
+
+    void BVTermPool::assignId(TermPtr _term, std::size_t _id)
+    {
+        _term->mId = _id;
+    }
 }
 
 #define BV_TERM_POOL BVTermPool::getInstance()

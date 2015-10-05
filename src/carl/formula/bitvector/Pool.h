@@ -59,13 +59,23 @@ namespace carl
 			}
 		}
 
+		/**
+		 * Assigns a unique id to the generated element.
+		 * Note that this method serves as a callback for subclasses.
+		 * The actual assignment of the id is done there.
+		 * @param _element The element for which to add the id.
+		 * @param _id A unique id.
+		 */
+		virtual void assignId(ElementPtr /* _element */, std::size_t /* _id */)
+		{ }
+
 	public:
 
 		void print() const
 		{
 			std::cout << "Pool contains:" << std::endl;
 			for(const auto& ele : mPool) {
-				std::cout << "id " << ele->mId << ":  " << *ele << std::endl;
+				std::cout << "- " << *ele << std::endl;
 			}
 			std::cout << std::endl;
 		}
@@ -86,7 +96,7 @@ namespace carl
 
 			if(iterBoolPair.second) { // Element has just been inserted
 				// Assign a new id
-				_element->mId = mIdAllocator++; // id should be set here to avoid conflicts when multi-threading
+				assignId(_element, mIdAllocator++); // id should be set here to avoid conflicts when multi-threading
 			} else {
 				// The argument can be deleted, return the already existent instance
 				delete _element;

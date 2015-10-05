@@ -16,10 +16,6 @@ namespace carl
 
 	class BVConstraint
 	{
-		// TODO: Assigning mId requires Pool<BVConstraint> to be a friend,
-		// using the private constructors requires BVConstraintPool to be
-		// a friend. Should we move mId assignment to subclass?
-		friend class Pool<BVConstraint>;
 		friend class BVConstraintPool;
 
 	private:
