@@ -66,7 +66,7 @@ namespace carl
 		 * @param _element The element for which to add the id.
 		 * @param _id A unique id.
 		 */
-		virtual void assignId(ElementPtr _element, std::size_t)
+		virtual void assignId(ElementPtr /* _element */, std::size_t /* _id */)
 		{ }
 
 	public:
