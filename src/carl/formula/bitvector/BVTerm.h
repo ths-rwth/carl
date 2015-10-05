@@ -233,13 +233,9 @@ namespace carl
 		}
 	};
 
-	// Forward declaration
-	template<typename Element>
-	class Pool;
-
 	class BVTermContent
 	{
-		friend class Pool<BVTermContent>;
+		friend class BVTermPool;
 		friend class BVTerm;
 
 	private:
