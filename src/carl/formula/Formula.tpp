@@ -1110,7 +1110,9 @@ namespace carl
                                     assert( !subsubformula.isFalse() );
                                     if( !subsubformula.isTrue() )
                                     {
-                                        subformulasToTransformTmp.push_back( Formula<Pol>( OR, Formula<Pol>( FormulaType::NOT, tseitinVar ), subsubformula ) );
+                                        Formula<Pol> notTVar( FormulaType::NOT, tseitinVar );
+                                        Formula<Pol> tmpOr( OR, notTVar, subsubformula );
+                                        subformulasToTransformTmp.push_back( std::move( tmpOr ) );
                                         subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
                                     }
                                 }

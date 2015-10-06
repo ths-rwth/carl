@@ -43,6 +43,8 @@ namespace carl
             mutable std::recursive_mutex mMutexPool;
             ///
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
+            ///
+            FastPointerMap<FormulaContent<Pol>,typename FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*>::iterator> mTseitinVarToFormula;
             
             #ifdef THREAD_SAFE
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock( mMutexPool );
@@ -107,6 +109,7 @@ namespace carl
                     const FormulaContent<Pol>* hi = create( carl::freshBooleanVariable() );
                     hi->mDifficulty = _formula.difficulty();
                     iter.first->second = hi;
+                    mTseitinVarToFormula[hi] = iter.first;
                 }
                 return Formula<Pol>( iter.first->second );
             }
@@ -357,15 +360,25 @@ namespace carl
 			}
             
             void free( const FormulaContent<Pol>* _elem )
-            {   
+            {
                 FORMULA_POOL_LOCK_GUARD
                 const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
                 if( tmp->mUsages == 1 )
                 {
-                    mTseitinVars.erase( tmp );
-                    mTseitinVars.erase( tmp->mNegation );
+                    auto tmpTVIter = mTseitinVarToFormula.find( tmp );
+                    if( tmpTVIter != mTseitinVarToFormula.end() )
+                    {
+                        mTseitinVars.erase( tmpTVIter->second );
+                        mTseitinVarToFormula.erase( tmpTVIter );
+                    }
+                    auto tmpNegTVIter = mTseitinVarToFormula.find( tmp->mNegation );
+                    if( tmpNegTVIter != mTseitinVarToFormula.end() )
+                    {
+                        mTseitinVars.erase( tmpNegTVIter->second );
+                        mTseitinVarToFormula.erase( tmpNegTVIter );
+                    }
                     mPool.erase( tmp );
                     delete tmp->mNegation;
                     delete tmp;
