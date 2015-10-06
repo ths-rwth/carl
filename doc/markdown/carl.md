@@ -15,3 +15,8 @@ It contains information about supplementary features like our logging framework 
 
 Note that this documentation is, and will probably still be for quite some time, work in progress.
 If you feel that some topic that is important to you is missing or some explanation is unclear, please let us know!
+
+### Contact
+- github: https://github.com/smtrat/carl
+- IRC: #carl on chat.freenode.net
+
