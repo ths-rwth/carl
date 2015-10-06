@@ -18,5 +18,5 @@ If you feel that some topic that is important to you is missing or some explanat
 
 ### Contact
 - github: https://github.com/smtrat/carl
-- IRC: #carl on chat.freenode.net
+- IRC: \#carl on chat.freenode.net
 
