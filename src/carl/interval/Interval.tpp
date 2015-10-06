@@ -382,16 +382,16 @@ Number Interval<Number>::distance(const Interval<Number>& intervalA)
     {
         assert( this->upperBoundType() != BoundType::INFTY );
         assert( intervalA.lowerBoundType() != BoundType::INFTY );
-        return carl::abs(intervalA.lower() - this->upper());
+        return carl::abs(Number(intervalA.lower() - this->upper()));
     }
     else if( intervalA.lowerBoundType() == BoundType::INFTY || this->upperBoundType() == BoundType::INFTY )
     {
         assert( this->lowerBoundType() != BoundType::INFTY );
         assert( intervalA.upperBoundType() != BoundType::INFTY );
-        return carl::abs(intervalA.upper() - this->lower());
+        return carl::abs(Number(intervalA.upper() - this->lower()));
     }
-    Number distA = carl::abs(intervalA.upper() - this->lower());
-    Number distB = carl::abs(intervalA.lower() - this->upper());
+    Number distA = carl::abs(Number(intervalA.upper() - this->lower()));
+    Number distB = carl::abs(Number(intervalA.lower() - this->upper()));
     if( distA < distB )
         return distA;
     return distB;
