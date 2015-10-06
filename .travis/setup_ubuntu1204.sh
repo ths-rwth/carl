@@ -20,7 +20,6 @@ if [[ ${TASK} == "doxygen" ]]; then
 	install doxygen biblatex
 fi
 
-
 if [[ ${USE} == "g++-4.8" ]]; then
 	install gcc-4.8 g++-4.8
 	defCXX gcc-4.8 g++-4.8
@@ -55,5 +54,3 @@ fi
 sudo service postgresql stop
 sudo service mysql stop
 sudo service cron stop
-
-ps aux --cols 120
