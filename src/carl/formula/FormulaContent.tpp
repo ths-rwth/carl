@@ -84,6 +84,7 @@ namespace carl {
         mType( _type ),
 		mSubformulas( std::move(_subformulas) )
     {
+        assert( !mSubformulas.empty() );
         assert( isNary() );
         for (const auto& subformula: mSubformulas) {
             mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);

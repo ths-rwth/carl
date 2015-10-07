@@ -19,7 +19,9 @@ namespace carl
         mIdAllocator( 3 ),
         mpTrue( new FormulaContent<Pol>( TRUE, 1 ) ),
         mpFalse( new FormulaContent<Pol>( FALSE, 2 ) ),
-        mPool()
+        mPool(),
+        mTseitinVars(),
+        mTseitinVarToFormula()
     {
         ConstraintPool<Pol>::getInstance();
         mpTrue->mNegation = mpFalse;
@@ -131,6 +133,10 @@ namespace carl
     const FormulaContent<Pol>* FormulaPool<Pol>::createNAry(FormulaType _type, Formulas<Pol>&& _subformulas)
     {
         assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
+//        std::cout << __func__ << _type;
+//        for( const auto& f : _subformulas )
+//            std::cout << " " << f;
+//        std::cout << std::endl;
         if( _subformulas.size() == 1 )
         {
             return _subformulas[0].mpContent;
@@ -252,7 +258,9 @@ namespace carl
             result = subformulas.begin()->mpContent;
         }
         else
+        {
             result = add( new FormulaContent<Pol>( _type, std::move( subformulas ) ) );
+        }
         return negateResult ? result->mNegation : result;
     }
     
