@@ -44,6 +44,7 @@ enum class IntegerHandling {
 inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
     switch (ih) {
         case IntegerHandling::SPLIT_SOLUTION: return os << "Split on Solution";
+		case IntegerHandling::SPLIT_SOLUTION_INVERSE: return os << "Split on inverse Solution";
         case IntegerHandling::SPLIT_LAZY: return os << "Split lazy";
         case IntegerHandling::SPLIT_EARLY: return os << "Split early";
         case IntegerHandling::BACKTRACK: return os << "Backtrack";
