@@ -468,12 +468,12 @@ namespace carl
 			}
 		}
 		if (!inserted) newExps.emplace_back(rhs, 1);
-		return std::move(MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 ));
+		return MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 );
 	}
 	
 	Monomial::Arg operator*(Variable::Arg lhs, const Monomial::Arg& rhs)
 	{
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	
 	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs)
@@ -491,6 +491,6 @@ namespace carl
 		}
 		else
 			newExps.emplace_back( lhs, 2 );
-		return std::move(MonomialPool::getInstance().create( std::move(newExps), 2 ));
+		return MonomialPool::getInstance().create( std::move(newExps), 2 );
 	}
 }
