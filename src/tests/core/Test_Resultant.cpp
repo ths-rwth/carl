@@ -20,15 +20,15 @@ typedef mpz_class Integer;
 
 TEST(Resultant, det)
 {
-    Variable m = VariablePool::getInstance().getFreshVariable("m");
-    Variable r = VariablePool::getInstance().getFreshVariable("r");
+    //Variable m = freshRealVariable("m");
+    Variable r = freshRealVariable("r");
 
     MultivariatePolynomial<Rational> mr(r);
     MultivariatePolynomial<Rational> one((Rational)1);
     MultivariatePolynomial<Rational> zero((Rational)0);
-    Variable x = VariablePool::getInstance().getFreshVariable("x");
-	Variable c = VariablePool::getInstance().getFreshVariable("c");
-	Variable t = VariablePool::getInstance().getFreshVariable("t");
+    Variable x = freshRealVariable("x");
+	Variable c = freshRealVariable("c");
+	Variable t = freshRealVariable("t");
 
 	MultivariatePolynomial<Rational> mc(c);
 	MultivariatePolynomial<Rational> mt(t);
