@@ -346,6 +346,6 @@ class PreventConversion
         explicit PreventConversion( const T& _other ) : mContent( _other ) {}
 //        template<typename O>
 //        PreventConversion( const O& _other ) = delete;
-        operator T () const { return mContent; }
+        operator const T&() const { return mContent; }
 };
 }
