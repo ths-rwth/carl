@@ -634,6 +634,8 @@ namespace carl
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( mpContent->mConstraint );
+                else if( mpContent->mType == FormulaType::NOT )
+                    mpContent->mSubformula.getConstraints( _constraints );
                 else if( isNary() )
                 {
                     for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
@@ -649,6 +651,8 @@ namespace carl
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( *this );
+                else if( mpContent->mType == FormulaType::NOT )
+                    mpContent->mSubformula.getConstraints( _constraints );
                 else if( isNary() )
                 {
                     for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
