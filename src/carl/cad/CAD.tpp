@@ -1087,6 +1087,8 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		if (status == cad::Answer::True) {
 			CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting succesfull");
 			return std::make_pair(true, false);
+		} else if (status == cad::Answer::Unknown) {
+			return std::make_pair(false, false);
 		}
 		CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting failed");
 	}
@@ -1166,6 +1168,8 @@ cad::Answer CAD<Number>::mainCheck(
 		if (status == cad::Answer::True) {
 			// lifting yields a satisfying sample
 			return cad::Answer::True;
+		} else if (status == cad::Answer::Unknown) {
+			return cad::Answer::Unknown;
 		}
 	} else {
 		CARL_LOG_TRACE("carl.cad", "maxDepth != 0, maxDepth = " << maxDepth);
@@ -1266,6 +1270,8 @@ cad::Answer CAD<Number>::mainCheck(
 			if (status == cad::Answer::True) {
 				// lifting yields a satisfying sample
 				return cad::Answer::True;
+			} else if (status == cad::Answer::Unknown) {
+				return cad::Answer::Unknown;
 			}
 		}
 		this->eliminationSets[(unsigned)level].setLiftingPositionsReset();
@@ -1533,6 +1539,8 @@ cad::Answer CAD<Number>::liftCheck(
 					integralityBacktracking = true;
 					CARL_LOG_ERROR("carl.cad", "Lifting was successful, but integrality is violated.");
 				}
+			} else if (liftingSuccessful == cad::Answer::Unknown) {
+				return liftingSuccessful;
 			} else if (!satPath.empty()) {
 				// Sample was SAT, but not integral.
 				if (checkIntegrality(newNode)) {
