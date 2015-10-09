@@ -23,7 +23,7 @@ namespace carl
         switch( getType() )
         {
             case FormulaType::BOOL:
-                if( _ofThisType == (_type == VariableType::VT_BOOL) )
+                if( !_ofThisType || (_type == VariableType::VT_BOOL) )
                 {
                     _vars.insert( boolean() );
                 }
@@ -35,14 +35,14 @@ namespace carl
             case FormulaType::CONSTRAINT:
                 for( auto var : constraint().variables() )
                 {
-                    if( _ofThisType == (var.getType() == VariableType::VT_INT) )
+                    if( !_ofThisType || (var.getType() == VariableType::VT_INT) )
                         _vars.insert( var );
-                    if( _ofThisType == (var.getType() == VariableType::VT_REAL) )
+                    if( !_ofThisType || (var.getType() == VariableType::VT_REAL) )
                         _vars.insert( var );
                 }
                 break;
             case FormulaType::BITVECTOR: {
-                if (_ofThisType == (_type == VariableType::VT_BITVECTOR)) {
+                if (!_ofThisType || (_type == VariableType::VT_BITVECTOR)) {
                     std::set<BVVariable> vars;
                     bvConstraint().collectVariables(vars);
                     for (const auto& v: vars) _vars.insert(v());
@@ -53,7 +53,7 @@ namespace carl
                 std::set<UVariable> vars;
                 uequality().collectUVariables(vars);
                 for (const auto& v: vars) {
-                    if (_ofThisType == (SortManager::getInstance().getType(v.domain()) == _type))
+                    if( !_ofThisType || (SortManager::getInstance().getType(v.domain()) == _type))
                         _vars.insert(v());
                 }
                 break;
