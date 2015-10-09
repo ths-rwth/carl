@@ -1462,6 +1462,20 @@ cad::Answer CAD<Number>::liftCheck(
 				currentSamples.simplify(true);
 			}
 		}
+		if (this->setting.integerHandling == cad::IntegerHandling::SPLIT_EARLY) {
+			if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
+				for (const auto& newSample: sampleSetIncrement) {
+					if (!newSample->isIntegral()) {
+						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+						sample.pop_back();
+						sample.push_back(newSample);
+						r = RealAlgebraicPoint<Number>(std::move(sample));
+						CARL_LOG_TRACE("carl.cad", "Eager split at " << r);
+						return cad::Answer::Unknown;
+					}
+				}
+			}
+		}
 
 		/* Phase 2
 		 * Lifting of the current level.
@@ -1477,15 +1491,14 @@ cad::Answer CAD<Number>::liftCheck(
 				break;
 			}
 			RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
-			if (this->setting.splitInteger) {
-				CARL_LOG_TRACE("carl.cad", "Trying to split at integer: ");
+			if (this->setting.integerHandling == cad::IntegerHandling::SPLIT_LAZY) {
 				if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
 					if (!newSample->isIntegral()) {
-						//std::cout << "Split!" << std::endl;
 						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
 						sample.pop_back();
 						sample.push_back(newSample);
 						r = RealAlgebraicPoint<Number>(std::move(sample));
+						CARL_LOG_TRACE("carl.cad", "Lazy split at " << r);
 						return cad::Answer::Unknown;
 					}
 				}
