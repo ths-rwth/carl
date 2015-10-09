@@ -444,7 +444,7 @@ namespace carl
 			newExps.insert(newExps.end(), itright, rhs->end());
 		Monomial::Arg result = createMonomial(std::move(newExps), lhs->tdeg() + rhs->tdeg());
 		CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
-		return std::move(result);
+		return result;
 	}
 
 	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
