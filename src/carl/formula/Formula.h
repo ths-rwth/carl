@@ -669,6 +669,11 @@ namespace carl
             void collectVariables( Variables& _vars, carl::VariableType _type, bool _ofThisType = true ) const;
             
             /**
+             * @return The formula's complexity, which is mainly the number of operations within this formula.
+             */
+            size_t complexity() const;
+            
+            /**
              * @param _formula The formula to compare with.
              * @return true, if this formula and the given formula are equal;
              *         false, otherwise.

@@ -298,6 +298,11 @@ namespace carl
             }
             
             /**
+             * @return An approximation of the complexity of this uninterpreted equality.
+             */
+            size_t complexity() const;
+            
+            /**
              * @param _ueq The uninterpreted equality to compare with.
              * @return true, if this and the given equality instance are equal.
              */

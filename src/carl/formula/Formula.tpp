@@ -83,6 +83,32 @@ namespace carl
     }
 
     template<typename Pol>
+    size_t Formula<Pol>::complexity() const
+    {
+        size_t result = 0;
+        carl::FormulaVisitor<Formula<Pol>> visitor;
+        visitor.visit(*this, 
+            [&](const Formula& _f) 
+            {
+                switch( _f.getType() )
+                {
+                    case FormulaType::TRUE:
+                    case FormulaType::FALSE:
+                        break;
+                    case FormulaType::CONSTRAINT:
+                        result += _f.constraint().complexity(); break;
+                    case FormulaType::BITVECTOR:
+                        result += _f.bvConstraint().complexity(); break;
+                    case FormulaType::UEQ:
+                        result += _f.uequality().complexity(); break;
+                    default:
+                        ++result;
+                }
+            });
+        return result;
+    }
+    
+    template<typename Pol>
     unsigned Formula<Pol>::satisfiedBy( const EvaluationMap<typename Pol::NumberType>& _assignment ) const
     {
         switch( getType() )

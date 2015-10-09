@@ -191,6 +191,14 @@ namespace carl
 		{
 			return mHash;
 		}
+            
+        /**
+         * @return An approximation of the complexity of this bit vector constraint.
+         */
+        size_t complexity() const
+        {
+            return 1 + mLhs.complexity() + mRhs.complexity();
+        }
 	};
 } // namespace carl
 

@@ -135,6 +135,11 @@ namespace carl
 		bool isConstant() const {
 			return type() == BVTermType::CONSTANT;
 		}
+            
+        /**
+         * @return An approximation of the complexity of this bit vector term.
+         */
+        size_t complexity() const;
 		
 		void collectVariables(std::set<BVVariable>& vars) const;
 

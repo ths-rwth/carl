@@ -284,6 +284,14 @@ namespace carl
 		{
 			return mExponents.size();
 		}
+        
+        /**
+         * @return An approximation of the complexity of this monomial.
+         */
+        size_t complexity() const
+        {
+            return mTotalDegree;
+        }
 
 		/**
 		 * Retrieves the single variable of the monomial.

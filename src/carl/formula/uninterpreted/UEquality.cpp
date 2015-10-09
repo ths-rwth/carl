@@ -8,7 +8,21 @@
 #include "UEquality.h"
 
 namespace carl
-{        
+{
+    size_t UEquality::complexity() const
+    {
+        size_t result = 0;
+        if( lhsIsUV() )
+            ++result;
+        else
+            result += lhsAsUF().args().size();
+        if( rhsIsUV() )
+            ++result;
+        else
+            result += rhsAsUF().args().size();
+        return result;
+    }
+    
     bool UEquality::operator==( const UEquality& _ueq ) const
     {
         if( mNegated != _ueq.negated() )

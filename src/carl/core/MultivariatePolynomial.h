@@ -278,6 +278,17 @@ public:
         return mTerms.size();
     }
     
+    /**
+     * @return An approximation of the complexity of this polynomial.
+     */
+    size_t complexity() const
+    {
+        size_t result = 0;
+        for(const auto& term : mTerms)
+            result += term.complexity();
+        return result;
+    }
+    
 	/**
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 

@@ -731,6 +731,14 @@ namespace carl
             }
             
             /**
+             * @return An approximation of the complexity of this constraint.
+             */
+            size_t complexity() const
+            {
+                return 1 + mpContent->mLhs.complexity();
+            }
+            
+            /**
              * Checks whether the given assignment satisfies this constraint.
              * @param _assignment The assignment.
              * @return 1, if the given assignment satisfies this constraint.
