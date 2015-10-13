@@ -9,7 +9,7 @@
 
 namespace carl {
 
-typedef std::map<std::string, unsigned> BenchmarkResult;
+typedef std::map<std::string, std::size_t> BenchmarkResult;
 
 template<typename... Identifier>
 class BenchmarkFile {
