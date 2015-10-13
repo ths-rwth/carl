@@ -2,7 +2,7 @@
 
 mkdir build || return 1
 cd build/ || return 1
-cmake -D DEVELOPER=ON ../ || return 1
+cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON ../ || return 1
 
 if [[ ${TASK} == "doxygen" ]]; then
 	make doc || return 1
