@@ -8,7 +8,7 @@
  */
 #include "../carl/interval/rounding.h"
 #include "../carl/numbers/roundingConversion.h"
- #include "../carl/numbers/FLOAT_T.h"
+#include "../carl/numbers/FLOAT_T.h"
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
@@ -25,7 +25,7 @@ void toInt(mpz_t intRep, mpfr_t a) {
 	//std::cout << "Min Exponent is " << carl::binary(mpfr_get_emin()) << std::endl;
 	//std::cout << "Scaled exponent: " << (a->_mpfr_exp + std::abs(mpfr_get_emin())) << std::endl;
 	//std::cout << "Scaled exponent: " << carl::binary((a->_mpfr_exp + std::abs(mpfr_get_emin()))) << std::endl;
-	
+
 	// mpfr mantissa is stored in limbs (usually 64-bit words) - the number of those depends on the precision.
 	int limbs = std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
 	/*
@@ -104,7 +104,7 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 	mpz_abs(intRepA, intRepA);
 	mpz_abs(intRepB, intRepB);
 
-	
+
 
 	// case distinction to cope with zero.
 	if(mpfr_zero_p(a) != 0) { // a is zero
@@ -127,7 +127,7 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 		}else{
 			mpfr_nextbelow(zero);
 		}
-		
+
 		toInt(intRepZero, zero);
 		mpz_abs(intRepZero, intRepZero);
 		mpz_sub(distance, intRepB,intRepZero);
@@ -147,8 +147,8 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 		}else{
 			mpfr_nextbelow(zero);
 		}
-		
-		
+
+
 		toInt(intRepZero, zero);
 		mpz_abs(intRepZero, intRepZero);
 		mpz_sub(distance, intRepA,intRepZero);
@@ -186,12 +186,12 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 		mpz_abs(intRepZeroA, intRepZeroA);
 		toInt(intRepZeroB, zeroB);
 		mpz_abs(intRepZeroB, intRepZeroB);
-		
+
 		mpz_sub(distance, intRepA,intRepZeroA);
 		mpz_sub(d2, intRepB,intRepZeroB);
 		mpz_add(distance, distance, d2);
 		mpz_add_ui(distance,distance, 2);
-		
+
 		mpfr_clear(zeroA);
 		mpfr_clear(zeroB);
 		mpz_clear(intRepZeroA);
@@ -212,24 +212,36 @@ unsigned distance(mpfr_t a, mpfr_t b) {
 
 int main (int argc, char** argv)
 {
+	//carl::FLOAT_T<mpfr_t> eps = std::numeric_limits<carl::FLOAT_T<mpfr_t>>::epsilon();
+	carl::FLOAT_T<mpfr_t> eps = carl::FLOAT_T<mpfr_t>::maxval();
+	char out[1000];
+	std::string fString = "%." + std::to_string(eps.precision()+5) + "RNf";
+	//char format[fString.length()];
+	char* format = (char*)fString.c_str();
+	std::cout << "Precision is " << eps.precision() << std::endl;
+ 	mpfr_sprintf(out, "%.RDe", eps.value());
+	std::cout << std::string(out) << std::endl;
+
+
+	/*
 #ifdef USE_MPFR_FLOAT
 	/*
 	mpfr_ptr numberA = new mpfr_t();
 	mpfr_init(numberA);
 	mpfr_set_ui(numberA, 5, MPFR_RNDN);
-	
+
 	mpfr_ptr numberB = new mpfr_t;
 	mpfr_init(numberB);
 	mpfr_set_ui(numberB, 5, MPFR_RNDN);
-	
+
 	mpfr_ptr result;
 	mpfr_init(result);
-	
+
 	//carl::convRnd<mpfr_ptr> r;
 	//mpfr_rnd_t tmp =  r.operator() (carl::CARL_RND::CARL_RNDD);
-	
+
 	//result = carl::add_down(numberA, numberB);
-	
+
 	mpfr_clears(numberA, numberB, result);
 	*/
 	/*
@@ -242,7 +254,7 @@ int main (int argc, char** argv)
 	//mpfr_nextbelow(f);
 	//mpfr_nextbelow(f);
 
-	
+
 	char out1[120];
 	char out2[120];
 	for(unsigned target = 0; target < 400; ++target){
@@ -261,15 +273,15 @@ int main (int argc, char** argv)
 		mpfr_clear(g);
 		std::cout << "##############################" << std::endl;
 	}
-	
+
 	mpfr_clear(f);
 	*/
-
+	/*
 	carl::FLOAT_T<mpfr_t> a(1);
 	carl::FLOAT_T<mpfr_t> b(2);
 
 	carl::AlmostEqual2sComplement(a,b);
-
+	*/
 	/*
 	std::cout << "F" << std::endl;
 	char out[120];
@@ -356,7 +368,7 @@ int main (int argc, char** argv)
 	}
 	std::cout << std::endl;
 	limbs = std::ceil(double(h->_mpfr_prec)/double(mp_bits_per_limb));
-	
+
 	mpz_t mant;
 	mpz_t tmp;
 	mpz_init(mant);
@@ -408,7 +420,8 @@ int main (int argc, char** argv)
 	std::cout << "RES: " << std::endl << std::string(out) << std::endl;
 
 	mpfr_clear(f);
+
+	#endif
 	*/
-#endif
 	return 0;
 }
