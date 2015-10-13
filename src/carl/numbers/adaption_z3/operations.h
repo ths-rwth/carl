@@ -5,8 +5,8 @@
  * 
  * @warning This file should never be included directly but only via operations.h
  */
-#ifdef COMPARE_WITH_Z3
 #pragma once
+
 #include "../../util/platform.h"
 #include <limits.h>
 
@@ -35,4 +35,3 @@ inline std::string toString(const rational& _number, bool _infix) {
 }
 
 }
-#endif
