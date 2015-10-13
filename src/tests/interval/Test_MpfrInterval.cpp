@@ -9,7 +9,7 @@
 
 
 #include "gtest/gtest.h"
-#include "../../carl/numbers/FLOAT_T.h"
+#include "../../carl/numbers/numbers.h"
 #include "../../carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
