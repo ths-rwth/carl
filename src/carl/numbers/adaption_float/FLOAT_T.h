@@ -10,6 +10,10 @@
 
 #pragma once
 
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include <string>
 #include <cfloat>
 #include <iostream>
@@ -17,28 +21,24 @@
 #include <math.h>
 #include <cmath>
 #include <cstddef>
+#include <gmpxx.h>
 #ifdef USE_CLN_NUMBERS
 #include <cln/cln.h>
-#else
-#include <gmpxx.h>
 #endif
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>
 #endif
 
-#include "typetraits.h"
-#include "../util/hash.h"
+#include "../../util/hash.h"
+#include "../adaption_gmpxx/typetraits.h"
+#include "../adaption_gmpxx/operations.h"
 #ifdef USE_CLN_NUMBERS
-#include "adaption_cln/typetraits.h"
-#include "adaption_cln/operations.h"
-#else
-#include "adaption_gmpxx/typetraits.h"
-#include "adaption_gmpxx/operations.h"
+#include "../adaption_cln/typetraits.h"
+#include "../adaption_cln/operations.h"
 #endif
-#include "config.h"
 #include "roundingConversion.h"
-#include "../util/SFINAE.h"
-#include "../core/logging.h"
+#include "../../util/SFINAE.h"
+#include "../../core/logging.h"
 
 
 namespace carl
@@ -1873,4 +1873,4 @@ namespace std{
 }
 
 
-#include "adaption_float/mpfr_float.tpp"
+#include "mpfr_float.tpp"

@@ -7,6 +7,11 @@
 
 #pragma once
 
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
+#include <cassert>
 #include <cmath>
 #include <limits>
 
@@ -44,7 +49,7 @@ inline std::size_t bitsize(unsigned) {
 }
 
 template<typename C>
-inline void reserve(size_t) {
+inline void reserve(std::size_t) {
 }
 
 /**
@@ -73,47 +78,6 @@ inline double ceil(double n) {
 }
 inline double abs(double n) {
 	return std::abs(n);
-}
-
-/**
- * Returns a down-rounded representation of the given numeric.
- * @param o Number to round.
- * @param overapproximate Flag if overapproximation shall be guaranteed.
- * @return Double representation of o.
- */
-template<typename Rational>
-static double roundDown(const Rational& o, bool overapproximate = false) {
-    typedef std::numeric_limits<double> limits;
-    double result = carl::toDouble(o);
-    if (result == -limits::infinity()) return result;
-    if (result == limits::infinity()) return limits::max();
-    // If the cln::cl_RA cannot be represented exactly by a double, round.
-    if (overapproximate || carl::rationalize<Rational>(result) != o) {
-            if (result == -limits::max()) return -limits::infinity();
-            return std::nextafter(result, -limits::infinity());
-    } else {
-            return result;
-    }
-}
-
-/** Returns a up-rounded representation of the given numeric
- * @param o
- * @param overapproximate
- * @return double representation of o (overapprox) Note, that it can return the double INFINITY.
- */
-template<typename Rational>
-static double roundUp(const Rational& o, bool overapproximate = false) {
-    typedef std::numeric_limits<double> limits;
-    double result = carl::toDouble(o);
-    if (result == limits::infinity()) return result;
-    if (result == -limits::infinity()) return -limits::max();
-    // If the cln::cl_RA cannot be represented exactly by a double, round.
-    if (overapproximate || carl::rationalize<Rational>(result) != o) {
-            if (result == limits::max()) return limits::infinity();
-            return std::nextafter(result, limits::infinity());
-    } else {
-            return result;
-    }
 }
 
 inline long mod(const long& n, const long& m) {

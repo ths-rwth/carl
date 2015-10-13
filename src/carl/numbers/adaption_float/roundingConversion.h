@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include "../util/platform.h"
-#include "config.h"
+#include "../../util/platform.h"
 CLANG_WARNING_DISABLE("-Wsign-conversion")
 #ifdef USE_MPFR_FLOAT
 #include <mpfr.h>

@@ -124,26 +124,6 @@ namespace carl
         }
         return result;
     }
-    
-    #ifdef USE_CLN_NUMBERS
-    template<>
-    mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n) {
-        typedef signed long int IntType;
-        cln::cl_I den = carl::getDenom((cln::cl_RA)n);
-        if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )
-        {
-            cln::cl_I num = carl::getNum((cln::cl_RA)n);
-            if( num <= std::numeric_limits<IntType>::max() && num >= std::numeric_limits<IntType>::min() )
-            {
-                return mpq_class(carl::toInt<IntType>(num))/mpq_class(carl::toInt<IntType>(den));
-            }
-        }
-        std::stringstream s;
-        s << ((cln::cl_RA)n);
-        mpq_class result = rationalize<mpq_class>(s.str());
-        return result;
-    }
-    #endif
 
     std::string toString(const mpq_class& _number, bool _infix)
     {

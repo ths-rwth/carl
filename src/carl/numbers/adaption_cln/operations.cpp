@@ -144,24 +144,6 @@ namespace carl
         return result;
     }
 
-    template<>
-    cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n) {
-        typedef signed long int IntType;
-        mpz_class den = carl::getDenom((mpq_class)n);
-        if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )
-        {
-            mpz_class num = carl::getNum((mpq_class)n);
-            if( num <= std::numeric_limits<IntType>::max() && num >= std::numeric_limits<IntType>::min() )
-            {
-                return cln::cl_RA(carl::toInt<IntType>(num))/cln::cl_RA(carl::toInt<IntType>(den));
-            }
-        }
-        std::stringstream s;
-        s << ((mpq_class)n);
-        cln::cl_RA result = rationalize<cln::cl_RA>(s.str());
-        return result;
-    }
-
     std::string toString(const cln::cl_RA& _number, bool _infix)
     {
         std::stringstream s;

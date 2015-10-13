@@ -8,6 +8,11 @@
  * 
  */
 #pragma once
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include "../../util/platform.h"
 #include <cassert>
 #include <limits>
@@ -16,8 +21,6 @@
 #include <vector>
 #include "typetraits.h"
 #include "boost/algorithm/string.hpp"
-#include "../constants.h"
-#include "../operations.h"
 
 namespace carl {
 
@@ -190,27 +193,6 @@ inline cln::cl_LF toLF(const cln::cl_RA& n) {
 	return cln::cl_R_to_LF(n, std::max(cln::integer_length(cln::numerator(n)), cln::integer_length(cln::denominator(n))));
 }
 
-template<typename T>
-inline T rationalize(double n);
-
-template<typename T>
-inline T rationalize(float n);
-
-template<typename T>
-inline T rationalize(int n);
-
-template<typename T>
-inline T rationalize(size_t n);
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
-template<typename T>
-inline T rationalize(const PreventConversion<cln::cl_RA>&);
-
-template<typename T>
-inline T rationalize(const PreventConversion<mpq_class>&);
-
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
 
@@ -232,14 +214,6 @@ inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
 
 template<>
 cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
-
-template<>
-cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n);
-
-template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<cln::cl_RA>& n) {
-	return n;
-}
 
 /**
  * Get absolute value of an integer.

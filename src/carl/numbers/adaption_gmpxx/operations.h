@@ -8,6 +8,11 @@
  */
 
 #pragma once
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include "../../util/platform.h"
 #include <cstddef>
 #include <limits.h>
@@ -15,8 +20,6 @@
 #include <vector>
 #include "typetraits.h"
 #include "boost/algorithm/string.hpp"
-#include "../constants.h"
-#include "../operations.h"
 
 namespace carl {
 
@@ -192,10 +195,6 @@ inline T rationalize(size_t n);
 template<typename T>
 inline T rationalize(const std::string& n);
 
-#ifdef USE_CLN_NUMBERS
-template<typename T>
-inline T rationalize(const PreventConversion<cln::cl_RA>&);
-#endif
 
 template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
@@ -227,11 +226,6 @@ template<>
 inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
 }
-
-#ifdef USE_CLN_NUMBERS
-template<>
-mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n);
-#endif
 
 /**
  * Basic Operators
@@ -482,4 +476,3 @@ std::string toString(const mpq_class& _number, bool _infix);
 std::string toString(const mpz_class& _number, bool _infix);
 
 }
-
