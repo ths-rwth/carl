@@ -719,7 +719,7 @@ class FLOAT_T<mpfr_t>
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
 			FLOAT_T<mpfr_t> res;
 			mpfr_div(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
-			return std::move(res);
+			return res;
 		}
 		
 		friend FLOAT_T<mpfr_t> operator /(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
