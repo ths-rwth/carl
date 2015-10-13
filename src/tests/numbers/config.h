@@ -14,10 +14,10 @@ typedef testing::Types<
 > IntegerTypes;
 
 typedef testing::Types<
-	mpq_class,
 	#ifdef USE_CLN_NUMBERS
-	cln::cl_RA
+	cln::cl_RA,
 	#endif
+	mpq_class
 > RationalTypes;
 
 typedef testing::Types<
