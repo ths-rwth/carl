@@ -69,7 +69,7 @@ TEST(EliminationSet, SetProperty)
 	cad::PolynomialOwner<Rational> owner;
 	cad::EliminationSet<Rational> s(&owner);
 	
-	cad::MPolynomial<Rational> mpone({1});
+	cad::MPolynomial<Rational> mpone(1);
 	
 	for (unsigned int i = 0; i < 10; i++) {
 		cad::UPolynomial<Rational>* p = new cad::UPolynomial<Rational>(x, {mpone, mpone, mpone});
