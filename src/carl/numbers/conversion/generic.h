@@ -43,20 +43,24 @@ namespace carl {
 	    }
 	}
 
+	#ifdef USE_CLN_NUMBERS
 	template<>
     inline cln::cl_RA convert<double, cln::cl_RA>(const double& n) {
     	return carl::rationalize<cln::cl_RA>(n);
     }
+    #endif
 
     template<>
     inline mpq_class convert<double, mpq_class>(const double& n) {
     	return carl::rationalize<mpq_class>(n);
     }
 
+    #ifdef USE_CLN_NUMBERS
     template<>
     inline double convert<cln::cl_RA, double>(const cln::cl_RA& n) {
     	return carl::toDouble(n);
     }
+    #endif
 
     template<>
     inline double convert<mpq_class, double>(const mpq_class& n) {
@@ -68,19 +72,23 @@ namespace carl {
     	return n.value();
     }
 
+    #ifdef USE_MPFR_FLOAT
     template<>
     inline double convert<FLOAT_T<mpfr_t>, double>(const FLOAT_T<mpfr_t>& n) {
     	return carl::toDouble(n);
     }
+    #endif
 
     template<>
     inline FLOAT_T<double> convert<double, FLOAT_T<double>>(const double& n) {
     	return FLOAT_T<double>(n);
     }
 
+    #ifdef USE_MPFR_FLOAT
     template<>
     inline FLOAT_T<mpfr_t> convert<double, FLOAT_T<mpfr_t>>(const double& n) {
     	return FLOAT_T<mpfr_t>(n);
     }
+    #endif
 
 }
