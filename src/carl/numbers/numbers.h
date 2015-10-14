@@ -1,4 +1,4 @@
-/** 
+/**
  * @file:   numbers.h
  * @author: Sebastian Junges
  *
@@ -14,8 +14,6 @@
 #include "constants.h"
 #include "operations_predeclarations.h"
 #include "operations_generic.h"
-
-
 
 #include "adaption_native/operations.h"
 #include "adaption_native/typetraits.h"

@@ -12,3 +12,4 @@ namespace carl {
 
 #include "generic.h"
 #include "cln_gmp.h"
+#include "native.h"
