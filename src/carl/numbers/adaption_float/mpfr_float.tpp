@@ -1086,12 +1086,12 @@ namespace std{
 
 			size_t seed = 0;
 			while(limbs > 0) {
-			    carl::hash_combine(seed,numStruct._mpfr_d[limbs-1]);
+			    carl::hash_add(seed,numStruct._mpfr_d[limbs-1]);
 			    --limbs;
 			}
-			carl::hash_combine(seed, size_t(numStruct._mpfr_sign));
-			carl::hash_combine(seed, size_t(numStruct._mpfr_prec));
-			carl::hash_combine(seed, size_t(numStruct._mpfr_exp));
+			carl::hash_add(seed, size_t(numStruct._mpfr_sign));
+			carl::hash_add(seed, size_t(numStruct._mpfr_prec));
+			carl::hash_add(seed, size_t(numStruct._mpfr_exp));
 			return seed;
 		}
 	};

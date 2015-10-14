@@ -4,7 +4,7 @@
 
 using namespace carl;
 
-TEST(Hash, hash_combine)
+TEST(Hash, hash_add)
 {
 	std::size_t seed = 0;
 	std::size_t val = 5;
@@ -14,7 +14,7 @@ TEST(Hash, hash_combine)
 	std::string s4 = "foo";
 	
 	
-	carl::hash_combine(seed, val);
-	carl::hash_combine(seed, s1);
-	carl::hash_combine(seed, s2, s3, s4);
+	carl::hash_add(seed, val);
+	carl::hash_add(seed, s1);
+	carl::hash_add(seed, s2, s3, s4);
 }
