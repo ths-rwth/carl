@@ -43,3 +43,5 @@
 #include "Numeric.h"
 
 #include "conversion/conversion.h"
+
+#include "Number.h"
