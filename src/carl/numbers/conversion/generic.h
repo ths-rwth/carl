@@ -1,7 +1,7 @@
 #pragma once
 
 namespace carl {
-	
+
 	/**
 	 * Returns a down-rounded representation of the given numeric.
 	 * @param o Number to round.
@@ -42,5 +42,45 @@ namespace carl {
 	            return result;
 	    }
 	}
-	
+
+	template<>
+    inline cln::cl_RA convert<double, cln::cl_RA>(const double& n) {
+    	return carl::rationalize<cln::cl_RA>(n);
+    }
+
+    template<>
+    inline mpq_class convert<double, mpq_class>(const double& n) {
+    	return carl::rationalize<mpq_class>(n);
+    }
+
+    template<>
+    inline double convert<cln::cl_RA, double>(const cln::cl_RA& n) {
+    	return carl::toDouble(n);
+    }
+
+    template<>
+    inline double convert<mpq_class, double>(const mpq_class& n) {
+    	return carl::toDouble(n);
+    }
+
+    template<>
+    inline double convert<FLOAT_T<double>, double>(const FLOAT_T<double>& n) {
+    	return n.value();
+    }
+
+    template<>
+    inline double convert<FLOAT_T<mpfr_t>, double>(const FLOAT_T<mpfr_t>& n) {
+    	return carl::toDouble(n);
+    }
+
+    template<>
+    inline FLOAT_T<double> convert<double, FLOAT_T<double>>(const double& n) {
+    	return FLOAT_T<double>(n);
+    }
+
+    template<>
+    inline FLOAT_T<mpfr_t> convert<double, FLOAT_T<mpfr_t>>(const double& n) {
+    	return FLOAT_T<mpfr_t>(n);
+    }
+
 }

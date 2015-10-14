@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   operations_native.h
  * Author: Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- * 
+ *
  * This file should never be included directly but only via operations.h
  */
 
@@ -19,7 +19,7 @@ namespace carl {
 
 /**
  * Informational functions
- * 
+ *
  * The following functions return informations about the given numbers.
  */
 
@@ -54,7 +54,7 @@ inline void reserve(std::size_t) {
 
 /**
  * Conversion functions
- * 
+ *
  * The following function convert types to other types.
  */
 
@@ -67,7 +67,7 @@ inline double toDouble(const double& n) {
 
 /**
  * Basic Operators
- * 
+ *
  * The following functions implement simple operations on the given numbers.
  */
 inline double floor(double n) {
@@ -103,6 +103,27 @@ inline int div(const int& n, const int& m) {
 inline int quotient(const int& n, const int& m) {
 	return n / m;
 }
+
+inline double sin(double in) {
+	return std::sin(in);
+}
+
+inline double cos(double in) {
+	return std::cos(in);
+}
+
+inline double acos(double in) {
+	return std::acos(in);
+}
+
+inline double sqrt(double in) {
+	return std::sqrt(in);
+}
+
+inline double pow(double in, size_t exp) {
+	return std::pow(in,exp);
+}
+
 
 /**
  * Returns the highest power of two below n.
