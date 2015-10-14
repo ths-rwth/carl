@@ -363,7 +363,9 @@ inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
  * @return true, if the number to calculate the square root for is a square;
  *         false, otherwise.
  */
-bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b);
+bool sqrt_exact(const cln::cl_RA& a, cln::cl_RA& b);
+
+cln::cl_RA sqrt(const cln::cl_RA& a);
 
 /**
  * Calculate the square root of a fraction.
@@ -374,7 +376,7 @@ bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b);
  * @param a A fraction.
  * @return Interval containing the square root of a.
  */
-std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a);
+std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a);
 
 /**
  * Compute square root in a fast but less precise way.

@@ -25,7 +25,7 @@ TEST(NumbersCLN, squareroot)
 {
 	cln::cl_RA b = cln::cl_I(2)/cln::cl_I(3);
 	std::pair<cln::cl_RA, cln::cl_RA> resultB;
-	resultB = carl::sqrt(b);
+	resultB = carl::sqrt_safe(b);
 
 }
 

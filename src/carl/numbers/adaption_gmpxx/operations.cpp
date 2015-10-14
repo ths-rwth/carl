@@ -4,7 +4,7 @@
 namespace carl
 {
 
-    bool sqrtp(const mpq_class& a, mpq_class& b)
+    bool sqrt_exact(const mpq_class& a, mpq_class& b)
     {
         if( mpq_sgn(a.__get_mp()) < 0 ) return false;
         mpz_class den = a.get_den();
@@ -29,7 +29,12 @@ namespace carl
         return true;
     }
     
-    std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a)
+    mpq_class sqrt(const mpq_class& a) {
+        auto r = sqrt_safe(a);
+        return (r.first + r.second) / 2;
+    }
+    
+    std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a)
     {
         assert( mpq_sgn(a.__get_mp()) > 0 );
         mpz_class den = a.get_den();

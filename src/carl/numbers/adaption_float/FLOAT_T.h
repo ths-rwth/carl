@@ -562,7 +562,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& root_assign(std::size_t, CARL_RND = CARL_RND::N)
 		{
 			assert(*this >= 0);
 			/// @todo implement root_assign for FLOAT_T
@@ -578,7 +578,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, std::size_t, CARL_RND = CARL_RND::N) const
 		{
 			assert(*this >= 0);
 			CARL_LOG_NOTIMPLEMENTED();
@@ -592,7 +592,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& pow_assign(unsigned _exp, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& pow_assign(std::size_t _exp, CARL_RND = CARL_RND::N)
 		{
 			mValue = std::pow(mValue, _exp);
 			return *this;
@@ -606,7 +606,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, unsigned _exp, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, std::size_t _exp, CARL_RND = CARL_RND::N) const
 		{
 			_result.mValue = std::pow(mValue, _exp);
 			return _result;

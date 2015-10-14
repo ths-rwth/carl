@@ -363,9 +363,11 @@ inline mpq_class pow(const mpq_class& b, std::size_t e) {
  * @return true, if the number to calculate the square root for is a square;
  *         false, otherwise.
  */
-bool sqrtp(const mpq_class& a, mpq_class& b);
+bool sqrt_exact(const mpq_class& a, mpq_class& b);
 
-std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a);
+mpq_class sqrt(const mpq_class& a);
+
+std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a);
 
 /**
  * Compute square root in a fast but less precise way.

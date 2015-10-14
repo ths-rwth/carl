@@ -52,13 +52,19 @@ namespace carl
         return 0;
     }
 
-    bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b)
+    bool sqrt_exact(const cln::cl_RA& a, cln::cl_RA& b)
     {
         if( a < 0 ) return false;
         return cln::sqrtp( a, &b );
     }
+    
+    cln::cl_RA sqrt(const cln::cl_RA& a)
+    {
+        auto r = sqrt_safe(a);
+        return (r.first + r.second) / 2;
+    }
 
-    std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a)
+    std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a)
     {
         assert( a >= 0 );
         cln::cl_RA exact_root;

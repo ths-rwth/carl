@@ -18,7 +18,7 @@ TEST(NumbersGMPxx, squareroot)
 {
     mpq_class a(mpz_class(2), mpz_class(3));
     std::pair<mpq_class, mpq_class> resultA;
-    resultA = sqrt(a);
+    resultA = sqrt_safe(a);
     EXPECT_EQ(resultA.first.get_den(), 2);
     EXPECT_EQ(resultA.first.get_num(), 1);
     EXPECT_EQ(resultA.second.get_den(), 1);

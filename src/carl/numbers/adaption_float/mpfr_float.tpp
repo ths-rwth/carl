@@ -150,7 +150,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_t tmp;
 			mpfr_init2(tmp,prec);
 			mpfr_set_ui(tmp,1,mpfr_rnd_t(_rnd));
-			mpfr_mul_2ui(tmp,tmp,mpfr_get_emin()-1,mpfr_rnd_t(_rnd));
+			mpfr_mul_2ui(tmp,tmp,(unsigned)mpfr_get_emin()-1,mpfr_rnd_t(_rnd));
 			return FLOAT_T<mpfr_t>(tmp);
 		}
 
@@ -161,7 +161,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_init2(tmp,prec);
 			mpfr_set_ui(tmp,1, mpfr_rnd_t(_rnd));
 			mpfr_sub(tmp,tmp,machine_epsilon(prec).value(), mpfr_rnd_t(_rnd));
-			mpfr_mul_2ui(tmp,tmp,mpfr_get_emax(),mpfr_rnd_t(_rnd));
+			mpfr_mul_2ui(tmp,tmp,(unsigned)mpfr_get_emax(),mpfr_rnd_t(_rnd));
 			return (FLOAT_T<mpfr_t>(tmp)); 
 		}
 
@@ -825,9 +825,9 @@ class FLOAT_T<mpfr_t>
 			distance(a.value(), b.value(), dist);
 		}
 
-		inline static int bits2digits(precision_t b) {
+		inline static std::size_t bits2digits(precision_t b) {
 			const double LOG10_2 = 0.30102999566398119;
-			return int(std::floor( b * LOG10_2 ));
+			return std::size_t(std::floor( b * LOG10_2 ));
 		}
 
 	private:
@@ -865,7 +865,7 @@ class FLOAT_T<mpfr_t>
 			//std::cout << "Scaled exponent: " << carl::binary((a->_mpfr_exp + std::abs(mpfr_get_emin()))) << std::endl;
 			
 			// mpfr mantissa is stored in limbs (usually 64-bit words) - the number of those depends on the precision.
-			int limbs = std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
+			std::size_t limbs = (std::size_t)std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
 			/*
 			std::cout << "Mantissa is ";
 			while( limbs > 0 ){
@@ -882,7 +882,7 @@ class FLOAT_T<mpfr_t>
 			mpz_set_ui(mant,0);
 			mpz_set_ui(tmp,0);
 			// as mpfr uses whole limbs (64-bit) we can cut away the additional zeroes (offset), if there are any
-			unsigned offset = mp_bits_per_limb - (a->_mpfr_prec % mp_bits_per_limb);
+			long offset = mp_bits_per_limb - (a->_mpfr_prec % mp_bits_per_limb);
 			//std::cout << "Offset is " << offset << " bits" << std::endl;
 			//std::cout << "Mantissa is ";
 			//char outStr[1024];
@@ -891,7 +891,7 @@ class FLOAT_T<mpfr_t>
 			while( limbs > 0 ){
 				mpz_set_ui(tmp, a->_mpfr_d[limbs-1]);
 				//std::cout << "Shift: " << (mp_bits_per_limb*(limbs-1)) << " bits" << std::endl;
-				mpz_mul_2exp(tmp, tmp, (mp_bits_per_limb*(limbs-1)));
+				mpz_mul_2exp(tmp, tmp, ((std::size_t)mp_bits_per_limb*(limbs-1)));
 				mpz_add(mant, mant, tmp);
 				--limbs;
 			}
@@ -1042,7 +1042,7 @@ class FLOAT_T<mpfr_t>
 			//std::cout << "Modify by " << 2*std::abs(offset)*a->_mpfr_prec << std::endl;
 			
 			// shift by offset (exponent differences).
-			unsigned shift = 2*std::abs(offset)*unsigned(a->_mpfr_prec);
+			long shift = 2*std::abs(offset)*unsigned(a->_mpfr_prec);
 			mpz_sub_ui(dist, dist, shift);
 			// cleanup.
 			mpz_clear(intRepA);
@@ -1082,7 +1082,7 @@ namespace std{
 		size_t operator()(const carl::FLOAT_T<mpfr_t>& _in) const {
 
 			__mpfr_struct numStruct = *_in.value();
-			int limbs = std::ceil(double(numStruct._mpfr_prec)/double(mp_bits_per_limb));
+			std::size_t limbs = (std::size_t)std::ceil(double(numStruct._mpfr_prec)/double(mp_bits_per_limb));
 
 			size_t seed = 0;
 			while(limbs > 0) {
@@ -1151,12 +1151,12 @@ namespace std{
 		// See below for compatible implementation. 
 		inline static float_round_style round_style() { return round_to_nearest; }
 
-		inline static int digits() { return int(carl::FLOAT_T<mpfr_t>::defaultPrecision()); }
-		inline static int digits( const carl::FLOAT_T<mpfr_t>& x ) { return x.precision(); }
+		inline static std::size_t digits() { return std::size_t(carl::FLOAT_T<mpfr_t>::defaultPrecision()); }
+		inline static std::size_t digits( const carl::FLOAT_T<mpfr_t>& x ) { return std::size_t(x.precision()); }
 
-		inline static int digits10( carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision() ) { return carl::FLOAT_T<mpfr_t>::bits2digits(precision); }
-		inline static int digits10( const carl::FLOAT_T<mpfr_t>& x ) { return carl::FLOAT_T<mpfr_t>::bits2digits(x.precision()); }
-		inline static int max_digits10( carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision() ) { return digits10(precision); }
+		inline static std::size_t digits10( carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision() ) { return carl::FLOAT_T<mpfr_t>::bits2digits(precision); }
+		inline static std::size_t digits10( const carl::FLOAT_T<mpfr_t>& x ) { return carl::FLOAT_T<mpfr_t>::bits2digits(x.precision()); }
+		inline static std::size_t max_digits10( carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision() ) { return digits10(precision); }
 	};
 }
 

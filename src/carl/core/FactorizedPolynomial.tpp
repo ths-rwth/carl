@@ -733,7 +733,7 @@ namespace carl
     bool FactorizedPolynomial<P>::sqrt( FactorizedPolynomial<P>& _result ) const
     {
         CoeffType resultCoeff;
-        if( !carl::sqrtp( mCoefficient, resultCoeff ) )
+        if( !carl::sqrt_exact( mCoefficient, resultCoeff ) )
             return false;
         if( !existsFactorization( *this ) )
         {
