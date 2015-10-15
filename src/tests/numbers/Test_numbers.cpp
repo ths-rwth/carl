@@ -79,17 +79,18 @@ TYPED_TEST_CASE(RationalNumbers, RationalTypes);
 
 TYPED_TEST(RationalNumbers, Constructors) {
 	TypeParam a = TypeParam(2)/TypeParam(3);
-  EXPECT_EQ(2, getNum(a));
-  EXPECT_EQ(3, getDenom(a));
+	EXPECT_EQ(2, getNum(a));
+	EXPECT_EQ(3, getDenom(a));
 }
 
 TYPED_TEST(RationalNumbers, Squareroot) {
 	TypeParam a = TypeParam(2)/TypeParam(3);
-  std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
-  EXPECT_EQ(1, getNum(resultA.first));
-  EXPECT_EQ(2, getDenom(resultA.first));
-  EXPECT_EQ(2, getNum(resultA.second));
-  EXPECT_EQ(1, getDenom(resultA.second));
+	std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
+
+	//EXPECT_LE(TypeParam(80)/TypeParam(100), resultA.first);
+	//EXPECT_GE(TypeParam(82)/TypeParam(100), resultA.second);
+	EXPECT_LE(TypeParam(1)/TypeParam(2), resultA.first);
+	EXPECT_GE(TypeParam(2)/TypeParam(1), resultA.second);
 }
 
 TYPED_TEST(RationalNumbers, Rationalize) {
