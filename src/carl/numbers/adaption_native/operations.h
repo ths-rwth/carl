@@ -159,6 +159,7 @@ inline double log(double in) {
  */
 template<typename Number>
 inline Number highestPower(const Number& n) {
+	static_assert(std::is_fundamental<Number>::value, "Only works on native types.");
 	unsigned iterations = 0;
 	// Number has 2^k Bits, we do k iterations
 	if (sizeof(Number) == 2) iterations = 4;
