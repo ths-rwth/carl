@@ -61,9 +61,6 @@ public:
 				conflictGraph.set(constraintID, sampleID, true);
 			}
 		}
-		// store that the constraints are satisfied by r
-		/// @todo What if r was already seen? this generates a new sample vertex.
-		conflictGraph.addEdges(vertices.begin(), vertices.end());
 		return satisfied;
 	}
 	

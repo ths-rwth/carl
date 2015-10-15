@@ -404,13 +404,6 @@ cad::Answer CAD<Number>::check(
 		}
 	}
 
-	if (this->setting.computeConflictGraph) {
-		// add necessary conflict graph vertices if required
-		for (std::size_t i = conflictGraph.size(); i < constraints.size(); i++) {
-			conflictGraph.addConstraintVertex();
-		}
-	}
-
 	//////////////////////
 	// Preprocessing
 	assert(this->sampleTree.isConsistent());
