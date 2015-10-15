@@ -65,6 +65,24 @@ inline double toDouble(const double& n) {
 	return n;
 }
 
+template<typename Integer>
+inline Integer toInt(const double& n);
+
+template<>
+inline int toInt<int>(const double& n) {
+    return int(n);
+}
+
+template<>
+inline long toInt<long>(const double& n) {
+    return long(n);
+}
+
+template<>
+inline size_t toInt<size_t>(const double& n) {
+    return size_t(n);
+}
+
 /**
  * Basic Operators
  *
@@ -124,6 +142,9 @@ inline double pow(double in, size_t exp) {
 	return std::pow(in,exp);
 }
 
+inline double log(double in) {
+	return std::log(in);
+}
 
 /**
  * Returns the highest power of two below n.

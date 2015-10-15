@@ -1,11 +1,11 @@
-/** 
+/**
  * @file   adaption_cln/operations.h
  * @ingroup cln
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
- * 
+ *
  * @warning This file should never be included directly but only via operations.h
- * 
+ *
  */
 #pragma once
 
@@ -26,36 +26,36 @@ namespace carl {
 
 inline bool isZero(const cln::cl_I& n) {
 	return zerop(n);
-}	
-	
+}
+
 inline bool isZero(const cln::cl_RA& n) {
 	return zerop(n);
 }
 
 inline bool isOne(const cln::cl_I& n) {
 	return n == carl::constant_one<cln::cl_I>().get();
-}	
-	
+}
+
 inline bool isOne(const cln::cl_RA& n) {
 	return n  == carl::constant_one<cln::cl_RA>().get();
 }
 
 inline bool isPositive(const cln::cl_I& n) {
 	return n > carl::constant_zero<cln::cl_RA>().get();
-}	
-	
+}
+
 inline bool isPositive(const cln::cl_RA& n) {
 	return n > carl::constant_zero<cln::cl_RA>().get();
 }
 
 inline bool isNegative(const cln::cl_I& n) {
 	return n < carl::constant_zero<cln::cl_RA>().get();
-}	
-	
+}
+
 inline bool isNegative(const cln::cl_RA& n) {
 	return n < carl::constant_zero<cln::cl_RA>().get();
 }
-	
+
 /**
  * Extract the numerator from a fraction.
  * @param n Fraction.
@@ -173,6 +173,8 @@ inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
 	assert(isInteger(n));
 	return getNum(n);
 }
+
+
 
 /**
  * Convert a fraction to an unsigned.
@@ -355,9 +357,21 @@ inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
 	return cln::expt(n, (int)e);
 }
 
+inline cln::cl_RA log(const cln::cl_RA& n) {
+	return cln::rationalize(cln::realpart(cln::log(n)));
+}
+
+inline cln::cl_RA sin(const cln::cl_RA& n) {
+	return cln::rationalize(cln::sin(n));
+}
+
+inline cln::cl_RA cos(const cln::cl_RA& n) {
+	return cln::rationalize(cln::cos(n));
+}
+
 /**
  * Calculate the square root of a fraction if possible.
- * 
+ *
  * @param a The fraction to calculate the square root for.
  * @param b A reference to the rational, in which the result is stored.
  * @return true, if the number to calculate the square root for is a square;
@@ -369,7 +383,7 @@ cln::cl_RA sqrt(const cln::cl_RA& a);
 
 /**
  * Calculate the square root of a fraction.
- * 
+ *
  * If we are able to find a an \f$x\f$ such that \f$x\f$ is the exact root of \f$a\f$, \f$(x,x)\f$ is returned.
  * If we can not find such a number (note that such a number might not even exist), \f$(x,y)\f$ is returned with \f$ x < \sqrt{a} < y \f$.
  * Note that we try to find bounds that are very close to the actual square root. If a small representation is more important than a small interval, sqrt_fast should be used.
@@ -383,7 +397,7 @@ std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a);
  * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
  * Otherwise use the nearest integers as bounds on the square root.
  * @param a Some number.
- * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z. 
+ * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z.
  */
 std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a);
 

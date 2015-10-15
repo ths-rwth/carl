@@ -43,7 +43,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 
 namespace carl
 {
-	typedef long precision_t;
+	typedef size_t precision_t;
 
 	template<typename FloatType>
 	class FLOAT_T;
@@ -139,9 +139,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>() :
 			mValue()
-		{
-			assert(std::is_floating_point<FloatType>::value);
-		}
+		{}
 
 		/**
 		 * Constructor, which takes a double as input and optional rounding, which
@@ -151,20 +149,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
-			mValue = _double;
-		}
-
-		/**
-		 * Constructor, which takes a float as input and optional rounding, which
-		 * can be used, if the underlying fp implementation allows this.
-		 * @param _float Value to be initialized.
-		 * @param N Possible rounding direction.
-		 */
-		FLOAT_T<FloatType>(const float _float, const CARL_RND=CARL_RND::N)
-		{
-			assert(std::is_floating_point<FloatType>::value);
-			mValue = _float;
+			mValue = carl::convert<double, FloatType>(_double);
 		}
 
 		/**
@@ -175,7 +160,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _int;
 		}
 
@@ -187,7 +171,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const unsigned _int, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _int;
 		}
 
@@ -199,7 +182,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _long;
 		}
 
@@ -211,7 +193,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const unsigned long _long, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _long;
 		}
 
@@ -223,14 +204,10 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 */
 		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
-		{
-			assert(std::is_floating_point<FloatType>::value);
-		}
+		{}
 
 		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, const CARL_RND=CARL_RND::N) : mValue(_float.value())
-		{
-			assert(std::is_floating_point<FloatType>::value);
-		}
+		{}
 
 		/**
 		 * Constructor, which takes an arbitrary fp type as input and optional rounding, which
@@ -317,8 +294,8 @@ namespace carl
 		bool operator ==(const FLOAT_T<FloatType>& _rhs) const
 		{
 			//std::cout << "COMPARISON: " << *this << " == " << _rhs << " : " << (mValue == _rhs.mValue) << std::endl;
-			//return mValue == _rhs.mValue;
-			return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue), 4);
+			return mValue == _rhs.mValue;
+			// return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue), 4);
 		}
 
 		/**
@@ -524,7 +501,7 @@ namespace carl
 		FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
 			assert(mValue >= 0);
-			_result.mValue = std::sqrt(mValue);
+			_result.mValue = carl::sqrt(mValue);
 			return _result;
 		}
 
@@ -632,7 +609,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& abs(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::abs(mValue);
+			_result.mValue = carl::abs(mValue);
 			return _result;
 		}
 
@@ -667,7 +644,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& sin_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::sin(mValue);
+			mValue = carl::sin(mValue);
 			return *this;
 		}
 
@@ -680,7 +657,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& sin(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::sin(mValue);
+			_result.mValue = carl::sin(mValue);
 			return _result;
 		}
 
@@ -691,7 +668,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& cos_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::cos(mValue);
+			mValue = carl::cos(mValue);
 			return *this;
 		}
 
@@ -704,7 +681,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& cos(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::cos(mValue);
+			_result.mValue = carl::cos(mValue);
 			return _result;
 		}
 
@@ -728,7 +705,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& log(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::log(mValue);
+			_result.mValue = carl::log(mValue);
 			return _result;
 		}
 
@@ -981,7 +958,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result = std::floor(mValue);
+			_result.mValue = carl::floor(mValue);
 			return _result;
 		}
 
@@ -1005,7 +982,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result = std::ceil(mValue);
+			_result.mValue = carl::ceil(mValue);
 			return _result;
 		}
 
@@ -1038,7 +1015,10 @@ namespace carl
 		 */
 		explicit operator int() const
 		{
-			return (int) mValue;
+			if(*this >= 0)
+				return carl::toInt<int>(carl::floor(mValue));
+			else
+				return carl::toInt<int>(carl::ceil(mValue));
 		}
 
 		/**
@@ -1047,7 +1027,7 @@ namespace carl
 		 */
 		explicit operator long() const
 		{
-			return (long) mValue;
+			return carl::toInt<long>(mValue);;
 		}
 
 		/**
@@ -1056,7 +1036,7 @@ namespace carl
 		 */
 		explicit operator double() const
 		{
-			return (double) mValue;
+			return carl::toDouble(mValue);
 		}
 
 		/**
@@ -1067,7 +1047,7 @@ namespace carl
 		 */
 		friend std::ostream& operator<<(std::ostream& ostr, const FLOAT_T<FloatType>& p)
 		{
-			ostr << p.toString();
+			ostr << p.mValue;
 			return ostr;
 		}
 
@@ -1833,7 +1813,7 @@ namespace std{
 		static const bool is_signed			= true;
 		static const bool is_integer		= false;
 		static const bool is_exact			= false;
-		static const int  radix				= 2;    
+		static const int  radix				= 2;
 
 		static const bool has_infinity		= true;
 		static const bool has_quiet_NaN		= true;
@@ -1844,7 +1824,7 @@ namespace std{
 		static const bool is_modulo			= false;
 		static const bool traps				= true;
 		static const bool tinyness_before	= true;
-		
+
 		inline static carl::FLOAT_T<Number> (min)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::min()); }
 		inline static carl::FLOAT_T<Number> (max)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::max()); }
 		inline static carl::FLOAT_T<Number> lowest() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::lowest()); }
@@ -1852,17 +1832,17 @@ namespace std{
 		inline static carl::FLOAT_T<Number> epsilon() {  return carl::FLOAT_T<Number>(std::numeric_limits<Number>::epsilon()); }
 
 		inline static carl::FLOAT_T<Number> round_error() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::round_error()); }
-		
+
 		inline static const carl::FLOAT_T<Number> infinity() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::infinity()); }
-		
+
 		inline static const carl::FLOAT_T<Number> quiet_NaN() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::quiet_NaN()); }
 		inline static const carl::FLOAT_T<Number> signaling_NaN() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::signaling_NaN()); }
 		inline static const carl::FLOAT_T<Number> denorm_min() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::denorm_min()); }
 
 		static const int min_exponent = std::numeric_limits<Number>::min_exponent;
 		static const int max_exponent = std::numeric_limits<Number>::max_exponent;
-		static const int min_exponent10 = std::numeric_limits<Number>::min_exponent10; 
-		static const int max_exponent10 = std::numeric_limits<Number>::max_exponent10; 
+		static const int min_exponent10 = std::numeric_limits<Number>::min_exponent10;
+		static const int max_exponent10 = std::numeric_limits<Number>::max_exponent10;
 
 		inline static float_round_style round_style() { return std::numeric_limits<Number>::round_style; }
 

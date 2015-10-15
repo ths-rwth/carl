@@ -20,7 +20,7 @@ namespace carl
         mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
         if( !carl::isZero( root_num_rem ) )
             return false;
-        
+
         mpq_class resNum;
         mpq_set_z(resNum.get_mpq_t(), root_num.get_mpz_t());
         mpq_class resDen;
@@ -28,12 +28,12 @@ namespace carl
         mpq_div(b.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
         return true;
     }
-    
+
     mpq_class sqrt(const mpq_class& a) {
         auto r = sqrt_safe(a);
         return (r.first + r.second) / 2;
     }
-    
+
     std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a)
     {
         assert( mpq_sgn(a.__get_mp()) > 0 );
@@ -58,7 +58,7 @@ namespace carl
         mpq_set_ui(lower.__get_mp(), denominator, mpz_sgn(root_num_rem.__get_mp()) != 0 ? numerator+1 : numerator );
         return std::make_pair(lower,upper);
     }
-    
+
     std::pair<mpq_class, mpq_class> sqrt_fast(const mpq_class& a)
     {
         assert(a >= 0);
@@ -69,7 +69,7 @@ namespace carl
         mpz_class den;
         mpz_class den_rem;
         mpz_sqrtrem(den.__get_mp(), den_rem.__get_mp(), a.get_den().__get_mp());
-        
+
         if (carl::isZero(num_rem)) {
             if (carl::isZero(den_rem)) {
                 mpq_class exact_root = num / den;
@@ -106,7 +106,7 @@ namespace carl
         }
 #endif
     }
-    
+
     template<>
     mpq_class rationalize<mpq_class>(const std::string& inputstring)
     {
@@ -142,7 +142,7 @@ namespace carl
             if(d != mpz_class(1)) s << "(/ " << carl::abs(carl::getNum(_number)) << " " << carl::abs(d) << ")";
             else s << carl::abs(_number);
         }
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }
@@ -153,7 +153,7 @@ namespace carl
         bool negative = (_number < mpz_class(0));
         if(negative) s << "(-" << (_infix ? "" : " ");
         s << carl::abs(_number);
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }

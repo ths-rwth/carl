@@ -1,7 +1,7 @@
 #pragma once
 
 namespace carl {
-	
+
 	template<typename T>
 	class Number {
 	private:
@@ -12,16 +12,23 @@ namespace carl {
 		Number(T&& t): mData(std::move(t)) {}
 		Number(const Number<T>& n): mData(n.mData) {}
 		Number(Number<T>&& n): mData(std::move(n.mData)) {}
-		
+
 		Number<T>& operator=(const Number<T>& n) {
 			mData = n.mData;
 			return *this;
 		}
+
+		template<typename Other>
+		Number<T>& operator=(const Other& n) {
+			mData = n;
+			return *this;
+		}
+
 		Number<T>& operator=(Number<T>&& n) {
 			mData = std::move(n.mData);
 			return *this;
 		}
-		
+
 		operator T&() {
 			return mData;
 		}
@@ -29,10 +36,10 @@ namespace carl {
 			return mData;
 		}
 	};
-	
+
 	template<typename T>
 	Number<T> operator+(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) + T(rhs);
+		return T(T(lhs) + T(rhs));
 	}
 	template<typename T>
 	Number<T> operator+=(const Number<T>& lhs, const Number<T>& rhs) {
@@ -40,7 +47,7 @@ namespace carl {
 	}
 	template<typename T>
 	Number<T> operator-(const Number<T>& lhs, const Number<T>& rhs) {
-		return T(lhs) - T(rhs);
+		return T(T(lhs) - T(rhs));
 	}
 	template<typename T>
 	Number<T> operator-=(const Number<T>& lhs, const Number<T>& rhs) {
@@ -62,30 +69,35 @@ namespace carl {
 	Number<T> operator/=(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) /= T(rhs);
 	}
-	
+
 	template<typename T>
-	Number<T> operator==(const Number<T>& lhs, const Number<T>& rhs) {
+	bool operator==(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) == T(rhs);
 	}
 	template<typename T>
-	Number<T> operator!=(const Number<T>& lhs, const Number<T>& rhs) {
+	bool operator!=(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) != T(rhs);
 	}
 	template<typename T>
-	Number<T> operator<(const Number<T>& lhs, const Number<T>& rhs) {
+	bool operator<(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) < T(rhs);
 	}
 	template<typename T>
-	Number<T> operator<=(const Number<T>& lhs, const Number<T>& rhs) {
+	bool operator<=(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) <= T(rhs);
 	}
 	template<typename T>
-	Number<T> operator>=(const Number<T>& lhs, const Number<T>& rhs) {
+	bool operator>=(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) >= T(rhs);
 	}
 	template<typename T>
-	Number<T> operator>(const Number<T>& lhs, const Number<T>& rhs) {
+	bool operator>(const Number<T>& lhs, const Number<T>& rhs) {
 		return T(lhs) > T(rhs);
 	}
-	
+
+	template<typename T>
+	std::ostream& operator <<(std::ostream& os, const Number<T>& n) {
+		return os << T(n);
+	}
+
 }
