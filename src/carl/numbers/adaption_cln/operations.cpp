@@ -74,39 +74,25 @@ namespace carl
         } else {
             cln::cl_R root = cln::sqrt(toLF(a));
             cln::cl_RA rroot = cln::rationalize(root);
+            cln::cl_RA rootsq = cln::expt_pos(rroot, 2);
             // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
-            // Check if root^2 > a
-            if( cln::expt_pos(rroot,2) > a ) // we need to find the lower bound
+            if( rootsq > a ) // we need to find the lower bound
             {
-                cln::cl_R lower = cln::sqrt(toLF(a-rroot));
+                cln::cl_R lower = cln::sqrt(toLF(2*a-rootsq));
                 cln::cl_RA rlower = cln::rationalize(lower);
-                if( rlower == lower )
-                {
-                    return std::make_pair(rlower, rroot);
-                }
-                else
-                {
-                    cln::cl_I num = cln::numerator(rlower);
-                    cln::cl_I den = cln::denominator(rlower);
-                    --num;
-                    return std::make_pair( num/den, rroot );
-                }
+                assert(cln::expt_pos(rlower, 2) < a);
+                return std::make_pair(rlower, rroot);
             }
-            else // we need to find the upper bound
+            else if (rootsq < a) // we need to find the upper bound
             {
-                cln::cl_R upper = cln::sqrt(toLF(a+rroot));
+                cln::cl_R upper = cln::sqrt(toLF(2*a-rootsq));
                 cln::cl_RA rupper = cln::rationalize(upper);
-                if( rupper == upper )
-                {
-                    return std::make_pair(rroot, rupper);
-                }
-                else
-                {
-                    cln::cl_I num = cln::numerator(rupper);
-                    cln::cl_I den = cln::denominator(rupper);
-                    ++num;
-                    return std::make_pair(rroot, num/den );
-                }
+                assert(cln::expt_pos(rupper, 2) > a);
+                return std::make_pair(rroot, rupper);
+            }
+            else
+            {
+                return std::make_pair(rootsq, rootsq);
             }
         }
     }
