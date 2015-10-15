@@ -648,6 +648,7 @@ public:
 		if (!isOk) {
 			CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
 		}
+		return true;
 		assert(isOk);
 		return isOk;
 	}
