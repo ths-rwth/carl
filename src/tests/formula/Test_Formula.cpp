@@ -1,18 +1,9 @@
 #include "gtest/gtest.h"
-#include "../../carl/core/MultivariatePolynomial.h"
 #include "../../carl/core/VariablePool.h"
 #include "../../carl/formula/Formula.h"
 #include "../../carl/util/stringparser.h"
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
+#include "../Common.h"
 
 using namespace carl;
 
@@ -46,12 +37,12 @@ TEST(Formula, Construction)
     Pol pi2( i2 );
     Pol pi3( i3 );
     Pol lhsC = Rational(2) * pi1 + Rational(2) * pi2 + Rational(2) * pi3 - Rational(5);
-    
+
     // Constraints can then be constructed as follows:
     Constr constraintA = Constr( lhsD, Relation::EQ );
-    
-    // Uninterpreted functions are 
-    
+
+    // Uninterpreted functions are
+
     // Now, we can construct the atoms of the Boolean Ast
     const Formula<Pol> atomA = Formula<Pol>( constraintA );
     const Formula<Pol> atomB = Formula<Pol>( lhsB, Relation::EQ );
@@ -59,7 +50,7 @@ TEST(Formula, Construction)
     const Formula<Pol> inEq = Formula<Pol>( lhsC, Relation::EQ );
     std::cout << inEq << std::endl;
     EXPECT_TRUE( inEq.getType() == FormulaType::FALSE );
-    
+
     // and the Ast itself:
     Formulas<Pol> subAstsA;
     subAstsA.push_back( Formula<Pol>( FormulaType::NOT, atomC ) );
@@ -75,7 +66,7 @@ TEST(Formula, BooleanConstructors)
 {
     Variable b1 = freshBooleanVariable("b1");
     Variable b2 = freshBooleanVariable("b2");
-    
+
     FormulaT True = FormulaT(FormulaType::TRUE);
     EXPECT_TRUE(True.isTrue());
     FormulaT False = FormulaT(FormulaType::FALSE);
@@ -85,10 +76,10 @@ TEST(Formula, BooleanConstructors)
     EXPECT_EQ(FormulaType::BOOL, fb1.getType());
     FormulaT fb2 = FormulaT(b2);
     EXPECT_EQ(FormulaType::BOOL, fb2.getType());
-    
+
     FormulaT nb1 = FormulaT(FormulaType::NOT, fb1);
     EXPECT_EQ(FormulaType::NOT, nb1.getType());
-    
+
     FormulaT Fimpl = FormulaT(FormulaType::IMPLIES, nb1, fb2);
     FormulaT Fand = FormulaT(FormulaType::AND, nb1, fb2);
     FormulaT For = FormulaT(FormulaType::OR, nb1, fb2);

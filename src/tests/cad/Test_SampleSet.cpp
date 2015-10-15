@@ -2,23 +2,14 @@
 
 #include <list>
 
-#include "../../carl/core/RealAlgebraicNumber.h"
 #include "carl/cad/SampleSet.h"
+
+#include "../Common.h"
 
 using namespace carl;
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
-
 TEST(SampleSet, BasicOperations)
-{  
+{
 	cad::SampleSet<Rational> s;
 
 	auto pos = s.insert(RealAlgebraicNumberNR<Rational>::create(0));

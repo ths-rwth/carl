@@ -6,6 +6,8 @@
 #include <list>
 #include <boost/variant.hpp>
 
+#include "../Common.h"
+
 using namespace carl;
 
 TEST(Monomial, Operators)
@@ -13,7 +15,7 @@ TEST(Monomial, Operators)
     Variable v0 = Variable((unsigned)1);
     Variable v1 = Variable((unsigned)2);
     Variable v2 = Variable((unsigned)3);
-    
+
 	Monomial::Arg m0 = carl::createMonomial(v0, (exponent) 1);
 	m0 = m0 * v1;
     EXPECT_EQ((unsigned)1,m0->exponentOfVariable(v1));
@@ -24,7 +26,7 @@ TEST(Monomial, Operators)
     m0 = m0 * v2;
     EXPECT_EQ((unsigned)4,m0->tdeg());
     EXPECT_EQ((unsigned)3,m0->nrVariables());
-    
+
 	Monomial::Arg m2 = carl::createMonomial(v1, (exponent) 1);
 	Monomial::Arg m3 = carl::createMonomial(v1, (exponent) 1);
     m2 = m2 * v1;
@@ -50,15 +52,15 @@ TEST(Monomial, MonomialMultiplication)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
     EXPECT_EQ(
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})), 
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
 		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}))
 	);
     EXPECT_EQ(
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})), 
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
 		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 3)}))
 	);
     EXPECT_EQ(
-		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 5), std::make_pair(y, 3)})), 
+		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 5), std::make_pair(y, 3)})),
 		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3), std::make_pair(y, 3)}))
 	);
 }
@@ -70,7 +72,7 @@ TEST(Monomial, derivative)
     Monomial::Arg m0 = v0 * v1;
     Term<int> t = m0->derivative<int>(v0);
     EXPECT_EQ((unsigned)1, t.getNrVariables());
-    
+
 }
 
 TEST(Monomial, division)
@@ -78,7 +80,7 @@ TEST(Monomial, division)
     Variable v0((unsigned)1);
     Variable v1((unsigned)2);
     Variable v2((unsigned)3);
-    
+
     Monomial::Arg m0 = v0 * v0 * v1 * v1 * v2;
     Monomial::Arg m1 = v0 * v0 * v0;
     Monomial::Arg m2 = v0 * v0 * v1 * v2;

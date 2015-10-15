@@ -4,6 +4,8 @@
 #include "carl/util/stringparser.h"
 #include <gmpxx.h>
 
+#include "../Common.h"
+
 using namespace carl;
 
 typedef mpq_class Rational;
@@ -116,7 +118,7 @@ TEST(FactorizedPolynomial, Construction)
     Pol f5 = sp.parseMultivariatePolynomial<Rational>("-1*x + 1");
     Pol f6 = sp.parseMultivariatePolynomial<Rational>("x");
     Pol f7 = f6 - c1;
-    
+
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fc1( (Rational) 1 );
     FPol fc2( (Rational) 42 );
@@ -135,17 +137,17 @@ TEST(FactorizedPolynomial, Construction)
 
     //Common divisor
     std::cout << "Common divisor of " << fpA << " and " << fpB;
-    FPol fpCD = commonDivisor( fpA, fpB ); 
+    FPol fpCD = commonDivisor( fpA, fpB );
     std::cout << ": " << fpCD << std::endl;
     std::cout << "Common divisor of " << fpA << " and " << fc1;
-    FPol fpAc1 = commonDivisor( fpA, fc1 ); 
+    FPol fpAc1 = commonDivisor( fpA, fc1 );
     std::cout << ": " << fpAc1 << std::endl;
     EXPECT_EQ( fc1, fpAc1 );
     std::cout << "Common divisor of " << fc2 << " and " << fpB;
-    FPol fpc2B = commonDivisor( fc2, fpB ); 
+    FPol fpc2B = commonDivisor( fc2, fpB );
     std::cout << ": " << fpc2B << std::endl;
     EXPECT_EQ( fc1, fpc2B );
-    
+
     //GCD
     FPol fpRestA0;
     FPol fpRestB0;
@@ -156,7 +158,7 @@ TEST(FactorizedPolynomial, Construction)
     EXPECT_EQ( fp9, fpRestB0 * fpGCD0 );
     EXPECT_EQ( computePolynomial(fp8), computePolynomial(fpRestA0 * fpGCD0) );
     EXPECT_EQ( computePolynomial(fp9), computePolynomial(fpRestB0 * fpGCD0) );
-    
+
     FPol fpRestA;
     FPol fpRestB;
     std::cout << "GCD of " << fpA << " and " << fpB << ": ";
@@ -164,7 +166,7 @@ TEST(FactorizedPolynomial, Construction)
     std::cout << fpGCD << " with rest " << fpRestA << " and " << fpRestB << std::endl;
     EXPECT_EQ( fpA, fpRestA * fpGCD );
     EXPECT_EQ( fpB, fpRestB * fpGCD );
-    
+
     FPol fpRest3;
     FPol fpRest4;
     std::cout << "GCD of " << fp3 << " and " << fp4 << ": ";
@@ -228,7 +230,7 @@ TEST(FactorizedPolynomial, Construction)
     FPol fpMul4 = fc2 * fc3;
     std::cout << fpMul4 << std::endl;
     EXPECT_EQ( fMul4, computePolynomial( fpMul4 ) );
-    
+
     //Some test
     FPol fres = fp5;
     FPol ftest = fp7;
@@ -266,14 +268,14 @@ TEST(FactorizedPolynomial, CommonDivisor)
     carl::VariablePool::getInstance().clear();
     StringParser sp;
     sp.setVariables({"x", "y", "z"});
-    
+
     Pol fA = sp.parseMultivariatePolynomial<Rational>("x*y");
     Pol fB = sp.parseMultivariatePolynomial<Rational>("x*y*z");
-    
+
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fpA( fA, pCache );
     FPol fpB( fB, pCache );
-    
+
     std::cout << std::endl << "Common divisor of " << fpA << " and " << fpB << ": ";
     FPol fpC = commonDivisor( fpA, fpB );
     std::cout << fpC << std::endl << std::endl;
@@ -287,7 +289,7 @@ TEST(FactorizedPolynomial, GCD)
 
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
-    
+
     VariablePool& vpool = VariablePool::getInstance();
     Variable t = vpool.getFreshVariable();
     vpool.setName(t, "t");
@@ -390,7 +392,7 @@ TEST(FactorizedPolynomial, LCM)
     Pol pLCM = lcm( pA, pB );
     FPol fpLCM = lcm( fpA, fpB );
     EXPECT_EQ( pLCM, computePolynomial( fpLCM ) );
-    
+
     carl::VariablePool::getInstance().clear();
     Variable y(1);
     Variable x(2);
@@ -399,7 +401,7 @@ TEST(FactorizedPolynomial, LCM)
     Pol p1( px*py-py+Rational(1) );
     p1 *= Rational(3);
     Pol p2( Rational(2)*px*py-Rational(2)*py+Rational(3) );
-    
+
     FPol fp1( p1, pCache );
     FPol fp2( p2, pCache );
     EXPECT_FALSE( (p1<p2) == (p2<p1) );

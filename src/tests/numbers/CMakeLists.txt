@@ -15,6 +15,6 @@ add_executable( runNumbersTests
 	Test_operations_rounding.cpp
 )
 cotire(runNumbersTests)
-target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
+target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
 
 add_test( NAME numbers COMMAND runNumbersTests )

@@ -26,7 +26,7 @@ if (COMPARE_WITH_Z3)
     set(libs_dynamic ${libs_dynamic} ${Z3_LIBRARIES})
 endif()
 
-target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
+target_link_libraries(runCoreTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
 
 cotire(runCoreTests)
 
