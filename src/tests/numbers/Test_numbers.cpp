@@ -46,6 +46,32 @@ TYPED_TEST(IntegerNumbers, Pow) {
   EXPECT_EQ(TypeParam(0), highestPower(TypeParam(0)));
 }*/
 
+TYPED_TEST(IntegerNumbers, Constant_Neg_Pos) {
+  EXPECT_EQ(true, isZero(TypeParam(0)));
+  EXPECT_EQ(false, isZero(TypeParam(1)));
+  EXPECT_EQ(false, isZero(TypeParam(-1)));
+
+  EXPECT_EQ(true, isOne(TypeParam(1)));
+  EXPECT_EQ(false, isOne(TypeParam(2)));
+  EXPECT_EQ(false, isOne(TypeParam(0)));
+  EXPECT_EQ(false, isOne(TypeParam(-1)));
+
+  EXPECT_EQ(true, isPositive(TypeParam(1)));
+  EXPECT_EQ(false, isPositive(TypeParam(0)));
+  EXPECT_EQ(false, isPositive(TypeParam(-1)));
+
+  EXPECT_EQ(true, isNegative(TypeParam(-1)));
+  EXPECT_EQ(false, isNegative(TypeParam(0)));
+  EXPECT_EQ(false, isNegative(TypeParam(1)));
+}
+
+/*
+ *                                Integer
+// ---------- --------- -------- ------- ------ ----- ---- --- -- -
+// ---------- --------- -------- ------- ------ ----- ---- --- -- -
+ *                                Rational
+ */
+
 template<typename T>
 class RationalNumbers: public testing::Test {};
 
@@ -92,4 +118,35 @@ TYPED_TEST(RationalNumbers, Sqrt_fast) {
     EXPECT_EQ(TypeParam(21), s.first);
     EXPECT_EQ(TypeParam(22), s.second);
   }
+}
+
+TYPED_TEST(RationalNumbers, Constant_Neg_Pos) {
+  EXPECT_EQ(true, isZero(TypeParam(0)));
+  EXPECT_EQ(false, isZero(TypeParam(1)/TypeParam(10)));
+  EXPECT_EQ(false, isZero(TypeParam(-1)/TypeParam(10)));
+
+  EXPECT_EQ(true, isOne(TypeParam(1)));
+  EXPECT_EQ(true, isOne(TypeParam(2)/TypeParam(2)));
+  EXPECT_EQ(false, isOne(TypeParam(11)/TypeParam(10)));
+  EXPECT_EQ(false, isOne(TypeParam(0)));
+  EXPECT_EQ(false, isOne(TypeParam(-1)/TypeParam(10)));
+
+  EXPECT_EQ(true, isPositive(TypeParam(1)/TypeParam(10)));
+  EXPECT_EQ(false, isPositive(TypeParam(0)));
+  EXPECT_EQ(false, isPositive(TypeParam(-1)/TypeParam(10)));
+
+  EXPECT_EQ(true, isNegative(TypeParam(-1)/TypeParam(10)));
+  EXPECT_EQ(false, isNegative(TypeParam(0)));
+  EXPECT_EQ(false, isNegative(TypeParam(1)/TypeParam(10)));
+}
+
+TYPED_TEST(RationalNumbers, ToDouble) {
+  double res = toDouble(TypeParam(1)/TypeParam(10));
+  EXPECT_EQ(true, res>0.05);
+  EXPECT_EQ(true, res<0.15);
+}
+
+TYPED_TEST(RationalNumbers, ToInt) {
+  typedef typename IntegralType<TypeParam>::type IntType;
+  EXPECT_EQ(42, toInt<IntType>(TypeParam(42)/TypeParam(1)));
 }
