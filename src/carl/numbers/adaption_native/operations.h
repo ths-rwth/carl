@@ -23,6 +23,19 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
+inline bool isZero(const int& n) {
+	return n == 0;
+}
+inline bool isOne(const int& n) {
+	return n == 1;
+}
+inline bool isPositive(const int& n) {
+	return n > 0;
+}
+inline bool isNegative(const int& n) {
+	return n < 0;
+}
+
 inline bool isNumber(const double& d) {
 	return (d == d) && !std::isinf(d);
 }
