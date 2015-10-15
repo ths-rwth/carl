@@ -121,6 +121,10 @@ inline int div(const int& n, const int& m) {
 inline int quotient(const int& n, const int& m) {
 	return n / m;
 }
+inline void divide(const int& dividend, const int& divisor, int& quo, int& rem) {
+	quo = quotient(dividend, divisor);
+	rem = remainder(dividend, divisor);
+}
 
 inline double sin(double in) {
 	return std::sin(in);
