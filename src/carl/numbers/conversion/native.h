@@ -12,6 +12,16 @@ namespace carl {
     }
 
     template<>
+    inline FLOAT_T<mpq_class> convert<double, FLOAT_T<mpq_class>>(const double& n) {
+    	return FLOAT_T<mpq_class>(carl::rationalize<mpq_class>(n));
+    }
+
+    template<>
+    inline double convert<FLOAT_T<mpq_class>, double>(const FLOAT_T<mpq_class>& n) {
+    	return carl::toDouble(n.value());
+    }
+
+    template<>
     inline double convert<FLOAT_T<double>, double>(const FLOAT_T<double>& n) {
     	return n.value();
     }

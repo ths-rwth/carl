@@ -958,7 +958,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result = carl::floor(mValue);
+			_result.mValue = carl::floor(mValue);
 			return _result;
 		}
 
@@ -982,7 +982,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result = carl::ceil(mValue);
+			_result.mValue = carl::ceil(mValue);
 			return _result;
 		}
 

@@ -331,6 +331,18 @@ inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
 	return res;
 }
 
+inline mpq_class log(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::log(mpq_class(n).get_d()));
+}
+
+inline mpq_class sin(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::sin(mpq_class(n).get_d()));
+}
+
+inline mpq_class cos(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::cos(mpq_class(n).get_d()));
+}
+
 template<>
 inline mpz_class pow(const mpz_class& b, std::size_t e) {
 	mpz_class res;
