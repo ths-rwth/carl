@@ -290,6 +290,7 @@ private:
 		improveBounds( true ),
 		exploreInteger(false),
 		splitInteger(true),
+		integerHandling(IntegerHandling::SPLIT_SOLUTION),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
@@ -315,6 +316,7 @@ public:
 		improveBounds( s.improveBounds ),
 		exploreInteger(s.exploreInteger),
 		splitInteger(s.splitInteger),
+		integerHandling(s.integerHandling),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
