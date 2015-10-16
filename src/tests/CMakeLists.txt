@@ -1,5 +1,7 @@
 include_directories(${GTEST_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${include_dirs})
 
+add_library(prepareTest Common.cpp)
+
 ################################
 # Unit Tests
 ################################

@@ -1,18 +1,9 @@
 #include "gtest/gtest.h"
 #include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
 #include "carl/interval/IntervalEvaluation.h"
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
+#include "../Common.h"
 
 using namespace carl;
 
@@ -33,7 +24,7 @@ TEST(IntervalEvaluation, Monomial)
     vpool.setName(c, "c");
     Variable d = vpool.getFreshVariable();
     vpool.setName(d, "d");
-    
+
     map[a] = ia;
     map[b] = ib;
     map[c] = ic;
@@ -48,9 +39,9 @@ TEST(IntervalEvaluation, Monomial)
 //    MultivariatePolynomial<Rational> e7({(Rational)1*a,(Rational)1*b*, Monomial(c,2),(Rational)-1*Monomial(d,3)});
     MultivariatePolynomial<Rational> e7({a,c});
     e7 = e7.pow(2)*b*d+a;
-    
+
 //    e7     = a + b * pow( c + a, 2 ) * d;
-    
+
     Interval<Rational> result = IntervalEvaluation::evaluate( e1, map );
     EXPECT_EQ( Interval<Rational>( 1, 14 ), result );
 

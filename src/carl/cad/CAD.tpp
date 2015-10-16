@@ -404,13 +404,6 @@ cad::Answer CAD<Number>::check(
 		}
 	}
 
-	if (this->setting.computeConflictGraph) {
-		// add necessary conflict graph vertices if required
-		for (std::size_t i = conflictGraph.size(); i < constraints.size(); i++) {
-			conflictGraph.addConstraintVertex();
-		}
-	}
-
 	//////////////////////
 	// Preprocessing
 	assert(this->sampleTree.isConsistent());
@@ -582,6 +575,8 @@ cad::Answer CAD<Number>::check(
 
 	if (satisfiable == cad::Answer::True) {
 		CARL_LOG_DEBUG("carl.cad", "Result: sat (by sample point " << r << ")");
+	} else if (satisfiable == cad::Answer::Unknown) {
+		CARL_LOG_DEBUG("carl.cad", "Result: unknown");
 	} else {
 		CARL_LOG_DEBUG("carl.cad", "Result: unsat");
 	}
@@ -1354,6 +1349,7 @@ cad::Answer CAD<Number>::liftCheck(
 		return cad::Answer::True;
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
+	CARL_LOG_FUNC("carl.cad", "Integer setting: " << this->setting.integerHandling);
 	assert(this->sampleTree.is_valid(node));
 	if (checkBounds && boundsActive && (*node != nullptr)) {
 		// bounds shall be checked and the level is non-empty
@@ -1470,13 +1466,24 @@ cad::Answer CAD<Number>::liftCheck(
 		}
 		if (this->setting.integerHandling == cad::IntegerHandling::SPLIT_EARLY) {
 			if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
+				Interval<Number> bound = Interval<Number>::unboundedInterval();
+				if (checkBounds) {
+					CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+					CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+					CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
+					assert(openVariableCount < this->variables.size());
+					auto b = bounds.find(openVariableCount);
+					if (b != bounds.end()) bound = b->second;
+				}
+				CARL_LOG_DEBUG("carl.cad", "Checking if we should split early within " << bound);
 				for (const auto& newSample: sampleSetIncrement) {
+					if (!newSample->containedIn(bound)) continue;
 					if (!newSample->isIntegral()) {
 						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
 						sample.pop_back();
 						sample.push_back(newSample);
 						r = RealAlgebraicPoint<Number>(std::move(sample));
-						CARL_LOG_TRACE("carl.cad", "Eager split at " << r);
+						CARL_LOG_DEBUG("carl.cad", "Eager split at " << r);
 						return cad::Answer::Unknown;
 					}
 				}
@@ -1499,13 +1506,25 @@ cad::Answer CAD<Number>::liftCheck(
 			RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
 			if (this->setting.integerHandling == cad::IntegerHandling::SPLIT_LAZY) {
 				if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
-					if (!newSample->isIntegral()) {
-						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-						sample.pop_back();
-						sample.push_back(newSample);
-						r = RealAlgebraicPoint<Number>(std::move(sample));
-						CARL_LOG_TRACE("carl.cad", "Lazy split at " << r);
-						return cad::Answer::Unknown;
+					Interval<Number> bound = Interval<Number>::unboundedInterval();
+					if (checkBounds) {
+						CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+						CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+						CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
+						assert(openVariableCount < this->variables.size());
+						auto b = bounds.find(openVariableCount);
+						if (b != bounds.end()) bound = b->second;
+					}
+					CARL_LOG_DEBUG("carl.cad", "Checking if we should split lazy within " << bound);
+					if (newSample->containedIn(bound)) {
+						if (!newSample->isIntegral()) {
+							std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+							sample.pop_back();
+							sample.push_back(newSample);
+							r = RealAlgebraicPoint<Number>(std::move(sample));
+							CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
+							return cad::Answer::Unknown;
+						}
 					}
 				}
 			}

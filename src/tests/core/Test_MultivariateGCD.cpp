@@ -3,6 +3,8 @@
 #include "carl/core/PrimitiveEuclideanAlgorithm.h"
 #include <gmpxx.h>
 
+#include "../Common.h"
+
 using namespace carl;
 
 typedef mpq_class Rational;

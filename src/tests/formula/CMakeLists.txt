@@ -5,7 +5,7 @@ add_executable(runFormulaTests
 )
 cotire(runFormulaTests)
 
-target_link_libraries(runFormulaTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
+target_link_libraries(runFormulaTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
 
 cotire(runFormulaTests)
 

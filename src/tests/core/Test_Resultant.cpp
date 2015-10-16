@@ -1,22 +1,13 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/Resultant.h"
 
 #include <random>
 #include <cmath>
-using namespace carl;
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
+#include "../Common.h"
+using namespace carl;
 
 TEST(Resultant, det)
 {

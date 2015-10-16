@@ -1,7 +1,6 @@
 # Add test cpp file
 add_executable( runNumbersTests
-    Test_numbers_cln.cpp
-    Test_numbers_gmpxx.cpp
+    Test_numbers.cpp
     Test_numbers_native.cpp
     Test_Numeric.cpp
     Test_EEA.cpp
@@ -15,6 +14,6 @@ add_executable( runNumbersTests
 	Test_operations_rounding.cpp
 )
 cotire(runNumbersTests)
-target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
+target_link_libraries(runNumbersTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
 
 add_test( NAME numbers COMMAND runNumbersTests )

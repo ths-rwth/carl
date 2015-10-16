@@ -44,31 +44,7 @@ enum ConflictType
 
 template<typename Number>
 class ConflictGraph {
-public:
-	/// type for constraint and sample-point index vertices in a conflict graph
-	typedef long unsigned Vertex;
-	/// type for the adjacency list of one constraint vertex
-	typedef std::vector<ConflictType> AdjacencyArray;
-	
 private:
-	std::vector<AdjacencyArray> data;
-	
-	/**
-	 *  Flag that indicates whether the entries of the adjacency arrays are read inverted (true) or not.
-	 */
-	bool mInverted;
-	
-	/**
-	 * Contains the degrees of all constraint vertices.
-	 * The degree of a constraint vertex is the number of entries set to true in the adjacency matrix.
-	 */
-	std::vector<unsigned int> mDegrees;
-	
-	/**
-	 * Current count of sample point vertices.
-	 */
-	long unsigned mSamplePointVertexCount;
-	
 	/// Maps constraints to IDs used in mData
 	std::map<Constraint<Number>, std::size_t> mConstraints;
 	/// Stores for each constraints, which sample points violate the constraint
@@ -76,6 +52,22 @@ private:
 	/// Stores the number of samples that have been registered
 	std::size_t mSampleCount = 0;
 public:
+
+	/**
+	 * Constructs an empty graph.
+	 */
+	ConflictGraph() {}
+		
+	/**
+	 * Copy constructor.
+	 */
+	ConflictGraph(const ConflictGraph& g):
+		mConstraints(g.mConstraints),
+		mData(g.mData),
+		mSampleCount(g.mSampleCount)
+	{
+		CARL_LOG_FUNC("carl.cad.cg", "Copied " << *this);
+	}
 	/**
 	 * Returns the constraint ID for the given constraint.
 	 */
@@ -84,6 +76,7 @@ public:
 		if (it == mConstraints.end()) {
 			it = mConstraints.insert(std::make_pair(c, mConstraints.size())).first;
 		}
+		CARL_LOG_TRACE("carl.cad.cg", c << " -> " << it->second);
 		return it->second;
 	}
 	/**
@@ -109,6 +102,7 @@ public:
 		if (sample >= mData[constraint].size()) {
 			mData[constraint].resize(sample+1);
 		}
+		CARL_LOG_TRACE("carl.cad.cg", "Set " << constraint << " / " << sample << " to " << value);
 		mData[constraint][sample] = value;
 	}
 	/**
@@ -158,79 +152,7 @@ public:
 		}
 		return false;
 	}
-	void print() const {
-		std::cout << "Print CG with " << mData.size() << " constraints" << std::endl;
-		for (std::size_t i = 0; i < mData.size(); i++) {
-			std::cout << getConstraint(i) << ":" << std::endl;
-			std::cout << "\t" << mData[i] << std::endl;
-		}
-	}
-	
-	/**
-	 * Constructs an empty graph.
-	 */
-	ConflictGraph();
-		
-	/**
-	 * Copy constructor.
-	 */
-	ConflictGraph(const ConflictGraph& g);
-	
-	/**
-	 * Constructs the adjacency matrix of this conflict graph.
-	 * @param m initial number of vertices in U (number of constraints)
-	 */
-	ConflictGraph(unsigned int m);
 
-	/**
-	 * Re returns the number of vertices in this graph.
-	 * @return Number of vertices.
-	 */
-	long unsigned size() const {
-		return this->data.size();
-	}
-
-	/**
-	 * Invert the conflict graph.
-	 * Note that this operation does <b>not</b> change the current adjacency matrix, only the operations from now on are inverted.
-	 *
-	 * Is the graph inverted, all operations have the opposite outcome or effect.
-	 */
-	void invert() {
-	   mInverted = !mInverted;
-	}
-	
-	/**
-	 * Give the inverted status of the conflict graph.
-	 * Is the graph inverted, all operations have the opposite outcome or effect.
-	 * @return
-	 */
-	bool isInverted() const {
-	   return mInverted;
-	}
-	
-	/**
-	 * Add edges between the constraint indices from [first, last[ and a newly generated sample point index,
-	 * indicating that the corresponding constraints are satisfied by some sample point.
-	 *
-	 * Note that this method does not regard whether the graph is inverted as the inverted flag only concerns reading operations.
-	 * 
-	 * @param first constraint node to be connected Make sure that i does not exceed the maximum index of the constraint nodes.
-	 *      Otherwise you have to use addConstraintVertex in advance.
-	 * @param last constraint node to be connected Make sure that i does not exceed the maximum index of the constraint nodes.
-	 *      Otherwise you have to useP addConstraintVertex in advance.
-	 * @complexity amortized linear in the number of constraints plus the constraints added
-	 */
-	template<class InputIterator>
-	void addEdges(const InputIterator& first, const InputIterator& last);
-	
-	/**
-	 * Add a new constraint vertex by enlarging the respective index.
-	 * The new constraint receives the index returned.
-	 * @return index of the new constraint
-	 * @complexity constant
-	 */
-	Vertex addConstraintVertex();
 	
 	/**
 	 * Remove the specified constraint vertex by removing the respective index.
@@ -238,62 +160,29 @@ public:
 	 * @param i constraint vertex index
 	 * @complexity constant
 	 */
-	void removeConstraint(const cad::Constraint<Number>& c);
+	void removeConstraint(const cad::Constraint<Number>& c) {
+		auto it = mConstraints.find(c);
+		if (it == mConstraints.end()) return;
+		CARL_LOG_FUNC("carl.cad.cg", c);
+		std::size_t cid = it->second;
+		mConstraints.erase(it);
+		assert(mData.size() > cid);
+		mData.erase(mData.begin() + (long)cid);
+		
+		for (auto& it: mConstraints) {
+			if (it.second > cid) it.second--;
+		}
+	}
 	
-	/**
-	 * Remove all sample point vertices while keeping the constraint vertices, in particular, remove all edges.
-	 * @complexity linear in the number of constraints
-	 */
-	void clearSampleVertices();
-	
-	/**
-	  * Gives the vertex adjacent to the maximum number of all constraint-representing vertices present in this graph.
-	 * The degree of a constraint vertex is the number of true entries in the adjacency matrix.
-	 *
-	 * Is the graph inverted, all reading operations have the opposite outcome, i.e., maxDegreeVertex has the oposite outcome as well.
-	 *
-	 * @return the vertex with the highest degree
-	 * @complexity linear in the number of constraint vertices present
-	 */
-	Vertex maxDegreeVertex() const;
-	
-	/**
-	 * Give the degree of the specified constraint vertex, i.e. the number of true entries in the adjacency matrix.
-	 *
-	 * Is the graph inverted, all reading operations have the opposite outcome, i.e., degree has the inverted outcome as well.
-	 *
-	 * @param i
-	 * @return degree of vertex
-	 * @complexity constant
-	 */
-	unsigned long degree(const Vertex& i) const;
-	
-	/**
-	 * Turns any sample point vertex whose corresponding sample point <b>not</b> satisfies the given constraint vertex' constraint into a satisfying vertex.
-	 *
-	 * This is a destructive method!
-	 * @param vertex constraint vertex to be cleared
-	 * @complexity number of constraint vertices times the number of sample point vertices
-	 */
-	void invertConflictingVertices(const Vertex& vertex);
-	
-	/**
-	 * Turns any sample point vertex whose corresponding sample point satisfies the given constraint vertex' constraint into a non-satisfying one.
-	 *
-	 * This is a destructive method!
-	 * @param vertex constraint vertex to be cleared
-	 * @complexity number of constraint vertices times the number of sample point vertices
-	 */
-	void invertSatisfyingVertices(const Vertex& vertex);
-	
-	/**
-	 * Output the graph in incidence list representation to output stream os.
-	 * @param os output stream
-	 * @param g the conflict graph
-	 * @return output stream containing the graph representation
-	 */
-	template<typename Num>
-	friend std::ostream& operator<<(std::ostream& os, const ConflictGraph<Num>& g);
+	template<typename T>
+	friend std::ostream& operator<<(std::ostream& os, const ConflictGraph<T>& cg) {
+		os << "Print CG with " << cg.mData.size() << " constraints" << std::endl;
+		for (std::size_t i = 0; i < cg.mData.size(); i++) {
+			os << cg.getConstraint(i) << ":" << std::endl;
+			os << "\t" << cg.mData[i] << std::endl;
+		}
+		return os;
+	}
 };
 
 }

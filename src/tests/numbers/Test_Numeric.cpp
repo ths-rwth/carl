@@ -4,17 +4,10 @@
 #include "carl/numbers/Numeric.h"
 #include <bitset>
 
+#include "../Common.h"
+
 using namespace carl;
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
 
 TEST(Numeric, constructors)
 {
@@ -56,57 +49,57 @@ TEST(Numeric, operations)
 {
     Numeric<Rational> n = Numeric<Rational>(1) + Numeric<Rational>(5);
     EXPECT_EQ( Rational(1)+Rational(5), n.toRational());
-    
+
     n = Numeric<Rational>(12) - Numeric<Rational>(47);
     EXPECT_EQ( Rational(12)-Rational(47), n.toRational());
-    
+
     n = Numeric<Rational>(-761) * Numeric<Rational>(3);
     EXPECT_EQ( Rational(-761)*Rational(3), n.toRational());
-    
+
     n = Numeric<Rational>(120) / Numeric<Rational>(24);
     EXPECT_EQ( Rational(120)/Rational(24), n.toRational());
-    
+
     n += Numeric<Rational>( 102345 );
     EXPECT_EQ( Rational( 102350 ), n.toRational());
-    
+
     n -= Numeric<Rational>( 1023452 );
     EXPECT_EQ( Rational( -921102 ), n.toRational());
-    
+
     n -= Numeric<Rational>( (HIGHTEST_INTEGER_VALUE - 1) );
     EXPECT_EQ( Rational( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) ) ), n.toRational());
-    
+
     Numeric<Rational> n2;
     n2 -= Numeric<Rational>( HIGHTEST_INTEGER_VALUE );
     EXPECT_EQ( Rational( ( -HIGHTEST_INTEGER_VALUE ) ), n2.toRational());
-    
+
     n -= n2;
     EXPECT_EQ( Rational( ( -921102 - (HIGHTEST_INTEGER_VALUE - 1) - (-HIGHTEST_INTEGER_VALUE) ) ), n.toRational());
-    
+
     Numeric<Rational> n3( (HIGHTEST_INTEGER_VALUE - 1) );
     n3 *= Numeric<Rational>( 2 );
     EXPECT_EQ( Rational( (HIGHTEST_INTEGER_VALUE - 1) ) * Rational( 2 ), n3.toRational());
-    
+
     Numeric<Rational> n4( (Rational(1)/Rational(3)) );
     n4 *= Numeric<Rational>( 9 );
     EXPECT_EQ( Rational( 3 ), n4.toRational() );
     EXPECT_TRUE( IS_INT( n4.content() ) );
-    
+
     Numeric<Rational> n5( 2 );
     n5 *= Numeric<Rational>( (Rational(1)/Rational(3)) );
     EXPECT_EQ( (Rational( 2 )/Rational( 3 )), n5.toRational() );
     EXPECT_FALSE( IS_INT( n5.content() ) );
-    
+
     Numeric<Rational> n6( HIGHTEST_INTEGER_VALUE + 1 );
     n6 /= Numeric<Rational>( 3 );
     EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 )/Rational( 3 )), n6.toRational() );
-    
+
     Numeric<Rational> n7( 44 );
     n7 /= Numeric<Rational>( 11 );
     EXPECT_EQ( Rational( 4 ), n7.toRational() );
     EXPECT_TRUE( IS_INT( n7.content() ) );
-    
+
     Numeric<Rational> n8( HIGHTEST_INTEGER_VALUE - 3 );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n8 ).toRational() ); 
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n8 ).toRational() );
     ++n8;
     EXPECT_TRUE( IS_INT( n8.content() ) );
     ++n8;
@@ -115,10 +108,10 @@ TEST(Numeric, operations)
     EXPECT_FALSE( IS_INT( n8.content() ) );
     ++n8;
     EXPECT_FALSE( IS_INT( n8.content() ) );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n8 ).toRational() ); 
-    
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n8 ).toRational() );
+
     Numeric<Rational> n9( -HIGHTEST_INTEGER_VALUE + 3 );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n9 ).toRational() ); 
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE - 3 ) ), carl::abs( n9 ).toRational() );
     --n9;
     EXPECT_TRUE( IS_INT( n9.content() ) );
     --n9;
@@ -127,8 +120,8 @@ TEST(Numeric, operations)
     EXPECT_FALSE( IS_INT( n9.content() ) );
     --n9;
     EXPECT_FALSE( IS_INT( n9.content() ) );
-    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n9 ).toRational() ); 
-    
+    EXPECT_EQ( (Rational( HIGHTEST_INTEGER_VALUE + 1 ) ), carl::abs( n9 ).toRational() );
+
     Numeric<Rational> c1;
     Numeric<Rational> c2( 12 );
     Numeric<Rational> c3( -(HIGHTEST_INTEGER_VALUE - 1) );
@@ -152,7 +145,7 @@ TEST(Numeric, operations)
     EXPECT_TRUE( c7 == c4 );
     EXPECT_FALSE( c7 != c4 );
     EXPECT_FALSE( c7 > c4 );
-    
+
     Numeric<Rational> c8( 144 );
     Numeric<Rational> c9( HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE+HIGHTEST_INTEGER_VALUE-3 );
     Numeric<Rational> c10( 3 );
@@ -202,7 +195,7 @@ TEST(Numeric, gcd)
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( -d, e ).toRational() );
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( e, -d ).toRational() );
     EXPECT_EQ( carl::lcm( e.toRational(), d.toRational() ), carl::lcm( d, -e ).toRational() );
-    
+
     Numeric<Rational> g( 997002998000 );
     Numeric<Rational> h( 996005994003 );
     Numeric<Rational> j = g * h;

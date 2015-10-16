@@ -23,6 +23,19 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
+inline bool isZero(const int& n) {
+	return n == 0;
+}
+inline bool isOne(const int& n) {
+	return n == 1;
+}
+inline bool isPositive(const int& n) {
+	return n > 0;
+}
+inline bool isNegative(const int& n) {
+	return n < 0;
+}
+
 inline bool isNumber(const double& d) {
 	return (d == d) && !std::isinf(d);
 }
@@ -121,6 +134,10 @@ inline int div(const int& n, const int& m) {
 inline int quotient(const int& n, const int& m) {
 	return n / m;
 }
+inline void divide(const int& dividend, const int& divisor, int& quo, int& rem) {
+	quo = quotient(dividend, divisor);
+	rem = remainder(dividend, divisor);
+}
 
 inline double sin(double in) {
 	return std::sin(in);
@@ -155,6 +172,7 @@ inline double log(double in) {
  */
 template<typename Number>
 inline Number highestPower(const Number& n) {
+	static_assert(std::is_fundamental<Number>::value, "Only works on native types.");
 	unsigned iterations = 0;
 	// Number has 2^k Bits, we do k iterations
 	if (sizeof(Number) == 2) iterations = 4;
