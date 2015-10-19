@@ -93,6 +93,10 @@ TYPED_TEST(RationalNumbers, Constructors) {
 }
 
 TYPED_TEST(RationalNumbers, Squareroot) {
+  TypeParam result = carl::sqrt(TypeParam(2));
+  EXPECT_LE(result, TypeParam(156)/TypeParam(100));
+	EXPECT_GE(result, TypeParam(126)/TypeParam(100));
+
 	TypeParam a = TypeParam(2)/TypeParam(3);
 	std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
 
