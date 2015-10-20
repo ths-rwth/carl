@@ -340,6 +340,11 @@ namespace carl
                 collectVariables( _booleanVars, carl::VariableType::VT_BOOL );
             }
             
+            Formula negated() const
+            {
+                return Formula( mpContent->mNegation );
+            }
+            
             /**
              * @return A constant reference to the only sub-formula, in case this formula is an negation.
              */
