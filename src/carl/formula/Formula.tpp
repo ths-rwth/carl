@@ -961,17 +961,17 @@ namespace carl
                 case FormulaType::IMPLIES: // (-> lhs rhs)  ->  (or (not lhs) rhs)
                 {
                     Formulas<Pol> tmpSubformulas;
-                    tmpSubformulas.push_back( Formula<Pol>( NOT, currentFormula.premise() ) );
+                    tmpSubformulas.emplace_back( NOT, currentFormula.premise() );
                     tmpSubformulas.push_back( currentFormula.conclusion() );
-                    subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, tmpSubformulas ) );
+                    subformulasToTransform.emplace_back( FormulaType::OR, std::move(tmpSubformulas) );
                     break;
                 }
                 case FormulaType::ITE: // (ite cond then else)  ->  auxBool, where (or (not cond) then) and (or cond else) are added to the queue
                 {
                     // Add: (or (not cond) then)
-                    subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, currentFormula.condition() ), currentFormula.firstCase() ) );
+                    subformulasToTransform.emplace_back( FormulaType::OR, Formula<Pol>( FormulaType::NOT, currentFormula.condition() ), currentFormula.firstCase() );
                     // Add: (or cond else)
-                    subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, currentFormula.condition(), currentFormula.secondCase() ) );
+                    subformulasToTransform.emplace_back( FormulaType::OR, currentFormula.condition(), currentFormula.secondCase() );
                     break;
                 }
                 case FormulaType::IFF: 
@@ -984,9 +984,9 @@ namespace carl
                         for( auto& subFormula : currentFormula.subformulas() )
                         {
                             subformulasA.push_back( subFormula );
-                            subformulasB.push_back( Formula<Pol>( FormulaType::NOT, subFormula ) );
+                            subformulasB.emplace_back( FormulaType::NOT, subFormula );
                         }
-                        subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, Formula<Pol>( AND, move( subformulasA ) ), Formula<Pol>( FormulaType::AND, move( subformulasB ) ) ) );
+                        subformulasToTransform.emplace_back( FormulaType::OR, Formula<Pol>( AND, move( subformulasA ) ), Formula<Pol>( FormulaType::AND, move( subformulasB ) ) );
                     }
                     else
                     {
@@ -995,10 +995,43 @@ namespace carl
                         // Get lhs and rhs.
                         const Formula<Pol>& lhs = *currentFormula.subformulas().begin();
                         const Formula<Pol>& rhs = currentFormula.back();
-                        // add (or lhs (not rhs)) to the queue
-                        subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, lhs, Formula<Pol>( FormulaType::NOT, rhs ) ) );
-                        // add (or (not lhs) rhs) to the queue
-                        subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, lhs ), rhs ) );
+                        if( lhs.getType() == FormulaType::AND )
+                        {
+                            Formulas<Pol> subformulas;
+                            for( auto& subFormula : lhs.subformulas() )
+                            {
+                                subformulas.emplace_back( FormulaType::NOT, subFormula );
+                            }
+                            subformulas.push_back( rhs );
+                            subformulasToTransform.emplace_back( FormulaType::OR, std::move(subformulas) );
+                            Formula<Pol> rhsNegated( FormulaType::NOT, rhs );
+                            for( auto& subFormula : lhs.subformulas() )
+                            {
+                                subformulasToTransform.emplace_back( FormulaType::OR, subFormula, rhsNegated );
+                            }
+                        }
+                        else if( rhs.getType() == FormulaType::AND )
+                        {
+                            Formulas<Pol> subformulas;
+                            for( auto& subFormula : rhs.subformulas() )
+                            {
+                                subformulas.emplace_back( FormulaType::NOT, subFormula );
+                            }
+                            subformulas.push_back( lhs );
+                            subformulasToTransform.emplace_back( FormulaType::OR, std::move(subformulas) );
+                            Formula<Pol> lhsNegated( FormulaType::NOT, lhs );
+                            for( auto& subFormula : rhs.subformulas() )
+                            {
+                                subformulasToTransform.emplace_back( FormulaType::OR, subFormula, lhsNegated );
+                            }
+                        }
+                        else
+                        {
+                            // add (or lhs (not rhs)) to the queue
+                            subformulasToTransform.emplace_back( FormulaType::OR, lhs, Formula<Pol>( FormulaType::NOT, rhs ) );
+                            // add (or (not lhs) rhs) to the queue
+                            subformulasToTransform.emplace_back( FormulaType::OR, Formula<Pol>( FormulaType::NOT, lhs ), rhs );
+                        }
                     }
                     break;
                 }
@@ -1008,9 +1041,9 @@ namespace carl
                     Formula<Pol> lhs = currentFormula.connectPrecedingSubformulas();
                     const Formula<Pol>& rhs = currentFormula.back();
                     // add (or lhs rhs) to the queue
-                    subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, lhs, rhs) );
+                    subformulasToTransform.emplace_back( FormulaType::OR, lhs, rhs);
                     // add (or (not lhs) (not rhs)) to the queue
-                    subformulasToTransform.push_back( Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, lhs ), Formula<Pol>( FormulaType::NOT, rhs ) ) );
+                    subformulasToTransform.emplace_back( FormulaType::OR, Formula<Pol>( FormulaType::NOT, lhs ), Formula<Pol>( FormulaType::NOT, rhs ) );
                     break;
                 }
                 // Note, that the following case could be implemented using less code, but it would clearly
@@ -1054,17 +1087,17 @@ namespace carl
                                     phis.push_back( subsubformula );
                                 break;
                             case FormulaType::IMPLIES: // (-> lhs_i rhs_i) -> (not lhs_i) rhs_i
-                                phis.push_back( Formula<Pol>( NOT, currentSubformula.premise() ) );
+                                phis.emplace_back( NOT, currentSubformula.premise() );
                                 phis.push_back( currentSubformula.conclusion() );
                                 break;
                             case FormulaType::ITE: // (ite cond then else)  ->  (and (or (not cond) then) (or cond else))
                             {   
                                 Formulas<Pol> tmpSubformulas;
                                 // Add: (or (not cond) then)
-                                tmpSubformulas.push_back( Formula<Pol>( FormulaType::OR, Formula<Pol>( FormulaType::NOT, currentSubformula.condition() ), currentSubformula.firstCase() ) );
+                                tmpSubformulas.emplace_back( FormulaType::OR, Formula<Pol>( FormulaType::NOT, currentSubformula.condition() ), currentSubformula.firstCase() );
                                 // Add: (or cond else)
-                                tmpSubformulas.push_back( Formula<Pol>( FormulaType::OR, currentSubformula.condition(), currentSubformula.secondCase() ) );
-                                phis.push_back( Formula<Pol>( FormulaType::AND, tmpSubformulas ) );
+                                tmpSubformulas.emplace_back( FormulaType::OR, currentSubformula.condition(), currentSubformula.secondCase() );
+                                phis.emplace_back( FormulaType::AND, std::move(tmpSubformulas) );
                                 break;
                             }
                             case FormulaType::NOT: // resolve the negation
@@ -1149,9 +1182,9 @@ namespace carl
                                     for( const Formula<Pol>& subsubformula : tmpSubSubformulas )
                                     {
                                         if( !subsubformula.isTrue() )
-                                            tmpSubformulas.push_back( Formula<Pol>( NOT, subsubformula ) );
+                                            tmpSubformulas.emplace_back( NOT, subsubformula );
                                     }
-                                    subformulasToTransformTmp.push_back( Formula<Pol>( OR, tmpSubformulas ) );
+                                    subformulasToTransformTmp.emplace_back( OR, std::move(tmpSubformulas) );
                                     subformulasToTransformTmp.back().mpContent->mTseitinClause = true;
                                 }
                                 subsubformulas.push_back( tseitinVar );
@@ -1186,10 +1219,10 @@ namespace carl
                                 for( auto& subFormula : currentSubformula.subformulas() )
                                 {
                                     subformulasA.push_back( subFormula );
-                                    subformulasB.push_back( Formula<Pol>( FormulaType::NOT, subFormula ) );
+                                    subformulasB.emplace_back( FormulaType::NOT, subFormula );
                                 }
-                                phis.push_back( Formula<Pol>( FormulaType::AND, move( subformulasA ) ) );
-                                phis.push_back( Formula<Pol>( FormulaType::AND, move( subformulasB ) ) );
+                                phis.emplace_back( FormulaType::AND, std::move( subformulasA ) );
+                                phis.emplace_back( FormulaType::AND, std::move( subformulasB ) );
                                 break;
                             }
                             case FormulaType::XOR: // (xor lhs rhs) -> (and lhs (not rhs)) and (and (not lhs) rhs) are added to the queue
@@ -1198,9 +1231,9 @@ namespace carl
                                 Formula<Pol> lhs = currentSubformula.connectPrecedingSubformulas();
                                 const Formula<Pol>& rhs = currentSubformula.back();
                                 // add (and lhs (not rhs)) to the queue
-                                phis.push_back( Formula<Pol>( FormulaType::AND, lhs, Formula<Pol>( FormulaType::NOT, rhs )) );
+                                phis.emplace_back( FormulaType::AND, lhs, Formula<Pol>( FormulaType::NOT, rhs ) );
                                 // add (and (not lhs) rhs) to the queue
-                                phis.push_back( Formula<Pol>( FormulaType::AND, Formula<Pol>( FormulaType::NOT, lhs ), rhs ) );
+                                phis.emplace_back( FormulaType::AND, Formula<Pol>( FormulaType::NOT, lhs ), rhs );
                                 break;
                             }
                             case FormulaType::EXISTS:
@@ -1237,7 +1270,7 @@ namespace carl
                         {
                             int clauseBeginPos = 0;
                             int clauseEndPos = 0;
-                            Formula<Pol> tseitinVar = Formula<Pol>( TRUE );
+                            Formula<Pol> tseitinVar( TRUE );
                             while( true )
                             {
                                 clauseEndPos = clauseBeginPos + (int)sizeof(uint32_t) - 2;
@@ -1248,7 +1281,7 @@ namespace carl
                                     assert( !tseitinVar.isTrue() );
                                     partOfSubformulas.emplace_back( NOT, tseitinVar );
                                     std::move( subsubformulas.begin()+clauseBeginPos, subsubformulas.end(), std::back_inserter(partOfSubformulas));
-                                    resultSubformulas.push_back( Formula<Pol>( OR, std::move( partOfSubformulas ) ) );
+                                    resultSubformulas.emplace_back( OR, std::move( partOfSubformulas ) );
                                     break;
                                 }
                                 std::vector<Formula<Pol>> partOfSubformulas;
@@ -1258,13 +1291,13 @@ namespace carl
                                 std::move( subsubformulas.begin()+clauseBeginPos, subsubformulas.begin()+clauseEndPos, std::back_inserter(partOfSubformulas));
                                 tseitinVar = Formula<Pol>( freshBooleanVariable() );
                                 partOfSubformulas.push_back( tseitinVar );
-                                resultSubformulas.push_back( Formula<Pol>( OR, std::move( partOfSubformulas ) ) );
+                                resultSubformulas.emplace_back( OR, std::move( partOfSubformulas ) );
                                 clauseBeginPos = clauseEndPos;
                             }
                         }
                         else
                         {
-                            resultSubformulas.push_back( Formula<Pol>( OR, std::move( subsubformulas ) ) );
+                            resultSubformulas.emplace_back( OR, std::move( subsubformulas ) );
                         }
                     }
                     break;
