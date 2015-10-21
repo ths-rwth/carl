@@ -87,8 +87,7 @@ namespace carl {
         assert( !mSubformulas.empty() );
         assert( isNary() );
         for (const auto& subformula: mSubformulas) {
-            mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
-            mHash ^= subformula.getHash();
+			carl::hash_add(mHash, subformula.getHash());
         }
 		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformulas);
     }
