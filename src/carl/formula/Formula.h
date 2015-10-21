@@ -559,6 +559,11 @@ namespace carl
                         || mpContent->mType == FormulaType::UEQ || mpContent->mType == FormulaType::BITVECTOR
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
+            
+            bool isLiteral() const
+            {
+                return propertyHolds( PROP_IS_A_LITERAL );
+            }
 
             /**
              * @return true, if the outermost operator of this formula is Boolean;
