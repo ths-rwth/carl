@@ -310,7 +310,7 @@ namespace carl
              */
             void realValuedVars( Variables& _realVars ) const
             {
-                collectVariables( _realVars, carl::VariableType::VT_REAL );
+                collectVariables( _realVars, false, true, false, false, false );
             }
             
             /**
@@ -319,7 +319,7 @@ namespace carl
              */
             void integerValuedVars( Variables& _intVars ) const
             {
-                collectVariables( _intVars, carl::VariableType::VT_INT );
+                collectVariables( _intVars, false, false, true, false, false );
             }
             
             /**
@@ -328,7 +328,7 @@ namespace carl
              */
             void arithmeticVars( Variables& _arithmeticVars ) const
             {
-                collectVariables( _arithmeticVars, carl::VariableType::VT_BOOL, false );
+                collectVariables( _arithmeticVars, false, true, true, false, false );
             }
             
             /**
@@ -337,7 +337,16 @@ namespace carl
              */
             void booleanVars( Variables& _booleanVars ) const
             {
-                collectVariables( _booleanVars, carl::VariableType::VT_BOOL );
+                collectVariables( _booleanVars, true, false, false, false, false );
+            }
+            
+            /**
+             * Collects all variables occurring in this formula.
+             * @param _vars The container to collect the variables in.
+             */
+            void allVars( Variables& _vars ) const
+            {
+                collectVariables( _vars, true, true, true, true, true );
             }
             
             Formula negated() const
@@ -676,7 +685,8 @@ namespace carl
 			 * @param _type
 			 * @param _ofThisType
              */
-            void collectVariables( Variables& _vars, carl::VariableType _type, bool _ofThisType = true ) const;
+            void collectVariables( Variables& _vars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
+            void collectVariables_( Variables& _vars, std::set<BVVariable>* _bvVars, std::set<UVariable>* _ueVars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
             
             /**
              * @return The formula's complexity, which is mainly the number of operations within this formula.

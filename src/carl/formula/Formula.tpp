@@ -16,68 +16,97 @@ using namespace std;
 
 namespace carl
 {
+    template<typename Pol>
+    void Formula<Pol>::collectVariables( Variables& _vars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const
+    {
+        std::set<BVVariable>* bvVars = nullptr;
+        std::set<UVariable>* ueVars = nullptr;
+        if( _bitvectorVars )
+            bvVars = new std::set<BVVariable>();
+        bool considerUninterpreted = _uninterpretedVars || propertyHolds( PROP_CONTAINS_UNINTERPRETED_EQUATIONS );
+        if( considerUninterpreted )
+            ueVars = new std::set<UVariable>();
+        collectVariables_( _vars, bvVars, ueVars, _booleanVars, _realVars, _integerVars, _uninterpretedVars, _bitvectorVars );
+        if( _bitvectorVars )
+        {
+            assert( bvVars != nullptr );
+            for (const auto& v: *bvVars) _vars.insert(v());
+            delete bvVars;
+        }
+        if( considerUninterpreted )
+        {   
+            for (const auto& v: *ueVars) {
+                switch( SortManager::getInstance().getType(v.domain()) )
+                {
+                    case VariableType::VT_UNINTERPRETED:
+                        if( _uninterpretedVars )
+                            _vars.insert(v());
+                        break;
+                    case VariableType::VT_BOOL:
+                        if( _booleanVars )
+                            _vars.insert(v());
+                        break;
+                    case VariableType::VT_REAL:
+                        if( _realVars )
+                            _vars.insert(v());
+                        break;
+                    default:
+                        assert( VariableType::VT_INT );
+                        if( _integerVars )
+                            _vars.insert(v());
+                        break;
+                }
+            }
+            delete ueVars;
+        }
+    }
     
     template<typename Pol>
-    void Formula<Pol>::collectVariables( Variables& _vars, VariableType _type, bool _ofThisType ) const
+    void Formula<Pol>::collectVariables_( Variables& _vars, std::set<BVVariable>* _bvVars, std::set<UVariable>* _ueVars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const
     {
         switch( getType() )
         {
-            case FormulaType::BOOL:
-                if( !_ofThisType || (_type == VariableType::VT_BOOL) )
-                {
-                    _vars.insert( boolean() );
-                }
-                break;
             case FormulaType::TRUE:
-                break;
             case FormulaType::FALSE:
+                break;
+            case FormulaType::BOOL:
+                if( _booleanVars )
+                    _vars.insert( boolean() );
                 break;
             case FormulaType::CONSTRAINT:
                 for( auto var : constraint().variables() )
                 {
-                    if( !_ofThisType || (var.getType() == VariableType::VT_INT) )
+                    if( _integerVars )
                         _vars.insert( var );
-                    if( !_ofThisType || (var.getType() == VariableType::VT_REAL) )
+                    if( _realVars )
                         _vars.insert( var );
                 }
                 break;
-            case FormulaType::BITVECTOR: {
-                if (!_ofThisType || (_type == VariableType::VT_BITVECTOR)) {
-                    std::set<BVVariable> vars;
-                    bvConstraint().collectVariables(vars);
-                    for (const auto& v: vars) _vars.insert(v());
+            case FormulaType::BITVECTOR:
+                if( _bitvectorVars ) 
+                {
+                    assert( _bvVars != nullptr );
+                    bvConstraint().collectVariables(*_bvVars);
                 }
                 break;
-            }
-            case FormulaType::UEQ: {
-                std::set<UVariable> vars;
-                uequality().collectUVariables(vars);
-                for (const auto& v: vars) {
-                    if( !_ofThisType || (SortManager::getInstance().getType(v.domain()) == _type))
-                        _vars.insert(v());
+            case FormulaType::UEQ:
+                if( _uninterpretedVars )
+                {
+                    assert( _ueVars != nullptr );
+                    uequality().collectUVariables(*_ueVars);
                 }
                 break;
-            }
             case FormulaType::NOT:
-                subformula().collectVariables( _vars, _type, _ofThisType );
-                break;
-            case FormulaType::IMPLIES:
-                premise().collectVariables( _vars, _type, _ofThisType );
-                conclusion().collectVariables( _vars, _type, _ofThisType );
-                break;
-            case FormulaType::ITE:
-                condition().collectVariables( _vars, _type, _ofThisType );
-                firstCase().collectVariables( _vars, _type, _ofThisType );
-                secondCase().collectVariables( _vars, _type, _ofThisType );
+                subformula().collectVariables_( _vars, _bvVars, _ueVars, _booleanVars, _realVars, _integerVars, _uninterpretedVars, _bitvectorVars );
                 break;
             case FormulaType::EXISTS:
             case FormulaType::FORALL:
-                quantifiedFormula().collectVariables(_vars, _type, _ofThisType);
+                quantifiedFormula().collectVariables_( _vars, _bvVars, _ueVars, _booleanVars, _realVars, _integerVars, _uninterpretedVars, _bitvectorVars );
                 break;
             default:
             {
                 for( const Formula<Pol>& subFormula : subformulas() )
-                    subFormula.collectVariables( _vars, _type, _ofThisType );
+                    subFormula.collectVariables_( _vars, _bvVars, _ueVars, _booleanVars, _realVars, _integerVars, _uninterpretedVars, _bitvectorVars );
             }
         }
     }
