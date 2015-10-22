@@ -51,7 +51,7 @@ namespace carl
                             _vars.insert(v());
                         break;
                     default:
-                        assert( VariableType::VT_INT );
+                        assert( SortManager::getInstance().getType(v.domain()) == VariableType::VT_INT );
                         if( _integerVars )
                             _vars.insert(v());
                         break;
