@@ -16,6 +16,7 @@
 
 #include "../../util/Singleton.h"
 #include "../../util/Common.h"
+#include "../../util/hash.h"
 #include <vector>
 #include <string.h>
 #include "../Sort.h"
@@ -139,13 +140,10 @@ public:
      */
     size_t operator()( const carl::UFInstanceContent& _ufun ) const 
     {
-        hash<carl::UVariable> h;
-        size_t result = hash<carl::UninterpretedFunction>()( _ufun.uninterpretedFunction() );
-        for( auto& arg : _ufun.args() )
-        {
-            // perform a circular shift by 5 bits.
-            CIRCULAR_SHIFT( size_t, result, 5 );
-            result ^= h( arg );
+        std::hash<carl::UVariable> h;
+        std::size_t result = std::hash<carl::UninterpretedFunction>()(_ufun.uninterpretedFunction());
+        for (const auto& arg: _ufun.args()) {
+			carl::hash_add(result, h(arg));
         }
         return result;
     }
