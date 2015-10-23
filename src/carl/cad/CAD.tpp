@@ -804,7 +804,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	if (!currentSamples.samples().empty()) {
 		// Sanity check: Assert that outermost sample is a root.
 		auto first = *currentSamples.samples().begin();
-		assert(!first->isRoot());
+		//assert(!first->isRoot());
 	}
 
 	bool boundsActive = !bounds.isEmpty() && !bounds.isInfinite();
@@ -1011,7 +1011,7 @@ std::list<RealAlgebraicNumberPtr<Number>> CAD<Number>::constructSampleAt(sampleI
 }
 
 template<typename Number>
-std::pair<bool, bool> CAD<Number>::checkNode(
+typename CAD<Number>::CheckNodeResult CAD<Number>::checkNode(
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
@@ -1029,7 +1029,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 	// settings demand not to take this sample (e.g., because only real roots are solutions)
 	if (sampleList.empty()) {
 		CARL_LOG_TRACE("carl.cad", "sample is empty");
-		return std::make_pair(false, true);
+		return CNR_SKIP;
 	}
 	RealAlgebraicPoint<Number> sample(sampleList);
 	bool boundsOK = true;
@@ -1048,12 +1048,12 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 	if (!boundsOK) {
 		CARL_LOG_TRACE("carl.cad", "bound clash");
 		// this point did not match the bounds => continue searching
-		return std::make_pair(false, true);
+		return CNR_SKIP;
 	}
 	if (sample.dim() == dim) {
 		CARL_LOG_TRACE("carl.cad", "full dimension");
 		// found a sample to check with the constraints
-		if (excludePrevious) return std::make_pair(false, true);
+		if (excludePrevious) return CNR_SKIP;
 
 		if (
 			(this->setting.computeConflictGraph && constraints.satisfiedBy(sample, getVariables(), conflictGraph)) ||
@@ -1061,7 +1061,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 			) {
 			r = sample;
 			CARL_LOG_TRACE("carl.cad", "sample is good!");
-			return std::make_pair(true, false);
+			return CNR_TRUE;
 		}
 	} else {
 		CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", continue lifting");
@@ -1081,13 +1081,14 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		///@todo Handle answers
 		if (status == cad::Answer::True) {
 			CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting succesfull");
-			return std::make_pair(true, false);
+			return CNR_TRUE;
 		} else if (status == cad::Answer::Unknown) {
-			return std::make_pair(false, false);
+			CARL_LOG_DEBUG("carl.cad", "Incomplete sample " << sampleList << ", lifting got unknown");
+			return CNR_UNKNOWN;
 		}
 		CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting failed");
 	}
-	return std::make_pair(false, false);
+	return CNR_FALSE;
 }
 
 template<typename Number>
@@ -1173,8 +1174,9 @@ cad::Answer CAD<Number>::mainCheck(
 			// traverse the current sample tree leaves for satisfying samples
 			CARL_LOG_TRACE("carl.cad", this->sampleTree);
 			auto res = this->checkNode(leaf, true, next, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);
-			if (res.first) return cad::Answer::True;
-			if (res.second) continue;
+			if (res == CNR_TRUE) return cad::Answer::True;
+			if (res == CNR_UNKNOWN) return cad::Answer::Unknown;
+			if (res == CNR_SKIP) continue;
 		}
 	}
 	CARL_LOG_TRACE("carl.cad", "Checking if CAD is complete");
@@ -1350,6 +1352,7 @@ cad::Answer CAD<Number>::liftCheck(
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
 	CARL_LOG_FUNC("carl.cad", "Integer setting: " << this->setting.integerHandling);
+	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumberPtr<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << sampleTree);
 	assert(this->sampleTree.is_valid(node));
 	if (checkBounds && boundsActive && (*node != nullptr)) {
 		// bounds shall be checked and the level is non-empty
@@ -1361,6 +1364,20 @@ cad::Answer CAD<Number>::liftCheck(
 			if (!(*node)->containedIn(bound->second)) {
 				return cad::Answer::False;
 			}
+		}
+	}
+	
+	
+	if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
+		if (!(*node)->isIntegral()) {
+			assert(openVariableCount < this->variables.size());
+			CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+			CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+			std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+			sample.pop_back();
+			r = RealAlgebraicPoint<Number>(std::move(sample));
+			CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
+			return cad::Answer::Unknown;
 		}
 	}
 
@@ -1464,28 +1481,26 @@ cad::Answer CAD<Number>::liftCheck(
 				currentSamples.simplify(true);
 			}
 		}
-		if (this->setting.integerHandling == cad::IntegerHandling::SPLIT_EARLY) {
-			if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
-				Interval<Number> bound = Interval<Number>::unboundedInterval();
-				if (checkBounds) {
-					CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
-					CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
-					CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
-					assert(openVariableCount < this->variables.size());
-					auto b = bounds.find(openVariableCount);
-					if (b != bounds.end()) bound = b->second;
-				}
-				CARL_LOG_DEBUG("carl.cad", "Checking if we should split early within " << bound);
-				for (const auto& newSample: sampleSetIncrement) {
-					if (!newSample->containedIn(bound)) continue;
-					if (!newSample->isIntegral()) {
-						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-						sample.pop_back();
-						sample.push_back(newSample);
-						r = RealAlgebraicPoint<Number>(std::move(sample));
-						CARL_LOG_DEBUG("carl.cad", "Eager split at " << r);
-						return cad::Answer::Unknown;
-					}
+		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
+			Interval<Number> bound = Interval<Number>::unboundedInterval();
+			if (checkBounds) {
+				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+				CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
+				assert(openVariableCount < this->variables.size());
+				auto b = bounds.find(openVariableCount);
+				if (b != bounds.end()) bound = b->second;
+			}
+			CARL_LOG_DEBUG("carl.cad", "Checking if we should split early within " << bound);
+			for (const auto& newSample: sampleSetIncrement) {
+				if (!newSample->containedIn(bound)) continue;
+				if (!newSample->isIntegral()) {
+					std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+					sample.pop_back();
+					sample.insert(sample.begin(), newSample);
+					r = RealAlgebraicPoint<Number>(std::move(sample));
+					CARL_LOG_DEBUG("carl.cad", "Eager split at " << r);
+					return cad::Answer::Unknown;
 				}
 			}
 		}
@@ -1504,30 +1519,6 @@ cad::Answer CAD<Number>::liftCheck(
 				break;
 			}
 			RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
-			if (this->setting.integerHandling == cad::IntegerHandling::SPLIT_LAZY) {
-				if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
-					Interval<Number> bound = Interval<Number>::unboundedInterval();
-					if (checkBounds) {
-						CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
-						CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
-						CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
-						assert(openVariableCount < this->variables.size());
-						auto b = bounds.find(openVariableCount);
-						if (b != bounds.end()) bound = b->second;
-					}
-					CARL_LOG_DEBUG("carl.cad", "Checking if we should split lazy within " << bound);
-					if (newSample->containedIn(bound)) {
-						if (!newSample->isIntegral()) {
-							std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-							sample.pop_back();
-							sample.push_back(newSample);
-							r = RealAlgebraicPoint<Number>(std::move(sample));
-							CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
-							return cad::Answer::Unknown;
-						}
-					}
-				}
-			}
 
 			// Sample storage
 			auto newNode = this->storeSampleInTree(newSample, node);
@@ -1548,7 +1539,20 @@ cad::Answer CAD<Number>::liftCheck(
 				// there might still be samples left but not stored yet
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
-					this->storeSampleInTree(sampleSetIncrement.next(), node);
+					RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
+					if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
+						if (!newSample->isIntegral()) {
+							std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+							CARL_LOG_DEBUG("carl.cad", "Current sample: " << sample);
+							sample.pop_back();
+							sample.insert(sample.begin(), newSample);
+							r = RealAlgebraicPoint<Number>(std::move(sample));
+							CARL_LOG_DEBUG("carl.cad", "Dangling lazy split at " << r);
+							sampleSetIncrement.pop();
+							continue;
+						}
+					}
+					this->storeSampleInTree(newSample, node);
 					sampleSetIncrement.pop();
 				}
 				if (checkIntegrality(newNode)) {
@@ -1559,6 +1563,7 @@ cad::Answer CAD<Number>::liftCheck(
 					CARL_LOG_ERROR("carl.cad", "Lifting was successful, but integrality is violated.");
 				}
 			} else if (liftingSuccessful == cad::Answer::Unknown) {
+				CARL_LOG_DEBUG("carl.cad", "Got unknown, propagating...");
 				return liftingSuccessful;
 			} else if (!satPath.empty()) {
 				// Sample was SAT, but not integral.
