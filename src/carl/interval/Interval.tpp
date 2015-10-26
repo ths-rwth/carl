@@ -3,7 +3,7 @@
  *
  * @file Interval.tpp
  * @author Stefan Schupp <stefan.schupp@cs.rwth-aachen.de>
- * 
+ *
  * @since	2013-12-20
  * @version 2014-11-11
  */
@@ -14,7 +14,7 @@
 
 namespace carl
 {
-	
+
 	using namespace boost::numeric;
 
 /*******************************************************************************
@@ -36,12 +36,12 @@ Interval<Number> Interval<Number>::integralPart() const
 {
 	if(this->isEmpty())
 		return *this;
-	
+
 	Number newLowerBound = 0;
 	Number newUpperBound = 0;
 	BoundType newLowerBoundType = mLowerBoundType;
 	BoundType newUpperBoundType = mUpperBoundType;
-	
+
 	switch(mLowerBoundType) {
 		case BoundType::WEAK:
 			newLowerBound = ceil(mContent.lower());
@@ -94,7 +94,7 @@ bool Interval<Number>::containsInteger() const
 				return true;
 			case BoundType::STRICT:
 				break;
-			case BoundType::WEAK: 
+			case BoundType::WEAK:
 				if (carl::isInteger(mContent.lower())) return true;
 		}
 		switch (mUpperBoundType) {
@@ -102,7 +102,7 @@ bool Interval<Number>::containsInteger() const
 				return true;
 			case BoundType::STRICT:
 				break;
-			case BoundType::WEAK: 
+			case BoundType::WEAK:
 				if (carl::isInteger(mContent.upper())) return true;
 		}
 		if (carl::ceil(mContent.lower()) < mContent.upper()) return true;
@@ -210,7 +210,7 @@ template<typename Number>
         }
         return true;    // for open intervals: (lower() < n && upper() > n) || (n == carl::constant_zero<Number>().get() && lower() == cln::cl_RA( 0 ) && upper() == cln::cl_RA( 0 ))	}
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::contains(const Interval<Number>& rhs) const
 	{
@@ -229,7 +229,7 @@ template<typename Number>
 		if( lowerOk && upperOk )
 		{
             return true;
-		}       
+		}
         // Note that from this point on at least one bound is equal
         // to our bounds but no bound is outside of our bounds
         // check the bound types
@@ -253,7 +253,7 @@ template<typename Number>
         // otherwise return false
         return false; // not less and not equal
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::meets(const Number& n) const
 	{
@@ -267,13 +267,13 @@ template<typename Number>
 		assert(this->isConsistent());
 		return rhs.contains(*this);
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::isProperSubset(const Interval<Number>& rhs) const
 	{
         return this->isSubset(rhs);
     }
-	
+
     template<typename Number>
     void Interval<Number>::bloat_by(const Number& width)
     {
@@ -320,26 +320,26 @@ template<typename Number>
 		}
 		Number diameter = this->diameter();
         diameter /= Number(n);
-		
+
         Interval<Number> tmp;
         tmp.set(mContent.lower(), mContent.lower()+diameter);
         tmp.setLowerBoundType(mLowerBoundType);
         tmp.setUpperBoundType(BoundType::STRICT);
         result.push_back(tmp);
-		
+
         for( unsigned i = 1; i < (n-1); ++i )
         {
             tmp.set(diameter*i, diameter*(i+1));
 	    tmp.setUpperBoundType(BoundType::STRICT);
             result.push_back(tmp);
         }
-		
+
         tmp.set(diameter*(n-1),diameter*n);
         tmp.setUpperBoundType(mUpperBoundType);
         result.push_back(tmp);
 		return result;
 	}
-	
+
     template<typename Number>
 	std::string Interval<Number>::toString() const
 	{
@@ -367,7 +367,7 @@ template<typename Number>
 		return oss.str();
 	}
 
- 
+
 /**
 * Calculates the distance between two Intervals.
 * @param intervalA Interval to which we want to know the distance.
@@ -400,7 +400,7 @@ Number Interval<Number>::distance(const Interval<Number>& intervalA)
 template<typename Number>
 Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval)
 {
-    return Interval(std::min(interval.lower(), this->lower()),std::min(interval.upper(), this->upper()));
+    return Interval(std::min(interval.lower(), this->lower()),std::max(interval.upper(), this->upper()));
 }
 
 /*******************************************************************************
@@ -768,7 +768,7 @@ void Interval<Number>::inverse_assign()
             // otherwise inteval is already fully positive
             return *this;
         }
-        
+
         template<typename Number>
         void Interval<Number>::abs_assign()
         {
@@ -847,7 +847,7 @@ bool Interval<Number>::reciprocal(Interval<Number>& a, Interval<Number>& b) cons
             {
                 a = Interval<Number>(BoostInterval( carl::constant_one<Number>().get() ) /BoostInterval( mContent.lower() ), BoundType::INFTY, mLowerBoundType );
             }
-			
+
             return false;
         }
 	}
@@ -1326,14 +1326,14 @@ template<typename Number>
         }
         return Interval<Number>(lowerValue, maxLowest, upperValue, minUppest );
 	}
-	
+
 template<typename Number>
 	Interval<Number>& Interval<Number>::intersect_assign(const Interval<Number>& rhs)
 	{
 		*this = this->intersect(rhs);
         return *this;
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::unite(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
@@ -1359,7 +1359,7 @@ template<typename Number>
                 resultA = *this;
                 resultB = rhs;
                 return true;
-            }		
+            }
 		}
 		else
 		{
@@ -1421,7 +1421,7 @@ template<typename Number>
 			return false;
 		}
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
@@ -1513,7 +1513,7 @@ template<typename Number>
 			return false;
 		}
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::complement(Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
@@ -1531,14 +1531,14 @@ template<typename Number>
 					resultA = Interval<Number>(mContent.upper(), lowerType, mContent.upper(), BoundType::INFTY);
 				}
 				return false;
-				
+
 			default:
 				switch (mUpperBoundType) {
 					case BoundType::INFTY:
 						upperType = mLowerBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
 						resultA = Interval<Number>(mContent.lower(), BoundType::INFTY, mContent.lower(), upperType);
 						return false;
-						
+
 					default:
 						upperType = mLowerBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
 						lowerType = mUpperBoundType == BoundType::STRICT ? BoundType::WEAK : BoundType::STRICT;
@@ -1548,7 +1548,7 @@ template<typename Number>
 				}
 		}
 	}
-	
+
 	template<typename Number>
 	bool Interval<Number>::symmetricDifference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const
 	{
@@ -1567,7 +1567,7 @@ template<typename Number>
 	}
 
 
-	
+
 /*******************************************************************************
  * Overloaded arithmetics operators
  ******************************************************************************/
@@ -1712,7 +1712,7 @@ inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs
 		{
 			return true;
 		}
-		
+
 		if( lhs.upper() == rhs.lower() )
 		{
 			switch (lhs.upperBoundType()) {
@@ -1727,7 +1727,7 @@ inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs
 		{
 			return false;
 		}
-		
+
 	}
 
 template<typename Number>
@@ -1743,7 +1743,7 @@ inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs)
 		{
 			return true;
 		}
-		
+
 		if( lhs.upper() == rhs.lower() )
 		{
 			switch (lhs.upperBoundType()) {

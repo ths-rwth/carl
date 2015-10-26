@@ -1073,7 +1073,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 				++sub;
 				assert(sub != substitutions.end());
 				// Go to the next variable.
-				while (sub->second.isZero())
+				while (sub->first != expResultB->first.first)
 				{
 					assert(sub != substitutions.end());
 					++sub;
