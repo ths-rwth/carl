@@ -5,9 +5,41 @@
 
 #pragma once
 
-#include "Common.h"
 #include "carl/numbers/numbers.h"
+#include <boost/version.hpp>
+#include "Common.h"
 
+#if BOOST_VERSION >= 105900
+#ifdef USE_CLN_NUMBERS
+namespace boost { namespace spirit { namespace traits {
+    template<> inline bool scale(int exp, cln::cl_RA& r, cln::cl_RA acc) {
+        if (exp >= 0)
+            r = acc * carl::pow(cln::cl_RA(10), (unsigned)exp);
+        else
+            r = acc / carl::pow(cln::cl_RA(10), (unsigned)(-exp));
+		return true;
+    }
+    template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
+        return value == 1;
+    }
+}}}
+#endif
+namespace boost { namespace spirit { namespace traits {
+    template<> inline bool scale(int exp, mpq_class& r, mpq_class acc) {
+        if (exp >= 0)
+            r = acc * carl::pow(mpq_class(10), (unsigned)exp);
+        else
+            r = acc / carl::pow(mpq_class(10), (unsigned)(-exp));
+		return true;
+    }
+    template<> inline bool is_equal_to_one(const mpq_class& value) {
+        return value == 1;
+    }
+    template<> inline mpq_class negate(bool neg, const mpq_class& n) {
+        return neg ? mpq_class(-n) : n;
+    }
+}}}
+#else
 #ifdef USE_CLN_NUMBERS
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, cln::cl_RA& r) {
@@ -35,6 +67,7 @@ namespace boost { namespace spirit { namespace traits {
         return neg ? mpq_class(-n) : n;
     }
 }}}
+#endif
 
 namespace carl {
 namespace parser {
