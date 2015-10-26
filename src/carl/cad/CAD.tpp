@@ -1367,17 +1367,18 @@ cad::Answer CAD<Number>::liftCheck(
 		}
 	}
 	
-	
-	if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
-		if (!(*node)->isIntegral()) {
-			assert(openVariableCount < this->variables.size());
-			CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
-			CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
-			std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-			sample.pop_back();
-			r = RealAlgebraicPoint<Number>(std::move(sample));
-			CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
-			return cad::Answer::Unknown;
+	if (*node != nullptr) {
+		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
+			if (!(*node)->isIntegral()) {
+				assert(openVariableCount < this->variables.size());
+				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+				std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+				sample.pop_back();
+				r = RealAlgebraicPoint<Number>(std::move(sample));
+				CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
+				return cad::Answer::Unknown;
+			}
 		}
 	}
 
@@ -1544,10 +1545,10 @@ cad::Answer CAD<Number>::liftCheck(
 						if (!newSample->isIntegral()) {
 							std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
 							CARL_LOG_DEBUG("carl.cad", "Current sample: " << sample);
-							sample.pop_back();
-							sample.insert(sample.begin(), newSample);
-							r = RealAlgebraicPoint<Number>(std::move(sample));
-							CARL_LOG_DEBUG("carl.cad", "Dangling lazy split at " << r);
+							//sample.pop_back();
+							//sample.insert(sample.begin(), newSample);
+							//r = RealAlgebraicPoint<Number>(std::move(sample));
+							//CARL_LOG_DEBUG("carl.cad", "Dangling lazy split at " << r);
 							sampleSetIncrement.pop();
 							continue;
 						}
