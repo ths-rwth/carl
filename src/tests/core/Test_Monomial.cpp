@@ -86,6 +86,7 @@ TEST(Monomial, division)
     Monomial::Arg m2 = v0 * v0 * v1 * v2;
     Monomial::Arg m0x = v0 * v0 * v1 * v2;
     Monomial::Arg m0y = v0 * v0 * v1 * v1;
+    Monomial::Arg m0z = v0 * v1;
 	Monomial::Arg tmp;
     EXPECT_FALSE(m0->divide(m1, tmp));
     EXPECT_FALSE(m1->divide(m0, tmp));
@@ -95,6 +96,20 @@ TEST(Monomial, division)
     EXPECT_EQ(m0y, tmp);
 	m0->divide(m2, tmp);
     EXPECT_EQ(v1, tmp);
+}
+
+TEST(Monomial, divisible)
+{
+    VariablePool& pool = VariablePool::getInstance();
+    Variable x = pool.getFreshVariable("x");
+    Variable y = pool.getFreshVariable("y");
+    Monomial::Arg m1 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
+    Monomial::Arg m2 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}));
+    Monomial::Arg m3 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 1), std::make_pair(x, 1)}));
+//    std::cout << m1 << " divisible by " << m2 << std::endl;
+//    std::cout << m2 << " == " << m3 << std::endl;
+    EXPECT_TRUE(m2==m3);
+    EXPECT_TRUE(m1->divisible(m2));
 }
 
 TEST(Monomial, Comparison)

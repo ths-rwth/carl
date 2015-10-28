@@ -413,8 +413,6 @@ namespace carl
 				return false;
 			}
 			return true;
-			
-			
 		}
 		/**
 		 * Returns a new monomial that is this monomial divided by m.
