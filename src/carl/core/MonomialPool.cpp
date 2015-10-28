@@ -81,9 +81,9 @@ namespace carl
 		return add(std::move(_exponents), _totalDegree);
 	}
 
-	Monomial::Arg MonomialPool::create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents, exponent _totalDegree )
+	Monomial::Arg MonomialPool::create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents )
 	{
-		return add(Monomial::Arg(new Monomial(_exponents, _totalDegree)));
+		return add(Monomial::Arg(new Monomial(_exponents)));
 	}
 
 	Monomial::Arg MonomialPool::create( std::vector<std::pair<Variable, exponent>>&& _exponents )

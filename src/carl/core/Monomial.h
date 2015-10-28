@@ -827,4 +827,3 @@ namespace std
 		}
 	};
 } // namespace std
-

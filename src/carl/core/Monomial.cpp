@@ -366,6 +366,7 @@ namespace carl
 			lastVar = ve.first;
 		}
 		if (tdegree != mTotalDegree) return false;
+		if (!std::is_sorted(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; })) return false;
 		return true;
 	}
 	
