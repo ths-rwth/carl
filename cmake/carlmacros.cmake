@@ -58,8 +58,9 @@ function(collect_files prefix name)
       if(NOT ${subdir} STREQUAL "")
         LIST_APPEND_UNIQUE(${prefix}_${name}_subdir ${subdir})
         list(APPEND ${prefix}_${name}_${subdir}_headers ${name}/${subfile})
-      endif()
+      elseif()
         list(APPEND ${prefix}_${name}_headers ${name}/${subfile})
+      endif()
 
     elseif(${subfile} MATCHES ".*([.]cpp)")
       list(APPEND ${prefix}_${name}_sources ${name}/${subfile})
@@ -68,7 +69,7 @@ function(collect_files prefix name)
 
   foreach(subdir ${${prefix}_${name}_subdir})
     install(FILES			${${prefix}_${name}_${subdir}_headers}
-      DESTINATION		include/${prefix}/${subdir})
+    DESTINATION		include/${prefix}/${name}/${subdir})
   endforeach()
 
 	#Install
