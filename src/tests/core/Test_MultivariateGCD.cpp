@@ -11,6 +11,8 @@
 	#include <gmpxx.h>
 #endif
 
+#include "../Common.h"
+
 using namespace carl;
 
 typedef mpq_class Rational;

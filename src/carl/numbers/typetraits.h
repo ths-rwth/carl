@@ -29,6 +29,10 @@
 
 #pragma once
 
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include "../util/platform.h"
 #include "config.h"
 #include <type_traits>
@@ -346,6 +350,6 @@ class PreventConversion
         explicit PreventConversion( const T& _other ) : mContent( _other ) {}
 //        template<typename O>
 //        PreventConversion( const O& _other ) = delete;
-        operator T () const { return mContent; }
+        operator const T&() const { return mContent; }
 };
 }

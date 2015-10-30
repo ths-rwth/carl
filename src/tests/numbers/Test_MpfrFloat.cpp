@@ -5,7 +5,7 @@
 
  
 #include "gtest/gtest.h"
-#include "../../carl/numbers/FLOAT_T.h"
+#include "../../carl/numbers/numbers.h"
 
 #ifdef USE_MPFR_FLOAT
 TEST(mpfrFloatTest, Constructor)
@@ -48,6 +48,14 @@ TEST(mpfrFloatTest, Constructor)
     ASSERT_EQ(hf1, carl::FLOAT_T<mpfr_t>(hf1));
     
     SUCCEED();
+}
+
+TEST(mpfrFloatTest, Hash)
+{
+	std::hash<carl::FLOAT_T<mpfr_t>> hasher;
+	hasher(carl::FLOAT_T<mpfr_t>(10));
+	hasher(carl::FLOAT_T<mpfr_t>(-12.23648192394727230203828));
+	SUCCEED();
 }
 
 /*

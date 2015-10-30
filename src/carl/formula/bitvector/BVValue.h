@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../../numbers/config.h"
+#include "../../numbers/numbers.h"
 #include <boost/dynamic_bitset.hpp>
 #include "../../util/platform.h"
 #ifdef USE_CLN_NUMBERS

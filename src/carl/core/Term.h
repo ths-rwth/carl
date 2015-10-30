@@ -170,6 +170,15 @@ class Term
 			if(!mMonomial) return 0;
 			return mMonomial->nrVariables();
 		}
+        
+        /**
+         * @return An approximation of the complexity of this monomial.
+         */
+        size_t complexity() const
+        {
+            if(!mMonomial) return 1;
+            return mMonomial->complexity();
+        }
 		
 		/**
 		 * @param v The variable to check for its occurrence.
@@ -192,6 +201,11 @@ class Term
 			return mMonomial->hasNoOtherVariable(v);
 		}
 		
+        bool isSingleVariable() const
+        {
+            if (!mMonomial) return false;
+            return mMonomial->isLinear();
+        }
 		/**
 		 * For terms with exactly one variable, get this variable.
 		 * @return The only variable occuring in the term.

@@ -48,6 +48,11 @@ namespace carl
                 {
                     return false;
                 }
+                
+                bool operator()(const Arg& arg) const
+                {
+                    return boost::apply_visitor(*this, arg);
+                }
             };
 
             /**
@@ -72,6 +77,11 @@ namespace carl
                 {
                     return true;
                 }
+                
+                bool operator()(const Arg& arg) const
+                {
+                    return boost::apply_visitor(*this, arg);
+                }
             };
 
         private:
@@ -86,13 +96,14 @@ namespace carl
             Arg mRhs;
 
         public:
-#ifdef __VS
-			UEquality() {} // Needed for union initialization in Formula.h
-#else
-			UEquality(); // No default constructor.
-#endif
-
-			/**
+            
+            UEquality():
+                mNegated( false ),
+                mLhs( UVariable(Variable::NO_VARIABLE, Sort()) ),
+                mRhs( UVariable(Variable::NO_VARIABLE, Sort()) )
+            {}
+            
+	    /**
              * Constructs an uninterpreted equality.
              * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
              * @param _uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
@@ -285,6 +296,11 @@ namespace carl
             {
                 return boost::get<UFInstance>(mRhs);
             }
+            
+            /**
+             * @return An approximation of the complexity of this uninterpreted equality.
+             */
+            size_t complexity() const;
             
             /**
              * @param _ueq The uninterpreted equality to compare with.

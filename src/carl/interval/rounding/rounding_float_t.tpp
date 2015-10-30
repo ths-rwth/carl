@@ -10,8 +10,7 @@
  */
 
 #pragma once
-#include "../../numbers/roundingConversion.h"
-#include "../../numbers/FLOAT_T.h"
+#include "../../numbers/numbers.h"
 
 namespace carl
 {

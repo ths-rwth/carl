@@ -41,7 +41,7 @@ namespace carl
 		case BVTermType::NAND: return "bvnand";
 		case BVTermType::NOR: return "bvnor";
 		case BVTermType::XNOR: return "bvxnor";
-		case BVTermType::ADD: return "bvplus";
+		case BVTermType::ADD: return "bvadd";
 		case BVTermType::SUB: return "bvsub";
 		case BVTermType::MUL: return "bvmul";
 		case BVTermType::DIV_U: return "bvudiv";
@@ -135,6 +135,11 @@ namespace carl
 		bool isConstant() const {
 			return type() == BVTermType::CONSTANT;
 		}
+            
+        /**
+         * @return An approximation of the complexity of this bit vector term.
+         */
+        size_t complexity() const;
 		
 		void collectVariables(std::set<BVVariable>& vars) const;
 
@@ -233,13 +238,9 @@ namespace carl
 		}
 	};
 
-	// Forward declaration
-	template<typename Element>
-	class Pool;
-
 	class BVTermContent
 	{
-		friend class Pool<BVTermContent>;
+		friend class BVTermPool;
 		friend class BVTerm;
 
 	private:
@@ -299,20 +300,11 @@ namespace carl
 #endif
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
-#ifdef __VS
-			mType(_type), mWidth(_variable.width()), mId(0), mHash(0) //,
-		// TODO: Hash - mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
-		{
-			mpVariableVS = new BVVariable(_variable);
-			assert(_type == BVTermType::VARIABLE);
-		}
-#else
-			mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0), mHash(0) //,
-			// TODO: Hash - mHash(((size_t)_variable.getId() << 5) ^ typeId(_type))
+		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0),
+		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::VARIABLE);
 		}
-#endif
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
 #ifdef __VS
@@ -660,7 +652,7 @@ namespace carl
 namespace std
 {
 	/**
-	 * Implements std::hash for bit vector terms.
+	 * Implements std::hash for bit vector term contents.
 	 */
 	template <>
 	struct hash<carl::BVTermContent>
@@ -668,12 +660,30 @@ namespace std
 		public:
 
 		/**
-		 * @param _formula The bit vector term to get the hash for.
-		 * @return The hash of the given bit vector term.
+		 * @param _termContent The bit vector term content to get the hash for.
+		 * @return The hash of the given bit vector term content.
 		 */
-		size_t operator()(const carl::BVTermContent& _term) const
+		size_t operator()(const carl::BVTermContent& _termContent) const
 		{
-			return _term.hash();
+			return _termContent.hash();
 		}
 	};
-}
+
+    /**
+     * Implements std::hash for bit vector terms.
+     */
+    template <>
+    struct hash<carl::BVTerm>
+    {
+        public:
+
+        /**
+         * @param _term The bit vector term to get the hash for.
+         * @return The hash of the given bit vector term.
+         */
+        size_t operator()(const carl::BVTerm& _term) const
+        {
+            return _term.hash();
+        }
+    };
+}    // namespace std

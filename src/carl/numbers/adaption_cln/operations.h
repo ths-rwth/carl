@@ -1,13 +1,18 @@
-/** 
+/**
  * @file   adaption_cln/operations.h
  * @ingroup cln
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
- * 
+ *
  * @warning This file should never be included directly but only via operations.h
- * 
+ *
  */
 #pragma once
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include "../../util/platform.h"
 #include <cassert>
 #include <limits>
@@ -16,43 +21,41 @@
 #include <vector>
 #include "typetraits.h"
 #include "boost/algorithm/string.hpp"
-#include "../constants.h"
-#include "../operations.h"
 
 namespace carl {
 
 inline bool isZero(const cln::cl_I& n) {
 	return zerop(n);
-}	
-	
+}
+
 inline bool isZero(const cln::cl_RA& n) {
 	return zerop(n);
 }
 
 inline bool isOne(const cln::cl_I& n) {
 	return n == carl::constant_one<cln::cl_I>().get();
-}	
-	
+}
+
 inline bool isOne(const cln::cl_RA& n) {
 	return n  == carl::constant_one<cln::cl_RA>().get();
 }
 
 inline bool isPositive(const cln::cl_I& n) {
 	return n > carl::constant_zero<cln::cl_RA>().get();
-}	
-	
+}
+
 inline bool isPositive(const cln::cl_RA& n) {
 	return n > carl::constant_zero<cln::cl_RA>().get();
 }
 
 inline bool isNegative(const cln::cl_I& n) {
 	return n < carl::constant_zero<cln::cl_RA>().get();
-}	
-	
+}
+
 inline bool isNegative(const cln::cl_RA& n) {
 	return n < carl::constant_zero<cln::cl_RA>().get();
 }
-	
+
 /**
  * Extract the numerator from a fraction.
  * @param n Fraction.
@@ -176,6 +179,8 @@ inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
 	return getNum(n);
 }
 
+
+
 /**
  * Convert a fraction to an unsigned.
  * @param n A fraction.
@@ -194,27 +199,6 @@ inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
 inline cln::cl_LF toLF(const cln::cl_RA& n) {
 	return cln::cl_R_to_LF(n, std::max(cln::integer_length(cln::numerator(n)), cln::integer_length(cln::denominator(n))));
 }
-
-template<typename T>
-inline T rationalize(double n);
-
-template<typename T>
-inline T rationalize(float n);
-
-template<typename T>
-inline T rationalize(int n);
-
-template<typename T>
-inline T rationalize(size_t n);
-
-template<typename T>
-inline T rationalize(const std::string& n);
-
-template<typename T>
-inline T rationalize(const PreventConversion<cln::cl_RA>&);
-
-template<typename T>
-inline T rationalize(const PreventConversion<mpq_class>&);
 
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_23 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 23);
 static const cln::cl_RA ONE_DIVIDED_BY_10_TO_THE_POWER_OF_52 = cln::cl_RA(1)/cln::expt(cln::cl_RA(10), 52);
@@ -237,14 +221,6 @@ inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
 
 template<>
 cln::cl_RA rationalize<cln::cl_RA>(const std::string& inputstring);
-
-template<>
-cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<mpq_class>& n);
-
-template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(const PreventConversion<cln::cl_RA>& n) {
-	return n;
-}
 
 /**
  * Get absolute value of an integer.
@@ -386,33 +362,47 @@ inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
 	return cln::expt(n, (int)e);
 }
 
+inline cln::cl_RA log(const cln::cl_RA& n) {
+	return cln::rationalize(cln::realpart(cln::log(n)));
+}
+
+inline cln::cl_RA sin(const cln::cl_RA& n) {
+	return cln::rationalize(cln::sin(n));
+}
+
+inline cln::cl_RA cos(const cln::cl_RA& n) {
+	return cln::rationalize(cln::cos(n));
+}
+
 /**
  * Calculate the square root of a fraction if possible.
- * 
+ *
  * @param a The fraction to calculate the square root for.
  * @param b A reference to the rational, in which the result is stored.
  * @return true, if the number to calculate the square root for is a square;
  *         false, otherwise.
  */
-bool sqrtp(const cln::cl_RA& a, cln::cl_RA& b);
+bool sqrt_exact(const cln::cl_RA& a, cln::cl_RA& b);
+
+cln::cl_RA sqrt(const cln::cl_RA& a);
 
 /**
  * Calculate the square root of a fraction.
- * 
+ *
  * If we are able to find a an \f$x\f$ such that \f$x\f$ is the exact root of \f$a\f$, \f$(x,x)\f$ is returned.
  * If we can not find such a number (note that such a number might not even exist), \f$(x,y)\f$ is returned with \f$ x < \sqrt{a} < y \f$.
  * Note that we try to find bounds that are very close to the actual square root. If a small representation is more important than a small interval, sqrt_fast should be used.
  * @param a A fraction.
  * @return Interval containing the square root of a.
  */
-std::pair<cln::cl_RA, cln::cl_RA> sqrt(const cln::cl_RA& a);
+std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a);
 
 /**
  * Compute square root in a fast but less precise way.
  * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
  * Otherwise use the nearest integers as bounds on the square root.
  * @param a Some number.
- * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z. 
+ * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z.
  */
 std::pair<cln::cl_RA, cln::cl_RA> sqrt_fast(const cln::cl_RA& a);
 

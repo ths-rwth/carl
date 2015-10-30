@@ -4,7 +4,7 @@
 namespace carl
 {
 
-    bool sqrtp(const mpq_class& a, mpq_class& b)
+    bool sqrt_exact(const mpq_class& a, mpq_class& b)
     {
         if( mpq_sgn(a.__get_mp()) < 0 ) return false;
         mpz_class den = a.get_den();
@@ -20,7 +20,7 @@ namespace carl
         mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
         if( !carl::isZero( root_num_rem ) )
             return false;
-        
+
         mpq_class resNum;
         mpq_set_z(resNum.get_mpq_t(), root_num.get_mpz_t());
         mpq_class resDen;
@@ -28,8 +28,13 @@ namespace carl
         mpq_div(b.get_mpq_t(), resNum.get_mpq_t(), resDen.get_mpq_t());
         return true;
     }
-    
-    std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a)
+
+    mpq_class sqrt(const mpq_class& a) {
+        auto r = sqrt_safe(a);
+        return (r.first + r.second) / 2;
+    }
+
+    std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a)
     {
         assert( mpq_sgn(a.__get_mp()) > 0 );
         mpz_class den = a.get_den();
@@ -53,11 +58,11 @@ namespace carl
         numerator = mpz_get_ui(root_num.__get_mp());
         denominator = mpz_get_ui(root_den.__get_mp());
 
-        mpq_set_ui(upper.__get_mp(), mpz_sgn(root_den_rem.__get_mp()) != 0 ? denominator+1 : denominator, numerator);
-        mpq_set_ui(lower.__get_mp(), denominator, mpz_sgn(root_num_rem.__get_mp()) != 0 ? numerator+1 : numerator );
+        mpq_set_ui(lower.__get_mp(), numerator, mpz_sgn(root_den_rem.__get_mp()) != 0 ? denominator+1 : denominator);
+        mpq_set_ui(upper.__get_mp(), mpz_sgn(root_num_rem.__get_mp()) != 0 ? numerator+1 : numerator, denominator);
         return std::make_pair(lower,upper);
     }
-    
+
     std::pair<mpq_class, mpq_class> sqrt_fast(const mpq_class& a)
     {
         assert(a >= 0);
@@ -68,7 +73,7 @@ namespace carl
         mpz_class den;
         mpz_class den_rem;
         mpz_sqrtrem(den.__get_mp(), den_rem.__get_mp(), a.get_den().__get_mp());
-        
+
         if (carl::isZero(num_rem)) {
             if (carl::isZero(den_rem)) {
                 mpq_class exact_root = num / den;
@@ -105,7 +110,7 @@ namespace carl
         }
 #endif
     }
-    
+
     template<>
     mpq_class rationalize<mpq_class>(const std::string& inputstring)
     {
@@ -128,26 +133,6 @@ namespace carl
         }
         return result;
     }
-    
-    #ifdef USE_CLN_NUMBERS
-    template<>
-    mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n) {
-        typedef signed long int IntType;
-        cln::cl_I den = carl::getDenom((cln::cl_RA)n);
-        if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )
-        {
-            cln::cl_I num = carl::getNum((cln::cl_RA)n);
-            if( num <= std::numeric_limits<IntType>::max() && num >= std::numeric_limits<IntType>::min() )
-            {
-                return mpq_class(carl::toInt<IntType>(num))/mpq_class(carl::toInt<IntType>(den));
-            }
-        }
-        std::stringstream s;
-        s << ((cln::cl_RA)n);
-        mpq_class result = rationalize<mpq_class>(s.str());
-        return result;
-    }
-    #endif
 
     std::string toString(const mpq_class& _number, bool _infix)
     {
@@ -161,7 +146,7 @@ namespace carl
             if(d != mpz_class(1)) s << "(/ " << carl::abs(carl::getNum(_number)) << " " << carl::abs(d) << ")";
             else s << carl::abs(_number);
         }
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }
@@ -172,7 +157,7 @@ namespace carl
         bool negative = (_number < mpz_class(0));
         if(negative) s << "(-" << (_infix ? "" : " ");
         s << carl::abs(_number);
-        if(negative) 
+        if(negative)
             s << ")";
         return s.str();
     }

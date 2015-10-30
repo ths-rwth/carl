@@ -7,6 +7,8 @@
 #include "Util.cpp"
 #include <list>
 
+#include "../Common.h"
+
 using namespace carl;
 
 template<typename T>
@@ -41,7 +43,7 @@ TYPED_TEST(TermTest, Multiplication)
     t *= v0;
     Term<TypeParam> t1(1, v0,2);
     EXPECT_EQ(t1,t);
-    
+
 }
 
 TYPED_TEST(TermTest, VariableMultiplication)
@@ -127,4 +129,3 @@ TYPED_TEST(TermTest, OtherComparison)
 
     expectRightOrder(list);
 }
-

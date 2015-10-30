@@ -8,78 +8,143 @@
 #include <vector>
 #include "Variable.h"
 #include <set>
-#include "carl/core/MultivariatePolynomial.h"
+#include "MultivariatePolynomial.h"
+#include "../interval/Interval.h"
+#include "../interval/IntervalEvaluation.h"
+ #include "MultivariateHornerSettings.h"
+
+#include "Term.h"
 
 namespace carl{
 
-template< typename PolynomialType >
-class MultivariateHorner { 
+static std::map<Variable, Interval<double>> mMap = {{ Variable::NO_VARIABLE , Interval<double>(0)}};
+
+template<typename PolynomialType, class strategy >
+class MultivariateHorner : public std::enable_shared_from_this<MultivariateHorner<PolynomialType, strategy >> { 
 
 /**
 * Datastructure to save Polynomes once they are transformed into a horner scheme:
 *
-* h = Variable^(Exponent) * SUM(h_dependent) + SUM(h_independent) + constant
+* h = Variable * h_dependent + h_independent || Variable * const_dependent + const_independent || Variable * h_dependent + const_independent
 *
 */
-public:
-	/// Type of the coefficients. 	
-	
+
+
+private:
 	typedef typename PolynomialType::CoeffType CoeffType;
-	CoeffType mCoeff = constant_zero<CoeffType>::get();
-	Variable mVariable;
-	MultivariateHorner *mDependent;
-	MultivariateHorner *mIndependent;
+
+	CoeffType mConst_dependent = static_cast<CoeffType>(0);
+	CoeffType mConst_independent = static_cast<CoeffType>(0);
+	Variable mVariable = Variable::NO_VARIABLE;
+	unsigned mExponent = 1;
+	std::shared_ptr<MultivariateHorner> mH_dependent;
+	std::shared_ptr<MultivariateHorner> mH_independent;
+
 	
+public:
+		
 	//Constuctor
+    MultivariateHorner () = delete;
 	MultivariateHorner (const PolynomialType& inPut);
+	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map);
+	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map, int& counter);
+    MultivariateHorner ( const MultivariateHorner& ) = default;
+    MultivariateHorner ( MultivariateHorner&& ) = default;
+//    MultivariateHorner& operator=(MultivariateHorner&& mh) = delete;
+
+
+	//~MultivariateHorner ();
+	
+	MultivariateHorner& operator=(const MultivariateHorner& mh) = default;
+
+/*
+	MultivariateHorner& operator=(MultivariateHorner&& mh) 
+	{
+		mConst_dependent = std::move(mh.mConst_dependent);
+		mConst_independent = std::move(mh.mConst_independent);	 	
+	 
+	 	mH_dependent = std::move(mh.mH_dependent);
+	 	mH_independent = std::move(mh.mH_independent);		
+	 
+	 	mVariable = mh.mVariable;		
+	 	mExponent = mh.mExponent;
+		return *this;
+	}
+*/
 
 	//getter and setters
-	Variable getVariable(){
+	Variable getVariable() const
+	{
 		return mVariable;
 	}
 
-	void setVariable(Variable::Arg var){
+	void setVariable(Variable::Arg& var) 
+	{
 		mVariable = var;
 	}
 
-	const MultivariateHorner& getDependent(){
-		return *mDependent;
+	std::shared_ptr<MultivariateHorner> getDependent() const
+	{
+		return mH_dependent;
 	}
 
-	void setDependent(const MultivariateHorner& dependent){
-		mDependent = *dependent;
+	void removeDependent()
+	{
+			mH_dependent = NULL;
 	}
 
-	const MultivariateHorner& getIndependent(){
-		return *mIndependent;
+	void removeIndepenent() 
+	{
+			mH_independent = NULL;
 	}
 
-	void setIndependent(const MultivariateHorner& independent){
-		*mIndependent = independent;
+	void setDependent(std::shared_ptr <MultivariateHorner> dependent)
+	{
+
+		mH_dependent = dependent;
 	}
 
-	CoeffType& getConstant(){
-		return mCoeff;
+	std::shared_ptr<MultivariateHorner> getIndependent() const
+	{
+		return mH_independent;
 	}
 
-	void setConstant(const CoeffType& constant){
-		mCoeff = constant;
+	void setIndependent(std::shared_ptr <MultivariateHorner> independent)
+	{
+		mH_independent = independent;
+	}
+
+	const CoeffType& getDepConstant() const
+	{
+		return mConst_dependent;
+	}
+
+	void setDepConstant(const CoeffType& constant)
+	{
+		mConst_dependent = constant;
 	}	
 
-	MultivariateHorner& operator=(const MultivariateHorner& mh) {
-
-		mCoeff = mh.mCoeff;
-		std::cout << "A" << std::endl;
-	 	mDependent = mh.mDependent;
-	 	std::cout << "B" << std::endl;
-	 	mIndependent = mh.mIndependent;		
-	 	std::cout << "C" << std::endl;
-	 	mVariable = mh.mVariable;
-		
-		return *this;
+	const CoeffType& getIndepConstant() const
+	{
+		return mConst_independent;
 	}
-};
+
+	void setIndepConstant(const CoeffType& constant){
+		mConst_independent = constant;
+	}
+
+	unsigned getExponent() const
+	{
+		return mExponent;
+	}
+
+	void setExponent(const unsigned& exp){
+		mExponent = exp;
+	}
+
+}; //Class MultivarHorner
 
 }//namespace carl
-
 #include "MultivariateHorner.tpp"
+
+

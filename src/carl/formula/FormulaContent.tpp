@@ -127,26 +127,21 @@ namespace carl {
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formulas<Pol>&& _subformulas):
         mHash( (size_t)_type ),
-#ifdef __VS
-		mType( _type )
     {
-		mpSubformulasVS = new Formulas<Pol>(std::move(_subformulas));
-		assert( isNary() );
-		for (const auto& subformula: *mpSubformulasVS) {
-			mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
-			mHash ^= subformula.getHash();
-	}
-		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << *mpSubformulasVS);
+#ifdef __VS
+        assert( !mpSubformulasVS->empty() );
+        assert( isNary() );
+        for (const auto& subformula: *mpSubformulasVS) {
+			carl::hash_add(mHash, subformula.getHash());
+        }
+	CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << *mpSubformulasVS);
 #else
-		mType(_type),
-		mSubformulas(std::move(_subformulas))
-	{
-		assert(isNary());
-		for (const auto& subformula : mSubformulas) {
-			mHash = CIRCULAR_SHIFT(std::size_t, mHash, 5);
-			mHash ^= subformula.getHash();
-		}
-		CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformulas);
+        assert( !mSubformulas.empty() );
+        assert( isNary() );
+        for (const auto& subformula: mSubformulas) {
+			carl::hash_add(mHash, subformula.getHash());
+        }
+	CARL_LOG_DEBUG("carl.formula", "Created " << *this << " from " << _type << " " << mSubformulas);
 #endif
     }
 

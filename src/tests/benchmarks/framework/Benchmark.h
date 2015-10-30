@@ -139,7 +139,7 @@ private:
 	std::string name;
 
 	template<typename R, typename Src>
-	unsigned runSamples(std::vector<R>& res, const Src& src) {
+	std::size_t runSamples(std::vector<R>& res, const Src& src) {
 		carl::Timer timer;
 		for (const auto& cur: src) {
 			res.push_back(std::move(executor(cur)));
@@ -151,7 +151,7 @@ public:
 		results.reserve(reference.size());
 		std::cout << "Reference " << name << " ... ";
 		std::cout.flush();
-		unsigned time = runSamples(results, reference);
+		std::size_t time = runSamples(results, reference);
 		runtimes[name] = time;
 		std::cout << time << " ms" << std::endl;
 	}
@@ -162,7 +162,7 @@ public:
 		BenchmarkConverter<Converter> benchmarks(reference);
 		std::cout << "Comparing " << name << " ... ";
 		std::cout.flush();
-		unsigned time = runSamples(res, benchmarks);
+		std::size_t time = runSamples(res, benchmarks);
 		runtimes[name] = time;
 		std::cout << time << " ms" << std::endl;
 		

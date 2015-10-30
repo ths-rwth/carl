@@ -199,7 +199,7 @@ Term<Coefficient> Term<Coefficient>::calcLcmAndDivideBy(const Monomial::Arg& m) 
 template<typename Coefficient>
 bool Term<Coefficient>::sqrt(Term<Coefficient>& res) const {
     Coefficient resCoeff;
-    if (!carl::sqrtp(this->coeff(), resCoeff)) return false;
+    if (!carl::sqrt_exact(this->coeff(), resCoeff)) return false;
     if (this->monomial() == nullptr) {
         res = Term(resCoeff);
         return true;

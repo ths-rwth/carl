@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "../numbers/numbers.h"
+
 namespace carl {
 
 class CArLConverter {

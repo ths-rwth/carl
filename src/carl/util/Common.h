@@ -62,7 +62,7 @@ namespace carl
     
     typedef std::set<Variable> Variables;
 
-	typedef std::vector<Variables> QuantifiedVariables;
+    typedef std::vector<Variables> QuantifiedVariables;
     
     template<typename T> 
     using PointerSet = std::set<const T*, pointerLess<T>>;
@@ -125,15 +125,5 @@ namespace carl
     static const unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
     static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
-    
-    // Macros.
-
-	///@todo replace by version without _intType:
-	/// #define CIRCULAR_SHIFT(_value, _shift) ((_value << _shift) | (_value >> ((sizeof _value)*8 - _shift)))
-	#define CIRCULAR_SHIFT(_intType, _value, _shift) ((_value << _shift) | (_value >> (sizeof(_intType)*8 - _shift)))
 	
 }	// namespace carl
-
-
-
-

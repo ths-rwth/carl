@@ -64,10 +64,11 @@ namespace carl
             const FormulaContent<Pol>* mpContent;
             
             
-            Formula( const FormulaContent<Pol>* _content ):
+            explicit Formula( const FormulaContent<Pol>* _content ):
                 mpContent( _content )
             {
-                FormulaPool<Pol>::getInstance().reg( mpContent );
+                if( _content != nullptr )
+                    FormulaPool<Pol>::getInstance().reg( _content );
             }
             
             #ifdef THREAD_SAFE
@@ -171,8 +172,10 @@ namespace carl
             {}
             
             Formula( const Formula& _formula ):
-                Formula( _formula.mpContent )
+                mpContent( _formula.mpContent )
             {
+                if( _formula.mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
             }
             
             Formula( Formula&& _formula ):
@@ -191,7 +194,8 @@ namespace carl
             
             Formula& operator=( const Formula& _formula )
             {
-                FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
+                if( _formula.mpContent != nullptr )
+                    FormulaPool<Pol>::getInstance().reg( _formula.mpContent );
                 if( mpContent != nullptr )
                     FormulaPool<Pol>::getInstance().free( mpContent );
                 mpContent = _formula.mpContent;
@@ -306,7 +310,7 @@ namespace carl
              */
             void realValuedVars( Variables& _realVars ) const
             {
-                collectVariables( _realVars, carl::VariableType::VT_REAL );
+                collectVariables( _realVars, false, true, false, false, false );
             }
             
             /**
@@ -315,7 +319,7 @@ namespace carl
              */
             void integerValuedVars( Variables& _intVars ) const
             {
-                collectVariables( _intVars, carl::VariableType::VT_INT );
+                collectVariables( _intVars, false, false, true, false, false );
             }
             
             /**
@@ -324,7 +328,7 @@ namespace carl
              */
             void arithmeticVars( Variables& _arithmeticVars ) const
             {
-                collectVariables( _arithmeticVars, carl::VariableType::VT_BOOL, false );
+                collectVariables( _arithmeticVars, false, true, true, false, false );
             }
             
             /**
@@ -333,7 +337,21 @@ namespace carl
              */
             void booleanVars( Variables& _booleanVars ) const
             {
-                collectVariables( _booleanVars, carl::VariableType::VT_BOOL );
+                collectVariables( _booleanVars, true, false, false, false, false );
+            }
+            
+            /**
+             * Collects all variables occurring in this formula.
+             * @param _vars The container to collect the variables in.
+             */
+            void allVars( Variables& _vars ) const
+            {
+                collectVariables( _vars, true, true, true, true, true );
+            }
+            
+            Formula negated() const
+            {
+                return Formula( mpContent->mNegation );
             }
             
             /**
@@ -633,6 +651,11 @@ namespace carl
                         || mpContent->mType == FormulaType::UEQ || mpContent->mType == FormulaType::BITVECTOR
                         || mpContent->mType == FormulaType::FALSE || mpContent->mType == FormulaType::TRUE);
             }
+            
+            bool isLiteral() const
+            {
+                return propertyHolds( PROP_IS_A_LITERAL );
+            }
 
             /**
              * @return true, if the outermost operator of this formula is Boolean;
@@ -721,12 +744,32 @@ namespace carl
 #ifdef __VS
                     _constraints.push_back( *mpContent->mpConstraintVS );
 #else
-					_constraints.push_back(mpContent->mConstraint);
+                    _constraints.push_back( mpContent->mConstraint );
 #endif
-                else if( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR || mpContent->mType == FormulaType::NOT 
-                        || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR || mpContent->mType == FormulaType::IMPLIES )
+                else if( mpContent->mType == FormulaType::NOT )
+                    mpContent->mSubformula.getConstraints( _constraints );
+                else if( isNary() )
+                {
                     for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
-                        (*subAst)->getConstraints( _constraints );
+                        subAst->getConstraints( _constraints );
+                }
+            }
+            
+            /**
+             * Collects all constraint occurring in this formula.
+             * @param _constraints The container to insert the constraint into.
+             */
+            void getConstraints( std::vector<Formula>& _constraints ) const
+            {
+                if( mpContent->mType == FormulaType::CONSTRAINT )
+                    _constraints.push_back( *this );
+                else if( mpContent->mType == FormulaType::NOT )
+                    mpContent->mSubformula.getConstraints( _constraints );
+                else if( isNary() )
+                {
+                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
+                        subAst->getConstraints( _constraints );
+                }
             }
 
             /**
@@ -735,7 +778,13 @@ namespace carl
 			 * @param _type
 			 * @param _ofThisType
              */
-            void collectVariables( Variables& _vars, carl::VariableType _type, bool _ofThisType = true ) const;
+            void collectVariables( Variables& _vars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
+            void collectVariables_( Variables& _vars, std::set<BVVariable>* _bvVars, std::set<UVariable>* _ueVars, bool _booleanVars, bool _realVars, bool _integerVars, bool _uninterpretedVars, bool _bitvectorVars ) const;
+            
+            /**
+             * @return The formula's complexity, which is mainly the number of operations within this formula.
+             */
+            size_t complexity() const;
             
             /**
              * @param _formula The formula to compare with.

@@ -51,6 +51,7 @@ option( USE_GINAC "Compile with testing with the runtime and result comparisons 
 option( COMPARE_WITH_Z3 "Compile benchmarks that compare to z3" OFF )
 option( USE_Z3_NUMBERS "Make z3 rationals available in carl" OFF )
 option( USE_CLN_NUMBERS "Make cln rationals and integers available in carl" OFF )
+OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
@@ -98,10 +99,10 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		message(FATAL_ERROR " clang version must be at least 3.3!")
 	endif()
 	if (APPLE)
-		message("-- Using clang on apple")
+		message(STATUS "Using clang on apple")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 	else()
-		message("-- Using clang")
+		message(STATUS "Using clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 	endif()
 	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} -O3 -fomit-frame-pointer -msse -msse2 -funroll-loops")
@@ -110,7 +111,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
 		message(FATAL_ERROR " g++ version must be at least 4.8!")
 	endif()
-	message("-- Using g++")
+	message(STATUS "Using g++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
 	if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.9 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.9)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmax-errors=5 -fdiagnostics-color=auto")
@@ -123,7 +124,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} /O2 /MT")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} /MTd")
 else()
-	message("-- Possibly unsupported compiler")
+	message(WARNING "Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 endif()
 if(DEVELOPER)
@@ -133,6 +134,7 @@ if(DEVELOPER)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wno-deprecated-declarations")
 	endif()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -ftemplate-backtrace-limit=0")
+	#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -print-search-dirs")
 
 	if (ALLWARNINGS)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -157,40 +159,40 @@ if(DEVELOPER)
 	set(CMAKE_BUILD_TYPE "DEBUG")
 endif()
 
-message("-- CXX Flags: ${CMAKE_CXX_FLAGS}")
-message("-- CXX Debug Flags: ${CMAKE_CXX_DEBUG_FLAGS}")
-message("-- CXX Release Flags: ${CMAKE_CXX_RELEASE_FLAGS}")
-message("-- Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "CXX Flags: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CXX Debug Flags: ${CMAKE_CXX_DEBUG_FLAGS}")
+message(STATUS "CXX Release Flags: ${CMAKE_CXX_RELEASE_FLAGS}")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-set(DYNAMIC_EXT "so")
-set(STATIC_EXT "a")
-if (APPLE)
-	set(DYNAMIC_EXT "dylib")
-	set(STATIC_EXT "a")
+set(DYNAMIC_EXT ".so")
+set(STATIC_EXT ".a")
+if(APPLE)
+	set(DYNAMIC_EXT ".dylib")
+	set(STATIC_EXT ".a")
 elseif (WIN32)
-	set(DYNAMIC_EXT "dll")
-	set(STATIC_EXT "lib")
+	set(DYNAMIC_EXT ".dll")
+	set(STATIC_EXT ".lib")
 endif()
-message("-- Assuming extension for shared libraries: .${DYNAMIC_EXT}")
-message("-- Assuming extension for static libraries: .${STATIC_EXT}")
+message(STATUS "Assuming extension for shared libraries: ${DYNAMIC_EXT}")
+message(STATUS "Assuming extension for static libraries: ${STATIC_EXT}")
 
 if(BUILD_STATIC)
-	message("-- Building static: yes")
+	message(STATUS "Building static: yes")
 	if (LOGGING)
-	message("-- WARNING: a static build with logging enabled will probably trigger a segfault!")
+	message(WARNING "A static build with logging enabled will probably trigger a segfault!")
 	endif()
 else()
-	message("-- Building static: no")
+	message(STATUS "Building static: no")
 endif()
 
 
 if(USE_COTIRE)
 	# We use cotire, simply include it
-	message("-- using cotire")
+	message(STATUS "using cotire")
 	include(cotire)
 else()
 	# We do not use cotire, create dummy function.
-	message("-- not using cotire")
+	message(STATUS "not using cotire")
 	function(cotire)
 	endfunction(cotire)
 endif()
@@ -209,13 +211,11 @@ endif()
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Boost
-set(Boost_COMPONENTS )
-set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost REQUIRED COMPONENTS ${Boost_COMPONENTS})
-set(Boost_DYNAMIC ${Boost_LIBRARIES})
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost REQUIRED COMPONENTS ${Boost_COMPONENTS})
-set(Boost_STATIC ${Boost_LIBRARIES})
+load_library(carl Boost 1.29 REQUIRED)
+
+include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
+list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_DYNAMIC})
+list(APPEND carl_LIBRARIES_STATIC ${Boost_STATIC})
 
 
 if(USE_GINAC)
@@ -224,40 +224,23 @@ endif()
 
 # CLN
 IF(USE_CLN_NUMBERS)
-    find_package(CLN REQUIRED)
+	load_library(carl CLN 0.0 REQUIRED)
 endif()
 
 # GMP
-find_package(GMP REQUIRED)
-find_package(GMPXX REQUIRED)
-
-include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
-IF(USE_CLN_NUMBERS)
-    include_directories(SYSTEM ${SYSTEM} ${CLN_INCLUDE_DIR})
-endif()
-include_directories(SYSTEM ${SYSTEM} ${EIGEN3_INCLUDE_DIR} ${GMPXX_INCLUDE_DIR} ${GMP_INCLUDE_DIR} )
-
-
-set(libs ${libs} ${Boost_LIBRARIES} gmpxx gmp)
-IF(USE_CLN_NUMBERS)
-    set(libs ${libs} cln)
-endif()
-
+load_library(carl GMPXX 0.0 REQUIRED)
+load_library(carl GMP 0.0 REQUIRED)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
 # # # # # # # # # # # # # # # # # # # # # #
 
-OPTION( USE_MPFR_FLOAT "Use the mpfr implementation of floating point numbers." OFF )
 IF(USE_MPFR_FLOAT)
-	find_package(MPFR REQUIRED)
-	include_directories(SYSTEM ${include_dirs} ${MPFR_INCLUDE_DIRS})
-	set(libs ${libs} mpfr)
+	load_library(carl MPFR 0.0 REQUIRED)
 endif()
 
 if(COMPARE_WITH_Z3)
-    find_package(Z3)
-    include_directories(${Z3_INCLUDE_DIRS})
+    load_library(carl Z3 4.0)
 endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
@@ -275,25 +258,25 @@ endif()
 # we only search for this libraries in the system, if we do not force using the shipped resources.
 if(NOT FORCE_SHIPPED_RESOURCES)
 	# find googletest
-	find_package(GTest)
-	find_package(Eigen3)
+	load_library(carl GTest 0.0)
+	load_library(carl Eigen3 0.0)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
-
 
 enable_testing()
 
 if(USE_GINAC)
-	find_package( GiNaC 1.5.8 REQUIRED )
-	include_directories(SYSTEM ${include_dirs} ${GINAC_INCLUDE_DIRS})
-	set(libs ${libs} ginac)
-	set(USE_CLN_NUMBERS ON)
+	load_library(carl GiNaC 1.5.8 REQUIRED )
 endif()
+
+message(STATUS "include: ${carl_INCLUDE_DIRS}")
+message(STATUS "dynamic: ${carl_LIBRARIES_DYNAMIC}")
+message(STATUS "static: ${carl_LIBRARIES_STATIC}")
+include_directories(SYSTEM ${SYSTEM} ${carl_INCLUDE_DIRS})
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
 if (NOT WIN32)
-	set(libs ${libs} pthread dl)
+	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
 endif()
 
 # # # # # # # # # # # # # # # # # # # # # #

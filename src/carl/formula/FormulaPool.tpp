@@ -19,7 +19,9 @@ namespace carl
         mIdAllocator( 3 ),
         mpTrue( new FormulaContent<Pol>( TRUE, 1 ) ),
         mpFalse( new FormulaContent<Pol>( FALSE, 2 ) ),
-        mPool()
+        mPool(),
+        mTseitinVars(),
+        mTseitinVarToFormula()
     {
         ConstraintPool<Pol>::getInstance();
         mpTrue->mNegation = mpFalse;
@@ -36,6 +38,7 @@ namespace carl
     template<typename Pol>
     FormulaPool<Pol>::~FormulaPool()
     {
+//        assert( mPool.size() == 2 );
         mPool.clear();
         delete mpTrue;
         delete mpFalse;
@@ -81,6 +84,7 @@ namespace carl
     {
         if( _subformulaA.mpContent == mpTrue && _subformulaB.mpContent == mpFalse )
             return true;
+        assert( !( _subformulaA.getType() == FormulaType::NOT && _subformulaA.subformula() == _subformulaB ) );
         if( _subformulaB.getType() == FormulaType::NOT && _subformulaB.subformula() == _subformulaA )
             return true;
         return false;
@@ -90,30 +94,37 @@ namespace carl
     const FormulaContent<Pol>* FormulaPool<Pol>::createImplication(Formulas<Pol>&& _subformulas) {
         assert(_subformulas.size() >= 2);
         #ifdef SIMPLIFY_FORMULA
-        auto it = _subformulas.rbegin();
         // Conclusion
-        if (it->mpContent == mpTrue) return create(TRUE);
-        if (it->mpContent == mpFalse) {
+        if (_subformulas.back().mpContent == mpTrue)
+            return create(TRUE);
+        if (_subformulas.back().mpContent == mpFalse) {
             _subformulas.pop_back();
             for (auto& f: _subformulas) {
                 f = Formula<Pol>(NOT, f);
             }
             return create(OR, std::move(_subformulas));
         }
-        // Premises
-        for (it++; it != _subformulas.rend(); ) {
-            if (it->mpContent == mpFalse) return create(TRUE);
-			if (it->mpContent == mpTrue)
-			{
-				Formulas<Pol>::iterator tempIter = _subformulas.erase(--it.base());
-				it = Formulas<Pol>::reverse_iterator(tempIter);
-			}
-			else
-				++it;
-        }
         #endif
         Formula<Pol> conclusion = _subformulas.back();
         _subformulas.pop_back();
+        #ifdef SIMPLIFY_FORMULA
+        // Premises
+        for (auto it = _subformulas.begin(); it != _subformulas.end(); ) {
+            if (it->mpContent == mpFalse) return create(TRUE);
+            if (it->mpContent == mpTrue) {
+                auto jt = it;
+                ++jt;
+                if( jt != _subformulas.end() )
+                    *it = _subformulas.back();
+                _subformulas.pop_back();
+            }
+            else
+                ++it;
+        }
+        #endif
+        if (_subformulas.empty()) {
+            return conclusion.mpContent;
+        }
         Formula<Pol> premise(AND, std::move(_subformulas));
         return add(new FormulaContent<Pol>(IMPLIES, {premise, conclusion}));
     }
@@ -121,138 +132,136 @@ namespace carl
     template<typename Pol>
     const FormulaContent<Pol>* FormulaPool<Pol>::createNAry(FormulaType _type, Formulas<Pol>&& _subformulas)
     {
-        assert(_type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF);
-        //cout << "create new formula with type " << _type << endl;
-        //for( auto f : _subformulas )
-        //    cout << "\t" << f << endl;
-        if (_subformulas.size() == 1) {
+        assert( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::XOR || _type == FormulaType::IFF );
+//        std::cout << __func__ << _type;
+//        for( const auto& f : _subformulas )
+//            std::cout << " " << f;
+//        std::cout << std::endl;
+        if( _subformulas.size() == 1 )
+        {
             return _subformulas[0].mpContent;
         }
-        for( size_t pos = 0; pos < _subformulas.size(); )
+        if( _type != FormulaType::IFF )
         {
-            if( _subformulas[pos].getType() == _type && (_type == FormulaType::AND || _type == FormulaType::OR) )
+            for( size_t pos = 0; pos < _subformulas.size(); )
             {
-                // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
-                // Note, that a1 to an are definitely created before b, as they were sub-formulas
-                // of it, hence, the ids of a1 to an are smaller than the one of b and therefore a1<b .. an<b.
-                // That means, that a1 .. an are inserted into the given set of sub formulas before the position of
-                // b (=iter).
-                // Note also that the operator of a1 to an cannot be oper, as they where also created with this pool.
-                Formula<Pol> tmp = _subformulas[pos];
-                _subformulas[pos] = _subformulas.back();
-                _subformulas.pop_back();
-                _subformulas.insert(_subformulas.end(), tmp.subformulas().begin(), tmp.subformulas().end() );
-            }
-            else
-            {
-                // Check if the sub-formula at iter is the negation of the sub-formula at iterB
-                // Note, that the negation of a formula would by construction always be right after the formula
-                // in a set of formulas whose comparison operator is based on the one of formulas This is due to
-                // them comparing just the ids and we construct the negation of a formula right after the formula
-                // itself and assign the next id to it.
-                if( pos < _subformulas.size() - 1 && formulasInverse( _subformulas[pos], _subformulas[pos+1] ) )
+                if( _subformulas[pos].getType() == _type )
                 {
+                    // We have (op .. (op a1 .. an) b ..), so create (op .. a1 .. an b ..) instead.
+                    // Note, that a1 to an are definitely created before b, as they were sub-formulas
+                    // of it, hence, the ids of a1 to an are smaller than the one of b and therefore a1<b .. an<b.
+                    // That means, that a1 .. an are inserted into the given set of sub formulas before the position of
+                    // b (=iter).
+                    // Note also that the operator of a1 to an cannot be oper, as they where also created with this pool.
+                    Formula<Pol> tmp = _subformulas[pos];
+                    _subformulas[pos] = _subformulas.back();
+                    _subformulas.pop_back();
+                    _subformulas.insert(_subformulas.end(), tmp.subformulas().begin(), tmp.subformulas().end() );
+                }
+                else
+                    ++pos;
+            }
+        }
+        std::sort( _subformulas.begin(), _subformulas.end() );
+        std::vector<Formula<Pol>> subformulas;
+        subformulas.reserve( _subformulas.size() );
+        bool negateResult = false;
+        size_t pos = 0;
+        while( pos < _subformulas.size() && _subformulas[pos].isTrue() )
+        {
+            switch( _type )
+            {
+                case FormulaType::XOR:
+                    negateResult = !negateResult;
+                    break;
+                case FormulaType::OR:
+                    return trueFormula();
+                default:
+                    assert( _type == FormulaType::AND || _type == FormulaType::IFF );
+            }
+            ++pos;
+        }
+        while( pos < _subformulas.size() && _subformulas[pos].isFalse() )
+        {
+            switch( _type )
+            {
+                case FormulaType::IFF:
+                    if( _subformulas[0].isTrue() )
+                        return falseFormula();
+                    negateResult = true;
+                    break;
+                case FormulaType::AND:
+                    return falseFormula();
+                default:
+                    assert( _type == FormulaType::OR || _type == FormulaType::XOR );
+            }
+            ++pos;   
+        }
+        for( ; pos < _subformulas.size(); )
+        {
+            if( pos < _subformulas.size() - 1 )
+            {
+                if( _subformulas[pos] == _subformulas[pos+1] )
+                {
+                    size_t numOfEqualSubformulas = pos;
+                    ++pos;
+                    while( pos < _subformulas.size() - 1 && _subformulas[pos] == _subformulas[pos+1] )
+                        ++pos;
+                    if( _type == FormulaType::XOR && (pos + 1 - numOfEqualSubformulas) % 2 == 0 )
+                        ++pos;
+                }
+                else if( formulasInverse( _subformulas[pos], _subformulas[pos+1] ) )
+                {
+                    // Check if the sub-formula at pos is the negation of the sub-formula at pos+1
+                    // Note, that the negation of a formula would by construction always be right after the formula
+                    // in a set of formulas whose comparison operator is based on the one of formulas This is due to
+                    // them comparing just the ids and we construct the negation of a formula right after the formula
+                    // itself and assign the next id to it.
                     switch( _type )
                     {
                         case FormulaType::AND:
-                        {
                             return falseFormula();
-                        }
                         case FormulaType::OR:
-                        {
                             return trueFormula();
-                        }
                         case FormulaType::IFF:
-                        {
                             return falseFormula();
-                        }
-                        case FormulaType::XOR:
-                        {
-                            _subformulas[pos] = Formula<Pol>( trueFormula() );
-                            ++pos;
-                            _subformulas[pos] = _subformulas.back();
-                            _subformulas.pop_back();
-                            break;
-                        }
                         default:
-                        {
-                            assert( false );
-                            break;
-                        }
+                            assert( _type == FormulaType::XOR );
+                            negateResult = !negateResult;
                     }
+                    ++pos;
+                    ++pos;
                 }
                 else
                 {
+                    subformulas.push_back( _subformulas[pos] );
                     ++pos;
                 }
             }
+            else
+            {
+                subformulas.push_back( _subformulas[pos] );
+                ++pos;
+            }
         }
-        std::sort(_subformulas.begin(), _subformulas.end());
-        _subformulas.erase(std::unique(_subformulas.begin(), _subformulas.end()), _subformulas.end());
-        if( _subformulas.empty() )
+        if( subformulas.empty() )
+        {
+            if( negateResult || _type == FormulaType::AND || _type == FormulaType::IFF )
+                return trueFormula();
             return falseFormula();
+        }
+        const FormulaContent<Pol>* result;
+        if( subformulas.size() == 1 )
+        {
+            if( _type == FormulaType::IFF && _subformulas[0] == *subformulas.begin() )
+                return trueFormula();
+            result = subformulas.begin()->mpContent;
+        }
         else
         {
-            #ifdef SIMPLIFY_FORMULA
-            if( _type == FormulaType::AND || _type == FormulaType::OR || _type == FormulaType::IFF )
-            {
-                auto iterToTrue = _subformulas.begin();
-                auto iterToFalse = _subformulas.begin();
-                if( iterToTrue->mpContent == mpTrue )
-                {
-                    ++iterToFalse;
-                    if( iterToFalse != _subformulas.end() && iterToFalse->mpContent != mpFalse )
-                        iterToFalse = _subformulas.end();
-                }
-                else
-                {
-                    iterToTrue = _subformulas.end();
-                    if( iterToFalse->mpContent != mpFalse )
-                        iterToFalse = _subformulas.end();
-                }
-                if( _type == FormulaType::AND )
-                {
-                    if( iterToFalse != _subformulas.end() ) return falseFormula();
-                    if( iterToTrue != _subformulas.end() ) _subformulas.erase( iterToTrue );
-                    else if( _subformulas.empty() ) return trueFormula();
-                }
-                else if( _type == FormulaType::OR )
-                {
-                    if( iterToTrue != _subformulas.end() ) return trueFormula();
-                    if( iterToFalse != _subformulas.end() ) _subformulas.erase( iterToFalse );
-                    else if( _subformulas.empty() ) return falseFormula();
-                }
-                else // _type == FormulaType::IFF
-                {
-                    if( iterToFalse != _subformulas.end() && iterToTrue != _subformulas.end() )
-                    {
-                        return falseFormula();
-                    }
-                    else if( iterToFalse != _subformulas.end() )
-                    {
-                        if( _subformulas.size() == 2 )
-                        {
-                            if( iterToFalse == _subformulas.begin() )
-                                return (++iterToFalse)->mpContent->mNegation;
-                            return _subformulas.begin()->mpContent->mNegation;
-                        }
-                    }
-                    else if( iterToTrue != _subformulas.end() )
-                    {
-                        if( _subformulas.size() == 2 )
-                        {
-                            if( iterToTrue == _subformulas.begin() )
-                                return (++iterToTrue)->mpContent;
-                            return _subformulas.begin()->mpContent;
-                        }
-                    }
-                }
-            }
-            #endif
-            if( _subformulas.size() == 1 )
-                return newFormulaWithOneSubformula( _type, *(_subformulas.begin()) );
+            result = add( new FormulaContent<Pol>( _type, std::move( subformulas ) ) );
         }
-        return add( new FormulaContent<Pol>( _type, std::move( _subformulas ) ) );
+        return negateResult ? result->mNegation : result;
     }
     
     template<typename Pol>
@@ -272,10 +281,10 @@ namespace carl
             std::swap(_subformulas[1], _subformulas[2]);
             return createITE(std::move(_subformulas));
         }
-        if (condition == elsecase) elsecase = falseFormula();
-        if (condition == elsecase.mpContent->mNegation) elsecase = trueFormula();
-        if (condition == thencase) thencase = trueFormula();
-        if (condition == thencase.mpContent->mNegation) thencase = falseFormula();
+        if (condition == elsecase) elsecase = Formula<Pol>(falseFormula());
+        if (condition.mpContent == elsecase.mpContent->mNegation) elsecase = Formula<Pol>(trueFormula());
+        if (condition == thencase) thencase = Formula<Pol>(trueFormula());
+        if (condition.mpContent == thencase.mpContent->mNegation) thencase = Formula<Pol>(falseFormula());
         
         if (thencase.isFalse()) {
             // (ite c false b) = (~c or false) and (c or b) = ~c and (c or b) = (~c and b)

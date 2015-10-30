@@ -16,7 +16,7 @@
 #include <cstring>
 #include <sstream>
 #include <assert.h>
-#include "Relation.h"
+#include "../core/Relation.h"
 #include "../config.h"
 #include "../core/VariableInformation.h"
 #include "../interval/Interval.h"
@@ -698,7 +698,7 @@ namespace carl
                 if( isBound() )
                 {
                     if( mpContent->mRelation == Relation::EQ ) return true;
-                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm()->coeff();
+                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm().coeff();
                     if( coeff < 0 )
                         return (mpContent->mRelation == Relation::LEQ || mpContent->mRelation == Relation::LESS );
                     else
@@ -718,7 +718,7 @@ namespace carl
                 if( isBound() )
                 {
                     if( mpContent->mRelation == Relation::EQ ) return true;
-                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm()->coeff();
+                    const typename Pol::NumberType& coeff = mpContent->mLhs.lterm().coeff();
                     if( coeff > 0 )
                         return (mpContent->mRelation == Relation::LEQ || mpContent->mRelation == Relation::LESS );
                     else
@@ -728,6 +728,14 @@ namespace carl
                     }
                 }
                 return false;
+            }
+            
+            /**
+             * @return An approximation of the complexity of this constraint.
+             */
+            size_t complexity() const
+            {
+                return 1 + mpContent->mLhs.complexity();
             }
             
             /**

@@ -4,27 +4,12 @@
 #include <list>
 
 #include "carl/core/UnivariatePolynomial.h"
-#include "carl/core/MultivariatePolynomial.h"
 #include "carl/cad/EliminationSet.h"
 #include "carl/util/platform.h"
 
-using namespace carl;
+#include "../Common.h"
 
-#ifdef USE_CLN_NUMBERS
-	#include <cln/cln.h>
-	typedef cln::cl_RA Rational;
-	typedef cln::cl_I Integer;
-#elif defined(__WIN)
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-	typedef mpq_class Rational;
-	typedef mpz_class Integer;
-#else
-	#include <gmpxx.h>
-	typedef mpq_class Rational;
-	typedef mpz_class Integer;
-#endif
+using namespace carl;
 
 TEST(EliminationSet, BasicOperations)
 {
@@ -37,7 +22,7 @@ TEST(EliminationSet, BasicOperations)
 	cad::PolynomialOwner<Rational> owner;
 
 	cad::EliminationSet<Rational> s(&owner);
-	
+
 	cad::MPolynomial<Rational> mpz({z});
 	cad::MPolynomial<Rational> mpxz2({(Rational)-1*x*z});
 	cad::MPolynomial<Rational> mpxz({(Rational)-1*x*z, Term<Rational>(2)});
@@ -49,19 +34,19 @@ TEST(EliminationSet, BasicOperations)
 	cad::UPolynomial<Rational>* q = new cad::UPolynomial<Rational>(x, (Rational)-3*mpone + mpone*y*y*y);
 	cad::UPolynomial<Rational>* r = new cad::UPolynomial<Rational>(x, mpz + mpxz2*y*y);
 	cad::UPolynomial<Rational>* w = new cad::UPolynomial<Rational>(x, mpz + mpxz*y*y);
-	
+
 	s.insert(p);
 	s.insert(q, {one, p});
 	s.insert(r, {w, nullptr, p, q});
 	s.insert(w, {p, q});
-	
+
 	ASSERT_EQ((size_t)1, s.erase(p));
 	ASSERT_EQ((size_t)0, s.erase(p));
 	s.removeByParent(p); // delete q and w
 	ASSERT_EQ((size_t)0, s.erase(q));
 	ASSERT_EQ((size_t)0, s.erase(w));
 	ASSERT_EQ((size_t)1, s.erase(r));
-	
+
 	delete one;
 	delete p;
 	delete q;
@@ -75,9 +60,9 @@ TEST(EliminationSet, SetProperty)
 	Variable x = vpool.getFreshVariable();
 	cad::PolynomialOwner<Rational> owner;
 	cad::EliminationSet<Rational> s(&owner);
-	
-	cad::MPolynomial<Rational> mpone({1});
-	
+
+	cad::MPolynomial<Rational> mpone(1);
+
 	for (unsigned int i = 0; i < 10; i++) {
 		cad::UPolynomial<Rational>* p = new cad::UPolynomial<Rational>(x, {mpone, mpone, mpone});
 		s.insert(p);

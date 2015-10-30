@@ -2,8 +2,8 @@
  * @file Heap.h
  * This file has been extracted from mathic. It was deployed without license at:
  * http://www.broune.com/papers/issac2012.html
- * Currently, it is distributed under LGPL v2  from 
- * http://www.broune.com/papers/issac2012.html
+ * 
+ * As of now, it is available at @cite Mathic .
  */
 
 #pragma once
@@ -345,4 +345,3 @@ namespace carl
         return true;
     }
 }
-

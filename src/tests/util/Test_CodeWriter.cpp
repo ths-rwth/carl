@@ -1,45 +1,30 @@
 #include "gtest/gtest.h"
 #include "carl/io/CodeWriter.h"
-#include "carl/core/MultivariatePolynomial.h"
 
 #include <fstream>
 
-#ifdef USE_CLN_NUMBERS
-	#include <cln/cln.h>
-	typedef cln::cl_RA Rational;
-	typedef cln::cl_I Integer;
-#elif defined(__WIN)
-	#pragma warning(push, 0)
-	#include <mpirxx.h>
-	#pragma warning(pop)
-	typedef mpq_class Rational;
-	typedef mpz_class Integer;
-#else
-	#include <gmpxx.h>
-	typedef mpq_class Rational;
-	typedef mpz_class Integer;
-#endif
+#include "../Common.h"
 
 using namespace carl;
 
 TEST(CodeWriter, Basic)
 {
-		
+
     carl::GeneratorWriter<carl::MultivariatePolynomial<Rational>, carl::MultivariatePolynomial<Rational>> gw("TestAdditionGenerator");
-	
+
 	carl::Variable x(1);
 	carl::Variable y(2);
 	carl::Variable z(3);
-	
+
 	carl::MultivariatePolynomial<Rational> p1({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
 	carl::MultivariatePolynomial<Rational> p2({(Rational)1*x, (Rational)-1*y*z, (Rational)3*x*z*z});
 	carl::MultivariatePolynomial<Rational> p3({(Rational)1*z, (Rational)-1*x*x, (Rational)3*y*x*x});
-	
-	
+
+
 	gw.addCall(p1*p2, p2*p3);
 	gw.addCall(p2*p2, p2*p1);
 	gw.addCall(p3*p2, p2*p2);
-	
+
 	std::ofstream out("test.cpp");
 	out << "\
 #include <utility>\n\
@@ -83,6 +68,3 @@ TEST_F(BenchmarkTest, Addition)\n\
 }\
 " << std::endl;
 }
-	
-
-	

@@ -41,6 +41,7 @@ protected:
 private:
 	std::weak_ptr<RealAlgebraicNumberIR> pThis;
 	std::shared_ptr<RealAlgebraicNumberIR> thisPtr() const {
+		assert(!pThis.expired());
 		return std::shared_ptr<RealAlgebraicNumberIR>(this->pThis);
 	}
 	
@@ -90,7 +91,8 @@ public:
 			const bool normalize = true,
 			const bool isRoot = true) {
 		assert(i.isOpenInterval() || i.isPointInterval());
-		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(p, p.standardSturmSequence(), i, normalize, isRoot));
+		UnivariatePolynomial<Number> pn = p.normalized();
+		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(pn, pn.standardSturmSequence(), i, normalize, isRoot));
 		CARL_LOG_TRACE("carl.core", "Creating " << res);
 		res->pThis = res;
 		return res;
@@ -301,6 +303,10 @@ private:
 	 * @return If a refinement was done.
 	 */
 	bool checkIntersection(std::shared_ptr<RealAlgebraicNumberIR> n, const Interval<Number> i);
+	
+	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
+		return p.countRealRoots(this->interval) == 1;
+	}
 
 public:	
 	/**

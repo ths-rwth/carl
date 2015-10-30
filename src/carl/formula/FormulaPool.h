@@ -43,6 +43,8 @@ namespace carl
             mutable std::recursive_mutex mMutexPool;
             ///
             FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*> mTseitinVars;
+            ///
+            FastPointerMap<FormulaContent<Pol>,typename FastPointerMap<FormulaContent<Pol>,const FormulaContent<Pol>*>::iterator> mTseitinVarToFormula;
             
             #ifdef THREAD_SAFE
             #define FORMULA_POOL_LOCK_GUARD std::lock_guard<std::recursive_mutex> lock( mMutexPool );
@@ -107,6 +109,7 @@ namespace carl
                     const FormulaContent<Pol>* hi = create( carl::freshBooleanVariable() );
                     hi->mDifficulty = _formula.difficulty();
                     iter.first->second = hi;
+                    mTseitinVarToFormula[hi] = iter.first;
                 }
                 return Formula<Pol>( iter.first->second );
             }
@@ -357,15 +360,25 @@ namespace carl
 			}
             
             void free( const FormulaContent<Pol>* _elem )
-            {   
+            {
                 FORMULA_POOL_LOCK_GUARD
                 const FormulaContent<Pol>* tmp = _elem->mType == FormulaType::NOT ? _elem->mNegation : _elem;
                 assert( tmp->mUsages > 0 );
                 --tmp->mUsages;
                 if( tmp->mUsages == 1 )
                 {
-                    mTseitinVars.erase( tmp );
-                    mTseitinVars.erase( tmp->mNegation );
+                    auto tmpTVIter = mTseitinVarToFormula.find( tmp );
+                    if( tmpTVIter != mTseitinVarToFormula.end() )
+                    {
+                        mTseitinVars.erase( tmpTVIter->second );
+                        mTseitinVarToFormula.erase( tmpTVIter );
+                    }
+                    auto tmpNegTVIter = mTseitinVarToFormula.find( tmp->mNegation );
+                    if( tmpNegTVIter != mTseitinVarToFormula.end() )
+                    {
+                        mTseitinVars.erase( tmpNegTVIter->second );
+                        mTseitinVarToFormula.erase( tmpNegTVIter );
+                    }
                     mPool.erase( tmp );
                     delete tmp->mNegation;
                     delete tmp;
@@ -407,8 +420,8 @@ namespace carl
                     result[form] = (*_func)( _arg, form );
                     if( elem != mpFalse )
                     {
-                        Formula<Pol> form(elem->mNegation);
-                        result[form] = (*_func)( _arg, form );
+                        Formula<Pol> form2(elem->mNegation);
+                        result[form2] = (*_func)( _arg, form2 );
                     }
                 }
                 return result;
@@ -430,31 +443,6 @@ namespace carl
             //const FormulaContent<Pol>* create( FormulaType _type, Formulas<Pol>&& _subformulas );
             
     private:
-        
-            /**
-             * Creates a formula of the given type but with only one sub-formula.
-             * @param _type
-             * @param _subformula
-             * @return True, if the given type is IFF;
-             *         False, if the given type is XOR;
-             *         The given sub-formula if the type is AND or OR.
-             */
-            const FormulaContent<Pol>* newFormulaWithOneSubformula( FormulaType _type, const Formula<Pol>& _subformula )
-            {
-                assert( FormulaType::OR || FormulaType::AND || FormulaType::XOR || FormulaType::IFF );
-                // We expect that this only happens, if the intended sub-formulas are all the same.
-                switch( _type )
-                {
-                    case FormulaType::XOR: // f xor f is false
-                        return falseFormula();
-                    case FormulaType::IFF: // f iff f is true
-                        return trueFormula();
-                    default: // f or f = f; f and f = f
-                    {
-                        return _subformula.mpContent;
-                    }
-                }
-            }
             
             /**
              * Inserts the given formula to the pool, if it does not yet occur in there.

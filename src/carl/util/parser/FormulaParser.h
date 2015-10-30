@@ -20,11 +20,11 @@ struct FormulaParser: public qi::grammar<Iterator, Formula<Pol>(), Skipper> {
         naryop.add("or", FormulaType::OR);
         
 		varname = qi::lexeme[ (qi::alpha | qi::char_("~!@$%^&*_+=<>.?/-")) > *(qi::alnum | qi::char_("~!@$%^&*_+=<>.?/-"))];
-        formula.name("varname");
+        varname.name("varname");
 //        qi::debug(varname);
         
 		variable = (varmap[qi::_val = qi::_1]) | (varname[qi::_val = px::bind(&FormulaParser<Pol>::newVariable, px::ref(*this), qi::_1)]);
-        formula.name("variable");
+        variable.name("variable");
 //        qi::debug(variable);
         
         formula_op = 
@@ -73,10 +73,10 @@ private:
                     return Formula<Pol>( FormulaType::FALSE );
                 Formulas<Pol> subFormulas;
                 subFormulas.push_back( first );
-                for (const auto& op: ops) {
-                    if( op.getType() == FormulaType::FALSE )
+                for (const auto& subop: ops) {
+                    if( subop.getType() == FormulaType::FALSE )
                         return Formula<Pol>( FormulaType::FALSE );
-                    subFormulas.push_back( op );
+                    subFormulas.push_back( subop );
                 }
                 return Formula<Pol>( FormulaType::AND, subFormulas );
             }
@@ -85,10 +85,10 @@ private:
                     return Formula<Pol>( FormulaType::TRUE );
                 Formulas<Pol> subFormulas;
                 subFormulas.push_back( first );
-                for (const auto& op: ops) {
-                    if( op.getType() == FormulaType::TRUE )
+                for (const auto& subop: ops) {
+                    if( subop.getType() == FormulaType::TRUE )
                         return Formula<Pol>( FormulaType::TRUE );
-                    subFormulas.push_back( op );
+                    subFormulas.push_back( subop );
                 }
                 return Formula<Pol>( FormulaType::OR, subFormulas );
             }

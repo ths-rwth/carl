@@ -16,10 +16,6 @@ namespace carl
 
 	class BVConstraint
 	{
-		// TODO: Assigning mId requires Pool<BVConstraint> to be a friend,
-		// using the private constructors requires BVConstraintPool to be
-		// a friend. Should we move mId assignment to subclass?
-		friend class Pool<BVConstraint>;
 		friend class BVConstraintPool;
 
 	private:
@@ -195,6 +191,14 @@ namespace carl
 		{
 			return mHash;
 		}
+            
+        /**
+         * @return An approximation of the complexity of this bit vector constraint.
+         */
+        size_t complexity() const
+        {
+            return 1 + mLhs.complexity() + mRhs.complexity();
+        }
 	};
 } // namespace carl
 

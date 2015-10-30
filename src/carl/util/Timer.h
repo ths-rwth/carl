@@ -16,7 +16,7 @@ struct Timer {
 	/// The clock type used jere.
 	typedef std::chrono::high_resolution_clock clock;
 	/// The duration type used here.
-	typedef std::chrono::duration<unsigned,std::milli> duration;
+	typedef std::chrono::duration<std::size_t,std::milli> duration;
 	/// Start of this timer.
 	clock::time_point start;
 	Timer(): start(clock::now()) {}
@@ -24,7 +24,7 @@ struct Timer {
 	 * Calculated the number of milliseconds since this object has been created.
      * @return Milliseconds passed.
      */
-	unsigned passed() const {
+	std::size_t passed() const {
 		clock::duration d(clock::now() - start);
 		return std::chrono::duration_cast<duration>(d).count();
 	}

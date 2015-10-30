@@ -394,53 +394,6 @@ cad::Answer CAD<Number>::check(
 	assert(this->isSampleTreeConsistent());
 	assert(this->sampleTree.isConsistent());
 
-#ifdef CAD_CHECK_REDIRECT
-	CAD<Number>::checkCallCount++;
-	this->setting.trimVariables = false;
-	this->prepareElimination();
-	std::string filename = "cad";
-	std::stringstream stream;
-	stream << this;
-	filename += stream.str() + "_constraints";
-	stream.str("");
-	stream << CAD<Number>::checkCallCount;
-	filename += stream.str() + ".smt2";
-	CARL_LOG_INFO("carl.cad", "Redirecting call to file " << filename << "...");
-
-	// add bounds to the constraints
-	for (const auto& b: bounds) {
-		if (b.first >= this->variables.size()) continue;
-
-		switch (b.second.lowerBoundType()) {
-			case BoundType::INFTY:
-				break;
-			case BoundType::STRICT:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.lower()), MPolynomial(1)}), Sign::POSITIVE, this->variables);
-				break;
-			case BoundType::WEAK:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.lower()), MPolynomial(1)}), Sign::NEGATIVE, this->variables, true);
-				break;
-			default:
-				assert(false);
-		}
-
-		switch (b.second.upperBoundType()) {
-			case BoundType::INFTY:
-				break;
-			case BoundType::STRICT:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.upper()), MPolynomial(1)}), Sign::NEGATIVE, this->variables);
-				break;
-			case BoundType::WEAK:
-				constraints.emplace_back(UPolynomial(this->variables[b.first], {MPolynomial(-b.second.upper()), MPolynomial(1)}), Sign::POSITIVE, this->variables, true);
-				break;
-			default:
-				assert(false);
-		}
-	}
-	this->printConstraints(filename);
-	CARL_LOG_INFO("carl.cad", "done.");
-#endif
-
 	//////////////////////
 	// Initialization
 
@@ -453,13 +406,6 @@ cad::Answer CAD<Number>::check(
 		}
 		if (b.second.lowerBoundType() == BoundType::WEAK || b.second.upperBoundType() == BoundType::WEAK) {
 			onlyStrictBounds = false;
-		}
-	}
-
-	if (this->setting.computeConflictGraph) {
-		// add necessary conflict graph vertices if required
-		for (std::size_t i = conflictGraph.size(); i < constraints.size(); i++) {
-			conflictGraph.addConstraintVertex();
 		}
 	}
 
@@ -491,6 +437,7 @@ cad::Answer CAD<Number>::check(
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
+					CARL_LOG_FATAL("carl.cad", "Exiting. Why?");
 					exit(123);
 					//std::swap(constraints.back(), constraint);
 					conflictGraph = cad::ConflictGraph<Number>();
@@ -633,6 +580,8 @@ cad::Answer CAD<Number>::check(
 
 	if (satisfiable == cad::Answer::True) {
 		CARL_LOG_DEBUG("carl.cad", "Result: sat (by sample point " << r << ")");
+	} else if (satisfiable == cad::Answer::Unknown) {
+		CARL_LOG_DEBUG("carl.cad", "Result: unknown");
 	} else {
 		CARL_LOG_DEBUG("carl.cad", "Result: unsat");
 	}
@@ -860,24 +809,32 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	if (!currentSamples.samples().empty()) {
 		// Sanity check: Assert that outermost sample is a root.
 		auto first = *currentSamples.samples().begin();
-		assert(!first->isRoot());
+		//assert(!first->isRoot());
 	}
 
 	bool boundsActive = !bounds.isEmpty() && !bounds.isInfinite();
 
 	for (const auto& root: roots) {
-		if (!root->containedIn(bounds)) continue;
+		CARL_LOG_TRACE("carl.cad", "\tWorking on " << root);
+		if (!root->containedIn(bounds)) {
+			CARL_LOG_TRACE("carl.cad", "\tout of bounds " << bounds << " -> ignoring");
+			continue;
+		}
 		auto insertValue = currentSamples.insert(root);
 		auto insertIt = std::get<0>(insertValue);
 		if (!std::get<1>(insertValue)) {
 			if (std::get<2>(insertValue)) {
 				newSampleSet.insert(*insertIt);
 				replacedSamples.push_front(*insertIt);
+				CARL_LOG_TRACE("carl.cad", "\treplaced another sample");
+			} else {
+				CARL_LOG_TRACE("carl.cad", "\tsample already exists as " << *insertIt);
 			}
 		} else {
 			// we found a new sample
 			// add the root to new samples (with root switch on)
 			newSampleSet.insert(*insertIt);
+			CARL_LOG_TRACE("carl.cad", "\tadded as new sample");
 		}
 		// local set storing the elements which shall be added to currentSampleSet and newSampleSet in the end
 		std::list<RealAlgebraicNumberNRPtr<Number>> newSamples;
@@ -1059,7 +1016,7 @@ std::list<RealAlgebraicNumberPtr<Number>> CAD<Number>::constructSampleAt(sampleI
 }
 
 template<typename Number>
-std::pair<bool, bool> CAD<Number>::checkNode(
+typename CAD<Number>::CheckNodeResult CAD<Number>::checkNode(
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
@@ -1077,7 +1034,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 	// settings demand not to take this sample (e.g., because only real roots are solutions)
 	if (sampleList.empty()) {
 		CARL_LOG_TRACE("carl.cad", "sample is empty");
-		return std::make_pair(false, true);
+		return CNR_SKIP;
 	}
 	RealAlgebraicPoint<Number> sample(sampleList);
 	bool boundsOK = true;
@@ -1096,12 +1053,12 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 	if (!boundsOK) {
 		CARL_LOG_TRACE("carl.cad", "bound clash");
 		// this point did not match the bounds => continue searching
-		return std::make_pair(false, true);
+		return CNR_SKIP;
 	}
 	if (sample.dim() == dim) {
 		CARL_LOG_TRACE("carl.cad", "full dimension");
 		// found a sample to check with the constraints
-		if (excludePrevious) return std::make_pair(false, true);
+		if (excludePrevious) return CNR_SKIP;
 
 		if (
 			(this->setting.computeConflictGraph && constraints.satisfiedBy(sample, getVariables(), conflictGraph)) ||
@@ -1109,7 +1066,7 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 			) {
 			r = sample;
 			CARL_LOG_TRACE("carl.cad", "sample is good!");
-			return std::make_pair(true, false);
+			return CNR_TRUE;
 		}
 	} else {
 		CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", continue lifting");
@@ -1129,11 +1086,14 @@ std::pair<bool, bool> CAD<Number>::checkNode(
 		///@todo Handle answers
 		if (status == cad::Answer::True) {
 			CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting succesfull");
-			return std::make_pair(true, false);
+			return CNR_TRUE;
+		} else if (status == cad::Answer::Unknown) {
+			CARL_LOG_DEBUG("carl.cad", "Incomplete sample " << sampleList << ", lifting got unknown");
+			return CNR_UNKNOWN;
 		}
 		CARL_LOG_TRACE("carl.cad", "Incomplete sample " << sampleList << ", lifting failed");
 	}
-	return std::make_pair(false, false);
+	return CNR_FALSE;
 }
 
 template<typename Number>
@@ -1173,22 +1133,12 @@ cad::Answer CAD<Number>::mainCheck(
 	////////////
 	// Main search strategy
 
-	/* Three phases are preformed:
-	 * Phase 1: Try to lift every sample ending in a node of the trace starting from the topmost node.
+	/* 
 	 * Phase 2: Search the sample tree for already satisfying samples and lift the samples not yet lifted to the full dimension
 	 *          (all possibly within given bounds).
 	 *          Note that next == true skips...
 	 * Phase 3: Lift at those sample tree nodes where lifting is still possible (possibly within given bounds).
 	 */
-
-	/* Phase 1
-	 * Check or lift the possibly stored last sample point first.
-	 *
-	 * If the sample tree is non-trivial (maxDepth != 0), check the given sample point first.
-	 * This can be, e.g., the sample which satisfied the last set of constraints.
-	 */
-
-	CARL_LOG_DEBUG("carl.cad", "mainCheck: Entering Phase 1...");
 
 	/* Phase 2
 	 * Invariant: There might be nodes in the sample tree which are not at the final depth and still need to be lifted.
@@ -1219,6 +1169,8 @@ cad::Answer CAD<Number>::mainCheck(
 		if (status == cad::Answer::True) {
 			// lifting yields a satisfying sample
 			return cad::Answer::True;
+		} else if (status == cad::Answer::Unknown) {
+			return cad::Answer::Unknown;
 		}
 	} else {
 		CARL_LOG_TRACE("carl.cad", "maxDepth != 0, maxDepth = " << maxDepth);
@@ -1227,8 +1179,9 @@ cad::Answer CAD<Number>::mainCheck(
 			// traverse the current sample tree leaves for satisfying samples
 			CARL_LOG_TRACE("carl.cad", this->sampleTree);
 			auto res = this->checkNode(leaf, true, next, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);
-			if (res.first) return cad::Answer::True;
-			if (res.second) continue;
+			if (res == CNR_TRUE) return cad::Answer::True;
+			if (res == CNR_UNKNOWN) return cad::Answer::Unknown;
+			if (res == CNR_SKIP) continue;
 		}
 	}
 	CARL_LOG_TRACE("carl.cad", "Checking if CAD is complete");
@@ -1276,6 +1229,8 @@ cad::Answer CAD<Number>::mainCheck(
 
 		// lift all nodes at the corresponding tree depth according to the found lifting positions
 		unsigned depth = (unsigned)((int)dim - level - 1);
+		CARL_LOG_TRACE("carl.cad", "Current depth = " << depth);
+		CARL_LOG_TRACE("carl.cad", this->sampleTree);
 		assert(depth >= 0 && depth < dim);
 		assert(depth <= (unsigned)this->sampleTree.max_depth());
 		for (auto node = this->sampleTree.begin_depth(depth); node != this->sampleTree.end_depth(); node++) {
@@ -1317,6 +1272,8 @@ cad::Answer CAD<Number>::mainCheck(
 			if (status == cad::Answer::True) {
 				// lifting yields a satisfying sample
 				return cad::Answer::True;
+			} else if (status == cad::Answer::Unknown) {
+				return cad::Answer::Unknown;
 			}
 		}
 		this->eliminationSets[(unsigned)level].setLiftingPositionsReset();
@@ -1399,6 +1356,8 @@ cad::Answer CAD<Number>::liftCheck(
 		return cad::Answer::True;
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
+	CARL_LOG_FUNC("carl.cad", "Integer setting: " << this->setting.integerHandling);
+	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumberPtr<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << sampleTree);
 	assert(this->sampleTree.is_valid(node));
 	if (checkBounds && boundsActive && (*node != nullptr)) {
 		// bounds shall be checked and the level is non-empty
@@ -1409,6 +1368,21 @@ cad::Answer CAD<Number>::liftCheck(
 		if (bound != bounds.end()) {
 			if (!(*node)->containedIn(bound->second)) {
 				return cad::Answer::False;
+			}
+		}
+	}
+	
+	if (*node != nullptr) {
+		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
+			if (!(*node)->isIntegral()) {
+				assert(openVariableCount < this->variables.size());
+				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+				std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+				sample.pop_back();
+				r = RealAlgebraicPoint<Number>(std::move(sample));
+				CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
+				return cad::Answer::Unknown;
 			}
 		}
 	}
@@ -1513,6 +1487,29 @@ cad::Answer CAD<Number>::liftCheck(
 				currentSamples.simplify(true);
 			}
 		}
+		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
+			Interval<Number> bound = Interval<Number>::unboundedInterval();
+			if (checkBounds) {
+				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+				CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
+				assert(openVariableCount < this->variables.size());
+				auto b = bounds.find(openVariableCount);
+				if (b != bounds.end()) bound = b->second;
+			}
+			CARL_LOG_DEBUG("carl.cad", "Checking if we should split early within " << bound);
+			for (const auto& newSample: sampleSetIncrement) {
+				if (!newSample->containedIn(bound)) continue;
+				if (!newSample->isIntegral()) {
+					std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+					sample.pop_back();
+					sample.insert(sample.begin(), newSample);
+					r = RealAlgebraicPoint<Number>(std::move(sample));
+					CARL_LOG_DEBUG("carl.cad", "Eager split at " << r);
+					return cad::Answer::Unknown;
+				}
+			}
+		}
 
 		/* Phase 2
 		 * Lifting of the current level.
@@ -1528,19 +1525,6 @@ cad::Answer CAD<Number>::liftCheck(
 				break;
 			}
 			RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
-			if (this->setting.splitInteger) {
-				CARL_LOG_TRACE("carl.cad", "Trying to split at integer: ");
-				if (this->variables[openVariableCount].getType() == VariableType::VT_INT) {
-					if (!newSample->isIntegral()) {
-						std::cout << "Split!" << std::endl;
-						std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-						sample.pop_back();
-						sample.push_back(newSample);
-						r = RealAlgebraicPoint<Number>(std::move(sample));
-						return cad::Answer::Unknown;
-					}
-				}
-			}
 
 			// Sample storage
 			auto newNode = this->storeSampleInTree(newSample, node);
@@ -1561,7 +1545,20 @@ cad::Answer CAD<Number>::liftCheck(
 				// there might still be samples left but not stored yet
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
-					this->storeSampleInTree(sampleSetIncrement.next(), node);
+					RealAlgebraicNumberPtr<Number> newSample = sampleSetIncrement.next();
+					if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
+						if (!newSample->isIntegral()) {
+							std::vector<RealAlgebraicNumberPtr<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+							CARL_LOG_DEBUG("carl.cad", "Current sample: " << sample);
+							//sample.pop_back();
+							//sample.insert(sample.begin(), newSample);
+							//r = RealAlgebraicPoint<Number>(std::move(sample));
+							//CARL_LOG_DEBUG("carl.cad", "Dangling lazy split at " << r);
+							sampleSetIncrement.pop();
+							continue;
+						}
+					}
+					this->storeSampleInTree(newSample, node);
 					sampleSetIncrement.pop();
 				}
 				if (checkIntegrality(newNode)) {
@@ -1571,6 +1568,9 @@ cad::Answer CAD<Number>::liftCheck(
 					integralityBacktracking = true;
 					CARL_LOG_ERROR("carl.cad", "Lifting was successful, but integrality is violated.");
 				}
+			} else if (liftingSuccessful == cad::Answer::Unknown) {
+				CARL_LOG_DEBUG("carl.cad", "Got unknown, propagating...");
+				return liftingSuccessful;
 			} else if (!satPath.empty()) {
 				// Sample was SAT, but not integral.
 				if (checkIntegrality(newNode)) {

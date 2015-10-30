@@ -1,3 +1,4 @@
+
 /**
  * @file MonomialPool.cpp
  * @author Florian Corzilius <corzilius@cs.rwth-aachen.de>
@@ -50,7 +51,15 @@ namespace carl
 				newExps.assign(mExponents.begin(), mExponents.end());
 				newExps[(unsigned)(it - mExponents.begin())].second -= 1;
 			}
-			res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			if (newExps.empty())
+			{
+				res = nullptr;	
+			}
+			else
+			{
+				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+			}
+			
 			return true;
 		}
 	}
@@ -357,6 +366,7 @@ namespace carl
 			lastVar = ve.first;
 		}
 		if (tdegree != mTotalDegree) return false;
+		if (!std::is_sorted(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; })) return false;
 		return true;
 	}
 	
@@ -435,7 +445,7 @@ namespace carl
 			newExps.insert(newExps.end(), itright, rhs->end());
 		Monomial::Arg result = createMonomial(std::move(newExps), lhs->tdeg() + rhs->tdeg());
 		CARL_LOG_TRACE("carl.core.monomial", "Result: " << result);
-		return std::move(result);
+		return result;
 	}
 
 	Monomial::Arg operator*(const Monomial::Arg& lhs, Variable::Arg rhs)
@@ -459,12 +469,12 @@ namespace carl
 			}
 		}
 		if (!inserted) newExps.emplace_back(rhs, 1);
-		return std::move(MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 ));
+		return MonomialPool::getInstance().create( std::move(newExps), lhs->tdeg() + 1 );
 	}
 	
 	Monomial::Arg operator*(Variable::Arg lhs, const Monomial::Arg& rhs)
 	{
-		return std::move(rhs * lhs);
+		return rhs * lhs;
 	}
 	
 	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs)
@@ -482,6 +492,6 @@ namespace carl
 		}
 		else
 			newExps.emplace_back( lhs, 2 );
-		return std::move(MonomialPool::getInstance().create( std::move(newExps), 2 ));
+		return MonomialPool::getInstance().create( std::move(newExps), 2 );
 	}
 }

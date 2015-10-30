@@ -27,9 +27,13 @@ if(GMP_FOUND)
                PATHS ${GMP_LIBRARIES_DIR_SEARCH}
                DOC "Path to the GMPXX library"
                )
-               
-  
-  
-  find_package_handle_standard_args(GMPXX "DEFAULT_MSG" GMPXX_LIBRARIES GMPXX_INCLUDE_DIR )
-
+    if (GMPXX_INCLUDE_DIR AND GMPXX_LIBRARIES)
+        set(GMPXX_FOUND TRUE)
+    endif()
+else()
+    message(warning "Did not search for GMPXX as GMP was not found")
 endif()
+
+MARK_AS_ADVANCED (	GMPXX_INCLUDE_DIR
+					GMPXX_LIBRARIES
+				 )

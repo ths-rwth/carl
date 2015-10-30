@@ -15,18 +15,18 @@ set(MPFR_PREFIX "" CACHE PATH "The path to the previx of an MPFR installation")
 find_path(MPFR_INCLUDE_DIR mpfr.h 
 	PATHS ${MPFR_PREFIX}/include /usr/include /usr/local/include)
 
-find_library(MPFR_LIBRARY NAMES mpfr 
+find_library(MPFR_LIBRARIES NAMES mpfr 
 	PATHS ${MPFR_PREFIX}/lib /usr/lib /usr/local/lib)
 
-if(MPFR_INCLUDE_DIR AND MPFR_LIBRARY)
-	get_filename_component(MPFR_LIBRARY_DIR ${MPFR_LIBRARY} PATH)
+if(MPFR_INCLUDE_DIR AND MPFR_LIBRARIES)
+	get_filename_component(MPFR_LIBRARIES_DIR ${MPFR_LIBRARIES} PATH)
    set(MPFR_FOUND TRUE)
 endif()
 
 
 if(MPFR_FOUND)
    if(NOT MPFR_FIND_QUIETLY)
-      MESSAGE(STATUS "Found MPFR: ${MPFR_LIBRARY}")
+      MESSAGE(STATUS "Found MPFR: ${MPFR_LIBRARIES}")
    endif()
 elseif(MPFR_FOUND)
    if(MPFR_FIND_REQUIRED)

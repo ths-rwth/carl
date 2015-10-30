@@ -441,6 +441,11 @@ private:
 	// AUXILIARY METHODS //
 	///////////////////////
 	
+	bool integerHeuristicActive(cad::IntegerHandling heuristic, std::size_t variable) const {
+		if (this->setting.integerHandling != heuristic) return false;
+		return this->variables[variable].getType() == VariableType::VT_INT;
+	}
+	
 	/**
 	 * Constructs the path from the given node to the root and conjoins all RealAlgebraicNumbers on the nodes of the path.
 	 *
@@ -473,7 +478,8 @@ private:
 	 * @param dim
      * @return 
      */
-	std::pair<bool, bool> checkNode(
+	enum CheckNodeResult { CNR_SKIP, CNR_TRUE, CNR_FALSE, CNR_UNKNOWN};
+	CheckNodeResult checkNode(
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
@@ -648,6 +654,7 @@ public:
 		if (!isOk) {
 			CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
 		}
+		return true;
 		assert(isOk);
 		return isOk;
 	}

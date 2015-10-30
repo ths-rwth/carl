@@ -16,6 +16,7 @@
 
 #include "../../util/Singleton.h"
 #include "../../util/Common.h"
+#include "../../util/hash.h"
 #include <vector>
 #include <string.h>
 #include "../Sort.h"
@@ -159,15 +160,12 @@ public:
      * @param _ufun The uninterpreted function to get the hash for.
      * @return The hash of the given uninterpreted function.
      */
-    size_t operator()( const carl::UFContent& _ufun ) const 
+    std::size_t operator()( const carl::UFContent& _ufun ) const 
     {
         hash<carl::Sort> h;
-        size_t result = hash<string>()( _ufun.name() );
-        for( auto& dom : _ufun.domain() )
-        {
-            // perform a circular shift by 5 bits.
-            CIRCULAR_SHIFT( size_t, result, 5 );
-            result ^= h( dom );
+        std::size_t result = std::hash<std::string>()(_ufun.name());
+        for (auto& dom: _ufun.domain()) {
+			carl::hash_add(result, h(dom));
         }
         return result;
     }

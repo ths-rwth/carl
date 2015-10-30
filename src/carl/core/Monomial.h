@@ -284,6 +284,14 @@ namespace carl
 		{
 			return mExponents.size();
 		}
+        
+        /**
+         * @return An approximation of the complexity of this monomial.
+         */
+        size_t complexity() const
+        {
+            return mTotalDegree;
+        }
 
 		/**
 		 * Retrieves the single variable of the monomial.
@@ -405,8 +413,6 @@ namespace carl
 				return false;
 			}
 			return true;
-			
-			
 		}
 		/**
 		 * Returns a new monomial that is this monomial divided by m.
@@ -821,4 +827,3 @@ namespace std
 		}
 	};
 } // namespace std
-

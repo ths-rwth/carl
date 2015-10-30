@@ -29,6 +29,32 @@ enum class SampleOrdering : unsigned {
 	Default = SampleOrdering::IntRatRoot
 };
 
+/// Defines how integers are handled.
+enum class IntegerHandling {
+    /// Generate a full real solution and split on non-integral assignments in this solution. This is done in the CADModule in SMT-RAT.
+    SPLIT_SOLUTION,
+	SPLIT_SOLUTION_INVERSE,
+    /// Split if no integral sample is available for an integer variable.
+    SPLIT_LAZY,
+    /// Split if a non-integral sample is available for an integer variable.
+    SPLIT_EARLY,
+    /// Backtrack within the sampling phase.
+    BACKTRACK
+};
+inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
+    switch (ih) {
+        case IntegerHandling::SPLIT_SOLUTION: return os << "Split on Solution";
+		case IntegerHandling::SPLIT_SOLUTION_INVERSE: return os << "Split on inverse Solution";
+        case IntegerHandling::SPLIT_LAZY: return os << "Split lazy";
+        case IntegerHandling::SPLIT_EARLY: return os << "Split early";
+        case IntegerHandling::BACKTRACK: return os << "Backtrack";
+    }
+    return os;
+}
+inline std::istream& operator>>(std::istream& in, IntegerHandling&) {
+    return in;
+}
+
 /**
  * Streaming operator for SampleOrdering.
  * @param os Output stream.
@@ -114,6 +140,7 @@ public:
 	bool improveBounds;
 	bool exploreInteger;
 	bool splitInteger;
+	IntegerHandling integerHandling;
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
 	/// standard strategy to be used for real root isolation
@@ -263,6 +290,7 @@ private:
 		improveBounds( true ),
 		exploreInteger(false),
 		splitInteger(true),
+		integerHandling(IntegerHandling::SPLIT_SOLUTION),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
@@ -288,6 +316,7 @@ public:
 		improveBounds( s.improveBounds ),
 		exploreInteger(s.exploreInteger),
 		splitInteger(s.splitInteger),
+		integerHandling(s.integerHandling),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}

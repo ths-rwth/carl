@@ -13,11 +13,11 @@ namespace carl
 {
     enum class BoundType {
                 /// the given bound is compared by a strict ordering relation
-                STRICT,
+                STRICT=0,
                 /// the given bound is compared by a weak ordering relation
-                WEAK,
+                WEAK=1,
                 /// the given bound is interpreted as minus or plus infinity depending on whether it is the left or the right bound
-                INFTY
+                INFTY=2
             };
     
 	inline static BoundType getWeakestBoundType( BoundType type1, BoundType type2 )

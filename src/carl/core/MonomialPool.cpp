@@ -68,7 +68,7 @@ namespace carl
 	}
 #endif
 	Monomial::Arg MonomialPool::add( Monomial::Content&& c, exponent totalDegree) {
-		return MonomialPool::add(std::move(PoolEntry(Monomial::hashContent(c), std::move(c))), totalDegree);
+		return MonomialPool::add(PoolEntry(Monomial::hashContent(c), std::move(c)), totalDegree);
 	}
 	
 	Monomial::Arg MonomialPool::create( Variable::Arg _var, exponent _exp )
@@ -81,9 +81,9 @@ namespace carl
 		return add(std::move(_exponents), _totalDegree);
 	}
 
-	Monomial::Arg MonomialPool::create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents, exponent _totalDegree )
+	Monomial::Arg MonomialPool::create( const std::initializer_list<std::pair<Variable, exponent>>& _exponents )
 	{
-		return add(Monomial::Arg(new Monomial(_exponents, _totalDegree)));
+		return add(Monomial::Arg(new Monomial(_exponents)));
 	}
 
 	Monomial::Arg MonomialPool::create( std::vector<std::pair<Variable, exponent>>&& _exponents )

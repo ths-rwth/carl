@@ -9,6 +9,7 @@
 
 #include "../../core/logging.h"
 #include "Common.h"
+#include "../../numbers/numbers.h"
 #include "FormulaParser.h"
 #include "PolynomialParser.h"
 #include "RationalFunctionParser.h"
@@ -59,8 +60,10 @@ public:
 	void addVariable(Variable::Arg v) {
         if( v.getType() == VariableType::VT_BOOL )
             formulaParser.addVariable(v);
-        else
+        else {
             polynomialParser.addVariable(v);
+			ratfunParser.addVariable(v);
+		}
 	}
 };
 

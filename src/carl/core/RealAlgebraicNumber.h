@@ -132,7 +132,7 @@ public:
 	 * Thus, if the result of this method is integral, an integral value has been found and otherwise, branching at the returned point guarantees progress.
 	 * @return a suitable branching point.
 	 */
-	virtual Number branchingPoint() const {
+	virtual Number branchingPoint() {
 		return this->value();
 	}
 
@@ -152,7 +152,7 @@ public:
 	 * Checks if the represented value is integral.
 	 * @return If this is integral.
 	 */
-	virtual bool isIntegral() const {
+	virtual bool isIntegral() {
 		return carl::isInteger(mValue);
 	}
 
