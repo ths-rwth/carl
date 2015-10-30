@@ -13,7 +13,7 @@ sudo add-apt-repository -y ppa:smspillaz/cmake-2.8.12
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get -qq update
 
-sudo apt-get purge cmake
+sudo apt-get -qq purge cmake
 install cmake libboost1.48-all-dev libcln-dev libeigen3-dev libgtest-dev libstdc++-4.9-dev time
 
 if [[ ${TASK} == "doxygen" ]]; then
