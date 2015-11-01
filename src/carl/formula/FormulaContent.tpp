@@ -126,7 +126,7 @@ namespace carl {
 
     template<typename Pol>
     FormulaContent<Pol>::FormulaContent(FormulaType _type, Formulas<Pol>&& _subformulas):
-        mHash( (size_t)_type ),
+        mHash( (size_t)_type )
     {
 #ifdef __VS
         assert( !mpSubformulasVS->empty() );

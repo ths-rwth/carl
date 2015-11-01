@@ -154,12 +154,21 @@ namespace carl
             return 1;
         if(this->type() == BVTermType::VARIABLE)
             return mpContent->mWidth;
+#ifdef __VS
         if(typeIsUnary(this->type()))
-            return mpContent->mWidth + mpContent->mUnary.mOperand.complexity();
+            return mpContent->mWidth + mpContent->mpUnaryVS->mOperand.complexity();
         if(typeIsBinary(this->type()))
-            return mpContent->mWidth + mpContent->mBinary.mFirst.complexity() + mpContent->mBinary.mSecond.complexity();
+            return mpContent->mWidth + mpContent->mpBinaryVS->mFirst.complexity() + mpContent->mpBinaryVS->mSecond.complexity();
         assert(this->type() == BVTermType::EXTRACT);
-        return mpContent->mExtract.mHighest - mpContent->mExtract.mLowest + mpContent->mExtract.mOperand.complexity();
+        return mpContent->mpExtractVS->mHighest - mpContent->mpExtractVS->mLowest + mpContent->mpExtractVS->mOperand.complexity();
+#else
+		if (typeIsUnary(this->type()))
+			return mpContent->mWidth + mpContent->mUnary.mOperand.complexity();
+		if (typeIsBinary(this->type()))
+			return mpContent->mWidth + mpContent->mBinary.mFirst.complexity() + mpContent->mBinary.mSecond.complexity();
+		assert(this->type() == BVTermType::EXTRACT);
+		return mpContent->mExtract.mHighest - mpContent->mExtract.mLowest + mpContent->mExtract.mOperand.complexity();
+#endif
     }
     
     BVTerm BVTerm::substitute(const std::map<BVVariable,BVTerm>& _substitutions) const

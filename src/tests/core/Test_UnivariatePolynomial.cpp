@@ -288,7 +288,7 @@ TEST(UnivariatePolynomial, factorization)
 TEST(UnivariatePolynomial, isNumber)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
-	EXPECT_FALSE(UnivariatePolynomial<Rational>(x, {1,2,3}).isNumber());
+	EXPECT_FALSE(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{1, 2, 3}).isNumber());
 	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, 1).isNumber());
 }
 
@@ -296,7 +296,7 @@ TEST(UnivariatePolynomial, isUnivariate)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
 	//Variable y = VariablePool::getInstance().getFreshVariable();
-	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, {1,2,3}).isUnivariate());
+	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{1, 2, 3}).isUnivariate());
 	//TODO: How does this work?
 	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).isUnivariate());
 }
@@ -304,52 +304,52 @@ TEST(UnivariatePolynomial, isUnivariate)
 TEST(UnivariatePolynomial, numericUnit)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericUnit(), 1);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,-3}).numericUnit(), -1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{1, 2, 3}).numericUnit(), 1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{1, 2, -3}).numericUnit(), -1);
 }
 
 TEST(UnivariatePolynomial, numericContent)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericContent(), 1);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {15,27,3}).numericContent(), 3);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-1,-2,-3}).numericContent(), 1);
-	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-15,-27,-3}).numericContent(), 3);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{1, 2, 3}).numericContent(), 1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{15, 27, 3}).numericContent(), 3);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{-1, -2, -3}).numericContent(), 1);
+	EXPECT_EQ(UnivariatePolynomial<Rational>(x, std::initializer_list<Rational>{-15, -27, -3}).numericContent(), 3);
 }
 
 TEST(UnivariatePolynomial, unitPart)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {1,2,3}).unitPart());
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {15,27,3}).unitPart());
-	EXPECT_EQ(-1,UnivariatePolynomial<Integer>(x, {-1,-2,-3}).unitPart());
-	EXPECT_EQ(-1,UnivariatePolynomial<Integer>(x, {-15,-27,-3}).unitPart());
+	EXPECT_EQ(1, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{1, 2, 3}).unitPart());
+	EXPECT_EQ(1, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{15, 27, 3}).unitPart());
+	EXPECT_EQ(-1, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{-1, -2, -3}).unitPart());
+	EXPECT_EQ(-1, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{-15, -27, -3}).unitPart());
 }
 
 TEST(UnivariatePolynomial, content)
 {
     Variable x = VariablePool::getInstance().getFreshVariable();
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {1,2,3}).normalized().content());
-	EXPECT_EQ(3,UnivariatePolynomial<Integer>(x, {15,27,3}).normalized().content());
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {-1,-2,-3}).normalized().content());
-	EXPECT_EQ(3,UnivariatePolynomial<Integer>(x, {-15,-27,-3}).normalized().content());
+	EXPECT_EQ(1, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{1, 2, 3}).normalized().content());
+	EXPECT_EQ(3, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{15, 27, 3}).normalized().content());
+	EXPECT_EQ(1, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{-1, -2, -3}).normalized().content());
+	EXPECT_EQ(3, UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{-15, -27, -3}).normalized().content());
 }
 
 
 TEST(UnivariatePolynomial, primitivePart)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {1,2,3}),UnivariatePolynomial<Integer>(x, {1,2,3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {5,9,1}),UnivariatePolynomial<Integer>(x, {15,27,3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {1,2,3}),UnivariatePolynomial<Integer>(x, {-1,-2,-3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {5,9,1}),UnivariatePolynomial<Integer>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{1, 2, 3}), UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{ 1, 2, 3 }).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{5, 9, 1}), UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{ 15, 27, 3 }).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{1, 2, 3}), UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{ -1, -2, -3 }).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{5, 9, 1}), UnivariatePolynomial<Integer>(x, std::initializer_list<Integer>{ -15, -27, -3 }).normalized().primitivePart().normalized().primitivePart());
 }
 
 TEST(UnivariatePolynomial, switchVariable)
 {
 	Variable x = VariablePool::getInstance().getFreshVariable();
 	Variable y = VariablePool::getInstance().getFreshVariable();
-	UnivariatePolynomial<Integer> p(x, {1,2,3});
+	UnivariatePolynomial<Integer> p(x, std::initializer_list<Integer>{1, 2, 3});
 	auto q = p.switchVariable(y);
 	std::cout << p << " -> " << q << std::endl;
 }

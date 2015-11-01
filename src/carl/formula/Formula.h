@@ -740,19 +740,27 @@ namespace carl
              */
             void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const
             {
-                if( mpContent->mType == FormulaType::CONSTRAINT )
 #ifdef __VS
-                    _constraints.push_back( *mpContent->mpConstraintVS );
-#else
-                    _constraints.push_back( mpContent->mConstraint );
-#endif
+				if (mpContent->mType == FormulaType::CONSTRAINT)
+					_constraints.push_back(*mpContent->mpConstraintVS);
                 else if( mpContent->mType == FormulaType::NOT )
-                    mpContent->mSubformula.getConstraints( _constraints );
+                    mpContent->mpSubformulaVS->getConstraints( _constraints );
                 else if( isNary() )
                 {
-                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
+                    for( const_iterator subAst = mpContent->mpSubformulasVS->begin(); subAst != mpContent->mpSubformulasVS->end(); ++subAst )
                         subAst->getConstraints( _constraints );
                 }
+#else
+                if (mpContent->mType == FormulaType::CONSTRAINT)
+                    _constraints.push_back(mpContent->mConstraint);
+                else if (mpContent->mType == FormulaType::NOT)
+                    mpContent->mSubformula.getConstraints(_constraints);
+                else if (isNary())
+                {
+                    for (const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst)
+                        subAst->getConstraints(_constraints);
+                }
+#endif
             }
             
             /**
@@ -763,13 +771,23 @@ namespace carl
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( *this );
+#ifdef __VS
                 else if( mpContent->mType == FormulaType::NOT )
-                    mpContent->mSubformula.getConstraints( _constraints );
+                    mpContent->mpSubformulaVS->getConstraints( _constraints );
                 else if( isNary() )
                 {
-                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
+                    for( const_iterator subAst = mpContent->mpSubformulasVS->begin(); subAst != mpContent->mpSubformulasVS->end(); ++subAst )
                         subAst->getConstraints( _constraints );
                 }
+#else
+				else if (mpContent->mType == FormulaType::NOT)
+					mpContent->mSubformula.getConstraints(_constraints);
+				else if (isNary())
+				{
+					for (const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst)
+						subAst->getConstraints(_constraints);
+				}
+#endif
             }
 
             /**
@@ -1047,7 +1065,6 @@ namespace carl
 		 * @param func Function to call.
 		 */
 		void visitVoid(const Formula& formula, const std::function<void(Formula)>& func);
-		void rvisit(const Formula& formula, const std::function<void(Formula)>& func);
 		/**
 		 * Recursively calls func on every subformula and return a new formula.
 		 * On every call of func, the passed formula is replaced by the result.
@@ -1056,7 +1073,6 @@ namespace carl
 		 * @return New formula.
 		 */
 		Formula visitResult(const Formula& formula, const std::function<Formula(Formula)>& func);
-		Formula rvisit(const Formula& formula, const std::function<Formula(Formula)>& func);
 	};
     
     template<typename Formula>

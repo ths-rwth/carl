@@ -25,16 +25,9 @@ TEST(GB_Buchberger, T1)
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
-#ifdef __VS
-    //TODO matthias: fix real issue
-    MultivariatePolynomial<Rational> F1({ (Rational)1 * x*x, (Rational)0*x });
-    MultivariatePolynomial<Rational> F2({ (Rational)1 * y*y, (Rational)-1 * (Rational)1 / (Rational)2 * x });
-    MultivariatePolynomial<Rational> F3({ (Rational)1 * x*y, (Rational)0*x });
-#else
     MultivariatePolynomial<Rational> F1({(Rational)1*x*x} );
     MultivariatePolynomial<Rational> F2({(Rational)1*y*y, (Rational)-1*(Rational)1/(Rational)2*x} );
     MultivariatePolynomial<Rational> F3({(Rational)1*x*y} );
-#endif
     GBProcedure<MultivariatePolynomial<Rational>, Buchberger, StdAdding> gbobject;
     EXPECT_TRUE(gbobject.inputEmpty());
     gbobject.addPolynomial(f1);
@@ -68,17 +61,10 @@ TEST(GB_Buchberger, T1_ReasonSets)
     PolynomialWithReasonSet<Rational> f1rs(f1);
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
     PolynomialWithReasonSet<Rational> f2rs(f2);
-<<<<<<< HEAD
     
-#ifdef __VS
-    PolynomialWithReasonSet<Rational> F1({(Rational)1*x*x, (Rational)0*x});
-    PolynomialWithReasonSet<Rational> F2({(Rational)1*y*y, (Rational)-1*(Rational)1/(Rational)2*x} );
-    PolynomialWithReasonSet<Rational> F3({(Rational)1*x*y, (Rational)0*x});
-#else
     PolynomialWithReasonSet<Rational> F1({ (Rational)1 * x*x });
     PolynomialWithReasonSet<Rational> F2({ (Rational)1 * y*y, (Rational)-1 * (Rational)1 / (Rational)2 * x });
     PolynomialWithReasonSet<Rational> F3({ (Rational)1 * x*y });
-#endif
     GBProcedure<PolynomialWithReasonSet<Rational>, Buchberger, StdAdding> gbobject;
     EXPECT_TRUE(gbobject.inputEmpty());
     gbobject.addPolynomial(f1rs);

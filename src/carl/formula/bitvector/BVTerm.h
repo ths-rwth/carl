@@ -300,9 +300,16 @@ namespace carl
 #endif
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
+#ifdef __VS
+		mType(_type), mWidth(_variable.width()), mId(0),
+		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
+		{
+			mpVariableVS = new BVVariable(_variable);
+#else
 		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0),
 		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
 		{
+#endif
 			assert(_type == BVTermType::VARIABLE);
 		}
 

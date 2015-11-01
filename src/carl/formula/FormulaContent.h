@@ -283,18 +283,31 @@ namespace carl {
                     case FormulaType::TRUE: break;
                     case FormulaType::FALSE: break;
                     case FormulaType::BOOL: break;
-                    case FormulaType::NOT: { mSubformula.~Formula(); break; }
+#ifdef __VS
+					case FormulaType::NOT: { mpSubformulaVS->~Formula(); delete mpSubformulasVS; break; }
+#else
+					case FormulaType::NOT: { mSubformula.~Formula(); break; }
+#endif
                     case FormulaType::IMPLIES: 
                     case FormulaType::AND: ;
                     case FormulaType::OR: ;
                     case FormulaType::XOR: ;
                     case FormulaType::IFF: ;
-                    case FormulaType::ITE: { mSubformulas.~vector(); break; }
+#ifdef __VS
+					case FormulaType::ITE: { mpSubformulasVS->~vector(); delete mpSubformulasVS; break; }
                     case FormulaType::EXISTS: ;
-                    case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
-                    case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
-                    case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
-                    case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
+					case FormulaType::FORALL: { mpQuantifierContentVS->~QuantifierContent(); delete mpQuantifierContentVS; break; }
+					case FormulaType::CONSTRAINT: { mpConstraintVS->~Constraint(); delete mpConstraintVS; break; }
+					case FormulaType::BITVECTOR: { mpBVConstraintVS->~BVConstraint(); delete mpBVConstraintVS; break; }
+					case FormulaType::UEQ: { mpUIEqualityVS->~UEquality(); delete mpUIEqualityVS; break; }
+#else
+					case FormulaType::ITE: { mSubformulas.~vector(); break; }
+					case FormulaType::EXISTS:;
+					case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
+					case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
+					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
+					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
+#endif
                 }
             }
 
