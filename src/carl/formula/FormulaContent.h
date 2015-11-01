@@ -284,7 +284,7 @@ namespace carl {
                     case FormulaType::FALSE: break;
                     case FormulaType::BOOL: break;
 #ifdef __VS
-					case FormulaType::NOT: { mpSubformulaVS->~Formula(); delete mpSubformulasVS; break; }
+					case FormulaType::NOT: { mpSubformulaVS->~Formula(); break; }
 #else
 					case FormulaType::NOT: { mSubformula.~Formula(); break; }
 #endif
@@ -294,12 +294,12 @@ namespace carl {
                     case FormulaType::XOR: ;
                     case FormulaType::IFF: ;
 #ifdef __VS
-					case FormulaType::ITE: { mpSubformulasVS->~vector(); delete mpSubformulasVS; break; }
+					case FormulaType::ITE: { mpSubformulasVS->~vector(); break; }
                     case FormulaType::EXISTS: ;
-					case FormulaType::FORALL: { mpQuantifierContentVS->~QuantifierContent(); delete mpQuantifierContentVS; break; }
-					case FormulaType::CONSTRAINT: { mpConstraintVS->~Constraint(); delete mpConstraintVS; break; }
-					case FormulaType::BITVECTOR: { mpBVConstraintVS->~BVConstraint(); delete mpBVConstraintVS; break; }
-					case FormulaType::UEQ: { mpUIEqualityVS->~UEquality(); delete mpUIEqualityVS; break; }
+					case FormulaType::FORALL: { mpQuantifierContentVS->~QuantifierContent(); break; }
+					case FormulaType::CONSTRAINT: { mpConstraintVS->~Constraint(); break; }
+					case FormulaType::BITVECTOR: { mpBVConstraintVS->~BVConstraint(); break; }
+					case FormulaType::UEQ: { mpUIEqualityVS->~UEquality(); break; }
 #else
 					case FormulaType::ITE: { mSubformulas.~vector(); break; }
 					case FormulaType::EXISTS:;
