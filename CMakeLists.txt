@@ -202,6 +202,7 @@ list(APPEND carl_LIBRARIES_STATIC ${Boost_STATIC})
 
 
 if(USE_GINAC)
+	load_library(carl GiNaC 1.5.8 REQUIRED )
     set(USE_CLN_NUMBERS ON)
 endif()
 
@@ -247,10 +248,6 @@ endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
-
-if(USE_GINAC)
-	load_library(carl GiNaC 1.5.8 REQUIRED )
-endif()
 
 message(STATUS "include: ${carl_INCLUDE_DIRS}")
 message(STATUS "dynamic: ${carl_LIBRARIES_DYNAMIC}")
