@@ -71,7 +71,7 @@ namespace carl
             GiNaC::ex result = 0;
             for(auto term = poly.begin(); term != poly.end(); ++term)
             {
-                GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( carl::rationalize<cln::cl_RA>(PreventConversion<typename Poly::PolyType::CoeffType>(term->coeff())) ) );
+                GiNaC::ex factor = GiNaC::ex( GiNaC::numeric( carl::convert<typename Poly::PolyType::CoeffType, cln::cl_RA>(term->coeff()) ) );
                 if((*term).monomial())
                 {
                     for (auto it: *(term->monomial())) {
@@ -187,4 +187,3 @@ namespace carl
 #include "OldGinacConverter.tpp"
 
 #endif
-
