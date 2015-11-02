@@ -68,6 +68,7 @@ namespace carl
         auto iterBoolPair = mConstraints.insert( constraint );
         if( iterBoolPair.second )
         {
+            constraint->mID = mIdAllocator;
             ++mIdAllocator;
             mLastConstructedConstraintWasKnown = false;
         }
@@ -85,10 +86,11 @@ namespace carl
         CONSTRAINT_POOL_LOCK_GUARD
         if( _lhs.isConstant() )
             return evaluate<Pol>( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
-//        if( _lhs.totalDegree() == 1 && (_rel != Relation::EQ && _rel != Relation::NEQ) &&  )
-        ConstraintContent<Pol>* constraint = createNormalizedConstraint( _lhs, _rel );
-        const ConstraintContent<Pol>* result = addConstraintToPool( constraint );
-        return result;
+        if( _lhs.totalDegree() == 1 && (_rel != Relation::EQ && _rel != Relation::NEQ) && _lhs.isUnivariate() )
+        {
+            return create( _lhs.getSingleVariable(), _rel, (-_lhs.constantPart())/_lhs.lcoeff() );
+        }
+        return addConstraintToPool( createNormalizedConstraint( _lhs, _rel ) );
     }
 
     template<typename Pol>
@@ -97,7 +99,6 @@ namespace carl
         assert( _rel != Relation::EQ );
         assert( _rel != Relation::NEQ );
         Pol lhs = makePolynomial<Pol>( _var );
-        std::cout << "createNormalizedBound _var = " << _var << " _rel = " << _rel << " and _bound = " << _bound << std::endl;
         switch( _rel )
         {
             case Relation::GREATER:
@@ -143,6 +144,7 @@ namespace carl
                 {
                     lhs -= _bound;
                 }
+                break;
             default:
                 assert( _rel == Relation::LEQ );
                 if( _var.getType() == VariableType::VT_INT )
@@ -154,8 +156,7 @@ namespace carl
                     lhs -= _bound;
                 break;
         }
-        std::cout << "Create constraint with lhs = " << lhs << " and _rel = " << _rel << std::endl;
-        return new ConstraintContent<Pol>( std::move(lhs), _rel, mIdAllocator );
+        return new ConstraintContent<Pol>( std::move(lhs), _rel );
     }
     
     template<typename Pol>
