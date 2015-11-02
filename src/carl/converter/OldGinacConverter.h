@@ -9,14 +9,13 @@
 
 #include "config.h"
 
-#ifdef COMPARE_WITH_GINAC
+#ifdef USE_GINAC
 #include <unordered_map>
 #include <ginac/ginac.h>
 #include <mutex>
 #include "../core/VariablePool.h"
 #include "../util/Singleton.h"
 #include "../util/SFINAE.h"
-#include "../numbers/typetraits.h"
 #include "../numbers/numbers.h"
 #include "../util/Common.h"
 

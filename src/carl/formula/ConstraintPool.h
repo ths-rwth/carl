@@ -58,7 +58,7 @@ namespace carl
              * @param _bound
              * @return The constructed constraint.
              */
-            ConstraintContent<Pol>* createNormalizedBound( Variable::Arg _var, const Relation _rel, const typename Pol::NumberType& _bound ) const;
+            ConstraintContent<Pol>* createNormalizedBound( Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound ) const;
             
             /**
              * Creates a normalized constraint, which has the same solutions as the constraint consisting of the given

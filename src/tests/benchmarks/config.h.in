@@ -3,5 +3,5 @@
  */ 
 #pragma once
 
-#cmakedefine COMPARE_WITH_GINAC
+#cmakedefine USE_GINAC
 #cmakedefine COMPARE_WITH_Z3

@@ -48,7 +48,7 @@ MultivariatePolynomial<C,O,P> MultivariateGCD<GCDCalculation, C, O, P>::calculat
 	// And we check for linearly appearing variables. Notice that ay + b is irreducible and thus,
 	// gcd(p, ay + b) is either ay + b or 1.
     
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
     return ginacGcd<Polynomial>( mp1, mp2 );
     #else 
 	Variable x = getMainVar(mp1, mp2);
@@ -105,7 +105,7 @@ template<typename C, typename O, typename P>
 MultivariatePolynomial<C,O,P> gcd(const MultivariatePolynomial<C,O,P>& a, const MultivariatePolynomial<C,O,P>& b)
 {
 	MultivariateGCD<PrimitiveEuclidean, C, O, P> gcd_calc(a,b);
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
     assert( gcd_calc.checkCorrectnessWithGinac() );
     #endif 
 	return gcd_calc.calculate();
