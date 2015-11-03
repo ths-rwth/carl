@@ -95,7 +95,7 @@ namespace carl
                     case Relation::LESS: _rel = Relation::GREATER; break;
                     case Relation::GREATER: _rel = Relation::LESS; break;
                     case Relation::LEQ: _rel = Relation::GEQ; break;
-                    case Relation::GEQ: _rel = Relation::LEQ; break;
+                    default: assert( _rel == Relation::GEQ); _rel = Relation::LEQ; break;
                 }
             }
             return create( _lhs.getSingleVariable(), _rel, (-_lhs.constantPart())/_lhs.lcoeff() );
