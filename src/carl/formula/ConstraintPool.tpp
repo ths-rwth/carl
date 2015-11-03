@@ -88,6 +88,16 @@ namespace carl
             return evaluate<Pol>( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
         if( _lhs.totalDegree() == 1 && (_rel != Relation::EQ && _rel != Relation::NEQ) && _lhs.isUnivariate() )
         {
+            if( carl::isNegative( _lhs.lcoeff() ) )
+            {
+                switch( _rel )
+                {
+                    case Relation::LESS: _rel = Relation::GREATER; break;
+                    case Relation::GREATER: _rel = Relation::LESS; break;
+                    case Relation::LEQ: _rel = Relation::GEQ; break;
+                    case Relation::GEQ: _rel = Relation::LEQ; break;
+                }
+            }
             return create( _lhs.getSingleVariable(), _rel, (-_lhs.constantPart())/_lhs.lcoeff() );
         }
         return addConstraintToPool( createNormalizedConstraint( _lhs, _rel ) );
@@ -108,7 +118,7 @@ namespace carl
                     if( isInteger( _bound ) )
                         lhs += _bound + typename Pol::NumberType( 1 );
                     else
-                        lhs += carl::floor( _bound );
+                        lhs += carl::ceil( _bound );
                     _rel = Relation::LEQ;
                 }
                 else
@@ -122,7 +132,9 @@ namespace carl
                 if( _var.getType() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
-                        lhs += carl::floor( _bound );
+                        lhs += _bound;
+                    else
+                        lhs += carl::ceil( _bound );
                     _rel = Relation::LEQ;
                 }
                 else
@@ -135,9 +147,9 @@ namespace carl
                 if( _var.getType() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
-                        lhs -= _bound - typename Pol::NumberType( 1 );
+                        lhs -= (_bound - typename Pol::NumberType( 1 ));
                     else
-                        lhs -= carl::ceil( _bound );
+                        lhs -= carl::floor( _bound );
                     _rel = Relation::LEQ;
                 }
                 else
@@ -150,7 +162,9 @@ namespace carl
                 if( _var.getType() == VariableType::VT_INT )
                 {
                     if( isInteger( _bound ) )
-                        lhs -= carl::ceil( _bound );
+                        lhs -= _bound;
+                    else
+                        lhs -= carl::floor( _bound );
                 }
                 else
                     lhs -= _bound;
