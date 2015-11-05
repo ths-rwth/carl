@@ -122,7 +122,7 @@ namespace carl
 			mExponents(exponents),
 			mTotalDegree(0)
 		{
-			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });
+			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first < p2.first; });
 			for (const auto& e: mExponents) mTotalDegree += e.second;
 			calcHash();
 			assert(isConsistent());
