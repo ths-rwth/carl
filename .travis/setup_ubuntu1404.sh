@@ -38,8 +38,8 @@ elif [[ ${USE} == "clang++-3.7" ]]; then
 	defCXX clang-3.7 clang++-3.7
 fi
 
-ps aux
-
 sudo service postgresql stop
 sudo service mysql stop
 sudo service cron stop
+
+ps aux

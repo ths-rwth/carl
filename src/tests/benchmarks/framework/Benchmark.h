@@ -98,7 +98,7 @@ protected:
 	bool operator()(const bool lhs, const bool rhs) {
 		return lhs == rhs;
 	}
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
 	bool operator()(const GMP& lhs, const GMP& rhs) {
 		return lhs == rhs;
 	}

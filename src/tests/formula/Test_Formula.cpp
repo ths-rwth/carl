@@ -252,3 +252,76 @@ TEST(Formula, IFFConstruction)
     EXPECT_EQ( FormulaT( FormulaType::IFF, {a, a, a} ), t );
     EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f, b, f, t, f, na, a, t, nb} ), f );
 }
+
+TEST(Formula, ConstraintConstruction)
+{
+    Variable x = VariablePool::getInstance().getFreshVariable( "x", VariableType::VT_REAL );
+    Pol px( x );
+    EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, Rational(1) ) ), FormulaT( Constr( -px+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, -Rational(1) ) ), FormulaT( Constr( -px-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, Rational(0) ) ), FormulaT( Constr( -px, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -px-Rational(1), carl::Relation::GEQ ) ), FormulaT( Constr( px+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -px+Rational(1), carl::Relation::GEQ ) ), FormulaT( Constr( px-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -px, carl::Relation::GEQ ) ), FormulaT( Constr( px, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GREATER, Rational(1) ) ), FormulaT( Constr( -px+Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GREATER, -Rational(1) ) ), FormulaT( Constr( -px-Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GREATER, Rational(0) ) ), FormulaT( Constr( -px, carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( -px-Rational(1), carl::Relation::GREATER ) ), FormulaT( Constr( px+Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( -px+Rational(1), carl::Relation::GREATER ) ), FormulaT( Constr( px-Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( -px, carl::Relation::GREATER ) ), FormulaT( Constr( px, carl::Relation::LESS ) ) );
+    
+    Variable i = VariablePool::getInstance().getFreshVariable( "i", VariableType::VT_INT );
+    Pol pi( i );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, Rational(1) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, -Rational(1) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, Rational(0) ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(1), carl::Relation::GEQ ) ), FormulaT( Constr( pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(1), carl::Relation::GEQ ) ), FormulaT( Constr( pi-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi, carl::Relation::GEQ ) ), FormulaT( Constr( pi, carl::Relation::LEQ ) ) );
+    
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(1) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(1) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(0) ) ), FormulaT( Constr( -pi, carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(1), carl::Relation::GREATER ) ), FormulaT( Constr( pi+Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(1), carl::Relation::GREATER ) ), FormulaT( Constr( pi-Rational(1), carl::Relation::LESS ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi, carl::Relation::GREATER ) ), FormulaT( Constr( pi, carl::Relation::LESS ) ) );
+    
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LEQ, Rational(1)/Rational(2) ) ), FormulaT( Constr( pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LEQ, Rational(3)/Rational(2) ) ), FormulaT( Constr( pi-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LEQ, -Rational(1)/Rational(2) ) ), FormulaT( Constr( pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LEQ, -Rational(3)/Rational(2) ) ), FormulaT( Constr( pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(1)/Rational(2), carl::Relation::LEQ ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(3)/Rational(2), carl::Relation::LEQ ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(1)/Rational(2), carl::Relation::LEQ ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(3)/Rational(2), carl::Relation::LEQ ) ), FormulaT( Constr( -pi+Rational(2), carl::Relation::LEQ ) ) );
+    
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, Rational(1) ) ), FormulaT( Constr( pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, Rational(0) ) ), FormulaT( Constr( pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, -Rational(1) ) ), FormulaT( Constr( pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, Rational(1)/Rational(2) ) ), FormulaT( Constr( pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, Rational(3)/Rational(2) ) ), FormulaT( Constr( pi-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, -Rational(1)/Rational(2) ) ), FormulaT( Constr( pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::LESS, -Rational(3)/Rational(2) ) ), FormulaT( Constr( pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(1), carl::Relation::LESS ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi, carl::Relation::LESS ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(1), carl::Relation::LESS ) ), FormulaT( Constr( -pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(1)/Rational(2), carl::Relation::LESS ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(1)/Rational(2), carl::Relation::LESS ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, Rational(1)/Rational(2) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, -Rational(1)/Rational(2) ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, -Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(1)/Rational(2), carl::Relation::GEQ ) ), FormulaT( Constr( pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi-Rational(3)/Rational(2), carl::Relation::GEQ ) ), FormulaT( Constr( pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(1)/Rational(2), carl::Relation::GEQ ) ), FormulaT( Constr( pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( -pi+Rational(3)/Rational(2), carl::Relation::GEQ ) ), FormulaT( Constr( pi-Rational(1), carl::Relation::LEQ ) ) );
+    
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(1) ) ), FormulaT( Constr( -pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(0) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(1) ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(1)/Rational(2) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi+Rational(2), carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(1)/Rational(2) ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
+    EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
+}

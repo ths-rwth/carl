@@ -1,10 +1,17 @@
 #pragma once
 
+#include "../config.h"
+
 #ifdef USE_CLN_NUMBERS
 namespace carl {
 	
+	template<>
+    inline cln::cl_RA convert<cln::cl_RA, cln::cl_RA>(const cln::cl_RA& n) {
+		return n;
+	}
+	
     template<>
-    inline mpq_class convert<PreventConversion<cln::cl_RA>, mpq_class>(const PreventConversion<cln::cl_RA>& n) {
+    inline mpq_class convert<cln::cl_RA, mpq_class>(const cln::cl_RA& n) {
         typedef signed long int IntType;
         cln::cl_I den = carl::getDenom((cln::cl_RA)n);
         if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )
@@ -21,10 +28,13 @@ namespace carl {
         return result;
     }
 	
-	
+	template<>
+    inline mpq_class convert<mpq_class, mpq_class>(const mpq_class& n) {
+		return n;
+	}
 
     template<>
-    inline cln::cl_RA convert<PreventConversion<mpq_class>, cln::cl_RA>(const PreventConversion<mpq_class>& n) {
+    inline cln::cl_RA convert<mpq_class, cln::cl_RA>(const mpq_class& n) {
         typedef signed long int IntType;
         mpz_class den = carl::getDenom((mpq_class)n);
         if( den <= std::numeric_limits<IntType>::max() && den >= std::numeric_limits<IntType>::min() )

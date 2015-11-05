@@ -3,7 +3,7 @@
 
 #include "../config.h"
 #include "carl/converter/CArLConverter.h"
-#ifdef COMPARE_WITH_GINAC
+#ifdef USE_GINAC
 #include "carl/converter/GiNaCConverter.h"
 #endif
 #ifdef COMPARE_WITH_Z3
@@ -21,7 +21,7 @@ namespace carl {
  */
 struct ConversionInformation {
 	CArLConverter carl;
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
 	std::map<carl::Variable, GiNaC::ex> ginacVariables;
 	GiNaCConverter ginac;
     #endif
@@ -61,7 +61,7 @@ inline CMP<rational> Conversion::convert<CMP<rational>, CMP<cln::cl_RA>>(const C
 }
 #endif
 #endif
-#ifdef COMPARE_WITH_GINAC
+#ifdef USE_GINAC
 template<>
 inline GMP Conversion::convert<GMP, CMP<cln::cl_RA>>(const CMP<cln::cl_RA>& m, const CIPtr& ci) {
 	return ci->ginac(m);

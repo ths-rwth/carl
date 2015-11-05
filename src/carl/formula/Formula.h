@@ -665,6 +665,16 @@ namespace carl
             {
                 return !isAtom();
             }
+			
+			bool isBound() const
+			{
+				if (mpContent->mType == FormulaType::CONSTRAINT) return mpContent->mConstraint.isBound();
+				if (mpContent->mType == FormulaType::NOT) {
+					if (mpContent->mType != FormulaType::CONSTRAINT) return false;
+					return mpContent->mConstraint.relation() != Relation::EQ;
+				}
+				return false;
+			}
 
             /**
              * @return true, if the type of this formulas allows n-ary combinations of sub-formulas, for an arbitrary n.

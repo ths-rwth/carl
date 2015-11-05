@@ -131,7 +131,7 @@ class MultivariateGCD : GCDCalculation
 		
 	}
     
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
     bool checkCorrectnessWithGinac()
     {
         if(!checkConversion<Polynomial>(mp1))

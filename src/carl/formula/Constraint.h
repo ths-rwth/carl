@@ -328,22 +328,20 @@ namespace carl
              */
             unsigned maxDegree( const Variable& _variable ) const
             {
-                auto varInfo = mVarInfoMap.find( _variable );
-                if( varInfo == mVarInfoMap.end() ) return 0;
+                auto varInfo = mVarInfoMap.find(_variable);
+                if (varInfo == mVarInfoMap.end()) return 0;
                 return varInfo->second.maxDegree();
             }
             
             /**
              * @return The maximal degree of all variables in this constraint. (Monomial-wise)
              */
-            unsigned maxDegree() const
+            std::size_t maxDegree() const
             {
-                unsigned result = 0;
-                for( auto var = mVariables.begin(); var != mVariables.end(); ++var)
-                {
-                    unsigned deg = maxDegree( *var );
-                    if( deg > result )
-                        result = deg;
+                std::size_t result = 0;
+                for (const auto& var: mVariables) {
+                    std::size_t deg = maxDegree(var);
+                    if (deg > result) result = deg;
                 }
                 return result;
             }
@@ -1268,4 +1266,3 @@ namespace std
 } // namespace std
 
 #include "Constraint.tpp"
-

@@ -120,7 +120,7 @@ namespace carl
     
     static const unsigned MAX_DEGREE_FOR_FACTORIZATION = 6;
     
-    static const unsigned MIN_DEGREE_FOR_FACTORIZATION = 2;
+    static const unsigned MIN_DEGREE_FOR_FACTORIZATION = 1;
     
     static const unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
     

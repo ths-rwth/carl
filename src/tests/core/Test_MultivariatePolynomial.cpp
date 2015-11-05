@@ -271,7 +271,7 @@ TEST(MultivariatePolynomial, Substitute)
     EXPECT_EQ(mp2, mp.substitute(substitutions));
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
     EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), mp.substitute(substitutions));
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
     VariablePool& vpool = VariablePool::getInstance();
     Variable v = vpool.getFreshVariable();
     vpool.setName(v, "v");

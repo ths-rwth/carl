@@ -19,7 +19,7 @@ protected:
     
 	BenchmarkTest(): file({
 		"CArL"
-#ifdef COMPARE_WITH_GINAC
+#ifdef USE_GINAC
 		,"GiNaC"
 #endif
 #ifdef COMPARE_WITH_Z3
