@@ -668,11 +668,20 @@ namespace carl
 			
 			bool isBound() const
 			{
+#ifdef __VS
+				if (mpContent->mType == FormulaType::CONSTRAINT) return mpContent->mpConstraintVS->isBound();
+				if (mpContent->mType == FormulaType::NOT) {
+					if (mpContent->mType != FormulaType::CONSTRAINT) return false;
+					return mpContent->mpConstraintVS->relation() != Relation::EQ;
+				}
+#else
 				if (mpContent->mType == FormulaType::CONSTRAINT) return mpContent->mConstraint.isBound();
 				if (mpContent->mType == FormulaType::NOT) {
 					if (mpContent->mType != FormulaType::CONSTRAINT) return false;
 					return mpContent->mConstraint.relation() != Relation::EQ;
 				}
+#endif
+
 				return false;
 			}
 
