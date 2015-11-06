@@ -31,17 +31,17 @@ TEST(GB_Buchberger, T1)
     gbobject.reduceInput();
     EXPECT_FALSE(gbobject.inputEmpty());
     gbobject.calculate();
-    EXPECT_EQ(F2,gbobject.getIdeal().getGenerator(0));
+    EXPECT_EQ(F1,gbobject.getIdeal().getGenerator(0));
     EXPECT_EQ(F3,gbobject.getIdeal().getGenerator(1));
-    EXPECT_EQ(F1,gbobject.getIdeal().getGenerator(2));
+    EXPECT_EQ(F2,gbobject.getIdeal().getGenerator(2));
     GBProcedure<MultivariatePolynomial<Rational>, Buchberger, RealRadicalAwareAdding> gb2object;
     EXPECT_TRUE(gb2object.inputEmpty());
     gb2object.addPolynomial(f1);
     gb2object.addPolynomial(f2);
     EXPECT_FALSE(gb2object.inputEmpty());
     gb2object.calculate();
-    EXPECT_EQ(y,gb2object.getIdeal().getGenerator(0));
-    EXPECT_EQ(x,gb2object.getIdeal().getGenerator(1));
+    EXPECT_EQ(x,gb2object.getIdeal().getGenerator(0));
+    EXPECT_EQ(y,gb2object.getIdeal().getGenerator(1));
 }
 
 TEST(GB_Buchberger, T1_ReasonSets)
@@ -64,15 +64,15 @@ TEST(GB_Buchberger, T1_ReasonSets)
     gbobject.reduceInput();
     EXPECT_FALSE(gbobject.inputEmpty());
     gbobject.calculate();
-    EXPECT_EQ(F2,gbobject.getIdeal().getGenerator(0));
+    EXPECT_EQ(F1,gbobject.getIdeal().getGenerator(0));
     EXPECT_EQ(F3,gbobject.getIdeal().getGenerator(1));
-    EXPECT_EQ(F1,gbobject.getIdeal().getGenerator(2));
+    EXPECT_EQ(F2,gbobject.getIdeal().getGenerator(2));
     GBProcedure<PolynomialWithReasonSet<Rational>, Buchberger, RealRadicalAwareAdding> gb2object;
     EXPECT_TRUE(gb2object.inputEmpty());
     gb2object.addPolynomial(f1rs);
     gb2object.addPolynomial(f2rs);
     EXPECT_FALSE(gb2object.inputEmpty());
     gb2object.calculate();
-    EXPECT_EQ(y,gb2object.getIdeal().getGenerator(0));
-    EXPECT_EQ(x,gb2object.getIdeal().getGenerator(1));
+    EXPECT_EQ(x,gb2object.getIdeal().getGenerator(0));
+    EXPECT_EQ(y,gb2object.getIdeal().getGenerator(1));
 }
