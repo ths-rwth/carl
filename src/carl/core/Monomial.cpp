@@ -331,14 +331,14 @@ namespace carl
 			}
 			// Variable is not present in lhs, dividing lcm yields variable will not occur in result
 
-			else if(itleft->first < itright->first)
+			else if(itleft->first > itright->first)
 			{
 				newExps.push_back(*itright);
 				++itright;
 			}
 			else
 			{
-				assert(itleft->first > itright->first);
+				assert(itleft->first < itright->first);
 				newExps.push_back(*itleft);
 				++itleft;
 			}
