@@ -10,6 +10,43 @@
 
 using namespace carl;
 
+TEST(Monomial, Constructor)
+{
+	Variable x = freshRealVariable("x");
+	
+	Monomial m(x, 3);
+	EXPECT_TRUE(m.exponents().size() == 1);
+	EXPECT_TRUE(m.exponents().front().first == x);
+	EXPECT_TRUE(m.exponents().front().second == 3);
+}
+
+TEST(Monomial, TotalDegree)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+
+	Monomial::Arg m1 = x*x*x;
+	EXPECT_TRUE(m1->tdeg() == 3);
+	Monomial::Arg m2 = x*x*y;
+	EXPECT_TRUE(m2->tdeg() == 3);
+	Monomial::Arg m3 = x*y*y*y;
+	EXPECT_TRUE(m3->tdeg() == 4);
+}
+
+TEST(Monomial, degreeCategories)
+{
+	Variable x = freshRealVariable("x");
+	
+	Monomial::Arg m1 = createMonomial(x,1);
+	EXPECT_TRUE(m1->isLinear());
+	EXPECT_TRUE(m1->isAtMostLinear());
+	EXPECT_TRUE(!m1->isSquare());
+	Monomial::Arg m2 = createMonomial(x,2);
+	EXPECT_TRUE(!m2->isLinear());
+	EXPECT_TRUE(!m2->isAtMostLinear());
+	EXPECT_TRUE(m2->isSquare());
+}
+
 TEST(Monomial, Operators)
 {
     Variable v0 = freshRealVariable("a");
