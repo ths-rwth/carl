@@ -132,7 +132,6 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
 }
 template<>
 inline int toInt<int>(const mpz_class& n) {
-    std::cout << "mpz_class to int" << std::endl;
     assert(n <= std::numeric_limits<int>::max());
     assert(n >= std::numeric_limits<int>::min());
     return (int)mpz_get_si(n.get_mpz_t());
