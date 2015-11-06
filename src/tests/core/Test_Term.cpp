@@ -4,7 +4,7 @@
 #include "carl/core/VariablePool.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Term.h"
-#include "Util.cpp"
+#include "Util.h"
 #include <list>
 
 #include "../Common.h"
@@ -100,11 +100,11 @@ TYPED_TEST(TermTest, Comparison)
     Variable z = pool.getFreshVariable("z");
 
     ComparisonList<Term<TypeParam> > terms;
+    terms.push_back((TypeParam)2 * x * y * z);
     terms.push_back((TypeParam)3 * y * z * z);
     terms.push_back((TypeParam)9 * y * z * z);
-    terms.push_back((TypeParam)2 * x * y * z);
-    terms.push_back((TypeParam)4 * x * y * z * z);
     terms.push_back((TypeParam)7 * x * y * y * z);
+    terms.push_back((TypeParam)4 * x * y * z * z);
 
     expectRightOrder(terms);
 }
@@ -117,15 +117,15 @@ TYPED_TEST(TermTest, OtherComparison)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
 
-    list.push_back(y);
-    list.push_back((TypeParam)3 * y);
     list.push_back(x);
     list.push_back((TypeParam)7 * x);
+    list.push_back(y);
+    list.push_back((TypeParam)3 * y);
     list.push_back(x * x);
     list.push_back((TypeParam)3 * x * x);
+    list.push_back((TypeParam)9 * x * x * y);
     list.push_back(x * y * y);
     list.push_back((TypeParam)5 * x * y * y);
-    list.push_back((TypeParam)9 * x * x * y);
 
     expectRightOrder(list);
 }

@@ -34,8 +34,8 @@ TEST(VariablePool, order)
     Variable x = pool.getFreshVariable("x");
     Variable y = pool.getFreshVariable("y");
     
-    EXPECT_TRUE(x > y);
-    EXPECT_TRUE(y < x);
-    EXPECT_FALSE(x < y);
-    EXPECT_FALSE(y > x);
+    EXPECT_TRUE(x < y);
+    EXPECT_TRUE(y > x);
+    EXPECT_FALSE(x > y);
+    EXPECT_FALSE(y < x);
 }

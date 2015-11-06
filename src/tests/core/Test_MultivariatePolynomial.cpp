@@ -3,7 +3,7 @@
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
-#include "Util.cpp"
+#include "Util.h"
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
 #include "carl/util/stringparser.h"
@@ -92,7 +92,7 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
 TEST(MultivariatePolynomial, Addition)
 {
 	VariablePool::getInstance().clear();
-    Variable v0((unsigned)1);
+    Variable v0 = freshRealVariable("v0");
     Term<Integer> t0(v0);
     MultivariatePolynomial<Integer> p0(v0);
     p0 += 3;
@@ -102,8 +102,8 @@ TEST(MultivariatePolynomial, Addition)
     p0 += -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
 
-    Variable v1((unsigned)2);
-    Variable v2((unsigned)3);
+    Variable v1 = freshRealVariable("v1");
+    Variable v2 = freshRealVariable("v2");
     p0 += v1;
     p0 += createMonomial(v2, (exponent) 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
@@ -116,9 +116,9 @@ TEST(MultivariatePolynomial, Addition)
     p1 += v1;
     p0 += p1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
-    MultivariatePolynomial<Integer> mp2(v0);
-    mp2 += (Integer)2 * v1;
-    EXPECT_EQ(v0, mp2.lterm());
+    MultivariatePolynomial<Integer> mp2(v1);
+    mp2 += (Integer)2 * v0;
+    EXPECT_EQ(v1, mp2.lterm());
     MultivariatePolynomial<Integer> p10a;
     p10a += v0*v0;
     p10a += v1;
@@ -194,25 +194,19 @@ TEST(MultivariatePolynomial, toString)
 
 TEST(MultivariatePolynomial, Normalize)
 {
-    Variable v0(1);
-    Variable v1(2);
-    Variable v2(3);
-    MultivariatePolynomial<Rational> mp;
-    mp += v0;
-    MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
+    Variable v0 = freshRealVariable("v0");
+    Variable v1 = freshRealVariable("v1");
+    MultivariatePolynomial<Rational> mp(v0);
+    MultivariatePolynomial<Rational> mp2 = mp * Rational(2);
     EXPECT_EQ(mp, mp.normalize());
     EXPECT_EQ(mp, mp2.normalize());
 
-    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
-    mp += (Rational)2 * v1;
-    mp2 = MultivariatePolynomial<Rational>(v0);
-    mp2 += v1;
+    mp = Rational(2) * v0 + Rational(2) * v1;
+    mp2 = MultivariatePolynomial<Rational>(v0) + v1;
     EXPECT_EQ(mp2, mp.normalize());
 
-    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
-    mp += (Rational)4 * v1;
-    mp2 = MultivariatePolynomial<Rational>(v0);
-    mp2 += (Rational)2 * v1;
+    mp = Rational(4) * v0 + Rational(2) * v1;
+    mp2 = Rational(2) * v0 + v1;
     EXPECT_EQ(mp2, mp.normalize());
 }
 
@@ -452,17 +446,12 @@ TEST(MultivariatePolynomial, SPolynomial)
 
 TEST(MultivariatePolynomial, GatherVariables)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     std::set<Variable> vars;
     f1.gatherVariables(vars);
-    EXPECT_EQ(y, *vars.begin());
+    EXPECT_EQ(x, *vars.begin());
     EXPECT_EQ((unsigned)2, vars.size());
 }
 
@@ -585,10 +574,9 @@ TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
 
 TYPED_TEST(MultivariatePolynomialTest, Comparison)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
-    Variable z = pool.getFreshVariable("z");
+    Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Variable z = freshRealVariable("z");
 
     MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z;
     MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y;
@@ -597,8 +585,8 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
 
     ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
     polynomials.push_back(p0);
-    polynomials.push_back(p2);
     polynomials.push_back(p1);
+    polynomials.push_back(p2);
     polynomials.push_back(p3);
 
     expectRightOrder(polynomials);
@@ -615,12 +603,12 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
     list.push_back(Term<TypeParam>((TypeParam)0));
     list.push_back(Term<TypeParam>((TypeParam)1));
     list.push_back(Term<TypeParam>((TypeParam)5));
-    list.push_back(y);
     list.push_back(x);
+    list.push_back(y);
     list.push_back((TypeParam)2 * x * x + y);
-    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
     list.push_back((TypeParam)3 * x * x);
     list.push_back((TypeParam)4 * x * y + (TypeParam)5 * x * x);
+    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
     list.push_back((TypeParam)6 * x * x + y * y);
     list.push_back(x * x * y);
     list.push_back((TypeParam)7 * x * x * y);
