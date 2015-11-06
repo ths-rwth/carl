@@ -129,6 +129,12 @@ public:
 	}
 	
 	/**
+	 * Retrieves the name of the variable.
+	 * @return Variable name.
+	 */
+	std::string getName() const;
+	
+	/**
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
 	 */
@@ -142,13 +148,13 @@ public:
 	 * @param rhs Variable.
 	 * @return `os`
 	 */
-	friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs);
-	
-	/**
-	 * Print the friendly name of the variable to the stream
-     * @param os The stream where the variable name should be printed
-     */
-	void printFriendlyName(std::ostream& os = std::cout) const;
+	friend std::ostream& operator<<(std::ostream& os, Variable::Arg rhs) {
+		#ifdef CARL_USE_FRIENDLY_VARNAMES
+        return os << rhs.getName();
+		#else
+		return os << "x_" << rhs.getId();
+		#endif
+	}
 	
 	/// @name Comparison operators
 	/// @{

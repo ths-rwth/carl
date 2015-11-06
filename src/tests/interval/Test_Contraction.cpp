@@ -19,16 +19,11 @@ TEST(Contraction, SimpleNewton)
     Interval<double> id = Interval<double>( 0, 2 );
 
     Interval<double>::evalintervalmap map;
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable a = vpool.getFreshVariable();
-    vpool.setName(a, "a");
-    Variable b = vpool.getFreshVariable();
-    vpool.setName(b, "b");
-    Variable c = vpool.getFreshVariable();
-    vpool.setName(c, "c");
-    Variable d = vpool.getFreshVariable();
-    vpool.setName(d, "d");
-
+	Variable a = freshRealVariable("a");
+	Variable b = freshRealVariable("b");
+	Variable c = freshRealVariable("c");
+	Variable d = freshRealVariable("d");
+    
     map[a] = ia;
     map[b] = ib;
     map[c] = ic;

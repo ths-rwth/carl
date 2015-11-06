@@ -153,7 +153,7 @@ RealAlgebraicNumberPtr<Number> evaluate(const MultivariatePolynomial<Number>& p,
 	if (m.size() == 1 && m.begin()->second->sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
 		return RealAlgebraicNumberIR<Number>::create(poly.mainVar());
 	}
-	Variable v = VariablePool::getInstance().getFreshVariable();
+	Variable v = freshRealVariable();
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
@@ -210,4 +210,3 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 
 }
 }
-

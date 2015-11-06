@@ -12,18 +12,20 @@
 
 typedef carl::cad::Constraint<Rational> Constraint;
 typedef carl::MultivariatePolynomial<Rational> MPolynomial;
-typedef carl::UnivariatePolynomial<MPolynomial> Polynomial;
+typedef carl::UnivariatePolynomial<MPolynomial> UPolynomial;
 typedef carl::RealAlgebraicNumberNR<Rational> RANNR;
 typedef carl::RealAlgebraicNumberIR<Rational> RANIR;
 typedef carl::RealAlgebraicPoint<Rational> RAP;
 
+using namespace carl;
+
 TEST(Constraint, satisfiedBy)
 {
-	carl::Variable x = carl::VariablePool::getInstance().getFreshVariable("x");
-	carl::Variable y = carl::VariablePool::getInstance().getFreshVariable("y");
+	carl::Variable x = freshRealVariable("x");
+	carl::Variable y = freshRealVariable("y");
 
 	// p1 = x^2 + y^2 - 1
-	Polynomial p1(x, {MPolynomial({carl::Term<Rational>(y)*y, carl::Term<Rational>(-1)}), MPolynomial(0), MPolynomial(1)});
+	UPolynomial p1(x, {MPolynomial({carl::Term<Rational>(y)*y, carl::Term<Rational>(-1)}), MPolynomial(0), MPolynomial(1)});
 
 	{
 		// x^2 + y^2 - 1 @ x=-0.5, y=-1
@@ -36,11 +38,11 @@ TEST(Constraint, satisfiedBy)
 
 TEST(Constraint, satisfiedBySqrt)
 {
-	carl::Variable x = carl::VariablePool::getInstance().getFreshVariable("x");
-	carl::Variable y = carl::VariablePool::getInstance().getFreshVariable("y");
+	carl::Variable x = freshRealVariable("x");
+	carl::Variable y = freshRealVariable("y");
 
 	// p1 = x^2 + y^2 - 1
-	Polynomial p1(x, {MPolynomial({carl::Term<Rational>(y)*y, carl::Term<Rational>(-1)}), MPolynomial(0), MPolynomial(1)});
+	UPolynomial p1(x, {MPolynomial({carl::Term<Rational>(y)*y, carl::Term<Rational>(-1)}), MPolynomial(0), MPolynomial(1)});
 
 	carl::UnivariatePolynomial<Rational> px(x, {-1, 0, 2});
 	carl::UnivariatePolynomial<Rational> py(y, {-1, 0, 2});

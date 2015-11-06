@@ -12,13 +12,9 @@ TEST(Reductor, Constructor)
 
 TEST(Reductor, Reduction)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Variable z = freshRealVariable("z");
     Ideal<MultivariatePolynomial<Rational>> ideal;
     MultivariatePolynomial<Rational> p1;
     p1 += x*x;

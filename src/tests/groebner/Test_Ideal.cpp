@@ -12,11 +12,9 @@ using namespace carl;
 
 TEST(Ideal, Construction)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    Variable y = vpool.getFreshVariable();
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
     Ideal<MultivariatePolynomial<Rational>> ideal;
     MultivariatePolynomial<Rational> p1;
     p1 += x*x;

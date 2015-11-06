@@ -15,9 +15,8 @@ using namespace carl;
 
 TEST(RealAlgebraicNumber, Evaluation)
 {
-	VariablePool& vpool = VariablePool::getInstance();
-    Variable y = vpool.getFreshVariable("skoY");
-    Variable x = vpool.getFreshVariable("skoX");
+    Variable y = freshRealVariable("skoY");
+    Variable x = freshRealVariable("skoX");
 
 	MultivariatePolynomial<Rational> mpx(x);
 	MultivariatePolynomial<Rational> mpy(y);
@@ -56,8 +55,7 @@ TEST(RealAlgebraicNumber, Evaluation)
 
 TEST(RealAlgebraicNumber, Evaluation2)
 {
-	VariablePool& vpool = VariablePool::getInstance();
-    Variable t = vpool.getFreshVariable("t");
+    Variable t = freshRealVariable("t");
 
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> mp(t, {
 		MultivariatePolynomial<Rational>(-3),

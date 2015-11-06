@@ -15,12 +15,8 @@ using PolynomialWithReasonSet = MultivariatePolynomial<Coeff, GrLexOrdering, Std
 
 TEST(GB_Buchberger, T1)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-//    Variable z = vpool.getFreshVariable();
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
@@ -50,12 +46,8 @@ TEST(GB_Buchberger, T1)
 
 TEST(GB_Buchberger, T1_ReasonSets)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-//    Variable z = vpool.getFreshVariable();
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
     PolynomialWithReasonSet<Rational> f1rs(f1);

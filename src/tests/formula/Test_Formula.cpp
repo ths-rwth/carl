@@ -13,13 +13,13 @@ typedef Formula<Pol> FormulaT;
 
 TEST(Formula, Construction)
 {
-    Variable x = VariablePool::getInstance().getFreshVariable( "x", VariableType::VT_REAL );
-    Variable y = VariablePool::getInstance().getFreshVariable( "y", VariableType::VT_REAL );
-    Variable i1 = VariablePool::getInstance().getFreshVariable( "i1", VariableType::VT_INT );
-    Variable i2 = VariablePool::getInstance().getFreshVariable( "i2", VariableType::VT_INT );
-    Variable i3 = VariablePool::getInstance().getFreshVariable( "i3", VariableType::VT_INT );
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable i1 = freshIntegerVariable("i1");
+    Variable i2 = freshIntegerVariable("i2");
+    Variable i3 = freshIntegerVariable("i3");
 //    Variable i = newArithmeticVariable( "i", VariableType::VT_INT );
-    Variable b = VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL );
+    Variable b = freshBooleanVariable("b");
 //    Sort sortS = newSort( "S" );
 //    Sort sortT = newSort( "T" );
 //    Variable u = VariableNamePool::getInstance().newUninterpretedVariable( "u" );
@@ -97,9 +97,9 @@ TEST(Formula, FormulaPoolDestructor)
 
 TEST(Formula, ANDConstruction)
 {
-    FormulaT a( VariablePool::getInstance().getFreshVariable( "a", VariableType::VT_BOOL ) );
+    FormulaT a( freshBooleanVariable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL ) );
+    FormulaT b( freshBooleanVariable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -137,9 +137,9 @@ TEST(Formula, ANDConstruction)
 
 TEST(Formula, ORConstruction)
 {
-    FormulaT a( VariablePool::getInstance().getFreshVariable( "a", VariableType::VT_BOOL ) );
+    FormulaT a( freshBooleanVariable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL ) );
+    FormulaT b( freshBooleanVariable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -177,9 +177,9 @@ TEST(Formula, ORConstruction)
 
 TEST(Formula, XORConstruction)
 {
-    FormulaT a( VariablePool::getInstance().getFreshVariable( "a", VariableType::VT_BOOL ) );
+    FormulaT a( freshBooleanVariable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL ) );
+    FormulaT b( freshBooleanVariable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -217,9 +217,9 @@ TEST(Formula, XORConstruction)
 
 TEST(Formula, IFFConstruction)
 {
-    FormulaT a( VariablePool::getInstance().getFreshVariable( "a", VariableType::VT_BOOL ) );
+    FormulaT a( freshBooleanVariable("a") );
     FormulaT na( FormulaType::NOT, a );
-    FormulaT b( VariablePool::getInstance().getFreshVariable( "b", VariableType::VT_BOOL ) );
+    FormulaT b( freshBooleanVariable("b") );
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
@@ -255,7 +255,7 @@ TEST(Formula, IFFConstruction)
 
 TEST(Formula, ConstraintConstruction)
 {
-    Variable x = VariablePool::getInstance().getFreshVariable( "x", VariableType::VT_REAL );
+    Variable x = freshRealVariable("x");
     Pol px( x );
     EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, Rational(1) ) ), FormulaT( Constr( -px+Rational(1), carl::Relation::LEQ ) ) );
     EXPECT_EQ( FormulaT( Constr( x, carl::Relation::GEQ, -Rational(1) ) ), FormulaT( Constr( -px-Rational(1), carl::Relation::LEQ ) ) );
@@ -270,7 +270,7 @@ TEST(Formula, ConstraintConstruction)
     EXPECT_EQ( FormulaT( Constr( -px+Rational(1), carl::Relation::GREATER ) ), FormulaT( Constr( px-Rational(1), carl::Relation::LESS ) ) );
     EXPECT_EQ( FormulaT( Constr( -px, carl::Relation::GREATER ) ), FormulaT( Constr( px, carl::Relation::LESS ) ) );
     
-    Variable i = VariablePool::getInstance().getFreshVariable( "i", VariableType::VT_INT );
+    Variable i = freshIntegerVariable("i");
     Pol pi( i );
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, Rational(1) ) ), FormulaT( Constr( -pi+Rational(1), carl::Relation::LEQ ) ) );
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GEQ, -Rational(1) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );

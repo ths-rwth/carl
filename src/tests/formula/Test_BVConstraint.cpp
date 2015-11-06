@@ -14,8 +14,8 @@ using namespace carl;
 
 TEST(BVConstraint, Construction)
 {
-    Variable a = VariablePool::getInstance().getFreshVariable("a", VariableType::VT_BITVECTOR);
-    Variable b = VariablePool::getInstance().getFreshVariable("b", VariableType::VT_BITVECTOR);
+    Variable a = freshBitvectorVariable("a");
+    Variable b = freshBitvectorVariable("b");
 
     Sort bvSort = SortManager::getInstance().addSort("BitVec");
     SortManager::getInstance().makeSortIndexable(bvSort, 1, VariableType::VT_BITVECTOR);

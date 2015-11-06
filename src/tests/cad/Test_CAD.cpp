@@ -20,9 +20,9 @@ protected:
 	typedef carl::CAD<Rational>::MPolynomial Polynomial;
 
 	CADTest() :
-		x(carl::VariablePool::getInstance().getFreshVariable("x")),
-		y(carl::VariablePool::getInstance().getFreshVariable("y")),
-		z(carl::VariablePool::getInstance().getFreshVariable("z"))
+		x(freshRealVariable("x")),
+		y(freshRealVariable("y")),
+		z(freshRealVariable("z"))
 	{
 		CARL_LOG_INFO("carl.core", "Variables " << x << ", " << y);
 	}

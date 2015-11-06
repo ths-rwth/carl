@@ -9,6 +9,8 @@ typedef carl::UnivariatePolynomial<Rational> UPolynomial;
 typedef carl::MultivariatePolynomial<Rational> MPolynomial;
 typedef carl::UnivariatePolynomial<MPolynomial> UMPolynomial;
 
+using namespace carl;
+
 template<typename Number>
 bool represents(const carl::RealAlgebraicNumberPtr<Number> root, const Number& exact) {
 	if (root->isNumeric()) {
@@ -21,9 +23,8 @@ bool represents(const carl::RealAlgebraicNumberPtr<Number> root, const Number& e
 
 TEST(RootFinder, realRoots)
 {
-	carl::VariablePool& vpool = carl::VariablePool::getInstance();
-	carl::Variable x = vpool.getFreshVariable();
-	carl::Variable y = vpool.getFreshVariable();
+	carl::Variable x = freshRealVariable("x");
+	carl::Variable y = freshRealVariable("y");
 
 	{
 		UPolynomial p(x, {(Rational)-1, (Rational)0, (Rational)0, (Rational)1});

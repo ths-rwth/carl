@@ -79,17 +79,6 @@ protected:
 	 */
 	VariablePool();
 
-public:
-
-	/**
-	 * Clears everything already created in this pool.
-	 */
-	void clear()
-    {
-        mVariableNames.clear();
-		mNextIDs.fill(1);
-    }
-
 	/**
 	 * Get a variable which was not used before.
 	 * This method is thread-safe.
@@ -106,6 +95,18 @@ public:
 	 * @return A new variable.
 	 */
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
+
+public:
+
+	/**
+	 * Clears everything already created in this pool.
+	 */
+	void clear()
+    {
+        mVariableNames.clear();
+		mNextIDs.fill(1);
+    }
+
 
 	/**
 	 * Searches in the friendly names list for a variable with the given name.
@@ -147,6 +148,8 @@ public:
 	std::size_t nrVariables(VariableType type = VariableType::VT_REAL) const {
 		return nextID(type) - 1;
 	}
+	friend inline Variable freshVariable(const VariableType& vt);
+	friend inline Variable freshVariable(const std::string& name, const VariableType& vt);
 };
 
 inline Variable freshVariable(const VariableType& vt) {
@@ -156,6 +159,12 @@ inline Variable freshVariable(const std::string& name, const VariableType& vt) {
 	return VariablePool::getInstance().getFreshVariable(name, vt);
 }
 
+inline Variable freshBitvectorVariable() {
+	return freshVariable(VariableType::VT_BITVECTOR);
+}
+inline Variable freshBitvectorVariable(const std::string& name) {
+	return freshVariable(name, VariableType::VT_BITVECTOR);
+}
 inline Variable freshBooleanVariable() {
 	return freshVariable(VariableType::VT_BOOL);
 }
