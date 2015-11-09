@@ -4,8 +4,6 @@
 #include "carl/core/MonomialPool.h"
 
 int main() {
-	carl::VariablePool& pool = carl::VariablePool::getInstance();
-
 	/*
 	 * A carl::Monomial object represents a monomial, being the product of
 	 * multiple variables. Our representation consists of a list of (unique)
@@ -21,8 +19,8 @@ int main() {
 	 * A Monomial can either be constructed from a carl::Variable and an
 	 * exponent, or from an appropriate std::vector<> or std::initializer_list<>.
 	 */
-	carl::Variable x = pool.getFreshVariable();
-	carl::Variable y = pool.getFreshVariable();
+	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::freshRealVariable("y");
 
 	carl::Monomial a(x, 2);
 	carl::Monomial b({std::make_pair(x,3), std::make_pair(y, 2)});
@@ -51,7 +49,7 @@ int main() {
 	 */
 	carl::Monomial::Arg e = x*x*y;
 	carl::Monomial::Arg f = x*y;
-	carl::Monomial::Arg g = c*d;
+	carl::Monomial::Arg g = e*f;
 
 	assert(g == d);
 }

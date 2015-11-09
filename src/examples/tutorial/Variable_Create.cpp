@@ -46,11 +46,9 @@ int main() {
 	carl::Variable e = carl::freshRealVariable();
 
 	assert(c.getType() == carl::VariableType::VT_INT);
-	assert(c.getName() == "x_3");
 	assert(d.getName() == "d");
 	assert(e.getType() == carl::VariableType::VT_REAL);
-	assert(e.getName() == "x_5");
-
+	
 	/*
 	 * In short test cases, it may be easier to simply assign ids manually.
 	 * To do this, you can use the carl::Variable constructors directly.
