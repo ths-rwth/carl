@@ -336,11 +336,11 @@ namespace carl
             /**
              * @return The maximal degree of all variables in this constraint. (Monomial-wise)
              */
-            std::size_t maxDegree() const
+            unsigned maxDegree() const
             {
-                std::size_t result = 0;
+                unsigned result = 0;
                 for (const auto& var: mVariables) {
-                    std::size_t deg = maxDegree(var);
+                    unsigned deg = maxDegree(var);
                     if (deg > result) result = deg;
                 }
                 return result;
