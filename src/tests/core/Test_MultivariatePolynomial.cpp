@@ -419,7 +419,6 @@ TEST(MultivariatePolynomial, SPolynomial)
 {
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
-    Variable z = freshRealVariable("z");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> g1({(Rational)3*x*x*x*x*y, (Rational)1*y*y});
     EXPECT_EQ((unsigned)3,MultivariatePolynomial<Rational>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
@@ -436,7 +435,7 @@ TEST(MultivariatePolynomial, SPolynomial)
 TEST(MultivariatePolynomial, GatherVariables)
 {
     Variable x = freshRealVariable("x");
-	Variable y = freshRealVariable("y");
+    Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     std::set<Variable> vars;
     f1.gatherVariables(vars);
@@ -448,7 +447,6 @@ TEST(MultivariatePolynomial, Derivative)
 {
     Variable x = freshRealVariable("x");
     Variable y = freshRealVariable("y");
-    Variable z = freshRealVariable("z");
     MultivariatePolynomial<Rational> fx({x});
     EXPECT_EQ((Rational)1, fx.derivative(x));
     EXPECT_EQ((Rational)0, fx.derivative(y));
@@ -502,11 +500,32 @@ TEST(MultivariatePolynomial, varInfo)
 TEST(MultivariatePolynomial, Quotient)
 {
     Variable x = freshRealVariable("x");
-	MultivariatePolynomial<Rational> one(Rational(1));
-	MultivariatePolynomial<Rational> m1 = x*x - one;
-	MultivariatePolynomial<Rational> m2 = x - one;
-	MultivariatePolynomial<Rational> res = x + one;
-	EXPECT_EQ(res, m1.quotient(m2));
+    MultivariatePolynomial<Rational> one(Rational(1));
+    MultivariatePolynomial<Rational> m1 = x*x - one;
+    MultivariatePolynomial<Rational> m2 = x - one;
+    MultivariatePolynomial<Rational> res = x + one;
+    EXPECT_EQ(res, m1.quotient(m2));
+}
+
+TEST(MultivariatePolynomial, Quotient2)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"t", "u"});
+//    Variable t = carl::VariablePool::getInstance().findVariableWithName("t");
+//    MultivariatePolynomial<Rational> p1 = sp.parseMultivariatePolynomial<Rational>("t^3*u^6+(-3)*t*u^5+(-1)*u^6+(-3)*t^2*u^6+3*t*u^6+(-1)*t^3*u^5+(-1)*t^3+(-3)*t+3*t^2+(-3)*u+3*t^3*u+9*t*u+(-9)*t^2*u+5*u^2+(-5)*t^3*u^2+(-15)*t*u^2+15*t^2*u^2+3*t^2*u^4+(-3)*t*u^4+(-1)*t^3*u^4+(-4)*u^3+u^4+(-12)*t^2*u^3+12*t*u^3+4*t^3*u^3+u^5+3*t^2*u^5+1");
+//    MultivariatePolynomial<Rational> p2 = sp.parseMultivariatePolynomial<Rational>("u^2+(-1)*u+1");
+//    EXPECT_TRUE( p1.quotient(p2).has(t) );
+//    EXPECT_EQ( p1.quotient(p2)*p2, p1 );
+//    MultivariatePolynomial<Rational> p3 = sp.parseMultivariatePolynomial<Rational>("t^2+(-1)*u+1");
+//    MultivariatePolynomial<Rational> p4 = p2*p3;
+//    EXPECT_EQ( p4.quotient(p2)*p2, p4 );
+//    EXPECT_EQ( p4.quotient(p3)*p3, p4 );
+    MultivariatePolynomial<Rational> p5 = sp.parseMultivariatePolynomial<Rational>("u+1");
+    MultivariatePolynomial<Rational> p6 = sp.parseMultivariatePolynomial<Rational>("t+1");
+    MultivariatePolynomial<Rational> p7 = p5*p6;
+    EXPECT_EQ( p7, p7.quotient(p5)*p5 );
+    EXPECT_EQ( p7, p7.quotient(p6)*p6 );
 }
 
 TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
