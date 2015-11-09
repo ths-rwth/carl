@@ -95,7 +95,7 @@ public:
 	 * Default constructor, constructing a variable, which is considered as not an actual variable.
 	 * Such an invalid variable is stored in NO_VARIABLE, so use this if you need a default value for a variable.
 	 */
-	explicit Variable() : mContent(0) {} 
+	explicit Variable() noexcept : mContent(0) {} 
 	
 	/**
 	 * Although we recommend access through the VariablePool, we allow public construction of variables for local purposes.
@@ -104,7 +104,7 @@ public:
 	 * @param type The type.
 	 * @param rank The rank.
 	 */
-	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0):
+	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept :
 		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | (unsigned)type)
 	{
 		assert(rank < (1 << RESERVED_FOR_RANK));
@@ -116,7 +116,7 @@ public:
 	 * Retrieves the id of the variable.
 	 * @return Variable id.
 	 */
-	std::size_t getId() const {
+	std::size_t getId() const noexcept {
 		return (mContent >> RESERVED_FOR_TYPE) % (std::size_t(1) << AVAILABLE);
 	}
 	
@@ -124,7 +124,7 @@ public:
 	 * Retrieves the type of the variable.
 	 * @return Variable type.
 	 */
-	VariableType getType() const {
+	VariableType getType() const noexcept {
 		return VariableType(mContent % (std::size_t(1) << RESERVED_FOR_TYPE));
 	}
 	
@@ -138,7 +138,7 @@ public:
 	 * Retrieves the rank of the variable.
 	 * @return Variable rank.
 	 */
-	std::size_t getRank() const {
+	std::size_t getRank() const noexcept {
 		return mContent >> (AVAILABLE + RESERVED_FOR_TYPE);
 	}
 	
@@ -169,22 +169,22 @@ public:
 	 * @param rhs Second variable.
 	 * @return `lhs ~ rhs`, `~` being the relation that is checked.
 	 */
-	friend bool operator==(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator==(Variable::Arg lhs, Variable::Arg rhs) noexcept {
 		return lhs.mContent == rhs.mContent;
 	}
-	friend bool operator!=(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator!=(Variable::Arg lhs, Variable::Arg rhs) noexcept {
 		return lhs.mContent != rhs.mContent;
 	}
-	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator<(Variable::Arg lhs, Variable::Arg rhs) noexcept {
 		return lhs.mContent < rhs.mContent;
 	}
-	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator<=(Variable::Arg lhs, Variable::Arg rhs) noexcept {
 		return lhs.mContent <= rhs.mContent;
 	}
-	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator>(Variable::Arg lhs, Variable::Arg rhs) noexcept {
 		return lhs.mContent > rhs.mContent;
 	}
-	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) {
+	friend bool operator>=(Variable::Arg lhs, Variable::Arg rhs) noexcept {
 		return lhs.mContent >= rhs.mContent;
 	}
 	/// @}
@@ -218,7 +218,7 @@ namespace std {
 		 * @param variable Variable.
 		 * @return Hash of variable
 		 */
-		size_t operator()(const carl::Variable& variable) const {
+		size_t operator()(const carl::Variable& variable) const noexcept {
 			return variable.getId();
 		}
 	};

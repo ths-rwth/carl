@@ -23,7 +23,7 @@ VariablePool::VariablePool():
 	setPrefix();
 }
 
-Variable VariablePool::getFreshVariable(VariableType type) {
+Variable VariablePool::getFreshVariable(VariableType type) noexcept {
 	std::size_t tmp = 0;
 	{
 		FRESHVAR_LOCK_GUARD
@@ -42,7 +42,7 @@ Variable VariablePool::getFreshVariable(const std::string& name, VariableType ty
 	return tmp;
 }
 
-Variable VariablePool::findVariableWithName(const std::string& name) const
+Variable VariablePool::findVariableWithName(const std::string& name) const noexcept
 {
 	for (auto v: mVariableNames) {
 		if (v.second == name) return v.first;
