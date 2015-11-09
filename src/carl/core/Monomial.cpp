@@ -109,14 +109,14 @@ namespace carl
 				itright++;
 			}
 			// Variable is not present in lhs, division fails.
-			else if(itleft->first < itright->first) 
+			else if(itleft->first > itright->first) 
 			{
 				CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 				return false;
 			}
 			else
 			{
-				assert(itleft->first > itright->first);
+				assert(itleft->first < itright->first);
 				newExps.push_back(*itleft);
 			}
 		}
