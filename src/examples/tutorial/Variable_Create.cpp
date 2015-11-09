@@ -4,8 +4,6 @@
 #include "carl/core/VariablePool.h"
 
 int main() {
-	carl::VariablePool& pool = carl::VariablePool::getInstance();
-
 	/*
 	 * A carl::Variable object represents a single variable.
 	 * A variable can have any type from carl::VariableType:
@@ -30,28 +28,28 @@ int main() {
 	 * The VariablePool makes sure that a new variable gets a fresh consecutive
 	 * ID and stores variable names.
 	 */
-	carl::Variable a = pool.getFreshVariable("x", carl::VariableType::VT_REAL);
-	carl::Variable b = pool.getFreshVariable("y", carl::VariableType::VT_INT);
+	carl::Variable a = carl::freshRealVariable("x");
+	carl::Variable b = carl::freshIntegerVariable("y");
 
 	assert(a.getType() == carl::VariableType::VT_REAL);
-	assert(pool.getName(a) == "x");
+	assert(a.getName() == "x");
 	assert(b.getType() == carl::VariableType::VT_INT);
-	assert(pool.getName(b) == "y");
+	assert(b.getName() == "y");
 
 	/*
 	 * You can create anonymous variables by omitting the first argument.
 	 * The variables will be printed in any output as "x_<id>" in this case.
 	 * You can also omit the second argument, in this case the type is VT_REAL.
 	 */
-	carl::Variable c = pool.getFreshVariable(carl::VariableType::VT_INT);
-	carl::Variable d = pool.getFreshVariable("d");
-	carl::Variable e = pool.getFreshVariable();
+	carl::Variable c = carl::freshIntegerVariable();
+	carl::Variable d = carl::freshRealVariable("d");
+	carl::Variable e = carl::freshRealVariable();
 
 	assert(c.getType() == carl::VariableType::VT_INT);
-	assert(pool.getName(c) == "x_3");
-	assert(pool.getName(d) == "d");
+	assert(c.getName() == "x_3");
+	assert(d.getName() == "d");
 	assert(e.getType() == carl::VariableType::VT_REAL);
-	assert(pool.getName(e) == "x_5");
+	assert(e.getName() == "x_5");
 
 	/*
 	 * In short test cases, it may be easier to simply assign ids manually.
