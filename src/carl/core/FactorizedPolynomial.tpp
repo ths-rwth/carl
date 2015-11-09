@@ -59,7 +59,7 @@ namespace carl
                 Factorization<P> factorization;
                 PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( factorization), new P(poly) );
                 //Factorization is not set yet
-                auto ret = mpCache->cache( pfPair, &carl::canBeUpdated, &carl::update );
+                auto ret = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
                 mCacheRef = ret.first;
                 mpCache->reg( mCacheRef );
                 if( ret.second )
@@ -83,10 +83,6 @@ namespace carl
             //pfPair->assertFactorization();
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
-//        if(computePolynomial(*this) != _polynomial)
-//        {
-//            exit(1234);
-//        }
         assert(computePolynomial(*this) == _polynomial);
     }
     
