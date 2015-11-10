@@ -726,9 +726,9 @@ void CAD<Number>::addSampleBelow(
 		Inserter i
 ) {
 	if (left.isNumeric()) {
-		i = RealAlgebraicNumber<Number>(carl::ceil(left.value()) + 1, false);
+		i = RealAlgebraicNumber<Number>(carl::floor(left.value()) - 1, false);
 	} else {
-		i = RealAlgebraicNumber<Number>(carl::ceil(left.getInterval().upper()) + 1, false);
+		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().upper()) - 1, false);
 	}
 }
 
@@ -740,9 +740,9 @@ void CAD<Number>::addSampleAbove(
 		Inserter i
 ) {
 	if (right.isNumeric()) {
-		i = RealAlgebraicNumber<Number>(carl::floor(right.value()) - 1, false);
+		i = RealAlgebraicNumber<Number>(carl::ceil(right.value()) + 1, false);
 	} else {
-		i = RealAlgebraicNumber<Number>(carl::floor(right.getInterval().lower()) - 1, false);
+		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().lower()) + 1, false);
 	}
 }
 
@@ -818,7 +818,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	if (!currentSamples.samples().empty()) {
 		// Sanity check: Assert that outermost sample is a root.
 		auto first = *currentSamples.samples().begin();
-		//assert(!first->isRoot());
+		assert(!first.isRoot());
 	}
 
 	bool boundsActive = !bounds.isEmpty() && !bounds.isInfinite();
@@ -864,19 +864,23 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
+			CARL_LOG_TRACE("carl.cad", "\tAdding a sample above " << *insertIt);
 			addSampleAbove((*insertIt), type, std::front_inserter(newSamples));
 		} else if (neighbor->isRoot()) {
+			CARL_LOG_TRACE("carl.cad", "\tAdding a sample between " << *insertIt << " and " << *neighbor);
 			addSampleBetween((*insertIt), (*neighbor), type, std::front_inserter(newSamples));
 		}
 
 		// previous: left neighbor
 		neighbor = insertIt;
 		if (neighbor == currentSamples.begin()) {
+			CARL_LOG_TRACE("carl.cad", "\tAdding a sample below " << *insertIt);
 			addSampleBelow((*insertIt), type, std::front_inserter(newSamples));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if (neighbor->isRoot()) {
+				CARL_LOG_TRACE("carl.cad", "\tAdding a sample between " << *neighbor << " and " << *insertIt);
 				addSampleBetween((*neighbor), (*insertIt), type, std::front_inserter(newSamples));
 			}
 		}
@@ -1308,7 +1312,7 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 	if (newNode == this->sampleTree.end_children(node)) {
 		newNode = this->sampleTree.append(node, newSample);
 	} else if (*newNode == newSample) {
-		//assert(newSample.isRoot() || (!newNode->isRoot()));
+		assert(newSample.isRoot() || (!newNode->isRoot()));
 		newNode = this->sampleTree.replace(newNode, newSample);
 		assert(newNode.depth() <= variables.size());
 	} else {
