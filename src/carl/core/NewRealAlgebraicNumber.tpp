@@ -71,7 +71,7 @@ namespace carl {
 	
 	template<typename Number>
 	void RealAlgebraicNumber<Number>::refine(RealAlgebraicNumberSettings::RefinementStrategy strategy) const {
-		assert(!isNumeric());
+		if (isNumeric()) return;
 		
 		Number m;
 		switch (strategy) {
@@ -94,10 +94,9 @@ namespace carl {
 			} else {
 				mIR->interval.setLower(m);
 			}
+			mIR->refinementCount++;
+			assert(mIR->interval.isConsistent());
 		}
-		
-		mIR->refinementCount++;
-		assert(mIR->interval.isConsistent());
 	}
 	
 	template<typename Number>

@@ -186,9 +186,10 @@ public:
 		if (isNumeric()) return i.contains(mValue);
 		else {
 			mIR->refineAvoiding(i.lower(), *this);
+			if (isNumeric()) return i.contains(mValue);
 			mIR->refineAvoiding(i.upper(), *this);
 			if (isNumeric()) return i.contains(mValue);
-			else return i.contains(mIR->interval);
+			return i.contains(mIR->interval);
 		}
 	}
 	
