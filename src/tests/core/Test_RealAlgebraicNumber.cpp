@@ -2,8 +2,6 @@
 #include <map>
 
 #include "carl/core/RealAlgebraicNumber.h"
-#include "carl/core/RealAlgebraicNumberNR.h"
-#include "carl/core/RealAlgebraicNumberIR.h"
 #include "carl/core/RealAlgebraicNumberEvaluation.h"
 #include "carl/core/RealAlgebraicPoint.h"
 #include "carl/core/UnivariatePolynomial.h"
@@ -42,7 +40,7 @@ TEST(RealAlgebraicNumber, Evaluation)
 	Interval<Rational> iy(Rational(-147580509)/24822226, BoundType::STRICT, Rational(-73113831)/12411113, BoundType::STRICT);
 
 	std::vector<Variable> vars({y, x});
-	RealAlgebraicPoint<Rational> point({RealAlgebraicNumberIR<Rational>::create(py, iy), RealAlgebraicNumberIR<Rational>::create(px, ix)});
+	RealAlgebraicPoint<Rational> point({RealAlgebraicNumber<Rational>(py, iy), RealAlgebraicNumber<Rational>(px, ix)});
 
 	//RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<Rational>(p), point, vars);
 
@@ -65,7 +63,20 @@ TEST(RealAlgebraicNumber, Evaluation2)
 	UnivariatePolynomial<Rational> p(t, {-3, 0, 1});
 	std::vector<Variable> vars({t});
 	Interval<Rational> i(Rational(13)/8, BoundType::STRICT, Rational(7)/4, BoundType::STRICT);
-	RealAlgebraicPoint<Rational> point({RealAlgebraicNumberIR<Rational>::create(p, i)});
+	RealAlgebraicPoint<Rational> point({RealAlgebraicNumber<Rational>(p, i)});
 	auto res = RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<Rational>(mp), point, vars);
 	std::cerr << res << std::endl;
+}
+
+TEST(RealAlgebraicNumber, Add)
+{
+	Variable x = freshRealVariable("x");
+	UnivariatePolynomial<Rational> p(x, {-2, 0, 1});
+	std::cout << p << std::endl;
+	Interval<Rational> i(Rational(14)/10, BoundType::STRICT, Rational(15)/10, BoundType::STRICT);
+	
+	auto ran = RealAlgebraicNumber<Rational>(2);
+	auto ranir = RealAlgebraicNumber<Rational>(p, i);
+	
+	EXPECT_TRUE(ran + ran == RealAlgebraicNumber<Rational>(4));
 }
