@@ -398,8 +398,7 @@ Number Interval<Number>::distance(const Interval<Number>& intervalA)
 }
 
 template<typename Number>
-Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval)
-{
+Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval) const {
 	if(this->isEmpty())
 		return interval;
 

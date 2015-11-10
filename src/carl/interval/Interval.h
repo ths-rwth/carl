@@ -1666,7 +1666,7 @@ namespace carl
     */
     Number distance(const Interval<Number>& intervalA);
 
-    Interval<Number> convexHull(const Interval<Number>& interval);
+    Interval<Number> convexHull(const Interval<Number>& interval) const;
 
     };
 
