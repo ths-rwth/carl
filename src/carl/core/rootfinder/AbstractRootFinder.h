@@ -8,8 +8,6 @@
 
 #include "../../interval/Interval.h"
 #include "../RealAlgebraicNumber.h"
-#include "../RealAlgebraicNumberIR.h"
-#include "../RealAlgebraicNumberNR.h"
 #include "../UnivariatePolynomial.h"
 
 namespace carl {
@@ -56,13 +54,13 @@ protected:
 	 * Roots that have been found.
 	 * If the instantiated root finder works in an incremental manner, this list may not contain all roots, if it is called before the root finder has indicated that it is finished.
 	 */
-	std::list<RealAlgebraicNumberPtr<Number>> roots;
+	std::list<RealAlgebraicNumber<Number>> roots;
 	/**
 	 * Flag that indicates if the search has finished.
      */
 	bool finished;
 #ifdef ROOTFINDER_CACHE
-	static std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumberPtr<Number>>> cache;
+	static std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumber<Number>>> cache;
 #endif
 
 public:
@@ -107,7 +105,7 @@ public:
 	 * Additional calls will not recompute all roots but only return the cached result.
 	 * @returns List of roots.
 	 */
-	std::list<RealAlgebraicNumberPtr<Number>> getAllRoots();
+	std::list<RealAlgebraicNumber<Number>> getAllRoots();
 	
 protected:
 	/**
@@ -116,7 +114,7 @@ protected:
 	 * @param root Pointer to new root.
 	 * @param reducePolynomial Indicates if the polynomial should be reduced.
 	 */
-	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true);
+	virtual void addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial = true);
 	
 	/**
 	 * Adds a new root to the internal root list from an interval.
@@ -185,7 +183,7 @@ protected:
 
 #ifdef ROOTFINDER_CACHE
 template<typename Number>
-std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumberPtr<Number>>> AbstractRootFinder<Number>::cache;
+std::map<UnivariatePolynomial<Number>, std::list<RealAlgebraicNumber<Number>>> AbstractRootFinder<Number>::cache;
 #endif
 
 }
