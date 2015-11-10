@@ -49,22 +49,20 @@ protected:
 		this->bounds.clear();
 	}
 
-	bool hasNRValue(const carl::RealAlgebraicNumberPtr<Rational> n, Rational val) {
-		if (n->isNumeric()) return n->value() == val;
+	bool hasNRValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
+		if (n.isNumeric()) return n.value() == val;
 		return false;
 	}
-	bool hasValue(const carl::RealAlgebraicNumberPtr<Rational> n, Rational val) {
-		if (n->isNumeric()) return n->value() == val;
+	bool hasValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
+		if (n.isNumeric()) return n.value() == val;
 		else {
-			carl::RealAlgebraicNumberIRPtr<Rational> ir = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Rational>>(n);
-			return ir->getInterval().contains(val);
+			return n.getInterval().contains(val);
 		}
 	}
-	bool hasSqrtValue(const carl::RealAlgebraicNumberPtr<Rational> n, Rational val) {
-		if (n->isNumeric()) return n->value() * n->value() == val;
+	bool hasSqrtValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
+		if (n.isNumeric()) return n.value() * n.value() == val;
 		else {
-			carl::RealAlgebraicNumberIRPtr<Rational> ir = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Rational>>(n);
-			return (ir->getInterval() * ir->getInterval()).contains(val);
+			return (n.getInterval() * n.getInterval()).contains(val);
 		}
 	}
 
@@ -196,20 +194,20 @@ TEST_F(CADTest, CheckInt)
 }
 
 template<typename T>
-inline std::shared_ptr<carl::RealAlgebraicNumberNR<Rational>> NR(T t, bool b) {
-	return carl::RealAlgebraicNumberNR<Rational>::create(t, b);
+inline carl::RealAlgebraicNumber<Rational> NR(T t, bool b) {
+	return carl::RealAlgebraicNumber<Rational>(t, b);
 }
 
 TEST(CAD, Samples)
 {
-	std::list<carl::RealAlgebraicNumberPtr<Rational>> roots({ NR(-1, true), NR(1, true) });
+	std::list<carl::RealAlgebraicNumber<Rational>> roots({ NR(-1, true), NR(1, true) });
 
 	carl::cad::SampleSet<Rational> currentSamples;
 	currentSamples.insert(NR(-1, false));
 	currentSamples.insert(NR(0, true));
 	currentSamples.insert(NR(1, false));
 
-	std::forward_list<carl::RealAlgebraicNumberPtr<Rational>> replacedSamples;
+	std::forward_list<carl::RealAlgebraicNumber<Rational>> replacedSamples;
 
 	carl::Interval<Rational> bounds(0, carl::BoundType::STRICT, 1, carl::BoundType::INFTY);
 
