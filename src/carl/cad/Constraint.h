@@ -113,9 +113,9 @@ public:
 		
 		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, _variables);
 		if (this->negated) {
-			return res->sgn() != this->sign;
+			return res.sgn() != this->sign;
 		} else {
-			return res->sgn() == this->sign;
+			return res.sgn() == this->sign;
 		}
 	}
 
