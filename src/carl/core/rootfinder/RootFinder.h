@@ -115,14 +115,6 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
 );
 
-template<typename Coeff, typename Number = typename UnderlyingNumberType<Coeff>::type>
-std::list<RealAlgebraicNumber<Number>> realRoots(
-		UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
-		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
-		SplittingStrategy pivoting = SplittingStrategy::DEFAULT
-);
-
 /////////////////////////
 // Auxiliary Functions //
 /////////////////////////
