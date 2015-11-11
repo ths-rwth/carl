@@ -36,6 +36,7 @@
 #include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
+CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 #include <boost/functional/hash.hpp>
