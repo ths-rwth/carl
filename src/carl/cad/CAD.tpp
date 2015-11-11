@@ -34,7 +34,7 @@ CAD<Number>::CAD():
 		setting(cad::CADSettings::getSettings())
 {
 	// initialize root with empty node
-	this->sampleTree.setRoot(RealAlgebraicNumber<Number>());
+	this->sampleTree.setRoot(RealAlgebraicNumber<Number>(0, false));
 }
 
 template<typename Number>
@@ -49,7 +49,7 @@ CAD<Number>::CAD(cad::PolynomialOwner<Number>* parent):
 		setting(cad::CADSettings::getSettings())
 {
 	// initialize root with empty node
-	this->sampleTree.setRoot(RealAlgebraicNumber<Number>());
+	this->sampleTree.setRoot(RealAlgebraicNumber<Number>(0, false));
 }
 
 template<typename Number>
@@ -1370,7 +1370,7 @@ cad::Answer CAD<Number>::liftCheck(
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
 	CARL_LOG_FUNC("carl.cad", "Integer setting: " << this->setting.integerHandling);
-	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumber<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << sampleTree);
+	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumber<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << std::endl << sampleTree);
 	assert(this->sampleTree.is_valid(node));
 	if (checkBounds && boundsActive && (!node.isRoot())) {
 		// bounds shall be checked and the level is non-empty

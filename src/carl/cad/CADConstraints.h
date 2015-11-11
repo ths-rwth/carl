@@ -53,6 +53,7 @@ public:
 		std::forward_list<std::size_t> vertices;
 		for (std::size_t i = 0; i < constraints.size(); i++) {
 			std::size_t constraintID = conflictGraph.getConstraint(constraints[i]);
+			CARL_LOG_DEBUG("carl.cad", "Checking if " << constraints[i] << " is satisfied by " << r << " over " << variables)
 			if (constraints[i].satisfiedBy(r, variables)) {
 				vertices.push_front(i);
 				conflictGraph.set(constraintID, sampleID, false);
