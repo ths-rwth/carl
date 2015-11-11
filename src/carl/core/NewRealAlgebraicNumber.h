@@ -87,7 +87,9 @@ public:
 		mValue(carl::constant_zero<Number>::get()),
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p, i))
-	{}
+	{
+		if (i.contains(0)) mIR->refineAvoiding(0, *this);
+	}
 		
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran):
 		mValue(ran.mValue),
