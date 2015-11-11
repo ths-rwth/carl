@@ -88,7 +88,15 @@ public:
 		mIsRoot(isRoot),
 		mIR(std::make_shared<IntervalContent>(p, i))
 	{
-		if (i.contains(0)) mIR->refineAvoiding(0, *this);
+		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
+		assert(p.countRealRoots(i) == 1);
+		if (mIR->polynomial.degree() == 1) {
+			Number a = mIR->polynomial.coefficients()[1];
+			Number b = mIR->polynomial.coefficients()[0];
+			switchToNR(-b / a);
+		} else {
+			if (i.contains(0)) mIR->refineAvoiding(0, *this);
+		}
 	}
 		
 	RealAlgebraicNumber(const RealAlgebraicNumber& ran):
