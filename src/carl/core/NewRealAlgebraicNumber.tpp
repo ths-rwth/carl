@@ -102,6 +102,7 @@ namespace carl {
 	template<typename Number>
 	bool RealAlgebraicNumber<Number>::equal(const RealAlgebraicNumber<Number>& n) const {
 		CARL_LOG_FUNC("carl.ran", *this << ", " << n);
+		if (this == &n) return true;
 		if (isNumeric()) {
 			if (n.isNumeric()) {
 				return value() == n.value();
@@ -144,6 +145,7 @@ namespace carl {
 	template<typename Number>
 	bool RealAlgebraicNumber<Number>::less(const RealAlgebraicNumber<Number>& n) const {
 		CARL_LOG_FUNC("carl.ran", *this << ", " << n);
+		if (this == &n) return false;
 		if (isNumeric()) {
 			if (n.isNumeric()) {
 				return value() < n.value();
