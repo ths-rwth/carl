@@ -49,7 +49,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, Rea
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
 template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(MultivariatePolynomial<Number>& p, RANMap<Number>& m);
+RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m);
 
 /**
  * Computes a univariate polynomial with rational coefficients that has the roots of p whose coefficient variables have been substituted by the roots given in m.
@@ -81,7 +81,7 @@ UnivariatePolynomial<Number> evaluatePolynomial(
  */
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
-		UnivariatePolynomial<Coeff>& p,
+		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		std::map<Variable, Interval<Number>>& varToInterval
 );
@@ -131,6 +131,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.numericContent());
 	}
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << pol << " on " << m);
 	return evaluateIR(pol, m);
 }
 
@@ -143,7 +144,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
  * @return Evaluation result
  */
 template<typename Number>
-RealAlgebraicNumber<Number> evaluateIR(MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
 	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
@@ -199,14 +200,16 @@ UnivariatePolynomial<Number> evaluatePolynomial(
 			tmp = tmp.switchVariable(i.first).resultant(p2);
 			varToInterval[i.first] = i.second.getInterval();
 		}
+		CARL_LOG_DEBUG("carl.ran", "Substituted " << i.first << " -> " << i.second << ", result: " << tmp);
 	}
+	CARL_LOG_DEBUG("carl.ran", "Result: " << tmp.switchVariable(v).toNumberCoefficients());
 	return tmp.switchVariable(v).toNumberCoefficients();
 }
 
 
 template<typename Number, typename Coeff>
 UnivariatePolynomial<Number> evaluateCoefficients(
-		UnivariatePolynomial<Coeff>& p,
+		const UnivariatePolynomial<Coeff>& p,
 		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		std::map<Variable, Interval<Number>>& varToInterval
 ) {
