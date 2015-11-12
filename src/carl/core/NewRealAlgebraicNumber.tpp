@@ -118,13 +118,16 @@ namespace carl {
 		if (upper() <= n.lower()) return false;
 		if (lower() >= n.upper()) return false;
 		if (getPolynomial() == n.getPolynomial()) {
-			if (lower() >= n.lower() && n.upper() >= upper()) return true;
-			if (lower() <= n.lower() && n.upper() <= upper()) return true;
-		}
-		
-		CARL_LOG_TRACE("carl.ran", "\tNot trivially equal or different");
-
-		if (getPolynomial() != n.getPolynomial()) {
+			if (n.lower() <= lower()) {
+				if (upper() <= n.upper()) return true;
+				refineAvoiding(n.upper());
+			} else {
+				assert(lower() <= n.lower());
+				if (n.upper() <= upper()) return true;
+				refineAvoiding(n.lower());
+			}
+		} else {
+			assert(getPolynomial() != n.getPolynomial());
 			auto g = UnivariatePolynomial<Number>::gcd(getPolynomial(), n.getPolynomial());
 			if (!isRootOf(g)) return false;
 			mIR->polynomial = g;
@@ -134,7 +137,6 @@ namespace carl {
 			n.mIR->sturmSequence = mIR->sturmSequence;
 			return equal(n);
 		}
-		
 		return equal(n);
 	}
 	
