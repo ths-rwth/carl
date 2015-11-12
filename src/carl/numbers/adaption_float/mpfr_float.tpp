@@ -44,14 +44,14 @@ class FLOAT_T<mpfr_t>
 			mpfr_init2(mValue,_prec);
 			mpfr_set_si(mValue,_int,mpfr_rnd_t(_rnd));
 		}
-		
+
 		// Default precision is initially set to 53 bits in mpfr implementation
 		FLOAT_T(const unsigned _int, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
 			mpfr_init2(mValue,_prec);
 			mpfr_set_ui(mValue,_int,mpfr_rnd_t(_rnd));
 		}
-		
+
 		// Default precision is initially set to 53 bits in mpfr implementation
 
 		FLOAT_T(const long _long, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
@@ -66,7 +66,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_init2(mValue,_prec);
 			mpfr_set_ui(mValue,_long,mpfr_rnd_t(_rnd));
 		}
-		
+
 		FLOAT_T(const mpfr_t& _mpfrNumber)
 		{
 			mpfr_init2(mValue,mpfr_get_prec(_mpfrNumber));
@@ -85,12 +85,12 @@ class FLOAT_T<mpfr_t>
 			//mpfr_set(mValue, _float.value(), MPFR_RNDN);
 			mpfr_swap(mValue,_float.mValue);
 		}
-		
+
 		FLOAT_T(const std::string& _string)
 		{
 			mpfr_init_set_str(mValue, _string.c_str(), 10, MPFR_RNDN);
 		}
-		
+
 		template<typename F, DisableIf< std::is_same<F, mpfr_t> > = dummy>
 		FLOAT_T(const FLOAT_T<F>& _float, const CARL_RND _rnd=CARL_RND::N, precision_t _prec=mDefaultPrecision)
 		{
@@ -102,11 +102,11 @@ class FLOAT_T<mpfr_t>
 		{
 			mpfr_clear(mValue);
 		}
-		
+
 		static inline const FLOAT_T<mpfr_t> const_infinity(){
 			mpfr_t tmp;
 			mpfr_init2(tmp, FLOAT_T<mpfr_t>::defaultPrecision());
-			mpfr_set_inf(tmp,1); 
+			mpfr_set_inf(tmp,1);
 			return FLOAT_T<mpfr_t>(tmp);
 		}
 
@@ -134,7 +134,7 @@ class FLOAT_T<mpfr_t>
 		}
 
 		static inline FLOAT_T<mpfr_t> machine_epsilon(const FLOAT_T<mpfr_t>& x)
-		{    
+		{
 			/* the smallest eps such that x + eps != x */
 			FLOAT_T<mpfr_t> tmp(x);
 			if( x < 0)
@@ -162,13 +162,13 @@ class FLOAT_T<mpfr_t>
 			mpfr_set_ui(tmp,1, mpfr_rnd_t(_rnd));
 			mpfr_sub(tmp,tmp,machine_epsilon(prec).value(), mpfr_rnd_t(_rnd));
 			mpfr_mul_2ui(tmp,tmp,(unsigned)mpfr_get_emax(),mpfr_rnd_t(_rnd));
-			return (FLOAT_T<mpfr_t>(tmp)); 
+			return (FLOAT_T<mpfr_t>(tmp));
 		}
 
 		/*******************
 		 * Getter & Setter *
 		 *******************/
-		
+
 		const mpfr_t& value() const
 		{
 			return mValue;
@@ -181,22 +181,22 @@ class FLOAT_T<mpfr_t>
 		static precision_t defaultPrecision () {
 			return mDefaultPrecision;
 		}
-		
+
 		precision_t precision() const
 		{
 			return mpfr_get_prec(mValue);
 		}
-		
+
 		FLOAT_T<mpfr_t>& setPrecision( const precision_t& _prec, const CARL_RND _rnd=CARL_RND::N )
 		{
 			mpfr_prec_round(mValue, convPrec(_prec), mpfr_rnd_t(_rnd));
 			return *this;
 		}
-		
+
 		/*************
 		 * Operators *
 		 *************/
-		
+
 		FLOAT_T<mpfr_t>& operator = (const FLOAT_T<mpfr_t>& _rhs)
 		{
 			if(this->mValue == _rhs.value())
@@ -205,7 +205,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
 			return *this;
 		}
-		
+
 		FLOAT_T<mpfr_t>& safeSet (const FLOAT_T<mpfr_t>& _rhs, const CARL_RND _rnd=CARL_RND::N)
 		{
 			mpfr_set_prec(mValue, mpfr_get_prec(_rhs.mValue));
@@ -214,7 +214,7 @@ class FLOAT_T<mpfr_t>
 		}
 
 		/**
-		 * Boolean operators 
+		 * Boolean operators
 		 */
 
 		bool operator == ( const FLOAT_T<mpfr_t>& _rhs) const
@@ -231,12 +231,12 @@ class FLOAT_T<mpfr_t>
 		{
 			return mpfr_greater_p(mValue, _rhs.mValue) != 0;
 		}
-		
+
 	bool operator > ( int _rhs) const
 		{
 			return mpfr_cmp_si(mValue, _rhs) > 0;
 		}
-		
+
 		bool operator > ( unsigned _rhs) const
 		{
 			return mpfr_cmp_ui(mValue, _rhs) > 0;
@@ -246,12 +246,12 @@ class FLOAT_T<mpfr_t>
 		{
 			return mpfr_less_p(mValue, _rhs.mValue) != 0;
 		}
-		
+
 		bool operator < ( int _rhs) const
 		{
 			return mpfr_cmp_si(mValue, _rhs) < 0;
 		}
-		
+
 		bool operator < ( unsigned _rhs) const
 		{
 			return mpfr_cmp_ui(mValue, _rhs) < 0;
@@ -381,7 +381,7 @@ class FLOAT_T<mpfr_t>
 		{
 			mpfr_abs(_result.mValue, mValue, mpfr_rnd_t(_rnd));
 		}
-		
+
 		FLOAT_T<mpfr_t>& exp_assign(CARL_RND _rnd = CARL_RND::N)
 		{
 			mpfr_exp(mValue, mValue, mpfr_rnd_t(_rnd));
@@ -513,7 +513,7 @@ class FLOAT_T<mpfr_t>
 		{
 			mpfr_asinh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
 		}
-		
+
 		FLOAT_T<mpfr_t>& acosh_assign(CARL_RND _rnd = CARL_RND::N)
 		{
 			mpfr_acosh(mValue, mValue, mpfr_rnd_t(_rnd));
@@ -524,7 +524,7 @@ class FLOAT_T<mpfr_t>
 		{
 			mpfr_acosh(_result.mValue, mValue, mpfr_rnd_t(_rnd));
 		}
-		
+
 		FLOAT_T<mpfr_t>& atanh_assign(CARL_RND _rnd = CARL_RND::N)
 		{
 			mpfr_atanh(mValue, mValue, mpfr_rnd_t(_rnd));
@@ -565,7 +565,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_rint_ceil(mValue, mValue, mpfr_rnd_t(_rnd));
 			return *this;
 		}
-		
+
 		/**
 		 * conversion operators
 		 */
@@ -574,7 +574,7 @@ class FLOAT_T<mpfr_t>
 		{
 			return mpfr_get_d(mValue, mpfr_rnd_t(_rnd));
 		}
-		
+
 		/**
 		 * Explicit typecast operator to integer.
 		 * @return Integer representation of this.
@@ -583,7 +583,7 @@ class FLOAT_T<mpfr_t>
 		{
 			return (int)this->toDouble();
 		}
-		
+
 		/**
 		 * Explicit typecast operator to long.
 		 * @return Long representation of this.
@@ -592,7 +592,7 @@ class FLOAT_T<mpfr_t>
 		{
 			return (long)(this->toDouble());
 		}
-		
+
 		/**
 		 * Explicit typecast operator to double.
 		 * @return Double representation of this.
@@ -601,14 +601,14 @@ class FLOAT_T<mpfr_t>
 		{
 			return this->toDouble();
 		}
-		
-		
+
+
 		friend std::ostream & operator<< (std::ostream& ostr, const FLOAT_T<mpfr_t> & p) {
 			ostr << p.toString();
 			return ostr;
 		}
-		
-		
+
+
 
 		friend bool operator== (const FLOAT_T<mpfr_t>& _lhs, const int _rhs)
 		{
@@ -639,7 +639,7 @@ class FLOAT_T<mpfr_t>
 		{
 			return _rhs == _lhs;
 		}
-		
+
 		/**
 		* Operators
 		*/
@@ -650,70 +650,70 @@ class FLOAT_T<mpfr_t>
 			mpfr_add(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator +(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_add(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator +(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_add(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
 			return res;
 		}
-	
+
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_sub(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator -(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_sub(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_sub(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_mul_si(res.mValue, _lhs.mValue, -1, MPFR_RNDN);
 			return res;
 		}
-	
+
 		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator *(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_mul(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
 			mpfr_mul(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
 			return res;
 		}
-	
+
 		friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
@@ -721,7 +721,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_div(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator /(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
@@ -729,7 +729,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_div(res.mValue, _lhs, _rhs.mValue, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const mpfr_t& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
@@ -737,25 +737,25 @@ class FLOAT_T<mpfr_t>
 			mpfr_div(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
 			return res;
 		}
-		
+
 		friend FLOAT_T<mpfr_t>& operator++(FLOAT_T<mpfr_t>& _num)
 		{
 			mpfr_add_ui(_num.mValue, _num.mValue, 1, MPFR_RNDN);
 			return _num;
 		}
-		
+
 		friend FLOAT_T<mpfr_t>& operator--(FLOAT_T<mpfr_t>& _num)
 		{
 			mpfr_sub_ui(_num.mValue, _num.mValue, 1, MPFR_RNDN);
 			return _num;
 		}
-		
+
 		FLOAT_T<mpfr_t>& operator +=(const FLOAT_T<mpfr_t>& _rhs)
 		{
 			mpfr_add(mValue, mValue, _rhs.mValue, MPFR_RNDN);
 			return *this;
 		}
-		
+
 		FLOAT_T<mpfr_t>& operator +=(const mpfr_t& _rhs)
 		{
 			mpfr_add(mValue, mValue, _rhs, MPFR_RNDN);
@@ -767,13 +767,13 @@ class FLOAT_T<mpfr_t>
 			mpfr_sub(mValue,mValue, _rhs.mValue, MPFR_RNDN);
 			return *this;
 		}
-		
+
 		FLOAT_T<mpfr_t>& operator -=(const mpfr_t& _rhs)
 		{
 			mpfr_sub(mValue,mValue, _rhs, MPFR_RNDN);
 			return *this;
 		}
-		
+
 		FLOAT_T<mpfr_t> operator-()
 		{
 			FLOAT_T<mpfr_t> res;
@@ -786,7 +786,7 @@ class FLOAT_T<mpfr_t>
 			mpfr_mul(mValue, mValue, _rhs.mValue, MPFR_RNDN);
 			return *this;
 		}
-		
+
 		FLOAT_T<mpfr_t>& operator *=(const mpfr_t& _rhs)
 		{
 			mpfr_mul(mValue, mValue, _rhs, MPFR_RNDN);
@@ -799,14 +799,14 @@ class FLOAT_T<mpfr_t>
 			mpfr_div(mValue, mValue, _rhs.mValue, MPFR_RNDN);
 			return *this;
 		}
-		
+
 		FLOAT_T<mpfr_t>& operator /=(const mpfr_t& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
 			mpfr_div(mValue, mValue, _rhs, MPFR_RNDN);
 			return *this;
 		}
-			
+
 		/**
 		 * Auxiliary Functions
 		 */
@@ -820,14 +820,14 @@ class FLOAT_T<mpfr_t>
 			mpfr_sprintf(out, "%.20RDe", mValue);
 			return std::string(out);
 		}
-		
+
 		static void integerDistance(const FLOAT_T<mpfr_t>& a, const FLOAT_T<mpfr_t>& b, mpz_t& dist) {
 			distance(a.value(), b.value(), dist);
 		}
 
 		inline static std::size_t bits2digits(precision_t b) {
 			const double LOG10_2 = 0.30102999566398119;
-			return std::size_t(std::floor( b * LOG10_2 ));
+			return std::size_t(std::floor( double(b) * LOG10_2 ));
 		}
 
 	private:
@@ -835,7 +835,7 @@ class FLOAT_T<mpfr_t>
 		void clear() {
 			mpfr_clear(mValue);
 		}
-		
+
 		mpfr_prec_t convPrec(precision_t _prec) const
 		{
 			return _prec;
@@ -844,15 +844,15 @@ class FLOAT_T<mpfr_t>
 		/**
 		 * @brief Converts a given float to its integer representation
 		 * @details This function converts a mpfr float to a corresponding integer representation. This is done as follows:
-		 * We can use a transformation similar to the one used for c++ doubles (with modifications). We use the mantissa and extend 
+		 * We can use a transformation similar to the one used for c++ doubles (with modifications). We use the mantissa and extend
 		 * it by the exponent (we left-shift the exponent in front of the mantissa) and add the sign. This can be interpreted as an
 		 * integer. Note that zero is a special case, which should be handled separately.
-		 * 
+		 *
 		 * @param intRep Parameter where we write the integer to.
 		 * @param a input mpfr float.
 		 */
 		static void toInt(mpz_t& intRep, const mpfr_t a) {
-	
+
 			//std::cout << "Bits per limb " << mp_bits_per_limb << std::endl;
 			//std::cout << "Number limbs " << std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb)) << std::endl;
 			//std::cout << "Precision is " << a->_mpfr_prec << std::endl;
@@ -863,7 +863,7 @@ class FLOAT_T<mpfr_t>
 			//std::cout << "Min Exponent is " << carl::binary(mpfr_get_emin()) << std::endl;
 			//std::cout << "Scaled exponent: " << (a->_mpfr_exp + std::abs(mpfr_get_emin())) << std::endl;
 			//std::cout << "Scaled exponent: " << carl::binary((a->_mpfr_exp + std::abs(mpfr_get_emin()))) << std::endl;
-			
+
 			// mpfr mantissa is stored in limbs (usually 64-bit words) - the number of those depends on the precision.
 			std::size_t limbs = (std::size_t)std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
 			/*
@@ -927,10 +927,10 @@ class FLOAT_T<mpfr_t>
 		 * @brief Calculates the distance in ULPs between two mpfr floats a and b.
 		 * @details We use an integer representation for calculating the distance. Special cases are whenever we reach or cross
 		 * zero. TODO: Include cases for NaN and INFTY.
-		 * 
-		 * @param a 
+		 *
+		 * @param a
 		 * @param b
-		 * 
+		 *
 		 * @return [description]
 		 */
 		static void distance(const mpfr_t& a, const mpfr_t& b, mpz_t& dist) {
@@ -968,7 +968,7 @@ class FLOAT_T<mpfr_t>
 					}else{
 						mpfr_nextbelow(zero);
 					}
-					
+
 					toInt(intRepZero, zero);
 					mpz_abs(intRepZero, intRepZero);
 					mpz_sub(dist, intRepB,intRepZero);
@@ -989,7 +989,7 @@ class FLOAT_T<mpfr_t>
 				}else{
 					mpfr_nextbelow(zero);
 				}
-				
+
 				toInt(intRepZero, zero);
 				mpz_abs(intRepZero, intRepZero);
 				mpz_sub(dist, intRepA,intRepZero);
@@ -1027,12 +1027,12 @@ class FLOAT_T<mpfr_t>
 				mpz_abs(intRepZeroA, intRepZeroA);
 				toInt(intRepZeroB, zeroB);
 				mpz_abs(intRepZeroB, intRepZeroB);
-				
+
 				mpz_sub(dist, intRepA,intRepZeroA);
 				mpz_sub(d2, intRepB,intRepZeroB);
 				mpz_add(dist, dist, d2);
 				mpz_add_ui(dist,dist, 2);
-				
+
 				mpfr_clear(zeroA);
 				mpfr_clear(zeroB);
 				mpz_clear(intRepZeroA);
@@ -1040,7 +1040,7 @@ class FLOAT_T<mpfr_t>
 				mpz_clear(d2);
 			}
 			//std::cout << "Modify by " << 2*std::abs(offset)*a->_mpfr_prec << std::endl;
-			
+
 			// shift by offset (exponent differences).
 			long shift = 2*std::abs(offset)*unsigned(a->_mpfr_prec);
 			mpz_sub_ui(dist, dist, shift);
@@ -1104,7 +1104,7 @@ namespace std{
 		static const bool is_signed			= true;
 		static const bool is_integer		= false;
 		static const bool is_exact			= false;
-		static const int  radix				= 2;    
+		static const int  radix				= 2;
 
 		static const bool has_infinity		= true;
 		static const bool has_quiet_NaN		= true;
@@ -1118,21 +1118,21 @@ namespace std{
 
 		static const float_denorm_style has_denorm  = denorm_absent;
 
-		
+
 		inline static carl::FLOAT_T<mpfr_t> (min) (carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return  carl::FLOAT_T<mpfr_t>::minval(_rnd, precision); }
 		inline static carl::FLOAT_T<mpfr_t> (max) (carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return  carl::FLOAT_T<mpfr_t>::maxval(_rnd, precision); }
 		inline static carl::FLOAT_T<mpfr_t> lowest (carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return -carl::FLOAT_T<mpfr_t>::maxval(_rnd, precision); }
 
 		// Returns smallest eps such that 1 + eps != 1 (classic machine epsilon)
 		inline static carl::FLOAT_T<mpfr_t> epsilon(carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) {  return  carl::FLOAT_T<mpfr_t>::machine_epsilon(precision); }
-		
+
 		// Returns smallest eps such that x + eps != x (relative machine epsilon)
 		inline static carl::FLOAT_T<mpfr_t> epsilon(const carl::FLOAT_T<mpfr_t>& x) { return carl::FLOAT_T<mpfr_t>::machine_epsilon(x); }
 
 		inline static carl::FLOAT_T<mpfr_t> round_error(carl::CARL_RND _rnd = carl::CARL_RND::N, carl::precision_t precision = carl::FLOAT_T<mpfr_t>::defaultPrecision()) { return carl::FLOAT_T<mpfr_t>(0.5, _rnd, precision); }
-		
+
 		inline static const carl::FLOAT_T<mpfr_t> infinity() { return carl::FLOAT_T<mpfr_t>::const_infinity(); }
-		
+
 		inline static const carl::FLOAT_T<mpfr_t> quiet_NaN() { return carl::FLOAT_T<mpfr_t>().setNan(); }
 		inline static const carl::FLOAT_T<mpfr_t> signaling_NaN() { return carl::FLOAT_T<mpfr_t>().setNan(); }
 		inline static const carl::FLOAT_T<mpfr_t> denorm_min() { return (min)(); }
@@ -1144,11 +1144,11 @@ namespace std{
 		static const int max_exponent10 = (int) (MPFR_EMAX_DEFAULT * 0.3010299956639811);
 
 		// Following members should be constant according to standard, but they can be variable in MPFR
-		// So we define them as functions here. 
+		// So we define them as functions here.
 		//
 		// This is preferable way for std::numeric_limits<carl::FLOAT_T<mpfr_t>> specialization.
-		// But it is incompatible with standard std::numeric_limits and might not work with other libraries, e.g. boost. 
-		// See below for compatible implementation. 
+		// But it is incompatible with standard std::numeric_limits and might not work with other libraries, e.g. boost.
+		// See below for compatible implementation.
 		inline static float_round_style round_style() { return round_to_nearest; }
 
 		inline static std::size_t digits() { return std::size_t(carl::FLOAT_T<mpfr_t>::defaultPrecision()); }
