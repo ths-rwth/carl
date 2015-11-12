@@ -105,6 +105,24 @@ public:
 		mIsRoot(ran.mIsRoot),
 		mIR(ran.mIR)
 	{}
+	RealAlgebraicNumber(RealAlgebraicNumber&& ran):
+		mValue(std::move(ran.mValue)),
+		mIsRoot(ran.mIsRoot),
+		mIR(std::move(ran.mIR))
+	{}
+		
+	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) {
+		mValue = n.mValue;
+		mIsRoot = n.mIsRoot;
+		mIR = n.mIR;
+		return *this;
+	}
+	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) {
+		mValue = std::move(n.mValue);
+		mIsRoot = n.mIsRoot;
+		mIR = std::move(n.mIR);
+		return *this;
+	}
 	
 	/**
 	 * @return the flag marking whether the real algebraic number stems from a root computation or not
@@ -216,6 +234,8 @@ public:
 	
 	bool equal(const RealAlgebraicNumber<Number>& n) const;
 	bool less(const RealAlgebraicNumber<Number>& n) const;
+	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
+	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
 	
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
