@@ -202,7 +202,21 @@ class FLOAT_T<mpfr_t>
 			if(this->mValue == _rhs.value())
 				return *this;
 
-			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
+			// Note: This is a workaround to get the limb size correct. Instead use free and reallocate.
+			mpfr_set(mValue, _rhs.mValue, MPFR_RNDN);
+
+			mValue->_mpfr_prec = _rhs.mValue->_mpfr_prec;
+			mValue->_mpfr_sign = _rhs.mValue->_mpfr_sign;
+			mValue->_mpfr_exp = _rhs.mValue->_mpfr_exp;
+
+			// deep-copy limbs
+			std::size_t limbs = (std::size_t)std::ceil(double(_rhs.mValue->_mpfr_prec)/double(mp_bits_per_limb));
+
+			while( limbs > 0 ){
+				mValue->_mpfr_d[limbs-1] = _rhs.mValue->_mpfr_d[limbs-1];
+				--limbs;
+			}
+
 			return *this;
 		}
 
