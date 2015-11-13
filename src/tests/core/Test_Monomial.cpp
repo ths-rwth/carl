@@ -37,7 +37,7 @@ TEST(Monomial, degreeCategories)
 {
 	Variable x = freshRealVariable("x");
 	
-	Monomial::Arg m1 = createMonomial(x,1);
+	Monomial::Arg m1 = createMonomial(x, (unsigned)1);
 	EXPECT_TRUE(m1->isLinear());
 	EXPECT_TRUE(m1->isAtMostLinear());
 	EXPECT_TRUE(!m1->isSquare());

@@ -32,7 +32,7 @@ private:
 	{
 	}
 public:
-	static std::shared_ptr<RealAlgebraicNumberNR> create(const Number& n, bool isRoot = true) {
+	static std::shared_ptr<RealAlgebraicNumber<Number>> create(const Number& n, bool isRoot = true) {
 		auto res = std::shared_ptr<RealAlgebraicNumberNR>(new RealAlgebraicNumberNR(n, isRoot));
 		res->pThis = res;
 		return res;
