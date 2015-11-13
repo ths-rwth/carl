@@ -39,7 +39,9 @@ enum class IntegerHandling {
     /// Split if a non-integral sample is available for an integer variable.
     SPLIT_EARLY,
     /// Backtrack within the sampling phase.
-    BACKTRACK
+    BACKTRACK,
+	/// Do not care about integers
+	NONE
 };
 inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
     switch (ih) {
