@@ -70,13 +70,34 @@ class FLOAT_T<mpfr_t>
 		FLOAT_T(const mpfr_t& _mpfrNumber)
 		{
 			mpfr_init2(mValue,mpfr_get_prec(_mpfrNumber));
-			mpfr_set(mValue, _mpfrNumber, MPFR_RNDN);
+
+			mValue->_mpfr_prec = _mpfrNumber->_mpfr_prec;
+			mValue->_mpfr_sign = _mpfrNumber->_mpfr_sign;
+			mValue->_mpfr_exp = _mpfrNumber->_mpfr_exp;
+
+			// deep-copy limbs
+			std::size_t limbs = (std::size_t)std::ceil(double(_mpfrNumber->_mpfr_prec)/double(mp_bits_per_limb));
+
+			while( limbs > 0 ){
+				mValue->_mpfr_d[limbs-1] = _mpfrNumber->_mpfr_d[limbs-1];
+				--limbs;
+			}
 		}
 
 		FLOAT_T(const FLOAT_T<mpfr_t>& _float)
 		{
 			mpfr_init2(mValue, mpfr_get_prec(_float.value()));
-			mpfr_set(mValue, _float.value(), MPFR_RNDN);
+			mValue->_mpfr_prec = _float.mValue->_mpfr_prec;
+			mValue->_mpfr_sign = _float.mValue->_mpfr_sign;
+			mValue->_mpfr_exp = _float.mValue->_mpfr_exp;
+
+			// deep-copy limbs
+			std::size_t limbs = (std::size_t)std::ceil(double(_float.mValue->_mpfr_prec)/double(mp_bits_per_limb));
+
+			while( limbs > 0 ){
+				mValue->_mpfr_d[limbs-1] = _float.mValue->_mpfr_d[limbs-1];
+				--limbs;
+			}
 		}
 
 		FLOAT_T(FLOAT_T<mpfr_t>&& _float)
