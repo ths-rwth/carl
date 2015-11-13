@@ -1659,7 +1659,11 @@ inline const Interval<Number> operator *(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(lhs * rhs.content().lower(), rhs.lowerBoundType(), lhs * rhs.content().upper(), rhs.upperBoundType());
+		if(lhs < 0) {
+			return Interval<Number>(lhs * rhs.content().upper(), rhs.upperBoundType(), lhs * rhs.content().lower(), rhs.lowerBoundType());
+		} else {
+			return Interval<Number>(lhs * rhs.content().lower(), rhs.lowerBoundType(), lhs * rhs.content().upper(), rhs.upperBoundType());
+		}
 	}
 
 template<typename Number>
