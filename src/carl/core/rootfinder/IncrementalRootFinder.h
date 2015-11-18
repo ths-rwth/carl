@@ -96,7 +96,7 @@ public:
 	 * @param root Real root.
 	 * @param reducePolynomial Flag if polynomial should be reduced.
 	 */
-	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) = 0;
+	virtual void addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial = true) = 0;
 	/**
 	 * Add a root to the list of found roots.
 	 * @param interval Interval that contains the real root.
@@ -229,7 +229,7 @@ private:
 	/**
 	 * Iterator pointing to the next root within the root list that should be returned.
 	 */
-	typename std::list<RealAlgebraicNumberPtr<Number>>::iterator nextRoot;
+	typename std::list<RealAlgebraicNumber<Number>>::iterator nextRoot;
 
 public:
 
@@ -259,10 +259,17 @@ public:
 
 	/**
 	 * Computes some new isolating root of the polynomial.
-	 * If all roots have already been found, a nullptr will be returned.
-	 * @return A new root, nullptr if all roots have been found.
+	 * If all roots have already been found, returns false.
+	 * @return True if a new root is available, false otherwise.
 	 */
-	RealAlgebraicNumberPtr<Number> next();
+	bool hasNext();
+
+	/**
+	 * Returns the next root as computed by hasNext().
+	 * Asserts that there actually is a new root.
+	 * @return A new root.
+	 */
+	RealAlgebraicNumber<Number> next();
 
 	/**
 	 * Adds a new item to the internal interval queue.
@@ -276,7 +283,7 @@ public:
 
 protected:
 
-	virtual void addRoot(RealAlgebraicNumberPtr<Number> root, bool reducePolynomial = true) {
+	virtual void addRoot(RealAlgebraicNumber<Number> root, bool reducePolynomial = true) {
 		if (this->nextRoot == this->roots.end()) this->nextRoot--;
 		AbstractRootFinder<Number>::addRoot(root, reducePolynomial);
 	}

@@ -100,7 +100,7 @@ public:
 	}
 
 	template<typename Coeff>
-	void sample(const std::string& id, const carl::RealAlgebraicNumberPtr<Coeff>& s, const carl::RealAlgebraicNumberPtr<Coeff>& p) {
+	void sample(const std::string& id, const carl::RealAlgebraicNumber<Coeff>& s, const carl::RealAlgebraicNumber<Coeff>& p) {
 		CARL_LOG_TRACE("carl.cad.dot." + id, "\"" << p << "\" -> \"" << s << "\";");
 	}
 };

@@ -5,6 +5,12 @@
 
 #pragma once
 
+#define NEWRAN
+
+#ifdef NEWRAN
+#include "NewRealAlgebraicNumber.h"
+#else
+
 #include <memory>
 
 #include "../util/SFINAE.h"
@@ -68,16 +74,6 @@ public:
 	 * Destructor.
 	 */
 	virtual ~RealAlgebraicNumber() {
-	}
-
-	static std::shared_ptr<RealAlgebraicNumber> create(bool isRoot, bool isNumeric = false, const Number& value = 0) {
-		auto res = std::shared_ptr<RealAlgebraicNumber>(new RealAlgebraicNumber(isRoot, isNumeric, value));
-		res->pThis = res;
-		return res;
-	}
-
-	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
-		return RealAlgebraicNumber<Number>::create(isRoot(), isNumeric(), value());
 	}
 
 	///////////////
@@ -215,3 +211,5 @@ std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Numbe
 }
 
 }
+
+#endif

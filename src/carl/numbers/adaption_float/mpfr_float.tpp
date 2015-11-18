@@ -75,15 +75,18 @@ class FLOAT_T<mpfr_t>
 
 		FLOAT_T(const FLOAT_T<mpfr_t>& _float)
 		{
-			mpfr_init2(mValue, mpfr_get_prec(_float.value()));
-			mpfr_set(mValue, _float.value(), MPFR_RNDN);
+			mpfr_init2(mValue, mpfr_get_prec(_float.mValue));
+			mpfr_set(mValue, _float.mValue, MPFR_RNDN);
 		}
 
 		FLOAT_T(FLOAT_T<mpfr_t>&& _float)
 		{
-			mpfr_init2(mValue, mpfr_get_prec(_float.value()));
-			//mpfr_set(mValue, _float.value(), MPFR_RNDN);
-			mpfr_swap(mValue,_float.mValue);
+			if(this->mValue == _float.value()){
+				mpfr_swap(mValue,_float.mValue);
+			} else {
+				mpfr_init2(mValue, mpfr_get_prec(_float.value()));
+				mpfr_swap(mValue,_float.mValue);
+			}
 		}
 
 		FLOAT_T(const std::string& _string)
@@ -202,7 +205,23 @@ class FLOAT_T<mpfr_t>
 			if(this->mValue == _rhs.value())
 				return *this;
 
-			mpfr_set(mValue, _rhs.value(), MPFR_RNDN);
+			// Note: This is a workaround to get the limb size correct. Instead use free and reallocate.
+			mpfr_set_prec(mValue, mpfr_get_prec(_rhs.mValue));
+			mpfr_set(mValue, _rhs.mValue, MPFR_RNDN);
+
+			/*
+			mValue->_mpfr_prec = _rhs.mValue->_mpfr_prec;
+			mValue->_mpfr_sign = _rhs.mValue->_mpfr_sign;
+			mValue->_mpfr_exp = _rhs.mValue->_mpfr_exp;
+
+			// deep-copy limbs
+			std::size_t limbs = (std::size_t)std::ceil(double(_rhs.mValue->_mpfr_prec)/double(mp_bits_per_limb));
+
+			while( limbs > 0 ){
+				mValue->_mpfr_d[limbs-1] = _rhs.mValue->_mpfr_d[limbs-1];
+				--limbs;
+			}
+			*/
 			return *this;
 		}
 
@@ -815,9 +834,9 @@ class FLOAT_T<mpfr_t>
 		{
 			// TODO: Better rounding mode?
 //            std::string out;
-			char out[30];
+			char out[80];
 //            str << mpfr_get_d(mValue, MPFR_RNDN);
-			mpfr_sprintf(out, "%.20RDe", mValue);
+			mpfr_sprintf(out, "%.50RDe", mValue);
 			return std::string(out);
 		}
 
@@ -1085,13 +1104,25 @@ namespace std{
 			std::size_t limbs = (std::size_t)std::ceil(double(numStruct._mpfr_prec)/double(mp_bits_per_limb));
 
 			size_t seed = 0;
-			while(limbs > 0) {
-			    carl::hash_add(seed,numStruct._mpfr_d[limbs-1]);
-			    --limbs;
+			//std::cout << "start hash" << std::endl;
+			//std::cout << "seed: " << seed << std::endl;
+			if(mpfr_number_p(_in.value()) && mpfr_zero_p(_in.value()) == 0){
+				while(limbs > 0) {
+				    carl::hash_add(seed,numStruct._mpfr_d[limbs-1]);
+				    //std::cout << "seed: " << seed << std::endl;
+				    --limbs;
+				}
 			}
-			carl::hash_add(seed, size_t(numStruct._mpfr_sign));
+			//std::cout << "seed: " << seed << std::endl;
+			if(mpfr_nan_p(_in.value()) == 0){
+				carl::hash_add(seed, size_t(numStruct._mpfr_sign));
+			}
+			//std::cout << "seed: " << seed << std::endl;
 			carl::hash_add(seed, size_t(numStruct._mpfr_prec));
+			//std::cout << "seed: " << seed << std::endl;
 			carl::hash_add(seed, size_t(numStruct._mpfr_exp));
+			//std::cout << "seed: " << seed << std::endl;
+			//std::cout << "end hash" << std::endl;
 			return seed;
 		}
 	};

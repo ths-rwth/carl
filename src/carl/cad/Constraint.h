@@ -112,10 +112,11 @@ public:
 		assert(_variables.size() == r.dim());
 		
 		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, _variables);
+		CARL_LOG_DEBUG("carl.ran", *this << " evaluates to " << res << " on " << r);
 		if (this->negated) {
-			return res->sgn() != this->sign;
+			return res.sgn() != this->sign;
 		} else {
-			return res->sgn() == this->sign;
+			return res.sgn() == this->sign;
 		}
 	}
 

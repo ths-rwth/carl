@@ -888,8 +888,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	if (!this->has(var)) {
 		return;
 	}
-	std::stringstream ss;
-	ss << *this;
 	TermsType newTerms;
 	// If we replace a variable by zero, just eliminate all terms containing the variable.
 	if(value.isZero())
@@ -902,7 +900,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 			} else removedLast = true;
 		}
 		mTerms.swap(newTerms);
-		CARL_LOG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+		CARL_LOG_TRACE("carl.core", *this << " [ " << var << " -> " << value << " ] = " << *this);
 		if (removedLast) {
 			mOrdered = false;
 			makeMinimallyOrdered<false, true>();

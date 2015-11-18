@@ -79,13 +79,13 @@ public:
 	 * @param var Variable.
 	 * @return New RealAlgebraicNumberIR of value zero.
 	 */
-	static std::shared_ptr<RealAlgebraicNumberIR> create(Variable::Arg var) {
+	static std::shared_ptr<RealAlgebraicNumber<Number>> create(Variable::Arg var) {
 		auto res = std::shared_ptr<RealAlgebraicNumberIR>(new RealAlgebraicNumberIR(var));
 		res->pThis = res;
 		return res;
 	}
 
-	static std::shared_ptr<RealAlgebraicNumberIR> create(
+	static std::shared_ptr<RealAlgebraicNumber<Number>> create(
 			const UnivariatePolynomial<Number>& p,
 			const Interval<Number>& i,
 			const bool normalize = true,
@@ -98,7 +98,7 @@ public:
 		return res;
 	}
 	
-	static std::shared_ptr<RealAlgebraicNumberIR> create(
+	static std::shared_ptr<RealAlgebraicNumber<Number>> create(
 			const UnivariatePolynomial<Number>& p,
 			const std::list<UnivariatePolynomial<Number>>& seq,
 			const Interval<Number>& i,
@@ -246,13 +246,14 @@ public:
 	 * @param n Other number.
 	 * @return this + n.
 	 */
-	std::shared_ptr<RealAlgebraicNumberIR<Number>> add(const std::shared_ptr<RealAlgebraicNumberIR<Number>>& n);
+	std::shared_ptr<RealAlgebraicNumber<Number>> add(const RealAlgebraicNumberNRPtr<Number>& n);
+	std::shared_ptr<RealAlgebraicNumber<Number>> add(const RealAlgebraicNumberIRPtr<Number>& n);
 
 	/**
 	 * Creates the negation of this RealAlgebraicNumberIR.
 	 * @return `-this`.
 	 */
-	std::shared_ptr<RealAlgebraicNumberIR<Number>> minus() const;
+	std::shared_ptr<RealAlgebraicNumber<Number>> minus() const;
 
 	/**
 	 * Checks if the interval that defines this number is contained in the given interval.

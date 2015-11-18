@@ -56,7 +56,7 @@ RealAlgebraicNumberIR<Number>::RealAlgebraicNumberIR(
 }
 
 template<typename Number>
-RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
+RealAlgebraicNumberPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAlgebraicNumberIRPtr<Number>& n) {
 	if (this->isZero() || n->isZero()) return n;
 
 	Variable x=  this->getPolynomial().mainVar();
@@ -81,7 +81,7 @@ RealAlgebraicNumberIRPtr<Number> RealAlgebraicNumberIR<Number>::add(const RealAl
 }
 
 template<typename Number>
-std::shared_ptr<RealAlgebraicNumberIR<Number>> RealAlgebraicNumberIR<Number>::minus() const {
+RealAlgebraicNumberPtr<Number> RealAlgebraicNumberIR<Number>::minus() const {
 	if (this->isZero()) {
 		return RealAlgebraicNumberIR<Number>::create(this->polynomial, this->interval);
 	}
