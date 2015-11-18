@@ -59,10 +59,11 @@ namespace carl
     static const Condition PROP_IS_A_CLAUSE                     = Condition( 3 );
     static const Condition PROP_IS_A_LITERAL                    = Condition( 4 );
     static const Condition PROP_IS_AN_ATOM                      = Condition( 5 );
+    static const Condition PROP_IS_LITERAL_CONJUNCTION          = Condition( 6 );
     static const Condition STRONG_CONDITIONS                    = PROP_IS_IN_NNF | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION |
-                                                                  PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_AN_ATOM ;
+                                                                  PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_AN_ATOM | PROP_IS_LITERAL_CONJUNCTION;
 
-    //Propositions which hold, if they hold in at least one sub formula (16-31)
+    //Propositions which hold, if they hold in at least one sub formula (16-63)
     static const Condition PROP_CONTAINS_EQUATION                = Condition( 16 );
     static const Condition PROP_CONTAINS_INEQUALITY              = Condition( 17 );
     static const Condition PROP_CONTAINS_STRICT_INEQUALITY       = Condition( 18 );
