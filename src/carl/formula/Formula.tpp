@@ -337,7 +337,7 @@ namespace carl
             {
                 Condition subFormulaConds = _content.mSubformula.mpContent->mProperties;
                 if( PROP_IS_AN_ATOM <= subFormulaConds )
-                    _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_PURE_CONJUNCTION;
+                    _content.mProperties |= PROP_IS_A_CLAUSE | PROP_IS_A_LITERAL | PROP_IS_IN_CNF | PROP_IS_LITERAL_CONJUNCTION;
                 _content.mProperties |= (subFormulaConds & WEAK_CONDITIONS);
                 break;
             }
@@ -360,16 +360,22 @@ namespace carl
             }
             case FormulaType::AND:
             {
-                _content.mProperties |= PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
+                _content.mProperties |= PROP_IS_LITERAL_CONJUNCTION | PROP_IS_PURE_CONJUNCTION | PROP_IS_IN_CNF | PROP_IS_IN_NNF;
                 for( auto subFormula = _content.mSubformulas.begin(); subFormula != _content.mSubformulas.end(); ++subFormula )
                 {
                     Condition subFormulaConds = subFormula->properties();
                     if( !(PROP_IS_A_CLAUSE<=subFormulaConds) )
                     {
                         _content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
+                        _content.mProperties &= ~PROP_IS_LITERAL_CONJUNCTION;
                         _content.mProperties &= ~PROP_IS_IN_CNF;
                     }
                     else if( !(PROP_IS_A_LITERAL<=subFormulaConds) )
+                    {
+                        _content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
+                        _content.mProperties &= ~PROP_IS_LITERAL_CONJUNCTION;
+                    }
+                    else if( !(PROP_IS_AN_ATOM <=subFormulaConds) )
                         _content.mProperties &= ~PROP_IS_PURE_CONJUNCTION;
                     if( !(PROP_IS_IN_NNF<=subFormulaConds) )
                         _content.mProperties &= ~PROP_IS_IN_NNF;

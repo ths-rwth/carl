@@ -277,12 +277,12 @@ namespace carl
                 }
                 else if(itleft->first < itright->first) 
                 {
-                    ++itright;
+                    ++itleft;
                 }
                 else
                 {
                     assert(itleft->first > itright->first);
-                    ++itleft;
+                    ++itright;
                 }
             }
              // Insert remaining part
