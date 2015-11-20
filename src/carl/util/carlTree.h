@@ -110,11 +110,11 @@ protected:
 			assert(current != MAXINT);
 			return mTree->nodes[current].data;
 		}
-		T* const operator->() {
+		T* operator->() {
 			assert(current != MAXINT);
 			return &(mTree->nodes[current].data);
 		}
-		T const * const operator->() const {
+		T const * operator->() const {
 			assert(current != MAXINT);
 			return &(mTree->nodes[current].data);
 		}
