@@ -139,7 +139,7 @@ private:
 	 */
 	PolynomialComparator liftingOrder;
 
-	ProjectionType projectionType = ProjectionType::McCallum;
+	ProjectionType projectionType = ProjectionType::Brown;
 	ProjectionOperator<const UPolynomial*> projection;
 	template<typename... Args>
 	void project(Args&&... args) const {
