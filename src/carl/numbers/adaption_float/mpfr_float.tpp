@@ -684,6 +684,20 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator +(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_add(res.mValue, FLOAT_T<mpfr_t>(_lhs).mValue, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator +(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
+		{
+			return _rhs+_lhs;
+		}
+
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -705,6 +719,22 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator -(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_sub(res.mValue, FLOAT_T<mpfr_t>(_lhs).mValue, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			mpfr_sub(res.mValue, _lhs.mValue, FLOAT_T<mpfr_t>(_rhs).mValue, MPFR_RNDN);
+			return res;
+		}
+
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -717,6 +747,21 @@ class FLOAT_T<mpfr_t>
 			FLOAT_T<mpfr_t> res;
 			mpfr_mul(res.mValue, _lhs.mValue, _rhs.mValue, MPFR_RNDN);
 			return res;
+		}
+
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator *(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			FLOAT_T<mpfr_t> res;
+			FLOAT_T<mpfr_t> lhs = FLOAT_T<mpfr_t>(_lhs);
+			mpfr_mul(res.mValue, lhs.mValue, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
+		{
+			return _rhs*_lhs;
 		}
 
 		friend FLOAT_T<mpfr_t> operator *(const mpfr_t& _lhs, const FLOAT_T<mpfr_t>& _rhs)
@@ -754,6 +799,24 @@ class FLOAT_T<mpfr_t>
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
 			FLOAT_T<mpfr_t> res;
 			mpfr_div(res.mValue, _lhs.mValue, _rhs, MPFR_RNDN);
+			return res;
+		}
+
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator /(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
+		{
+			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
+			FLOAT_T<mpfr_t> res;
+			mpfr_div(res.mValue, FLOAT_T<mpfr_t>(_lhs).mValue, _rhs.mValue, MPFR_RNDN);
+			return res;
+		}
+
+		template<typename Other>
+		friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
+		{
+			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
+			FLOAT_T<mpfr_t> res;
+			mpfr_div(res.mValue, _lhs.mValue, FLOAT_T<mpfr_t>(_rhs).mValue, MPFR_RNDN);
 			return res;
 		}
 
