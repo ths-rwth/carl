@@ -20,7 +20,7 @@
 
 #include "CADTypes.h"
 #include "CADSettings.h"
-#include "Elimination.h"
+#include "Projection.h"
 
 namespace carl {
 namespace cad {
