@@ -684,7 +684,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator +(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -692,7 +692,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator +(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			return _rhs+_lhs;
@@ -719,7 +719,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator -(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -727,7 +727,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator -(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -749,7 +749,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator *(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			FLOAT_T<mpfr_t> res;
@@ -758,7 +758,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator *(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			return _rhs*_lhs;
@@ -802,7 +802,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator /(const Other& _lhs, const FLOAT_T<mpfr_t>& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.
@@ -811,7 +811,7 @@ class FLOAT_T<mpfr_t>
 			return res;
 		}
 
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<mpfr_t> operator /(const FLOAT_T<mpfr_t>& _lhs, const Other& _rhs)
 		{
 			// TODO: mpfr_div results in infty when dividing by zero, although this should not be defined.

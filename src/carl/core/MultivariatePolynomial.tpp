@@ -19,7 +19,7 @@
 
 namespace carl
 {
-	
+
 template<typename Coeff, typename Ordering, typename Policies>
 TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>,Ordering> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager;
 
@@ -179,7 +179,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 		mTermAdditionManager.readTerms(id, mTerms);
 		mOrdered = false;
 	}
-	
+
 	if (!mOrdered) {
 		makeMinimallyOrdered();
 	}
@@ -232,7 +232,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	: MultivariatePolynomial(p.first, p.second)
 {
 }
-	
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands)
 {
@@ -573,11 +573,11 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 	// A constant polynomial is obviously univariate.
 	if (isConstant()) return true;
-	
+
 	if (this->lterm().getNrVariables() > 1) {
 		return false;
 	}
-	
+
 	Variable v = lterm().getSingleVariable();
 	for (const auto& term : mTerms) {
 		if (!term.hasNoOtherVariable(v)) return false;
@@ -836,7 +836,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	{
 		return MultivariatePolynomial<C,O,P>();
 	}
-	
+
 	MultivariatePolynomial<C,O,P> remainder;
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
@@ -1194,11 +1194,11 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 	}
     if( carl::isNegative(lcoeff()) )
     {
-        return Coeff(den)/(-num);
+        return Coeff(den)/Coeff(-num);
     }
     else
     {
-        return Coeff(den)/num;
+        return Coeff(den)/Coeff(num);
     }
 }
 
@@ -1377,7 +1377,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		return MultivariatePolynomial((Coeff)1);
 	}
-	
+
 	CARL_LOG_INEFFICIENT();
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
 	for(unsigned i = 1; i < exp; i++)
@@ -1884,7 +1884,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		*this = -rhs;
 		return *this += c;
 	}
-	
+
 	auto id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.template addTerm<false>(id, term);
