@@ -20,6 +20,7 @@
 
 #include "CADTypes.h"
 #include "CADSettings.h"
+#include "Elimination.h"
 
 namespace carl {
 namespace cad {
@@ -137,7 +138,14 @@ private:
 	 * PolynomialComparator that defines the order of the polynomials in the lifting queue.
 	 */
 	PolynomialComparator liftingOrder;
-	
+
+	ProjectionType projectionType = ProjectionType::McCallum;
+	ProjectionOperator<const UPolynomial*> projection;
+	template<typename... Args>
+	void project(Args&&... args) const {
+		projection(projectionType, std::forward<Args>(args)...);
+	}
+
 	/**
 	 * Elimination queue containing all polynomials not yet considered for non-paired elimination.
 	 * Access permits reset of the queue, automatic update after insertion of new elements and a pop method.
@@ -462,7 +470,7 @@ public:
 	bool emptyPairedEliminationQueue() const {
 	   return mPairedEliminationQueue.empty();
 	}
-	
+
 	/**
 	 * Does the elimination of the polynomial p and stores the resulting polynomials into the specified
 	 * destination set.
@@ -574,116 +582,6 @@ public:
 	 */
 	template<typename Coeff>
 	friend void std::swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
-
-	//////////////////////////////
-	// STATIC AUXILIARY METHODS //
-	//////////////////////////////
-	
-	/**
-	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
-	 * This elimination operator follows McCallums definition [McCallum - TR578, 1985].
-	 *
-	 *<p><strong>Note that the set returned by this method should be disjoint to the set returned by the two-polynomial variant of <code>eliminate</code>.</strong></p>
-	 *
-	 * Optimizations:
-	 * <ul>
-	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
-	 * </ul>
-	 *
-	 * @param p input polynomial for the elimination procedure
-	 * @param variable the new main variable for the returned set
-	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
-	 * @param avoidSingle If true, the polynomial added to eliminated is not added to the single-elimination queue (default: false).
-	 * @complexity O ( deg(P) ) subresultant computations. The degree of the output is bound by O(deg(P)^2)!
-	 * @return a list of polynomials in which the main variable of p is eliminated
-	 */
-	static void elimination(
-			const UPolynomial* p,
-			Variable::Arg variable,
-			EliminationSet<Coefficient>& eliminated,
-			bool avoidSingle
-			);
-
-	/**
-	 * Performs all steps of a CAD elimination/projection operator which are related to a pair of polynomials.
-	 * This elimination operator follows McCallums definition [McCallum - TR578, 1985].
-	 *
-	 *<p><strong>Note that the set returned by this method should be disjoint to the set returned by the single-polynomial variant of <code>eliminate</code>.</strong></p>
-	 *
-	 * Optimizations:
-	 * <ul>
-	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
-	 * </ul>
-	 *
-	 * @param p first input polynomial for the elimination procedure
-	 * @param q second input polynomial for the elimination procedure
-	 * @param variable the new main variable for the returned set
-	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
-	 * @param avoidSingle If true, the polynomials added to eliminated are not added to the single-elimination queue (default: false).
-	 * @complexity O( deg(P)^2 ) subresultant computations. The degree of the output is bound by O(max(deg(P),deg(Q))^2)!
-	 * @return a list of polynomials in which the main variable of p1 and p2 is eliminated
-	 */
-	static void elimination(
-			const UPolynomial* p,
-			const UPolynomial* q,
-			Variable::Arg variable,
-			EliminationSet<Coefficient>& eliminated,
-			bool avoidSingle 
-			);
-	
-	/**
-	 * Performs all steps of a CAD elimination/projection operator which are related to one single polynomial.
-	 *
-	 * Optimizations:
-	 * <ul>
-	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
-	 * </ul>
-	 *
-	 * @param p input polynomial for the elimination procedure constrained by an equation
-	 * @param variable the new main variable for the returned set
-	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
-	 * @param avoidSingle If true, the polynomial added to eliminated is not added to the single-elimination queue (default: false).
-	 * @complexity
-	 * @see Scott McCallum - On Projection in CAD-Based Quantifier Elimination with Equational Constraint
-	 * @return a list of polynomials in which the main variable of p is eliminated
-	 */
-	static void eliminationEq(
-			const UPolynomial* p,
-			Variable::Arg variable,
-			EliminationSet<Coefficient>& eliminated,
-			bool avoidSingle
-			)
-	{
-		elimination(p, variable, eliminated, avoidSingle);
-	}
-	
-	/**
-	 * Performs all steps of a CAD elimination/projection operator which are related to a pair of polynomials.
-	 *
-	 * Optimizations:
-	 * <ul>
-	 * <li> No numeric elimination polynomials are inserted into eliminated. </li>
-	 * </ul>
-	 *
-	 * @param p first input polynomial for the elimination procedure constrained by an equation
-	 * @param q second input polynomial for the elimination procedure
-	 * @param variable the new main variable for the returned set
-	 * @param eliminated the set of eliminated polynomials to be augmented by the result of the elimination
-	 * @param avoidSingle If true, the polynomial added to eliminated is not added to the single-elimination queue (default: false).
-	 * @complexity
-	 * @see Scott McCallum - On Projection in CAD-Based Quantifier Elimination with Equational Constraint
-	 * @return a list of polynomials in which the main variable of p1 and p2 is eliminated
-	 */
-	static void eliminationEq(
-			const UPolynomial* p,
-			const UPolynomial* q,
-			Variable::Arg variable,
-			EliminationSet<Coefficient>& eliminated,
-			bool avoidSingle
-			)
-	{
-		elimination(p, q, variable, eliminated, avoidSingle);
-	}
 };
 
 }
