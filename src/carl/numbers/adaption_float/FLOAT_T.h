@@ -1371,6 +1371,11 @@ namespace carl
 			return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
 		}
 
+		friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, long int _rhs)
+		{
+			return FLOAT_T<FloatType>(_lhs.mValue * FLOAT_T<FloatType>(_rhs) );
+		}
+
 		/**
 		 * Operator for addition of two numbers.
 		 * @param _lhs Lefthand side.
