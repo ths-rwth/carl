@@ -21,21 +21,8 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #include <math.h>
 #include <cmath>
 #include <cstddef>
-#include <gmpxx.h>
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-#endif
-#ifdef USE_MPFR_FLOAT
-#include <mpfr.h>
-#endif
 
 #include "../../util/hash.h"
-#include "../adaption_gmpxx/typetraits.h"
-#include "../adaption_gmpxx/operations.h"
-#ifdef USE_CLN_NUMBERS
-#include "../adaption_cln/typetraits.h"
-#include "../adaption_cln/operations.h"
-#endif
 #include "roundingConversion.h"
 #include "../../util/SFINAE.h"
 #include "../../core/logging.h"
@@ -1274,7 +1261,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue + _rhs);
@@ -1287,7 +1274,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator +(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return _rhs + _lhs;
@@ -1311,7 +1298,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue - _rhs);
@@ -1324,7 +1311,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator -(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
@@ -1358,7 +1345,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
@@ -1371,7 +1359,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator *(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
@@ -1396,7 +1384,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			assert(_rhs != 0);
@@ -1410,7 +1398,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other>
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
 		friend FLOAT_T<FloatType> operator /(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			assert(_rhs != 0);
