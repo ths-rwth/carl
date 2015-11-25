@@ -9,7 +9,7 @@ function install {
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get -qq update
 
-install biblatex cmake doxygen libboost1.55-all-dev libcln-dev libeigen3-dev libgtest-dev
+install cmake doxygen libboost1.55-all-dev libcln-dev libeigen3-dev libgtest-dev
 
 if [[ ${USE} == "g++-4.8" ]]; then
 	install gcc-4.8 g++-4.8
