@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "config.h"
+
 #include <cassert>
 #include <chrono>
 #include <fstream>
@@ -14,7 +16,9 @@
 #include <mutex>
 #include <sstream>
 #include <string.h>
+#ifdef THREAD_SAFE
 #include <thread>
+#endif
 #include <utility>
 
 #include "../util/Singleton.h"
@@ -266,7 +270,12 @@ struct Formatter {
      */
 	virtual void prefix(std::ostream& os, const Timer& timer, const std::string& channel, LogLevel level, const RecordInfo& info) {
 		os.fill(' ');
-		os << "[" << std::right << std::setw(5) << timer << "] " << std::this_thread::get_id() << " " << level << " ";
+		os << "[" << std::right << std::setw(5) << timer << "] ";
+#ifdef THREAD_SAFE
+		os << std::this_thread::get_id() << " ";
+#endif
+		os << level << " ";
+
 		std::string filename(carl::basename(info.filename));
 		unsigned long spacing = 1;
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();

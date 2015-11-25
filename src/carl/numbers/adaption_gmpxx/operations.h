@@ -247,6 +247,21 @@ inline mpq_class abs(const mpq_class& n) {
 	return res;
 }
 
+inline mpz_class round(const mpq_class& n) {
+	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
+	mpz_class res;
+	mpz_class rem;
+	mpz_fdiv_qr(res.get_mpz_t(), rem.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
+    rem *= 2;
+    if( rem >= getDenom(n) )
+        ++res;
+	return res;
+}
+
+inline mpz_class round(const mpz_class& n) {
+	return n;
+}
+
 inline mpz_class floor(const mpq_class& n) {
 	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
 	mpz_class res;

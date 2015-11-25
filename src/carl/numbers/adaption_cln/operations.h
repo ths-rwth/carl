@@ -236,6 +236,24 @@ inline cln::cl_RA abs(const cln::cl_RA& n) {
 }
 
 /**
+ * Round a fraction to next integer.
+ * @param n A fraction.
+ * @return The next integer.
+ */
+inline cln::cl_I round(const cln::cl_RA& n) {
+	return cln::round1(n);
+}
+
+/**
+ * Round an integer to next integer, that is do nothing.
+ * @param n An integer.
+ * @return The next integer.
+ */
+inline cln::cl_I round(const cln::cl_I& n) {
+	return n;
+}
+
+/**
  * Round down a fraction.
  * @param n A fraction.
  * @return \f$\lfloor n \rfloor\f$.
