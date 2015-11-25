@@ -1044,9 +1044,10 @@ namespace carl
 		 * @param _rhs Righthand side of the comparison.
 		 * @return True if _lhs equals _rhs.
 		 */
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const int _rhs)
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
-			return _lhs.mValue == _rhs;
+			return _lhs.mValue == FloatType(_rhs);
 		}
 
 		/**
@@ -1055,51 +1056,8 @@ namespace carl
 		 * @param _rhs Righthand side of the comparison.
 		 * @return True if _lhs equals _rhs.
 		 */
-		friend bool operator==(const int _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return _rhs == _lhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const double _rhs)
-		{
-			return _lhs.mValue == _rhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const double _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return _rhs == _lhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const float _rhs)
-		{
-			return _lhs.mValue == _rhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const float _lhs, const FLOAT_T<FloatType>& _rhs)
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		friend bool operator==(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return _rhs == _lhs;
 		}
