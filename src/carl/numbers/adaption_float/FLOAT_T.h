@@ -583,7 +583,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& abs_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::abs(mValue);
+			mValue = carl::abs(mValue);
 			return *this;
 		}
 
@@ -992,7 +992,7 @@ namespace carl
 		 */
 		double toDouble(CARL_RND = CARL_RND::N) const
 		{
-			return (double) mValue;
+			return carl::toDouble(mValue);
 		}
 
 
@@ -1014,7 +1014,7 @@ namespace carl
 		 */
 		explicit operator long() const
 		{
-			return carl::toInt<long>(mValue);;
+			return carl::toInt<long>(mValue);
 		}
 
 		/**
