@@ -62,9 +62,7 @@ namespace carl {
 	
 	template<typename Number>
 	bool RealAlgebraicNumber<Number>::isIntegral() const {
-		while (!isNumeric() && mIR->interval.containsInteger()) {
-			refine();
-		}
+		refineToIntegrality();
 		if (isNumeric()) return carl::isInteger(mValue);
 		return false;
 	}

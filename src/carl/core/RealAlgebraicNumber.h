@@ -231,6 +231,12 @@ public:
 		return mIR->refineAvoiding(n, *this);
 	}
 	void refine(RealAlgebraicNumberSettings::RefinementStrategy strategy = RealAlgebraicNumberSettings::RefinementStrategy::DEFAULT) const;
+	/// Refines until the number is either numeric or the interval does not contain any integer.
+	void refineToIntegrality() const {
+		while (!isNumeric() && mIR->interval.containsInteger()) {
+			refine();
+		}
+	}
 	
 	bool equal(const RealAlgebraicNumber<Number>& n) const;
 	bool less(const RealAlgebraicNumber<Number>& n) const;
@@ -275,4 +281,5 @@ namespace std {
 	
 }
 
+#include "RealAlgebraicNumberOperations.h"
 #include "RealAlgebraicNumber.tpp"
