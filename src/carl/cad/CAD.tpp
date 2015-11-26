@@ -728,7 +728,7 @@ void CAD<Number>::addSampleBelow(
 	if (left.isNumeric()) {
 		i = RealAlgebraicNumber<Number>(carl::floor(left.value()) - 1, false);
 	} else {
-		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().upper()) - 1, false);
+		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().lower()) - 1, false);
 	}
 }
 
@@ -742,7 +742,7 @@ void CAD<Number>::addSampleAbove(
 	if (right.isNumeric()) {
 		i = RealAlgebraicNumber<Number>(carl::ceil(right.value()) + 1, false);
 	} else {
-		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().lower()) + 1, false);
+		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().upper()) + 1, false);
 	}
 }
 
@@ -792,9 +792,9 @@ void CAD<Number>::addSampleBetween(
 				x += carl::constant_one<Number>::get();
 			}
 		} else {
-			i = RealAlgebraicNumber<Number>(carl::ceil(interval.lower()) + 1, false);
+			i = RealAlgebraicNumber<Number>(carl::floor(interval.lower()) - 1, false);
 			i = RealAlgebraicNumber<Number>(interval.sample(false), false);
-			i = RealAlgebraicNumber<Number>(carl::floor(interval.upper()) - 1, false);
+			i = RealAlgebraicNumber<Number>(carl::ceil(interval.upper()) + 1, false);
 		}
 	} else {
 		i = RealAlgebraicNumber<Number>(interval.sample(false), false);
