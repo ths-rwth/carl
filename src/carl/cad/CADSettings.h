@@ -33,7 +33,8 @@ enum class SampleOrdering : unsigned {
 enum class IntegerHandling {
     /// Generate a full real solution and split on non-integral assignments in this solution. This is done in the CADModule in SMT-RAT.
     SPLIT_SOLUTION,
-	SPLIT_SOLUTION_INVERSE,
+	/// First try to guess based on full real solution. If this does not work, split.
+	GUESS_AND_SPLIT,
     /// Split if no integral sample is available for an integer variable.
     SPLIT_LAZY,
     /// Split if a non-integral sample is available for an integer variable.
@@ -45,8 +46,8 @@ enum class IntegerHandling {
 };
 inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
 	switch (ih) {
-		case IntegerHandling::SPLIT_SOLUTION: return os << "Split on Solution";
-		case IntegerHandling::SPLIT_SOLUTION_INVERSE: return os << "Split on inverse Solution";
+		case IntegerHandling::SPLIT_SOLUTION: return os << "Split on solution";
+		case IntegerHandling::GUESS_AND_SPLIT: return os << "Guess then split";
 		case IntegerHandling::SPLIT_LAZY: return os << "Split lazy";
 		case IntegerHandling::SPLIT_EARLY: return os << "Split early";
 		case IntegerHandling::BACKTRACK: return os << "Backtrack";

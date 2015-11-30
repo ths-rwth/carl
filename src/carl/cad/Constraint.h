@@ -108,7 +108,7 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
+	bool satisfiedBy(const RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
 		assert(_variables.size() == r.dim());
 		
 		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, _variables);
