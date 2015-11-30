@@ -34,7 +34,7 @@ using RANMap = std::map<Variable, RealAlgebraicNumber<Number>>;
  * @return Evaluation result
  */
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
+RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables);
 
 /**
  * Evaluates the given polynomial with the given values for the variables.
@@ -92,7 +92,7 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 // Implementation
 
 template<typename Number, typename Coeff>
-RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
+RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
 	assert(point.dim() == variables.size());
 	RANMap<Number> RANs;
 	MultivariatePolynomial<Coeff> pol(p);

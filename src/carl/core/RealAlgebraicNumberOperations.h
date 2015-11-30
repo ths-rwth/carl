@@ -5,132 +5,45 @@
  * This file should never be included directly but only via RealAlgebraicNumber.h
  */
 
-#include "RealAlgebraicNumberIR.h"
-#include "../util/pointerOperations.h"
-
 #pragma once
+
+#include "RealAlgebraicNumber.h"
+#include "../numbers/numbers.h"
 
 namespace carl {
 
-/**
- * Specialization of `std::equal_to` for RealAlgebraicNumberPtr.
- */
-template<typename Number>
-struct equal_to<std::shared_ptr<carl::RealAlgebraicNumber<Number>>> {
-	/**
-	 * Checks lhs and rhs for equality.
-	 * @param lhs First number.
-	 * @param rhs Second number.
-	 * @return `lhs == rhs`.
-	 */
-	bool operator()(const carl::RealAlgebraicNumberPtr<Number>& lhs, const carl::RealAlgebraicNumberPtr<Number>& rhs) const {
-		if (lhs == rhs) return true;
-		if (lhs->isNumeric()) {
-			if (rhs->isNumeric()) {
-				return lhs->value() == rhs->value();
-			} else {
-				if (!std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs)->refineAvoiding(lhs->value())) {
-					return false;
-				}
-			}
-		} else {
-			auto lhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhs);
-			if (rhs->isNumeric()) {
-				if (!lhsIR->refineAvoiding(rhs->value())) {
-					return false;
-				}
-			} else {
-				auto rhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs);
-				return lhsIR->equal(rhsIR);
-			}
-		}
-		// nrA must be the exact numeric representation of irB OR nrB must be the exact numeric representation of irA
-		return true;
+	template<typename Number>
+	inline bool isZero(const RealAlgebraicNumber<Number>& n) {
+		return n.isZero();
 	}
-};
 
-/**
- * Specialization of `std::equal_to` for RealAlgebraicNumberIRPtr.
- */
-template<typename Number>
-struct equal_to<std::shared_ptr<carl::RealAlgebraicNumberIR<Number>>> {
-	/// Equality operator for RealAlgebraicNumberPtr.
-	equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
-	/**
-	 * Calls `eq(lhs, rhs)`.
-	 * @param lhs First number.
-	 * @param rhs Second number.
-	 * @return `lhs == rhs`.
-	 */
-	bool operator()(const carl::RealAlgebraicNumberIRPtr<Number>& lhs, const carl::RealAlgebraicNumberIRPtr<Number>& rhs) const {
-		return eq(lhs, rhs);
+	template<typename Number>
+	inline bool isInteger(const RealAlgebraicNumber<Number>& n) {
+		return n.isIntegral();
 	}
-};
 
-/**
- * Specialization of `std::equal_to` for RealAlgebraicNumberNRPtr.
- */
-template<typename Number>
-struct equal_to<std::shared_ptr<carl::RealAlgebraicNumberNR<Number>>> {
-	/// Equality operator for RealAlgebraicNumberPtr.
-	equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
-	/**
-	 * Calls `eq(lhs, rhs)`.
-	 * @param lhs First number.
-	 * @param rhs Second number.
-	 * @return `lhs == rhs`.
-	 */
-	bool operator()(const carl::RealAlgebraicNumberNRPtr<Number>& lhs, const carl::RealAlgebraicNumberNRPtr<Number>& rhs) const {
-		return eq(lhs, rhs);
+	template<typename Number>
+	inline typename IntegralType<Number>::type floor(const RealAlgebraicNumber<Number>& n) {
+		n.refineToIntegrality();
+		return floor_fast(n);
 	}
-};
 
-/**
- * Specialization of `std::less` for RealAlgebraicNumberPtr.
- */
-template<typename Number>
-struct less<std::shared_ptr<carl::RealAlgebraicNumber<Number>>> {
-	/// Equality operator for RealAlgebraicNumberPtr.
-	std::equal_to<carl::RealAlgebraicNumberPtr<Number>> eq;
-	/**
-	 * Checks if one number is smaller than another.
-	 * @param lhs First number.
-	 * @param rhs Second number.
-	 * @return `lhs < rhs`.
-     */
-	bool operator()(carl::RealAlgebraicNumberPtr<Number> lhs, carl::RealAlgebraicNumberPtr<Number> rhs) const {
-		assert(lhs != nullptr);
-		assert(rhs != nullptr);
-		if (lhs == rhs) return false;
-		if (eq(lhs,rhs)) return false;
-		if (lhs->isNumeric()) {
-			if (rhs->isNumeric()) {
-				return lhs->value() < rhs->value();
-			} else {
-				auto rhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs);
-				rhsIR->refineAvoiding(lhs->value());
-				if (rhs->isNumeric()) {
-					return lhs->value() < rhs->value();
-				} else {
-					return lhs->value() <= std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs)->lower();
-				}
-			}
-		} else {
-			auto lhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhs);
-			if (rhs->isNumeric()) {
-				lhsIR->refineAvoiding(rhs->value());
-				if (lhs->isNumeric()) {
-					return lhs->value() < rhs->value();
-				} else {
-					return lhsIR->upper() <= rhs->value();
-				}
-			} else {
-				auto rhsIR = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(rhs);
-				if (lhsIR->equal(rhsIR)) return false;
-				return std::const_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(lhsIR)->lessWhileUnequal(rhsIR);
-			}
-		}
+	template<typename Number>
+	inline typename IntegralType<Number>::type floor_fast(const RealAlgebraicNumber<Number>& n) {
+		if (n.isNumeric()) return carl::floor(n.value());
+		else return carl::floor(n.lower());
 	}
-};
+	
+	template<typename Number>
+	inline typename IntegralType<Number>::type ceil(const RealAlgebraicNumber<Number>& n) {
+		n.refineToIntegrality();
+		return ceil_fast(n);
+	}
+	
+	template<typename Number>
+	inline typename IntegralType<Number>::type ceil_fast(const RealAlgebraicNumber<Number>& n) {
+		if (n.isNumeric()) return carl::ceil(n.value());
+		else return carl::ceil(n.upper());
+	}
 
 }

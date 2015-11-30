@@ -593,8 +593,8 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 	Variable var = v.front();
 	if (!this->variables.empty()) var = this->variables.first();
 
-	CARL_LOG_TRACE("carl.core", "Adding " << p);
-	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var));
+	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var).squareFreePart());
+	CARL_LOG_TRACE("carl.cad", "Adding" << std::endl << "original   " << p.toUnivariatePolynomial(var) << std::endl << "simplified " << *up);
 	if (polynomials.isScheduled(up)) {
 		// same polynomial was already considered in scheduled polynomials
 		delete up;
@@ -728,7 +728,7 @@ void CAD<Number>::addSampleBelow(
 	if (left.isNumeric()) {
 		i = RealAlgebraicNumber<Number>(carl::floor(left.value()) - 1, false);
 	} else {
-		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().upper()) - 1, false);
+		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().lower()) - 1, false);
 	}
 }
 
@@ -742,7 +742,7 @@ void CAD<Number>::addSampleAbove(
 	if (right.isNumeric()) {
 		i = RealAlgebraicNumber<Number>(carl::ceil(right.value()) + 1, false);
 	} else {
-		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().lower()) + 1, false);
+		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().upper()) + 1, false);
 	}
 }
 
@@ -792,9 +792,9 @@ void CAD<Number>::addSampleBetween(
 				x += carl::constant_one<Number>::get();
 			}
 		} else {
-			i = RealAlgebraicNumber<Number>(carl::ceil(interval.lower()) + 1, false);
+			i = RealAlgebraicNumber<Number>(carl::floor(interval.lower()) - 1, false);
 			i = RealAlgebraicNumber<Number>(interval.sample(false), false);
-			i = RealAlgebraicNumber<Number>(carl::floor(interval.upper()) - 1, false);
+			i = RealAlgebraicNumber<Number>(carl::ceil(interval.upper()) + 1, false);
 		}
 	} else {
 		i = RealAlgebraicNumber<Number>(interval.sample(false), false);
@@ -1386,7 +1386,7 @@ cad::Answer CAD<Number>::liftCheck(
 	}
 	
 	if (!node.isRoot()) {
-		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
+		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
 			if (!node->isIntegral()) {
 				assert(openVariableCount < this->variables.size());
 				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
@@ -1519,6 +1519,12 @@ cad::Answer CAD<Number>::liftCheck(
 					sample.insert(sample.begin(), newSample);
 					r = RealAlgebraicPoint<Number>(std::move(sample));
 					CARL_LOG_DEBUG("carl.cad", "Eager split at " << r);
+					// there might still be samples left but not stored yet
+					while (!sampleSetIncrement.empty()) {
+						// store the remaining samples in the sample tree (without lifting)
+						this->storeSampleInTree(sampleSetIncrement.next(), node);
+						sampleSetIncrement.pop();
+					}
 					return cad::Answer::Unknown;
 				}
 			}
@@ -1558,20 +1564,7 @@ cad::Answer CAD<Number>::liftCheck(
 				// there might still be samples left but not stored yet
 				while (!sampleSetIncrement.empty()) {
 					// store the remaining samples in the sample tree (without lifting)
-					RealAlgebraicNumber<Number> newSample = sampleSetIncrement.next();
-					if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount)) {
-						if (!newSample.isIntegral()) {
-							std::vector<RealAlgebraicNumber<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-							CARL_LOG_DEBUG("carl.cad", "Current sample: " << sample);
-							//sample.pop_back();
-							//sample.insert(sample.begin(), newSample);
-							//r = RealAlgebraicPoint<Number>(std::move(sample));
-							//CARL_LOG_DEBUG("carl.cad", "Dangling lazy split at " << r);
-							sampleSetIncrement.pop();
-							continue;
-						}
-					}
-					this->storeSampleInTree(newSample, node);
+					this->storeSampleInTree(sampleSetIncrement.next(), node);
 					sampleSetIncrement.pop();
 				}
 				if (checkIntegrality(newNode)) {

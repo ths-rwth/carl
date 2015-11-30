@@ -98,6 +98,16 @@ public:
 		return this->numbers[index];
 	}
 	
+	/**
+	 * Retrieves the number of this point at the given index.
+	 * @param index Index.
+	 * @return Value of this point at the given index.
+	 */
+	RealAlgebraicNumber<Number>& operator[](std::size_t index) {
+		assert(index < this->numbers.size());
+		return this->numbers[index];
+	}
+	
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Num>& r);
 
