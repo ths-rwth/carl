@@ -32,6 +32,9 @@ namespace carl
 {
 	typedef size_t precision_t;
 
+	template<typename Number>
+    class Interval;
+
 	template<typename FloatType>
 	class FLOAT_T;
 
@@ -1219,7 +1222,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue + _rhs);
@@ -1232,7 +1235,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator +(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return _rhs + _lhs;
@@ -1256,7 +1259,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue - _rhs);
@@ -1269,7 +1272,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator -(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
@@ -1304,7 +1307,7 @@ namespace carl
 		 * @return Number which holds the result.
 		 */
 
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
@@ -1317,7 +1320,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator *(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
@@ -1342,7 +1345,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			assert(_rhs != 0);
@@ -1356,7 +1359,7 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
 		friend FLOAT_T<FloatType> operator /(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			assert(_rhs != 0);
