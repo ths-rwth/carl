@@ -907,7 +907,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		std::forward_list<RealAlgebraicNumber<Number>>& replacedSamples,
 		const Interval<Number>& bounds
 ) {
-	assert(variables.size() == node.depth() + openVariableCount + 1);
+	assert(mVariables.size() == node.depth() + openVariableCount + 1);
 	std::map<Variable, RealAlgebraicNumber<Number>> m;
 	auto valit = sampleTree.begin_path(node);
 	for (std::size_t i = node.depth(); i > 0; i--) {
@@ -1313,10 +1313,10 @@ typename CAD<Number>::sampleIterator CAD<Number>::storeSampleInTree(RealAlgebrai
 	} else if (*newNode == newSample) {
 		assert(newSample.isRoot() || (!newNode->isRoot()));
 		newNode = this->sampleTree.replace(newNode, newSample);
-		assert(newNode.depth() <= variables.size());
+		assert(newNode.depth() <= mVariables.size());
 	} else {
 		newNode = this->sampleTree.insert(newNode, newSample);
-		assert(newNode.depth() <= variables.size());
+		assert(newNode.depth() <= mVariables.size());
 	}
 	assert(this->sampleTree.isConsistent());
 	return newNode;
@@ -1762,7 +1762,7 @@ void CAD<Number>::widenBounds(BoundMap&) {
 template<typename Number>
 void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number>& r) {
 	// the size of variables should be compatible to the dimension of the given point
-	assert(this->anAnswerFound() || .size() == r.dim());
+	assert(this->anAnswerFound() || mVariables.size() == r.dim());
 
 	for (unsigned level = 0; level < r.dim(); level++) {
 		// shrink the bounds in each level
