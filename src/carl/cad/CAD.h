@@ -72,7 +72,7 @@ public:
 	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
 	
-	cad::Variables variables;
+	cad::Variables mVariables;
 	
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
@@ -109,7 +109,7 @@ private:
 	 */
 	cad::CADSettings setting;
 	
-	cad::CADConstraints<Number> constraints;
+	cad::CADConstraints<Number> mConstraints;
 	
 	static unsigned checkCallCount;
 
@@ -179,7 +179,7 @@ public:
 	* @return list of main variables of the polynomials of this cad
 	*/
 	const std::vector<Variable>& getVariables() const {
-		return this->variables.getCurrent();
+		return mVariables.getCurrent();
 	}
 	
 	/**
@@ -366,9 +366,9 @@ public:
 	///////////////////////////
 
 	template<typename Inserter>
-	static void addSampleBelow(const RealAlgebraicNumber<Number>& left, VariableType type, Inserter i);
+	static void addSampleBelow(const RealAlgebraicNumber<Number>& left, Inserter i);
 	template<typename Inserter>
-	static void addSampleAbove(const RealAlgebraicNumber<Number>& right, VariableType type, Inserter i);
+	static void addSampleAbove(const RealAlgebraicNumber<Number>& right, Inserter i);
 	template<typename Inserter>
 	static void addSampleBetween(const RealAlgebraicNumber<Number>& left, const RealAlgebraicNumber<Number>& right, VariableType type, Inserter i);
 	
@@ -447,7 +447,7 @@ private:
 	
 	bool integerHeuristicActive(cad::IntegerHandling heuristic, std::size_t variable) const {
 		if (this->setting.integerHandling != heuristic) return false;
-		return this->variables[variable].getType() == VariableType::VT_INT;
+		return mVariables[variable].getType() == VariableType::VT_INT;
 	}
 	
 	/**
@@ -671,7 +671,7 @@ public:
 	template<typename It>
 	bool checkIntegrality(It node) const {
 		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
-			Variable var = variables[pit.depth() - 1];
+			Variable var = mVariables[pit.depth() - 1];
 			if ((var.getType() == VariableType::VT_INT) && (!pit->isIntegral())) return false;
 		}
 		return true;

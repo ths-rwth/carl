@@ -99,7 +99,7 @@ public:
 		}
 	}
 	
-	Variable operator[](std::size_t i) const {
+	Variable::Arg operator[](std::size_t i) const {
 		assert(i < curVars.size());
 		return curVars[i];
 	}

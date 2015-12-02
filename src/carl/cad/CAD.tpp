@@ -24,7 +24,7 @@ unsigned CAD<Number>::checkCallCount = 0;
 
 template<typename Number>
 CAD<Number>::CAD():
-		variables(),
+		mVariables(),
 		sampleTree(),
 		eliminationSets(),
 		polynomials(),
@@ -39,7 +39,7 @@ CAD<Number>::CAD():
 
 template<typename Number>
 CAD<Number>::CAD(cad::PolynomialOwner<Number>* parent):
-		variables(),
+		mVariables(),
 		sampleTree(),
 		eliminationSets(),
 		polynomials(parent),
@@ -71,7 +71,7 @@ CAD<Number>::CAD(const std::list<const UPolynomial*>& s, const std::vector<Varia
 		CAD()
 {
 	this->scheduledPolynomials.assign(s.begin(), s.end());
-	this->variables.setNewVariables(v);
+	mVariables.setNewVariables(v);
 	this->setting = _setting;
 	this->prepareElimination();
 }
@@ -85,7 +85,7 @@ CAD<Number>::CAD(const std::list<const UPolynomial*>& s, const std::vector<Varia
 
 template<typename Number>
 CAD<Number>::CAD(const CAD<Number>& cad):
-		variables( cad.variables ),
+		mVariables( cad.mVariables ),
 		sampleTree( cad.sampleTree ),
 		eliminationSets( cad.eliminationSets ),
 		polynomials( cad.polynomials ),
@@ -104,7 +104,7 @@ cad::SampleSet<Number> CAD<Number>::samplesAt(const sampleIterator& node) const 
 
 template<typename Number>
 std::vector<RealAlgebraicPoint<Number>> CAD<Number>::samples() const {
-	size_t dim  = this->variables.size();
+	size_t dim  = mVariables.size();
 	std::vector<RealAlgebraicPoint<Number>> s;
 	for (auto leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
 		// for each leaf construct the path by iterating back to the root
@@ -131,16 +131,16 @@ void CAD<Number>::printSampleTree(std::ostream& os) const {
 
 template<typename Number>
 void CAD<Number>::printConstraints(const std::string& filename) const {
-	if( !constraints.empty() ){
+	if( !mConstraints.empty() ){
 		std::ofstream smtlibFile;
 		smtlibFile.open(filename);
 		smtlibFile << "(set-logic QF_NRA)\n(set-info :smt-lib-version 2.0)\n";
 		// add all real-valued variables
-		for (const auto& var: this->variables)
+		for (const auto& var: mVariables)
 			smtlibFile << "(declare-fun " << var << " () Real)\n";
 
 		smtlibFile << "(assert (and ";
-		for (const auto& constraint: constraints) {
+		for (const auto& constraint: mConstraints) {
 			switch (constraint.getSign()) {
 				case Sign::ZERO: {
 					if (constraint.isNegated())
@@ -183,7 +183,7 @@ void CAD<Number>::printConstraints(const std::string& filename) const {
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 	//os << endl << cad.getSetting() << endl;
-	os << "Variables: " << cad.variables << std::endl;
+	os << "Variables: " << cad.mVariables << std::endl;
 	os << "Polynomials: " << cad.polynomials << std::endl;
 	os << "Elimination sets:" << std::endl;
 	unsigned level = 0;
@@ -200,11 +200,11 @@ std::ostream& operator<<(std::ostream& os, const CAD<Number>& cad) {
 template<typename Number>
 bool CAD<Number>::prepareElimination() {
 	CARL_LOG_TRACE("carl.cad", __func__ << "()");
-	if (this->variables.newEmpty() && (!polynomials.hasScheduled() || variables.empty())) {
+	if (mVariables.newEmpty() && (!polynomials.hasScheduled() || mVariables.empty())) {
 		return false;
 	}
 
-	std::size_t newVariableCount = this->variables.newSize();
+	std::size_t newVariableCount = mVariables.newSize();
 
 	/* Algorithm overview:
 	 *
@@ -219,17 +219,17 @@ bool CAD<Number>::prepareElimination() {
 
 	/* Part A */
 
-	if (!this->variables.newEmpty()) {
+	if (!mVariables.newEmpty()) {
 		// introduce new elimination levels and fill them appropriately
 		// (1)
 
-		CARL_LOG_TRACE("carl.cad", "Adding " << this->variables.newSize() << " to " << this->variables.size() << " old variables.");
+		CARL_LOG_TRACE("carl.cad", "Adding " << mVariables.newSize() << " to " << mVariables.size() << " old variables.");
 		// variables, newVariables = newVariables:variables, []
-		this->variables.appendNewToCur();
+		mVariables.appendNewToCur();
 
 		// (1)
 		/// @todo make this more efficient
-		std::vector<cad::EliminationSet<Number>> sets(this->variables.size(), cad::EliminationSet<Number>(&this->polynomials, this->setting.order, this->setting.order));
+		std::vector<cad::EliminationSet<Number>> sets(mVariables.size(), cad::EliminationSet<Number>(&this->polynomials, this->setting.order, this->setting.order));
 		for (long unsigned i = newVariableCount; i < sets.size(); i++) {
 			std::swap(sets[i], this->eliminationSets[i - newVariableCount]);
 		}
@@ -239,8 +239,8 @@ bool CAD<Number>::prepareElimination() {
 	// add new polynomials to level 0, unifying their variables, and the list of all polynomials
 	for (const auto& p: polynomials.getScheduled()) {
 		auto tmp = p;
-		if (p->mainVar() != this->variables.front()) {
-			tmp = new UPolynomial(p->switchVariable(this->variables.front()));
+		if (p->mainVar() != mVariables.front()) {
+			tmp = new UPolynomial(p->switchVariable(mVariables.front()));
 			this->polynomials.take(tmp);
 		}
 		this->polynomials.addPolynomial(tmp);
@@ -253,7 +253,7 @@ bool CAD<Number>::prepareElimination() {
 	}
 	this->eliminationSets.front().makePrimitive();
 	this->eliminationSets.front().makeSquarefree();
-	if (this->setting.simplifyByRootcounting && this->variables.size() == 1) {
+	if (this->setting.simplifyByRootcounting && mVariables.size() == 1) {
 		// this simplification is done for the base level in liftCheck
 		this->eliminationSets.front().removePolynomialsWithoutRealRoots();
 	}
@@ -284,18 +284,18 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 		// construct constraints and polynomials representing the bounds
 		for (const auto& b: bounds) {
 			std::size_t l = b.first;
-			if (l >= this->variables.size()) continue;
+			if (l >= mVariables.size()) continue;
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
 			if (b.second.lowerBoundType() != BoundType::INFTY) {
-				tmp.push_back(this->polynomials.take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.lower()), MPolynomial(1)})));
+				tmp.push_back(this->polynomials.take(new UPolynomial(mVariables[l], {MPolynomial(-b.second.lower()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[b.first].insert(tmp.back());
 				}
 			}
 			if (b.second.upperBoundType() != BoundType::INFTY) {
-				tmp.push_back(this->polynomials.take(new UPolynomial(this->variables[l], {MPolynomial(-b.second.upper()), MPolynomial(1)})));
+				tmp.push_back(this->polynomials.take(new UPolynomial(mVariables[l], {MPolynomial(-b.second.upper()), MPolynomial(1)})));
 				if (!this->setting.earlyLiftingPruningByBounds) {
 					// need to add bound polynomial if no bounds are generated automatically
 					this->eliminationSets[l].insert(tmp.back());
@@ -304,10 +304,10 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 
 			// eliminate bound-related polynomials
 			l++;
-			while (!tmp.empty() && l < this->variables.size()) {
+			while (!tmp.empty() && l < mVariables.size()) {
 				std::list<const UPolynomial*> tmp2;
 				for (const auto& p: tmp) {
-					auto res = this->eliminationSets[l-1].eliminateInto(p, this->eliminationSets[l], this->variables[l], this->setting);
+					auto res = this->eliminationSets[l-1].eliminateInto(p, this->eliminationSets[l], mVariables[l], this->setting);
 					tmp2.insert(tmp2.begin(), res.begin(), res.end());
 				}
 				std::swap(tmp, tmp2);
@@ -326,7 +326,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 				}
 			}
 			while (!this->eliminationSets[l-1].emptyPairedEliminationQueue()) {
-				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], this->variables[l], this->setting);
+				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], mVariables[l], this->setting);
 			}
 		}
 	} else {
@@ -334,7 +334,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 		for (unsigned l = 1; l < this->eliminationSets.size(); l++) {
 			while (	!this->eliminationSets[l-1].emptySingleEliminationQueue() ||
 					!this->eliminationSets[l-1].emptyPairedEliminationQueue()) {
-				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], this->variables[l], this->setting, false);
+				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], mVariables[l], this->setting, false);
 			}
 		}
 	}
@@ -342,7 +342,7 @@ void CAD<Number>::completeElimination(const CAD<Number>::BoundMap& bounds) {
 
 template<typename Number>
 void CAD<Number>::clear() {
-	this->variables.clear();
+	mVariables.clear();
 	this->sampleTree.clear();
 	// Add empty root node
 	this->sampleTree.insert(this->sampleTree.begin(), nullptr);
@@ -358,8 +358,8 @@ void CAD<Number>::clear() {
 template<typename Number>
 void CAD<Number>::complete() {
 	RealAlgebraicPoint<Number> r;
-	assert(this->variables.size() > 0);
-	std::vector<cad::Constraint<Number>> c(1, cad::Constraint<Number>(UPolynomial(this->variables.front(), MPolynomial(1)), Sign::ZERO, this->variables));
+	assert(mVariables.size() > 0);
+	std::vector<cad::Constraint<Number>> c(1, cad::Constraint<Number>(UPolynomial(mVariables.front(), MPolynomial(1)), Sign::ZERO, mVariables));
 	this->check(c, r, true);
 }
 
@@ -373,13 +373,13 @@ cad::Answer CAD<Number>::check(
 	bool checkBounds)
 {
 	assert(this->sampleTree.isConsistent());
-	this->constraints = _constraints;
+	mConstraints = _constraints;
     #ifdef LOGGING_CARL
 	CARL_LOG_DEBUG("carl.cad", "Checking the system");
-	for (const auto& c: constraints) CARL_LOG_DEBUG("carl.cad", "  " << c);
+	for (const auto& c: mConstraints) CARL_LOG_DEBUG("carl.cad", "  " << c);
 	CARL_LOG_DEBUG("carl.cad", "within " << ( bounds.empty() ? "no bounds." : "these bounds:" ));
 	for (const auto& b: bounds) {
-		if (this->variables.size() > b.first) { CARL_LOG_DEBUG("carl.cad", "  " << b.second << " for variable " << this->variables[b.first]); }
+		if (mVariables.size() > b.first) { CARL_LOG_DEBUG("carl.cad", "  " << b.second << " for variable " << mVariables[b.first]); }
 		else { CARL_LOG_DEBUG("carl.cad", "  " << b.second << " for variable " << b.first); }
 	}
 	for (unsigned i = 0; i < this->eliminationSets.size(); i++) {
@@ -413,7 +413,7 @@ cad::Answer CAD<Number>::check(
 		CARL_LOG_DEBUG("carl.cad", "Checking bound " << b.first << " : " << b.second);
 		if (b.second.isEmpty()) return cad::Answer::False;
 	}
-	if (constraints.empty() && useBounds) {
+	if (mConstraints.empty() && useBounds) {
 		// each bound non-empty plus empty input constraints
 		return cad::Answer::True;
 	}
@@ -422,19 +422,19 @@ cad::Answer CAD<Number>::check(
 	if (this->setting.preSolveByBounds) {
 		typename Interval<Number>::evalintervalmap m;
 		for (const auto& b: bounds) {
-			if (b.first >= this->variables.size()) continue;
-			m[this->variables[b.first]] = b.second;
+			if (b.first >= mVariables.size()) continue;
+			m[mVariables[b.first]] = b.second;
 		}
 		if (!m.empty()) {
 			// there are bounds we can use
-			for (const auto& constraint: constraints) {
+			for (const auto& constraint: mConstraints) {
 				/// @todo A Constraint may be negated.
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
 					CARL_LOG_FATAL("carl.cad", "Exiting. Why?");
 					exit(123);
-					//std::swap(constraints.back(), constraint);
+					//std::swap(mConstraints.back(), constraint);
 					conflictGraph = cad::ConflictGraph<Number>();
 					return cad::Answer::False;
 				}
@@ -450,7 +450,7 @@ cad::Answer CAD<Number>::check(
 		std::vector<cad::Constraint<Number>> strictInequalities;
 		std::vector<cad::Constraint<Number>> weakInequalities;
 
-		for (cad::Constraint<Number> c: constraints) {
+		for (cad::Constraint<Number> c: mConstraints) {
 			if (c.getSign() == Sign::ZERO && !c.isNegated()) {
 				equations.push_back(c);
 			} else if (c.getSign() != Sign::ZERO && c.isNegated()) {
@@ -460,7 +460,7 @@ cad::Answer CAD<Number>::check(
 			}
 		}
 		if (weakInequalities.empty()) {
-			if (!useBounds && strictInequalities.empty() && this->variables.size() <= 1) {
+			if (!useBounds && strictInequalities.empty() && mVariables.size() <= 1) {
 				// root-only samples not valid in general!
 				this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
 			} else if (onlyStrictBounds && equations.empty()) {
@@ -477,19 +477,19 @@ cad::Answer CAD<Number>::check(
 	this->prepareElimination();
 	assert(this->sampleTree.isConsistent());
 
-	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(this->variables.size(), std::pair<UPolynomial*, UPolynomial*>());
-	CARL_LOG_TRACE("carl.cad", "Creating boundPolynomials of size " << this->variables.size());
+	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(mVariables.size(), std::pair<UPolynomial*, UPolynomial*>());
+	CARL_LOG_TRACE("carl.cad", "Creating boundPolynomials of size " << mVariables.size());
 
 	if (useBounds) {
 		CARL_LOG_DEBUG("carl.cad", "Preprocess bounds");
 		// construct constraints and polynomials representing the bounds
 		for (const auto& b: bounds) {
-			if (b.first >= this->variables.size()) continue;
+			if (b.first >= mVariables.size()) continue;
 
 			// construct bound-related polynomials
 			std::list<const UPolynomial*> tmp;
 			if (b.second.lowerBoundType() != BoundType::INFTY) {
-				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.lower())), MPolynomial(Term<Number>(1))});
+				UPolynomial p(mVariables[b.first], {MPolynomial(Term<Number>(-b.second.lower())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(this->polynomials.take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
@@ -497,7 +497,7 @@ cad::Answer CAD<Number>::check(
 				boundPolynomials[b.first].first = tmp.back();
 			}
 			if (b.second.upperBoundType() != BoundType::INFTY) {
-				UPolynomial p(this->variables[b.first], {MPolynomial(Term<Number>(-b.second.upper())), MPolynomial(Term<Number>(1))});
+				UPolynomial p(mVariables[b.first], {MPolynomial(Term<Number>(-b.second.upper())), MPolynomial(Term<Number>(1))});
 				tmp.push_back(this->polynomials.take(new UPolynomial(p.pseudoPrimpart())));
 				this->eliminationSets[b.first].insert(tmp.back());
 				this->iscomplete = false; // new polynomials induce new sample points
@@ -507,10 +507,10 @@ cad::Answer CAD<Number>::check(
 			// eliminate bound-related polynomials only
 			// l: variable index of the elimination destination
 			std::size_t l = b.first + 1;
-			while (!tmp.empty() && l < this->variables.size()) {
+			while (!tmp.empty() && l < mVariables.size()) {
 				std::list<const UPolynomial*> tmp2;
 				for (const auto& p: tmp) {
-					auto res = this->eliminationSets[l-1].eliminateInto(p, this->eliminationSets[l], this->variables[l], this->setting);
+					auto res = this->eliminationSets[l-1].eliminateInto(p, this->eliminationSets[l], mVariables[l], this->setting);
 					tmp2.insert(tmp2.begin(), res.begin(), res.end());
 				}
 				std::swap(tmp, tmp2);
@@ -538,7 +538,7 @@ cad::Answer CAD<Number>::check(
 		}
 		assert(this->sampleTree.isConsistent());
 		// restore elimination polynomials to their previous state due to possible bound-related simplifications
-		for (unsigned l = 0; l < this->variables.size(); l++) {
+		for (unsigned l = 0; l < mVariables.size(); l++) {
 			// remove bound polynomials and their children
 			if (boundPolynomials[l].first != nullptr) {
 				// remove exclusively children if bound polynomials were not added
@@ -554,10 +554,10 @@ cad::Answer CAD<Number>::check(
 			// re-add the input polynomials to the top-level (for they could have been deleted)
 			this->eliminationSets.front().clear();
 			for (const auto& p: this->polynomials.getPolynomials()) {
-				if (p->mainVar() == this->variables.front()) {
+				if (p->mainVar() == mVariables.front()) {
 					this->eliminationSets.front().insert(p);
 				} else {
-					this->eliminationSets.front().insert(this->polynomials.take(new UPolynomial(p->switchVariable(this->variables.front()))));
+					this->eliminationSets.front().insert(this->polynomials.take(new UPolynomial(p->switchVariable(mVariables.front()))));
 				}
 			}
 		} else {
@@ -591,7 +591,7 @@ template<typename Number>
 void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable>& v) {
 	CARL_LOG_TRACE("carl.cad", __func__ << "( " << p << ", " << v << " )");
 	Variable var = v.front();
-	if (!this->variables.empty()) var = this->variables.first();
+	if (!mVariables.empty()) var = mVariables.first();
 
 	UPolynomial* up = new UPolynomial(p.toUnivariatePolynomial(var).squareFreePart());
 	CARL_LOG_TRACE("carl.cad", "Adding" << std::endl << "original   " << p.toUnivariatePolynomial(var) << std::endl << "simplified " << *up);
@@ -611,7 +611,7 @@ void CAD<Number>::addPolynomial(const MPolynomial& p, const std::vector<Variable
 	this->polynomials.schedule(p, up);
 
 	// determine the variables differing from mVariables and add them to the front of the existing variables
-	this->variables.complete(v);
+	mVariables.complete(v);
 }
 
 template<typename Number>
@@ -696,11 +696,11 @@ void CAD<Number>::removePolynomial(const UPolynomial* p, unsigned level, bool ch
 
 template<typename Number>
 std::vector<Interval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoint<Number>& r) const {
-	std::vector<Interval<Number>> bounds(this->variables.size());
+	std::vector<Interval<Number>> bounds(mVariables.size());
 	// initially, parent is the root
 	auto parent = this->sampleTree.begin();
 
-	for (int index = this->variables.size()-1; index >= 0; index--) {
+	for (int index = mVariables.size()-1; index >= 0; index--) {
 		// tree is build upside down, index is in [mVariables.size()-1, 0]
 		RealAlgebraicNumber<Number> sample = r[index];
 		if (this->sampleTree.begin(parent) == this->sampleTree.end(parent)) {
@@ -722,12 +722,13 @@ template<typename Number>
 template<typename Inserter>
 void CAD<Number>::addSampleBelow(
 		const RealAlgebraicNumber<Number>& left,
-		VariableType type,
 		Inserter i
 ) {
 	if (left.isNumeric()) {
+		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::floor(left.value()) - 1) << " below " << left);
 		i = RealAlgebraicNumber<Number>(carl::floor(left.value()) - 1, false);
 	} else {
+		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::floor(left.getInterval().lower()) - 1) << " below " << left);
 		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().lower()) - 1, false);
 	}
 }
@@ -736,12 +737,13 @@ template<typename Number>
 template<typename Inserter>
 void CAD<Number>::addSampleAbove(
 		const RealAlgebraicNumber<Number>& right,
-		VariableType type,
 		Inserter i
 ) {
 	if (right.isNumeric()) {
+		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::ceil(right.value()) + 1) << " above " << right);
 		i = RealAlgebraicNumber<Number>(carl::ceil(right.value()) + 1, false);
 	} else {
+		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::ceil(right.getInterval().upper()) + 1) << " above " << right);
 		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().upper()) + 1, false);
 	}
 }
@@ -797,6 +799,7 @@ void CAD<Number>::addSampleBetween(
 			i = RealAlgebraicNumber<Number>(carl::ceil(interval.upper()) + 1, false);
 		}
 	} else {
+		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (interval.sample(false)) << " between " << left << " and " << right);
 		i = RealAlgebraicNumber<Number>(interval.sample(false), false);
 	}
 }
@@ -855,32 +858,28 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		 */
 
 		//std::cout << *this << std::endl;
-		carl::VariableType type = this->variables[openVariableCount].getType();
+		carl::VariableType type = mVariables[openVariableCount].getType();
 		if (!this->setting.exploreInteger) type = VariableType::VT_REAL;
-		//std::cout << "Current var: " << openVariableCount << " -> " << this->variables[openVariableCount] << std::endl;
+		//std::cout << "Current var: " << openVariableCount << " -> " << mVariables[openVariableCount] << std::endl;
 		//REGISTERED_ASSERT(openVariableCount > 1);
 		// next: right neighbor
 		auto neighbor = insertIt;
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
-			CARL_LOG_TRACE("carl.cad", "\tAdding a sample above " << *insertIt);
-			addSampleAbove((*insertIt), type, std::front_inserter(newSamples));
+			addSampleAbove((*insertIt), std::front_inserter(newSamples));
 		} else if (neighbor->isRoot()) {
-			CARL_LOG_TRACE("carl.cad", "\tAdding a sample between " << *insertIt << " and " << *neighbor);
 			addSampleBetween((*insertIt), (*neighbor), type, std::front_inserter(newSamples));
 		}
 
 		// previous: left neighbor
 		neighbor = insertIt;
 		if (neighbor == currentSamples.begin()) {
-			CARL_LOG_TRACE("carl.cad", "\tAdding a sample below " << *insertIt);
-			addSampleBelow((*insertIt), type, std::front_inserter(newSamples));
+			addSampleBelow((*insertIt), std::front_inserter(newSamples));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if (neighbor->isRoot()) {
-				CARL_LOG_TRACE("carl.cad", "\tAdding a sample between " << *neighbor << " and " << *insertIt);
 				addSampleBetween((*neighbor), (*insertIt), type, std::front_inserter(newSamples));
 			}
 		}
@@ -912,7 +911,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 	std::map<Variable, RealAlgebraicNumber<Number>> m;
 	auto valit = sampleTree.begin_path(node);
 	for (std::size_t i = node.depth(); i > 0; i--) {
-		m[variables[variables.size() - i]] = *valit;
+		m[mVariables[mVariables.size() - i]] = *valit;
 		valit++;
 	}
 	return this->samples(
@@ -1052,13 +1051,13 @@ typename CAD<Number>::CheckNodeResult CAD<Number>::checkNode(
 	RealAlgebraicPoint<Number> sample(sampleList);
 	bool boundsOK = true;
 	// offset for incomplete samples (sample is filled from behind)
-	unsigned firstLevel = (unsigned)(this->variables.size() - sample.dim());
+	unsigned firstLevel = (unsigned)(mVariables.size() - sample.dim());
 	CARL_LOG_TRACE("carl.cad", "first level " << firstLevel);
 
 	// test if the sample _r is already outside the bounds (boundsOK=false) or if it can be checked against the constraints or further lifted (boundsOK=true)
 	for (const auto& i: bounds) {
 		// bounds correspond to mVariables indices, so shift those indices by firstLevel to the left
-		if (i.first < this->variables.size() && firstLevel <= i.first && !sample[i.first - firstLevel].containedIn(i.second)) {
+		if (i.first < mVariables.size() && firstLevel <= i.first && !sample[i.first - firstLevel].containedIn(i.second)) {
 			boundsOK = false;
 			break;
 		}
@@ -1074,8 +1073,8 @@ typename CAD<Number>::CheckNodeResult CAD<Number>::checkNode(
 		if (excludePrevious) return CNR_SKIP;
 
 		if (
-			(this->setting.computeConflictGraph && constraints.satisfiedBy(sample, getVariables(), conflictGraph)) ||
-			(!this->setting.computeConflictGraph && constraints.satisfiedBy(sample, getVariables()))
+			(this->setting.computeConflictGraph && mConstraints.satisfiedBy(sample, getVariables(), conflictGraph)) ||
+			(!this->setting.computeConflictGraph && mConstraints.satisfiedBy(sample, getVariables()))
 			) {
 			r = sample;
 			CARL_LOG_TRACE("carl.cad", "sample is good!");
@@ -1091,7 +1090,7 @@ typename CAD<Number>::CheckNodeResult CAD<Number>::checkNode(
 		//for (const auto& component: sampleList) {
 		for (std::size_t j = 0; j < sampleList.size(); j++) {
 			i--;
-			vars.push_front(this->variables[i]);
+			vars.push_front(mVariables[i]);
 		}
 		// perform lifting at the incomplete leaf (without elimination, only by the current elimination polynomials)
 		std::stack<std::size_t> satPath;
@@ -1118,17 +1117,17 @@ cad::Answer CAD<Number>::mainCheck(
 		bool boundsNontrivial,
 		bool checkBounds
 ) {
-	CARL_LOG_TRACE("carl.cad", __func__ << "( " << constraints << ", " << bounds << " )");
+	CARL_LOG_TRACE("carl.cad", __func__ << "( " << mConstraints << ", " << bounds << " )");
 	assert(this->sampleTree.isConsistent());
 
-	if (this->variables.empty()) {
+	if (mVariables.empty()) {
 		// there are no valid samples available
 		// if there is no constraint, all constraints are satisfied; otherwise no constraint
-		if (constraints.empty()) return cad::Answer::True;
+		if (mConstraints.empty()) return cad::Answer::True;
 		else return cad::Answer::False;
 	}
 
-	const std::size_t dim = this->variables.size();
+	const std::size_t dim = mVariables.size();
 	CARL_LOG_TRACE("carl.cad", "mainCheck: dimension is " << dim);
 	auto sampleTreeRoot = this->sampleTree.begin();
 	std::size_t tmp = this->sampleTree.max_depth(sampleTreeRoot);
@@ -1139,8 +1138,8 @@ cad::Answer CAD<Number>::mainCheck(
 
 	// unify the variables for each constraint to match the CAD's variable order
 	// @todo is this necessary? why?
-	//for (unsigned i = 0; i < constraints.size(); ++i) {
-	//	constraints[i].unifyVariables(this->variables);
+	//for (unsigned i = 0; i < mConstraints.size(); ++i) {
+	//	mConstraints[i].unifyVariables(mVariables);
 	//}
 
 	////////////
@@ -1255,11 +1254,11 @@ cad::Answer CAD<Number>::mainCheck(
 			RealAlgebraicPoint<Number> sample(sampleList);
 			bool boundsOK = true;
 			// offset for incomplete samples (sample is filled from behind)
-			std::size_t firstLevel = this->variables.size() - sample.dim();
+			std::size_t firstLevel = mVariables.size() - sample.dim();
 			// test if the sample _r is already outside the bounds (boundsOK=false) or if it can be checked against the constraints or further lifted (boundsOK=true)
 			for (const auto& i: bounds) {
 				// bounds correspond to mVariables indices, so shift those indices by firstLevel to the left
-				if (i.first < this->variables.size() && firstLevel <= i.first && !sample[i.first - firstLevel].containedIn(i.second)) {
+				if (i.first < mVariables.size() && firstLevel <= i.first && !sample[i.first - firstLevel].containedIn(i.second)) {
 					boundsOK = false;
 					break;
 				}
@@ -1275,7 +1274,7 @@ cad::Answer CAD<Number>::mainCheck(
 			for (std::size_t j = 0; j < sampleList.size(); j++) {
 				assert(i > 0);
 				i--;
-				vars.push_front(this->variables[i]);
+				vars.push_front(mVariables[i]);
 			}
 			assert(level + 1 == (int)i);
 			// perform lifting at the incomplete leaf with the stored queue (reset performed in liftCheck)
@@ -1340,8 +1339,8 @@ cad::Answer CAD<Number>::baseLiftCheck(
 	std::vector<RealAlgebraicNumber<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
 	sample.pop_back();
 	RealAlgebraicPoint<Number> t(std::move(sample));
-	if ((this->setting.computeConflictGraph && constraints.satisfiedBy(t, getVariables(), conflictGraph)) ||
-		(!this->setting.computeConflictGraph && constraints.satisfiedBy(t, getVariables()))) {
+	if ((this->setting.computeConflictGraph && mConstraints.satisfiedBy(t, getVariables(), conflictGraph)) ||
+		(!this->setting.computeConflictGraph && mConstraints.satisfiedBy(t, getVariables()))) {
 		r = t;
 		CARL_LOG_TRACE("carl.cad", "Returning true as a satisfying sample was found");
 		return cad::Answer::True;
@@ -1369,13 +1368,12 @@ cad::Answer CAD<Number>::liftCheck(
 		return cad::Answer::True;
 	}
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
-	CARL_LOG_FUNC("carl.cad", "Integer setting: " << this->setting.integerHandling);
 	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumber<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << std::endl << sampleTree);
 	assert(this->sampleTree.is_valid(node));
 	if (checkBounds && boundsActive && (!node.isRoot())) {
 		// bounds shall be checked and the level is non-empty
 		// level should be non-empty
-		assert(openVariableCount < this->variables.size());
+		assert(openVariableCount < mVariables.size());
 		// see if bounds are given for the previous level
 		auto bound = bounds.find(openVariableCount);
 		if (bound != bounds.end()) {
@@ -1388,8 +1386,8 @@ cad::Answer CAD<Number>::liftCheck(
 	if (!node.isRoot()) {
 		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
 			if (!node->isIntegral()) {
-				assert(openVariableCount < this->variables.size());
-				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+				assert(openVariableCount < mVariables.size());
+				CARL_LOG_DEBUG("carl.cad", "Variables: " << mVariables);
 				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
 				std::vector<RealAlgebraicNumber<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
 				sample.pop_back();
@@ -1411,7 +1409,7 @@ cad::Answer CAD<Number>::liftCheck(
 
 	std::list<Variable> newVariables(_variables);
 	// the first variable is always the last one lifted
-	newVariables.push_front(this->variables[openVariableCount]);
+	newVariables.push_front(mVariables[openVariableCount]);
 	// see if bounds are given for this level
 	auto bound = boundsActive ? bounds.find(openVariableCount) : bounds.end();
 	bool boundActive = bounds.end() != bound;
@@ -1436,7 +1434,7 @@ cad::Answer CAD<Number>::liftCheck(
 
 	// fill in a standard sample to ensure termination in the main loop
 	if (!node.isRoot()) {
-		CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth() - 1]);
+		CARL_LOG_TRACE("carl.cad", "Calling samples() for " << mVariables[node.depth() - 1]);
 	}
 	if (boundActive) {
 		// add the bounds as roots and appropriate intermediate samples and start the lifting with this initial list
@@ -1477,7 +1475,7 @@ cad::Answer CAD<Number>::liftCheck(
 			auto next = this->eliminationSets[openVariableCount].nextLiftingPosition();
 
 			if (!node.isRoot()) {
-				CARL_LOG_TRACE("carl.cad", "Calling samples() for " << this->variables[node.depth()-1]);
+				CARL_LOG_TRACE("carl.cad", "Calling samples() for " << mVariables[node.depth()-1]);
 			}
 			if (boundActive && this->setting.earlyLiftingPruningByBounds) {
 				// found bounds for the current lifting variable => remove all samples outside these bounds
@@ -1503,10 +1501,10 @@ cad::Answer CAD<Number>::liftCheck(
 		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
 			Interval<Number> bound = Interval<Number>::unboundedInterval();
 			if (checkBounds) {
-				CARL_LOG_DEBUG("carl.cad", "Variables: " << this->variables);
+				CARL_LOG_DEBUG("carl.cad", "Variables: " << mVariables);
 				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
-				CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << this->variables[openVariableCount]);
-				assert(openVariableCount < this->variables.size());
+				CARL_LOG_DEBUG("carl.cad", "Retrieving bounds for " << mVariables[openVariableCount]);
+				assert(openVariableCount < mVariables.size());
 				auto b = bounds.find(openVariableCount);
 				if (b != bounds.end()) bound = b->second;
 			}
@@ -1567,12 +1565,12 @@ cad::Answer CAD<Number>::liftCheck(
 					this->storeSampleInTree(sampleSetIncrement.next(), node);
 					sampleSetIncrement.pop();
 				}
-				if (checkIntegrality(newNode)) {
-					return cad::Answer::True;
-					CARL_LOG_TRACE("carl.cad", "Returning true as lifting was successful");
-				} else {
+				if (this->setting.integerHandling == cad::IntegerHandling::BACKTRACK && !checkIntegrality(newNode)) {
 					integralityBacktracking = true;
 					CARL_LOG_ERROR("carl.cad", "Lifting was successful, but integrality is violated.");
+				} else {
+					return cad::Answer::True;
+					CARL_LOG_TRACE("carl.cad", "Returning true as lifting was successful");
 				}
 			} else if (liftingSuccessful == cad::Answer::Unknown) {
 				CARL_LOG_DEBUG("carl.cad", "Got unknown, propagating...");
@@ -1642,14 +1640,14 @@ int CAD<Number>::eliminate(std::size_t level, const BoundMap& bounds, bool bound
 					// delete polynomial and try the next one
 					this->eliminationSets[l-1].erase(p);
 				}
-				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], this->variables[l], this->setting);
+				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], mVariables[l], this->setting);
 				// store level of successful elimination
 				level = (unsigned)l;
 
 				if (this->setting.removeConstants) {
 					// get rid of all constants moved to the current level
 					for (; l < this->eliminationSets.size(); l++) {
-						this->eliminationSets[l-1].moveConstants(this->eliminationSets[l], this->variables[l]);
+						this->eliminationSets[l-1].moveConstants(this->eliminationSets[l], mVariables[l]);
 					}
 					this->eliminationSets.back().removeConstants();
 				}
@@ -1671,15 +1669,15 @@ int CAD<Number>::eliminate(std::size_t level, const BoundMap& bounds, bool bound
 		} else {
 			CARL_LOG_TRACE("carl.cad.elimination", "eliminate without bounds in level " << l);
 			for (; l <= level; l++) {
-				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], this->variables[l], this->setting, false);
+				this->eliminationSets[l-1].eliminateNextInto(this->eliminationSets[l], mVariables[l], this->setting, false);
 				CARL_LOG_TRACE("carl.cad", "eliminated" << std::endl << (l-1) << ": " << this->eliminationSets[l-1] << std::endl << l << ": " << this->eliminationSets[l]);
 				level = (unsigned)l;
 				if (this->setting.removeConstants) {
 					// get rid of all constants moved to the current level
 					for (; l < this->eliminationSets.size(); l++) {
 						assert(l < this->eliminationSets.size());
-						assert(l < this->variables.size());
-						this->eliminationSets[l-1].moveConstants(this->eliminationSets[l], this->variables[l]);
+						assert(l < mVariables.size());
+						this->eliminationSets[l-1].moveConstants(this->eliminationSets[l], mVariables[l]);
 					}
 					this->eliminationSets.back().removeConstants();
 				}
@@ -1764,7 +1762,7 @@ void CAD<Number>::widenBounds(BoundMap&) {
 template<typename Number>
 void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number>& r) {
 	// the size of variables should be compatible to the dimension of the given point
-	assert(this->anAnswerFound() || this->variables.size() == r.dim());
+	assert(this->anAnswerFound() || .size() == r.dim());
 
 	for (unsigned level = 0; level < r.dim(); level++) {
 		// shrink the bounds in each level
@@ -1890,11 +1888,11 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, std::
 	BoundMap bounds;
 	// variable index for the cad box
 	std::size_t j = 0;
-	for (std::size_t i = level; i < this->variables.size(); i++) {
+	for (std::size_t i = level; i < mVariables.size(); i++) {
 		// prune the variables not occurring in p in order to trim the cadBox in advance
-		if (p->has(this->variables[i])) {
+		if (p->has(mVariables[i])) {
 			// the variable is actually occurring in p
-			vars.push_back(this->variables[i]);
+			vars.push_back(mVariables[i]);
 			auto bound = box.find(i);
 			if (box.end() != bound) {
 				bounds[j++] = bound->second;
@@ -1907,25 +1905,25 @@ bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, std::
 	CAD<Number> cadbox(static_cast<cad::PolynomialOwner<Number>*>(&this->polynomials));
 	CARL_LOG_INFO("carl.core", "Now in nested CAD " << &cadbox);
 	cadbox.polynomials.schedule(p, false);
-	cadbox.variables.setNewVariables(vars);
+	cadbox.mVariables.setNewVariables(vars);
 	cadbox.setting = boxSetting;
 
 	RealAlgebraicPoint<Number> r;
-	std::vector<cad::Constraint<Number>> cons(1, cad::Constraint<Number>(MultivariatePolynomial<Number>(*p), Sign::ZERO, variables.getCurrent()));
+	std::vector<cad::Constraint<Number>> cons(1, cad::Constraint<Number>(MultivariatePolynomial<Number>(*p), Sign::ZERO, mVariables.getCurrent()));
 	if (cadbox.check(cons, r, bounds, false, false) == cad::Answer::True) {
 		cadbox.completeElimination();
 		CARL_LOG_TRACE("carl.core", "Back from nested CAD " << &cadbox);
 		if (recuperate) {
 			// recuperate eliminated polynomials and go on with the elimination
 			std::size_t k = 0;
-			for (std::size_t i = level + 1; i < this->variables.size(); i++) {
+			for (std::size_t i = level + 1; i < mVariables.size(); i++) {
 				// we start with level + 1 because p is already in mEliminationSets[level]
 				// search for the variables actually occurring in cadBox
-				while (k < cadbox.variables.size() && this->variables[i] != cadbox.variables[k]) {
+				while (k < cadbox.mVariables.size() && mVariables[i] != cadbox.mVariables[k]) {
 					// cadBox.mVariables are ordered in the same way as mVariables and a subset of mVariables
 					k++;
 				}
-				if (k >= cadbox.variables.size()) break;
+				if (k >= cadbox.mVariables.size()) break;
 				// recuperate the elimination polynomials corresponding to i
 				// insert NOT avoiding single elimination (there might be elimination steps not done yet)
 				this->eliminationSets[i].insert(cadbox.eliminationSets[k], false);
