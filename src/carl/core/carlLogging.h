@@ -249,6 +249,8 @@ struct RecordInfo {
 struct Formatter {
 	/// Width of the longest channel.
 	std::size_t channelwidth = 10;
+	/// Print information like log level, file etc.
+	bool printInformation = true;
 	
 	virtual ~Formatter() {}
 	/**
@@ -269,6 +271,7 @@ struct Formatter {
      * @param info Auxiliary information.
      */
 	virtual void prefix(std::ostream& os, const Timer& timer, const std::string& channel, LogLevel level, const RecordInfo& info) {
+		if (!printInformation) return;
 		os.fill(' ');
 		os << "[" << std::right << std::setw(5) << timer << "] ";
 #ifdef THREAD_SAFE
