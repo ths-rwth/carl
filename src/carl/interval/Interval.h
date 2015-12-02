@@ -55,11 +55,6 @@ namespace carl
     template<typename Number>
     class Interval;
 
-    /**
-    * States whether a given type is an `Interval`.
-    * By default, a type is not.
-    */
-   template <class Number> struct is_interval : std::false_type {};
    /**
     * States that `boost::variant` is indeed a `boost::variant`.
     */
@@ -1673,8 +1668,6 @@ namespace carl
 
 	template<typename T>
 	struct is_number<Interval<T>> : std::true_type {};
-
-
 
     /*
      * Overloaded arithmetics operators
