@@ -18,6 +18,7 @@
 
 	#define CLANG_WARNING_DISABLE(warning)\
 		_Pragma("clang diagnostic push")\
+		_Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"")\
 		_Pragma( STRINGIFY(clang diagnostic ignored warning) )
 	#define CLANG_WARNING_RESET\
 		_Pragma("clang diagnostic pop")

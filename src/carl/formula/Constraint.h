@@ -336,11 +336,11 @@ namespace carl
             /**
              * @return The maximal degree of all variables in this constraint. (Monomial-wise)
              */
-            std::size_t maxDegree() const
+            unsigned maxDegree() const
             {
-                std::size_t result = 0;
+                unsigned result = 0;
                 for (const auto& var: mVariables) {
-                    std::size_t deg = maxDegree(var);
+                    unsigned deg = maxDegree(var);
                     if (deg > result) result = deg;
                 }
                 return result;
@@ -683,9 +683,14 @@ namespace carl
             /**
              * @return true, if this constraint is a bound.
              */
-            bool isBound() const
+            bool isBound(bool negated = false) const
             {
-                return ( mpContent->mRelation != Relation::NEQ && mpContent->mVariables.size() == 1 && maxDegree( *mpContent->mVariables.begin() ) == 1 );
+				if (mpContent->mVariables.size() != 1 || maxDegree(*mpContent->mVariables.begin()) != 1) return false;
+				if (negated) {
+					return mpContent->mRelation != Relation::EQ;
+				} else {
+					return mpContent->mRelation != Relation::NEQ;
+				}
             }
             
             /**

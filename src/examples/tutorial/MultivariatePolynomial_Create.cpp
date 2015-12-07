@@ -15,9 +15,8 @@ typedef mpz_class Integer;
 #endif
 
 int main() {
-	carl::VariablePool& pool = carl::VariablePool::getInstance();
-	carl::Variable x = pool.getFreshVariable();
-	carl::Variable y = pool.getFreshVariable();
+	carl::Variable x = carl::freshRealVariable("x");
+	carl::Variable y = carl::freshRealVariable("y");
 
 	/*
 	 * A carl::MultivariatePolynomial represents a monomial in multiple

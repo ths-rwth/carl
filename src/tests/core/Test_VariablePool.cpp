@@ -8,34 +8,31 @@ TEST(VariablePool, singleton)
 {
 	VariablePool& pool1 = VariablePool::getInstance();
 	VariablePool& pool2 = VariablePool::getInstance();
-	Variable x = pool1.getFreshVariable();
-	std::string name = "test";
-	ASSERT_EQ(&pool1, &pool2);
+	EXPECT_EQ(&pool1, &pool2);
 
+	Variable x = freshRealVariable();
+	std::string name = "test";
 	pool1.setName(x, name);
-	ASSERT_EQ(name, pool2.getName(x));
+	EXPECT_EQ(name, pool2.getName(x));
 }
 
 TEST(VariablePool, variableName)
 {
 	VariablePool& vpool = VariablePool::getInstance();
-	Variable x = vpool.getFreshVariable( carl::VariableType::VT_INT );
-	vpool.setName(x, "test");
+	Variable x = freshIntegerVariable("test");
 	std::string name = vpool.getName(x, true);
 	std::stringstream o;
 	o << x;
-	ASSERT_EQ(name, o.str());
-	
+	EXPECT_EQ(name, o.str());
 }
 
 TEST(VariablePool, order)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
     
-    EXPECT_TRUE(x > y);
-    EXPECT_TRUE(y < x);
-    EXPECT_FALSE(x < y);
-    EXPECT_FALSE(y > x);
+    EXPECT_TRUE(x < y);
+    EXPECT_TRUE(y > x);
+    EXPECT_FALSE(x > y);
+    EXPECT_FALSE(y < x);
 }

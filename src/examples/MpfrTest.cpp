@@ -6,13 +6,34 @@
  * @since	2013-12-16
  * @version	2013-12-16
  */
-#include "../carl/interval/rounding.h"
-#include "../carl/numbers/roundingConversion.h"
-#include "../carl/numbers/FLOAT_T.h"
+
+#include "../carl/numbers/numbers.h"
 
 #include <mpfr.h>
 #include <gmp.h>
 
+
+void compare() {
+	mpfr_t a;
+	mpfr_init2(a,53);
+	mpfr_set_ui(a,53, mpfr_rnd_t::MPFR_RNDN);
+
+	mpfr_t b;
+	mpfr_init2(b,14);
+
+	mpfr_set_prec(b, mpfr_get_prec(a));
+	mpfr_set(b, a, MPFR_RNDN);
+
+	assert(b->_mpfr_prec == a->_mpfr_prec);
+	assert(b->_mpfr_sign = a->_mpfr_sign);
+	assert(b->_mpfr_exp = a->_mpfr_exp);
+
+	std::size_t limbs = (std::size_t)std::ceil(double(a->_mpfr_prec)/double(mp_bits_per_limb));
+	while( limbs > 0 ){
+		assert(b->_mpfr_d[limbs-1] == a->_mpfr_d[limbs-1]);
+		--limbs;
+	}
+}
 
 
 void toInt(mpz_t intRep, mpfr_t a) {
@@ -84,6 +105,7 @@ void toInt(mpz_t intRep, mpfr_t a) {
 
 int main (int argc, char** argv)
 {
+	/*
 	char outStr[1024];
 
 	mpfr_t a;
@@ -101,6 +123,8 @@ int main (int argc, char** argv)
 
 	mpz_get_str(outStr, 10,b);
 	std::cout << std::string(outStr) << std::endl;
+	*/
 
+	compare();
 	return 0;
 }

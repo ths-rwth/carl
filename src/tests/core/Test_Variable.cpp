@@ -1,7 +1,7 @@
 
 #include "gtest/gtest.h"
 #include "carl/core/Variable.h"
-#include "Util.cpp"
+#include "Util.h"
 
 using namespace carl;
 

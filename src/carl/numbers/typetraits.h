@@ -1,4 +1,4 @@
-/** 
+/**
  * @file   numbers/typetraits.h
  * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
@@ -77,7 +77,7 @@ template<> struct name<_type>: carl::has_subtype<value> {}
 
 namespace carl {
 
-// 
+//
 // Forward declarations
 //
 template<typename IntegerT>
@@ -153,7 +153,7 @@ struct is_finite<GFNumber<C>>: std::false_type {};
  */
 /**
  * States if a type is a floating point type.
- * 
+ *
  * Default is true if `std::is_floating_point` is true for this type.
  * @ingroup typetraits_is_float
  */
@@ -249,6 +249,13 @@ struct is_number<GFNumber<C>>: std::true_type {};
  */
 template<typename T>
 struct is_rational: std::false_type {};
+
+/**
+* States whether a given type is an `Interval`.
+* By default, a type is not.
+*/
+template <class Number>
+struct is_interval : std::false_type {};
 
 /**
  * @addtogroup typetraits_is_subset_of_rationals is_subset_of_rationals

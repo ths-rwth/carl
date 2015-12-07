@@ -109,14 +109,14 @@ namespace carl
 				itright++;
 			}
 			// Variable is not present in lhs, division fails.
-			else if(itleft->first < itright->first) 
+			else if(itleft->first > itright->first) 
 			{
 				CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 				return false;
 			}
 			else
 			{
-				assert(itleft->first > itright->first);
+				assert(itleft->first < itright->first);
 				newExps.push_back(*itleft);
 			}
 		}
@@ -277,12 +277,12 @@ namespace carl
                 }
                 else if(itleft->first < itright->first) 
                 {
-                    ++itright;
+                    ++itleft;
                 }
                 else
                 {
                     assert(itleft->first > itright->first);
-                    ++itleft;
+                    ++itright;
                 }
             }
              // Insert remaining part
@@ -331,14 +331,14 @@ namespace carl
 			}
 			// Variable is not present in lhs, dividing lcm yields variable will not occur in result
 
-			else if(itleft->first < itright->first)
+			else if(itleft->first > itright->first)
 			{
 				newExps.push_back(*itright);
 				++itright;
 			}
 			else
 			{
-				assert(itleft->first > itright->first);
+				assert(itleft->first < itright->first);
 				newExps.push_back(*itleft);
 				++itleft;
 			}
@@ -356,17 +356,26 @@ namespace carl
 		if (mTotalDegree < 1) return false;
 		unsigned tdegree = 0;
 		Variable lastVar = Variable::NO_VARIABLE;
-		for(auto ve : mExponents)
+		for(const auto& ve : mExponents)
 		{
-			if (ve.second <= 0) return false;
+			if (ve.second <= 0) {
+				CARL_LOG_TRACE("carl.core.monomial", "Degree is zero.");
+				return false;
+			}
 			if (lastVar != Variable::NO_VARIABLE) {
-				if (ve.first > lastVar) return false;
+				if (ve.first <= lastVar) return false;
 			}
 			tdegree += ve.second;
 			lastVar = ve.first;
 		}
-		if (tdegree != mTotalDegree) return false;
-		if (!std::is_sorted(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; })) return false;
+		if (tdegree != mTotalDegree) {
+			CARL_LOG_TRACE("carl.core.monomial", "Wrong total degree.");
+			return false;
+		}
+		if (!std::is_sorted(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first < p2.first; })) {
+			CARL_LOG_TRACE("carl.core.monomial", "Is not sorted.");
+			return false;
+		}
 		return true;
 	}
 	
@@ -385,9 +394,9 @@ namespace carl
 			//which variable occurs first
 			if (lhsit->first == rhsit->first) {
 				//equal variables
-				if (lhsit->second < rhsit->second)
-					return CompareResult::LESS;
 				if (lhsit->second > rhsit->second)
+					return CompareResult::LESS;
+				if (lhsit->second < rhsit->second)
 					return CompareResult::GREATER;
 			} else {
 				return (lhsit->first < rhsit->first) ? CompareResult::LESS : CompareResult::GREATER;
@@ -426,7 +435,7 @@ namespace carl
 				++itright;
 			}
 			// Variable is not present in lhs, we have to insert var-exp pair from rhs.
-			else if(itleft->first < itright->first)
+			else if(itleft->first > itright->first)
 			{
 				newExps.emplace_back( itright->first, itright->second );
 				++itright;
@@ -458,11 +467,11 @@ namespace carl
 		bool inserted = false;
 		for (const auto& p: *lhs) {
 			if (inserted) newExps.push_back(p);
-			else if (p.first > rhs) newExps.push_back(p);
+			else if (p.first < rhs) newExps.push_back(p);
 			else if (p.first == rhs) {
 				newExps.emplace_back(rhs, p.second + 1);
 				inserted = true;
-			} else if (p.first < rhs) {
+			} else if (p.first > rhs) {
 				newExps.emplace_back(rhs, 1);
 				newExps.push_back(p);
 				inserted = true;
@@ -482,13 +491,13 @@ namespace carl
 		std::vector<std::pair<Variable, exponent>> newExps;
 		if( lhs < rhs )
 		{
-			newExps.emplace_back( rhs, 1 );
 			newExps.emplace_back( lhs, 1 );
+			newExps.emplace_back( rhs, 1 );
 		}
 		else if( lhs > rhs )
 		{
-			newExps.emplace_back( lhs, 1 );
 			newExps.emplace_back( rhs, 1 );
+			newExps.emplace_back( lhs, 1 );
 		}
 		else
 			newExps.emplace_back( lhs, 2 );

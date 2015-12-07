@@ -3,7 +3,7 @@
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
-#include "Util.cpp"
+#include "Util.h"
 #include <list>
 #include "carl/converter/OldGinacConverter.h"
 #include "carl/util/stringparser.h"
@@ -70,9 +70,8 @@ TEST(MultivariatePolynomial, remainder)
 
 TEST(MultivariatePolynomial, toUnivariatePolynomial)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-	Variable y = vpool.getFreshVariable();
+    Variable x = freshRealVariable();
+	Variable y = freshRealVariable();
 	{
 		MultivariatePolynomial<Rational> p({(Rational)1*x, (Rational)-1*x*x, (Rational)3*x*x*x});
 		UnivariatePolynomial<Rational> res(x, {(Rational)0, (Rational)1, (Rational)-1, (Rational)3});
@@ -92,8 +91,7 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
 
 TEST(MultivariatePolynomial, Addition)
 {
-	VariablePool::getInstance().clear();
-    Variable v0((unsigned)1);
+    Variable v0 = freshRealVariable("v0");
     Term<Integer> t0(v0);
     MultivariatePolynomial<Integer> p0(v0);
     p0 += 3;
@@ -103,8 +101,8 @@ TEST(MultivariatePolynomial, Addition)
     p0 += -6;
     EXPECT_EQ((unsigned)1, p0.nrTerms());
 
-    Variable v1((unsigned)2);
-    Variable v2((unsigned)3);
+    Variable v1 = freshRealVariable("v1");
+    Variable v2 = freshRealVariable("v2");
     p0 += v1;
     p0 += createMonomial(v2, (exponent) 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
@@ -117,9 +115,9 @@ TEST(MultivariatePolynomial, Addition)
     p1 += v1;
     p0 += p1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
-    MultivariatePolynomial<Integer> mp2(v0);
-    mp2 += (Integer)2 * v1;
-    EXPECT_EQ(v0, mp2.lterm());
+    MultivariatePolynomial<Integer> mp2(v1);
+    mp2 += (Integer)2 * v0;
+    EXPECT_EQ(v1, mp2.lterm());
     MultivariatePolynomial<Integer> p10a;
     p10a += v0*v0;
     p10a += v1;
@@ -195,25 +193,19 @@ TEST(MultivariatePolynomial, toString)
 
 TEST(MultivariatePolynomial, Normalize)
 {
-    Variable v0(1);
-    Variable v1(2);
-    Variable v2(3);
-    MultivariatePolynomial<Rational> mp;
-    mp += v0;
-    MultivariatePolynomial<Rational> mp2 = mp * (Rational)2;
+    Variable v0 = freshRealVariable("v0");
+    Variable v1 = freshRealVariable("v1");
+    MultivariatePolynomial<Rational> mp(v0);
+    MultivariatePolynomial<Rational> mp2 = mp * Rational(2);
     EXPECT_EQ(mp, mp.normalize());
     EXPECT_EQ(mp, mp2.normalize());
 
-    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
-    mp += (Rational)2 * v1;
-    mp2 = MultivariatePolynomial<Rational>(v0);
-    mp2 += v1;
+    mp = Rational(2) * v0 + Rational(2) * v1;
+    mp2 = MultivariatePolynomial<Rational>(v0) + v1;
     EXPECT_EQ(mp2, mp.normalize());
 
-    mp = MultivariatePolynomial<Rational>((Rational)2 * v0);
-    mp += (Rational)4 * v1;
-    mp2 = MultivariatePolynomial<Rational>(v0);
-    mp2 += (Rational)2 * v1;
+    mp = Rational(4) * v0 + Rational(2) * v1;
+    mp2 = Rational(2) * v0 + v1;
     EXPECT_EQ(mp2, mp.normalize());
 }
 
@@ -272,15 +264,10 @@ TEST(MultivariatePolynomial, Substitute)
     substitutions[v0] = MultivariatePolynomial<Rational>((Rational)0);
     EXPECT_EQ(MultivariatePolynomial<Rational>((Rational)4 * v1), mp.substitute(substitutions));
     #ifdef USE_GINAC
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable v = vpool.getFreshVariable();
-    vpool.setName(v, "v");
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable v = freshRealVariable("v");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
 
     std::map<GiNaC::ex, Variable, GiNaC::ex_is_less> vars;
     GiNaC::symbol vg("v"), xg("x"), yg("y"), zg("z");
@@ -431,13 +418,8 @@ TEST(MultivariatePolynomial, Substitute)
 
 TEST(MultivariatePolynomial, SPolynomial)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     MultivariatePolynomial<Rational> g1({(Rational)3*x*x*x*x*y, (Rational)1*y*y});
     EXPECT_EQ((unsigned)3,MultivariatePolynomial<Rational>::SPolynomial(f1.normalize(), g1.normalize()).nrTerms());
@@ -458,35 +440,25 @@ TEST(MultivariatePolynomial, SPolynomial)
 
 TEST(MultivariatePolynomial, GatherVariables)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
     std::set<Variable> vars;
     f1.gatherVariables(vars);
-    EXPECT_EQ(y, *vars.begin());
+    EXPECT_EQ(x, *vars.begin());
     EXPECT_EQ((unsigned)2, vars.size());
 }
 
 TEST(MultivariatePolynomial, Derivative)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 #ifdef __VS
     MultivariatePolynomial<Rational> fx({x, 0});
 #else
-	MultivariatePolynomial<Rational> fx({x});
+    MultivariatePolynomial<Rational> fx({x});
 #endif
-	EXPECT_EQ((Rational)1, fx.derivative(x));
+    EXPECT_EQ((Rational)1, fx.derivative(x));
     EXPECT_EQ((Rational)0, fx.derivative(y));
 #ifdef __VS
 	MultivariatePolynomial<Rational> f2x({ (Rational)2 * x , (Rational)0*x});
@@ -504,13 +476,9 @@ TEST(MultivariatePolynomial, Derivative)
 
 TEST(MultivariatePolynomial, varInfo)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x});
 
@@ -545,21 +513,39 @@ TEST(MultivariatePolynomial, varInfo)
 
 TEST(MultivariatePolynomial, Quotient)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-	MultivariatePolynomial<Rational> one(Rational(1));
-	MultivariatePolynomial<Rational> m1 = x*x - one;
-	MultivariatePolynomial<Rational> m2 = x - one;
-	MultivariatePolynomial<Rational> res = x + one;
-	EXPECT_EQ(res, m1.quotient(m2));
+    Variable x = freshRealVariable("x");
+    MultivariatePolynomial<Rational> one(Rational(1));
+    MultivariatePolynomial<Rational> m1 = x*x - one;
+    MultivariatePolynomial<Rational> m2 = x - one;
+    MultivariatePolynomial<Rational> res = x + one;
+    EXPECT_EQ(res, m1.quotient(m2));
+}
+
+TEST(MultivariatePolynomial, Quotient2)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"t", "u"});
+    Variable t = carl::VariablePool::getInstance().findVariableWithName("t");
+    MultivariatePolynomial<Rational> p1 = sp.parseMultivariatePolynomial<Rational>("t^3*u^6+(-3)*t*u^5+(-1)*u^6+(-3)*t^2*u^6+3*t*u^6+(-1)*t^3*u^5+(-1)*t^3+(-3)*t+3*t^2+(-3)*u+3*t^3*u+9*t*u+(-9)*t^2*u+5*u^2+(-5)*t^3*u^2+(-15)*t*u^2+15*t^2*u^2+3*t^2*u^4+(-3)*t*u^4+(-1)*t^3*u^4+(-4)*u^3+u^4+(-12)*t^2*u^3+12*t*u^3+4*t^3*u^3+u^5+3*t^2*u^5+1");
+    MultivariatePolynomial<Rational> p2 = sp.parseMultivariatePolynomial<Rational>("u^2+(-1)*u+1");
+    EXPECT_TRUE( p1.quotient(p2).has(t) );
+    EXPECT_EQ( p1.quotient(p2)*p2, p1 );
+    MultivariatePolynomial<Rational> p3 = sp.parseMultivariatePolynomial<Rational>("t^2+(-1)*u+1");
+    MultivariatePolynomial<Rational> p4 = p2*p3;
+    EXPECT_EQ( p4.quotient(p2)*p2, p4 );
+    EXPECT_EQ( p4.quotient(p3)*p3, p4 );
+    MultivariatePolynomial<Rational> p5 = sp.parseMultivariatePolynomial<Rational>("u+1");
+    MultivariatePolynomial<Rational> p6 = sp.parseMultivariatePolynomial<Rational>("t+1");
+    MultivariatePolynomial<Rational> p7 = p5*p6;
+    EXPECT_EQ( p7, p7.quotient(p5)*p5 );
+    EXPECT_EQ( p7, p7.quotient(p6)*p6 );
 }
 
 TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
     EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)12*x*x*x*x*x*y, (TypeParam)6*x*x*x*y*y*y, (TypeParam)27*x*x*y*y, (TypeParam)28*x*x*x*x*y, (TypeParam)14*x*x*y*y*y, (TypeParam)63*x*y*y}),
             MultivariatePolynomial<TypeParam>({(TypeParam)3*x*x*y, (TypeParam)7*x*y}) * MultivariatePolynomial<TypeParam>({(TypeParam)4*x*x*x, (TypeParam)2*x*y*y, (TypeParam)9*y}));
@@ -587,9 +573,8 @@ TYPED_TEST(MultivariatePolynomialTest, MultivariatePolynomialMultiplication)
 
 TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
     EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)5*x*y, (TypeParam)7*y, (TypeParam)11*x*x}), (TypeParam)5*x*y+(TypeParam)7*y+(TypeParam)11*x*x);
     EXPECT_EQ(MultivariatePolynomial<TypeParam>({(TypeParam)1*x, (TypeParam)1*y}), (TypeParam)1*x + (TypeParam)1*y);
@@ -598,10 +583,9 @@ TYPED_TEST(MultivariatePolynomialTest, CreationViaOperators)
 
 TYPED_TEST(MultivariatePolynomialTest, Comparison)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
-    Variable z = pool.getFreshVariable("z");
+    Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+	Variable z = freshRealVariable("z");
 
     MultivariatePolynomial<TypeParam> p0 = (TypeParam)3 * x * y * y + (TypeParam)7 * y * z;
     MultivariatePolynomial<TypeParam> p1 = (TypeParam)3 * x * y * y + (TypeParam)2 * x * x * y;
@@ -610,8 +594,8 @@ TYPED_TEST(MultivariatePolynomialTest, Comparison)
 
     ComparisonList<MultivariatePolynomial<TypeParam>> polynomials;
     polynomials.push_back(p0);
-    polynomials.push_back(p2);
     polynomials.push_back(p1);
+    polynomials.push_back(p2);
     polynomials.push_back(p3);
 
     expectRightOrder(polynomials);
@@ -621,19 +605,18 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 {
     ComparisonList<Variable, Monomial::Arg, Term<TypeParam>, MultivariatePolynomial<TypeParam>> list;
 
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
     list.push_back(Term<TypeParam>((TypeParam)0));
     list.push_back(Term<TypeParam>((TypeParam)1));
     list.push_back(Term<TypeParam>((TypeParam)5));
-    list.push_back(y);
     list.push_back(x);
+    list.push_back(y);
     list.push_back((TypeParam)2 * x * x + y);
-    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
     list.push_back((TypeParam)3 * x * x);
     list.push_back((TypeParam)4 * x * y + (TypeParam)5 * x * x);
+    list.push_back((TypeParam)8 * x * y + (TypeParam)2 * x * x);
     list.push_back((TypeParam)6 * x * x + y * y);
     list.push_back(x * x * y);
     list.push_back((TypeParam)7 * x * x * y);
@@ -650,9 +633,8 @@ TYPED_TEST(MultivariatePolynomialTest, OtherComparison)
 
 TEST(MultivariatePolynomialTest, Resultant)
 {
-	VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x0");
-    Variable y = pool.getFreshVariable("x1");
+    Variable x = freshRealVariable("x0");
+    Variable y = freshRealVariable("x1");
 	typedef Rational T;
 	carl::CIPtr ci = carl::CIPtr(new ConversionInformation());
 
@@ -680,11 +662,10 @@ TEST(MultivariatePolynomialTest, Resultant)
 
 TEST(MultivariatePolynomialTest, Definiteness)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable w = pool.getFreshVariable("w");
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
-    Variable z = pool.getFreshVariable("z");
+    Variable w = freshRealVariable("w");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
     MultivariatePolynomial<Rational> p1({(Rational)6*x*x, (Rational)49*y*y, (Rational)51*z*z, (Rational)-82*y*z, (Rational)20*x*z, (Rational)-4*x*y});
     EXPECT_TRUE(p1.definiteness() == Definiteness::POSITIVE_SEMI);
     MultivariatePolynomial<Rational> p2 = p1 + Rational(1);

@@ -62,7 +62,7 @@ namespace carl
 		typedef std::vector<std::pair<Variable, exponent>> Content;
 		~Monomial();
 	protected:
-		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
+		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
@@ -136,7 +136,6 @@ namespace carl
 			mExponents(std::move(exponents)),
 			mTotalDegree(0)
 		{
-			
 			for(auto const& ve : mExponents)
 			{
 				mTotalDegree += ve.second;

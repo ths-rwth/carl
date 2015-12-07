@@ -27,6 +27,7 @@ CLANG_WARNING_DISABLE("-Wsign-conversion")
 	#include <gmpxx.h>
 #endif
 CLANG_WARNING_RESET
+CLANG_WARNING_RESET
 
 #include "../typetraits.h"
 

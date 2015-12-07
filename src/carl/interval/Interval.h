@@ -36,6 +36,7 @@
 #include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
+CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 #include <boost/functional/hash.hpp>
@@ -54,11 +55,6 @@ namespace carl
     template<typename Number>
     class Interval;
 
-    /**
-    * States whether a given type is an `Interval`.
-    * By default, a type is not.
-    */
-   template <class Number> struct is_interval : std::false_type {};
    /**
     * States that `boost::variant` is indeed a `boost::variant`.
     */
@@ -1666,14 +1662,12 @@ namespace carl
     */
     Number distance(const Interval<Number>& intervalA);
 
-    Interval<Number> convexHull(const Interval<Number>& interval);
+    Interval<Number> convexHull(const Interval<Number>& interval) const;
 
     };
 
 	template<typename T>
 	struct is_number<Interval<T>> : std::true_type {};
-
-
 
     /*
      * Overloaded arithmetics operators

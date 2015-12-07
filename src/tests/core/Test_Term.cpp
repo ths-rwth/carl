@@ -4,7 +4,7 @@
 #include "carl/core/VariablePool.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Term.h"
-#include "Util.cpp"
+#include "Util.h"
 #include <list>
 
 #include "../Common.h"
@@ -48,9 +48,8 @@ TYPED_TEST(TermTest, Multiplication)
 
 TYPED_TEST(TermTest, VariableMultiplication)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
     EXPECT_EQ(Term<TypeParam>(3, x * y), (TypeParam)3 * x * y);
     EXPECT_EQ(Term<TypeParam>(1, x * y), x * y);
@@ -59,9 +58,8 @@ TYPED_TEST(TermTest, VariableMultiplication)
 
 TYPED_TEST(TermTest, TermMultiplication)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
     EXPECT_EQ(Term<TypeParam>(12, x * x * y), Term<TypeParam>(3, x * y) * Term<TypeParam>(4, x, 1));
     EXPECT_EQ(Term<TypeParam>(TypeParam(0)), Term<TypeParam>(3, x * x) * Term<TypeParam>(0, y * y * y));
@@ -94,17 +92,16 @@ TYPED_TEST(TermTest, Substitute)
 
 TYPED_TEST(TermTest, Comparison)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
-    Variable z = pool.getFreshVariable("z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
 
     ComparisonList<Term<TypeParam> > terms;
+    terms.push_back((TypeParam)2 * x * y * z);
     terms.push_back((TypeParam)3 * y * z * z);
     terms.push_back((TypeParam)9 * y * z * z);
-    terms.push_back((TypeParam)2 * x * y * z);
-    terms.push_back((TypeParam)4 * x * y * z * z);
     terms.push_back((TypeParam)7 * x * y * y * z);
+    terms.push_back((TypeParam)4 * x * y * z * z);
 
     expectRightOrder(terms);
 }
@@ -113,19 +110,18 @@ TYPED_TEST(TermTest, OtherComparison)
 {
     ComparisonList<Variable, Monomial::Arg, Term<TypeParam> > list;
 
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
-    list.push_back(y);
-    list.push_back((TypeParam)3 * y);
     list.push_back(x);
     list.push_back((TypeParam)7 * x);
+    list.push_back(y);
+    list.push_back((TypeParam)3 * y);
     list.push_back(x * x);
     list.push_back((TypeParam)3 * x * x);
+    list.push_back((TypeParam)9 * x * x * y);
     list.push_back(x * y * y);
     list.push_back((TypeParam)5 * x * y * y);
-    list.push_back((TypeParam)9 * x * x * y);
 
     expectRightOrder(list);
 }

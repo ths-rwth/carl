@@ -9,21 +9,21 @@ typedef carl::UnivariatePolynomial<Rational> UPolynomial;
 typedef carl::MultivariatePolynomial<Rational> MPolynomial;
 typedef carl::UnivariatePolynomial<MPolynomial> UMPolynomial;
 
+using namespace carl;
+
 template<typename Number>
-bool represents(const carl::RealAlgebraicNumberPtr<Number> root, const Number& exact) {
-	if (root->isNumeric()) {
-		return root->value() == exact;
+bool represents(const carl::RealAlgebraicNumber<Number> root, const Number& exact) {
+	if (root.isNumeric()) {
+		return root.value() == exact;
 	} else {
-		carl::RealAlgebraicNumberIRPtr<Number> interval = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Number>>(root);
-		return interval->getInterval().contains(exact);
+		return root.getInterval().contains(exact);
 	}
 }
 
 TEST(RootFinder, realRoots)
 {
-	carl::VariablePool& vpool = carl::VariablePool::getInstance();
-	carl::Variable x = vpool.getFreshVariable();
-	carl::Variable y = vpool.getFreshVariable();
+	carl::Variable x = freshRealVariable("x");
+	carl::Variable y = freshRealVariable("y");
 
 	{
 		UPolynomial p(x, {(Rational)-1, (Rational)0, (Rational)0, (Rational)1});
@@ -49,8 +49,9 @@ TEST(RootFinder, realRoots)
 
 	{
 		UMPolynomial p(x, {MPolynomial(y), MPolynomial(0), MPolynomial(1)});
-		std::map<carl::Variable, carl::RealAlgebraicNumberPtr<Rational>> m;
-		m[y] = carl::RealAlgebraicNumberNR<Rational>::create(-1);
+		std::map<carl::Variable, carl::RealAlgebraicNumber<Rational>> m;
+		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
+		std::cout << "Map = " << m << std::endl;
 		auto roots = carl::rootfinder::realRoots(p, m);
 		ASSERT_TRUE(roots.size() == 2);
 		ASSERT_TRUE(represents(roots.front(), (Rational)-1));

@@ -298,9 +298,7 @@ TEST(FactorizedPolynomial, GCD)
     Pol pA = sp.parseMultivariatePolynomial<Rational>("4*x*y");
     Pol pB = sp.parseMultivariatePolynomial<Rational>("2*x*y*z");
 
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable t = vpool.getFreshVariable();
-    vpool.setName(t, "t");
+    Variable t = freshRealVariable("t");
     Pol one(Rational(1));
     Pol g1 = t*t - one;
     Pol g2 = t - one;

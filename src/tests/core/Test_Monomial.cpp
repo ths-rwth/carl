@@ -2,7 +2,7 @@
 #include "carl/core/Variable.h"
 #include "carl/core/Monomial.h"
 #include "carl/core/Monomial_derivative.h"
-#include "Util.cpp"
+#include "Util.h"
 #include <list>
 #include <boost/variant.hpp>
 
@@ -10,11 +10,48 @@
 
 using namespace carl;
 
+TEST(Monomial, Constructor)
+{
+	Variable x = freshRealVariable("x");
+	
+	Monomial m(x, 3);
+	EXPECT_TRUE(m.exponents().size() == 1);
+	EXPECT_TRUE(m.exponents().front().first == x);
+	EXPECT_TRUE(m.exponents().front().second == 3);
+}
+
+TEST(Monomial, TotalDegree)
+{
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+
+	Monomial::Arg m1 = x*x*x;
+	EXPECT_TRUE(m1->tdeg() == 3);
+	Monomial::Arg m2 = x*x*y;
+	EXPECT_TRUE(m2->tdeg() == 3);
+	Monomial::Arg m3 = x*y*y*y;
+	EXPECT_TRUE(m3->tdeg() == 4);
+}
+
+TEST(Monomial, degreeCategories)
+{
+	Variable x = freshRealVariable("x");
+	
+	Monomial::Arg m1 = createMonomial(x, (unsigned)1);
+	EXPECT_TRUE(m1->isLinear());
+	EXPECT_TRUE(m1->isAtMostLinear());
+	EXPECT_TRUE(!m1->isSquare());
+	Monomial::Arg m2 = createMonomial(x,2);
+	EXPECT_TRUE(!m2->isLinear());
+	EXPECT_TRUE(!m2->isAtMostLinear());
+	EXPECT_TRUE(m2->isSquare());
+}
+
 TEST(Monomial, Operators)
 {
-    Variable v0 = Variable((unsigned)1);
-    Variable v1 = Variable((unsigned)2);
-    Variable v2 = Variable((unsigned)3);
+    Variable v0 = freshRealVariable("a");
+    Variable v1 = freshRealVariable("b");
+    Variable v2 = freshRealVariable("c");
 
 	Monomial::Arg m0 = carl::createMonomial(v0, (exponent) 1);
 	m0 = m0 * v1;
@@ -36,21 +73,19 @@ TEST(Monomial, Operators)
 
 TEST(Monomial, VariableMultiplication)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
-    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1)})), x);
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    //EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1)})), x);
     EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)})), x * y);
-    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 1)})), x * x * y);
-    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})), y * x * y);
-    EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3)})), x * x * x);
+    //EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 1)})), x * x * y);
+    //EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})), y * x * y);
+    //EXPECT_EQ(carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 3)})), x * x * x);
 }
 
 TEST(Monomial, MonomialMultiplication)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
     EXPECT_EQ(
 		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 2), std::make_pair(y, 3)})),
 		carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 2)})) * carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}))
@@ -100,9 +135,8 @@ TEST(Monomial, division)
 
 TEST(Monomial, divisible)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
     Monomial::Arg m1 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
     Monomial::Arg m2 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(x, 1), std::make_pair(y, 1)}));
     Monomial::Arg m3 = carl::createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 1), std::make_pair(x, 1)}));
@@ -110,23 +144,28 @@ TEST(Monomial, divisible)
 //    std::cout << m2 << " == " << m3 << std::endl;
     EXPECT_TRUE(m2==m3);
     EXPECT_TRUE(m1->divisible(m2));
+	
+	{
+		Monomial::Arg m1 = createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2)}));
+		Monomial::Arg m2 = createMonomial(std::initializer_list<std::pair<Variable, exponent>>({std::make_pair(y, 2), std::make_pair(x, 2)}));
+		EXPECT_TRUE(m2->divisible(m1));
+	}
 }
 
 TEST(Monomial, Comparison)
 {
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
-    Variable z = pool.getFreshVariable("z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
 
     ComparisonList<Monomial::Arg> monomials;
-    monomials.push_back(y * y * y);
-    monomials.push_back(x * y * z);
-    monomials.push_back(x * y * y);
-    monomials.push_back(x * x * y);
     monomials.push_back(x * x * x);
-    monomials.push_back(x * y * y * z);
+    monomials.push_back(x * x * y);
+    monomials.push_back(x * y * y);
+    monomials.push_back(x * y * z);
+    monomials.push_back(y * y * y);
     monomials.push_back(x * x * z * z);
+    monomials.push_back(x * y * y * z);
 
     expectRightOrder(monomials);
 }
@@ -136,17 +175,16 @@ TEST(Monomial, OtherComparison)
 {
     ComparisonList<Variable,Monomial::Arg> list;
 
-    VariablePool& pool = VariablePool::getInstance();
-    Variable x = pool.getFreshVariable("x");
-    Variable y = pool.getFreshVariable("y");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
 
-    list.push_back(y);
     list.push_back(x);
-    list.push_back(y * y);
-    list.push_back(x * y);
+    list.push_back(y);
     list.push_back(x * x);
-    list.push_back(x * x * y);
+    list.push_back(x * y);
+    list.push_back(y * y);
     list.push_back(x * x * x);
+    list.push_back(x * x * y);
     list.push_back(x * x * x * x);
 
     expectRightOrder(list);

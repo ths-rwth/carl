@@ -20,7 +20,9 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #include <iostream>
 #include <vector>
 #include "typetraits.h"
+CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include "boost/algorithm/string.hpp"
+CLANG_WARNING_RESET
 
 namespace carl {
 
@@ -151,7 +153,6 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
 
 template<>
 inline int toInt<int>(const mpz_class& n) {
-    std::cout << "mpz_class to int" << std::endl;
     assert(n <= std::numeric_limits<int>::max());
     assert(n >= std::numeric_limits<int>::min());
     return (int)mpz_get_si(n.get_mpz_t());
@@ -267,6 +268,21 @@ inline mpq_class abs(const mpq_class& n) {
 	mpq_class res;
 	mpq_abs(res.get_mpq_t(), n.get_mpq_t());
 	return res;
+}
+
+inline mpz_class round(const mpq_class& n) {
+	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
+	mpz_class res;
+	mpz_class rem;
+	mpz_fdiv_qr(res.get_mpz_t(), rem.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
+    rem *= 2;
+    if( rem >= getDenom(n) )
+        ++res;
+	return res;
+}
+
+inline mpz_class round(const mpz_class& n) {
+	return n;
 }
 
 inline mpz_class floor(const mpq_class& n) {

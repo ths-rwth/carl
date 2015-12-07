@@ -18,4 +18,11 @@ namespace carl {
 		carl::hash_add(seed, value);
 		carl::hash_add(seed, std::forward<Tail>(tail)...);
 	}
+	
+	template<typename... Args>
+	inline std::size_t hash_all(Args&&... args) {
+		std::size_t seed = 0;
+		hash_add(seed, std::forward<Args>(args)...);
+		return seed;
+	}
 }

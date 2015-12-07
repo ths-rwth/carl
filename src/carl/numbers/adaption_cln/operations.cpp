@@ -57,7 +57,7 @@ namespace carl
         if( a < 0 ) return false;
         return cln::sqrtp( a, &b );
     }
-    
+
     cln::cl_RA sqrt(const cln::cl_RA& a)
     {
         auto r = sqrt_safe(a);
@@ -131,7 +131,7 @@ namespace carl
         }
         if(strs.size() > 1)
         {
-            result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_I(10),static_cast<unsigned>(strs.back().size())));
+            result += (cln::cl_RA(strs.back().c_str())/carl::pow(cln::cl_RA(10),static_cast<unsigned>(strs.back().size())));
         }
         return result;
     }

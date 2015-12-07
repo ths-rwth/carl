@@ -56,8 +56,7 @@ TEST(EliminationSet, BasicOperations)
 
 TEST(EliminationSet, SetProperty)
 {
-	VariablePool& vpool = VariablePool::getInstance();
-	Variable x = vpool.getFreshVariable();
+	Variable x = freshRealVariable("x");
 	cad::PolynomialOwner<Rational> owner;
 	cad::EliminationSet<Rational> s(&owner);
 

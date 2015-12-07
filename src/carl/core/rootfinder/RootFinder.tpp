@@ -15,9 +15,9 @@ namespace carl {
 namespace rootfinder {
 
 template<typename Coeff, typename Number>
-std::list<RealAlgebraicNumberPtr<Number>> realRoots(
+std::list<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumberPtr<Number>>& m,
+		const std::map<Variable, RealAlgebraicNumber<Number>>& m,
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
@@ -26,7 +26,7 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 	
 	if (p.isZero()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "p is 0 -> sampling " << interval.sample());
-		return { RealAlgebraicNumberNR<Number>::create(interval.sample(), true) };
+		return { RealAlgebraicNumber<Number>(interval.sample(), true) };
 	}
 	if (p.isConstant()) {
 		CARL_LOG_TRACE("carl.core.rootfinder", "p is constant but not zero -> no root");
@@ -34,33 +34,37 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 	}
 	
 	UnivariatePolynomial<Coeff> tmp(p);
-	std::map<Variable, RealAlgebraicNumberIRPtr<Number>> IRmap;
+	std::map<Variable, RealAlgebraicNumber<Number>> IRmap;
 	
 	for (Variable v: tmp.gatherVariables()) {
 		if (v == p.mainVar()) continue;
 		assert(m.count(v) > 0);
-		if (m.at(v)->isNumeric()) {
-			tmp.substituteIn(v, Coeff(m.at(v)->value()));
+		if (m.at(v).isNumeric()) {
+			tmp.substituteIn(v, Coeff(m.at(v).value()));
 		} else {
-			IRmap[v] = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(m.at(v));
+			IRmap.emplace(v, m.at(v));
 		}
 	}
-	if (IRmap.size() == 0) {
+	if (IRmap.empty()) {
 		return realRoots(tmp, interval, pivoting);
 	} else {
-		return realRoots(tmp, IRmap, interval, pivoting);
+		CARL_LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
+		std::map<Variable, Interval<Number>> varToInterval;
+		UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(tmp, IRmap, varToInterval);
+		CARL_LOG_FUNC("carl.core.rootfinder", "Calling on " << res);
+		return realRoots(res, interval, pivoting);
 	}
 }
 
 template<typename Coeff, typename Number>
-std::list<RealAlgebraicNumberPtr<Number>> realRoots(
+std::list<RealAlgebraicNumber<Number>> realRoots(
 		const UnivariatePolynomial<Coeff>& p,
 		const std::list<Variable> variables,
-		const std::list<RealAlgebraicNumberPtr<Number>> values,
+		const std::list<RealAlgebraicNumber<Number>> values,
 		const Interval<Number>& interval,
 		SplittingStrategy pivoting
 ) {
-	std::map<Variable, RealAlgebraicNumberPtr<Number>> m;
+	std::map<Variable, RealAlgebraicNumber<Number>> m;
 	
 	assert(variables.size() == values.size());
 	auto varit = variables.begin();
@@ -71,19 +75,6 @@ std::list<RealAlgebraicNumberPtr<Number>> realRoots(
 		valit++;
 	}
 	return realRoots(p, m, interval, pivoting);
-}
-
-template<typename Coeff, typename Number>
-std::list<RealAlgebraicNumberPtr<Number>> realRoots(
-		UnivariatePolynomial<Coeff>& p,
-		const std::map<Variable, RealAlgebraicNumberIRPtr<Number>>& m,
-		const Interval<Number>& interval,
-		SplittingStrategy pivoting
-) {
-	CARL_LOG_FUNC("carl.core.rootfinder", p << " in " << p.mainVar() << ", " << m << ", " << interval);
-	std::map<Variable, Interval<Number>> varToInterval;
-	UnivariatePolynomial<Number> res = RealAlgebraicNumberEvaluation::evaluateCoefficients(p, m, varToInterval);
-	return realRoots(res, interval, pivoting);
 }
 
 }

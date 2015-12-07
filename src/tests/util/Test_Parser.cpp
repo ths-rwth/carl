@@ -67,5 +67,19 @@ TEST(Parser, Formula)
 
     FT result = parser.formula("(O4853 IMPLIES (O3838 AND ((((((((O4848) OR (O4851)) OR (O4849)) OR (O4850)) OR (O6262)) OR (O6285)) OR (O6217)) OR (O8504)) AND (NOT O8665)))");
     std::cout << result << std::endl;
-    EXPECT_EQ(FT(IMPLIES, FT(b1), FT(AND, FT(b2), FT(OR, FT(OR, FT(b3), FT(b4)), FT(OR, FT(b5), FT(b6), FT(b7)), FT(OR, FT(b8), FT(b9), FT(b10))), FT(NOT, FT(b11)))), result);
+    EXPECT_EQ(
+		FT(IMPLIES, {
+			FT(b1),
+			FT(AND, {
+				FT(b2),
+				FT(OR, {
+					FT(OR, {FT(b3), FT(b4)}),
+					FT(OR, {FT(b5), FT(b6), FT(b7)}),
+					FT(OR, {FT(b8), FT(b9), FT(b10)})
+				}),
+				FT(NOT, FT(b11))
+			})
+		}),
+		result
+	);
 }

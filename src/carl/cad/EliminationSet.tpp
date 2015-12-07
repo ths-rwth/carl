@@ -133,7 +133,7 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		InputIterator first,
 		InputIterator last,
 		const std::list<UPolynomial*>& parents,
-		bool avoidSingle 
+		bool avoidSingle
 		)
 {
 	std::list<UPolynomial*> inserted;
@@ -184,7 +184,7 @@ bool EliminationSet<Coefficient>::insertAmend(EliminationSet<Coefficient>& s) {
 template<typename Coefficient>
 size_t EliminationSet<Coefficient>::erase(const UPolynomial* p) {
 	if (p == nullptr) return 0;
-	
+
 	// remove the child for each parent from the children mapping
 	for (auto i:  this->parentsPerChild[p]) {
 		if (i.first != nullptr) this->childrenPerParent[i.first].erase( p );
@@ -194,7 +194,7 @@ size_t EliminationSet<Coefficient>::erase(const UPolynomial* p) {
 	this->parentsPerChild.erase(p);
 	// remove from lifting and elimination queues
 	auto queuePosition = std::lower_bound(this->mLiftingQueue.begin(), this->mLiftingQueue.end(), p, this->liftingOrder);
-	
+
 	if (queuePosition != this->mLiftingQueue.end() && *queuePosition == p ) {
 		this->mLiftingQueue.erase(queuePosition);
 	}
@@ -332,7 +332,8 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		// (1) elimination with existing polynomials
 		for (auto pol_it1: this->polynomials) {
 			assert(p->mainVar() == pol_it1->mainVar());
-			eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+			//eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+			project(p, pol_it1, variable, newEliminationPolynomials);
 		}
 		// (2) elimination with polynomial itself @todo: proof that we do not need that
 		// eliminationEq( p, p, variable, newEliminationPolynomials, setting );
@@ -340,21 +341,24 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		// (1) elimination with existing polynomials
 		for (auto pol_it1: this->polynomials) {
 			assert(p->mainVar() == pol_it1->mainVar());
-			elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+			//elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+			project(p, pol_it1, variable, newEliminationPolynomials);
 		}
 		// (2) elimination with polynomial itself @todo: proof that we do not need that
 		// elimination( p, p, variable, newEliminationPolynomials, setting );
-		
+
 	}
 
 	// !PAIRED (single) elimination
 
 	if( setting.equationsOnly ) {
-		eliminationEq( p, variable, newEliminationPolynomials, false );
+		//eliminationEq( p, variable, newEliminationPolynomials, false );
+		project(p, variable, newEliminationPolynomials);
 	} else {
-		elimination( p, variable, newEliminationPolynomials, false );
+		//elimination( p, variable, newEliminationPolynomials, false );
+		project(p, variable, newEliminationPolynomials);
 	}
-	
+
 
 	// optimizations
 	if( setting.simplifyByFactorization )
@@ -431,13 +435,13 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 		if( setting.equationsOnly ) {
 			// (1) elimination with existing polynomials
 			for (auto pol_it1: this->polynomials)
-				eliminationEq( p, pol_it1, variable, newEliminationPolynomials, false );
+				project( p, pol_it1, variable, newEliminationPolynomials);
 			// (2) elimination with polynomial itself @todo: proof that we do not need that
-			// eliminationEq( p, p, variable, newEliminationPolynomials, setting );	
+			// eliminationEq( p, p, variable, newEliminationPolynomials, setting );
 		} else {
 			// (1) elimination with existing polynomials
 			for (auto pol_it1: this->polynomials)
-				elimination( p, pol_it1, variable, newEliminationPolynomials, false );
+				project( p, pol_it1, variable, newEliminationPolynomials);
 			// (2) elimination with polynomial itself @todo: proof that we do not need that
 			// elimination( p, p, variable, newEliminationPolynomials, setting );
 		}
@@ -450,9 +454,9 @@ std::list<const typename EliminationSet<Coefficient>::UPolynomial*> EliminationS
 	{
 		p = mSingleEliminationQueue.front();
 		if (setting.equationsOnly) {
-			eliminationEq( p, variable, newEliminationPolynomials, false );
+			project( p, variable, newEliminationPolynomials );
 		} else {
-			elimination( p, variable, newEliminationPolynomials, false );
+			project( p, variable, newEliminationPolynomials );
 		}
 		mSingleEliminationQueue.pop_front();
 	}
@@ -579,56 +583,6 @@ std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff
 	return os;
 }
 
-template<typename Coeff>
-void EliminationSet<Coeff>::elimination(
-			const UPolynomial* p,
-			Variable::Arg variable,
-			EliminationSet<Coeff>& eliminated,
-			bool avoidSingle
-) {
-	CARL_LOG_FUNC("carl.cad.eliminationset", *p << ", " << variable << ", " << avoidSingle);
-	std::list<const UPolynomial*> parents({p});
-	// add all coefficients of p
-	for (const auto& coeff: p->coefficients()) {
-		if (coeff.isNumber()) continue;
-		eliminated.insert(coeff.toUnivariatePolynomial(variable), parents, avoidSingle);
-		DOT_EDGE("elimination", p, coeff.toUnivariatePolynomial(variable), "label=\"coefficient\"");
-	}
-	// add the discriminant of p, i.e., all resultants of p and p' with normalized leading coefficient
-	eliminated.insert(p->discriminant().switchVariable(variable), parents, avoidSingle);
-	DOT_EDGE("elimination", p, p->discriminant().switchVariable(variable), "label=\"discriminant\"");
-}
-
-template<typename Coeff>
-void EliminationSet<Coeff>::elimination(
-		const UPolynomial* p,
-		const UPolynomial* q,
-		Variable::Arg variable,
-		EliminationSet<Coeff>& eliminated,
-		bool avoidSingle
-) {
-	assert(p->mainVar() == q->mainVar());
-	std::list<const UPolynomial*> parents({p, q});
-	eliminated.insert(p->resultant(*q).switchVariable(variable), parents, avoidSingle);
-	DOT_HYPEREDGE("elimination", std::initializer_list<const UPolynomial*>({p, q}), p->resultant(*q).switchVariable(variable));
-}
-
-#ifdef __VS
-template<typename Coefficient>
-void swap(carl::cad::EliminationSet<Coefficient>& lhs, carl::cad::EliminationSet<Coefficient>& rhs) {
-	using std::swap;
-	std::swap(lhs.polynomials, rhs.polynomials);
-	std::swap(lhs.mLiftingQueue, rhs.mLiftingQueue);
-	std::swap(lhs.mLiftingQueueReset, rhs.mLiftingQueueReset);
-	std::swap(lhs.mSingleEliminationQueue, rhs.mSingleEliminationQueue);
-	std::swap(lhs.mPairedEliminationQueue, rhs.mPairedEliminationQueue);
-	std::swap(lhs.childrenPerParent, rhs.childrenPerParent);
-	std::swap(lhs.parentsPerChild, rhs.parentsPerChild);
-	std::swap(lhs.liftingOrder, rhs.liftingOrder);
-	std::swap(lhs.eliminationOrder, rhs.eliminationOrder);
-	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
-}
-#endif
 }
 }
 

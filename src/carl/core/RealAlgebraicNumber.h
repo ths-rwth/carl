@@ -1,88 +1,129 @@
-/**
- * @file RealAlgebraicNumber.h
- * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
- */
-
 #pragma once
 
+#include <iostream>
 #include <memory>
 
-#include "../util/SFINAE.h"
-#include "../numbers/numbers.h"
-#include "../core/Sign.h"
 #include "UnivariatePolynomial.h"
+#include "../interval/Interval.h"
+#include "../core/Sign.h"
 
 #include "RealAlgebraicNumberSettings.h"
 
 namespace carl {
 
-/**
- * This class is the base for all representations of real algebraic numbers and provides crucial operations such as arithmetic, ordering or sign determination on them.
- */
-/// @todo Add `EnableIf<is_fraction<Number>>` such that gcc does not crash.
 template<typename Number>
 class RealAlgebraicNumber {
-protected:
-	////////////////
-	// Attributes //
-	////////////////
-
-	/**
-	 * flag indicating whether this number represents a root of a polynomial or an intermediate point
-	 */
-	bool mIsRoot;
-	/**
-	 * flag indicating whether this number is representable by a numeric
-	 */
-	bool mIsNumeric;
-	/**
-	 * the exact numeric value of this number if available, otherwise mIsNumeric is false and mValue 0
-	 */
-	Number mValue;
-
 private:
-	std::weak_ptr<RealAlgebraicNumber> pThis;
-	std::shared_ptr<RealAlgebraicNumber> thisPtr() const {
-		return std::shared_ptr<RealAlgebraicNumber>(this->pThis);
+	friend std::hash<RealAlgebraicNumber<Number>>;
+	using Polynomial = UnivariatePolynomial<Number>;
+	struct IntervalContent {
+		Polynomial polynomial;
+		Interval<Number> interval;
+		std::list<Polynomial> sturmSequence;
+		std::size_t refinementCount;
+		
+		IntervalContent(
+			const Polynomial& p,
+			const Interval<Number> i
+		):
+			polynomial(p),
+			interval(i),
+			sturmSequence(p.standardSturmSequence()),
+			refinementCount(0)
+		{}
+		
+		IntervalContent(
+			const Polynomial& p,
+			const Interval<Number> i,
+			const std::list<UnivariatePolynomial<Number>>& seq
+		):
+			polynomial(p),
+			interval(i),
+			sturmSequence(seq),
+			refinementCount(0)
+		{}
+			
+		/** Refines the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
+		 * @param n
+		 * @rcomplexity constant
+		 * @scomplexity constant
+		 * @return true, if n is the exact numeric representation of this root, otherwise false
+		 */
+		bool refineAvoiding(const Number& n, const RealAlgebraicNumber<Number>& parent);
+	};
+	
+	mutable Number mValue;
+	bool mIsRoot;
+	mutable std::shared_ptr<IntervalContent> mIR;
+	
+	void checkForSimplification() const {
+		if (mIR && mIR->interval.isPointInterval()) {
+			switchToNR(mIR->interval.lower());
+		}
 	}
-
-protected:
-	//////////////////////////
-	// Con- and destructors //
-	//////////////////////////
-
-	/**
-	 * Constructs a real algebraic number with a specified marking as to whether this number stems from a real root computation or not.
-	 * @param isRoot true marks this real algebraic number to stem from a root computation
-	 * @param isNumeric true marks this real algebraic number to be representable as an exact numeric (standard is false)
-	 * @param value the exact numeric value of this number if available, otherwise mIsNumeric is false and mValue 0
-	 */
-	RealAlgebraicNumber(bool isRoot, bool isNumeric = false, const Number& value = 0) :
-			mIsRoot(isRoot),
-			mIsNumeric(isNumeric),
-			mValue(value)
-	{
+	
+	void switchToNR(const Number& n) const {
+		assert(mIR);
+		mIR->interval = Interval<Number>(n);
+		mValue = n;
+		mIR.reset();
 	}
+	
 public:
-	/**
-	 * Destructor.
-	 */
-	virtual ~RealAlgebraicNumber() {
+	RealAlgebraicNumber():
+		mValue(carl::constant_zero<Number>::get()),
+		mIsRoot(true)
+	{}
+	explicit RealAlgebraicNumber(const Number& n, bool isRoot = true):
+		mValue(n),
+		mIsRoot(isRoot)
+	{}
+	explicit RealAlgebraicNumber(Variable::Arg var, bool isRoot = true):
+		mValue(carl::constant_zero<Number>::get()),
+		mIsRoot(isRoot),
+		mIR(std::make_shared<IntervalContent>(Polynomial(var), Interval<Number>::zeroInterval()))
+	{}
+	explicit RealAlgebraicNumber(const Polynomial& p, const Interval<Number>& i, bool isRoot = true):
+		mValue(carl::constant_zero<Number>::get()),
+		mIsRoot(isRoot),
+		mIR(std::make_shared<IntervalContent>(p.normalized(), i))
+	{
+		assert(!mIR->polynomial.isZero() && mIR->polynomial.degree() > 0);
+		assert(i.isOpenInterval() || i.isPointInterval());
+		assert(p.countRealRoots(i) == 1);
+		if (mIR->polynomial.degree() == 1) {
+			Number a = mIR->polynomial.coefficients()[1];
+			Number b = mIR->polynomial.coefficients()[0];
+			switchToNR(-b / a);
+		} else {
+			if (i.contains(0)) mIR->refineAvoiding(0, *this);
+		}
 	}
-
-	static std::shared_ptr<RealAlgebraicNumber> create(bool isRoot, bool isNumeric = false, const Number& value = 0) {
-		auto res = std::shared_ptr<RealAlgebraicNumber>(new RealAlgebraicNumber(isRoot, isNumeric, value));
-		res->pThis = res;
-		return res;
+		
+	RealAlgebraicNumber(const RealAlgebraicNumber& ran):
+		mValue(ran.mValue),
+		mIsRoot(ran.mIsRoot),
+		mIR(ran.mIR)
+	{}
+	RealAlgebraicNumber(RealAlgebraicNumber&& ran):
+		mValue(std::move(ran.mValue)),
+		mIsRoot(ran.mIsRoot),
+		mIR(std::move(ran.mIR))
+	{}
+		
+	RealAlgebraicNumber& operator=(const RealAlgebraicNumber& n) {
+		mValue = n.mValue;
+		mIsRoot = n.mIsRoot;
+		mIR = n.mIR;
+		return *this;
 	}
-
-	virtual std::shared_ptr<RealAlgebraicNumber<Number>> clone() const {
-		return RealAlgebraicNumber<Number>::create(isRoot(), isNumeric(), value());
+	RealAlgebraicNumber& operator=(RealAlgebraicNumber&& n) {
+		mValue = std::move(n.mValue);
+		mIsRoot = n.mIsRoot;
+		mIR = std::move(n.mIR);
+		return *this;
 	}
-
-	///////////////
-	// Selectors //
-	///////////////
+	
 	/**
 	 * @return the flag marking whether the real algebraic number stems from a root computation or not
 	 */
@@ -97,121 +138,148 @@ public:
 	void setIsRoot(bool isRoot) {
 		mIsRoot = isRoot;
 	}
-
-	/**
-	 * Returns true if the number is exactly zero.
-	 * @return true if an exact numeric representation was found during the refinements, false otherwise.
-	 */
-	virtual bool isZero() const {
-		return this->value() == 0;
-	}
-
-	/**
-	 * Returns true if an exact numeric representation was found during the refinements.
-	 * 
-	 * If the return value is false, this guarantees that this object is an instance of RealAlgebraicNumberIR.
-	 * @return true if an exact numeric representation was found during the refinements, false otherwise.
-	 */
-	bool isNumeric() const {
-		return mIsNumeric;
-	}
-
-	/**
-	 * Returns true if the number is represented numericly, that means not as an interval.
-	 * 
-	 * @return 
-	 */
-	virtual bool isNumericRepresentation() const {
-		return true;
-	}
-
-	/**
-	 * Returns a point that is suitable for splitting during branch and bound when searching for integer solutions.
-	 * If this number is numeric, it returns the same as value().
-	 * If this number is represented by an interval, it returns some value from this interval that is not integral.
-	 * Thus, if the result of this method is integral, an integral value has been found and otherwise, branching at the returned point guarantees progress.
-	 * @return a suitable branching point.
-	 */
-	virtual Number branchingPoint() {
-		return this->value();
-	}
-
-	/** Gives an exact numeric representation of this real algebraic number which could have been found during the refinement steps.
-	 * The method returns 0 if the value was never set during refinement.
-	 * @return an exact numeric representation of this real algebraic number which could have been found during the refinement steps
-	 */
-	const Number& value() const {
-		return mValue;
-	}
-
-	virtual bool containedIn(const Interval<Number>& i) {
-		return i.contains(this->value());
-	}
-
-	/**
-	 * Checks if the represented value is integral.
-	 * @return If this is integral.
-	 */
-	virtual bool isIntegral() {
-		return carl::isInteger(mValue);
-	}
-
-	////////////////
-	// Operations //
-	////////////////
-
-	/**
-	 * Returns sign (GiNaC::ZERO_SIGN, GiNaC::POSITIVE_SIGN, GiNaC::NEGATIVE_SIGN) of this real algebraic number.
-	 * @return sign of this real algebraic number.
-	 */
-	virtual Sign sgn() const {
-		if (this->value() == 0) return Sign::ZERO;
-		else if (this->value() > 0) return Sign::POSITIVE;
-		else return Sign::NEGATIVE;
-	}
-
-	/**
-	 * Returns sign (GiNaC::ZERO_SIGN, GiNaC::POSITIVE_SIGN, GiNaC::NEGATIVE_SIGN) of the specified univariate polynomial at this real algebraic number.
-	 * @param p rational univariate polynomial
-	 * @return sign of the univariate polynomial at this real algebraic number.
-	 */
-	virtual Sign sgn(const UnivariatePolynomial<Number>& p) const {
-		Number x = p.evaluate(this->value());
-		if (x == 0) return Sign::ZERO;
-		else if (x > 0) return Sign::POSITIVE;
-		else return Sign::NEGATIVE;
-	}
-
-	/** Computes a numeric value for this real algebraic number approximating it.
-	 * @complexity constant
-	 * @return a numeric value for this real algebraic number approximating it
-	 */
-	virtual const Number approximateValue() const {
-		return this->value();
+	
+	bool isZero() const {
+		if (isNumeric()) return carl::isZero(mValue);
+		else return mIR->interval.isZero();
 	}
 	
+	bool isNumeric() const {
+		checkForSimplification();
+		return !mIR;
+	}
+	
+	bool isIntegral() const;
+	
+	Number branchingPoint() const {
+		if (isNumeric()) return mValue;
+		else return mIR->interval.sample();
+	}
+	
+	const Number& value() const {
+		assert(isNumeric());
+		return mValue;
+	}
+	
+	std::size_t getRefinementCount() const {
+		assert(!isNumeric());
+		return mIR->refinementCount;
+	}
+	const Interval<Number>& getInterval() const {
+		assert(!isNumeric());
+		return mIR->interval;
+	}
+	const Number& lower() const {
+		return getInterval().lower();
+	}
+	const Number& upper() const {
+		return getInterval().upper();
+	}
+	const Polynomial& getPolynomial() const {
+		assert(!isNumeric());
+		return mIR->polynomial;
+	}
+	
+	Sign sgn() const {
+		if (isNumeric()) {
+			return carl::sgn(mValue);
+		} else {
+			return mIR->interval.sgn();
+		}
+	}
+	
+	Sign sgn(const Polynomial& p) const {
+		if (isNumeric()) {
+			return carl::sgn(p.evaluate(mValue));
+		} else {
+			if (mIR->polynomial == p) return Sign::ZERO;
+			auto seq = mIR->polynomial.standardSturmSequence(mIR->polynomial.derivative() * p);
+			int variations = Polynomial::countRealRoots(seq, mIR->interval);
+			assert((variations == -1) || (variations == 0) || (variations == 1));
+			switch (variations) {
+				case -1: return Sign::NEGATIVE;
+				case 0: return Sign::ZERO;
+				case 1: return Sign::POSITIVE;
+			}
+			CARL_LOG_ERROR("carl.ran", "Unexpected number of variations, should be -1, 0, 1 but was " << variations);
+			return Sign::ZERO;
+		}
+	}
+	
+	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
+		if (isNumeric()) return p.countRealRoots(value()) == 1;
+		else return p.countRealRoots(getInterval()) == 1;
+	}
+	
+	bool containedIn(const Interval<Number>& i) const {
+		if (isNumeric()) return i.contains(mValue);
+		else {
+			if (getInterval().contains(i.lower())) {
+				mIR->refineAvoiding(i.lower(), *this);
+				if (isNumeric()) return i.contains(mValue);
+			}
+			if (getInterval().contains(i.upper())) {
+				mIR->refineAvoiding(i.upper(), *this);
+				if (isNumeric()) return i.contains(mValue);
+			}
+			return i.contains(mIR->interval);
+		}
+	}
+	
+	bool refineAvoiding(const Number& n) const {
+		assert(!isNumeric());
+		return mIR->refineAvoiding(n, *this);
+	}
+	void refine(RealAlgebraicNumberSettings::RefinementStrategy strategy = RealAlgebraicNumberSettings::RefinementStrategy::DEFAULT) const;
+	/// Refines until the number is either numeric or the interval does not contain any integer.
+	void refineToIntegrality() const {
+		while (!isNumeric() && mIR->interval.containsInteger()) {
+			refine();
+		}
+	}
+	
+	bool equal(const RealAlgebraicNumber<Number>& n) const;
+	bool less(const RealAlgebraicNumber<Number>& n) const;
+	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
+	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
+	
 	template<typename Num>
-	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>* g);
+	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
+		if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
+		else return os << "(IR " << ran.getInterval() << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+	}
 };
 
 template<typename Number>
-using RealAlgebraicNumberPtr = std::shared_ptr<RealAlgebraicNumber<Number>>;
+inline RealAlgebraicNumber<Number> operator+(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return RealAlgebraicNumber<Number>(lhs.value() + rhs.value());
 }
-
-#include "RealAlgebraicNumberIR.h"
-#include "RealAlgebraicNumberNR.h"
-#include "RealAlgebraicNumberOperations.h"
-
-namespace carl {
 
 template<typename Number>
-std::ostream& operator<<(std::ostream& os, const carl::RealAlgebraicNumber<Number>* g) {
-	if (g == nullptr) return os << "nullptr";
-	if (g->isNumericRepresentation()) {
-		return os << static_cast<const carl::RealAlgebraicNumberNR<Number>*>(g);
-	} else {
-		return os << static_cast<const carl::RealAlgebraicNumberIR<Number>*>(g);
-	}
+inline bool operator==(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return lhs.equal(rhs);
+}
+template<typename Number>
+inline bool operator<(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return lhs.less(rhs);
 }
 
 }
+
+namespace std {
+	
+	template<typename Number>
+	struct hash<carl::RealAlgebraicNumber<Number>> {
+		std::size_t operator()(const carl::RealAlgebraicNumber<Number>& n) const {
+			if (n.isNumeric()) {
+				return carl::hash_all(true, n.mIsRoot, n.mValue);
+			} else {
+				return carl::hash_all(false, n.mIsRoot, n.mIR);
+			}
+		}
+	};
+	
+}
+
+#include "RealAlgebraicNumberOperations.h"
+#include "RealAlgebraicNumber.tpp"

@@ -677,8 +677,8 @@ namespace carl
 #else
 				if (mpContent->mType == FormulaType::CONSTRAINT) return mpContent->mConstraint.isBound();
 				if (mpContent->mType == FormulaType::NOT) {
-					if (mpContent->mType != FormulaType::CONSTRAINT) return false;
-					return mpContent->mConstraint.relation() != Relation::EQ;
+					if (mpContent->mSubformula.mpContent->mType != FormulaType::CONSTRAINT) return false;
+					return mpContent->mSubformula.mpContent->mConstraint.isBound(true);
 				}
 #endif
 

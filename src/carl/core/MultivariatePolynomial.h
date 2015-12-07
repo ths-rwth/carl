@@ -363,6 +363,14 @@ public:
 	MultivariatePolynomial& stripLT();
     
     /**
+     * @return true, if this polynomial consists just of one variable (with coefficient 1). 
+     */
+    bool isVariable() const
+    {
+        return totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
+    }
+    
+    /**
      * For terms with exactly one variable, get this variable.
      * @return The only variable occuring in the term.
      */

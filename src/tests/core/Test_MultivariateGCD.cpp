@@ -19,13 +19,9 @@ typedef mpq_class Rational;
 
 TEST(MultivariateGCD, test1)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
+    Variable y = freshRealVariable("y");
+    Variable z = freshRealVariable("z");
     typedef MultivariatePolynomial<Rational> P;
     P f1({(Rational)1*x*x*x*y*y, (Rational)-1*x*x*y*y*y, (Rational)1*x*y});
     P g1({(Rational)1*x*x*x*x*y, (Rational)3*x*y*y});
@@ -49,4 +45,8 @@ TEST(MultivariateGCD, test1)
 //    EXPECT_EQ((unsigned)2,result.size());
 //    std::cout << result.front() << std::endl;
 //    std::cout << result.back() << std::endl;
+    
+    P h1({(Rational)1*x*y});
+    P h2({(Rational)1*y});
+    EXPECT_EQ( carl::gcd( h1, h2 ), h2 );
 }

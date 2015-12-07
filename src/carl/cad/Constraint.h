@@ -108,14 +108,15 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
+	bool satisfiedBy(const RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
 		assert(_variables.size() == r.dim());
 		
 		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, _variables);
+		CARL_LOG_DEBUG("carl.ran", *this << " evaluates to " << res << " on " << r);
 		if (this->negated) {
-			return res->sgn() != this->sign;
+			return res.sgn() != this->sign;
 		} else {
-			return res->sgn() == this->sign;
+			return res.sgn() == this->sign;
 		}
 	}
 

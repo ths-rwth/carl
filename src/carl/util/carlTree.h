@@ -104,6 +104,9 @@ protected:
 			assert(current != MAXINT);
 			return mTree->nodes[current].depth;
 		}
+		bool isRoot() const {
+			return current == 0;
+		}
 		T& operator*() {
 			assert(current != MAXINT);
 			return mTree->nodes[current].data;
@@ -111,6 +114,14 @@ protected:
 		const T& operator*() const {
 			assert(current != MAXINT);
 			return mTree->nodes[current].data;
+		}
+		T* operator->() {
+			assert(current != MAXINT);
+			return &(mTree->nodes[current].data);
+		}
+		T const * operator->() const {
+			assert(current != MAXINT);
+			return &(mTree->nodes[current].data);
 		}
 
 		template<typename I = Iterator>

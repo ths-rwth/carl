@@ -398,9 +398,19 @@ Number Interval<Number>::distance(const Interval<Number>& intervalA)
 }
 
 template<typename Number>
-Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval)
-{
-    return Interval(std::min(interval.lower(), this->lower()),std::max(interval.upper(), this->upper()));
+Interval<Number> Interval<Number>::convexHull(const Interval<Number>& interval) const {
+	if(this->isEmpty())
+		return interval;
+
+	if(interval.isEmpty())
+		return *this;
+
+	BoundType newLowerBound = getStrictestBoundType(this->lowerBoundType(), interval.lowerBoundType());
+	BoundType newUpperBound = getStrictestBoundType(this->upperBoundType(), interval.upperBoundType());
+	Number newLower = interval.lower() < this->lower() ? interval.lower() : this->lower();
+	Number newUpper = interval.upper() > this->upper() ? interval.upper() : this->upper();
+
+    return Interval(newLower, newLowerBound, newUpper, newUpperBound);
 }
 
 /*******************************************************************************
@@ -1649,7 +1659,11 @@ inline const Interval<Number> operator *(const Interval<Number>& lhs, const Inte
 template<typename Number>
 inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs)
 	{
-		return Interval<Number>(lhs * rhs.content().lower(), rhs.lowerBoundType(), lhs * rhs.content().upper(), rhs.upperBoundType());
+		if(lhs < 0) {
+			return Interval<Number>(lhs * rhs.content().upper(), rhs.upperBoundType(), lhs * rhs.content().lower(), rhs.lowerBoundType());
+		} else {
+			return Interval<Number>(lhs * rhs.content().lower(), rhs.lowerBoundType(), lhs * rhs.content().upper(), rhs.upperBoundType());
+		}
 	}
 
 template<typename Number>

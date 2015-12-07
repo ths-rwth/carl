@@ -45,11 +45,11 @@ private:
 	 */
 	mutable std::mutex setNameMutex;
 
-	std::size_t& nextID(const VariableType& vt) {
+	std::size_t& nextID(const VariableType& vt) noexcept {
 		assert((std::size_t)vt < mNextIDs.size());
 		return mNextIDs[(std::size_t)vt];
 	}
-	const std::size_t& nextID(const VariableType& vt) const {
+	const std::size_t& nextID(const VariableType& vt) const noexcept {
 		assert((std::size_t)vt < mNextIDs.size());
 		return mNextIDs[(std::size_t)vt];
 	}
@@ -79,24 +79,13 @@ protected:
 	 */
 	VariablePool();
 
-public:
-
-	/**
-	 * Clears everything already created in this pool.
-	 */
-	void clear()
-    {
-        mVariableNames.clear();
-		mNextIDs.fill(1);
-    }
-
 	/**
 	 * Get a variable which was not used before.
 	 * This method is thread-safe.
 	 * @param type Type for the new variable.
 	 * @return A new variable.
 	 */
-	Variable getFreshVariable(VariableType type = VariableType::VT_REAL);
+	Variable getFreshVariable(VariableType type = VariableType::VT_REAL) noexcept;
 
 	/**
 	 * Get a variable with was not used before and set a name for it.
@@ -107,12 +96,24 @@ public:
 	 */
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
 
+public:
+
+	/**
+	 * Clears everything already created in this pool.
+	 */
+	void clear() noexcept
+    {
+        mVariableNames.clear();
+		mNextIDs.fill(1);
+    }
+
+
 	/**
 	 * Searches in the friendly names list for a variable with the given name.
 	 * @param name The friendly variable name to look for.
 	 * @return The first variable with that friendly name.
 	 */
-	Variable findVariableWithName(const std::string& name) const;
+	Variable findVariableWithName(const std::string& name) const noexcept;
 	/**
 	 * Get a human-readable name for the given variable.
 	 * If the given Variable is Variable::NO_VARIABLE, "NO_VARIABLE" is returned.
@@ -144,37 +145,45 @@ public:
 	 * Returns the number of variables initialized by the pool.
 	 * @return Number of variables.
 	 */
-	std::size_t nrVariables(VariableType type = VariableType::VT_REAL) const {
+	std::size_t nrVariables(VariableType type = VariableType::VT_REAL) const noexcept {
 		return nextID(type) - 1;
 	}
+	friend inline Variable freshVariable(const VariableType& vt) noexcept;
+	friend inline Variable freshVariable(const std::string& name, const VariableType& vt);
 };
 
-inline Variable freshVariable(const VariableType& vt) {
+inline Variable freshVariable(const VariableType& vt) noexcept {
 	return VariablePool::getInstance().getFreshVariable(vt);
 }
 inline Variable freshVariable(const std::string& name, const VariableType& vt) {
 	return VariablePool::getInstance().getFreshVariable(name, vt);
 }
 
-inline Variable freshBooleanVariable() {
+inline Variable freshBitvectorVariable() noexcept {
+	return freshVariable(VariableType::VT_BITVECTOR);
+}
+inline Variable freshBitvectorVariable(const std::string& name) {
+	return freshVariable(name, VariableType::VT_BITVECTOR);
+}
+inline Variable freshBooleanVariable() noexcept {
 	return freshVariable(VariableType::VT_BOOL);
 }
 inline Variable freshBooleanVariable(const std::string& name) {
 	return freshVariable(name, VariableType::VT_BOOL);
 }
-inline Variable freshRealVariable() {
+inline Variable freshRealVariable() noexcept {
 	return freshVariable(VariableType::VT_REAL);
 }
 inline Variable freshRealVariable(const std::string& name) {
 	return freshVariable(name, VariableType::VT_REAL);
 }
-inline Variable freshIntegerVariable() {
+inline Variable freshIntegerVariable() noexcept {
 	return freshVariable(VariableType::VT_INT);
 }
 inline Variable freshIntegerVariable(const std::string& name) {
 	return freshVariable(name, VariableType::VT_INT);
 }
-inline Variable freshUninterpretedVariable() {
+inline Variable freshUninterpretedVariable() noexcept {
 	return freshVariable(VariableType::VT_UNINTERPRETED);
 }
 inline Variable freshUninterpretedVariable(const std::string& name) {
