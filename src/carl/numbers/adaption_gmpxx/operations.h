@@ -118,24 +118,6 @@ inline double toDouble(const mpz_class& n) {
 	return n.get_d();
 }
 
-#ifdef __WIN64
-//TODO matthias: completely use long long instead of long on windows 64bit
-template<typename Integer>
-inline Integer toInt(const mpz_class& n);
-template<>
-inline signed long long int toInt<signed long long int>(const mpz_class& n) {
-	assert(n <= std::numeric_limits<signed long long int>::max());
-	assert(n >= std::numeric_limits<signed long long int>::min());
-	return mpz_get_si(n.get_mpz_t());
-}
-template<>
-inline unsigned long long int toInt<unsigned long long int>(const mpz_class& n) {
-	assert(n <= std::numeric_limits<unsigned long long int>::max());
-	assert(n >= std::numeric_limits<unsigned long long int>::min());
-	return mpz_get_ui(n.get_mpz_t());
-}
-#endif
-
 template<typename Integer>
 inline Integer toInt(const mpz_class& n);
 template<>
@@ -190,10 +172,6 @@ inline unsigned toInt<unsigned>(const mpq_class& n) {
 template<>
 inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
 	return toInt<unsigned long int>(toInt<mpz_class>(n));
-}
-template<>
-inline unsigned long long int toInt<unsigned long long int>(const mpq_class& n) {
-	return toInt<unsigned long long int>(toInt<mpz_class>(n));
 }
 template<>
 inline int toInt<int>(const mpq_class& n) {
