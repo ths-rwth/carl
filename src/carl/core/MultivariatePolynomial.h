@@ -367,7 +367,7 @@ public:
      */
     bool isVariable() const
     {
-        return totalDegree() == 1 && nrTerms() == 1 && lterm() == constant_one<CoeffType>::get();
+        return totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
     }
     
     /**
@@ -376,7 +376,7 @@ public:
      */
     Variable::Arg getSingleVariable() const
     {
-        assert( !isVariable() );
+        assert( !isConstant() );
         return lterm().getSingleVariable();
     }
     
