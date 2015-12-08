@@ -373,7 +373,9 @@ cad::Answer CAD<Number>::check(
 	bool checkBounds)
 {
 	assert(this->sampleTree.isConsistent());
-	mConstraints = _constraints;
+	this->prepareElimination();
+	assert(this->sampleTree.isConsistent());
+	mConstraints.set(_constraints, mVariables);
     #ifdef LOGGING_CARL
 	CARL_LOG_DEBUG("carl.cad", "Checking the system");
 	for (const auto& c: mConstraints) CARL_LOG_DEBUG("carl.cad", "  " << c);
@@ -432,10 +434,8 @@ cad::Answer CAD<Number>::check(
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
-					CARL_LOG_FATAL("carl.cad", "Exiting. Why?");
-					exit(123);
-					//std::swap(mConstraints.back(), constraint);
 					conflictGraph = cad::ConflictGraph<Number>();
+					conflictGraph.
 					return cad::Answer::False;
 				}
 				// else: no additional check is needed!
@@ -472,10 +472,6 @@ cad::Answer CAD<Number>::check(
 
 	//////////////////////
 	// Main check procedure
-
-	assert(this->sampleTree.isConsistent());
-	this->prepareElimination();
-	assert(this->sampleTree.isConsistent());
 
 	std::vector<std::pair<const UPolynomial*, const UPolynomial*>> boundPolynomials(mVariables.size(), std::pair<UPolynomial*, UPolynomial*>());
 	CARL_LOG_TRACE("carl.cad", "Creating boundPolynomials of size " << mVariables.size());
@@ -1350,6 +1346,22 @@ cad::Answer CAD<Number>::baseLiftCheck(
 }
 
 template<typename Number>
+cad::Answer CAD<Number>::partialLiftCheck(
+		sampleIterator node,
+		cad::ConflictGraph<Number>& conflictGraph
+) {
+	std::vector<RealAlgebraicNumber<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+	sample.pop_back();
+	RealAlgebraicPoint<Number> t(std::move(sample));
+	if ((this->setting.computeConflictGraph && mConstraints.satisfiedPartiallyBy(t, getVariables(), conflictGraph)) ||
+		(!this->setting.computeConflictGraph && mConstraints.satisfiedPartiallyBy(t, getVariables()))) {
+		return cad::Answer::True;
+	}
+	CARL_LOG_DEBUG("carl.cad", "Early abort for sample " << t);
+	return cad::Answer::False;
+}
+
+template<typename Number>
 cad::Answer CAD<Number>::liftCheck(
 		sampleIterator node,
 		std::size_t openVariableCount,
@@ -1370,6 +1382,7 @@ cad::Answer CAD<Number>::liftCheck(
 	CARL_LOG_FUNC("carl.cad", *node << ", " << openVariableCount);
 	CARL_LOG_DEBUG("carl.cad", "Lifting " << std::vector<RealAlgebraicNumber<Number>>(sampleTree.begin_path(node), sampleTree.end_path()) << " on " << std::endl << sampleTree);
 	assert(this->sampleTree.is_valid(node));
+
 	if (checkBounds && boundsActive && (!node.isRoot())) {
 		// bounds shall be checked and the level is non-empty
 		// level should be non-empty
@@ -1382,6 +1395,9 @@ cad::Answer CAD<Number>::liftCheck(
 			}
 		}
 	}
+	
+	//auto partialAnswer = partialLiftCheck(node, conflictGraph);
+	//if (partialAnswer == cad::Answer::False) return partialAnswer;
 	
 	if (!node.isRoot()) {
 		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
@@ -1797,90 +1813,11 @@ void CAD<Number>::shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number
 }
 
 template<typename Number>
-void CAD<Number>::trimVariables() {
-	// tree is build upside down, depth is max_level - level + 1
-	int depth = this->variables.size();
-	int maxDepth = this->sampleTree.max_depth();
-	// variables and elimination levels should always match
-	assert(depth == this->eliminationSets.size());
-	if (this->variables.empty()) return;
-
-	// simultaneously remove elimination sets, variables and samples
-	auto variable = this->variables.begin();
-	for (auto eliminationSet = this->eliminationSets.begin(); eliminationSet != this->eliminationSets.end(); eliminationSet++) {
-		if (eliminationSet->empty()) {
-			/* In this level, *variable would have to be eliminated, but the level is empty (and not empty just because of certain bounds).
-			 * Thus, there is no polynomial in further levels claiming this variable.
-			 */
-			if (eliminationSet != this->eliminationSets.begin()) {
-				// check whether no previous elimination level claims the variable
-				bool foundVariable = false;
-				for (auto previous = eliminationSet-1; previous != this->eliminationSets.begin(); --previous) {
-					for (const auto& p: previous) {
-						if (p->has(*variable)) {
-							foundVariable = true;
-							break;
-						}
-					}
-					if (foundVariable) break;
-				}
-				if (foundVariable) {
-					eliminationSet++;
-					continue;
-				}
-				// else: can safely remove the variable since it is not present in previous levels
-			}
-			// else: can safely remove the topmost variable
-
-			eliminationSet = this->eliminationSets.erase(eliminationSet);
-			variable = this->variables.erase(variable);
-			if (depth <= maxDepth) {
-				// remove the complete layer of samples from the sample tree at the given depth
-				// fix the iterators to be deleted in a separate list independent of merging with the children
-				std::queue<sampleIterator> toDelete;
-				for (auto node = this->sampleTree.begin_fixed(this->sampleTree.begin(), depth); this->sampleTree.is_valid(node) && depth == this->sampleTree.depth(node); node = this->sampleTree.next_at_same_depth(node)) {
-					toDelete.push(node);
-				}
-				while (!toDelete.empty()) {
-					// move all children of every node to be deleted, to the current level in a sorted manner, including the subtrees
-					auto node = toDelete.front();
-					auto parent = this->sampleTree.parent(node);
-					for (auto child = this->sampleTree.begin(node); child != this->sampleTree.end(node); child++) {
-						auto newNode = std::lower_bound(this->sampleTree.begin(parent), this->sampleTree.end(parent), *child);
-						if (newNode == this->sampleTree.end(parent)) {
-							// the child is not contained in the siblings nor any child is greater than it
-							this->sampleTree.append_child(parent, child);
-						} else {
-							// newNode is a sibling being greater than child or newNode == node or RealAlgebraicNumberFactory::equal( *newNode, *child )
-							// makes sure that newNode does not occur as node in the future
-							this->sampleTree.insert_subtree(newNode, child);
-						}
-						/* Remark:
-						 * The current implementation permits several equal nodes as children of a node. This is semantically equivalent to
-						 * merging the subtrees of equal nodes recursively.
-						 * Approach for merging: reparent the child's children, sort the new children, unify them and proceed with reparenting recursively.
-						 *
-						 */
-					}
-					this->sampleTree.erase(node);
-					toDelete.pop();
-				}
-			}
-		} else {
-			eliminationSet++;
-			variable++;
-		}
-		depth--;
-	}
-}
-
-template<typename Number>
 bool CAD<Number>::vanishesInBox(const UPolynomial* p, const BoundMap& box, std::size_t level, bool recuperate) {
 	cad::CADSettings boxSetting = cad::CADSettings::getSettings();
 	boxSetting.simplifyEliminationByBounds = false; // would cause recursion in vanishesInBox
 	boxSetting.earlyLiftingPruningByBounds = true; // important for efficiency
 	boxSetting.simplifyByRootcounting = false; // too much overhead
-	boxSetting.trimVariables = false; // not needed for nothing is removed
 	boxSetting.simplifyByFactorization = true; // mandatory for a square-free basis
 	boxSetting.preSolveByBounds = true; // important for efficiency
 	boxSetting.computeConflictGraph = false; // too much overhead and not needed

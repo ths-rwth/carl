@@ -683,7 +683,7 @@ public:
 	 */
 	template<typename Iterator>
 	bool is_leaf(const Iterator& it) const {
-		return it.current->firstChild == MAXINT;
+		return nodes[it.current].firstChild == MAXINT;
 	}
 	/**
 	 * Check if the given element is a leftmost child.
