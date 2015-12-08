@@ -24,10 +24,22 @@
 		_Pragma("clang diagnostic pop")
 #elif __GNUC__
 	#define __GCC
-	
+
+	#define CLANG_WARNING_DISABLE(warning)
+	#define CLANG_WARNING_RESET
+#elif _MSC_VER
+	#define __VS
+
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
 #else
 	#warning "You are using an unsupported compiler."
 	#define __UNSUPPORTED
+#endif
+
+#ifdef _WIN32
+	#define __WIN
+	#ifdef _WIN64
+	#define __WIN64
+	#endif
 #endif

@@ -363,6 +363,14 @@ public:
 	MultivariatePolynomial& stripLT();
     
     /**
+     * @return true, if this polynomial consists just of one variable (with coefficient 1). 
+     */
+    bool isVariable() const
+    {
+        return totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
+    }
+    
+    /**
      * For terms with exactly one variable, get this variable.
      * @return The only variable occuring in the term.
      */
@@ -1238,9 +1246,9 @@ public:
 	}
 
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	inline const MultivariatePolynomial<C, O, P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, O, P>& rhs);
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	inline const MultivariatePolynomial<C, O, P> operator*(const MultivariatePolynomial<C, O, P>& lhs, const UnivariatePolynomial<C>& rhs);
 	/// @}
     
     /// @name Division operators

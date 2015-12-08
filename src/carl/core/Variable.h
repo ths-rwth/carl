@@ -190,16 +190,16 @@ public:
 	/// @}
 
 	/// Number of bits available for the content.
-	static constexpr unsigned BITSIZE = CHAR_BIT * sizeof(mContent);
+	static const unsigned BITSIZE = CHAR_BIT * sizeof(size_t); //mContent has type size_t
 	/// Number of bits reserved for the type.
-	static constexpr unsigned RESERVED_FOR_TYPE = 3;
+	static const unsigned RESERVED_FOR_TYPE = 3;
 	/// Number of bits reserved for the rank.
-	static constexpr unsigned RESERVED_FOR_RANK = 4;
+	static const unsigned RESERVED_FOR_RANK = 4;
 	/// Overall number of bits reserved.
-	static constexpr unsigned RESERVED = RESERVED_FOR_RANK + RESERVED_FOR_TYPE;
+	static const unsigned RESERVED = RESERVED_FOR_RANK + RESERVED_FOR_TYPE;
 	static_assert(RESERVED < BITSIZE, "Too many bits reserved for special use.");
 	/// Number of bits available for the id.
-	static constexpr unsigned AVAILABLE = BITSIZE - RESERVED;
+	static const unsigned AVAILABLE = BITSIZE - RESERVED;
 
 	/// Instance of an invalid variable.
 	static const Variable NO_VARIABLE;

@@ -49,7 +49,19 @@ public:
 	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map);
 	MultivariateHorner (const PolynomialType& inPut, const std::map<Variable, Interval<double>>& map, int& counter);
     MultivariateHorner ( const MultivariateHorner& ) = default;
-    MultivariateHorner ( MultivariateHorner&& ) = default;
+#ifdef __VS
+	MultivariateHorner(MultivariateHorner&& multiHorner)
+	{
+		mConst_dependent = multiHorner.mConst_dependent;
+		mConst_independent = multiHorner.mConst_independent;
+		mVariable = multiHorner.mVariable;
+		mExponent = multiHorner.mExponent;
+		mH_dependent = multiHorner.mH_dependent;
+		mH_independent = multiHorner.mH_independent;
+	}
+#else
+	MultivariateHorner ( MultivariateHorner&& ) = default;
+#endif
 //    MultivariateHorner& operator=(MultivariateHorner&& mh) = delete;
 
 

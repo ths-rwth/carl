@@ -169,8 +169,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+#ifdef __VS
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(TermsType&& terms, bool duplicates, bool ordered) :
+#else
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType&& terms, bool duplicates, bool ordered):
-	mTerms(std::move(terms)),
+#endif
+mTerms(std::move(terms)),
 	mOrdered(ordered)
 {
 	if( duplicates ) {
@@ -188,7 +192,11 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered):
+#ifdef __VS
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const TermsType& terms, bool duplicates, bool ordered) :
+#else
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered) :
+#endif
 	mTerms(terms),
 	mOrdered(ordered)
 {
@@ -1515,7 +1523,11 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
 	static std::vector<const C*> coeffs;
+#ifdef __VS
+    coeffs.resize(MonomialPool::getInstance().nextID());
+#else
 	coeffs.reserve(MonomialPool::getInstance().nextID());
+#endif
 	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
 	for (const auto& t: lhs.mTerms) {
 		std::size_t id = 0;

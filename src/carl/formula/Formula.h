@@ -360,7 +360,11 @@ namespace carl
             const Formula& subformula() const
             {
                 assert( mpContent->mType == NOT );
-                return mpContent->mSubformula;
+#ifdef __VS
+                return *mpContent->mpSubformulaVS;
+#else
+				return mpContent->mSubformula;
+#endif
             }
             
             /**
@@ -369,7 +373,11 @@ namespace carl
             const Formula& premise() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mSubformulas[0];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(0);
+#else
+				return mpContent->mSubformulas[0];
+#endif
             }
             
             /**
@@ -378,7 +386,11 @@ namespace carl
             const Formula& conclusion() const
             {
                 assert( mpContent->mType == IMPLIES );
-                return mpContent->mSubformulas[1];
+#ifdef __VS
+                return mpContent->mpSubformulasVS->at(1);
+#else
+				return mpContent->mSubformulas[1];
+#endif
             }
             
             /**
@@ -387,7 +399,11 @@ namespace carl
             const Formula& condition() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mSubformulas[0];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(0);
+#else
+				return mpContent->mSubformulas[0];
+#endif
             }
             
             /**
@@ -396,7 +412,11 @@ namespace carl
             const Formula& firstCase() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mSubformulas[1];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(1);
+#else
+				return mpContent->mSubformulas[1];
+#endif
             }
             
             /**
@@ -405,7 +425,11 @@ namespace carl
             const Formula& secondCase() const
             {
                 assert( mpContent->mType == ITE );
-                return mpContent->mSubformulas[2];
+#ifdef __VS
+				return mpContent->mpSubformulasVS->at(2);
+#else
+				return mpContent->mSubformulas[2];
+#endif
             }
 
             /**
@@ -414,7 +438,11 @@ namespace carl
 			const std::vector<carl::Variable>& quantifiedVariables() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
+#ifdef __VS
+				return mpContent->mpQuantifierContentVS->mVariables;
+#else
 				return mpContent->mQuantifierContent.mVariables;
+#endif
 			}
 
             /**
@@ -423,7 +451,11 @@ namespace carl
 			const Formula& quantifiedFormula() const
 			{
 				assert( mpContent->mType == FormulaType::EXISTS || mpContent->mType == FormulaType::FORALL );
+#ifdef __VS
+				return mpContent->mpQuantifierContentVS->mFormula;
+#else
 				return mpContent->mQuantifierContent.mFormula;
+#endif
 			}
 
             /**
@@ -433,7 +465,11 @@ namespace carl
             const Formulas<Pol>& subformulas() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas;
+#ifdef __VS
+                return *mpContent->mpSubformulasVS;
+#else
+				return mpContent->mSubformulas;
+#endif
             }
 
             /**
@@ -443,13 +479,21 @@ namespace carl
             const Constraint<Pol>& constraint() const
             {
                 assert( mpContent->mType == FormulaType::CONSTRAINT || mpContent->mType == FormulaType::TRUE || mpContent->mType == FormulaType::FALSE );
-                return mpContent->mConstraint;
+#ifdef __VS
+		return *mpContent->mpConstraintVS;
+#else
+		return mpContent->mConstraint;
+#endif
             }
             
             const BVConstraint& bvConstraint() const
             {
                 assert( mpContent->mType == FormulaType::BITVECTOR );
-                return mpContent->mBVConstraint;
+#ifdef __VS
+                return *mpContent->mpBVConstraintVS;
+#else
+				return mpContent->mBVConstraint;
+#endif
             }
 
             /**
@@ -459,7 +503,11 @@ namespace carl
             carl::Variable::Arg boolean() const
             {
                 assert( mpContent->mType == FormulaType::BOOL );
-                return mpContent->mVariable;
+#ifdef __VS
+                return *mpContent->mpVariableVS;
+#else
+				return mpContent->mVariable;
+#endif
             }
             
             /**
@@ -469,7 +517,11 @@ namespace carl
             const UEquality& uequality() const
             {
                 assert( mpContent->mType == FormulaType::UEQ );
-                return mpContent->mUIEquality;
+#ifdef __VS
+                return *mpContent->mpUIEqualityVS;
+#else
+				return mpContent->mUIEquality;
+#endif
             }
 
             /**
@@ -482,7 +534,11 @@ namespace carl
                         || mpContent->mType == FormulaType::BITVECTOR )
                     return 1;
                 else
-                    return mpContent->mSubformulas.size();
+#ifdef __VS
+                    return mpContent->mpSubformulasVS->size();
+#else
+					return mpContent->mSubformulas.size();
+#endif
             }
 
             /**
@@ -496,7 +552,11 @@ namespace carl
                         || mpContent->mType == FormulaType::BITVECTOR )
                     return false;
                 else
-                    return mpContent->mSubformulas.empty();
+#ifdef __VS
+                    return mpContent->mpSubformulasVS->empty();
+#else
+					return mpContent->mSubformulas.empty();
+#endif
             }
 
             /**
@@ -505,7 +565,11 @@ namespace carl
             const_iterator begin() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas.begin();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->begin();
+#else
+				return mpContent->mSubformulas.begin();
+#endif
             }
 
             /**
@@ -515,7 +579,11 @@ namespace carl
             {
                 assert( mpContent->mType == FormulaType::AND || mpContent->mType == FormulaType::OR 
                         || mpContent->mType == FormulaType::IFF || mpContent->mType == FormulaType::XOR );
-                return mpContent->mSubformulas.end();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->end();
+#else
+				return mpContent->mSubformulas.end();
+#endif
             }
 
             /**
@@ -524,7 +592,11 @@ namespace carl
             const_reverse_iterator rbegin() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas.rbegin();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->rbegin();
+#else
+				return mpContent->mSubformulas.rbegin();
+#endif
             }
 
             /**
@@ -533,7 +605,11 @@ namespace carl
             const_reverse_iterator rend() const
             {
                 assert( isNary() );
-                return mpContent->mSubformulas.rend();
+#ifdef __VS
+				return mpContent->mpSubformulasVS->rend();
+#else
+				return mpContent->mSubformulas.rend();
+#endif
             }
 
             /**
@@ -542,10 +618,17 @@ namespace carl
             const Formula& back() const
             {
                 assert( isBooleanCombination() );
-                if( mpContent->mType == FormulaType::NOT )
+#ifdef __VS
+				if (mpContent->mType == FormulaType::NOT)
+					return *mpContent->mpSubformulaVS;
+				else
+					return *(--(mpContent->mpSubformulasVS->end()));
+#else
+				if (mpContent->mType == FormulaType::NOT)
                     return mpContent->mSubformula;
-                else
-                    return *(--(mpContent->mSubformulas.end()));
+				else
+					return *(--(mpContent->mSubformulas.end()));
+#endif
             }
             
             /**
@@ -585,11 +668,20 @@ namespace carl
 			
 			bool isBound() const
 			{
+#ifdef __VS
+				if (mpContent->mType == FormulaType::CONSTRAINT) return mpContent->mpConstraintVS->isBound();
+				if (mpContent->mType == FormulaType::NOT) {
+					if (mpContent->mType != FormulaType::CONSTRAINT) return false;
+					return mpContent->mpConstraintVS->relation() != Relation::EQ;
+				}
+#else
 				if (mpContent->mType == FormulaType::CONSTRAINT) return mpContent->mConstraint.isBound();
 				if (mpContent->mType == FormulaType::NOT) {
 					if (mpContent->mSubformula.mpContent->mType != FormulaType::CONSTRAINT) return false;
 					return mpContent->mSubformula.mpContent->mConstraint.isBound(true);
 				}
+#endif
+
 				return false;
 			}
 
@@ -650,9 +742,15 @@ namespace carl
                 if( isAtom() )
                     return false;
                 if( mpContent->mType == FormulaType::NOT )
-                    return mpContent->mSubformula == _formula;
-                else
-                    return std::find(mpContent->mSubformulas.begin(), mpContent->mSubformulas.end(), _formula ) != mpContent->mSubformulas.end();
+#ifdef __VS
+                    return (*mpContent->mpSubformulaVS) == _formula;
+				else
+					return std::find(mpContent->mpSubformulasVS->begin(), mpContent->mpSubformulasVS->end(), _formula) != mpContent->mpSubformulasVS->end();
+#else
+					return mpContent->mSubformula == _formula;
+				else
+					return std::find(mpContent->mSubformulas.begin(), mpContent->mSubformulas.end(), _formula) != mpContent->mSubformulas.end();
+#endif
             }
             
             /**
@@ -661,15 +759,27 @@ namespace carl
              */
             void getConstraints( std::vector<Constraint<Pol>>& _constraints ) const
             {
-                if( mpContent->mType == FormulaType::CONSTRAINT )
-                    _constraints.push_back( mpContent->mConstraint );
+#ifdef __VS
+				if (mpContent->mType == FormulaType::CONSTRAINT)
+					_constraints.push_back(*mpContent->mpConstraintVS);
                 else if( mpContent->mType == FormulaType::NOT )
-                    mpContent->mSubformula.getConstraints( _constraints );
+                    mpContent->mpSubformulaVS->getConstraints( _constraints );
                 else if( isNary() )
                 {
-                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
+                    for( const_iterator subAst = mpContent->mpSubformulasVS->begin(); subAst != mpContent->mpSubformulasVS->end(); ++subAst )
                         subAst->getConstraints( _constraints );
                 }
+#else
+                if (mpContent->mType == FormulaType::CONSTRAINT)
+                    _constraints.push_back(mpContent->mConstraint);
+                else if (mpContent->mType == FormulaType::NOT)
+                    mpContent->mSubformula.getConstraints(_constraints);
+                else if (isNary())
+                {
+                    for (const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst)
+                        subAst->getConstraints(_constraints);
+                }
+#endif
             }
             
             /**
@@ -680,13 +790,23 @@ namespace carl
             {
                 if( mpContent->mType == FormulaType::CONSTRAINT )
                     _constraints.push_back( *this );
+#ifdef __VS
                 else if( mpContent->mType == FormulaType::NOT )
-                    mpContent->mSubformula.getConstraints( _constraints );
+                    mpContent->mpSubformulaVS->getConstraints( _constraints );
                 else if( isNary() )
                 {
-                    for( const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst )
+                    for( const_iterator subAst = mpContent->mpSubformulasVS->begin(); subAst != mpContent->mpSubformulasVS->end(); ++subAst )
                         subAst->getConstraints( _constraints );
                 }
+#else
+				else if (mpContent->mType == FormulaType::NOT)
+					mpContent->mSubformula.getConstraints(_constraints);
+				else if (isNary())
+				{
+					for (const_iterator subAst = mpContent->mSubformulas.begin(); subAst != mpContent->mSubformulas.end(); ++subAst)
+						subAst->getConstraints(_constraints);
+				}
+#endif
             }
 
             /**
@@ -963,8 +1083,7 @@ namespace carl
 		 * @param formula Formula to visit.
 		 * @param func Function to call.
 		 */
-		void visit(const Formula& formula, const std::function<void(Formula)>& func);
-		void rvisit(const Formula& formula, const std::function<void(Formula)>& func);
+		void visitVoid(const Formula& formula, const std::function<void(Formula)>& func);
 		/**
 		 * Recursively calls func on every subformula and return a new formula.
 		 * On every call of func, the passed formula is replaced by the result.
@@ -972,8 +1091,7 @@ namespace carl
 		 * @param func Function to call.
 		 * @return New formula.
 		 */
-		Formula visit(const Formula& formula, const std::function<Formula(Formula)>& func);
-		Formula rvisit(const Formula& formula, const std::function<Formula(Formula)>& func);
+		Formula visitResult(const Formula& formula, const std::function<Formula(Formula)>& func);
 	};
     
     template<typename Formula>

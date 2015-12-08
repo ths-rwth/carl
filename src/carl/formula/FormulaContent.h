@@ -145,24 +145,45 @@ namespace carl {
             /// The content of this formula.
             union
             {
+#ifdef __VS
                 /// The variable, in case this formula wraps a variable.
-                carl::Variable mVariable;
+                carl::Variable* mpVariableVS;
                 /// The polynomial, in case this formula wraps a polynomial.
-                Pol mPolynomial;
+                Pol* mpPolynomialVS;
                 /// The arithmetic constraint over a formula.
-                ArithmeticConstraintContent<Pol> mArithmetic;
+                ArithmeticConstraintContent<Pol>* mpArithmeticVS;
                 /// The constraint, in case this formula wraps a constraint.
-                Constraint<Pol> mConstraint;
+                Constraint<Pol>* mpConstraintVS;
                 /// The bitvector constraint.
-                BVConstraint mBVConstraint;
+                BVConstraint* mpBVConstraintVS;
                 /// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
-                UEquality mUIEquality;
+                UEquality* mpUIEqualityVS;
                 /// The only sub-formula, in case this formula is an negation.
-                Formula<Pol> mSubformula;
+                Formula<Pol>* mpSubformulaVS;
                 /// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
-                Formulas<Pol> mSubformulas;
+                Formulas<Pol>* mpSubformulasVS;
                 /// The quantifed variables and the bound formula, in case this formula is a quantified formula.
-                QuantifierContent<Pol> mQuantifierContent;
+                QuantifierContent<Pol>* mpQuantifierContentVS;
+#else
+				/// The variable, in case this formula wraps a variable.
+				carl::Variable mVariable;
+				/// The polynomial, in case this formula wraps a polynomial.
+				Pol mPolynomial;
+				/// The arithmetic constraint over a formula.
+				ArithmeticConstraintContent<Pol> mArithmetic;
+				/// The constraint, in case this formula wraps a constraint.
+				Constraint<Pol> mConstraint;
+				/// The bitvector constraint.
+				BVConstraint mBVConstraint;
+				/// The uninterpreted equality, in case this formula wraps an uninterpreted equality.
+				UEquality mUIEquality;
+				/// The only sub-formula, in case this formula is an negation.
+				Formula<Pol> mSubformula;
+				/// The subformulas, in case this formula is a n-nary operation as AND, OR, IFF or XOR.
+				Formulas<Pol> mSubformulas;
+				/// The quantifed variables and the bound formula, in case this formula is a quantified formula.
+				QuantifierContent<Pol> mQuantifierContent;
+#endif
             };
             /// The negation
             const FormulaContent<Pol> *mNegation = nullptr;
@@ -262,18 +283,31 @@ namespace carl {
                     case FormulaType::TRUE: break;
                     case FormulaType::FALSE: break;
                     case FormulaType::BOOL: break;
-                    case FormulaType::NOT: { mSubformula.~Formula(); break; }
+#ifdef __VS
+					case FormulaType::NOT: { mpSubformulaVS->~Formula(); break; }
+#else
+					case FormulaType::NOT: { mSubformula.~Formula(); break; }
+#endif
                     case FormulaType::IMPLIES: 
                     case FormulaType::AND: ;
                     case FormulaType::OR: ;
                     case FormulaType::XOR: ;
                     case FormulaType::IFF: ;
-                    case FormulaType::ITE: { mSubformulas.~vector(); break; }
+#ifdef __VS
+					case FormulaType::ITE: { mpSubformulasVS->~vector(); break; }
                     case FormulaType::EXISTS: ;
-                    case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
-                    case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
-                    case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
-                    case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
+					case FormulaType::FORALL: { mpQuantifierContentVS->~QuantifierContent(); break; }
+					case FormulaType::CONSTRAINT: { mpConstraintVS->~Constraint(); break; }
+					case FormulaType::BITVECTOR: { mpBVConstraintVS->~BVConstraint(); break; }
+					case FormulaType::UEQ: { mpUIEqualityVS->~UEquality(); break; }
+#else
+					case FormulaType::ITE: { mSubformulas.~vector(); break; }
+					case FormulaType::EXISTS:;
+					case FormulaType::FORALL: { mQuantifierContent.~QuantifierContent(); break; }
+					case FormulaType::CONSTRAINT: { mConstraint.~Constraint(); break; }
+					case FormulaType::BITVECTOR: { mBVConstraint.~BVConstraint(); break; }
+					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
+#endif
                 }
             }
 

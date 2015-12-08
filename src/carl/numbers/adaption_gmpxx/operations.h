@@ -132,6 +132,7 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
     assert(n >= std::numeric_limits<unsigned long int>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
+
 template<>
 inline int toInt<int>(const mpz_class& n) {
     assert(n <= std::numeric_limits<int>::max());

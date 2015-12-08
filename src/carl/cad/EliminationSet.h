@@ -581,12 +581,17 @@ public:
 	 * @see std::set::swap
 	 */
 	template<typename Coeff>
+#ifdef __VS
+	friend void swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
+#else
 	friend void std::swap(EliminationSet<Coeff>& lhs, EliminationSet<Coeff>& rhs);
+#endif
 };
 
 }
 }
 
+#ifndef __VS
 namespace std {
 /**
  * Swaps two elimination sets.
@@ -596,5 +601,6 @@ namespace std {
 template<typename Coeff>
 void swap(carl::cad::EliminationSet<Coeff>& lhs, carl::cad::EliminationSet<Coeff>& rhs);
 }
+#endif
 
 #include "EliminationSet.tpp"

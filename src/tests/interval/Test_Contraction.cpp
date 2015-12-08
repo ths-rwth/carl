@@ -3,6 +3,7 @@
 #include "carl/core/VariablePool.h"
 #include "carl/interval/IntervalEvaluation.h"
 #include "carl/interval/Contraction.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 
@@ -89,5 +90,4 @@ TEST(Contraction, SimpleNewton)
     EXPECT_EQ(split, false);
 
     EXPECT_EQ(resultA.isEmpty(), true);
-
 }

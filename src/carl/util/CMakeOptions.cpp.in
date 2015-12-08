@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "CMakeOptions.h"
+#include <string>
 
 namespace carl {
 

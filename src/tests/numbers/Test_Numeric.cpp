@@ -1,8 +1,9 @@
 #include "gtest/gtest.h"
 
-#include "../../carl/numbers/numbers.h"
+#include "carl/numbers/numbers.h"
 #include "carl/numbers/Numeric.h"
 #include <bitset>
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 

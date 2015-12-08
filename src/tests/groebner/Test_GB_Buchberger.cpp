@@ -3,6 +3,7 @@
 
 #include "carl/groebner/Ideal.h"
 #include "carl/groebner/groebner.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 
@@ -20,7 +21,6 @@ TEST(GB_Buchberger, T1)
 
     MultivariatePolynomial<Rational> f1({(Rational)1*x*x*x, (Rational)-2*x*y} );
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
-
     MultivariatePolynomial<Rational> F1({(Rational)1*x*x} );
     MultivariatePolynomial<Rational> F2({(Rational)1*y*y, (Rational)-1*(Rational)1/(Rational)2*x} );
     MultivariatePolynomial<Rational> F3({(Rational)1*x*y} );
@@ -53,10 +53,10 @@ TEST(GB_Buchberger, T1_ReasonSets)
     PolynomialWithReasonSet<Rational> f1rs(f1);
     MultivariatePolynomial<Rational> f2({(Rational)1*x*x*y, (Rational)-2*y*y, (Rational)1*x});
     PolynomialWithReasonSet<Rational> f2rs(f2);
-
-    PolynomialWithReasonSet<Rational> F1({(Rational)1*x*x} );
-    PolynomialWithReasonSet<Rational> F2({(Rational)1*y*y, (Rational)-1*(Rational)1/(Rational)2*x} );
-    PolynomialWithReasonSet<Rational> F3({(Rational)1*x*y} );
+    
+    PolynomialWithReasonSet<Rational> F1({ (Rational)1 * x*x });
+    PolynomialWithReasonSet<Rational> F2({ (Rational)1 * y*y, (Rational)-1 * (Rational)1 / (Rational)2 * x });
+    PolynomialWithReasonSet<Rational> F3({ (Rational)1 * x*y });
     GBProcedure<PolynomialWithReasonSet<Rational>, Buchberger, StdAdding> gbobject;
     EXPECT_TRUE(gbobject.inputEmpty());
     gbobject.addPolynomial(f1rs);

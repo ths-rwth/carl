@@ -6,6 +6,7 @@
 #include "carl/numbers/GaloisField.h"
 #include "carl/util/debug.h"
 #include "carl/interval/Interval.h"
+#include "carl/util/platform.h"
 
 #include <random>
 #include <cmath>

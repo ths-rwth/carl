@@ -43,8 +43,8 @@ TEST(Constraint, satisfiedBySqrt)
 	// p1 = x^2 + y^2 - 1
 	UPolynomial p1(x, {MPolynomial({carl::Term<Rational>(y)*y, carl::Term<Rational>(-1)}), MPolynomial(0), MPolynomial(1)});
 
-	carl::UnivariatePolynomial<Rational> px(x, {-1, 0, 2});
-	carl::UnivariatePolynomial<Rational> py(y, {-1, 0, 2});
+	carl::UnivariatePolynomial<Rational> px(x, std::initializer_list<Rational>{-1, 0, 2});
+	carl::UnivariatePolynomial<Rational> py(y, std::initializer_list<Rational>{-1, 0, 2});
 
 	carl::Interval<Rational> i(Rational(11)/16, carl::BoundType::STRICT, Rational(3)/4, carl::BoundType::STRICT);
 

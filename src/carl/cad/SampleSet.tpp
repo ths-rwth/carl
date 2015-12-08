@@ -196,9 +196,18 @@ bool SampleSet<Number>::isConsistent() const {
 	return true;
 }
 
+#ifdef __VS
+template<typename Num>
+void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
+	std::swap(lhs.mSamples, rhs.mSamples);
+	std::swap(lhs.mHeap, rhs.mHeap);
+}
+#endif
+
 }
 }
 
+#ifndef __VS
 namespace std {
 
 template<typename Num>
@@ -208,3 +217,4 @@ void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
 }
 
 }
+#endif

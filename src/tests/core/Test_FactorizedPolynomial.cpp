@@ -2,7 +2,15 @@
 #include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/util/stringparser.h"
-#include <gmpxx.h>
+#include "carl/util/platform.h"
+
+#ifdef __WIN
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
+#else
+	#include <gmpxx.h>
+#endif
 
 #include "../Common.h"
 

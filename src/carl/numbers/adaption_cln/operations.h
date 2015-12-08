@@ -155,10 +155,15 @@ inline long int toInt<long int>(const cln::cl_I& n) {
     assert(n >= std::numeric_limits<long int>::min());
     return cln::cl_I_to_long(n);
 }
+/**
+* Convert a cln integer to an unsigned longint.
+* @param n An integer.
+* @return n as unsigned long int.
+*/
 template<>
-inline std::size_t toInt<std::size_t>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<std::size_t>::max());
-    assert(n >= std::numeric_limits<std::size_t>::min());
+inline unsigned long int toInt<unsigned long int>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<unsigned long int>::max());
+    assert(n >= std::numeric_limits<unsigned long int>::min());
     return cln::cl_I_to_ulong(n);
 }
 

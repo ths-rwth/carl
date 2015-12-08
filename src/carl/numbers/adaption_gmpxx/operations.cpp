@@ -49,7 +49,11 @@ namespace carl
 
         mpq_class lower;
         mpq_class upper;
+#ifdef __WIN64
+		long long unsigned numerator, denominator;
+#else
         long unsigned numerator, denominator;
+#endif
 
         numerator = mpz_get_ui(root_num.__get_mp());
         denominator = mpz_get_ui(root_den.__get_mp());

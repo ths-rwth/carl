@@ -3,6 +3,7 @@
 #include "carl/core/VariablePool.h"
 #include "carl/util/stringparser.h"
 #include "carl/core/FactorizedPolynomial.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 
@@ -266,5 +267,4 @@ TEST(RationalFunction, Derivative)
     RFactFunc r2(fp3, fp2*fp2);
 
 	EXPECT_EQ(r2, r1.derivative(sp.variables().at("x")));
-
 }

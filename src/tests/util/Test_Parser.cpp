@@ -2,6 +2,7 @@
 #include "carl/numbers/numbers.h"
 #include "carl/core/Variable.h"
 #include "carl/util/parser/Parser.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 

@@ -3,6 +3,7 @@
 #include <list>
 
 #include "carl/cad/SampleSet.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 

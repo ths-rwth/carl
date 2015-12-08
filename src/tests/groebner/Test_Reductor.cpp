@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "carl/groebner/Reductor.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 
@@ -48,5 +49,4 @@ TEST(Reductor, Reduction)
     Reductor<MultivariatePolynomial<Rational>, MultivariatePolynomial<Rational>> reductor4(ideal, f4);
     fres = reductor4.fullReduce();
     EXPECT_EQ((Rational)-1 * z, fres);
-
 }

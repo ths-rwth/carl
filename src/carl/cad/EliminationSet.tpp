@@ -586,6 +586,7 @@ std::ostream& operator<<(std::ostream& os, const carl::cad::EliminationSet<Coeff
 }
 }
 
+#ifndef __VS
 namespace std {
 
 template<typename Coefficient>
@@ -602,3 +603,4 @@ void swap(carl::cad::EliminationSet<Coefficient>& lhs, carl::cad::EliminationSet
 	std::swap(lhs.polynomialOwner, rhs.polynomialOwner);
 }
 }
+#endif

@@ -34,9 +34,9 @@ TEST(RealAlgebraicNumber, Evaluation)
 	});
 
 	//UnivariatePolynomial<Rational> px(y, {-3528000, 0, 882000, 0, -74760, 0, 3444, 0, -84, 0, 1});
-	UnivariatePolynomial<Rational> px(y, {-3528000, 0, 882000, 0, -74760, 0, 3444, 0, -84, 0, 1});
+	UnivariatePolynomial<Rational> px(y, std::initializer_list<Rational>{-3528000, 0, 882000, 0, -74760, 0, 3444, 0, -84, 0, 1});
 	Interval<Rational> ix(Rational(2927288666429)/1099511627776, BoundType::STRICT, Rational(1463644333215)/549755813888, BoundType::STRICT);
-	UnivariatePolynomial<Rational> py(y, {-18289152000, 0, 4572288000, 0, -387555840, 0, 18156096, 0, -556416, 0, 11232, 0, -144, 0, 1});
+	UnivariatePolynomial<Rational> py(y, std::initializer_list<Rational>{-18289152000, 0, 4572288000, 0, -387555840, 0, 18156096, 0, -556416, 0, 11232, 0, -144, 0, 1});
 	Interval<Rational> iy(Rational(-147580509)/24822226, BoundType::STRICT, Rational(-73113831)/12411113, BoundType::STRICT);
 
 	std::vector<Variable> vars({y, x});
@@ -60,7 +60,7 @@ TEST(RealAlgebraicNumber, Evaluation2)
 		MultivariatePolynomial<Rational>(0),
 		MultivariatePolynomial<Rational>(1)
 	});
-	UnivariatePolynomial<Rational> p(t, {-3, 0, 1});
+	UnivariatePolynomial<Rational> p(t, std::initializer_list<Rational>{-3, 0, 1});
 	std::vector<Variable> vars({t});
 	Interval<Rational> i(Rational(13)/8, BoundType::STRICT, Rational(7)/4, BoundType::STRICT);
 	RealAlgebraicPoint<Rational> point({RealAlgebraicNumber<Rational>(p, i)});

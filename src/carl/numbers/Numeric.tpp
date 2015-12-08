@@ -22,7 +22,11 @@ namespace carl
     {
         if( mFreeRationalIds.empty() )
         {
+#ifdef __VS
+            mRationalPool.push_back(_value);
+#else
             mRationalPool.emplace_back( _value );
+#endif
             assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE - 1 <= std::numeric_limits<size_t>::max() );
             return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1;
         }

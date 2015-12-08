@@ -103,7 +103,7 @@ namespace carl
                 mRhs( UVariable(Variable::NO_VARIABLE, Sort()) )
             {}
             
-			/**
+	    /**
              * Constructs an uninterpreted equality.
              * @param _negated true, if the negation of this equality shall hold, which means that it is actually an inequality.
              * @param _uvarA An uninterpreted variable, which is going to be the left-hand side of this uninterpreted equality.
@@ -317,7 +317,7 @@ namespace carl
             std::string toString( unsigned _unequalSwitch, bool _infix, bool _friendlyNames ) const;
             
             void collectUVariables( std::set<UVariable>& _uvars ) const;
-            
+
             /**
              * Prints the given uninterpreted equality on the given output stream.
              * @param _os The output stream to print on.

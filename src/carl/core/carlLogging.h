@@ -25,6 +25,7 @@
 #include "../util/Timer.h"
 #include "../io/streamingOperators.h"
 #include "carlLoggingHelper.h"
+#include "../util/platform.h"
 
 namespace carl {
 
@@ -280,7 +281,11 @@ struct Formatter {
 		os << level << " ";
 
 		std::string filename(carl::basename(info.filename));
+#ifdef __WIN64
+		unsigned long long spacing = 1;
+#else
 		unsigned long spacing = 1;
+#endif
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
 		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
 		if (!info.func.empty()) os << info.func << "(): ";
@@ -419,6 +424,10 @@ public:
 inline Logger& logger() {
 	return Logger::getInstance();
 }
+
+#ifdef __VS
+#define __func__ __FUNCTION__
+#endif
 
 /// Create a record info.
 #define __CARL_LOG_RECORD ::carl::logging::RecordInfo(__FILE__, __func__, __LINE__)

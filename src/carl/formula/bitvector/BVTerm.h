@@ -246,6 +246,16 @@ namespace carl
 	private:
 		BVTermType mType;
 
+#ifdef __VS
+		union
+		{
+			BVVariable* mpVariableVS;
+			BVValue* mpValueVS;
+			BVUnaryContent* mpUnaryVS;
+			BVBinaryContent* mpBinaryVS;
+			BVExtractContent* mpExtractVS;
+		};
+#else
 		union
 		{
 			BVVariable mVariable;
@@ -254,6 +264,7 @@ namespace carl
 			BVBinaryContent mBinary;
 			BVExtractContent mExtract;
 		};
+#endif
 		std::size_t mWidth;
 		std::size_t mId;
 		std::size_t mHash;
@@ -261,31 +272,60 @@ namespace carl
 	public:
 
 		BVTermContent() :
+#ifdef __VS
+		mType(BVTermType::CONSTANT), mWidth(0), mId(0), mHash(0)
+		{
+			mpValueVS = new BVValue();
+		}
+#else
 		mType(BVTermType::CONSTANT), mValue(), mWidth(0), mId(0), mHash(0)
 		{
 		}
+#endif
 
 		BVTermContent(BVTermType _type, BVValue _value) :
-		mType(_type), mValue(_value), mWidth(_value.width()), mId(0),
+#ifdef __VS
+		mType(_type), mWidth(_value.width()), mId(0),
 		mHash((std::hash<BVValue>()(_value) << 5) ^ typeId(_type))
+		{
+			mpValueVS = new BVValue(_value);
+			assert(_type == BVTermType::CONSTANT);
+		}
+#else
+			mType(_type), mValue(_value), mWidth(_value.width()), mId(0),
+			mHash((std::hash<BVValue>()(_value) << 5) ^ typeId(_type))
 		{
 			assert(_type == BVTermType::CONSTANT);
 		}
+#endif
 
 		BVTermContent(BVTermType _type, const BVVariable& _variable) :
+#ifdef __VS
+		mType(_type), mWidth(_variable.width()), mId(0),
+		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
+		{
+			mpVariableVS = new BVVariable(_variable);
+#else
 		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0),
 		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
 		{
+#endif
 			assert(_type == BVTermType::VARIABLE);
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _index = 0) :
-		mType(_type), mUnary(_operand, _index), mWidth(0), mId(0),
+#ifdef __VS
+			mType(_type), mWidth(0), mId(0),
 		mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
+			mpUnaryVS = new BVUnaryContent(_operand, _index);
+#else
+			mType(_type), mUnary(_operand, _index), mWidth(0), mId(0),
+			mHash((_index << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
+		{
+#endif
 			assert(typeIsUnary(_type));
-
-			if(_type == BVTermType::NOT || _type == BVTermType::NEG) {
+			if (_type == BVTermType::NOT || _type == BVTermType::NEG) {
 				assert(_index == 0);
 				mWidth = _operand.width();
 			} else if(_type == BVTermType::LROTATE || _type == BVTermType::RROTATE) {
@@ -301,9 +341,16 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _first, const BVTerm& _second) :
-		mType(_type), mBinary(_first, _second), mWidth(0), mId(0),
+#ifdef __VS
+			mType(_type), mWidth(0), mId(0),
 		mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
 		{
+			mpBinaryVS = new BVBinaryContent(_first, _second); 
+#else
+			mType(_type), mBinary(_first, _second), mWidth(0), mId(0),
+			mHash((_first.hash() << 10) ^ (_second.hash() << 5) ^ typeId(_type))
+		{
+#endif
 			assert(typeIsBinary(_type));
 
 			if(_type == BVTermType::CONCAT) {
@@ -316,20 +363,36 @@ namespace carl
 		}
 
 		BVTermContent(BVTermType _type, const BVTerm& _operand, const size_t _highest, const size_t _lowest) :
-		mType(_type), mExtract(_operand, _highest, _lowest), mWidth(_highest - _lowest + 1), mId(0),
+#ifdef __VS
+			mType(_type), mWidth(_highest - _lowest + 1), mId(0),
 		mHash((_highest << 15) ^ (_lowest << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
 		{
+			mpExtractVS = new BVExtractContent(_operand, _highest, _lowest);
+#else
+			mType(_type), mExtract(_operand, _highest, _lowest), mWidth(_highest - _lowest + 1), mId(0),
+			mHash((_highest << 15) ^ (_lowest << 10) ^ (_operand.hash() << 5) ^ typeId(_type))
+		{
+#endif
 			assert(_type == BVTermType::EXTRACT);
 			assert(_highest < _operand.width() && _highest >= _lowest);
 		}
 
 		~BVTermContent()
 		{
+#ifdef __VS
 			if(mType == BVTermType::VARIABLE) {
-				mVariable.~BVVariable();
+				mpVariableVS->~BVVariable();
 			} else if(mType == BVTermType::CONSTANT) {
+				mpValueVS->~BVValue();
+			}
+#else
+			if (mType == BVTermType::VARIABLE) {
+				mVariable.~BVVariable();
+			}
+			else if (mType == BVTermType::CONSTANT) {
 				mValue.~BVValue();
 			}
+#endif
 		}
 
 		size_t width() const
@@ -347,17 +410,37 @@ namespace carl
             return (mType == BVTermType::CONSTANT && mWidth == 0);
         }
 		void collectVariables(std::set<BVVariable>& vars) const {
+#ifdef __VS
 			if(mType == BVTermType::CONSTANT) {
 			} else if(mType == BVTermType::VARIABLE) {
-				vars.insert(mVariable);
+				vars.insert(*mpVariableVS);
 			} else if(mType == BVTermType::EXTRACT) {
-				mExtract.mOperand.collectVariables(vars);
+				mpExtractVS->mOperand.collectVariables(vars);
 			} else if(typeIsUnary(mType)) {
+				mpUnaryVS->mOperand.collectVariables(vars);
+			}
+			else if (typeIsBinary(mType)) {
+				mpBinaryVS->mFirst.collectVariables(vars);
+				mpBinaryVS->mSecond.collectVariables(vars);
+			}
+#else
+			if (mType == BVTermType::CONSTANT) {
+			}
+			else if (mType == BVTermType::VARIABLE) {
+				vars.insert(mVariable);
+			}
+			else if (mType == BVTermType::EXTRACT) {
+				mExtract.mOperand.collectVariables(vars);
+			}
+			else if (typeIsUnary(mType)) {
 				mUnary.mOperand.collectVariables(vars);
-			} else if(typeIsBinary(mType)) {
+			}
+			else if (typeIsBinary(mType)) {
 				mBinary.mFirst.collectVariables(vars);
 				mBinary.mSecond.collectVariables(vars);
-			} else {
+			}
+#endif
+			else {
 				std::cerr << "Type is " << mType << std::endl;
 				assert(false);
 			}
@@ -376,11 +459,23 @@ namespace carl
 		{
             if(isInvalid()) {
                 return _init + "%invalid%";
+#ifdef __VS
             } else if(mType == BVTermType::CONSTANT) {
-                return _init + mValue.toString();
-			} else if(mType == BVTermType::VARIABLE) {
+                return _init + mpValueVS->toString();
+			}
+			else if (mType == BVTermType::VARIABLE) {
+				return _init + mpVariableVS->toString(_friendlyNames);
+			}
+#else
+			}
+			else if (mType == BVTermType::CONSTANT) {
+				return _init + mValue.toString();
+			}
+			else if (mType == BVTermType::VARIABLE) {
 				return _init + mVariable.toString(_friendlyNames);
-			} else {
+			}
+#endif
+			else {
 				std::string operatorStr = carl::toString(mType);
 				std::string operatorPrefix = operatorStr;
 				std::string operatorInfix = operatorStr;
@@ -391,23 +486,47 @@ namespace carl
 
 				// Rewrite operator strings for indexed (parameterized) operators
 				if(mType == BVTermType::EXTRACT) {
+#ifdef __VS
+					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mpExtractVS->mHighest) + " " + std::to_string(mpExtractVS->mLowest) + ")";
+					operatorInfix = operatorStr + "_{" + std::to_string(mpExtractVS->mHighest) + "," + std::to_string(mpExtractVS->mLowest) + "}";
+#else
 					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mExtract.mHighest) + " " + std::to_string(mExtract.mLowest) + ")";
 					operatorInfix = operatorStr + "_{" + std::to_string(mExtract.mHighest) + "," + std::to_string(mExtract.mLowest) + "}";
+#endif
 				} else if(mType == BVTermType::LROTATE || mType == BVTermType::RROTATE
 					|| mType == BVTermType::EXT_U || mType == BVTermType::EXT_S || mType == BVTermType::REPEAT) {
+#ifdef __VS
+					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mpUnaryVS->mIndex) + ")";
+					operatorInfix = operatorStr + "_" + std::to_string(mpUnaryVS->mIndex);
+#else
 					operatorPrefix = "(_ " + operatorStr + " " + std::to_string(mUnary.mIndex) + ")";
 					operatorInfix = operatorStr + "_" + std::to_string(mUnary.mIndex);
+#endif
 				}
 
 				// Fill arg* variables
+#ifdef __VS
 				if(mType == BVTermType::EXTRACT) {
-					argFirst = mExtract.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = mpExtractVS->mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				} else if(typeIsUnary(mType)) {
-					argFirst = mUnary.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argFirst = mpUnaryVS->mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 				} else if(typeIsBinary(mType)) {
+					argFirst = mpBinaryVS->mFirst.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+					argSecond = mpBinaryVS->mSecond.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+				}
+#else
+				if (mType == BVTermType::EXTRACT) {
+					argFirst = mExtract.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+				}
+				else if (typeIsUnary(mType)) {
+					argFirst = mUnary.mOperand.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
+				}
+				else if (typeIsBinary(mType)) {
 					argFirst = mBinary.mFirst.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
 					argSecond = mBinary.mSecond.toString((_oneline ? "" : _init + "   "), _oneline, _infix, _friendlyNames);
-				} else {
+				}
+#endif
+				else {
 					assert(false);
 				}
 
@@ -448,17 +567,36 @@ namespace carl
 				return false;
 			}
 
+#ifdef __VS
 			if(mType == BVTermType::CONSTANT) {
-				return mValue == _other.mValue;
+				return *mpValueVS == *_other.mpValueVS;
 			} else if(mType == BVTermType::VARIABLE) {
-				return mVariable == _other.mVariable;
+				return *mpVariableVS == *_other.mpVariableVS;
 			} else if(mType == BVTermType::EXTRACT) {
-				return mExtract == _other.mExtract;
+				return *mpExtractVS == *_other.mpExtractVS;
 			} else if(typeIsUnary(mType)) {
-				return mUnary == _other.mUnary;
+				return *mpUnaryVS == *_other.mpUnaryVS;
 			} else if(typeIsBinary(mType)) {
+				return *mpBinaryVS == *_other.mpBinaryVS;
+			}
+#else
+			if (mType == BVTermType::CONSTANT) {
+				return mValue == _other.mValue;
+			}
+			else if (mType == BVTermType::VARIABLE) {
+				return mVariable == _other.mVariable;
+			}
+			else if (mType == BVTermType::EXTRACT) {
+				return mExtract == _other.mExtract;
+			}
+			else if (typeIsUnary(mType)) {
+				return mUnary == _other.mUnary;
+			}
+			else if (typeIsBinary(mType)) {
 				return mBinary == _other.mBinary;
-			} else {
+			}
+#endif
+			else {
 				std::cerr << "Type is " << mType << std::endl;
 				assert(false);
 				return false;
@@ -467,18 +605,40 @@ namespace carl
 		bool operator<(const BVTermContent& rhs) const {
 			if(mId != 0 && rhs.mId != 0) return mId < rhs.mId;
 			if(mType != rhs.mType) return mType < rhs.mType;
-
-			if(mType == BVTermType::CONSTANT) {
+#ifdef __VS
+			if (mType == BVTermType::CONSTANT) {
+				return *mpValueVS < *rhs.mpValueVS;
+			}
+			else if (mType == BVTermType::VARIABLE) {
+				return *mpVariableVS < *rhs.mpVariableVS;
+			}
+			else if (mType == BVTermType::EXTRACT) {
+				return *mpExtractVS < *rhs.mpExtractVS;
+			}
+			else if (typeIsUnary(mType)) {
+				return *mpUnaryVS < *rhs.mpUnaryVS;
+			}
+			else if (typeIsBinary(mType)) {
+				return *mpBinaryVS < *rhs.mpBinaryVS;
+			}
+#else
+			if (mType == BVTermType::CONSTANT) {
 				return mValue < rhs.mValue;
-			} else if(mType == BVTermType::VARIABLE) {
+			}
+			else if (mType == BVTermType::VARIABLE) {
 				return mVariable < rhs.mVariable;
-			} else if(mType == BVTermType::EXTRACT) {
+			}
+			else if (mType == BVTermType::EXTRACT) {
 				return mExtract < rhs.mExtract;
-			} else if(typeIsUnary(mType)) {
+			}
+			else if (typeIsUnary(mType)) {
 				return mUnary < rhs.mUnary;
-			} else if(typeIsBinary(mType)) {
+			}
+			else if (typeIsBinary(mType)) {
 				return mBinary < rhs.mBinary;
-			} else {
+			}
+#endif
+			else {
 				assert(false);
 				return false;
 			}

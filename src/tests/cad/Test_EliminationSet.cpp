@@ -5,6 +5,7 @@
 
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/cad/EliminationSet.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 

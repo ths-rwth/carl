@@ -2,6 +2,7 @@
 #include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/IntervalEvaluation.h"
+#include "carl/util/platform.h"
 
 #include "../Common.h"
 

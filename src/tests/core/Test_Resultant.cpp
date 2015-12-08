@@ -2,6 +2,7 @@
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/Resultant.h"
+#include "carl/util/platform.h"
 
 #include <random>
 #include <cmath>

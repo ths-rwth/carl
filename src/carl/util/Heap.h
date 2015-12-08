@@ -129,7 +129,11 @@ namespace carl
                         mTree( tree )
                     {}
 
-                    c_iterator( const Tree& tree, Heap::Node startpos ):
+#ifdef __VS
+                    c_iterator( const Tree& tree, Node startpos ):
+#else
+                    c_iterator(const Tree& tree, Heap::Node startpos) :
+#endif
                         mTree( tree ),
                         pos( startpos )
                     {}
@@ -162,8 +166,13 @@ namespace carl
                     }
 
                 protected:
+#ifdef __VS
+                    const Tree& mTree;
+                    Node        pos;
+#else
                     const Heap::Tree& mTree;
                     Heap::Node        pos;
+#endif
 
             };
 

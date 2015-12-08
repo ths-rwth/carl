@@ -8,15 +8,14 @@
  * @version 2014-11-11
  */
 
-#include "../../carl/util/platform.h"
+#include "carl/util/platform.h"
 CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
 CLANG_WARNING_RESET
-#include "../../carl/interval/Interval.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 
 #include "../Common.h"
-
 
 using namespace carl;
 
