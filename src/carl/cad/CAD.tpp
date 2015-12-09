@@ -440,7 +440,6 @@ cad::Answer CAD<Number>::check(
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
 					conflictGraph = cad::ConflictGraph<Number>();
-					conflictGraph.
 					return cad::Answer::False;
 				}
 				// else: no additional check is needed!
