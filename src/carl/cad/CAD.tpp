@@ -369,6 +369,32 @@ void CAD<Number>::complete() {
 }
 
 template<typename Number>
+void CAD<Number>::tryEquationSeparation(bool useBounds, bool onlyStrictBounds) {
+	bool hasEquations = false;
+	bool hasStrict = false;
+	bool hasWeak = false;
+	for (const auto& c: mConstraints) {
+		if (c.getSign() == Sign::ZERO && !c.isNegated()) {
+			hasEquations = true;
+		} else if (c.getSign() != Sign::ZERO && c.isNegated()) {
+			hasWeak = true;
+		} else {
+			hasStrict = true;
+		}
+	}
+	if (!hasWeak) {
+		if (!useBounds && !hasStrict && mVariables.size() <= 1) {
+			// root-only samples not valid in general!
+			alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, setting));
+		} else if (onlyStrictBounds && !hasEquations) {
+			alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::SplittingStrategy::DEFAULT, setting));
+		}
+	}
+	// else: mixed case, no optimization possible without zero-dimensional assumption
+}
+
+
+template<typename Number>
 cad::Answer CAD<Number>::check(
 	std::vector<cad::Constraint<Number>>& _constraints,
 	RealAlgebraicPoint<Number>& r,
@@ -452,28 +478,7 @@ cad::Answer CAD<Number>::check(
 	// separate treatment of equations and inequalities
 	cad::CADSettings backup = this->setting;
 	if (this->setting.autoSeparateEquations) {
-		std::vector<cad::Constraint<Number>> equations;
-		std::vector<cad::Constraint<Number>> strictInequalities;
-		std::vector<cad::Constraint<Number>> weakInequalities;
-
-		for (cad::Constraint<Number> c: mConstraints) {
-			if (c.getSign() == Sign::ZERO && !c.isNegated()) {
-				equations.push_back(c);
-			} else if (c.getSign() != Sign::ZERO && c.isNegated()) {
-				weakInequalities.push_back(c);
-			} else {
-				strictInequalities.push_back(c);
-			}
-		}
-		if (weakInequalities.empty()) {
-			if (!useBounds && strictInequalities.empty() && mVariables.size() <= 1) {
-				// root-only samples not valid in general!
-				this->alterSetting(cad::CADSettings::getSettings(cad::EQUATIONSONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
-			} else if (onlyStrictBounds && equations.empty()) {
-				this->alterSetting(cad::CADSettings::getSettings(cad::INEQUALITIESONLY, rootfinder::SplittingStrategy::DEFAULT, this->setting));
-			}
-		}
-		// else: mixed case, no optimization possible without zero-dimensional assumption
+		tryEquationSeparation(useBounds, onlyStrictBounds);
 	}
 
 	//////////////////////
