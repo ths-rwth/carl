@@ -70,7 +70,7 @@ public:
 	
 	bool satisfiedPartiallyBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& variables) const {
 		if (r.dim() == 0) return true;
-		std::vector<Variable> vars(variables.begin() + (variables.size() - r.dim()), variables.end());
+		std::vector<Variable> vars(variables.begin() + (long)(variables.size() - r.dim()), variables.end());
 		std::size_t dim = vars.size()-1;
 		for (const auto& cid: mVariableLookup[dim]) {
 			const auto& c = mConstraints[cid];
@@ -82,7 +82,7 @@ public:
 	bool satisfiedPartiallyBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& variables, cad::ConflictGraph<Number>& conflictGraph) const {
 		if (r.dim() == 0) return true;
 		bool satisfied = true;
-		std::vector<Variable> vars(variables.begin() + (variables.size() - r.dim()), variables.end());
+		std::vector<Variable> vars(variables.begin() + (long)(variables.size() - r.dim()), variables.end());
 		std::size_t dim = vars.size()-1;
 		std::size_t sampleID = conflictGraph.newSample();
 		for (const auto& cid: mVariableLookup[dim]) {
