@@ -439,7 +439,9 @@ cad::Answer CAD<Number>::check(
 				if (IntervalEvaluation::evaluate(constraint.getPolynomial(), m).sgn() != constraint.getSign()) {
 					// the constraint is unsatisfiable!
 					// this constraint is already the minimal infeasible set, so switch it with the last position in the constraints list
-					conflictGraph = cad::ConflictGraph<Number>();
+					std::size_t sampleID = conflictGraph.newSample();
+					std::size_t constraintID = conflictGraph.getConstraint(constraint);
+					conflictGraph.set(constraintID, sampleID, true);
 					return cad::Answer::False;
 				}
 				// else: no additional check is needed!
@@ -1094,6 +1096,7 @@ typename CAD<Number>::CheckNodeResult CAD<Number>::checkNode(
 		}
 		// perform lifting at the incomplete leaf (without elimination, only by the current elimination polynomials)
 		std::stack<std::size_t> satPath;
+		CARL_LOG_DEBUG("carl.cad", "lifting on incomplete node " << *node);
 		cad::Answer status = this->liftCheck(node, i, fullRestart, vars, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath);
 		///@todo Handle answers
 		if (status == cad::Answer::True) {
@@ -1170,6 +1173,7 @@ cad::Answer CAD<Number>::mainCheck(
 				CARL_LOG_TRACE("carl.cad", "Lifting");
 				// eliminate will not be able to produce a new polynomial.
 				std::stack<std::size_t> satPath;
+				CARL_LOG_DEBUG("carl.cad", "lifting on " << *this->sampleTree.begin_leaf());
 				return this->liftCheck(this->sampleTree.begin_leaf(), dim-this->sampleTree.begin_leaf().depth(), true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath);
 			}
 			CARL_LOG_DEBUG("carl.cad", "Waiting for something to lift, lastRes = " << lastRes << std::endl << *this);
@@ -1177,6 +1181,7 @@ cad::Answer CAD<Number>::mainCheck(
 
 		// perform an initial lifting step in order to fill the tree once
 		std::stack<std::size_t> satPath;
+		CARL_LOG_DEBUG("carl.cad", "lifting on " << *this->sampleTree.begin_leaf());
 		cad::Answer status = this->liftCheck(this->sampleTree.begin_leaf(), dim-this->sampleTree.begin_leaf().depth(), true, {}, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath);
 		if (status == cad::Answer::True) {
 			// lifting yields a satisfying sample
@@ -1218,10 +1223,13 @@ cad::Answer CAD<Number>::mainCheck(
 	CARL_LOG_TRACE("carl.cad", __func__ << ": Phase 3");
 
 	while (true) {
+		bool didProgress = false;
 		// search base level with open lifting position
 		int level = (int)dim - 1;
+		CARL_LOG_TRACE("carl.cad", "Elimination sets:");
 		for (; level >= 0; level--) {
 			// stop at the first level which has a non-empty lifting queue
+			CARL_LOG_TRACE("carl.cad", level << " -> " << eliminationSets[(unsigned)level]);
 			if (!this->eliminationSets[(unsigned)level].emptyLiftingQueue()) break;
 		}
 		if (level == -1) {
@@ -1241,7 +1249,7 @@ cad::Answer CAD<Number>::mainCheck(
 
 		// lift all nodes at the corresponding tree depth according to the found lifting positions
 		unsigned depth = (unsigned)((int)dim - level - 1);
-		CARL_LOG_TRACE("carl.cad", "Current depth = " << depth);
+		CARL_LOG_TRACE("carl.cad", "Current depth = " << depth << ", level = " << level);
 		CARL_LOG_TRACE("carl.cad", this->sampleTree);
 		assert(depth >= 0 && depth < dim);
 		assert(depth <= (unsigned)this->sampleTree.max_depth());
@@ -1279,7 +1287,9 @@ cad::Answer CAD<Number>::mainCheck(
 			assert(level + 1 == (int)i);
 			// perform lifting at the incomplete leaf with the stored queue (reset performed in liftCheck)
 			std::stack<std::size_t> satPath;
+			CARL_LOG_DEBUG("carl.cad", "lifting on " << *node);
 			cad::Answer status = liftCheck(node, i, false, vars, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath);
+			didProgress = true;
 			///@todo Handle answers
 			if (status == cad::Answer::True) {
 				// lifting yields a satisfying sample
@@ -1289,9 +1299,11 @@ cad::Answer CAD<Number>::mainCheck(
 			}
 		}
 		this->eliminationSets[(unsigned)level].setLiftingPositionsReset();
+		//if (!didProgress) break;
 	}
 
 	if (!boundsNontrivial) {
+		std::cout << "Reseting lifting positions " << std::endl;
 		// CAD is computed completely if there were no bounds used during elimination and lifting
 		this->iscomplete = true;
 		// all liftings were considered, so store the reset states
@@ -1568,6 +1580,7 @@ cad::Answer CAD<Number>::liftCheck(
 
 			// Lifting
 			// start lifting with the fresh new sample at the next level for *all* lifting positions
+			CARL_LOG_DEBUG("carl.cad", "lifting on " << newSample);
 			cad::Answer liftingSuccessful = this->liftCheck(newNode, openVariableCount, true, newVariables, bounds, boundsActive, checkBounds, r, conflictGraph, satPath);
 
 			///@todo warum hier pop() und nicht oben jeweils nach dem get()?
