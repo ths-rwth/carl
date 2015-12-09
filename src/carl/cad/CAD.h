@@ -282,6 +282,8 @@ public:
 	 */
 	void complete();
 	
+	void tryEquationSeparation(bool useBounds, bool onlyStrictBounds);
+	
 	
 	/**
 	 * Checks an arbitrary constraint for satisfiability on this set of samples. The cad is extended if there are still samples not computed.
@@ -536,6 +538,11 @@ public:
 		RealAlgebraicPoint<Number>& r,
 		cad::ConflictGraph<Number>& conflictGraph
 	);
+	
+	cad::Answer partialLiftCheck(
+		sampleIterator node,
+		cad::ConflictGraph<Number>& conflictGraph
+	);
 
 	/**
 	 * Constructs sample points for the given number of open variables openVariableCount by lifting
@@ -614,12 +621,6 @@ public:
 	 * @param r real algebraic point
 	 */
 	void shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number>& r);
-
-	/**
-	 * Removes all variables whose elimination sets are empty, i.e., if eliminationSets()[i] is empty, then variables()[i] is removed.
-	 * Note that this can only be applied if the removed variable is not needed in other polynomials any more, what can be determined in removePolynomial.
-	 */
-	void trimVariables();
 
 	/**
 	 * Determines whether p (of elimination set at level) has a root in the given box.

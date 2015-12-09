@@ -128,8 +128,6 @@ public:
 	bool inequalitiesOnly;
 	/// during one elimination operation, all polynomials which are just copied to the next level are removed from the previous
 	bool removeConstants;
-	/// if a polynomial is removed from the CAD, remove also those variables and the respective elimination and sample levels which correspond to empty elimination levels
-	bool trimVariables;
 	/// treat equations separately by tuning the cad object to equations
 	bool autoSeparateEquations;
 	/// compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check
@@ -187,7 +185,6 @@ public:
 			cadSettings.simplifyByFactorization     = true;
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = true;
-			cadSettings.trimVariables               = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 		}
 		if (setting & NOTBOUNDED) {
@@ -200,7 +197,6 @@ public:
 			cadSettings.simplifyByFactorization     = true;
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = false;
-			cadSettings.trimVariables               = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 		}
 		if (setting & EQUATIONSONLY) {
@@ -239,8 +235,6 @@ public:
 			settingStrs.push_back( "Use only intermediate points for lifting." );
 		if (settings.removeConstants)
 			settingStrs.push_back( "During elimination, all polynomials which are just copied to the next level are removed from the previous." );
-		if (settings.trimVariables)
-			settingStrs.push_back( "If a polynomial is removed from the CAD, remove also those variables and the respective elimination and sample levels which correspond to empty elimination levels." );
 		if (settings.autoSeparateEquations)
 			settingStrs.push_back( "Treat equations separately by tuning the cad object to equations." );
 		if (settings.computeConflictGraph)
@@ -285,7 +279,6 @@ private:
 		equationsOnly( false ),
 		inequalitiesOnly( false ),
 		removeConstants( true ),
-		trimVariables( false ),
 		autoSeparateEquations( false ),
 		computeConflictGraph( true ),
 		preSolveByBounds( false ),
@@ -311,7 +304,6 @@ public:
 		equationsOnly( s.equationsOnly ),
 		inequalitiesOnly( s.inequalitiesOnly ),
 		removeConstants( s.removeConstants ),
-		trimVariables( s.trimVariables ),
 		autoSeparateEquations( s.autoSeparateEquations ),
 		computeConflictGraph( s.computeConflictGraph ),
 		preSolveByBounds( s.preSolveByBounds ),
