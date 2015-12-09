@@ -7,7 +7,6 @@ add_library(prepareTest Common.cpp)
 ################################
 add_subdirectory(util)
 add_subdirectory(numbers)
-add_subdirectory(numbers_boost)
 add_subdirectory(core)
 add_subdirectory(formula)
 add_subdirectory(cad)
