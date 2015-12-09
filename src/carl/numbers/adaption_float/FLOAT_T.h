@@ -85,7 +85,7 @@ namespace carl
 	template<typename Number>
 	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned = 128)
 	{
-		return A == B;
+		return AlmostEqual2sComplement<double>(double(A), double(B), 128);
 	}
 
 	template<>
