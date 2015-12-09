@@ -211,18 +211,6 @@ namespace carl
 			mValue = val;
 		}
 
-		/**
-		 * Constructor, which takes a FLOAT_T instanciation with different fp implementation
-		 * as input and optional rounding, which can be used, if the underlying
-		 * fp implementation allows this.
-		 * @param _float Value to be initialized.
-		 * @param N Possible rounding direction.
-		 */
-		template<typename F, DisableIf< std::is_same<F, FloatType> > = dummy>
-		FLOAT_T<FloatType>(const FLOAT_T<F>& _float, const CARL_RND=CARL_RND::N)
-		{
-			mValue = _float.toDouble();
-		}
 
 		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
 		{
@@ -1028,6 +1016,16 @@ namespace carl
 		{
 			return carl::toDouble(mValue);
 		}
+
+		explicit operator mpq_class() const {
+			return carl::rationalize<mpq_class>(mValue);
+		}
+
+#ifdef USE_CLN_NUMBERS
+		explicit operator cln::cl_RA() const {
+			return carl::rationalize<cln::cl_RA>(mValue);
+		}
+#endif
 
 		/**
 		 * Output stream operator for numbers of type FLOAT_T.
