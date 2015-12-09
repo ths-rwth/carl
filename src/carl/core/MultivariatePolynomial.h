@@ -367,7 +367,7 @@ public:
      */
     bool isVariable() const
     {
-        return totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
+        return !mTerms.empty() && totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
     }
     
     /**
