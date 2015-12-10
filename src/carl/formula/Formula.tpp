@@ -2022,6 +2022,11 @@ namespace carl
 		return func(newFormula);
 	}
     
+	template<typename Formula>
+    Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<Formula,Formula>& replacements) {
+        Substitutor subs(replacements);
+        return visitor.visitResult(formula, std::function<Formula(Formula)>(subs));
+    }
     template<typename Formula>
     Formula FormulaSubstitutor<Formula>::substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements) {
         PolynomialSubstitutor subs(replacements);

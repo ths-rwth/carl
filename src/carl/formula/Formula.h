@@ -1098,6 +1098,16 @@ namespace carl
     struct FormulaSubstitutor {
     private:
         FormulaVisitor<Formula> visitor;
+		
+		struct Substitutor {
+			const std::map<Formula,Formula>& replacements;
+            Substitutor(const std::map<Formula,Formula>& repl): replacements(repl) {}
+            Formula operator()(const Formula& formula) {
+				auto it = replacements.find(formula);
+				if (it == replacements.end()) return formula;
+				return it->second;
+            }
+		};
         
         struct PolynomialSubstitutor {
             const std::map<Variable,typename Formula::PolynomialType>& replacements;
@@ -1135,6 +1145,7 @@ namespace carl
             return substitute(formula, tmp);
         }
         
+		Formula substitute(const Formula& formula, const std::map<Formula,Formula>& replacements);
         Formula substitute(const Formula& formula, const std::map<Variable,typename Formula::PolynomialType>& replacements);
         Formula substitute(const Formula& formula, const std::map<BVVariable,BVTerm>& replacements);
         Formula substitute(const Formula& formula, const std::map<UVariable,UFInstance>& replacements);
