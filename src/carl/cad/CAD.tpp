@@ -1228,7 +1228,7 @@ cad::Answer CAD<Number>::mainCheck(
 	CARL_LOG_TRACE("carl.cad", __func__ << ": Phase 3");
 
 	while (true) {
-		bool didProgress = false;
+		//bool didProgress = false;
 		// search base level with open lifting position
 		int level = (int)dim - 1;
 		CARL_LOG_TRACE("carl.cad", "Elimination sets:");
@@ -1294,7 +1294,7 @@ cad::Answer CAD<Number>::mainCheck(
 			std::stack<std::size_t> satPath;
 			CARL_LOG_DEBUG("carl.cad", "lifting on " << *node);
 			cad::Answer status = liftCheck(node, i, false, vars, bounds, boundsNontrivial, checkBounds, r, conflictGraph, satPath);
-			didProgress = true;
+			//didProgress = true;
 			///@todo Handle answers
 			if (status == cad::Answer::True) {
 				// lifting yields a satisfying sample
