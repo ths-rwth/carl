@@ -31,6 +31,7 @@ namespace carl {
 namespace logging {
 
 #if defined LOGGING_CARL
+	#define CARL_LOGGING_ENABLED
 	#define CARL_LOG_FATAL(channel, msg) __CARL_LOG_FATAL(channel, msg)
 	#define CARL_LOG_ERROR(channel, msg) __CARL_LOG_ERROR(channel, msg)
 	#define CARL_LOG_WARN(channel, msg) __CARL_LOG_WARN(channel, msg)
@@ -43,6 +44,7 @@ namespace logging {
 	#define CARL_LOG_NOTIMPLEMENTED() __CARL_LOG_ERROR("", "Not implemented method-stub called.")
 	#define CARL_LOG_INEFFICIENT() __CARL_LOG_WARN("", "Inefficient method called.")
 #elif defined LOGGING
+	#define CARL_LOGGING_ENABLED
 	#define CARL_LOG_BASIC(level, channel, msg) std::cerr << level << " " << channel << " " << __FILE__ << ":" << __LINE__ << " " << msg << std::endl
 	#define CARL_LOG_FATAL(channel, msg) CARL_LOG_BASIC("FATAL", channel, msg)
 	#define CARL_LOG_ERROR(channel, msg) CARL_LOG_BASIC("ERROR", channel, msg)
@@ -77,7 +79,7 @@ namespace logging {
 void setInitialLogLevel();
 
 inline void configureLogging() {
-#ifdef LOGGING
+#ifdef CARL_LOGGING_ENABLED
 	#if defined NDEBUG
 		std::cerr << "CArL: You are running in release mode with logging enabled. Are you sure, that this is what you want?" << std::endl;
 	#endif
