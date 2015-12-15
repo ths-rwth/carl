@@ -303,6 +303,17 @@ namespace carl
             {
                 return mpContent->mTseitinClause;
             }
+            
+            const Variables& variables() const
+            {
+                if( mpContent->mpVariables != nullptr )
+                {
+                    return *(mpContent->mpVariables);
+                }
+                mpContent->mpVariables = new Variables();
+                allVars( *(mpContent->mpVariables) );
+                return *(mpContent->mpVariables);
+            }
 
             /**
              * Collects all real valued variables occurring in this formula.

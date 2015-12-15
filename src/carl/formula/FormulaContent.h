@@ -195,6 +195,8 @@ namespace carl {
             mutable std::mutex mDifficultyMutex;
             ///
             mutable bool mTseitinClause = false;
+            /// Container collecting the variables which occur in this formula.
+            mutable Variables* mpVariables = nullptr;
             
             FormulaContent() = delete;
             FormulaContent(const FormulaContent&) = delete;
@@ -309,6 +311,9 @@ namespace carl {
 					case FormulaType::UEQ: { mUIEquality.~UEquality(); break; }
 #endif
                 }
+
+                if( mpVariables != nullptr )
+                    delete mpVariables;
             }
 
             std::size_t hash() const {
