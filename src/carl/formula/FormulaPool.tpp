@@ -291,28 +291,28 @@ namespace carl
             Formulas<Pol> subFormulas;
             subFormulas.push_back(Formula<Pol>(FormulaType::NOT, condition));
             subFormulas.push_back(elsecase);
-            return add(new FormulaContent<Pol>(FormulaType::AND, std::move(subFormulas)));
+            return create(FormulaType::AND, std::move(subFormulas));
         }
         if (thencase.isTrue()) {
             // (ite c false b) = (~c or true) and (c or b) = (c or b)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(condition);
             subFormulas.push_back(elsecase);
-            return add(new FormulaContent<Pol>(FormulaType::OR, std::move(subFormulas)));
+            return create(FormulaType::OR, std::move(subFormulas));
         }
         if (elsecase.isFalse()) {
             // (ite c false b) = (~c or a) and (c or false) = (~c or a) and c = (c and a)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(condition);
             subFormulas.push_back(thencase);
-            return add(new FormulaContent<Pol>(FormulaType::AND, std::move(subFormulas)));
+            return create(FormulaType::AND, std::move(subFormulas));
         }
         if (elsecase.isTrue()) {
             // (ite c false b) = (~c or a) and (c or true) = (~c or a)
             Formulas<Pol> subFormulas;
             subFormulas.push_back(Formula<Pol>(FormulaType::NOT, condition));
             subFormulas.push_back(thencase);
-            return add(new FormulaContent<Pol>(FormulaType::OR, std::move(subFormulas)));
+            return create(FormulaType::OR, std::move(subFormulas));
         }
         #endif
         return add(new FormulaContent<Pol>(ITE, std::move(_subformulas)));
