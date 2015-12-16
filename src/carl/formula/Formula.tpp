@@ -116,7 +116,7 @@ namespace carl
     {
         size_t result = 0;
         carl::FormulaVisitor<Formula<Pol>> visitor;
-        visitor.visitVoid(*this,
+        visitor.visit(*this,
             [&](const Formula& _f) 
             {
                 switch( _f.getType() )
@@ -528,7 +528,7 @@ namespace carl
             Variables vars;
             std::set<UVariable> uvars;
             std::set<BVVariable> bvvars;
-            visitor.visitVoid(*this, 
+            visitor.visit(*this,
                     [&](const Formula& _f) 
                     {
                         switch(_f.getType())
@@ -1927,7 +1927,7 @@ namespace carl
     }
 
 	template<typename Formula>
-	void FormulaVisitor<Formula>::visitVoid(const Formula& formula, const std::function<void(Formula)>& func) {
+	void FormulaVisitor<Formula>::visit(const Formula& formula, const std::function<void(Formula)>& func) {
 		switch (formula.getType()) {
 		case AND:
 		case OR:
@@ -1936,11 +1936,11 @@ namespace carl
 		case IMPLIES:
         case ITE:
         {
-            for (const auto& cur: formula.subformulas()) visitVoid(cur, func);
+            for (const auto& cur: formula.subformulas()) visit(cur, func);
 			break;
 		}
 		case NOT: {
-			visitVoid(formula.subformula(), func);
+			visit(formula.subformula(), func);
 			break;
 		}
 		case BOOL:
@@ -1952,7 +1952,7 @@ namespace carl
 			break;
 		case EXISTS:
 		case FORALL: {
-			visitVoid(formula.quantifiedFormula(), func);
+			visit(formula.quantifiedFormula(), func);
 			break;
 		}
 		}
