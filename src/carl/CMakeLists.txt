@@ -26,16 +26,16 @@ set(carl_lib_sources
 
 add_library(lib_carl SHARED ${carl_lib_sources})
 set_target_properties( lib_carl PROPERTIES
-		# create *nix style library versions + symbolic links
-		VERSION "${PROJECT_VERSION}"
-		SOVERSION "${PROJECT_VERSION}"
-		# allow creating static and shared libs without conflicts
-		CLEAN_DIRECT_OUTPUT 1
-		# avoid conflicts between library and binary target names
-		OUTPUT_NAME carl
-        LIBRARY_OUTPUT_DIRECTORY  ${CARL_LIBRARIES_DIR}
-        ARCHIVE_OUTPUT_DIRECTORY  ${CARL_LIBRARIES_DIR}
-		# we currently do not use public header option, as it doesnt support multi-directory headers
+	# create *nix style library versions + symbolic links
+	VERSION "${PROJECT_VERSION}"
+	SOVERSION "${PROJECT_VERSION}"
+	# allow creating static and shared libs without conflicts
+	CLEAN_DIRECT_OUTPUT 1
+	# avoid conflicts between library and binary target names
+	OUTPUT_NAME carl
+	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+	# we currently do not use public header option, as it doesnt support multi-directory headers
 )
 target_link_libraries( lib_carl ${carl_LIBRARIES_DYNAMIC} )
 
@@ -49,8 +49,8 @@ if(BUILD_STATIC)
 		CLEAN_DIRECT_OUTPUT 1
 		# avoid conflicts between library and binary target names
 		OUTPUT_NAME carl
-        LIBRARY_OUTPUT_DIRECTORY ${CARL_LIBRARIES_DIR}
-        ARCHIVE_OUTPUT_DIRECTORY ${CARL_LIBRARIES_DIR}
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
 

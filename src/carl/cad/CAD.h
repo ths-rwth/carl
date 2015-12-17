@@ -67,17 +67,17 @@ public:
 	typedef typename cad::CADPolynomials<Number>::MPolynomial MPolynomial;
 
 	/// Type of an iterator over the samples.
-	typedef typename tree<RealAlgebraicNumberPtr<Number>>::iterator sampleIterator;
+	typedef typename tree<RealAlgebraicNumber<Number>>::iterator sampleIterator;
 	/// Type of a map of variable bounds.
 	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:
 	
-	cad::Variables variables;
+	cad::Variables mVariables;
 	
 	/**
 	 * Sample components built during the CAD lifting arranged in a tree.
 	 */
-	carl::tree<RealAlgebraicNumberPtr<Number>> sampleTree;
+	carl::tree<RealAlgebraicNumber<Number>> sampleTree;
 
 	/**
 	 * Lists of polynomials occurring in every elimination level (immutable; new polynomials are appended at the tail)
@@ -109,7 +109,7 @@ private:
 	 */
 	cad::CADSettings setting;
 	
-	cad::CADConstraints<Number> constraints;
+	cad::CADConstraints<Number> mConstraints;
 	
 	static unsigned checkCallCount;
 
@@ -179,7 +179,7 @@ public:
 	* @return list of main variables of the polynomials of this cad
 	*/
 	const std::vector<Variable>& getVariables() const {
-		return this->variables.getCurrent();
+		return mVariables.getCurrent();
 	}
 	
 	/**
@@ -282,6 +282,8 @@ public:
 	 */
 	void complete();
 	
+	void tryEquationSeparation(bool useBounds, bool onlyStrictBounds);
+	
 	
 	/**
 	 * Checks an arbitrary constraint for satisfiability on this set of samples. The cad is extended if there are still samples not computed.
@@ -366,7 +368,11 @@ public:
 	///////////////////////////
 
 	template<typename Inserter>
-	static void addSamples(const RealAlgebraicNumberPtr<Number>& left, const RealAlgebraicNumberPtr<Number>& right, VariableType type, Inserter i);
+	static void addSampleBelow(const RealAlgebraicNumber<Number>& left, Inserter i);
+	template<typename Inserter>
+	static void addSampleAbove(const RealAlgebraicNumber<Number>& right, Inserter i);
+	template<typename Inserter>
+	static void addSampleBetween(const RealAlgebraicNumber<Number>& left, const RealAlgebraicNumber<Number>& right, VariableType type, Inserter i);
 	
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.
@@ -380,9 +386,9 @@ public:
 	 */
 	cad::SampleSet<Number> samples(
 			std::size_t openVariableCount,
-			const std::list<RealAlgebraicNumberPtr<Number>>& roots,
+			const std::list<RealAlgebraicNumber<Number>>& roots,
 			cad::SampleSet<Number>& currentSamples,
-			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
+			std::forward_list<RealAlgebraicNumber<Number>>& replacedSamples,
 			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
 	);
 
@@ -402,7 +408,7 @@ public:
 			const UPolynomial* p,
 			sampleIterator node,
 			cad::SampleSet<Number>& currentSamples,
-			std::forward_list<RealAlgebraicNumberPtr<Number>>& replacedSamples,
+			std::forward_list<RealAlgebraicNumber<Number>>& replacedSamples,
 			const Interval<Number>& bounds = Interval<Number>::unboundedInterval()
 	);
 
@@ -441,6 +447,11 @@ private:
 	// AUXILIARY METHODS //
 	///////////////////////
 	
+	bool integerHeuristicActive(cad::IntegerHandling heuristic, std::size_t variable) const {
+		if (this->setting.integerHandling != heuristic) return false;
+		return mVariables[variable].getType() == VariableType::VT_INT;
+	}
+	
 	/**
 	 * Constructs the path from the given node to the root and conjoins all RealAlgebraicNumbers on the nodes of the path.
 	 *
@@ -454,7 +465,7 @@ private:
 	 * @param root of the sample tree
 	 * @return RealAlgebraicPoint as list belonging to leaf
 	 */
-	std::list<RealAlgebraicNumberPtr<Number>> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
+	std::list<RealAlgebraicNumber<Number>> constructSampleAt(sampleIterator node, const sampleIterator& root) const;
 
 	/**
 	 * Helper method for mainCheck() routine.
@@ -473,7 +484,8 @@ private:
 	 * @param dim
      * @return 
      */
-	std::pair<bool, bool> checkNode(
+	enum CheckNodeResult { CNR_SKIP, CNR_TRUE, CNR_FALSE, CNR_UNKNOWN};
+	CheckNodeResult checkNode(
 		sampleIterator node,
 		bool fullRestart,
 		bool excludePrevious,
@@ -519,11 +531,16 @@ public:
      * @param newSample
      * @param node
      */
-	sampleIterator storeSampleInTree(RealAlgebraicNumberPtr<Number> newSample, sampleIterator node);
+	sampleIterator storeSampleInTree(RealAlgebraicNumber<Number> newSample, sampleIterator node);
 	
 	cad::Answer baseLiftCheck(
 		sampleIterator node,
 		RealAlgebraicPoint<Number>& r,
+		cad::ConflictGraph<Number>& conflictGraph
+	);
+	
+	cad::Answer partialLiftCheck(
+		sampleIterator node,
 		cad::ConflictGraph<Number>& conflictGraph
 	);
 
@@ -586,7 +603,7 @@ public:
 	 * @param sample
 	 * @return a bounding Interval for sample at parent's children
 	 */
-	Interval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumberPtr<Number> sample) const;
+	Interval<Number> getBounds(const sampleIterator& parent, const RealAlgebraicNumber<Number> sample) const;
 
 	/** CURRENTLY DISABLED
 	 *
@@ -604,12 +621,6 @@ public:
 	 * @param r real algebraic point
 	 */
 	void shrinkBounds(BoundMap& bounds, const RealAlgebraicPoint<Number>& r);
-
-	/**
-	 * Removes all variables whose elimination sets are empty, i.e., if eliminationSets()[i] is empty, then variables()[i] is removed.
-	 * Note that this can only be applied if the removed variable is not needed in other polynomials any more, what can be determined in removePolynomial.
-	 */
-	void trimVariables();
 
 	/**
 	 * Determines whether p (of elimination set at level) has a root in the given box.
@@ -636,8 +647,8 @@ public:
 	bool isSampleConsistent(It node) const {
 		bool lastRoot = false;
 		for (auto cur = sampleTree.begin_children(node); cur != sampleTree.end_children(node); cur++) {
-			if ((*cur)->isRoot() && lastRoot) return false;
-			lastRoot = (*cur)->isRoot();
+			if (cur->isRoot() && lastRoot) return false;
+			lastRoot = cur->isRoot();
 			if (!isSampleConsistent(cur)) return false;
 		}
 		return true;
@@ -648,6 +659,7 @@ public:
 		if (!isOk) {
 			CARL_LOG_ERROR("carl.cad", "SampleTree: " << this->sampleTree);
 		}
+		return true;
 		assert(isOk);
 		return isOk;
 	}
@@ -660,8 +672,8 @@ public:
 	template<typename It>
 	bool checkIntegrality(It node) const {
 		for (auto pit = sampleTree.begin_path(node); pit.depth() != 0; ++pit) {
-			Variable var = variables[pit.depth() - 1];
-			if ((var.getType() == VariableType::VT_INT) && (!(*pit)->isIntegral())) return false;
+			Variable var = mVariables[pit.depth() - 1];
+			if ((var.getType() == VariableType::VT_INT) && (!pit->isIntegral())) return false;
 		}
 		return true;
 	}

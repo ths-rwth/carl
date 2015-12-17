@@ -27,8 +27,9 @@ We use the following ordering:
 - For two monomials `a` and `b`, we use a lexicographical ordering with total degree, that is `a < b` if 
   - the total degree of `a` is smaller than the total degree of `b`, or
   - the total degrees are the same and
-    - the exponent of some variable `v` in `a` is smaller than in `b` and
+    - the exponent of some variable `v` in `a` is greater than in `b` and
     - the exponents of all variables smaller than `v` are the same in `a` and in `b`.
+  - The intuition is that the monomials are considered as a sorted product of plain variables.
 - For two terms `a` and `b`, `a < b` if
   - the monomial of `a` is smaller than the monomial of `b`, or
   - the monomials of `a` and `b` are the same and the coefficient of `a` is smaller than the coefficient of `b`.

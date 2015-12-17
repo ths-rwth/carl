@@ -5,7 +5,6 @@
  * @author  Florian Corzilius
  *
  */
-#ifdef COMPARE_WITH_Z3
 #pragma once
 #include <functional>
 
@@ -42,4 +41,3 @@ struct hash<mpq>
 };
 
 }
-#endif

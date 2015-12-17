@@ -7,6 +7,6 @@ add_executable( runIntervalTests
                                 Test_Contraction.cpp
 			  )
 cotire(runIntervalTests)
-target_link_libraries(runIntervalTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic})
+target_link_libraries(runIntervalTests ${GTEST_LIBRARIES} lib_carl ${libs_dynamic} prepareTest)
 
 add_test( NAME interval COMMAND runIntervalTests )

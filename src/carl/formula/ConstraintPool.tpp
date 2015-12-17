@@ -28,7 +28,7 @@ namespace carl
         if( needs_cache<Pol>::value )
         {
             mpPolynomialCache = std::shared_ptr<typename Pol::CACHE>(new typename Pol::CACHE());
-#ifdef COMPARE_WITH_GINAC
+#ifdef USE_GINAC
             setGinacConverterPolynomialCache<Pol>( mpPolynomialCache );
 #endif
         }
@@ -68,6 +68,7 @@ namespace carl
         auto iterBoolPair = mConstraints.insert( constraint );
         if( iterBoolPair.second )
         {
+            constraint->mID = mIdAllocator;
             ++mIdAllocator;
             mLastConstructedConstraintWasKnown = false;
         }
@@ -80,38 +81,96 @@ namespace carl
     }
 
     template<typename Pol>
-    const ConstraintContent<Pol>* ConstraintPool<Pol>::create( const Pol& _lhs, const Relation _rel )
+    const ConstraintContent<Pol>* ConstraintPool<Pol>::create( const Pol& _lhs, Relation _rel )
     {
         CONSTRAINT_POOL_LOCK_GUARD
         if( _lhs.isConstant() )
             return evaluate<Pol>( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
-        ConstraintContent<Pol>* constraint = createNormalizedConstraint( _lhs, _rel );
-        const ConstraintContent<Pol>* result = addConstraintToPool( constraint );
-        return result;
+        if( _lhs.totalDegree() == 1 && (_rel != Relation::EQ && _rel != Relation::NEQ) && _lhs.isUnivariate() )
+        {
+            if( carl::isNegative( _lhs.lcoeff() ) )
+            {
+                switch( _rel )
+                {
+                    case Relation::LESS: _rel = Relation::GREATER; break;
+                    case Relation::GREATER: _rel = Relation::LESS; break;
+                    case Relation::LEQ: _rel = Relation::GEQ; break;
+                    default: assert( _rel == Relation::GEQ); _rel = Relation::LEQ; break;
+                }
+            }
+            return create( _lhs.getSingleVariable(), _rel, (-_lhs.constantPart())/_lhs.lcoeff() );
+        }
+        return addConstraintToPool( createNormalizedConstraint( _lhs, _rel ) );
     }
 
     template<typename Pol>
-    ConstraintContent<Pol>* ConstraintPool<Pol>::createNormalizedBound( Variable::Arg _var, const Relation _rel, const typename Pol::NumberType& _bound ) const
+    ConstraintContent<Pol>* ConstraintPool<Pol>::createNormalizedBound( Variable::Arg _var, Relation _rel, const typename Pol::NumberType& _bound ) const
     {
-        assert( _rel != Relation::EQ && _rel != Relation::NEQ );
-        if( _rel == Relation::GREATER )
+        assert( _rel != Relation::EQ );
+        assert( _rel != Relation::NEQ );
+        Pol lhs = makePolynomial<Pol>( _var );
+        switch( _rel )
         {
-            Pol lhs = -(makePolynomial<Pol>( _var ));
-            lhs += _bound;
-            return new ConstraintContent<Pol>( std::move(lhs), Relation::LESS, mIdAllocator );
+            case Relation::GREATER:
+                lhs = -lhs;
+                if( _var.getType() == VariableType::VT_INT )
+                {
+                    if( isInteger( _bound ) )
+                        lhs += _bound + typename Pol::NumberType( 1 );
+                    else
+                        lhs += carl::ceil( _bound );
+                    _rel = Relation::LEQ;
+                }
+                else
+                {
+                    lhs += _bound;
+                    _rel = Relation::LESS;
+                }
+                break;
+            case Relation::GEQ:
+                lhs = -lhs;
+                if( _var.getType() == VariableType::VT_INT )
+                {
+                    if( isInteger( _bound ) )
+                        lhs += _bound;
+                    else
+                        lhs += carl::ceil( _bound );
+                    _rel = Relation::LEQ;
+                }
+                else
+                {
+                    lhs += _bound;
+                    _rel = Relation::LEQ;
+                }
+                break;
+            case Relation::LESS:
+                if( _var.getType() == VariableType::VT_INT )
+                {
+                    if( isInteger( _bound ) )
+                        lhs -= (_bound - typename Pol::NumberType( 1 ));
+                    else
+                        lhs -= carl::floor( _bound );
+                    _rel = Relation::LEQ;
+                }
+                else
+                {
+                    lhs -= _bound;
+                }
+                break;
+            default:
+                assert( _rel == Relation::LEQ );
+                if( _var.getType() == VariableType::VT_INT )
+                {
+                    if( isInteger( _bound ) )
+                        lhs -= _bound;
+                    else
+                        lhs -= carl::floor( _bound );
+                }
+                else
+                    lhs -= _bound;
+                break;
         }
-        else if( _rel == Relation::GEQ )
-        {
-            Pol lhs = -(makePolynomial<Pol>( _var ));
-            lhs += _bound;
-            return new ConstraintContent<Pol>( std::move(lhs), Relation::LEQ, mIdAllocator );
-        }
-        else
-        {
-            Pol lhs = makePolynomial<Pol>( _var );
-            lhs -= _bound;
-            return new ConstraintContent<Pol>( std::move(lhs), _rel, mIdAllocator );
-        }
+        return new ConstraintContent<Pol>( std::move(lhs), _rel );
     }
     
     template<typename Pol>

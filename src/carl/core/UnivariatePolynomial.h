@@ -30,6 +30,8 @@ template<typename Coefficient> class UnivariatePolynomial;
 template<typename Coefficient>
 using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
+template<typename Coefficient>
+using FactorMap = std::map<UnivariatePolynomial<Coefficient>, unsigned>;
 }
 
 #include "DivisionResult.h"
@@ -535,17 +537,26 @@ public:
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
+#ifdef __VS
+	template<typename C = Coefficient, EnableIfBool<!is_number<C>::value > = dummy>
+	Coefficient unitPart() const;
+#else
 	template<typename C = Coefficient, EnableIf<Not<is_number<C>> > = dummy>
 	Coefficient unitPart() const;
+#endif
 	/**
 	 * The unit part of a polynomial over a ring is the sign of the polynomial for nonzero polynomials, 
 	 * and one for zero polynomials.
 	 * @see @cite GCL92, page 42.
 	 * @return The unit part of the polynomial.
 	 */
+#ifdef __VS
+	template<typename C = Coefficient, EnableIfBool<!is_field<C>::value && is_number<C>::value> = dummy>
+	Coefficient unitPart() const;
+#else
 	template<typename C = Coefficient, EnableIf<Not<is_field<C>>, is_number<C>> = dummy>
 	Coefficient unitPart() const;
-	
+#endif
 	
 	/**
 	 * The content of a polynomial is the gcd of the coefficients of the normal part of a polynomial.
@@ -854,11 +865,10 @@ public:
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
 	IntNumberType mainDenom() const;
 
-
-	std::map<UnivariatePolynomial, unsigned> factorization() const;
+	FactorMap<Coefficient> factorization() const;
 
 	template<typename Integer>
-	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& _poly, std::map<UnivariatePolynomial, unsigned>& _linearFactors, const Integer& maxNum = 0 );
+	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
 
 	Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
 	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;

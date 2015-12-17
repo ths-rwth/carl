@@ -6,8 +6,13 @@
 
 #pragma once
 
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Eigenvalues>
+#ifdef __VS
+	#include <Eigen/Dense>
+	#include <Eigen/Eigenvalues>
+#else
+	#include <eigen3/Eigen/Dense>
+	#include <eigen3/Eigen/Eigenvalues>
+#endif
 
 #include "AbstractRootFinder.h"
 #include "RootFinder.h"
@@ -35,21 +40,28 @@ IncrementalRootFinder<Number, C>::IncrementalRootFinder(
 
 template<typename Number, typename C>
 void IncrementalRootFinder<Number, C>::findRoots() {
-	while (this->next() != nullptr) {}
+	while (this->processQueueItem()) {}
 	this->setFinished();
 }
 
 template<typename Number, typename C>
-RealAlgebraicNumberPtr<Number> IncrementalRootFinder<Number, C>::next() {
+bool IncrementalRootFinder<Number, C>::hasNext() {
 	while (this->nextRoot == this->roots.end()) {
 		if (!this->processQueueItem()) {
 			this->setFinished();
-			return nullptr;
+			return false;
 		}
 	}
+	return true;
+}
+
+template<typename Number, typename C>
+RealAlgebraicNumber<Number> IncrementalRootFinder<Number, C>::next() {
+	assert(this->nextRoot != this->roots.end());
 	auto tmp = this->nextRoot++;
 	return *tmp;
 }
+
 
 template<typename Number, typename C>
 bool IncrementalRootFinder<Number, C>::processQueueItem() {
@@ -72,7 +84,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 	}
 
 	if (interval.contains(0)) {
-		if (this->polynomial.evaluate(0) == 0) this->addRoot(RealAlgebraicNumberNR<Number>::create(0));
+		if (this->polynomial.evaluate(0) == 0) this->addRoot(RealAlgebraicNumber<Number>(0));
 		this->addQueue(Interval<Number>(interval.lower(), BoundType::STRICT, 0, BoundType::STRICT), strategy);
 		this->addQueue(Interval<Number>(0, BoundType::STRICT, interval.upper(), BoundType::STRICT), strategy);
 		return true;
@@ -171,7 +183,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	}
 	for (unsigned int i = 1; i < res.size()-1; i++) {
 		if (finder.getPolynomial().evaluate(res[i]) == 0) {
-			finder.addRoot(RealAlgebraicNumberNR<Number>::create(res[i]));
+			finder.addRoot(RealAlgebraicNumber<Number>(res[i]));
 		}
 		assert(res[i] <= res[i+1]);
 		if (res[i] < res[i+1]) {
@@ -186,7 +198,7 @@ template<typename Number>
 void GenericStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
 	Number pivot = interval.center();
 	if (finder.getPolynomial().evaluate(pivot) == 0) {
-		finder.addRoot(RealAlgebraicNumberNR<Number>::create(pivot));
+		finder.addRoot(RealAlgebraicNumber<Number>(pivot));
 	}
 	finder.addQueue(Interval<Number>(interval.lower(), BoundType::STRICT, pivot, BoundType::STRICT), SplittingStrategy::GENERIC);
 	finder.addQueue(Interval<Number>(pivot, BoundType::STRICT, interval.upper(), BoundType::STRICT), SplittingStrategy::GENERIC);
@@ -196,7 +208,7 @@ template<typename Number>
 void BinarySampleStrategy<Number>::operator()(const Interval<Number>& interval, RootFinder<Number>& finder) {
 	Number pivot = interval.sample();
 	if (finder.getPolynomial().evaluate(pivot) == 0) {
-		finder.addRoot(RealAlgebraicNumberNR<Number>::create(pivot));
+		finder.addRoot(RealAlgebraicNumber<Number>(pivot));
 	}
 	finder.addQueue(Interval<Number>(interval.lower(), BoundType::STRICT, pivot, BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
 	finder.addQueue(Interval<Number>(pivot, BoundType::STRICT, interval.upper(), BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
@@ -211,7 +223,7 @@ void BinaryNewtonStrategy<Number>::operator()(const Interval<Number>& interval, 
 	}
 	if (!interval.contains(pivot)) pivot = interval.sample();
 	if (finder.getPolynomial().evaluate(pivot) == 0) {
-		finder.addRoot(RealAlgebraicNumberNR<Number>::create(pivot));
+		finder.addRoot(RealAlgebraicNumber<Number>(pivot));
 	}
 	finder.addQueue(Interval<Number>(interval.lower(), BoundType::STRICT, pivot, BoundType::STRICT), SplittingStrategy::BINARYNEWTON);
 	finder.addQueue(Interval<Number>(pivot, BoundType::STRICT, interval.upper(), BoundType::STRICT), SplittingStrategy::BINARYNEWTON);

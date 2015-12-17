@@ -8,14 +8,20 @@
  * @version 2014-11-11
  */
 
-#include "../../carl/util/platform.h"
+#include "carl/util/platform.h"
 CLANG_WARNING_DISABLE("-Wsign-compare")
 #include "gtest/gtest.h"
 CLANG_WARNING_RESET
-#include "../../carl/interval/Interval.h"
+#include "carl/interval/Interval.h"
 #include "carl/core/VariablePool.h"
 #include "carl/core/MultivariatePolynomial.h"
-#include <gmpxx.h>
+#ifdef __WIN
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
+#else
+	#include <gmpxx.h>
+#endif
 
 using namespace carl;
 

@@ -12,7 +12,7 @@ template<typename Number> class RealAlgebraicPoint;
 }
 
 #include "RealAlgebraicNumber.h"
-#include "RealAlgebraicNumberOperations.h"
+//#include "RealAlgebraicNumberOperations.h"
 
 namespace carl {
 
@@ -25,7 +25,7 @@ private:
 	/**
 	 * Numbers of this RealAlgebraicPoint.
 	 */
-	std::vector<RealAlgebraicNumberPtr<Number>> numbers;
+	std::vector<RealAlgebraicNumber<Number>> numbers;
 
 public:
 	/**
@@ -39,7 +39,7 @@ public:
 	 * Creates a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::vector<RealAlgebraicNumberPtr<Number>>& v):
+	RealAlgebraicPoint(const std::vector<RealAlgebraicNumber<Number>>& v):
 		numbers(v)
 	{}
 
@@ -47,7 +47,7 @@ public:
 	 * Creates a real algebraic point with the specified components.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(std::vector<RealAlgebraicNumberPtr<Number>>&& v):
+	RealAlgebraicPoint(std::vector<RealAlgebraicNumber<Number>>&& v):
 		numbers(std::move(v))
 	{}
 
@@ -55,7 +55,7 @@ public:
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::list<RealAlgebraicNumberPtr<Number>>& v):
+	RealAlgebraicPoint(const std::list<RealAlgebraicNumber<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 
@@ -63,7 +63,7 @@ public:
 	 * Creates a real algebraic point with the specified components from a list.
 	 * @param v pointers to real algebraic numbers
 	 */
-	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumberPtr<Number>>& v):
+	RealAlgebraicPoint(const std::initializer_list<RealAlgebraicNumber<Number>>& v):
 		numbers(v.begin(), v.end())
 	{}
 
@@ -82,7 +82,7 @@ public:
 	 * @param r additional dimension given as real algebraic number
 	 * @return real algebraic point with higher dimension
 	 */
-	RealAlgebraicPoint conjoin(const RealAlgebraicNumberPtr<Number>& r) {
+	RealAlgebraicPoint conjoin(const RealAlgebraicNumber<Number>& r) {
 		RealAlgebraicPoint res = RealAlgebraicPoint(*this);
 		res.numbers.push_back(r);
 		return res;
@@ -93,7 +93,17 @@ public:
 	 * @param index Index.
 	 * @return Value of this point at the given index.
 	 */
-	RealAlgebraicNumberPtr<Number> operator[](std::size_t index) const {
+	const RealAlgebraicNumber<Number>& operator[](std::size_t index) const {
+		assert(index < this->numbers.size());
+		return this->numbers[index];
+	}
+	
+	/**
+	 * Retrieves the number of this point at the given index.
+	 * @param index Index.
+	 * @return Value of this point at the given index.
+	 */
+	RealAlgebraicNumber<Number>& operator[](std::size_t index) {
 		assert(index < this->numbers.size());
 		return this->numbers[index];
 	}

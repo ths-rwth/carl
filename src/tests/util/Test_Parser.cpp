@@ -2,16 +2,9 @@
 #include "carl/numbers/numbers.h"
 #include "carl/core/Variable.h"
 #include "carl/util/parser/Parser.h"
+#include "carl/util/platform.h"
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
+#include "../Common.h"
 
 using namespace carl;
 
@@ -22,7 +15,7 @@ TEST(Parser, Polynomial)
 	carl::Variable y = freshRealVariable("y");
 	parser.addVariable(x);
 	parser.addVariable(y);
-	
+
 	EXPECT_EQ(Rational(1), parser.polynomial("1"));
 	EXPECT_EQ(Rational(2)*x, parser.polynomial("2*x"));
 	EXPECT_EQ(x, parser.polynomial("x"));
@@ -38,7 +31,7 @@ TEST(Parser, RationalFunction)
 	carl::parser::Parser<MP> parser;
 	carl::Variable x = freshRealVariable("x");
 	parser.addVariable(x);
-	
+
 	EXPECT_EQ(RF(MP(Rational(2)*x)), parser.rationalFunction("2*x"));
 	EXPECT_EQ(RF(MP(x*x)), parser.rationalFunction("x^2"));
 	EXPECT_EQ(RF(MP(Rational(2)*x), MP(x*x)), parser.rationalFunction("2*x / x^2"));
@@ -74,5 +67,19 @@ TEST(Parser, Formula)
 
     FT result = parser.formula("(O4853 IMPLIES (O3838 AND ((((((((O4848) OR (O4851)) OR (O4849)) OR (O4850)) OR (O6262)) OR (O6285)) OR (O6217)) OR (O8504)) AND (NOT O8665)))");
     std::cout << result << std::endl;
-    EXPECT_EQ(FT(IMPLIES, FT(b1), FT(AND, FT(b2), FT(OR, FT(OR, FT(b3), FT(b4)), FT(OR, FT(b5), FT(b6), FT(b7)), FT(OR, FT(b8), FT(b9), FT(b10))), FT(NOT, FT(b11)))), result);
+    EXPECT_EQ(
+		FT(IMPLIES, {
+			FT(b1),
+			FT(AND, {
+				FT(b2),
+				FT(OR, {
+					FT(OR, {FT(b3), FT(b4)}),
+					FT(OR, {FT(b5), FT(b6), FT(b7)}),
+					FT(OR, {FT(b8), FT(b9), FT(b10)})
+				}),
+				FT(NOT, FT(b11))
+			})
+		}),
+		result
+	);
 }

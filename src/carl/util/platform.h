@@ -18,12 +18,18 @@
 
 	#define CLANG_WARNING_DISABLE(warning)\
 		_Pragma("clang diagnostic push")\
+		_Pragma("clang diagnostic ignored \"-Wunknown-pragmas\"")\
 		_Pragma( STRINGIFY(clang diagnostic ignored warning) )
 	#define CLANG_WARNING_RESET\
 		_Pragma("clang diagnostic pop")
 #elif __GNUC__
 	#define __GCC
-	
+
+	#define CLANG_WARNING_DISABLE(warning)
+	#define CLANG_WARNING_RESET
+#elif _MSC_VER
+	#define __VS
+
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
 #else
@@ -31,3 +37,9 @@
 	#define __UNSUPPORTED
 #endif
 
+#ifdef _WIN32
+	#define __WIN
+	#ifdef _WIN64
+	#define __WIN64
+	#endif
+#endif

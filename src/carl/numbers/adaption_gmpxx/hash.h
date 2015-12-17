@@ -7,9 +7,20 @@
  */
 
 #pragma once
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include <functional>
 #include <cstddef>
-#include <gmpxx.h>
+#ifdef __WIN
+	#pragma warning(push, 0)
+	#include <mpirxx.h>
+	#pragma warning(pop)
+#else
+	#include <gmpxx.h>
+#endif
 
 namespace std
 {

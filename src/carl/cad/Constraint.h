@@ -31,7 +31,7 @@ namespace cad {
 template<typename Number>
 class Constraint {
 private:
-	cad::MPolynomial<Number> polynomial;
+	cad::MultiPolynomial<Number> polynomial;
 	Sign sign;
 	std::vector<Variable> variables;
 	bool negated;
@@ -58,7 +58,7 @@ public:
 	 * @param v the variables of the polynomial
 	 * @param negated if set to <code>true</code>, <code>satisfiedBy</code> checks the negation of the specified sign condition. If otherwise <code>false</code> is specified (standard value), <code>satisfiedBy</code> checks the sign condition as specified.
 	 */
-	Constraint(const cad::MPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool _negated = false):
+	Constraint(const cad::MultiPolynomial<Number>& p, const Sign& s, const std::vector<Variable> v, bool _negated = false):
 		polynomial(p),
 		sign(s),
 		variables(checkVariables(p, v)),
@@ -74,7 +74,7 @@ public:
 	/**
 	 * @return the polynomial of the constraint
 	 */
-	const cad::MPolynomial<Number>& getPolynomial() const {
+	const cad::MultiPolynomial<Number>& getPolynomial() const {
 		return this->polynomial;
 	}
 
@@ -108,14 +108,15 @@ public:
 	 * @param r test point
 	 * @return false if the constraint was not satisfied by the given point, true otherwise.
 	 */
-	bool satisfiedBy(RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
+	bool satisfiedBy(const RealAlgebraicPoint<Number>& r, const std::vector<Variable>& _variables) const {
 		assert(_variables.size() == r.dim());
 		
 		auto res = RealAlgebraicNumberEvaluation::evaluate(this->polynomial, r, _variables);
+		CARL_LOG_DEBUG("carl.ran", *this << " evaluates to " << res << " on " << r);
 		if (this->negated) {
-			return res->sgn() != this->sign;
+			return res.sgn() != this->sign;
 		} else {
-			return res->sgn() == this->sign;
+			return res.sgn() == this->sign;
 		}
 	}
 
@@ -156,7 +157,7 @@ private:
 	 * @param v list of variables
 	 * @return v if the check was successful
 	 */
-	const std::vector<Variable> checkVariables(const cad::MPolynomial<Number>& p, const std::vector<Variable>& v) const {
+	const std::vector<Variable> checkVariables(const cad::MultiPolynomial<Number>& p, const std::vector<Variable>& v) const {
 		std::set<Variable> occuring = p.gatherVariables();
 		for (Variable var: v) {
 			occuring.erase(var);

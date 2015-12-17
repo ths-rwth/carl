@@ -1,34 +1,26 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
 #include "carl/core/Resultant.h"
+#include "carl/util/platform.h"
 
 #include <random>
 #include <cmath>
-using namespace carl;
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
+#include "../Common.h"
+using namespace carl;
 
 TEST(Resultant, det)
 {
-    Variable m = VariablePool::getInstance().getFreshVariable("m");
-    Variable r = VariablePool::getInstance().getFreshVariable("r");
+    //Variable m = freshRealVariable("m");
+    Variable r = freshRealVariable("r");
 
     MultivariatePolynomial<Rational> mr(r);
     MultivariatePolynomial<Rational> one((Rational)1);
     MultivariatePolynomial<Rational> zero((Rational)0);
-    Variable x = VariablePool::getInstance().getFreshVariable("x");
-	Variable c = VariablePool::getInstance().getFreshVariable("c");
-	Variable t = VariablePool::getInstance().getFreshVariable("t");
+    Variable x = freshRealVariable("x");
+	Variable c = freshRealVariable("c");
+	Variable t = freshRealVariable("t");
 
 	MultivariatePolynomial<Rational> mc(c);
 	MultivariatePolynomial<Rational> mt(t);

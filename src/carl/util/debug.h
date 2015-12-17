@@ -14,8 +14,12 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include <unistd.h>
 #include <sstream>
+
+#include "platform.h"
+#ifndef __VS
+#include <unistd.h>
+#endif
 
 namespace carl {
 
@@ -51,6 +55,10 @@ extern int last_assertion_code;
  * REGISTER_ASSERT; assert( ... );
  * @endcode
  */
+#ifdef __VS
+#define __func__ __FUNCTION__
+#endif
+
 #define REGISTER_ASSERT {\
 	std::stringstream ss; \
 	ss << __FILE__ << ":" << __LINE__ << " in " << __func__ << "()"; \

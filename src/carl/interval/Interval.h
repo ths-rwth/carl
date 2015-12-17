@@ -1,7 +1,7 @@
-/* The class which contains the interval arithmetic including trigonometric 
- * functions. The template parameter contains the number type used for the 
- * boundaries. It is necessary to implement the rounding and checking policies 
- * for any non-primitive type such that the desired inclusion property can be 
+/* The class which contains the interval arithmetic including trigonometric
+ * functions. The template parameter contains the number type used for the
+ * boundaries. It is necessary to implement the rounding and checking policies
+ * for any non-primitive type such that the desired inclusion property can be
  * maintained.
  *
  * Requirements for the NumberType:
@@ -10,7 +10,7 @@
  * - Operators <,>,<=,>=,==,!= with the expected functionality
  * - Operations abs, min, max, log, exp, power, sqrt
  * - Trigonometric functions sin, cos, tan, asin, acos, atan, sinh, cosh, tanh,
- *				asinh, acosh, atanh (these functions are needed for the 
+ *				asinh, acosh, atanh (these functions are needed for the
  *				specialization of the rounding modes.
  * - Operator <<
  *
@@ -36,6 +36,7 @@
 #include "../core/Sign.h"
 
 CLANG_WARNING_DISABLE("-Wunused-parameter")
+CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/interval.hpp>
 #include <boost/functional/hash.hpp>
@@ -53,12 +54,7 @@ namespace carl
 {
     template<typename Number>
     class Interval;
-    
-    /**
-    * States whether a given type is an `Interval`.
-    * By default, a type is not.
-    */
-   template <class Number> struct is_interval : std::false_type {};
+
    /**
     * States that `boost::variant` is indeed a `boost::variant`.
     */
@@ -67,7 +63,7 @@ namespace carl
     * States that `const boost::variant` is indeed a `boost::variant`.
     */
    template <class Number> struct is_interval<const carl::Interval<Number>> : std::true_type {};
-    
+
    /**
 	* Function which determines, if the interval is the zero interval.
 	* @return True if it is a pointinterval rooted at 0.
@@ -87,10 +83,10 @@ namespace carl
    {
 	   return _in.isOne();
    }
-   
-   
+
+
     /**
-     * Struct which holds the rounding and checking policies required for boost 
+     * Struct which holds the rounding and checking policies required for boost
      * interval.
      */
     template<typename Number>
@@ -112,10 +108,10 @@ namespace carl
     };
 
     /**
-     *The class which contains the interval arithmetic including trigonometric 
-     * functions. The template parameter contains the number type used for the 
-     * boundaries. It is necessary to implement the rounding and checking policies 
-     * for any non-primitive type such that the desired inclusion property can be 
+     *The class which contains the interval arithmetic including trigonometric
+     * functions. The template parameter contains the number type used for the
+     * boundaries. It is necessary to implement the rounding and checking policies
+     * for any non-primitive type such that the desired inclusion property can be
      * maintained.
      *
      * Requirements for the NumberType:
@@ -124,7 +120,7 @@ namespace carl
      * - Operators <,>,<=,>=,==,!= with the expected functionality
      * - Operations abs, min, max, log, exp, power, sqrt
      * - Trigonometric functions sin, cos, tan, asin, acos, atan, sinh, cosh, tanh,
-     *				asinh, acosh, atanh (these functions are needed for the 
+     *				asinh, acosh, atanh (these functions are needed for the
      *				specialization of the rounding modes.
      * - Operator <<
      */
@@ -144,7 +140,7 @@ namespace carl
         /// Macro to perform a quick check on the passed interval bounds.
 #define BOUNDS_OK( lower, lowerBoundType, upper, upperBoundType )\
 (lowerBoundType == BoundType::INFTY || upperBoundType == BoundType::INFTY || lower <= upper)
-		
+
         /// Macro to perform a quick check for emptiness of the interval.
 #define IS_EMPTY(lower, lowerBoundType, upper, upperBoundType )\
 (((lowerBoundType == BoundType::STRICT && upperBoundType != BoundType::INFTY) || (lowerBoundType != BoundType::INFTY && upperBoundType == BoundType::STRICT)) && lower == upper)
@@ -210,13 +206,13 @@ namespace carl
 
         /**
          * Constructor which constructs the interval according to the passed boost
-         * interval with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
-         * empty interval is constructed and if both bounds are infty the unbounded 
+         * interval with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
+         * empty interval is constructed and if both bounds are infty the unbounded
          * interval is constructed.
          * @param content The passed boost interval.
          * @param lowerBoundType The desired lower bound type, defaults to WEAK.
-         * @param upperBoundType The desired upper bound type, defaults to WEAK. 
+         * @param upperBoundType The desired upper bound type, defaults to WEAK.
          */
         Interval(const BoostInterval& content, BoundType lowerBoundType = BoundType::WEAK, BoundType upperBoundType = BoundType::WEAK)
         {
@@ -257,8 +253,8 @@ namespace carl
 
         /**
          * Constructor which constructs the interval according to the passed bounds
-         * with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -344,9 +340,9 @@ namespace carl
         }
 
         /**
-         * Constructor which constructs the interval according to the passed double 
-         * bounds with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * Constructor which constructs the interval according to the passed double
+         * bounds with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired double lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -424,9 +420,9 @@ namespace carl
         }
 
         /**
-         * Constructor which constructs the interval according to the passed int 
-         * bounds with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * Constructor which constructs the interval according to the passed int
+         * bounds with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -504,9 +500,9 @@ namespace carl
         }
 
         /**
-         * Constructor which constructs the interval according to the passed unsigned int 
-         * bounds with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * Constructor which constructs the interval according to the passed unsigned int
+         * bounds with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -550,9 +546,9 @@ namespace carl
                 mUpperBoundType = BoundType::STRICT;
             }
         }
-        
+
         /**
-         * Constructor which constructs a pointinterval from a passed general 
+         * Constructor which constructs a pointinterval from a passed general
          * rational number.
          * @param n The passed double.
          */
@@ -561,9 +557,9 @@ namespace carl
         {
             *this = Interval<double>(n, n);
         }
-        
+
         /**
-         * Constructor which constructs an interval from the passed general rational 
+         * Constructor which constructs an interval from the passed general rational
          * bounds.
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
@@ -576,8 +572,8 @@ namespace carl
 
         /**
          * Constructor which constructs the interval according to the passed general
-         * rational bounds with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * rational bounds with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -618,7 +614,7 @@ namespace carl
         }
 
         /**
-         * Constructor which constructs a pointinterval from a passed general 
+         * Constructor which constructs a pointinterval from a passed general
          * float number (e.g. FLOAT_T).
          * @param n The passed double.
          */
@@ -629,7 +625,7 @@ namespace carl
         }
 
         /**
-         * Constructor which constructs an interval from the passed general float 
+         * Constructor which constructs an interval from the passed general float
          * bounds (e.g. FLOAT_T).
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
@@ -642,8 +638,8 @@ namespace carl
 
         /**
          * Constructor which constructs the interval according to the passed general
-         * float bounds (e.g. FLOAT_T) with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * float bounds (e.g. FLOAT_T) with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -682,9 +678,9 @@ namespace carl
                 mContent = BoostInterval(left, right);
             }
         }
-		
+
 		/**
-         * Constructor which constructs a pointinterval from a passed general 
+         * Constructor which constructs a pointinterval from a passed general
          * float number (e.g. FLOAT_T).
          * @param n The passed double.
          */
@@ -695,7 +691,7 @@ namespace carl
         }
 
         /**
-         * Constructor which constructs an interval from the passed general float 
+         * Constructor which constructs an interval from the passed general float
          * bounds (e.g. FLOAT_T).
          * @param lower The desired lower bound.
          * @param upper The desired upper bound.
@@ -708,8 +704,8 @@ namespace carl
 
         /**
          * Constructor which constructs the interval according to the passed general
-         * float bounds (e.g. FLOAT_T) with the passed bound types. Note that if the interval is a 
-         * pointinterval with both strict bounds or the content is invalid the 
+         * float bounds (e.g. FLOAT_T) with the passed bound types. Note that if the interval is a
+         * pointinterval with both strict bounds or the content is invalid the
          * empty interval is constru
          * @param lower The desired lower bound.
          * @param lowerBoundType The desired lower bound type.
@@ -1024,7 +1020,7 @@ namespace carl
             assert(this->isConsistent());
             return this->isPointInterval() && (mContent.lower() == carl::constant_zero<Number>().get());
         }
-		
+
 		/**
          * Function which determines, if the interval is the one interval.
          * @return True if it is a pointinterval rooted at 1.
@@ -1034,7 +1030,7 @@ namespace carl
             assert(this->isConsistent());
             return this->isPointInterval() && (mContent.lower() == carl::constant_one<Number>().get());
         }
-		
+
 		/**
          * @return true, if it this interval contains only positive values.
          */
@@ -1047,7 +1043,7 @@ namespace carl
                 return mContent.lower() >= carl::constant_zero<Number>().get();
             return false;
         }
-		
+
 		/**
          * @return true, if it this interval contains only negative values.
          */
@@ -1060,7 +1056,7 @@ namespace carl
                 return mContent.upper() <= carl::constant_zero<Number>().get();
             return false;
         }
-		
+
 		/**
          * @return true, if it this interval contains only positive values or 0.
          */
@@ -1071,7 +1067,7 @@ namespace carl
                 return mContent.lower() >= carl::constant_zero<Number>().get();
             return false;
         }
-		
+
 		/**
          * @return true, if it this interval contains only negative values or 0.
          */
@@ -1094,25 +1090,25 @@ namespace carl
          * @return Interval.
          */
         Interval<Number> integralPart() const;
-        
+
         /**
          * Computes and assigns the integral part of the given interval.
          * @return Interval.
          */
         void integralPart_assign();
-        
+
         /**
          * Checks if the interval contains at least one integer value.
          * @return true, if the interval contains an integer.
          */
         bool containsInteger() const;
-        
+
         /**
          * Returns the diameter of the interval.
          * @return Diameter.
          */
         Number diameter() const;
-        
+
         /**
          * Computes and assigns the diameter of the interval.
          */
@@ -1124,7 +1120,7 @@ namespace carl
          * @return Ratio.
          */
         Number diameterRatio(const Interval<Number>& rhs) const;
-        
+
         /**
          * Computes and assigns the ratio of the diameters of the given intervals.
          * @param rhs Other interval.
@@ -1136,12 +1132,12 @@ namespace carl
          * @return Magnitude.
          */
         Number magnitude() const;
-        
+
         /**
          * Computes and assigns the magnitude of the interval.
          */
         void magnitude_assign();
-        
+
         /**
          * Returns the center point of the interval.
          * @return Center.
@@ -1169,7 +1165,7 @@ namespace carl
 				return (N)(std::nextafter(this->mContent.lower(), INFINITY));
 			return boost::numeric::median(mContent);
 		}
-        
+
         /**
          * Computes and assigns the center point of the interval.
          */
@@ -1180,7 +1176,7 @@ namespace carl
          * @return Some point within this interval.
          */
         Number sample(bool _includingBounds = true) const;
-        
+
         /**
          * Searches for some point in this interval, preferably near the midpoint and with a small representation and
          * assigns this interval the calculated point.
@@ -1193,7 +1189,7 @@ namespace carl
          * @return True if the value is contained in this.
          */
         bool contains(const Number& val) const;
-		
+
 		template<typename Num = Number, DisableIf<std::is_same<Num, int >> = dummy>
 		bool contains(int val) const
 		{
@@ -1353,20 +1349,20 @@ namespace carl
          * @return Interval.
          */
         Interval<Number> inverse() const;
-        
+
         /**
          * Calculates the absolute value of the interval.
          * @return Interval.
          */
         Interval<Number> abs() const;
-        
+
         /**
          * Calculates and assigns the absolute value of the interval.
          */
         void abs_assign();
-        
+
         /**
-         * Calculates and assigns the additive inverse of an interval with respect 
+         * Calculates and assigns the additive inverse of an interval with respect
          * to natural interval arithmetic.
          */
         void inverse_assign();
@@ -1385,7 +1381,7 @@ namespace carl
          * @return Result.
          */
         Interval<Number> pow(unsigned exp) const;
-        
+
         /**
          * Calculates and assigns the power of the interval with respect to natural interval arithmetic.
          * @param exp Exponent.
@@ -1398,7 +1394,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> sqrt() const;
-        
+
         /**
          * Calculates and assigns the square root of the interval with respect to natural interval arithmetic.
          */
@@ -1412,7 +1408,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> root(int deg) const;
-        
+
         /**
          * Calculates and assigns the nth root of the interval with respect to natural interval arithmetic.
          * @param deg Degree.
@@ -1426,7 +1422,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> log() const;
-        
+
         /**
          * Calculates and assigns the logarithm of the interval with respect to natural interval arithmetic.
          */
@@ -1443,7 +1439,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> sin() const;
-        
+
         /**
          * Calculates and assigns the sine of the given interval with respect to natural interval arithmetic.
          */
@@ -1456,7 +1452,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> cos() const;
-        
+
         /**
          * Calculates and assigns the cosine of the given interval with respect to natural interval arithmetic.
          */
@@ -1469,7 +1465,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> tan() const;
-        
+
         /**
          * Calculates and assigns the tangent of the given interval with respect to natural interval arithmetic.
          */
@@ -1482,7 +1478,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> asin() const;
-        
+
         /**
          * Calculates and assigns the arcus sine of the given interval with respect to natural interval arithmetic.
          */
@@ -1495,7 +1491,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> acos() const;
-        
+
         /**
          * Calculates and assigns the arcus cosine of the given interval with respect to natural interval arithmetic.
          */
@@ -1508,7 +1504,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> atan() const;
-        
+
         /**
          * Calculates and assigns the arcus tangent of the given interval with respect to natural interval arithmetic.
          */
@@ -1521,7 +1517,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> sinh() const;
-        
+
         /**
          * Calculates and assigns the hyperbolic sine of the given interval with respect to natural interval arithmetic.
          */
@@ -1534,7 +1530,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> cosh() const;
-        
+
         /**
          * Calculates and assigns the hyperbolic cosine of the given interval with respect to natural interval arithmetic.
          */
@@ -1547,7 +1543,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> tanh() const;
-        
+
         /**
          * Calculates and assigns the hyperbolic tangent of the given interval with respect to natural interval arithmetic.
          */
@@ -1560,7 +1556,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> asinh() const;
-        
+
         /**
          * Calculates and assigns the hyperbolic arcus sine of the given interval with respect to natural interval arithmetic.
          */
@@ -1573,7 +1569,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> acosh() const;
-        
+
         /**
          * Calculates and assigns the hyperbolic arcus cosine of the given interval with respect to natural interval arithmetic.
          */
@@ -1586,7 +1582,7 @@ namespace carl
          */
         template<typename Num = Number, EnableIf<std::is_floating_point<Num>> = dummy>
         Interval<Number> atanh() const;
-        
+
         /**
          * Calculates and assigns the hyperbolic arcus tangent of the given interval with respect to natural interval arithmetic.
          */
@@ -1596,7 +1592,7 @@ namespace carl
         /*
          * Boolean Operations
          */
-        
+
         bool intersectsWith(const Interval<Number>& rhs) const;
 
         /**
@@ -1605,7 +1601,7 @@ namespace carl
          * @return Result.
          */
         Interval<Number> intersect(const Interval<Number>& rhs) const;
-        
+
         /**
          * Intersects and assigns two intervals in a set-theoretic manner.
          * @param rhs Righthand side.
@@ -1633,7 +1629,7 @@ namespace carl
         bool difference(const Interval<Number>& rhs, Interval<Number>& resultA, Interval<Number>& resultB) const;
 
         /**
-         * Calculates the complement in a set-theoretic manner (can result 
+         * Calculates the complement in a set-theoretic manner (can result
          * in two distinct intervals).
          * @param resultA Result a.
          * @param resultB Result b.
@@ -1642,7 +1638,7 @@ namespace carl
         bool complement(Interval<Number>& resultA, Interval<Number>& resultB) const;
 
         /**
-         * Calculates the symmetric difference of two intervals in a 
+         * Calculates the symmetric difference of two intervals in a
          * set-theoretic manner (can result in two distinct intervals).
          * @param rhs Righthand side.
          * @param resultA Result a.
@@ -1666,14 +1662,12 @@ namespace carl
     */
     Number distance(const Interval<Number>& intervalA);
 
-    Interval<Number> convexHull(const Interval<Number>& interval);
+    Interval<Number> convexHull(const Interval<Number>& interval) const;
 
     };
 
 	template<typename T>
 	struct is_number<Interval<T>> : std::true_type {};
-  
-
 
     /*
      * Overloaded arithmetics operators
@@ -1687,7 +1681,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator +(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the addition of an interval and a number.
      * @param lhs Lefthand side.
@@ -1696,7 +1690,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the addition of an interval and a number.
      * @param lhs Lefthand side.
@@ -1705,7 +1699,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs);
-    
+
     /**
      * Operator for the addition of an interval and a number with assignment.
      * @param lhs Lefthand side.
@@ -1714,7 +1708,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the addition of an interval and a number with assignment.
      * @param lhs Lefthand side.
@@ -1723,7 +1717,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Number& rhs);
-    
+
     /**
      * Unary minus.
      * @param interval The operand.
@@ -1731,7 +1725,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator -(const Interval<Number>& interval);
-    
+
     /**
      * Operator for the subtraction of two intervals.
      * @param lhs Lefthand side.
@@ -1740,7 +1734,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the subtraction of an interval and a number.
      * @param lhs Lefthand side.
@@ -1749,7 +1743,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the subtraction of an interval and a number.
      * @param lhs Lefthand side.
@@ -1758,7 +1752,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs);
-	
+
 	/**
      * Operator for the subtraction of two intervals with assignment.
      * @param lhs Lefthand side.
@@ -1767,7 +1761,7 @@ namespace carl
      */
 	template<typename Number>
     inline const Interval<Number> operator -=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the subtraction of an interval and a number with assignment.
      * @param lhs Lefthand side.
@@ -1776,7 +1770,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator -=(const Interval<Number>& lhs, const Number& rhs);
-    
+
     /**
      * Operator for the multiplication of two intervals.
      * @param lhs Lefthand side.
@@ -1785,7 +1779,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator *(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the multiplication of an interval and a number.
      * @param lhs Lefthand side.
@@ -1794,7 +1788,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the multiplication of an interval and a number.
      * @param lhs Lefthand side.
@@ -1803,7 +1797,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs);
-    
+
     /**
      * Operator for the multiplication of an interval and a number with assignment.
      * @param lhs Lefthand side.
@@ -1812,7 +1806,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator *=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the multiplication of an interval and a number with assignment.
      * @param lhs Lefthand side.
@@ -1821,7 +1815,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator *=(const Interval<Number>& lhs, const Number& rhs);
-    
+
     /**
      * Operator for the division of two intervals.
      * @param lhs Lefthand side.
@@ -1830,7 +1824,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the division of an interval and a number.
      * @param lhs Lefthand side.
@@ -1839,7 +1833,7 @@ namespace carl
      */
     template<typename Number>
     inline const Interval<Number> operator /(const Number& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the division of an interval and a number.
      * @param lhs Lefthand side.
@@ -1861,7 +1855,7 @@ namespace carl
      */
     template<typename Number>
     inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1870,7 +1864,7 @@ namespace carl
      */
     template<typename Number>
     inline bool operator !=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1880,7 +1874,7 @@ namespace carl
      */
     template<typename Number>
     inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1890,7 +1884,7 @@ namespace carl
      */
     template<typename Number>
     inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1899,7 +1893,7 @@ namespace carl
      */
     template<typename Number>
     inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1908,7 +1902,7 @@ namespace carl
      */
     template<typename Number>
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1923,7 +1917,7 @@ namespace carl
     {
         return rhs>=lhs;
     }
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1938,7 +1932,7 @@ namespace carl
     {
         return rhs<=lhs;
     }
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1952,7 +1946,7 @@ namespace carl
     {
         return rhs>lhs;
     }
-    
+
     /**
      * Operator for the comparison of two intervals.
      * @param lhs Lefthand side.
@@ -1967,15 +1961,15 @@ namespace carl
         return rhs<lhs;
     }
 
-    
+
         template<typename Number>
     inline bool isInteger(const Interval<Number>&) {
 	return false;
     }
-    
+
     /**
      * Implements the division which assumes that there is no remainder.
-     * @param _lhs 
+     * @param _lhs
      * @param _rhs
      * @return Interval which holds the result.
      */
@@ -1984,7 +1978,7 @@ namespace carl
     {
         return _lhs / _rhs;
     }
-    
+
     /**
      * Implements the division with remainder.
      * @param _lhs
@@ -1996,7 +1990,7 @@ namespace carl
     {
         return _lhs / _rhs;
     }
-    
+
     /**
      * Casts the Interval to an arbitrary integer type which has a constructor for
      * a native int.
@@ -2008,7 +2002,7 @@ namespace carl
     {
         return Interval<Integer>(_floatInterval.lower(), _floatInterval.lowerBoundType(), _floatInterval.upper(), _floatInterval.upperBoundType());
     }
-    
+
     /**
      * Method which returns the absolute value of the passed number.
      * @param _in Number.
@@ -2019,7 +2013,7 @@ namespace carl
     {
         return _in.abs();
     }
-    
+
     /**
      * Method which returns the logarithm of the passed number.
      * @param _in Number.
@@ -2030,7 +2024,7 @@ namespace carl
     {
         return _in.log();
     }
-    
+
     /**
      * Method which returns the square root of the passed number.
      * @param _in Number.
@@ -2041,14 +2035,14 @@ namespace carl
     {
         return _in.sqrt();
     }
-    
-    
+
+
     template<typename Number>
     inline Interval<Number> pow(const Interval<Number>& _in, unsigned _exponent)
     {
         return _in.pow(_exponent);
     }
-    
+
     /**
      * Method which returns the next smaller integer of this number or the number
      * itself, if it is already an integer.
@@ -2060,7 +2054,7 @@ namespace carl
     {
         return Interval<Number>(floor(_in.lower()), _in.lowerBoundType(), floor(_in.upper()), _in.upperBoundType());
     }
-    
+
     /**
      * Method which returns the next larger integer of the passed number or the
      * number itself, if it is already an integer.
@@ -2072,7 +2066,7 @@ namespace carl
     {
         return Interval<Number>(ceil(_in.lower()), _in.lowerBoundType(), ceil(_in.upper()), _in.upperBoundType());
     }
-    
+
 }
 
 namespace std

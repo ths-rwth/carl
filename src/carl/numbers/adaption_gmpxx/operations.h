@@ -1,29 +1,35 @@
-/** 
+/**
  * @file   adaption_gmpxx/operations.h
  * @ingroup gmpxx
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  * @author Sebastian Junges
- * 
+ *
  * @warning This file should never be included directly but only via operations.h
  */
 
 #pragma once
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include "../../util/platform.h"
 #include <cstddef>
 #include <limits.h>
 #include <sstream>
+#include <iostream>
 #include <vector>
 #include "typetraits.h"
+CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include "boost/algorithm/string.hpp"
-#include "../constants.h"
-#include "../operations.h"
+CLANG_WARNING_RESET
 
 namespace carl {
 
 
 /**
  * Informational functions
- * 
+ *
  * The following functions return informations about the given numbers.
  */
 inline bool isZero(const mpz_class& n) {
@@ -44,20 +50,20 @@ inline bool isOne(const mpq_class& n) {
 
 inline bool isPositive(const mpz_class& n) {
 	return n > carl::constant_zero<mpz_class>().get();
-}	
-	
+}
+
 inline bool isPositive(const mpq_class& n) {
 	return n > carl::constant_zero<mpq_class>().get();
 }
 
 inline bool isNegative(const mpz_class& n) {
 	return n < carl::constant_zero<mpz_class>().get();
-}	
+}
 
 inline bool isNegative(const mpq_class& n) {
 	return n < carl::constant_zero<mpq_class>().get();
 }
-	
+
 inline mpz_class getNum(const mpq_class& n) {
 	return n.get_num();
 }
@@ -101,7 +107,7 @@ inline std::size_t bitsize(const mpq_class& n) {
 
 /**
  * Conversion functions
- * 
+ *
  * The following function convert types to other types.
  */
 
@@ -126,9 +132,9 @@ inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
     assert(n >= std::numeric_limits<unsigned long int>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
+
 template<>
 inline int toInt<int>(const mpz_class& n) {
-    std::cout << "mpz_class to int" << std::endl;
     assert(n <= std::numeric_limits<int>::max());
     assert(n >= std::numeric_limits<int>::min());
     return (int)mpz_get_si(n.get_mpz_t());
@@ -192,10 +198,6 @@ inline T rationalize(size_t n);
 template<typename T>
 inline T rationalize(const std::string& n);
 
-#ifdef USE_CLN_NUMBERS
-template<typename T>
-inline T rationalize(const PreventConversion<cln::cl_RA>&);
-#endif
 
 template<typename T>
 inline T rationalize(const PreventConversion<mpq_class>&);
@@ -228,14 +230,9 @@ inline mpq_class rationalize<mpq_class>(const PreventConversion<mpq_class>& n) {
 	return n;
 }
 
-#ifdef USE_CLN_NUMBERS
-template<>
-mpq_class rationalize<mpq_class>(const PreventConversion<cln::cl_RA>& n);
-#endif
-
 /**
  * Basic Operators
- * 
+ *
  * The following functions implement simple operations on the given numbers.
  */
 
@@ -249,6 +246,21 @@ inline mpq_class abs(const mpq_class& n) {
 	mpq_class res;
 	mpq_abs(res.get_mpq_t(), n.get_mpq_t());
 	return res;
+}
+
+inline mpz_class round(const mpq_class& n) {
+	if (isZero(mpz_class(n.get_num_mpz_t()))) return carl::constant_zero<mpz_class>::get();
+	mpz_class res;
+	mpz_class rem;
+	mpz_fdiv_qr(res.get_mpz_t(), rem.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
+    rem *= 2;
+    if( rem >= getDenom(n) )
+        ++res;
+	return res;
+}
+
+inline mpz_class round(const mpz_class& n) {
+	return n;
 }
 
 inline mpz_class floor(const mpq_class& n) {
@@ -336,6 +348,18 @@ inline mpq_class lcm(const mpq_class& a, const mpq_class& b) {
 	return res;
 }
 
+inline mpq_class log(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::log(mpq_class(n).get_d()));
+}
+
+inline mpq_class sin(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::sin(mpq_class(n).get_d()));
+}
+
+inline mpq_class cos(const mpq_class& n) {
+	return carl::rationalize<mpq_class>(std::cos(mpq_class(n).get_d()));
+}
+
 template<>
 inline mpz_class pow(const mpz_class& b, std::size_t e) {
 	mpz_class res;
@@ -362,27 +386,29 @@ inline mpq_class pow(const mpq_class& b, std::size_t e) {
 
 /**
  * Calculate the square root of a fraction if possible.
- * 
+ *
  * @param a The fraction to calculate the square root for.
  * @param b A reference to the rational, in which the result is stored.
  * @return true, if the number to calculate the square root for is a square;
  *         false, otherwise.
  */
-bool sqrtp(const mpq_class& a, mpq_class& b);
+bool sqrt_exact(const mpq_class& a, mpq_class& b);
 
-std::pair<mpq_class,mpq_class> sqrt(const mpq_class& a);
+mpq_class sqrt(const mpq_class& a);
+
+std::pair<mpq_class,mpq_class> sqrt_safe(const mpq_class& a);
 
 /**
  * Compute square root in a fast but less precise way.
  * Use cln::sqrt() to obtain an approximation. If the result is rational, i.e. the result is exact, use this result.
  * Otherwise use the nearest integers as bounds on the square root.
  * @param a Some number.
- * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z. 
+ * @return [x,x] if sqrt(a) = x is rational, otherwise [y,z] for y,z integer and y < sqrt(a) < z.
  */
 std::pair<mpq_class,mpq_class> sqrt_fast(const mpq_class& a);
 
 inline mpz_class mod(const mpz_class& n, const mpz_class& m) {
-    // TODO: In order to have the same result as division of native signed integer we have to 
+    // TODO: In order to have the same result as division of native signed integer we have to
     //       make it that complicated, as mpz_mod always returns positive integer. Maybe there is a better way.
 	mpz_class res;
 	mpz_mod(res.get_mpz_t(), abs(n).get_mpz_t(), m.get_mpz_t());
@@ -395,7 +421,7 @@ inline mpz_class remainder(const mpz_class& n, const mpz_class& m) {
 
 inline mpz_class quotient(const mpz_class& n, const mpz_class& d)
 {
-    // TODO: In order to have the same result as division of native signed integer we have to 
+    // TODO: In order to have the same result as division of native signed integer we have to
     //       make it that complicated, as mpz_div does round differently. Maybe there is a better way.
 	mpz_class res;
 	mpz_div(res.get_mpz_t(), abs(n).get_mpz_t(), abs(d).get_mpz_t());
@@ -488,4 +514,3 @@ std::string toString(const mpq_class& _number, bool _infix);
 std::string toString(const mpz_class& _number, bool _infix);
 
 }
-

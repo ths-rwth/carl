@@ -16,7 +16,7 @@ Factors<MultivariatePolynomial<C,O,P>> MultivariateFactor<C, O, P>::calculate()
 	// We start with some trivial cases.
     
     // Calculate the factorization.
-    #ifdef COMPARE_WITH_GINAC
+    #ifdef USE_GINAC
     return ginacFactorization<Poly>( mp );
     #else 
     if( mp.size() == 1 )

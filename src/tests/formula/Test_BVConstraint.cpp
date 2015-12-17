@@ -14,8 +14,8 @@ using namespace carl;
 
 TEST(BVConstraint, Construction)
 {
-    Variable a = VariablePool::getInstance().getFreshVariable("a", VariableType::VT_BITVECTOR);
-    Variable b = VariablePool::getInstance().getFreshVariable("b", VariableType::VT_BITVECTOR);
+    Variable a = freshBitvectorVariable("a");
+    Variable b = freshBitvectorVariable("b");
 
     Sort bvSort = SortManager::getInstance().addSort("BitVec");
     SortManager::getInstance().makeSortIndexable(bvSort, 1, VariableType::VT_BITVECTOR);
@@ -47,7 +47,7 @@ TEST(BVConstraint, Construction)
     check_for_default_constructor = bvzeroext;
 
     BVConstraint constraint = BVConstraint::create(BVCompareRelation::SLT, oxaa, bvzeroext);
-    std::cout << constraint.toString("", false, false, true) << std::endl;
+    // std::cout << constraint.toString("", false, false, true) << std::endl;
 
     // check for simplification of terms (division)
     BVTerm oxaa33(BVTermType::CONSTANT, BVValue(16, 43571));
@@ -88,6 +88,6 @@ TEST(BVConstraint, Construction)
     BVValue hugeClnVal(512, hugeClnNumber);
     assert(hugeVal == hugeClnVal);
 #endif
-    BV_TERM_POOL.print();
-    BV_CONSTRAINT_POOL.print();
+    /* BV_TERM_POOL.print();
+    BV_CONSTRAINT_POOL.print(); */
 }

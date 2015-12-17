@@ -10,6 +10,10 @@
 
 #pragma once
 
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
+
 #include <string>
 #include <cfloat>
 #include <iostream>
@@ -17,32 +21,19 @@
 #include <math.h>
 #include <cmath>
 #include <cstddef>
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-#else
-#include <gmpxx.h>
-#endif
-#ifdef USE_MPFR_FLOAT
-#include <mpfr.h>
-#endif
 
-#include "typetraits.h"
-#ifdef USE_CLN_NUMBERS
-#include "adaption_cln/typetraits.h"
-#include "adaption_cln/operations.h"
-#else
-#include "adaption_gmpxx/typetraits.h"
-#include "adaption_gmpxx/operations.h"
-#endif
-#include "config.h"
+#include "../../util/hash.h"
 #include "roundingConversion.h"
-#include "../util/SFINAE.h"
-#include "../core/logging.h"
+#include "../../util/SFINAE.h"
+#include "../../core/logging.h"
 
 
 namespace carl
 {
-	typedef long precision_t;
+	typedef size_t precision_t;
+
+	template<typename Number>
+    class Interval;
 
 	template<typename FloatType>
 	class FLOAT_T;
@@ -94,7 +85,7 @@ namespace carl
 	template<typename Number>
 	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned = 128)
 	{
-		return A == B;
+		return AlmostEqual2sComplement<double>(double(A), double(B), 128);
 	}
 
 	template<>
@@ -138,9 +129,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>() :
 			mValue()
-		{
-			assert(std::is_floating_point<FloatType>::value);
-		}
+		{}
 
 		/**
 		 * Constructor, which takes a double as input and optional rounding, which
@@ -150,20 +139,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
-			mValue = _double;
-		}
-
-		/**
-		 * Constructor, which takes a float as input and optional rounding, which
-		 * can be used, if the underlying fp implementation allows this.
-		 * @param _float Value to be initialized.
-		 * @param N Possible rounding direction.
-		 */
-		FLOAT_T<FloatType>(const float _float, const CARL_RND=CARL_RND::N)
-		{
-			assert(std::is_floating_point<FloatType>::value);
-			mValue = _float;
+			mValue = carl::convert<double, FloatType>(_double);
 		}
 
 		/**
@@ -174,7 +150,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _int;
 		}
 
@@ -186,7 +161,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const unsigned _int, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _int;
 		}
 
@@ -198,7 +172,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _long;
 		}
 
@@ -210,7 +183,6 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>(const unsigned long _long, const CARL_RND=CARL_RND::N)
 		{
-			assert(std::is_floating_point<FloatType>::value);
 			mValue = _long;
 		}
 
@@ -222,14 +194,10 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 */
 		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
-		{
-			assert(std::is_floating_point<FloatType>::value);
-		}
+		{}
 
 		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, const CARL_RND=CARL_RND::N) : mValue(_float.value())
-		{
-			assert(std::is_floating_point<FloatType>::value);
-		}
+		{}
 
 		/**
 		 * Constructor, which takes an arbitrary fp type as input and optional rounding, which
@@ -243,18 +211,6 @@ namespace carl
 			mValue = val;
 		}
 
-		/**
-		 * Constructor, which takes a FLOAT_T instanciation with different fp implementation
-		 * as input and optional rounding, which can be used, if the underlying
-		 * fp implementation allows this.
-		 * @param _float Value to be initialized.
-		 * @param N Possible rounding direction.
-		 */
-		template<typename F, DisableIf< std::is_same<F, FloatType> > = dummy>
-		FLOAT_T<FloatType>(const FLOAT_T<F>& _float, const CARL_RND=CARL_RND::N)
-		{
-			mValue = _float.toDouble();
-		}
 
 		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
 		{
@@ -316,8 +272,8 @@ namespace carl
 		bool operator ==(const FLOAT_T<FloatType>& _rhs) const
 		{
 			//std::cout << "COMPARISON: " << *this << " == " << _rhs << " : " << (mValue == _rhs.mValue) << std::endl;
-			//return mValue == _rhs.mValue;
-			return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue), 4);
+			return mValue == _rhs.mValue;
+			// return AlmostEqual2sComplement(double(mValue), double(_rhs.mValue), 4);
 		}
 
 		/**
@@ -523,7 +479,7 @@ namespace carl
 		FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
 			assert(mValue >= 0);
-			_result.mValue = std::sqrt(mValue);
+			_result.mValue = carl::sqrt(mValue);
 			return _result;
 		}
 
@@ -561,7 +517,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& root_assign(unsigned long int, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& root_assign(std::size_t, CARL_RND = CARL_RND::N)
 		{
 			assert(*this >= 0);
 			/// @todo implement root_assign for FLOAT_T
@@ -577,7 +533,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, unsigned long int, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, std::size_t, CARL_RND = CARL_RND::N) const
 		{
 			assert(*this >= 0);
 			CARL_LOG_NOTIMPLEMENTED();
@@ -591,7 +547,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& pow_assign(unsigned _exp, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& pow_assign(std::size_t _exp, CARL_RND = CARL_RND::N)
 		{
 			mValue = std::pow(mValue, _exp);
 			return *this;
@@ -605,7 +561,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, unsigned _exp, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, std::size_t _exp, CARL_RND = CARL_RND::N) const
 		{
 			_result.mValue = std::pow(mValue, _exp);
 			return _result;
@@ -618,7 +574,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& abs_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::abs(mValue);
+			mValue = carl::abs(mValue);
 			return *this;
 		}
 
@@ -631,7 +587,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& abs(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::abs(mValue);
+			_result.mValue = carl::abs(mValue);
 			return _result;
 		}
 
@@ -666,7 +622,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& sin_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::sin(mValue);
+			mValue = carl::sin(mValue);
 			return *this;
 		}
 
@@ -679,7 +635,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& sin(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::sin(mValue);
+			_result.mValue = carl::sin(mValue);
 			return _result;
 		}
 
@@ -690,7 +646,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& cos_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::cos(mValue);
+			mValue = carl::cos(mValue);
 			return *this;
 		}
 
@@ -703,7 +659,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& cos(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::cos(mValue);
+			_result.mValue = carl::cos(mValue);
 			return _result;
 		}
 
@@ -727,7 +683,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& log(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::log(mValue);
+			_result.mValue = carl::log(mValue);
 			return _result;
 		}
 
@@ -980,7 +936,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result = std::floor(mValue);
+			_result.mValue = carl::floor(mValue);
 			return _result;
 		}
 
@@ -1004,7 +960,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
 		{
-			_result = std::ceil(mValue);
+			_result.mValue = carl::ceil(mValue);
 			return _result;
 		}
 
@@ -1027,7 +983,7 @@ namespace carl
 		 */
 		double toDouble(CARL_RND = CARL_RND::N) const
 		{
-			return (double) mValue;
+			return carl::toDouble(mValue);
 		}
 
 
@@ -1037,7 +993,10 @@ namespace carl
 		 */
 		explicit operator int() const
 		{
-			return (int) mValue;
+			if(*this >= 0)
+				return carl::toInt<int>(carl::floor(mValue));
+			else
+				return carl::toInt<int>(carl::ceil(mValue));
 		}
 
 		/**
@@ -1046,7 +1005,7 @@ namespace carl
 		 */
 		explicit operator long() const
 		{
-			return (long) mValue;
+			return carl::toInt<long>(mValue);
 		}
 
 		/**
@@ -1055,8 +1014,18 @@ namespace carl
 		 */
 		explicit operator double() const
 		{
-			return (double) mValue;
+			return carl::toDouble(mValue);
 		}
+
+		explicit operator mpq_class() const {
+			return carl::rationalize<mpq_class>(mValue);
+		}
+
+#ifdef USE_CLN_NUMBERS
+		explicit operator cln::cl_RA() const {
+			return carl::rationalize<cln::cl_RA>(mValue);
+		}
+#endif
 
 		/**
 		 * Output stream operator for numbers of type FLOAT_T.
@@ -1066,7 +1035,7 @@ namespace carl
 		 */
 		friend std::ostream& operator<<(std::ostream& ostr, const FLOAT_T<FloatType>& p)
 		{
-			ostr << p.toString();
+			ostr << p.mValue;
 			return ostr;
 		}
 
@@ -1076,9 +1045,10 @@ namespace carl
 		 * @param _rhs Righthand side of the comparison.
 		 * @return True if _lhs equals _rhs.
 		 */
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const int _rhs)
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
-			return _lhs.mValue == _rhs;
+			return _lhs.mValue == FloatType(_rhs);
 		}
 
 		/**
@@ -1087,51 +1057,8 @@ namespace carl
 		 * @param _rhs Righthand side of the comparison.
 		 * @return True if _lhs equals _rhs.
 		 */
-		friend bool operator==(const int _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return _rhs == _lhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const double _rhs)
-		{
-			return _lhs.mValue == _rhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const double _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return _rhs == _lhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const float _rhs)
-		{
-			return _lhs.mValue == _rhs;
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		friend bool operator==(const float _lhs, const FLOAT_T<FloatType>& _rhs)
+		template<typename Other, EnableIf< is_number<Other> > = dummy>
+		friend bool operator==(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return _rhs == _lhs;
 		}
@@ -1293,7 +1220,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue + _rhs);
 		}
@@ -1305,7 +1233,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator +(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator +(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return _rhs + _lhs;
 		}
@@ -1328,7 +1257,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue - _rhs);
 		}
@@ -1340,7 +1270,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator -(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator -(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
 		}
@@ -1373,7 +1304,9 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
 		}
@@ -1385,7 +1318,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator *(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator *(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
 		}
@@ -1409,7 +1343,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const FloatType& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
 		{
 			assert(_rhs != 0);
 			return FLOAT_T<FloatType>(_lhs.mValue / _rhs);
@@ -1422,7 +1357,8 @@ namespace carl
 		 * @param _rhs Righthand side.
 		 * @return Number which holds the result.
 		 */
-		friend FLOAT_T<FloatType> operator /(const FloatType& _lhs, const FLOAT_T<FloatType>& _rhs)
+		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
+		friend FLOAT_T<FloatType> operator /(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			assert(_rhs != 0);
 			return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
@@ -1816,6 +1752,15 @@ namespace carl
 namespace std{
 
 	template<typename Number>
+	struct hash<carl::FLOAT_T<Number>> {
+		size_t operator()(const carl::FLOAT_T<Number>& _in) const {
+			return hasher(_in.value());
+		}
+	private:
+		std::hash<Number> hasher;
+	};
+
+	template<typename Number>
 	class numeric_limits<carl::FLOAT_T<Number>>
 	{
 	public:
@@ -1823,7 +1768,7 @@ namespace std{
 		static const bool is_signed			= true;
 		static const bool is_integer		= false;
 		static const bool is_exact			= false;
-		static const int  radix				= 2;    
+		static const int  radix				= 2;
 
 		static const bool has_infinity		= true;
 		static const bool has_quiet_NaN		= true;
@@ -1835,27 +1780,24 @@ namespace std{
 		static const bool traps				= true;
 		static const bool tinyness_before	= true;
 
-		static const float_denorm_style has_denorm  = denorm_absent;
-		
 		inline static carl::FLOAT_T<Number> (min)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::min()); }
 		inline static carl::FLOAT_T<Number> (max)() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::max()); }
 		inline static carl::FLOAT_T<Number> lowest() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::lowest()); }
 
-		// Returns smallest eps such that 1 + eps != 1 (classic machine epsilon)
 		inline static carl::FLOAT_T<Number> epsilon() {  return carl::FLOAT_T<Number>(std::numeric_limits<Number>::epsilon()); }
 
 		inline static carl::FLOAT_T<Number> round_error() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::round_error()); }
-		
+
 		inline static const carl::FLOAT_T<Number> infinity() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::infinity()); }
-		
+
 		inline static const carl::FLOAT_T<Number> quiet_NaN() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::quiet_NaN()); }
 		inline static const carl::FLOAT_T<Number> signaling_NaN() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::signaling_NaN()); }
 		inline static const carl::FLOAT_T<Number> denorm_min() { return carl::FLOAT_T<Number>(std::numeric_limits<Number>::denorm_min()); }
 
 		static const int min_exponent = std::numeric_limits<Number>::min_exponent;
 		static const int max_exponent = std::numeric_limits<Number>::max_exponent;
-		static const int min_exponent10 = std::numeric_limits<Number>::min_exponent10; 
-		static const int max_exponent10 = std::numeric_limits<Number>::max_exponent10; 
+		static const int min_exponent10 = std::numeric_limits<Number>::min_exponent10;
+		static const int max_exponent10 = std::numeric_limits<Number>::max_exponent10;
 
 		inline static float_round_style round_style() { return std::numeric_limits<Number>::round_style; }
 
@@ -1866,4 +1808,4 @@ namespace std{
 }
 
 
-#include "adaption_float/mpfr_float.tpp"
+#include "mpfr_float.tpp"

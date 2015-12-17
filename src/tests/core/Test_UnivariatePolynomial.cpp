@@ -1,45 +1,28 @@
 #include "gtest/gtest.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
-#include "carl/core/MultivariatePolynomial.h"
 
 #include "carl/numbers/GFNumber.h"
 #include "carl/numbers/GaloisField.h"
 #include "carl/util/debug.h"
 #include "carl/interval/Interval.h"
+#include "carl/util/platform.h"
 
 #include <random>
 #include <cmath>
-using namespace carl;
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
+#include "../Common.h"
+using namespace carl;
 
 TEST(UnivariatePolynomial, Constructor)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
+    Variable x = freshRealVariable("x");
     UnivariatePolynomial<Rational> pol(x, {(Rational)0, (Rational)2});
- 
 }
 
 TEST(UnivariatePolynomial, toInteger)
 {
-	VariablePool& vpool = VariablePool::getInstance();
-	Variable x = vpool.getFreshVariable();
-	vpool.setName(x, "x");
+	Variable x = freshRealVariable("x");
 	UnivariatePolynomial<Rational> pRA(x, {(Rational)0, (Rational)2});
 	UnivariatePolynomial<Integer> pI(x, {(Integer)0, (Integer)2});
 	EXPECT_EQ(pI, pRA.toIntegerDomain());
@@ -47,9 +30,7 @@ TEST(UnivariatePolynomial, toInteger)
 
 TEST(UnivariatePolynomial, Reduction)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
+    Variable x = freshRealVariable("x");
 
 	{
 		UnivariatePolynomial<Rational> p(x, {(Rational)1, (Rational)1,(Rational)0, (Rational)0,(Rational)1});
@@ -69,9 +50,7 @@ TEST(UnivariatePolynomial, Reduction)
 
 TEST(UnivariatePolynomial, Divide)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
+    Variable x = freshRealVariable("x");
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
     UnivariatePolynomial<Rational> q(x, {(Rational)-6, (Rational)-5,(Rational)1});
     DivisionResult<UnivariatePolynomial<Rational>> d = p.divideBy(p);
@@ -81,9 +60,7 @@ TEST(UnivariatePolynomial, Divide)
 
 TEST(UnivariatePolynomial, DivideInteger)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
+    Variable x = freshRealVariable("x");
     UnivariatePolynomial<Integer> p(x, {(Integer)0, (Integer)0,(Integer)5});
     UnivariatePolynomial<Integer> q(x, {(Integer)0, (Integer)0,(Integer)3});
     DivisionResult<UnivariatePolynomial<Integer>> d = p.divideBy(q);
@@ -93,12 +70,10 @@ TEST(UnivariatePolynomial, DivideInteger)
 
 TEST(UnivariatePolynomial, GCD)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
+    Variable x = freshRealVariable("x");
 	UnivariatePolynomial<Rational> s(x);
     UnivariatePolynomial<Rational> t(x);
-    
+
 	UnivariatePolynomial<Rational> v(x, {(Rational)1, (Rational)1});
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
 	UnivariatePolynomial<Rational> g = UnivariatePolynomial<Rational>::extended_gcd(p,v,s,t);
@@ -113,8 +88,8 @@ TEST(UnivariatePolynomial, GCD)
 	EXPECT_EQ(v,g);
 	g = UnivariatePolynomial<Rational>::gcd(p,v);
 	EXPECT_EQ(v,g);
-	
-    
+
+
     UnivariatePolynomial<Rational> q(x, {(Rational)-6, (Rational)-5,(Rational)1});
     //std::cout << "gcd" << UnivariatePolynomial<Rational>::gcd(p,q) << std::endl;
     g = UnivariatePolynomial<Rational>::extended_gcd(p,q,s,t);
@@ -123,7 +98,7 @@ TEST(UnivariatePolynomial, GCD)
     EXPECT_EQ((Rational)-1/(Rational)12,t);
 	g = UnivariatePolynomial<Rational>::gcd(p,q);
 	EXPECT_EQ(v,g);
-	
+
     UnivariatePolynomial<Integer> A1(x, {(Integer)0, (Integer)2});
 	const GaloisField<Integer>* gf5 = new GaloisField<Integer>(5);
     UnivariatePolynomial<GFNumber<Integer>> a1 = A1.toFiniteDomain(gf5);
@@ -135,7 +110,7 @@ TEST(UnivariatePolynomial, GCD)
 	std::cout << t1 << std::endl;
 	std::cout << s1 << std::endl;
 	std::cout << gp << std::endl;
-    
+
     UnivariatePolynomial<Rational> pola(x, {(Rational)-2, (Rational)5, (Rational)-5, (Rational)3});
 	UnivariatePolynomial<Rational> polb(x, {(Rational)5, (Rational)-10, (Rational)9});
 	g = UnivariatePolynomial<Rational>::extended_gcd(pola,polb,s,t);
@@ -148,11 +123,8 @@ TEST(UnivariatePolynomial, GCD)
 
 TEST(UnivariatePolynomial, cauchyBounds)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
+    Variable x = freshRealVariable("x");
 
-    
     UnivariatePolynomial<Rational> p(x, {(Rational)6, (Rational)7,(Rational)1});
     //p.cauchyBound();
     //p.modifiedCauchyBound();
@@ -160,14 +132,8 @@ TEST(UnivariatePolynomial, cauchyBounds)
 
 TEST(UnivariatePolynomial, toFiniteDomain)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
-    
+    Variable x = freshRealVariable("x");
+
     UnivariatePolynomial<Integer> pol(x, {(Integer)1, (Integer)2});
     const GaloisField<Integer>* gf5 = new GaloisField<Integer>(5);
     UnivariatePolynomial<GFNumber<Integer>> polF = pol.toFiniteDomain(gf5);
@@ -179,28 +145,20 @@ TEST(UnivariatePolynomial, toFiniteDomain)
 
 TEST(UnivariatePolynomial, normalizeCoefficients)
 {
-	VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    Variable y = vpool.getFreshVariable();
-    vpool.setName(y, "y");
-    Variable z = vpool.getFreshVariable();
-    vpool.setName(z, "z");
-    
+    Variable x = freshRealVariable("x");
+
 	UnivariatePolynomial<Integer> pol(x, {(Integer)1, (Integer)2});
     const GaloisField<Integer>* gf5 = new GaloisField<Integer>(5);
     UnivariatePolynomial<GFNumber<Integer>> polF = pol.toFiniteDomain(gf5);
-    
+
 	pol.normalizeCoefficients();
 	polF.normalizeCoefficients();
 }
 
 TEST(UnivariatePolynomial, factorization)
 {
-    VariablePool& vpool = VariablePool::getInstance();
-    Variable x = vpool.getFreshVariable();
-    vpool.setName(x, "x");
-    
+    Variable x = freshRealVariable("x");
+
     UnivariatePolynomial<Rational> linA(x, {(Rational)-2, (Rational)5});
     UnivariatePolynomial<Rational> linB(x, {(Rational)1, (Rational)3});
     UnivariatePolynomial<Rational> linC(x, {(Rational)2014, (Rational)68});
@@ -218,9 +176,9 @@ TEST(UnivariatePolynomial, factorization)
     UnivariatePolynomial<Rational> polG = quaA*quaB*linD*linE;
     UnivariatePolynomial<Rational> polH = polA*quaB*linD;
     UnivariatePolynomial<Rational> polI = linA*linA*quaA*quaA*quaB*quaB*quaB*quaB;
-    
+
     std::vector<UnivariatePolynomial<Rational>> polys = {linA, linC, linE, quaA, quaB, polA, polB, polC, polD, polE, polF, polG, polH, polI};
-    
+
     unsigned seed = 21344325;
     std::default_random_engine generator (seed);
     for(int e = 2; e <= 10; ++e)
@@ -243,7 +201,7 @@ TEST(UnivariatePolynomial, factorization)
             polys.push_back(randomPol);
         }
     }
-    
+
     for(UnivariatePolynomial<Rational> pol : polys)
     {
 //        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
@@ -264,13 +222,13 @@ TEST(UnivariatePolynomial, factorization)
 //        std::cout << std::endl;
         EXPECT_EQ(pol, productOfFactors);
     }
-    
+
     UnivariatePolynomial<Rational> pol2(x, {(Rational)-1, (Rational)2, (Rational)-6, (Rational)2});
     EXPECT_EQ(5, pol2.syntheticDivision((Rational)3) );
-    
+
     UnivariatePolynomial<Rational> pol3(x, {(Rational)-42, (Rational)0, (Rational)-12, (Rational)1});
     EXPECT_EQ(-123, pol3.syntheticDivision((Rational)3) );
-    
+
     UnivariatePolynomial<Rational> pol4(x, {(Rational)1, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> pol5(x, {(Rational)1, (Rational)0, (Rational)-1});
     UnivariatePolynomial<Rational> pol6 = pol4*pol5*pol5*pol5;
@@ -295,15 +253,15 @@ TEST(UnivariatePolynomial, factorization)
 
 TEST(UnivariatePolynomial, isNumber)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
 	EXPECT_FALSE(UnivariatePolynomial<Rational>(x, {1,2,3}).isNumber());
 	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, 1).isNumber());
 }
 
 TEST(UnivariatePolynomial, isUnivariate)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
-	//Variable y = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
+	//Variable y = VariablePool::getInstance().freshRealVariable();
 	EXPECT_TRUE(UnivariatePolynomial<Rational>(x, {1,2,3}).isUnivariate());
 	//TODO: How does this work?
 	//EXPECT_FALSE(UnivariatePolynomial<UnivariatePolynomial<int>>(x, UnivariatePolynomial<int>(y, {1,2,3})).isUnivariate());
@@ -311,14 +269,14 @@ TEST(UnivariatePolynomial, isUnivariate)
 
 TEST(UnivariatePolynomial, numericUnit)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericUnit(), 1);
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,-3}).numericUnit(), -1);
 }
 
 TEST(UnivariatePolynomial, numericContent)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {1,2,3}).numericContent(), 1);
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {15,27,3}).numericContent(), 3);
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-1,-2,-3}).numericContent(), 1);
@@ -327,7 +285,7 @@ TEST(UnivariatePolynomial, numericContent)
 
 TEST(UnivariatePolynomial, unitPart)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
 	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {1,2,3}).unitPart());
 	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {15,27,3}).unitPart());
 	EXPECT_EQ(-1,UnivariatePolynomial<Integer>(x, {-1,-2,-3}).unitPart());
@@ -336,7 +294,7 @@ TEST(UnivariatePolynomial, unitPart)
 
 TEST(UnivariatePolynomial, content)
 {
-    Variable x = VariablePool::getInstance().getFreshVariable();
+    Variable x = freshRealVariable("x");
 	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {1,2,3}).normalized().content());
 	EXPECT_EQ(3,UnivariatePolynomial<Integer>(x, {15,27,3}).normalized().content());
 	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {-1,-2,-3}).normalized().content());
@@ -346,7 +304,7 @@ TEST(UnivariatePolynomial, content)
 
 TEST(UnivariatePolynomial, primitivePart)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
 	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {1,2,3}),UnivariatePolynomial<Integer>(x, {1,2,3}).normalized().primitivePart());
 	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {5,9,1}),UnivariatePolynomial<Integer>(x, {15,27,3}).normalized().primitivePart());
 	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {1,2,3}),UnivariatePolynomial<Integer>(x, {-1,-2,-3}).normalized().primitivePart());
@@ -355,8 +313,8 @@ TEST(UnivariatePolynomial, primitivePart)
 
 TEST(UnivariatePolynomial, switchVariable)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable();
-	Variable y = VariablePool::getInstance().getFreshVariable();
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
 	UnivariatePolynomial<Integer> p(x, {1,2,3});
 	auto q = p.switchVariable(y);
 	std::cout << p << " -> " << q << std::endl;
@@ -364,23 +322,23 @@ TEST(UnivariatePolynomial, switchVariable)
 
 TEST(UnivariatePolynomial, resultant)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable("x");
-	Variable y = VariablePool::getInstance().getFreshVariable("y");
-	
+	Variable x = freshRealVariable("x");
+	Variable y = freshRealVariable("y");
+
 	// p1 = x - y
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p1(x, {MultivariatePolynomial<Rational>(-Term<Rational>(y)), MultivariatePolynomial<Rational>(1)});
 	// p2 = x^2 + y^2 - 1
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p2(x, {MultivariatePolynomial<Rational>({Term<Rational>(y)*y, Term<Rational>(-1)}), MultivariatePolynomial<Rational>(0), MultivariatePolynomial<Rational>(1)});
 	// p3 = x^2 - 1
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p3(x, {MultivariatePolynomial<Rational>(-Term<Rational>(1)), MultivariatePolynomial<Rational>(0), MultivariatePolynomial<Rational>(1)});
-	
+
 	// r1 = 2*y^2 - 1
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> r1(x, MultivariatePolynomial<Rational>({Term<Rational>(y)*y*Rational(2), Term<Rational>(-1)}));
 	// r2 = y^2 - 1
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> r2(x, MultivariatePolynomial<Rational>({Term<Rational>(y)*y, Term<Rational>(-1)}));
 	// r3 = y^4
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> r3(x, MultivariatePolynomial<Rational>(Term<Rational>(y)*y*y*y));
-	
+
 	EXPECT_EQ(r1, p1.resultant(p2));
 	EXPECT_EQ(r1, p2.resultant(p1));
 	EXPECT_EQ(r2, p1.resultant(p3));
@@ -391,44 +349,44 @@ TEST(UnivariatePolynomial, resultant)
 
 TEST(UnivariatePolynomial, resultant2)
 {
-	Variable x = VariablePool::getInstance().getFreshVariable("x");
-	Variable c = VariablePool::getInstance().getFreshVariable("c");
-	Variable t = VariablePool::getInstance().getFreshVariable("t");
-	
+	Variable x = freshRealVariable("x");
+	Variable c = freshRealVariable("c");
+	Variable t = freshRealVariable("t");
+
 	MultivariatePolynomial<Rational> mc(c);
 	MultivariatePolynomial<Rational> mt(t);
-	
+
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(x, {mt, mc, mc});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(x, {(Rational)0, (Rational)0, (Rational)0, (Rational)0, (Rational)1});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> r(x, MultivariatePolynomial<Rational>(Term<Rational>(t)*t*t*t));
-	
+
 	//std::cout << "resultant[" << p << ", " << q << "] = " << p.resultant(q) << std::endl;
-	
+
 	EXPECT_EQ(r, p.resultant(q));
 }
 
 TEST(UnivariatePolynomial, resultant3)
 {
-	Variable a = VariablePool::getInstance().getFreshVariable("a");
-	Variable t = VariablePool::getInstance().getFreshVariable("t");
-	
+	Variable a = freshRealVariable("a");
+	Variable t = freshRealVariable("t");
+
 	MultivariatePolynomial<Rational> ma(a);
 	MultivariatePolynomial<Rational> mt(t);
 	MultivariatePolynomial<Rational> one((Rational)1);
-	
+
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> p(a, {mt.pow(10) + mt.pow(8), mt.pow(8) + mt.pow(6), mt.pow(4)});
 	UnivariatePolynomial<MultivariatePolynomial<Rational>> q(a, {mt.pow(4), mt.pow(2), mt.pow(2), one});
 	//UnivariatePolynomial<MultivariatePolynomial<Rational>> r(b, MultivariatePolynomial<Rational>(Term<Rational>(t)*t*t*t));
-	
+
 	std::cout << "resultant[" << p << ", " << q << "] =\n\t" << p.resultant(q) << std::endl;
-	
+
 	//EXPECT_EQ(r, p.resultant(q));
 }
 
 TEST(UnivariatePolynomial, resultant4)
 {
-    Variable m = VariablePool::getInstance().getFreshVariable("m");
-    Variable r = VariablePool::getInstance().getFreshVariable("r");
+    Variable m = freshRealVariable("m");
+    Variable r = freshRealVariable("r");
 
     MultivariatePolynomial<Rational> mr(r);
     MultivariatePolynomial<Rational> one((Rational)1);
@@ -443,7 +401,7 @@ TEST(UnivariatePolynomial, resultant4)
 
 TEST(UnivariatePolynomial, intervalCoeffs)
 {
-	Variable a = VariablePool::getInstance().getFreshVariable("a");
+	Variable a = freshRealVariable("a");
 	UnivariatePolynomial<carl::Interval<double>> p(a);
 	p *= p;
 	p += p;

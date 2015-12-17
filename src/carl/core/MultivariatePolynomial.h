@@ -278,6 +278,17 @@ public:
         return mTerms.size();
     }
     
+    /**
+     * @return An approximation of the complexity of this polynomial.
+     */
+    size_t complexity() const
+    {
+        size_t result = 0;
+        for(const auto& term : mTerms)
+            result += term.complexity();
+        return result;
+    }
+    
 	/**
 	 * Gives the last term according to Ordering. Notice that if there is a constant part, it is always trailing.
 	 * @return 
@@ -350,6 +361,14 @@ public:
 	 */
 	///@todo find new lterm
 	MultivariatePolynomial& stripLT();
+    
+    /**
+     * @return true, if this polynomial consists just of one variable (with coefficient 1). 
+     */
+    bool isVariable() const
+    {
+        return !mTerms.empty() && totalDegree() == 1 && nrTerms() == 1 && lcoeff() == constant_one<CoeffType>::get();
+    }
     
     /**
      * For terms with exactly one variable, get this variable.
@@ -1227,9 +1246,9 @@ public:
 	}
 
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs);
+	inline const MultivariatePolynomial<C, O, P> operator*(const UnivariatePolynomial<C>& lhs, const MultivariatePolynomial<C, O, P>& rhs);
 	template<typename C, typename O, typename P>
-	inline MultivariatePolynomial<C,O,P> operator*(const MultivariatePolynomial<C,O,P>& lhs, const UnivariatePolynomial<C>& rhs);
+	inline const MultivariatePolynomial<C, O, P> operator*(const MultivariatePolynomial<C, O, P>& lhs, const UnivariatePolynomial<C>& rhs);
 	/// @}
     
     /// @name Division operators

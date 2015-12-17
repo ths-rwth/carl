@@ -17,76 +17,87 @@ class Variables final {
 	/**
 	 * Fix list of variables for all computations.
 	 */
-	std::vector<Variable> curVars;
+	std::vector<Variable> mCurVars;
 	
 	/**
 	 * list of new variables introduced by the scheduled elimination polynomials (mNewvariables and mVeriables are disjoint)
 	 */
-	std::vector<Variable> newVars;
-
+	std::vector<Variable> mNewVars;
 public:
 	bool empty() const {
-		return curVars.empty();
+		return mCurVars.empty();
 	}
 	bool newEmpty() const {
-		return newVars.empty();
+		return mNewVars.empty();
 	}
 	
 	std::size_t size() const {
-		return curVars.size();
+		return mCurVars.size();
 	}
 	std::size_t newSize() const {
-		return newVars.size();
+		return mNewVars.size();
 	}
 	
 	std::vector<Variable>::const_iterator begin() const {
-		return curVars.begin();
+		return mCurVars.begin();
 	}
 	std::vector<Variable>::iterator begin() {
-		return curVars.begin();
+		return mCurVars.begin();
 	}
 	std::vector<Variable>::const_iterator end() const {
-		return curVars.end();
+		return mCurVars.end();
 	}
 	std::vector<Variable>::iterator end() {
-		return curVars.end();
+		return mCurVars.end();
+	}
+	std::vector<Variable>::const_reverse_iterator rbegin() const {
+		return mCurVars.rbegin();
+	}
+	std::vector<Variable>::reverse_iterator rbegin() {
+		return mCurVars.rbegin();
+	}
+	std::vector<Variable>::const_reverse_iterator rend() const {
+		return mCurVars.rend();
+	}
+	std::vector<Variable>::reverse_iterator rend() {
+		return mCurVars.rend();
 	}
 	
 	const std::vector<Variable>& getCurrent() const {
-		return curVars;
+		return mCurVars;
 	}
 	
 	void clear() {
-		curVars.clear();
-		newVars.clear();
+		mCurVars.clear();
+		mNewVars.clear();
 	}
 	
 	bool contains(Variable::Arg v) const {
-		if (std::find(curVars.begin(), curVars.end(), v) != curVars.end()) return true;
-		if (std::find(newVars.begin(), newVars.end(), v) != newVars.end()) return true;
+		if (std::find(mCurVars.begin(), mCurVars.end(), v) != mCurVars.end()) return true;
+		if (std::find(mNewVars.begin(), mNewVars.end(), v) != mNewVars.end()) return true;
 		return false;
 	}
 	Variable front() const {
-		return curVars.front();
+		return mCurVars.front();
 	}
 	Variable first() const {
 		assert(!empty() || !newEmpty());
-		if (!empty()) return curVars.front();
-		if (!newEmpty()) return newVars.front();
+		if (!empty()) return mCurVars.front();
+		if (!newEmpty()) return mNewVars.front();
 		return Variable::NO_VARIABLE;
 	}
 	
 	void setNewVariables(const std::vector<Variable>& v) {
-		newVars = v;
+		mNewVars = v;
 	}
 	void addNew(Variable::Arg v) {
-		newVars.push_back(v);
+		mNewVars.push_back(v);
 	}
 	
 	void appendNewToCur() {
-		newVars.insert(newVars.end(), curVars.begin(), curVars.end());
-		curVars.clear();
-		std::swap(curVars, newVars);
+		mNewVars.insert(mNewVars.end(), mCurVars.begin(), mCurVars.end());
+		mCurVars.clear();
+		std::swap(mCurVars, mNewVars);
 	}
 	
 	/**
@@ -99,18 +110,18 @@ public:
 		}
 	}
 	
-	Variable operator[](std::size_t i) const {
-		assert(i < curVars.size());
-		return curVars[i];
+	Variable::Arg operator[](std::size_t i) const {
+		assert(i < mCurVars.size());
+		return mCurVars[i];
 	}
 	Variable& operator[](std::size_t i) {
-		assert(i < curVars.size());
-		return curVars[i];
+		assert(i < mCurVars.size());
+		return mCurVars[i];
 	}
 	
 	std::size_t indexOf(Variable::Arg v) {
-		for (std::size_t i = 0; i < this->curVars.size(); i++) {
-			if (v == curVars[i]) return i;
+		for (std::size_t i = 0; i < this->mCurVars.size(); i++) {
+			if (v == mCurVars[i]) return i;
 		}
 		assert(false);
 		return 0;
@@ -121,14 +132,14 @@ public:
 
 inline std::ostream& operator<<(std::ostream& os, const Variables& v) {
 	bool first = true;
-	for (const auto& it: v.curVars) {
+	for (const auto& it: v.mCurVars) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;
 	}
 	first = true;
 	os << " || ";
-	for (const auto& it: v.newVars) {
+	for (const auto& it: v.mNewVars) {
 		if (!first) os << ", ";
 		first = false;
 		os << it;

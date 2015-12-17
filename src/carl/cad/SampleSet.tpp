@@ -18,7 +18,7 @@ namespace carl {
 namespace cad {
 
 template<typename Number>
-bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
+bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {
 #define CHECK(expr) res = (expr); if (res.first) return res.second;
 	std::pair<bool, bool> res;
 	switch (mOrdering) {
@@ -46,31 +46,31 @@ bool SampleSet<Number>::SampleComparator::operator()(const RealAlgebraicNumberPt
 			CHECK(compareRoot(lhs, rhs));
 			break;
 		case SampleOrdering::Value:
-			return carl::less<RealAlgebraicNumberPtr<Number>>()(lhs, rhs);
+			return carl::less<RealAlgebraicNumber<Number>>()(lhs, rhs);
 			break;
 		default:
 			CARL_LOG_FATAL("carl.cad.sampleset", "Ordering " << mOrdering << " was not implemented.");
 			assert(false);
 			return false;
 	}
-	return carl::less<RealAlgebraicNumberPtr<Number>>()(lhs, rhs);
+	return carl::less<RealAlgebraicNumber<Number>>()(lhs, rhs);
 }
 
 template<typename Number>
-bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr<Number>& s) const {
+bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumber<Number>& s) const {
 	switch (mOrdering) {
 		case SampleOrdering::IntRatRoot:
-			return s->isNumericRepresentation() && carl::isInteger(s->value());
+			return s.isNumeric() && carl::isInteger(s.value());
 		case SampleOrdering::IntRatSize:
-			return s->isNumericRepresentation() && carl::isInteger(s->value());
+			return s.isNumeric() && carl::isInteger(s.value());
 		case SampleOrdering::Interval:
-			return !s->isNumericRepresentation();
+			return !s.isNumeric();
 		case SampleOrdering::NonRoot:
-			return !s->isRoot();
+			return !s.isRoot();
 		case SampleOrdering::RatRoot:
-			return s->isNumericRepresentation();
+			return s.isNumeric();
 		case SampleOrdering::Root:
-			return s->isRoot();
+			return s.isRoot();
 		case SampleOrdering::Value:
 			return true;
 		default:
@@ -81,7 +81,7 @@ bool SampleSet<Number>::SampleComparator::isOptimal(const RealAlgebraicNumberPtr
 }
 
 template<typename Number>
-std::tuple<typename SampleSet<Number>::Iterator, bool, bool> SampleSet<Number>::insert(RealAlgebraicNumberPtr<Number> r) {
+std::tuple<typename SampleSet<Number>::Iterator, bool, bool> SampleSet<Number>::insert(const RealAlgebraicNumber<Number>& r) {
 	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << r << " )");
 	CARL_LOG_TRACE("carl.cad.sampleset", *this);
 	assert(this->isConsistent());
@@ -91,13 +91,13 @@ std::tuple<typename SampleSet<Number>::Iterator, bool, bool> SampleSet<Number>::
 	if (res.second) {
 		mHeap.push_back(r);
 		std::push_heap(mHeap.begin(), mHeap.end(), mComp);
-	} else if (!(*res.first)->isRoot() && r->isRoot()) {
+	} else if (!(*res.first).isRoot() && r.isRoot()) {
 		this->remove(res.first);
 		std::get<0>(result) = std::get<0>(this->insert(r));
 		std::get<2>(result) = true;
-	} else if (!(*res.first)->isNumeric() && r->isNumeric()) {
+	} else if (!(*res.first).isNumeric() && r.isNumeric()) {
 		this->remove(res.first);
-		std::get<0>(result) = std::get<0>(this->insert(RealAlgebraicNumberNR<Number>::create(r->value(), true)));
+		std::get<0>(result) = std::get<0>(this->insert(RealAlgebraicNumber<Number>(r.value(), true)));
 		std::get<2>(result) = true;
 	}
 	assert(this->isConsistent());
@@ -116,7 +116,7 @@ void SampleSet<Number>::pop() {
 }
 
 template<typename Number>
-bool SampleSet<Number>::simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to) {
+bool SampleSet<Number>::simplify(const RealAlgebraicNumber<Number>& from, RealAlgebraicNumber<Number>& to) {
 	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << from << " -> " << to << " )");
 	assert(this->isConsistent());
 	if (mSamples.count(from) > 0) {
@@ -137,15 +137,14 @@ std::pair<typename SampleSet<Number>::SampleSimplification, bool> SampleSet<Numb
 	if (this->empty()) return simplification;
 	simplification.second = false;
 	for (auto n: this->mSamples) {
-		if (n->isNumericRepresentation()) continue;
-		auto nIR = std::static_pointer_cast<RealAlgebraicNumberIR<Number>>(n);
-		if (!fast && !nIR->isNumeric() && nIR->getRefinementCount() == 0) {
+		if (n.isNumeric()) continue;
+		if (!fast && !n.isNumeric() && n.getRefinementCount() == 0) {
 			// Try at least one refinement.
-			nIR->refine();
+			n.refine();
 		}
-		if (nIR->isNumeric()) {
-			auto nNR = RealAlgebraicNumberNR<Number>::create(nIR->value(), nIR->isRoot());
-			simplification.first[nIR] = nNR;
+		if (n.isNumeric()) {
+			auto nNR = RealAlgebraicNumber<Number>(n.value(), n.isRoot());
+			simplification.first[n] = nNR;
 		}
 	}
 	for (auto it: simplification.first) {
@@ -170,7 +169,7 @@ bool SampleSet<Number>::isConsistent() const {
 	CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "()");
 	CARL_LOG_TRACE("carl.cad.sampleset", "samples: " << mSamples);
 	CARL_LOG_TRACE("carl.cad.sampleset", "heap:    " << mHeap);
-	std::set<RealAlgebraicNumberPtr<Number>> queue(mHeap.begin(), mHeap.end());
+	std::set<RealAlgebraicNumber<Number>> queue(mHeap.begin(), mHeap.end());
 	for (auto n: this->mSamples) {
 		auto it = queue.find(n);
 		if (it == queue.end()) {
@@ -179,14 +178,16 @@ bool SampleSet<Number>::isConsistent() const {
 		}
 		queue.erase(it);
 	}
-	RealAlgebraicNumberPtr<Number> lastSample = nullptr;
-	for (auto n: this->mSamples) {
-		if (lastSample != nullptr && !carl::less<RealAlgebraicNumberPtr<Number>>()(lastSample, n)) {
+	RealAlgebraicNumber<Number> lastSample;
+	bool first = true;
+	for (const auto& n: this->mSamples) {
+		if (!first && !(lastSample < n)) {
 			CARL_LOG_ERROR("carl.cad.sampleset", "samples: " << mSamples);
 			CARL_LOG_ERROR("carl.cad.sampleset", "Samples in samples not in order: " << lastSample << " < " << n);
-			assert(carl::less<RealAlgebraicNumberPtr<Number>>()(lastSample, n));
+			assert(lastSample < n);
 		}
 		lastSample = n;
+		first = false;
 	}
 	if (!queue.empty()) {
 		CARL_LOG_ERROR("carl.cad.sampleset", "Additional samples in queue: " << queue);
@@ -195,9 +196,18 @@ bool SampleSet<Number>::isConsistent() const {
 	return true;
 }
 
+#ifdef __VS
+template<typename Num>
+void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
+	std::swap(lhs.mSamples, rhs.mSamples);
+	std::swap(lhs.mHeap, rhs.mHeap);
+}
+#endif
+
 }
 }
 
+#ifndef __VS
 namespace std {
 
 template<typename Num>
@@ -207,3 +217,4 @@ void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs) {
 }
 
 }
+#endif

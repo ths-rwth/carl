@@ -328,8 +328,8 @@ namespace carl
              */
             unsigned maxDegree( const Variable& _variable ) const
             {
-                auto varInfo = mVarInfoMap.find( _variable );
-                if( varInfo == mVarInfoMap.end() ) return 0;
+                auto varInfo = mVarInfoMap.find(_variable);
+                if (varInfo == mVarInfoMap.end()) return 0;
                 return varInfo->second.maxDegree();
             }
             
@@ -339,11 +339,9 @@ namespace carl
             unsigned maxDegree() const
             {
                 unsigned result = 0;
-                for( auto var = mVariables.begin(); var != mVariables.end(); ++var)
-                {
-                    unsigned deg = maxDegree( *var );
-                    if( deg > result )
-                        result = deg;
+                for (const auto& var: mVariables) {
+                    unsigned deg = maxDegree(var);
+                    if (deg > result) result = deg;
                 }
                 return result;
             }
@@ -685,9 +683,14 @@ namespace carl
             /**
              * @return true, if this constraint is a bound.
              */
-            bool isBound() const
+            bool isBound(bool negated = false) const
             {
-                return ( mpContent->mRelation != Relation::NEQ && mpContent->mVariables.size() == 1 && maxDegree( *mpContent->mVariables.begin() ) == 1 );
+				if (mpContent->mVariables.size() != 1 || maxDegree(*mpContent->mVariables.begin()) != 1) return false;
+				if (negated) {
+					return mpContent->mRelation != Relation::EQ;
+				} else {
+					return mpContent->mRelation != Relation::NEQ;
+				}
             }
             
             /**
@@ -728,6 +731,14 @@ namespace carl
                     }
                 }
                 return false;
+            }
+            
+            /**
+             * @return An approximation of the complexity of this constraint.
+             */
+            size_t complexity() const
+            {
+                return 1 + mpContent->mLhs.complexity();
             }
             
             /**
@@ -1260,4 +1271,3 @@ namespace std
 } // namespace std
 
 #include "Constraint.tpp"
-

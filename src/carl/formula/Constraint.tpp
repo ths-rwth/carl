@@ -8,7 +8,7 @@
  */
 
 #include "Constraint.h"
-#ifdef COMPARE_WITH_GINAC
+#ifdef USE_GINAC
 #include "../converter/OldGinacConverter.h"
 #endif
 #include "ConstraintPool.h"
@@ -257,8 +257,8 @@ namespace carl
     void ConstraintContent<Pol>::initFactorization() const 
     {
         #ifdef CONSTRAINT_WITH_FACTORIZATION
-        #ifdef COMPARE_WITH_GINAC
-        if( mLhs.nrTerms() <= MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION && mVariables.size() <= MAX_DIMENSION_FOR_FACTORIZATION
+        #ifdef USE_GINAC
+        if( !mLhs.isLinear() && mLhs.nrTerms() <= MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION && mVariables.size() <= MAX_DIMENSION_FOR_FACTORIZATION
             && maxDegree() <= MAX_DEGREE_FOR_FACTORIZATION && maxDegree() >= MIN_DEGREE_FOR_FACTORIZATION )
         {
             mFactorization = carl::factor( mLhs );
@@ -821,4 +821,3 @@ namespace carl
         }
     }
 }    // namespace carl
-

@@ -83,3 +83,23 @@ namespace carl
 		}
 	};
 } // end namespace carl
+
+namespace std
+{
+    /**
+     * Implements std::hash for bitvector variables.
+     */
+    template<>
+    struct hash<carl::BVVariable>
+    {
+    public:
+        /**
+         * @param _bvVar The bitvector variable to get the hash for.
+         * @return The hash of the given bitvector variable.
+         */
+        size_t operator()( const carl::BVVariable& _bvVar ) const
+        {
+            return hash<carl::Variable>()( _bvVar() ) ;
+        }
+    };
+}

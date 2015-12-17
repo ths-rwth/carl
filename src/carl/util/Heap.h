@@ -2,8 +2,8 @@
  * @file Heap.h
  * This file has been extracted from mathic. It was deployed without license at:
  * http://www.broune.com/papers/issac2012.html
- * Currently, it is distributed under LGPL v2  from 
- * http://www.broune.com/papers/issac2012.html
+ * 
+ * As of now, it is available at @cite Mathic .
  */
 
 #pragma once
@@ -129,7 +129,11 @@ namespace carl
                         mTree( tree )
                     {}
 
-                    c_iterator( const Tree& tree, Heap::Node startpos ):
+#ifdef __VS
+                    c_iterator( const Tree& tree, Node startpos ):
+#else
+                    c_iterator(const Tree& tree, Heap::Node startpos) :
+#endif
                         mTree( tree ),
                         pos( startpos )
                     {}
@@ -162,8 +166,13 @@ namespace carl
                     }
 
                 protected:
+#ifdef __VS
+                    const Tree& mTree;
+                    Node        pos;
+#else
                     const Heap::Tree& mTree;
                     Heap::Node        pos;
+#endif
 
             };
 
@@ -336,4 +345,3 @@ namespace carl
         return true;
     }
 }
-

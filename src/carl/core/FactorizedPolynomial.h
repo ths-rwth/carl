@@ -304,6 +304,23 @@ namespace carl
         }
         
         /**
+         * @return An approximation of the complexity of this polynomial.
+         */
+        size_t complexity() const
+        {
+            if( existsFactorization(*this) )
+            {
+                if( factorizedTrivially() )
+                    return polynomial().complexity();
+                size_t result = 0;
+                for( const auto& factor : content().factorization() )
+                    result += factor.first.complexity();
+                return result;
+            }
+            return 1;
+        }
+        
+        /**
          * Checks if the polynomial is linear.
          * @return If this is linear.
          */

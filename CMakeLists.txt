@@ -9,8 +9,11 @@
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
 
-cmake_minimum_required (VERSION 2.8.12 FATAL_ERROR)
-
+if (WIN32)
+	cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
+else()
+	cmake_minimum_required (VERSION 2.8.12 FATAL_ERROR)
+endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
@@ -67,7 +70,7 @@ set(CARL_LIBRARIES_DIR "${PROJECT_BINARY_DIR}/lib")
 # Offer the user the choice of overriding the installation directories
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for header files" )
 set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
-#set(SYSCONFIG_INSTALL_DIR etc/carl/  CACHE PATH "Instalation for system configuration files)
+#set(SYSCONFIG_INSTALL_DIR etc/carl/  CACHE PATH "Installation for system configuration files)
 set(BIN_INSTALL_DIR lib/ CACHE PATH "Installation directory for executables")
 
 
@@ -89,7 +92,9 @@ endforeach()
 # path to put in the executables after building.
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Directory for built executables")
 
+if (NOT WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
+endif()
 
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -98,6 +103,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	endif()
 	if (APPLE)
 		message(STATUS "Using clang on apple")
+                set(CMAKE_MACOSX_RPATH 1)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 	else()
 		message(STATUS "Using clang")
@@ -116,12 +122,21 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	endif()
 	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} -O3")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} -O1")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	message("-- Using Visual Studio C++")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} /O2 /MT")
+	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} /MTd")
 else()
 	message(WARNING "Possibly unsupported compiler")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 endif()
 if(DEVELOPER)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wno-deprecated-declarations")
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wno-deprecated-declarations")
+	endif()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -ftemplate-backtrace-limit=0")
 	#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -print-search-dirs")
 
@@ -158,6 +173,9 @@ set(STATIC_EXT ".a")
 if(APPLE)
 	set(DYNAMIC_EXT ".dylib")
 	set(STATIC_EXT ".a")
+elseif (WIN32)
+	set(DYNAMIC_EXT ".dll")
+	set(STATIC_EXT ".lib")
 endif()
 message(STATUS "Assuming extension for shared libraries: ${DYNAMIC_EXT}")
 message(STATUS "Assuming extension for static libraries: ${STATIC_EXT}")
@@ -208,6 +226,7 @@ include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
 
 
 if(USE_GINAC)
+	load_library(carl GiNaC 1.5.8 REQUIRED )
     set(USE_CLN_NUMBERS ON)
 endif()
 
@@ -254,17 +273,15 @@ add_subdirectory(resources EXCLUDE_FROM_ALL)
 
 enable_testing()
 
-if(USE_GINAC)
-	load_library(carl GiNaC 1.5.8 REQUIRED )
-endif()
-
 message(STATUS "include: ${carl_INCLUDE_DIRS}")
 message(STATUS "dynamic: ${carl_LIBRARIES_DYNAMIC}")
 message(STATUS "static: ${carl_LIBRARIES_STATIC}")
 include_directories(SYSTEM ${SYSTEM} ${carl_INCLUDE_DIRS})
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
-list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
+if (NOT WIN32)
+	list(APPEND carl_LIBRARIES_DYNAMIC pthread dl)
+endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.4 For Python

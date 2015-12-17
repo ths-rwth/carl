@@ -62,7 +62,7 @@ namespace carl
 		typedef std::vector<std::pair<Variable, exponent>> Content;
 		~Monomial();
 	protected:
-		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents. 
+		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
 		exponent mTotalDegree = 0;
@@ -122,7 +122,7 @@ namespace carl
 			mExponents(exponents),
 			mTotalDegree(0)
 		{
-			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });
+			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first < p2.first; });
 			for (const auto& e: mExponents) mTotalDegree += e.second;
 			calcHash();
 			assert(isConsistent());
@@ -136,7 +136,6 @@ namespace carl
 			mExponents(std::move(exponents)),
 			mTotalDegree(0)
 		{
-			
 			for(auto const& ve : mExponents)
 			{
 				mTotalDegree += ve.second;
@@ -284,6 +283,14 @@ namespace carl
 		{
 			return mExponents.size();
 		}
+        
+        /**
+         * @return An approximation of the complexity of this monomial.
+         */
+        size_t complexity() const
+        {
+            return mTotalDegree;
+        }
 
 		/**
 		 * Retrieves the single variable of the monomial.
@@ -405,8 +412,6 @@ namespace carl
 				return false;
 			}
 			return true;
-			
-			
 		}
 		/**
 		 * Returns a new monomial that is this monomial divided by m.
@@ -821,4 +826,3 @@ namespace std
 		}
 	};
 } // namespace std
-

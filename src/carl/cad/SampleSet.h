@@ -16,8 +16,6 @@
 
 #include "../core/logging.h"
 #include "../core/RealAlgebraicNumber.h"
-#include "../core/RealAlgebraicNumberIR.h"
-#include "../core/RealAlgebraicNumberNR.h"
 
 #include "CADSettings.h"
 
@@ -27,11 +25,11 @@ namespace cad {
 template<typename Number>
 class SampleSet {
 public:
-	typedef typename std::set<RealAlgebraicNumberPtr<Number>>::iterator Iterator;
-	typedef std::unordered_map<RealAlgebraicNumberIRPtr<Number>, RealAlgebraicNumberNRPtr<Number>> SampleSimplification;
+	typedef typename std::set<RealAlgebraicNumber<Number>>::iterator Iterator;
+	typedef std::unordered_map<RealAlgebraicNumber<Number>, RealAlgebraicNumber<Number>> SampleSimplification;
 private:
 	/**
-	 * A functor compatible to std::less<RealAlgebraicNumberPtr<Number>> that compares two samples according to a given order.
+	 * A functor compatible to std::less<RealAlgebraicNumber<Number>> that compares two samples according to a given order.
 	 */
 	struct SampleComparator {
 	private:
@@ -51,14 +49,14 @@ private:
          * @param rhs Right sample.
          * @return True if lhs < rhs.
          */
-		bool operator()(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const;
+		bool operator()(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const;
 
 		/**
 		 * Checks if the given sample is optimal with respect to the ordering.
 		 * @param s Sample.
 		 * @return True if s is optimal.
 		 */
-		bool isOptimal(const RealAlgebraicNumberPtr<Number>& s) const;
+		bool isOptimal(const RealAlgebraicNumber<Number>& s) const;
 
 		/**
 		 * Returns the current ordering.
@@ -76,7 +74,7 @@ private:
 		 * @return (true, a<b) if a<b or a>b, (false, undefined) if a==b (with respect to the inspected property).
 		 */
 		inline std::pair<bool, bool> compare(bool l, bool r) const {
-			if (l xor r) return std::make_pair(true, r);
+			if (l ^ r) return std::make_pair(true, r);
 			return std::make_pair(false, false);
 		}
 		/**
@@ -98,8 +96,8 @@ private:
          * @param rhs Second Sample.
          * @return Comparison result.
          */
-		inline std::pair<bool, bool> compareInt(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
-			return compare(lhs->isNumericRepresentation() && carl::isInteger(lhs->value()), rhs->isNumericRepresentation() && carl::isInteger(rhs->value()));
+		inline std::pair<bool, bool> compareInt(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {
+			return compare(lhs.isNumeric() && carl::isInteger(lhs.value()), rhs.isNumeric() && carl::isInteger(rhs.value()));
 		}
 		/**
 		 * Compares two samples checking if they are rationals.
@@ -107,8 +105,8 @@ private:
          * @param rhs Second Sample.
          * @return Comparison result.
          */
-		inline std::pair<bool, bool> compareRat(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
-			return compare(lhs->isNumericRepresentation(), rhs->isNumericRepresentation());
+		inline std::pair<bool, bool> compareRat(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {
+			return compare(lhs.isNumeric(), rhs.isNumeric());
 		}
 		/**
 		 * Compares two samples with respect to their representation size.
@@ -117,9 +115,9 @@ private:
 		 * @param rhs Second Sample.
 		 * @return Comparison result.
 		 */
-		inline std::pair<bool, bool> compareSize(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
-			assert(lhs->isNumeric() && rhs->isNumeric());
-			return compare(carl::bitsize(lhs->value()), carl::bitsize(lhs->value()));
+		inline std::pair<bool, bool> compareSize(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {
+			assert(lhs.isNumeric() && rhs.isNumeric());
+			return compare(carl::bitsize(lhs.value()), carl::bitsize(lhs.value()));
 		}
 		/**
 		 * Compares two samples checking if they are roots.
@@ -127,16 +125,16 @@ private:
          * @param rhs Second Sample.
          * @return Comparison result.
          */
-		inline std::pair<bool, bool> compareRoot(const RealAlgebraicNumberPtr<Number>& lhs, const RealAlgebraicNumberPtr<Number>& rhs) const {
-			return compare(lhs->isRoot(), rhs->isRoot());
+		inline std::pair<bool, bool> compareRoot(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) const {
+			return compare(lhs.isRoot(), rhs.isRoot());
 		}
 	};
 	
 	/// Contains all samples in the order of their value.
-	std::set<RealAlgebraicNumberPtr<Number>, carl::less<RealAlgebraicNumberPtr<Number>>> mSamples;
+	std::set<RealAlgebraicNumber<Number>> mSamples;
 
 	SampleComparator mComp;
-	std::vector<RealAlgebraicNumberPtr<Number>> mHeap;
+	std::vector<RealAlgebraicNumber<Number>> mHeap;
 	
 	/**
 	 * Restore the ordering.
@@ -172,7 +170,7 @@ public:
 	 * Retrieves the set of samples stored.
      * @return Sample set.
      */
-	const std::set<RealAlgebraicNumberPtr<Number>, carl::less<RealAlgebraicNumberPtr<Number>>>& samples() const {
+	const std::set<RealAlgebraicNumber<Number>>& samples() const {
 		return this->mSamples;
 	}
 
@@ -182,7 +180,7 @@ public:
      * @param r Sample to insert.
      * @return An iterator to the inserted sample, a flag that indicates if the insertion changed something and a flag that indicates if a value has been replaced or was new altogether.
      */
-	std::tuple<Iterator, bool, bool> insert(RealAlgebraicNumberPtr<Number> r);
+	std::tuple<Iterator, bool, bool> insert(const RealAlgebraicNumber<Number>& r);
 	
 	/**
 	 * Inserts a range of samples. Actually calls insert(s) for each sample s in the range.
@@ -209,7 +207,11 @@ public:
 	 * @param position Valid iterator to a sample.
 	 * @return Iterator to the next position in the container.
 	 */
+#ifdef __VS
+	typename SampleSet::Iterator remove(typename SampleSet::Iterator position) {
+#else
 	SampleSet::Iterator remove(SampleSet::Iterator position) {
+#endif
 		assert(position != mSamples.end());
 		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << *position << " )");
 		auto it = std::find(mHeap.begin(), mHeap.end(), *position);
@@ -225,14 +227,22 @@ public:
 	 * Returns an iterator to the first sample in this sample set.
 	 * @return Iterator to first sample.
 	 */
+#ifdef __VS
+	typename SampleSet::Iterator begin() {
+#else
 	SampleSet::Iterator begin() {
+#endif
 		return this->mSamples.begin();
 	}
 	/**
 	 * Returns an iterator to the first sample in this sample set.
 	 * @return Iterator to first sample.
 	 */
+#ifdef __VS
+	const typename SampleSet::Iterator begin() const {
+#else
 	const SampleSet::Iterator begin() const {
+#endif
 		return this->mSamples.begin();
 	}
 
@@ -240,14 +250,22 @@ public:
 	 * Returns an iterator to the element after the last sample in this sample set.
 	 * @return Iterator to end.
 	 */
+#ifdef __VS
+	typename SampleSet::Iterator end() {
+#else
 	SampleSet::Iterator end() {
+#endif
 		return this->mSamples.end();
 	}
 	/**
 	 * Returns an iterator to the element after the last sample in this sample set.
 	 * @return Iterator to end.
 	 */
+#ifdef __VS
+	const typename SampleSet::Iterator end() const {
+#else
 	const SampleSet::Iterator end() const {
+#endif
 		return this->mSamples.end();
 	}
 
@@ -255,7 +273,7 @@ public:
 	 * Retrieves the next sample according to the configured ordering.
 	 * @return Next sample.
 	 */
-	inline RealAlgebraicNumberPtr<Number> next() const {
+	inline RealAlgebraicNumber<Number> next() const {
 		assert(!mHeap.empty());
 		return mHeap.front();
 	}
@@ -274,7 +292,7 @@ public:
      * @param ordering New ordering.
      * @return Next sample.
      */
-	inline RealAlgebraicNumberPtr<Number> next(SampleOrdering ordering) {
+	inline RealAlgebraicNumber<Number> next(SampleOrdering ordering) {
 		this->restoreOrdering(ordering);
 		return this->next();
 	}
@@ -293,7 +311,7 @@ public:
 	 * @return true if the element was replaced, false otherwise
 	 * @complexity logarithmic in the elements stored
 	 */
-	bool simplify(const RealAlgebraicNumberIRPtr<Number> from, RealAlgebraicNumberNRPtr<Number> to);
+	bool simplify(const RealAlgebraicNumber<Number>& from, RealAlgebraicNumber<Number>& to);
 	
 	/**
 	 * Traverse all interval-represented samples and determine whether they could be simplified by numeric representations.
@@ -309,7 +327,7 @@ public:
 	 * Determines containment of r in the list.
 	 * @return true if r is contained in the list, false otherwise
 	 */
-	bool contains(const RealAlgebraicNumberPtr<Number> r) const {
+	bool contains(const RealAlgebraicNumber<Number> r) const {
 		return mSamples.find(r) != mSamples.end();
 	}
 
@@ -334,7 +352,11 @@ public:
 	 * @see std::set::swap
 	 */
 	template<typename Num>
+#ifdef __VS
+	friend void swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
+#else
 	friend void std::swap(SampleSet<Num>& lhs, SampleSet<Num>& rhs);
+#endif
 
 private:
 	/**
@@ -351,6 +373,7 @@ private:
 }
 }
 
+#ifndef __VS
 namespace std {
 /**
  * Swaps the contents of two SampleSet objects.
@@ -360,5 +383,6 @@ namespace std {
 template<typename Num>
 void swap(carl::cad::SampleSet<Num>& lhs, carl::cad::SampleSet<Num>& rhs);
 }
+#endif
 
 #include "SampleSet.tpp"

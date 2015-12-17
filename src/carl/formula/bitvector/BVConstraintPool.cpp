@@ -57,4 +57,10 @@ namespace carl
 
         return this->add(new Constraint(_relation, _lhs, _rhs));
     }
+
+    void BVConstraintPool::assignId(ConstraintPtr _constraint, std::size_t _id)
+    {
+        _constraint->mId = _id;
+    }
+
 }

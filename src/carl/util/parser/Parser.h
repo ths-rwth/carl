@@ -8,6 +8,8 @@
 #include <sstream>
 
 #include "../../core/logging.h"
+#include "Common.h"
+#include "../../numbers/numbers.h"
 #include "FormulaParser.h"
 #include "PolynomialParser.h"
 #include "RationalFunctionParser.h"

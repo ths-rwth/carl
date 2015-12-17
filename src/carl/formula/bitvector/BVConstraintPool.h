@@ -28,6 +28,8 @@ namespace carl
 
 		ConstConstraintPtr create(const BVCompareRelation& _relation,
 			const BVTerm& _lhs, const BVTerm& _rhs);
+
+		void assignId(ConstraintPtr _constraint, std::size_t _id);
 	};
 }
 

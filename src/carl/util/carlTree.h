@@ -25,7 +25,12 @@ namespace carl {
 template<typename T>
 class tree {
 private:
-	static constexpr std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
+#ifdef __VS
+	//Warning: might lead to problem when using 64bit
+	static const std::size_t MAXINT = UINT_MAX;
+#else
+	static const std::size_t MAXINT = std::numeric_limits<std::size_t>::max();
+#endif
 	struct Node {
 		std::size_t id;
 		mutable T data;
@@ -99,6 +104,9 @@ protected:
 			assert(current != MAXINT);
 			return mTree->nodes[current].depth;
 		}
+		bool isRoot() const {
+			return current == 0;
+		}
 		T& operator*() {
 			assert(current != MAXINT);
 			return mTree->nodes[current].data;
@@ -106,6 +114,14 @@ protected:
 		const T& operator*() const {
 			assert(current != MAXINT);
 			return mTree->nodes[current].data;
+		}
+		T* operator->() {
+			assert(current != MAXINT);
+			return &(mTree->nodes[current].data);
+		}
+		T const * operator->() const {
+			assert(current != MAXINT);
+			return &(mTree->nodes[current].data);
 		}
 
 		template<typename I = Iterator>
@@ -298,7 +314,7 @@ public:
 			} else {
 				PreorderIterator<false> it(this->mTree, this->current);
 				do {
-					++it;
+					it++;
 					if (it.current == MAXINT) break;
 				} while (this->mTree->nodes[it.current].firstChild != MAXINT);
 				this->current = it.current;
@@ -375,7 +391,7 @@ public:
 					if (this->current == MAXINT) return *this;
 				}
 				PreorderIterator<reverse> it(this->mTree, this->mTree->nodes[this->current].nextSibling);
-				for (; it.current != MAXINT; ++it) {
+				for (; it.current != MAXINT; it++) {
 					if (it.depth() == target) break;
 				}
 				this->current = it.current;
@@ -650,7 +666,7 @@ public:
 	 */
 	std::size_t max_depth() const {
 		std::size_t max = 0;
-		for (auto it = begin_leaf(); it != end_leaf(); ++it) {
+		for (auto it = begin_leaf(); it != end_leaf(); it++) {
 			if (it.depth() > max) max = it.depth();
 		}
 		return max;
@@ -658,7 +674,7 @@ public:
 	template<typename Iterator>
 	std::size_t max_depth(const Iterator& it) const {
 		std::size_t max = 0;
-		for (auto i = begin_children(it); i != end_children(it); ++i) {
+		for (auto i = begin_children(it); i != end_children(it); i++) {
 			std::size_t d = max_depth(i);
 			if (d + 1 > max) max = d + 1;
 		}
@@ -672,7 +688,7 @@ public:
 	 */
 	template<typename Iterator>
 	bool is_leaf(const Iterator& it) const {
-		return it.current->firstChild == MAXINT;
+		return nodes[it.current].firstChild == MAXINT;
 	}
 	/**
 	 * Check if the given element is a leftmost child.
@@ -826,10 +842,10 @@ public:
 		std::size_t id = position.current;
 		if (id == 0) {
 			clear();
-			++position;
+			position++;
 			return position;
 		}
-		++position;
+		position++;
 		if (nodes[id].nextSibling != MAXINT) {
 			nodes[nodes[id].nextSibling].previousSibling = nodes[id].previousSibling;
 		} else {
@@ -910,7 +926,7 @@ private:
 	
 public:
 	bool isConsistent() const {
-		for (auto it = this->begin(); it != this->end(); ++it) {
+		for (auto it = this->begin(); it != this->end(); it++) {
 			assert(isConsistent(it.current));
 		}
 		return true;
@@ -940,6 +956,6 @@ public:
 };
 
 template<typename T>
-constexpr std::size_t tree<T>::MAXINT;
+const std::size_t tree<T>::MAXINT;
 
 }

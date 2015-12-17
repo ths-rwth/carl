@@ -19,7 +19,7 @@
 
 namespace carl
 {
-	
+
 template<typename Coeff, typename Ordering, typename Policies>
 TermAdditionManager<MultivariatePolynomial<Coeff,Ordering,Policies>,Ordering> MultivariatePolynomial<Coeff,Ordering,Policies>::mTermAdditionManager;
 
@@ -169,8 +169,12 @@ MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(const Mu
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
+#ifdef __VS
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(TermsType&& terms, bool duplicates, bool ordered) :
+#else
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType&& terms, bool duplicates, bool ordered):
-	mTerms(std::move(terms)),
+#endif
+mTerms(std::move(terms)),
 	mOrdered(ordered)
 {
 	if( duplicates ) {
@@ -179,7 +183,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 		mTermAdditionManager.readTerms(id, mTerms);
 		mOrdered = false;
 	}
-	
+
 	if (!mOrdered) {
 		makeMinimallyOrdered();
 	}
@@ -188,7 +192,11 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(Multiv
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered):
+#ifdef __VS
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const TermsType& terms, bool duplicates, bool ordered) :
+#else
+MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const MultivariatePolynomial<Coeff, Ordering, Policies>::TermsType& terms, bool duplicates, bool ordered) :
+#endif
 	mTerms(terms),
 	mOrdered(ordered)
 {
@@ -232,7 +240,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(const 
 	: MultivariatePolynomial(p.first, p.second)
 {
 }
-	
+
 template<typename Coeff, typename Ordering, typename Policies>
 MultivariatePolynomial<Coeff, Ordering, Policies>::MultivariatePolynomial(ConstructorOperation op, const std::vector<MultivariatePolynomial>& operands)
 {
@@ -573,11 +581,11 @@ template<typename Coeff, typename Ordering, typename Policies>
 bool MultivariatePolynomial<Coeff,Ordering,Policies>::isUnivariate() const {
 	// A constant polynomial is obviously univariate.
 	if (isConstant()) return true;
-	
+
 	if (this->lterm().getNrVariables() > 1) {
 		return false;
 	}
-	
+
 	Variable v = lterm().getSingleVariable();
 	for (const auto& term : mTerms) {
 		if (!term.hasNoOtherVariable(v)) return false;
@@ -836,7 +844,7 @@ MultivariatePolynomial<C,O,P> MultivariatePolynomial<C,O,P>::remainder(const Mul
 	{
 		return MultivariatePolynomial<C,O,P>();
 	}
-	
+
 	MultivariatePolynomial<C,O,P> remainder;
 	MultivariatePolynomial p = *this;
 	while(!p.isZero())
@@ -888,8 +896,6 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 	if (!this->has(var)) {
 		return;
 	}
-	std::stringstream ss;
-	ss << *this;
 	TermsType newTerms;
 	// If we replace a variable by zero, just eliminate all terms containing the variable.
 	if(value.isZero())
@@ -902,7 +908,7 @@ void MultivariatePolynomial<Coeff,Ordering,Policies>::substituteIn(Variable::Arg
 			} else removedLast = true;
 		}
 		mTerms.swap(newTerms);
-		CARL_LOG_TRACE("carl.core", ss.str() << " [ " << var << " -> " << value << " ] = " << *this);
+		CARL_LOG_TRACE("carl.core", *this << " [ " << var << " -> " << value << " ] = " << *this);
 		if (removedLast) {
 			mOrdered = false;
 			makeMinimallyOrdered<false, true>();
@@ -1073,7 +1079,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 				++sub;
 				assert(sub != substitutions.end());
 				// Go to the next variable.
-				while (sub->second.isZero())
+				while (sub->first != expResultB->first.first)
 				{
 					assert(sub != substitutions.end());
 					++sub;
@@ -1196,11 +1202,11 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactor() const
 	}
     if( carl::isNegative(lcoeff()) )
     {
-        return Coeff(den)/(-num);
+        return Coeff(den)/Coeff(-num);
     }
     else
     {
-        return Coeff(den)/num;
+        return Coeff(den)/Coeff(num);
     }
 }
 
@@ -1379,7 +1385,7 @@ MultivariatePolynomial<Coeff,Ordering,Policies> MultivariatePolynomial<Coeff,Ord
 	{
 		return MultivariatePolynomial((Coeff)1);
 	}
-	
+
 	CARL_LOG_INEFFICIENT();
 	MultivariatePolynomial<Coeff,Ordering,Policies> res(*this);
 	for(unsigned i = 1; i < exp; i++)
@@ -1517,7 +1523,11 @@ bool operator==(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePoly
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
 	static std::vector<const C*> coeffs;
+#ifdef __VS
+    coeffs.resize(MonomialPool::getInstance().nextID());
+#else
 	coeffs.reserve(MonomialPool::getInstance().nextID());
+#endif
 	memset(&coeffs[0], 0, sizeof(typename std::vector<const C*>::value_type)*coeffs.capacity());
 	for (const auto& t: lhs.mTerms) {
 		std::size_t id = 0;
@@ -1886,7 +1896,7 @@ MultivariatePolynomial<Coeff, Ordering, Policies>& MultivariatePolynomial<Coeff,
 		*this = -rhs;
 		return *this += c;
 	}
-	
+
 	auto id = mTermAdditionManager.getId(mTerms.size() + rhs.mTerms.size());
 	for (const auto& term: mTerms) {
 		mTermAdditionManager.template addTerm<false>(id, term);

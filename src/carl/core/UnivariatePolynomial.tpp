@@ -705,8 +705,13 @@ const Coeff& UnivariatePolynomial<Coeff>::unitPart() const
 	return lcoeff();
 }
 
+#ifdef __VS
+template<typename Coeff>
+template<typename C, EnableIfBool<!is_number<C>::value>>
+#else
 template<typename Coeff>
 template<typename C, EnableIf<Not<is_number<C>>>>
+#endif
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
 	if(isZero() || lcoeff().isZero() || lcoeff().lcoeff() > NumberType(0))
@@ -719,9 +724,13 @@ Coeff UnivariatePolynomial<Coeff>::unitPart() const
 	}
 }
 
-
+#ifdef __VS
+template<typename Coeff>
+template<typename C, EnableIfBool<!is_field<C>::value && is_number<C>::value >>
+#else
 template<typename Coeff>
 template<typename C, EnableIf<Not<is_field<C>>, is_number<C> >>
+#endif
 Coeff UnivariatePolynomial<Coeff>::unitPart() const
 {
 	if(isZero() || lcoeff() > Coeff(0))
@@ -1005,10 +1014,10 @@ typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>:
 }
 
 template<typename Coeff>
-std::map<UnivariatePolynomial<Coeff>, unsigned> UnivariatePolynomial<Coeff>::factorization() const
+FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 {
 	CARL_LOG_TRACE("carl.core", "UnivFactor: " << *this );
-	std::map<UnivariatePolynomial<Coeff>, unsigned> result;
+	FactorMap<Coeff> result;
 	if(isConstant()) // Constant.
 	{
 		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << *this << ")^" << 1 );
@@ -1077,7 +1086,7 @@ std::map<UnivariatePolynomial<Coeff>, unsigned> UnivariatePolynomial<Coeff>::fac
 
 template<typename Coeff>
 template<typename Integer>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(const UnivariatePolynomial<Coeff>& poly, std::map<UnivariatePolynomial<Coeff>, unsigned>& linearFactors, const Integer& maxInt)
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(const UnivariatePolynomial<Coeff>& poly, FactorMap<Coeff>& linearFactors, const Integer& maxInt)
 {
 	CARL_LOG_TRACE("carl.core", "UnivELF: " << poly );
 	UnivariatePolynomial<Coeff> result(poly.mainVar());

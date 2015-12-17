@@ -50,7 +50,11 @@ namespace carl
 			mInputString = inputString;
 		}
 		
+#ifdef __VS
+		virtual cstring what() const override
+#else
 		virtual cstring what() const noexcept override
+#endif
 		{
 			std::stringstream strstr;
 			strstr << std::runtime_error::what() << " at " << mSubstring << " in " << mInputString;
@@ -63,9 +67,7 @@ namespace carl
 	
 	
 	class StringParser
-	{	
-	private:
-		VariablePool& mVPool = VariablePool::getInstance();		
+	{
 	protected:
 		bool mSingleSymbVariables;
 		bool mImplicitMultiplicationMode = false; 
@@ -89,7 +91,7 @@ namespace carl
 					mSingleSymbVariables = false;
 					mImplicitMultiplicationMode = false;
 				}
-				mVars.emplace(v, mVPool.getFreshVariable(v));
+				mVars.emplace(v, freshRealVariable(v));
 			}
 		}
 			
@@ -236,7 +238,7 @@ namespace carl
 				CARL_LOG_ASSERT("carl.stringparser", mSingleSymbVariables, "The implicit mode can only be set with single symbol variables");
 			}
 			
-			std::sort(varExpPairs.begin(), varExpPairs.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first > p2.first; });
+			std::sort(varExpPairs.begin(), varExpPairs.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first < p2.first; });
 			size_t nrVariables = varExpPairs.size();
 			std::unique(varExpPairs.begin(), varExpPairs.end());
 			if(nrVariables != varExpPairs.size())

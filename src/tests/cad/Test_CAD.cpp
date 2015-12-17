@@ -7,18 +7,12 @@
 #include "carl/core/logging.h"
 #include "carl/cad/CAD.h"
 #include "carl/cad/Constraint.h"
+#include "carl/util/platform.h"
+
+#include "../Common.h"
 
 using namespace carl;
 
-#ifdef USE_CLN_NUMBERS
-#include <cln/cln.h>
-typedef cln::cl_RA Rational;
-typedef cln::cl_I Integer;
-#else
-#include <gmpxx.h>
-typedef mpq_class Rational;
-typedef mpz_class Integer;
-#endif
 
 typedef carl::cad::Constraint<Rational> Constraint;
 
@@ -26,10 +20,10 @@ class CADTest : public ::testing::Test {
 protected:
 	typedef carl::CAD<Rational>::MPolynomial Polynomial;
 
-	CADTest() : 
-		x(carl::VariablePool::getInstance().getFreshVariable("x")),
-		y(carl::VariablePool::getInstance().getFreshVariable("y")),
-		z(carl::VariablePool::getInstance().getFreshVariable("z"))
+	CADTest() :
+		x(freshRealVariable("x")),
+		y(freshRealVariable("y")),
+		z(freshRealVariable("z"))
 	{
 		CARL_LOG_INFO("carl.core", "Variables " << x << ", " << y);
 	}
@@ -56,22 +50,20 @@ protected:
 		this->bounds.clear();
 	}
 
-	bool hasNRValue(const carl::RealAlgebraicNumberPtr<Rational> n, Rational val) {
-		if (n->isNumeric()) return n->value() == val;
+	bool hasNRValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
+		if (n.isNumeric()) return n.value() == val;
 		return false;
 	}
-	bool hasValue(const carl::RealAlgebraicNumberPtr<Rational> n, Rational val) {
-		if (n->isNumeric()) return n->value() == val;
+	bool hasValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
+		if (n.isNumeric()) return n.value() == val;
 		else {
-			carl::RealAlgebraicNumberIRPtr<Rational> ir = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Rational>>(n);
-			return ir->getInterval().contains(val);
+			return n.getInterval().contains(val);
 		}
 	}
-	bool hasSqrtValue(const carl::RealAlgebraicNumberPtr<Rational> n, Rational val) {
-		if (n->isNumeric()) return n->value() * n->value() == val;
+	bool hasSqrtValue(const carl::RealAlgebraicNumber<Rational> n, Rational val) {
+		if (n.isNumeric()) return n.value() * n.value() == val;
 		else {
-			carl::RealAlgebraicNumberIRPtr<Rational> ir = std::static_pointer_cast<carl::RealAlgebraicNumberIR<Rational>>(n);
-			return (ir->getInterval() * ir->getInterval()).contains(val);
+			return (n.getInterval() * n.getInterval()).contains(val);
 		}
 	}
 
@@ -203,25 +195,25 @@ TEST_F(CADTest, CheckInt)
 }
 
 template<typename T>
-inline std::shared_ptr<carl::RealAlgebraicNumberNR<Rational>> NR(T t, bool b) {
-	return carl::RealAlgebraicNumberNR<Rational>::create(t, b);
+inline carl::RealAlgebraicNumber<Rational> NR(T t, bool b) {
+	return carl::RealAlgebraicNumber<Rational>(t, b);
 }
 
 TEST(CAD, Samples)
 {
-	std::list<carl::RealAlgebraicNumberPtr<Rational>> roots({ NR(-1, true), NR(1, true) });
-	
+	std::list<carl::RealAlgebraicNumber<Rational>> roots({ NR(-1, true), NR(1, true) });
+
 	carl::cad::SampleSet<Rational> currentSamples;
 	currentSamples.insert(NR(-1, false));
 	currentSamples.insert(NR(0, true));
 	currentSamples.insert(NR(1, false));
-	
-	std::forward_list<carl::RealAlgebraicNumberPtr<Rational>> replacedSamples;
-	
+
+	std::forward_list<carl::RealAlgebraicNumber<Rational>> replacedSamples;
+
 	carl::Interval<Rational> bounds(0, carl::BoundType::STRICT, 1, carl::BoundType::INFTY);
-	
+
 	carl::CAD<Rational> cad;
-	
+
 	//carl::cad::SampleSet<Rational> res = cad.samples(0, roots, currentSamples, replacedSamples, bounds);
 
 	//std::cout << res << std::endl;

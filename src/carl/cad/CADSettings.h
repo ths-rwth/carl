@@ -29,6 +29,36 @@ enum class SampleOrdering : unsigned {
 	Default = SampleOrdering::IntRatRoot
 };
 
+/// Defines how integers are handled.
+enum class IntegerHandling {
+    /// Generate a full real solution and split on non-integral assignments in this solution. This is done in the CADModule in SMT-RAT.
+    SPLIT_SOLUTION,
+	/// First try to guess based on full real solution. If this does not work, split.
+	GUESS_AND_SPLIT,
+    /// Split if no integral sample is available for an integer variable.
+    SPLIT_LAZY,
+    /// Split if a non-integral sample is available for an integer variable.
+    SPLIT_EARLY,
+    /// Backtrack within the sampling phase.
+    BACKTRACK,
+	/// Do not care about integers
+	NONE
+};
+inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
+	switch (ih) {
+		case IntegerHandling::SPLIT_SOLUTION: return os << "Split on solution";
+		case IntegerHandling::GUESS_AND_SPLIT: return os << "Guess then split";
+		case IntegerHandling::SPLIT_LAZY: return os << "Split lazy";
+		case IntegerHandling::SPLIT_EARLY: return os << "Split early";
+		case IntegerHandling::BACKTRACK: return os << "Backtrack";
+		case IntegerHandling::NONE: return os << "None";
+	}
+	return os;
+}
+inline std::istream& operator>>(std::istream& in, IntegerHandling&) {
+    return in;
+}
+
 /**
  * Streaming operator for SampleOrdering.
  * @param os Output stream.
@@ -44,9 +74,9 @@ inline std::ostream& operator<<(std::ostream& os, SampleOrdering so) {
 }
 
 template<typename Coeff>
-using MPolynomial = carl::MultivariatePolynomial<Coeff>;
+using MultiPolynomial = carl::MultivariatePolynomial<Coeff>;
 template<typename Coeff>
-using UPolynomial = carl::UnivariatePolynomial<MPolynomial<Coeff>>;
+using UniPolynomial = carl::UnivariatePolynomial<MultiPolynomial<Coeff>>;
 
 /** Predefined settings for the CAD procedure.
  * Implementation of the types is located in CAD.h. Each setting is defined as a power of two in order to use several flags at a time.
@@ -98,8 +128,6 @@ public:
 	bool inequalitiesOnly;
 	/// during one elimination operation, all polynomials which are just copied to the next level are removed from the previous
 	bool removeConstants;
-	/// if a polynomial is removed from the CAD, remove also those variables and the respective elimination and sample levels which correspond to empty elimination levels
-	bool trimVariables;
 	/// treat equations separately by tuning the cad object to equations
 	bool autoSeparateEquations;
 	/// compute a conflict graph after determining unsatisfiability of a set of constraints via CAD::check
@@ -114,6 +142,7 @@ public:
 	bool improveBounds;
 	bool exploreInteger;
 	bool splitInteger;
+	IntegerHandling integerHandling;
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
 	/// standard strategy to be used for real root isolation
@@ -156,7 +185,6 @@ public:
 			cadSettings.simplifyByFactorization     = true;
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = true;
-			cadSettings.trimVariables               = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 		}
 		if (setting & NOTBOUNDED) {
@@ -169,7 +197,6 @@ public:
 			cadSettings.simplifyByFactorization     = true;
 			cadSettings.simplifyByRootcounting      = false;
 			cadSettings.simplifyEliminationByBounds = false;
-			cadSettings.trimVariables               = false;
 			cadSettings.order = PolynomialComparisonOrder::CauchyBound;
 		}
 		if (setting & EQUATIONSONLY) {
@@ -208,8 +235,6 @@ public:
 			settingStrs.push_back( "Use only intermediate points for lifting." );
 		if (settings.removeConstants)
 			settingStrs.push_back( "During elimination, all polynomials which are just copied to the next level are removed from the previous." );
-		if (settings.trimVariables)
-			settingStrs.push_back( "If a polynomial is removed from the CAD, remove also those variables and the respective elimination and sample levels which correspond to empty elimination levels." );
 		if (settings.autoSeparateEquations)
 			settingStrs.push_back( "Treat equations separately by tuning the cad object to equations." );
 		if (settings.computeConflictGraph)
@@ -254,7 +279,6 @@ private:
 		equationsOnly( false ),
 		inequalitiesOnly( false ),
 		removeConstants( true ),
-		trimVariables( false ),
 		autoSeparateEquations( false ),
 		computeConflictGraph( true ),
 		preSolveByBounds( false ),
@@ -263,6 +287,7 @@ private:
 		improveBounds( true ),
 		exploreInteger(false),
 		splitInteger(true),
+		integerHandling(IntegerHandling::SPLIT_SOLUTION),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
@@ -279,7 +304,6 @@ public:
 		equationsOnly( s.equationsOnly ),
 		inequalitiesOnly( s.inequalitiesOnly ),
 		removeConstants( s.removeConstants ),
-		trimVariables( s.trimVariables ),
 		autoSeparateEquations( s.autoSeparateEquations ),
 		computeConflictGraph( s.computeConflictGraph ),
 		preSolveByBounds( s.preSolveByBounds ),
@@ -288,6 +312,7 @@ public:
 		improveBounds( s.improveBounds ),
 		exploreInteger(s.exploreInteger),
 		splitInteger(s.splitInteger),
+		integerHandling(s.integerHandling),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}

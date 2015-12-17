@@ -83,10 +83,6 @@ namespace carl
             //pfPair->assertFactorization();
         }
         ASSERT_CACHE_REF_LEGAL( (*this) );
-//        if(computePolynomial(*this) != _polynomial)
-//        {
-//            exit(1234);
-//        }
         assert(computePolynomial(*this) == _polynomial);
     }
     
@@ -733,7 +729,7 @@ namespace carl
     bool FactorizedPolynomial<P>::sqrt( FactorizedPolynomial<P>& _result ) const
     {
         CoeffType resultCoeff;
-        if( !carl::sqrtp( mCoefficient, resultCoeff ) )
+        if( !carl::sqrt_exact( mCoefficient, resultCoeff ) )
             return false;
         if( !existsFactorization( *this ) )
         {

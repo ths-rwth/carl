@@ -1,4 +1,4 @@
-/** 
+/**
  * @file   numbers/typetraits.h
  * @ingroup typetraits
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
@@ -28,6 +28,10 @@
  */
 
 #pragma once
+
+#ifndef INCLUDED_FROM_NUMBERS_H
+static_assert(false, "This file may only be included indirectly by numbers.h");
+#endif
 
 #include "../util/platform.h"
 #include "config.h"
@@ -73,7 +77,7 @@ template<> struct name<_type>: carl::has_subtype<value> {}
 
 namespace carl {
 
-// 
+//
 // Forward declarations
 //
 template<typename IntegerT>
@@ -149,7 +153,7 @@ struct is_finite<GFNumber<C>>: std::false_type {};
  */
 /**
  * States if a type is a floating point type.
- * 
+ *
  * Default is true if `std::is_floating_point` is true for this type.
  * @ingroup typetraits_is_float
  */
@@ -216,7 +220,7 @@ struct is_subset_of_integers: std::integral_constant<bool, is_integer<Type>::val
 template<typename T>
 struct is_number {
 	/// Default value of this trait.
-	static constexpr bool value = is_subset_of_rationals<T>::value || is_subset_of_integers<T>::value || is_float<T>::value;
+	static const bool value = is_subset_of_rationals<T>::value || is_subset_of_integers<T>::value || is_float<T>::value;
 };
 
 /**
@@ -247,6 +251,13 @@ template<typename T>
 struct is_rational: std::false_type {};
 
 /**
+* States whether a given type is an `Interval`.
+* By default, a type is not.
+*/
+template <class Number>
+struct is_interval : std::false_type {};
+
+/**
  * @addtogroup typetraits_is_subset_of_rationals is_subset_of_rationals
  * All rational types that can represent a subset of all rationals are marked with `is_subset_of_rationals`.
  *
@@ -260,7 +271,7 @@ struct is_rational: std::false_type {};
 template<typename T>
 struct is_subset_of_rationals {
 	/// Default value of this trait.
-	static constexpr bool value = is_rational<T>::value;
+	static const bool value = is_rational<T>::value;
 };
 
 template<typename T>
@@ -346,6 +357,6 @@ class PreventConversion
         explicit PreventConversion( const T& _other ) : mContent( _other ) {}
 //        template<typename O>
 //        PreventConversion( const O& _other ) = delete;
-        operator T () const { return mContent; }
+        operator const T&() const { return mContent; }
 };
 }

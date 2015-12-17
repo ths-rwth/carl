@@ -2,7 +2,7 @@
 #include "carl/core/ConstraintOperations.h"
 #include "carl/util/stringparser.h"
 
-#include "carl/core/MultivariatePolynomial.h"
+#include "../Common.h"
 
 #include <unordered_set>
 
@@ -21,9 +21,9 @@ TEST(Constraint, Operations)
     using carl::CompareRelation;
     carl::StringParser sp;
     sp.setVariables({"x", "y", "z"});
-    
+
     std::vector<RFuncCon> v1;
-    
+
     Pol p1 = sp.parseMultivariatePolynomial<Rational>("3*x");
     Pol p2 = sp.parseMultivariatePolynomial<Rational>("1");
     RFunc r1(p1,p2);
@@ -33,8 +33,8 @@ TEST(Constraint, Operations)
     EXPECT_EQ((size_t)1, s1.size());
     v1.clear();
     s1.clear();
-    
-    
+
+
     Pol p3 = sp.parseMultivariatePolynomial<Rational>("z");
     RFunc r2(p1,p3);
     v1.push_back(RFuncCon(r2, CompareRelation::GEQ));
@@ -42,7 +42,7 @@ TEST(Constraint, Operations)
     EXPECT_EQ((size_t)2, s1.size());
     v1.clear();
     s1.clear();
-    
+
     Pol p4 = sp.parseMultivariatePolynomial<Rational>("-2");
     RFunc r3(p4);
     v1.push_back(RFuncCon(r3, CompareRelation::GEQ));
@@ -50,13 +50,11 @@ TEST(Constraint, Operations)
     EXPECT_EQ((size_t)1, s1.size());
     v1.clear();
     s1.clear();
-    
-    
-    
-    
-    
-    
-   
+
+
+
+
+
+
+
 }
-
-
