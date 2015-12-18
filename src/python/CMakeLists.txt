@@ -24,10 +24,3 @@ endif()
 #
 add_custom_target(pycarl DEPENDS pycarlcore)
 
-add_custom_command(TARGET pycarl PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PYCARL_SOURCE_DIR} ${PYCARL_OUTPUT_DIR})
-
-add_custom_command(TARGET pycarl PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "${CARL_LIBRARIES_DIR}/libcarl.1.0.0.dylib"  ${PYCARL_OUTPUT_DIR})

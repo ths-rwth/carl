@@ -9,6 +9,7 @@ import os.path
 import tempfile
 import glob
 import shutil
+import distutils
 print(os.getcwd())
 
 PYTHONINC = distutils.sysconfig.get_python_inc()
@@ -23,18 +24,22 @@ PYTHONLIB = PYTHONLIBS[0]
 
 d = "setuppy_build"
 print(d)
-
+if not os.path.exists(d):
+    os.makedirs(d)
 
 class MyEggInfo(egg_info):
     def run(self):
-        call(["cmake", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
-        call(["make", "pycarl"], cwd=d)
+        #call(["cmake", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
+        #call(["make", "pycarl"], cwd=d)
         print(">>>")
         try:
-            os.makedirs(os.path.join(d, "pycarl"))
+            src = os.path.join(d, "../pycarl")
+            dst = os.path.join(d, "pycarl/")
+            distutils.dir_util.copy_tree(src, dst)
             egg_info.run(self)
-            os.rmdir(os.path.join(d, "pycarl"))
+            #shutil.rmtree(os.path.join(d, "pycarl"))
         except:
+            print("Exception occurred")
             egg_info.run(self)
 
 
@@ -56,6 +61,6 @@ setup(cmdclass={'install': MyInstall, 'develop': MyDevelop, 'egg_info': MyEggInf
       description="pycarl - Python Bindings for Carl",
       package_dir={'':d},
       packages=['pycarl', 'pycarl.core'],
-       package_data={'pycarl.core': ['_core.so'], 'pycarl': ['*.so', '*.dylib', '*.a']},
+      package_data={'pycarl.core': ['_core.so'], 'pycarl': ['*.so', '*.dylib', '*.a']},
 
       include_package_data=True)
