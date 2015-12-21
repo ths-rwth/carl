@@ -269,7 +269,7 @@ TEST(RationalFunction, Derivative)
 	EXPECT_EQ(r2, r1.derivative(sp.variables().at("x")));
 }
 
-TEST(RationalFunction, Simplifaction)
+TEST(RationalFunction, Simplification)
 {
     carl::VariablePool::getInstance().clear();
     StringParser sp;
@@ -294,5 +294,9 @@ TEST(RationalFunction, Simplifaction)
     std::cout << r1 << std::endl;
     r1.simplify();
     std::cout << r1 << std::endl;
-    EXPECT_TRUE( r1.denominator().isOne() ); 
+    EXPECT_TRUE( r1.denominator().isOne() );
+
+    RFactFunc r2( (fq2*fq2), fp4 );
+    r2.simplify();
+    EXPECT_TRUE( r2.nominator().isOne() );
 }

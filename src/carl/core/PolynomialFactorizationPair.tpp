@@ -476,6 +476,7 @@ namespace carl
                         polA = *factorA.content().mpPolynomial;
                         polB = *factorB.content().mpPolynomial;
                         polGCD = carl::gcd( polA, polB );
+                        CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": GCD of " << polA << " and " << polB << ": " << polGCD);
                     }
 
                     if (polGCD.isOne())
@@ -521,6 +522,14 @@ namespace carl
                                 CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << gcdResult << ")^" << (exponentA-exponentCommon) << " to first open remainder: " << factorizationA );
                             }
                         }
+
+                        //Part of FactorB remains
+                        if ( exponentB > exponentCommon )
+                        {
+                            factorizationB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon) );
+                            CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << gcdResult << ")^" << (exponentB-exponentCommon) << " to second open remainder: " << factorizationB );
+                        }
+
                         if (!remainB.isOne())
                         {
                             //Set new factorization
@@ -528,18 +537,8 @@ namespace carl
                             factorB.content().setNewFactors( gcdResult, 1, polRemainB, 1 );
                             _pfPairBRefined = true;
                             //Add remaining factorization
-                            if (exponentB > exponentCommon)
-                            {
-                                factorizationB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon ) );
-                                CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << gcdResult << ")^" << (exponentB-exponentCommon) << " to second open remainder: " << factorizationB );
-                            }
                             _restB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
                             CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << polRemainB << ")^" << exponentB << " to second closed remainder: " << _restB );
-                        }
-                        else if ( exponentB > exponentCommon )
-                        {
-                            _restB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( gcdResult, exponentB-exponentCommon) );
-                            CARL_LOG_TRACE( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << gcdResult << ")^" << (exponentB-exponentCommon) << " to second closed remainder: " << _restB );
                         }
                     }
                 }
