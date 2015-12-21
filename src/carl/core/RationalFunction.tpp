@@ -59,14 +59,8 @@ namespace carl
         CoeffType cpFactor( std::move( cpFactorDen/cpFactorNom ) );
         if(!_justNormalize && !denominatorAsPolynomial().isConstant())
         {
-            std::cout << "nominatorAsPolynomial() = " << nominatorAsPolynomial() << std::endl;
-            std::cout << "denominatorAsPolynomial() = " << denominatorAsPolynomial() << std::endl;
             carl::gcd(nominatorAsPolynomial(), denominatorAsPolynomial());
-            std::cout << "nominatorAsPolynomial() = " << nominatorAsPolynomial() << std::endl;
-            std::cout << "denominatorAsPolynomial() = " << denominatorAsPolynomial() << std::endl;
             auto ret = carl::lazyDiv( nominatorAsPolynomial(), denominatorAsPolynomial() );
-            std::cout << "ret.first = " << ret.first << std::endl;
-            std::cout << "ret.second = " << ret.second << std::endl;
             mPolynomialQuotient->first = std::move( ret.first );
             mPolynomialQuotient->second = std::move( ret.second );
             CoeffType cpFactorNom( nominatorAsPolynomial().coprimeFactor() );
