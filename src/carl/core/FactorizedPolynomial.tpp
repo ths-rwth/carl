@@ -1295,7 +1295,6 @@ namespace carl
             factorA++;
         }
         Coeff<P> coefficientResult = _fpolyA.coefficient() / _fpolyB.coefficient();
-        assert( computePolynomial( _fpolyB ) * computePolynomial( resultFactorization ) * coefficientResult == computePolynomial( _fpolyA ) );
         return std::move( FactorizedPolynomial<P>( std::move( resultFactorization ), coefficientResult, FactorizedPolynomial<P>::chooseCache( _fpolyA.pCache(), _fpolyB.pCache() ) ) );
     }
 
