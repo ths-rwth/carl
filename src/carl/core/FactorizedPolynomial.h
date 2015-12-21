@@ -115,15 +115,6 @@ namespace carl
         friend Factorization<P1> commonDivisor( const FactorizedPolynomial<P1>& _fFactorizationA, const FactorizedPolynomial<P1>& _fFactorizationB, Factorization<P1>& _fFactorizationRestA, Factorization<P1>& _fFactorizationRestB);
 
         /**
-         * Divides each of the two given factorized polynomials by their common factors of their (partial) factorization.
-         * @param _fpolyA The first factorized polynomial.
-         * @param _fpolyB The second factorized polynomial.
-         * @return The pair of the resulting factorized polynomials.
-         */
-        template<typename P1>
-        friend std::pair<FactorizedPolynomial<P1>,FactorizedPolynomial<P1>> lazyDiv( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
-
-        /**
          * Determines the greatest common divisor of the two given factorized polynomials. The method exploits the partial factorization
          * stored in the arguments and refines it. (c.f. Accelerating Parametric Probabilistic Verification, Section 4)
          * @param _fpolyA The first factorized polynomial to compute the greatest common divisor for.
@@ -136,7 +127,7 @@ namespace carl
         friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB, FactorizedPolynomial<P1>& _fpolyRestA, FactorizedPolynomial<P1>& _fpolyRestB);
 
     public:
-           
+
         // Constructors.
         FactorizedPolynomial();
         explicit FactorizedPolynomial( const CoeffType& );
@@ -751,6 +742,15 @@ namespace carl
          */
         template<typename P1>
         friend FactorizedPolynomial<P1> gcd(const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB);
+        
+        /**
+         * Divides each of the two given factorized polynomials by their common factors of their (partial) factorization.
+         * @param _fpolyA The first factorized polynomial.
+         * @param _fpolyB The second factorized polynomial.
+         * @return The pair of the resulting factorized polynomials.
+         */
+        template<typename P1>
+        friend std::pair<FactorizedPolynomial<P1>,FactorizedPolynomial<P1>> lazyDiv( const FactorizedPolynomial<P1>& _fpolyA, const FactorizedPolynomial<P1>& _fpolyB );
         
         /**
          * @param _fpoly The polynomial to calculate the factorization for.

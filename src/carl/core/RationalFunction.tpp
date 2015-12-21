@@ -59,17 +59,22 @@ namespace carl
         CoeffType cpFactor( std::move( cpFactorDen/cpFactorNom ) );
         if(!_justNormalize && !denominatorAsPolynomial().isConstant())
         {
-            Pol gcd = carl::gcd(nominatorAsPolynomial(), denominatorAsPolynomial());
-            assert(nominatorAsPolynomial().quotient(gcd) * gcd == nominatorAsPolynomial());
-            mPolynomialQuotient->first = std::move( nominatorAsPolynomial().quotient(gcd) );
-            assert(denominatorAsPolynomial().quotient(gcd) * gcd == denominatorAsPolynomial());
-            mPolynomialQuotient->second = std::move( denominatorAsPolynomial().quotient(gcd) );
-            CoeffType cpFactorNom( std::move( nominatorAsPolynomial().coprimeFactor() ) );
-            CoeffType cpFactorDen( std::move( denominatorAsPolynomial().coprimeFactor() ) );
+            std::cout << "nominatorAsPolynomial() = " << nominatorAsPolynomial() << std::endl;
+            std::cout << "denominatorAsPolynomial() = " << denominatorAsPolynomial() << std::endl;
+            carl::gcd(nominatorAsPolynomial(), denominatorAsPolynomial());
+            std::cout << "nominatorAsPolynomial() = " << nominatorAsPolynomial() << std::endl;
+            std::cout << "denominatorAsPolynomial() = " << denominatorAsPolynomial() << std::endl;
+            auto ret = carl::lazyDiv( nominatorAsPolynomial(), denominatorAsPolynomial() );
+            std::cout << "ret.first = " << ret.first << std::endl;
+            std::cout << "ret.second = " << ret.second << std::endl;
+            mPolynomialQuotient->first = std::move( ret.first );
+            mPolynomialQuotient->second = std::move( ret.second );
+            CoeffType cpFactorNom( nominatorAsPolynomial().coprimeFactor() );
+            CoeffType cpFactorDen( denominatorAsPolynomial().coprimeFactor() );
             mPolynomialQuotient->first *= cpFactorNom;
             mPolynomialQuotient->second *= cpFactorDen;
             cpFactor *= cpFactorDen/cpFactorNom;
-            mIsSimplified = 1;
+            mIsSimplified = true;
         }
         mPolynomialQuotient->first *= carl::getNum( cpFactor );
         mPolynomialQuotient->second *= carl::getDenom( cpFactor );
