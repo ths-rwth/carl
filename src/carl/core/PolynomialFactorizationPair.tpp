@@ -455,6 +455,7 @@ namespace carl
                     }
                     if (exponentB > exponentCommon)
                     {
+                        //Ignore FactorB as it has no remaining common factor with current FactorB
                         _restB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB-exponentCommon ) );
                         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << factorB << ")^" << (exponentB-exponentCommon) << " to second open remainder: " << _restB );
                     }
@@ -481,7 +482,7 @@ namespace carl
 
                     if (polGCD.isOne())
                     {
-                        //No common factor
+                        //Ignore FactorB as it has no common factor with current FactorA
                         _restB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( factorB, exponentB ) );
                         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << factorB << ")^" << exponentB << " to second finished remainder: " << _restB );
                     }
@@ -536,7 +537,7 @@ namespace carl
                             FactorizedPolynomial<P> polRemainB( remainB, cache );
                             factorB.content().setNewFactors( gcdResult, 1, polRemainB, 1 );
                             _pfPairBRefined = true;
-                            //Add remaining factorization
+                            //Ignore remaining factorization as it has no common factor with FactorA anymore
                             _restB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
                             CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << polRemainB << ")^" << exponentB << " to second closed remainder: " << _restB );
                         }
@@ -576,6 +577,7 @@ namespace carl
         CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "GCD (internal) of " << _pfPairA << " and " << _pfPairB << ": " << result << " with rests " << _restA << " and " << _restB );
         assert( computePolynomial( result ) * computePolynomial( _restA ) == computePolynomial( _pfPairA ) );
         assert( computePolynomial( result ) * computePolynomial( _restB ) == computePolynomial( _pfPairB ) );
+        assert( carl::gcd( computePolynomial( _restA ), computePolynomial( _restB )).isOne());
         return result;
     }
     
