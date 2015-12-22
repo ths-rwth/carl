@@ -268,3 +268,35 @@ TEST(RationalFunction, Derivative)
 
 	EXPECT_EQ(r2, r1.derivative(sp.variables().at("x")));
 }
+
+TEST(RationalFunction, Simplification)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x", "y"});
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("2*x*y+(-2)*y+3");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("128*x^12*y^7+43740*x^3+8748*x^5+109350*x^2*y+257580*x^2*y^3+63990*x^2*y^5+(-12960)*x^2*y^6+(-168750)*x^2*y^4+1080*x^2*y^7+(-228420)*x^2*y^2+(-313470)*x^3*y+(-177147)*x^5*y+975402*x^5*y^2+59292*x^7*y^2+2292705*x^4*y^3+1156860*x^4*y^5+(-311760)*x^4*y^6+(-2200500)*x^4*y^4+33480*x^4*y^7+(-2345355)*x^5*y^3+(-99720)*x^9*y^5+(-19728)*x^10*y^6+9168*x^10*y^7+444960*x^8*y^5+560880*x^7*y^6+(-100968)*x^7*y^7+(-295920)*x^8*y^6+67480*x^8*y^7+(-30760)*x^9*y^7+100080*x^9*y^6+(-1135710)*x^7*y^5+1037340*x^7*y^4+(-2222910)*x^6*y^4+(-1835892)*x^5*y^5+587088*x^5*y^6+1808910*x^6*y^5+(-705168)*x^6*y^6+2859840*x^5*y^4+(-73208)*x^5*y^7+104216*x^6*y^7+(-270000)*x^8*y^4+(-421605)*x^7*y^3+1355535*x^6*y^3+1728*x^11*y^6+9792*x^10*y^5+30240*x^9*y^4+55080*x^8*y^3+(-1284255)*x^4*y^2+(-377379)*x^6*y^2+(-1193940)*x^3*y^3+(-413190)*x^3*y^5+95760*x^3*y^6+934740*x^3*y^4+(-9000)*x^3*y^7+855360*x^3*y^2+346275*x^4*y+34992*x^6*y+(-21870)*x^2+(-1616)*x^11*y^7+(-32805)*x^4");
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("x+1");
+    Pol q1 = sp.parseMultivariatePolynomial<Rational>("x*y+(-1)*y+1");
+    Pol q2 = sp.parseMultivariatePolynomial<Rational>("y+1");
+    Pol q3 = sp.parseMultivariatePolynomial<Rational>("2*x*y+(-2)*y+3");
+    Pol p4 = p3*q2*q2;
+    
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+    FPol fq1(q1, pCache);
+    FPol fq2(q2, pCache);
+    FPol fq3(q3, pCache);
+    FPol fp4(p4, pCache);
+    
+    RFactFunc r1( fp4, (fq2*fq2) );
+    std::cout << r1 << std::endl;
+    r1.simplify();
+    std::cout << r1 << std::endl;
+    EXPECT_TRUE( r1.denominator().isOne() );
+
+    RFactFunc r2( (fq2*fq2), fp4 );
+    r2.simplify();
+    EXPECT_TRUE( r2.nominator().isOne() );
+}

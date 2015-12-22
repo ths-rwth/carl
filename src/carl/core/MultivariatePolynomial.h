@@ -445,7 +445,7 @@ public:
 	 */
 	template<typename C = Coeff, EnableIf<is_field<C>> = dummy>
 	MultivariatePolynomial divideBy(const Coeff& divisor) const;
-
+    
 	/**
 	 * Divides the polynomial by another polynomial.
 	 * If the divisor divides this polynomial, quotient contains the result of the division and true is returned.
@@ -1264,6 +1264,12 @@ public:
         return std::move(MultivariatePolynomial<C,O,P>(lhs) /= rhs);
     }
 	/// @}
+    template<typename C, typename O, typename P>
+    std::pair<MultivariatePolynomial<C,O,P>,MultivariatePolynomial<C,O,P>> lazyDiv( const MultivariatePolynomial<C,O,P>& _polyA, const MultivariatePolynomial<C,O,P>& _polyB )
+    {
+        MultivariatePolynomial<C,O,P> g = gcd( _polyA, _polyB );
+        return std::make_pair( _polyA/g, _polyB/g );
+    }
 	
 } // namespace carl
 
