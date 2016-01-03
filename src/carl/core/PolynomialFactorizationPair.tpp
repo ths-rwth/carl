@@ -538,8 +538,8 @@ namespace carl
                             factorB.content().setNewFactors( gcdResult, 1, polRemainB, 1 );
                             _pfPairBRefined = true;
                             //Ignore remaining factorization as it has no common factor with FactorA anymore
-                            _restB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
-                            CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << polRemainB << ")^" << exponentB << " to second closed remainder: " << _restB );
+                            factorizationB.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( polRemainB, exponentB) );
+                            CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", __LINE__ << ": add (" << polRemainB << ")^" << exponentB << " to second open remainder: " << _restB );
                         }
                     }
                 }
