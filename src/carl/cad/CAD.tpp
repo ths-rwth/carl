@@ -17,6 +17,8 @@
 #include "../core/RealAlgebraicNumberSettings.h"
 #include "../core/rootfinder/RootFinder.h"
 
+#define PERFORM_PARTIAL_CHECK false
+
 namespace carl {
 
 template<typename Number>
@@ -1265,6 +1267,11 @@ cad::Answer CAD<Number>::mainCheck(
 			if (depth != sampleList.size()) continue;
 
 			RealAlgebraicPoint<Number> sample(sampleList);
+			if (PERFORM_PARTIAL_CHECK) {
+				CARL_LOG_DEBUG("carl.cad", "Partial check for " << *node);
+				auto partialAnswer = partialLiftCheck(node, conflictGraph);
+				if (partialAnswer == cad::Answer::False) continue;
+			}
 			bool boundsOK = true;
 			// offset for incomplete samples (sample is filled from behind)
 			std::size_t firstLevel = mVariables.size() - sample.dim();
@@ -1379,6 +1386,9 @@ cad::Answer CAD<Number>::partialLiftCheck(
 		return cad::Answer::True;
 	}
 	CARL_LOG_DEBUG("carl.cad", "Early abort for sample " << t);
+	//if (sampleTree.is_leaf(node)) {
+	//	sampleTree.append(node, RealAlgebraicNumber<Number>(0));
+	//}
 	return cad::Answer::False;
 }
 
@@ -1417,8 +1427,10 @@ cad::Answer CAD<Number>::liftCheck(
 		}
 	}
 	
-	//auto partialAnswer = partialLiftCheck(node, conflictGraph);
-	//if (partialAnswer == cad::Answer::False) return partialAnswer;
+	if (PERFORM_PARTIAL_CHECK) {
+		auto partialAnswer = partialLiftCheck(node, conflictGraph);
+		if (partialAnswer == cad::Answer::False) return cad::Answer::False;
+	}
 	
 	if (!node.isRoot()) {
 		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
