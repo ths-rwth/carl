@@ -741,6 +741,18 @@ namespace carl
             }
 
             /**
+             * @return true, if this formula is propositional;
+             *         false, otherwise.
+             */
+            bool isOnlyPropositional() const
+            {
+                return !(carl::PROP_CONTAINS_BITVECTOR <= properties()) 
+                    && !(carl::PROP_CONTAINS_UNINTERPRETED_EQUATIONS <= properties())
+                    && !(carl::PROP_CONTAINS_INTEGER_VALUED_VARS <= properties())
+                    && !(carl::PROP_CONTAINS_REAL_VALUED_VARS <= properties());
+            }
+
+            /**
              * @param _formula The pointer to the formula for which to check whether it points to a sub-formula
              *                  of this formula.
              * @return true, the given pointer to a formula points to a sub-formula of this formula;
