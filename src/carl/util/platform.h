@@ -42,4 +42,8 @@
 	#ifdef _WIN64
 	#define __WIN64
 	#endif
+#elif __APPLE__
+	#define __MACOS
+#elif __linux__
+	#define __LINUX
 #endif
