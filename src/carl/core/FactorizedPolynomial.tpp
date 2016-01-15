@@ -940,7 +940,7 @@ namespace carl
         Coeff<P> coefficientRestA = _lhs.coefficient() / coefficientCommon;
         Coeff<P> coefficientRestB = _rhs.coefficient() / coefficientCommon;
 
-        if (coefficientCommon == 0)
+        if (carl::isZero(coefficientCommon))
         {
             FactorizedPolynomial<P> result;
             assert( computePolynomial( _lhs ) + computePolynomial( _rhs ) == computePolynomial( result ) );

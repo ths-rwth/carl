@@ -256,7 +256,7 @@ namespace carl
          */
         bool isOne() const
         {
-            return isConstant() && mCoefficient == 1;
+            return isConstant() && carl::isOne(mCoefficient);
         }
 
         /**
@@ -264,7 +264,7 @@ namespace carl
          */
         bool isZero() const
         {
-            return isConstant() && mCoefficient == 0;
+            return isConstant() && carl::isZero(mCoefficient;
         }
         
         /**
@@ -1032,4 +1032,3 @@ namespace std
 } // namespace std
 
 #include "FactorizedPolynomial.tpp"
-
