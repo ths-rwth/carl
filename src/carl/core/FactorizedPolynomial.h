@@ -264,7 +264,7 @@ namespace carl
          */
         bool isZero() const
         {
-            return isConstant() && carl::isZero(mCoefficient;
+            return isConstant() && carl::isZero(mCoefficient);
         }
         
         /**
