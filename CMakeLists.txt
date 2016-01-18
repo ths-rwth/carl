@@ -30,6 +30,8 @@ set( PROJECT_VERSION "${carl_VERSION}")
 set( carl_NAME "CArL" )
 set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
