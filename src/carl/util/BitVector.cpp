@@ -6,11 +6,11 @@ namespace carl
 BitVector operator|(const BitVector& lhs, const BitVector& rhs)
 {
     BitVector res;
-    std::vector<unsigned>::const_iterator lhsIt = lhs.mBits.begin();
-    std::vector<unsigned>::const_iterator rhsIt = rhs.mBits.begin();
+    auto lhsIt = lhs.mBits.begin();
+    auto rhsIt = rhs.mBits.begin();
 
-    std::vector<unsigned>::const_iterator lhsEnd = lhs.mBits.end();
-    std::vector<unsigned>::const_iterator rhsEnd = rhs.mBits.end();
+    auto lhsEnd = lhs.mBits.end();
+    auto rhsEnd = rhs.mBits.end();
 
     while( true)
     {
@@ -47,7 +47,7 @@ bool operator ==(const BitVector::forward_iterator& fi1, const BitVector::forwar
 bool BitVector::subsetOf( const BitVector& superset)
 {
     std::vector<unsigned>::const_iterator sub = mBits.begin();
-    std::vector<unsigned>::const_iterator sup = superset.mBits.begin();
+    auto sup = superset.mBits.begin();
 
     if( sub == mBits.end())
     {
