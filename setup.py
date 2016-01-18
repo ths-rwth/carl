@@ -19,8 +19,8 @@ PYTHONLIBS = glob.glob(os.path.join(PYTHONLIBDIR, "*.dylib"))
 PYTHONLIBS.extend(glob.glob(os.path.join(PYTHONLIBDIR, "*.so")))
 PYTHONLIB = PYTHONLIBS[0]
 #print(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
-#print(PYTHONINC)
-#print(PYTHONLIB)
+print(PYTHONINC)
+print(PYTHONLIB)
 
 d = "setuppy_build"
 print(d)
