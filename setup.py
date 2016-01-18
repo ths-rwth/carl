@@ -49,8 +49,12 @@ class MyInstall(install):
         install.run(self)
 class MyDevelop(develop):
     def run(self):
-        call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
-        call(["make", "pycarl"], cwd=d)
+        ret = call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
+        if ret != 0:
+            raise RuntimeError("Failure during ccmake")
+        ret = call(["make", "pycarl"], cwd=d)
+        if ret != 0:
+            raise RuntimeError("Failure during ccmake")
         develop.run(self)
 
 
