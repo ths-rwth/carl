@@ -13,21 +13,15 @@
 #include "carl/core/RationalFunction.h"
 #include "carl/util/parser/Parser.h"
 
-#include <gmpxx.h>
-typedef mpq_class Rational;
+#include "definitions.h"
 
 //typedef double Rational;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
 
-
 /**
  * Following are some helper functions to provide some glue between Python and carl
  */
-// Convert Rational to std::string
-std::string rational_str(const Rational& rat) {
-	return rat.get_str();
-}
 
 Polynomial parsePolynomial(const std::string& text) {
 	carl::parser::Parser<Polynomial> p;
@@ -63,13 +57,6 @@ BOOST_PYTHON_MODULE(_core)
 		.to_python<std::set<carl::Variable> >()
 		;
 
-	class_<Rational>("Rational", init<double>())
-		.def("__float__", &Rational::get_d)
-		.def("__str__", &rational_str)
-		;
-	rational_converter();
-	//boost::python::implicitly_convertible<Rational,double>();
-	//boost::python::implicitly_convertible<double,Rational>();
 
 	enum_<carl::VariableType>("VariableType")
 		.value("BOOL", carl::VariableType::VT_BOOL)
@@ -101,6 +88,7 @@ BOOST_PYTHON_MODULE(_core)
 	class_<Polynomial>("Polynomial", init<Rational>())
 		.def(init<carl::Variable::Arg>())
 		.def(init<const carl::Monomial::Arg&>())
+		.def("constantPart", &Polynomial::constantPart, return_value_policy<copy_const_reference>())
 		.def("evaluate", &Polynomial::evaluate<Rational>)
 		.def("gatherVariables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
 		.def(self_ns::str(self_ns::self))

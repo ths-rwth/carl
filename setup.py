@@ -51,10 +51,10 @@ class MyDevelop(develop):
     def run(self):
         ret = call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
         if ret != 0:
-            raise RuntimeError("Failure during ccmake")
+            raise RuntimeError("Failure during cmake")
         ret = call(["make", "pycarl"], cwd=d)
         if ret != 0:
-            raise RuntimeError("Failure during ccmake")
+            raise RuntimeError("Failure during make")
         develop.run(self)
 
 
@@ -63,7 +63,7 @@ setup(cmdclass={'install': MyInstall, 'develop': MyDevelop, 'egg_info': MyEggInf
       version="1.1",
       description="pycarl - Python Bindings for Carl",
       package_dir={'':d},
-      packages=['pycarl', 'pycarl.core'],
-      package_data={'pycarl.core': ['_core.so'], 'pycarl': ['*.so', '*.dylib', '*.a']},
+      packages=['pycarl', 'pycarl.core', 'pycarl.numbers'],
+      package_data={'pycarl.core': ['_core.so'], 'pycarl.numbers' : ['_numbers.so'], 'pycarl': ['*.so', '*.dylib', '*.a']},
 
       include_package_data=True)

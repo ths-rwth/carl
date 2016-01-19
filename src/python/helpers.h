@@ -5,7 +5,7 @@
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
 
 #include "carl/core/Monomial.h"
-
+#include "definitions.h"
 
 namespace boost{
     namespace python{
@@ -195,7 +195,6 @@ struct iter_to_tuple {
 
 /**
  * Converts python floats into rationals
- */
 struct rational_converter {
     rational_converter() {
         boost::python::converter::registry::push_back(
@@ -218,6 +217,5 @@ struct rational_converter {
         data->convertible = storage;
     }
 };
+ */
 
-
-#endif //CARL_HELPERS_H
