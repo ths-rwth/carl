@@ -100,6 +100,8 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self - self)
 		.def(self + self)
 		.def(self * self)
+		.def(self != self)
+		.def(self == self)
 		;
 
 	class_<RationalFunction>("RationalFunction",
@@ -115,6 +117,8 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self + self)
 		.def(self * self)
 		.def(self / self)
+		.def(self == self)
+		.def(self != self)
 		;
 
 	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")

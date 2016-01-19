@@ -20,5 +20,12 @@ BOOST_PYTHON_MODULE(_numbers) {
             .def(self - self)
             .def(self * self)
             .def(self / self)
+            .def(self == self)
+            .def(self != self)
+            .def(-self)
+            .def(self < self)
+            .def(self > self)
+            .def(self >= self)
+            .def(self <= self)
     ;
 }
