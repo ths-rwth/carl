@@ -92,6 +92,9 @@ BOOST_PYTHON_MODULE(_core)
 		.def("evaluate", &Polynomial::evaluate<Rational>)
 		.def("gatherVariables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
 		.def(self_ns::str(self_ns::self))
+		.def(self - self)
+		.def(self + self)
+		.def(self * self)
 		;
 
 	class_<RationalFunction>("RationalFunction", init<Polynomial, Polynomial>())
@@ -100,6 +103,10 @@ BOOST_PYTHON_MODULE(_core)
 		.add_property("numerator", &RationalFunction::nominator)
 		.add_property("denominator", &RationalFunction::denominator)
 		.def(self_ns::str(self_ns::self))
+		.def(self - self)
+		.def(self + self)
+		.def(self * self)
+		.def(self / self)
 		;
 
 	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")
