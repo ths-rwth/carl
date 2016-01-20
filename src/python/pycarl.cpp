@@ -120,6 +120,15 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self_ns::str(self_ns::self))
 		;
 
+	class_<FactorizedRationalFunction>("FactorizedRationalFunction")
+		.def(init<FactorizedPolynomial, FactorizedPolynomial>())
+		.def("evaluate", &FactorizedRationalFunction::evaluate)
+		.def("gatherVariables", static_cast<std::set<carl::Variable> (FactorizedRationalFunction::*)() const>(&FactorizedRationalFunction::gatherVariables))
+		.add_property("numerator", &FactorizedRationalFunction::nominator)
+		.add_property("denominator", &FactorizedRationalFunction::denominator)
+		.def(self_ns::str(self_ns::self))
+		;
+
 	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")
 		.def("polynomial", &carl::parser::Parser<Polynomial>::polynomial)
 		.def("rationalFunction", &carl::parser::Parser<Polynomial>::rationalFunction)
