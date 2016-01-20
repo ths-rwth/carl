@@ -44,12 +44,12 @@ class MyEggInfo(egg_info):
 
 class MyInstall(install):
     def run(self):
-        call(["cmake", "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
+        call(["cmake", "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
         call(["make", "pycarl"], cwd=d)
         install.run(self)
 class MyDevelop(develop):
     def run(self):
-        ret = call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
+        ret = call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
         if ret != 0:
             raise RuntimeError("Failure during cmake")
         ret = call(["make", "pycarl"], cwd=d)
