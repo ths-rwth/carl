@@ -27,7 +27,6 @@ class SampleSet {
 public:
 	typedef typename std::set<RealAlgebraicNumber<Number>>::iterator Iterator;
 	typedef std::unordered_map<RealAlgebraicNumber<Number>, RealAlgebraicNumber<Number>> SampleSimplification;
-private:
 	/**
 	 * A functor compatible to std::less<RealAlgebraicNumber<Number>> that compares two samples according to a given order.
 	 */
