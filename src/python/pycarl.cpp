@@ -17,7 +17,10 @@
 
 //typedef double Rational;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
+typedef carl::FactorizedPolynomial<Polynomial> FactorizedPolynomial;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
+typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
+typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
 
 /**
  * Following are some helper functions to provide some glue between Python and carl
@@ -85,7 +88,8 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<Polynomial>("Polynomial", init<Rational>())
+	class_<Polynomial>("Polynomial")
+		.def(init<Rational>())
 		.def(init<carl::Variable::Arg>())
 		.def(init<const carl::Monomial::Arg&>())
 		.def("constantPart", &Polynomial::constantPart, return_value_policy<copy_const_reference>())
@@ -94,7 +98,21 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<RationalFunction>("RationalFunction", init<Polynomial, Polynomial>())
+	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache")
+		;
+	register_ptr_to_python<std::shared_ptr<carl::Cache<FactorizationPair>>>();
+
+	class_<FactorizedPolynomial>("FactorizedPolynomial")
+		.def(init<const Rational&>())
+		.def(init<const Polynomial&, const std::shared_ptr<carl::Cache<FactorizationPair>>>())
+		.def("constantPart", &FactorizedPolynomial::constantPart)
+		.def("evaluate", &FactorizedPolynomial::evaluate<Rational>)
+		.def("gatherVariables", static_cast<std::set<carl::Variable> (FactorizedPolynomial::*)() const>(&FactorizedPolynomial::gatherVariables))
+		.def(self_ns::str(self_ns::self))
+		;
+
+	class_<RationalFunction>("RationalFunction")
+		.def(init<Polynomial, Polynomial>())
 		.def("evaluate", &RationalFunction::evaluate)
 		.def("gatherVariables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
 		.add_property("numerator", &RationalFunction::nominator)
