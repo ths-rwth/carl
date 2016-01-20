@@ -568,7 +568,7 @@ namespace carl
             for( const auto& factor : content().factorization() )
             {
                 CoeffType subResult = factor.first.evaluate( _substitutions );
-                if( carl::isZero( subResult.isZero() ) )
+                if( carl::isZero( subResult ) )
                     return constant_zero<CoeffType>::get();
                 result *= carl::pow( subResult, factor.second );
             }
