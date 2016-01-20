@@ -16,5 +16,16 @@ BOOST_PYTHON_MODULE(_numbers) {
     class_<Rational, Rational*>("Rational", init<int>())
             .def("__float__", &ratToDouble)
             .def("__str__", &ratToString)
+            .def(self + self)
+            .def(self - self)
+            .def(self * self)
+            .def(self / self)
+            .def(self == self)
+            .def(self != self)
+            .def(-self)
+            .def(self < self)
+            .def(self > self)
+            .def(self >= self)
+            .def(self <= self)
     ;
 }

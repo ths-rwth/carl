@@ -88,14 +88,23 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<Polynomial>("Polynomial")
-		.def(init<Rational>())
+	class_<Polynomial>("Polynomial",
+	"Represent a multivariate polynomial")
 		.def(init<carl::Variable::Arg>())
 		.def(init<const carl::Monomial::Arg&>())
-		.def("constantPart", &Polynomial::constantPart, return_value_policy<copy_const_reference>())
+		.def(init<Rational>())
+		.def("constant_part", &Polynomial::constantPart, return_value_policy<copy_const_reference>())
 		.def("evaluate", &Polynomial::evaluate<Rational>)
-		.def("gatherVariables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
+		.def("gather_variables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
+		.add_property("total_degree", &Polynomial::totalDegree, "The maximum degree of the terms in the polynomial")
+		.def("degree", &Polynomial::degree, "Computes the degree with respect to the given variable")
+		.add_property("nr_terms", &Polynomial::nrTerms)
 		.def(self_ns::str(self_ns::self))
+		.def(self - self)
+		.def(self + self)
+		.def(self * self)
+		.def(self != self)
+		.def(self == self)
 		;
 
 	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache")
@@ -111,13 +120,20 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self_ns::str(self_ns::self))
 		;
 
-	class_<RationalFunction>("RationalFunction")
+	class_<RationalFunction>("RationalFunction",
+	"Represent a rational function, that is the fraction of two multivariate polynomials ")
 		.def(init<Polynomial, Polynomial>())
 		.def("evaluate", &RationalFunction::evaluate)
 		.def("gatherVariables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
 		.add_property("numerator", &RationalFunction::nominator)
 		.add_property("denominator", &RationalFunction::denominator)
 		.def(self_ns::str(self_ns::self))
+		.def(self - self)
+		.def(self + self)
+		.def(self * self)
+		.def(self / self)
+		.def(self == self)
+		.def(self != self)
 		;
 
 	class_<FactorizedRationalFunction>("FactorizedRationalFunction")

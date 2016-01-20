@@ -53,7 +53,7 @@ namespace carl
              * representation is fixed, so we can add the factorizations content belatedly. It is necessary to do so
              * as otherwise the factorized polynomial (this) being the only factor, is not yet cached which leads to an assertion.
              */
-            if ( _polyNormalized || mCoefficient == 1 )
+            if ( _polyNormalized || carl::isOne(mCoefficient) )
             {
                 assert( mpCache != nullptr );
                 Factorization<P> factorization;
@@ -92,7 +92,7 @@ namespace carl
         mpCache( _pCache ),
         mCoefficient( _coefficient )
     {
-        assert( _coefficient != 0 );
+        assert( !carl::isZero(_coefficient) );
         if ( _factorization.empty() )
             mpCache = nullptr;
         else
@@ -100,7 +100,7 @@ namespace carl
             assert( mpCache != nullptr );
             // TODO expensive
             for ( auto factor = _factorization.begin(); factor != _factorization.end(); factor++ )
-                assert( factor->first.coefficient() == 1 );
+            assert( carl::isOne(factor->first.coefficient()) );
             PolynomialFactorizationPair<P>* pfPair = new PolynomialFactorizationPair<P>( std::move( _factorization ) );
             auto ret = mpCache->cache( pfPair );//, &carl::canBeUpdated, &carl::update );
             mCacheRef = ret.first;
@@ -290,7 +290,7 @@ namespace carl
             assert( computePolynomial(*this).totalDegree() == result );
             return result;
         }
-        assert( mCoefficient != 0 );
+        assert( !carl::isZero(mCoefficient) );
         return 0;
     }
 
@@ -1253,7 +1253,7 @@ namespace carl
         if( !existsFactorization( _fpolyB ) )
         {
             FactorizedPolynomial<P> fPolyASimplified( _fpolyA );
-            assert( _fpolyB.mCoefficient != 0 );
+            assert( !carl::isZero(_fpolyB.mCoefficient) );
             fPolyASimplified.mCoefficient /= _fpolyB.mCoefficient;
             auto result = std::make_pair( fPolyASimplified, FactorizedPolynomial<P>( Coeff<P>( 1 ) ) );
             assert( computePolynomial( result.first ) * computePolynomial( _fpolyB ) == computePolynomial( result.second ) * computePolynomial( _fpolyA ) );
@@ -1262,10 +1262,10 @@ namespace carl
         else if( !existsFactorization( _fpolyA ) )
         {
             FactorizedPolynomial<P> fPolyASimplified( _fpolyA );
-            assert( _fpolyB.mCoefficient != 0 );
+            assert( !carl::isZero(_fpolyB.mCoefficient) );
             fPolyASimplified.mCoefficient /= _fpolyB.mCoefficient;
             FactorizedPolynomial<P> fPolyBSimplified( _fpolyB );
-            assert( _fpolyA.mCoefficient != 0 );
+            assert( !carl::isZero(_fpolyA.mCoefficient) );
             fPolyBSimplified.mCoefficient = Coeff<P>( 1 );
             auto result = std::make_pair( fPolyASimplified, fPolyBSimplified );
             assert( computePolynomial( result.first ) * computePolynomial( _fpolyB ) == computePolynomial( result.second ) * computePolynomial( _fpolyA ) );
