@@ -159,6 +159,7 @@ BOOST_PYTHON_MODULE(_core)
 	class_<carl::VariablePool, boost::noncopyable>("VariablePoolInst", no_init)
 		.def("getFreshVariable", static_cast<carl::Variable (carl::VariablePool::*)(carl::VariableType)>(&carl::VariablePool::getFreshVariable))
 		.def("getFreshVariable", static_cast<carl::Variable (carl::VariablePool::*)(const std::string&, carl::VariableType)>(&carl::VariablePool::getFreshVariable))
+		.def("findVariableWithName", &carl::VariablePool::findVariableWithName)
 		;
 
 	// Non-constructable class MonomialPool, static instance accessible via global
