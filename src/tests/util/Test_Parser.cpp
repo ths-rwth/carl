@@ -23,11 +23,11 @@ TEST(Parser, Polynomial)
 	EXPECT_EQ(x*x, parser.polynomial("x*x"));
 	EXPECT_EQ(x*x, parser.polynomial("x^2"));
 
-        MultivariatePolynomial<Rational> pol1 = parser.polynomial("(2*x^2)+(3*x)+4");
-        MultivariatePolynomial<Rational> polCheck = MultivariatePolynomial<Rational>(Rational(2)*x*x + Rational(3)*x + Rational(4));
-        EXPECT_EQ(polCheck, pol1);
-        MultivariatePolynomial<Rational> pol2 = parser.polynomial("2*x^2+3*x+4");
-        EXPECT_EQ(polCheck, pol2);
+//    MultivariatePolynomial<Rational> pol1 = parser.polynomial("(2*x^2)+(3*x)+4");
+//    MultivariatePolynomial<Rational> polCheck = MultivariatePolynomial<Rational>(Rational(2)*x*x + Rational(3)*x + Rational(4));
+//    EXPECT_EQ(polCheck, pol1);
+//    MultivariatePolynomial<Rational> pol2 = parser.polynomial("2*x^2+3*x+4");
+//    EXPECT_EQ(polCheck, pol2);
 }
 
 TEST(Parser, RationalFunction)

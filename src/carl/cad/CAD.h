@@ -66,8 +66,10 @@ public:
 	/// Type of multivariate polynomials.
 	typedef typename cad::CADPolynomials<Number>::MPolynomial MPolynomial;
 
+	typedef tree<RealAlgebraicNumber<Number>> Tree;
 	/// Type of an iterator over the samples.
-	typedef typename tree<RealAlgebraicNumber<Number>>::iterator sampleIterator;
+	typedef typename Tree::iterator sampleIterator;
+	typedef typename Tree::template LeafIterator<false> LeafIterator;
 	/// Type of a map of variable bounds.
 	typedef std::unordered_map<std::size_t, Interval<Number>> BoundMap;
 private:

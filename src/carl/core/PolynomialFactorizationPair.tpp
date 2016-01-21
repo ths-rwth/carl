@@ -106,7 +106,7 @@ namespace carl
         }
 
         // Check correctness
-        assert( mpPolynomial == nullptr || mpPolynomial->coprimeFactor() == 1);
+        assert( mpPolynomial == nullptr || carl::isOne(mpPolynomial->coprimeFactor()) );
         assert( mpPolynomial == nullptr || mFactorization.empty() || assertFactorization() );
 
         rehash();
@@ -347,8 +347,8 @@ namespace carl
         assert( factorizedTrivially() );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
-        //assert( _fpolyA.coefficient() == 1);
-        //assert( _fpolyB.coefficient() == 1);
+        //assert( carl::isOne(_fpolyA.coefficient()) );
+        //assert( carl::isOne(_fpolyB.coefficient()) );
         assert( exponentA > 0 );
         assert( exponentB > 0 );
         mFactorization.clear();
@@ -570,7 +570,7 @@ namespace carl
             _pfPairBRefined = true;
             _coeff *= cB;
         }
-        assert( _coeff == 1 );
+        assert( carl::isOne(_coeff) );
         // Check correctness
         assert( _pfPairA.assertFactorization() );
         assert( _pfPairB.assertFactorization() );

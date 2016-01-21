@@ -470,6 +470,7 @@ cad::Answer CAD<Number>::check(
 					std::size_t sampleID = conflictGraph.newSample();
 					std::size_t constraintID = conflictGraph.getConstraint(constraint);
 					conflictGraph.set(constraintID, sampleID, true);
+					CARL_LOG_DEBUG("smtrat.cad", "Conflicting for itself: " << constraint);
 					return cad::Answer::False;
 				}
 				// else: no additional check is needed!
@@ -923,6 +924,7 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		m[mVariables[mVariables.size() - i]] = *valit;
 		valit++;
 	}
+	CARL_LOG_FUNC("carl.cad", *p << " on " << m);
 	return this->samples(
 		openVariableCount,
 		carl::rootfinder::realRoots(*p, m, bounds, this->setting.splittingStrategy),
@@ -1198,8 +1200,45 @@ cad::Answer CAD<Number>::mainCheck(
 		}
 	} else {
 		CARL_LOG_TRACE("carl.cad", "maxDepth != 0, maxDepth = " << maxDepth);
+		std::vector<typename Tree::template LeafIterator<false>> leafs;
+		for (auto it = this->sampleTree.begin_leaf(); it != this->sampleTree.end_leaf(); it++) leafs.push_back(it);
+		typename cad::SampleSet<Number>::SampleComparator comp(setting.sampleOrdering);
+		//std::cout << "Before:";
+		//for (const auto& it: leafs) std::cout << " " << *it << "(" << (void*)&it << ")";
+		//std::cout << std::endl;
+		//std::cout << leafs.size() << std::endl;
+		//std::cout << "Sorting from [" << (void*)(&*leafs.begin()) << " to " << (void*)(&*leafs.end()) << ")" << std::endl;
+		std::sort(leafs.begin(), leafs.end(), [&](const LeafIterator& lhs, const LeafIterator& rhs){ 
+			std::stack<bool> l, r;
+			for (auto it = sampleTree.begin_path(lhs); it != sampleTree.end_path(); it++) l.push(it->isIntegral());
+			for (auto it = sampleTree.begin_path(rhs); it != sampleTree.end_path(); it++) r.push(it->isIntegral());
+			while (!l.empty() && !r.empty()) {
+				if (l.top() != r.top()) return l.top();
+				l.pop();
+				r.pop();
+			}
+			if (l.empty()) {
+				while (!r.empty()) {
+					if (!r.top()) return true;
+					r.pop();
+				}
+				return false;
+			} else if (r.empty()) {
+				while (!l.empty()) {
+					if (!l.top()) return false;
+					l.pop();
+				}
+				return true;
+			} else {
+				return false;
+			}
+		});
+		//std::cout << "After:";
+		//for (const auto& it: leafs) std::cout << " " << *it << "(" << (void*)&it << ")";
+		//std::cout << std::endl;
 		// the sample tree contains valid sample points
-		for (auto leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
+		//for (auto leaf = this->sampleTree.begin_leaf(); leaf != this->sampleTree.end_leaf(); leaf++) {
+		for (const auto& leaf: leafs) {
 			// traverse the current sample tree leaves for satisfying samples
 			CARL_LOG_TRACE("carl.cad", this->sampleTree);
 			auto res = this->checkNode(leaf, true, next, bounds, r, conflictGraph, boundsNontrivial, checkBounds, dim);
@@ -1433,7 +1472,7 @@ cad::Answer CAD<Number>::liftCheck(
 	}
 	
 	if (!node.isRoot()) {
-		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_LAZY, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
+		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_ASSIGNMENT, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_PATH, openVariableCount)) {
 			if (!node->isIntegral()) {
 				assert(openVariableCount < mVariables.size());
 				CARL_LOG_DEBUG("carl.cad", "Variables: " << mVariables);
@@ -1477,14 +1516,12 @@ cad::Answer CAD<Number>::liftCheck(
 	// the current list of samples at this position in the sample tree
 	cad::SampleSet<Number> currentSamples(setting.sampleOrdering);
 	currentSamples.insert(this->sampleTree.begin_children(node), this->sampleTree.end_children(node));
+	CARL_LOG_TRACE("carl.cad", "Getting old sample points: " << currentSamples);
 	// the current samples queue for this lifting process
 	cad::SampleSet<Number> sampleSetIncrement(setting.sampleOrdering);
 	std::forward_list<RealAlgebraicNumber<Number>> replacedSamples;
 
 	// fill in a standard sample to ensure termination in the main loop
-	if (!node.isRoot()) {
-		CARL_LOG_TRACE("carl.cad", "Calling samples() for " << mVariables[node.depth() - 1]);
-	}
 	if (boundActive) {
 		// add the bounds as roots and appropriate intermediate samples and start the lifting with this initial list
 		std::list<RealAlgebraicNumber<Number>> boundRoots;
@@ -1502,6 +1539,7 @@ cad::Answer CAD<Number>::liftCheck(
 	} else {
 		sampleSetIncrement.insert(this->samples(openVariableCount, {RealAlgebraicNumber<Number>(0, true)}, currentSamples, replacedSamples));
 	}
+	CARL_LOG_TRACE("carl.cad", "Adding new samples " << sampleSetIncrement);
 
 	while (true) {
 		if (this->anAnswerFound()) break;
@@ -1547,7 +1585,7 @@ cad::Answer CAD<Number>::liftCheck(
 				currentSamples.simplify(true);
 			}
 		}
-		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
+		/*if (integerHeuristicActive(cad::IntegerHandling::SPLIT_EARLY, openVariableCount)) {
 			Interval<Number> bound = Interval<Number>::unboundedInterval();
 			if (checkBounds) {
 				CARL_LOG_DEBUG("carl.cad", "Variables: " << mVariables);
@@ -1575,7 +1613,7 @@ cad::Answer CAD<Number>::liftCheck(
 					return cad::Answer::Unknown;
 				}
 			}
-		}
+		}*/
 
 		/* Phase 2
 		 * Lifting of the current level.

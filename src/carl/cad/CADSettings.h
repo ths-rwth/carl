@@ -31,14 +31,10 @@ enum class SampleOrdering : unsigned {
 
 /// Defines how integers are handled.
 enum class IntegerHandling {
-    /// Generate a full real solution and split on non-integral assignments in this solution. This is done in the CADModule in SMT-RAT.
-    SPLIT_SOLUTION,
-	/// First try to guess based on full real solution. If this does not work, split.
-	GUESS_AND_SPLIT,
-    /// Split if no integral sample is available for an integer variable.
-    SPLIT_LAZY,
-    /// Split if a non-integral sample is available for an integer variable.
-    SPLIT_EARLY,
+    /// Generate a full real solution and split on non-integral assignments in this solution.
+    SPLIT_ASSIGNMENT,
+	/// Generate a full real solution and split on integral assignments that lead to a non-integral assignment.
+	SPLIT_PATH,
     /// Backtrack within the sampling phase.
     BACKTRACK,
 	/// Do not care about integers
@@ -46,10 +42,8 @@ enum class IntegerHandling {
 };
 inline std::ostream& operator<<(std::ostream& os, const IntegerHandling& ih) {
 	switch (ih) {
-		case IntegerHandling::SPLIT_SOLUTION: return os << "Split on solution";
-		case IntegerHandling::GUESS_AND_SPLIT: return os << "Guess then split";
-		case IntegerHandling::SPLIT_LAZY: return os << "Split lazy";
-		case IntegerHandling::SPLIT_EARLY: return os << "Split early";
+		case IntegerHandling::SPLIT_ASSIGNMENT: return os << "Split assignment";
+		case IntegerHandling::SPLIT_PATH: return os << "Split path";
 		case IntegerHandling::BACKTRACK: return os << "Backtrack";
 		case IntegerHandling::NONE: return os << "None";
 	}
@@ -287,7 +281,7 @@ private:
 		improveBounds( true ),
 		exploreInteger(false),
 		splitInteger(true),
-		integerHandling(IntegerHandling::SPLIT_SOLUTION),
+		integerHandling(IntegerHandling::SPLIT_ASSIGNMENT),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
 	{}
