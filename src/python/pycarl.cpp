@@ -69,6 +69,7 @@ BOOST_PYTHON_MODULE(_core)
 	class_<carl::Variable>("Variable", no_init)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
+		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
 		.def(self_ns::str(self_ns::self))
 		;
 /*
@@ -105,6 +106,7 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self * self)
 		.def(self != self)
 		.def(self == self)
+		.def(self + other<carl::Variable>())
 		;
 
 	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache")
