@@ -312,27 +312,28 @@ namespace carl
         template<typename C=Pol, EnableIf<is_instantiation_of<FactorizedPolynomial, C>> = dummy>
         CoeffType evaluate(const std::map<Variable, CoeffType>& substitutions) const
         {
-	    if ( isConstant() )
-	    {
-	        return mNumberQuotient;
-	    }
-	    else {
-	        return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
-	    }
+            if ( isConstant() )
+            {
+                return mNumberQuotient;
+            }
+            else {
+                CARL_LOG_INEFFICIENT();
+                return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
+            }
         }
 
         template<typename C=Pol, DisableIf<is_instantiation_of<FactorizedPolynomial, C>> = dummy>
         CoeffType evaluate(const std::map<Variable, CoeffType>& substitutions) const
         {
-	    if ( isConstant() )
-	    {
-	        return mNumberQuotient;
-	    }
-	    else {
-	        return nominatorAsPolynomial().evaluate(substitutions) / denominatorAsPolynomial().evaluate(substitutions);
-	    }
+            if ( isConstant() )
+            {
+                return mNumberQuotient;
+            }
+            else {
+                return nominatorAsPolynomial().evaluate(substitutions) / denominatorAsPolynomial().evaluate(substitutions);
+            }
         }
-	
+
 		/**
 		 * Derivative of the rational function with respect to variable x
          * @param x the main variable
