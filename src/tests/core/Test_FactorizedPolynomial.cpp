@@ -535,3 +535,19 @@ TEST(FactorizedPolynomial, Equality)
     FPol fpEq6 = fp5 - fp6;
     EXPECT_EQ( fpEq6 == fp2, true );
 }
+
+TEST(FactorizedPolynomial, Evaluation)
+{
+    carl::VariablePool::getInstance().clear();
+    Variable x = freshRealVariable("x");
+    Pol p1({(Rational)6*x});
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1( p1, pCache );
+
+    std::map<carl::Variable, Rational> substitution;
+    substitution[x] = 3;
+    Rational result = fp1.evaluate(substitution);
+    EXPECT_EQ( Rational(18), result );
+}
+

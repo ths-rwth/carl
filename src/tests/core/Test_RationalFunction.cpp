@@ -300,3 +300,26 @@ TEST(RationalFunction, Simplification)
     r2.simplify();
     EXPECT_TRUE( r2.nominator().isOne() );
 }
+
+TEST(RationalFunction, Evaluation)
+{
+    carl::VariablePool::getInstance().clear();
+    Variable x = freshRealVariable("x");
+    Pol p1({Rational(3)*x});
+    Pol p2({Rational(2)});
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+
+    RFunc r1( p1, p2 );
+    RFactFunc rf1( fp1, fp2 );
+
+    std::map<Variable,Rational> substitutions;
+    substitutions[x] = Rational(4);
+
+    Rational resr1 = r1.evaluate(substitutions);
+    EXPECT_EQ( Rational(6), resr1 );
+    Rational resrf1 = rf1.evaluate(substitutions);
+    EXPECT_EQ( Rational(6), resrf1 );
+}
