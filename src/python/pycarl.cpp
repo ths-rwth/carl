@@ -107,6 +107,7 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self != self)
 		.def(self == self)
 		.def(self + other<carl::Variable>())
+		.def(self - other<carl::Variable>())
 		;
 
 	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache")
@@ -116,17 +117,22 @@ BOOST_PYTHON_MODULE(_core)
 	class_<FactorizedPolynomial>("FactorizedPolynomial")
 		.def(init<const Rational&>())
 		.def(init<const Polynomial&, const std::shared_ptr<carl::Cache<FactorizationPair>>>())
-		.def("constantPart", &FactorizedPolynomial::constantPart)
+		.def("constant_part", &FactorizedPolynomial::constantPart)
 		.def("evaluate", &FactorizedPolynomial::evaluate<Rational>)
-		.def("gatherVariables", static_cast<std::set<carl::Variable> (FactorizedPolynomial::*)() const>(&FactorizedPolynomial::gatherVariables))
+		.def("gather_variables", static_cast<std::set<carl::Variable> (FactorizedPolynomial::*)() const>(&FactorizedPolynomial::gatherVariables))
 		.def(self_ns::str(self_ns::self))
+		.def(self - self)
+		.def(self + self)
+		.def(self * self)
+		.def(self == self)
+		.def(self != self)
 		;
 
 	class_<RationalFunction>("RationalFunction",
 	"Represent a rational function, that is the fraction of two multivariate polynomials ")
 		.def(init<Polynomial, Polynomial>())
 		.def("evaluate", &RationalFunction::evaluate<Polynomial>)
-		.def("gatherVariables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
+		.def("gather_variables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
 		.add_property("numerator", &RationalFunction::nominator)
 		.add_property("denominator", &RationalFunction::denominator)
 		.def(self_ns::str(self_ns::self))
@@ -141,27 +147,33 @@ BOOST_PYTHON_MODULE(_core)
 	class_<FactorizedRationalFunction>("FactorizedRationalFunction")
 		.def(init<FactorizedPolynomial, FactorizedPolynomial>())
 		.def("evaluate", &FactorizedRationalFunction::evaluate<FactorizedPolynomial>)
-		.def("gatherVariables", static_cast<std::set<carl::Variable> (FactorizedRationalFunction::*)() const>(&FactorizedRationalFunction::gatherVariables))
+		.def("gather_variables", static_cast<std::set<carl::Variable> (FactorizedRationalFunction::*)() const>(&FactorizedRationalFunction::gatherVariables))
 		.add_property("numerator", &FactorizedRationalFunction::nominator)
 		.add_property("denominator", &FactorizedRationalFunction::denominator)
 		.def(self_ns::str(self_ns::self))
+		.def(self - self)
+		.def(self + self)
+		.def(self * self)
+		.def(self / self)
+		.def(self == self)
+		.def(self != self)
 		;
 
 	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")
 		.def("polynomial", &carl::parser::Parser<Polynomial>::polynomial)
-		.def("rationalFunction", &carl::parser::Parser<Polynomial>::rationalFunction)
-		.def("addVariable", &carl::parser::Parser<Polynomial>::addVariable)
+		.def("rational_function", &carl::parser::Parser<Polynomial>::rationalFunction)
+		.def("add_variable", &carl::parser::Parser<Polynomial>::addVariable)
 		;
 
 	// Global string parser functions (no variable management)
-	def("parsePolynomial", &parsePolynomial);
-	def("parseRationalFunction", &parseRationalFunction);
+	//def("parse_polynomial", &parsePolynomial);
+	//def("parse_rationalFunction", &parseRationalFunction);
 
 	// Non-constructable class VariablePool, static instance accessible via global
 	class_<carl::VariablePool, boost::noncopyable>("VariablePoolInst", no_init)
-		.def("getFreshVariable", static_cast<carl::Variable (carl::VariablePool::*)(carl::VariableType)>(&carl::VariablePool::getFreshVariable))
-		.def("getFreshVariable", static_cast<carl::Variable (carl::VariablePool::*)(const std::string&, carl::VariableType)>(&carl::VariablePool::getFreshVariable))
-		.def("findVariableWithName", &carl::VariablePool::findVariableWithName)
+		.def("get_fresh_variable", static_cast<carl::Variable (carl::VariablePool::*)(carl::VariableType)>(&carl::VariablePool::getFreshVariable))
+		.def("get_fresh_variable", static_cast<carl::Variable (carl::VariablePool::*)(const std::string&, carl::VariableType)>(&carl::VariablePool::getFreshVariable))
+		.def("find_variable_with_name", &carl::VariablePool::findVariableWithName)
 		;
 
 	// Non-constructable class MonomialPool, static instance accessible via global
