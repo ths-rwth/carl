@@ -309,20 +309,6 @@ namespace carl
          * @param substitutions A mapping from variable to constant values.
          * @return The result of the substitution
          */
-        template<typename C=Pol, EnableIf<is_instantiation_of<FactorizedPolynomial, C>> = dummy>
-        CoeffType evaluate(const std::map<Variable, CoeffType>& substitutions) const
-        {
-            if ( isConstant() )
-            {
-                return mNumberQuotient;
-            }
-            else {
-                CARL_LOG_INEFFICIENT();
-                return computePolynomial(nominatorAsPolynomial()).evaluate(substitutions) / computePolynomial(denominatorAsPolynomial()).evaluate(substitutions);
-            }
-        }
-
-        template<typename C=Pol, DisableIf<is_instantiation_of<FactorizedPolynomial, C>> = dummy>
         CoeffType evaluate(const std::map<Variable, CoeffType>& substitutions) const
         {
             if ( isConstant() )
