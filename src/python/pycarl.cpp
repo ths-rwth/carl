@@ -23,20 +23,6 @@ typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
 typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
 
 /**
- * Following are some helper functions to provide some glue between Python and carl
- */
-
-Polynomial parsePolynomial(const std::string& text) {
-	carl::parser::Parser<Polynomial> p;
-	return p.polynomial(text);
-}
-
-RationalFunction parseRationalFunction(const std::string& text) {
-	carl::parser::Parser<Polynomial> p;
-	return p.rationalFunction(text);
-}
-
-/**
  * The actual module definition
  */
 BOOST_PYTHON_MODULE(_core)
@@ -164,10 +150,6 @@ BOOST_PYTHON_MODULE(_core)
 		.def("rational_function", &carl::parser::Parser<Polynomial>::rationalFunction)
 		.def("add_variable", &carl::parser::Parser<Polynomial>::addVariable)
 		;
-
-	// Global string parser functions (no variable management)
-	//def("parse_polynomial", &parsePolynomial);
-	//def("parse_rationalFunction", &parseRationalFunction);
 
 	// Non-constructable class VariablePool, static instance accessible via global
 	class_<carl::VariablePool, boost::noncopyable>("VariablePoolInst", no_init)
