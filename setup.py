@@ -10,6 +10,7 @@ import tempfile
 import glob
 import shutil
 import distutils
+import multiprocessing
 print(os.getcwd())
 
 PYTHONINC = distutils.sysconfig.get_python_inc()
@@ -21,6 +22,8 @@ PYTHONLIB = PYTHONLIBS[0]
 #print(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
 print(PYTHONINC)
 print(PYTHONLIB)
+
+NO_COMPILE_CORES = multiprocessing.cpu_count()
 
 d = "setuppy_build"
 print(d)
@@ -45,14 +48,14 @@ class MyEggInfo(egg_info):
 class MyInstall(install):
     def run(self):
         call(["cmake", "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
-        call(["make", "pycarl"], cwd=d)
+        call(["make", "pycarl", "-j"+str(NO_COMPILE_CORES)], cwd=d)
         install.run(self)
 class MyDevelop(develop):
     def run(self):
         ret = call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
         if ret != 0:
             raise RuntimeError("Failure during cmake")
-        ret = call(["make", "pycarl"], cwd=d)
+        ret = call(["make", "pycarl", "-j"+str(NO_COMPILE_CORES)], cwd=d)
         if ret != 0:
             raise RuntimeError("Failure during make")
         develop.run(self)
