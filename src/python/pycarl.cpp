@@ -96,11 +96,13 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self - other<carl::Variable>())
 		;
 
-	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache")
+	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache",
+	"Cache storing all factorized polynomials")
 		;
 	register_ptr_to_python<std::shared_ptr<carl::Cache<FactorizationPair>>>();
 
-	class_<FactorizedPolynomial>("FactorizedPolynomial")
+	class_<FactorizedPolynomial>("FactorizedPolynomial",
+	"Represent a polynomial with its factorization")
 		.def(init<const Rational&>())
 		.def(init<const Polynomial&, const std::shared_ptr<carl::Cache<FactorizationPair>>>())
 		.def("constant_part", &FactorizedPolynomial::constantPart)
@@ -130,7 +132,8 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self != self)
 		;
 
-	class_<FactorizedRationalFunction>("FactorizedRationalFunction")
+	class_<FactorizedRationalFunction>("FactorizedRationalFunction",
+	"Represent a rational function, that is the fraction of two factorized polynomials ")
 		.def(init<FactorizedPolynomial, FactorizedPolynomial>())
 		.def("evaluate", &FactorizedRationalFunction::evaluate)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (FactorizedRationalFunction::*)() const>(&FactorizedRationalFunction::gatherVariables))
@@ -145,7 +148,8 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self != self)
 		;
 
-	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")
+	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser",
+	"Parser for polynomials and rational functions")
 		.def("polynomial", &carl::parser::Parser<Polynomial>::polynomial)
 		.def("rational_function", &carl::parser::Parser<Polynomial>::rationalFunction)
 		.def("add_variable", &carl::parser::Parser<Polynomial>::addVariable)
