@@ -175,7 +175,6 @@ inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
 }
 template<>
 inline int toInt<int>(const mpq_class& n) {
-    std::cout << "mpq_class to int" << std::endl;
 	return toInt<int>(toInt<mpz_class>(n));
 }
 template<>
@@ -503,8 +502,8 @@ inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 	return res;
 }
 
-std::string toString(const mpq_class& _number, bool _infix);
+std::string toString(const mpq_class& _number, bool _infix=true);
 
-std::string toString(const mpz_class& _number, bool _infix);
+std::string toString(const mpz_class& _number, bool _infix=true);
 
 }

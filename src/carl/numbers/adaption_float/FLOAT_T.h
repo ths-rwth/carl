@@ -211,11 +211,16 @@ namespace carl
 			mValue = val;
 		}
 
-
+		template<typename F = FloatType, EnableIf< carl::is_rational<F> > = dummy>
 		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
 		{
-			str2double (mValue, _string);
-//			mValue = std::atof(_string.c_str());
+			mValue = carl::rationalize<FloatType>(_string);
+		}
+
+		template<typename F = FloatType, EnableIf< std::is_same<F, double> > = dummy>
+		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
+		{
+			mValue = std::stod(_string);
 		}
 
 		/**
@@ -947,7 +952,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& floor_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::floor(mValue);
+			mValue = carl::floor(mValue);
 			return *this;
 		}
 
@@ -1493,7 +1498,7 @@ namespace carl
 		 */
 		std::string toString() const
 		{
-			return std::to_string(mValue);
+			return carl::toString(mValue);
 		}
 	};
 
