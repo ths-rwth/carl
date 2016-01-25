@@ -306,7 +306,7 @@ TEST(RationalFunction, Evaluation)
     carl::VariablePool::getInstance().clear();
     Variable x = freshRealVariable("x");
     Pol p1({Rational(3)*x});
-    Pol p2({Rational(2)});
+    Pol p2(Rational(2));
 
     std::shared_ptr<CachePol> pCache( new CachePol );
     FPol fp1(p1, pCache);
