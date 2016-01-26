@@ -35,5 +35,5 @@ BOOST_PYTHON_MODULE(_numbers) {
             .def(self >= int())
             .def(self <= int())
     ;
-    def("rationalize", static_cast<Rational (*)(double)>(&carl::rationalize));
+    def("rationalize", static_cast<Rational (*)(double)>(&carl::rationalize), "Construct a rational number from a double");
 }

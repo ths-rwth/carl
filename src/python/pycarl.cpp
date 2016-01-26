@@ -23,20 +23,6 @@ typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
 typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
 
 /**
- * Following are some helper functions to provide some glue between Python and carl
- */
-
-Polynomial parsePolynomial(const std::string& text) {
-	carl::parser::Parser<Polynomial> p;
-	return p.polynomial(text);
-}
-
-RationalFunction parseRationalFunction(const std::string& text) {
-	carl::parser::Parser<Polynomial> p;
-	return p.rationalFunction(text);
-}
-
-/**
  * The actual module definition
  */
 BOOST_PYTHON_MODULE(_core)
@@ -70,6 +56,9 @@ BOOST_PYTHON_MODULE(_core)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
 		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
+		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
+		.def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator-))
+		.def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
 		.add_property("name", &carl::Variable::getName)
 		.add_property("type", &carl::Variable::getType)
 		.def(self_ns::str(self_ns::self))
@@ -112,11 +101,13 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self - other<carl::Variable>())
 		;
 
-	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache")
+	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache",
+	"Cache storing all factorized polynomials")
 		;
 	register_ptr_to_python<std::shared_ptr<carl::Cache<FactorizationPair>>>();
 
-	class_<FactorizedPolynomial>("FactorizedPolynomial")
+	class_<FactorizedPolynomial>("FactorizedPolynomial",
+	"Represent a polynomial with its factorization")
 		.def(init<const Rational&>())
 		.def(init<const Polynomial&, const std::shared_ptr<carl::Cache<FactorizationPair>>>())
 		.def("constant_part", &FactorizedPolynomial::constantPart)
@@ -133,7 +124,7 @@ BOOST_PYTHON_MODULE(_core)
 	class_<RationalFunction>("RationalFunction",
 	"Represent a rational function, that is the fraction of two multivariate polynomials ")
 		.def(init<Polynomial, Polynomial>())
-		.def("evaluate", &RationalFunction::evaluate<Polynomial>)
+		.def("evaluate", &RationalFunction::evaluate)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
 		.add_property("numerator", &RationalFunction::nominator)
 		.add_property("denominator", &RationalFunction::denominator)
@@ -146,9 +137,10 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self != self)
 		;
 
-	class_<FactorizedRationalFunction>("FactorizedRationalFunction")
+	class_<FactorizedRationalFunction>("FactorizedRationalFunction",
+	"Represent a rational function, that is the fraction of two factorized polynomials ")
 		.def(init<FactorizedPolynomial, FactorizedPolynomial>())
-		.def("evaluate", &FactorizedRationalFunction::evaluate<FactorizedPolynomial>)
+		.def("evaluate", &FactorizedRationalFunction::evaluate)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (FactorizedRationalFunction::*)() const>(&FactorizedRationalFunction::gatherVariables))
 		.add_property("numerator", &FactorizedRationalFunction::nominator)
 		.add_property("denominator", &FactorizedRationalFunction::denominator)
@@ -161,15 +153,12 @@ BOOST_PYTHON_MODULE(_core)
 		.def(self != self)
 		;
 
-	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser")
+	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser",
+	"Parser for polynomials and rational functions")
 		.def("polynomial", &carl::parser::Parser<Polynomial>::polynomial)
 		.def("rational_function", &carl::parser::Parser<Polynomial>::rationalFunction)
 		.def("add_variable", &carl::parser::Parser<Polynomial>::addVariable)
 		;
-
-	// Global string parser functions (no variable management)
-	//def("parse_polynomial", &parsePolynomial);
-	//def("parse_rationalFunction", &parseRationalFunction);
 
 	// Non-constructable class VariablePool, static instance accessible via global
 	class_<carl::VariablePool, boost::noncopyable>("VariablePoolInst", no_init)

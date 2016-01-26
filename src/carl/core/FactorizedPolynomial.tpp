@@ -560,7 +560,7 @@ namespace carl
             return mCoefficient;
         if( factorizedTrivially() )
         {
-            return polynomial().evaluate( _substitutions );
+            return mCoefficient * polynomial().evaluate( _substitutions );
         }
         else
         {
