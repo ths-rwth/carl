@@ -70,6 +70,8 @@ BOOST_PYTHON_MODULE(_core)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
 		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
+		.add_property("name", &carl::Variable::getName)
+		.add_property("type", &carl::Variable::getType)
 		.def(self_ns::str(self_ns::self))
 		;
 /*
