@@ -1466,25 +1466,29 @@ cad::Answer CAD<Number>::liftCheck(
 		}
 	}
 	
+	if (setting.ignoreRoots) {
+		if (node->isRoot() && (!node->isIntegral())) return cad::Answer::False;
+	}
+	
 	if (PERFORM_PARTIAL_CHECK) {
 		auto partialAnswer = partialLiftCheck(node, conflictGraph);
 		if (partialAnswer == cad::Answer::False) return cad::Answer::False;
 	}
 	
-	if (!node.isRoot()) {
-		if (integerHeuristicActive(cad::IntegerHandling::SPLIT_ASSIGNMENT, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_PATH, openVariableCount)) {
-			if (!node->isIntegral()) {
-				assert(openVariableCount < mVariables.size());
-				CARL_LOG_DEBUG("carl.cad", "Variables: " << mVariables);
-				CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
-				std::vector<RealAlgebraicNumber<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
-				sample.pop_back();
-				r = RealAlgebraicPoint<Number>(std::move(sample));
-				CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
-				return cad::Answer::Unknown;
-			}
-		}
-	}
+	//if (!node.isRoot()) {
+	//	if (integerHeuristicActive(cad::IntegerHandling::SPLIT_ASSIGNMENT, openVariableCount) || integerHeuristicActive(cad::IntegerHandling::SPLIT_PATH, openVariableCount)) {
+	//		if (!node->isIntegral()) {
+	//			assert(openVariableCount < mVariables.size());
+	//			CARL_LOG_DEBUG("carl.cad", "Variables: " << mVariables);
+	//			CARL_LOG_DEBUG("carl.cad", "OpenVariableCount = " << openVariableCount);
+	//			std::vector<RealAlgebraicNumber<Number>> sample(sampleTree.begin_path(node), sampleTree.end_path());
+	//			sample.pop_back();
+	//			r = RealAlgebraicPoint<Number>(std::move(sample));
+	//			CARL_LOG_DEBUG("carl.cad", "Lazy split at " << r);
+	//			return cad::Answer::Unknown;
+	//		}
+	//	}
+	//}
 
 	// base level: zero variables left to substitute => evaluate the constraint
 	if (openVariableCount == 0) {
@@ -1628,7 +1632,9 @@ cad::Answer CAD<Number>::liftCheck(
 				computeMoreSamples = true;
 				break;
 			}
+			CARL_LOG_DEBUG("carl.cad", "Getting next sample from heap: " << sampleSetIncrement.getHeap());
 			RealAlgebraicNumber<Number> newSample = sampleSetIncrement.next();
+			CARL_LOG_DEBUG("carl.cad", "Got " << newSample);
 
 			// Sample storage
 			auto newNode = this->storeSampleInTree(newSample, node);

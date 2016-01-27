@@ -176,6 +176,10 @@ public:
 	const cad::CADSettings& getSetting() const {
 		return this->setting;
 	}
+	
+	const Tree& getSampleTree() const {
+		return sampleTree;
+	}
 
 	/**
 	* @return list of main variables of the polynomials of this cad
