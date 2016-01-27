@@ -308,6 +308,7 @@ public:
 		improveBounds( s.improveBounds ),
 		exploreInteger(s.exploreInteger),
 		splitInteger(s.splitInteger),
+		ignoreRoots(s.ignoreRoots),
 		integerHandling(s.integerHandling),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
