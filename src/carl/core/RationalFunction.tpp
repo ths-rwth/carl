@@ -313,7 +313,7 @@ namespace carl
         {
             CoeffType c(this->mNumberQuotient);
             *this = rhs.inverse();
-            return *this /= c;
+            return *this *= c;
         }
         else if( rhs.isConstant() )
         {

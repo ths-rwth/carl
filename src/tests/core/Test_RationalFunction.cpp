@@ -142,6 +142,43 @@ TEST(RationalFunction, Multiplication)
     EXPECT_TRUE( computePolynomial( FPol( fpNomA*fpDenA*fpNomB*fpDenB ) ).remainder( computePolynomial( FPol(rfC.nominator()*rfC.denominator()) ) ).isZero() );
 }
 
+TEST(RationalFunction, Division)
+{
+    carl::VariablePool::getInstance().clear();
+    StringParser sp;
+    sp.setVariables({"x"});
+
+    Pol p1 = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol p2 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol p3 = sp.parseMultivariatePolynomial<Rational>("1");
+    Pol p4 = sp.parseMultivariatePolynomial<Rational>("2");
+    Pol p5 = p1*p4 + p2;
+    RFunc r1(p1, p2);
+    RFunc r2(p3, p4);
+
+    RFunc r3 = r1 + r2;
+    RFunc r4 = r2 / r3;
+    EXPECT_EQ(p5, r3.nominator());
+    EXPECT_EQ(p5, r4.denominator());
+    EXPECT_EQ(p2, r4.nominator());
+
+    std::shared_ptr<CachePol> pCache( new CachePol );
+    FPol fp1(p1, pCache);
+    FPol fp2(p2, pCache);
+    FPol fp3(p3, pCache);
+    FPol fp4(p4, pCache);
+
+    RFactFunc rf1(fp1, fp2);
+    RFactFunc rf2(fp3, fp4);
+
+    RFactFunc rf3 = rf1 + rf2;
+    RFactFunc rf4 = rf2 / rf3;
+    std::cout << rf4 << std::endl;
+    EXPECT_EQ(p5, computePolynomial(rf3.nominator()));
+    EXPECT_EQ(p5, computePolynomial(rf4.denominator()));
+    EXPECT_EQ(p2, computePolynomial(rf4.nominator()));
+}
+
 TEST(RationalFunction, Addition)
 {
     carl::VariablePool::getInstance().clear();
