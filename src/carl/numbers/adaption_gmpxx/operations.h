@@ -94,7 +94,7 @@ inline bool isInteger(const mpz_class&) {
  * @return Bit size of n.
  */
 inline std::size_t bitsize(const mpz_class& n) {
-	return mpz_sizeinbase(n.__get_mp(),10);
+	return mpz_sizeinbase(n.__get_mp(),2);
 }
 /**
  * Get the bit size of the representation of a fraction.
@@ -102,7 +102,7 @@ inline std::size_t bitsize(const mpz_class& n) {
  * @return Bit size of n.
  */
 inline std::size_t bitsize(const mpq_class& n) {
-	return mpz_sizeinbase(getNum(n).__get_mp(),10) + mpz_sizeinbase(getDenom(n).__get_mp(),10);
+	return mpz_sizeinbase(getNum(n).__get_mp(),2) + mpz_sizeinbase(getDenom(n).__get_mp(),2);
 }
 
 /**
