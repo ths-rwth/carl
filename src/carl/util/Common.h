@@ -83,10 +83,10 @@ namespace carl
     using SharedPointerMap = std::map<std::shared_ptr<const T1>, T2, sharedPointerLess<T1>>;
     
     template<typename T> 
-    using FastSet = std::unordered_set<const T, std::hash<T>>;
+    using FastSet = std::unordered_set<T, std::hash<T>>;
     
     template<typename T1,typename T2> 
-    using FastMap = std::unordered_map<const T1, T2, std::hash<T1>>;
+    using FastMap = std::unordered_map<T1, T2, std::hash<T1>>;
     
     template<typename T> 
     using FastPointerSet = std::unordered_set<const T*, pointerHash<T>, pointerEqual<T>>;
