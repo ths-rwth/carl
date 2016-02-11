@@ -32,8 +32,6 @@ if not os.path.exists(d):
 
 class MyEggInfo(egg_info):
     def run(self):
-        #call(["cmake", "-DCARL_PYTHON=ON",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
-        #call(["make", "pycarl"], cwd=d)
         try:
             src = os.path.join(d, "../pycarl")
             dst = os.path.join(d, "pycarl/")
@@ -46,16 +44,57 @@ class MyEggInfo(egg_info):
 
 
 class MyInstall(install):
+    user_options = install.user_options + [
+        ('cmake=', None, 'Additional cmake arguments'),
+        ('make=', None, 'Additional make arguments'),
+    ]
+
+    def initialize_options(self):
+        install.initialize_options(self)
+        self.cmake = ""
+        self.make = ""
+    
     def run(self):
-        call(["cmake", "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
-        call(["make", "pycarl", "-j"+str(NO_COMPILE_CORES)], cwd=d)
-        install.run(self)
-class MyDevelop(develop):
-    def run(self):
-        ret = call(["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC, os.path.abspath(os.path.dirname(os.path.realpath(__file__)))], cwd=d)
+        # Call cmake
+        cmake_args = ["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC]
+        cmake_args.extend(self.cmake.split())
+        cmake_args.append(os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
+        ret = call(cmake_args, cwd=d)
         if ret != 0:
             raise RuntimeError("Failure during cmake")
-        ret = call(["make", "pycarl", "-j"+str(NO_COMPILE_CORES)], cwd=d)
+        
+        # Call make
+        make_args = ["make", "pycarl", "-j"+str(NO_COMPILE_CORES)]
+        make_args.extend(self.make.split())
+        ret = call(make_args, cwd=d)
+        if ret != 0:
+            raise RuntimeError("Failure during make")
+        install.run(self)
+
+class MyDevelop(develop):
+    user_options = develop.user_options + [
+        ('cmake=', None, 'Additional cmake arguments'),
+        ('make=', None, 'Additional make arguments'),
+    ]
+
+    def initialize_options(self):
+        develop.initialize_options(self)
+        self.cmake = ""
+        self.make = ""
+
+    def run(self):
+        # Call cmake
+        cmake_args = ["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC]
+        cmake_args.extend(self.cmake.split())
+        cmake_args.append(os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
+        ret = call(cmake_args, cwd=d)
+        if ret != 0:
+            raise RuntimeError("Failure during cmake")
+        
+        # Call make
+        make_args = ["make", "pycarl", "-j"+str(NO_COMPILE_CORES)]
+        make_args.extend(self.make.split())
+        ret = call(make_args, cwd=d)
         if ret != 0:
             raise RuntimeError("Failure during make")
         develop.run(self)
