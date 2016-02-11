@@ -96,6 +96,15 @@ inline size_t toInt<size_t>(const double& n) {
     return size_t(n);
 }
 
+template<typename T>
+inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::type toString(const T& n) {
+	return std::to_string(n);
+}
+
+inline std::string toString(const double& n) {
+	return std::to_string(n);
+}
+
 /**
  * Basic Operators
  *

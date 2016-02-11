@@ -211,11 +211,16 @@ namespace carl
 			mValue = val;
 		}
 
-
+		template<typename F = FloatType, EnableIf< carl::is_rational<F> > = dummy>
 		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
 		{
-			str2double (mValue, _string);
-//			mValue = std::atof(_string.c_str());
+			mValue = carl::rationalize<FloatType>(_string);
+		}
+
+		template<typename F = FloatType, EnableIf< std::is_same<F, double> > = dummy>
+		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
+		{
+			mValue = std::stod(_string);
 		}
 
 		/**
@@ -563,7 +568,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, std::size_t _exp, CARL_RND = CARL_RND::N) const
 		{
-			_result.mValue = std::pow(mValue, _exp);
+			_result.mValue = carl::pow(mValue, _exp);
 			return _result;
 		}
 
@@ -947,7 +952,7 @@ namespace carl
 		 */
 		FLOAT_T<FloatType>& floor_assign(CARL_RND = CARL_RND::N)
 		{
-			mValue = std::floor(mValue);
+			mValue = carl::floor(mValue);
 			return *this;
 		}
 
@@ -1493,13 +1498,13 @@ namespace carl
 		 */
 		std::string toString() const
 		{
-			return std::to_string(mValue);
+			return carl::toString(mValue);
 		}
 	};
 
 	template<typename FloatType>
-	inline bool isInteger(const FLOAT_T<FloatType>&) {
-	return false;
+	inline bool isInteger(const FLOAT_T<FloatType>& in) {
+		return carl::isInteger(in.value());
 	}
 
 	/**
@@ -1541,8 +1546,7 @@ namespace carl
 	template<typename Integer, typename FloatType>
 	inline Integer toInt(const FLOAT_T<FloatType>& _float)
 	{
-		Integer result = (int)_float;
-		return result;
+		return carl::toInt<Integer>(_float.value());
 	}
 
 	template<typename FloatType>
@@ -1589,6 +1593,12 @@ namespace carl
 		FLOAT_T<FloatType> result;
 		_in.sqrt(result);
 		return result;
+	}
+
+	template<typename FloatType>
+	inline std::pair<FLOAT_T<FloatType>, FLOAT_T<FloatType>> sqrt_safe(const FLOAT_T<FloatType>& _in)
+	{
+		return carl::sqrt_safe(_in.value());
 	}
 
 	template<typename FloatType>
@@ -1679,17 +1689,28 @@ namespace carl
 		return FLOAT_T<float>(_in);
 	}
 
+	template<>
+	inline FLOAT_T<mpq_class> rationalize<FLOAT_T<mpq_class>>(double _in)
+	{
+		return FLOAT_T<mpq_class>(carl::rationalize<mpq_class>(_in));
+	}
 
 	#ifdef USE_CLN_NUMBERS
+
+	template<>
+	inline FLOAT_T<cln::cl_RA> rationalize<FLOAT_T<cln::cl_RA>>(double _in)
+	{
+		return FLOAT_T<cln::cl_RA>(carl::rationalize<cln::cl_RA>(_in));
+	}
+
 	/**
 	 * Implicitly converts the number to a rational and returns the denominator.
 	 * @param _in Number.
 	 * @return Cln interger which holds the result.
 	 */
-	template<typename FloatType>
-	inline cln::cl_I getDenom(const FLOAT_T<FloatType>& _in)
+	inline cln::cl_I getDenom(const FLOAT_T<cln::cl_RA>& _in)
 	{
-		return carl::getDenom(carl::rationalize<cln::cl_RA>(_in.toDouble()));
+		return carl::getDenom(_in.value());
 	}
 
 	/**
@@ -1697,34 +1718,30 @@ namespace carl
 	 * @param _in Number.
 	 * @return Cln interger which holds the result.
 	 */
-	template<typename FloatType>
-	inline cln::cl_I getNum(const FLOAT_T<FloatType>& _in)
+	inline cln::cl_I getNum(const FLOAT_T<cln::cl_RA>& _in)
 	{
-		return carl::getNum(carl::rationalize<cln::cl_RA>(_in.toDouble()));
-	}
-	#else
-	/**
-	 * Implicitly converts the number to a rational and returns the denominator.
-	 * @param _in Number.
-	 * @return GMP interger which holds the result.
-	 */
-	template<typename FloatType>
-	inline mpz_class getDenom(const FLOAT_T<FloatType>& _in)
-	{
-		return carl::getDenom(carl::rationalize<mpq_class>(_in.toDouble()));
-	}
-
-	/**
-	 * Implicitly converts the number to a rational and returns the nominator.
-	 * @param _in Number.
-	 * @return GMP interger which holds the result.
-	 */
-	template<typename FloatType>
-	inline mpz_class getNum(const FLOAT_T<FloatType>& _in)
-	{
-		return carl::getNum(carl::rationalize<mpq_class>(_in.toDouble()));
+		return carl::getNum(_in.value());
 	}
 	#endif
+	/**
+	 * Implicitly converts the number to a rational and returns the denominator.
+	 * @param _in Number.
+	 * @return GMP interger which holds the result.
+	 */
+	inline mpz_class getDenom(const FLOAT_T<mpq_class>& _in)
+	{
+		return carl::getDenom(_in.value());
+	}
+
+	/**
+	 * Implicitly converts the number to a rational and returns the nominator.
+	 * @param _in Number.
+	 * @return GMP interger which holds the result.
+	 */
+	inline mpz_class getNum(const FLOAT_T<mpq_class>& _in)
+	{
+		return carl::getNum(_in.value());
+	}
 
 	template<typename FloatType>
 	inline bool isZero(const FLOAT_T<FloatType>& _in) {

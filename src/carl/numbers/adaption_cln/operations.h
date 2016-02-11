@@ -531,8 +531,8 @@ inline cln::cl_I operator/(const cln::cl_I& lhs, const int& rhs) {
 	return lhs / cln::cl_I(rhs);
 }
 
-std::string toString(const cln::cl_RA& _number, bool _infix);
+std::string toString(const cln::cl_RA& _number, bool _infix=true);
 
-std::string toString(const cln::cl_I& _number, bool _infix);
+std::string toString(const cln::cl_I& _number, bool _infix=true);
 
 }

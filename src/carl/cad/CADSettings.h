@@ -136,6 +136,7 @@ public:
 	bool improveBounds;
 	bool exploreInteger;
 	bool splitInteger;
+	bool ignoreRoots;
 	IntegerHandling integerHandling;
 	/// the order in which the polynomials in each elimination level are sorted
 	PolynomialComparisonOrder order;
@@ -281,6 +282,7 @@ private:
 		improveBounds( true ),
 		exploreInteger(false),
 		splitInteger(true),
+		ignoreRoots(false),
 		integerHandling(IntegerHandling::SPLIT_ASSIGNMENT),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)
@@ -306,6 +308,7 @@ public:
 		improveBounds( s.improveBounds ),
 		exploreInteger(s.exploreInteger),
 		splitInteger(s.splitInteger),
+		ignoreRoots(s.ignoreRoots),
 		integerHandling(s.integerHandling),
 		order(PolynomialComparisonOrder::Default),
 		splittingStrategy(rootfinder::SplittingStrategy::DEFAULT)

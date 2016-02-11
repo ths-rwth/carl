@@ -94,7 +94,7 @@ inline bool isInteger(const mpz_class&) {
  * @return Bit size of n.
  */
 inline std::size_t bitsize(const mpz_class& n) {
-	return mpz_sizeinbase(n.__get_mp(),10);
+	return mpz_sizeinbase(n.__get_mp(),2);
 }
 /**
  * Get the bit size of the representation of a fraction.
@@ -102,7 +102,7 @@ inline std::size_t bitsize(const mpz_class& n) {
  * @return Bit size of n.
  */
 inline std::size_t bitsize(const mpq_class& n) {
-	return mpz_sizeinbase(getNum(n).__get_mp(),10) + mpz_sizeinbase(getDenom(n).__get_mp(),10);
+	return mpz_sizeinbase(getNum(n).__get_mp(),2) + mpz_sizeinbase(getDenom(n).__get_mp(),2);
 }
 
 /**
@@ -175,7 +175,6 @@ inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
 }
 template<>
 inline int toInt<int>(const mpq_class& n) {
-    std::cout << "mpq_class to int" << std::endl;
 	return toInt<int>(toInt<mpz_class>(n));
 }
 template<>
@@ -509,8 +508,8 @@ inline mpq_class operator *(const mpq_class& lhs, const mpq_class& rhs)
 	return res;
 }
 
-std::string toString(const mpq_class& _number, bool _infix);
+std::string toString(const mpq_class& _number, bool _infix=true);
 
-std::string toString(const mpz_class& _number, bool _infix);
+std::string toString(const mpz_class& _number, bool _infix=true);
 
 }

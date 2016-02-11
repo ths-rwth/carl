@@ -151,10 +151,15 @@ public:
 	}
 	
 public:
+	
 	SampleSet(SampleOrdering ordering = SampleOrdering::Default):
 		mComp(ordering)
 	{
 		CARL_LOG_TRACE("carl.cad.sampleset", this << " " << __func__ << "( " << ordering << " )");
+	}
+	
+	const std::vector<RealAlgebraicNumber<Number>>& getHeap() const {
+		return mHeap;
 	}
 
 	/**
