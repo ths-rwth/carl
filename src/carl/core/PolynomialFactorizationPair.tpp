@@ -347,6 +347,8 @@ namespace carl
         assert( factorizedTrivially() );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
+        assert( _fpolyA.factorizedTrivially() );
+        assert( _fpolyB.factorizedTrivially() );
         //assert( carl::isOne(_fpolyA.coefficient()) );
         //assert( carl::isOne(_fpolyB.coefficient()) );
         assert( exponentA > 0 );
