@@ -347,8 +347,6 @@ namespace carl
         assert( factorizedTrivially() );
         assert( !_fpolyA.isOne() );
         assert( !_fpolyB.isOne() );
-        assert( _fpolyA.factorizedTrivially() );
-        assert( _fpolyB.factorizedTrivially() );
         //assert( carl::isOne(_fpolyA.coefficient()) );
         //assert( carl::isOne(_fpolyB.coefficient()) );
         assert( exponentA > 0 );
@@ -419,6 +417,10 @@ namespace carl
                     factorizationA.insert( currentFactorizationA.begin(), currentFactorizationA.end() );
                     breaked = true;
                     break;
+                } else if ( currentFactorizationA.begin()->second > 1 ) {
+                    // Polynomial has exponent > 1
+                    exponentA *= currentFactorizationA.begin()->second;
+                    factorA = currentFactorizationA.begin()->first;
                 }
                 // Take the second factor
                 FactorizedPolynomial<P> factorB = factorizationB.begin()->first;
@@ -430,6 +432,10 @@ namespace carl
                 {
                     factorizationB.insert( currentFactorizationB.begin(), currentFactorizationB.end() );
                     continue;
+                } else if ( currentFactorizationB.begin()->second > 1 ) {
+                    // Polynomial has exponent > 1
+                    exponentB *= currentFactorizationB.begin()->second;
+                    factorB = currentFactorizationB.begin()->first;
                 }
                 CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "" );
                 CARL_LOG_DEBUG( "carl.core.factorizedpolynomial", "####################################################" );

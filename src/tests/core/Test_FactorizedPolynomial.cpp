@@ -342,6 +342,7 @@ TEST(FactorizedPolynomial, GCD)
     FPol fpol1 = ft1 * ff1;
     FPol ft2(t2, pCache);
     FPol ft3 = ft2 * ft2 * ft2;
+    FPol tmp = ft3 * ft2;
     FPol ft4(t4, pCache);
     FPol ft5(t5, pCache);
     FPol ft6(t6, pCache);
