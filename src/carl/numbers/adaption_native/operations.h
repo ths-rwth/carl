@@ -96,6 +96,9 @@ inline size_t toInt<size_t>(const double& n) {
     return size_t(n);
 }
 
+template<>
+inline double rationalize(double n) { return n; }
+
 template<typename T>
 inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::type toString(const T& n) {
 	return std::to_string(n);
