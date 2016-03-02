@@ -326,6 +326,31 @@ TEST(FactorizedPolynomial, GCD)
     std::cout << fgGCD << " with rest " << fgRestA << " and " << fgRestB << std::endl;
     EXPECT_EQ( g1, computePolynomial( fgRestA ) * computePolynomial( fgGCD ) );
     EXPECT_EQ( g2, computePolynomial( fgRestB ) * computePolynomial( fgGCD ) );
+
+    Pol x = sp.parseMultivariatePolynomial<Rational>("x");
+    Pol y = sp.parseMultivariatePolynomial<Rational>("y");
+    Pol t1 = x*x*x;
+    Pol f1 = sp.parseMultivariatePolynomial<Rational>("x^6+6*y^5*x+15*y^4*x^2+20*y^3*x^3+15*y^2*x^4+y^6+6*y*x^5");
+    Pol t2 = x+y;
+    Pol t4 = Rational(2)*x+y;
+    Pol t5 = Rational(4)*x+y;
+    Pol t6 = Rational(4)*x+Rational(3)*y;
+    Pol t7 = Rational(4)*x*x*x+Rational(6)*y*x*x+Rational(4)*y*y*x+y*y*y;
+    FPol fx(x, pCache);
+    FPol ft1 = fx * fx * fx;
+    FPol ff1(f1, pCache);
+    FPol fpol1 = ft1 * ff1;
+    FPol ft2(t2, pCache);
+    FPol ft3 = ft2 * ft2 * ft2;
+    FPol tmp = ft3 * ft2;
+    FPol ft4(t4, pCache);
+    FPol ft5(t5, pCache);
+    FPol ft6(t6, pCache);
+    FPol ft7(t7, pCache);
+    FPol fpol2 = ft3 * ft4 * ft5 * ft6 * ft7;
+    FPol fpolRest1;
+    FPol fpolRest2;
+    FPol fpolGCD = gcd( fpol1, fpol2, fpolRest1, fpolRest2);
 }
 
 TEST(FactorizedPolynomial, Flattening)
