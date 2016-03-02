@@ -171,6 +171,33 @@ template<typename Number>
             return midc;
 		return mid;
 	}
+template<typename Number>
+	Number Interval<Number>::sampleSB( bool _includingBounds ) const
+	{
+		using Int = typename carl::IntegralType<Number>::type;
+		Int leftnum = carl::floor(this->center());
+		Int leftden = carl::constant_one<Int>::get();
+		Int rightnum = carl::constant_one<Int>::get();
+		Int rightden = carl::constant_zero<Int>::get();
+		Number cur = Number(leftnum) / leftden;
+		if (this->contains(cur)) {
+			return cur;
+		}
+		while (true) {
+			Int curnum = leftnum + rightnum;
+			Int curden = leftden + rightden;
+			cur = Number(curnum) / curden;
+			if ((cur < this->lower()) || (!_includingBounds && cur == this->lower())) {
+				leftnum = curnum;
+				leftden = curden;
+			} else if ((cur > this->upper()) || (!_includingBounds && cur == this->upper())) {
+				rightnum = curnum;
+				rightden = curden;
+			} else {
+				return cur;
+			}
+		}
+	}
 
 template<typename Number>
 	void Interval<Number>::sample_assign()

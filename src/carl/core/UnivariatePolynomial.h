@@ -81,6 +81,10 @@ public:
 	 * The integral type that belongs to the number type.
 	 */
 	typedef typename IntegralType<NumberType>::type IntNumberType;
+	
+	typedef void CACHE;
+	typedef Coefficient CoeffType;
+	typedef UnivariatePolynomial<Coefficient> PolyType;
 
 	// Rule of five
 	/**
@@ -458,6 +462,29 @@ public:
 			res.insert(tmp.begin(), tmp.end());
 		}
 		return res;
+	}
+	
+	/**
+	 * Gathers all variables that occur in the polynomial.
+	 * Applies, if the coefficients are numbers.
+	 * @return Set of variables.
+	 */
+	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
+	void gatherVariables(std::set<Variable>& vars) const {
+		vars = {this->mainVar()};
+	}
+	/**
+	 * Gathers all variables that occur in the polynomial.
+	 * Applies, if the coefficients are not numbers.
+	 * @return Set of variables.
+	 */
+	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
+	void gatherVariables(std::set<Variable>& set) const {
+		set = {this->mainVar()};
+		for (auto c: this->mCoefficients) {
+			auto tmp = c.gatherVariables();
+			set.insert(tmp.begin(), tmp.end());
+		}
 	}
 
 	/**

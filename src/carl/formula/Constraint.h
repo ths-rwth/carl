@@ -104,41 +104,17 @@ namespace carl
      * @return true,  if the given value satisfies the given relation to zero;
      *          false, otherwise.
      */
-    template<typename Pol>
-    inline bool evaluate( const typename Pol::NumberType& _value, const Relation& _rel )
+    template<typename Number>
+    inline bool evaluate( const Number& _value, const Relation& _rel )
     {
         switch( _rel )
         {
-            case Relation::EQ:
-            {
-                if( _value == 0 ) return true;
-                else return false;
-            }
-            case Relation::NEQ:
-            {
-                if( _value == 0 ) return false;
-                else return true;
-            }
-            case Relation::LESS:
-            {
-                if( _value < 0 ) return true;
-                else return false;
-            }
-            case Relation::GREATER:
-            {
-                if( _value > 0 ) return true;
-                else return false;
-            }
-            case Relation::LEQ:
-            {
-                if( _value <= 0 ) return true;
-                else return false;
-            }
-            case Relation::GEQ:
-            {
-                if( _value >= 0 ) return true;
-                else return false;
-            }
+            case Relation::EQ:		return carl::isZero(_value);
+            case Relation::NEQ:		return !carl::isZero(_value);
+            case Relation::LESS:	return _value < carl::constant_zero<Number>::get();
+            case Relation::GREATER:	return _value > carl::constant_zero<Number>::get();
+            case Relation::LEQ:		return _value <= carl::constant_zero<Number>::get();
+            case Relation::GEQ:		return _value >= carl::constant_zero<Number>::get();
             default:
             {
                 std::cerr << "Error in isConsistent: unexpected relation symbol." << std::endl;

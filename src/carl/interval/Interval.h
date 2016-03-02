@@ -1173,9 +1173,17 @@ namespace carl
 
         /**
          * Searches for some point in this interval, preferably near the midpoint and with a small representation.
+		 * Checks the integers next to the midpoint, uses the midpoint if both are outside.
          * @return Some point within this interval.
          */
         Number sample(bool _includingBounds = true) const;
+		
+		/**
+		 * Searches for some point in this interval, preferably near the midpoint and with a small representation.
+		 * Uses a binary search based on the Stern-Brocot tree starting from the integer below the midpoint.
+		 * @return Some point within this interval.
+		 */
+		Number sampleSB(bool _includingBounds = true) const;
 
         /**
          * Searches for some point in this interval, preferably near the midpoint and with a small representation and
