@@ -85,7 +85,7 @@ namespace carl
     {
         CONSTRAINT_POOL_LOCK_GUARD
         if( _lhs.isConstant() )
-            return evaluate<Pol>( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
+            return evaluate( _lhs.constantPart(), _rel ) ? mConsistentConstraint : mInconsistentConstraint;
         if( _lhs.totalDegree() == 1 && (_rel != Relation::EQ && _rel != Relation::NEQ) && _lhs.isUnivariate() )
         {
             if( carl::isNegative( _lhs.lcoeff() ) )
@@ -280,4 +280,3 @@ namespace carl
         return ConstraintPool<Pol>::getInstance();
     }
 }    // namespace carl
-

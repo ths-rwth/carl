@@ -83,7 +83,7 @@ namespace carl
     unsigned ConstraintContent<Pol>::isConsistent() const
     {
         if( mVariables.empty() )
-            return carl::evaluate<Pol>( mLhs.constantPart(), mRelation ) ? 1 : 0;
+            return carl::evaluate( mLhs.constantPart(), mRelation ) ? 1 : 0;
         else
         {
             switch( mRelation )
@@ -423,7 +423,7 @@ namespace carl
         Pol tmp = mpContent->mLhs.substitute( _assignment );
         if( tmp.isConstant() )
         {
-            result = carl::evaluate<Pol>( (tmp.isZero() ? typename Pol::NumberType( 0 ) : tmp.trailingTerm().coeff()), relation() ) ? 1 : 0;
+            result = carl::evaluate( (tmp.isZero() ? typename Pol::NumberType( 0 ) : tmp.trailingTerm().coeff()), relation() ) ? 1 : 0;
         }
 //        std::cout << "result is " << result << std::endl;
 //        std::cout << std::endl;
@@ -434,7 +434,7 @@ namespace carl
     unsigned Constraint<Pol>::consistentWith( const EvaluationMap<Interval<double>>& _solutionInterval ) const
     {
         if( variables().empty() )
-            return carl::evaluate<Pol>( constantPart(), relation() ) ? 1 : 0;
+            return carl::evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
             auto varIter = variables().begin();
@@ -543,7 +543,7 @@ namespace carl
     {
         _stricterRelation = relation();
         if( variables().empty() )
-            return carl::evaluate<Pol>( constantPart(), relation() ) ? 1 : 0;
+            return carl::evaluate( constantPart(), relation() ) ? 1 : 0;
         else
         {
             auto varIter = variables().begin();
