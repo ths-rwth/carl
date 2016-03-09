@@ -47,19 +47,30 @@ namespace carl
         mpz_class root_num_rem;
         mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
 
+        std::cout << "denominator:" << den << std::endl;
+        std::cout << "numerator:" << num << std::endl;
+
+        std::cout << "root_den:" << root_den << std::endl;
+        std::cout << "root_num:" << root_num << std::endl;
+        std::cout << "root_den_rem:" << root_den_rem << std::endl;
+        std::cout << "root_num_rem:" << root_num_rem << std::endl;
+
         mpq_class lower;
         mpq_class upper;
-#ifdef __WIN64
-		long long unsigned numerator, denominator;
-#else
-        long unsigned numerator, denominator;
-#endif
 
-        numerator = mpz_get_ui(root_num.__get_mp());
-        denominator = mpz_get_ui(root_den.__get_mp());
+        lower = root_num;
+        if(root_den_rem == 0)
+            lower /= root_den;
+        else
+            lower /= root_den+1;
 
-        mpq_set_ui(lower.__get_mp(), numerator, mpz_sgn(root_den_rem.__get_mp()) != 0 ? denominator+1 : denominator);
-        mpq_set_ui(upper.__get_mp(), mpz_sgn(root_num_rem.__get_mp()) != 0 ? numerator+1 : numerator, denominator);
+        if(root_num_rem == 0)
+            upper = root_num;
+        else
+            upper = root_num+1;
+
+        upper /= root_den;
+
         return std::make_pair(lower,upper);
     }
 

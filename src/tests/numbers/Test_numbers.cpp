@@ -104,6 +104,12 @@ TYPED_TEST(RationalNumbers, Squareroot) {
 	//EXPECT_GE(TypeParam(82)/TypeParam(100), resultA.second);
 	EXPECT_LE(TypeParam(1)/TypeParam(2), resultA.first);
 	EXPECT_GE(TypeParam(2)/TypeParam(1), resultA.second);
+
+  {
+    TypeParam a = TypeParam("93536104789177766012087302264675950042191285291185")/TypeParam("93536104789177786765035829293842113257979682750464");
+    std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
+    std::cout << "Result " << resultA.first << ", " << resultA.second << std::endl;
+  }
 }
 
 TYPED_TEST(RationalNumbers, Sqrt_fast) {
