@@ -17,49 +17,49 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 namespace carl
 {
 	template<typename T, EnableIf<has_isZero<T>>>
-	bool isZero(const T& t) 
+	inline bool isZero(const T& t) 
 	{
 		return t.isZero();
 	}
 	
 	template<typename T, DisableIf<has_isZero<T>>>
-	bool isZero(const T& t)
+	inline bool isZero(const T& t)
 	{
 		return t == 0;
 	}
 	
 	template<typename T, EnableIf<has_isOne<T>>>
-	bool isOne(const T& t) 
+	inline bool isOne(const T& t) 
 	{
 		return t.isOne();
 	}
 	
 	template<typename T, DisableIf<has_isOne<T>>>
-	bool isOne(const T& t) 
+	inline bool isOne(const T& t) 
 	{
 		return t == 1;
 	}
     
 	template<typename T, EnableIf<has_isPositive<T>>>
-	bool isPositive(const T& t) 
+	inline bool isPositive(const T& t) 
 	{
 		return t.isPositive();
 	}
 	
 	template<typename T, DisableIf<has_isPositive<T>>>
-	bool isPositive(const T& t)
+	inline bool isPositive(const T& t)
 	{
 		return t > 0;
 	}
 	
 	template<typename T, EnableIf<has_isNegative<T>>>
-	bool isNegative(const T& t) 
+	inline bool isNegative(const T& t) 
 	{
 		return t.isNegative();
 	}
 	
 	template<typename T, DisableIf<has_isNegative<T>>>
-	bool isNegative(const T& t) 
+	inline bool isNegative(const T& t) 
 	{
 		return t < 0;
 	}
