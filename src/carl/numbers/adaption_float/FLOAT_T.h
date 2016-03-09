@@ -1745,7 +1745,7 @@ namespace carl
 
 	template<typename FloatType>
 	inline bool isZero(const FLOAT_T<FloatType>& _in) {
-		return _in.value() == 0;
+		return isZero(_in.value());
 	}
 
 	template<typename FloatType>
