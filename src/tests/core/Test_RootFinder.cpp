@@ -28,23 +28,28 @@ TEST(RootFinder, realRoots)
 	{
 		UPolynomial p(x, {(Rational)-1, (Rational)0, (Rational)0, (Rational)1});
 		auto roots = carl::rootfinder::realRoots(p);
-		ASSERT_TRUE(roots.size() == 1);
-		ASSERT_TRUE(represents(roots.front(), (Rational)1));
+		EXPECT_TRUE(roots.size() == 1);
+		EXPECT_TRUE(represents(roots.front(), (Rational)1));
+	}
+	{
+		UPolynomial p(x, {(Rational)0, (Rational)-1, (Rational)0, (Rational)0, (Rational)1});
+		auto roots = carl::rootfinder::realRoots(p);
+		EXPECT_TRUE(roots.size() == 2);
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(0), MPolynomial(1)});
 		auto roots = carl::rootfinder::realRoots(p);
-		ASSERT_TRUE(roots.size() == 1);
-		ASSERT_TRUE(represents(roots.front(), (Rational)1));
+		EXPECT_TRUE(roots.size() == 1);
+		EXPECT_TRUE(represents(roots.front(), (Rational)1));
 	}
 
 	{
 		UMPolynomial p(x, {MPolynomial(-1), MPolynomial(0), MPolynomial(1)});
 		auto roots = carl::rootfinder::realRoots(p);
-		ASSERT_TRUE(roots.size() == 2);
-		ASSERT_TRUE(represents(roots.front(), (Rational)-1));
-		ASSERT_TRUE(represents(roots.back(), (Rational)1));
+		EXPECT_TRUE(roots.size() == 2);
+		EXPECT_TRUE(represents(roots.front(), (Rational)-1));
+		EXPECT_TRUE(represents(roots.back(), (Rational)1));
 	}
 
 	{
@@ -53,8 +58,8 @@ TEST(RootFinder, realRoots)
 		m.emplace(y, carl::RealAlgebraicNumber<Rational>(Rational(-1)));
 		std::cout << "Map = " << m << std::endl;
 		auto roots = carl::rootfinder::realRoots(p, m);
-		ASSERT_TRUE(roots.size() == 2);
-		ASSERT_TRUE(represents(roots.front(), (Rational)-1));
-		ASSERT_TRUE(represents(roots.back(), (Rational)1));
+		EXPECT_TRUE(roots.size() == 2);
+		EXPECT_TRUE(represents(roots.front(), (Rational)-1));
+		EXPECT_TRUE(represents(roots.back(), (Rational)1));
 	}
 }
