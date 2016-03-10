@@ -1143,14 +1143,14 @@ namespace carl
          * @return Center.
          */
         template<typename N = Number, DisableIf<std::is_floating_point<N>> = dummy>
-		Number center() const
+		N center() const
 		{
 			assert(this->isConsistent());
 			if (this->isInfinite()) return carl::constant_zero<Number>().get();
 			if (this->mLowerBoundType == BoundType::INFTY)
-				return (Number)(carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get());
+				return N(carl::floor(this->mContent.upper()) - carl::constant_one<Number>().get());
 			if (this->mUpperBoundType == BoundType::INFTY)
-				return (Number)(carl::ceil(this->mContent.lower()) + carl::constant_one<Number>().get());
+				return N(carl::ceil(this->mContent.lower()) + carl::constant_one<Number>().get());
 			return boost::numeric::median(mContent);
 		}
 
@@ -1160,9 +1160,9 @@ namespace carl
 			assert(this->isConsistent());
 			if (this->isInfinite()) return carl::constant_zero<N>().get();
 			if (this->mLowerBoundType == BoundType::INFTY)
-				return (N)(std::nextafter(this->mContent.upper(), -INFINITY));
+				return N(std::nextafter(this->mContent.upper(), -INFINITY));
 			if (this->mUpperBoundType == BoundType::INFTY)
-				return (N)(std::nextafter(this->mContent.lower(), INFINITY));
+				return N(std::nextafter(this->mContent.lower(), INFINITY));
 			return boost::numeric::median(mContent);
 		}
 
@@ -1177,7 +1177,7 @@ namespace carl
          * @return Some point within this interval.
          */
         Number sample(bool _includingBounds = true) const;
-		
+
 		/**
 		 * Searches for some point in this interval, preferably near the midpoint and with a small representation.
 		 * Uses a binary search based on the Stern-Brocot tree starting from the integer below the midpoint.

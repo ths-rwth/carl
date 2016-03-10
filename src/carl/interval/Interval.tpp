@@ -179,14 +179,14 @@ template<typename Number>
 		Int leftden = carl::constant_one<Int>::get();
 		Int rightnum = carl::constant_one<Int>::get();
 		Int rightden = carl::constant_zero<Int>::get();
-		Number cur = Number(leftnum) / leftden;
+		Number cur = Number(leftnum) / Number(leftden);
 		if (this->contains(cur)) {
 			return cur;
 		}
 		while (true) {
 			Int curnum = leftnum + rightnum;
 			Int curden = leftden + rightden;
-			cur = Number(curnum) / curden;
+			cur = Number(curnum) / Number(curden);
 			if ((cur < this->lower()) || (!_includingBounds && cur == this->lower())) {
 				leftnum = curnum;
 				leftden = curden;
