@@ -47,14 +47,6 @@ namespace carl
         mpz_class root_num_rem;
         mpz_sqrtrem(root_num.__get_mp(), root_num_rem.__get_mp(), num.__get_mp());
 
-        std::cout << "denominator:" << den << std::endl;
-        std::cout << "numerator:" << num << std::endl;
-
-        std::cout << "root_den:" << root_den << std::endl;
-        std::cout << "root_num:" << root_num << std::endl;
-        std::cout << "root_den_rem:" << root_den_rem << std::endl;
-        std::cout << "root_num_rem:" << root_num_rem << std::endl;
-
         mpq_class lower;
         mpq_class upper;
 
