@@ -118,7 +118,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 	MultivariatePolynomial<Number> pol(p);
 	
 	for (auto it = m.begin(); it != m.end();) {
-		assert(pol.has(it->first));
+		//assert(pol.has(it->first));
 		if (it->second.isNumeric()) {
 			// Plug in numeric representations
 			pol.substituteIn(it->first, MultivariatePolynomial<Number>(it->second.value()));
@@ -129,7 +129,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 		}
 	}
 	if (pol.isNumber()) {
-		return RealAlgebraicNumber<Number>(pol.numericContent());
+		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << pol << " on " << m);
 	return evaluateIR(pol, m);

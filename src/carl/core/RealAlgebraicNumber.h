@@ -260,8 +260,24 @@ inline bool operator==(const RealAlgebraicNumber<Number>& lhs, const RealAlgebra
 	return lhs.equal(rhs);
 }
 template<typename Number>
+inline bool operator!=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return !(lhs == rhs);
+}
+template<typename Number>
 inline bool operator<(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
 	return lhs.less(rhs);
+}
+template<typename Number>
+inline bool operator<=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return !(rhs < lhs);
+}
+template<typename Number>
+inline bool operator>(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return rhs < lhs;
+}
+template<typename Number>
+inline bool operator>=(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
+	return rhs <= lhs;
 }
 
 }

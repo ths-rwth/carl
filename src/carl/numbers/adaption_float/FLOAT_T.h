@@ -1045,30 +1045,6 @@ namespace carl
 		}
 
 		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
-		friend bool operator==(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
-		{
-			return _lhs.mValue == FloatType(_rhs);
-		}
-
-		/**
-		 * Comparison operator which tests for equality of two numbers.
-		 * @param _lhs Lefthand side of the comparison.
-		 * @param _rhs Righthand side of the comparison.
-		 * @return True if _lhs equals _rhs.
-		 */
-		template<typename Other, EnableIf< is_number<Other> > = dummy>
-		friend bool operator==(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return _rhs == _lhs;
-		}
-
-		/**
 		 * Function required for extension of Eigen3 with FLOAT_T as
 		 * a custom type which calculates the complex conjugate.
 		 * @param x The passed number.
@@ -1219,32 +1195,6 @@ namespace carl
 		}
 
 		/**
-		 * Operator for addition of two numbers, the righthand side type is the
-		 * underlying type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator +(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
-		{
-			return FLOAT_T<FloatType>(_lhs.mValue + _rhs);
-		}
-
-		/**
-		 * Operator for addition of two numbers, the lefthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator +(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return _rhs + _lhs;
-		}
-
-		/**
 		 * Operator for subtraction of two numbers
 		 * @param _lhs Lefthand side.
 		 * @param _rhs Righthand side.
@@ -1253,32 +1203,6 @@ namespace carl
 		friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const FLOAT_T<FloatType>& _rhs)
 		{
 			return FLOAT_T<FloatType>(_lhs.mValue - _rhs.mValue);
-		}
-
-		/**
-		 * Operator for addition of two numbers, the righthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator -(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
-		{
-			return FLOAT_T<FloatType>(_lhs.mValue - _rhs);
-		}
-
-		/**
-		 * Operator for subtraction of two numbers, the lefthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator -(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return FLOAT_T<FloatType>(_lhs - _rhs.mValue);
 		}
 
 		/**
@@ -1303,33 +1227,6 @@ namespace carl
 		}
 
 		/**
-		 * Operator for multiplication of two numbers, the righthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator *(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
-		{
-			return FLOAT_T<FloatType>(_lhs.mValue * _rhs);
-		}
-
-		/**
-		 * Operator for addition of two numbers, the lefthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator *(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			return FLOAT_T<FloatType>(_lhs * _rhs.mValue);
-		}
-
-		/**
 		 * Operator for addition of two numbers.
 		 * @param _lhs Lefthand side.
 		 * @param _rhs Righthand side.
@@ -1339,34 +1236,6 @@ namespace carl
 		{
 			assert(_rhs != 0);
 			return FLOAT_T<FloatType>(_lhs.mValue / _rhs.mValue);
-		}
-
-		/**
-		 * Operator for division of two numbers, the righthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator /(const FLOAT_T<FloatType>& _lhs, const Other& _rhs)
-		{
-			assert(_rhs != 0);
-			return FLOAT_T<FloatType>(_lhs.mValue / _rhs);
-		}
-
-		/**
-		 * Operator for division of two numbers, the lefthand side is the underlying
-		 * type.
-		 * @param _lhs Lefthand side.
-		 * @param _rhs Righthand side.
-		 * @return Number which holds the result.
-		 */
-		template<typename Other, EnableIf< is_number<Other>, Not<is_interval<Other>> > = dummy>
-		friend FLOAT_T<FloatType> operator /(const Other& _lhs, const FLOAT_T<FloatType>& _rhs)
-		{
-			assert(_rhs != 0);
-			return FLOAT_T<FloatType>(_lhs / _rhs.mValue);
 		}
 
 		/**
@@ -1745,7 +1614,7 @@ namespace carl
 
 	template<typename FloatType>
 	inline bool isZero(const FLOAT_T<FloatType>& _in) {
-		return _in.value() == 0;
+		return isZero(_in.value());
 	}
 
 	template<typename FloatType>

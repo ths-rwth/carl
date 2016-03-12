@@ -141,7 +141,7 @@ namespace carl{
 namespace carl {
 
 template<typename... T>
-inline Monomial::Arg createMonomial(T... t) {
+inline Monomial::Arg createMonomial(T&&... t) {
 	return MonomialPool::getInstance().create(std::forward<T>(t)...);
 }
 

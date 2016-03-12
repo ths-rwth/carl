@@ -1,6 +1,8 @@
 #include "../numbers.h"
 #include <limits>
 
+#include <boost/numeric/interval.hpp>
+
 #ifdef USE_CLN_NUMBERS
 namespace carl
 {
@@ -63,6 +65,15 @@ namespace carl
         auto r = sqrt_safe(a);
         return (r.first + r.second) / 2;
     }
+	
+	cln::cl_RA scaleByPowerOfTwo(const cln::cl_RA& a, int exp) {
+		if (exp > 0) {
+			return cln::cl_RA(cln::numerator(a) << exp) / cln::denominator(a);
+		} else if (exp < 0) {
+			return cln::cl_RA(cln::numerator(a)) / (cln::denominator(a) << -exp);
+		}
+		return a;
+	}
 
     std::pair<cln::cl_RA, cln::cl_RA> sqrt_safe(const cln::cl_RA& a)
     {
@@ -72,28 +83,30 @@ namespace carl
             // root can be computed exactly.
             return std::make_pair(exact_root, exact_root);
         } else {
-            cln::cl_R root = cln::sqrt(toLF(a));
-            cln::cl_RA rroot = cln::rationalize(root);
-            cln::cl_RA rootsq = cln::expt_pos(rroot, 2);
-            // we need to find the second bound of the overapprox. - the first is given by the rationalized result.
-            if( rootsq > a ) // we need to find the lower bound
-            {
-                cln::cl_R lower = cln::sqrt(toLF(2*a-rootsq));
-                cln::cl_RA rlower = cln::rationalize(lower);
-                assert(cln::expt_pos(rlower, 2) < a);
-                return std::make_pair(rlower, rroot);
-            }
-            else if (rootsq < a) // we need to find the upper bound
-            {
-                cln::cl_R upper = cln::sqrt(toLF(2*a-rootsq));
-                cln::cl_RA rupper = cln::rationalize(upper);
-                assert(cln::expt_pos(rupper, 2) > a);
-                return std::make_pair(rroot, rupper);
-            }
-            else
-            {
-                return std::make_pair(rootsq, rootsq);
-            }
+			auto factor = (int)cln::integer_length(cln::denominator(a)) - (int)cln::integer_length(cln::numerator(a));
+			if (cln::oddp(factor)) factor += 1;
+			cln::cl_RA n = scaleByPowerOfTwo(a, factor);
+			double dn = toDouble(n);
+			cln::cl_RA nra = cln::rationalize(dn);
+			boost::numeric::interval<double> i;
+			if (nra > n) {
+				i.assign(toDouble(2*n-nra), dn);
+				assert(2*n-nra <= n);
+			} else {
+				i.assign(dn, toDouble(2*n-nra));
+				assert(n <= 2*n-nra);
+			}
+			i = boost::numeric::sqrt(i);
+			i.assign(
+				std::nexttoward(i.lower(), -std::numeric_limits<double>::infinity()),
+				std::nexttoward(i.upper(), std::numeric_limits<double>::infinity())
+			);
+			factor = factor / 2;
+			cln::cl_RA lower = scaleByPowerOfTwo(cln::rationalize(i.lower()), -factor);
+			cln::cl_RA upper = scaleByPowerOfTwo(cln::rationalize(i.upper()), -factor);
+			assert(lower*lower <= a);
+			assert(a <= upper*upper);
+			return std::make_pair(lower, upper);
         }
     }
 
@@ -106,6 +119,8 @@ namespace carl
 			return std::make_pair(exact_root, exact_root);
 		} else {
 			// compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
+			auto factor = cln::integer_length(cln::denominator(a)) - cln::integer_length(cln::numerator(a));
+			if (cln::oddp(factor)) factor += 1;
 			cln::cl_I lower = cln::floor1(cln::sqrt(toLF(a)));
             cln::cl_I upper = lower + 1;
             assert(cln::expt_pos(lower,2) < a);

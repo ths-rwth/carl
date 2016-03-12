@@ -735,7 +735,7 @@ public:
 	PreorderIterator<> setRoot(const T& data) {
 		if (nodes.empty()) nodes.emplace_back(0, data, MAXINT, 0);
 		else nodes[0].data = data;
-		return PreorderIterator<>(this, MAXINT);
+		return PreorderIterator<>(this, 0);
 	}
 	/**
 	 * Clears the tree.
