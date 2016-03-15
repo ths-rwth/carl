@@ -321,7 +321,8 @@ namespace carl
              */
             void realValuedVars( Variables& _realVars ) const
             {
-                collectVariables( _realVars, false, true, false, false, false );
+                if( propertyHolds( PROP_CONTAINS_REAL_VALUED_VARS ) )
+                    collectVariables( _realVars, false, true, false, false, false );
             }
             
             /**
@@ -330,7 +331,8 @@ namespace carl
              */
             void integerValuedVars( Variables& _intVars ) const
             {
-                collectVariables( _intVars, false, false, true, false, false );
+                if( propertyHolds( PROP_CONTAINS_INTEGER_VALUED_VARS ) )
+                    collectVariables( _intVars, false, false, true, false, false );
             }
             
             /**
@@ -339,7 +341,8 @@ namespace carl
              */
             void arithmeticVars( Variables& _arithmeticVars ) const
             {
-                collectVariables( _arithmeticVars, false, true, true, false, false );
+                if( propertyHolds( PROP_CONTAINS_REAL_VALUED_VARS ) || propertyHolds( PROP_CONTAINS_INTEGER_VALUED_VARS ) )
+                    collectVariables( _arithmeticVars, false, true, true, false, false );
             }
             
             /**
@@ -348,7 +351,8 @@ namespace carl
              */
             void booleanVars( Variables& _booleanVars ) const
             {
-                collectVariables( _booleanVars, true, false, false, false, false );
+                if( propertyHolds( PROP_CONTAINS_BOOLEAN ) )
+                    collectVariables( _booleanVars, true, false, false, false, false );
             }
             
             /**
