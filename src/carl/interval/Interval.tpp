@@ -175,7 +175,7 @@ template<typename Number>
 	Number Interval<Number>::sampleSB( bool _includingBounds ) const
 	{
 		using Int = typename carl::IntegralType<Number>::type;
-		Int leftnum = carl::floor(this->center());
+		Int leftnum = Int(carl::floor(this->center()));
 		Int leftden = carl::constant_one<Int>::get();
 		Int rightnum = carl::constant_one<Int>::get();
 		Int rightden = carl::constant_zero<Int>::get();

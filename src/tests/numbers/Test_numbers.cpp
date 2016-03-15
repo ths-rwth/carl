@@ -93,23 +93,24 @@ TYPED_TEST(RationalNumbers, Constructors) {
 }
 
 TYPED_TEST(RationalNumbers, Squareroot) {
-  TypeParam result = carl::sqrt(TypeParam(2));
-  EXPECT_LE(result, TypeParam(156)/TypeParam(100));
-	EXPECT_GE(result, TypeParam(126)/TypeParam(100));
-
-	TypeParam a = TypeParam(2)/TypeParam(3);
-	std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
-
-	//EXPECT_LE(TypeParam(80)/TypeParam(100), resultA.first);
-	//EXPECT_GE(TypeParam(82)/TypeParam(100), resultA.second);
-	EXPECT_LE(TypeParam(1)/TypeParam(2), resultA.first);
-	EXPECT_GE(TypeParam(2)/TypeParam(1), resultA.second);
-
-  {
-    TypeParam a = TypeParam("93536104789177766012087302264675950042191285291185")/TypeParam("93536104789177786765035829293842113257979682750464");
-    std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
-    std::cout << "Result " << resultA.first << ", " << resultA.second << std::endl;
-  }
+	{
+		TypeParam a = TypeParam(2);
+		std::pair<TypeParam, TypeParam> res = sqrt_safe(a);
+		EXPECT_LE(res.first*res.first, a);
+		EXPECT_LE(a, res.second*res.second);
+	}
+	{
+		TypeParam a = TypeParam(2)/TypeParam(3);
+		std::pair<TypeParam, TypeParam> res = sqrt_safe(a);
+		EXPECT_LE(res.first*res.first, a);
+		EXPECT_LE(a, res.second*res.second);
+	}
+	{
+		TypeParam a = TypeParam("93536104789177766012087302264675950042191285291185")/TypeParam("93536104789177786765035829293842113257979682750464");
+		std::pair<TypeParam, TypeParam> resultA = sqrt_safe(a);
+		EXPECT_LE(resultA.first*resultA.first, a);
+		EXPECT_LE(a, resultA.second*resultA.second);
+	}
 }
 
 TYPED_TEST(RationalNumbers, Sqrt_fast) {
