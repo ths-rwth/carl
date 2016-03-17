@@ -287,7 +287,11 @@ endif()
 
 if (CLANG_TIDY)
 	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-	set(CLANG_TIDY_CHECKS "-checks='*,-llvm-header-guard,-google-readability-namespace-comments'")
+	set(CLANG_TIDY_CHECKS "*")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-header-guard")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-namespace-comments,-llvm-namespace-comment")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-braces-around-statements,-readability-braces-around-statements")
+	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
 	message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
 endif()
 
