@@ -7,17 +7,18 @@
 
 #pragma once
 
-#include <vector>
-#include <set>
-#include <map>
-#include <string.h>
-#include <unordered_set>
-#include <unordered_map>
-#include <memory>
 
 #include "../core/Variable.h"
 //#include "../core/VariableInformation.h"
 #include "pointerOperations.h"
+
+#include <map>
+#include <memory>
+#include <set>
+#include <string.h>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace carl
 {	

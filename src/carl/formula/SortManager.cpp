@@ -8,12 +8,10 @@
 
 #include "SortManager.h"
 
-using namespace std;
-
 namespace carl
 {
 	
-	ostream& SortManager::print(ostream& os, const Sort& sort) const {
+	std::ostream& SortManager::print(std::ostream& os, const Sort& sort) const {
 		const SortContent& sc = getContent(sort);
 		if (sc.indices != nullptr) os << "(_ ";
 		if (sc.parameters != nullptr) os << "(";
@@ -51,7 +49,7 @@ namespace carl
 		return getSort(new SortContent(sc.name, std::move(v)), VariableType::VT_UNINTERPRETED);
 	}
 	
-	bool SortManager::declare(const string& name, std::size_t arity) {
+	bool SortManager::declare(const std::string& name, std::size_t arity) {
 		if (!isSymbolFree(name)) return false;
 		mDeclarations[name] = arity;
 		if (arity == 0) addSortContent(new SortContent(name), VariableType::VT_UNINTERPRETED);
@@ -91,12 +89,12 @@ namespace carl
 		return getSort(newsc, checkIndices(sc.getUnindexed(), newsc->indices->size()));
 	}
 	
-	Sort SortManager::getSort(const string& name) {
+	Sort SortManager::getSort(const std::string& name) {
 		SortContent* sc = new SortContent(name);
 		// Find an instantiation of the given sort template.
 		auto it = mSortMap.find(sc);
 		if(it == mSortMap.end()) {
-			cerr << "The sort " << name << " has not been declared or defined." << endl;
+			std::cerr << "The sort " << name << " has not been declared or defined." << std::endl;
 			delete sc;
 			return Sort(0);
 		}
