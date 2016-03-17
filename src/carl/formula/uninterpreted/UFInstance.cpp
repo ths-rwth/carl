@@ -5,12 +5,14 @@
  * @version 2014-10-30
  */
 
-#include <sstream>
 
 #include "UFInstance.h"
 #include "UFInstanceManager.h"
+#include "UVariable.h"
 
-using namespace std;
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 namespace carl
 {
@@ -19,7 +21,7 @@ namespace carl
        return UFInstanceManager::getInstance().getUninterpretedFunction( *this );
     }
 
-    const vector<UVariable>& UFInstance::args() const
+    const std::vector<UVariable>& UFInstance::args() const	
     {
        return UFInstanceManager::getInstance().getArgs( *this );
     }
@@ -31,7 +33,7 @@ namespace carl
         return ss.str();
     }
     
-    ostream& operator<<( ostream& _os, const UFInstance& _ufun )
+    std::ostream& operator<<( std::ostream& _os, const UFInstance& _ufun )
     {
         return UFInstanceManager::getInstance().print( _os, _ufun );
     }

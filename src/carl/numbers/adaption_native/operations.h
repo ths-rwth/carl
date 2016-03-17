@@ -45,7 +45,7 @@ inline bool isInteger(const double& d) {
 	return std::modf(d, &tmp) == 0.0;
 }
 
-inline bool isInteger(const int&) {
+inline bool isInteger(const int& /*unused*/) {
 	return true;
 }
 
@@ -57,12 +57,12 @@ inline bool isPositive(const double& d) {
 	return d > 0;
 }
 
-inline std::size_t bitsize(unsigned) {
+inline std::size_t bitsize(unsigned /*unused*/) {
 	return sizeof(unsigned) * 8;
 }
 
 template<typename C>
-inline void reserve(std::size_t) {
+inline void reserve(std::size_t /*unused*/) {
 }
 
 /**
@@ -92,7 +92,7 @@ inline long toInt<long>(const double& n) {
 }
 
 template<>
-inline size_t toInt<size_t>(const double& n) {
+inline std::size_t toInt<std::size_t>(const double& n) {
     return size_t(n);
 }
 

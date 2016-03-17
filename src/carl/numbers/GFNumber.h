@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "numbers.h"
 #include "GaloisField.h"
+#include "numbers.h"
 
 namespace carl
 {
@@ -28,7 +28,7 @@ class GFNumber
 	: mN(carl::constant_zero<IntegerType>::get()), mGf(nullptr)
 	{
 	}
-	GFNumber(IntegerType n, const GaloisField<IntegerType>* gf= nullptr)
+	explicit GFNumber(IntegerType n, const GaloisField<IntegerType>* gf= nullptr)
 	: mN(gf == nullptr ? n : gf->symmetricModulo(n)), mGf(gf)
 	{
 		
@@ -201,7 +201,7 @@ GFNumber<IntegerT> abs(const GFNumber<IntegerT>& n) {
  * @return 
  */
 template<typename IntegerT>
-inline bool isInteger(const GFNumber<IntegerT>&) {
+inline bool isInteger(const GFNumber<IntegerT>& /*unused*/) {
 	return false;
 }
 
@@ -211,7 +211,7 @@ inline bool isInteger(const GFNumber<IntegerT>&) {
  * @return The string representation to the given galois field number.
  */
 template<typename IntegerType>
-std::string toString(const GFNumber<IntegerType>& _number, bool)
+std::string toString(const GFNumber<IntegerType>& _number, bool /*unused*/)
 {
     std::stringstream s;
     s << _number;

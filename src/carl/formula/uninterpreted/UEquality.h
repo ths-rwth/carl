@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <boost/variant.hpp>
 #include "UVariable.h"
 #include "UFInstance.h"
+#include <boost/variant.hpp>
 
 namespace carl
 {

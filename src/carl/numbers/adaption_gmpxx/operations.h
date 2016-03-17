@@ -14,15 +14,17 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include "../../util/platform.h"
-#include <cstddef>
-#include <limits.h>
-#include <sstream>
-#include <iostream>
-#include <vector>
 #include "typetraits.h"
+
 CLANG_WARNING_DISABLE("-Wunused-local-typedef")
 #include "boost/algorithm/string.hpp"
 CLANG_WARNING_RESET
+
+#include <cstddef>
+#include <iostream>
+#include <limits.h>
+#include <sstream>
+#include <vector>
 
 namespace carl {
 
@@ -84,7 +86,7 @@ inline bool isInteger(const mpq_class& n) {
 	 return 0 != mpz_divisible_p(n.get_num_mpz_t(), n.get_den_mpz_t());
 }
 
-inline bool isInteger(const mpz_class&) {
+inline bool isInteger(const mpz_class& /*unused*/) {
 	return true;
 }
 
@@ -137,13 +139,13 @@ template<>
 inline int toInt<int>(const mpz_class& n) {
     assert(n <= std::numeric_limits<int>::max());
     assert(n >= std::numeric_limits<int>::min());
-    return (int)mpz_get_si(n.get_mpz_t());
+    return int(mpz_get_si(n.get_mpz_t()));
 }
 template<>
 inline unsigned toInt<unsigned>(const mpz_class& n) {
     assert(n <= std::numeric_limits<unsigned>::max());
     assert(n >= std::numeric_limits<unsigned>::min());
-    return (unsigned)mpz_get_ui(n.get_mpz_t());
+    return unsigned(mpz_get_ui(n.get_mpz_t()));
 }
 template<typename Integer>
 inline Integer toInt(const mpq_class& n);

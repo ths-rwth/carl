@@ -7,13 +7,14 @@
 
 #pragma once
 
-#include <memory>
+#include "../interval/Interval.h"
+#include "../numbers/numbers.h"
+#include "../util/pointerOperations.h"
+#include "Definiteness.h"
 #include "Monomial.h"
 #include "VariablesInformation.h"
-#include "Definiteness.h"
-#include "../numbers/numbers.h"
-#include "../interval/Interval.h"
-#include "../util/pointerOperations.h"
+
+#include <memory>
 
 namespace carl
 {

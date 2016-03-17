@@ -10,14 +10,15 @@
 #include "config.h"
 
 #ifdef USE_GINAC
-#include <unordered_map>
-#include <ginac/ginac.h>
-#include <mutex>
 #include "../core/VariablePool.h"
 #include "../util/Singleton.h"
 #include "../util/SFINAE.h"
 #include "../numbers/numbers.h"
 #include "../util/Common.h"
+#include <cln/cln.h>
+#include <ginac/ginac.h>
+#include <mutex>
+#include <unordered_map>
 
 namespace carl
 {   

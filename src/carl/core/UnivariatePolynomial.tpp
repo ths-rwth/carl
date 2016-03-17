@@ -17,6 +17,7 @@
 #include "UnivariatePolynomial.h"
 #include "MultivariatePolynomial.h"
 #include "MultivariateGCD.h"
+#include "../converter/OldGinacConverter.h"
 
 namespace carl
 {
