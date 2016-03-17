@@ -5,6 +5,11 @@
 
 #pragma once
 
+#include "../io/streamingOperators.h"
+#include "../util/Singleton.h"
+#include "../util/Timer.h"
+#include "../util/platform.h"
+#include "carlLoggingHelper.h"
 #include "config.h"
 
 #include <cassert>
@@ -21,11 +26,6 @@
 #endif
 #include <utility>
 
-#include "../util/Singleton.h"
-#include "../util/Timer.h"
-#include "../io/streamingOperators.h"
-#include "carlLoggingHelper.h"
-#include "../util/platform.h"
 
 namespace carl {
 
@@ -148,9 +148,9 @@ struct StreamSink: public Sink {
 	 * Create a StreamSink from some output stream.
      * @param os Output stream.
      */
-	StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
-	virtual ~StreamSink() {}
-	virtual std::ostream& log() { return os; }
+	explicit StreamSink(std::ostream& _os): os(_os.rdbuf()) {}
+	~StreamSink() override {}
+	std::ostream& log() override { return os; }
 };
 /**
  * Logging sink for file output.
@@ -163,9 +163,9 @@ struct FileSink: public Sink {
 	 * The file is truncated upon construction.
      * @param filename
      */
-	FileSink(const std::string& filename): os(filename, std::ios::out) {}
-	virtual ~FileSink() { os.close(); }
-	virtual std::ostream& log() { return os; }
+	explicit FileSink(const std::string& filename): os(filename, std::ios::out) {}
+	~FileSink() override { os.close(); }
+	std::ostream& log() override { return os; }
 };
 
 /**
@@ -179,7 +179,7 @@ struct Filter {
 	 * Constructor.
 	 * @param level Default minimal log level.
 	 */
-	Filter(LogLevel level = LogLevel::LVL_DEFAULT) {
+	explicit Filter(LogLevel level = LogLevel::LVL_DEFAULT) {
 		(*this)("", level);
 	}
 	/**
@@ -281,11 +281,7 @@ struct Formatter {
 		os << level << " ";
 
 		std::string filename(carl::basename(info.filename));
-#ifdef __WIN64
-		unsigned long long spacing = 1;
-#else
-		unsigned long spacing = 1;
-#endif
+		std::size_t spacing = 1;
 		if (channelwidth + 15 > channel.size() + filename.size()) spacing = channelwidth + 15 - channel.size() - filename.size();
 		os << channel << std::string(spacing, ' ') << filename << ":" << std::left << std::setw(4) << info.line << " ";
 		if (!info.func.empty()) os << info.func << "(): ";
@@ -320,7 +316,7 @@ public:
 	/**
 	 * Desctructor.
      */
-	~Logger() {
+	~Logger() override {
 		data.clear();
 	}
 	/**

@@ -6,14 +6,8 @@
 #pragma once
 
 #include <bitset>
-#include <forward_list>
 #include <iostream>
-#include <list>
-#include <map>
-#include <set>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+#include <sstream>
 
 namespace carl {
 
@@ -32,7 +26,7 @@ std::string binary(const T& a, const bool& spacing = true)
 	const char* end = begin + sizeof(T);
 	while (begin != end) {
 		end--;
-		ss << std::bitset<8>((unsigned)*end);
+		ss << std::bitset<8>(unsigned(*end));
 		if (spacing && (begin != end)) ss << " ";
 	}
 	return ss.str();
