@@ -26,6 +26,9 @@ namespace carl {
 inline bool isZero(const int& n) {
 	return n == 0;
 }
+inline bool isZero(const double& n) {
+	return n == 0;
+}
 inline bool isOne(const int& n) {
 	return n == 1;
 }

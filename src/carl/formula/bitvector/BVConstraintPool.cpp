@@ -4,6 +4,7 @@
  */
 
 #include "BVConstraintPool.h"
+
 #include "BVConstraint.h"
 
 namespace carl

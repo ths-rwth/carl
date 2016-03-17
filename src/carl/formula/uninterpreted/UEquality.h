@@ -35,7 +35,7 @@ namespace carl
                  * @param An uninterpreted variable.
                  * @return true
                  */
-                bool operator()(const UVariable&) const
+                bool operator()(const UVariable& /*unused*/) const
                 {
                     return true;
                 }
@@ -44,7 +44,7 @@ namespace carl
                  * @param An uninterpreted function instance.
                  * @return false
                  */
-                bool operator()(const UFInstance&) const 
+                bool operator()(const UFInstance& /*unused*/) const 
                 {
                     return false;
                 }
@@ -64,7 +64,7 @@ namespace carl
                  * @param An uninterpreted variable.
                  * @return false
                  */
-                bool operator()(const UVariable&) const
+                bool operator()(const UVariable& /*unused*/) const
                 {
                     return false;
                 }
@@ -73,7 +73,7 @@ namespace carl
                  * @param An uninterpreted function instance.
                  * @return true
                  */
-                bool operator()(const UFInstance&) const 
+                bool operator()(const UFInstance& /*unused*/) const 
                 {
                     return true;
                 }

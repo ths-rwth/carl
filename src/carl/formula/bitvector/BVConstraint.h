@@ -32,9 +32,9 @@ namespace carl
 		BVTerm mRhs;
 
 
-		BVConstraint(bool _consistent = true) :
-		mHash(0), mId(0), mRelation(_consistent ? BVCompareRelation::EQ : BVCompareRelation::NEQ),
-		mLhs(), mRhs()
+		explicit BVConstraint(bool _consistent = true) :
+			mHash(0), mId(0), mRelation(_consistent ? BVCompareRelation::EQ : BVCompareRelation::NEQ),
+			mLhs(), mRhs()
 		{}
 
 		/**
@@ -45,8 +45,8 @@ namespace carl
 		 */
 		BVConstraint(const BVCompareRelation& _relation,
 			const BVTerm& _lhs, const BVTerm& _rhs) :
-		mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash()), mId(0),
-		mRelation(_relation), mLhs(_lhs), mRhs(_rhs)
+			mHash((toId(_relation) << 10) ^ (_lhs.hash() << 5) ^ _rhs.hash()), mId(0),
+			mRelation(_relation), mLhs(_lhs), mRhs(_rhs)
 		{
 			assert(_lhs.width() == _rhs.width());
 		}

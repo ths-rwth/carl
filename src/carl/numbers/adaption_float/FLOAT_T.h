@@ -14,23 +14,21 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
-#include <string>
+
+#include "../../core/logging.h"
+#include "../../util/hash.h"
+#include "../../util/SFINAE.h"
+#include "roundingConversion.h"
+
 #include <cfloat>
-#include <iostream>
-#include <assert.h>
-#include <math.h>
 #include <cmath>
 #include <cstddef>
-
-#include "../../util/hash.h"
-#include "roundingConversion.h"
-#include "../../util/SFINAE.h"
-#include "../../core/logging.h"
-
+#include <iostream>
+#include <string>
 
 namespace carl
 {
-	typedef size_t precision_t;
+	typedef std::size_t precision_t;
 
 	template<typename Number>
     class Interval;
@@ -83,7 +81,7 @@ namespace carl
 
 	// Usable AlmostEqual function taken from http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	template<typename Number>
-	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned = 128)
+	inline bool AlmostEqual2sComplement(const Number& A, const Number& B, unsigned /*unused*/ = 128)
 	{
 		return AlmostEqual2sComplement<double>(double(A), double(B), 128);
 	}
@@ -94,19 +92,16 @@ namespace carl
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
 		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		long long aInt = *(long long*)&A;
+		long long aInt = *reinterpret_cast<const long long*>(&A);
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
-			aInt = (long long)(0x8000000000000000) - aInt;
+			aInt = static_cast<long long>(0x8000000000000000) - aInt;
 		// Make bInt lexicographically ordered as a twos-complement int
-		long long bInt = *(long long*)&B;
+		long long bInt = *reinterpret_cast<const long long*>(&B);
 		if (bInt < 0)
-			bInt = (long long)(0x8000000000000000) - bInt;
-		unsigned long long intDiff = (unsigned long long)std::abs(aInt - bInt);
-		if (intDiff <= maxUlps)
-			return true;
-
-		return false;
+			bInt = static_cast<long long>(0x8000000000000000) - bInt;
+		unsigned long long intDiff = static_cast<unsigned long long>(std::abs(aInt - bInt));
+		return intDiff <= maxUlps;
 	}
 
 	/**
@@ -137,7 +132,7 @@ namespace carl
 		 * @param _double Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		FLOAT_T<FloatType>(const double _double, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const double _double, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::convert<double, FloatType>(_double);
 		}
@@ -148,7 +143,7 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		FLOAT_T<FloatType>(const int _int, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const int _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = _int;
 		}
@@ -159,7 +154,7 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		FLOAT_T<FloatType>(const unsigned _int, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const unsigned _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = _int;
 		}
@@ -170,7 +165,7 @@ namespace carl
 		 * @param _long Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		FLOAT_T<FloatType>(const long _long, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const long _long, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = _long;
 		}
@@ -181,7 +176,7 @@ namespace carl
 		 * @param _long Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		FLOAT_T<FloatType>(const unsigned long _long, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const unsigned long _long, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = _long;
 		}
@@ -193,10 +188,10 @@ namespace carl
 		 * @param _float Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, const CARL_RND=CARL_RND::N) : mValue(_float.mValue)
+		FLOAT_T<FloatType>(const FLOAT_T<FloatType>& _float, CARL_RND /*unused*/ = CARL_RND::N) : mValue(_float.mValue)
 		{}
 
-		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, const CARL_RND=CARL_RND::N) : mValue(_float.value())
+		FLOAT_T<FloatType>(FLOAT_T<FloatType>&& _float, CARL_RND /*unused*/ = CARL_RND::N) noexcept : mValue(_float.value())
 		{}
 
 		/**
@@ -206,19 +201,19 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 */
 		template<typename F = FloatType, DisableIf< std::is_same<F, double> > = dummy>
-		FLOAT_T<FloatType>(const FloatType& val, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const FloatType& val, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = val;
 		}
 
 		template<typename F = FloatType, EnableIf< carl::is_rational<F> > = dummy>
-		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::rationalize<FloatType>(_string);
 		}
 
 		template<typename F = FloatType, EnableIf< std::is_same<F, double> > = dummy>
-		FLOAT_T<FloatType>(const std::string& _string, const CARL_RND=CARL_RND::N)
+		explicit FLOAT_T<FloatType>(const std::string& _string, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::stod(_string);
 		}
@@ -253,7 +248,7 @@ namespace carl
 		 * @param Precision in bits.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& setPrecision(const precision_t&)
+		FLOAT_T<FloatType>& setPrecision(const precision_t& /*unused*/)
 		{
 			return *this;
 		}
@@ -359,7 +354,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& add_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& add_assign(const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = mValue + _op2.mValue;
 			return *this;
@@ -372,7 +367,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& add(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& add(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = mValue + _op2.mValue;
 			return _result;
@@ -385,7 +380,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& sub_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& sub_assign(const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = mValue - _op2.mValue;
 			return *this;
@@ -399,7 +394,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& sub(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& sub(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = mValue - _op2.mValue;
 			return _result;
@@ -412,7 +407,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& mul_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& mul_assign(const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = mValue * _op2.mValue;
 			return *this;
@@ -426,7 +421,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& mul(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& mul(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = mValue * _op2.mValue;
 			return _result;
@@ -439,9 +434,9 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& div_assign(const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N)
 		{
-			assert(_op2 != 0);
+			assert(!isZero(_op2));
 			mValue = mValue / _op2.mValue;
 			return *this;
 		}
@@ -454,7 +449,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& div(FLOAT_T<FloatType>& _result, const FLOAT_T<FloatType>& _op2, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			assert(_op2 != 0);
 			_result.mValue = mValue / _op2.mValue;
@@ -467,9 +462,9 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& sqrt_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& sqrt_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
-			assert(*this >= 0);
+			assert(mValue >= 0);
 			mValue = std::sqrt(mValue);
 			return *this;
 		}
@@ -481,7 +476,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& sqrt(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			assert(mValue >= 0);
 			_result.mValue = carl::sqrt(mValue);
@@ -494,7 +489,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& cbrt_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& cbrt_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			assert(*this >= 0);
 			mValue = std::cbrt(mValue);
@@ -508,7 +503,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& cbrt(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			assert(*this >= 0);
 			_result.mValue = std::cbrt(mValue);
@@ -522,7 +517,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& root_assign(std::size_t, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& root_assign(std::size_t /*unused*/, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			assert(*this >= 0);
 			/// @todo implement root_assign for FLOAT_T
@@ -538,7 +533,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>&, std::size_t, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& root(FLOAT_T<FloatType>& /*unused*/, std::size_t /*unused*/, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			assert(*this >= 0);
 			CARL_LOG_NOTIMPLEMENTED();
@@ -552,7 +547,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& pow_assign(std::size_t _exp, CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& pow_assign(std::size_t _exp, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::pow(mValue, _exp);
 			return *this;
@@ -566,7 +561,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, std::size_t _exp, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& pow(FLOAT_T<FloatType>& _result, std::size_t _exp, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::pow(mValue, _exp);
 			return _result;
@@ -577,7 +572,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& abs_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& abs_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::abs(mValue);
 			return *this;
@@ -590,7 +585,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& abs(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& abs(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::abs(mValue);
 			return _result;
@@ -601,7 +596,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& exp_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& exp_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::exp(mValue);
 			return *this;
@@ -614,7 +609,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& exp(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& exp(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::exp(this->mValue);
 			return _result;
@@ -625,7 +620,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& sin_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& sin_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::sin(mValue);
 			return *this;
@@ -638,7 +633,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& sin(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& sin(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::sin(mValue);
 			return _result;
@@ -649,7 +644,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& cos_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& cos_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::cos(mValue);
 			return *this;
@@ -662,7 +657,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& cos(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& cos(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::cos(mValue);
 			return _result;
@@ -673,7 +668,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& log_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& log_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::log(mValue);
 			return *this;
@@ -686,7 +681,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& log(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& log(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::log(mValue);
 			return _result;
@@ -697,7 +692,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& tan_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& tan_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::tan(mValue);
 			return *this;
@@ -710,7 +705,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& tan(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& tan(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::tan(mValue);
 			return _result;
@@ -721,7 +716,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& asin_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& asin_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::asin(mValue);
 			return *this;
@@ -734,7 +729,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& asin(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& asin(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::asin(mValue);
 			return _result;
@@ -745,7 +740,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& acos_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& acos_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::acos(mValue);
 			return *this;
@@ -758,7 +753,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& acos(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& acos(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::acos(mValue);
 			return _result;
@@ -769,7 +764,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& atan_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& atan_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::atan(mValue);
 			return *this;
@@ -782,7 +777,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& atan(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& atan(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::atan(mValue);
 			return _result;
@@ -793,7 +788,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& sinh_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& sinh_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::sinh(mValue);
 			return *this;
@@ -806,7 +801,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& sinh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& sinh(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::sinh(mValue);
 			return _result;
@@ -817,7 +812,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& cosh_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& cosh_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::cosh(mValue);
 			return *this;
@@ -830,7 +825,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& cosh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& cosh(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::cosh(mValue);
 			return _result;
@@ -841,7 +836,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& tanh_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& tanh_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::tanh(mValue);
 			return *this;
@@ -854,7 +849,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& tanh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& tanh(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::tanh(mValue);
 			return _result;
@@ -865,7 +860,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& asinh_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& asinh_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::asinh(mValue);
 			return *this;
@@ -878,7 +873,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& asinh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& asinh(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::asinh(mValue);
 			return _result;
@@ -889,7 +884,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& acosh_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& acosh_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::acosh(mValue);
 			return *this;
@@ -902,7 +897,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& acosh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& acosh(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::acosh(mValue);
 			return _result;
@@ -913,7 +908,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& atanh_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& atanh_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::atanh(mValue);
 			return *this;
@@ -926,7 +921,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& atanh(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& atanh(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = std::atanh(mValue);
 			return _result;
@@ -939,7 +934,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& floor(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::floor(mValue);
 			return _result;
@@ -950,7 +945,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& floor_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& floor_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::floor(mValue);
 			return *this;
@@ -963,7 +958,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to the result.
 		 */
-		FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND = CARL_RND::N) const
+		FLOAT_T<FloatType>& ceil(FLOAT_T<FloatType>& _result, CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			_result.mValue = carl::ceil(mValue);
 			return _result;
@@ -974,7 +969,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Reference to this.
 		 */
-		FLOAT_T<FloatType>& ceil_assign(CARL_RND = CARL_RND::N)
+		FLOAT_T<FloatType>& ceil_assign(CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = std::ceil(mValue);
 			return *this;
@@ -986,7 +981,7 @@ namespace carl
 		 * @param N Possible rounding direction.
 		 * @return Double representation of this
 		 */
-		double toDouble(CARL_RND = CARL_RND::N) const
+		double toDouble(CARL_RND /*unused*/ = CARL_RND::N) const
 		{
 			return carl::toDouble(mValue);
 		}
@@ -1072,7 +1067,7 @@ namespace carl
 		 * @param x The passed number.
 		 * @return Zero.
 		 */
-		inline FLOAT_T<FloatType> ei_imag(const FLOAT_T<FloatType>&)
+		inline FLOAT_T<FloatType> ei_imag(const FLOAT_T<FloatType>& /*unused*/)
 		{
 			return FLOAT_T<FloatType>(0);
 		}
@@ -1421,8 +1416,7 @@ namespace carl
 	template<typename FloatType>
 	inline double toDouble(const FLOAT_T<FloatType>& _float)
 	{
-		double result = (double)_float;
-		return result;
+		return double(_float);
 	}
 
 	/**

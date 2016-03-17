@@ -3,8 +3,8 @@
  * @author Andreas Krueger <andreas.krueger@rwth-aachen.de>
  */
 
-#include "BVConstraintPool.h"
 #include "BVConstraint.h"
+#include "BVConstraintPool.h"
 
 namespace carl
 {

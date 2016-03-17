@@ -17,7 +17,7 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #include "typetraits.h"
 
 CLANG_WARNING_DISABLE("-Wunused-local-typedef")
-#include "boost/algorithm/string.hpp"
+#include <boost/algorithm/string.hpp>
 CLANG_WARNING_RESET
 
 #include <cstddef>

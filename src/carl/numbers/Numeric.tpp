@@ -7,8 +7,6 @@
  */
 
 #include "typetraits.h"
-#include "Numeric.h"
-
 
 namespace carl
 {
@@ -28,14 +26,14 @@ namespace carl
             mRationalPool.emplace_back( _value );
 #endif
             assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE - 1 <= std::numeric_limits<size_t>::max() );
-            return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1;
+            return ContentType(mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1);
         }
         else
         {
             ContentType id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
             assert( id >= HIGHTEST_INTEGER_VALUE );
-            mRationalPool[(size_t)(id-HIGHTEST_INTEGER_VALUE)] = _value;
+            mRationalPool[std::size_t(id-HIGHTEST_INTEGER_VALUE)] = _value;
             return id;
         }
     }
@@ -47,14 +45,14 @@ namespace carl
         {
             mRationalPool.emplace_back( _value );
             assert( mRationalPool.size() + (size_t) HIGHTEST_INTEGER_VALUE - 1 <= std::numeric_limits<size_t>::max() );
-            return (ContentType) mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1;
+            return ContentType(mRationalPool.size() + HIGHTEST_INTEGER_VALUE - 1);
         }
         else
         {
             ContentType id = mFreeRationalIds.back();
             mFreeRationalIds.pop_back();
             assert( id >= HIGHTEST_INTEGER_VALUE );
-            mRationalPool[(size_t)(id-HIGHTEST_INTEGER_VALUE)] = _value;
+            mRationalPool[std::size_t(id-HIGHTEST_INTEGER_VALUE)] = _value;
             return id;
         }
     }
@@ -480,7 +478,7 @@ namespace carl
         if( IS_INT( _valueA.content() ) )
         {
             assert( IS_INT( _valueB.content() ) );
-            return _valueA.content() / _valueB.content();
+            return Numeric<T>(_valueA.content() / _valueB.content());
         }
         else
         {

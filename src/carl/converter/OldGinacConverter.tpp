@@ -8,13 +8,13 @@ namespace carl
         GiNaC::ex ginacPoly = _toConvert.expand();
         if(GiNaC::is_exactly_a<GiNaC::add>(ginacPoly))
         {
-            result = Poly((typename Poly::CoeffType)0);
+            result = Poly(typename Poly::CoeffType(0));
             for(auto summand = ginacPoly.begin(); summand != ginacPoly.end(); ++summand)
             {
                 const GiNaC::ex summandEx = *summand;
                 if(GiNaC::is_exactly_a<GiNaC::mul>(summandEx))
                 {
-                    Poly carlSummand = Poly((typename Poly::CoeffType)1);
+                    Poly carlSummand = Poly(typename Poly::CoeffType(1));
                     for(auto factor = summandEx.begin(); factor != summandEx.end(); ++factor)
                     {
                         const GiNaC::ex factorEx = *factor;
@@ -71,7 +71,7 @@ namespace carl
         }
         else if(GiNaC::is_exactly_a<GiNaC::mul>(ginacPoly))
         {
-            result = Poly((typename Poly::CoeffType)1);
+            result = Poly(typename Poly::CoeffType(1));
             for(auto factor = ginacPoly.begin(); factor != ginacPoly.end(); ++factor)
             {
                 const GiNaC::ex factorEx = *factor;

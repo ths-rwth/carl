@@ -49,7 +49,7 @@ namespace carl
 			} else {
 				// We have to decrease the exponent of the variable by one.
 				newExps.assign(mExponents.begin(), mExponents.end());
-				newExps[(unsigned)(it - mExponents.begin())].second -= 1;
+				newExps[unsigned(it - mExponents.begin())].second -= 1;
 			}
 			if (newExps.empty())
 			{
@@ -57,7 +57,7 @@ namespace carl
 			}
 			else
 			{
-				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+				res = MonomialPool::getInstance().create( std::move(newExps), exponent(mTotalDegree - 1) );
 			}
 			
 			return true;
@@ -88,7 +88,7 @@ namespace carl
 			{
 				// Insert remaining part
 				newExps.insert(newExps.end(), itleft, mExponents.end());
-				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
+				res = MonomialPool::getInstance().create( std::move(newExps), exponent(mTotalDegree - m->mTotalDegree) );
 				CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
 				return true;
 			}
@@ -132,7 +132,7 @@ namespace carl
 			res = nullptr;
 			return true;
 		}
-		res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
+		res = MonomialPool::getInstance().create( std::move(newExps), exponent(mTotalDegree - m->mTotalDegree) );
 		CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
 		return true;
 	}
@@ -202,7 +202,7 @@ namespace carl
 		{
 			newExps.push_back( std::make_pair( it.first, 1 ) );
 		}
-		return MonomialPool::getInstance().create( std::move(newExps), (exponent)mExponents.size() );
+		return MonomialPool::getInstance().create( std::move(newExps), exponent(mExponents.size()) );
 	}
 	
 	Monomial::Arg Monomial::pow(unsigned exp) const
@@ -215,7 +215,7 @@ namespace carl
 		exponent expsum = 0;
 		for (auto& it: mExponents)
 		{
-			newExps.push_back( std::make_pair( it.first, (exponent)(it.second * exp) ) );
+			newExps.push_back( std::make_pair( it.first, exponent(it.second * exp) ) );
 			expsum += newExps.back().second;
 		}
 		return createMonomial(std::move(newExps), expsum);

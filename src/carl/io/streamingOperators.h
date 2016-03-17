@@ -12,9 +12,9 @@
 #include <list>
 #include <map>
 #include <set>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -139,7 +139,7 @@ std::ostream& operator<<(std::ostream& os, const std::set<T, C>& s) {
  * @return Output stream.
  */
 template<std::size_t I = 0, typename... T, typename std::enable_if<I == sizeof...(T), void>::type* = nullptr>
-std::ostream& operator<<(std::ostream& os, const std::tuple<T...>&) {
+std::ostream& operator<<(std::ostream& os, const std::tuple<T...>& /*unused*/) {
 	return os << ")";
 }
 

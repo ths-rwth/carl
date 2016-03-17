@@ -10,8 +10,8 @@
 #define INCLUDED_FROM_NUMBERS_H true
 
 #include "config.h"
-#include "typetraits.h"
 #include "constants.h"
+#include "typetraits.h"
 #include "operations_predeclarations.h"
 #include "operations_generic.h"
 
@@ -32,8 +32,8 @@
 #include <mpfr.h>
 #endif
 
-#include "adaption_float/typetraits.h"
 #include "adaption_float/FLOAT_T.h"
+#include "adaption_float/typetraits.h"
 
 #ifdef USE_Z3_NUMBERS
 #include "adaption_z3/z3_include.h"

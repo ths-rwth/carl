@@ -5,14 +5,15 @@
 
 #pragma once
 
+#include "../config.h"
+#include "../util/Singleton.h"
+#include "Variable.h"
+
 #include <array>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <map>
 #include <string>
-#include "../config.h"
-#include "Variable.h"
-#include "../util/Singleton.h"
 
 
 namespace carl 
@@ -33,7 +34,7 @@ private:
 	 * Contains the id of the next variable to be created for each type.
 	 * As such, is also a counter of the variables that exist.
 	 */
-	std::array<std::size_t, (std::size_t)VariableType::TYPE_SIZE> mNextIDs;
+	std::array<std::size_t, std::size_t(VariableType::TYPE_SIZE)> mNextIDs;
 
 	/**
 	 * Mutex for calling getFreshVariable().
@@ -46,12 +47,12 @@ private:
 	mutable std::mutex setNameMutex;
 
 	std::size_t& nextID(const VariableType& vt) noexcept {
-		assert((std::size_t)vt < mNextIDs.size());
-		return mNextIDs[(std::size_t)vt];
+		assert(std::size_t(vt) < mNextIDs.size());
+		return mNextIDs[std::size_t(vt)];
 	}
 	const std::size_t& nextID(const VariableType& vt) const noexcept {
-		assert((std::size_t)vt < mNextIDs.size());
-		return mNextIDs[(std::size_t)vt];
+		assert(std::size_t(vt) < mNextIDs.size());
+		return mNextIDs[std::size_t(vt)];
 	}
 
 	/**

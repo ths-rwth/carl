@@ -6,17 +6,18 @@
  */
 
 #pragma once
+
+#include "../numbers/numbers.h"
+#include "CompareResult.h"
+#include "Variable.h"
+#include "VariablePool.h"
+#include "carlLoggingHelper.h"
+#include "logging.h"
+
 #include <algorithm>
 #include <list>
 #include <set>
 #include <sstream>
-
-#include "Variable.h"
-#include "CompareResult.h"
-#include "logging.h"
-#include "carlLoggingHelper.h"
-#include "../numbers/numbers.h"
-#include "VariablePool.h"
 
 namespace carl
 {   
@@ -91,7 +92,7 @@ namespace carl
 		 * @param v The variable.
 		 * @param e The exponent.
 		 */
-		Monomial(Variable::Arg v, exponent e = 1) :
+		explicit Monomial(Variable::Arg v, exponent e = 1) :
 			mExponents(1, std::make_pair(v,e)),
 			mTotalDegree(e)
 		{
@@ -118,7 +119,7 @@ namespace carl
 		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
 		 * @param exponents The variables and their exponents.
 		 */
-		explicit Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents) :
+		Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents) :
 			mExponents(exponents),
 			mTotalDegree(0)
 		{
@@ -407,11 +408,7 @@ namespace carl
 				}
 			}
 			// If there remain variables in the m, it fails.
-			if(itright != m->mExponents.end()) 
-			{
-				return false;
-			}
-			return true;
+			return itright == m->mExponents.end();
 		}
 		/**
 		 * Returns a new monomial that is this monomial divided by m.
@@ -656,8 +653,7 @@ namespace carl
 	inline bool operator==(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		if (lhs == nullptr) return false;
 		if (lhs->tdeg() != 1) return false;
-		if (lhs->begin()->first == rhs) return true;
-		return false;
+		return lhs->begin()->first == rhs;
 	}
 	
 	inline bool operator==(Variable::Arg lhs, const Monomial::Arg& rhs) {
@@ -763,7 +759,7 @@ namespace carl
 		bool operator()(const Monomial::Arg& lhs, const Monomial::Arg& rhs) const {
 			if (lhs == rhs) return false;
 			if (lhs && rhs) return (*this)(*lhs, *rhs);
-			return (bool)(rhs);
+			return bool(rhs);
 		}
 	};
 
@@ -792,8 +788,7 @@ namespace std
 	struct less<carl::Monomial::Arg> {
 		bool operator()(const carl::Monomial::Arg& lhs, const carl::Monomial::Arg& rhs) const {
 			if (lhs && rhs) return lhs < rhs;
-			if (lhs) return false;
-			return true;
+			return !lhs;
 		}
 	};
 	

@@ -11,10 +11,11 @@
 
 #ifdef USE_GINAC
 #include "../core/VariablePool.h"
-#include "../util/Singleton.h"
-#include "../util/SFINAE.h"
 #include "../numbers/numbers.h"
 #include "../util/Common.h"
+#include "../util/SFINAE.h"
+#include "../util/Singleton.h"
+
 #include <cln/cln.h>
 #include <ginac/ginac.h>
 #include <mutex>

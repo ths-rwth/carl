@@ -84,7 +84,7 @@ namespace carl
 		}
 		
 		bool getBit(unsigned pos) const {
-			assert(sizeof(unsigned) == 4);
+			static_assert(sizeof(unsigned) == 4, "Currently bitvectors are only supported on these platforms.");
 			unsigned vecElem =  pos >> 5;
 			if(vecElem < mBits.size()) {
 				unsigned bitNr = pos & unsigned(31);

@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include <iostream>
-#include <climits>
-#include <cassert>
-
 #include "config.h"
 
+#include <cassert>
+#include <climits>
+
+#include <iostream>
 
 namespace carl {
 
@@ -105,7 +105,7 @@ public:
 	 * @param rank The rank.
 	 */
 	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept :
-		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | (unsigned)type)
+		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | std::size_t(type))
 	{
 		assert(rank < (1 << RESERVED_FOR_RANK));
 		assert(0 < id && id < (std::size_t(1) << AVAILABLE));

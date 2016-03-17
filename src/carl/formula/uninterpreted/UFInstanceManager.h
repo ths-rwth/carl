@@ -7,21 +7,20 @@
 
 #pragma once
 
-#include <cassert>
-#include <iostream>
-#include <unordered_map>
-#include <set>
-#include <utility>
-#include <vector>
 
-#include "../../util/Singleton.h"
 #include "../../util/Common.h"
+#include "../../util/Singleton.h"
 #include "../../util/hash.h"
-#include <vector>
-#include <string.h>
 #include "../Sort.h"
 #include "UFInstance.h"
 #include "UVariable.h"
+
+#include <cassert>
+#include <iostream>
+#include <set>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace carl
 {
@@ -138,7 +137,7 @@ public:
      * @param _ufun The uninterpreted function to get the hash for.
      * @return The hash of the given uninterpreted function.
      */
-    size_t operator()( const carl::UFInstanceContent& _ufun ) const 
+    std::size_t operator()( const carl::UFInstanceContent& _ufun ) const 
     {
         std::hash<carl::UVariable> h;
         std::size_t result = std::hash<carl::UninterpretedFunction>()(_ufun.uninterpretedFunction());
@@ -178,7 +177,7 @@ class UFInstanceManager : public Singleton<UFInstanceManager>
         {
             mUFInstances.emplace_back( nullptr ); // default value
         }
-        ~UFInstanceManager() {
+        ~UFInstanceManager() override {
             mUFInstanceIdMap.clear();
             for (auto& ptr: mUFInstances) delete ptr;
             mUFInstances.clear();

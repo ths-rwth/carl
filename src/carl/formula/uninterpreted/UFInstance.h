@@ -7,11 +7,13 @@
 
 #pragma once
 
-#include <iostream>
-#include <utility>
-#include <vector>
 #include "UVariable.h"
 #include "UninterpretedFunction.h"
+
+#include <iostream>
+
+#include <utility>
+#include <vector>
 
 namespace carl
 {
@@ -112,9 +114,9 @@ namespace std
          * @param _ufi The uninterpreted function instance to get the hash for.
          * @return The hash of the given uninterpreted function instance.
          */
-        size_t operator()( const carl::UFInstance& _ufi ) const 
+        std::size_t operator()( const carl::UFInstance& _ufi ) const 
         {
-            return (size_t) _ufi.id();
+            return std::size_t(_ufi.id());
         }
     };
 }

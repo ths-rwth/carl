@@ -14,13 +14,13 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include "../../util/platform.h"
+#include "typetraits.h"
+#include <boost/algorithm/string.hpp>
 #include <cassert>
-#include <limits>
 #include <cmath>
+#include <limits>
 #include <sstream>
 #include <vector>
-#include "typetraits.h"
-#include "boost/algorithm/string.hpp"
 
 namespace carl {
 
@@ -80,7 +80,7 @@ inline cln::cl_I getDenom(const cln::cl_RA& n) {
  * @param An integer.
  * @return true.
  */
-inline bool isInteger(const cln::cl_I&) {
+inline bool isInteger(const cln::cl_I& /*unused*/) {
 	return true;
 }
 
@@ -90,7 +90,7 @@ inline bool isInteger(const cln::cl_I&) {
  * @return true.
  */
 inline bool isInteger(const cln::cl_RA& n) {
-	return getDenom(n) == (cln::cl_I)(1);
+	return isOne(getDenom(n));
 }
 
 /**
@@ -377,7 +377,7 @@ inline cln::cl_RA lcm(const cln::cl_RA& a, const cln::cl_RA& b) {
  */
 template<>
 inline cln::cl_RA pow(const cln::cl_RA& n, std::size_t e) {
-	return cln::expt(n, (int)e);
+	return cln::expt(n, int(e));
 }
 
 inline cln::cl_RA log(const cln::cl_RA& n) {

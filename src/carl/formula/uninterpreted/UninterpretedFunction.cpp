@@ -5,8 +5,9 @@
  * @version 2014-10-30
  */
 
-#include "../Sort.h"
 #include "UninterpretedFunction.h"
+
+#include "../Sort.h"
 #include "UFManager.h"
 
 #include <iostream>

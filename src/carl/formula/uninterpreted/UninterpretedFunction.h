@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include "../Sort.h"
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "../Sort.h"
 
 namespace carl
 {
@@ -119,9 +119,9 @@ namespace std
          * @param _uf The uninterpreted function to get the hash for.
          * @return The hash of the given uninterpreted function.
          */
-        size_t operator()( const carl::UninterpretedFunction& _uf ) const 
+        std::size_t operator()( const carl::UninterpretedFunction& _uf ) const 
         {
-            return (size_t) _uf.id();
+			return std::size_t(_uf.id());
         }
     };
 }

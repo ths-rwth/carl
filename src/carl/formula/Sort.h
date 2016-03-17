@@ -9,6 +9,7 @@
 #pragma once
 
 #include <iostream>
+
 #include <utility>
 
 namespace carl
@@ -21,7 +22,7 @@ class Sort
 {
     public:
         /// The type if the unique id to identify a sort in the sort manager.
-        typedef size_t IDType;
+        typedef std::size_t IDType;
     
         friend class SortManager;
 
@@ -97,9 +98,9 @@ namespace std
          * @param _sort The sort to get the hash for.
          * @return The hash of the given sort.
          */
-        size_t operator()( const carl::Sort& _sort ) const 
+        std::size_t operator()( const carl::Sort& _sort ) const 
         {
-            return (size_t) _sort.id();
+            return std::size_t(_sort.id());
         }
     };
 } // end namespace std

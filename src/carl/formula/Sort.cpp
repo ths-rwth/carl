@@ -7,6 +7,7 @@
  */
 
 #include "Sort.h"
+
 #include "SortManager.h"
 
 namespace carl
