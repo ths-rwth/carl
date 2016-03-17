@@ -30,9 +30,6 @@ set( PROJECT_VERSION "${carl_VERSION}")
 set( carl_NAME "CArL" )
 set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # for cmake 2.8.7
@@ -58,6 +55,7 @@ option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
+option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
@@ -287,6 +285,12 @@ endif()
 #include(GetGitRevisionDescription)
 #get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
+if (CLANG_TIDY)
+	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+	set(CLANG_TIDY_CHECKS "-checks='*,-llvm-header-guard,-google-readability-namespace-comments'")
+	message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
+endif()
+
 # # # # # # # # # # # # # # # # # # # # # #
 # E. Invoke subdirectories.
 # # # # # # # # # # # # # # # # # # # # # #
@@ -331,5 +335,3 @@ install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 # # # # # # # # # # # # # # # # # # # # # #
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
-
-# todo.
