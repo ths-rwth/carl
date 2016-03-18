@@ -92,15 +92,15 @@ namespace carl
 		// Make sure maxUlps is non-negative and small enough that the
 		// default NAN won't compare as equal to anything.
 		assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-		long long aInt = *reinterpret_cast<const long long*>(&A);
+		sint aInt = *reinterpret_cast<const sint*>(&A);
 		// Make aInt lexicographically ordered as a twos-complement int
 		if (aInt < 0)
-			aInt = static_cast<long long>(0x8000000000000000) - aInt;
+			aInt = static_cast<sint>(0x8000000000000000) - aInt;
 		// Make bInt lexicographically ordered as a twos-complement int
-		long long bInt = *reinterpret_cast<const long long*>(&B);
+		sint bInt = *reinterpret_cast<const sint*>(&B);
 		if (bInt < 0)
-			bInt = static_cast<long long>(0x8000000000000000) - bInt;
-		unsigned long long intDiff = static_cast<unsigned long long>(std::abs(aInt - bInt));
+			bInt = static_cast<sint>(0x8000000000000000) - bInt;
+		uint intDiff = static_cast<uint>(std::abs(aInt - bInt));
 		return intDiff <= maxUlps;
 	}
 
@@ -132,7 +132,7 @@ namespace carl
 		 * @param _double Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(const double _double, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(double _double, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = carl::convert<double, FloatType>(_double);
 		}
@@ -143,7 +143,7 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(const int _int, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(sint _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = _int;
 		}
@@ -154,31 +154,9 @@ namespace carl
 		 * @param _int Value to be initialized.
 		 * @param N Possible rounding direction.
 		 */
-		explicit FLOAT_T<FloatType>(const unsigned _int, CARL_RND /*unused*/ = CARL_RND::N)
+		explicit FLOAT_T<FloatType>(uint _int, CARL_RND /*unused*/ = CARL_RND::N)
 		{
 			mValue = _int;
-		}
-
-		/**
-		 * Constructor, which takes a long as input and optional rounding, which
-		 * can be used, if the underlying fp implementation allows this.
-		 * @param _long Value to be initialized.
-		 * @param N Possible rounding direction.
-		 */
-		explicit FLOAT_T<FloatType>(const long _long, CARL_RND /*unused*/ = CARL_RND::N)
-		{
-			mValue = _long;
-		}
-
-		/**
-		 * Constructor, which takes an unsigned long as input and optional rounding, which
-		 * can be used, if the underlying fp implementation allows this.
-		 * @param _long Value to be initialized.
-		 * @param N Possible rounding direction.
-		 */
-		explicit FLOAT_T<FloatType>(const unsigned long _long, CARL_RND /*unused*/ = CARL_RND::N)
-		{
-			mValue = _long;
 		}
 
 		/**

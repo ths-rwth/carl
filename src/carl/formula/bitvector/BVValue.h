@@ -36,7 +36,7 @@ namespace carl
         {
         }
 
-        explicit BVValue(std::size_t _width, unsigned long _value = 0) :
+        explicit BVValue(std::size_t _width, uint _value = 0) :
         	mValue(_width, _value)
         {
         }

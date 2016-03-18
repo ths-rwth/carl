@@ -132,17 +132,6 @@ inline Integer toInt(const cln::cl_I& n);
 template<typename Integer>
 inline Integer toInt(const cln::cl_RA& n);
 
-/**
- * Convert a cln integer to an int.
- * @param n An integer.
- * @return n as int.
- */
-template<>
-inline int toInt<int>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<int>::max());
-    assert(n >= std::numeric_limits<int>::min());
-    return cln::cl_I_to_int(n);
-}
 
 /**
  * Convert a cln integer to a longint.
@@ -150,9 +139,9 @@ inline int toInt<int>(const cln::cl_I& n) {
  * @return n as long int.
  */
 template<>
-inline long int toInt<long int>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<long int>::max());
-    assert(n >= std::numeric_limits<long int>::min());
+inline sint toInt<sint>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<sint>::max());
+    assert(n >= std::numeric_limits<sint>::min());
     return cln::cl_I_to_long(n);
 }
 /**
@@ -161,9 +150,9 @@ inline long int toInt<long int>(const cln::cl_I& n) {
 * @return n as unsigned long int.
 */
 template<>
-inline unsigned long int toInt<unsigned long int>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<unsigned long int>::max());
-    assert(n >= std::numeric_limits<unsigned long int>::min());
+inline uint toInt<uint>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<uint>::max());
+    assert(n >= std::numeric_limits<uint>::min());
     return cln::cl_I_to_ulong(n);
 }
 
@@ -177,18 +166,6 @@ template<>
 inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
 	assert(isInteger(n));
 	return getNum(n);
-}
-
-
-
-/**
- * Convert a fraction to an unsigned.
- * @param n A fraction.
- * @return n as unsigned.
- */
-template<>
-inline std::size_t toInt<std::size_t>(const cln::cl_RA& n) {
-	return toInt<std::size_t>(toInt<cln::cl_I>(n));
 }
 
 /**
@@ -210,12 +187,12 @@ template<>
 cln::cl_RA rationalize<cln::cl_RA>(float n);
 
 template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(size_t n) {
+inline cln::cl_RA rationalize<cln::cl_RA>(uint n) {
 	return cln::cl_RA(n);
 }
 
 template<>
-inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
+inline cln::cl_RA rationalize<cln::cl_RA>(sint n) {
 	return cln::cl_RA(n);
 }
 

@@ -13,7 +13,7 @@ namespace carl
                 return cln::rationalize(cln::cl_R(n));
             case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
 				static_assert(sizeof(n) == 8, "double is assumed to be eight bytes wide.");
-                long int significandBits = reinterpret_cast<long int>(&n);
+                sint significandBits = reinterpret_cast<sint>(&n);
                 significandBits = (significandBits << 12) >> 12;
                 if( n < 0 )
                     significandBits = -significandBits;
@@ -38,7 +38,7 @@ namespace carl
                 return cln::rationalize(cln::cl_R(n));
             case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
 				static_assert(sizeof(n) == 4, "float is assumed to be four bytes wide.");
-                long int significandBits = reinterpret_cast<long int>(&n);
+                sint significandBits = reinterpret_cast<sint>(&n);
                 significandBits = (significandBits << 9) >> 9;
                 if( n < 0 )
                     significandBits = -significandBits;
