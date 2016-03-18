@@ -205,7 +205,7 @@ TEST(UnivariatePolynomial, factorization)
     for(UnivariatePolynomial<Rational> pol : polys)
     {
 //        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
-        std::map<UnivariatePolynomial<Rational>, unsigned> factors = pol.factorization();
+        std::map<UnivariatePolynomial<Rational>, carl::uint> factors = pol.factorization();
         UnivariatePolynomial<Rational> productOfFactors = UnivariatePolynomial<Rational>(x, (Rational)1);
         for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {

@@ -10,7 +10,7 @@ typedef testing::Types<
 	#ifdef USE_CLN_NUMBERS
 	cln::cl_I,
 	#endif
-	int
+	carl::sint
 > IntegerTypes;
 
 typedef testing::Types<

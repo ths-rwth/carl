@@ -37,11 +37,11 @@ TEST(Monomial, degreeCategories)
 {
 	Variable x = freshRealVariable("x");
 	
-	Monomial::Arg m1 = createMonomial(x, (unsigned)1);
+	Monomial::Arg m1 = createMonomial(x, exponent(1));
 	EXPECT_TRUE(m1->isLinear());
 	EXPECT_TRUE(m1->isAtMostLinear());
 	EXPECT_TRUE(!m1->isSquare());
-	Monomial::Arg m2 = createMonomial(x,2);
+	Monomial::Arg m2 = createMonomial(x, exponent(2));
 	EXPECT_TRUE(!m2->isLinear());
 	EXPECT_TRUE(!m2->isAtMostLinear());
 	EXPECT_TRUE(m2->isSquare());
@@ -53,7 +53,7 @@ TEST(Monomial, Operators)
     Variable v1 = freshRealVariable("b");
     Variable v2 = freshRealVariable("c");
 
-	Monomial::Arg m0 = carl::createMonomial(v0, (exponent) 1);
+	Monomial::Arg m0 = carl::createMonomial(v0, exponent(1));
 	m0 = m0 * v1;
     EXPECT_EQ((unsigned)1,m0->exponentOfVariable(v1));
     m0 = m0 * v1;
@@ -64,8 +64,8 @@ TEST(Monomial, Operators)
     EXPECT_EQ((unsigned)4,m0->tdeg());
     EXPECT_EQ((unsigned)3,m0->nrVariables());
 
-	Monomial::Arg m2 = carl::createMonomial(v1, (exponent) 1);
-	Monomial::Arg m3 = carl::createMonomial(v1, (exponent) 1);
+	Monomial::Arg m3 = carl::createMonomial(v1, exponent(1));
+	Monomial::Arg m2 = carl::createMonomial(v1, exponent(1));
     m2 = m2 * v1;
     m3 = m3 * v1;
     EXPECT_EQ(m2, m3);

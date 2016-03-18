@@ -23,40 +23,40 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
-inline bool isZero(const int& n) {
+inline bool isZero(sint n) {
 	return n == 0;
 }
-inline bool isZero(const double& n) {
+inline bool isZero(double n) {
 	return n == 0;
 }
-inline bool isOne(const int& n) {
+inline bool isOne(sint n) {
 	return n == 1;
 }
-inline bool isPositive(const int& n) {
+inline bool isPositive(sint n) {
 	return n > 0;
 }
-inline bool isNegative(const int& n) {
+inline bool isNegative(sint n) {
 	return n < 0;
 }
 
-inline bool isNumber(const double& d) {
+inline bool isNumber(double d) {
 	return (d == d) && !std::isinf(d);
 }
 
-inline bool isInteger(const double& d) {
+inline bool isInteger(double d) {
 	double tmp;
 	return std::modf(d, &tmp) == 0.0;
 }
 
-inline bool isInteger(const int& /*unused*/) {
+inline bool isInteger(sint /*unused*/) {
 	return true;
 }
 
-inline bool isNegative(const double& d) {
+inline bool isNegative(double d) {
 	return d < 0;
 }
 
-inline bool isPositive(const double& d) {
+inline bool isPositive(double d) {
 	return d > 0;
 }
 
@@ -74,28 +74,28 @@ inline void reserve(std::size_t /*unused*/) {
  * The following function convert types to other types.
  */
 
-inline double toDouble(const int& n) {
+inline double toDouble(sint n) {
 	return double(n);
 }
-inline double toDouble(const double& n) {
+inline double toDouble(double n) {
 	return n;
 }
 
 template<typename Integer>
-inline Integer toInt(const double& n);
+inline Integer toInt(double n);
 
 template<>
-inline int toInt<int>(const double& n) {
+inline int toInt<int>(double n) {
     return int(n);
 }
 
 template<>
-inline long toInt<long>(const double& n) {
+inline long toInt<long>(double n) {
     return long(n);
 }
 
 template<>
-inline std::size_t toInt<std::size_t>(const double& n) {
+inline std::size_t toInt<std::size_t>(double n) {
     return size_t(n);
 }
 
@@ -107,7 +107,7 @@ inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::typ
 	return std::to_string(n);
 }
 
-inline std::string toString(const double& n) {
+inline std::string toString(double n) {
 	return std::to_string(n);
 }
 
@@ -126,30 +126,24 @@ inline double abs(double n) {
 	return std::abs(n);
 }
 
-inline long mod(const long& n, const long& m) {
+inline uint mod(uint n, uint m) {
 	return n % m;
 }
-inline unsigned long mod(const unsigned long& n, const unsigned long& m) {
-	return n % m;
-}
-inline unsigned mod(const unsigned& n, const unsigned& m) {
-	return n % m;
-}
-inline int mod(const int& n, const int& m) {
+inline sint mod(sint n, sint m) {
 	return n % m;
 }
 
-inline int remainder(const int& n, const int& m) {
+inline sint remainder(sint n, sint m) {
 	return n % m;
 }
-inline int div(const int& n, const int& m) {
+inline sint div(sint n, sint m) {
 	assert(n % m == 0);
 	return n / m;
 }
-inline int quotient(const int& n, const int& m) {
+inline sint quotient(sint n, sint m) {
 	return n / m;
 }
-inline void divide(const int& dividend, const int& divisor, int& quo, int& rem) {
+inline void divide(sint dividend, sint divisor, sint& quo, sint& rem) {
 	quo = quotient(dividend, divisor);
 	rem = remainder(dividend, divisor);
 }
@@ -170,7 +164,7 @@ inline double sqrt(double in) {
 	return std::sqrt(in);
 }
 
-inline double pow(double in, size_t exp) {
+inline double pow(double in, std::size_t exp) {
 	return std::pow(in,exp);
 }
 

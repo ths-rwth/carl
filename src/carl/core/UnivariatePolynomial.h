@@ -31,7 +31,7 @@ template<typename Coefficient>
 using UnivariatePolynomialPtr = std::shared_ptr<UnivariatePolynomial<Coefficient>>;
 
 template<typename Coefficient>
-using FactorMap = std::map<UnivariatePolynomial<Coefficient>, unsigned>;
+using FactorMap = std::map<UnivariatePolynomial<Coefficient>, uint>;
 }
 
 #include "DivisionResult.h"

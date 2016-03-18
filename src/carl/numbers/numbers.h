@@ -9,6 +9,13 @@
 
 #define INCLUDED_FROM_NUMBERS_H true
 
+#include <cstdint>
+
+namespace carl {
+	using uint = std::uint_fast64_t;
+	using sint = std::int_fast64_t;
+}
+
 #include "config.h"
 #include "constants.h"
 #include "typetraits.h"
