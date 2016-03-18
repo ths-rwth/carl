@@ -5,7 +5,7 @@
  */
 #pragma once
 
-// for code assistance
+#include "../numbers/numbers.h"
 #include "Term.h"
 #include "Monomial_derivative.h"
 #include "Monomial_substitute.h"

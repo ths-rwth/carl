@@ -10,10 +10,14 @@
 #define INCLUDED_FROM_NUMBERS_H true
 
 #include <cstdint>
+#include <type_traits>
 
 namespace carl {
 	using uint = std::uint_fast64_t;
 	using sint = std::int_fast64_t;
+	
+	static_assert(std::is_arithmetic<uint>::value, "");
+	static_assert(std::is_arithmetic<sint>::value, "");
 }
 
 #include "config.h"

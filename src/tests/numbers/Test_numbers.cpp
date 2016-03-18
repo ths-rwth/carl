@@ -1,9 +1,8 @@
-#include "gtest/gtest.h"
+#include "../Common.h"
 
+#include <carl/numbers/numbers.h>
 #include <gmpxx.h>
-
-#include "../../carl/numbers/numbers.h"
-#include "config.h"
+#include <gtest/gtest.h>
 
 template<typename T>
 class IntegerNumbers: public testing::Test {};

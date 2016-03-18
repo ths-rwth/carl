@@ -304,7 +304,7 @@ struct characteristic: std::integral_constant<unsigned, 0> {};
 template<typename RationalType>
 struct IntegralType {
 	/// @todo Should *any* type have an integral type?
-	typedef int type;
+	typedef sint type;
 };
 
 template<typename C>

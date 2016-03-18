@@ -91,18 +91,23 @@ inline sint toInt<sint>(double n) {
 
 template<>
 inline uint toInt<uint>(double n) {
-    return size_t(n);
+    return uint(n);
 }
 
 template<>
 inline double rationalize(double n) { return n; }
 
 template<typename T>
-inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::type toString(const T& n) {
+inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::type toString(const T& n, bool /*unused*/) {
 	return std::to_string(n);
 }
-
-inline std::string toString(double n) {
+//inline std::string toString(sint n, bool /*unused*/) {
+//	return std::to_string(n);
+//}
+//inline std::string toString(uint n, bool /*unused*/) {
+//	return std::to_string(n);
+//}
+inline std::string toString(double n, bool /*unused*/) {
 	return std::to_string(n);
 }
 

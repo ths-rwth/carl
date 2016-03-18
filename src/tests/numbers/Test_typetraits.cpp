@@ -133,10 +133,10 @@ TEST(typetraits, is_subset_of_rationals)
 TEST(typetraits, IntegralType)
 {
 	// Note: These checks are performed at compile time.
-	::testing::StaticAssertTypeEq<int, carl::IntegralType<bool>::type>();
-	::testing::StaticAssertTypeEq<int, carl::IntegralType<int>::type>();
-	::testing::StaticAssertTypeEq<long int, carl::IntegralType<double>::type>();
-	::testing::StaticAssertTypeEq<int, carl::IntegralType<std::string>::type>();
+	::testing::StaticAssertTypeEq<sint, carl::IntegralType<bool>::type>();
+	::testing::StaticAssertTypeEq<sint, carl::IntegralType<int>::type>();
+	::testing::StaticAssertTypeEq<sint, carl::IntegralType<double>::type>();
+	::testing::StaticAssertTypeEq<sint, carl::IntegralType<std::string>::type>();
 	#ifdef USE_CLN_NUMBERS
 	::testing::StaticAssertTypeEq<cln::cl_I, carl::IntegralType<cln::cl_I>::type>();
 	::testing::StaticAssertTypeEq<cln::cl_I, carl::IntegralType<cln::cl_RA>::type>();
