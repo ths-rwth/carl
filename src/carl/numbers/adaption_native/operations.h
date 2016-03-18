@@ -85,17 +85,12 @@ template<typename Integer>
 inline Integer toInt(double n);
 
 template<>
-inline int toInt<int>(double n) {
-    return int(n);
+inline sint toInt<sint>(double n) {
+    return sint(n);
 }
 
 template<>
-inline long toInt<long>(double n) {
-    return long(n);
-}
-
-template<>
-inline std::size_t toInt<std::size_t>(double n) {
+inline uint toInt<uint>(double n) {
     return size_t(n);
 }
 
@@ -164,7 +159,7 @@ inline double sqrt(double in) {
 	return std::sqrt(in);
 }
 
-inline double pow(double in, std::size_t exp) {
+inline double pow(double in, uint exp) {
 	return std::pow(in,exp);
 }
 
@@ -182,7 +177,7 @@ inline double log(double in) {
 template<typename Number>
 inline Number highestPower(const Number& n) {
 	static_assert(std::is_fundamental<Number>::value, "Only works on native types.");
-	unsigned iterations = 0;
+	uint iterations = 0;
 	// Number has 2^k Bits, we do k iterations
 	if (sizeof(Number) == 2) iterations = 4;
 	else if (sizeof(Number) == 4) iterations = 5;
@@ -190,7 +185,7 @@ inline Number highestPower(const Number& n) {
 	assert(iterations > 0);
 
 	Number res = n;
-	for (unsigned i = 0; i < iterations; i++) {
+	for (uint i = 0; i < iterations; i++) {
 		res |= res >> (1 << i);
 	}
 	res -= res >> 1;
