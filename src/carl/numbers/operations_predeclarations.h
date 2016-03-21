@@ -15,11 +15,14 @@ namespace carl {
 	template<typename T>
 	inline T rationalize(float n);
 
-	template<typename T>
-	inline T rationalize(int n);
+    template<typename T>
+    inline T rationalize(int n);
 
 	template<typename T>
-	inline T rationalize(std::size_t n);
+	inline T rationalize(sint n);
+
+	template<typename T>
+	inline T rationalize(uint n);
 
 	template<typename T>
 	inline T rationalize(const std::string& n);

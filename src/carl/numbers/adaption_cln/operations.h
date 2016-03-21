@@ -133,6 +133,13 @@ template<typename Integer>
 inline Integer toInt(const cln::cl_RA& n);
 
 
+template<>
+inline int toInt<int>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<int>::max());
+    assert(n >= std::numeric_limits<int>::min());
+    return cln::cl_I_to_long(n);
+}
+
 /**
  * Convert a cln integer to a longint.
  * @param n An integer.
