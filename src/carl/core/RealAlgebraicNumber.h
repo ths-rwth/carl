@@ -251,11 +251,6 @@ public:
 };
 
 template<typename Number>
-inline RealAlgebraicNumber<Number> operator+(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
-	return RealAlgebraicNumber<Number>(lhs.value() + rhs.value());
-}
-
-template<typename Number>
 inline bool operator==(const RealAlgebraicNumber<Number>& lhs, const RealAlgebraicNumber<Number>& rhs) {
 	return lhs.equal(rhs);
 }
