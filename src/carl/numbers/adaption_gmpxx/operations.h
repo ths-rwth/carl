@@ -123,13 +123,13 @@ inline double toDouble(const mpz_class& n) {
 template<typename Integer>
 inline Integer toInt(const mpz_class& n);
 template<>
-    inline std::int32_t toInt<std::int32_t>(const mpz_class& n) {
+inline std::int32_t toInt<std::int32_t>(const mpz_class& n) {
     assert(n <= std::numeric_limits<std::int32_t>::max());
     assert(n >= std::numeric_limits<std::int32_t>::min());
     return std::int32_t(mpz_get_si(n.get_mpz_t()));
 }
 template<>
-    inline std::uint32_t toInt<std::uint32_t>(const mpz_class& n) {
+inline std::uint32_t toInt<std::uint32_t>(const mpz_class& n) {
     assert(n <= std::numeric_limits<std::uint32_t>::max());
     assert(n >= std::numeric_limits<std::uint32_t>::min());
     return std::uint32_t(mpz_get_ui(n.get_mpz_t()));

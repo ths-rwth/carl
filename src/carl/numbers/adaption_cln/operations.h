@@ -132,35 +132,29 @@ inline Integer toInt(const cln::cl_I& n);
 template<typename Integer>
 inline Integer toInt(const cln::cl_RA& n);
 
-
 template<>
-inline int toInt<int>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<int>::max());
-    assert(n >= std::numeric_limits<int>::min());
+inline std::int32_t toInt<std::int32_t>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<std::int32_t>::max());
+    assert(n >= std::numeric_limits<std::int32_t>::min());
     return cln::cl_I_to_int(n);
 }
-
-/**
- * Convert a cln integer to a longint.
- * @param n An integer.
- * @return n as long int.
- */
 template<>
-inline sint toInt<sint>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<sint>::max());
-    assert(n >= std::numeric_limits<sint>::min());
+inline std::uint32_t toInt<std::uint32_t>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<std::uint32_t>::max());
+    assert(n >= std::numeric_limits<std::uint32_t>::min());
+    return std::uint32_t(cln::cl_I_to_int(n));
+}
+template<>
+inline std::int64_t toInt<std::int64_t>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<std::int64_t>::max());
+    assert(n >= std::numeric_limits<std::int64_t>::min());
     return cln::cl_I_to_long(n);
 }
-/**
-* Convert a cln integer to an unsigned longint.
-* @param n An integer.
-* @return n as unsigned long int.
-*/
 template<>
-inline uint toInt<uint>(const cln::cl_I& n) {
-    assert(n <= std::numeric_limits<uint>::max());
-    assert(n >= std::numeric_limits<uint>::min());
-    return cln::cl_I_to_ulong(n);
+inline std::uint64_t toInt<std::uint64_t>(const cln::cl_I& n) {
+    assert(n <= std::numeric_limits<std::uint64_t>::max());
+    assert(n >= std::numeric_limits<std::uint64_t>::min());
+    return std::uint64_t(cln::cl_I_to_long(n));
 }
 
 /**
