@@ -126,7 +126,7 @@ template<>
     inline std::int32_t toInt<std::int32_t>(const mpz_class& n) {
     assert(n <= std::numeric_limits<std::int32_t>::max());
     assert(n >= std::numeric_limits<std::int32_t>::min());
-    return mpz_get_si(n.get_mpz_t());
+    return std::int32_t(mpz_get_si(n.get_mpz_t()));
 }
 template<>
 inline std::int64_t toInt<std::int64_t>(const mpz_class& n) {

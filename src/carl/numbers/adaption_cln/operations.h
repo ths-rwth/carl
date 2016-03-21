@@ -137,7 +137,7 @@ template<>
 inline int toInt<int>(const cln::cl_I& n) {
     assert(n <= std::numeric_limits<int>::max());
     assert(n >= std::numeric_limits<int>::min());
-    return cln::cl_I_to_long(n);
+    return cln::cl_I_to_int(n);
 }
 
 /**
