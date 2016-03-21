@@ -129,6 +129,12 @@ template<>
     return std::int32_t(mpz_get_si(n.get_mpz_t()));
 }
 template<>
+    inline std::uint32_t toInt<std::uint32_t>(const mpz_class& n) {
+    assert(n <= std::numeric_limits<std::uint32_t>::max());
+    assert(n >= std::numeric_limits<std::uint32_t>::min());
+    return std::uint32_t(mpz_get_ui(n.get_mpz_t()));
+}
+template<>
 inline std::int64_t toInt<std::int64_t>(const mpz_class& n) {
     assert(n <= std::numeric_limits<std::int64_t>::max());
     assert(n >= std::numeric_limits<std::int64_t>::min());
@@ -140,18 +146,6 @@ inline std::uint64_t toInt<std::uint64_t>(const mpz_class& n) {
     assert(n >= std::numeric_limits<std::uint64_t>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
-/*template<>
-inline sint toInt<sint>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<sint>::max());
-    assert(n >= std::numeric_limits<sint>::min());
-    return mpz_get_si(n.get_mpz_t());
-}
-template<>
-inline uint toInt<uint>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<uint>::max());
-    assert(n >= std::numeric_limits<uint>::min());
-    return mpz_get_ui(n.get_mpz_t());
-}*/
 
 template<typename Integer>
 inline Integer toInt(const mpq_class& n);
@@ -177,14 +171,18 @@ template<>
 inline std::int32_t toInt<std::int32_t>(const mpq_class& n) {
     return toInt<std::int32_t>(toInt<mpz_class>(n));
 }
-    template<>
-    inline std::int64_t toInt<std::int64_t>(const mpq_class& n) {
-        return toInt<std::int64_t>(toInt<mpz_class>(n));
-    }
-    template<>
-    inline std::uint64_t toInt<std::uint64_t>(const mpq_class& n) {
-        return toInt<std::uint64_t>(toInt<mpz_class>(n));
-    }
+template<>
+inline std::uint32_t toInt<std::uint32_t>(const mpq_class& n) {
+	return toInt<std::uint32_t>(toInt<mpz_class>(n));
+}
+template<>
+inline std::int64_t toInt<std::int64_t>(const mpq_class& n) {
+    return toInt<std::int64_t>(toInt<mpz_class>(n));
+}
+template<>
+inline std::uint64_t toInt<std::uint64_t>(const mpq_class& n) {
+    return toInt<std::uint64_t>(toInt<mpz_class>(n));
+}
 
 /*template<>
 inline uint toInt<uint>(const mpq_class& n) {
