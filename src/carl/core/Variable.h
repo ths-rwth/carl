@@ -15,7 +15,7 @@
 namespace carl {
 
 /// Type of an exponent.
-typedef unsigned exponent;	
+using exponent = unsigned long;
 	
 /**
  * Several types of variables are supported.
@@ -69,16 +69,16 @@ class Variable
 {	
 private:
 	/// Type if a variable is passed by reference.
-	typedef const Variable& ByRef;
+	using ByRef = const Variable&;
 	/// Type if a variable is passed by value.
-	typedef Variable ByValue;
+	using ByValue = Variable;
 public:
 #ifdef VARIABLE_PASS_BY_VALUE
 	/// Argument type for variables being function arguments.
-	typedef VariableByValue Arg;		
+	using Arg = VariableByValue;
 #else
 	/// Argument type for variables being function arguments.
-	typedef ByRef Arg;
+	using Arg = ByRef;
 #endif
  
 private:

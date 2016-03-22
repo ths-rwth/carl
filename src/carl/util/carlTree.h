@@ -177,7 +177,7 @@ public:
 	{
 		friend tree;
 	protected:
-		typedef BaseIterator<PreorderIterator<reverse>, reverse> Base;
+		using Base = BaseIterator<PreorderIterator<reverse>, reverse>;
 		PreorderIterator(const tree<T>* t): Base(t, MAXINT) {}
 		PreorderIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		PreorderIterator& next() {
@@ -239,7 +239,7 @@ public:
 	{
 		friend tree;
 	protected:
-		typedef BaseIterator<PostorderIterator<reverse>,reverse> Base;
+		using Base = BaseIterator<PostorderIterator<reverse>,reverse>;
 		PostorderIterator(const tree<T>* t): Base(t, MAXINT) {}
 		PostorderIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		PostorderIterator& next() {
@@ -305,7 +305,7 @@ public:
 	{
 		friend tree;
 	protected:
-		typedef BaseIterator<LeafIterator<reverse>,reverse> Base;
+		using Base = BaseIterator<LeafIterator<reverse>,reverse>;
 		LeafIterator(const tree<T>* t): Base(t, MAXINT) {}
 		LeafIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		LeafIterator& next() {
@@ -366,7 +366,7 @@ public:
 	{
 		friend tree;
 	protected:
-		typedef BaseIterator<DepthIterator<reverse>,reverse> Base;
+		using Base = BaseIterator<DepthIterator<reverse>,reverse>;
 		std::size_t depth;
 		DepthIterator(const tree<T>* t): Base(t, MAXINT), depth(0) {}
 		DepthIterator(const tree<T>* t, std::size_t root, std::size_t _depth): Base(t, root), depth(_depth) {
@@ -453,7 +453,7 @@ public:
 	{
 		friend tree;
 	protected:
-		typedef BaseIterator<ChildrenIterator<reverse>,reverse> Base;
+		using Base = BaseIterator<ChildrenIterator<reverse>,reverse>;
 		std::size_t parent;
 		ChildrenIterator(const tree<T>* t, std::size_t base, bool end = false): Base(t, base) {
 			parent = base;
@@ -519,7 +519,7 @@ public:
 	{
 		friend tree;
 	protected:
-		typedef BaseIterator<PathIterator,false> Base;
+		using Base = BaseIterator<PathIterator,false>;
 		PathIterator(const tree<T>* t, std::size_t root): Base(t, root) {}
 		PathIterator& next() {
 			if (this->current != MAXINT) {
@@ -546,7 +546,7 @@ public:
 	static_assert(std::is_move_constructible<PathIterator>::value, "");
 	static_assert(std::is_destructible<PathIterator>::value, "");
 
-	typedef PreorderIterator<false> iterator;
+	using iterator = PreorderIterator<false>;
 
 	tree() {}
 	tree(const tree& t): nodes(t.nodes), emptyNodes(t.emptyNodes) {}

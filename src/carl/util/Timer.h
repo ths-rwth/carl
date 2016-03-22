@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <chrono>
+#include <iostream>
+
 namespace carl
 {
 /**
@@ -14,9 +17,9 @@ namespace carl
  */
 struct Timer {
 	/// The clock type used jere.
-	typedef std::chrono::high_resolution_clock clock;
+	using clock = std::chrono::high_resolution_clock;
 	/// The duration type used here.
-	typedef std::chrono::duration<std::size_t,std::milli> duration;
+	using duration = std::chrono::duration<std::size_t,std::milli>;
 	/// Start of this timer.
 	clock::time_point start;
 	Timer(): start(clock::now()) {}

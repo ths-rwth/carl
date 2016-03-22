@@ -205,7 +205,7 @@ namespace carl
 		return MonomialPool::getInstance().create( std::move(newExps), exponent(mExponents.size()) );
 	}
 	
-	Monomial::Arg Monomial::pow(unsigned exp) const
+	Monomial::Arg Monomial::pow(uint exp) const
 	{
 		if (exp == 0)
 		{

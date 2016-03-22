@@ -13,6 +13,7 @@
 
 #include "Variable.h"
 #include "MonomialPool.h"
+#include "../numbers/numbers.h"
 namespace carl
 {
 
@@ -27,11 +28,11 @@ namespace carl
 	{
 		
 		/// Maximal degree variable occurs with.
-		unsigned mMaxDegree;
+		uint mMaxDegree;
 		/// Minimal non-zero degree variable occurs with.
-		unsigned mMinDegree;
+		uint mMinDegree;
 		/// Number of terms a variable occurs in.
-		unsigned mOccurence;
+		uint mOccurence;
 	public:
 		VariableInformation()
 		:	mMaxDegree(0), 
@@ -41,7 +42,7 @@ namespace carl
 			
 		}
         
-		VariableInformation(unsigned degreeOfOccurence)
+		VariableInformation(uint degreeOfOccurence)
 		:	mMaxDegree(degreeOfOccurence), 
 			mMinDegree(degreeOfOccurence), 
 			mOccurence(1)
@@ -49,7 +50,7 @@ namespace carl
 			
 		}
         
-		VariableInformation(unsigned maxDegree, unsigned minDegree, unsigned occurence)
+		VariableInformation(uint maxDegree, uint minDegree, uint occurence)
 		:	mMaxDegree(maxDegree), 
 			mMinDegree(minDegree), 
 			mOccurence(occurence)
@@ -70,17 +71,17 @@ namespace carl
             return false;
         }
     
-		unsigned maxDegree() const
+		uint maxDegree() const
 		{
 			return mMaxDegree;
 		}
 		
-		unsigned minDegree() const
+		uint minDegree() const
 		{
 			return mMinDegree;
 		}
 		
-		unsigned occurence() const
+		uint occurence() const
 		{
 			return mOccurence;
 		}
@@ -90,7 +91,7 @@ namespace carl
          * @param degree
 		 * @return true if degree was larger.
          */
-		bool raiseMaxDegree(unsigned degree)
+		bool raiseMaxDegree(uint degree)
 		{
 			if(mMaxDegree < degree)
 			{
@@ -105,7 +106,7 @@ namespace carl
          * @param degree
 		 * @return true if degree was smaller.
          */
-		bool lowerMinDegree(unsigned degree)
+		bool lowerMinDegree(uint degree)
 		{
 			if(mMinDegree > degree)
 			{
@@ -122,7 +123,7 @@ namespace carl
 		}
 		
 		template<typename Term>
-		void updateCoeff(unsigned, const Term&)
+		void updateCoeff(uint, const Term&)
 		{
 			// Empty function, we do not save the coefficient here.
 			// TODO there might be a better solution to this.
@@ -130,7 +131,7 @@ namespace carl
         
         void collect(Variable::Arg var, const typename CoeffType::CoeffType&, const typename CoeffType::MonomType& monomial)
         {
-            exponent e = monomial.exponentOfVariable(var);
+            uint e = monomial.exponentOfVariable(var);
             if(e > 0)
             {
                 // One more term in which the variable occurs.
@@ -148,17 +149,17 @@ namespace carl
 	template<typename CoeffType>
 	class VariableInformation<true, CoeffType> : public VariableInformation<false, CoeffType>
 	{
-		std::map<unsigned, CoeffType> mCoeffs;
+		std::map<uint, CoeffType> mCoeffs;
 	public:
 		VariableInformation() :  VariableInformation<false, CoeffType>()
 		{
 		}
         
-		VariableInformation(unsigned degreeOfOccurence) :  VariableInformation<false, CoeffType>(degreeOfOccurence)
+		VariableInformation(uint degreeOfOccurence) :  VariableInformation<false, CoeffType>(degreeOfOccurence)
 		{
 		}
         
-        VariableInformation(unsigned maxDegree, unsigned minDegree, unsigned occurence, std::map<unsigned, CoeffType>&& coeffs):
+        VariableInformation(uint maxDegree, uint minDegree, unsigned occurence, std::map<uint, CoeffType>&& coeffs):
             VariableInformation<false, CoeffType>(maxDegree, minDegree, occurence),
             mCoeffs(coeffs)
         {
@@ -173,15 +174,15 @@ namespace carl
             return !mCoeffs.empty();
         }
 	
-		const std::map<unsigned, CoeffType>& coeffs() const
+		const std::map<uint, CoeffType>& coeffs() const
 		{
 			return mCoeffs;
 		}
 		
 		template<typename Term>
-		void updateCoeff(unsigned exponent, const Term& t)
+		void updateCoeff(uint exponent, const Term& t)
 		{
-			typename std::map<unsigned, CoeffType>::iterator it = mCoeffs.find(exponent);
+			auto it = mCoeffs.find(exponent);
 			if(it == mCoeffs.end())
 			{
 				mCoeffs.emplace(exponent, CoeffType(t));

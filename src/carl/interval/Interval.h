@@ -1388,13 +1388,13 @@ namespace carl
          * @param exp Exponent.
          * @return Result.
          */
-        Interval<Number> pow(unsigned exp) const;
+        Interval<Number> pow(uint exp) const;
 
         /**
          * Calculates and assigns the power of the interval with respect to natural interval arithmetic.
          * @param exp Exponent.
          */
-        void pow_assign(unsigned exp);
+        void pow_assign(uint exp);
 
         /**
          * Calculates the square root of the interval with respect to natural interval arithmetic.

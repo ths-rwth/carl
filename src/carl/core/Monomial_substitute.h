@@ -18,7 +18,7 @@ Term<Coefficient> Monomial::substitute(const std::map<Variable,Coefficient>& sub
 	CARL_LOG_FUNC("carl.core.monomial", *this << ", " << substitutions << ", " << factor);
     std::vector<std::pair<Variable, exponent>> newExps;
     exponent tdegree = mTotalDegree;
-	for (auto ve : mExponents) 
+	for (const auto& ve : mExponents) 
 	{
 		auto it = substitutions.find(ve.first);
 		if(it == substitutions.end())
@@ -49,7 +49,7 @@ Term<Coefficient> Monomial::substitute(const std::map<Variable,Term<Coefficient>
     std::vector<std::pair<Variable, exponent>> newExps;
     exponent tdegree = mTotalDegree;
 	Term<Coefficient> factor(coeff);
-	for(auto ve : mExponents) 
+	for(const auto& ve : mExponents) 
 	{
 		auto it = substitutions.find(ve.first);
 		if(it == substitutions.end())

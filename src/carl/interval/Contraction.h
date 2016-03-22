@@ -24,7 +24,7 @@ namespace carl {
             /// The variable, for which to solve.
             Variable mVar;
             /// Stores n, if the nth root has to be taken of mNumerator/mDenominator
-            unsigned mRoot;
+            uint mRoot;
             /// Stores the numerator
             Polynomial mNumerator;
             /// Stores the denominator, which is one, if mDenominator == nullptr

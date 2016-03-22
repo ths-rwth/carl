@@ -87,7 +87,7 @@ class Term
 		 * @param v Variable.
 		 * @param e Exponent.
 		 */
-		Term(const Coefficient& c, Variable::Arg v, exponent e);
+		Term(const Coefficient& c, Variable::Arg v, uint e);
 		
 		/**
 		 * Get the coefficient.
@@ -112,7 +112,7 @@ class Term
 		 * Gives the total degree, i.e. the sum of all exponents.
 		 * @return Total degree.
 		 */
-		inline exponent tdeg() const
+		inline uint tdeg() const
 		{
 			if(!mMonomial) return 0;
 			return mMonomial->tdeg();
@@ -297,7 +297,7 @@ class Term
 			}
 		}
 		
-		Term pow(unsigned exp) const
+		Term pow(uint exp) const
 		{
 			if(mMonomial)
 			{

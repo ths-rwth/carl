@@ -173,7 +173,7 @@ namespace carl
 				return vecIter == vecEnd;
 			}
 		};
-		typedef forward_iterator const_iterator;
+		using const_iterator = forward_iterator;
 		
 		forward_iterator begin() const {
 			return forward_iterator(mBits.begin(), mBits.end());

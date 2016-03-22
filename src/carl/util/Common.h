@@ -61,9 +61,9 @@ namespace carl
 //    template<typename Pol>
 //    using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
     
-    typedef std::set<Variable> Variables;
+    using Variables = std::set<Variable>;
 
-    typedef std::vector<Variables> QuantifiedVariables;
+    using QuantifiedVariables = std::vector<Variables>;
     
     template<typename T> 
     using PointerSet = std::set<const T*, pointerLess<T>>;
