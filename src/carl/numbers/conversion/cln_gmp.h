@@ -18,7 +18,7 @@ namespace carl {
             cln::cl_I num = carl::getNum(n);
             if( num <= std::numeric_limits<sint>::max() && num >= std::numeric_limits<sint>::min() )
             {
-                return mpq_class(carl::toInt<int>(num))/mpq_class(carl::toInt<int>(den));
+                return mpq_class(carl::toInt<sint>(num))/mpq_class(carl::toInt<sint>(den));
             }
         }
         std::stringstream s;

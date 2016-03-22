@@ -13,8 +13,8 @@
 #include <type_traits>
 
 namespace carl {
-	using uint = std::uint_fast64_t;
-	using sint = std::int_fast64_t;
+	using uint = unsigned long;
+	using sint = long;
 	
 	static_assert(std::is_arithmetic<uint>::value, "");
 	static_assert(std::is_arithmetic<sint>::value, "");
