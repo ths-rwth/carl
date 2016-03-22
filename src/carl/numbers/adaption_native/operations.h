@@ -126,16 +126,10 @@ inline double abs(double n) {
 	return std::abs(n);
 }
 
-inline std::uint32_t mod(std::uint32_t n, std::uint32_t m) {
+inline uint mod(uint n, uint m) {
 	return n % m;
 }
-inline std::int32_t mod(std::int32_t n, std::int32_t m) {
-	return n % m;
-}
-inline std::uint64_t mod(std::uint64_t n, std::uint64_t m) {
-	return n % m;
-}
-inline std::int64_t mod(std::int64_t n, std::int64_t m) {
+inline sint mod(sint n, int m) {
 	return n % m;
 }
 
