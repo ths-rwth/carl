@@ -188,11 +188,11 @@ namespace carl
         
         private:
             /// A unique id.
-            size_t mID;
+            std::size_t mID;
             /// The hash value.
-            size_t mHash;
+            std::size_t mHash;
             /// A unique id.
-            mutable size_t mUsages;
+            mutable std::size_t mUsages;
             /// The relation symbol comparing the polynomial considered by this constraint to zero.
             Relation mRelation;
             /// The polynomial which is compared by this constraint to zero.
@@ -226,7 +226,7 @@ namespace carl
              *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
              *             and b is a rational.
              */
-            ConstraintContent( carl::Variable::Arg _var, Relation _rel, unsigned _id = 0 ):
+            ConstraintContent( carl::Variable::Arg _var, Relation _rel, std::size_t _id = 0 ):
                 ConstraintContent<Pol>::ConstraintContent( std::move( makePolynomial<Pol>(_var) ), _rel, _id )
             {}
             
@@ -241,21 +241,21 @@ namespace carl
              *             newBound( x, _rel, b ) if _lhs = x - b and x is a variable
              *             and b is a rational.
              */
-            ConstraintContent( const Pol& _lhs, Relation _rel, unsigned _id = 0 ):
+            ConstraintContent( const Pol& _lhs, Relation _rel, std::size_t _id = 0 ):
                 ConstraintContent<Pol>::ConstraintContent( std::move( Pol( _lhs ) ), _rel, _id)
             {}
             
             template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            ConstraintContent( const typename Pol::PolyType& _lhs, Relation _rel, unsigned _id = 0 ):
+            ConstraintContent( const typename Pol::PolyType& _lhs, Relation _rel, std::size_t _id = 0 ):
                 ConstraintContent<Pol>::ConstraintContent( std::move( makePolynomial<Pol>( _lhs ) ), _rel, _id )
             {}
             
             template<typename P = Pol, EnableIf<needs_cache<P>> = dummy>
-            ConstraintContent( typename Pol::PolyType&& _lhs, Relation _rel, unsigned _id = 0 ):
+            ConstraintContent( typename Pol::PolyType&& _lhs, Relation _rel, std::size_t _id = 0 ):
                 ConstraintContent<Pol>::ConstraintContent( std::move( makePolynomial<Pol>( std::move( _lhs ) ) ), _rel, _id )
             {}
             
-            ConstraintContent( Pol&& _lhs, Relation _rel, unsigned _id = 0 );
+            ConstraintContent( Pol&& _lhs, Relation _rel, std::size_t _id = 0 );
             
             /**
              * Initializes some basic information of the constraint, such as the definiteness of the left-hand 
@@ -302,7 +302,7 @@ namespace carl
              * @param _variable The variable for which to determine the maximal degree.
              * @return The maximal degree of the given variable in this constraint content. (Monomial-wise)
              */
-            unsigned maxDegree( const Variable& _variable ) const
+            uint maxDegree( const Variable& _variable ) const
             {
                 auto varInfo = mVarInfoMap.find(_variable);
                 if (varInfo == mVarInfoMap.end()) return 0;
@@ -312,11 +312,11 @@ namespace carl
             /**
              * @return The maximal degree of all variables in this constraint. (Monomial-wise)
              */
-            unsigned maxDegree() const
+            uint maxDegree() const
             {
-                unsigned result = 0;
+                uint result = 0;
                 for (const auto& var: mVariables) {
-                    unsigned deg = maxDegree(var);
+                    uint deg = maxDegree(var);
                     if (deg > result) result = deg;
                 }
                 return result;
@@ -522,7 +522,7 @@ namespace carl
              * @param _variable The variable for which to determine the maximal degree.
              * @return The maximal degree of the given variable in this constraint. (Monomial-wise)
              */
-            unsigned maxDegree( const Variable& _variable ) const
+            uint maxDegree( const Variable& _variable ) const
             {   
                 VARINFOMAP_LOCK_GUARD
                 return mpContent->maxDegree( _variable );
@@ -531,7 +531,7 @@ namespace carl
             /**
              * @return The maximal degree of all variables in this constraint. (Monomial-wise)
              */
-            unsigned maxDegree() const
+            uint maxDegree() const
             {
                 VARINFOMAP_LOCK_GUARD
                 return mpContent->maxDegree();
@@ -541,7 +541,7 @@ namespace carl
              * @param _variable The variable for which to determine the minimal degree.
              * @return The minimal degree of the given variable in this constraint. (Monomial-wise)
              */
-            unsigned minDegree( const Variable& _variable ) const
+            uint minDegree( const Variable& _variable ) const
             {
                 VARINFOMAP_LOCK_GUARD
                 auto varInfo = mpContent->mVarInfoMap.find( _variable );
@@ -554,7 +554,7 @@ namespace carl
              * @return The number of occurrences of the given variable in this constraint. (In 
              *          how many monomials of the left-hand side does the given variable occur?)
              */
-            unsigned occurences( const Variable& _variable ) const
+            uint occurences( const Variable& _variable ) const
             {
                 VARINFOMAP_LOCK_GUARD
                 auto varInfo = mpContent->mVarInfoMap.find( _variable );
@@ -853,7 +853,7 @@ namespace carl
              * @param _degree The according degree of the variable for which to calculate the coefficient.
              * @return The ith coefficient of the given variable, where i is the given degree.
              */
-            Pol coefficient( const Variable& _var, unsigned _degree ) const;
+            Pol coefficient( const Variable& _var, uint _degree ) const;
             
             /**
              * If this constraint represents a substitution (equation, where at least one variable occurs only linearly),

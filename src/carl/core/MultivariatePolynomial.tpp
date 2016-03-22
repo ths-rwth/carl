@@ -67,14 +67,16 @@ MultivariatePolynomial<Coeff,Ordering,Policies>& MultivariatePolynomial<Coeff,Or
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(int c) : MultivariatePolynomial((Coeff)c)
+template<typename C>
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIfNotSame<C,sint> c) : MultivariatePolynomial(Coeff(c))
 {
 	mOrdered = true;
 	assert(this->isConsistent());
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(unsigned c) : MultivariatePolynomial((Coeff)c)
+template<typename C>
+MultivariatePolynomial<Coeff,Ordering,Policies>::MultivariatePolynomial(EnableIfNotSame<C,uint> c) : MultivariatePolynomial(Coeff(c))
 {
 	mOrdered = true;
 	assert(this->isConsistent());
@@ -1465,7 +1467,7 @@ UnivariatePolynomial<MultivariatePolynomial<C,O,P>> MultivariatePolynomial<C,O,P
 			auto mon = term.monomial();
 			auto exponent = mon->exponentOfVariable(v);
 			if (exponent >= coeffs.size()) {
-				coeffs.resize(exponent + 1, MultivariatePolynomial<C,O,P>(0));
+				coeffs.resize(exponent + 1);
 			}
 			std::shared_ptr<const carl::Monomial> tmp = mon->dropVariable(v);
 			coeffs[exponent] += term.coeff() * tmp;

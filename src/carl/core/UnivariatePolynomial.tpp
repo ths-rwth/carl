@@ -111,11 +111,11 @@ UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, std::ve
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coeff>& coefficients)
+UnivariatePolynomial<Coeff>::UnivariatePolynomial(Variable::Arg mainVar, const std::map<uint, Coeff>& coefficients)
 : mMainVar(mainVar)
 {
 	mCoefficients.reserve(coefficients.rbegin()->first);
-	for( const std::pair<unsigned, Coeff>& expAndCoeff : coefficients)
+	for (const auto& expAndCoeff : coefficients)
 	{
 		if(expAndCoeff.first != mCoefficients.size() + 1)
 		{
@@ -170,8 +170,8 @@ void UnivariatePolynomial<Coeff>::substituteIn(Variable::Arg var, const Coeff& v
 			tmp.substituteIn(var, value);
 			*this = tmp.toUnivariatePolynomial(this->mMainVar);
 		} else {
-			for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
-				this->mCoefficients[i].substituteIn(var, value);
+			for (auto& c: mCoefficients) {
+				c.substituteIn(var, value);
 			}
 		}
 	}
@@ -193,8 +193,8 @@ template<typename C, DisableIf<is_number<C>>>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Arg var, const Coeff& value) const {
 	if (var == this->mainVar()) {
 		UnivariatePolynomial<Coeff> res(this->mainVar());
-		for (unsigned i = 0; i < this->mCoefficients.size(); i++) {
-			res += this->mCoefficients[i].substitute(var, value);
+		for (const auto& c: mCoefficients) {
+			res += c.substitute(var, value);
 		}
 		CARL_LOG_TRACE("carl.core.uvpolynomial", *this << " [ " << var << " -> " << value << " ] = " << res);
 		return res;
@@ -206,7 +206,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Ar
 				return tmp.toUnivariatePolynomial(this->mMainVar);
 			} else {
 		std::vector<Coeff> res(this->mCoefficients.size());
-		for (unsigned i = 0; i < res.size(); i++) {
+		for (std::size_t i = 0; i < res.size(); i++) {
 			res[i] = this->mCoefficients[i].substitute(var, value);
 		}
 		UnivariatePolynomial<Coeff> resp(this->mainVar(), res);
@@ -218,7 +218,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::substitute(Variable::Ar
 }
 
 template<typename Coeff>
-UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth) const
+UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(uint nth) const
 {
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	if (this->isConstant()) {
@@ -229,8 +229,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 	if(nth == 1)
 	{
 		typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
-		int i = 0;
-		for(it += nth; it != mCoefficients.end(); ++it)
+		uint i = 0;
+		for(it += sint(nth); it != mCoefficients.end(); ++it)
 		{
 			++i;
 			result.mCoefficients.push_back(Coeff(i) * *it);
@@ -240,14 +240,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::derivative(unsigned nth
 	else
 	{
 		// here we handle nth > 1.
-		int c = 1;
-		for(unsigned k = 2; k <= nth; ++k)
+		uint c = 1;
+		for(uint k = 2; k <= nth; ++k)
 		{
 			c *= k;
 		}
-		typename std::vector<Coeff>::const_iterator it = mCoefficients.begin();
-		unsigned i = nth;
-		for(it += nth; it != mCoefficients.end(); ++it)
+		auto it = mCoefficients.begin();
+		uint i = nth;
+		for(it += sint(nth); it != mCoefficients.end(); ++it)
 		{
 			result.mCoefficients.push_back(Coeff(c) * *it);
 			++i;
@@ -288,10 +288,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 
 	UnivariatePolynomial<Coeff> result(mMainVar);
 	result.mCoefficients.reserve(mCoefficients.size()-1);
-	unsigned degdiff = degree() - divisor.degree();
+	uint degdiff = degree() - divisor.degree();
 	if(degdiff > 0)
 	{
-		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + degdiff);
+		result.mCoefficients.assign(mCoefficients.begin(), mCoefficients.begin() + long(degdiff));
 	}
 	if(prefactor != nullptr)
 	{
@@ -304,14 +304,14 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::remainder_helper(const 
 	// By construction, the leading coefficient will be zero.
 	if(prefactor != nullptr)
 	{
-		for(unsigned i = 0; i < mCoefficients.size() - degdiff -1; ++i)
+		for(std::size_t i = 0; i < mCoefficients.size() - degdiff -1; ++i)
 		{
 			result.mCoefficients.push_back(mCoefficients[i + degdiff] * *prefactor - factor * divisor.mCoefficients[i]);
 		}
 	}
 	else
 	{
-		for(unsigned i = 0; i < mCoefficients.size() - degdiff -1; ++i)
+		for(std::size_t i = 0; i < mCoefficients.size() - degdiff -1; ++i)
 		{
 			result.mCoefficients.push_back(mCoefficients[i + degdiff] - factor * divisor.mCoefficients[i]);
 		}
@@ -355,7 +355,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::prem_old(const Univaria
 		return *this;
 	}
 	Coeff b = divisor.lcoeff();
-	unsigned d = degree() - divisor.degree() + 1;
+	uint d = degree() - divisor.degree() + 1;
 	Coeff prefactor = carl::pow(b,d);
 	return remainder(divisor, prefactor);
 }
@@ -428,8 +428,8 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::sprem(const UnivariateP
 		return *this;
 	}
 	Coeff b = divisor.lcoeff();
-	unsigned d = degree() - divisor.degree() + 1;
-	if(d%2) ++d;
+	uint d = degree() - divisor.degree() + 1;
+	if (d % 2 == 1) ++d;
 	Coeff prefactor = pow(b,d);
 	return remainder(divisor, &prefactor);
 }
@@ -647,7 +647,7 @@ template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert() const {
 	std::vector<NewCoeff> coeffs;
 	coeffs.resize(this->mCoefficients.size());
-	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+	for (std::size_t i = 0; i < this->mCoefficients.size(); i++) {
 		coeffs[i] = NewCoeff(this->mCoefficients[i]);
 	}
 	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
@@ -658,7 +658,7 @@ template<typename NewCoeff>
 UnivariatePolynomial<NewCoeff> UnivariatePolynomial<Coeff>::convert(const std::function<NewCoeff(const Coeff&)>& f) const {
 	std::vector<NewCoeff> coeffs;
 	coeffs.resize(this->mCoefficients.size());
-	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
+	for (std::size_t i = 0; i < this->mCoefficients.size(); i++) {
 		coeffs[i] = f(this->mCoefficients[i]);
 	}
 	return UnivariatePolynomial<NewCoeff>(this->mMainVar, coeffs);
@@ -815,8 +815,8 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 
 	result.quotient.mCoefficients.resize(1+mCoefficients.size()-divisor.mCoefficients.size(), Coeff(0));
 
-	unsigned int degdiff = this->degree() - divisor.degree();
-	for (unsigned int offset = 0; offset <= degdiff; offset++) {
+	uint degdiff = this->degree() - divisor.degree();
+	for (std::size_t offset = 0; offset <= degdiff; offset++) {
 		Coeff factor = carl::quotient(result.remainder.mCoefficients[this->degree()-offset], divisor.lcoeff());
 		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff - offset) * divisor;
 		result.quotient.mCoefficients[degdiff-offset] += factor;
@@ -843,7 +843,7 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 	do
 	{
 		Coeff factor = result.remainder.lcoeff()/divisor.lcoeff();
-		unsigned degdiff = result.remainder.degree() - divisor.degree();
+		uint degdiff = result.remainder.degree() - divisor.degree();
 		result.remainder -= UnivariatePolynomial<Coeff>(mMainVar, factor, degdiff) * divisor;
 		result.quotient.mCoefficients[degdiff] += factor;
 	}
@@ -858,8 +858,8 @@ template<typename C, EnableIf<is_field<C>>>
 DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideBy(const Coeff& divisor) const 
 {
 	UnivariatePolynomial<Coeff> res(*this);
-	for (unsigned i = 0; i < res.mCoefficients.size(); i++) {
-		res.mCoefficients[i] = res.mCoefficients[i] / divisor;
+	for (auto& c: res.mCoefficients) {
+		c = c / divisor;
 	}
 	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
 }
@@ -884,8 +884,8 @@ DivisionResult<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::divideB
 {
 	UnivariatePolynomial<Coeff> res(*this);
 	assert(res.isConsistent());
-	for (unsigned i = 0; i < res.mCoefficients.size(); i++) {
-		res.mCoefficients[i] = res.mCoefficients[i].divideBy(divisor);
+	for (auto& c: res.mCoefficients) {
+		c = c.divideBy(divisor);
 	}
 	assert(res.isConsistent());
 	return DivisionResult<UnivariatePolynomial<Coeff>>(res, UnivariatePolynomial(this->mainVar()));
@@ -984,7 +984,7 @@ typename UnivariatePolynomial<Coeff>::NumberType UnivariatePolynomial<Coeff>::nu
 	UnivariatePolynomial<Coeff>::NumberType c = this->numericContent(0) * mainDenom;
 	assert(getDenom(c) == 1);
 	IntNumberType res = getNum(c);
-	for (unsigned i = 1; i < this->mCoefficients.size(); i++) {
+	for (std::size_t i = 1; i < this->mCoefficients.size(); i++) {
 		c = this->numericContent(i) * mainDenom;
 		assert(getDenom(c) == 1);
 		res = carl::gcd(getNum(c), res);
@@ -997,8 +997,8 @@ template<typename C, EnableIf<is_number<C>>>
 typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::mainDenom() const
 {
 	IntNumberType denom = 1;
-	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
-		denom = carl::lcm(denom, getDenom(this->mCoefficients[i]));
+	for (const auto& c: mCoefficients) {
+		denom = carl::lcm(denom, getDenom(c));
 	}
 	CARL_LOG_TRACE("carl.core", "mainDenom of " << *this << " is " << denom);
 	return denom;
@@ -1008,8 +1008,8 @@ template<typename C, DisableIf<is_number<C>>>
 typename UnivariatePolynomial<Coeff>::IntNumberType UnivariatePolynomial<Coeff>::mainDenom() const
 {
 	IntNumberType denom = 1;
-	for (unsigned int i = 0; i < this->mCoefficients.size(); i++) {
-		denom = carl::lcm(denom, this->mCoefficients[i].mainDenom());
+	for (const auto& c: mCoefficients) {
+		denom = carl::lcm(denom, c.mainDenom());
 	}
 	return denom;
 }
@@ -1022,7 +1022,7 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 	if(isConstant()) // Constant.
 	{
 		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << *this << ")^" << 1 );
-		result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(*this, 1));
+		result.emplace(*this, 1);
 		return result;
 	}
 	// Make the polynomial's coefficients coprime (integral and with gcd 1).
@@ -1036,7 +1036,7 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 	{
 		// Store the rational factor and make the polynomial's coefficients coprime.
 		CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor) << ")^" << 1 );
-		result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor), 1));
+		result.emplace(UnivariatePolynomial<Coeff>(mainVar(), ((Coeff) 1) / factor), 1);
 		remainingPoly.mCoefficients.reserve(mCoefficients.size());
 		for(const Coeff& coeff : mCoefficients)
 		{
@@ -1050,7 +1050,7 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 	if(!remainingPoly.isConstant())
 	{
 		// Calculate the square free factorization.
-		std::map<unsigned, UnivariatePolynomial<Coeff>> sff = remainingPoly.squareFreeFactorization();
+		auto sff = remainingPoly.squareFreeFactorization();
 //		factor = (Coeff) 1;
 		for(auto expFactorPair = sff.begin(); expFactorPair != sff.end(); ++expFactorPair)
 		{
@@ -1062,7 +1062,7 @@ FactorMap<Coeff> UnivariatePolynomial<Coeff>::factorization() const
 //			}
 			if(!expFactorPair->second.isConstant() || expFactorPair->second.lcoeff() != (Coeff) 1)
 			{
-				auto retVal = result.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(expFactorPair->second, expFactorPair->first));
+				auto retVal = result.emplace(expFactorPair->second, expFactorPair->first);
 				CARL_LOG_TRACE("carl.core", "UnivFactor: add the factor (" << expFactorPair->second << ")^" << expFactorPair->first );
 				if(!retVal.second)
 				{
@@ -1095,7 +1095,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 	auto cf = poly.coefficients().begin();
 	if(*cf == Coeff(0)) // result is of the form a_n * x^n + ... + a_k * x^k (a>k, k>0)
 	{
-		unsigned k = 0;
+		uint k = 0;
 		while(*cf == Coeff(0))
 		{
 			assert(cf != poly.coefficients().end());
@@ -1103,7 +1103,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 			++k;
 		}
 		// Take x^k as a factor.
-		auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(poly.mainVar(), {(Coeff)0, (Coeff)1}), k));
+		auto retVal = linearFactors.emplace(UnivariatePolynomial<Coeff>(poly.mainVar(), {(Coeff)0, (Coeff)1}), k);
 		CARL_LOG_TRACE("carl.core", "UnivELF: add the factor (" << retVal.first->first << ")^" << k );
 		if(!retVal.second)
 		{
@@ -1186,7 +1186,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 					UnivariatePolynomial<Coeff> linearFactor(result.mainVar(), {-posRatZero, (Coeff)1});
 					while(image == 0)
 					{
-						auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(linearFactor, 1));
+						auto retVal = linearFactors.emplace(linearFactor, 1);
 						CARL_LOG_TRACE("carl.core", "UnivELF: add the factor (" << linearFactor << ")^" << 1 );
 						if(!retVal.second)
 						{
@@ -1287,7 +1287,7 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 								factor *= linearFactors.begin()->first.lcoeff();
 								linearFactors.erase(linearFactors.begin());
 							}
-							linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({factor})), 1));
+							linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, uint>(UnivariatePolynomial<Coeff>(result.mainVar(), std::initializer_list<Coeff>({factor})), 1));
 						}
 						return result;
 					}
@@ -1312,9 +1312,9 @@ LinearFactorRemains:
 				factor *= linearFactors.begin()->first.lcoeff();
 			linearFactors.erase(linearFactors.begin());
 		}
-		linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, unsigned>(UnivariatePolynomial<Coeff>(result.mainVar(), factor), 1));
+		linearFactors.insert(linearFactors.begin(), std::pair<UnivariatePolynomial<Coeff>, uint>(UnivariatePolynomial<Coeff>(result.mainVar(), factor), 1));
 	}
-	auto retVal = linearFactors.insert(std::pair<UnivariatePolynomial<Coeff>, unsigned>(result, 1));
+	auto retVal = linearFactors.emplace(result, 1);
 	CARL_LOG_TRACE("carl.core", "UnivELF: add the factor (" << result << ")^" << 1 );
 	if(!retVal.second)
 	{
@@ -1356,10 +1356,10 @@ Coeff UnivariatePolynomial<Coeff>::syntheticDivision(const Coeff& zeroOfDivisor)
 }
 
 template<typename Coeff>
-std::map<unsigned, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squareFreeFactorization() const
+std::map<uint, UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::squareFreeFactorization() const
 {
 	CARL_LOG_TRACE("carl.core", "UnivSSF: " << *this);
-	std::map<unsigned,UnivariatePolynomial<Coeff>> result;
+	std::map<uint,UnivariatePolynomial<Coeff>> result;
 CLANG_WARNING_DISABLE("-Wtautological-compare")
 	assert(!isZero()); // TODO what if zero?
 	// degree() >= characteristic<Coeff>::value throws a warning in clang...
@@ -1367,7 +1367,7 @@ CLANG_WARNING_DISABLE("-Wtautological-compare")
 CLANG_WARNING_RESET
 	{
 		CARL_LOG_TRACE("carl.core", "UnivSSF: degree greater than characteristic!");
-		result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(1, *this));
+		result.emplace(1, *this);
 		CARL_LOG_TRACE("carl.core", "UnivSSF: add the factor (" << *this << ")^1");
 	}
 	else
@@ -1387,7 +1387,7 @@ CLANG_WARNING_RESET
 		CARL_LOG_TRACE("carl.core", "UnivSSF: c = " << c);
 		if(c.isZero())
 		{
-			result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(1, *this));
+			result.emplace(1, *this);
 			CARL_LOG_TRACE("carl.core", "UnivSSF: add the factor (" << *this << ")^1");
 		}
 		else
@@ -1398,7 +1398,7 @@ CLANG_WARNING_RESET
 			CARL_LOG_TRACE("carl.core", "UnivSSF: y = " << y);
 			UnivariatePolynomial<Coeff> z = y-w.derivative();
 			CARL_LOG_TRACE("carl.core", "UnivSSF: z = " << z);
-			unsigned i = 1;
+			uint i = 1;
 			while(!z.isZero())
 			{
 				CARL_LOG_TRACE("carl.core", "UnivSSF: next iteration");
@@ -1410,7 +1410,7 @@ CLANG_WARNING_RESET
 				}
 				CARL_LOG_TRACE("carl.core", "UnivSSF: g = " << g);
 				assert(result.find(i) == result.end());
-				result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(i, g));
+				result.emplace(i, g);
 				CARL_LOG_TRACE("carl.core", "UnivSSF: add the factor (" << g << ")^" << i);
 				++i;
 				w = w.divideBy(g).quotient;
@@ -1420,7 +1420,7 @@ CLANG_WARNING_RESET
 				z = y - w.derivative();
 				CARL_LOG_TRACE("carl.core", "UnivSSF: z = " << z);
 			}
-			result.insert(std::pair<unsigned, UnivariatePolynomial<Coeff>>(i, w));
+			result.emplace(i, w);
 			CARL_LOG_TRACE("carl.core", "UnivSSF: add the factor (" << w << ")^" << i);
 		}
 	}
@@ -1429,11 +1429,11 @@ CLANG_WARNING_RESET
 
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::eliminateZeroRoots() {
-	unsigned int i = 0;
+	std::size_t i = 0;
 	while ((i < this->mCoefficients.size()) && (this->mCoefficients[i] == Coeff(0))) i++;
 	if (i == 0) return;
 	// Now shift by i elements, drop lower i coefficients (they are zero anyway)
-	for (unsigned int j = 0; j < this->mCoefficients.size()-i; j++) {
+	for (std::size_t j = 0; j < this->mCoefficients.size()-i; j++) {
 		this->mCoefficients[j] = this->mCoefficients[j+i];
 	}
 	this->mCoefficients.resize(this->mCoefficients.size()-i);
@@ -1450,7 +1450,7 @@ void UnivariatePolynomial<Coeff>::eliminateRoot(const Coeff& root) {
 	}
 	do {
 		std::vector<Coeff> tmp(this->mCoefficients.size()-1);
-		for (unsigned long i = this->mCoefficients.size()-1; i > 0; i--) {
+		for (std::size_t i = this->mCoefficients.size()-1; i > 0; i--) {
 			tmp[i-1] = this->mCoefficients[i];
 			this->mCoefficients[i-1] += this->mCoefficients[i] * root;
 		}
@@ -1481,7 +1481,7 @@ std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::standardStur
 }
 
 template<typename Coeff>
-unsigned int UnivariatePolynomial<Coeff>::signVariations(const Interval<Coeff>& interval) const {
+uint UnivariatePolynomial<Coeff>::signVariations(const Interval<Coeff>& interval) const {
 	if (interval.isEmpty()) return 0;
 	if (interval.isPointInterval()) {
 		std::vector<Coeff> vals;
@@ -1531,8 +1531,8 @@ void UnivariatePolynomial<Coeff>::reverse() {
 template<typename Coeff>
 void UnivariatePolynomial<Coeff>::scale(const Coeff& factor) {
 	Coeff f = factor;
-	for (unsigned int i = 1; i < this->mCoefficients.size(); i++) {
-		this->mCoefficients[i] *= f;
+	for (auto& c: mCoefficients) {
+		c *= f;
 		f *= factor;
 	}
 }
@@ -1543,9 +1543,9 @@ void UnivariatePolynomial<Coeff>::shift(const Coeff& a) {
 	next.reserve(this->mCoefficients.size());
 	next.push_back(this->mCoefficients.back());
 
-	for (unsigned int i = 0; i < this->mCoefficients.size()-1; i++) {
+	for (std::size_t i = 0; i < this->mCoefficients.size()-1; i++) {
 		next.push_back(next.back());
-		for (unsigned int j = i; j > 0; j--) {
+		for (std::size_t j = i; j > 0; j--) {
 			next[j] = a * next[j] + next[j-1];
 		}
 		next[0] = a * next[0] + this->mCoefficients[this->mCoefficients.size()-2-i];
@@ -1628,13 +1628,13 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 		CARL_LOG_TRACE("carl.core.resultant", "p = " << p);
 		CARL_LOG_TRACE("carl.core.resultant", "q = " << q);
 		if (q.isZero()) return subresultants;
-		unsigned pDeg = p.degree();
-		unsigned qDeg = q.degree();
+		uint pDeg = p.degree();
+		uint qDeg = q.degree();
 		subresultants.push_front(q);
 		
 		// Part 2
 		assert(pDeg >= qDeg);
-		unsigned delta = pDeg - qDeg;
+		uint delta = pDeg - qDeg;
 		CARL_LOG_TRACE("carl.core.resultant", "delta = " << delta);
 		
 		/** Case distinction on delta: either we choose b as next subresultant or we could reduce b (delta > 1)
@@ -1667,7 +1667,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				case SubresultantStrategy::Lazard: {
 					CARL_LOG_TRACE("carl.core.resultant", "Part 2: Ducos/Lazard strategy");
 					// "dichotomous Lazard": efficient exponentiation
-					unsigned deltaReduced = delta-1;
+					uint deltaReduced = delta-1;
 					CARL_LOG_TRACE("carl.core.resultant", "deltaReduced = " << deltaReduced);
 					// should be true by the loop condition
 					assert(deltaReduced > 0);
@@ -1678,7 +1678,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 					CARL_LOG_TRACE("carl.core.resultant", "lcoeffQ = " << lcoeffQ);
 					CARL_LOG_TRACE("carl.core.resultant", "reductionCoeff = " << reductionCoeff);
 					
-					unsigned exponent = highestPower(deltaReduced);
+					uint exponent = highestPower(deltaReduced);
 					deltaReduced -= exponent;
 					CARL_LOG_TRACE("carl.core.resultant", "exponent = " << exponent);
 					CARL_LOG_TRACE("carl.core.resultant", "deltaReduced = " << deltaReduced);
@@ -1741,13 +1741,13 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				Coeff lcoeffC = c.lcoeff();
 				std::vector<Coeff> h(pDeg);
 				
-				for (unsigned d = 0; d < qDeg; d++) {
+				for (uint d = 0; d < qDeg; d++) {
 					h[d] = lcoeffC * Coeff(variable).pow(d);
 				}
 				if (pDeg != qDeg) { // => aDeg > bDeg
 					h[qDeg] = Coeff(lcoeffC * Coeff(variable).pow(qDeg) - c); // H_e
 				}
-				for (unsigned d = qDeg + 1; d < pDeg; d++) {
+				for (uint d = qDeg + 1; d < pDeg; d++) {
 					Coeff t = h[d-1] * variable;
 					UnivariatePolynomial<Coeff> reducedNewB = t.toUnivariatePolynomial(variable).coefficients()[qDeg] * q;
 					bool res = reducedNewB.divideBy(lcoeffQ, reducedNewB);
@@ -1756,7 +1756,7 @@ const std::list<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::subres
 				}
 				
 				UnivariatePolynomial<Coeff> sum(p.mainVar(), h.front() * p.coefficients()[0]);
-				for (unsigned d = 1; d < pDeg; d++) {
+				for (uint d = 1; d < pDeg; d++) {
 					sum += h[d] * p.coefficients()[d];
 				}
 				UnivariatePolynomial<Coeff> normalizedSum(p.mainVar());
@@ -1787,8 +1787,8 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 ) {
 	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs(subres.size());
-	unsigned i = 0;
-	for (auto s: subres) {
+	uint i = 0;
+	for (const auto& s: subres) {
 		assert(!s.isZero());
 		if (s.degree() < i) {
 			// this and all further subresultants won't have a non-zero i-th coefficient
@@ -1823,7 +1823,7 @@ template<typename Coeff>
 UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::discriminant(const SubresultantStrategy strategy) const {
 	UnivariatePolynomial<Coeff> resultant = this->resultant(this->derivative(), strategy);
 	if(isLinearInMainVar()) return resultant;
-	unsigned d = this->degree();
+	uint d = this->degree();
 	Coeff sign = ((d*(d-1) / 2) % 2 == 0) ? Coeff(1) : Coeff(-1);
 	Coeff redCoeff = sign * this->lcoeff();
 	bool res = resultant.divideBy(redCoeff, resultant);
@@ -1878,15 +1878,15 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator+=(const Univa
 	
 	if(mCoefficients.size() < rhs.mCoefficients.size())
 	{
-		for(unsigned i = 0; i < mCoefficients.size(); ++i)
+		for(std::size_t i = 0; i < mCoefficients.size(); ++i)
 		{
 			mCoefficients[i] += rhs.mCoefficients[i];
 		}
-		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - ((unsigned)(rhs.mCoefficients.size() - mCoefficients.size())), rhs.mCoefficients.end());
+		mCoefficients.insert(mCoefficients.end(), rhs.mCoefficients.end() - sint(rhs.mCoefficients.size() - mCoefficients.size()), rhs.mCoefficients.end());
 	}
 	else
 	{
-		for(unsigned i = 0; i < rhs.mCoefficients.size(); ++i)
+		for(std::size_t i = 0; i < rhs.mCoefficients.size(); ++i)
 		{
 			mCoefficients[i] += rhs.mCoefficients[i]; 
 		}
@@ -2028,10 +2028,10 @@ UnivariatePolynomial<Coeff>& UnivariatePolynomial<Coeff>::operator*=(const Univa
 	
 	std::vector<Coeff> newCoeffs; 
 	newCoeffs.reserve(mCoefficients.size() + rhs.mCoefficients.size());
-	for(unsigned e = 0; e < mCoefficients.size() + rhs.degree(); ++e)
+	for(std::size_t e = 0; e < mCoefficients.size() + rhs.degree(); ++e)
 	{
 		newCoeffs.push_back(Coeff(0));
-		for(unsigned i = 0; i < mCoefficients.size() && i <= e; ++i)
+		for(std::size_t i = 0; i < mCoefficients.size() && i <= e; ++i)
 		{
 			if(e - i < rhs.mCoefficients.size())
 			{

@@ -42,10 +42,10 @@ using FactorMap = std::map<UnivariatePolynomial<Coefficient>, uint>;
 namespace carl
 {
 
-enum class PolynomialComparisonOrder : unsigned {
+enum class PolynomialComparisonOrder {
 	CauchyBound, LowDegree, Memory, Default = LowDegree
 };
-enum class SubresultantStrategy : unsigned {
+enum class SubresultantStrategy {
 	Generic, Lazard, Ducos, Default = Lazard
 };
 	
@@ -153,7 +153,7 @@ public:
 	 * @param mainVar New main variable.
 	 * @param coefficients Assignment of degree to coefficients.
 	 */
-	UnivariatePolynomial(Variable::Arg mainVar, const std::map<unsigned, Coefficient>& coefficients);
+	UnivariatePolynomial(Variable::Arg mainVar, const std::map<uint, Coefficient>& coefficients);
 
 	/**
 	 * Destructor.
@@ -332,9 +332,9 @@ public:
 	 * @see @cite GCL92, page 38
 	 * @return Degree.
 	 */
-	unsigned degree() const {
+	uint degree() const {
 		assert(!this->isZero());
-		return (unsigned)mCoefficients.size()-1;
+		return uint(mCoefficients.size()-1);
 	}
 	
 	/**
@@ -345,7 +345,7 @@ public:
 	 * @return Total degree.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	unsigned totalDegree() const {
+	uint totalDegree() const {
 		return this->degree();
 	}
 	/**
@@ -357,12 +357,12 @@ public:
 	 * @return Total degree.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	unsigned totalDegree() const {
+	uint totalDegree() const {
 		assert(!this->isZero());
-		unsigned max = 0;
-		for (unsigned deg = 0; deg < this->mCoefficients.size(); deg++) {
+		uint max = 0;
+		for (std::size_t deg = 0; deg < this->mCoefficients.size(); deg++) {
 			if (!this->mCoefficients[deg].isZero()) {
-				unsigned tdeg = deg + this->mCoefficients[deg].totalDegree();
+				uint tdeg = deg + this->mCoefficients[deg].totalDegree();
 				if (tdeg > max) max = tdeg;
 			}
 		}
@@ -494,7 +494,7 @@ public:
 	 * @return If v occurs in the polynomial.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	unsigned has(Variable::Arg v) const {
+	bool has(Variable::Arg v) const {
 		return v == this->mainVar();
 	}
 	/**
@@ -504,7 +504,7 @@ public:
 	 * @return If v occurs in the polynomial.
 	 */
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	unsigned has(Variable::Arg v) const {
+	bool has(Variable::Arg v) const {
 		bool hasVar = v == this->mainVar();
 		for (auto c: this->mCoefficients) {
 			hasVar = hasVar || c.has(v);
@@ -606,7 +606,7 @@ public:
 	 * @param nth how many times the derivative should be applied.
 	 * @return A polynomial \f$(d/dx)^n p(x)\f$ where \f$p(x)\f$ is the input polynomial.
 	 */
-	UnivariatePolynomial derivative(unsigned nth = 1) const;
+	UnivariatePolynomial derivative(uint nth = 1) const;
 
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor, const Coefficient& prefactor) const;
 	UnivariatePolynomial remainder(const UnivariatePolynomial& divisor) const;
@@ -624,7 +624,7 @@ public:
 	 */
 	UnivariatePolynomial negateVariable() const {
 		UnivariatePolynomial<Coefficient> res(*this);
-		for (unsigned int deg = 0; deg < res.coefficients().size(); deg++) {
+		for (std::size_t deg = 0; deg < res.coefficients().size(); deg++) {
 			if (deg % 2 == 1) res.mCoefficients[deg] = -res.mCoefficients[deg];
 		}
 		return res;
@@ -829,12 +829,12 @@ public:
 	 * @return numeric content part of i'th coefficient.
 	 */
 	template<typename C=Coefficient, EnableIf<is_number<C>> = dummy>
-	NumberType numericContent(unsigned int i) const
+	NumberType numericContent(std::size_t i) const
 	{
 		return this->mCoefficients[i];
 	}
 	template<typename C=Coefficient, DisableIf<is_number<C>> = dummy>
-	NumberType numericContent(unsigned int i) const
+	NumberType numericContent(std::size_t i) const
 	{
 		return this->mCoefficients[i].numericContent();
 	}
@@ -867,7 +867,7 @@ public:
 	 *		gcd( a/b, c/d ) = gcd( a/b*l, c/d*l ) / l
 	 * where l = lcm(b,d).
 	 * @return numeric content part of the polynomial.
-	 * @see UnivariatePolynomials::numericContent(unsigned int)
+	 * @see UnivariatePolynomials::numericContent(std::size_t)
 	 */
 	template<typename N=NumberType, EnableIf<is_subset_of_rationals<N>> = dummy>
 	typename UnderlyingNumberType<Coefficient>::type numericContent() const;
@@ -898,7 +898,7 @@ public:
 	static UnivariatePolynomial excludeLinearFactors(const UnivariatePolynomial& poly, FactorMap<Coefficient>& linearFactors, const Integer& maxInt = 0 );
 
 	Coefficient syntheticDivision(const Coefficient& _zeroOfDivisor);
-	std::map<unsigned, UnivariatePolynomial> squareFreeFactorization() const;
+	std::map<uint, UnivariatePolynomial> squareFreeFactorization() const;
 
 	/**
 	 * Checks if zero is a real root of this polynomial.
@@ -932,7 +932,7 @@ public:
 	 * @param interval Count roots within this interval.
 	 * @return Upper bound for number of real roots within the interval.
 	 */
-	unsigned int signVariations(const Interval<Coefficient>& interval) const;
+	uint signVariations(const Interval<Coefficient>& interval) const;
 
 	/**
 	 * Count the number of real roots within the given interval using Sturm sequences.

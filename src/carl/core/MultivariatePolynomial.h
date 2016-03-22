@@ -7,15 +7,17 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "Polynomial.h"
 #include "Term.h"
 #include "DivisionResult.h"
 #include "MultivariatePolynomialPolicy.h"
 #include "VariableInformation.h"
+#include "../numbers/numbers.h"
 #include "../util/TermAdditionManager.h"
+
+#include <memory>
+#include <type_traits>
+#include <vector>
 
 namespace carl
 {
@@ -61,6 +63,9 @@ public:
     typedef std::vector<int> CACHE;
 	/// Type our terms vector.f
 	typedef std::vector<Term<Coeff>> TermsType;
+	
+	template<typename C, typename T>
+	using EnableIfNotSame = typename std::enable_if<!std::is_same<C,T>::value,T>::type;
     
 protected:
     
@@ -75,7 +80,7 @@ public:
     ///
     static TermAdditionManager<MultivariatePolynomial,Ordering> mTermAdditionManager;
     
-	enum ConstructorOperation : unsigned { ADD, SUB, MUL, DIV };
+	enum ConstructorOperation { ADD, SUB, MUL, DIV };
     friend inline std::ostream& operator<<(std::ostream& os, ConstructorOperation op) {
         switch (op) {
             case ConstructorOperation::ADD: return os << "+";
@@ -93,8 +98,11 @@ public:
 	MultivariatePolynomial(MultivariatePolynomial<Coeff, Ordering, Policies>&&);
 	MultivariatePolynomial& operator=(const MultivariatePolynomial& p);
 	MultivariatePolynomial& operator=(MultivariatePolynomial&& p);
-	explicit MultivariatePolynomial(int c);
-	explicit MultivariatePolynomial(unsigned c);
+	explicit MultivariatePolynomial(int c): MultivariatePolynomial(sint(c)) {}
+	template<typename C = Coeff>
+	explicit MultivariatePolynomial(EnableIfNotSame<C,sint> c);
+	template<typename C = Coeff>
+	explicit MultivariatePolynomial(EnableIfNotSame<C,uint> c);
 	explicit MultivariatePolynomial(const Coeff& c);
 	explicit MultivariatePolynomial(Variable::Arg v);
 	explicit MultivariatePolynomial(const Term<Coeff>& t);

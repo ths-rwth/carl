@@ -43,7 +43,7 @@ namespace carl
     {}
 
     template<typename Pol>
-    ConstraintContent<Pol>::ConstraintContent( Pol&& _lhs, Relation _rel, unsigned _id ):
+    ConstraintContent<Pol>::ConstraintContent( Pol&& _lhs, Relation _rel, std::size_t _id ):
         mID( _id ),
         mHash( CONSTRAINT_HASH( _lhs, _rel, Pol ) ),
         mUsages( 0 ),
@@ -263,13 +263,13 @@ namespace carl
         {
             mFactorization = carl::factor( mLhs );
         } else {
-			mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
+			mFactorization.emplace( mLhs, 1 );
 		}
         #else
-        mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
+        mFactorization.emplace( mLhs, 1 );
         #endif
         #else
-        mFactorization.insert( pair<Pol, unsigned>( mLhs, 1 ) );
+        mFactorization.emplace( mLhs, 1 );
         #endif
     }
 
@@ -736,7 +736,7 @@ namespace carl
     }
 
     template<typename Pol>
-    Pol Constraint<Pol>::coefficient( const Variable& _var, unsigned _degree ) const
+    Pol Constraint<Pol>::coefficient( const Variable& _var, uint _degree ) const
     {
         VARINFOMAP_LOCK_GUARD
         auto varInfo = mpContent->mVarInfoMap.find( _var );
