@@ -156,6 +156,14 @@ inline cln::cl_I toInt<cln::cl_I>(const cln::cl_RA& n) {
 	assert(isInteger(n));
 	return getNum(n);
 }
+template<>
+inline sint toInt<sint>(const cln::cl_RA& n) {
+	return toInt<sint>(toInt<cln::cl_I>(n));
+}
+template<>
+inline uint toInt<uint>(const cln::cl_RA& n) {
+    return toInt<uint>(toInt<cln::cl_I>(n));
+}
 
 /**
  * Convert a cln fraction to a cln long float.
