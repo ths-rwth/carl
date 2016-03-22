@@ -251,7 +251,7 @@ TEST(UnivariatePolynomial, factorization)
     UnivariatePolynomial<Rational> pol4(x, {(Rational)1, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> pol5(x, {(Rational)1, (Rational)0, (Rational)-1});
     UnivariatePolynomial<Rational> pol6 = pol4*pol5*pol5*pol5;
-    std::map<unsigned, UnivariatePolynomial<Rational>> sffactors = pol6.squareFreeFactorization();
+    auto sffactors = pol6.squareFreeFactorization();
 //    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     UnivariatePolynomial<Rational> productOfFactors = UnivariatePolynomial<Rational>(x, (Rational)1);
     for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)

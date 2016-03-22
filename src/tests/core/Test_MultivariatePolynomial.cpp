@@ -22,9 +22,9 @@ TYPED_TEST(MultivariatePolynomialTest, Constructor)
     Variable v0(1);
     Term<TypeParam> t0(v0);
     MultivariatePolynomial<TypeParam> p0(t0);
-
+	
     MultivariatePolynomial<TypeParam> p1(TypeParam(3));
-    EXPECT_EQ((unsigned)1, p1.nrTerms());
+    EXPECT_EQ(1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
 }
 
