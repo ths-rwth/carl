@@ -6,6 +6,7 @@
 #pragma once
 
 #include <bitset>
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 
@@ -22,11 +23,11 @@ template<typename T>
 std::string binary(const T& a, const bool& spacing = true)
 {
 	std::stringstream ss;
-    const char* begin = reinterpret_cast<const char*>(&a);
-	const char* end = begin + sizeof(T);
+    const std::uint8_t* begin = reinterpret_cast<const std::uint8_t*>(&a);
+	const std::uint8_t* end = begin + sizeof(T);
 	while (begin != end) {
 		end--;
-		ss << std::bitset<8>(unsigned(*end));
+		ss << std::bitset<8>(std::uint8_t(*end));
 		if (spacing && (begin != end)) ss << " ";
 	}
 	return ss.str();

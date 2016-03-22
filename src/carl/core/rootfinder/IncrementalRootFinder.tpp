@@ -90,8 +90,7 @@ bool IncrementalRootFinder<Number, C>::processQueueItem() {
 		return true;
 	}
 
-	unsigned int variations;
-	variations = this->polynomial.signVariations(interval);
+	uint variations = this->polynomial.signVariations(interval);
 
 	if (variations == 0) return true;
 	if (variations == 1) {
@@ -155,7 +154,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 		} else if (roots.size() > 1) {
 			Number tmp = 2 * roots[0] - roots[1];
 			if (interval.contains(tmp)) res.push_back(tmp);
-			for (unsigned int i = 0; i < roots.size()-1; i++) {
+			for (std::size_t i = 0; i < roots.size()-1; i++) {
 				if (interval.contains(roots[i]) && finder.getPolynomial().evaluate(roots[i]) == 0) {
 					res.push_back(roots[i]);
 				}
@@ -181,7 +180,7 @@ void buildIsolation(std::vector<double>&& doubleRoots, const Interval<Number>& i
 	if (res[0] < res[1]) {
 		finder.addQueue(Interval<Number>(res[0], BoundType::STRICT, res[1], BoundType::STRICT), SplittingStrategy::BINARYSAMPLE);
 	}
-	for (unsigned int i = 1; i < res.size()-1; i++) {
+	for (std::size_t i = 1; i < res.size()-1; i++) {
 		if (finder.getPolynomial().evaluate(res[i]) == 0) {
 			finder.addRoot(RealAlgebraicNumber<Number>(res[i]));
 		}
@@ -246,10 +245,10 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	UnivariatePolynomial<Number> p = finder.getPolynomial();
 	
 	// Create companion matrix
-	unsigned int degree = p.degree();
+	uint degree = p.degree();
 	Eigen::MatrixXd m = Eigen::MatrixXd::Zero(degree, degree);
 	m(0, degree-1) = toDouble(Number(-p.coefficients()[0] / p.coefficients()[degree]));
-	for (unsigned int i = 1; i < degree; i++) {
+	for (uint i = 1; i < degree; i++) {
 		m(i, i-1) = 1;
 		m(i, degree-1) = toDouble(Number(-p.coefficients()[i] / p.coefficients()[degree]));
 	}
@@ -259,7 +258,7 @@ void EigenValueStrategy<Number>::operator()(const Interval<Number>& interval, Ro
 	
 	// Save real parts to tmp
 	std::vector<double> tmp((size_t)eigenvalues.size());
-	for (unsigned int i = 0; i < eigenvalues.size(); i++) {
+	for (uint i = 0; i < eigenvalues.size(); i++) {
 		if (eigenvalues[i].imag() > eigenvalues[i].real() / 4) tmp[i] = 0;
 		else tmp[i] = eigenvalues[i].real();
 	}

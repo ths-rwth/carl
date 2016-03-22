@@ -286,7 +286,7 @@ struct is_polynomial<carl::MultivariatePolynomial<T, O, P>>: std::true_type {};
  * @see UnivariatePolynomial - squareFreeFactorization for example.
  */
 template<typename type>
-struct characteristic: std::integral_constant<unsigned, 0> {};
+struct characteristic: std::integral_constant<uint, 0> {};
 
 
 /**

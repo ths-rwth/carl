@@ -11,7 +11,7 @@ namespace carl
 	/**
 	 * Regarding a polynomial \f$p\f$ as a function \f$p: X \rightarrow Y\f$, its definiteness gives information about the codomain \f$Y\f$.
 	 */
-    enum class Definiteness : unsigned {
+    enum class Definiteness {
 		/// Indicates that \f$y < 0 \forall y \in Y\f$.
 		NEGATIVE = 0,
 		/// Indicates that \f$y \leq 0 \forall y \in Y\f$.

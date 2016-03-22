@@ -322,7 +322,7 @@ namespace carl
 		 * @param index Index.
 		 * @return VarExpPair.
 		 */
-		const std::pair<Variable, exponent>& operator[](unsigned index) const
+		const std::pair<Variable, uint>& operator[](std::size_t index) const
 		{
 			assert(index < mExponents.size());
 			return mExponents[index];

@@ -91,7 +91,7 @@ namespace carl{
 			 * Constructor of the pool.
 			 * @param _capacity Expected necessary capacity of the pool.
 			 */
-			explicit MonomialPool( unsigned _capacity = 10000 ):
+			explicit MonomialPool( std::size_t _capacity = 10000 ):
 				Singleton<MonomialPool>(),
 				mPool(_capacity)
 			{}

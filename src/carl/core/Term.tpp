@@ -389,7 +389,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 }
 
 template<typename Coeff>
-const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs)
+const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs)
 {
 	return Term<Coeff>(lhs.coeff()/rhs, lhs.monomial());
 }

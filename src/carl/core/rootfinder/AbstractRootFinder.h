@@ -126,7 +126,7 @@ protected:
 	 * Informational method for subclasses specifying the maximum degree of the polynomial that solveTrivial() can handle.
      * @return Maximum degree that solveTrivial() can handle.
      */
-	unsigned int solveTrivialMaxDegree() const {
+	uint solveTrivialMaxDegree() const {
 		return 2;
 	}
 	

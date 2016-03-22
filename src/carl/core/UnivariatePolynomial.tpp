@@ -1138,10 +1138,10 @@ UnivariatePolynomial<Coeff> UnivariatePolynomial<Coeff>::excludeLinearFactors(co
 		std::vector<std::pair<Integer, Integer>> shiftedTcs;
 		bool positive = true;
 		bool tcFactorsFound = false;
-		std::vector<Integer> tcFactors = std::vector<Integer>(1, 1); // TODO: store the divisors of some numbers during compilation
+		std::vector<Integer> tcFactors(1, 1); // TODO: store the divisors of some numbers during compilation
 		auto tcFactor = tcFactors.begin();
 		bool lcFactorsFound = false;
-		std::vector<Integer> lcFactors = std::vector<Integer>(1, 1); // TODO: store the divisors of some numbers during compilation
+		std::vector<Integer> lcFactors(1, 1); // TODO: store the divisors of some numbers during compilation
 		auto lcFactor = lcFactors.begin();
 		while(true)
 		{

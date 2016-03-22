@@ -129,7 +129,7 @@ inline double abs(double n) {
 inline uint mod(uint n, uint m) {
 	return n % m;
 }
-inline sint mod(sint n, int m) {
+inline sint mod(sint n, sint m) {
 	return n % m;
 }
 

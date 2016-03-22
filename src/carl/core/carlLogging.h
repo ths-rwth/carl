@@ -80,7 +80,7 @@ namespace logging {
  * 
  * All messages which have a level that is equal or greater than the specified value will be forwarded.
  */
-enum class LogLevel : unsigned {
+enum class LogLevel {
 	/// All log messages.
 	LVL_ALL,
 	/// Log messages used for tracing the program flow in detail.
@@ -233,14 +233,14 @@ struct RecordInfo {
 	/// Function name.
 	std::string func;
 	/// Line number.
-	unsigned line;
+	uint line;
 	/**
 	 * Constructor.
      * @param filename File name.
      * @param func Function name.
      * @param line Line number.
      */
-	RecordInfo(const std::string& _filename, const std::string& _func, unsigned _line): 
+	RecordInfo(const std::string& _filename, const std::string& _func, uint _line): 
 		filename(_filename), func(_func), line(_line) {}
 };
 

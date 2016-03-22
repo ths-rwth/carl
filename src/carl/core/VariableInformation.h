@@ -159,7 +159,7 @@ namespace carl
 		{
 		}
         
-        VariableInformation(uint maxDegree, uint minDegree, unsigned occurence, std::map<uint, CoeffType>&& coeffs):
+        VariableInformation(uint maxDegree, uint minDegree, uint occurence, std::map<uint, CoeffType>&& coeffs):
             VariableInformation<false, CoeffType>(maxDegree, minDegree, occurence),
             mCoeffs(coeffs)
         {
@@ -200,7 +200,7 @@ namespace carl
             std::vector<std::pair<Variable, exponent>> exps;
             exps.reserve(monomial.nrVariables()-1);
             exponent totalDegree = monomial.tdeg();
-            for(unsigned i = 0; i<monomial.nrVariables(); ++i)
+            for(std::size_t i = 0; i < monomial.nrVariables(); ++i)
             {
                 if(monomial[i].first == v)
                 {

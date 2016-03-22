@@ -342,7 +342,7 @@ class Term
 		 * @return `lhs / rhs`
 		 */
 		template<typename Coeff>
-		friend const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs);
+		friend const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs);
 		/// @}
 		
 		/**

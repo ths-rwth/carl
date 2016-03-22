@@ -114,17 +114,17 @@ namespace carl
     using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
     template<typename Pol>
-    using Factors = std::map<Pol,exponent>;
+    using Factors = std::map<Pol,uint>;
     
     // Constants.
     ///@todo move static variables to own cpp
     
-    static const unsigned MAX_DEGREE_FOR_FACTORIZATION = 6;
+    static constexpr unsigned MAX_DEGREE_FOR_FACTORIZATION = 6;
     
-    static const unsigned MIN_DEGREE_FOR_FACTORIZATION = 1;
+    static constexpr unsigned MIN_DEGREE_FOR_FACTORIZATION = 1;
     
-    static const unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
+    static constexpr unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
-    static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
+    static constexpr unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
 	
 }	// namespace carl

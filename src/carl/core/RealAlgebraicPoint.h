@@ -119,7 +119,7 @@ public:
 	bool operator==(RealAlgebraicPoint<Number>& r) {
 		if (this->dim() != r.dim()) return false;
 		std::not_equal_to<Number> neq;
-		for (unsigned i = 0; i < this->numbers.size(); i++) {
+		for (std::size_t i = 0; i < this->numbers.size(); i++) {
 			if (neq(this->numbers[i], r.numbers[i])) return false;
 		}
 		return true;
@@ -135,7 +135,7 @@ public:
 template<typename Number>
 std::ostream& operator<<(std::ostream& os, const RealAlgebraicPoint<Number>& r) {
 	os << "(";
-	for (unsigned i = 0; i < r.dim(); i++) {
+	for (std::size_t i = 0; i < r.dim(); i++) {
 		if (i > 0) os << ", ";
 		os << r.numbers[i];
 	}

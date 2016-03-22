@@ -38,7 +38,7 @@ namespace rootfinder {
 /**
  * Enum of all strategies for splitting some interval.
  */
-enum class SplittingStrategy : unsigned int {
+enum class SplittingStrategy {
 	/// Uses GenericStrategy
 	GENERIC,
 	/// Uses BinarySampleStrategy
@@ -187,7 +187,7 @@ struct EigenValueStrategy: public AbstractStrategy<EigenValueStrategy<Number>, N
  */
 template<typename Number>
 struct AberthStrategy : public AbstractStrategy<AberthStrategy<Number>, Number> {
-	std::vector<double> teruiSasaki(const UnivariatePolynomial<Number>& p, const unsigned int rootCount);
+	std::vector<double> teruiSasaki(const UnivariatePolynomial<Number>& p, uint rootCount);
 	double step(std::vector<double>& roots, const UnivariatePolynomial<Number>& p, const UnivariatePolynomial<Number>& pd);
 	Number step(std::vector<Number>& roots, const UnivariatePolynomial<Number>& p, const UnivariatePolynomial<Number>& pd);
 	bool Aberth(const UnivariatePolynomial<Number>& polynomial, std::vector<double>& roots, const double epsilon = 0.01);
