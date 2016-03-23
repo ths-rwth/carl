@@ -1,5 +1,5 @@
 /**
- * @file tree.h
+ * @file carlTree.h
  * @author Gereon Kremer <gereon.kremer@cs.rwth-aachen.de>
  */
 
