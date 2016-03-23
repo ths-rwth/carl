@@ -145,6 +145,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
  */
 template<typename Number>
 RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
 	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
@@ -172,7 +173,6 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 		for (auto it = m.begin(); it != m.end(); it++) {
 			it->second.refine();
 			if (it->second.isNumeric()) {
-				m.erase(it);
 				return evaluate(p, m);
 			} else {
 				varToInterval[it->first] = it->second.getInterval();
