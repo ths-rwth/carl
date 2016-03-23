@@ -39,7 +39,7 @@ private:
 		std::size_t nextSibling = MAXINT;
 		std::size_t firstChild = MAXINT;
 		std::size_t lastChild = MAXINT;
-		std::size_t depth;
+		std::size_t depth = MAXINT;
 		Node(std::size_t _id, const T& _data, std::size_t _parent, std::size_t _depth):
 			id(_id), data(_data), parent(_parent), depth(_depth)
 		{
@@ -710,12 +710,8 @@ public:
 	}
 	template<typename Iterator>
 	bool is_valid(const Iterator& it) const {
-		std::size_t cur = emptyNodes;
-		while (cur != MAXINT) {
-			if (cur == it.current) return false;
-			cur = nodes[cur].nextSibling;
-		}
-		return (it.current >= 0) && (it.current < nodes.size());
+		if (it.current >= nodes.size()) return false;
+		return nodes[it.current].depth < MAXINT;
 	}
 	/**
 	 * Retrieves the parent of an element.
@@ -921,6 +917,7 @@ private:
 		eraseChildren(id);
 		nodes[id].nextSibling = emptyNodes;
 		nodes[id].previousSibling = MAXINT;
+		nodes[id].depth = MAXINT;
 		emptyNodes = id;
 	}
 	
