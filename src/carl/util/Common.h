@@ -9,7 +9,6 @@
 
 
 #include "../core/Variable.h"
-//#include "../core/VariableInformation.h"
 #include "pointerOperations.h"
 
 #include <map>
@@ -119,12 +118,12 @@ namespace carl
     // Constants.
     ///@todo move static variables to own cpp
     
-    static constexpr unsigned MAX_DEGREE_FOR_FACTORIZATION = 6;
+    static constexpr uint MAX_DEGREE_FOR_FACTORIZATION = 6;
     
-    static constexpr unsigned MIN_DEGREE_FOR_FACTORIZATION = 1;
+    static constexpr uint MIN_DEGREE_FOR_FACTORIZATION = 1;
     
-    static constexpr unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
+    static constexpr uint MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
-    static constexpr unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
+    static constexpr uint MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
 	
 }	// namespace carl
