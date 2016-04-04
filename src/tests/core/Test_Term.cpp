@@ -1,9 +1,8 @@
-#include "gtest/gtest.h"
-#include "../numbers/config.h"
-#include "carl/core/Variable.h"
-#include "carl/core/VariablePool.h"
-#include "carl/core/Monomial.h"
-#include "carl/core/Term.h"
+#include <gtest/gtest.h>
+#include <carl/core/Variable.h>
+#include <carl/core/VariablePool.h>
+#include <carl/core/Monomial.h>
+#include <carl/core/Term.h>
 #include "Util.h"
 #include <list>
 

@@ -16,9 +16,9 @@ namespace carl
 template<typename NumberType>
 class PrimeFactory
 {
-	static const unsigned nrPrimes = 12;
+	static constexpr std::size_t nrPrimes = 12;
 	static const NumberType PRIMES[nrPrimes];
-	unsigned nextPrimeNr = 0;
+	std::size_t nextPrimeNr = 0;
 	public:
 	NumberType nextPrime();
 };

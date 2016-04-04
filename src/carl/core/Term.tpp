@@ -5,7 +5,7 @@
  */
 #pragma once
 
-// for code assistance
+#include "../numbers/numbers.h"
 #include "Term.h"
 #include "Monomial_derivative.h"
 #include "Monomial_substitute.h"
@@ -28,7 +28,7 @@ Term<Coefficient>::Term(const Coefficient& c) :
 }
 template<typename Coefficient>
 Term<Coefficient>::Term(Variable::Arg v) :
-	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, (exponent)1))
+	mCoeff(carl::constant_one<Coefficient>().get()), mMonomial(createMonomial(v, uint(1)))
 {
 	assert(this->isConsistent());
 }
@@ -55,7 +55,7 @@ Term<Coefficient>::Term(Coefficient&& c, const Monomial::Arg& m) :
 }
 
 template<typename Coefficient>
-Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, exponent e): 
+Term<Coefficient>::Term(const Coefficient& c, Variable::Arg v, uint e): 
 	mCoeff(c),
 	mMonomial(createMonomial(v,e))
 {
@@ -350,7 +350,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(Variable::Arg rhs)
 	}
 	else
 	{
-		mMonomial = createMonomial(rhs, (exponent)1);
+		mMonomial = createMonomial(rhs, uint(1));
 	}
 	return *this;
 }
@@ -389,7 +389,7 @@ Term<Coefficient>& Term<Coefficient>::operator*=(const Term& rhs)
 }
 
 template<typename Coeff>
-const Term<Coeff> operator/(const Term<Coeff>& lhs, unsigned long rhs)
+const Term<Coeff> operator/(const Term<Coeff>& lhs, uint rhs)
 {
 	return Term<Coeff>(lhs.coeff()/rhs, lhs.monomial());
 }

@@ -6,17 +6,18 @@
  */
 
 #pragma once
+
+#include "../numbers/numbers.h"
+#include "CompareResult.h"
+#include "Variable.h"
+#include "VariablePool.h"
+#include "carlLoggingHelper.h"
+#include "logging.h"
+
 #include <algorithm>
 #include <list>
 #include <set>
 #include <sstream>
-
-#include "Variable.h"
-#include "CompareResult.h"
-#include "logging.h"
-#include "carlLoggingHelper.h"
-#include "../numbers/numbers.h"
-#include "VariablePool.h"
 
 namespace carl
 {   
@@ -25,7 +26,7 @@ namespace carl
 	class Term;
 	
 	/// Type of an exponent.
-	typedef unsigned exponent;
+	using exponent = uint;
 	
 	/**
 	 * Compare a pair of variable and exponent with a variable.
@@ -34,7 +35,7 @@ namespace carl
 	 * @param v Variable.
 	 * @return `p.first == v`
 	 */
-	inline bool operator==(const std::pair<Variable, exponent>& p, Variable::Arg v) {
+	inline bool operator==(const std::pair<Variable, uint>& p, Variable::Arg v) {
 		return p.first == v;
 	}
 
@@ -58,14 +59,14 @@ namespace carl
 	{
 		friend class MonomialPool;
 	public:
-		typedef std::shared_ptr<const Monomial> Arg;
-		typedef std::vector<std::pair<Variable, exponent>> Content;
+		using Arg = std::shared_ptr<const Monomial>;
+		using Content = std::vector<std::pair<Variable, uint>>;
 		~Monomial();
 	protected:
 		/// A vector of variable exponent pairs (v_i^e_i) with nonzero exponents.
 		Content mExponents;
 		/// Some applications performance depends on getting the degree of monomials very fast
-		exponent mTotalDegree = 0;
+		uint mTotalDegree = 0;
 		/// Monomial id.
 		mutable std::size_t mId = 0;
 		/// Cached hash.
@@ -91,7 +92,7 @@ namespace carl
 		 * @param v The variable.
 		 * @param e The exponent.
 		 */
-		Monomial(Variable::Arg v, exponent e = 1) :
+		explicit Monomial(Variable::Arg v, uint e = 1) :
 			mExponents(1, std::make_pair(v,e)),
 			mTotalDegree(e)
 		{
@@ -106,7 +107,7 @@ namespace carl
 		 * @param exponents The variables and their exponents.
 		 * @param totalDegree The total degree of the monomial to generate.
 		 */
-		Monomial(Content&& exponents, exponent totalDegree) :
+		Monomial(Content&& exponents, uint totalDegree) :
 			mExponents(std::move(exponents)),
 			mTotalDegree(totalDegree)
 		{
@@ -118,11 +119,11 @@ namespace carl
 		 * Generate a monomial from an initializer list of variable-exponent pairs and a total degree.
 		 * @param exponents The variables and their exponents.
 		 */
-		explicit Monomial(const std::initializer_list<std::pair<Variable, exponent>>& exponents) :
+		Monomial(const std::initializer_list<std::pair<Variable, uint>>& exponents) :
 			mExponents(exponents),
 			mTotalDegree(0)
 		{
-			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, exponent>& p1, const std::pair<Variable, exponent>& p2){ return p1.first < p2.first; });
+			std::sort(mExponents.begin(), mExponents.end(), [](const std::pair<Variable, uint>& p1, const std::pair<Variable, uint>& p2){ return p1.first < p2.first; });
 			for (const auto& e: mExponents) mTotalDegree += e.second;
 			calcHash();
 			assert(isConsistent());
@@ -321,7 +322,7 @@ namespace carl
 		 * @param index Index.
 		 * @return VarExpPair.
 		 */
-		const std::pair<Variable, exponent>& operator[](unsigned index) const
+		const std::pair<Variable, uint>& operator[](std::size_t index) const
 		{
 			assert(index < mExponents.size());
 			return mExponents[index];
@@ -407,11 +408,7 @@ namespace carl
 				}
 			}
 			// If there remain variables in the m, it fails.
-			if(itright != m->mExponents.end()) 
-			{
-				return false;
-			}
-			return true;
+			return itright == m->mExponents.end();
 		}
 		/**
 		 * Returns a new monomial that is this monomial divided by m.
@@ -459,7 +456,7 @@ namespace carl
 		 * @param exp Exponent.
 		 * @return this to the power of exp.
 		 */
-		Monomial::Arg pow(unsigned exp) const;
+		Monomial::Arg pow(uint exp) const;
 		
 		/**
 		 * Fill the set of variables with the variables from this monomial.
@@ -656,8 +653,7 @@ namespace carl
 	inline bool operator==(const Monomial::Arg& lhs, Variable::Arg rhs) {
 		if (lhs == nullptr) return false;
 		if (lhs->tdeg() != 1) return false;
-		if (lhs->begin()->first == rhs) return true;
-		return false;
+		return lhs->begin()->first == rhs;
 	}
 	
 	inline bool operator==(Variable::Arg lhs, const Monomial::Arg& rhs) {
@@ -763,7 +759,7 @@ namespace carl
 		bool operator()(const Monomial::Arg& lhs, const Monomial::Arg& rhs) const {
 			if (lhs == rhs) return false;
 			if (lhs && rhs) return (*this)(*lhs, *rhs);
-			return (bool)(rhs);
+			return bool(rhs);
 		}
 	};
 
@@ -792,8 +788,7 @@ namespace std
 	struct less<carl::Monomial::Arg> {
 		bool operator()(const carl::Monomial::Arg& lhs, const carl::Monomial::Arg& rhs) const {
 			if (lhs && rhs) return lhs < rhs;
-			if (lhs) return false;
-			return true;
+			return !lhs;
 		}
 	};
 	

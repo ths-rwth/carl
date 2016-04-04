@@ -9,9 +9,9 @@
 
 namespace carl
 {
-    size_t UEquality::complexity() const
+    std::size_t UEquality::complexity() const
     {
-        size_t result = 0;
+        std::size_t result = 0;
         if( lhsIsUV() )
             ++result;
         else

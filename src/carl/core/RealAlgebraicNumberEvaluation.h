@@ -115,6 +115,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	MultivariatePolynomial<Number> pol(p);
 	
 	for (auto it = m.begin(); it != m.end();) {
@@ -131,7 +132,6 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
 	if (pol.isNumber()) {
 		return RealAlgebraicNumber<Number>(pol.constantPart());
 	}
-	CARL_LOG_DEBUG("carl.ran", "Evaluating " << pol << " on " << m);
 	return evaluateIR(pol, m);
 }
 
@@ -145,6 +145,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RA
  */
 template<typename Number>
 RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
+	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
 	assert(m.size() > 0);
 	auto poly = p.toUnivariatePolynomial(m.begin()->first);
 	if (m.size() == 1 && m.begin()->second.sgn(poly.toNumberCoefficients()) == Sign::ZERO) {
@@ -154,6 +155,7 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 	// compute the result polynomial and the initial result interval
 	std::map<Variable, Interval<Number>> varToInterval;
 	UnivariatePolynomial<Number> res = evaluatePolynomial(UnivariatePolynomial<MultivariatePolynomial<Number>>(v, {MultivariatePolynomial<Number>(-p), MultivariatePolynomial<Number>(1)}), m, varToInterval);
+	CARL_LOG_DEBUG("carl.ran", "res = " << res);
 	Interval<Number> interval = IntervalEvaluation::evaluate(poly, varToInterval);
 
 	// the interval should include at least one root.
@@ -171,7 +173,6 @@ RealAlgebraicNumber<Number> evaluateIR(const MultivariatePolynomial<Number>& p, 
 		for (auto it = m.begin(); it != m.end(); it++) {
 			it->second.refine();
 			if (it->second.isNumeric()) {
-				m.erase(it);
 				return evaluate(p, m);
 			} else {
 				varToInterval[it->first] = it->second.getInterval();

@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <mutex>
-#include <map>
 
 namespace carl
 {
@@ -42,7 +42,7 @@ class GaloisField
      * @param k A exponent
 	 * @see GaloisFieldManager where the overhead of creating several GFs is prevented by storing them.
      */
-	GaloisField(unsigned p, unsigned k=1)
+	explicit GaloisField(unsigned p, unsigned k = 1)
 	: mP(p), mK(k), mPK(pow(IntegerType(p),k)), symmetricModuloOperationOffset( (mPK-1)/2 )
 	{ 
 	}

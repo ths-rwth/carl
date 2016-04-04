@@ -17,7 +17,6 @@ set(carl_lib_util_headers
 	debug.h
 	Heap.h
 	SFINAE.h
-	tree.h
 	Cache.h
 	TermAdditionManager.h
 	Common.h

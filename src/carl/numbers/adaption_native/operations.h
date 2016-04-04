@@ -23,46 +23,49 @@ namespace carl {
  * The following functions return informations about the given numbers.
  */
 
-inline bool isZero(const int& n) {
+inline bool isZero(sint n) {
 	return n == 0;
 }
-inline bool isOne(const int& n) {
+inline bool isZero(double n) {
+	return n == 0;
+}
+inline bool isOne(sint n) {
 	return n == 1;
 }
-inline bool isPositive(const int& n) {
+inline bool isPositive(sint n) {
 	return n > 0;
 }
-inline bool isNegative(const int& n) {
+inline bool isNegative(sint n) {
 	return n < 0;
 }
 
-inline bool isNumber(const double& d) {
+inline bool isNumber(double d) {
 	return (d == d) && !std::isinf(d);
 }
 
-inline bool isInteger(const double& d) {
+inline bool isInteger(double d) {
 	double tmp;
 	return std::modf(d, &tmp) == 0.0;
 }
 
-inline bool isInteger(const int&) {
+inline bool isInteger(sint /*unused*/) {
 	return true;
 }
 
-inline bool isNegative(const double& d) {
+inline bool isNegative(double d) {
 	return d < 0;
 }
 
-inline bool isPositive(const double& d) {
+inline bool isPositive(double d) {
 	return d > 0;
 }
 
-inline std::size_t bitsize(unsigned) {
+inline std::size_t bitsize(unsigned /*unused*/) {
 	return sizeof(unsigned) * 8;
 }
 
 template<typename C>
-inline void reserve(std::size_t) {
+inline void reserve(std::size_t /*unused*/) {
 }
 
 /**
@@ -71,40 +74,40 @@ inline void reserve(std::size_t) {
  * The following function convert types to other types.
  */
 
-inline double toDouble(const int& n) {
+inline double toDouble(sint n) {
 	return double(n);
 }
-inline double toDouble(const double& n) {
+inline double toDouble(double n) {
 	return n;
 }
 
 template<typename Integer>
-inline Integer toInt(const double& n);
+inline Integer toInt(double n);
 
 template<>
-inline int toInt<int>(const double& n) {
-    return int(n);
+inline sint toInt<sint>(double n) {
+    return sint(n);
 }
 
 template<>
-inline long toInt<long>(const double& n) {
-    return long(n);
-}
-
-template<>
-inline size_t toInt<size_t>(const double& n) {
-    return size_t(n);
+inline uint toInt<uint>(double n) {
+    return uint(n);
 }
 
 template<>
 inline double rationalize(double n) { return n; }
 
 template<typename T>
-inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::type toString(const T& n) {
+inline typename std::enable_if<std::is_arithmetic<T>::value(), std::string>::type toString(const T& n, bool /*unused*/) {
 	return std::to_string(n);
 }
-
-inline std::string toString(const double& n) {
+//inline std::string toString(sint n, bool /*unused*/) {
+//	return std::to_string(n);
+//}
+//inline std::string toString(uint n, bool /*unused*/) {
+//	return std::to_string(n);
+//}
+inline std::string toString(double n, bool /*unused*/) {
 	return std::to_string(n);
 }
 
@@ -123,30 +126,24 @@ inline double abs(double n) {
 	return std::abs(n);
 }
 
-inline long mod(const long& n, const long& m) {
+inline uint mod(uint n, uint m) {
 	return n % m;
 }
-inline unsigned long mod(const unsigned long& n, const unsigned long& m) {
-	return n % m;
-}
-inline unsigned mod(const unsigned& n, const unsigned& m) {
-	return n % m;
-}
-inline int mod(const int& n, const int& m) {
+inline sint mod(sint n, sint m) {
 	return n % m;
 }
 
-inline int remainder(const int& n, const int& m) {
+inline sint remainder(sint n, sint m) {
 	return n % m;
 }
-inline int div(const int& n, const int& m) {
+inline sint div(sint n, sint m) {
 	assert(n % m == 0);
 	return n / m;
 }
-inline int quotient(const int& n, const int& m) {
+inline sint quotient(sint n, sint m) {
 	return n / m;
 }
-inline void divide(const int& dividend, const int& divisor, int& quo, int& rem) {
+inline void divide(sint dividend, sint divisor, sint& quo, sint& rem) {
 	quo = quotient(dividend, divisor);
 	rem = remainder(dividend, divisor);
 }
@@ -167,7 +164,7 @@ inline double sqrt(double in) {
 	return std::sqrt(in);
 }
 
-inline double pow(double in, size_t exp) {
+inline double pow(double in, uint exp) {
 	return std::pow(in,exp);
 }
 
@@ -185,7 +182,7 @@ inline double log(double in) {
 template<typename Number>
 inline Number highestPower(const Number& n) {
 	static_assert(std::is_fundamental<Number>::value, "Only works on native types.");
-	unsigned iterations = 0;
+	uint iterations = 0;
 	// Number has 2^k Bits, we do k iterations
 	if (sizeof(Number) == 2) iterations = 4;
 	else if (sizeof(Number) == 4) iterations = 5;
@@ -193,7 +190,7 @@ inline Number highestPower(const Number& n) {
 	assert(iterations > 0);
 
 	Number res = n;
-	for (unsigned i = 0; i < iterations; i++) {
+	for (uint i = 0; i < iterations; i++) {
 		res |= res >> (1 << i);
 	}
 	res -= res >> 1;

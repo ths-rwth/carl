@@ -1,12 +1,13 @@
-#include <boost/concept_check.hpp>
-
-#include "gtest/gtest.h"
-#include "../numbers/config.h"
-#include "carl/core/Variable.h"
-#include "carl/core/Monomial.h"
-#include "carl/core/Term.h"
 
 #include "../Common.h"
+
+#include <carl/core/Variable.h>
+#include <carl/core/Monomial.h>
+#include <carl/core/Term.h>
+#include <carl/core/MultivariatePolynomial.h>
+
+#include <boost/concept_check.hpp>
+#include "gtest/gtest.h"
 
 using namespace carl;
 

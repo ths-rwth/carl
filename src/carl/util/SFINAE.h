@@ -7,8 +7,8 @@
  */
 
 #pragma once
-#include <type_traits>
 #include "platform.h"
+#include <type_traits>
 
 namespace carl
 {

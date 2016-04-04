@@ -88,3 +88,10 @@ install( TARGETS ${CARL_TARGETS}
 		GROUP_READ GROUP_EXECUTE
 		WORLD_READ WORLD_EXECUTE
 )
+
+if (CLANG_TIDY)
+	add_custom_target(tidy
+		COMMAND clang-tidy -p ../../build/compile_commands.json ${CLANG_TIDY_CHECKS} -header-filter='.*' ${carl_lib_sources}
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src/carl/
+	)
+endif()

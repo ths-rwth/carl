@@ -50,7 +50,7 @@ Term<Coefficient> Monomial::derivative(Variable::Arg v) const
         {
             std::vector<std::pair<Variable, exponent>> newExps;
             newExps.assign(mExponents.begin(), mExponents.end());
-            newExps[(unsigned)(it - mExponents.begin())].second -= (exponent)1;
+            newExps[uint(it - mExponents.begin())].second -= (exponent)1;
 			std::shared_ptr<const Monomial> result = createMonomial( std::move(newExps), mTotalDegree - 1 );
 			CARL_LOG_TRACE("carl.core.monomial", "Result: " << it->second << "*" << result);
             return std::move(Term<Coefficient>((Coefficient)it->second, result));
@@ -58,4 +58,3 @@ Term<Coefficient> Monomial::derivative(Variable::Arg v) const
     }
 }
 }
-

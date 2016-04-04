@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include <iomanip>
-#include <iostream>
+#include "MonomialPool.h"
 #include "config.h"
 #include "logging.h"
-#include "MonomialPool.h"
+
+#include <iomanip>
+#include <iostream>
 
 namespace carl
 {

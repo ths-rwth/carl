@@ -7,9 +7,8 @@
  */
 
 #include "Sort.h"
-#include "SortManager.h"
 
-using namespace std;
+#include "SortManager.h"
 
 namespace carl
 {
@@ -28,8 +27,8 @@ namespace carl
         return mId < _sort.id();
     }
     
-    ostream& operator<<( ostream& _os, const Sort& _sort )
+    std::ostream& operator<<( std::ostream& _os, const Sort& _sort )
     {
-        return SortManager::getInstance().print( _os, _sort );
+        return SortManager::getInstance().print(_os, _sort);
     }
 }

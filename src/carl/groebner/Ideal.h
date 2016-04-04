@@ -6,11 +6,12 @@
 
 #pragma once
 
-#include <unordered_set>
 #include "ideal-ds/IdealDSVector.h"
 #include "ideal-ds/PolynomialSorts.h"
 
 #include "../core/Term.h"
+#include "../core/MultivariatePolynomial.h"
+#include <unordered_set>
 
 namespace carl
 {

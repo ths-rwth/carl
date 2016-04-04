@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../util/Common.h"
 #include "../../core/VariablePool.h"
+#include "../../util/Common.h"
 #include "../Sort.h"
 #include "../SortManager.h"
 
@@ -36,7 +36,7 @@ namespace carl
             UVariable(): mVar(Variable::NO_VARIABLE) {
 			}
 
-			UVariable(Variable::Arg var):
+			explicit UVariable(Variable::Arg var):
                 mVar(var),
 				mDomain(SortManager::getInstance().getInterpreted(var.getType()))
             {

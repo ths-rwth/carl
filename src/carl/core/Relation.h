@@ -5,12 +5,15 @@
  */
 
 #pragma once
+
+#include <cassert>
 #include <iostream>
 #include <memory>
+#include <sstream>
 
 namespace carl {
 
-enum class Relation: unsigned { EQ = 0, NEQ = 1, LESS = 2, LEQ = 4, GREATER = 3, GEQ = 5 };
+enum class Relation { EQ = 0, NEQ = 1, LESS = 2, LEQ = 4, GREATER = 3, GEQ = 5 };
 inline std::ostream& operator<<(std::ostream& os, const Relation& r) {
 	switch (r) {
 		case Relation::EQ:	os << "="; break;

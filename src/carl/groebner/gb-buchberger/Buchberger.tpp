@@ -122,7 +122,7 @@ void Buchberger<Polynomial, AddingPolicy>::update(const size_t index)
 		// TODO why do we update if otherIndex is something constant?!
 		size_t otherIndex = *jt;
 		assert(generators.size() > otherIndex);
-		unsigned oideg = generators[otherIndex].lmon() ? generators[otherIndex].lmon()->tdeg() : 0;
+		uint oideg = generators[otherIndex].lmon() ? generators[otherIndex].lmon()->tdeg() : 0;
 		SPolPair sp(otherIndex, index, Monomial::lcm(generators[index].lmon(), generators[otherIndex].lmon()));
 		if(sp.mLcm->tdeg() == generators[index].lmon()->tdeg() + oideg)
 		{

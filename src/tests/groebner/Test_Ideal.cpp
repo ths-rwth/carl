@@ -1,11 +1,11 @@
-#include "gtest/gtest.h"
-#include "carl/groebner/Reductor.h"
-#include "carl/core/Monomial.h"
-
-#include "carl/groebner/Ideal.h"
-#include "carl/util/platform.h"
-
 #include "../Common.h"
+
+#include <carl/core/Monomial.h>
+#include <carl/groebner/Ideal.h>
+#include <carl/groebner/Reductor.h>
+#include <carl/util/platform.h>
+
+#include <gtest/gtest.h>
 
 
 using namespace carl;

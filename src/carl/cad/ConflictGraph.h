@@ -187,5 +187,3 @@ public:
 
 }
 }
-
-#include "ConflictGraph.tpp"

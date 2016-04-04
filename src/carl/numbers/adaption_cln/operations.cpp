@@ -12,8 +12,8 @@ namespace carl
             case FP_NORMAL: // normalized are fully supported
                 return cln::rationalize(cln::cl_R(n));
             case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
-                assert(sizeof(n) == 8);
-                long int significandBits = reinterpret_cast<long int>(&n);
+				static_assert(sizeof(n) == 8, "double is assumed to be eight bytes wide.");
+                sint significandBits = reinterpret_cast<sint>(&n);
                 significandBits = (significandBits << 12) >> 12;
                 if( n < 0 )
                     significandBits = -significandBits;
@@ -37,8 +37,8 @@ namespace carl
             case FP_NORMAL: // normalized are fully supported
                 return cln::rationalize(cln::cl_R(n));
             case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
-                assert(sizeof(n) == 4);
-                long int significandBits = reinterpret_cast<long int>(&n);
+				static_assert(sizeof(n) == 4, "float is assumed to be four bytes wide.");
+                sint significandBits = reinterpret_cast<sint>(&n);
                 significandBits = (significandBits << 9) >> 9;
                 if( n < 0 )
                     significandBits = -significandBits;
@@ -83,7 +83,7 @@ namespace carl
             // root can be computed exactly.
             return std::make_pair(exact_root, exact_root);
         } else {
-			auto factor = (int)cln::integer_length(cln::denominator(a)) - (int)cln::integer_length(cln::numerator(a));
+			auto factor = int(cln::integer_length(cln::denominator(a))) - int(cln::integer_length(cln::numerator(a)));
 			if (cln::oddp(factor)) factor += 1;
 			cln::cl_RA n = scaleByPowerOfTwo(a, factor);
 			double dn = toDouble(n);
@@ -119,8 +119,8 @@ namespace carl
 			return std::make_pair(exact_root, exact_root);
 		} else {
 			// compute an approximation with sqrt(). we can assume that the surrounding integers contain the actual root.
-			auto factor = cln::integer_length(cln::denominator(a)) - cln::integer_length(cln::numerator(a));
-			if (cln::oddp(factor)) factor += 1;
+			//auto factor = cln::integer_length(cln::denominator(a)) - cln::integer_length(cln::numerator(a));
+			//if (cln::oddp(factor)) factor += 1;
 			cln::cl_I lower = cln::floor1(cln::sqrt(toLF(a)));
             cln::cl_I upper = lower + 1;
             assert(cln::expt_pos(lower,2) < a);

@@ -30,9 +30,6 @@ set( PROJECT_VERSION "${carl_VERSION}")
 set( carl_NAME "CArL" )
 set( carl_DESCRIPTION ${PROJECT_DESCRIPTION} )
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-
 # path to find own modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # for cmake 2.8.7
@@ -59,6 +56,7 @@ option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CARL_PYTHON "Build Python bindings" ON)
+option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
@@ -118,7 +116,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		message(FATAL_ERROR " g++ version must be at least 4.8!")
 	endif()
 	message(STATUS "Using g++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wunknown-pragmas")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wunknown-pragmas")
 	if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.9 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.9)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmax-errors=5 -fdiagnostics-color=auto")
 	endif()
@@ -131,7 +129,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} /MTd")
 else()
 	message(WARNING "Possibly unsupported compiler")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 if(DEVELOPER)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -313,6 +311,21 @@ endif()
 #include(GetGitRevisionDescription)
 #get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
+if (CLANG_TIDY)
+	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+	set(CLANG_TIDY_CHECKS "*")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-header-guard")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-namespace-comments,-llvm-namespace-comment")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-braces-around-statements,-readability-braces-around-statements")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-readability-else-after-return")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-todo")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-runtime-int")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-misc-macro-parentheses")
+	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-clang-analyzer-alpha.core.CastToStruct")
+	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
+	message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
+endif()
+
 # # # # # # # # # # # # # # # # # # # # # #
 # E. Invoke subdirectories.
 # # # # # # # # # # # # # # # # # # # # # #
@@ -357,5 +370,3 @@ install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 # # # # # # # # # # # # # # # # # # # # # #
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
-
-# todo.

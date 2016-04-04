@@ -167,7 +167,7 @@ namespace carl
 
 		const BVValue& value() const;
 		
-		BVTerm substitute(const std::map<BVVariable,BVTerm>&) const;
+		BVTerm substitute(const std::map<BVVariable,BVTerm>& /*unused*/) const;
 	};
 
 	struct BVUnaryContent
@@ -175,8 +175,8 @@ namespace carl
 		BVTerm mOperand;
 		size_t mIndex;
 
-		BVUnaryContent(const BVTerm& _operand, const size_t _index = 0) :
-		mOperand(_operand), mIndex(_index)
+		explicit BVUnaryContent(const BVTerm& _operand, const size_t _index = 0) :
+			mOperand(_operand), mIndex(_index)
 		{
 		}
 
@@ -307,7 +307,7 @@ namespace carl
 			mpVariableVS = new BVVariable(_variable);
 #else
 		mType(_type), mVariable(_variable), mWidth(_variable.width()), mId(0),
-		mHash(((std::size_t)_variable().getId() << 5) ^ typeId(_type))
+		mHash((_variable().getId() << 5) ^ typeId(_type))
 		{
 #endif
 			assert(_type == BVTermType::VARIABLE);

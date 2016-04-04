@@ -12,9 +12,9 @@
 #include "../RealAlgebraicNumber.h"
 #include "../RealAlgebraicNumberEvaluation.h"
 #include "../UnivariatePolynomial.h"
-#include "../../interval/Interval.h"
 #include "../Sign.h"
 #include "../logging.h"
+#include "../../interval/Interval.h"
 #include "IncrementalRootFinder.h"
 
 namespace carl {
@@ -127,7 +127,7 @@ std::list<RealAlgebraicNumber<Number>> realRoots(
  * @return
  */
 template<typename Coeff, typename Number= typename UnderlyingNumberType<Coeff>::type>
-unsigned long countRealRoots(
+uint countRealRoots(
 		const UnivariatePolynomial<Coeff>& polynomial,
 		const Interval<Number>& interval = Interval<Number>::unboundedInterval(),
 		SplittingStrategy pivoting = SplittingStrategy::DEFAULT

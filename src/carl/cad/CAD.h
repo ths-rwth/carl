@@ -40,7 +40,6 @@
 #include "../core/RealAlgebraicNumber.h"
 #include "../core/RealAlgebraicPoint.h"
 #include "../core/Variable.h"
-//#include "../util/tree.h"
 #include "../util/carlTree.h"
 
 #include "CADConstraints.h"

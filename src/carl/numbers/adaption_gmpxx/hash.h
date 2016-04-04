@@ -12,8 +12,8 @@
 static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
-#include <functional>
 #include <cstddef>
+#include <functional>
 #ifdef __WIN
 	#pragma warning(push, 0)
 	#include <mpirxx.h>

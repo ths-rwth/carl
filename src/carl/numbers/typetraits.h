@@ -58,7 +58,7 @@ namespace carl {
 template<typename T>
 struct has_subtype {
 	/// A type associated with the type
-	typedef T type;
+	using type = T;
 };
 
 }
@@ -286,7 +286,7 @@ struct is_polynomial<carl::MultivariatePolynomial<T, O, P>>: std::true_type {};
  * @see UnivariatePolynomial - squareFreeFactorization for example.
  */
 template<typename type>
-struct characteristic: std::integral_constant<unsigned, 0> {};
+struct characteristic: std::integral_constant<uint, 0> {};
 
 
 /**
@@ -304,12 +304,12 @@ struct characteristic: std::integral_constant<unsigned, 0> {};
 template<typename RationalType>
 struct IntegralType {
 	/// @todo Should *any* type have an integral type?
-	typedef int type;
+	using type = sint;
 };
 
 template<typename C>
 struct IntegralType<GFNumber<C>> {
-	typedef C type;
+	using type = C;
 };
 
 /**

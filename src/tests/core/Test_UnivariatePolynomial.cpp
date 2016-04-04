@@ -14,6 +14,18 @@
 #include "../Common.h"
 using namespace carl;
 
+template<typename T>
+class UnivariatePolynomialTest: public testing::Test {};
+TYPED_TEST_CASE(UnivariatePolynomialTest, NumberTypes);
+
+template<typename T>
+class UnivariatePolynomialRatTest: public testing::Test {};
+TYPED_TEST_CASE(UnivariatePolynomialRatTest, RationalTypes);
+
+template<typename T>
+class UnivariatePolynomialIntTest: public testing::Test {};
+TYPED_TEST_CASE(UnivariatePolynomialIntTest, IntegerTypes);
+
 TEST(UnivariatePolynomial, Constructor)
 {
     Variable x = freshRealVariable("x");
@@ -24,7 +36,7 @@ TEST(UnivariatePolynomial, toInteger)
 {
 	Variable x = freshRealVariable("x");
 	UnivariatePolynomial<Rational> pRA(x, {(Rational)0, (Rational)2});
-	UnivariatePolynomial<Integer> pI(x, {(Integer)0, (Integer)2});
+	UnivariatePolynomial<IntegralType<Rational>::type> pI(x, {(IntegralType<Rational>::type)0, (IntegralType<Rational>::type)2});
 	EXPECT_EQ(pI, pRA.toIntegerDomain());
 }
 
@@ -58,14 +70,14 @@ TEST(UnivariatePolynomial, Divide)
 //    std::cout << d.remainder << std::endl;
 }
 
-TEST(UnivariatePolynomial, DivideInteger)
+TYPED_TEST(UnivariatePolynomialIntTest, DivideInteger)
 {
     Variable x = freshRealVariable("x");
-    UnivariatePolynomial<Integer> p(x, {(Integer)0, (Integer)0,(Integer)5});
-    UnivariatePolynomial<Integer> q(x, {(Integer)0, (Integer)0,(Integer)3});
-    DivisionResult<UnivariatePolynomial<Integer>> d = p.divideBy(q);
-    std::cout << d.quotient << std::endl;
-    std::cout << d.remainder << std::endl;
+    UnivariatePolynomial<TypeParam> p(x, {(TypeParam)0, (TypeParam)0,(TypeParam)5});
+    UnivariatePolynomial<TypeParam> q(x, {(TypeParam)0, (TypeParam)0,(TypeParam)3});
+    //DivisionResult<UnivariatePolynomial<TypeParam>> d = p.divideBy(q);
+    //std::cout << d.quotient << std::endl;
+    //std::cout << d.remainder << std::endl;
 }
 
 TEST(UnivariatePolynomial, GCD)
@@ -98,22 +110,29 @@ TEST(UnivariatePolynomial, GCD)
     EXPECT_EQ((Rational)-1/(Rational)12,t);
 	g = UnivariatePolynomial<Rational>::gcd(p,q);
 	EXPECT_EQ(v,g);
+}
 
-    UnivariatePolynomial<Integer> A1(x, {(Integer)0, (Integer)2});
-	const GaloisField<Integer>* gf5 = new GaloisField<Integer>(5);
-    UnivariatePolynomial<GFNumber<Integer>> a1 = A1.toFiniteDomain(gf5);
-	UnivariatePolynomial<Integer> A2(x, 1, 5);
-	UnivariatePolynomial<GFNumber<Integer>> a2 = A2.toFiniteDomain(gf5);
-	UnivariatePolynomial<GFNumber<Integer>> s1(x);
-	UnivariatePolynomial<GFNumber<Integer>> t1(x);
-    UnivariatePolynomial<GFNumber<Integer>> gp = UnivariatePolynomial<GFNumber<Integer>>::extended_gcd(a1,a2,s1,t1);
+TYPED_TEST(UnivariatePolynomialIntTest, GCD)
+{
+    Variable x = freshRealVariable("x");
+	UnivariatePolynomial<Rational> s(x);
+    UnivariatePolynomial<Rational> t(x);
+	
+    UnivariatePolynomial<TypeParam> A1(x, {(TypeParam)0, (TypeParam)2});
+	const GaloisField<TypeParam>* gf5 = new GaloisField<TypeParam>(5);
+    UnivariatePolynomial<GFNumber<TypeParam>> a1 = A1.toFiniteDomain(gf5);
+	UnivariatePolynomial<TypeParam> A2(x, 1, 5);
+	UnivariatePolynomial<GFNumber<TypeParam>> a2 = A2.toFiniteDomain(gf5);
+	UnivariatePolynomial<GFNumber<TypeParam>> s1(x);
+	UnivariatePolynomial<GFNumber<TypeParam>> t1(x);
+    UnivariatePolynomial<GFNumber<TypeParam>> gp = UnivariatePolynomial<GFNumber<TypeParam>>::extended_gcd(a1,a2,s1,t1);
 	std::cout << t1 << std::endl;
 	std::cout << s1 << std::endl;
 	std::cout << gp << std::endl;
 
     UnivariatePolynomial<Rational> pola(x, {(Rational)-2, (Rational)5, (Rational)-5, (Rational)3});
 	UnivariatePolynomial<Rational> polb(x, {(Rational)5, (Rational)-10, (Rational)9});
-	g = UnivariatePolynomial<Rational>::extended_gcd(pola,polb,s,t);
+	UnivariatePolynomial<Rational> g = UnivariatePolynomial<Rational>::extended_gcd(pola,polb,s,t);
 	std::cout << g << std::endl;
 	g = UnivariatePolynomial<Rational>::gcd(pola,polb);
 	std::cout << g << std::endl;
@@ -130,26 +149,26 @@ TEST(UnivariatePolynomial, cauchyBounds)
     //p.modifiedCauchyBound();
 }
 
-TEST(UnivariatePolynomial, toFiniteDomain)
+TYPED_TEST(UnivariatePolynomialIntTest, toFiniteDomain)
 {
     Variable x = freshRealVariable("x");
 
-    UnivariatePolynomial<Integer> pol(x, {(Integer)1, (Integer)2});
-    const GaloisField<Integer>* gf5 = new GaloisField<Integer>(5);
-    UnivariatePolynomial<GFNumber<Integer>> polF = pol.toFiniteDomain(gf5);
+    UnivariatePolynomial<TypeParam> pol(x, {(TypeParam)1, (TypeParam)2});
+    const GaloisField<TypeParam>* gf5 = new GaloisField<TypeParam>(5);
+    UnivariatePolynomial<GFNumber<TypeParam>> polF = pol.toFiniteDomain(gf5);
     std::cout << polF << std::endl;
-    UnivariatePolynomial<Integer> pol5(x, {(Integer)1, (Integer)5});
-    UnivariatePolynomial<GFNumber<Integer>> pol5F = pol5.toFiniteDomain(gf5);
+    UnivariatePolynomial<TypeParam> pol5(x, {(TypeParam)1, (TypeParam)5});
+    UnivariatePolynomial<GFNumber<TypeParam>> pol5F = pol5.toFiniteDomain(gf5);
     std::cout << pol5F << std::endl;
 }
 
-TEST(UnivariatePolynomial, normalizeCoefficients)
+TYPED_TEST(UnivariatePolynomialIntTest, normalizeCoefficients)
 {
     Variable x = freshRealVariable("x");
 
-	UnivariatePolynomial<Integer> pol(x, {(Integer)1, (Integer)2});
-    const GaloisField<Integer>* gf5 = new GaloisField<Integer>(5);
-    UnivariatePolynomial<GFNumber<Integer>> polF = pol.toFiniteDomain(gf5);
+	UnivariatePolynomial<TypeParam> pol(x, {(TypeParam)1, (TypeParam)2});
+    const GaloisField<TypeParam>* gf5 = new GaloisField<TypeParam>(5);
+    UnivariatePolynomial<GFNumber<TypeParam>> polF = pol.toFiniteDomain(gf5);
 
 	pol.normalizeCoefficients();
 	polF.normalizeCoefficients();
@@ -205,7 +224,7 @@ TEST(UnivariatePolynomial, factorization)
     for(UnivariatePolynomial<Rational> pol : polys)
     {
 //        std::cout << "Factorization of  " << pol << "  is  " << std::endl;
-        std::map<UnivariatePolynomial<Rational>, unsigned> factors = pol.factorization();
+        std::map<UnivariatePolynomial<Rational>, carl::uint> factors = pol.factorization();
         UnivariatePolynomial<Rational> productOfFactors = UnivariatePolynomial<Rational>(x, (Rational)1);
         for(auto factor = factors.begin(); factor != factors.end(); ++factor)
         {
@@ -232,7 +251,7 @@ TEST(UnivariatePolynomial, factorization)
     UnivariatePolynomial<Rational> pol4(x, {(Rational)1, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> pol5(x, {(Rational)1, (Rational)0, (Rational)-1});
     UnivariatePolynomial<Rational> pol6 = pol4*pol5*pol5*pol5;
-    std::map<unsigned, UnivariatePolynomial<Rational>> sffactors = pol6.squareFreeFactorization();
+    auto sffactors = pol6.squareFreeFactorization();
 //    std::cout << "Square free factorization of  " << pol6 << "  is  " << std::endl;
     UnivariatePolynomial<Rational> productOfFactors = UnivariatePolynomial<Rational>(x, (Rational)1);
     for(auto factor = sffactors.begin(); factor != sffactors.end(); ++factor)
@@ -283,39 +302,39 @@ TEST(UnivariatePolynomial, numericContent)
 	EXPECT_EQ(UnivariatePolynomial<Rational>(x, {-15,-27,-3}).numericContent(), 3);
 }
 
-TEST(UnivariatePolynomial, unitPart)
+TYPED_TEST(UnivariatePolynomialIntTest, unitPart)
 {
 	Variable x = freshRealVariable("x");
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {1,2,3}).unitPart());
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {15,27,3}).unitPart());
-	EXPECT_EQ(-1,UnivariatePolynomial<Integer>(x, {-1,-2,-3}).unitPart());
-	EXPECT_EQ(-1,UnivariatePolynomial<Integer>(x, {-15,-27,-3}).unitPart());
+	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {1,2,3}).unitPart());
+	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {15,27,3}).unitPart());
+	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).unitPart());
+	EXPECT_EQ(-1,UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).unitPart());
 }
 
-TEST(UnivariatePolynomial, content)
+TYPED_TEST(UnivariatePolynomialIntTest, content)
 {
     Variable x = freshRealVariable("x");
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {1,2,3}).normalized().content());
-	EXPECT_EQ(3,UnivariatePolynomial<Integer>(x, {15,27,3}).normalized().content());
-	EXPECT_EQ(1,UnivariatePolynomial<Integer>(x, {-1,-2,-3}).normalized().content());
-	EXPECT_EQ(3,UnivariatePolynomial<Integer>(x, {-15,-27,-3}).normalized().content());
+	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized().content());
+	EXPECT_EQ(3,UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized().content());
+	EXPECT_EQ(1,UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized().content());
+	EXPECT_EQ(3,UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).normalized().content());
 }
 
 
-TEST(UnivariatePolynomial, primitivePart)
+TYPED_TEST(UnivariatePolynomialIntTest, primitivePart)
 {
 	Variable x = freshRealVariable("x");
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {1,2,3}),UnivariatePolynomial<Integer>(x, {1,2,3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {5,9,1}),UnivariatePolynomial<Integer>(x, {15,27,3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {1,2,3}),UnivariatePolynomial<Integer>(x, {-1,-2,-3}).normalized().primitivePart());
-	EXPECT_EQ(UnivariatePolynomial<Integer>(x, {5,9,1}),UnivariatePolynomial<Integer>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),UnivariatePolynomial<TypeParam>(x, {1,2,3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),UnivariatePolynomial<TypeParam>(x, {15,27,3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {1,2,3}),UnivariatePolynomial<TypeParam>(x, {-1,-2,-3}).normalized().primitivePart());
+	EXPECT_EQ(UnivariatePolynomial<TypeParam>(x, {5,9,1}),UnivariatePolynomial<TypeParam>(x, {-15,-27,-3}).normalized().primitivePart().normalized().primitivePart());
 }
 
-TEST(UnivariatePolynomial, switchVariable)
+TYPED_TEST(UnivariatePolynomialIntTest, switchVariable)
 {
 	Variable x = freshRealVariable("x");
 	Variable y = freshRealVariable("y");
-	UnivariatePolynomial<Integer> p(x, {1,2,3});
+	UnivariatePolynomial<TypeParam> p(x, {1,2,3});
 	auto q = p.switchVariable(y);
 	std::cout << p << " -> " << q << std::endl;
 }

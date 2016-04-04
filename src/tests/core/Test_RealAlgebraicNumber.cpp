@@ -67,16 +67,3 @@ TEST(RealAlgebraicNumber, Evaluation2)
 	auto res = RealAlgebraicNumberEvaluation::evaluate(MultivariatePolynomial<Rational>(mp), point, vars);
 	std::cerr << res << std::endl;
 }
-
-TEST(RealAlgebraicNumber, Add)
-{
-	Variable x = freshRealVariable("x");
-	UnivariatePolynomial<Rational> p(x, {-2, 0, 1});
-	std::cout << p << std::endl;
-	Interval<Rational> i(Rational(14)/10, BoundType::STRICT, Rational(15)/10, BoundType::STRICT);
-	
-	auto ran = RealAlgebraicNumber<Rational>(2);
-	auto ranir = RealAlgebraicNumber<Rational>(p, i);
-	
-	EXPECT_TRUE(ran + ran == RealAlgebraicNumber<Rational>(4));
-}

@@ -7,20 +7,19 @@
 
 #pragma once
 
-#include <cassert>
-#include <iostream>
-#include <unordered_map>
-#include <set>
-#include <utility>
-#include <vector>
 
 #include "../../util/Singleton.h"
 #include "../../util/Common.h"
 #include "../../util/hash.h"
-#include <vector>
-#include <string.h>
 #include "../Sort.h"
 #include "UninterpretedFunction.h"
+
+#include <cassert>
+#include <iostream>
+#include <set>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace carl
 {
@@ -108,11 +107,7 @@ class UFContent
          */
         bool operator==( const UFContent& _ufc ) const
         {
-            if( mDomain == _ufc.domain() && mName == _ufc.name() )
-            {
-                return true;
-            }
-            return false;
+            return mDomain == _ufc.domain() && mName == _ufc.name();
         }
 
         /**
@@ -200,7 +195,7 @@ class UFManager : public Singleton<UFManager>
         {
             mUFs.emplace_back( nullptr ); // default value
         }
-        ~UFManager() {
+        ~UFManager() override {
             mUFIdMap.clear();
             for (auto& ptr: mUFs) delete ptr;
             mUFs.clear();

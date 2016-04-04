@@ -27,8 +27,8 @@ namespace carl
 		}
 		if (mExponents.size() == 1) return nullptr;
 
-		exponent tDeg = mTotalDegree - it->second;
-		std::vector<std::pair<Variable, exponent>> newExps(mExponents.begin(), it);
+		uint tDeg = mTotalDegree - it->second;
+		Content newExps(mExponents.begin(), it);
 		it++;
 		newExps.insert(newExps.end(), it, mExponents.end());
 		return MonomialPool::getInstance().create( std::move(newExps), tDeg );
@@ -39,7 +39,7 @@ namespace carl
 		auto it = std::find(mExponents.cbegin(), mExponents.cend(), v);
 		if(it == mExponents.cend()) return false;
 		else {
-			std::vector<std::pair<Variable, exponent>> newExps;
+			Content newExps;
 			// If the exponent is one, the variable does not occur in the new monomial.
 			if(it->second == 1) {
 				if(it != mExponents.begin()) {
@@ -49,7 +49,7 @@ namespace carl
 			} else {
 				// We have to decrease the exponent of the variable by one.
 				newExps.assign(mExponents.begin(), mExponents.end());
-				newExps[(unsigned)(it - mExponents.begin())].second -= 1;
+				newExps[uint(it - mExponents.begin())].second -= 1;
 			}
 			if (newExps.empty())
 			{
@@ -57,7 +57,7 @@ namespace carl
 			}
 			else
 			{
-				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - 1) );
+				res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - 1) );
 			}
 			
 			return true;
@@ -77,7 +77,7 @@ namespace carl
 			CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 			return false;
 		}
-		std::vector<std::pair<Variable, exponent>> newExps;
+		Content newExps;
 
 		// Linear, as we expect small monomials.
 		auto itright = m->mExponents.begin();
@@ -88,7 +88,7 @@ namespace carl
 			{
 				// Insert remaining part
 				newExps.insert(newExps.end(), itleft, mExponents.end());
-				res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
+				res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - m->mTotalDegree) );
 				CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
 				return true;
 			}
@@ -101,7 +101,7 @@ namespace carl
 					CARL_LOG_TRACE("carl.core.monomial", "Result: nullptr");
 					return false;
 				}
-				exponent newExp = itleft->second - itright->second;
+				uint newExp = itleft->second - itright->second;
 				if(newExp > 0)
 				{
 					newExps.push_back(std::make_pair(itleft->first, newExp));
@@ -132,14 +132,14 @@ namespace carl
 			res = nullptr;
 			return true;
 		}
-		res = MonomialPool::getInstance().create( std::move(newExps), (exponent)(mTotalDegree - m->mTotalDegree) );
+		res = MonomialPool::getInstance().create( std::move(newExps), uint(mTotalDegree - m->mTotalDegree) );
 		CARL_LOG_TRACE("carl.core.monomial", "Result: " << res);
 		return true;
 	}
 	
 	Monomial::Arg Monomial::sqrt() const {
 		if (mTotalDegree % 2 == 1) return nullptr;
-		std::vector<std::pair<Variable, exponent>> newExps;
+		Content newExps;
 		for (const auto& it: mExponents) {
 			if (it.second % 2 == 1) return nullptr;
 			newExps.emplace_back(it.first, it.second / 2);
@@ -149,8 +149,8 @@ namespace carl
 
 	Monomial::Arg Monomial::calcLcmAndDivideBy(const std::shared_ptr<const Monomial>& m) const
 	{
-		std::vector<std::pair<Variable, exponent>> newExps;
-		exponent tdegree = mTotalDegree;
+		Content newExps;
+		auto tdegree = mTotalDegree;
 		// Linear, as we expect small monomials.
 		auto itright = m->mExponents.begin();
 		for(auto itleft = mExponents.begin(); itleft != mExponents.end();)
@@ -165,7 +165,7 @@ namespace carl
 			// Variable is present in both monomials.
 			if(itleft->first == itright->first)
 			{
-				exponent newExp = std::max(itleft->second, itright->second) - itright->second;
+				uint newExp = std::max(itleft->second, itright->second) - itright->second;
 				if(newExp != 0)
 				{
 					newExps.emplace_back(itleft->first, newExp);
@@ -197,25 +197,25 @@ namespace carl
 	
 	Monomial::Arg Monomial::separablePart() const
 	{
-		std::vector<std::pair<Variable, exponent>> newExps;
+		Content newExps;
 		for (auto& it: mExponents)
 		{
 			newExps.push_back( std::make_pair( it.first, 1 ) );
 		}
-		return MonomialPool::getInstance().create( std::move(newExps), (exponent)mExponents.size() );
+		return MonomialPool::getInstance().create( std::move(newExps), uint(mExponents.size()) );
 	}
 	
-	Monomial::Arg Monomial::pow(unsigned exp) const
+	Monomial::Arg Monomial::pow(uint exp) const
 	{
 		if (exp == 0)
 		{
 			return nullptr;
 		}
-		std::vector<std::pair<Variable, exponent>> newExps;
-		exponent expsum = 0;
+		Content newExps;
+		uint expsum = 0;
 		for (auto& it: mExponents)
 		{
-			newExps.push_back( std::make_pair( it.first, (exponent)(it.second * exp) ) );
+			newExps.push_back( std::make_pair( it.first, uint(it.second * exp) ) );
 			expsum += newExps.back().second;
 		}
 		return createMonomial(std::move(newExps), expsum);
@@ -239,7 +239,7 @@ namespace carl
 				else {
 					std::string varName = VariablePool::getInstance().getName(vp->first, friendlyVarNames);
 					ss << "(*";
-					for (unsigned i = 0; i < vp->second; i++) ss << " " << varName;
+					for (uint i = 0; i < vp->second; i++) ss << " " << varName;
 					ss << ")";
 				}
 			}
@@ -258,8 +258,8 @@ namespace carl
             assert(lhs->isConsistent());
             assert(rhs->isConsistent());
 
-            std::vector<std::pair<Variable, exponent>> newExps;
-            exponent expsum = 0;
+            Content newExps;
+            uint expsum = 0;
             // Linear, as we expect small monomials.
             auto itright = rhs->mExponents.cbegin();
             auto leftEnd = lhs->mExponents.cend();
@@ -269,7 +269,7 @@ namespace carl
                 // Variable is present in both monomials.
                 if(itleft->first == itright->first)
                 {
-                    exponent newExp = std::min(itleft->second, itright->second);
+                    uint newExp = std::min(itleft->second, itright->second);
                     newExps.push_back(std::make_pair(itleft->first, newExp));
                     expsum += newExp;
                     ++itright;
@@ -303,8 +303,8 @@ namespace carl
 		assert(lhs->isConsistent());
 		assert(rhs->isConsistent());
 
-		std::vector<std::pair<Variable, exponent>> newExps;
-		exponent expsum = lhs->tdeg() + rhs->tdeg();
+		Content newExps;
+		uint expsum = lhs->tdeg() + rhs->tdeg();
 		// Linear, as we expect small monomials.
 		auto itright = rhs->mExponents.cbegin();
 		auto leftEnd = lhs->mExponents.cend();
@@ -323,7 +323,7 @@ namespace carl
 			// Variable is present in both monomials.
 			if(itleft->first == itright->first)
 			{
-				exponent newExp = std::max(itleft->second, itright->second);
+				uint newExp = std::max(itleft->second, itright->second);
 				newExps.push_back(std::make_pair(itleft->first, newExp));
 				expsum -= std::min(itleft->second, itright->second);
 				++itright;
@@ -354,7 +354,7 @@ namespace carl
 	{
 		CARL_LOG_FUNC("carl.core.monomial", mExponents << ", " << mTotalDegree << ", " << mHash);
 		if (mTotalDegree < 1) return false;
-		unsigned tdegree = 0;
+		uint tdegree = 0;
 		Variable lastVar = Variable::NO_VARIABLE;
 		for(const auto& ve : mExponents)
 		{
@@ -419,7 +419,7 @@ namespace carl
 		assert( lhs->tdeg() > 0 );
 		assert(lhs->isConsistent());
 		assert(rhs->isConsistent());
-		std::vector<std::pair<Variable, exponent>> newExps;
+		Monomial::Content newExps;
 		newExps.reserve(lhs->exponents().size() + rhs->exponents().size());
 
 		// Linear, as we expect small monomials.
@@ -462,7 +462,7 @@ namespace carl
 		if (!lhs) {
 			return MonomialPool::getInstance().create(rhs, 1);
 		}
-		std::vector<std::pair<Variable, exponent>> newExps;
+		Monomial::Content newExps;
 		// Linear, as we expect small monomials.
 		bool inserted = false;
 		for (const auto& p: *lhs) {
@@ -488,7 +488,7 @@ namespace carl
 	
 	Monomial::Arg operator*(Variable::Arg lhs, Variable::Arg rhs)
 	{
-		std::vector<std::pair<Variable, exponent>> newExps;
+		Monomial::Content newExps;
 		if( lhs < rhs )
 		{
 			newExps.emplace_back( lhs, 1 );

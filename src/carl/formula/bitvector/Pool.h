@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "../../util/Singleton.h"
 #include "../../util/Common.h"
+#include "../../util/Singleton.h"
+
 #include <mutex>
 
 namespace carl
@@ -42,9 +43,9 @@ namespace carl
 		 * Constructor of the pool.
 		 * @param _capacity Expected necessary capacity of the pool.
 		 */
-		Pool(unsigned _capacity = 10000) :
-		mIdAllocator(1),
-		mPool()
+		explicit Pool(unsigned _capacity = 10000) :
+			mIdAllocator(1),
+			mPool()
 		{
 			mPool.reserve(_capacity);
 

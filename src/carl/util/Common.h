@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include <vector>
-#include <set>
-#include <map>
-#include <string.h>
-#include <unordered_set>
-#include <unordered_map>
-#include <memory>
 
 #include "../core/Variable.h"
-//#include "../core/VariableInformation.h"
 #include "pointerOperations.h"
+
+#include <map>
+#include <memory>
+#include <set>
+#include <string.h>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace carl
 {	
@@ -60,9 +60,9 @@ namespace carl
 //    template<typename Pol>
 //    using VarInfoMap = std::map<Variable, VarInfo<Pol>>;
     
-    typedef std::set<Variable> Variables;
+    using Variables = std::set<Variable>;
 
-    typedef std::vector<Variables> QuantifiedVariables;
+    using QuantifiedVariables = std::vector<Variables>;
     
     template<typename T> 
     using PointerSet = std::set<const T*, pointerLess<T>>;
@@ -113,17 +113,17 @@ namespace carl
     using FastSharedPointerMapB = std::unordered_map<std::shared_ptr<const T1>, T2, sharedPointerHashWithNull<T1>, pointerEqualWithNull<T1>>;
     
     template<typename Pol>
-    using Factors = std::map<Pol,exponent>;
+    using Factors = std::map<Pol,uint>;
     
     // Constants.
     ///@todo move static variables to own cpp
     
-    static const unsigned MAX_DEGREE_FOR_FACTORIZATION = 6;
+    static constexpr uint MAX_DEGREE_FOR_FACTORIZATION = 6;
     
-    static const unsigned MIN_DEGREE_FOR_FACTORIZATION = 1;
+    static constexpr uint MIN_DEGREE_FOR_FACTORIZATION = 1;
     
-    static const unsigned MAX_DIMENSION_FOR_FACTORIZATION = 6;
+    static constexpr uint MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
-    static const unsigned MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
+    static constexpr uint MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
 	
 }	// namespace carl

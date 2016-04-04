@@ -4,6 +4,8 @@
  */
 
 #pragma once
+
+#include <cassert>
 #include <iostream>
 #include <string>
 
@@ -75,7 +77,7 @@ namespace carl
 		return _r == BVCompareRelation::ULT ||
 			_r == BVCompareRelation::UGT ||
 			_r == BVCompareRelation::SLT ||
-			_r == BVCompareRelation::UGT ||
+			_r == BVCompareRelation::SGT ||
 			_r == BVCompareRelation::NEQ;
 	}
 

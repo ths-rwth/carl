@@ -9,9 +9,20 @@
 
 #define INCLUDED_FROM_NUMBERS_H true
 
+#include <cstdint>
+#include <type_traits>
+
+namespace carl {
+	using uint = unsigned long;
+	using sint = long;
+	
+	static_assert(std::is_arithmetic<uint>::value, "");
+	static_assert(std::is_arithmetic<sint>::value, "");
+}
+
 #include "config.h"
-#include "typetraits.h"
 #include "constants.h"
+#include "typetraits.h"
 #include "operations_predeclarations.h"
 #include "operations_generic.h"
 
@@ -32,8 +43,8 @@
 #include <mpfr.h>
 #endif
 
-#include "adaption_float/typetraits.h"
 #include "adaption_float/FLOAT_T.h"
+#include "adaption_float/typetraits.h"
 
 #ifdef USE_Z3_NUMBERS
 #include "adaption_z3/z3_include.h"

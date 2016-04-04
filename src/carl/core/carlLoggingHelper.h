@@ -6,14 +6,9 @@
 #pragma once
 
 #include <bitset>
-#include <forward_list>
+#include <cstdint>
 #include <iostream>
-#include <list>
-#include <map>
-#include <set>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+#include <sstream>
 
 namespace carl {
 
@@ -28,11 +23,11 @@ template<typename T>
 std::string binary(const T& a, const bool& spacing = true)
 {
 	std::stringstream ss;
-    const char* begin = reinterpret_cast<const char*>(&a);
-	const char* end = begin + sizeof(T);
+    const std::uint8_t* begin = reinterpret_cast<const std::uint8_t*>(&a);
+	const std::uint8_t* end = begin + sizeof(T);
 	while (begin != end) {
 		end--;
-		ss << std::bitset<8>((unsigned)*end);
+		ss << std::bitset<8>(std::uint8_t(*end));
 		if (spacing && (begin != end)) ss << " ";
 	}
 	return ss.str();

@@ -5,17 +5,14 @@
 
 #pragma once
 
-#include <iostream>
-#include <climits>
-#include <cassert>
-
 #include "config.h"
 
+#include <cassert>
+#include <climits>
+
+#include <iostream>
 
 namespace carl {
-
-/// Type of an exponent.
-typedef unsigned exponent;	
 	
 /**
  * Several types of variables are supported.
@@ -23,7 +20,7 @@ typedef unsigned exponent;
  * REAL: the reals
  * INT: the integers
  */
-enum class VariableType : unsigned { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
+enum class VariableType { VT_BOOL = 0, VT_REAL = 1, VT_INT = 2, VT_UNINTERPRETED = 3, VT_BITVECTOR = 4, MIN_TYPE = VT_BOOL, MAX_TYPE = VT_BITVECTOR, TYPE_SIZE = MAX_TYPE - MIN_TYPE + 1 };
 
 /**
  * Streaming operator for VariableType.
@@ -38,7 +35,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 		case VariableType::VT_INT: return os << "Int";
 		case VariableType::VT_UNINTERPRETED: return os << "Uninterpreted";
 		case VariableType::VT_BITVECTOR: return os << "Bitvector";
-		default: return os << "Invalid " << unsigned(t);
+		default: return os << "Invalid " << uint(t);
 	}
 	return os << "Unknown";
 }
@@ -69,16 +66,16 @@ class Variable
 {	
 private:
 	/// Type if a variable is passed by reference.
-	typedef const Variable& ByRef;
+	using ByRef = const Variable&;
 	/// Type if a variable is passed by value.
-	typedef Variable ByValue;
+	using ByValue = Variable;
 public:
 #ifdef VARIABLE_PASS_BY_VALUE
 	/// Argument type for variables being function arguments.
-	typedef VariableByValue Arg;		
+	using Arg = VariableByValue;
 #else
 	/// Argument type for variables being function arguments.
-	typedef ByRef Arg;
+	using Arg = ByRef;
 #endif
  
 private:
@@ -105,7 +102,7 @@ public:
 	 * @param rank The rank.
 	 */
 	explicit Variable(std::size_t id, VariableType type = VariableType::VT_REAL, std::size_t rank = 0) noexcept :
-		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | (unsigned)type)
+		mContent((rank << (AVAILABLE + RESERVED_FOR_TYPE)) | (id << RESERVED_FOR_TYPE) | std::size_t(type))
 	{
 		assert(rank < (1 << RESERVED_FOR_RANK));
 		assert(0 < id && id < (std::size_t(1) << AVAILABLE));
@@ -190,16 +187,16 @@ public:
 	/// @}
 
 	/// Number of bits available for the content.
-	static const unsigned BITSIZE = CHAR_BIT * sizeof(size_t); //mContent has type size_t
+	static constexpr std::size_t BITSIZE = CHAR_BIT * sizeof(std::size_t); //mContent has type size_t
 	/// Number of bits reserved for the type.
-	static const unsigned RESERVED_FOR_TYPE = 3;
+	static constexpr std::size_t RESERVED_FOR_TYPE = 3;
 	/// Number of bits reserved for the rank.
-	static const unsigned RESERVED_FOR_RANK = 4;
+	static constexpr std::size_t RESERVED_FOR_RANK = 4;
 	/// Overall number of bits reserved.
-	static const unsigned RESERVED = RESERVED_FOR_RANK + RESERVED_FOR_TYPE;
+	static constexpr std::size_t RESERVED = RESERVED_FOR_RANK + RESERVED_FOR_TYPE;
 	static_assert(RESERVED < BITSIZE, "Too many bits reserved for special use.");
 	/// Number of bits available for the id.
-	static const unsigned AVAILABLE = BITSIZE - RESERVED;
+	static constexpr std::size_t AVAILABLE = BITSIZE - RESERVED;
 
 	/// Instance of an invalid variable.
 	static const Variable NO_VARIABLE;
@@ -218,7 +215,7 @@ namespace std {
 		 * @param variable Variable.
 		 * @return Hash of variable
 		 */
-		size_t operator()(const carl::Variable& variable) const noexcept {
+		std::size_t operator()(const carl::Variable& variable) const noexcept {
 			return variable.getId();
 		}
 	};

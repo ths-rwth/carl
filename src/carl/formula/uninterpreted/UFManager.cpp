@@ -8,11 +8,9 @@
 #include "UFManager.h"
 #include <string>
 
-using namespace std;
-
 namespace carl
 {   
-    ostream& UFManager::print( ostream& _out, const UninterpretedFunction& _uf ) const
+    std::ostream& UFManager::print( std::ostream& _out, const UninterpretedFunction& _uf ) const
     {
         assert( _uf.id() != 0 );
         assert( _uf.id() < mUFs.size() );

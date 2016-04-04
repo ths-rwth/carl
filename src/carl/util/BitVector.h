@@ -15,13 +15,13 @@
 namespace carl
 {
 
-    const unsigned sizeOfUnsigned = sizeof(unsigned);
+    constexpr unsigned sizeOfUnsigned = sizeof(unsigned);
 	
     class BitVector {
 	public:
 		BitVector() {}
 		
-		BitVector(unsigned pos) {
+		explicit BitVector(unsigned pos) {
 			setBit(pos);
 		}
 		
@@ -54,7 +54,7 @@ namespace carl
             {
                 if(*it != 0) {
                     unsigned elem = *it;
-                    while( (elem & (unsigned)1) == 0 )
+                    while( (elem & unsigned(1)) == 0 )
                     {
                         elem >>= 1;
                         ++pos;
@@ -69,8 +69,8 @@ namespace carl
 		void setBit(unsigned pos, bool val = true) {
 			static_assert(sizeof(unsigned) == 4, "Currently bitvectors are only supported on these platforms.");
 			unsigned vecElem = pos >> 5;
-			unsigned mask = (unsigned)1;
-			mask <<= (pos & (unsigned)31);
+			unsigned mask = unsigned(1);
+			mask <<= (pos & unsigned(31));
 			if(vecElem >=  mBits.size()) {
 				mBits.resize(vecElem + 1, 0);
 			} 
@@ -84,11 +84,11 @@ namespace carl
 		}
 		
 		bool getBit(unsigned pos) const {
-			assert(sizeof(unsigned) == 4);
+			static_assert(sizeof(unsigned) == 4, "Currently bitvectors are only supported on these platforms.");
 			unsigned vecElem =  pos >> 5;
 			if(vecElem < mBits.size()) {
-				unsigned bitNr = pos & (unsigned)31;
-				return (mBits[vecElem] >> bitNr) & (unsigned)1;
+				unsigned bitNr = pos & unsigned(31);
+				return (mBits[vecElem] >> bitNr) & unsigned(1);
 			} 
 			else 
 			{
@@ -149,7 +149,7 @@ namespace carl
 			
 		public:
 			bool get() {
-				return (bool)(curVecElem & (unsigned)1);
+				return bool(curVecElem & unsigned(1));
 			}
 			
 			void next() {
@@ -173,7 +173,7 @@ namespace carl
 				return vecIter == vecEnd;
 			}
 		};
-		typedef forward_iterator const_iterator;
+		using const_iterator = forward_iterator;
 		
 		forward_iterator begin() const {
 			return forward_iterator(mBits.begin(), mBits.end());

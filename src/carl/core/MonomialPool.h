@@ -5,16 +5,15 @@
 
 #pragma once
 
-#include "config.h"
-#include "Monomial.h"
-
-#include <memory.h>
-#include <unordered_set>
-
 #include "../config.h"
 #include "../util/Common.h"
 #include "../util/IDGenerator.h"
 #include "../util/Singleton.h"
+#include "Monomial.h"
+#include "config.h"
+
+#include <memory.h>
+#include <unordered_set>
 
 namespace carl{
 
@@ -92,7 +91,7 @@ namespace carl{
 			 * Constructor of the pool.
 			 * @param _capacity Expected necessary capacity of the pool.
 			 */
-			MonomialPool( unsigned _capacity = 10000 ):
+			explicit MonomialPool( std::size_t _capacity = 10000 ):
 				Singleton<MonomialPool>(),
 				mPool(_capacity)
 			{}

@@ -6,10 +6,10 @@
  */
 
 #pragma once
-#include <list>
-#include "../numbers/GFNumber.h"
+#include "../numbers/numbers.h"
 #include "UnivariatePolynomial.h"
 #include "logging.h"
+#include <list>
 
 
 namespace carl

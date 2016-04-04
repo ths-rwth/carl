@@ -22,9 +22,9 @@ TEST(doubleFloatTest, Constructor)
     
     // integer constructor tests
     int iVal = 4;
-    ASSERT_NO_THROW(carl::FLOAT_T<double> hf1 = carl::FLOAT_T<double>(iVal));
+    ASSERT_NO_THROW(carl::FLOAT_T<double> hf1 = carl::FLOAT_T<double>(double(iVal)));
     iVal = 0;
-    EXPECT_EQ(0, carl::FLOAT_T<double>(iVal).value());
+    EXPECT_EQ(0, carl::FLOAT_T<double>(double(iVal)).value());
     
     // mpfr constructor tests
     dVal = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899;
@@ -37,7 +37,7 @@ TEST(doubleFloatTest, Constructor)
 TEST(doubleFloatTest, Hash)
 {
 	std::hash<carl::FLOAT_T<double>> hasher;
-	hasher(carl::FLOAT_T<double>(2));
+	hasher(carl::FLOAT_T<double>(2.0));
 	SUCCEED();
 }
 

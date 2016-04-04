@@ -8,18 +8,18 @@
 
 #pragma once
 
+#include "../core/logging.h"
+#include "../io/streamingOperators.h"
+#include "../util/Common.h"
+#include "../util/Singleton.h"
+#include "Sort.h"
+
 #include <cassert>
 #include <iostream>
 #include <map>
 #include <set>
 #include <utility>
 #include <vector>
-
-#include "../core/logging.h"
-#include "../util/Singleton.h"
-#include "../util/Common.h"
-#include "../io/streamingOperators.h"
-#include "Sort.h"
 
 namespace carl
 {
@@ -190,7 +190,7 @@ class SortManager : public Singleton<SortManager>
 		}
 
 	public:
-		~SortManager() {
+		~SortManager() override {
 			for (auto& s: mSorts) delete s;
 			mSorts.clear();
 		}

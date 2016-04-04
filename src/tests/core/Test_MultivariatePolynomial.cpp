@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "../numbers/config.h"
 #include "carl/core/UnivariatePolynomial.h"
 #include "carl/core/VariablePool.h"
 #include "carl/interval/Interval.h"
@@ -16,38 +15,38 @@ using namespace carl;
 template<typename T>
 class MultivariatePolynomialTest: public testing::Test {};
 
-TYPED_TEST_CASE(MultivariatePolynomialTest, RationalTypes); // TODO should use NumberTypes
+TYPED_TEST_CASE(MultivariatePolynomialTest, NumberTypes);
 
-TEST(MultivariatePolynomial, Constructor)
+TYPED_TEST(MultivariatePolynomialTest, Constructor)
 {
     Variable v0(1);
-    Term<Integer> t0(v0);
-    MultivariatePolynomial<Integer> p0(t0);
-
-    MultivariatePolynomial<Integer> p1(3);
-    EXPECT_EQ((unsigned)1, p1.nrTerms());
+    Term<TypeParam> t0(v0);
+    MultivariatePolynomial<TypeParam> p0(t0);
+	
+    MultivariatePolynomial<TypeParam> p1(TypeParam(3));
+    EXPECT_EQ(1, p1.nrTerms());
     EXPECT_TRUE(p1.isLinear());
 }
 
-TEST(MultivariatePolynomial, Operators)
+TYPED_TEST(MultivariatePolynomialTest, Operators)
 {
     Variable v0(1);
-    Term<Integer> t0(v0);
-    MultivariatePolynomial<Integer> p0a(t0);
-    MultivariatePolynomial<Integer> p0b(v0);
+    Term<TypeParam> t0(v0);
+    MultivariatePolynomial<TypeParam> p0a(t0);
+    MultivariatePolynomial<TypeParam> p0b(v0);
     EXPECT_EQ(p0a, p0b);
 
     EXPECT_TRUE(p0a.isUnivariate());
 }
 
-TEST(MultivariatePolynomial, getTerms)
+TYPED_TEST(MultivariatePolynomialTest, getTerms)
 {
     Variable v0(1);
-	MultivariatePolynomial<Rational> p;
-	p += Rational(1);
+	MultivariatePolynomial<TypeParam> p;
+	p += TypeParam(1);
 	p += v0;
 	p *= v0;
-	MultivariatePolynomial<Rational> p2 = p + Rational(1);
+	MultivariatePolynomial<TypeParam> p2 = p + TypeParam(1);
 
 	auto& t = p2.getTerms();
 	t.erase(t.begin());
@@ -89,11 +88,11 @@ TEST(MultivariatePolynomial, toUnivariatePolynomial)
 	}
 }
 
-TEST(MultivariatePolynomial, Addition)
+TYPED_TEST(MultivariatePolynomialTest, Addition)
 {
     Variable v0 = freshRealVariable("v0");
-    Term<Integer> t0(v0);
-    MultivariatePolynomial<Integer> p0(v0);
+    Term<TypeParam> t0(v0);
+    MultivariatePolynomial<TypeParam> p0(v0);
     p0 += 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 += 3;
@@ -108,21 +107,21 @@ TEST(MultivariatePolynomial, Addition)
     EXPECT_EQ((unsigned)3,p0.nrTerms());
     p0 += createMonomial(v2, (exponent) 1);
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 += Term<Integer>(-2,v2,1);
+    p0 += Term<TypeParam>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
 
-    MultivariatePolynomial<Integer> p1(v0);
+    MultivariatePolynomial<TypeParam> p1(v0);
     p1 += v1;
     p0 += p1;
     EXPECT_EQ((unsigned)2,p0.nrTerms());
-    MultivariatePolynomial<Integer> mp2(v1);
-    mp2 += (Integer)2 * v0;
+    MultivariatePolynomial<TypeParam> mp2(v1);
+    mp2 += (TypeParam)2 * v0;
     EXPECT_EQ(v1, mp2.lterm());
-    MultivariatePolynomial<Integer> p10a;
+    MultivariatePolynomial<TypeParam> p10a;
     p10a += v0*v0;
     p10a += v1;
     EXPECT_EQ(v0*v0, p10a.lterm());
-    MultivariatePolynomial<Integer> p10b;
+    MultivariatePolynomial<TypeParam> p10b;
     p10b += v1;
     p10b += v0*v0;
     EXPECT_EQ(v0*v0, p10b.lterm());
@@ -137,10 +136,10 @@ TEST(MultivariatePolynomial, Addition)
 	EXPECT_EQ(p10a, p10b);
 }
 
-TEST(MultivariatePolynomial, Substraction)
+TYPED_TEST(MultivariatePolynomialTest, Substraction)
 {
     Variable v0((unsigned)1);
-    MultivariatePolynomial<Integer> p0(v0);
+    MultivariatePolynomial<TypeParam> p0(v0);
     p0 -= 3;
     EXPECT_EQ((unsigned)2, p0.nrTerms());
     p0 -= 3;
@@ -156,28 +155,28 @@ TEST(MultivariatePolynomial, Substraction)
     p0 -= createMonomial(v2, (exponent) 1);
 
     EXPECT_EQ((unsigned)3,p0.nrTerms());
-    p0 -= Term<Integer>(-2,v2,1);
+    p0 -= Term<TypeParam>(-2,v2,1);
     EXPECT_EQ((unsigned)2,p0.nrTerms());
 
-    MultivariatePolynomial<Integer> p1(v0);
+    MultivariatePolynomial<TypeParam> p1(v0);
     p1 -= v1;
     p0 -= p1;
     EXPECT_EQ((unsigned)0,p0.nrTerms());
 }
 
-TEST(MultivariatePolynomial, Multiplication)
+TYPED_TEST(MultivariatePolynomialTest, Multiplication)
 {
     Variable v0(1);
     Variable v1(2);
-    MultivariatePolynomial<Integer> p0(v0);
+    MultivariatePolynomial<TypeParam> p0(v0);
 
     p0 *= v0;
-    EXPECT_EQ(Term<Integer>((unsigned)1,v0,2), p0.lterm());
+    EXPECT_EQ(Term<TypeParam>((unsigned)1,v0,2), p0.lterm());
 
-    MultivariatePolynomial<Integer> q({Integer(2)*v0*v0, Integer(1)*v0*v1});
-    Term<Integer> t(1, v0,2);
-    MultivariatePolynomial<Integer> res = q * t;
-    EXPECT_EQ(MultivariatePolynomial<Integer>({Integer(2)*v0*v0*v0*v0, Integer(1)*v0*v0*v0*v1}), res);
+    MultivariatePolynomial<TypeParam> q({TypeParam(2)*v0*v0, TypeParam(1)*v0*v1});
+    Term<TypeParam> t(1, v0,2);
+    MultivariatePolynomial<TypeParam> res = q * t;
+    EXPECT_EQ(MultivariatePolynomial<TypeParam>({TypeParam(2)*v0*v0*v0*v0, TypeParam(1)*v0*v0*v0*v1}), res);
 
     p0 += v1;
     p0 += 1;

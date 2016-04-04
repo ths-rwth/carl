@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
+#include "../Common.h"
 
-#include "../../carl/numbers/numbers.h"
-#include "config.h"
+#include <carl/numbers/numbers.h>
+#include <gtest/gtest.h>
 
 using namespace carl;
 
@@ -105,5 +105,3 @@ TYPED_TEST(RationalDivision, Quotient) {
 		}
 	}
 }
-
-

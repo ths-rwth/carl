@@ -27,7 +27,7 @@ namespace carl
     private:
         boost::dynamic_bitset<> mValue;
 
-        BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
+        explicit BVValue(boost::dynamic_bitset<>&& value): mValue(std::move(value))
         {
         }
 
@@ -36,13 +36,13 @@ namespace carl
         {
         }
 
-        BVValue(std::size_t _width, unsigned long _value = 0) :
-        mValue(_width, _value)
+        explicit BVValue(std::size_t _width, uint _value = 0) :
+        	mValue(_width, _value)
         {
         }
 #ifdef USE_CLN_NUMBERS
-        BVValue(std::size_t _width, const cln::cl_I _value) :
-        mValue(_width)
+        explicit BVValue(std::size_t _width, const cln::cl_I _value) :
+        	mValue(_width)
         {
             for(std::size_t i=0;i<_width;++i) {
                 mValue[i] = cln::logbitp(i, _value);
@@ -50,7 +50,7 @@ namespace carl
         }
 #endif
         BVValue(std::size_t _width, const mpz_class _value) :
-        mValue()
+        	mValue()
         {
             // Obtain an mpz_t copy of _value
             mpz_t value;
@@ -93,7 +93,7 @@ namespace carl
 
         template <typename BlockInputIterator>
         explicit BVValue(BlockInputIterator _first, BlockInputIterator _last) :
-        mValue(_first, _last)
+        	mValue(_first, _last)
         {
         }
 
@@ -101,7 +101,7 @@ namespace carl
         explicit BVValue(const std::basic_string<Char,Traits,Alloc>& _s,
                          typename std::basic_string<Char, Traits, Alloc>::size_type _pos = 0,
                          typename std::basic_string<Char, Traits, Alloc>::size_type _n = std::basic_string<Char,Traits,Alloc>::npos) :
-        mValue(_s, _pos, _n)
+        	mValue(_s, _pos, _n)
         {
         }
 
@@ -382,7 +382,7 @@ namespace carl
             for(std::size_t i=highestRelevantPos+1;i<_other.width();++i) {
                 if(_other[i]) {
                     boost::dynamic_bitset<> allZero(width());
-                    return fillWithOnes ? ~allZero : allZero;
+                    return BVValue(fillWithOnes ? ~allZero : allZero);
                 }
             }
 
@@ -400,7 +400,7 @@ namespace carl
                 shiftBy *= 2;
             }
 
-            return (fillWithOnes ? ~shifted : shifted);
+            return BVValue(fillWithOnes ? ~shifted : shifted);
         }
 
         BVValue divideUnsigned(const BVValue& _other, bool _returnRemainder = false) const

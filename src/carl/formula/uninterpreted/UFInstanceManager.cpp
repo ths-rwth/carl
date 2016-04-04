@@ -8,11 +8,9 @@
 
 #include "UFInstanceManager.h"
 
-using namespace std;
-
 namespace carl
 {   
-    ostream& UFInstanceManager::print( ostream& _out, const UFInstance& _ufi, bool _infix, bool _friendlyNames ) const
+    std::ostream& UFInstanceManager::print( std::ostream& _out, const UFInstance& _ufi, bool _infix, bool _friendlyNames ) const
     {
         assert( _ufi.id() != 0 );
         assert( _ufi.id() < mUFInstances.size() );

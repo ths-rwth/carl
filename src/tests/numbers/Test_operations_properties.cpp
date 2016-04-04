@@ -1,8 +1,8 @@
-#include "gtest/gtest.h"
+#include "../Common.h"
 
-#include "../../carl/numbers/numbers.h"
-#include "config.h"
-#include "carl/core/MultivariateGCD.h"
+#include <carl/core/MultivariateGCD.h>
+#include <carl/numbers/numbers.h>
+#include <gtest/gtest.h>
 
 using namespace carl;
 

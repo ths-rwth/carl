@@ -38,7 +38,7 @@ namespace carl
 
 		ConstTermPtr create(BVTermType _type, const BVTerm& _operand, const size_t _first, const size_t _last);
 
-		void assignId(TermPtr _term, std::size_t _id);
+		void assignId(TermPtr _term, std::size_t _id) override;
 	};
 }
 

@@ -14,15 +14,17 @@ static_assert(false, "This file may only be included indirectly by numbers.h");
 #endif
 
 #include "../../util/platform.h"
+#include "typetraits.h"
+
+CLANG_WARNING_DISABLE("-Wunused-local-typedef")
+#include <boost/algorithm/string.hpp>
+CLANG_WARNING_RESET
+
 #include <cstddef>
+#include <iostream>
 #include <limits.h>
 #include <sstream>
-#include <iostream>
 #include <vector>
-#include "typetraits.h"
-CLANG_WARNING_DISABLE("-Wunused-local-typedef")
-#include "boost/algorithm/string.hpp"
-CLANG_WARNING_RESET
 
 namespace carl {
 
@@ -84,7 +86,7 @@ inline bool isInteger(const mpq_class& n) {
 	 return 0 != mpz_divisible_p(n.get_num_mpz_t(), n.get_den_mpz_t());
 }
 
-inline bool isInteger(const mpz_class&) {
+inline bool isInteger(const mpz_class& /*unused*/) {
 	return true;
 }
 
@@ -121,30 +123,18 @@ inline double toDouble(const mpz_class& n) {
 template<typename Integer>
 inline Integer toInt(const mpz_class& n);
 template<>
-inline signed long int toInt<signed long int>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<signed long int>::max());
-    assert(n >= std::numeric_limits<signed long int>::min());
+inline sint toInt<sint>(const mpz_class& n) {
+    assert(n <= std::numeric_limits<sint>::max());
+    assert(n >= std::numeric_limits<sint>::min());
     return mpz_get_si(n.get_mpz_t());
 }
 template<>
-inline unsigned long int toInt<unsigned long int>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<unsigned long int>::max());
-    assert(n >= std::numeric_limits<unsigned long int>::min());
+inline uint toInt<uint>(const mpz_class& n) {
+    assert(n <= std::numeric_limits<uint>::max());
+    assert(n >= std::numeric_limits<uint>::min());
     return mpz_get_ui(n.get_mpz_t());
 }
 
-template<>
-inline int toInt<int>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<int>::max());
-    assert(n >= std::numeric_limits<int>::min());
-    return (int)mpz_get_si(n.get_mpz_t());
-}
-template<>
-inline unsigned toInt<unsigned>(const mpz_class& n) {
-    assert(n <= std::numeric_limits<unsigned>::max());
-    assert(n >= std::numeric_limits<unsigned>::min());
-    return (unsigned)mpz_get_ui(n.get_mpz_t());
-}
 template<typename Integer>
 inline Integer toInt(const mpq_class& n);
 
@@ -166,21 +156,22 @@ inline mpz_class toInt<mpz_class>(const mpq_class& n) {
  * @return n as unsigned.
  */
 template<>
-inline unsigned toInt<unsigned>(const mpq_class& n) {
-	return toInt<unsigned>(toInt<mpz_class>(n));
+inline sint toInt<sint>(const mpq_class& n) {
+    return toInt<sint>(toInt<mpz_class>(n));
 }
 template<>
-inline unsigned long int toInt<unsigned long int>(const mpq_class& n) {
-	return toInt<unsigned long int>(toInt<mpz_class>(n));
+inline uint toInt<uint>(const mpq_class& n) {
+	return toInt<uint>(toInt<mpz_class>(n));
+}
+
+/*template<>
+inline uint toInt<uint>(const mpq_class& n) {
+	return toInt<uint>(toInt<mpz_class>(n));
 }
 template<>
-inline int toInt<int>(const mpq_class& n) {
-	return toInt<int>(toInt<mpz_class>(n));
-}
-template<>
-inline signed long int toInt<signed long int>(const mpq_class& n) {
-	return toInt<signed long int>(toInt<mpz_class>(n));
-}
+inline sint toInt<sint>(const mpq_class& n) {
+	return toInt<sint>(toInt<mpz_class>(n));
+}*/
 
 template<typename T>
 inline T rationalize(double n);
@@ -189,10 +180,10 @@ template<typename T>
 inline T rationalize(float n);
 
 template<typename T>
-inline T rationalize(int n);
+inline T rationalize(sint n);
 
 template<typename T>
-inline T rationalize(size_t n);
+inline T rationalize(std::size_t n);
 
 template<typename T>
 inline T rationalize(const std::string& n);
@@ -212,7 +203,7 @@ inline mpq_class rationalize<mpq_class>(double d) {
 }
 
 template<>
-inline mpq_class rationalize<mpq_class>(size_t n) {
+inline mpq_class rationalize<mpq_class>(std::size_t n) {
 	return mpq_class(n);
 }
 

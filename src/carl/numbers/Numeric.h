@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include <iostream>
-#include <assert.h>
-#include <vector>
-#include <limits>
 #include "numbers.h"
+
+#include <iostream>
+#include <limits>
+#include <vector>
 
 namespace carl
 {
@@ -39,9 +39,9 @@ namespace carl
          * Default constructor.
          */
         Numeric();
-        Numeric( const T& );
-        Numeric( ContentType, bool = false );
-        Numeric( const Numeric<T>& );
+        Numeric( const T& /*unused*/ );
+        Numeric( ContentType /*unused*/, bool /*unused*/ = false );
+        Numeric( const Numeric<T>& /*unused*/ );
         ~Numeric();
         
         ContentType content() const
@@ -51,61 +51,61 @@ namespace carl
 
         // Methods:
 
-        Numeric<T>& operator=( const T& );
-        Numeric<T>& operator=( ContentType );
-        Numeric<T>& operator=( const Numeric<T>& );
+        Numeric<T>& operator=( const T& /*unused*/ );
+        Numeric<T>& operator=( ContentType /*unused*/ );
+        Numeric<T>& operator=( const Numeric<T>& /*unused*/ );
 
-        bool operator==( const Numeric<T>& ) const;
-        bool operator!=( const Numeric<T>& ) const;
-        bool operator<( const Numeric<T>& ) const;
-        bool operator<=( const Numeric<T>& ) const;
-        bool operator>( const Numeric<T>& ) const;
-        bool operator>=( const Numeric<T>& ) const;
+        bool operator==( const Numeric<T>& /*unused*/ ) const;
+        bool operator!=( const Numeric<T>& /*unused*/ ) const;
+        bool operator<( const Numeric<T>& /*unused*/ ) const;
+        bool operator<=( const Numeric<T>& /*unused*/ ) const;
+        bool operator>( const Numeric<T>& /*unused*/ ) const;
+        bool operator>=( const Numeric<T>& /*unused*/ ) const;
         
         template<typename T1>
-        friend Numeric<T1>& div_assign( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& div_assign( Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1>& gcd_assign( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& gcd_assign( Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         
         template<typename T1>
-        friend Numeric<T1>& operator+=( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& operator+=( Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1>& operator-=( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& operator-=( Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1>& operator*=( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& operator*=( Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1>& operator/=( Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1>& operator/=( Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         
         template<typename T1>
-        friend Numeric<T1>& operator++( Numeric<T1>& );
+        friend Numeric<T1>& operator++( Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1>& operator--( Numeric<T1>& );
+        friend Numeric<T1>& operator--( Numeric<T1>& /*unused*/ );
         
         template<typename T1>
-        friend Numeric<T1> operator-( const Numeric<T1>& );
+        friend Numeric<T1> operator-( const Numeric<T1>& /*unused*/ );
         
         template<typename T1>
-        friend Numeric<T1> div( const Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1> div( const Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1> abs( const Numeric<T1>& );
+        friend Numeric<T1> abs( const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1> lcm( const Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1> lcm( const Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         template<typename T1>
-        friend Numeric<T1> gcd( const Numeric<T1>&, const Numeric<T1>& );
+        friend Numeric<T1> gcd( const Numeric<T1>& /*unused*/, const Numeric<T1>& /*unused*/ );
         
         template<typename T1>
-        friend std::ostream& operator <<( std::ostream&, const Numeric<T1>& );
+        friend std::ostream& operator <<( std::ostream& /*unused*/, const Numeric<T1>& /*unused*/ );
         
-        static ContentType allocate( const T& );
-        static ContentType allocate( ContentType );
-        static void gcd_( ContentType&, ContentType );
+        static ContentType allocate( const T& /*unused*/ );
+        static ContentType allocate( ContentType /*unused*/ );
+        static void gcd_( ContentType& /*unused*/, ContentType /*unused*/ );
         
         T toRational() const
         {
             if( std::abs( this->mContent ) < HIGHTEST_INTEGER_VALUE )
                 return T( this->mContent );
             else
-                return mRationalPool[(size_t)this->mContent-(size_t)HIGHTEST_INTEGER_VALUE];
+                return mRationalPool[std::size_t(this->mContent)-std::size_t(HIGHTEST_INTEGER_VALUE)];
         }
         
         operator T() const
@@ -119,7 +119,7 @@ namespace carl
                 return typename IntegralType<T>::type( this->mContent );
             else
             {
-                T& rat = mRationalPool[(size_t)this->mContent-(size_t)HIGHTEST_INTEGER_VALUE];
+                T& rat = mRationalPool[std::size_t(this->mContent)-std::size_t(HIGHTEST_INTEGER_VALUE)];
                 assert( carl::isInteger( rat ) );
                 return carl::getNum( rat );
             }
@@ -130,13 +130,13 @@ namespace carl
         inline const T& rational() const
         {
             assert( std::abs( this->mContent ) >= HIGHTEST_INTEGER_VALUE );
-            return mRationalPool[(size_t)this->mContent-(size_t)HIGHTEST_INTEGER_VALUE];
+            return mRationalPool[std::size_t(this->mContent)-std::size_t(HIGHTEST_INTEGER_VALUE)];
         }
         
         inline T& rRational()
         {
             assert( std::abs( this->mContent ) >= HIGHTEST_INTEGER_VALUE );
-            return mRationalPool[(size_t)this->mContent-(size_t)HIGHTEST_INTEGER_VALUE];
+            return mRationalPool[std::size_t(this->mContent)-std::size_t(HIGHTEST_INTEGER_VALUE)];
         }
         
         inline void maybeRationalize()
@@ -182,41 +182,41 @@ namespace carl
     };
 
     template<typename T>
-    Numeric<T>& div_assign( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& div_assign( Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& gcd_assign( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& gcd_assign( Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> div( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> div( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> abs( const Numeric<T>& );
+    Numeric<T> abs( const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> lcm( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> lcm( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> gcd( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> gcd( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> operator+( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> operator+( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> operator-( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> operator-( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> operator*( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> operator*( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> operator/( const Numeric<T>&, const Numeric<T>& );
+    Numeric<T> operator/( const Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& operator+=( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& operator+=( Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& operator-=( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& operator-=( Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& operator*=( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& operator*=( Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& operator/=( Numeric<T>&, const Numeric<T>& );
+    Numeric<T>& operator/=( Numeric<T>& /*unused*/, const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T> operator-( const Numeric<T>& );
+    Numeric<T> operator-( const Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& operator++( Numeric<T>& );
+    Numeric<T>& operator++( Numeric<T>& /*unused*/ );
     template<typename T>
-    Numeric<T>& operator--( Numeric<T>& );
+    Numeric<T>& operator--( Numeric<T>& /*unused*/ );
     template<typename T>
-    std::ostream& operator <<( std::ostream&, const Numeric<T>& );
+    std::ostream& operator <<( std::ostream& /*unused*/, const Numeric<T>& /*unused*/ );
     
     #define IS_INT( value ) std::abs( value ) < HIGHTEST_INTEGER_VALUE
     
@@ -226,7 +226,7 @@ namespace carl
         if( std::abs( _value.content() ) < HIGHTEST_INTEGER_VALUE )
             return true;
         else
-            return carl::isInteger( Numeric<T>::mRationalPool[(size_t)_value.content()-(size_t)HIGHTEST_INTEGER_VALUE] );
+            return carl::isInteger( Numeric<T>::mRationalPool[std::size_t(_value.content())-std::size_t(HIGHTEST_INTEGER_VALUE)] );
     }
     
 //    template<>
@@ -243,7 +243,7 @@ namespace carl
     template<typename Integer, typename T>
     inline Integer toInt(const Numeric<T>& n)
     {
-        return carl::toInt<Integer>((T)n); // TODO: this could be more efficient for native integer types
+        return carl::toInt<Integer>(T(n)); // TODO: this could be more efficient for native integer types
     }
     
 } // namespace carl
