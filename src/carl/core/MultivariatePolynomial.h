@@ -259,7 +259,7 @@ public:
 	 * Retrieves information about the definiteness of the polynomial.
 	 * @return Definiteness of this.
 	 */
-	Definiteness definiteness() const;
+	Definiteness definiteness( bool _fullEffort = true ) const;
     
     /**
      * @param _notTrivial If this flag is true, this polynomial is not yet in form of a sos (the method than avoids checking this).

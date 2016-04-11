@@ -54,25 +54,22 @@ namespace carl
         mVarInfoMap(),
         mLhsDefinitess( Definiteness::NON )
     {
-        mLhs.gatherVariables( mVariables );
-        
         if( hasIntegerValuedVariable() && !hasRealValuedVariable() )
         {
             if( mRelation == Relation::LESS )
             {
-                mLhs += typename Pol::NumberType( 1 );
+                mLhs += carl::constant_one<typename Pol::CoeffType>::get();
                 mRelation = Relation::LEQ;
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
             if( mRelation == Relation::GREATER )
             {
-                mLhs -= typename Pol::NumberType( 1 );
+                mLhs -= carl::constant_one<typename Pol::CoeffType>::get();
                 mRelation = Relation::GEQ;
                 mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
             }
         }
-        initVariableInformations();
-        mLhsDefinitess = mLhs.definiteness();
+        mLhsDefinitess = mLhs.definiteness( FULL_EFFORT_FOR_DEFINITENESS_CHECK );
     }
 
     template<typename Pol>
@@ -82,7 +79,7 @@ namespace carl
     template<typename Pol>
     unsigned ConstraintContent<Pol>::isConsistent() const
     {
-        if( mVariables.empty() )
+        if( mLhs.isConstant() )
             return carl::evaluate( mLhs.constantPart(), mRelation ) ? 1 : 0;
         else
         {
@@ -232,25 +229,15 @@ namespace carl
     }
 
     template<typename Pol>
-    void ConstraintContent<Pol>::init()
+    void ConstraintContent<Pol>::initLazy()
     {
-        if( hasIntegerValuedVariable() && !hasRealValuedVariable() )
-        {
-            if( mRelation == Relation::LESS )
-            {
-                mLhs += carl::constant_one<typename Pol::CoeffType>::get();
-                mRelation = Relation::LEQ;
-                mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
-            }
-            if( mRelation == Relation::GREATER )
-            {
-                mLhs -= carl::constant_one<typename Pol::CoeffType>::get();
-                mRelation = Relation::GEQ;
-                mHash = CONSTRAINT_HASH( mLhs, mRelation, Pol );
-            }
-        }
+        mLhs.gatherVariables( mVariables );
+    }
+
+    template<typename Pol>
+    void ConstraintContent<Pol>::initEager()
+    {
         initVariableInformations();
-        mLhsDefinitess = mLhs.definiteness();
     }
     
     template<typename Pol>
