@@ -306,12 +306,12 @@ namespace carl
                 carl::exponent e = ft->second;
                 assert( e != 0 );
                 result *= carl::pow( ft->first.coefficient(), e );
-                ft = mFactorization.erase(ft);
 
                 for( auto partFactor = partFactorization.begin(); partFactor != partFactorization.end(); partFactor++ )
                 {
                     mFactorization.insert( std::pair<FactorizedPolynomial<P>, carl::exponent>( partFactor->first, partFactor->second * e ) );
                 }
+                ft = mFactorization.erase(ft);
             }
         }
         assert( assertFactorization() );
