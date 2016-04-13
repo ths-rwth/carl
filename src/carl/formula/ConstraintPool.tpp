@@ -226,6 +226,7 @@ namespace carl
             }
             else
             {
+                _constraint->initLazy();
                 ConstraintContent<Pol>* constraint = _constraint->simplify();
                 if( constraint != nullptr ) // Constraint could be simplified.
                 {
@@ -238,8 +239,9 @@ namespace carl
                         delete constraint;
                     }
                     else // Simplified version has not been generated before.
-                    { 
-                        constraint->init();
+                    {
+                        constraint->initLazy();
+                        constraint->initEager();
                         constraint->mID = mIdAllocator;
                         ++mIdAllocator;
                     }
@@ -249,6 +251,7 @@ namespace carl
                 }
                 else // Constraint could not be simplified.
                 {
+                    _constraint->initEager();
                     _constraint->mID = mIdAllocator;
                     ++mIdAllocator;
                 }

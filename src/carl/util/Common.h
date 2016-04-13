@@ -125,5 +125,7 @@ namespace carl
     static constexpr uint MAX_DIMENSION_FOR_FACTORIZATION = 6;
     
     static constexpr uint MAX_NUMBER_OF_MONOMIALS_FOR_FACTORIZATION = 10;
+    
+    static constexpr bool FULL_EFFORT_FOR_DEFINITENESS_CHECK = false;
 	
 }	// namespace carl

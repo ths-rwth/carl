@@ -366,8 +366,10 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
-Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() const
+Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
 {
+    if( isLinear() )
+        return Definiteness::NON;
 	auto term = mTerms.rbegin();
 	if( term == mTerms.rend() ) return Definiteness::NON;
 	Definiteness result = term->definiteness();
@@ -405,7 +407,7 @@ Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness() con
             }
 		}
 	}
-    if( result == Definiteness::NON && totalDegree() == 2 )
+    if( _fullEffort && result == Definiteness::NON && totalDegree() == 2 )
     {
         assert( !isConstant() );
         bool lTermNegative = carl::isNegative( lterm().coeff() );

@@ -261,7 +261,8 @@ namespace carl
              * Initializes some basic information of the constraint, such as the definiteness of the left-hand 
              * side and specific information to each variable.
              */
-            void init();
+            void initLazy();
+            void initEager();
             
             /**
              * Initializes the stored factorization.
