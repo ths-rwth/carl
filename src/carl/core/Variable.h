@@ -35,7 +35,7 @@ inline std::ostream& operator<<(std::ostream& os, const VariableType& t) {
 		case VariableType::VT_INT: return os << "Int";
 		case VariableType::VT_UNINTERPRETED: return os << "Uninterpreted";
 		case VariableType::VT_BITVECTOR: return os << "Bitvector";
-		default: return os << "Invalid " << uint(t);
+		default: return os << "Invalid " << int(t);
 	}
 	return os << "Unknown";
 }

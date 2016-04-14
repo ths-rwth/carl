@@ -9,6 +9,7 @@
 
 
 #include "../core/Variable.h"
+#include "../numbers/numbers.h"
 #include "pointerOperations.h"
 
 #include <map>
