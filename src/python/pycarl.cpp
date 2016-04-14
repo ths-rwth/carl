@@ -145,5 +145,9 @@ PYBIND11_PLUGIN(_core) {
 	m.attr("VariablePool") = py::cast(carl::VariablePool::getInstance(), py::return_value_policy::reference);
 	m.attr("MonomialPool") = py::cast(carl::MonomialPool::getInstance(), py::return_value_policy::reference);
 
+	py::class_<carl::Formula<Polynomial>>(m, "Formula")
+		.def("__str__", &streamToString<carl::Formula<Polynomial>>)
+		;
+
 	return m.ptr();
 }

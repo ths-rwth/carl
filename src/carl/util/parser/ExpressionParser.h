@@ -344,10 +344,16 @@ struct ExpressionParser: public qi::grammar<Iterator, ExpressionType<Pol>(), Ski
 
 	ExpressionParser(): ExpressionParser<Pol>::base_type(main, "polynomial") {
 		/** Tokens */
-		operation.add("+", ADD)("-", SUB);
+		operationShift.add("+", ADD)("-", SUB);
 		operationScale.add("*", MUL)("/", DIV);
 		operationPow.add("^", POW)("**", POW);
 		operationSign.add("-", NEG);
+
+		operationNot.add("not", carl::FormulaType::NOT)("!", carl::FormulaType::NOT);
+		operationImp.add("imp", carl::FormulaType::IMPLIES)("->", carl::FormulaType::IMPLIES);
+		operationIff.add("iff", carl::FormulaType::IFF)("<->", carl::FormulaType::IFF);
+		operationAnd.add("and", FormulaType::AND)("&", FormulaType::AND)("or", FormulaType::OR)("|", FormulaType::OR);
+
 		varname = qi::lexeme[ (qi::alpha | qi::char_("_")) >> *(qi::alnum | qi::char_("_"))];
 		variable = varname[qi::_val = px::bind(&ExpressionParser<Pol>::newVariable, px::ref(*this), qi::_1)];
 
@@ -355,12 +361,13 @@ struct ExpressionParser: public qi::grammar<Iterator, ExpressionType<Pol>(), Ski
 		// operationScaleLA is a look-ahead hack to prevent the * operator from consuming ** (power)
 		operationScaleLA = qi::lexeme[ operationScale >> !qi::lit("*") ][qi::_val = qi::_1];
 		monomial = variable[qi::_val = qi::_1];
-		atom = (monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
+		boolean = (qi::true_[qi::_val = px::bind(&ExpressionParser<Pol>::makeBool, px::ref(*this), true)] | qi::false_[qi::_val = px::bind(&ExpressionParser<Pol>::makeBool, px::ref(*this), false)]);
+		atom = (boolean[qi::_val = qi::_1] | monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
 		expr = ("(" > expr_sum > ")")[qi::_val = qi::_1] | atom[qi::_val = qi::_1];
 		expr_power = (expr >> *(operationPow > exponentVal))[qi::_val = px::bind(&ExpressionParser<Pol>::powExpr, px::ref(*this), qi::_1, qi::_2)];
 		expr_sign = (*operationSign > expr_power)[qi::_val = px::bind(&ExpressionParser<Pol>::signExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_product = (expr_sign >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Pol>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_sum = (expr_product >> *(operation > expr_product))[qi::_val = px::bind(&ExpressionParser<Pol>::addExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_product = (expr_sign >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Pol>::arithmeticExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_sum = (expr_product >> *(operationShift > expr_product))[qi::_val = px::bind(&ExpressionParser<Pol>::arithmeticExpr, px::ref(*this), qi::_1, qi::_2)];
 		main = expr_sum;
 
 		varname.name("varname");
@@ -393,7 +400,53 @@ private:
 		return v;
 	}
 
-	expr_type addExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
+	expr_type makeBool(bool value) {
+		if (value) {
+			return Formula<Pol>(FormulaType::TRUE);
+		} else {
+			return Formula<Pol>(FormulaType::FALSE);
+		}
+	}
+
+	expr_type booleanBinaryExpr(const expr_type& first, const std::vector<boost::fusion::vector2<carl::FormulaType,expr_type>>& ops) {
+		expr_type res = first;
+		for (const auto& op: ops) {
+			switch (boost::fusion::at_c<0>(op)) {
+				case carl::FormulaType::AND: {
+					res = boost::apply_visitor( perform_addition(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+				case carl::FormulaType::OR: {
+					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+				case carl::FormulaType::IMPLIES: {
+					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+				case carl::FormulaType::IFF: {
+					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+			}
+		}
+		return res;
+	}
+
+	expr_type booleanUnaryExpr(const std::vector<carl::FormulaType>& ops, const expr_type& first) {
+		expr_type res = first;
+		for (const auto& op: ops) {
+			switch (op) {
+				case carl::FormulaType::NOT: {
+					res = boost::apply_visitor( perform_negate(), res );
+					break;
+				}
+			}
+		}
+		return res;
+	}
+
+	expr_type arithmeticExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
 		expr_type res = first;
 		for (const auto& op: ops) {
 			switch (boost::fusion::at_c<0>(op)) {
@@ -405,14 +458,6 @@ private:
 					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
 					break;
 				}
-			}
-		}
-		return res;
-	}
-	expr_type mulExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
-		expr_type res = first;
-		for (const auto& op: ops) {
-			switch (boost::fusion::at_c<0>(op)) {
 				case MUL: {
 					res = boost::apply_visitor( perform_multiplication(), res, boost::fusion::at_c<1>(op) );
 					break;
@@ -425,7 +470,7 @@ private:
 		}
 		return res;
 	}
-	
+
 	expr_type powExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,exponent>>& ops) {
 		expr_type res = first;
 		for (const auto& op: ops) {
@@ -454,7 +499,11 @@ private:
 		return res;
 	}
 
-	qi::symbols<char, Operation> operation;
+	qi::symbols<char, carl::FormulaType> operationNot;
+	qi::symbols<char, carl::FormulaType> operationImp;
+	qi::symbols<char, carl::FormulaType> operationIff;
+	qi::symbols<char, carl::FormulaType> operationAnd;
+	qi::symbols<char, Operation> operationShift;
 	qi::symbols<char, Operation> operationScale;
 	qi::symbols<char, Operation> operationPow;
 	qi::symbols<char, Operation> operationSign;
@@ -467,6 +516,7 @@ private:
 
 	qi::rule<Iterator, Operation(), Skipper> operationScaleLA;
 
+	qi::rule<Iterator, expr_type(), Skipper> boolean;
 	qi::rule<Iterator, expr_type(), Skipper> monomial;
 	qi::rule<Iterator, expr_type(), Skipper> atom;
 
