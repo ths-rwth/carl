@@ -116,6 +116,7 @@ PYBIND11_PLUGIN(_parsing) {
 	//TODO: hardcoded module path, this is fragile
 	// Import core as the result of parse depends on it
 	py::module::import("pycarl.core._core");
+	py::module::import("pycarl.numbers._numbers");
 /*
 	py::class_<carl::parser::Parser<Polynomial>>(m, "Parser",
 	py::doc("Parser for polynomials and rational functions"))

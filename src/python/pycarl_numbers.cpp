@@ -8,8 +8,8 @@
 
 
 // Thin wrappers for rationals
-double ratToDouble(const Rational& r) { return 0.0; } //carl::toDouble(r); }
-std::string ratToString(const Rational& r ) { return std::string(); } //carl::toString(r, true); }
+double ratToDouble(const Rational& r) { return carl::toDouble(r); }
+std::string ratToString(const Rational& r ) { return carl::toString(r, true); }
 
 namespace py = pybind11;
 
