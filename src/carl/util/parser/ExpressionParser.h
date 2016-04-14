@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Common.h"
+#include "ExpressionParserResult.h"
 
 #if BOOST_VERSION >= 105900
 #ifdef USE_CLN_NUMBERS
@@ -71,11 +72,9 @@ namespace carl {
 namespace parser {
 
 template<typename Pol>
-struct ExpressionParser: public qi::grammar<Iterator,
-		boost::variant< typename Pol::CoeffType, Variable, Monomial::Arg, Term<typename Pol::CoeffType>, Pol, RatFun<Pol> >(),
-		Skipper> {
+struct ExpressionParser: public qi::grammar<Iterator, ExpressionType<Pol>(), Skipper> {
     typedef typename Pol::CoeffType CoeffType;
-	using expr_type = boost::variant< CoeffType, Variable, Monomial::Arg, Term<CoeffType>, Pol, RatFun<Pol> >;
+	using expr_type = ExpressionType<Pol>;
 
 	class perform_addition: public boost::static_visitor<expr_type> {
 	public:
@@ -97,17 +96,30 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		}
 
 		template<typename T>
-		expr_type operator()(const RatFun<Pol>& lhs, const T& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const RatFun<Pol>& lhs, const T& rhs) const {
 			return (lhs) + (rhs);
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Pol>& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
 			return (rhs) + Pol(lhs);
 		}
 
 		expr_type operator()(const RatFun<Pol>& lhs, const RatFun<Pol>& rhs) const {
 			return (lhs) + (rhs);
+		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No addition for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No addition for formula");
 		}
 	};
 
@@ -131,29 +143,44 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		}
 
 		template<typename T>
-		expr_type operator()(const RatFun<Pol>& lhs, const T& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const RatFun<Pol>& lhs, const T& rhs) const {
 			return (lhs) - (rhs);
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Pol>& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
 			return (rhs) - Pol(lhs);
 		}
 
 		expr_type operator()(const RatFun<Pol>& lhs, const RatFun<Pol>& rhs) const {
 			return (lhs) - (rhs);
 		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No subtraction for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No subtraction for formula");
+		}
 	};
 
 	class perform_multiplication: public boost::static_visitor<expr_type> {
 	public:
 		template<typename T, typename U>
-		expr_type operator()(const T& lhs, const U& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		 operator()(const T& lhs, const U& rhs) const {
 			return lhs * rhs;
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Pol>& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
 			return rhs * lhs;
 		}
 
@@ -172,6 +199,17 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		expr_type operator()(const Term<CoeffType>& lhs, const RatFun<Pol>& rhs) const {
 			return (rhs) * Pol(lhs);
 		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No multiplication for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No multiplication for formula");
+		}
 	};
 
 	class perform_division: public boost::static_visitor<expr_type> {
@@ -181,7 +219,8 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		}
 
 		template<typename T>
-		expr_type operator()(const RatFun<Pol>& lhs, const T& rhs) const {
+		typename std::enable_if<!std::is_base_of<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const RatFun<Pol>& lhs, const T& rhs) const {
 			return lhs / rhs;
 		}
 
@@ -198,19 +237,33 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const CoeffType& coeff) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const CoeffType& coeff) const {
 			return lhs * reciprocal(coeff);
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Pol>& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
 			// TODO: Not extremely efficient probably
 			return  RatFun<Pol>(rhs.denominator(), rhs.nominator()) * Pol(lhs);
 		}
 
 		template<typename T, typename U>
-		expr_type operator()(const T& lhs, const U& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const U& rhs) const {
 			return RatFun<Pol>(Pol(lhs), Pol(rhs));
+		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No division for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No division for formula");
 		}
 	};
 
@@ -240,6 +293,10 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		expr_type operator()(const Monomial::Arg& lhs) const {
 			return lhs->pow(expVal);
 		}
+
+		expr_type operator()(const Formula<Pol>& lhs) const {
+			throw std::runtime_error("No power for fomula");
+		}
 	};
 
 	class perform_negate: public boost::static_visitor<expr_type> {
@@ -247,6 +304,10 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		template<typename T>
 		expr_type operator()(const T& lhs) const {
 			return lhs * CoeffType(-1);
+		}
+
+		expr_type operator()(const Formula<Pol>& lhs) const {
+			throw std::runtime_error("No negate for fomula");
 		}
 	};
 
@@ -274,6 +335,10 @@ struct ExpressionParser: public qi::grammar<Iterator,
 
 		void operator()(const Variable& expr) const {
 			std::cout << "Variable " << expr << std::endl;
+		}
+
+		void operator()(const Formula<Pol>& expr) const {
+			std::cout << "Formula " << expr << std::endl;
 		}
 	};
 

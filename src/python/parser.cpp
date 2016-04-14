@@ -4,13 +4,13 @@
 //#include "carl/util/parser/Parser.h"
 #include "carl/util/parser/ExpressionParser.h"
 
-expr_type parse(const std::string& input) {
+carl::parser::ExpressionType<Polynomial> parse(const std::string& input) {
 	typedef std::string::const_iterator It;
 	It f(begin(input)), l(end(input));
 	try {
 		carl::parser::ExpressionParser<Polynomial> parser;
 		carl::parser::Skipper skipper;
-		expr_type data;
+		carl::parser::ExpressionType<Polynomial> data;
 
 		bool parse_result = qi::phrase_parse(f, l, parser, skipper, data);
 		//bool parse_result = qi::parse(f, l, parser, data);

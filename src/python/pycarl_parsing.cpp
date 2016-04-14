@@ -67,7 +67,7 @@ public:
 };
 
 py::handle parseString(const std::string& input) {
-	expr_type data = parse(input);
+	carl::parser::ExpressionType<Polynomial> data = parse(input);
 
 	py::object obj = boost::apply_visitor( to_object(), data );
 	obj.inc_ref();

@@ -7,9 +7,6 @@
 
 #pragma once
 
-#include <string>
-#include <boost/variant/variant.hpp>
+#include "carl/util/parser/ExpressionParserResult.h"
 
-typedef boost::variant< Rational, carl::Variable, carl::Monomial::Arg, carl::Term<Rational>, Polynomial, RationalFunction > expr_type;
-
-expr_type parse(const std::string& input);
+carl::parser::ExpressionType<Polynomial> parse(const std::string& input);
