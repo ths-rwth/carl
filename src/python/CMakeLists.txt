@@ -1,6 +1,7 @@
 # This is a CMake example for Python
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src ${pycarl_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${pybind11_incdir})
 
 ADD_LIBRARY(pycarlcore SHARED pycarl.cpp)
 ADD_LIBRARY(pycarlnumbers SHARED pycarl_numbers.cpp)
