@@ -1,67 +1,44 @@
-//#include <python3.4m/Python.h>
-//#include <python2.7/Python.h>
 #include <Python.h>
-#include <boost/python.hpp>
-#include <boost/python/stl_iterator.hpp>
-#include <boost/python/suite/indexing/map_indexing_suite.hpp>
-
-#include "helpers.h"
-
-#include "carl/core/Variable.h"
-#include "carl/core/Monomial.h"
-#include "carl/core/MultivariatePolynomial.h"
-#include "carl/core/RationalFunction.h"
-#include "carl/util/parser/Parser.h"
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
+#include "pybind11/operators.h"
 
 #include "definitions.h"
 
-//typedef double Rational;
-typedef carl::MultivariatePolynomial<Rational> Polynomial;
-typedef carl::FactorizedPolynomial<Polynomial> FactorizedPolynomial;
-typedef carl::RationalFunction<Polynomial> RationalFunction;
-typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
-typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
+namespace py = pybind11;
+
+template<typename T>
+/**
+ * Helper function to get a string out of the stream operator.
+ * Used for __str__ functions.
+ */
+std::string streamToString(T const & t) {
+	std::stringstream ss;
+	ss << t;
+	return ss.str();
+}
 
 /**
  * The actual module definition
  */
-BOOST_PYTHON_MODULE(_core)
-{
-	using namespace boost::python;
+PYBIND11_PLUGIN(_core) {
+	py::module m("core", "pycarl core");
 
-	// Register interable conversions.
-	iterable_converter()
-		.from_python<std::vector<double> >()
-		.from_python<std::list<double> >().from_python<std::vector<std::string> >()
-		.from_python<std::list<std::string> >()
-		;
-	dict_converter()
-		.from_python<std::map<carl::Variable, Rational> >()
-		;
-
-	map_to_dict()
-		.to_python<std::map<std::string, carl::Variable> >()
-		;
-	iter_to_tuple()
-		.to_python<std::set<carl::Variable> >()
-		;
-
-
-	enum_<carl::VariableType>("VariableType")
+	py::enum_<carl::VariableType>(m, "VariableType")
 		.value("BOOL", carl::VariableType::VT_BOOL)
 		.value("INT", carl::VariableType::VT_INT)
 		.value("REAL", carl::VariableType::VT_REAL);
 
-	class_<carl::Variable>("Variable", no_init)
+	py::class_<carl::Variable>(m, "Variable")
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
-		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
-		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
-		.def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator-))
-		.def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
-		.add_property("name", &carl::Variable::getName)
-		.add_property("type", &carl::Variable::getType)
-		.def(self_ns::str(self_ns::self))
+		//.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
+		//.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
+		//.def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator-))
+		//.def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
+		.def_property_readonly("name", &carl::Variable::getName)
+		.def_property_readonly("type", &carl::Variable::getType)
+		.def("__str__", &streamToString<carl::Variable>)
 		;
 /*
 	class_<carl::Monomial, carl::Monomial::Arg, boost::noncopyable>("Monomial", no_init)
@@ -71,108 +48,102 @@ BOOST_PYTHON_MODULE(_core)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, carl::Variable::Arg)>(&carl::operator*))
 		;
 */
-	class_<carl::Term<Rational>>("Term")
-		.def(init<Rational>())
-		.def(init<carl::Variable::Arg>())
-		.def(init<const carl::Monomial::Arg&>())
-		.def(init<Rational, const carl::Monomial::Arg&>())
-		.def(init<Rational, carl::Variable::Arg, carl::exponent>())
-		.def(self_ns::str(self_ns::self))
+	py::class_<carl::Term<Rational>>(m, "Term")
+		.def(py::init<Rational>())
+		.def(py::init<carl::Variable::Arg>())
+		.def(py::init<const carl::Monomial::Arg&>())
+		.def(py::init<Rational, const carl::Monomial::Arg&>())
+		.def(py::init<Rational, carl::Variable::Arg, carl::exponent>())
+		.def("__str__", &streamToString<carl::Term<Rational>>)
 		;
 
-	class_<Polynomial>("Polynomial",
-	"Represent a multivariate polynomial")
-		.def(init<carl::Variable::Arg>())
-		.def(init<const carl::Monomial::Arg&>())
-		.def(init<Rational>())
-		.def("constant_part", &Polynomial::constantPart, return_value_policy<copy_const_reference>())
+	py::class_<Polynomial>(m, "Polynomial",
+	py::doc("Represent a multivariate polynomial"))
+		.def(py::init<carl::Variable::Arg>())
+		.def(py::init<const carl::Monomial::Arg&>())
+		.def(py::init<Rational>())
+		.def("constant_part", &Polynomial::constantPart, py::return_value_policy::reference_internal)
 		.def("evaluate", &Polynomial::evaluate<Rational>)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
-		.add_property("total_degree", &Polynomial::totalDegree, "The maximum degree of the terms in the polynomial")
-		.def("degree", &Polynomial::degree, "Computes the degree with respect to the given variable")
-		.add_property("nr_terms", &Polynomial::nrTerms)
-		.def(self_ns::str(self_ns::self))
-		.def(self - self)
-		.def(self + self)
-		.def(self * self)
-		.def(self != self)
-		.def(self == self)
-		.def(self + other<carl::Variable>())
-		.def(self - other<carl::Variable>())
+		.def_property_readonly("total_degree", &Polynomial::totalDegree, py::doc("The maximum degree of the terms in the polynomial"))
+		.def("degree", &Polynomial::degree, py::doc("Computes the degree with respect to the given variable"))
+		.def_property_readonly("nr_terms", &Polynomial::nrTerms)
+		.def("__str__", &streamToString<Polynomial>)
+		.def(py::self - py::self)
+		.def(py::self + py::self)
+		.def(py::self * py::self)
+		.def(py::self != py::self)
+		.def(py::self == py::self)
+		.def("__add__", [](Polynomial const & left, carl::Variable const& right) {return left + right;})
+		.def("__sub__", [](Polynomial const & left, carl::Variable const& right) {return left - right;})
 		;
 
-	class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>, boost::noncopyable>("FactorizationCache",
-	"Cache storing all factorized polynomials")
+	py::class_<carl::Cache<FactorizationPair>, std::shared_ptr<carl::Cache<FactorizationPair>>>(m, "FactorizationCache",
+	py::doc("Cache storing all factorized polynomials"))
 		;
-	register_ptr_to_python<std::shared_ptr<carl::Cache<FactorizationPair>>>();
 
-	class_<FactorizedPolynomial>("FactorizedPolynomial",
-	"Represent a polynomial with its factorization")
-		.def(init<const Rational&>())
-		.def(init<const Polynomial&, const std::shared_ptr<carl::Cache<FactorizationPair>>>())
+	py::class_<FactorizedPolynomial>(m, "FactorizedPolynomial",
+	py::doc("Represent a polynomial with its factorization"))
+		.def(py::init<const Rational&>())
+		.def(py::init<const Polynomial&, const std::shared_ptr<carl::Cache<FactorizationPair>>>())
 		.def("constant_part", &FactorizedPolynomial::constantPart)
 		.def("evaluate", &FactorizedPolynomial::evaluate<Rational>)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (FactorizedPolynomial::*)() const>(&FactorizedPolynomial::gatherVariables))
-		.def(self_ns::str(self_ns::self))
-		.def(self - self)
-		.def(self + self)
-		.def(self * self)
-		.def(self == self)
-		.def(self != self)
+		.def("__str__", &streamToString<FactorizedPolynomial>)
+		.def(py::self - py::self)
+		.def(py::self + py::self)
+		.def(py::self * py::self)
+		.def(py::self == py::self)
+		.def(py::self != py::self)
 		;
 
-	class_<RationalFunction>("RationalFunction",
-	"Represent a rational function, that is the fraction of two multivariate polynomials ")
-		.def(init<Polynomial, Polynomial>())
+	py::class_<RationalFunction>(m, "RationalFunction",
+	py::doc("Represent a rational function, that is the fraction of two multivariate polynomials "))
+		.def(py::init<Polynomial, Polynomial>())
 		.def("evaluate", &RationalFunction::evaluate)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
-		.add_property("numerator", &RationalFunction::nominator)
-		.add_property("denominator", &RationalFunction::denominator)
-		.def(self_ns::str(self_ns::self))
-		.def(self - self)
-		.def(self + self)
-		.def(self * self)
-		.def(self / self)
-		.def(self == self)
-		.def(self != self)
+		.def_property_readonly("numerator", &RationalFunction::nominator)
+		.def_property_readonly("denominator", &RationalFunction::denominator)
+		.def("__str__", &streamToString<RationalFunction>)
+		.def(py::self - py::self)
+		.def(py::self + py::self)
+		.def(py::self * py::self)
+		.def(py::self / py::self)
+		.def(py::self == py::self)
+		.def(py::self != py::self)
 		;
 
-	class_<FactorizedRationalFunction>("FactorizedRationalFunction",
-	"Represent a rational function, that is the fraction of two factorized polynomials ")
-		.def(init<FactorizedPolynomial, FactorizedPolynomial>())
+	py::class_<FactorizedRationalFunction>(m, "FactorizedRationalFunction",
+	py::doc("Represent a rational function, that is the fraction of two factorized polynomials "))
+		.def(py::init<FactorizedPolynomial, FactorizedPolynomial>())
 		.def("evaluate", &FactorizedRationalFunction::evaluate)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (FactorizedRationalFunction::*)() const>(&FactorizedRationalFunction::gatherVariables))
-		.add_property("numerator", &FactorizedRationalFunction::nominator)
-		.add_property("denominator", &FactorizedRationalFunction::denominator)
-		.def(self_ns::str(self_ns::self))
-		.def(self - self)
-		.def(self + self)
-		.def(self * self)
-		.def(self / self)
-		.def(self == self)
-		.def(self != self)
-		;
-
-	class_<carl::parser::Parser<Polynomial>, boost::noncopyable>("Parser",
-	"Parser for polynomials and rational functions")
-		.def("polynomial", &carl::parser::Parser<Polynomial>::polynomial)
-		.def("rational_function", &carl::parser::Parser<Polynomial>::rationalFunction)
-		.def("add_variable", &carl::parser::Parser<Polynomial>::addVariable)
+		.def_property_readonly("numerator", &FactorizedRationalFunction::nominator)
+		.def_property_readonly("denominator", &FactorizedRationalFunction::denominator)
+		.def("__str__", &streamToString<FactorizedRationalFunction>)
+		.def(py::self - py::self)
+		.def(py::self + py::self)
+		.def(py::self * py::self)
+		.def(py::self / py::self)
+		.def(py::self == py::self)
+		.def(py::self != py::self)
 		;
 
 	// Non-constructable class VariablePool, static instance accessible via global
-	class_<carl::VariablePool, boost::noncopyable>("VariablePoolInst", no_init)
+	py::class_<carl::VariablePool>(m, "VariablePoolInst")
 		.def("get_fresh_variable", static_cast<carl::Variable (carl::VariablePool::*)(carl::VariableType)>(&carl::VariablePool::getFreshVariable))
 		.def("get_fresh_variable", static_cast<carl::Variable (carl::VariablePool::*)(const std::string&, carl::VariableType)>(&carl::VariablePool::getFreshVariable))
 		.def("find_variable_with_name", &carl::VariablePool::findVariableWithName)
 		;
 
 	// Non-constructable class MonomialPool, static instance accessible via global
-	class_<carl::MonomialPool, boost::noncopyable>("MonomialPoolInst", no_init)
+	py::class_<carl::MonomialPool>(m, "MonomialPoolInst")
 		.def("create", static_cast<carl::Monomial::Arg (carl::MonomialPool::*)(carl::Variable::Arg, carl::exponent)>(&carl::MonomialPool::create))
 		;
 
 	// Setup the global variables
-	scope().attr("VariablePool") = object(ptr(&carl::VariablePool::getInstance()));
-	scope().attr("MonomialPool") = object(ptr(&carl::MonomialPool::getInstance()));
+	m.attr("VariablePool") = py::cast(carl::VariablePool::getInstance(), py::return_value_policy::reference);
+	m.attr("MonomialPool") = py::cast(carl::MonomialPool::getInstance(), py::return_value_policy::reference);
+
+	return m.ptr();
 }

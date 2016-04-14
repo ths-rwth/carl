@@ -1,21 +1,22 @@
 #include <Python.h>
 #include "pybind11/pybind11.h"
+#include <pybind11/operators.h>
 
 #include "definitions.h"
-#include "helpers.h"
+//#include "helpers.h"
 #include "carl/numbers/numbers.h"
 
 
 // Thin wrappers for rationals
-double ratToDouble(const Rational& r) { return carl::toDouble(r); }
-std::string ratToString(const Rational& r ) { return carl::toString(r, true); }
+double ratToDouble(const Rational& r) { return 0.0; } //carl::toDouble(r); }
+std::string ratToString(const Rational& r ) { return std::string(); } //carl::toString(r, true); }
 
 namespace py = pybind11;
 
 PYBIND11_PLUGIN(_numbers) {
-        py::module m("numbers", "Number plugin for pycarl");
+        py::module m("numbers");
 
-        py::class_<Rational, Rational*>("Rational", "Class wrapping rational numbers")
+        py::class_<Rational, Rational*>(m, "Rational", py::doc("Class wrapping rational numbers"))
         .def(py::init<int>())
         .def("__float__", &ratToDouble)
         .def("__str__", &ratToString)
@@ -41,7 +42,4 @@ PYBIND11_PLUGIN(_numbers) {
         m.def("rationalize", static_cast<Rational (*)(double)>(&carl::rationalize), "Construct a rational number from a double");
 
         return m.ptr();
-}
-
-
 }
