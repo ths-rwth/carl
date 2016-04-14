@@ -72,6 +72,8 @@ else()
 	add_dependencies(resources eigen)
 endif()
 
+set(pybind11_incdir "{CMAKE_CURRENT_SOURCE_DIR}/pybind11/include" PARENT_SCOPE)
+
 if(OBTAIN_BOOST)
 	message("-- Get actual version of Boost and install it in resources")
 	set( Boost_Bootstrap_Command )
