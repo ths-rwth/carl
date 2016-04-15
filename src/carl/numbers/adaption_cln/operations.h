@@ -505,6 +505,10 @@ inline cln::cl_I operator/(const cln::cl_I& lhs, const int& rhs) {
 	return lhs / cln::cl_I(rhs);
 }
 
+inline cln::cl_RA reciprocal(const cln::cl_RA& a) {
+	return cln::recip(a);
+}
+
 std::string toString(const cln::cl_RA& _number, bool _infix=true);
 
 std::string toString(const cln::cl_I& _number, bool _infix=true);

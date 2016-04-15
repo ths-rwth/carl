@@ -6,7 +6,40 @@
 #pragma once
 
 #include "Common.h"
+#include "ExpressionParserResult.h"
 
+#if BOOST_VERSION >= 105900
+#ifdef USE_CLN_NUMBERS
+namespace boost { namespace spirit { namespace traits {
+    template<> inline bool scale(int exp, cln::cl_RA& r, cln::cl_RA acc) {
+        if (exp >= 0)
+            r = acc * carl::pow(cln::cl_RA(10), (unsigned)exp);
+        else
+            r = acc / carl::pow(cln::cl_RA(10), (unsigned)(-exp));
+		return true;
+    }
+    template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
+        return value == 1;
+    }
+}}}
+#endif
+namespace boost { namespace spirit { namespace traits {
+    template<> inline bool scale(int exp, mpq_class& r, mpq_class acc) {
+        if (exp >= 0)
+            r = acc * carl::pow(mpq_class(10), (unsigned)exp);
+        else
+            r = acc / carl::pow(mpq_class(10), (unsigned)(-exp));
+		return true;
+    }
+    template<> inline bool is_equal_to_one(const mpq_class& value) {
+        return value == 1;
+    }
+    template<> inline mpq_class negate(bool neg, const mpq_class& n) {
+        return neg ? mpq_class(-n) : n;
+    }
+}}}
+#else
+#ifdef USE_CLN_NUMBERS
 namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, cln::cl_RA& r) {
         if (exp >= 0)
@@ -14,58 +47,79 @@ namespace boost { namespace spirit { namespace traits {
         else
             r /= carl::pow(cln::cl_RA(10), (unsigned)(-exp));
     }
-
+    template<> inline bool is_equal_to_one(const cln::cl_RA& value) {
+        return value == 1;
+    }
+}}}
+#endif
+namespace boost { namespace spirit { namespace traits {
     template<> inline void scale(int exp, mpq_class& r) {
         if (exp >= 0)
             r *= carl::pow(mpq_class(10), (unsigned)exp);
         else
             r /= carl::pow(mpq_class(10), (unsigned)(-exp));
     }
-
+    template<> inline bool is_equal_to_one(const mpq_class& value) {
+        return value == 1;
+    }
+    template<> inline mpq_class negate(bool neg, const mpq_class& n) {
+        return neg ? mpq_class(-n) : n;
+    }
 }}}
+#endif
 
 namespace carl {
 namespace parser {
 
-
-
-template<typename Coeff>
-struct ExpressionParser: public qi::grammar<Iterator,
-		boost::variant< Coeff, Variable, Monomial::Arg, Term<Coeff>, Poly<Coeff>, RatFun<Coeff> >(),
-		Skipper> {
-	using expr_type = boost::variant< Coeff, Variable, Monomial::Arg, Term<Coeff>, Poly<Coeff>, RatFun<Coeff> >;
+template<typename Pol>
+struct ExpressionParser: public qi::grammar<Iterator, ExpressionType<Pol>(), Skipper> {
+    typedef typename Pol::CoeffType CoeffType;
+	using expr_type = ExpressionType<Pol>;
 
 	class perform_addition: public boost::static_visitor<expr_type> {
 	public:
 		template<typename T, typename U>
 		expr_type operator()(const T& lhs, const U& rhs) const {
-			return Poly<Coeff>(lhs) + Poly<Coeff>(rhs);
+			return Pol(lhs) + Pol(rhs);
 		}
 
-		expr_type operator()(const Coeff& lhs, const Coeff& rhs) const {
+		expr_type operator()(const CoeffType& lhs, const CoeffType& rhs) const {
 			return (lhs) + (rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Monomial::Arg& rhs) const {
-			return (lhs) + Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Monomial::Arg& rhs) const {
+			return (lhs) + Pol(rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Term<Coeff>& rhs) const {
-			return (lhs) + Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Term<CoeffType>& rhs) const {
+			return (lhs) + Pol(rhs);
 		}
 
 		template<typename T>
-		expr_type operator()(const RatFun<Coeff>& lhs, const T& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const RatFun<Pol>& lhs, const T& rhs) const {
 			return (lhs) + (rhs);
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Coeff>& rhs) const {
-			return (rhs) + Poly<Coeff>(lhs);
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
+			return (rhs) + Pol(lhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const RatFun<Coeff>& rhs) const {
+		expr_type operator()(const RatFun<Pol>& lhs, const RatFun<Pol>& rhs) const {
 			return (lhs) + (rhs);
+		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No addition for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No addition for formula");
 		}
 	};
 
@@ -73,102 +127,143 @@ struct ExpressionParser: public qi::grammar<Iterator,
 	public:
 		template<typename T, typename U>
 		expr_type operator()(const T& lhs, const U& rhs) const {
-			return Poly<Coeff>(lhs) - Poly<Coeff>(rhs);
+			return Pol(lhs) - Pol(rhs);
 		}
 
-		expr_type operator()(const Coeff& lhs, const Coeff& rhs) const {
+		expr_type operator()(const CoeffType& lhs, const CoeffType& rhs) const {
 			return (lhs) - (rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Monomial::Arg& rhs) const {
-			return (lhs) - Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Monomial::Arg& rhs) const {
+			return (lhs) - Pol(rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Term<Coeff>& rhs) const {
-			return (lhs) - Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Term<CoeffType>& rhs) const {
+			return (lhs) - Pol(rhs);
 		}
 
 		template<typename T>
-		expr_type operator()(const RatFun<Coeff>& lhs, const T& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const RatFun<Pol>& lhs, const T& rhs) const {
 			return (lhs) - (rhs);
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Coeff>& rhs) const {
-			return (rhs) - Poly<Coeff>(lhs);
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
+			return (rhs) - Pol(lhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const RatFun<Coeff>& rhs) const {
+		expr_type operator()(const RatFun<Pol>& lhs, const RatFun<Pol>& rhs) const {
 			return (lhs) - (rhs);
+		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No subtraction for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No subtraction for formula");
 		}
 	};
 
 	class perform_multiplication: public boost::static_visitor<expr_type> {
 	public:
 		template<typename T, typename U>
-		expr_type operator()(const T& lhs, const U& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		 operator()(const T& lhs, const U& rhs) const {
 			return lhs * rhs;
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Coeff>& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
 			return rhs * lhs;
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Monomial::Arg& rhs) const {
-			return (lhs) * Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Monomial::Arg& rhs) const {
+			return (lhs) * Pol(rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Term<Coeff>& rhs) const {
-			return (lhs) * Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Term<CoeffType>& rhs) const {
+			return (lhs) * Pol(rhs);
 		}
 
-		expr_type operator()(const Monomial::Arg& lhs, const RatFun<Coeff>& rhs) const {
-			return (rhs) * Poly<Coeff>(lhs);
+		expr_type operator()(const Monomial::Arg& lhs, const RatFun<Pol>& rhs) const {
+			return (rhs) * Pol(lhs);
 		}
 
-		expr_type operator()(const Term<Coeff>& lhs, const RatFun<Coeff>& rhs) const {
-			return (rhs) * Poly<Coeff>(lhs);
+		expr_type operator()(const Term<CoeffType>& lhs, const RatFun<Pol>& rhs) const {
+			return (rhs) * Pol(lhs);
+		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No multiplication for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No multiplication for formula");
 		}
 	};
 
 	class perform_division: public boost::static_visitor<expr_type> {
 	public:
-		expr_type operator()(const RatFun<Coeff>& lhs, const Coeff& rhs) const {
+		expr_type operator()(const RatFun<Pol>& lhs, const CoeffType& rhs) const {
 			return lhs / rhs;
 		}
 
 		template<typename T>
-		expr_type operator()(const RatFun<Coeff>& lhs, const T& rhs) const {
+		typename std::enable_if<!std::is_base_of<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const RatFun<Pol>& lhs, const T& rhs) const {
 			return lhs / rhs;
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Monomial::Arg& rhs) const {
-			return lhs / Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Monomial::Arg& rhs) const {
+			return lhs / Pol(rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const Term<Coeff>& rhs) const {
-			return lhs / Poly<Coeff>(rhs);
+		expr_type operator()(const RatFun<Pol>& lhs, const Term<CoeffType>& rhs) const {
+			return lhs / Pol(rhs);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs, const RatFun<Coeff>& rhs) const {
+		expr_type operator()(const RatFun<Pol>& lhs, const RatFun<Pol>& rhs) const {
 			return lhs / rhs;
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const Coeff& coeff) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const CoeffType& coeff) const {
 			return lhs * reciprocal(coeff);
 		}
 
 		template<typename T>
-		expr_type operator()(const T& lhs, const RatFun<Coeff>& rhs) const {
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const RatFun<Pol>& rhs) const {
 			// TODO: Not extremely efficient probably
-			return  RatFun<Coeff>(rhs.denominator(), rhs.nominator()) * Poly<Coeff>(lhs);
+			return  RatFun<Pol>(rhs.denominator(), rhs.nominator()) * Pol(lhs);
 		}
 
 		template<typename T, typename U>
-		expr_type operator()(const T& lhs, const U& rhs) const {
-			return RatFun<Coeff>(Poly<Coeff>(lhs), Poly<Coeff>(rhs));
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const U& rhs) const {
+			return RatFun<Pol>(Pol(lhs), Pol(rhs));
+		}
+
+		template<typename T>
+		expr_type operator()(const Formula<Pol>& lhs, const T& rhs) const {
+			throw std::runtime_error("No division for formula");
+		}
+
+		template<typename T>
+		typename std::enable_if<!std::is_same<Formula<Pol>, T>::value, expr_type>::type
+		operator()(const T& lhs, const Formula<Pol>& rhs) const {
+			throw std::runtime_error("No division for formula");
 		}
 	};
 
@@ -183,11 +278,11 @@ struct ExpressionParser: public qi::grammar<Iterator,
 			return lhs.pow(expVal);
 		}
 
-		expr_type operator()(const RatFun<Coeff>& lhs) const {
-			return RatFun<Coeff>(lhs.nominator().pow(expVal), lhs.denominator().pow(expVal));
+		expr_type operator()(const RatFun<Pol>& lhs) const {
+			return RatFun<Pol>(lhs.nominator().pow(expVal), lhs.denominator().pow(expVal));
 		}
 
-		expr_type operator()(const Coeff& lhs) const {
+		expr_type operator()(const CoeffType& lhs) const {
 			return carl::pow(lhs, expVal);
 		}
 
@@ -198,63 +293,35 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		expr_type operator()(const Monomial::Arg& lhs) const {
 			return lhs->pow(expVal);
 		}
+
+		expr_type operator()(const Formula<Pol>& lhs) const {
+			throw std::runtime_error("No power for fomula");
+		}
 	};
 
 	class perform_negate: public boost::static_visitor<expr_type> {
 	public:
 		template<typename T>
 		expr_type operator()(const T& lhs) const {
-			return lhs * Coeff(-1.0);
-		}
-	};
-
-	class to_poly: public boost::static_visitor<Poly<Coeff>> {
-	public:
-		Poly<Coeff> operator()(const Poly<Coeff>& p) const {
-			return p;
+			return lhs * CoeffType(-1);
 		}
 
-		Poly<Coeff> operator()(const RatFun<Coeff>& p) const {
-			throw std::runtime_error("Cannot make polynomial out of rational function");
-		}
-
-		template<typename T>
-		Poly<Coeff> operator()(const T& expr) const {
-			return Poly<Coeff>(expr);
-		}
-	};
-
-	class to_ratfun: public boost::static_visitor<RatFun<Coeff>> {
-	public:
-		RatFun<Coeff> operator()(const RatFun<Coeff>& expr) const {
-			return expr;
-		}
-
-		RatFun<Coeff> operator()(const Monomial::Arg& expr) const {
-			return RatFun<Coeff>(Poly<Coeff>(expr));
-		}
-
-		RatFun<Coeff> operator()(const Term<Coeff>& expr) const {
-			return RatFun<Coeff>(Poly<Coeff>(expr));
-		}
-
-		template<typename T>
-		RatFun<Coeff> operator()(const T& expr) const {
-			return RatFun<Coeff>(expr);
+		expr_type operator()(const Formula<Pol>& lhs) const {
+			throw std::runtime_error("No negate for fomula");
 		}
 	};
 
 	class print_expr_type: public boost::static_visitor<> {
 	public:
-		void operator()(const RatFun<Coeff>& expr) const {
+		void operator()(const RatFun<Pol>& expr) const {
 			std::cout << "Rational function " << expr << std::endl;
 		}
 
-		void operator()(const Poly<Coeff>& expr) const {
+		void operator()(const Pol& expr) const {
 			std::cout << "Polynomial " << expr << std::endl;
 		}
 
-		void operator()(const Term<Coeff>& expr) const {
+		void operator()(const Term<CoeffType>& expr) const {
 			std::cout << "Term " << expr << std::endl;
 		}
 
@@ -262,34 +329,45 @@ struct ExpressionParser: public qi::grammar<Iterator,
 			std::cout << "Monomial " << expr << std::endl;
 		}
 
-		void operator()(const Coeff& expr) const {
+		void operator()(const CoeffType& expr) const {
 			std::cout << "Coefficient " << expr << std::endl;
 		}
 
 		void operator()(const Variable& expr) const {
 			std::cout << "Variable " << expr << std::endl;
 		}
+
+		void operator()(const Formula<Pol>& expr) const {
+			std::cout << "Formula " << expr << std::endl;
+		}
 	};
 
-	ExpressionParser(): ExpressionParser<Coeff>::base_type(main, "polynomial") {
+	ExpressionParser(): ExpressionParser<Pol>::base_type(main, "polynomial") {
 		/** Tokens */
-		operation.add("+", ADD)("-", SUB);
+		operationShift.add("+", ADD)("-", SUB);
 		operationScale.add("*", MUL)("/", DIV);
 		operationPow.add("^", POW)("**", POW);
 		operationSign.add("-", NEG);
+
+		operationNot.add("not", carl::FormulaType::NOT)("!", carl::FormulaType::NOT);
+		operationImp.add("imp", carl::FormulaType::IMPLIES)("->", carl::FormulaType::IMPLIES);
+		operationIff.add("iff", carl::FormulaType::IFF)("<->", carl::FormulaType::IFF);
+		operationAnd.add("and", FormulaType::AND)("&", FormulaType::AND)("or", FormulaType::OR)("|", FormulaType::OR);
+
 		varname = qi::lexeme[ (qi::alpha | qi::char_("_")) >> *(qi::alnum | qi::char_("_"))];
-		variable = varname[qi::_val = px::bind(&ExpressionParser<Coeff>::newVariable, px::ref(*this), qi::_1)];
+		variable = varname[qi::_val = px::bind(&ExpressionParser<Pol>::newVariable, px::ref(*this), qi::_1)];
 
 		/** Rules */
 		// operationScaleLA is a look-ahead hack to prevent the * operator from consuming ** (power)
 		operationScaleLA = qi::lexeme[ operationScale >> !qi::lit("*") ][qi::_val = qi::_1];
 		monomial = variable[qi::_val = qi::_1];
-		atom = (monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
+		boolean = (qi::true_[qi::_val = px::bind(&ExpressionParser<Pol>::makeBool, px::ref(*this), true)] | qi::false_[qi::_val = px::bind(&ExpressionParser<Pol>::makeBool, px::ref(*this), false)]);
+		atom = (boolean[qi::_val = qi::_1] | monomial[qi::_val = qi::_1] | coeff[qi::_val = qi::_1]);
 		expr = ("(" > expr_sum > ")")[qi::_val = qi::_1] | atom[qi::_val = qi::_1];
-		expr_power = (expr >> *(operationPow > exponentVal))[qi::_val = px::bind(&ExpressionParser<Coeff>::powExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_sign = (*operationSign > expr_power)[qi::_val = px::bind(&ExpressionParser<Coeff>::signExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_product = (expr_sign >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Coeff>::mulExpr, px::ref(*this), qi::_1, qi::_2)];
-		expr_sum = (expr_product >> *(operation > expr_product))[qi::_val = px::bind(&ExpressionParser<Coeff>::addExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_power = (expr >> *(operationPow > exponentVal))[qi::_val = px::bind(&ExpressionParser<Pol>::powExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_sign = (*operationSign > expr_power)[qi::_val = px::bind(&ExpressionParser<Pol>::signExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_product = (expr_sign >> *(operationScaleLA > expr_power))[qi::_val = px::bind(&ExpressionParser<Pol>::arithmeticExpr, px::ref(*this), qi::_1, qi::_2)];
+		expr_sum = (expr_product >> *(operationShift > expr_product))[qi::_val = px::bind(&ExpressionParser<Pol>::arithmeticExpr, px::ref(*this), qi::_1, qi::_2)];
 		main = expr_sum;
 
 		varname.name("varname");
@@ -303,7 +381,7 @@ struct ExpressionParser: public qi::grammar<Iterator,
 		expr_sum.name("expr_sum");
 		main.name("main");
 	}
-	
+
 	void addVariable(Variable::Arg v) {
 		auto s = VariablePool::getInstance().getName(v);
 		varmap.add(s, v);
@@ -322,7 +400,53 @@ private:
 		return v;
 	}
 
-	expr_type addExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
+	expr_type makeBool(bool value) {
+		if (value) {
+			return Formula<Pol>(FormulaType::TRUE);
+		} else {
+			return Formula<Pol>(FormulaType::FALSE);
+		}
+	}
+
+	expr_type booleanBinaryExpr(const expr_type& first, const std::vector<boost::fusion::vector2<carl::FormulaType,expr_type>>& ops) {
+		expr_type res = first;
+		for (const auto& op: ops) {
+			switch (boost::fusion::at_c<0>(op)) {
+				case carl::FormulaType::AND: {
+					res = boost::apply_visitor( perform_addition(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+				case carl::FormulaType::OR: {
+					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+				case carl::FormulaType::IMPLIES: {
+					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+				case carl::FormulaType::IFF: {
+					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
+					break;
+				}
+			}
+		}
+		return res;
+	}
+
+	expr_type booleanUnaryExpr(const std::vector<carl::FormulaType>& ops, const expr_type& first) {
+		expr_type res = first;
+		for (const auto& op: ops) {
+			switch (op) {
+				case carl::FormulaType::NOT: {
+					res = boost::apply_visitor( perform_negate(), res );
+					break;
+				}
+			}
+		}
+		return res;
+	}
+
+	expr_type arithmeticExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
 		expr_type res = first;
 		for (const auto& op: ops) {
 			switch (boost::fusion::at_c<0>(op)) {
@@ -334,14 +458,6 @@ private:
 					res = boost::apply_visitor( perform_subtraction(), res, boost::fusion::at_c<1>(op) );
 					break;
 				}
-			}
-		}
-		return res;
-	}
-	expr_type mulExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,expr_type>>& ops) {
-		expr_type res = first;
-		for (const auto& op: ops) {
-			switch (boost::fusion::at_c<0>(op)) {
 				case MUL: {
 					res = boost::apply_visitor( perform_multiplication(), res, boost::fusion::at_c<1>(op) );
 					break;
@@ -354,7 +470,7 @@ private:
 		}
 		return res;
 	}
-	
+
 	expr_type powExpr(const expr_type& first, const std::vector<boost::fusion::vector2<Operation,exponent>>& ops) {
 		expr_type res = first;
 		for (const auto& op: ops) {
@@ -383,7 +499,11 @@ private:
 		return res;
 	}
 
-	qi::symbols<char, Operation> operation;
+	qi::symbols<char, carl::FormulaType> operationNot;
+	qi::symbols<char, carl::FormulaType> operationImp;
+	qi::symbols<char, carl::FormulaType> operationIff;
+	qi::symbols<char, carl::FormulaType> operationAnd;
+	qi::symbols<char, Operation> operationShift;
 	qi::symbols<char, Operation> operationScale;
 	qi::symbols<char, Operation> operationPow;
 	qi::symbols<char, Operation> operationSign;
@@ -391,11 +511,12 @@ private:
 
 	qi::rule<Iterator, std::string(), Skipper> varname;
 	qi::uint_parser<exponent,10,1,-1> exponentVal;
-	qi::real_parser<Coeff,RationalPolicies<Coeff>> coeff;
+	qi::real_parser<CoeffType,RationalPolicies<CoeffType>> coeff;
 	qi::rule<Iterator, Variable(), Skipper> variable;
 
 	qi::rule<Iterator, Operation(), Skipper> operationScaleLA;
 
+	qi::rule<Iterator, expr_type(), Skipper> boolean;
 	qi::rule<Iterator, expr_type(), Skipper> monomial;
 	qi::rule<Iterator, expr_type(), Skipper> atom;
 
