@@ -14,4 +14,5 @@ typedef carl::FactorizedPolynomial<Polynomial> FactorizedPolynomial;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
 typedef carl::RationalFunction<FactorizedPolynomial> FactorizedRationalFunction;
 typedef carl::PolynomialFactorizationPair<Polynomial> FactorizationPair;
+typedef carl::Constraint<Polynomial> Constraint;
 typedef carl::Formula<Polynomial> Formula;
