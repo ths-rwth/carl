@@ -1,4 +1,6 @@
-#include "definitions.h"
+#include "mod_core.h"
+#include "mod_func.h"
+
 #include "parser.h"
 
 //#include "carl/util/parser/Parser.h"

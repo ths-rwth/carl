@@ -215,23 +215,8 @@ endif()
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Boost
-if(CARL_PYTHON)
-	load_library(carl Boost 1.49 REQUIRED)
-	load_library(pycarl Boost 1.55 COMPONENTS python3)
-	#HACK for DEBIAN
-	if(NOT Boost_PYTHON3_FOUND)
-		set(PYVERSION 34)
-		load_library(pycarl Boost 1.55 COMPONENTS python-py${PYVERSION})
-		if(NOT Boost_PYTHON-PY${PYVERSION}_FOUND)
-			message(FATAL_ERROR "Could not find Boost Python")
-		endif()
-	endif()   
-else()
-	load_library(carl Boost 1.29 REQUIRED)
-endif()
+load_library(carl Boost 1.29 REQUIRED)
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
-
-
 
 if(USE_GINAC)
 	load_library(carl GiNaC 1.5.8 REQUIRED )

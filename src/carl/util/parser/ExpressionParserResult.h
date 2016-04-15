@@ -12,6 +12,12 @@
 #include <string>
 #include <boost/variant/variant.hpp>
 
+#include "carl/core/Variable.h"
+#include "carl/core/Monomial.h"
+#include "carl/core/Term.h"
+#include "carl/core/RationalFunction.h"
+#include "carl/formula/Formula.h"
+
 namespace carl {
 namespace parser {
 
