@@ -18,6 +18,21 @@ std::string streamToString(T const & t) {
 	return ss.str();
 }
 
+carl::Variable getOrCreateVariable(std::string const & name, carl::VariableType type) {
+	// Variables are constructed by the Pool. Note that for a given name,
+	//two Variable instances may differ, but refer to the same id (data)
+	auto& pool = carl::VariablePool::getInstance();
+	carl::Variable res = pool.findVariableWithName(name);
+	if (res != carl::Variable::NO_VARIABLE) {
+		return res;
+	}
+	return pool.getFreshVariable(name, type);
+}
+
+// Be warned: Enabling something like this will break everything about Monomial,
+// as to Python the shared_ptr (Arg) IS the Monomial
+//  //PYBIND11_DECLARE_HOLDER_TYPE(T, std::shared_ptr<T>);
+
 /**
  * The actual module definition
  */
@@ -30,6 +45,18 @@ PYBIND11_PLUGIN(_core) {
 		.value("REAL", carl::VariableType::VT_REAL);
 
 	py::class_<carl::Variable>(m, "Variable")
+		.def("__init__",
+			[](carl::Variable &instance, std::string name, carl::VariableType type) -> void {
+				carl::Variable tmp = getOrCreateVariable(name, type);
+				new (&instance) carl::Variable(tmp);
+			}
+		)
+		.def("__init__",
+			[](carl::Variable &instance, carl::VariableType type) -> void {
+				carl::Variable tmp = carl::VariablePool::getInstance().getFreshVariable(type);
+				new (&instance) carl::Variable(tmp);
+			}
+		)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
 		.def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
@@ -40,14 +67,18 @@ PYBIND11_PLUGIN(_core) {
 		.def_property_readonly("type", &carl::Variable::getType)
 		.def("__str__", &streamToString<carl::Variable>)
 		;
-/*
-	class_<carl::Monomial, carl::Monomial::Arg, boost::noncopyable>("Monomial", no_init)
+
+	py::class_<carl::Monomial::Arg>(m, "Monomial")
+		.def("__init__", [] (carl::Monomial::Arg& arg, carl::Variable v, carl::exponent e) -> void {
+			auto m = carl::MonomialPool::getInstance().create(v, e);
+			arg = m;
+		})
 		.def("tdeg", &carl::Monomial::tdeg)
-		.def(self_ns::str(self_ns::self))
+		.def("__str__", &streamToString<carl::Monomial::Arg>)
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, const carl::Monomial::Arg&)>(&carl::operator*))
 		.def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, carl::Variable::Arg)>(&carl::operator*))
 		;
-*/
+
 	py::class_<carl::Term<Rational>>(m, "Term")
 		.def(py::init<Rational>())
 		.def(py::init<carl::Variable::Arg>())
@@ -65,8 +96,8 @@ PYBIND11_PLUGIN(_core) {
 		.def("constant_part", &Polynomial::constantPart, py::return_value_policy::reference_internal)
 		.def("evaluate", &Polynomial::evaluate<Rational>)
 		.def("gather_variables", static_cast<std::set<carl::Variable> (Polynomial::*)() const>(&Polynomial::gatherVariables))
-		.def_property_readonly("total_degree", &Polynomial::totalDegree, py::doc("The maximum degree of the terms in the polynomial"))
-		.def("degree", &Polynomial::degree, py::doc("Computes the degree with respect to the given variable"))
+		.def_property_readonly("total_degree", &Polynomial::totalDegree)//, py::doc("The maximum degree of the terms in the polynomial"))
+		.def("degree", &Polynomial::degree)//, py::doc("Computes the degree with respect to the given variable"))
 		.def_property_readonly("nr_terms", &Polynomial::nrTerms)
 		.def("__str__", &streamToString<Polynomial>)
 		.def(py::self - py::self)

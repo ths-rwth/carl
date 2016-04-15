@@ -57,10 +57,11 @@ class to_object: public boost::static_visitor<py::object> {
 public:
 	template<typename T>
 	py::object operator()(const T& expr) const {
-		py::object res = py::cast(expr, py::return_value_policy::take_ownership);
+		// Expr is on the stack, make a copy
+		py::object res = py::cast(expr, py::return_value_policy::copy);
 		if (!res) {
 			// return void
-			res = py::cast(nullptr);
+			res = py::object(Py_None, true);
 		}
 		return res;
 	}
@@ -70,8 +71,8 @@ py::handle parseString(const std::string& input) {
 	carl::parser::ExpressionType<Polynomial> data = parse(input);
 
 	py::object obj = boost::apply_visitor( to_object(), data );
-	obj.inc_ref();
-	return obj.release();
+	auto handl = obj.release();
+	return handl;
 }
 
 namespace pybind11 {
