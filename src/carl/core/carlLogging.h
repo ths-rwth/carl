@@ -233,14 +233,14 @@ struct RecordInfo {
 	/// Function name.
 	std::string func;
 	/// Line number.
-	uint line;
+	std::size_t line;
 	/**
 	 * Constructor.
      * @param filename File name.
      * @param func Function name.
      * @param line Line number.
      */
-	RecordInfo(const std::string& _filename, const std::string& _func, uint _line): 
+	RecordInfo(const std::string& _filename, const std::string& _func, std::size_t _line): 
 		filename(_filename), func(_func), line(_line) {}
 };
 
