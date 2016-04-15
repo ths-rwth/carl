@@ -160,6 +160,8 @@ PYBIND11_PLUGIN(_core) {
 		.def(py::self != py::self)
 		;
 
+// Commented out: Use the Monomial and Variable Python constructors instead
+/*
 	// Non-constructable class VariablePool, static instance accessible via global
 	py::class_<carl::VariablePool>(m, "VariablePoolInst")
 		.def("get_fresh_variable", static_cast<carl::Variable (carl::VariablePool::*)(carl::VariableType)>(&carl::VariablePool::getFreshVariable))
@@ -175,7 +177,7 @@ PYBIND11_PLUGIN(_core) {
 	// Setup the global variables
 	m.attr("VariablePool") = py::cast(carl::VariablePool::getInstance(), py::return_value_policy::reference);
 	m.attr("MonomialPool") = py::cast(carl::MonomialPool::getInstance(), py::return_value_policy::reference);
-
+*/
 	py::class_<carl::Formula<Polynomial>>(m, "Formula")
 		.def("__str__", &streamToString<carl::Formula<Polynomial>>)
 		;
