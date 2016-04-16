@@ -31,8 +31,8 @@ PYBIND11_PLUGIN(func) {
         })
         .def("tdeg", &carl::Monomial::tdeg)
         .def("__str__", &streamToString<carl::Monomial::Arg>)
-        .def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, const carl::Monomial::Arg&)>(&carl::operator*))
-        .def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, carl::Variable::Arg)>(&carl::operator*))
+        .def(py::self * py::self)
+        //.def(py::self * carl::Variable::Arg())
         ;
 
     py::class_<Term>(m, "Term")

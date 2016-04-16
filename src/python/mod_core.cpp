@@ -19,20 +19,46 @@ carl::Variable getOrCreateVariable(std::string const & name, carl::VariableType 
     return pool.getFreshVariable(name, type);
 }
 
+int rationalToInt(const Rational& val) {
+    return carl::toInt<carl::sint>(carl::getNum(val)) / carl::toInt<carl::sint>(carl::getDenom(val));
+}
+
 PYBIND11_PLUGIN(core) {
     py::module m("core");
 
     py::class_<Rational, Rational*>(m, "Rational", py::doc("Class wrapping rational numbers"))
-    .def(py::init<int>())
+    .def("__init__", [](Rational &instance, double val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
+    .def("__init__", [](Rational &instance, int val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
+    .def("__int__", static_cast<int (*)(Rational const&)>(&rationalToInt))
     .def("__float__", static_cast<double (*)(Rational const&)>(&carl::toDouble))
     .def("__str__", [](Rational const& r) {return carl::toString(r, true);})
+
+    .def("__add__",  static_cast<Polynomial (*)(const Rational&, const Polynomial&)>(&carl::operator+))
+    .def("__add__",  static_cast<Polynomial (*)(const Rational&, const Term&)>(&carl::operator+))
+    .def("__add__",  static_cast<Polynomial (*)(const Rational&, const Monomial&)>(&carl::operator+))
+    .def("__add__",  static_cast<Polynomial (*)(const Rational&, carl::Variable::Arg)>(&carl::operator+))
     .def(py::self + py::self)
-    .def(py::self - py::self)
+
+    .def("__sub__",  static_cast<Polynomial (*)(const Rational&, const Polynomial&)>(&carl::operator-))
+    .def("__sub__",  static_cast<Polynomial (*)(const Rational&, const Term&)>(&carl::operator-))
+    .def("__sub__",  static_cast<Polynomial (*)(const Rational&, const Monomial&)>(&carl::operator-))
+    .def("__sub__",  static_cast<Polynomial (*)(const Rational&, carl::Variable::Arg)>(&carl::operator-))
+    .def(py::self + py::self)
+
+    .def("__mul__",  static_cast<Polynomial (*)(const Rational&, const Polynomial&)>(&carl::operator*))
+    .def("__mul__",  static_cast<Term (*)(const Rational&, const Term&)>(&carl::operator*))
+    .def("__mul__",  static_cast<Term (*)(const Rational&, const Monomial&)>(&carl::operator*))
+    .def("__mul__",  static_cast<Term (*)(const Rational&, carl::Variable::Arg)>(&carl::operator*))
     .def(py::self * py::self)
+
     .def(py::self / py::self)
+
+    .def("__pow__", static_cast<Rational (*)(const Rational&, std::size_t)>(&carl::pow))
+    .def("__pos__", [](const Rational& var) -> Rational {return Rational(var);})
+    .def(-py::self)
+
     .def(py::self == py::self)
     .def(py::self != py::self)
-    .def(-py::self)
     .def(py::self < py::self)
     .def(py::self > py::self)
     .def(py::self >= py::self)
@@ -56,47 +82,51 @@ PYBIND11_PLUGIN(core) {
                 carl::Variable tmp = getOrCreateVariable(name, type);
                 new (&instance) carl::Variable(tmp);
             }
-        )
+        , py::arg("name"), py::arg("type") = carl::VariableType::VT_REAL)
         .def("__init__",
             [](carl::Variable &instance, carl::VariableType type) -> void {
                 carl::Variable tmp = carl::VariablePool::getInstance().getFreshVariable(type);
                 new (&instance) carl::Variable(tmp);
             }
-        )
+        , py::arg("type") = carl::VariableType::VT_REAL)
 
         .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator+))
-        .def(py::self + Term())
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Term&)>(&carl::operator+))
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Monomial&)>(&carl::operator+))
         .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
-        .def(py::self + Rational())
-        .def(py::self + double())
-        .def(py::self + carl::sint())
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator+))
 
-        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator-))
-        .def(py::self - Term())
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Term&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Monomial&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
-        .def(py::self - Rational())
-        .def(py::self - double())
-        .def(py::self - carl::sint())
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator-))
 
-        .def(py::self * Polynomial())
-        .def(py::self * Term())
-        .def(py::self * py::self)
-        .def(py::self * Rational())
-        .def(py::self * double())
-        .def(py::self * carl::sint())
-/*
-        .def("__div__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator/))
-        .def(py::self / Term())
-        .def("_div__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator/))
+        .def("__mul__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator*))
+        .def("__mul__",  static_cast<Term (*)(carl::Variable::Arg, const Term&)>(&carl::operator*))
+        .def("__mul__",  static_cast<Monomial (*)(carl::Variable::Arg, const Monomial&)>(&carl::operator*))
+        .def("__mul__",  static_cast<Monomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
+        .def("__mul__",  static_cast<Term (*)(carl::Variable::Arg, const Rational&)>(&carl::operator*))
+
         .def(py::self / Rational())
-        .def(py::self / double())
-        .def(py::self / carl::sint())
-*/
-        .def(py::self * py::self)
+
+        .def("__pow__", [](carl::Variable::Arg var, carl::uint exp) -> Monomial {return carl::Monomial(var).pow(exp);})
+
+        .def("__pos__", [](carl::Variable::Arg var) -> carl::Variable {return carl::Variable(var);})
+        .def("__neg__", [](carl::Variable::Arg var) -> Term {return var * Rational(-1);})
+
+        .def(py::self == py::self)
+        .def(py::self != py::self)
+        .def(py::self < py::self)
+        .def(py::self <= py::self)
+        .def(py::self > py::self)
+        .def(py::self >= py::self)
+
         .def_property_readonly("name", &carl::Variable::getName)
         .def_property_readonly("type", &carl::Variable::getType)
+        .def_property_readonly("id", &carl::Variable::getId)
+        .def_property_readonly("rank", &carl::Variable::getRank)
         .def("__str__", &streamToString<carl::Variable>)
-        .def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
         ;
 
     m.def("rationalize", static_cast<Rational (*)(double)>(&carl::rationalize), "Construct a rational number from a double");
