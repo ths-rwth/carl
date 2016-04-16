@@ -3,10 +3,12 @@
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src ${pycarl_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${pybind11_incdir})
 
-ADD_LIBRARY(pycarl_core SHARED mod_core.cpp)
-ADD_LIBRARY(pycarl_func SHARED mod_func.cpp)
-ADD_LIBRARY(pycarl_formula SHARED mod_formula.cpp)
-ADD_LIBRARY(pycarl_parse SHARED mod_parse.cpp parser.cpp)
+FILE(GLOB core_files "core/*.cpp")
+FILE(GLOB formula_files "formula/*.cpp")
+FILE(GLOB parse_files "parse/*.cpp")
+ADD_LIBRARY(pycarl_core SHARED mod_core.cpp ${core_files})
+ADD_LIBRARY(pycarl_formula SHARED mod_formula.cpp ${formula_files})
+ADD_LIBRARY(pycarl_parse SHARED mod_parse.cpp ${parse_files})
 
 SET(PYCARL_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
 SET(PYCARL_OUTPUT_DIR "${PROJECT_BINARY_DIR}/pycarl")
@@ -16,13 +18,6 @@ SET_TARGET_PROPERTIES(pycarl_core PROPERTIES
         PREFIX ""
         SUFFIX ".so"
         LIBRARY_OUTPUT_DIRECTORY ${PYCARL_OUTPUT_DIR}/
-)
-
-SET_TARGET_PROPERTIES(pycarl_func PROPERTIES
-        OUTPUT_NAME func
-        PREFIX ""
-        SUFFIX ".so"
-        LIBRARY_OUTPUT_DIRECTORY ${PYCARL_OUTPUT_DIR}/func
 )
 
 SET_TARGET_PROPERTIES(pycarl_formula PROPERTIES
@@ -46,15 +41,13 @@ add_custom_command(TARGET pycarl_files POST_BUILD COMMAND ${CMAKE_COMMAND} -E
 
 if(BUILD_STATIC)
     TARGET_LINK_LIBRARIES(pycarl_core lib_carl_static  ${pycarl_LIBRARIES_STATIC} ${PYTHON_LIBRARIES} ${libs_static} )
-    TARGET_LINK_LIBRARIES(pycarl_func lib_carl_static ${pycarl_LIBRARIES_STATIC} ${PYTHON_LIBRARIES} ${libs_static} )
     TARGET_LINK_LIBRARIES(pycarl_formula lib_carl_static ${pycarl_LIBRARIES_STATIC} ${PYTHON_LIBRARIES} ${libs_static} )
     TARGET_LINK_LIBRARIES(pycarl_parse lib_carl_static ${pycarl_LIBRARIES_STATIC} ${PYTHON_LIBRARIES} ${libs_static} )
 else()
     TARGET_LINK_LIBRARIES(pycarl_core lib_carl ${pycarl_LIBRARIES_DYNAMIC} ${PYTHON_LIBRARIES} ${libs_dynamic})
-    TARGET_LINK_LIBRARIES(pycarl_func lib_carl ${pycarl_LIBRARIES_DYNAMIC} ${PYTHON_LIBRARIES} ${libs_dynamic})
     TARGET_LINK_LIBRARIES(pycarl_formula lib_carl ${pycarl_LIBRARIES_DYNAMIC} ${PYTHON_LIBRARIES} ${libs_dynamic})
     TARGET_LINK_LIBRARIES(pycarl_parse lib_carl ${pycarl_LIBRARIES_DYNAMIC} ${PYTHON_LIBRARIES} ${libs_dynamic})
 endif()
 #
-add_custom_target(pycarl DEPENDS pycarl_files pycarl_core pycarl_func pycarl_formula pycarl_parse)
+add_custom_target(pycarl DEPENDS pycarl_files pycarl_core pycarl_formula pycarl_parse)
 
