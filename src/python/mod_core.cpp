@@ -19,19 +19,13 @@ carl::Variable getOrCreateVariable(std::string const & name, carl::VariableType 
     return pool.getFreshVariable(name, type);
 }
 
-int rationalToInt(const Rational& val) {
-    return carl::toInt<carl::sint>(carl::getNum(val)) / carl::toInt<carl::sint>(carl::getDenom(val));
-}
-
 PYBIND11_PLUGIN(core) {
     py::module m("core");
 
     py::class_<Rational, Rational*>(m, "Rational", py::doc("Class wrapping rational numbers"))
     .def("__init__", [](Rational &instance, double val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
     .def("__init__", [](Rational &instance, int val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
-    .def("__int__", static_cast<int (*)(Rational const&)>(&rationalToInt))
-    .def("__float__", static_cast<double (*)(Rational const&)>(&carl::toDouble))
-    .def("__str__", [](Rational const& r) {return carl::toString(r, true);})
+    .def("__init__", [](Rational &instance,std::string val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
 
     .def("__add__",  static_cast<Polynomial (*)(const Rational&, const Polynomial&)>(&carl::operator+))
     .def("__add__",  static_cast<Polynomial (*)(const Rational&, const Term&)>(&carl::operator+))
@@ -69,6 +63,26 @@ PYBIND11_PLUGIN(core) {
     .def(py::self != int())
     .def(py::self >= int())
     .def(py::self <= int())
+    .def("__eq__", [](const Rational& lhs, double rhs) { return lhs == carl::rationalize<Rational>(rhs); })
+    .def("__neq__", [](const Rational& lhs, double rhs) { return lhs != carl::rationalize<Rational>(rhs); })
+    .def("__gt__", [](const Rational& lhs, double rhs) { return lhs > carl::rationalize<Rational>(rhs); })
+    .def("__ge__", [](const Rational& lhs, double rhs) { return lhs >= carl::rationalize<Rational>(rhs); })
+    .def("__lt__", [](const Rational& lhs, double rhs) { return lhs < carl::rationalize<Rational>(rhs); })
+    .def("__le__", [](const Rational& lhs, double rhs) { return lhs <= carl::rationalize<Rational>(rhs); })
+
+    .def("__int__",  [](const Rational& val) -> int {
+        return carl::toInt<carl::sint>(carl::getNum(val)) /
+            carl::toInt<carl::sint>(carl::getDenom(val));
+    })
+    .def("__float__", static_cast<double (*)(Rational const&)>(&carl::toDouble))
+    .def("__str__", [](Rational const& r) {return carl::toString(r, true);})
+
+    .def_property_readonly("numerator", [](const Rational& val) -> int {
+        return carl::toInt<carl::sint>(carl::getNum(val));
+    })
+    .def_property_readonly("denominator", [](const Rational& val) -> int {
+        return carl::toInt<carl::sint>(carl::getDenom(val));
+    })
     ;
 
     py::enum_<carl::VariableType>(m, "VariableType")
