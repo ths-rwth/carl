@@ -35,13 +35,13 @@ PYBIND11_PLUGIN(func) {
         .def("__mul__", static_cast<carl::Monomial::Arg (*)(const carl::Monomial::Arg&, carl::Variable::Arg)>(&carl::operator*))
         ;
 
-    py::class_<carl::Term<Rational>>(m, "Term")
+    py::class_<Term>(m, "Term")
         .def(py::init<Rational>())
         .def(py::init<carl::Variable::Arg>())
         .def(py::init<const carl::Monomial::Arg&>())
         .def(py::init<Rational, const carl::Monomial::Arg&>())
         .def(py::init<Rational, carl::Variable::Arg, carl::exponent>())
-        .def("__str__", &streamToString<carl::Term<Rational>>)
+        .def("__str__", &streamToString<Term>)
         ;
 
     py::class_<Polynomial>(m, "Polynomial",

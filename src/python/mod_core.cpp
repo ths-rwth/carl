@@ -63,15 +63,40 @@ PYBIND11_PLUGIN(core) {
                 new (&instance) carl::Variable(tmp);
             }
         )
-        //.def(py::self + py::self)
-        //.def(py::self - py::self)
+
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator+))
+        .def(py::self + Term())
+        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
+        .def(py::self + Rational())
+        .def(py::self + double())
+        .def(py::self + carl::sint())
+
+        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator-))
+        .def(py::self - Term())
+        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
+        .def(py::self - Rational())
+        .def(py::self - double())
+        .def(py::self - carl::sint())
+
+        .def(py::self * Polynomial())
+        .def(py::self * Term())
+        .def(py::self * py::self)
+        .def(py::self * Rational())
+        .def(py::self * double())
+        .def(py::self * carl::sint())
+/*
+        .def("__div__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator/))
+        .def(py::self / Term())
+        .def("_div__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator/))
+        .def(py::self / Rational())
+        .def(py::self / double())
+        .def(py::self / carl::sint())
+*/
         .def(py::self * py::self)
         .def_property_readonly("name", &carl::Variable::getName)
         .def_property_readonly("type", &carl::Variable::getType)
         .def("__str__", &streamToString<carl::Variable>)
         .def("__mul__", static_cast<carl::Monomial::Arg (*)(carl::Variable::Arg, const carl::Monomial::Arg&)>(&carl::operator*))
-        .def("__add__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator+))
-        .def("__sub__", static_cast<Polynomial (*)(carl::Variable::Arg, Rational const&)>(&carl::operator-))
         ;
 
     m.def("rationalize", static_cast<Rational (*)(double)>(&carl::rationalize), "Construct a rational number from a double");

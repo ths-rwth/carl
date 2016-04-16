@@ -6,6 +6,7 @@
 #include "carl/core/FactorizedPolynomial.h"
 #include "carl/core/RationalFunction.h"
 
+typedef carl::Term<Rational> Term;
 typedef carl::MultivariatePolynomial<Rational> Polynomial;
 typedef carl::FactorizedPolynomial<Polynomial> FactorizedPolynomial;
 typedef carl::RationalFunction<Polynomial> RationalFunction;
