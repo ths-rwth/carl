@@ -184,6 +184,11 @@ template<>
 cln::cl_RA rationalize<cln::cl_RA>(float n);
 
 template<>
+inline cln::cl_RA rationalize<cln::cl_RA>(int n) {
+    return cln::cl_RA(n);
+}
+
+template<>
 inline cln::cl_RA rationalize<cln::cl_RA>(uint n) {
 	return cln::cl_RA(n);
 }

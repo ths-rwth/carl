@@ -612,6 +612,18 @@ class Term
 	inline Term<Coeff> operator*(const Coeff& lhs, Variable::Arg rhs) {
 		return std::move(rhs * lhs);
 	}
+    template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
+    inline Term<Coeff> operator/(const Term<Coeff>& lhs, const Coeff& rhs) {
+        return std::move(lhs * reciprocal(rhs));
+    }
+    template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
+    inline Term<Coeff> operator/(const Monomial::Arg& lhs, const Coeff& rhs) {
+        return std::move(lhs * reciprocal(rhs));
+    }
+    template<typename Coeff, EnableIf<carl::is_subset_of_rationals<Coeff>> = dummy>
+    inline Term<Coeff> operator/(Variable::Arg& lhs, const Coeff& rhs) {
+        return std::move(lhs * reciprocal(rhs));
+    }
 	/// @}
 
 } // namespace carl
