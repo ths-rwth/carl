@@ -369,7 +369,17 @@ namespace carl
         inline RationalFunction& operator+=(const Pol& rhs)
         {
             return this->template add<false>( rhs );
-        }	
+        }
+
+        inline RationalFunction& operator+=(const Term<CoeffType>& rhs)
+        {
+            return this->template add<false>( Pol(rhs) );
+        }
+
+        inline RationalFunction& operator+=(const Monomial::Arg& rhs)
+        {
+            return this->template add<false>( Pol(rhs) );
+        }
 
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         inline RationalFunction& operator+=(Variable::Arg rhs)
@@ -393,23 +403,33 @@ namespace carl
          */
         inline RationalFunction& operator-=(const RationalFunction& rhs)
         {
-            return this->template add<true>( rhs );
+            return this->template add<true>( -rhs );
         }
 
         inline RationalFunction& operator-=(const Pol& rhs)
         {
-            return this->template add<true>( rhs );
-        }	
+            return this->template add<true>( -rhs );
+        }
+
+        inline RationalFunction& operator-=(const Term<CoeffType>& rhs)
+        {
+            return this->template add<true>( Pol(-rhs) );
+        }
+
+        inline RationalFunction& operator-=(const Monomial::Arg& rhs)
+        {
+            return this->template add<true>( Pol(CoeffType(-1)*rhs) );
+        }
 
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         inline RationalFunction& operator-=(Variable::Arg rhs)
         {
-            return this->template add<true>( rhs );
+            return this->template add<true>( Pol(CoeffType(-1)*rhs) );
         }
 
         inline RationalFunction& operator-=(const CoeffType& rhs)
         {
-            return this->template add<true>( rhs );
+            return this->template add<true>( -rhs );
         }
         /// @}
 
@@ -422,6 +442,8 @@ namespace carl
          */
         RationalFunction& operator*=(const RationalFunction& rhs);
         RationalFunction& operator*=(const Pol& rhs);
+        RationalFunction& operator*=(const Term<CoeffType>& rhs);
+        RationalFunction& operator*=(const Monomial::Arg& rhs);
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         RationalFunction& operator*=(Variable::Arg rhs);
         RationalFunction& operator*=(const CoeffType& rhs);
@@ -434,6 +456,8 @@ namespace carl
          */
         RationalFunction& operator/=(const RationalFunction& rhs);
         RationalFunction& operator/=(const Pol& rhs);
+        RationalFunction& operator/=(const Term<CoeffType>& rhs);
+        RationalFunction& operator/=(const Monomial::Arg& rhs);
         template<typename P = Pol, DisableIf<needs_cache<P>> = dummy>
         RationalFunction& operator/=(Variable::Arg rhs);
         RationalFunction& operator/=(const CoeffType& rhs);
@@ -468,6 +492,12 @@ namespace carl
 		return std::move( RationalFunction<Pol, AS>(lhs) += rhs );
 	}
 	
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+	inline RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs)
+	{
+		return std::move( RationalFunction<Pol, AS>(lhs) += rhs );
+	}
+
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	inline RationalFunction<Pol, AS> operator+(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
 	{
@@ -505,6 +535,12 @@ namespace carl
 	}
 	
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+	inline RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs)
+	{
+		return std::move( RationalFunction<Pol, AS>(lhs) -= rhs );
+	}
+
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	inline RationalFunction<Pol, AS> operator-(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) -= rhs );
@@ -535,6 +571,12 @@ namespace carl
 	}
 	
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+	inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs)
+	{
+		return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
+	}
+
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	inline RationalFunction<Pol, AS> operator*(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
 	{
 		return std::move( RationalFunction<Pol, AS>(lhs) *= rhs );
@@ -564,6 +606,12 @@ namespace carl
 		return std::move( RationalFunction<Pol, AS>(lhs) /= rhs );
 	}
 	
+	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
+	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, const Monomial::Arg& rhs)
+	{
+		return std::move( RationalFunction<Pol, AS>(lhs) /= rhs );
+	}
+
 	template<typename Pol, bool AS, DisableIf<needs_cache<Pol>> = dummy>
 	inline RationalFunction<Pol, AS> operator/(const RationalFunction<Pol, AS>& lhs, Variable::Arg rhs)
 	{
