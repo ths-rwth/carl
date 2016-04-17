@@ -34,6 +34,11 @@ void define_monomial(py::module& m) {
         .def("__mul__",  static_cast<Monomial (*)(const Monomial&, carl::Variable::Arg)>(&carl::operator*))
         .def("__mul__",  static_cast<Term (*)(const Monomial&, const Rational&)>(&carl::operator*))
 
+        .def(PY_DIV, [](const Monomial& lhs, const RationalFunction& rhs) { return RationalFunction(Polynomial(lhs)) / rhs; })
+        .def(PY_DIV, [](const Monomial& lhs, const Polynomial& rhs) { return RationalFunction(Polynomial(lhs)) / rhs; })
+        .def(PY_DIV, [](const Monomial& lhs, const Term& rhs) { return RationalFunction(Polynomial(lhs)) / rhs; })
+        .def(PY_DIV, [](const Monomial& lhs, const Monomial& rhs) { return RationalFunction(Polynomial(lhs)) / rhs; })
+        .def(PY_DIV, [](const Monomial& lhs, carl::Variable::Arg rhs) { return RationalFunction(Polynomial(lhs)) / rhs; })
         .def(py::self / Rational())
 
         .def("__pow__", [](const Monomial& var, carl::uint exp) {return var->pow(exp);})

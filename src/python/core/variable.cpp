@@ -62,6 +62,11 @@ void define_variable(py::module& m) {
         .def("__mul__",  static_cast<Monomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator*))
         .def("__mul__",  static_cast<Term (*)(carl::Variable::Arg, const Rational&)>(&carl::operator*))
 
+        .def(PY_DIV, [](carl::Variable::Arg lhs, const RationalFunction& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, const Polynomial& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, const Term& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, const Monomial& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, carl::Variable::Arg rhs) { return RationalFunction(lhs) / rhs; })
         .def(py::self / Rational())
 
         .def("__pow__", [](carl::Variable::Arg var, carl::uint exp) -> Monomial {return carl::Monomial(var).pow(exp);})

@@ -12,7 +12,7 @@
 #include "carl/numbers/numbers.h"
 
 void define_rational(py::module& m) {
-    py::class_<Rational>(m, "Rational", py::doc("Class wrapping rational numbers"))
+    py::class_<Rational>(m, "Rational", "Class wrapping rational numbers")
         .def("__init__", [](Rational &instance, double val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
         .def("__init__", [](Rational &instance, int val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
         .def("__init__", [](Rational &instance,std::string val) -> void { auto tmp = carl::rationalize<Rational>(val); new (&instance) Rational(tmp); })
@@ -35,6 +35,11 @@ void define_rational(py::module& m) {
         .def("__mul__",  static_cast<Term (*)(const Rational&, carl::Variable::Arg)>(&carl::operator*))
         .def(py::self * py::self)
 
+        .def(PY_DIV, [](const Rational& lhs, const RationalFunction& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Rational& lhs, const Polynomial& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Rational& lhs, const Term& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Rational& lhs, const Monomial& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Rational& lhs, carl::Variable::Arg rhs) { return RationalFunction(lhs) / rhs; })
         .def(py::self / py::self)
 
         .def("__pow__", static_cast<Rational (*)(const Rational&, std::size_t)>(&carl::pow))

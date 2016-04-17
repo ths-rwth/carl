@@ -10,7 +10,7 @@
 #include "common.h"
 
 void define_rationalfunction(py::module& m) {
-    py::class_<RationalFunction>(m, "RationalFunction", py::doc("Represent a rational function, that is the fraction of two multivariate polynomials "))
+    py::class_<RationalFunction>(m, "RationalFunction", "Represent a rational function, that is the fraction of two multivariate polynomials ")
         .def(py::init<Polynomial, Polynomial>())
 
         .def("__add__",  static_cast<RationalFunction (*)(const RationalFunction&, const Polynomial&)>(&carl::operator+))

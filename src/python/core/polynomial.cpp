@@ -10,7 +10,7 @@
 #include "common.h"
 
 void define_polynomial(py::module& m) {
-    py::class_<Polynomial>(m, "Polynomial", py::doc("Represent a multivariate polynomial"))
+    py::class_<Polynomial>(m, "Polynomial","Represent a multivariate polynomial")
         .def(py::init<const Term&>())
         .def(py::init<const Monomial&>())
         .def(py::init<carl::Variable::Arg>())
@@ -34,6 +34,11 @@ void define_polynomial(py::module& m) {
         .def("__mul__",  static_cast<Polynomial (*)(const Polynomial&, carl::Variable::Arg)>(&carl::operator*))
         .def("__mul__",  static_cast<Polynomial (*)(const Polynomial&, const Rational&)>(&carl::operator*))
 
+        .def(PY_DIV, [](const Polynomial& lhs, const RationalFunction& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Polynomial& lhs, const Polynomial& rhs) { return RationalFunction(lhs, rhs); })
+        .def(PY_DIV, [](const Polynomial& lhs, const Term& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Polynomial& lhs, const Monomial& rhs) { return RationalFunction(lhs) / rhs; })
+        .def(PY_DIV, [](const Polynomial& lhs, carl::Variable::Arg rhs) { return RationalFunction(lhs) / rhs; })
         .def(py::self / Rational())
 
         .def("__pow__", [](const Polynomial& var, carl::uint exp) {return var.pow(exp);})
