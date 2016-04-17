@@ -546,9 +546,12 @@ protected:
         internals.registered_types_cpp[std::type_index(*(rec->type))] = tinfo;
         internals.registered_types_py[type] = tinfo;
 
-        auto scope_module = (object) rec->scope.attr("__module__");
-        if (!scope_module)
-            scope_module = (object) rec->scope.attr("__name__");
+        object scope_module;
+        if (rec->scope) {
+            scope_module = (object) rec->scope.attr("__module__");
+            if (!scope_module)
+                scope_module = (object) rec->scope.attr("__name__");
+        }
 
         std::string full_name = (scope_module ? ((std::string) scope_module.str() + "." + rec->name)
                                               : std::string(rec->name));
@@ -560,7 +563,9 @@ protected:
 
 #if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
         /* Qualified names for Python >= 3.3 */
-        auto scope_qualname = (object) rec->scope.attr("__qualname__");
+        object scope_qualname;
+        if (rec->scope)
+            scope_qualname = (object) rec->scope.attr("__qualname__");
         if (scope_qualname) {
             type->ht_qualname = PyUnicode_FromFormat(
                 "%U.%U", scope_qualname.ptr(), name.ptr());
@@ -608,7 +613,8 @@ protected:
             attr("__module__") = scope_module;
 
         /* Register type with the parent scope */
-        rec->scope.attr(handle(type->ht_name)) = *this;
+        if (rec->scope)
+            rec->scope.attr(handle(type->ht_name)) = *this;
 
         type_holder.release();
     }
@@ -985,9 +991,27 @@ PYBIND11_NOINLINE inline void keep_alive_impl(int Nurse, int Patient, handle arg
     (void) wr.release();
 }
 
+template <typename Iterator> struct iterator_state { Iterator it, end; };
+
 NAMESPACE_END(detail)
 
 template <typename... Args> detail::init<Args...> init() { return detail::init<Args...>(); }
+
+template <typename Iterator, typename... Extra> iterator make_iterator(Iterator first, Iterator last, Extra&&... extra) {
+    typedef detail::iterator_state<Iterator> state;
+
+    if (!detail::get_type_info(typeid(state))) {
+        class_<state>(handle(), "")
+            .def("__iter__", [](state &s) -> state& { return s; })
+            .def("__next__", [](state &s) -> decltype(*std::declval<Iterator>()) & {
+                if (s.it == s.end)
+                    throw stop_iteration();
+                return *s.it++;
+            }, return_value_policy::reference_internal, std::forward<Extra>(extra)...);
+    }
+
+    return (iterator) cast(state { first, last });
+}
 
 template <typename InputType, typename OutputType> void implicitly_convertible() {
     auto implicit_caster = [](PyObject *obj, PyTypeObject *type) -> PyObject * {
@@ -1032,8 +1056,8 @@ inline function get_overload(const void *this_ptr, const char *name)  {
     handle type = py_object.get_type();
     auto key = std::make_pair(type.ptr(), name);
 
-    /* Cache functions that aren't overloaded in python to avoid
-       many costly dictionary lookups in Python */
+    /* Cache functions that aren't overloaded in Python to avoid
+       many costly Python dictionary lookups below */
     auto &cache = detail::get_internals().inactive_overload_cache;
     if (cache.find(key) != cache.end())
         return function();
@@ -1044,10 +1068,16 @@ inline function get_overload(const void *this_ptr, const char *name)  {
         return function();
     }
 
+    /* Don't call dispatch code if invoked from overridden function */
     PyFrameObject *frame = PyThreadState_Get()->frame;
-    pybind11::str caller = pybind11::handle(frame->f_code->co_name).str();
-    if ((std::string) caller == name)
-        return function();
+    if (frame && (std::string) pybind11::handle(frame->f_code->co_name).str() == name &&
+        frame->f_code->co_argcount > 0) {
+        PyFrame_FastToLocals(frame);
+        PyObject *self_caller = PyDict_GetItem(
+            frame->f_locals, PyTuple_GET_ITEM(frame->f_code->co_varnames, 0));
+        if (self_caller == py_object.ptr())
+            return function();
+    }
     return overload;
 }
 

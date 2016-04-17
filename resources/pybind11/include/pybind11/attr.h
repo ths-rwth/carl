@@ -179,7 +179,6 @@ template <> struct process_attribute<name> : process_attribute_default<name> {
 /// Process an attribute specifying the function's docstring
 template <> struct process_attribute<doc> : process_attribute_default<doc> {
     static void init(const doc &n, function_record *r) { r->doc = const_cast<char *>(n.value); }
-    static void init(const doc &n, type_record *r) { r->doc = const_cast<char *>(n.value); }
 };
 
 /// Process an attribute specifying the function's docstring (provided as a C-style string)

@@ -137,6 +137,7 @@ public:
 
     PYBIND11_NOINLINE static handle cast(const void *_src, return_value_policy policy, handle parent,
                                          const std::type_info *type_info,
+                                         const std::type_info *type_info_backup,
                                          void *(*copy_constructor)(const void *),
                                          const void *existing_holder = nullptr) {
         void *src = const_cast<void *>(_src);
@@ -153,6 +154,11 @@ public:
             return handle((PyObject *) it_instance->second).inc_ref();
 
         auto it = internals.registered_types_cpp.find(std::type_index(*type_info));
+        if (it == internals.registered_types_cpp.end()) {
+            type_info = type_info_backup;
+            it = internals.registered_types_cpp.find(std::type_index(*type_info));
+        }
+
         if (it == internals.registered_types_cpp.end()) {
             std::string tname = type_info->name();
             detail::clean_type_id(tname);
@@ -172,6 +178,8 @@ public:
 
         if (policy == return_value_policy::automatic)
             policy = return_value_policy::take_ownership;
+        else if (policy == return_value_policy::automatic_reference)
+            policy = return_value_policy::reference;
 
         if (policy == return_value_policy::copy) {
             wrapper->value = copy_constructor(wrapper->value);
@@ -211,13 +219,13 @@ public:
     type_caster() : type_caster_generic(typeid(type)) { }
 
     static handle cast(const type &src, return_value_policy policy, handle parent) {
-        if (policy == return_value_policy::automatic)
+        if (policy == return_value_policy::automatic || policy == return_value_policy::automatic_reference)
             policy = return_value_policy::copy;
-        return type_caster_generic::cast(&src, policy, parent, &typeid(type), &copy_constructor);
+        return cast(&src, policy, parent);
     }
 
     static handle cast(const type *src, return_value_policy policy, handle parent) {
-        return type_caster_generic::cast(src, policy, parent, &typeid(type), &copy_constructor);
+        return type_caster_generic::cast(src, policy, parent, src ? &typeid(*src) : nullptr, &typeid(type), &copy_constructor);
     }
 
     template <typename T> using cast_op_type = pybind11::detail::cast_op_type<T>;
@@ -405,6 +413,17 @@ protected:
     bool success = false;
 };
 
+template <typename type> class type_caster<std::unique_ptr<type>> {
+public:
+    static handle cast(std::unique_ptr<type> &&src, return_value_policy policy, handle parent) {
+        handle result = type_caster<type>::cast(src.get(), policy, parent);
+        if (result)
+            src.release();
+        return result;
+    }
+    static PYBIND11_DESCR name() { return type_caster<type>::name(); }
+};
+
 template <> class type_caster<std::wstring> {
 public:
     bool load(handle src, bool) {
@@ -521,7 +540,8 @@ public:
     template <typename T> using cast_op_type = type;
 
     operator type() {
-        return type(first, second);
+        return type(first .operator typename type_caster<typename intrinsic_type<T1>::type>::template cast_op_type<T1>(),
+                    second.operator typename type_caster<typename intrinsic_type<T2>::type>::template cast_op_type<T2>());
     }
 protected:
     type_caster<typename intrinsic_type<T1>::type> first;
@@ -652,7 +672,9 @@ public:
 
     static handle cast(const holder_type &src, return_value_policy policy, handle parent) {
         return type_caster_generic::cast(
-            src.get(), policy, parent, &typeid(type), &copy_constructor, &src);
+            src.get(), policy, parent,
+            src.get() ? &typeid(*src.get()) : nullptr, &typeid(type),
+            &copy_constructor, &src);
     }
 
 protected:
@@ -686,29 +708,36 @@ template <typename T> inline T cast(handle handle) {
     return (T) conv;
 }
 
-template <typename T> inline object cast(const T &value, return_value_policy policy = return_value_policy::automatic, handle parent = handle()) {
+template <typename T> inline object cast(const T &value, return_value_policy policy = return_value_policy::automatic_reference, handle parent = handle()) {
     if (policy == return_value_policy::automatic)
         policy = std::is_pointer<T>::value ? return_value_policy::take_ownership : return_value_policy::copy;
+    else if (policy == return_value_policy::automatic_reference)
+        policy = std::is_pointer<T>::value ? return_value_policy::reference : return_value_policy::copy;
     return object(detail::type_caster<typename detail::intrinsic_type<T>::type>::cast(value, policy, parent), false);
 }
 
 template <typename T> inline T handle::cast() const { return pybind11::cast<T>(*this); }
 template <> inline void handle::cast() const { return; }
 
-template <typename... Args> inline object handle::call(Args&&... args_) const {
+template <return_value_policy policy = return_value_policy::automatic_reference,
+          typename... Args> inline tuple make_tuple(Args&&... args_) {
     const size_t size = sizeof...(Args);
     std::array<object, size> args {
         { object(detail::type_caster<typename detail::intrinsic_type<Args>::type>::cast(
-            std::forward<Args>(args_), return_value_policy::reference, nullptr), false)... }
+            std::forward<Args>(args_), policy, nullptr), false)... }
     };
     for (auto &arg_value : args)
         if (!arg_value)
-            throw cast_error("handle::call(): unable to convert input "
-                             "arguments to Python objects");
-    tuple args_tuple(size);
+            throw cast_error("make_tuple(): unable to convert arguments to Python objects");
+    tuple result(size);
     int counter = 0;
     for (auto &arg_value : args)
-        PyTuple_SET_ITEM(args_tuple.ptr(), counter++, arg_value.release().ptr());
+        PyTuple_SET_ITEM(result.ptr(), counter++, arg_value.release().ptr());
+    return result;
+}
+
+template <typename... Args> inline object handle::call(Args&&... args) const {
+    tuple args_tuple = pybind11::make_tuple(std::forward<Args>(args)...);
     object result(PyObject_CallObject(m_ptr, args_tuple.ptr()), false);
     if (!result)
         throw error_already_set();

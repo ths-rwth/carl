@@ -373,10 +373,10 @@ Passing STL data structures
 ===========================
 
 When including the additional header file :file:`pybind11/stl.h`, conversions
-between ``std::vector<>``, ``std::set<>``, and ``std::map<>`` and the Python
-``list``, ``set`` and ``dict`` data structures are automatically enabled. The
-types ``std::pair<>`` and ``std::tuple<>`` are already supported out of the box
-with just the core :file:`pybind11/pybind11.h` header.
+between ``std::vector<>``, ``std::list<>``, ``std::set<>``, and ``std::map<>``
+and the Python ``list``, ``set`` and ``dict`` data structures are automatically
+enabled. The types ``std::pair<>`` and ``std::tuple<>`` are already supported
+out of the box with just the core :file:`pybind11/pybind11.h` header.
 
 .. note::
 
@@ -387,8 +387,8 @@ with just the core :file:`pybind11/pybind11.h` header.
     The file :file:`example/example2.cpp` contains a complete example that
     demonstrates how to pass STL data types in more detail.
 
-Binding sequence data types, the slicing protocol, etc.
-=======================================================
+Binding sequence data types, iterators, the slicing protocol, etc.
+==================================================================
 
 Please refer to the supplemental example for details.
 
@@ -416,6 +416,9 @@ functions. The default policy is :enum:`return_value_policy::automatic`.
 | Return value policy                              | Description                                                               |
 +==================================================+===========================================================================+
 | :enum:`return_value_policy::automatic`           | Automatic: copy objects returned as values and take ownership of          |
+|                                                  | objects returned as pointers                                              |
++--------------------------------------------------+---------------------------------------------------------------------------+
+| :enum:`return_value_policy::automatic_reference` | Automatic variant 2 : copy objects returned as values and reference       |
 |                                                  | objects returned as pointers                                              |
 +--------------------------------------------------+---------------------------------------------------------------------------+
 | :enum:`return_value_policy::copy`                | Create a new copy of the returned object, which will be owned by Python   |
@@ -457,7 +460,7 @@ See below for an example that uses the
 
         py::class_<Example>(m, "Example")
             .def(py::init<>())
-            .def("get_internal", &Example::get_internal, "Return the internal data", py::return_value_policy::reference_internal)
+            .def("get_internal", &Example::get_internal, "Return the internal data", py::return_value_policy::reference_internal);
 
         return m.ptr();
     }
@@ -527,8 +530,39 @@ Python side:
 
     py::implicitly_convertible<A, B>();
 
+Unique pointers
+===============
+
+Given a class ``Example`` with Python bindings, it's possible to return
+instances wrapped in C++11 unique pointers, like so
+
+.. code-block:: cpp
+
+    std::unique_ptr<Example> create_example() { return std::unique_ptr<Example>(new Example()); }
+
+.. code-block:: cpp
+
+    m.def("create_example", &create_example);
+
+In other words, there is nothing special that needs to be done. While returning
+unique pointers in this way is allowed, it is *illegal* to use them as function
+arguments. For instance, the following function signature cannot be processed
+by pybind11.
+
+.. code-block:: cpp
+
+    void do_something_with_example(std::unique_ptr<Example> ex) { ... }
+
+The above signature would imply that Python needs to give up ownership of an
+object that is passed to this function, which is generally not possible (for
+instance, the object might be referenced elsewhere).
+
 Smart pointers
 ==============
+
+This section explains how to pass values that are wrapped in "smart" pointer
+types with internal reference counting. For simpler C++11 unique pointers,
+please refer to the previous section.
 
 The binding generator for classes (:class:`class_`) takes an optional second
 template type, which denotes a special *holder* type that is used to manage
@@ -674,23 +708,35 @@ automatically converted into a Python ``Exception``. pybind11 defines multiple
 special exception classes that will map to different types of Python
 exceptions:
 
-+----------------------------+------------------------------+
-|  C++ exception type        |  Python exception type       |
-+============================+==============================+
-| :class:`std::exception`    | ``Exception``                |
-+----------------------------+------------------------------+
-| :class:`stop_iteration`    | ``StopIteration`` (used to   |
-|                            | implement custom iterators)  |
-+----------------------------+------------------------------+
-| :class:`index_error`       | ``IndexError`` (used to      |
-|                            | indicate out of bounds       |
-|                            | accesses in ``__getitem__``, |
-|                            | ``__setitem__``, etc.)       |
-+----------------------------+------------------------------+
-| :class:`error_already_set` | Indicates that the Python    |
-|                            | exception flag has already   |
-|                            | been initialized.            |
-+----------------------------+------------------------------+
++--------------------------------------+------------------------------+
+|  C++ exception type                  |  Python exception type       |
++======================================+==============================+
+| :class:`std::exception`              | ``RuntimeError``             |
++--------------------------------------+------------------------------+
+| :class:`std::bad_alloc`              | ``MemoryError``              |
++--------------------------------------+------------------------------+
+| :class:`std::domain_error`           | ``ValueError``               |
++--------------------------------------+------------------------------+
+| :class:`std::invalid_argument`       | ``ValueError``               |
++--------------------------------------+------------------------------+
+| :class:`std::length_error`           | ``ValueError``               |
++--------------------------------------+------------------------------+
+| :class:`std::out_of_range`           | ``ValueError``               |
++--------------------------------------+------------------------------+
+| :class:`std::range_error`            | ``ValueError``               |
++--------------------------------------+------------------------------+
+| :class:`pybind11::stop_iteration`    | ``StopIteration`` (used to   |
+|                                      | implement custom iterators)  |
++--------------------------------------+------------------------------+
+| :class:`pybind11::index_error`       | ``IndexError`` (used to      |
+|                                      | indicate out of bounds       |
+|                                      | accesses in ``__getitem__``, |
+|                                      | ``__setitem__``, etc.)       |
++--------------------------------------+------------------------------+
+| :class:`pybind11::error_already_set` | Indicates that the Python    |
+|                                      | exception flag has already   |
+|                                      | been initialized             |
++--------------------------------------+------------------------------+
 
 When a Python function invoked from C++ throws an exception, it is converted
 into a C++ exception of type :class:`error_already_set` whose string payload
@@ -704,9 +750,9 @@ Buffer protocol
 ===============
 
 Python supports an extremely general and convenient approach for exchanging
-data between plugin libraries. Types can expose a buffer view which provides
-fast direct access to the raw internal representation. Suppose we want to bind
-the following simplistic Matrix class:
+data between plugin libraries. Types can expose a buffer view [#f1]_,
+which provides fast direct access to the raw internal representation. Suppose
+we want to bind the following simplistic Matrix class:
 
 .. code-block:: cpp
 
@@ -798,12 +844,14 @@ objects (e.g. a NumPy matrix).
     The file :file:`example/example7.cpp` contains a complete example that
     demonstrates using the buffer protocol with pybind11 in more detail.
 
+.. [#f1] http://docs.python.org/3/c-api/buffer.html
+
 NumPy support
 =============
 
 By exchanging ``py::buffer`` with ``py::array`` in the above snippet, we can
 restrict the function so that it only accepts NumPy arrays (rather than any
-type of Python object satisfying the buffer object protocol).
+type of Python object satisfying the buffer protocol).
 
 In many situations, we want to define a function which only accepts a NumPy
 array of a certain data type. This is possible via the ``py::array_t<T>``
@@ -815,8 +863,9 @@ dense array of doubles in C-style ordering.
     void f(py::array_t<double> array);
 
 When it is invoked with a different type (e.g. an integer), the binding code
-will attempt to cast the input into a NumPy array of the requested type.
-Note that this feature requires the ``pybind11/numpy.h`` header to be included.
+will attempt to cast the input into a NumPy array of the requested type. Note
+that this feature requires the :file:``pybind11/numpy.h`` header to be
+included.
 
 Vectorizing functions
 =====================
@@ -836,7 +885,10 @@ After including the ``pybind11/numpy.h`` header, this is extremely simple:
     m.def("vectorized_func", py::vectorize(my_func));
 
 Invoking the function like below causes 4 calls to be made to ``my_func`` with
-each of the the array elements. The result is returned as a NumPy array of type
+each of the the array elements. The significant advantage of this compared to
+solutions like ``numpy.vectorize()`` is that the loop over the elements runs
+entirely on the C++ side and can be crunched down into a tight, optimized loop
+by the compiler. The result is returned as a NumPy array of type
 ``numpy.dtype.float64``.
 
 .. code-block:: python
@@ -1019,11 +1071,11 @@ like so:
 Partitioning code over multiple extension modules
 =================================================
 
-It's straightforward to split binding code over multiple extension modules, while
-referencing types that are declared elsewhere. Everything "just" works without any special
-precautions. One exception to this rule occurs when extending a type declared
-in another extension module. Recall the basic example from Section
-:ref:`inheritance`.
+It's straightforward to split binding code over multiple extension modules,
+while referencing types that are declared elsewhere. Everything "just" works
+without any special precautions. One exception to this rule occurs when
+extending a type declared in another extension module. Recall the basic example
+from Section :ref:`inheritance`.
 
 .. code-block:: cpp
 
@@ -1054,8 +1106,6 @@ lookup of the corresponding Python type. However, this also requires invoking
 the ``import`` function once to ensure that the pybind11 binding code of the
 module ``basic`` has been executed.
 
-Naturally, both methods will fail when there are cyclic dependencies.
-
 .. code-block:: cpp
 
     py::module::import("basic");
@@ -1063,6 +1113,28 @@ Naturally, both methods will fail when there are cyclic dependencies.
     py::class_<Dog>(m, "Dog", py::base<Pet>())
         .def(py::init<const std::string &>())
         .def("bark", &Dog::bark);
+
+Naturally, both methods will fail when there are cyclic dependencies.
+
+Note that compiling code which has its default symbol visibility set to
+*hidden* (e.g. via the command line flag ``-fvisibility=hidden`` on GCC/Clang) can interfere with the
+ability to access types defined in another extension module. Workarounds
+include changing the global symbol visibility (not recommended, because it will
+lead unnecessarily large binaries) or manually exporting types that are
+accessed by multiple extension modules:
+
+.. code-block:: cpp
+
+    #ifdef _WIN32
+    #  define EXPORT_TYPE __declspec(dllexport)
+    #else
+    #  define EXPORT_TYPE __attribute__ ((visibility("default")))
+    #endif
+
+    class EXPORT_TYPE Dog : public Animal {
+        ...
+    };
+
 
 Treating STL data structures as opaque objects
 ==============================================
@@ -1073,9 +1145,9 @@ linked lists, hash tables, etc. This even works in a recursive manner, for
 instance to deal with lists of hash maps of pairs of elementary and custom
 types, etc.
 
-The fundamental limitation of this approach is the internal conversion between
-Python and C++ types involves a copy operation that prevents pass-by-reference
-semantics. What does this mean?
+A fundamental limitation of this approach is that the internal conversion
+between Python and C++ types involves a copy operation that prevents
+pass-by-reference semantics. What does this mean?
 
 Suppose we bind the following function
 
@@ -1115,3 +1187,113 @@ set of admissible operations.
 
     The file :file:`example/example14.cpp` contains a complete example that
     demonstrates how to create opaque types using pybind11 in more detail.
+
+Pickling support
+================
+
+Python's ``pickle`` module provides a powerful facility to serialize and
+de-serialize a Python object graph into a binary data stream. To pickle and
+unpickle C++ classes using pybind11, two additional functions must be provided.
+Suppose the class in question has the following signature:
+
+.. code-block:: cpp
+
+    class Pickleable {
+    public:
+        Pickleable(const std::string &value) : m_value(value) { }
+        const std::string &value() const { return m_value; }
+
+        void setExtra(int extra) { m_extra = extra; }
+        int extra() const { return m_extra; }
+    private:
+        std::string m_value;
+        int m_extra = 0;
+    };
+
+The binding code including the requisite ``__setstate__`` and ``__getstate__`` methods [#f2]_
+looks as follows:
+
+.. code-block:: cpp
+
+    py::class_<Pickleable>(m, "Pickleable")
+        .def(py::init<std::string>())
+        .def("value", &Pickleable::value)
+        .def("extra", &Pickleable::extra)
+        .def("setExtra", &Pickleable::setExtra)
+        .def("__getstate__", [](const Pickleable &p) {
+            /* Return a tuple that fully encodes the state of the object */
+            return py::make_tuple(p.value(), p.extra());
+        })
+        .def("__setstate__", [](Pickleable &p, py::tuple t) {
+            if (t.size() != 2)
+                throw std::runtime_error("Invalid state!");
+
+            /* Invoke the in-place constructor. Note that this is needed even
+               when the object just has a trivial default constructor */
+            new (&p) Pickleable(t[0].cast<std::string>());
+
+            /* Assign any additional state */
+            p.setExtra(t[1].cast<int>());
+        });
+
+An instance can now be pickled as follows:
+
+.. code-block:: python
+
+    try:
+        import cPickle as pickle  # Use cPickle on Python 2.7
+    except ImportError:
+        import pickle
+
+    p = Pickleable("test_value")
+    p.setExtra(15)
+    data = pickle.dumps(p, -1)
+
+Note that only the cPickle module is supported on Python 2.7. It is also
+important to request usage of the highest protocol version using the ``-1``
+argument to ``dumps``. Failure to follow these two steps will lead to important
+pybind11 memory allocation routines to be skipped during unpickling, which will
+likely cause memory corruption and/or segmentation faults.
+
+.. seealso::
+
+    The file :file:`example/example15.cpp` contains a complete example that
+    demonstrates how to pickle and unpickle types using pybind11 in more detail.
+
+.. [#f2] http://docs.python.org/3/library/pickle.html#pickling-class-instances
+
+Generating documentation using Sphinx
+=====================================
+
+Sphinx [#f3]_ has the ability to inspect the signatures and documentation
+strings in pybind11-based extension modules to automatically generate beautiful
+documentation in a variety formats. The pbtest repository [#f4]_ contains a
+simple example repository which uses this approach.
+
+There are two potential gotchas when using this approach: first, make sure that
+the resulting strings do not contain any :kbd:`TAB` characters, which break the
+docstring parsing routines. You may want to use C++11 raw string literals,
+which are convenient for multi-line comments. Conveniently, any excess
+indentation will be automatically be removed by Sphinx. However, for this to
+work, it is important that all lines are indented consistently, i.e.:
+
+.. code-block:: cpp
+
+    // ok
+    m.def("foo", &foo, R"mydelimiter(
+        The foo function
+
+        Parameters
+        ----------
+    )mydelimiter");
+
+    // *not ok*
+    m.def("foo", &foo, R"mydelimiter(The foo function
+
+        Parameters
+        ----------
+    )mydelimiter");
+
+.. [#f3] http://www.sphinx-doc.org
+.. [#f4] http://github.com/pybind/pbtest
+
