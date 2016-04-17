@@ -11,11 +11,36 @@
 
 void define_term(py::module& m) {
     py::class_<Term>(m, "Term")
-        .def(py::init<Rational>())
-        .def(py::init<carl::Variable::Arg>())
-        .def(py::init<const carl::Monomial::Arg&>())
-        .def(py::init<Rational, const carl::Monomial::Arg&>())
-        .def(py::init<Rational, carl::Variable::Arg, carl::exponent>())
+        .def(py::init<Rational, const Monomial&>())
+
+        .def("__add__",  static_cast<Polynomial (*)(const Term&, const Polynomial&)>(&carl::operator+))
+        .def("__add__",  static_cast<Polynomial (*)(const Term&, const Term&)>(&carl::operator+))
+        .def("__add__",  static_cast<Polynomial (*)(const Term&, const Monomial&)>(&carl::operator+))
+        .def("__add__",  static_cast<Polynomial (*)(const Term&, carl::Variable::Arg)>(&carl::operator+))
+        .def("__add__",  static_cast<Polynomial (*)(const Term&, const Rational&)>(&carl::operator+))
+
+        .def("__sub__",  static_cast<Polynomial (*)(const Term&, const Polynomial&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(const Term&, const Term&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(const Term&, const Monomial&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(const Term&, carl::Variable::Arg)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(const Term&, const Rational&)>(&carl::operator-))
+
+        .def("__mul__",  static_cast<Polynomial (*)(const Term&, const Polynomial&)>(&carl::operator*))
+        .def("__mul__",  static_cast<Term (*)(const Term&, const Term&)>(&carl::operator*))
+        .def("__mul__",  static_cast<Term (*)(const Term&, const Monomial&)>(&carl::operator*))
+        .def("__mul__",  static_cast<Term (*)(const Term&, carl::Variable::Arg)>(&carl::operator*))
+        .def("__mul__",  static_cast<Term (*)(const Term&, const Rational&)>(&carl::operator*))
+
+        .def(py::self / Rational())
+
+        .def("__pow__", [](const Term& var, carl::uint exp) {return var.pow(exp);})
+
+        .def("__pos__", [](const Term& var) {return Term(var);})
+        .def("__neg__", [](const Term& var) {return var * Term(-1);})
+
+        .def_property_readonly("coeff", [] (const Term& arg) -> Rational { return arg.coeff(); })
+        .def_property_readonly("monomial", &Term::monomial)
+
         .def("__str__", &streamToString<Term>)
         ;
 }

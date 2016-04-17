@@ -50,11 +50,11 @@ void define_variable(py::module& m) {
         .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
         .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator+))
 
-        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Term&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Monomial&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
-        .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator-))
+        .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator-))
 
         .def("__mul__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator*))
         .def("__mul__",  static_cast<Term (*)(carl::Variable::Arg, const Term&)>(&carl::operator*))
@@ -66,8 +66,8 @@ void define_variable(py::module& m) {
 
         .def("__pow__", [](carl::Variable::Arg var, carl::uint exp) -> Monomial {return carl::Monomial(var).pow(exp);})
 
-        .def("__pos__", [](carl::Variable::Arg var) -> carl::Variable {return carl::Variable(var);})
-        .def("__neg__", [](carl::Variable::Arg var) -> Term {return var * Rational(-1);})
+        .def("__pos__", [](carl::Variable::Arg var) {return carl::Variable(var);})
+        .def("__neg__", [](carl::Variable::Arg var) {return var * Rational(-1);})
 
         .def(py::self == py::self)
         .def(py::self != py::self)

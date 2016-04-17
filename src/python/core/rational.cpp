@@ -27,7 +27,7 @@ void define_rational(py::module& m) {
         .def("__sub__",  static_cast<Polynomial (*)(const Rational&, const Term&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(const Rational&, const Monomial&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(const Rational&, carl::Variable::Arg)>(&carl::operator-))
-        .def(py::self + py::self)
+        .def(py::self - py::self)
 
         .def("__mul__",  static_cast<Polynomial (*)(const Rational&, const Polynomial&)>(&carl::operator*))
         .def("__mul__",  static_cast<Term (*)(const Rational&, const Term&)>(&carl::operator*))
@@ -38,7 +38,7 @@ void define_rational(py::module& m) {
         .def(py::self / py::self)
 
         .def("__pow__", static_cast<Rational (*)(const Rational&, std::size_t)>(&carl::pow))
-        .def("__pos__", [](const Rational& var) -> Rational {return Rational(var);})
+        .def("__pos__", [](const Rational& var) {return Rational(var);})
         .def(-py::self)
 
         .def(py::self == py::self)

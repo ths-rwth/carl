@@ -9,6 +9,8 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/stl.h>
+#include <tuple>
 
 namespace py = pybind11;
 
@@ -40,7 +42,75 @@ public:
     }
     PYBIND11_TYPE_CASTER(handle, _("handle"));
 };
+/*
+template <typename TupleType, typename ... Keys> struct tuple_caster {
+    typedef TupleType type;
+    template<typename Type>
+    using type_conv = type_caster<typename intrinsic_type<Type>::type>;
+
+    bool load(handle src, bool convert) {
+        pybind11::tuple tup(src, true);
+        if (!tup.check())
+            return false;
+
+        return loadItem<0, Keys...>(tup, convert);
+    }
+
+    static handle cast(const type &src, return_value_policy policy, handle parent) {
+        pybind11::tuple tup(sizeof...(Keys));
+        if (!castItem<0, Keys...>(tup, src, policy, parent)) {
+            return handle();
+        }
+
+        return tup.release();
+    }
+
+private:
+    template<int N, typename Type, typename ... Types>
+    bool loadItem(pybind11::tuple& tup, bool convert) {
+        type_conv<Type> conv;
+        if (!conv.load(tup[N], convert))
+                return false;
+        std::get<N>(value) = static_cast<Type>(conv);
+        return loadItem<N+1, Types...>(tup, convert);
+    }
+
+    template<int N, typename Type>
+    bool loadItem(pybind11::tuple& tup, bool convert) {
+        type_conv<Type> conv;
+        if (!conv.load(tup[N], convert))
+                return false;
+        std::get<N>(value) = static_cast<Type>(conv);
+        return true;
+    }
+
+    template<int N, typename Type, typename ... Types>
+    static bool castItem(pybind11::tuple& tup, const type &src, return_value_policy policy, handle parent) {
+        auto obj = type_conv<Type>::cast(std::get<N>(src), policy, parent);
+        object value_ = object(obj, false);
+        if (!obj) {
+            return false;
+        }
+        return castItem<N+1, Types...>(tup, src, policy, parent);
+    }
+
+    template<int N, typename Type>
+    static bool castItem(pybind11::tuple& tu, const type &src, return_value_policy policy, handle parent) {
+        auto obj = type_conv<Type>::cast(std::get<N>(src), policy, parent);
+        object value_ = object(obj, false);
+        if (!obj) {
+            return false;
+        }
+        return true;
+    }
+};
+
+template <typename ... Types> struct type_caster<std::tuple<Types...>>
+ : tuple_caster<std::tuple<Types...>, Types...> { };
+
+template <typename Type1, typename Type2> struct type_caster<std::pair<Type1, Type2>>
+ : tuple_caster<std::pair<Type1, Type2>, Type1, Type2> { };
+*/
 
 }
 }
-
