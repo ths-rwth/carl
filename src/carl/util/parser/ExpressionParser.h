@@ -395,7 +395,13 @@ private:
 		if ((vptr = varmap.find(s)) != nullptr) {
 			return *vptr;
 		}
-		Variable v = freshRealVariable(s);
+		Variable v = VariablePool::getInstance().findVariableWithName(s);
+		if (v != Variable::NO_VARIABLE) {
+	        varmap.add(s, v);
+	        return v;
+		}
+
+		v = freshRealVariable(s);
 		varmap.add(s, v);
 		return v;
 	}
