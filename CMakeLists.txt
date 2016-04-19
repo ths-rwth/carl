@@ -55,7 +55,8 @@ option( USE_COTIRE "Use cotire to generate and use precompiled headers" OFF )
 option( BUILD_STATIC "Build the static library as well" OFF )
 option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
-option( CARL_PYTHON "Build Python bindings" ON)
+option( CARL_PYTHON "Build Python bindings" OFF)
+set( CARL_PYTHON_VERSION CACHE STRING "Force a particular version of Python to use, rather than system default")
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -185,6 +186,9 @@ if(BUILD_STATIC)
 	if (LOGGING)
 	message(WARNING "A static build with logging enabled will probably trigger a segfault!")
 	endif()
+	if (CARL_PYTHON)
+	message(FATAL_ERROR "Cannot build Python libraries statically")
+	endif()
 else()
 	message(STATUS "Building static: no")
 endif()
@@ -281,10 +285,14 @@ endif()
 # # # # # # # # # # # # # # # # # # # # # #
 
 if(CARL_PYTHON)
-	set(Python_ADDITIONAL_VERSIONS 3.4)
-	FIND_PACKAGE(PythonInterp REQUIRED)
-	FIND_PACKAGE(PythonLibs 3.4 REQUIRED)
-	include_directories(${PYTHON_INCLUDE_DIR})
+    if(DEFINED CARL_PYTHON_VERSION)
+        # User defined version
+        FIND_PACKAGE(PythonLibs ${CARL_PYTHON_VERSION} REQUIRED)
+    else()
+        # Try to find current interpreter to derive system version used
+        FIND_PACKAGE(PythonInterp)
+        FIND_PACKAGE(PythonLibs REQUIRED)
+    endif()
 endif()
 
 
