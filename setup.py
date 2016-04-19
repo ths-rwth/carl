@@ -6,22 +6,9 @@ from subprocess import call, STDOUT
 import distutils.sysconfig
 import os
 import os.path
-import tempfile
-import glob
 import shutil
 import distutils
 import multiprocessing
-print(os.getcwd())
-
-PYTHONINC = distutils.sysconfig.get_python_inc()
-PYTHONLIB = distutils.sysconfig.get_python_lib(plat_specific=True, standard_lib=True)
-PYTHONLIBDIR = distutils.sysconfig.get_config_var("LIBDIR")
-PYTHONLIBS = glob.glob(os.path.join(PYTHONLIBDIR, "*.dylib"))
-PYTHONLIBS.extend(glob.glob(os.path.join(PYTHONLIBDIR, "*.so")))
-PYTHONLIB = PYTHONLIBS[0]
-#print(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
-print(PYTHONINC)
-print(PYTHONLIB)
 
 NO_COMPILE_CORES = multiprocessing.cpu_count()
 
@@ -56,7 +43,7 @@ class MyInstall(install):
     
     def run(self):
         # Call cmake
-        cmake_args = ["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC]
+        cmake_args = ["cmake",  "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF"]
         cmake_args.extend(self.cmake.split())
         cmake_args.append(os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
         ret = call(cmake_args, cwd=d)
@@ -84,7 +71,7 @@ class MyDevelop(develop):
 
     def run(self):
         # Call cmake
-        cmake_args = ["cmake",  "-DUSE_GINAC=ON", "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF",  "-DPYTHON_LIBRARY="+PYTHONLIB, "-DPYTHON_INCLUDE_DIR="+PYTHONINC]
+        cmake_args = ["cmake",  "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF"]
         cmake_args.extend(self.cmake.split())
         cmake_args.append(os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
         ret = call(cmake_args, cwd=d)
@@ -105,7 +92,10 @@ setup(cmdclass={'install': MyInstall, 'develop': MyDevelop, 'egg_info': MyEggInf
       version="1.1",
       description="pycarl - Python Bindings for Carl",
       package_dir={'':d},
-      packages=['pycarl', 'pycarl.core', 'pycarl.numbers'],
-      package_data={'pycarl.core': ['_core.so'], 'pycarl.numbers' : ['_numbers.so'], 'pycarl': ['*.so', '*.dylib', '*.a']},
-
+      packages=['pycarl', 'pycarl.formula', 'pycarl.parser'],
+      package_data={
+          'pycarl': ['*.so', '*.dylib', '*.a'],
+          'pycarl.formula' : ['formula/formula.so'],
+          'pycarl.parser' : ['parser/parser.so']
+      },
       include_package_data=True)
