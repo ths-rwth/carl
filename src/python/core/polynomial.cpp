@@ -52,7 +52,7 @@ void define_polynomial(py::module& m) {
         .def_property_readonly("total_degree", &Polynomial::totalDegree)//, py::doc("The maximum degree of the terms in the polynomial"))
         .def("degree", &Polynomial::degree)//, py::doc("Computes the degree with respect to the given variable"))
         .def_property_readonly("nr_terms", &Polynomial::nrTerms)
-        .def("__str__", &Polynomial::toString)
+        .def("__str__", [](const Polynomial& var) { return var.toString(); })
 
         .def(py::self != py::self)
         .def(py::self == py::self)

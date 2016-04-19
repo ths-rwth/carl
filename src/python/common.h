@@ -16,8 +16,10 @@ namespace py = pybind11;
 
 #if PY_MAJOR_VERSION >= 3
 #define PY_DIV "__truediv__"
+#define PY_RDIV "__rtruediv__"
 #else
 #define PY_DIV "__div__"
+#define PY_RDIV "__rdiv__"
 #endif
 
 namespace pybind11 {

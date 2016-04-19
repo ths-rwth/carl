@@ -44,6 +44,7 @@ void define_rationalfunction(py::module& m) {
 
         .def("evaluate", &RationalFunction::evaluate)
         .def("gather_variables", static_cast<std::set<carl::Variable> (RationalFunction::*)() const>(&RationalFunction::gatherVariables))
+        .def_property_readonly("nominator", &RationalFunction::nominator)
         .def_property_readonly("numerator", &RationalFunction::nominator)
         .def_property_readonly("denominator", &RationalFunction::denominator)
         .def("__str__", &streamToString<RationalFunction>)

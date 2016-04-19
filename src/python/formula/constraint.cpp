@@ -48,5 +48,8 @@ void define_constraint(py::module& m) {
         .def("__xor__", [](const Constraint& lhs, const Formula& rhs){
             return Formula(carl::FormulaType::XOR, {Formula(lhs), rhs});
         })
+
+        .def("satisfied_by", [](const Constraint& constraint, const carl::EvaluationMap<Rational>& evaluation) { return Formula(constraint).satisfiedBy(evaluation); })
+
         ;
 }
