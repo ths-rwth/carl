@@ -54,13 +54,13 @@ void define_variable(py::module& m) {
         .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Monomial&)>(&carl::operator+))
         .def("__add__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator+))
         .def("__add__",  adder_func)
-        .def("__add__", [&adder_func](carl::Variable::Arg lhs, double rhs) -> Polynomial {
+        .def("__add__", [adder_func](carl::Variable::Arg lhs, double rhs) -> Polynomial {
             return adder_func(lhs, carl::rationalize<Rational>(rhs)); })
-        .def("__add__", [&adder_func](carl::Variable::Arg lhs, int rhs) -> Polynomial {
+        .def("__add__", [adder_func](carl::Variable::Arg lhs, int rhs) -> Polynomial {
             return adder_func(lhs, carl::rationalize<Rational>(rhs)); })
-        .def("__radd__", [&radder_func](carl::Variable::Arg rhs, double lhs) -> Polynomial  {
+        .def("__radd__", [radder_func](carl::Variable::Arg rhs, double lhs) -> Polynomial  {
             return radder_func(carl::rationalize<Rational>(lhs), rhs); })
-        .def("__radd__", [&radder_func](carl::Variable::Arg rhs, int lhs) -> Polynomial {
+        .def("__radd__", [radder_func](carl::Variable::Arg rhs, int lhs) -> Polynomial {
             return radder_func(carl::rationalize<Rational>(lhs), rhs); })
 
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator-))
@@ -68,13 +68,13 @@ void define_variable(py::module& m) {
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Monomial&)>(&carl::operator-))
         .def("__sub__",  static_cast<Polynomial (*)(carl::Variable::Arg, carl::Variable::Arg)>(&carl::operator-))
         .def("__sub__",  subs_func)
-        .def("__sub__", [&subs_func](carl::Variable::Arg lhs, double rhs) -> Polynomial {
+        .def("__sub__", [subs_func](carl::Variable::Arg lhs, double rhs) -> Polynomial {
             return subs_func(lhs, carl::rationalize<Rational>(rhs)); })
-        .def("__sub__", [&subs_func](carl::Variable::Arg lhs, int rhs) -> Polynomial {
+        .def("__sub__", [subs_func](carl::Variable::Arg lhs, int rhs) -> Polynomial {
             return subs_func(lhs, carl::rationalize<Rational>(rhs)); })
-        .def("__sub__", [&rsubs_func](carl::Variable::Arg rhs, double lhs) -> Polynomial  {
+        .def("__sub__", [rsubs_func](carl::Variable::Arg rhs, double lhs) -> Polynomial  {
             return rsubs_func(carl::rationalize<Rational>(lhs), rhs); })
-        .def("__sub__", [&rsubs_func](carl::Variable::Arg rhs, int lhs) -> Polynomial {
+        .def("__sub__", [rsubs_func](carl::Variable::Arg rhs, int lhs) -> Polynomial {
             return rsubs_func(carl::rationalize<Rational>(lhs), rhs); })
 
         .def("__mul__",  static_cast<Polynomial (*)(carl::Variable::Arg, const Polynomial&)>(&carl::operator*))
