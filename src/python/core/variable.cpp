@@ -32,8 +32,8 @@ void define_variabletype(py::module& m) {
 void define_variable(py::module& m) {
     auto adder_func = static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator+);
     auto radder_func = static_cast<Polynomial (*)(const Rational&, carl::Variable::Arg)>(&carl::operator+);
-    auto subs_func = static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator+);
-    auto rsubs_func = static_cast<Polynomial (*)(const Rational&, carl::Variable::Arg)>(&carl::operator+);
+    auto subs_func = static_cast<Polynomial (*)(carl::Variable::Arg, const Rational&)>(&carl::operator-);
+    auto rsubs_func = static_cast<Polynomial (*)(const Rational&, carl::Variable::Arg)>(&carl::operator-);
 
     py::class_<carl::Variable>(m, "Variable")
         .def("__init__",
