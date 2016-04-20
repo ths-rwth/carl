@@ -73,7 +73,7 @@ class MyDevelop(develop):
 
     def run(self):
         # Call cmake
-        cmake_args = ["cmake",  "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF"]
+        cmake_args = ["cmake",  "-DCARL_PYTHON=ON", "-DBUILD_STATIC=OFF", "-DDEVELOPER=ON"]
         cmake_args.extend(self.cmake.split())
         cmake_args.append(PROJECT_DIR)
         ret = call(cmake_args, cwd=BUILD_DIR)
