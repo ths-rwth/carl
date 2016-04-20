@@ -60,7 +60,7 @@ void define_rational(py::module& m) {
 
         .def("__pow__", static_cast<Rational (*)(const Rational&, std::size_t)>(&carl::pow))
         .def("__pos__", [](const Rational& var) {return Rational(var);})
-        .def(-py::self)
+        .def("__neg__", [](const Rational& var) -> Rational {return -var;})
         .def("__abs__", [](const Rational& var) {return carl::abs(var);})
 
         .def("__eq__", [](const Rational& lhs, const Rational& rhs) -> bool { return lhs == rhs; })
