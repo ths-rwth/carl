@@ -107,6 +107,13 @@ class ExpressionSemantics(object):
                 assert False, "Unknown scale op {}".format(op)
         return expr
 
+    def pow_expr(self, ast):
+        expr = ast.lhs
+        if not ast.rhs:
+            return expr
+        assert ast.op == '**', "Unknown pow op {}".format(ast.op)
+        return expr ** int(ast.rhs)
+
     def unary_expr(self, ast):
         if ast.op is None:
             return ast.rhs

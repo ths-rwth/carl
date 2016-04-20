@@ -38,9 +38,9 @@ numerical_expr = @:add_expr ;
 
 add_expr = lhs:scale_expr rhs:{('+' | '-') ~ scale_expr}*;
 
-scale_expr =  lhs:unary_expr rhs:{('*' | '/') ~ unary_expr}*;
+scale_expr =  lhs:pow_expr rhs:{('*' | '/') ~ pow_expr}*;
 
-# pow_expr = lhs:{unary_expr ('**')}* rhs:unary_expr ;
+pow_expr = lhs:unary_expr [op:('**') rhs:pow_expr] ;
 
 unary_expr = op:['+' | '-' | '~'] ~ rhs:atom ;
 

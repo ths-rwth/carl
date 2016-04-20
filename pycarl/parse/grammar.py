@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 20, 9, 10, 57, 2)
+__version__ = (2016, 4, 20, 9, 29, 34, 2)
 
 __all__ = [
     'parserParser',
@@ -247,7 +247,7 @@ class parserParser(Parser):
 
     @graken()
     def _scale_expr_(self):
-        self._unary_expr_()
+        self._pow_expr_()
         self.name_last_node('lhs')
 
         def block2():
@@ -259,12 +259,28 @@ class parserParser(Parser):
                         self._token('/')
                     self._error('expecting one of: * /')
             self._cut()
-            self._unary_expr_()
+            self._pow_expr_()
         self._closure(block2)
         self.name_last_node('rhs')
 
         self.ast._define(
             ['lhs', 'rhs'],
+            []
+        )
+
+    @graken()
+    def _pow_expr_(self):
+        self._unary_expr_()
+        self.name_last_node('lhs')
+        with self._optional():
+            with self._group():
+                self._token('**')
+            self.name_last_node('op')
+            self._pow_expr_()
+            self.name_last_node('rhs')
+
+        self.ast._define(
+            ['lhs', 'op', 'rhs'],
             []
         )
 
@@ -356,6 +372,9 @@ class parserSemantics(object):
         return ast
 
     def scale_expr(self, ast):
+        return ast
+
+    def pow_expr(self, ast):
         return ast
 
     def unary_expr(self, ast):
