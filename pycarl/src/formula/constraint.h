@@ -8,7 +8,7 @@
 #ifndef PYTHON_FORMULA_CONSTRAINT_H_
 #define PYTHON_FORMULA_CONSTRAINT_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_relation(py::module& m);
 void define_constraint(py::module& m);

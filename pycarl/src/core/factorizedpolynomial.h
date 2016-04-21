@@ -8,7 +8,7 @@
 #ifndef PYTHON_CORE_FACTORIZEDPOLYNOMIAL_H_
 #define PYTHON_CORE_FACTORIZEDPOLYNOMIAL_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_factorizationcache(py::module& m);
 void define_factorizedpolynomial(py::module& m);

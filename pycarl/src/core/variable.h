@@ -8,7 +8,7 @@
 #ifndef PYTHON_CORE_VARIABLE_H_
 #define PYTHON_CORE_VARIABLE_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_variabletype(py::module& m);
 void define_variable(py::module& m);

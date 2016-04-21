@@ -8,10 +8,10 @@
 #ifndef PYTHON_FORMULA_TYPES_H_
 #define PYTHON_FORMULA_TYPES_H_
 
-#include "python/core/common.h"
+#include "core/common.h"
 
-#include "carl/formula/Constraint.h"
-#include "carl/formula/Formula.h"
+#include <carl/formula/Constraint.h>
+#include <carl/formula/Formula.h>
 
 typedef carl::Constraint<Polynomial> Constraint;
 typedef carl::Formula<Polynomial> Formula;

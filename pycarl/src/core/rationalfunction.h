@@ -8,7 +8,7 @@
 #ifndef PYTHON_CORE_RATIONALFUNCTION_H_
 #define PYTHON_CORE_RATIONALFUNCTION_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_rationalfunction(py::module& m);
 

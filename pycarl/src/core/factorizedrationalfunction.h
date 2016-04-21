@@ -8,7 +8,7 @@
 #ifndef PYTHON_CORE_FACTORIZEDRATIONALFUNCTION_H_
 #define PYTHON_CORE_FACTORIZEDRATIONALFUNCTION_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_factorizedrationalfunction(py::module& m);
 

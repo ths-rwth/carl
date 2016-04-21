@@ -8,7 +8,7 @@
 #ifndef PYTHON_CORE_TERM_H_
 #define PYTHON_CORE_TERM_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_term(py::module& m);
 

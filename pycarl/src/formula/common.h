@@ -11,6 +11,6 @@
 #include "types.h"
 
 //toString
-#include "python/helpers.h"
+#include "src/helpers.h"
 
 #endif /* PYTHON_FORMULA_COMMON_H_ */

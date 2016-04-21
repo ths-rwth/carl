@@ -8,7 +8,7 @@
 #ifndef PYTHON_FORMULA_FORMULA_H_
 #define PYTHON_FORMULA_FORMULA_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_formula_type(py::module& m);
 void define_formula(py::module& m);

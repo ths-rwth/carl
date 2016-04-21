@@ -8,7 +8,7 @@
 #ifndef PYTHON_CORE_MONOMIAL_H_
 #define PYTHON_CORE_MONOMIAL_H_
 
-#include "python/common.h"
+#include "src/common.h"
 
 void define_monomial(py::module& m);
 

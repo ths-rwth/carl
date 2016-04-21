@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "python/common.h"
+#include "src/common.h"
 #include <string>
 
 py::handle parseString(const std::string& input);
