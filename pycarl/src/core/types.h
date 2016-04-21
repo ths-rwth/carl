@@ -16,7 +16,7 @@
 #include <carl/core/FactorizedPolynomial.h>
 #include <carl/core/RationalFunction.h>
 
-#ifdef USE_CLN_NUMBERS
+#ifdef PYCARL_USE_CLN
 typedef cln::cl_RA Rational;
 #else
 //typedef double Rational;
