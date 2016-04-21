@@ -9,6 +9,8 @@ import os.path
 import shutil
 import distutils
 import multiprocessing
+from distutils.core import Extension
+from glob import glob
 
 NO_COMPILE_CORES = multiprocessing.cpu_count()
 
@@ -88,6 +90,33 @@ class MyDevelop(develop):
             raise RuntimeError("Failure during make")
         develop.run(self)
 
+core_sources = glob(os.path.join(PROJECT_DIR, 'src', 'core', '*.cpp'))
+formula_sources = glob(os.path.join(PROJECT_DIR, 'src', 'formula', '*.cpp'))
+parse_sources = glob(os.path.join(PROJECT_DIR, 'src', 'parse', '*.cpp'))
+
+ext_core = Extension(
+    name='_core',
+    sources=['src/mod_core.cpp'] + core_sources,
+    include_dirs=['src', '../resources/pybind11/include'],
+    libraries=['carl'],
+    extra_compile_args=['-std=c++11'],
+)
+
+ext_formula = Extension(
+    name='_formula',
+    sources=['src/mod_formula.cpp'] + formula_sources,
+    include_dirs=['src', '../resources/pybind11/include'],
+    libraries=['carl'],
+    extra_compile_args=['-std=c++11'],
+)
+
+ext_parse = Extension(
+    name='_parse',
+    sources=['src/mod_parse.cpp'] + parse_sources,
+    include_dirs=['src', '../resources/pybind11/include'],
+    libraries=['carl'],
+    extra_compile_args=['-std=c++11'],
+)
 
 setup(cmdclass={'install': MyInstall, 'develop': MyDevelop, 'egg_info': MyEggInfo},
       name="pycarl",
@@ -97,9 +126,5 @@ setup(cmdclass={'install': MyInstall, 'develop': MyDevelop, 'egg_info': MyEggInf
       package_dir={
           'pycarl':'lib'
       },
-      package_data={
-          'pycarl': ['*.so', '*.dylib', '*.a'],
-          'pycarl.formula' : ['formula/formula.so'],
-          'pycarl.parse' : ['parse/parse.so']
-      },
+      ext_modules=[ext_core, ext_formula],
       include_package_data=True)
