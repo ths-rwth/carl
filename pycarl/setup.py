@@ -91,6 +91,10 @@ class pycarl_build_ext(build_ext):
                 self.undef = []
             self.undef += ['PYCARL_USE_CLN']
 
+        if library_dirs:
+            # Makes local carl library lookup that much easier
+            self.rpath += library_dirs
+
 setup(name="pycarl",
       version="1.1",
       author="H. Bruintjes",
