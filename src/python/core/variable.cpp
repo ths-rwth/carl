@@ -92,9 +92,9 @@ void define_variable(py::module& m) {
         .def(PY_DIV, [](carl::Variable::Arg lhs, const Term& rhs) { return RationalFunction(lhs) / rhs; })
         .def(PY_DIV, [](carl::Variable::Arg lhs, const Monomial& rhs) { return RationalFunction(lhs) / rhs; })
         .def(PY_DIV, [](carl::Variable::Arg lhs, carl::Variable::Arg rhs) { return RationalFunction(lhs) / rhs; })
-        .def(PY_DIV, [](carl::Variable::Arg lhs, const Rational& rhs) { if (rhs == 0.0) throw std::runtime_error("Div by zero"); return lhs / rhs; })
-        .def(PY_DIV, [](carl::Variable::Arg lhs, double rhs) { if (rhs == 0.0) throw std::runtime_error("Div by zero"); return lhs / carl::rationalize<Rational>(rhs); })
-        .def(PY_DIV, [](carl::Variable::Arg lhs, int rhs) { if (rhs == 0.0) throw std::runtime_error("Div by zero"); return lhs / carl::rationalize<Rational>(rhs); })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, const Rational& rhs) { if (carl::isZero(rhs)) throw std::runtime_error("Div by zero"); return lhs / rhs; })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, double rhs) { if (carl::isZero(rhs)) throw std::runtime_error("Div by zero"); return lhs / carl::rationalize<Rational>(rhs); })
+        .def(PY_DIV, [](carl::Variable::Arg lhs, int rhs) { if (rhs == 0) throw std::runtime_error("Div by zero"); return lhs / carl::rationalize<Rational>(rhs); })
 
         .def("__pow__", [](carl::Variable::Arg var, carl::uint exp) -> Monomial {return carl::Monomial(var).pow(exp);})
 
