@@ -103,9 +103,7 @@ setup(name="pycarl",
       url="http://moves.rwth-aachen.de",
       description="pycarl - Python Bindings for Carl",
       packages=['pycarl', 'pycarl.formula', 'pycarl.parse'],
-      package_dir={
-          'pycarl':'lib'
-      },
+      package_dir={'':'lib'},
       ext_package='pycarl',
       ext_modules=[ext_core, ext_formula #, ext_parse
                    ],
