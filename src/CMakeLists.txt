@@ -1,6 +1,5 @@
 # Libraries..
 add_subdirectory(carl)
-add_subdirectory(python EXCLUDE_FROM_ALL)
 
 # For unit tests.
 # We decided to always compile them, if gtest is present,
