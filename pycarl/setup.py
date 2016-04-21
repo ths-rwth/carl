@@ -93,8 +93,10 @@ setup(cmdclass={'install': MyInstall, 'develop': MyDevelop, 'egg_info': MyEggInf
       name="pycarl",
       version="1.1",
       description="pycarl - Python Bindings for Carl",
-      package_dir={'':BUILD_DIR},
       packages=['pycarl', 'pycarl.formula', 'pycarl.parse'],
+      package_dir={
+          'pycarl':'lib'
+      },
       package_data={
           'pycarl': ['*.so', '*.dylib', '*.a'],
           'pycarl.formula' : ['formula/formula.so'],
