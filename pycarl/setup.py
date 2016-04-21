@@ -30,7 +30,7 @@ ext_core = Extension(
 )
 
 ext_formula = Extension(
-    name='formula',
+    name='formula.formula',
     sources=['src/mod_formula.cpp'] + formula_sources,
     include_dirs=['.', 'src', '../resources/pybind11/include'],
     libraries=['carl'],
@@ -38,7 +38,7 @@ ext_formula = Extension(
 )
 
 ext_parse = Extension(
-    name='parse',
+    name='parse.parse',
     sources=['src/mod_parse.cpp'] + parse_sources,
     include_dirs=['.', 'src', '../resources/pybind11/include'],
     libraries=['carl'],
@@ -52,5 +52,6 @@ setup(name="pycarl",
       package_dir={
           'pycarl':'lib'
       },
+      ext_package='pycarl',
       ext_modules=[ext_core, ext_formula],
 )
