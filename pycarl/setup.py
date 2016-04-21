@@ -15,13 +15,10 @@ parse_sources = glob(os.path.join('src', 'parse', '*.cpp'))
 # Configuration shared between external modules follows
 
 # To help along, if carl and/or pybind is not system installed, retrieve from carl distribution
-include_dirs = ['.', 'src']
+include_dirs = ['.', 'src', 'resources/pybind11/include']
 local_carl_path = os.path.join(PROJECT_DIR, '..', 'src')
 if os.path.exists(local_carl_path):
     include_dirs.append(local_carl_path)
-local_pybind_path = os.path.join(PROJECT_DIR, '..', 'resources', 'pybind11', 'include')
-if os.path.exists(local_pybind_path):
-    include_dirs.append(local_pybind_path)
 
 # Like includes, also add local path for library, assuming made in 'build'
 library_dirs = []
