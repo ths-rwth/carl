@@ -1,19 +1,8 @@
 #!/usr/bin/python
-from setuptools import setup, find_packages
-from setuptools.command.install import install
-from setuptools.command.develop import develop
-from setuptools.command.egg_info import egg_info
-from subprocess import call, STDOUT
-import distutils.sysconfig
-import os
-import os.path
-import shutil
-import distutils
-import multiprocessing
+from setuptools import setup
 from distutils.core import Extension
+import os.path
 from glob import glob
-
-NO_COMPILE_CORES = multiprocessing.cpu_count()
 
 PROJECT_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
@@ -47,6 +36,11 @@ ext_parse = Extension(
 
 setup(name="pycarl",
       version="1.1",
+      author="H. Bruintjes",
+      author_email="h.bruintjes@cs.rwth-aachen.de",
+      maintainer="S. Junges",
+      maintainer_email="sebastian.junges@cs.rwth-aachen.de",
+      url="http://moves.rwth-aachen.de",
       description="pycarl - Python Bindings for Carl",
       packages=['pycarl', 'pycarl.formula', 'pycarl.parse'],
       package_dir={
