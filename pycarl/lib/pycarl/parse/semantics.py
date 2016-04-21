@@ -60,7 +60,7 @@ class ExpressionSemantics(object):
         expr = ast.lhs
         if ast.rhs:
             op, rhs = ast.rhs
-            if op == '==':
+            if op in ['==', '=']:
                 expr = Constraint(self._make_poly(expr - rhs), Relation.EQ)
             elif op == '!=':
                 expr = Constraint(self._make_poly(expr - rhs), Relation.NEQ)

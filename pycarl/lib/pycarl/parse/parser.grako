@@ -30,7 +30,7 @@ and_form = lhs:constraint rhs:{'&' ~ constraint}* ;
 constraint = @:eq_expr ;
 
 # Constraints cannot be nested!
-eq_expr = lhs:rel_expr rhs:[('==' | '!=') ~ numerical_expr] ;
+eq_expr = lhs:rel_expr rhs:[('==' | '!=' | '=') ~ numerical_expr] ;
 
 rel_expr = lhs:numerical_expr rhs:[('<=' | '>=' | '<' | '>') ~ numerical_expr] ;
 

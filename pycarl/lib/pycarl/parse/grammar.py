@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS, generic_main  # noqa
 
 
-__version__ = (2016, 4, 20, 9, 29, 34, 2)
+__version__ = (2016, 4, 21, 18, 34, 2, 3)
 
 __all__ = [
     'parserParser',
@@ -182,7 +182,9 @@ class parserParser(Parser):
                         self._token('==')
                     with self._option():
                         self._token('!=')
-                    self._error('expecting one of: != ==')
+                    with self._option():
+                        self._token('=')
+                    self._error('expecting one of: != = ==')
             self._cut()
             self._numerical_expr_()
         self.name_last_node('rhs')
