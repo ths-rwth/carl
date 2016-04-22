@@ -138,13 +138,13 @@ namespace carl
 				{
 					throw InvalidInputStringException("Denominator is zero", nomAndDenom.back() , inputString);
 				}
-				return RationalFunction<MultivariatePolynomial<C,O,P>>{nom, denom};
+				return {nom, denom};
 			}
 			else
 			{
 				assert(nomAndDenom.size() == 1);
 				auto pol = parseMultivariatePolynomial<C>(nomAndDenom.front());
-				return RationalFunction<MultivariatePolynomial<C,O,P>>{pol};
+				return {pol};
 			}
 		}
 		

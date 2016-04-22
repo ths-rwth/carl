@@ -80,8 +80,6 @@ protected:
 	 */
 	VariablePool();
 
-public:
-
 	/**
 	 * Get a variable which was not used before.
 	 * This method is thread-safe.
@@ -98,6 +96,8 @@ public:
 	 * @return A new variable.
 	 */
 	Variable getFreshVariable(const std::string& name, VariableType type = VariableType::VT_REAL);
+
+public:
 
 	/**
 	 * Clears everything already created in this pool.

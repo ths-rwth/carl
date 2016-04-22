@@ -37,7 +37,7 @@ template<typename Pol>
 using RatFun = RationalFunction<Pol>;
 
 template<typename Coeff>
-struct RationalPolicies : qi::real_policies<Coeff> {
+struct RationalPolicies : qi::ureal_policies<Coeff> {
     template <typename It, typename Attr>
     static bool parse_nan(It&, It const&, Attr&) { return false; }
     template <typename It, typename Attr>

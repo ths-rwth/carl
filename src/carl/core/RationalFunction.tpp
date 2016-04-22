@@ -168,10 +168,8 @@ namespace carl
         if( this->isConstant() )
         {
             CoeffType c = this->mNumberQuotient;
-            CoeffType nc = CoeffType(getNum(c));
-            CoeffType dc = CoeffType(getDenom(c));
-            Pol resultNum( std::move( byInverse ? (rhs * dc - nc) : (rhs * dc + nc) ) );
-            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(dc)) ) );
+            Pol resultNum( std::move( byInverse ? (rhs * getDenom(c) - getNum(c)) : (rhs * getDenom(c) + getNum(c)) ) );
+            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(getDenom(c))) ) );
             return *this;
         }
 		mIsSimplified = false;
@@ -190,15 +188,13 @@ namespace carl
         if( this->isConstant() )
         {
             CoeffType c(this->mNumberQuotient);
-            CoeffType nc = CoeffType(getNum(c));
-            CoeffType dc = CoeffType(getDenom(c));
             Pol resultNum( rhs );
-            resultNum *= dc;
+            resultNum *= getDenom(c);
             if(byInverse)
-                resultNum -= nc;
+                resultNum -= getNum(c);
             else
-                resultNum += nc;
-            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(dc)) ) );
+                resultNum += getNum(c);
+            *this = std::move( RationalFunction<Pol, AS>( std::move(resultNum), std::move(Pol(getDenom(c))) ) );
             return *this;
         }
 		mIsSimplified = false;
