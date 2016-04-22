@@ -937,39 +937,39 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs <= lhs;
+		return rhs < lhs;
 	}
 	/// @}
 
@@ -983,39 +983,39 @@ public:
 	 */
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const Term<C>& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const Monomial::Arg& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, Variable::Arg rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const MultivariatePolynomial<C,O,P>& lhs, const C& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const Term<C>& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const Monomial::Arg& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(Variable::Arg lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	template<typename C, typename O, typename P>
 	inline bool operator>=(const C& lhs, const MultivariatePolynomial<C,O,P>& rhs) {
-		return rhs < lhs;
+		return rhs <= lhs;
 	}
 	/// @}
 	
