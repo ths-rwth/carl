@@ -3,7 +3,7 @@
 #include "core/types.h"
 
 //#include <carl/util/parser/Parser.h>
-#include >carl/util/parser/ExpressionParser.h>
+#include <carl/util/parser/ExpressionParser.h>
 
 #include <boost/variant/get.hpp>
 #include <boost/variant/static_visitor.hpp>

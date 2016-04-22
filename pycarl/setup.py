@@ -106,7 +106,7 @@ setup(name="pycarl",
       packages=['pycarl', 'pycarl.formula', 'pycarl.parse'],
       package_dir={'':'lib'},
       ext_package='pycarl',
-      ext_modules=[ext_core, ext_formula #, ext_parse
+      ext_modules=[ext_core, ext_formula, ext_parse
                    ],
       cmdclass={
         'build_ext': pycarl_build_ext,
