@@ -40,6 +40,14 @@ TEST(Formula, Construction)
 
     // Constraints can then be constructed as follows:
     Constr constraintA = Constr( lhsD, Relation::EQ );
+    EXPECT_EQ( Constr( px-Rational(1), Relation::LEQ ), Constr( x, Relation::LEQ, Rational(1) ) );
+    EXPECT_EQ( Constr( px-Rational(1), Relation::LESS ), Constr( x, Relation::LESS, Rational(1) ) );
+    EXPECT_EQ( Constr( px-Rational(1), Relation::GEQ ), Constr( x, Relation::GEQ, Rational(1) ) );
+    EXPECT_EQ( Constr( px-Rational(1), Relation::GREATER ), Constr( x, Relation::GREATER, Rational(1) ) );
+    EXPECT_EQ( Constr( px+Rational(1), Relation::LEQ ), Constr( x, Relation::LEQ, -Rational(1) ) );
+    EXPECT_EQ( Constr( px+Rational(1), Relation::LESS ), Constr( x, Relation::LESS, -Rational(1) ) );
+    EXPECT_EQ( Constr( px+Rational(1), Relation::GEQ ), Constr( x, Relation::GEQ, -Rational(1) ) );
+    EXPECT_EQ( Constr( px+Rational(1), Relation::GREATER ), Constr( x, Relation::GREATER, -Rational(1) ) );
 
     // Uninterpreted functions are
 

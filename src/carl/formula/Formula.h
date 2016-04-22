@@ -147,6 +147,7 @@ namespace carl
                 Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(Formulas<Pol>(_subasts.begin(), _subasts.end()) ) ))
             {}
             
+            // TODO: Does the following constructor anything more efficient than the one before?
             explicit Formula( FormulaType _type, FormulaSet<Pol>&& _subasts ):
                 Formula( FormulaPool<Pol>::getInstance().create( _type, std::move(Formulas<Pol>(_subasts.begin(), _subasts.end()) ) ))
             {}
