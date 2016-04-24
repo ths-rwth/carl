@@ -180,10 +180,13 @@ template<typename T>
 inline T rationalize(float n);
 
 template<typename T>
-inline T rationalize(sint n);
+inline T rationalize(int n);
 
 template<typename T>
-inline T rationalize(std::size_t n);
+inline T rationalize(uint n);
+
+template<typename T>
+inline T rationalize(sint n);
 
 template<typename T>
 inline T rationalize(const std::string& n);
@@ -203,12 +206,17 @@ inline mpq_class rationalize<mpq_class>(double d) {
 }
 
 template<>
-inline mpq_class rationalize<mpq_class>(std::size_t n) {
+inline mpq_class rationalize<mpq_class>(int n) {
 	return mpq_class(n);
 }
 
 template<>
-inline mpq_class rationalize<mpq_class>(int n) {
+inline mpq_class rationalize<mpq_class>(uint n) {
+	return mpq_class(n);
+}
+
+template<>
+inline mpq_class rationalize<mpq_class>(sint n) {
 	return mpq_class(n);
 }
 

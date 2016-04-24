@@ -11,7 +11,7 @@
 class to_object: public boost::static_visitor<py::object> {
 public:
     template<typename T>
-    py::object operator()(const T& expr) const {
+    py::object operator()(T expr) const {
         // Expr is on the stack, make a copy
         py::object res = py::cast(expr, py::return_value_policy::copy);
         if (!res) {

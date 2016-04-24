@@ -51,6 +51,7 @@ void define_monomial(py::module& m) {
         .def("__str__", &streamToString<carl::Monomial::Arg>)
 
        .def("__len__", [](const Monomial& m) { return m->nrVariables(); })
+       .def("__getitem__", [](const Monomial& m, std::size_t index) { return *(m->begin()+index); })
        .def("__iter__", [](const Monomial& m) { return py::make_iterator(m->begin(), m->end()); },
                         py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
         ;
