@@ -1,7 +1,32 @@
 language: cpp
 
-sudo: required
-dist: trusty
+#sudo: required
+#dist: trusty
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise
+      - llvm-toolchain-precise-3.5
+      - llvm-toolchain-precise-3.6
+      - llvm-toolchain-precise-3.7
+      - llvm-toolchain-precise-3.8
+    packages:
+      - cmake
+      - doxygen
+      - libboost1.55-all-dev
+      - libcln-dev
+      - libeigen3-dev
+      - libgtest-dev
+      - g++-4.8
+      - g++-4.9
+      - g++-5
+      - clang-3.4
+      - clang-3.5
+      - clang-3.6
+      - clang-3.7
+      - clang-3.8
 
 os:
   - linux
