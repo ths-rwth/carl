@@ -17,7 +17,7 @@ addons:
       - cmake
       - cmake-data
       - doxygen
-      - libboost-all-dev
+      - boost1.55
       - libcln-dev
       - libeigen3-dev
       - libgtest-dev
