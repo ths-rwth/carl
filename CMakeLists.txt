@@ -95,8 +95,8 @@ endif()
 
 # compiler flags.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3)
-		message(FATAL_ERROR " clang version must be at least 3.3!")
+	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
+		message(FATAL_ERROR " clang version must be at least 3.4!")
 	endif()
 	if (APPLE)
 		message(STATUS "Using clang on apple")
