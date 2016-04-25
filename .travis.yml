@@ -7,6 +7,7 @@ addons:
   apt:
     sources:
       - boost-latest
+      - kalakris-cmake
       - llvm-toolchain-precise
       - llvm-toolchain-precise-3.6
       - llvm-toolchain-precise-3.7
