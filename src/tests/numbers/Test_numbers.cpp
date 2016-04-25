@@ -213,11 +213,11 @@ TYPED_TEST(RationalNumbers, Constant_Neg_Pos) {
 }
 
 TYPED_TEST(RationalNumbers, ToDouble_Int) {
-  double res = carl::toDouble(TypeParam(TypeParam(1)/TypeParam(10)));
+  double res = carl::toDouble(TypeParam(1)/TypeParam(10));
   EXPECT_GE(res, 0.05);
   EXPECT_LE(res, 0.15);
 
   typedef typename carl::IntegralType<TypeParam>::type IntType;
-  EXPECT_EQ(42, carl::toInt<IntType>(TypeParam(TypeParam(42)/TypeParam(1))));
-  EXPECT_EQ(-42, carl::toInt<IntType>(TypeParam(TypeParam(42)/TypeParam(-1))));
+  EXPECT_EQ(42, carl::toInt<IntType>(TypeParam(42)/TypeParam(1)));
+  EXPECT_EQ(-42, carl::toInt<IntType>(TypeParam(42)/TypeParam(-1)));
 }
