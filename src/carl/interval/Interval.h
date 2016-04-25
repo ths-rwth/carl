@@ -852,6 +852,44 @@ namespace carl
         }
 
         /**
+         * The setter for the lower boundary of the interval.
+         * @param n Lower boundary.
+         */
+        inline void setLowerBound(const Number& n, BoundType b)
+        {
+        	if(b == BoundType::INFTY) {
+        		mLowerBoundType = b;
+        	} else {
+        		if(mUpperBoundType == BoundType::INFTY){
+        			mLowerBoundType = b;
+        			this->set(n, n);
+	        	} else {
+	        		mLowerBoundType = b;
+	        		this->set(n, mContent.upper());
+	        	}
+        	}
+        }
+
+        /**
+         * The setter for the upper boundary of the interval.
+         * @param n Upper boundary.
+         */
+        inline void setUpperBound(const Number& n, BoundType b)
+        {
+            if(b == BoundType::INFTY) {
+        		mUpperBoundType = b;
+        	} else {
+        		if(mLowerBoundType == BoundType::INFTY){
+        			mUpperBoundType = b;
+        			this->set(n, n);
+	        	} else {
+	        		mUpperBoundType = b;
+	        		this->set(mContent.lower(), n);
+	        	}
+        	}
+        }
+
+        /**
          * The setter for the lower bound type of the interval.
          * @param b Lower bound type.
          */
