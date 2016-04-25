@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ls -al /usr/include/c++/
+
 mkdir build || return 1
 cd build/ || return 1
 cmake -D DEVELOPER=ON -D USE_CLN_NUMBERS=ON ../ || return 1
