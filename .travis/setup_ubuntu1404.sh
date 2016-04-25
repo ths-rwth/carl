@@ -11,6 +11,8 @@ function install {
 
 #install cmake doxygen libboost1.55-all-dev libcln-dev libeigen3-dev libgtest-dev
 
+dpkg -s libgmp-dev
+
 if [[ ${USE} == "g++-4.8" ]]; then
 	#install gcc-4.8 g++-4.8
 	defCXX gcc-4.8 g++-4.8
