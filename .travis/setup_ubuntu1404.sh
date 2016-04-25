@@ -36,6 +36,8 @@ elif [[ ${USE} == "clang++-3.7" ]]; then
 	#sudo apt-get -qq update
 	#install clang-3.7
 	defCXX clang-3.7 clang++-3.7
+elif [[ ${USE} == "clang++-3.8" ]]; then
+	defCXX clang-3.8 clang++-3.8
 fi
 
 #sudo service postgresql stop
