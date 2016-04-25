@@ -15,7 +15,7 @@ addons:
     packages:
       - cmake
       - doxygen
-      - libboost1.55-all-dev
+      - libboost-all-dev
       - libcln-dev
       - libeigen3-dev
       - libgtest-dev
@@ -43,6 +43,7 @@ env:
     - USE=clang++-3.5
     - USE=clang++-3.6
     - USE=clang++-3.7
+    - USE=clang++-3.8
     - USE=clang++-3.5 TASK=doxygen
 
 matrix:
@@ -59,6 +60,8 @@ matrix:
       env: USE=clang++-3.6
     - os: osx
       env: USE=clang++-3.7
+    - os: osx
+      env: USE=clang++-3.8
     - os: osx
       env: USE=clang++-3.5 TASK=doxygen
 
