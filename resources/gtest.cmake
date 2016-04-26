@@ -4,9 +4,6 @@ ExternalProject_Add(
     googletest
     URL "https://github.com/google/googletest/archive/release-${gtest_VERSION}.zip"
     INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON
 )
 
 ExternalProject_Get_Property(googletest source_dir)

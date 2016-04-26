@@ -4,9 +4,6 @@ ExternalProject_Add(
     Eigen3
     URL "https://bitbucket.org/eigen/eigen/get/${Eigen3_VERSION}.zip"
 	INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON
 )
 
 ExternalProject_Get_Property(Eigen3 source_dir)
