@@ -22,6 +22,6 @@ elif [[ ${USE} == "clang++-3.4" ]]; then
 	#install clang-3.4
 	#defCXX clang-3.4 clang++-3.4
 elif [[ ${USE} == "clang++-3.5" ]]; then
-	install llvm
+	install llvm --with-clang
 	defCXX clang clang++
 fi
