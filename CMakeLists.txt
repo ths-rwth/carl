@@ -258,8 +258,8 @@ endif()
 # we only search for this libraries in the system, if we do not force using the shipped resources.
 if(NOT FORCE_SHIPPED_RESOURCES)
 	# find googletest
-	load_library(carl GTest 0.0)
-	load_library(carl Eigen3 0.0)
+	load_library(carl GTest 1.6.0)
+	load_library(carl Eigen3 3.2.0)
 endif()
 add_subdirectory(resources EXCLUDE_FROM_ALL)
 
