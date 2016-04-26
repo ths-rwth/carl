@@ -9,11 +9,11 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
-	message("-- Use system version of GTest")
+	message(STATUS "Use system version of GTest")
 else()
-	message("-- Use shipped version of GTest")
+	message(STATUS "Use shipped version of GTest")
 	include(gtest.cmake)
-	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
+	set(GTEST_LIBRARIES ${GTEST_LIBRARIES} PARENT_SCOPE)
 	set(GTEST_INCLUDE_DIR ${GTEST_INCLUDE_DIR} PARENT_SCOPE)
 endif()
 
@@ -21,22 +21,8 @@ if(EIGEN3_FOUND)
 	message(STATUS "Use system version of Eigen3")
 else()
 	message(STATUS "Use shipped version of Eigen3")
-	ExternalProject_Add(
-		eigen
-		DOWNLOAD_COMMAND ""
-		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0"
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
-		#		   -DBUILD_SHARED_LIBS:BOOL=0
-		INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
-		# Wrap download, configure and build steps in a script to log output
-		LOG_CONFIGURE ON
-		LOG_BUILD ON)
-
-
-	set( Eigen3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include")
-	message(STATUS "Found Eigen3: ${Eigen3_INCLUDE_DIR}")
+	include(eigen3.cmake)
 	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${Eigen3_INCLUDE_DIR}" PARENT_SCOPE)
-	add_dependencies(resources eigen)
 endif()
 
 if(OBTAIN_BOOST)

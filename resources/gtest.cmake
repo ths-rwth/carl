@@ -1,36 +1,18 @@
-########################### GTEST
-# Enable ExternalProject CMake module
-INCLUDE(ExternalProject)
+set(gtest_VERSION "1.7.0")
 
-# Set default ExternalProject root directory
-SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/third_party)
-
-# Add gtest
-# http://stackoverflow.com/questions/9689183/cmake-googletest
 ExternalProject_Add(
     googletest
-    URL https://github.com/google/googletest/archive/release-1.7.0.zip
-    # TIMEOUT 10
-    # # Force separate output paths for debug and release builds to allow easy
-    # # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-    # CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
-    #            -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-    #            -Dgtest_force_shared_crt=ON
-    # Disable install step
+    URL "https://github.com/google/googletest/archive/release-${gtest_VERSION}.zip"
     INSTALL_COMMAND ""
-    # Wrap download, configure and build steps in a script to log output
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
 )
 
-# Specify include dir
 ExternalProject_Get_Property(googletest source_dir)
-message(STATUS "Source dir: ${source_dir}")
 set(GTEST_INCLUDE_DIR ${source_dir}/include)
 
-
 ExternalProject_Get_Property(googletest binary_dir)
-set(GTEST_LIBRARY ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
-set(GTEST_MAIN_LIBRARY ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a)
+set(GTEST_LIBRARIES "${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a"
+
 add_dependencies(resources googletest)
