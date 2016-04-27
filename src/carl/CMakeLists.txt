@@ -25,6 +25,7 @@ set(carl_lib_sources
 )
 
 add_library(lib_carl SHARED ${carl_lib_sources})
+add_dependencies(lib_carl resources)
 set_target_properties( lib_carl PROPERTIES
 	# create *nix style library versions + symbolic links
 	VERSION "${PROJECT_VERSION}"
@@ -41,6 +42,7 @@ target_link_libraries( lib_carl ${carl_LIBRARIES_DYNAMIC} )
 
 if(BUILD_STATIC)
 	add_library(lib_carl_static STATIC ${carl_lib_sources})
+	add_dependencies(lib_carl_static resources)
 	set_target_properties( lib_carl_static PROPERTIES
 		# create *nix style library versions + symbolic links
 		VERSION "${PROJECT_VERSION}"

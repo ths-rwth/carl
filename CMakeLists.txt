@@ -223,8 +223,10 @@ if(USE_GINAC)
 endif()
 
 # CLN
-IF(USE_CLN_NUMBERS)
-	load_library(carl CLN 0.0 REQUIRED)
+if(NOT FORCE_SHIPPED_RESOURCES)
+	IF(USE_CLN_NUMBERS)
+		load_library(carl CLN 0.0 REQUIRED)
+	endif()
 endif()
 
 # GMP
@@ -261,7 +263,7 @@ if(NOT FORCE_SHIPPED_RESOURCES)
 	load_library(carl GTest 1.6.0)
 	load_library(carl Eigen3 3.2.0)
 endif()
-add_subdirectory(resources EXCLUDE_FROM_ALL)
+add_subdirectory(resources)
 
 enable_testing()
 
