@@ -3,6 +3,7 @@ from setuptools import setup
 from distutils.core import Extension
 from distutils.command.build_ext import build_ext
 import os.path
+import platform
 from glob import glob
 
 PROJECT_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
@@ -30,6 +31,10 @@ libraries = ['carl']
 extra_compile_args = ['-std=c++11']
 define_macros = []
 
+extra_link_args = []
+if platform.system() == 'Darwin':
+    extra_link_args.append('-Wl,-rpath,'+library_dirs[0])
+
 ext_core = Extension(
     name='core',
     sources=['src/mod_core.cpp'] + core_sources,
@@ -37,7 +42,8 @@ ext_core = Extension(
     libraries=libraries,
     library_dirs=library_dirs,
     extra_compile_args=extra_compile_args,
-    define_macros=define_macros
+    define_macros=define_macros,
+    extra_link_args=extra_link_args
 )
 
 ext_formula = Extension(
@@ -47,7 +53,8 @@ ext_formula = Extension(
     libraries=libraries,
     library_dirs=library_dirs,
     extra_compile_args=extra_compile_args,
-    define_macros=define_macros
+    define_macros=define_macros,
+    extra_link_args=extra_link_args
 )
 
 ext_parse = Extension(
@@ -57,7 +64,8 @@ ext_parse = Extension(
     libraries=libraries,
     library_dirs=library_dirs,
     extra_compile_args=extra_compile_args,
-    define_macros=define_macros
+    define_macros=define_macros,
+    extra_link_args=extra_link_args
 )
 
 class pycarl_build_ext(build_ext):
