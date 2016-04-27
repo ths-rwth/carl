@@ -82,9 +82,9 @@ void define_rational(py::module& m) {
         .def(py::self >= int())
         .def(py::self <= int())
 
-        .def("__int__",  [](const Rational& val) -> int {
-            return carl::toInt<carl::sint>(carl::getNum(val)) /
-                carl::toInt<carl::sint>(carl::getDenom(val));
+        .def("__int__",  [](const Rational& val) {
+            double d = carl::toDouble(val);
+            return static_cast<carl::sint>(d);
         })
         .def("__float__", static_cast<double (*)(Rational const&)>(&carl::toDouble))
         .def("__str__", [](Rational const& r) {return carl::toString(r, true);})
@@ -99,8 +99,9 @@ void define_rational(py::module& m) {
             return carl::toInt<carl::sint>(carl::getDenom(val));
         })
 
-        .def("__getstate__", [](const Rational& val) {return std::pair<carl::sint, carl::sint>(carl::toInt<carl::sint>(carl::getNum(val)), carl::toInt<carl::sint>(carl::getDenom(val)));})
+        .def("__getstate__", [](const Rational& val) {
+            return std::pair<std::string, std::string>(carl::toString(carl::getNum(val)), carl::toString(carl::getDenom(val)));})
 
-        .def("__setstate__", [](Rational& val, std::pair<carl::sint, carl::sint> data) {Rational res = carl::rationalize<Rational>(data.first) / carl::rationalize<Rational>(data.second); new (&val) Rational(res); })
+        .def("__setstate__", [](Rational& val, std::pair<std::string, std::string> data) {Rational res = carl::rationalize<Rational>(data.first) / carl::rationalize<Rational>(data.second); new (&val) Rational(res); })
         ;
 }
