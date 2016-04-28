@@ -7,69 +7,34 @@ INCLUDE(ExternalProject)
 # Set default ExternalProject root directory
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
+if(CLN_FOUND)
+	set(CLN_LIBRARIES ${CLN_LIBRARIES} PARENT_SCOPE)
+	message(STATUS "Use system version of CLN")
+else()
+	message(STATUS "Use shipped version of CLN")
+	include(cln.cmake)
+	set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC};${CLN_LIBRARIES_DYNAMIC}")
+	set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC};${CLN_LIBRARIES_STATIC}")
+	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${CLN_INCLUDE_DIR}")
+endif()
+
 if(GTEST_FOUND)
 	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
-	message("-- Use system version of GTest")
+	message(STATUS "Use system version of GTest")
 else()
-	# Create configure command dependend on compiler
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-            set (cmake_command -Dgtest_force_shared_crt=ON -DCXX=/usr/bin/clang++ -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_CXX_FLAGS=-DGTEST_USE_OWN_TR1_TUPLE=1 )
-	else()
-            set(cmake_command -Dgtest_force_shared_crt=ON)
-	endif()
-	# Add gtest (local build)
-	message("-- Use shipped version of GTest")
-	ExternalProject_Add(
-		googletest
-		#For downloads (may be useful later!)
-		#SVN_REPOSITORY http://googletest.googlecode.com/svn/trunk/
-		#TIMEOUT 10
-		DOWNLOAD_COMMAND ""
-		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/gtest-1.6.0"
-		# Force separate output paths for debug and release builds to allow easy
-		# identification of correct lib in subsequent TARGET_LINK_LIBRARIES 
-		CMAKE_ARGS ${cmake_command}
-		# Disable install step
-		INSTALL_COMMAND ""
-		# Wrap download, configure and build steps in a script to log output
-		LOG_CONFIGURE ON
-		LOG_BUILD ON)
-
-	# Specify include dir
-	ExternalProject_Get_Property(googletest source_dir)
-	set(GTEST_INCLUDE_DIR ${source_dir}/include PARENT_SCOPE)
-	
-	# Specify MainTest's link libraries
-	ExternalProject_Get_Property(googletest binary_dir)
-	
-	if (WIN32)
-		set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} PARENT_SCOPE)
-	else()
-		set(GTEST_LIBRARIES ${binary_dir}/libgtest.a ${binary_dir}/libgtest_main.a PARENT_SCOPE)
-	endif()
-	add_dependencies(resources googletest)
+	message(STATUS "Use shipped version of GTest")
+	include(gtest.cmake)
+	message(STATUS "From ${GTEST_LIBRARIES}")
+	set(GTEST_LIBRARIES "${GTEST_LIBRARIES}" PARENT_SCOPE)
+	set(GTEST_INCLUDE_DIR ${GTEST_INCLUDE_DIR} PARENT_SCOPE)
 endif()
 
 if(EIGEN3_FOUND)
 	message(STATUS "Use system version of Eigen3")
 else()
 	message(STATUS "Use shipped version of Eigen3")
-	ExternalProject_Add(
-		eigen
-		DOWNLOAD_COMMAND ""
-		SOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0"
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
-		#		   -DBUILD_SHARED_LIBS:BOOL=0
-		INSTALL_DIR ${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build
-		# Wrap download, configure and build steps in a script to log output
-		LOG_CONFIGURE ON
-		LOG_BUILD ON)
-
-
-	set( Eigen3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/resources/eigen-3.2.0/build/include")
-	message(STATUS "Found Eigen3: ${Eigen3_INCLUDE_DIR}")
-	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${Eigen3_INCLUDE_DIR}" PARENT_SCOPE)
-	add_dependencies(resources eigen)
+	include(eigen3.cmake)
+	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${Eigen3_INCLUDE_DIR}")
 endif()
 
 set(pybind11_incdir "${CMAKE_CURRENT_SOURCE_DIR}/pybind11/include" PARENT_SCOPE)
@@ -119,3 +84,7 @@ if(OBTAIN_BOOST)
 
   add_dependencies(resources boost)
 endif()
+
+set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS}" PARENT_SCOPE)
+set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC}" PARENT_SCOPE)
+set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC}" PARENT_SCOPE)

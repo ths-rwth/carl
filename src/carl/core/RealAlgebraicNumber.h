@@ -241,8 +241,9 @@ public:
 	bool equal(const RealAlgebraicNumber<Number>& n) const;
 	bool less(const RealAlgebraicNumber<Number>& n) const;
 	std::pair<bool,bool> checkOrder(const RealAlgebraicNumber<Number>& n) const;
+private:
 	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
-	
+public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 		if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
