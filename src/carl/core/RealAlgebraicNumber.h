@@ -124,6 +124,11 @@ public:
 		return *this;
 	}
 	
+	std::size_t size() const {
+		if (isNumeric()) return carl::bitsize(mValue);
+		else return carl::bitsize(lower()) + carl::bitsize(upper()) * getPolynomial().degree();
+	}
+	
 	/**
 	 * @return the flag marking whether the real algebraic number stems from a root computation or not
 	 */
