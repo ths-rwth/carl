@@ -5,6 +5,7 @@ add_executable( runCADTests
     Test_Constraint.cpp
     Test_EliminationSet.cpp
     Test_SampleSet.cpp
+    Test_Thom.cpp
 )
 cotire(runCADTests)
 
