@@ -5,23 +5,51 @@
  * Created on 2. Mai 2016, 22:06
  */
 
+/*
+ * IDEAS for IMPROVEMENTS
+ * - do the linear algebra on integers (possible?)
+ * - is kronecker product distributive?
+ * - "kartesian product" operator for list
+ * - don't iterate from back to front?
+ * 
+ */
+#pragma once
+
 #include <Eigen/Dense>
 #include <cmath>
 
 #include "TarskiQuery.h"
 
-#pragma once
+
+#define VERBOSE
+#ifdef VERBOSE
+        #define PRINTV(x) std::cout << #x << " = " << x << std::endl;
+        #define PRINTV2(x) std::cout << #x << " = " << std::endl << x << std::endl;
+        #define PRINT(x) std::cout << x << std::endl;
+        #define LINE std::cout << "-----------------------------------------------" << std::endl;
+#else
+        #define PRINTV(x)
+        #define PRINTV2(x)
+        #define PRINT
+        #define LINE
+#endif
+
+
 
 using namespace Eigen;
 using namespace carl;
 
-// todo make this a global (or static) constant and give it a better name
-Matrix3f getStandardMatrixInverse() {
-        Matrix3f res;
-        res << 1, 1, 1,
-               0, 1, -1,
-               0, 1, 1;
-        return res.inverse();
+MatrixXf adaptedMat(const std::vector<std::vector<unsigned>>& A, const std::vector<SignCondition>& sign);
+
+const std::vector<SignCondition> basicSignCondition({SignCondition(1, Sign::ZERO), SignCondition(1, Sign::POSITIVE), SignCondition(1, Sign::NEGATIVE)});
+const std::vector<std::vector<unsigned>> basicAdaptedList({std::vector<unsigned>(1, 0), std::vector<unsigned>(1, 1), std::vector<unsigned>(1, 2)});
+const Matrix3f basicMatrixInverse = adaptedMat(basicAdaptedList, basicSignCondition).inverse();
+
+template<typename T>
+std::vector<T> operator*(const T elem, const std::vector<T>& vec) {
+        std::vector<T> res(vec);
+        res.insert(res.begin(), elem);
+        return res;
 }
 
 float sigmaToTheAlpha(const std::vector<unsigned>& alpha, const SignCondition& sigma) {
@@ -44,9 +72,7 @@ MatrixXf adaptedMat(const std::vector<std::vector<unsigned>>& A, const std::vect
         return res;
 }
 
-#define LINE std::cout << "-----------------------------------------------" << std::endl;
-#define PRINT(x) std::cout << #x << " = " << x << std::endl;
-#define PRINT2(x) std::cout << #x << " = " << std::endl << x << std::endl;
+
 
 // https://forum.kde.org/viewtopic.php?f=74&t=50952
 MatrixXf kroneckerProduct(const MatrixXf& m1, const MatrixXf& m2) {
@@ -59,19 +85,17 @@ MatrixXf kroneckerProduct(const MatrixXf& m1, const MatrixXf& m2) {
         return m3;
 }
 
-const Matrix3f mmm = getStandardMatrixInverse();
-
 template<typename Coeff>
-VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P, 
-                        const std::vector<std::vector<unsigned>>& B, 
+VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
+                        const std::vector<std::vector<unsigned>>& B,
                         const std::vector<std::vector<unsigned>>& Ada,
                         const UnivariatePolynomial<Coeff>& z) {
         // asserts
         assert(B.front().size() == 1); // must hold for all vectors in B
         assert(P.size() == Ada.front().size() + 1);
         
-        std::cout << "Input to compute_dprime:" << std::endl;
-        PRINT(P); PRINT(B); PRINT(Ada);
+        PRINT("Input to compute_dprime:");
+        PRINTV(P); PRINTV(B); PRINTV(Ada);
         
         // first calculate the list of mappings B x Ada
         std::vector<std::vector<unsigned>> bxada;
@@ -83,7 +107,7 @@ VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
                         bxada.push_back(newMapping);
                 }
         }
-        PRINT(bxada);
+        PRINTV(bxada);
         assert(P.size() == bxada.front().size());
         VectorXf res(bxada.size()); // we already know the length of the resulting vector
         for(unsigned i = 0; i < bxada.size(); i++) {
@@ -92,13 +116,12 @@ VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
                 for(unsigned j = 0; j < P.size(); j++) {
                         poly *= P[j].pow(bxada[i][j]);                       
                 }
-                PRINT(poly);
+                PRINTV(poly);
                 int taq = tarskiQuery(poly, z);
-                //std::cout << "taq = " << taq << std::endl;
                 res(i) = (float)taq;
                  
         }
-        PRINT2(res);
+        PRINTV2(res);
         LINE;
         return res;
 }
@@ -109,7 +132,7 @@ bool extends(const SignCondition& tau, const SignCondition& sigma) {
         for(unsigned i = 1; i < tau.size(); i++) {
                 if(tau[i] != sigma[i-1]) return false;
         }
-        std::cout << "EXTENDS: " << tau << " extends " << sigma << std::endl;
+        PRINT(tau << " extends " << sigma);
         return true;
 }
 
@@ -140,9 +163,9 @@ std::vector<std::vector<unsigned>> firstNLines(const unsigned n, const MatrixXf&
                         firstLines(i, j) = mat(i, j);
                 }
         }
-        PRINT2(firstLines);
+        PRINTV2(firstLines);
         FullPivLU<MatrixXf> dec(firstLines);
-        PRINT(dec.rank());
+        PRINTV(dec.rank());
         // not sure if it is meant to be that the first n lines are always linearly independent
         // or we have to find the "first" lin. ind. n lines.
         assert(dec.rank() == n);
@@ -157,7 +180,7 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
         assert(sign.front().size() > 0);
         // TODO implement for the case where Q is empty
         unsigned r_1 = (unsigned)sign.size();
-        PRINT(r_1);
+        PRINTV(r_1);
         std::vector<std::vector<unsigned>> res(ada);
         for(auto& a : res) {
                 a.insert(a.begin(), 0); // NOT SURE WHICH ONE!!
@@ -169,28 +192,24 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
                 // compute r_2
                 std::vector<SignCondition> sign2 = calculateR(2, sign, newSign);
                 unsigned r_2 = (unsigned)sign2.size();
-                PRINT(sign2);
-                PRINT(r_2);
+                PRINTV(sign2);
+                PRINTV(r_2);
                 MatrixXf mat2 = adaptedMat(ada, sign2);
-                PRINT2(mat2);
+                PRINTV2(mat2);
                 std::vector<std::vector<unsigned>> A_2 = firstNLines(r_2, mat2, ada);
-                for(const auto& a : A_2) {
-                        std::vector<unsigned> tmp(a);
-                        tmp.insert(tmp.begin(), 1);
-                        res.push_back(tmp);
+                for(const std::vector<unsigned>& a : A_2) {
+                        res.push_back((unsigned)1 * a);
                 }
-                PRINT(res);
+                PRINTV(res);
                 if((unsigned)newSign.size() != r_1 + r_2) {
                         std::vector<SignCondition> sign3 = calculateR(3, sign, newSign);
                         unsigned r_3 = (unsigned)sign3.size();
-                        PRINT(r_3);
+                        PRINTV(r_3);
                         std::vector<std::vector<unsigned>> A_3 = firstNLines(r_3, mat2, ada);
                         for(const auto& a : A_3) {
-                                std::vector<unsigned> tmp(a);
-                                tmp.insert(tmp.begin(), 2);
-                                res.push_back(tmp);
+                                res.push_back((unsigned)2 * a);
                         }
-                        PRINT(res);
+                        PRINTV(res);
                 }       
         }       
         return res;
@@ -201,69 +220,62 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
 
 template<typename Coeff>
 std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z) {
-        std::cout << "input to signDetermination: " << std::endl;
-        PRINT(p); PRINT(z);
+        PRINT("Input to signDetermination:");
+        PRINTV(p); PRINTV(z);
         assert(!z.isZero()); // because otherwise the set Zeros(z) is infinite
-        const unsigned s = (unsigned)p.size();
-        assert(s > 0);
+        assert((unsigned)p.size() > 0);
                
         int r = tarskiQuery(p.front().one(), z); // this is just the total number of roots of z
-        PRINT(r);
+        assert(r >= 0);
+        PRINTV(r);
         if(r == 0) return std::vector<SignCondition>(); // then z has no roots, so there are no realisable sign conditions on the roots of z
         LINE;
         
         // main loop
         std::vector<SignCondition> lastSign; // this is an "ordered set" (lexicografically with 0 < 1 < -1)
         std::vector<std::vector<unsigned>> lastAda;
-        for(unsigned i = s; i >= 1; i--) {
-                std::cout << "i = " << i << std::endl;
+        for(unsigned i = (unsigned)p.size() - 1; i >= 0; i--) {
+                PRINTV(i);
                 LINE;
                 std::vector<SignCondition> sign; // our first aim in this step is to compute this
                 
-                int taq0 = r;
-                int taq1 = tarskiQuery(p[i-1], z);
-                int taq2 = tarskiQuery(p[i-1] * p[i-1], z);
-                Vector3f t((float)taq0, (float)taq1, (float)taq2); // right hand side of equation system
-                PRINT2(t);
-                Vector3f c = (Vector3f) (mmm * t);
-                PRINT2(c);
+                int taq1 = tarskiQuery(p[i], z);
+                int taq2 = tarskiQuery(p[i] * p[i], z);
+                assert(std::abs(taq1) <= r && std::abs(taq2) <= r);
+                Vector3f t((float)r, (float)taq1, (float)taq2); // right hand side of equation system
+                PRINTV2(t);
+                Vector3f c = (Vector3f) (basicMatrixInverse * t);
+                PRINTV2(c);
                 
                 if(c(0) != 0.0f) sign.push_back(SignCondition(1, Sign::ZERO));
                 if(c(1) != 0.0f) sign.push_back(SignCondition(1, Sign::POSITIVE));
                 if(c(2) != 0.0f) sign.push_back(SignCondition(1, Sign::NEGATIVE));
-                std::cout << "sign = " << sign << std::endl;
+                PRINTV(sign);
                 assert(sign.size() > 0 && sign.size() <= 3);
                 
-                std::vector<std::vector<unsigned>> B;
-                B.push_back(std::vector<unsigned>(1, 0));
-                if(sign.size() > 1) {
-                        B.push_back(std::vector<unsigned>(1, 1));
-                        if(sign.size() > 2) {
-                                B.push_back(std::vector<unsigned>(1, 2));
-                        }
-                }
+                std::vector<std::vector<unsigned>> B(basicAdaptedList.begin(), basicAdaptedList.begin() + sign.size());
                 assert(B.size() == sign.size());
-                std::cout << "B = " << B << std::endl;
+                PRINTV(B);
                 MatrixXf M = adaptedMat(B, sign);
-                std::cout << "M = " << std::endl << M << std::endl;
+                PRINTV(M);
                 
                 LINE;
                 
-                if(i == s) {
+                if(i == (unsigned)p.size() - 1) {
                         lastSign = sign;
                         lastAda = B;
                 }
-                else { // i < s
-                        VectorXf d_prime = compute_dprime(std::vector<UnivariatePolynomial<Coeff>>(p.begin() + i - 1, p.end()), B, lastAda, z);
+                else { // i < p.size()
+                        VectorXf d_prime = compute_dprime(std::vector<UnivariatePolynomial<Coeff>>(p.begin() + i, p.end()), B, lastAda, z);
                         MatrixXf M_prime = kroneckerProduct(adaptedMat(lastAda, lastSign), M);
-                        PRINT2(M_prime);
-                        assert(M_prime.rows() == M_prime.cols() && M_prime.rows() == d_prime.size());
+                        PRINTV2(M_prime);
+                        assert(M_prime.rows() == M_prime.cols() && M_prime.rows() == d_prime.size()); // assert square matrix and d_prime has correct length
                         
                         // do the linear algebra stuff
-                        assert(FullPivLU<MatrixXf>(M_prime).rank() == M_prime.cols());
+                        assert(FullPivLU<MatrixXf>(M_prime).rank() == M_prime.cols()); // assert M_prime is invertible
                         PartialPivLU<MatrixXf> dec(M_prime);
                         VectorXf c_prime = dec.solve(d_prime);
-                        PRINT2(c_prime);
+                        PRINTV2(c_prime);
                         
                         std::vector<SignCondition> newSign;
                         assert(c_prime.size() == sign.size() * lastSign.size());
@@ -271,26 +283,24 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
                         for(unsigned i = 0; i < lastSign.size(); i++) {
                                 for(unsigned j = 0; j < sign.size(); j++) {
                                        if((int)c_prime(k) != 0) {
-                                               SignCondition newCond(sign[j]);
-                                               newCond.insert(newCond.end(), lastSign[i].begin(), lastSign[i].end());
-                                               newSign.push_back(newCond);
+                                               newSign.push_back(SignCondition(sign[j].front() * lastSign[i]));
                                        }
                                        k++;
                                 }
                         }
-                        PRINT(newSign);
-                        if(i == 1) { // then we are done!
+                        PRINTV(newSign);
+                        if(i == 0) { // then we are done!
                                 return newSign;
                         }
                         
                         LINE;
-                        std::cout << "compute the ADAPTED FAMILY now ... inputs to this are:" << std::endl;
-                        PRINT(lastSign);
-                        PRINT(newSign);
-                        PRINT(lastAda);
+                        PRINT("compute the ADAPTED FAMILY now ... inputs to this are:");
+                        PRINTV(lastSign);
+                        PRINTV(newSign);
+                        PRINTV(lastAda);
                         
                         std::vector<std::vector<unsigned>> newAda = adaptedFamily(lastSign, newSign, lastAda);
-                        PRINT(newAda);
+                        PRINTV(newAda);
                         
                         LINE;
                         
