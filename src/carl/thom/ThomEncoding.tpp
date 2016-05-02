@@ -260,6 +260,7 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
                         assert(M_prime.rows() == M_prime.cols() && M_prime.rows() == d_prime.size());
                         
                         // do the linear algebra stuff
+                        assert(FullPivLU<MatrixXf>(M_prime).rank() == M_prime.cols());
                         PartialPivLU<MatrixXf> dec(M_prime);
                         VectorXf c_prime = dec.solve(d_prime);
                         PRINT2(c_prime);
