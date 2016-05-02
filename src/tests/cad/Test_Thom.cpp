@@ -71,6 +71,7 @@ TEST(Thom, TarskiQuery) {
     // TODO add some more tests here
 }
 
+
 TEST(Thom, SignDetermination) {
     Variable x = freshRealVariable("x");
     
@@ -87,7 +88,15 @@ TEST(Thom, SignDetermination) {
     
     UnivariatePolynomial<Rational> a(x, {(Rational)-2, (Rational)0, (Rational)1});
     UnivariatePolynomial<Rational> b(x, {(Rational)2, (Rational)1});
-    UnivariatePolynomial<Rational> c = a*b;
-    std::vector<UnivariatePolynomial<Rational>> deriv({c.derivative(), c.derivative(2), c.derivative(3), c.derivative(4), c.derivative(4)});
-    signDetermination(deriv, c);
+    UnivariatePolynomial<Rational> c = a*a*b;
+    std::vector<UnivariatePolynomial<Rational>> deriv({c.derivative(), c.derivative(2), c.derivative(3), c.derivative(4), c.derivative(5)});
+    //signDetermination(deriv, c);
+    
+    z = UnivariatePolynomial<Rational>(x, {(Rational)0, (Rational)-1, (Rational)0, (Rational)1});
+    p1 = UnivariatePolynomial<Rational>(x, {(Rational)2, (Rational)1});
+    p2 = UnivariatePolynomial<Rational>(x, {(Rational)-2, (Rational)1});
+    p3 = UnivariatePolynomial<Rational>(x, {(Rational)0, (Rational)-1});
+    p4 = z.one();
+    p = std::vector<UnivariatePolynomial<Rational>>({p4, p3, p2, p1});
+    signDetermination(p, z);
 }
