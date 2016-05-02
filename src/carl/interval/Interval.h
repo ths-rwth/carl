@@ -861,11 +861,12 @@ namespace carl
         		mLowerBoundType = b;
         	} else {
         		if(mUpperBoundType == BoundType::INFTY){
-        			mLowerBoundType = b;
         			this->set(n, n);
+        			mLowerBoundType = b;
+        			mUpperBoundType = BoundType::INFTY;
 	        	} else {
-	        		mLowerBoundType = b;
 	        		this->set(n, mContent.upper());
+	        		mLowerBoundType = b;
 	        	}
         	}
         }
@@ -880,11 +881,12 @@ namespace carl
         		mUpperBoundType = b;
         	} else {
         		if(mLowerBoundType == BoundType::INFTY){
-        			mUpperBoundType = b;
         			this->set(n, n);
+        			mUpperBoundType = b;
+        			mLowerBoundType = BoundType::INFTY;
 	        	} else {
-	        		mUpperBoundType = b;
 	        		this->set(mContent.lower(), n);
+	        		mUpperBoundType = b;
 	        	}
         	}
         }
