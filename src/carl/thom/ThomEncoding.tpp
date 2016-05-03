@@ -39,6 +39,34 @@
 using namespace Eigen;
 using namespace carl;
 
+// see Algorithms for Real Algebraic Geometry, Proposition 2.28, p. 42
+// this is a friend of class thom encoding
+template<typename C>
+bool operator>(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+        assert(lhs.p != nullptr && rhs.p != nullptr);
+        if(*(lhs.p) == *(rhs.p)) {
+                assert(lhs.signs.size() == rhs.signs.size());
+                for(unsigned k = lhs.signs.size() - 1; k >= 0; k--) {
+                        if(lhs.signs[k] != rhs.signs[k]) {
+                                Sign equalSign = k != lhs.signs.size() ? lhs.signs[k+1] : sgn(*(lhs.p).lcoeff());
+                                assert(equalSign != Sign::ZERO);
+                                if(equalSign == Sign::POSITIVE) {
+                                        return lhs.signs[k] > rhs.signs[k];
+                                }
+                                else { // equalSign == Sign::NEGATIVE
+                                        return lhs.signs[k] < rhs.signs[k];
+                                }
+                        }
+                }
+                // in this case they are actually equal
+                return false;
+        }
+        else {
+                assert(false);
+        }
+        return false;
+}
+
 MatrixXf adaptedMat(const std::vector<std::vector<unsigned>>& A, const std::vector<SignCondition>& sign);
 
 const std::vector<SignCondition> basicSignCondition({SignCondition(1, Sign::ZERO), SignCondition(1, Sign::POSITIVE), SignCondition(1, Sign::NEGATIVE)});

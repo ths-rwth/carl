@@ -11,6 +11,11 @@
 #include "../core/UnivariatePolynomial.h"
 #include "../core/Sign.h"
 
+/*
+ * TODO list
+ * - put sign determinatation in its own header
+ */
+
 namespace carl {
 
 // a list of sign conditions that a list of polynomials realizes at a point
@@ -75,7 +80,6 @@ public:
         
         template<typename C>
         friend bool operator>(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-                return lhs >= rhs && lhs != rhs;
         }
         
         template<typename C>
