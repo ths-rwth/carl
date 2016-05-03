@@ -19,6 +19,7 @@ typedef std::vector<Sign> SignCondition; // a list of sign conditions that a lis
 
 /*
  * Calculates the set of sign conditions realized by the polynomials in the list p on the roots of z.
+ * This is essential to many algorithms dealing with thom encondings of RANs.
  */
 template<typename Coeff>
 std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z);
