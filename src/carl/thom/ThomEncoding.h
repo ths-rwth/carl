@@ -47,13 +47,18 @@ private:
          * The list of sign conditions realized by the derivatives
          * We only need to store the sign up to the P^(deg(P) - 1) since P^(deg(P)) is constant
          */
-        std::vector<SignCondition> signs;
+        SignCondition signs;
         
 public:
         /*
          * some default constructor (needed?)
          */
-        ThomEncoding();
+        //ThomEncoding();
+        
+        /*
+         * Constructs a thom encoding with the given polynomial and the sign conditions
+         */
+        ThomEncoding(const std::shared_ptr<UnivariatePolynomial<Coeff>>& ptr, const SignCondition& s);
         
         /*
          * Constructs a trivial thom encoding for the given rational number.
@@ -68,31 +73,53 @@ public:
                 
         // COPY CONSTRUCTOR NEEDED??
         
+        /*
+         * checks some basic invariants of a thom encoding object
+         */
+        bool isConsistent() const {
+                if(p == nullptr) {                              // p not initialized
+                        return signs.size() == 0;
+                }
+                if(tarskiQuery(p->one(), *p) == 0) {            // p has no roots - this is not ok
+                        return false;
+                }
+                if(signs.size() != p->degree() - 1) {           // SignCondition has correct number of elements
+                        return false;
+                }
+                return true;
+        }
         
+        /*
+         * Returns the sign of the n-th derivative P^(n) (counting starts from 1)
+         */
+        Sign operator[](const uint n) const;
         
         template<typename C>
         friend bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
         template<typename C>
-        friend bool operator<=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-                return lhs < rhs || lhs == rhs;
-        }
+        friend bool operator<=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
         template<typename C>
-        friend bool operator>(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-        }
+        friend bool operator>(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
         template<typename C>
-        friend bool operator>=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-                return !(lhs < rhs);
-        }
+        friend bool operator>=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
         template<typename C>
         friend bool operator==(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
         template<typename C>
-        friend bool operator!=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
-                return !(lhs == rhs);
+        friend bool operator!=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
+        
+        /*
+         * output operator
+         */
+        template <typename C>
+	friend std::ostream& operator<<(std::ostream& os, const ThomEncoding<C>& rhs) {
+                assert(rhs.p != nullptr);
+                os << "(" << *(rhs.p) << ", " << rhs.signs << ")" << std::endl;
+                return os;
         }
 };
 

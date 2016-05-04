@@ -39,22 +39,44 @@
 using namespace Eigen;
 using namespace carl;
 
+template<typename Coeff>
+ThomEncoding<Coeff>::ThomEncoding(const std::shared_ptr<UnivariatePolynomial<Coeff>>& ptr, const SignCondition& s) : 
+        signs(s),
+        p(ptr)
+{
+        assert(isConsistent());
+}
+
+template<typename Coeff>
+Sign ThomEncoding<Coeff>::operator[](const uint n) const {
+        assert(n >= 1);
+        if(n <= (unsigned)signs.size()) {
+                return signs[n-1];
+        }
+        else if(n == (unsigned)signs.size() + 1) {
+                return Sign(sgn(p->lcoeff()));
+        }
+        else {
+                return Sign::ZERO;
+        }
+}
+
 // see Algorithms for Real Algebraic Geometry, Proposition 2.28, p. 42
 // this is a friend of class thom encoding
 template<typename C>
-bool operator>(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) {
+bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) { // THIS IS ACTUALLY <
         assert(lhs.p != nullptr && rhs.p != nullptr);
         if(*(lhs.p) == *(rhs.p)) {
                 assert(lhs.signs.size() == rhs.signs.size());
-                for(unsigned k = lhs.signs.size() - 1; k >= 0; k--) {
-                        if(lhs.signs[k] != rhs.signs[k]) {
-                                Sign equalSign = k != lhs.signs.size() ? lhs.signs[k+1] : sgn(*(lhs.p).lcoeff());
+                for(uint k = lhs.p->degree(); k > 0; k--) {
+                        if(lhs[k] != rhs[k]) {
+                                Sign equalSign = lhs[k+1];
                                 assert(equalSign != Sign::ZERO);
                                 if(equalSign == Sign::POSITIVE) {
-                                        return lhs.signs[k] > rhs.signs[k];
+                                        return lhs[k] > rhs[k];
                                 }
                                 else { // equalSign == Sign::NEGATIVE
-                                        return lhs.signs[k] < rhs.signs[k];
+                                        return lhs[k] < rhs[k];
                                 }
                         }
                 }

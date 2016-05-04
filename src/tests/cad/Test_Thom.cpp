@@ -2,6 +2,7 @@
 
 #include "carl/thom/ThomEncoding.h"
 #include "carl/thom/TarskiQuery.h"
+#include "carl/thom/ThomRootFinder.h"
 #include "carl/core/VariablePool.h"
 
 #include "../Common.h"
@@ -99,4 +100,15 @@ TEST(Thom, SignDetermination) {
     p4 = z.one();
     p = std::vector<UnivariatePolynomial<Rational>>({p4, p3, p2, p1});
     signDetermination(p, z);
+}
+
+TEST(Thom, RootFinder) {
+    Variable x = freshRealVariable("x");
+    
+    UnivariatePolynomial<Rational> a(x, {(Rational)-2, (Rational)0, (Rational)1});
+    UnivariatePolynomial<Rational> b(x, {(Rational)2, (Rational)1});
+    UnivariatePolynomial<Rational> c = a*b;
+    
+    realRoots(c);
+    
 }
