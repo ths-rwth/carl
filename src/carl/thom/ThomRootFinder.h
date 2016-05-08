@@ -11,6 +11,7 @@
 
 #include "ThomEncoding.h"
 #include "../interval/Interval.h"
+#include "ThomUtil.h"
 
 
 namespace carl {
@@ -32,19 +33,19 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         assert(derivatives.size() == polynomial.degree() - 1);
         
         // run the core algorithm on p and its derivatives
-        std::vector<SignCondition> signConds = signDetermination(derivatives, polynomial);
+        std::vector<SignCondition> signConds = signDetermination(derivatives, polynomial, true);
         
         std::vector<ThomEncoding<Coeff>> res;
         res.reserve(signConds.size());
         
         // this pointer cant be a local variable??
-        std::shared_ptr<UnivariatePolynomial<Coeff>>* ptr = new std::shared_ptr<UnivariatePolynomial<Coeff>>();
-        *ptr = std::make_shared<UnivariatePolynomial<Coeff>>(polynomial);
+        std::shared_ptr<UnivariatePolynomial<Coeff>> ptr = std::make_shared<UnivariatePolynomial<Coeff>>(polynomial);
         
         for(const SignCondition& s : signConds) {
-                ThomEncoding<Coeff> t(*ptr, s);
+                ThomEncoding<Coeff> t(ptr, s);
                 res.push_back(t);
         }
+        // sort the roots in an ascending order (using operator <)
         std::sort(res.begin(), res.end());
         
         std::cout << "Root finder result: " << res << std::endl;

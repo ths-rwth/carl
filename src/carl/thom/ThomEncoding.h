@@ -27,7 +27,7 @@ typedef std::vector<Sign> SignCondition;
  * This is essential to many algorithms dealing with thom encondings of RANs.
  */
 template<typename Coeff>
-std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z);
+std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z, const bool = false);
 
 /*
  *
@@ -74,7 +74,7 @@ public:
         // COPY CONSTRUCTOR NEEDED??
         
         /*
-         * checks some basic invariants of a thom encoding object
+         * checks some basic invariants of a thom encoding object (for debugging purpose)
          */
         bool isConsistent() const {
                 if(p == nullptr) {                              // p not initialized
@@ -90,13 +90,38 @@ public:
         }
         
         /*
+         * Return true if and only if the given rational number is encoded by this Thom encoding.
+         * (for debugging purposes)
+         */
+        bool represents(Coeff rational) const {
+                std::vector<UnivariatePolynomial<Coeff>> derivatives;
+                derivatives.reserve(p->degree() - 1);
+                for(uint n = 1; n < p->degree(); n++ ) {
+                        derivatives.push_back(p->derivative(n));
+                }
+                assert(derivatives.size() == p->degree() - 1);
+                assert(derivatives.size() == signs.size());
+                for(uint n = 1; n < derivatives.size(); n++) {
+                        if(Sign(sgn(derivatives[n].evaluate(rational))) != signs[n]) {
+                                return false;
+                        }
+                }
+                return true;
+        }
+        
+        /*
          * Returns the sign of the n-th derivative P^(n) (counting starts from 1)
          */
         Sign operator[](const uint n) const;
         
+        /*
+         * Compares the RANs represented by the given Thom ecodings
+         * This is quite expensive if the underlying polynomials are different.
+         */
         template<typename C>
         friend bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
+        // TODO implement these operators
         template<typename C>
         friend bool operator<=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         

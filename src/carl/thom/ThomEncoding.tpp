@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include "TarskiQuery.h"
+#include "ThomUtil.h"
 
 
 #define VERBOSE
@@ -38,6 +39,7 @@
 
 using namespace Eigen;
 using namespace carl;
+
 
 template<typename Coeff>
 ThomEncoding<Coeff>::ThomEncoding(const std::shared_ptr<UnivariatePolynomial<Coeff>>& ptr, const SignCondition& s) : 
@@ -64,7 +66,7 @@ Sign ThomEncoding<Coeff>::operator[](const uint n) const {
 // see Algorithms for Real Algebraic Geometry, Proposition 2.28, p. 42
 // this is a friend of class thom encoding
 template<typename C>
-bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) { // THIS IS ACTUALLY <
+bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) { 
         assert(lhs.p != nullptr && rhs.p != nullptr);
         if(*(lhs.p) == *(rhs.p)) {
                 assert(lhs.signs.size() == rhs.signs.size());
@@ -73,10 +75,10 @@ bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) { // THIS
                                 Sign equalSign = lhs[k+1];
                                 assert(equalSign != Sign::ZERO);
                                 if(equalSign == Sign::POSITIVE) {
-                                        return lhs[k] > rhs[k];
+                                        return lhs[k] < rhs[k];
                                 }
                                 else { // equalSign == Sign::NEGATIVE
-                                        return lhs[k] < rhs[k];
+                                        return lhs[k] > rhs[k];
                                 }
                         }
                 }
@@ -84,7 +86,28 @@ bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs) { // THIS
                 return false;
         }
         else {
-                assert(false);
+                // calculate the sign condition realized by rhs on Der(lhs),Der(rhs')
+                std::vector<UnivariatePolynomial<C>> der1 = der(*(lhs.p));
+                std::vector<UnivariatePolynomial<C>> der2 = der(rhs.p->derivative());
+                der1.insert(der1.end(), der2.begin(), der2.end());
+                der1.pop_back(); // lalala
+                PRINTV(der1);
+                std::vector<SignCondition> signConds = signDetermination(der1, *(rhs.p));
+                SignCondition wanted; // linear search here...
+                bool succes = false;
+                for(const SignCondition& c : signConds) {
+                        if(extends(c, rhs.signs)) {
+                                wanted = c;
+                                succes = true;
+                                break;
+                        }
+                }
+                assert(succes);
+                wanted.erase(wanted.begin() + lhs.p->degree() + 1, wanted.end());
+                PRINTV(wanted);
+                PRINTV(lhs.signs);
+                assert(wanted.size() == lhs.signs.size() + 2);
+                PRINTV(wanted);
         }
         return false;
 }
@@ -139,7 +162,8 @@ template<typename Coeff>
 VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
                         const std::vector<std::vector<unsigned>>& B,
                         const std::vector<std::vector<unsigned>>& Ada,
-                        const UnivariatePolynomial<Coeff>& z) {
+                        const UnivariatePolynomial<Coeff>& z,
+                        const bool reduce = false) {
         // asserts
         assert(B.front().size() == 1); // must hold for all vectors in B
         assert(P.size() == Ada.front().size() + 1);
@@ -164,7 +188,10 @@ VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
                 // evaluate the i-th element of bxada on P
                 UnivariatePolynomial<Coeff> poly = P.front().one();
                 for(unsigned j = 0; j < P.size(); j++) {
-                        poly *= P[j].pow(bxada[i][j]);                       
+                        poly *= P[j].pow(bxada[i][j]);
+                        if(reduce) {
+                                poly = poly.remainder(z);
+                        }
                 }
                 PRINTV(poly);
                 int taq = tarskiQuery(poly, z);
@@ -176,15 +203,7 @@ VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
         return res;
 }
 
-// states that tau extends sigma (see Algorithms for RAG, p.387)
-bool extends(const SignCondition& tau, const SignCondition& sigma) {
-        assert(tau.size() == sigma.size() +1);
-        for(unsigned i = 1; i < tau.size(); i++) {
-                if(tau[i] != sigma[i-1]) return false;
-        }
-        PRINT(tau << " extends " << sigma);
-        return true;
-}
+
 
 std::vector<SignCondition> calculateR(unsigned which, const std::vector<SignCondition>& sign, const std::vector<SignCondition>& newSign) {
         assert(which == 2 || which == 3);
@@ -269,7 +288,7 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
 
 
 template<typename Coeff>
-std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z) {
+std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z, const bool reduce = false) {
         PRINT("Input to signDetermination:");
         PRINTV(p); PRINTV(z);
         assert(!z.isZero()); // because otherwise the set Zeros(z) is infinite
@@ -284,7 +303,7 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
         // main loop
         std::vector<SignCondition> lastSign; // this is an "ordered set" (lexicografically with 0 < 1 < -1)
         std::vector<std::vector<unsigned>> lastAda;
-        for(unsigned i = (unsigned)p.size() - 1; i >= 0; i--) {
+        for(int i = (int)p.size() - 1; i >= 0; i--) {
                 PRINTV(i);
                 LINE;
                 std::vector<SignCondition> sign; // our first aim in this step is to compute this
@@ -314,9 +333,12 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
                 if(i == (unsigned)p.size() - 1) {
                         lastSign = sign;
                         lastAda = B;
+                        if(i == 0) { // then we are already done
+                                return sign;
+                        }
                 }
                 else { // i < p.size()
-                        VectorXf d_prime = compute_dprime(std::vector<UnivariatePolynomial<Coeff>>(p.begin() + i, p.end()), B, lastAda, z);
+                        VectorXf d_prime = compute_dprime(std::vector<UnivariatePolynomial<Coeff>>(p.begin() + i, p.end()), B, lastAda, z, reduce);
                         MatrixXf M_prime = kroneckerProduct(adaptedMat(lastAda, lastSign), M);
                         PRINTV2(M_prime);
                         assert(M_prime.rows() == M_prime.cols() && M_prime.rows() == d_prime.size()); // assert square matrix and d_prime has correct length
