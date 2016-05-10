@@ -10,6 +10,5 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(eigen3 binary_dir)
 set(eigen3_INCLUDE_DIR ${binary_dir}/include)
-message(STATUS "eigen3 include ${eigen3_INCLUDE_DIR}")
 
 add_dependencies(resources eigen3)
