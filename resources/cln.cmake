@@ -2,7 +2,7 @@ set(cln_VERSION "1-3-4")
 
 find_program(AUTORECONF autoreconf)
 if(NOT AUTORECONF)
-	message(ERROR "Could not build cln, missing binary for autoreconf")
+	message(ERROR "Can not build cln, missing binary for autoreconf")
 endif()
 
 ExternalProject_Add(

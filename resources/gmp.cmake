@@ -1,5 +1,10 @@
 set(gmp_VERSION "6.1.0")
 
+find_program(M4 m4)
+if(NOT M4)
+	message(ERROR "Can not build gmp, missing binary for m4")
+endif()
+
 ExternalProject_Add(
     gmp
 	URL "https://gmplib.org/download/gmp/gmp-${gmp_VERSION}.tar.bz2"
