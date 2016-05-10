@@ -47,7 +47,7 @@ if(EIGEN3_FOUND)
 else()
 	message(STATUS "Use shipped version of Eigen3")
 	include(eigen3.cmake)
-	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${Eigen3_INCLUDE_DIR}")
+	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${eigen3_INCLUDE_DIR}")
 endif()
 
 if(OBTAIN_BOOST)
