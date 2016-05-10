@@ -8,6 +8,6 @@ ExternalProject_Add(
 )
 
 ExternalProject_Get_Property(Eigen3 source_dir)
-set(Eigen3_INCLUDE_DIR ${source_dir}/include)
+set(Eigen3_INCLUDE_DIR ${source_dir})
 
 add_dependencies(resources Eigen3)
