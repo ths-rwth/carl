@@ -230,8 +230,10 @@ if(NOT FORCE_SHIPPED_RESOURCES)
 endif()
 
 # GMP
-load_library(carl GMPXX 0.0 REQUIRED)
-load_library(carl GMP 0.0 REQUIRED)
+if(NOT FORCE_SHIPPED_RESOURCES)
+	load_library(carl GMPXX 0.0 REQUIRED)
+	load_library(carl GMP 0.0 REQUIRED)
+endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries

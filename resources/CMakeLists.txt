@@ -7,6 +7,17 @@ INCLUDE(ExternalProject)
 # Set default ExternalProject root directory
 SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
 
+if(GMP_FOUND)
+	set(GMP_LIBRARIES ${GMP_LIBRARIES} PARENT_SCOPE)
+	message(STATUS "Use system version of GMP")
+else()
+	message(STATUS "Use shipped version of GMP")
+	include(gmp.cmake)
+	set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC};${GMP_LIBRARIES_DYNAMIC}")
+	set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC};${GMP_LIBRARIES_STATIC}")
+	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${GMP_INCLUDE_DIR}")
+endif()
+
 if(USE_CLN_NUMBERS)
 	if(CLN_FOUND)
 		set(CLN_LIBRARIES ${CLN_LIBRARIES} PARENT_SCOPE)
