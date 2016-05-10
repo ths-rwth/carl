@@ -15,7 +15,7 @@ ExternalProject_Add(
 )
 
 ExternalProject_Get_Property(gmp source_dir)
-set(GMP_INCLUDE_DIR ${source_dir}/include)
+set(GMP_INCLUDE_DIR ${source_dir})
 set(GMP_LIBRARIES_DYNAMIC "${source_dir}/.libs/libgmpxx.so;${source_dir}/.libs/libgmp.so")
 set(GMP_LIBRARIES_STATIC "${source_dir}/.libs/libgmpxx.a;${source_dir}/.libs/libgmp.a")
 
