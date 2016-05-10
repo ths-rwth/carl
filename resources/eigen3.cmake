@@ -1,8 +1,6 @@
-set(eigen3_VERSION "3.2.8")
-
 ExternalProject_Add(
     eigen3
-    URL "https://bitbucket.org/eigen/eigen/get/${eigen3_VERSION}.zip"
+    URL "https://bitbucket.org/eigen/eigen/get/${EIGEN3_VERSION}.zip"
 	URL_MD5 e368e3dd35e9a5f46a118029cabc494d
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=.
 	BUILD_COMMAND ""

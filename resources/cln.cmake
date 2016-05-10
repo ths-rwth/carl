@@ -1,14 +1,14 @@
-set(cln_VERSION "1-3-4")
-
 find_program(AUTORECONF autoreconf)
 if(NOT AUTORECONF)
 	message(ERROR "Can not build cln, missing binary for autoreconf")
 endif()
 
+string(REPLACE "." "-" CLN_TAG ${CLN_VERSION})
+
 ExternalProject_Add(
     cln
     GIT_REPOSITORY "git://www.ginac.de/cln.git"
-	GIT_TAG "cln_${cln_VERSION}"
+	GIT_TAG "cln_${CLN_TAG}"
 	BUILD_IN_SOURCE YES
 	CONFIGURE_COMMAND ${AUTORECONF} -iv COMMAND ./configure
 	BUILD_COMMAND make
