@@ -311,6 +311,7 @@ add_subdirectory(src)
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Add all targets to the build-tree export set
+message(STATUS "Exporting ${CARL_TARGETS}")
 export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 
 # Export the package for use from the build-tree
@@ -319,27 +320,27 @@ export(PACKAGE carl)
 
 include(CMakePackageConfigHelpers)
 # Create the carlConfig.cmake and carlConfigVersion files
-file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
 configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/carlConfig.cmake
 							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
 							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
 							 )
+#write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
+#	 VERSION 0.1.0
+# COMPATIBILITY SameMajorVersion )
 # ... for the install tree
-set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake
-							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
-							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
-							 )
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
-								 VERSION 0.1.0
-								 COMPATIBILITY SameMajorVersion )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
-		DESTINATION ${CMAKE_INSTALL_DIR} )
+#file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
+#set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+#configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake
+#							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
+#							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
+#							 )
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
+#		DESTINATION ${CMAKE_INSTALL_DIR} )
 
 # Install the export set for use with the install-tree
-install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
+#install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # G. CPack
