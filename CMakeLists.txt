@@ -225,14 +225,14 @@ endif()
 # CLN
 if(NOT FORCE_SHIPPED_RESOURCES)
 	IF(USE_CLN_NUMBERS)
-		load_library(carl CLN 0.0 REQUIRED)
+		load_library(carl CLN 0.0)
 	endif()
 endif()
 
 # GMP
 if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl GMPXX 0.0 REQUIRED)
-	load_library(carl GMP 0.0 REQUIRED)
+	load_library(carl GMPXX 0.0)
+	load_library(carl GMP 0.0)
 endif()
 
 # # # # # # # # # # # # # # # # # # # # # #
