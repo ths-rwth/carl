@@ -21,3 +21,5 @@ set(CLN_LIBRARIES_DYNAMIC "${source_dir}/src/.libs/libcln.so")
 set(CLN_LIBRARIES_STATIC "${source_dir}/src/.libs/libcln.a")
 
 add_dependencies(resources cln)
+
+mark_as_advanced(AUTORECONF)

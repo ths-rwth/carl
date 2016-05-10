@@ -2,6 +2,7 @@ find_program(M4 m4)
 if(NOT M4)
 	message(ERROR "Can not build gmp, missing binary for m4")
 endif()
+mark_as_advanced(M4)
 
 ExternalProject_Add(
     gmp
