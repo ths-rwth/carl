@@ -209,7 +209,13 @@ endif()
 # C.1. Required libraries for core.
 # # # # # # # # # # # # # # # # # # # # # #
 
-# Boost
+INCLUDE(ExternalProject)
+add_custom_target(resources)
+
+# Set default ExternalProject root directory
+SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
+
+##### Boost
 load_library(carl Boost 1.29 REQUIRED)
 
 include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
@@ -217,21 +223,76 @@ list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_DYNAMIC})
 list(APPEND carl_LIBRARIES_STATIC ${Boost_STATIC})
 
 
+##### CLN
+if(USE_CLN_NUMBERS)
+	if(NOT FORCE_SHIPPED_RESOURCES)
+		load_library(carl CLN 0.0)
+	endif()
+	if(CLN_FOUND)
+		set(CLN_LIBRARIES ${CLN_LIBRARIES})
+		message(STATUS "Use system version of CLN ${CLN_VERSION}")
+	else()
+		set(CLN_VERSION "1.3.4")
+		message(STATUS "Use shipped version of CLN ${CLN_VERSION}")
+		include(resources/cln.cmake)
+	endif()
+	set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC};${CLN_LIBRARIES_DYNAMIC}")
+	set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC};${CLN_LIBRARIES_STATIC}")
+	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${CLN_INCLUDE_DIR}")
+endif()
+
+
+##### Eigen3
+if(NOT FORCE_SHIPPED_RESOURCES)
+	load_library(carl Eigen3 3.2.0)
+endif()
+if(EIGEN3_FOUND)
+	message(STATUS "Use system version of Eigen3 ${EIGEN3_VERSION}")
+else()
+	set(EIGEN3_VERSION "3.2.8")
+	message(STATUS "Use shipped version of Eigen3 ${EIGEN3_VERSION}")
+	include(resources/eigen3.cmake)
+endif()
+set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${eigen3_INCLUDE_DIR}")
+
+
+##### GiNaC
 if(USE_GINAC)
 	load_library(carl GiNaC 1.5.8 REQUIRED )
-    set(USE_CLN_NUMBERS ON)
+	set(USE_CLN_NUMBERS ON)
 endif()
 
-# CLN
+
+##### GMP
 if(NOT FORCE_SHIPPED_RESOURCES)
-	IF(USE_CLN_NUMBERS)
-		load_library(carl CLN 0.0 REQUIRED)
-	endif()
+	load_library(carl GMP 5.1)
 endif()
+if(GMP_FOUND)
+	message(STATUS "Use system version of GMP ${GMP_VERSION}")
+else()
+	set(GMP_VERSION "6.1.0")
+	message(STATUS "Use shipped version of GMP ${GMP_VERSION}")
+	include(resources/gmp.cmake)
+endif()
+set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC};${GMP_LIBRARIES_DYNAMIC}")
+set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC};${GMP_LIBRARIES_STATIC}")
+set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${GMP_INCLUDE_DIR}")
 
-# GMP
-load_library(carl GMPXX 0.0 REQUIRED)
-load_library(carl GMP 0.0 REQUIRED)
+
+##### GTest
+if(NOT FORCE_SHIPPED_RESOURCES)
+	load_library(carl GTest 1.6.0)
+endif()
+if(GTEST_FOUND)
+	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY})
+	message(STATUS "Use system version of GTest")
+else()
+	set(GTEST_VERSION "1.7.0")
+	message(STATUS "Use shipped version of GTest ${GTEST_VERSION}")
+	include(resources/gtest.cmake)
+endif()
+set(GTEST_LIBRARIES "${GTEST_LIBRARIES}")
+set(GTEST_INCLUDE_DIR ${GTEST_INCLUDE_DIR})
 
 # # # # # # # # # # # # # # # # # # # # # #
 # C.2. optional libraries
@@ -258,12 +319,7 @@ else()
 endif()
 
 # we only search for this libraries in the system, if we do not force using the shipped resources.
-if(NOT FORCE_SHIPPED_RESOURCES)
-	# find googletest
-	load_library(carl GTest 1.6.0)
-	load_library(carl Eigen3 3.2.0)
-endif()
-add_subdirectory(resources)
+
 
 enable_testing()
 
@@ -311,6 +367,7 @@ add_subdirectory(src)
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Add all targets to the build-tree export set
+message(STATUS "Exporting ${CARL_TARGETS}")
 export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 
 # Export the package for use from the build-tree
@@ -319,27 +376,27 @@ export(PACKAGE carl)
 
 include(CMakePackageConfigHelpers)
 # Create the carlConfig.cmake and carlConfigVersion files
-file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
 configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/carlConfig.cmake
 							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
 							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
 							 )
+#write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
+#	 VERSION 0.1.0
+# COMPATIBILITY SameMajorVersion )
 # ... for the install tree
-set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake
-							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
-							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
-							 )
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
-								 VERSION 0.1.0
-								 COMPATIBILITY SameMajorVersion )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
-		DESTINATION ${CMAKE_INSTALL_DIR} )
+#file(RELATIVE_PATH REL_INCLUDE_DIR "${CMAKE_INSTALL_DIR}" "${INCLUDE_INSTALL_DIR}")
+#set(CONF_INCLUDE_DIRS "\${carl_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+#configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake
+#							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
+#							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
+#							 )
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/carlConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
+#		DESTINATION ${CMAKE_INSTALL_DIR} )
 
 # Install the export set for use with the install-tree
-install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
+#install(EXPORT carlTargets DESTINATION ${CMAKE_INSTALL_DIR} COMPONENT dev)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # G. CPack
