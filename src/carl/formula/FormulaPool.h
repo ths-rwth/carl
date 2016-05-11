@@ -411,7 +411,8 @@ namespace carl
                         // the tseitin variable is not used -> delete it
                         const FormulaContent<Pol>* tmp = tvIter->second;
                         mTseitinVars.erase( tvIter );
-                        mTseitinVarToFormula.erase( tvIter->second );
+                        assert( mTseitinVarToFormula.find( tmp ) != mTseitinVarToFormula.end() );
+                        mTseitinVarToFormula.erase( tmp );
                         mPool.erase( tmp );
                         delete tmp->mNegation;
                         delete tmp;
