@@ -4,21 +4,10 @@ find_path(GMP_INCLUDE
 	DOC "Include directory for GMP"
 )
 find_path(GMPXX_INCLUDE
-	NAMES gmpxx.h 
+	NAMES gmpxx.h
 	HINTS ${GMP_INCLUDE}
 	DOC "Include directory for GMPXX"
 )
-
-# Version
-function(GetVersionPart OUTPUT FILENAME DESC)
-	file(STRINGS ${FILENAME} RES REGEX "^#define __GNU_MP_${DESC}[ \\t]+.*")
-	string(REGEX MATCH "[0-9]+" RES "${RES}")
-	set(${OUTPUT} "${RES}" PARENT_SCOPE)
-endfunction()
-GetVersionPart(MAJOR "${GMP_INCLUDE}/gmp.h" "VERSION")
-GetVersionPart(MINOR "${GMP_INCLUDE}/gmp.h" "VERSION_MINOR")
-GetVersionPart(PATCH "${GMP_INCLUDE}/gmp.h" "VERSION_PATCHLEVEL")
-set(GMP_VERSION "${MAJOR}.${MINOR}.${PATCH}")
 
 # Library files
 find_library(GMP_LIBRARY
@@ -35,6 +24,16 @@ if(GMP_INCLUDE AND GMPXX_INCLUDE AND GMP_LIBRARY AND GMPXX_LIBRARY)
    set(GMP_FOUND TRUE)
    set(GMP_INCLUDE_DIR "${GMP_INCLUDE};${GMPXX_INCLUDE}")
    set(GMP_LIBRARIES "${GMP_LIBRARY};${GMPXX_LIBRARY}")
+   # Version
+	function(GetVersionPart OUTPUT FILENAME DESC)
+		file(STRINGS ${FILENAME} RES REGEX "^#define __GNU_MP_${DESC}[ \\t]+.*")
+		string(REGEX MATCH "[0-9]+" RES "${RES}")
+		set(${OUTPUT} "${RES}" PARENT_SCOPE)
+	endfunction()
+	GetVersionPart(MAJOR "${GMP_INCLUDE}/gmp.h" "VERSION")
+	GetVersionPart(MINOR "${GMP_INCLUDE}/gmp.h" "VERSION_MINOR")
+	GetVersionPart(PATCH "${GMP_INCLUDE}/gmp.h" "VERSION_PATCHLEVEL")
+	set(GMP_VERSION "${MAJOR}.${MINOR}.${PATCH}")
 endif()
 
 # Cleanup
