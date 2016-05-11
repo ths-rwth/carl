@@ -13,8 +13,8 @@ matrix:
       env: USE=g++-4.9
     - os: linux
       env: USE=g++-5
-    - os: linux
-      env: USE=g++-6
+#    - os: linux
+#      env: USE=g++-6
     - os: linux
       env: USE=clang++-3.6
     - os: linux
