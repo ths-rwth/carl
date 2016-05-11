@@ -138,7 +138,7 @@ namespace carl {
             mutable double mActivity = 0.0;
             /// Some value stating an expected difficulty of solving this formula for satisfiability.
             mutable double mDifficulty = 0.0;
-            /// The unique id.
+            /// The number of formulas existing with this content.
             mutable size_t mUsages = 0;
             /// The type of this formula.
             FormulaType mType;
