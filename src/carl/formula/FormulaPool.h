@@ -88,6 +88,24 @@ namespace carl
                 {
                     std::cout << "id " << ele->mId << "[usages=" << ele->mUsages << "]:  " << *ele << std::endl;
                 }
+                std::cout << "Tseitin variables:" << std::endl;
+                for( const auto& tvVar : mTseitinVars )
+                {
+                    if( tvVar.second != nullptr )
+                    {
+                        std::cout << "id " << tvVar.first->mId << "  ->  " << tvVar.second->mId << " [remapping: ";
+                        auto iter = mTseitinVarToFormula.find( tvVar.second );
+                        if( iter != mTseitinVarToFormula.end() )
+                        {
+                            assert( iter->second != mTseitinVars.end() );
+                            std::cout << iter->first->mId << " -> " << iter->second->first->mId << "]" << std::endl;
+                        }
+                        else
+                            std::cout << "not yet remapped!" << std::endl;
+                    }
+                    else
+                        std::cout << "id " << tvVar.first->mId << "  ->  nullptr" << std::endl;
+                }
                 std::cout << std::endl;
             }
             
@@ -367,22 +385,62 @@ namespace carl
                 --tmp->mUsages;
                 if( tmp->mUsages == 1 )
                 {
-                    auto tmpTVIter = mTseitinVarToFormula.find( tmp );
+                    bool stillStoredAsTseitinVariable = false;
+                    if( freeTseitinVariable( tmp ) )
+                        stillStoredAsTseitinVariable = true;
+                    if( freeTseitinVariable( tmp->mNegation ) )
+                        stillStoredAsTseitinVariable = true;
+                    if( !stillStoredAsTseitinVariable )
+                    {
+                        mPool.erase( tmp );
+                        delete tmp->mNegation;
+                        delete tmp;
+                    }
+                }
+            }
+            
+            bool freeTseitinVariable( const FormulaContent<Pol>* _toDelete )
+            {
+                bool stillStoredAsTseitinVariable = false;
+                auto tvIter = mTseitinVars.find( _toDelete );
+                if( tvIter != mTseitinVars.end() )
+                {
+                    // if this formula HAS a tseitin variable
+                    if( tvIter->second->mUsages == 1 )
+                    {
+                        // the tseitin variable is not used -> delete it
+                        const FormulaContent<Pol>* tmp = tvIter->second;
+                        mTseitinVars.erase( tvIter );
+                        mTseitinVarToFormula.erase( tvIter->second );
+                        mPool.erase( tmp );
+                        delete tmp->mNegation;
+                        delete tmp;
+                    }
+                    else // the tseitin variable is used, so we cannot delete the formula
+                        stillStoredAsTseitinVariable = true;
+                }
+                else
+                {
+                    auto tmpTVIter = mTseitinVarToFormula.find( _toDelete );
                     if( tmpTVIter != mTseitinVarToFormula.end() )
                     {
-                        mTseitinVars.erase( tmpTVIter->second );
-                        mTseitinVarToFormula.erase( tmpTVIter );
+                        const FormulaContent<Pol>* fcont = tmpTVIter->second->first;
+                        // if this formula IS a tseitin variable
+                        if( fcont->mUsages == 1 )
+                        {
+                            // the formula variable is not used -> delete it
+                            const FormulaContent<Pol>* tmp = fcont->mType == FormulaType::NOT ? fcont->mNegation : fcont;
+                            mTseitinVars.erase( tmpTVIter->second );
+                            mTseitinVarToFormula.erase( tmpTVIter );
+                            mPool.erase( tmp );
+                            delete tmp->mNegation;
+                            delete tmp;
+                        }
+                        else // the formula is used, so we cannot delete the tseitin variable
+                            stillStoredAsTseitinVariable = true;
                     }
-                    auto tmpNegTVIter = mTseitinVarToFormula.find( tmp->mNegation );
-                    if( tmpNegTVIter != mTseitinVarToFormula.end() )
-                    {
-                        mTseitinVars.erase( tmpNegTVIter->second );
-                        mTseitinVarToFormula.erase( tmpNegTVIter );
-                    }
-                    mPool.erase( tmp );
-                    delete tmp->mNegation;
-                    delete tmp;
                 }
+                return stillStoredAsTseitinVariable;
             }
             
             void reg( const FormulaContent<Pol>* _elem ) const

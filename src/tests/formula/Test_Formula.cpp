@@ -52,22 +52,24 @@ TEST(Formula, Construction)
     // Uninterpreted functions are
 
     // Now, we can construct the atoms of the Boolean Ast
-    const Formula<Pol> atomA = Formula<Pol>( constraintA );
-    const Formula<Pol> atomB = Formula<Pol>( lhsB, Relation::EQ );
-    const Formula<Pol> atomC = Formula<Pol>( b );
-    const Formula<Pol> inEq = Formula<Pol>( lhsC, Relation::EQ );
-    std::cout << inEq << std::endl;
+    FormulaT atomA( constraintA );
+    FormulaT atomB( lhsB, Relation::EQ );
+    FormulaT atomC( b );
+    FormulaT inEq( lhsC, Relation::EQ );
     EXPECT_TRUE( inEq.getType() == FormulaType::FALSE );
 
     // and the Ast itself:
     Formulas<Pol> subAstsA;
-    subAstsA.push_back( Formula<Pol>( FormulaType::NOT, atomC ) );
+    subAstsA.emplace_back( FormulaType::NOT, atomC );
     subAstsA.push_back( atomA );
     subAstsA.push_back( atomB );
-    const Formula<Pol> phiA( FormulaType::AND, subAstsA );
-    const Formula<Pol> phiC( FormulaType::OR, {Formula<Pol>( FormulaType::NOT, atomA ), atomC} );
-    const Formula<Pol> phiE( FormulaType::IMPLIES, {phiA, phiC} );
-    std::cout << phiE << std::endl;
+    FormulaT phiA( FormulaType::AND, subAstsA );
+    FormulaT tsVarA = FormulaPool<Pol>::getInstance().createTseitinVar( phiA );
+    FormulaT phiC( FormulaType::OR, {FormulaT( FormulaType::NOT, atomA ), atomC} );
+    FormulaT tsVarC = FormulaPool<Pol>::getInstance().createTseitinVar( phiC );
+    FormulaT phiE( FormulaType::IMPLIES, {phiA, phiC} );
+    FormulaT tsVarE = FormulaPool<Pol>::getInstance().createTseitinVar( phiE );
+    FormulaT( FormulaType::XOR, {tsVarA, tsVarC, tsVarE} );
 }
 
 TEST(Formula, BooleanConstructors)
@@ -111,10 +113,10 @@ TEST(Formula, ANDConstruction)
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
-	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<Formula<Pol>>{}), t);
-	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<Formula<Pol>>{f}), f);
-	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<Formula<Pol>>{t}), t);
-	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<Formula<Pol>>{a}), a);
+	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<FormulaT>{}), t);
+	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<FormulaT>{f}), f);
+	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<FormulaT>{t}), t);
+	EXPECT_EQ(FormulaT(FormulaType::AND, std::initializer_list<FormulaT>{a}), a);
     EXPECT_EQ( FormulaT( FormulaType::AND, {f, f} ), f );
     EXPECT_EQ( FormulaT( FormulaType::AND, {t, t} ), t );
     EXPECT_EQ( FormulaT( FormulaType::AND, {t, f} ), f );
@@ -151,10 +153,10 @@ TEST(Formula, ORConstruction)
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
-	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<Formula<Pol>>{}), f);
-	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<Formula<Pol>>{f}), f);
-	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<Formula<Pol>>{t}), t);
-	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<Formula<Pol>>{a}), a);
+	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<FormulaT>{}), f);
+	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<FormulaT>{f}), f);
+	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<FormulaT>{t}), t);
+	EXPECT_EQ(FormulaT(FormulaType::OR, std::initializer_list<FormulaT>{a}), a);
     EXPECT_EQ( FormulaT( FormulaType::OR, {f, f} ), f );
     EXPECT_EQ( FormulaT( FormulaType::OR, {t, t} ), t );
     EXPECT_EQ( FormulaT( FormulaType::OR, {t, f} ), t );
@@ -191,10 +193,10 @@ TEST(Formula, XORConstruction)
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
-	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<Formula<Pol>>{}), f);
-	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<Formula<Pol>>{f}), f);
-	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<Formula<Pol>>{t}), t);
-	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<Formula<Pol>>{a}), a);
+	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<FormulaT>{}), f);
+	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<FormulaT>{f}), f);
+	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<FormulaT>{t}), t);
+	EXPECT_EQ(FormulaT(FormulaType::XOR, std::initializer_list<FormulaT>{a}), a);
     EXPECT_EQ( FormulaT( FormulaType::XOR, {f, f} ), f );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {t, t} ), f );
     EXPECT_EQ( FormulaT( FormulaType::XOR, {t, f} ), t );
@@ -231,10 +233,10 @@ TEST(Formula, IFFConstruction)
     FormulaT nb( FormulaType::NOT, b );
     FormulaT t( FormulaType::TRUE );
     FormulaT f( FormulaType::FALSE );
-	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<Formula<Pol>>{}), t);
-	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<Formula<Pol>>{f}), f);
-	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<Formula<Pol>>{t}), t);
-	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<Formula<Pol>>{a}), a);
+	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<FormulaT>{}), t);
+	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<FormulaT>{f}), f);
+	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<FormulaT>{t}), t);
+	EXPECT_EQ(FormulaT(FormulaType::IFF, std::initializer_list<FormulaT>{a}), a);
     EXPECT_EQ( FormulaT( FormulaType::IFF, {f, f} ), t );
     EXPECT_EQ( FormulaT( FormulaType::IFF, {t, t} ), t );
     EXPECT_EQ( FormulaT( FormulaType::IFF, {t, f} ), f );
