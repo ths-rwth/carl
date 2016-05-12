@@ -20,6 +20,9 @@ elif [[ ${USE} == "g++-4.9" ]]; then
 elif [[ ${USE} == "g++-5" ]]; then
 	install gcc-5 g++-5
 	defCXX gcc-5 g++-5
+elif [[ ${USE} == "g++-6" ]]; then
+	install gcc-6 g++-6
+	defCXX gcc-6 g++-6
 elif [[ ${USE} == "clang++-3.4" ]]; then
 	install clang-3.4 libc++-dev
 	defCXX clang clang++

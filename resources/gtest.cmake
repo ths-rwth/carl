@@ -1,9 +1,7 @@
-set(gtest_VERSION "1.7.0")
-
 ExternalProject_Add(
     googletest
 	GIT_REPOSITORY https://github.com/google/googletest.git
-	GIT_TAG "release-${gtest_VERSION}"
+	GIT_TAG "release-${GTEST_VERSION}"
     INSTALL_COMMAND ""
 )
 

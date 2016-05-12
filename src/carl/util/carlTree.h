@@ -107,6 +107,9 @@ protected:
 		bool isRoot() const {
 			return current == 0;
 		}
+		bool isValid() const {
+			return (mTree != nullptr) && mTree->is_valid(*this);
+		}
 		T& operator*() {
 			assert(current != MAXINT);
 			return mTree->nodes[current].data;
