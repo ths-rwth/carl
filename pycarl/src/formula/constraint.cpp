@@ -53,3 +53,25 @@ void define_constraint(py::module& m) {
 
         ;
 }
+
+void define_simple_constraint(py::module& m) {
+    py::class_<SimpleConstraint>(m, "SimpleConstraint")
+        .def(py::init<bool>())
+        .def(py::init<Polynomial, carl::Relation>())
+        .def("__str__", &streamToString<SimpleConstraint>)
+
+        .def("lhs", &SimpleConstraint::lhs, "Get the left hand side of the constraint")
+        .def("rel", &SimpleConstraint::rel, "Get the relation of the constraint")
+        
+        ;
+    
+    py::class_<SimpleConstraintRatFunc>(m, "SimpleConstraintRatFunc")
+        .def(py::init<bool>())
+        .def(py::init<FactorizedRationalFunction, carl::Relation>())
+        .def("__str__", &streamToString<SimpleConstraintRatFunc>)
+
+        .def("lhs", &SimpleConstraint::lhs, "Get the left hand side of the constraint")
+        .def("rel", &SimpleConstraint::rel, "Get the relation of the constraint")
+        
+        ;
+}

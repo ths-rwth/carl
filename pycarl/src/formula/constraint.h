@@ -12,5 +12,6 @@
 
 void define_relation(py::module& m);
 void define_constraint(py::module& m);
+void define_simple_constraint(py::module& m);
 
 #endif /* PYTHON_FORMULA_CONSTRAINT_H_ */

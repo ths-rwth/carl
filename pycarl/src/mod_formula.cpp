@@ -12,6 +12,7 @@ PYBIND11_PLUGIN(formula) {
 
 	define_relation(m);
 	define_constraint(m);
+	define_simple_constraint(m);
 	define_formula_type(m);
 	define_formula(m);
 
