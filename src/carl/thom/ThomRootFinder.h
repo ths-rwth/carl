@@ -17,12 +17,14 @@
 namespace carl {
 
 /*
- * 
+ * Returns the roots of the given univariate polynomial encoded in the thom representation.
+ * The roots are returned in an ascending order.
+ * todo: find roots only in a given intervall
  */
 template<typename Coeff>
 std::vector<ThomEncoding<Coeff>> realRoots(
-        const UnivariatePolynomial<Coeff>& polynomial,
-        const Interval<Coeff>& interval = Interval<Coeff>::unboundedInterval()       
+        const UnivariatePolynomial<Coeff>& polynomial//,
+        //const Interval<Coeff>& interval = Interval<Coeff>::unboundedInterval()       
 ) {
         assert(!polynomial.isZero());
         std::vector<UnivariatePolynomial<Coeff>> derivatives;
@@ -38,7 +40,6 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         std::vector<ThomEncoding<Coeff>> res;
         res.reserve(signConds.size());
         
-        // this pointer cant be a local variable??
         std::shared_ptr<UnivariatePolynomial<Coeff>> ptr = std::make_shared<UnivariatePolynomial<Coeff>>(polynomial);
         
         for(const SignCondition& s : signConds) {
@@ -48,7 +49,6 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         // sort the roots in an ascending order (using operator <)
         std::sort(res.begin(), res.end());
         
-        std::cout << "Root finder result: " << res << std::endl;
         
         return res;
 }

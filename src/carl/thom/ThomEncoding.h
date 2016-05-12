@@ -10,6 +10,7 @@
 
 #include "../core/UnivariatePolynomial.h"
 #include "../core/Sign.h"
+#include "ThomUtil.h"
 
 /*
  * TODO list
@@ -18,16 +19,7 @@
 
 namespace carl {
 
-// a list of sign conditions that a list of polynomials realizes at a point
-// we also view this as a mapping from the polynomials to a Sign
-typedef std::vector<Sign> SignCondition; 
-
-/*
- * Calculates the set of sign conditions realized by the polynomials in the list p on the roots of z.
- * This is essential to many algorithms dealing with thom encondings of RANs.
- */
-template<typename Coeff>
-std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z, const bool = false);
+enum ComparisonResult {LESS, EQUAL, GREATER};
 
 /*
  *
@@ -90,24 +82,15 @@ public:
         }
         
         /*
-         * Return true if and only if the given rational number is encoded by this Thom encoding.
-         * (for debugging purposes)
+         * Returns true if and only if the given rational number is encoded by this Thom encoding.
+         * (for debugging)
          */
-        bool represents(Coeff rational) const {
-                std::vector<UnivariatePolynomial<Coeff>> derivatives;
-                derivatives.reserve(p->degree() - 1);
-                for(uint n = 1; n < p->degree(); n++ ) {
-                        derivatives.push_back(p->derivative(n));
-                }
-                assert(derivatives.size() == p->degree() - 1);
-                assert(derivatives.size() == signs.size());
-                for(uint n = 1; n < derivatives.size(); n++) {
-                        if(Sign(sgn(derivatives[n].evaluate(rational))) != signs[n]) {
-                                return false;
-                        }
-                }
-                return true;
-        }
+        bool represents(Coeff rational) const;
+        
+        /*
+         * Returns the sign condition of the represented number realized on der(p) = p,p',...,p^{deg(p)}
+         */
+        SignCondition fullSignCondition() const;
         
         /*
          * Returns the sign of the n-th derivative P^(n) (counting starts from 1)
@@ -121,7 +104,6 @@ public:
         template<typename C>
         friend bool operator<(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
-        // TODO implement these operators
         template<typename C>
         friend bool operator<=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
@@ -136,6 +118,9 @@ public:
         
         template<typename C>
         friend bool operator!=(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
+        
+        template<typename C>
+        friend ComparisonResult compare(const ThomEncoding<C>& lhs, const ThomEncoding<C>& rhs);
         
         /*
          * output operator

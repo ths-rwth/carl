@@ -141,4 +141,7 @@ TEST(Thom, Comparison) {
     std::vector<ThomEncoding<Rational>> rq = realRoots(q);
     EXPECT_TRUE(rp.size() == 2 && rq.size() == 2);
     EXPECT_TRUE(rp[0] < rq[0]);
+    EXPECT_TRUE(rp[0] < rq[1]);
+    EXPECT_TRUE(rp[1] > rq[0]);
+    EXPECT_TRUE(rp[1] < rq[1]);
 }
