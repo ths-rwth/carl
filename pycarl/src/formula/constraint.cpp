@@ -70,8 +70,8 @@ void define_simple_constraint(py::module& m) {
         .def(py::init<FactorizedRationalFunction, carl::Relation>())
         .def("__str__", &streamToString<SimpleConstraintRatFunc>)
 
-        .def("lhs", &SimpleConstraint::lhs, "Get the left hand side of the constraint")
-        .def("rel", &SimpleConstraint::rel, "Get the relation of the constraint")
+        .def("lhs", &SimpleConstraintRatFunc::lhs, "Get the left hand side of the constraint")
+        .def("rel", &SimpleConstraintRatFunc::rel, "Get the relation of the constraint")
         
         ;
 }
