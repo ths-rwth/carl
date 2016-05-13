@@ -129,6 +129,11 @@ set_target_properties(${TARGET} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES \"${INC
 	endif()
 endmacro(export_target)
 
+macro(export_dependency output TARGET DEP)
+	set(${output} "${${output}}set_target_properties(${TARGET} PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES \"${DEP}\")
+")
+endmacro(export_dependency)
+
 macro(load_library group name version)
     string(TOUPPER ${name} LIBNAME)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${DYNAMIC_EXT})
