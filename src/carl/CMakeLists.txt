@@ -40,7 +40,7 @@ set_target_properties( lib_carl PROPERTIES
 	# we currently do not use public header option, as it doesnt support multi-directory headers
 )
 target_link_libraries(lib_carl PUBLIC GMP_SHARED GMPXX_SHARED dl)
-if(USE_CLN)
+if(USE_CLN_NUMBERS)
 	target_link_libraries(lib_carl PUBLIC CLN_SHARED)
 endif()
 if(USE_GINAC)
@@ -73,7 +73,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 	endif()
 
 	target_link_libraries(lib_carl_static PUBLIC GMP_STATIC GMPXX_STATIC dl)
-	if(USE_CLN)
+	if(USE_CLN_NUMBERS)
 		target_link_libraries(lib_carl_static PUBLIC CLN_STATIC)
 	endif()
 	if(USE_GINAC)
