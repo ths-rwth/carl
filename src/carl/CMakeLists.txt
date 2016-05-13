@@ -26,6 +26,7 @@ set(carl_lib_sources
 )
 
 add_library(lib_carl SHARED ${carl_lib_sources})
+add_dependencies(lib_carl resources)
 set_target_properties( lib_carl PROPERTIES
 	# create *nix style library versions + symbolic links
 	VERSION "${PROJECT_VERSION}"
