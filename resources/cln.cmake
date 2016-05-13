@@ -9,16 +9,14 @@ ExternalProject_Add(
     cln
     GIT_REPOSITORY "git://www.ginac.de/cln.git"
 	GIT_TAG "cln_${CLN_TAG}"
-	BUILD_IN_SOURCE YES
-	CONFIGURE_COMMAND ${AUTORECONF} -iv COMMAND ./configure
-	BUILD_COMMAND make
-    INSTALL_COMMAND ""
+	BUILD_IN_SOURCE 1
+	CONFIGURE_COMMAND ${AUTORECONF} -iv COMMAND ./configure --prefix=<INSTALL_DIR>
 )
 
-ExternalProject_Get_Property(cln source_dir)
+ExternalProject_Get_Property(cln INSTALL_DIR)
 
-add_imported_library(CLN SHARED "${source_dir}/src/.libs/libcln.so" "${source_dir}/include")
-add_imported_library(CLN STATIC "${source_dir}/src/.libs/libcln.a" "${source_dir}/include")
+add_imported_library(CLN SHARED "${INSTALL_DIR}/lib/libcln.so" "${INSTALL_DIR}/include")
+add_imported_library(CLN STATIC "${INSTALL_DIR}/lib/libcln.a" "${INSTALL_DIR}/include")
 
 add_dependencies(resources cln)
 
