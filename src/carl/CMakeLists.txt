@@ -40,7 +40,7 @@ set_target_properties( lib_carl PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
 	# we currently do not use public header option, as it doesnt support multi-directory headers
 )
-target_link_libraries(lib_carl PUBLIC GMP_SHARED GMPXX_SHARED dl)
+target_link_libraries(lib_carl PUBLIC GMP_SHARED GMPXX_SHARED pthread dl)
 if(USE_CLN_NUMBERS)
 	target_link_libraries(lib_carl PUBLIC CLN_SHARED)
 endif()
