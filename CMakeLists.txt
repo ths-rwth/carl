@@ -93,75 +93,7 @@ if (NOT WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 endif()
 
-# compiler flags.
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
-		message(FATAL_ERROR " clang version must be at least 3.5!")
-	endif()
-	if (APPLE)
-		message(STATUS "Using clang on apple")
-                set(CMAKE_MACOSX_RPATH 1)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -stdlib=libc++")
-	else()
-		message(STATUS "Using clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-	endif()
-	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} -O3 -fomit-frame-pointer -msse -msse2 -funroll-loops")
-	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} -O1")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
-		message(FATAL_ERROR " g++ version must be at least 4.9!")
-	endif()
-	message(STATUS "Using g++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wunknown-pragmas")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmax-errors=5 -fdiagnostics-color=auto")
-	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} -O3")
-	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} -O1")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	message("-- Using Visual Studio C++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} /O2 /MT")
-	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} /MTd")
-else()
-	message(WARNING "Possibly unsupported compiler")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-if(DEVELOPER)
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wconversion -Wno-deprecated-declarations")
-	endif()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -ftemplate-backtrace-limit=0")
-	#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -print-search-dirs")
-
-	if (ALLWARNINGS)
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat -Wno-c++98-compat-pedantic")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-id-macro")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-newline-eof")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-switch-enum")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-padded")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-float-equal")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedef")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-variable-declarations")
-	endif()
-	endif()
-
-	set(CMAKE_BUILD_TYPE "DEBUG")
-endif()
-
-message(STATUS "CXX Flags: ${CMAKE_CXX_FLAGS}")
-message(STATUS "CXX Debug Flags: ${CMAKE_CXX_DEBUG_FLAGS}")
-message(STATUS "CXX Release Flags: ${CMAKE_CXX_RELEASE_FLAGS}")
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+include(compiler-options)
 
 set(DYNAMIC_EXT ".so")
 set(STATIC_EXT ".a")
@@ -172,8 +104,6 @@ elseif (WIN32)
 	set(DYNAMIC_EXT ".dll")
 	set(STATIC_EXT ".lib")
 endif()
-message(STATUS "Assuming extension for shared libraries: ${DYNAMIC_EXT}")
-message(STATUS "Assuming extension for static libraries: ${STATIC_EXT}")
 
 if(BUILD_STATIC)
 	message(STATUS "Building static: yes")
@@ -209,124 +139,12 @@ endif()
 # C.1. Required libraries for core.
 # # # # # # # # # # # # # # # # # # # # # #
 
-INCLUDE(ExternalProject)
-add_custom_target(resources)
+include(resources/resources.cmake)
 
-# Set default ExternalProject root directory
-SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/resources)
-
-##### Boost
-load_library(carl Boost 1.29 REQUIRED)
-
-include_directories(SYSTEM ${include_dirs} ${Boost_INCLUDE_DIRS})
-list(APPEND carl_LIBRARIES_DYNAMIC ${Boost_DYNAMIC})
-list(APPEND carl_LIBRARIES_STATIC ${Boost_STATIC})
-
-
-##### CLN
-if(USE_CLN_NUMBERS)
-	if(NOT FORCE_SHIPPED_RESOURCES)
-		load_library(carl CLN 0.0)
-	endif()
-	if(CLN_FOUND)
-		set(CLN_LIBRARIES ${CLN_LIBRARIES})
-		message(STATUS "Use system version of CLN ${CLN_VERSION}")
-	else()
-		set(CLN_VERSION "1.3.4")
-		message(STATUS "Use shipped version of CLN ${CLN_VERSION}")
-		include(resources/cln.cmake)
-	endif()
-	set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC};${CLN_LIBRARIES_DYNAMIC}")
-	set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC};${CLN_LIBRARIES_STATIC}")
-	set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${CLN_INCLUDE_DIR}")
-endif()
-
-
-##### Eigen3
-if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl Eigen3 3.2.0)
-endif()
-if(EIGEN3_FOUND)
-	message(STATUS "Use system version of Eigen3 ${EIGEN3_VERSION}")
-else()
-	set(EIGEN3_VERSION "3.2.8")
-	message(STATUS "Use shipped version of Eigen3 ${EIGEN3_VERSION}")
-	include(resources/eigen3.cmake)
-endif()
-set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${eigen3_INCLUDE_DIR}")
-
-
-##### GiNaC
-if(USE_GINAC)
-	load_library(carl GiNaC 1.5.8 REQUIRED )
-	set(USE_CLN_NUMBERS ON)
-endif()
-
-
-##### GMP
-if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl GMP 5.1)
-endif()
-if(GMP_FOUND)
-	message(STATUS "Use system version of GMP ${GMP_VERSION}")
-else()
-	set(GMP_VERSION "6.1.0")
-	message(STATUS "Use shipped version of GMP ${GMP_VERSION}")
-	include(resources/gmp.cmake)
-endif()
-set(carl_LIBRARIES_DYNAMIC "${carl_LIBRARIES_DYNAMIC};${GMP_LIBRARIES_DYNAMIC}")
-set(carl_LIBRARIES_STATIC "${carl_LIBRARIES_STATIC};${GMP_LIBRARIES_STATIC}")
-set(carl_INCLUDE_DIRS "${carl_INCLUDE_DIRS};${GMP_INCLUDE_DIR}")
-
-
-##### GTest
-if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl GTest 1.6.0)
-endif()
-if(GTEST_FOUND)
-	set(GTEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY})
-	message(STATUS "Use system version of GTest")
-else()
-	set(GTEST_VERSION "1.7.0")
-	message(STATUS "Use shipped version of GTest ${GTEST_VERSION}")
-	include(resources/gtest.cmake)
-endif()
-set(GTEST_LIBRARIES "${GTEST_LIBRARIES}")
-set(GTEST_INCLUDE_DIR ${GTEST_INCLUDE_DIR})
-
-# # # # # # # # # # # # # # # # # # # # # #
-# C.2. optional libraries
-# # # # # # # # # # # # # # # # # # # # # #
-
-IF(USE_MPFR_FLOAT)
-	load_library(carl MPFR 0.0 REQUIRED)
-endif()
-
-if(COMPARE_WITH_Z3)
-    load_library(carl Z3 4.0)
-endif()
-
-# # # # # # # # # # # # # # # # # # # # # #
-# C.3. Development and debug libraries.
-# # # # # # # # # # # # # # # # # # # # # #
-
-# if doxygen is installed, create the make doc target
-find_package(Doxygen)
-if(DOXYGEN)
-	add_subdirectory(doxygen-conf)
-else()
-	message(WARNING, "Doxygen not found")
-endif()
 
 # we only search for this libraries in the system, if we do not force using the shipped resources.
 
-
 enable_testing()
-
-message(STATUS "include: ${carl_INCLUDE_DIRS}")
-message(STATUS "dynamic: ${carl_LIBRARIES_DYNAMIC}")
-message(STATUS "static: ${carl_LIBRARIES_STATIC}")
-include_directories(SYSTEM ${SYSTEM} ${carl_INCLUDE_DIRS})
 
 #dl must be linked LAST as this is required for the stacktrace in util/platform.h
 if (NOT WIN32)
@@ -341,20 +159,7 @@ endif()
 #include(GetGitRevisionDescription)
 #get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-if (CLANG_TIDY)
-	set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-	set(CLANG_TIDY_CHECKS "*")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-llvm-header-guard")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-namespace-comments,-llvm-namespace-comment")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-braces-around-statements,-readability-braces-around-statements")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-readability-else-after-return")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-readability-todo")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-google-runtime-int")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-misc-macro-parentheses")
-	set(CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS},-clang-analyzer-alpha.core.CastToStruct")
-	set(CLANG_TIDY_CHECKS "-checks='${CLANG_TIDY_CHECKS}'")
-	message(STATUS "Enabled checks for clang-tidy: ${CLANG_TIDY_CHECKS}")
-endif()
+include(clang-tidy)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # E. Invoke subdirectories.
@@ -367,21 +172,33 @@ add_subdirectory(src)
 # # # # # # # # # # # # # # # # # # # # # #
 
 # Add all targets to the build-tree export set
-message(STATUS "Exporting ${CARL_TARGETS}")
 export(TARGETS ${CARL_TARGETS} FILE "${PROJECT_BINARY_DIR}/carlTargets.cmake")
 
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE carl)
 
+set(DEP_TARGETS "")
+export_target(DEP_TARGETS CLN_SHARED)
+export_target(DEP_TARGETS CLN_STATIC)
+export_target(DEP_TARGETS GMP_SHARED)
+export_target(DEP_TARGETS GMP_STATIC)
+export_target(DEP_TARGETS GMPXX_SHARED)
+export_target(DEP_TARGETS GMPXX_STATIC)
+export_target(DEP_TARGETS EIGEN3)
+export_target(DEP_TARGETS GTESTCORE_STATIC)
+export_target(DEP_TARGETS GTESTMAIN_STATIC)
+
 include(CMakePackageConfigHelpers)
 # Create the carlConfig.cmake and carlConfigVersion files
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
-configure_package_config_file(cmake/carlConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/carlConfig.cmake
-							  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
-							  PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
-							 )
+configure_package_config_file(
+	cmake/carlConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/carlConfig.cmake
+	INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
+	PATH_VARS INCLUDE_INSTALL_DIR #SYSCONFIG_INSTALL_DIR
+)
 #write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/carlConfigVersion.cmake
 #	 VERSION 0.1.0
 # COMPATIBILITY SameMajorVersion )

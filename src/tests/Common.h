@@ -3,7 +3,7 @@
 #include <carl/interval/Interval.h>
 #include <carl/numbers/numbers.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using Rational = mpq_class;
 //using Integer = mpz_class;

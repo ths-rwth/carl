@@ -1,7 +1,9 @@
-include_directories(${GTEST_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${include_dirs})
 
-add_library(prepareTest Common.cpp)
-add_dependencies(prepareTest resources)
+#include_directories(${CMAKE_SOURCE_DIR}/src ${include_dirs})
+
+add_library(TestCommon SHARED Common.cpp)
+target_link_libraries(TestCommon lib_carl ${GTEST_LIBRARIES})
+add_dependencies(TestCommon resources lib_carl)
 
 ################################
 # Unit Tests

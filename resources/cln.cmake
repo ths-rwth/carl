@@ -16,9 +16,9 @@ ExternalProject_Add(
 )
 
 ExternalProject_Get_Property(cln source_dir)
-set(CLN_INCLUDE_DIR "${source_dir}/include")
-set(CLN_LIBRARIES_DYNAMIC "${source_dir}/src/.libs/libcln.so")
-set(CLN_LIBRARIES_STATIC "${source_dir}/src/.libs/libcln.a")
+
+add_imported_library(CLN SHARED "${source_dir}/src/.libs/libcln.so" "${source_dir}/include")
+add_imported_library(CLN STATIC "${source_dir}/src/.libs/libcln.a" "${source_dir}/include")
 
 add_dependencies(resources cln)
 

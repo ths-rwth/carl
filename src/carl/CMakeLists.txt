@@ -1,4 +1,5 @@
 # include directories.
+message(STATUS "Including ${include_dirs}")
 include_directories(
 	${include_dirs}
 )
@@ -25,7 +26,6 @@ set(carl_lib_sources
 )
 
 add_library(lib_carl SHARED ${carl_lib_sources})
-add_dependencies(lib_carl resources)
 set_target_properties( lib_carl PROPERTIES
 	# create *nix style library versions + symbolic links
 	VERSION "${PROJECT_VERSION}"
@@ -36,9 +36,10 @@ set_target_properties( lib_carl PROPERTIES
 	OUTPUT_NAME carl
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+	INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
 	# we currently do not use public header option, as it doesnt support multi-directory headers
 )
-target_link_libraries( lib_carl ${carl_LIBRARIES_DYNAMIC} )
+target_link_libraries(lib_carl PUBLIC CLN_SHARED GMP_SHARED GMPXX_SHARED dl GINAC_SHARED)
 
 if(BUILD_STATIC)
 	add_library(lib_carl_static STATIC ${carl_lib_sources})
@@ -53,6 +54,7 @@ if(BUILD_STATIC)
 		OUTPUT_NAME carl
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src"
 		# we currently do not use public header option, as it doesnt support multi-directory headers
 	)
 
@@ -64,11 +66,16 @@ if(BUILD_STATIC)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 	endif()
 
-	target_link_libraries( lib_carl_static ${carl_LIBRARIES_STATIC} )
+	#target_link_libraries( lib_carl_static ${carl_LIBRARIES_STATIC} )
+	target_link_libraries(lib_carl_static CLN_STATIC)
+	target_link_libraries(lib_carl_static GMP_STATIC GMPXX_STATIC)
 	set(CARL_TARGETS lib_carl lib_carl_static CACHE STRING INTERNAL FORCE)
 else()
 	set(CARL_TARGETS lib_carl CACHE STRING INTERNAL FORCE)
 endif()
+
+
+
 
 cotire(carl)
 
