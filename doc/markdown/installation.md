@@ -5,7 +5,7 @@ Download
 --------
 We mirror our master branch to github.com. If you want to use the newest bleeding edge version, you can checkout from https://github.com/smtrat/carl.
 Although we try to keep the master branch stable, there is a chance that the current revision is broken.
-You can check [here](https://travis-ci.org/nafur/carl/builds) if the current revision compiles and all the unit tests work.
+You can check [here](https://travis-ci.org/smtrat/carl/builds) if the current revision compiles and all the unit tests work.
 
 You can download specific versions we tagged at https://github.com/smtrat/carl/releases.
 
