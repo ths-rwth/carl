@@ -6,6 +6,7 @@ function install {
 	sudo apt-get -qq install --force-yes $*
 }
 
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 1397BC53640DB551
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get -qq update
 
