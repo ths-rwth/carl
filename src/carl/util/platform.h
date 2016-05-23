@@ -13,7 +13,7 @@
 
 #define STRINGIFY(s) #s
 
-#ifdef __clang__
+#if defined __clang__
 	#define __CLANG
 
 	#define CLANG_WARNING_DISABLE(warning)\
@@ -22,12 +22,12 @@
 		_Pragma( STRINGIFY(clang diagnostic ignored warning) )
 	#define CLANG_WARNING_RESET\
 		_Pragma("clang diagnostic pop")
-#elif __GNUC__
+#elif defined __GNUC__
 	#define __GCC
 
 	#define CLANG_WARNING_DISABLE(warning)
 	#define CLANG_WARNING_RESET
-#elif _MSC_VER
+#elif defined _MSC_VER
 	#define __VS
 
 	#define CLANG_WARNING_DISABLE(warning)
@@ -37,15 +37,15 @@
 	#define __UNSUPPORTED
 #endif
 
-#ifdef _WIN32
+#if defined _WIN32
 	#define __WIN
-#elif _WIN64
+#elif defined _WIN64
 	#define __WIN
-#elif __APPLE__
+#elif defined __APPLE__
 	#define __MACOS
-#elif __linux__
+#elif defined __linux__
 	#define __LINUX
-#elif
+#else
 	#warning "You are using an unsupported operating system."
 #endif
 
