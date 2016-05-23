@@ -4,22 +4,23 @@ find_path(CLN_INCLUDE_DIR
   HINTS ${CLN_PKGCONF_INCLUDE_DIRS}
 )
 
-# Version
-file(STRINGS ${CLN_INCLUDE_DIR}/cln/version.h CLN_VERSION REGEX "^#define[\t ]+CL_VERSION .*")
-string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLN_VERSION "${CLN_VERSION}")
-
-if(CLN_FIND_VERSION VERSION_GREATER CLN_VERSION)
-	message(WARNING "Required CLN ${CLN_FIND_VERSION} but found only CLN ${CLN_VERSION}.")
-	return()
-endif()
-
 # Library files
 find_library(CLN_LIBRARY
   NAMES cln
   HINTS ${CLN_PKGCONF_LIBRARY_DIRS}
 )
+
 if(CLN_INCLUDE_DIR AND CLN_LIBRARY)
     set(CLN_FOUND TRUE)
+
+	# Version
+	file(STRINGS ${CLN_INCLUDE_DIR}/cln/version.h CLN_VERSION REGEX "^#define[\t ]+CL_VERSION .*")
+	string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" CLN_VERSION "${CLN_VERSION}")
+
+	if(CLN_FIND_VERSION VERSION_GREATER CLN_VERSION)
+		message(WARNING "Required CLN ${CLN_FIND_VERSION} but found only CLN ${CLN_VERSION}.")
+		return()
+	endif()
 endif()
 
 # Cleanup
