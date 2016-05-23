@@ -90,6 +90,7 @@ macro(add_imported_library name type lib include)
 	file(MAKE_DIRECTORY "${include}")
 	if("${lib}" STREQUAL "")
 		if("${type}" STREQUAL "SHARED")
+			# TODO: Compat to CMake 2.8
 			if(${CMAKE_MAJOR_VERSION} GREATER 2)
 				add_library(${name} INTERFACE IMPORTED)
 				set_target_properties(${name} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${include}")
