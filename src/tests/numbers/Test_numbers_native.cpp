@@ -5,7 +5,12 @@
 #include <cstdint>
 #include <type_traits>
 
-
+/**
+ * We refer to
+ * - http://en.cppreference.com/w/cpp/language/types
+ * - http://en.cppreference.com/w/cpp/types/integer
+ * We check that we are within ILP32, LLP64 or LP64.
+ */
 TEST(NumbersNative, NumberWidth)
 {
 	static_assert(sizeof(short) == 2,"");
@@ -21,12 +26,12 @@ TEST(NumbersNative, NumberWidth)
 	static_assert(sizeof(unsigned) == 4,"");
 	static_assert(sizeof(unsigned int) == 4,"");
 	
-	static_assert(sizeof(long) == 8,"");
-	static_assert(sizeof(long int) == 8,"");
-	static_assert(sizeof(signed long) == 8,"");
-	static_assert(sizeof(signed long int) == 8,"");
-	static_assert(sizeof(unsigned long) == 8,"");
-	static_assert(sizeof(unsigned long int) == 8,"");
+	static_assert(sizeof(long) >= 4,"");
+	static_assert(sizeof(long int) >= 4,"");
+	static_assert(sizeof(signed long) >= 4,"");
+	static_assert(sizeof(signed long int) >= 4,"");
+	static_assert(sizeof(unsigned long) >= 4,"");
+	static_assert(sizeof(unsigned long int) >= 4,"");
 	
 	static_assert(sizeof(long long) == 8,"");
 	static_assert(sizeof(long long int) == 8,"");

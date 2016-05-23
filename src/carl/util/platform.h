@@ -39,11 +39,14 @@
 
 #ifdef _WIN32
 	#define __WIN
-	#ifdef _WIN64
-	#define __WIN64
-	#endif
+#elif _WIN64
+	#define __WIN
 #elif __APPLE__
 	#define __MACOS
 #elif __linux__
 	#define __LINUX
+#elif
+	#warning "You are using an unsupported operating system."
 #endif
+
+#define __BITS (sizeof(void*))
