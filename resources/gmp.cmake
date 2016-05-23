@@ -1,6 +1,6 @@
 find_program(M4 m4)
 if(NOT M4)
-	message(ERROR "Can not build gmp, missing binary for m4")
+	message(FATAL_ERROR "Can not build gmp, missing binary for m4")
 endif()
 mark_as_advanced(M4)
 
@@ -15,9 +15,9 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(gmp source_dir)
 
-add_resource_library(GMP SHARED "${source_dir}/.libs/libgmp.so" "${source_dir}")
-add_resource_library(GMP STATIC "${source_dir}/.libs/libgmp.a" "${source_dir}")
-add_resource_library(GMPXX SHARED "${source_dir}/.libs/libgmpxx.so" "${source_dir}")
-add_resource_library(GMPXX STATIC "${source_dir}/.libs/libgmpxx.a" "${source_dir}")
+add_imported_library(GMP SHARED "${source_dir}/.libs/libgmp.so" "${source_dir}")
+add_imported_library(GMP STATIC "${source_dir}/.libs/libgmp.a" "${source_dir}")
+add_imported_library(GMPXX SHARED "${source_dir}/.libs/libgmpxx.so" "${source_dir}")
+add_imported_library(GMPXX STATIC "${source_dir}/.libs/libgmpxx.a" "${source_dir}")
 
 add_dependencies(resources gmp)
