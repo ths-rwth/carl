@@ -154,7 +154,7 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
 		res += p.coefficients()[i] * exp;
-		exp *= varValue;
+		exp = varValue.pow(i+1);
 	}
 	return res;
 }
@@ -164,11 +164,11 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 	CARL_LOG_FUNC("carl.core.monomial", p << ", " << map);
 	assert(map.count(p.mainVar()) > 0);
 	Interval<Numeric> res = Interval<Numeric>::emptyInterval();
-	const Interval<Numeric> varValue = map.at(p.mainVar());
+	const Interval<Numeric>& varValue = map.at(p.mainVar());
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i <= p.degree(); i++) {
 		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
-		exp *= varValue;
+		exp = varValue.pow(i+1);
 	}
 	return res;
 }
