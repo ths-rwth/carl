@@ -54,6 +54,8 @@ namespace carl
         mVarInfoMap(),
         mLhsDefinitess( Definiteness::NON )
     {
+        
+        initLazy(); // TODO: this must unfortunately be done here and basically collects the variables. The reason is that without the variables, we cannot do the integer normalization.
         if( hasIntegerValuedVariable() && !hasRealValuedVariable() )
         {
             if( mRelation == Relation::LESS )
@@ -197,26 +199,26 @@ namespace carl
                             return new ConstraintContent( Pol( typename Pol::NumberType( 0 ) ), Relation::EQ );
                         case Relation::LEQ:
                         {
-                            Pol newLhs = ((mLhs - constPart) * (typename Pol::NumberType( 1 ) / g));
-                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
+                            Pol newLhs = ((mLhs - constPart) * g);
+                            newLhs += carl::floor( (constPart * g) ) + typename Pol::NumberType( 1 );
                             return new ConstraintContent( newLhs, Relation::LEQ );
                         }
                         case Relation::GEQ:
                         {
-                            Pol newLhs = ((mLhs - constPart) * (typename Pol::NumberType( 1 ) / g));
-                            newLhs += carl::floor( (constPart / g) );
+                            Pol newLhs = ((mLhs - constPart) * g);
+                            newLhs += carl::floor( (constPart * g) );
                             return new ConstraintContent( newLhs, Relation::GEQ );
                         }
                         case Relation::LESS:
                         {
-                            Pol newLhs = ((mLhs - constPart) * (typename Pol::NumberType( 1 ) / g));
-                            newLhs += carl::floor( (constPart / g) ) + typename Pol::NumberType( 1 );
+                            Pol newLhs = ((mLhs - constPart) * g);
+                            newLhs += carl::floor( (constPart * g) ) + typename Pol::NumberType( 1 );
                             return new ConstraintContent( newLhs, Relation::LEQ );
                         }
                         case Relation::GREATER:
                         {
-                            Pol newLhs = ((mLhs - constPart) * (typename Pol::NumberType( 1 ) / g));
-                            newLhs += carl::floor( (constPart / g) );
+                            Pol newLhs = ((mLhs - constPart) * g);
+                            newLhs += carl::floor( (constPart * g) );
                             return new ConstraintContent( newLhs, Relation::GEQ );
                         }
                         default:
