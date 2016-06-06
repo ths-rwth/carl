@@ -37,7 +37,7 @@ elif [[ ${USE} == "clang++-3.5" ]]; then
 elif [[ ${USE} == "clang++-3.6" ]]; then
 	sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.6 main"
 	sudo apt-get -qq update
-	install clang-3.6 libc++-dev
+	install clang-3.6 g++-5 libc++-dev
 	defCXX clang-3.6 clang++-3.6
 elif [[ ${USE} == "clang++-3.7" ]]; then
 	sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main"
