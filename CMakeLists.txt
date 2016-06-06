@@ -9,11 +9,7 @@
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
 
-if (WIN32)
-	cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
-else()
-	cmake_minimum_required (VERSION 2.8.12 FATAL_ERROR)
-endif()
+cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
 
 # # # # # # # # # # # # # # # # # # # # # #
 # A. Project properties
