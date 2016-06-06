@@ -3,12 +3,12 @@
 source setup_common.sh
 
 function install {
-	sudo apt-get -qq install --force-yes $*
+	#sudo apt-get -qq install --force-yes $*
 }
 
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 1397BC53640DB551
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-sudo apt-get -qq update
+#sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 1397BC53640DB551
+#sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+#sudo apt-get -qq update
 
 install cmake doxygen libboost1.55-all-dev libcln-dev libeigen3-dev
 
@@ -35,22 +35,22 @@ elif [[ ${USE} == "clang++-3.5" ]]; then
 	defCXX clang-3.5 clang++-3.5
 	export CXXFLAGS="-stdlib=libc++"
 elif [[ ${USE} == "clang++-3.6" ]]; then
-	sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.6 main"
-	sudo apt-get -qq update
+	#sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.6 main"
+	#sudo apt-get -qq update
 	install clang-3.6 g++-5 libc++-dev
 	defCXX clang-3.6 clang++-3.6
 elif [[ ${USE} == "clang++-3.7" ]]; then
-	sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main"
-	sudo apt-get -qq update
+	#sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main"
+	#sudo apt-get -qq update
 	install clang-3.7 libc++-dev
 	defCXX clang-3.7 clang++-3.7
 elif [[ ${USE} == "clang++-3.8" ]]; then
-	sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.8 main"
-	sudo apt-get -qq update
+	#sudo add-apt-repository -y "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.8 main"
+	#sudo apt-get -qq update
 	install clang-3.8 libc++-dev
 	defCXX clang-3.8 clang++-3.8
 fi
 
-sudo service postgresql stop
-sudo service mysql stop
-sudo service cron stop
+#sudo service postgresql stop
+#sudo service mysql stop
+#sudo service cron stop
