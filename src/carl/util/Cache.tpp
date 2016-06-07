@@ -149,7 +149,6 @@ namespace carl
     template<typename T>
     void Cache<T>::rehash( Ref _refStoragePos )
     {
-        size_t tmpSoac = sumOfAllUsageCounts();
         std::lock_guard<std::recursive_mutex> lock( mMutex );
         assert( _refStoragePos < mCacheRefs.size() );
         TypeInfoPair<T,Info>* cacheRef = mCacheRefs[_refStoragePos];
@@ -173,7 +172,6 @@ namespace carl
             }
             assert( info.usageCount + infoB.usageCount >= info.usageCount );
             info.usageCount += infoB.usageCount;
-            assert( tmpSoac == sumOfAllUsageCounts() );
             info.refStoragePositions.insert( info.refStoragePositions.end(), infoB.refStoragePositions.begin(), infoB.refStoragePositions.end() );
             assert( !hasDuplicates( info.refStoragePositions ) );
             assert( std::find( infoB.refStoragePositions.begin(), infoB.refStoragePositions.end(), _refStoragePos ) != infoB.refStoragePositions.end() );
