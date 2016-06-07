@@ -35,7 +35,7 @@ public:
     }
 
     static handle cast(handle src, return_value_policy policy, handle parent) {
-        switch(policy) {
+        switch (policy) {
             case return_value_policy::automatic:
             case return_value_policy::copy:
             case return_value_policy::take_ownership:
@@ -45,6 +45,8 @@ public:
             case return_value_policy::reference_internal:
                 parent.inc_ref();
                 return handle(src);
+			default:
+				std::cerr << "Help!" << std::endl;
         }
         return handle(src);
     }
