@@ -251,9 +251,8 @@ inline mpz_class round(const mpq_class& n) {
 	mpz_class res;
 	mpz_class rem;
 	mpz_fdiv_qr(res.get_mpz_t(), rem.get_mpz_t(), n.get_num_mpz_t(), n.get_den_mpz_t());
-    rem *= 2;
-    if( rem >= getDenom(n) )
-        ++res;
+	rem *= 2;
+	if (rem >= getDenom(n)) ++res;
 	return res;
 }
 
