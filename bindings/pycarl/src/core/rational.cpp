@@ -87,7 +87,7 @@ void define_rational(py::module& m) {
             return static_cast<carl::sint>(d);
         })
         .def("__float__", static_cast<double (*)(Rational const&)>(&carl::toDouble))
-        .def("__str__", [](Rational const& r) {return carl::toString(r, true);})
+        .def("__str__", &streamToString<Rational>)
 
         .def_property_readonly("nominator", [](const Rational& val) -> int {
             return carl::toInt<carl::sint>(carl::getNum(val));
