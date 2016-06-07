@@ -9,6 +9,8 @@
 #include "core/factorizedpolynomial.h"
 #include "core/factorizedrationalfunction.h"
 
+#include "core/Interval.h"
+
 PYBIND11_PLUGIN(core) {
     py::module m("core");
 
@@ -22,6 +24,9 @@ PYBIND11_PLUGIN(core) {
     define_factorizedpolynomial(m);
     define_rationalfunction(m);
     define_factorizedrationalfunction(m);
+	
+	define_boundtype(m);
+	define_interval(m);
 
     // Commented out, for Python Variable can be constructed directly
     /*
