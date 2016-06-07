@@ -89,8 +89,8 @@ std::ostream& operator<<(std::ostream& os, const std::list<T>& l) {
  * @param m map to be printed.
  * @return Output stream.
  */
-template<typename Key, typename Value>
-std::ostream& operator<<(std::ostream& os, const std::map<Key, Value>& m) {
+template<typename Key, typename Value, typename Comparator>
+std::ostream& operator<<(std::ostream& os, const std::map<Key, Value, Comparator>& m) {
 	os << "{";
 	bool first = true;
 	for (const auto& it: m) {

@@ -370,6 +370,13 @@ namespace carl
                 return Formula( mpContent->mNegation );
             }
             
+            const Formula& removeNegations() const
+            {
+                if( getType() == FormulaType::NOT )
+                    return subformula().removeNegations();
+                return *this;
+            }
+            
             /**
              * @return A constant reference to the only sub-formula, in case this formula is an negation.
              */

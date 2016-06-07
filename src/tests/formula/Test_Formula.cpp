@@ -334,4 +334,13 @@ TEST(Formula, ConstraintConstruction)
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi+Rational(2), carl::Relation::LEQ ) ) );
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(1)/Rational(2) ) ), FormulaT( Constr( -pi, carl::Relation::LEQ ) ) );
     EXPECT_EQ( FormulaT( Constr( i, carl::Relation::GREATER, -Rational(3)/Rational(2) ) ), FormulaT( Constr( -pi-Rational(1), carl::Relation::LEQ ) ) );
+    
+    // check if the integer normalization works
+    Variable j = freshIntegerVariable("j");
+    Pol pj( j );
+    EXPECT_EQ( Constr( pi+pj-Rational(3), carl::Relation::LESS ).relation(), carl::Relation::LEQ );
+    EXPECT_EQ( Constr( Rational(9)*pi+Rational(18)*pj-Rational(4), carl::Relation::GEQ ), Constr( pi+Rational(2)*pj-Rational(1), carl::Relation::GEQ ) );
+    EXPECT_EQ( Constr( Rational(9)*pi+Rational(18)*pj-Rational(5), carl::Relation::LEQ ), Constr( pi+Rational(2)*pj, carl::Relation::LEQ ) );
+    EXPECT_EQ( Constr( Rational(3)*pi+Rational(6)*pj, carl::Relation::GREATER ), Constr( pi+Rational(2)*pj-Rational(1), carl::Relation::GEQ ) );
+    EXPECT_EQ( Constr( Rational(3)*pi+Rational(6)*pj-Rational(3), carl::Relation::LESS ), Constr( pi+Rational(2)*pj, carl::Relation::LEQ ) );
 }

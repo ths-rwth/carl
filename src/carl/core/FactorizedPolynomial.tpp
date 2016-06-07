@@ -554,22 +554,22 @@ namespace carl
     
     template<typename P>
     template<typename SubstitutionType>
-    typename FactorizedPolynomial<P>::CoeffType FactorizedPolynomial<P>::evaluate( const std::map<Variable,SubstitutionType>& _substitutions ) const
+    SubstitutionType FactorizedPolynomial<P>::evaluate( const std::map<Variable,SubstitutionType>& _substitutions ) const
     {
         if( !existsFactorization( *this ) )
             return mCoefficient;
         if( factorizedTrivially() )
         {
-            return mCoefficient * polynomial().evaluate( _substitutions );
+            return SubstitutionType(mCoefficient) * polynomial().evaluate( _substitutions );
         }
         else
         {
-            CoeffType result = mCoefficient;
+            SubstitutionType result = mCoefficient;
             for( const auto& factor : content().factorization() )
             {
-                CoeffType subResult = factor.first.evaluate( _substitutions );
+                SubstitutionType subResult = factor.first.evaluate( _substitutions );
                 if( carl::isZero( subResult ) )
-                    return constant_zero<CoeffType>::get();
+                    return constant_zero<SubstitutionType>::get();
                 result *= carl::pow( subResult, factor.second );
             }
             assert( result == computePolynomial( *this ).evaluate( _substitutions ) );

@@ -631,6 +631,12 @@ namespace carl
 		 * @return If this is consistent.
 		 */
 		bool isConsistent() const;
+        
+        /*
+         * TODO: cannot link Monomial::evaluate
+        template<typename SubstitutionType>
+		SubstitutionType evaluate(const std::map<Variable, SubstitutionType>& map) const;
+         */
 	};
 	
 	/// @name Comparison operators
