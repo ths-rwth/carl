@@ -2015,7 +2015,7 @@ namespace carl
     template<typename Number>
     inline Interval<Number> div(const Interval<Number>& _lhs, const Interval<Number>& _rhs)
     {
-        return _lhs / _rhs;
+        return _lhs.div(_rhs);
     }
 
     /**
@@ -2027,7 +2027,7 @@ namespace carl
     template<typename Number>
     inline Interval<Number> quotient(const Interval<Number>& _lhs, const Interval<Number>& _rhs)
     {
-        return _lhs / _rhs;
+        return _lhs.div(_rhs);
     }
 
     /**
