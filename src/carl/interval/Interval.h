@@ -1864,33 +1864,6 @@ namespace carl
     template<typename Number>
     inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs);
 
-    /**
-     * Operator for the division of two intervals.
-     * @param lhs Lefthand side.
-     * @param rhs Righthand side.
-     * @return Resulting interval.
-     */
-    template<typename Number>
-    inline Interval<Number> operator/(const Interval<Number>& lhs, const Interval<Number>& rhs);
-
-    /**
-     * Operator for the division of an interval and a number.
-     * @param lhs Lefthand side.
-     * @param rhs Righthand side.
-     * @return Resulting interval.
-     */
-    template<typename Number>
-    inline Interval<Number> operator/(const Number& lhs, const Interval<Number>& rhs);
-
-    /**
-     * Operator for the division of an interval and a number.
-     * @param lhs Lefthand side.
-     * @param rhs Righthand side.
-     * @return Resulting interval.
-     */
-    template<typename Number>
-    inline Interval<Number> operator/(const Interval<Number>& lhs, const Number& rhs);
-
     /*
      * Comparison operators
      */

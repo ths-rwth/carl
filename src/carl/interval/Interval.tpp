@@ -1712,24 +1712,6 @@ inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs)
 		return lhs *= Interval<Number>(rhs);
 	}
 
-template<typename Number>
-inline Interval<Number> operator/(const Interval<Number>& lhs, const Interval<Number>& rhs)
-	{
-		return lhs.div(rhs);
-	}
-
-template<typename Number>
-inline Interval<Number> operator/(const Number& lhs, const Interval<Number>& rhs)
-	{
-		return Interval<Number>(lhs).div_assign(rhs);
-	}
-
-template<typename Number>
-inline Interval<Number> operator/(const Interval<Number>& lhs, const Number& rhs)
-	{
-		return lhs.div(Interval<Number>(rhs));
-	}
-
 /*******************************************************************************
  * Comparison operators
  ******************************************************************************/
