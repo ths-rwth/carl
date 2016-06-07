@@ -1,5 +1,7 @@
 # Add test cpp file
 add_executable( runNumbersTests
+    Test_CLN.cpp
+    Test_GMP.cpp
     Test_numbers.cpp
     Test_numbers_native.cpp
     Test_Numeric.cpp

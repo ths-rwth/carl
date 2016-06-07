@@ -91,3 +91,40 @@ TEST(Contraction, SimpleNewton)
 
     EXPECT_EQ(resultA.isEmpty(), true);
 }
+
+#ifndef THREAD_SAFE
+#ifdef USE_CLN_NUMBERS
+typedef cln::cl_RA RationalB;
+
+TEST(Contraction, WithPropagation)
+{
+    Variable y = freshRealVariable("y");
+    Variable r = freshRealVariable("_r_9");
+    
+    Interval<double>::evalintervalmap map;
+    
+    RationalB r1 = RationalB(1)/RationalB(20);
+    RationalB r2 = RationalB(93222358)/RationalB(131836323);
+    RationalB r3 = RationalB(1)/RationalB(2);
+    Interval<double> i1 = Interval<double>( r1, BoundType::WEAK, r2, BoundType::WEAK );
+    std::cout << "i1: " << std::setprecision(100) << i1 << std::endl;
+    Interval<double> i2 = Interval<double>( r3, BoundType::STRICT, RationalB(0), BoundType::INFTY );
+    std::cout << "i2: " << std::setprecision(100) << i2 << std::endl;
+    
+    map[y] = i1;
+    map[r] = i2;
+    
+    MultivariatePolynomial<RationalB> e8({(RationalB)1*y*y,(RationalB)-1*r});
+    Contraction<SimpleNewton, MultivariatePolynomial<RationalB>> e8_contractor(e8);
+    
+    Interval<double> resultA, resultB;
+    bool split = e8_contractor(map,y,resultA,resultB,true,true);
+    std::cout << "split = " << split << std::endl;
+    std::cout << "resultA = " << resultA << std::endl;
+    std::cout << "resultB = " << resultB << std::endl;
+    EXPECT_FALSE( split );
+    EXPECT_FALSE( resultA.isEmpty() );
+    EXPECT_TRUE( resultB.isEmpty() );
+}
+#endif
+#endif
