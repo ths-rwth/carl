@@ -53,6 +53,8 @@ option( THREAD_SAFE "Use mutexing to assure thread safety" OFF )
 option( PRUNE_MONOMIAL_POOL "Prune monomial pool" ON )
 option( CLANG_TIDY "Enable usage of clang-tidy" OFF )
 
+option( BINDINGS_PYTHON "Build python bindings" OFF )
+
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
@@ -189,3 +191,7 @@ include(export)
 # # # # # # # # # # # # # # # # # # # # # #
 # G. CPack
 # # # # # # # # # # # # # # # # # # # # # #
+
+if (BINDINGS_PYTHON)
+	add_subdirectory(bindings/pycarl)
+endif()
