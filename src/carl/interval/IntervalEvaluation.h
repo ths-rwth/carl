@@ -67,6 +67,8 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const Monomial& m, const s
 		// We expect every variable to be in the map.
 		CARL_LOG_ASSERT("carl.interval", map.count(m[i].first) > (size_t)0, "Every variable is expected to be in the map.");
 		result *= map.at(m[i].first).pow(m[i].second);
+        if( result.isZero() )
+            return result;
 	}
 	return result;
 }
@@ -75,17 +77,8 @@ template<typename Coeff, typename Numeric, EnableIf<std::is_same<Numeric, Coeff>
 inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
 {
 	Interval<Numeric> result(t.coeff());
-	if (t.monomial()) {
-		const Monomial& m = *t.monomial();
-		// TODO use iterator.
-		CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
-		for (unsigned i = 0; i < m.nrVariables(); ++i) {
-			CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
-			// We expect every variable to be in the map.
-			assert(map.count(m[i].first) > 0);
-			result *= map.at(m[i].first).pow(m[i].second);
-		}
-	}
+	if (t.monomial())
+		result *= IntervalEvaluation::evaluate( *t.monomial(), map );
 	return result;
 }
 
@@ -93,17 +86,8 @@ template<typename Coeff, typename Numeric, DisableIf<std::is_same<Numeric, Coeff
 inline Interval<Numeric> IntervalEvaluation::evaluate(const Term<Coeff>& t, const std::map<Variable, Interval<Numeric>>& map)
 {
 	Interval<Numeric> result(t.coeff());
-	if (t.monomial()) {
-		const Monomial& m = *t.monomial();
-		// TODO use iterator.
-		CARL_LOG_TRACE("carl.core.monomial", "Iterating over " << m);
-		for (unsigned i = 0; i < m.nrVariables(); ++i) {
-			CARL_LOG_TRACE("carl.core.monomial", "Iterating: " << m[i].first);
-			// We expect every variable to be in the map.
-			assert(map.count(m[i].first) > 0);
-			result *= map.at(m[i].first).pow(m[i].second);
-		}
-	}
+	if (t.monomial())
+		result *= IntervalEvaluation::evaluate( *t.monomial(), map );
 	return result;
 }
 
@@ -116,6 +100,8 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const MultivariatePolynomi
 	} else {
 		Interval<Numeric> result(evaluate(p[0], map)); 
 		for (unsigned i = 1; i < p.nrTerms(); ++i) {
+            if( result.isInfinite() )
+                return result;
 			result += evaluate(p[i], map);
 		}
 		return result;
@@ -154,6 +140,8 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i < p.degree(); i++) {
 		res += p.coefficients()[i] * exp;
+        if( res.isInfinite() )
+            return res;
 		exp = varValue.pow(i+1);
 	}
 	return res;
@@ -168,6 +156,8 @@ inline Interval<Numeric> IntervalEvaluation::evaluate(const UnivariatePolynomial
 	Interval<Numeric> exp(1);
 	for (unsigned i = 0; i <= p.degree(); i++) {
 		res += IntervalEvaluation::evaluate(p.coefficients()[i], map) * exp;
+        if( res.isInfinite() )
+            return res;
 		exp = varValue.pow(i+1);
 	}
 	return res;

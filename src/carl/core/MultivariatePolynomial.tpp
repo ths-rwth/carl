@@ -1182,13 +1182,17 @@ MultivariatePolynomial<Coeff, Ordering, Policies> MultivariatePolynomial<Coeff, 
 
 template<typename Coeff, typename Ordering, typename Policies>
 template<typename SubstitutionType>
-Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& substitutions) const
+SubstitutionType MultivariatePolynomial<Coeff,Ordering,Policies>::evaluate(const std::map<Variable,SubstitutionType>& map) const
 {
-	// We do not have to construct polynomials all the time.
-	CARL_LOG_INEFFICIENT();
-	MultivariatePolynomial result = substitute(substitutions);
-	assert(result.isConstant());
-	return result.constantPart();
+	if(isZero()) {
+		return constant_zero<SubstitutionType>::get();
+	} else {
+		SubstitutionType result(mTerms[0].evaluate(map)); 
+		for (unsigned i = 1; i < mTerms.size(); ++i) {
+			result += mTerms[i].evaluate(map);
+		}
+		return result;
+	};
 }
 
 template<typename Coeff, typename Ordering, typename Policies>
