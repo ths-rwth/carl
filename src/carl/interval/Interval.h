@@ -1728,7 +1728,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator +(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator+(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the addition of an interval and a number.
@@ -1737,7 +1737,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator+(const Number& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the addition of an interval and a number.
@@ -1746,7 +1746,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number> operator+(const Interval<Number>& lhs, const Number& rhs);
 
     /**
      * Operator for the addition of an interval and a number with assignment.
@@ -1755,7 +1755,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number>& operator+=(Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the addition of an interval and a number with assignment.
@@ -1764,7 +1764,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator +=(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number>& operator+=(Interval<Number>& lhs, const Number& rhs);
 
     /**
      * Unary minus.
@@ -1772,7 +1772,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator -(const Interval<Number>& interval);
+    inline Interval<Number> operator-(const Interval<Number>& interval);
 
     /**
      * Operator for the subtraction of two intervals.
@@ -1781,7 +1781,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator-(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the subtraction of an interval and a number.
@@ -1790,7 +1790,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator-(const Number& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the subtraction of an interval and a number.
@@ -1799,7 +1799,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number> operator-(const Interval<Number>& lhs, const Number& rhs);
 
 	/**
      * Operator for the subtraction of two intervals with assignment.
@@ -1808,7 +1808,7 @@ namespace carl
      * @return Resulting interval.
      */
 	template<typename Number>
-    inline const Interval<Number> operator -=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number>& operator-=(Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the subtraction of an interval and a number with assignment.
@@ -1817,7 +1817,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator -=(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number>& operator-=(Interval<Number>& lhs, const Number& rhs);
 
     /**
      * Operator for the multiplication of two intervals.
@@ -1826,7 +1826,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator *(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator*(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the multiplication of an interval and a number.
@@ -1835,7 +1835,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator*(const Number& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the multiplication of an interval and a number.
@@ -1844,7 +1844,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number> operator*(const Interval<Number>& lhs, const Number& rhs);
 
     /**
      * Operator for the multiplication of an interval and a number with assignment.
@@ -1853,7 +1853,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator *=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number>& operator*=(Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the multiplication of an interval and a number with assignment.
@@ -1862,7 +1862,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator *=(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs);
 
     /**
      * Operator for the division of two intervals.
@@ -1871,7 +1871,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator/(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the division of an interval and a number.
@@ -1880,7 +1880,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator /(const Number& lhs, const Interval<Number>& rhs);
+    inline Interval<Number> operator/(const Number& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the division of an interval and a number.
@@ -1889,7 +1889,7 @@ namespace carl
      * @return Resulting interval.
      */
     template<typename Number>
-    inline const Interval<Number> operator /(const Interval<Number>& lhs, const Number& rhs);
+    inline Interval<Number> operator/(const Interval<Number>& lhs, const Number& rhs);
 
     /*
      * Comparison operators
@@ -1902,7 +1902,7 @@ namespace carl
      * @return True if both intervals are equal.
      */
     template<typename Number>
-    inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline bool operator==(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the comparison of two intervals.
@@ -1911,7 +1911,7 @@ namespace carl
      * @return True if both intervals are unequal.
      */
     template<typename Number>
-    inline bool operator !=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline bool operator!=(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the comparison of two intervals.
@@ -1921,7 +1921,7 @@ namespace carl
      * at the upper bound of lhs.
      */
     template<typename Number>
-    inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline bool operator<=(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the comparison of two intervals.
@@ -1931,7 +1931,7 @@ namespace carl
      * at the lower bound of lhs.
      */
     template<typename Number>
-    inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline bool operator>=(const Interval<Number>& lhs, const Interval<Number>& rhs);
 
     /**
      * Operator for the comparison of two intervals.
@@ -1959,9 +1959,9 @@ namespace carl
      * at the upper bound of lhs.
      */
     template<typename Number>
-    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs);
+    inline bool operator<=(const Interval<Number>& lhs, const Number& rhs);
     template<typename Number>
-    inline bool operator <=(const Number& lhs, const Interval<Number>& rhs)
+    inline bool operator<=(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs>=lhs;
     }
@@ -1974,9 +1974,9 @@ namespace carl
      * at the lower bound of lhs.
      */
     template<typename Number>
-    inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs);
+    inline bool operator>=(const Interval<Number>& lhs, const Interval<Number>& rhs);
     template<typename Number>
-    inline bool operator >=(const Number& lhs, const Interval<Number>& rhs)
+    inline bool operator>=(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs<=lhs;
     }
@@ -1990,7 +1990,7 @@ namespace carl
     template<typename Number>
     inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs);
     template<typename Number>
-    inline bool operator <(const Number& lhs, const Interval<Number>& rhs)
+    inline bool operator<(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs>lhs;
     }
@@ -2004,7 +2004,7 @@ namespace carl
     template<typename Number>
     inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs);
     template<typename Number>
-    inline bool operator >(const Number& lhs, const Interval<Number>& rhs)
+    inline bool operator>(const Number& lhs, const Interval<Number>& rhs)
     {
         return rhs<lhs;
     }

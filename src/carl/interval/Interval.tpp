@@ -1610,81 +1610,81 @@ template<typename Number>
  ******************************************************************************/
 
 template<typename Number>
-inline const Interval<Number> operator +(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator+(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.add(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator +(const Number& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator+(const Number& lhs, const Interval<Number>& rhs)
 	{
 		return Interval<Number>( lhs + rhs.content().lower(), rhs.lowerBoundType(), lhs + rhs.content().upper(), rhs.upperBoundType());
 	}
 
 template<typename Number>
-inline const Interval<Number> operator +(const Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number> operator+(const Interval<Number>& lhs, const Number& rhs)
 	{
 		return rhs + lhs;
 	}
 
 template<typename Number>
-inline const Interval<Number> operator +=(Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number>& operator+=(Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		lhs.add_assign(rhs);
                 return lhs;
 	}
 
 template<typename Number>
-inline const Interval<Number> operator +=(Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number>& operator+=(Interval<Number>& lhs, const Number& rhs)
 	{
 		return lhs += Interval<Number>(rhs);
 	}
 
 template<typename Number>
-    inline const Interval<Number> operator -(const Interval<Number>& interval)
+    inline Interval<Number> operator-(const Interval<Number>& interval)
     {
         return interval.inverse();
     }
 
 template<typename Number>
-inline const Interval<Number> operator -(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator-(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.sub(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator -(const Number& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator-(const Number& lhs, const Interval<Number>& rhs)
 	{
 		return Interval<Number>(lhs).sub(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator -(const Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number> operator-(const Interval<Number>& lhs, const Number& rhs)
 	{
 		return lhs.sub(Interval<Number>(rhs));
 	}
 
 template<typename Number>
-inline const Interval<Number> operator -=(Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number>& operator-=(Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		lhs.sub_assign(rhs);
                 return lhs;
 	}
 
 template<typename Number>
-inline const Interval<Number> operator -=(Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number> operator-=(Interval<Number>& lhs, const Number& rhs)
 	{
 		return lhs -= Interval<Number>(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator *(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator*(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.mul(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator *(const Number& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator*(const Number& lhs, const Interval<Number>& rhs)
 	{
 		if(lhs < 0) {
 			return Interval<Number>(lhs * rhs.content().upper(), rhs.upperBoundType(), lhs * rhs.content().lower(), rhs.lowerBoundType());
@@ -1694,38 +1694,38 @@ inline const Interval<Number> operator *(const Number& lhs, const Interval<Numbe
 	}
 
 template<typename Number>
-inline const Interval<Number> operator *(const Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number> operator*(const Interval<Number>& lhs, const Number& rhs)
 	{
 		return rhs * lhs;
 	}
 
 template<typename Number>
-inline const Interval<Number> operator *=(Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number>& operator*=(Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		lhs.mul_assign(rhs);
                 return lhs;
 	}
 
 template<typename Number>
-inline const Interval<Number> operator *=(Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number>& operator*=(Interval<Number>& lhs, const Number& rhs)
 	{
 		return lhs *= Interval<Number>(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator /(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator/(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.div(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator /(const Number& lhs, const Interval<Number>& rhs)
+inline Interval<Number> operator/(const Number& lhs, const Interval<Number>& rhs)
 	{
 		return Interval<Number>(lhs).div_assign(rhs);
 	}
 
 template<typename Number>
-inline const Interval<Number> operator /(const Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number> operator/(const Interval<Number>& lhs, const Number& rhs)
 	{
 		return lhs.div(Interval<Number>(rhs));
 	}
@@ -1735,19 +1735,19 @@ inline const Interval<Number> operator /(const Interval<Number>& lhs, const Numb
  ******************************************************************************/
 
 template<typename Number>
-inline bool operator ==(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline bool operator==(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return lhs.content().lower() == rhs.content().lower() && lhs.content().upper() == rhs.content().upper() && lhs.lowerBoundType() == rhs.lowerBoundType() && lhs.upperBoundType() == rhs.upperBoundType();
 	}
 
 template<typename Number>
-inline bool operator !=(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline bool operator!=(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return !(lhs == rhs);
 	}
 
 template<typename Number>
-inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline bool operator<=(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		if( lhs < rhs )
 		{
@@ -1772,13 +1772,13 @@ inline bool operator <=(const Interval<Number>& lhs, const Interval<Number>& rhs
 	}
 
 template<typename Number>
-inline bool operator >=(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline bool operator>=(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return rhs <= lhs;
 	}
 
 template<typename Number>
-inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline bool operator<(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		if( lhs.upper() < rhs.lower() )
 		{
@@ -1803,13 +1803,13 @@ inline bool operator <(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	}
 
 template<typename Number>
-inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
+inline bool operator>(const Interval<Number>& lhs, const Interval<Number>& rhs)
 	{
 		return rhs < lhs;
 	}
 
     template<typename Number>
-    inline bool operator <=(const Interval<Number>& lhs, const Number& rhs)
+    inline bool operator<=(const Interval<Number>& lhs, const Number& rhs)
     {
         switch( lhs.upperBoundType() )
         {
@@ -1821,7 +1821,7 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
     }
 
     template<typename Number>
-    inline bool operator >=(const Interval<Number>& lhs, const Number& rhs)
+    inline bool operator>=(const Interval<Number>& lhs, const Number& rhs)
     {
         switch( lhs.lowerBoundType() )
         {
@@ -1833,7 +1833,7 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
     }
 
     template<typename Number>
-    inline bool operator <(const Interval<Number>& lhs, const Number& rhs)
+    inline bool operator<(const Interval<Number>& lhs, const Number& rhs)
     {
         switch( lhs.upperBoundType() )
         {
@@ -1847,7 +1847,7 @@ inline bool operator >(const Interval<Number>& lhs, const Interval<Number>& rhs)
     }
 
     template<typename Number>
-    inline bool operator >(const Interval<Number>& lhs, const Number& rhs)
+    inline bool operator>(const Interval<Number>& lhs, const Number& rhs)
     {
         switch( lhs.lowerBoundType() )
         {
