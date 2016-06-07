@@ -1672,7 +1672,7 @@ inline Interval<Number>& operator-=(Interval<Number>& lhs, const Interval<Number
 	}
 
 template<typename Number>
-inline Interval<Number> operator-=(Interval<Number>& lhs, const Number& rhs)
+inline Interval<Number>& operator-=(Interval<Number>& lhs, const Number& rhs)
 	{
 		return lhs -= Interval<Number>(rhs);
 	}
