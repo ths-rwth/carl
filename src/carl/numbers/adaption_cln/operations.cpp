@@ -10,7 +10,7 @@ namespace carl
     cln::cl_RA rationalize<cln::cl_RA>(double n) {
         switch (std::fpclassify(n)) {
             case FP_NORMAL: // normalized are fully supported
-                return cln::rationalize(cln::cl_R(n));
+                return cln::rationalize(convert<mpq_class, cln::cl_RA>(n));
             case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
 				static_assert(sizeof(n) == 8, "double is assumed to be eight bytes wide.");
                 sint significandBits = reinterpret_cast<sint>(&n);
@@ -35,7 +35,7 @@ namespace carl
         switch (std::fpclassify(n))
         {
             case FP_NORMAL: // normalized are fully supported
-                return cln::rationalize(cln::cl_R(n));
+                return cln::rationalize(convert<mpq_class, cln::cl_RA>(n));
             case FP_SUBNORMAL: { // subnormals result in underflows, hence the value of the double is 0.f, where f is the significand precision
 				static_assert(sizeof(n) == 4, "float is assumed to be four bytes wide.");
                 sint significandBits = reinterpret_cast<sint>(&n);

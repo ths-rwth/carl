@@ -1354,7 +1354,7 @@ cad::Answer CAD<Number>::mainCheck(
 	}
 
 	if (!boundsNontrivial) {
-		std::cout << "Reseting lifting positions " << std::endl;
+		//std::cout << "Reseting lifting positions " << std::endl;
 		// CAD is computed completely if there were no bounds used during elimination and lifting
 		this->iscomplete = true;
 		// all liftings were considered, so store the reset states
