@@ -1785,6 +1785,7 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 		const UnivariatePolynomial<Coeff>& q,
 		const SubresultantStrategy strategy
 ) {
+	// Attention: Mathematica / Wolframalpha has one entry less (the last one) which is identical to p!
 	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
 	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
 	uint i = 0;
