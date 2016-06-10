@@ -8,7 +8,7 @@ if (PYTHONINTERP_FOUND)
 		DEPENDS lib_carl
 	)
 	add_custom_target(PythonBindingsDevelop
-		COMMAND ${PYTHON_EXECUTABLE} setup.py develop --user
+		COMMAND ${PYTHON_EXECUTABLE} setup.py develop
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS lib_carl
 	)
