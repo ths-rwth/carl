@@ -1786,7 +1786,7 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 		const SubresultantStrategy strategy
 ) {
 	std::list<UnivariatePolynomial<Coeff>> subres = UnivariatePolynomial<Coeff>::subresultants(p, q, strategy);
-	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs(subres.size());
+	std::vector<UnivariatePolynomial<Coeff>> subresCoeffs;
 	uint i = 0;
 	for (const auto& s: subres) {
 		assert(!s.isZero());
@@ -1794,10 +1794,10 @@ const std::vector<UnivariatePolynomial<Coeff>> UnivariatePolynomial<Coeff>::prin
 			// this and all further subresultants won't have a non-zero i-th coefficient
 			break;
 		}
-		subresCoeffs[i] = s->coefficients()[i];
+		assert(s.degree() == i);
+		subresCoeffs.emplace_back(s.mainVar(), s.lcoeff());
 		i++;
 	}
-	subresCoeffs.resize(i);
 	return subresCoeffs;
 }
 
