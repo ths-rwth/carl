@@ -725,6 +725,10 @@ public:
 	Iterator get_parent(const Iterator& it) const {
 		return Iterator(this, nodes[it.current].parent);
 	}
+	template<typename Iterator>
+	Iterator left_sibling(const Iterator& it) const {
+		return Iterator(this, nodes[it.current].previousSibling);
+	}
 
 	/**
 	 * Sets the value of the root element.
@@ -867,14 +871,6 @@ public:
 	void eraseChildren(const Iterator& position) {
 		eraseChildren(position.current);
 	}
-	template<typename TT>
-	friend std::ostream& operator<<(std::ostream& os, const tree<TT>& tree) {
-		for (auto it = tree.begin_preorder(); it != tree.end_preorder(); it++) {
-			os << std::string(it.depth(), '\t') << *it << std::endl;
-		}
-		return os;
-	}
-
 private:
 	std::size_t newNode(const T& data, std::size_t parent, std::size_t depth) {
 		std::size_t newID = 0;
@@ -923,7 +919,7 @@ private:
 		nodes[id].depth = MAXINT;
 		emptyNodes = id;
 	}
-	
+
 public:
 	bool isConsistent() const {
 		for (auto it = this->begin(); it != this->end(); it++) {
@@ -942,7 +938,7 @@ public:
 				child = nodes[child].nextSibling;
 			}
 			assert(child == nodes[node].lastChild);
-			
+
 			child = nodes[node].lastChild;
 			while (nodes[child].previousSibling != MAXINT) {
 				assert(nodes[child].parent == node);
@@ -954,6 +950,15 @@ public:
 		return true;
 	}
 };
+
+
+template<typename TT>
+std::ostream& operator<<(std::ostream& os, const tree<TT>& tree) {
+	for (auto it = tree.begin_preorder(); it != tree.end_preorder(); it++) {
+		os << std::string(it.depth(), '\t') << *it << std::endl;
+	}
+	return os;
+}
 
 template<typename T>
 const std::size_t tree<T>::MAXINT;
