@@ -24,6 +24,13 @@ using _Monomial = Term<Coeff>;
 template<typename Coeff>
 using GB = std::vector<MultivariatePolynomial<Coeff>>;
 
+// Checks if the set mon of this groebner basis is finite (Prop. 12.7, page 541)
+// Here we assume that the underlying ring is the polynomial ring in exactly the variables that actually occur in the basis.
+// Otherwise, this should return false anyway.
+// This is also a necessary condition for the system (for which g was computed) to be 0-dim.
+template<typename Coeff>
+bool hasFiniteMon(const GB<Coeff>& g);
+
 
 // cor (the corners of the staircase) are just the leading monomials of the polynomials in the groebner base
 template<typename Coeff>

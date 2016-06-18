@@ -10,12 +10,10 @@
 
 #include "../core/UnivariatePolynomial.h"
 #include "../core/Sign.h"
-#include "ThomUtil.h"
 
-/*
- * TODO list
- * - put sign determinatation in its own header
- */
+#include "ThomUtil.h"
+#include "TarskiQuery/TarskiQuery.h"
+
 
 namespace carl {
 

@@ -34,10 +34,10 @@ std::vector<Coeff> newtonSums(const std::vector<Coeff>& newtonSums) {
 }
 
 template<typename Coeff>
-using Matrix = Eigen::Matrix<Coeff, Eigen::Dynamic, Eigen::Dynamic>;
+using CoeffMatrix = Eigen::Matrix<Coeff, Eigen::Dynamic, Eigen::Dynamic>;
 
 template<typename Coeff>
-void printMatrix(const Matrix<Coeff>& m) {
+void printMatrix(const CoeffMatrix<Coeff>& m) {
         for(int i = 0; i < m.rows(); i++) {
                 for(int j = 0; j < m.cols(); j++) {
                         std::cout << m(i, j) << "\t";
@@ -48,7 +48,7 @@ void printMatrix(const Matrix<Coeff>& m) {
 
 // algorithm 8.17, p. 300
 template<typename Coeff>
-std::vector<Coeff> charPol(const Matrix<Coeff>& m) {
+std::vector<Coeff> charPol(const CoeffMatrix<Coeff>& m) {
         long int n = m.cols();
         assert(n == m.rows());
         
@@ -58,9 +58,9 @@ std::vector<Coeff> charPol(const Matrix<Coeff>& m) {
         std::cout << "n = " << n << std::endl;
         std::cout << "r = " << r << std::endl;
         
-        Matrix<Coeff> id = Matrix<Coeff>::Identity(n, n);
+        CoeffMatrix<Coeff> id = CoeffMatrix<Coeff>::Identity(n, n);
         
-        std::vector<Matrix<Coeff>> B;
+        std::vector<CoeffMatrix<Coeff>> B;
         std::vector<Coeff> N((r * r), Coeff(0));
         B.push_back(id);
         N[0] = static_cast<Coeff>(n);
@@ -71,7 +71,7 @@ std::vector<Coeff> charPol(const Matrix<Coeff>& m) {
         }
         std::cout << N << std::endl;
         
-        std::vector<Matrix<Coeff>> C;
+        std::vector<CoeffMatrix<Coeff>> C;
         C.push_back(m * B.back());
         N[r] = C.back().trace();
         for(int j = 1; j < r - 1; j++) {
@@ -83,7 +83,7 @@ std::vector<Coeff> charPol(const Matrix<Coeff>& m) {
         
         for(int i = 1; i < r; i++) {
                 for(int j = 1; j < r; j++) {
-                        Matrix<Coeff> tmp(B[i] * C[j-1]);
+                        CoeffMatrix<Coeff> tmp(B[i] * C[j-1]);
                         N[j*r + i] = tmp.trace();
                 }
         }

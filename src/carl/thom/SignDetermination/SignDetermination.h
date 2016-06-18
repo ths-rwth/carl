@@ -1,8 +1,8 @@
 /* 
- * File:   SignDetermination.h
+ * File:   SignDeterminationGeneric.h
  * Author: tobias
  *
- * Created on 8. Mai 2016, 19:29
+ * Created on 14. Juni 2016, 19:18
  */
 
 #pragma once
@@ -10,32 +10,47 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include "TarskiQuery.h"
-#include "ThomUtil.h"
+#include "../TarskiQuery/TarskiQuery.h"
+#include "../ThomUtil.h"
+#include "../ThomSettings.h"
 
+namespace carl {
 
 /*
- * Calculates the set of sign conditions realized by the (univ.) polynomials in the list p on the roots of z.
+ * Calculates the set of sign conditions realized by the polynomials in the list p on the roots of z.
  * This is essential to many algorithms dealing with thom encondings of RANs.
- */
-template<typename Coeff>
-std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z, const bool reduce = false);
-
-
-
-/*
- * IDEAS for IMPROVEMENTS
- * - do the linear algebra exact 
- * - ...
  * 
+ * z ist the zero set. In the univariate case this can only contain one polynomial.
+ * (in theory, it could contain more, but then gcd would have to be computed and we dont want this)
+ * in the multivariate case, it should contain as many polynomials as there are variables
  */
-using namespace carl;
-using namespace Eigen;
+template<typename Polynomial, typename Settings = ThomCurrentSettings>
+std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const std::vector<Polynomial>& z);
+
+template<typename Polynomial, typename Settings = ThomCurrentSettings>
+std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const Polynomial& z) {
+        return signDetermination(p, std::vector<Polynomial>(1, z));
+}
+
+// todo: offer a version that takes bounds?
+
+}
+
+
+
+namespace carl {
+        
+using Eigen::MatrixXf;
+using Eigen::VectorXf;
+using Eigen::Matrix3f;
+using Eigen::Vector3f;
+using Eigen::FullPivLU;
+using Eigen::PartialPivLU;
 
 MatrixXf adaptedMat(const std::vector<std::vector<unsigned>>& A, const std::vector<SignCondition>& sign);
 
-const std::vector<SignCondition> basicSignCondition({SignCondition(1, Sign::ZERO), SignCondition(1, Sign::POSITIVE), SignCondition(1, Sign::NEGATIVE)});
-const std::vector<std::vector<unsigned>> basicAdaptedList({std::vector<unsigned>(1, 0), std::vector<unsigned>(1, 1), std::vector<unsigned>(1, 2)});
+const std::vector<SignCondition> basicSignCondition = {{Sign::ZERO}, {Sign::POSITIVE}, {Sign::NEGATIVE}};
+const std::vector<std::vector<unsigned>> basicAdaptedList = {{0}, {1}, {2}};
 const Matrix3f basicMatrixInverse = adaptedMat(basicAdaptedList, basicSignCondition).inverse();
 
 template<typename T>
@@ -78,12 +93,11 @@ MatrixXf kroneckerProduct(const MatrixXf& m1, const MatrixXf& m2) {
         return m3;
 }
 
-template<typename Coeff>
-VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
+template<typename Polynomial, typename Settings>
+VectorXf compute_dprime(const std::vector<Polynomial>& P,
                         const std::vector<std::vector<unsigned>>& B,
                         const std::vector<std::vector<unsigned>>& Ada,
-                        const UnivariatePolynomial<Coeff>& z,
-                        const bool reduce = false) {
+                        const TarskiQueryManager<Polynomial>& tarskiQuery) {
         // asserts
         assert(B.front().size() == 1); // must hold for all vectors in B
         assert(P.size() == Ada.front().size() + 1);
@@ -106,15 +120,17 @@ VectorXf compute_dprime(const std::vector<UnivariatePolynomial<Coeff>>& P,
         VectorXf res(bxada.size()); // we already know the length of the resulting vector
         for(unsigned i = 0; i < bxada.size(); i++) {
                 // evaluate the i-th element of bxada on P
-                UnivariatePolynomial<Coeff> poly = P.front().one();
+                Polynomial poly = P.front();
+                poly = poly.divideBy(poly).quotient; // now poly is the 1-polynomial ... somewhat stupid. optimize this
                 for(unsigned j = 0; j < P.size(); j++) {
                         poly *= P[j].pow(bxada[i][j]);
-                        if(reduce) {
-                                poly = poly.remainder(z);
+                        if(Settings::SIGN_DETERMINATION_REDUCE) {
+                                // poly = poly.remainder(z);
+                                // todo implement!!
                         }
                 }
                 PRINTV(poly);
-                int taq = tarskiQuery(poly, z);
+                int taq = tarskiQuery(poly);
                 res(i) = (float)taq;
                  
         }
@@ -207,14 +223,18 @@ std::vector<std::vector<unsigned>> adaptedFamily(const std::vector<SignCondition
 
 
 
-template<typename Coeff>
-std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynomial<Coeff>>& p, const UnivariatePolynomial<Coeff>& z, const bool reduce = false) {
+template<typename Polynomial, typename Settings = ThomCurrentSettings>
+std::vector<SignCondition> signDetermination(const std::vector<Polynomial>& p, const std::vector<Polynomial>& z) {
+        static_assert(is_polynomial<Polynomial>::value, "only call 'signDetermination' on polynomial types");
         PRINT("Input to signDetermination:");
         PRINTV(p); PRINTV(z);
-        assert(!z.isZero()); // because otherwise the set Zeros(z) is infinite
+        assert(isZeroDimensionalSystem(z)); // because otherwise the set Zeros(z) is infinite
         assert((unsigned)p.size() > 0);
+        
+        // set up the tarski query manager for this sign determination
+        TarskiQueryManager<Polynomial> tarskiQuery(z);
                
-        int r = tarskiQuery(p.front().one(), z); // this is just the total number of roots of z
+        int r = tarskiQuery(1); // this is just the total number of roots of z
         assert(r >= 0);
         PRINTV(r);
         if(r == 0) return std::vector<SignCondition>(); // then z has no roots, so there are no realisable sign conditions on the roots of z
@@ -228,8 +248,8 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
                 LINE;
                 std::vector<SignCondition> sign; // our first aim in this step is to compute this
                 
-                int taq1 = tarskiQuery(p[i], z);
-                int taq2 = tarskiQuery(p[i] * p[i], z);
+                int taq1 = tarskiQuery(p[i]);
+                int taq2 = tarskiQuery(p[i] * p[i]);
                 assert(std::abs(taq1) <= r && std::abs(taq2) <= r);
                 Vector3f t((float)r, (float)taq1, (float)taq2); // right hand side of equation system
                 PRINTV2(t);
@@ -258,7 +278,7 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
                         }
                 }
                 else { // i < p.size()
-                        VectorXf d_prime = compute_dprime(std::vector<UnivariatePolynomial<Coeff>>(p.begin() + i, p.end()), B, lastAda, z, reduce);
+                        VectorXf d_prime = compute_dprime<Polynomial,Settings>(std::vector<Polynomial>(p.begin() + i, p.end()), B, lastAda, tarskiQuery);
                         MatrixXf M_prime = kroneckerProduct(adaptedMat(lastAda, lastSign), M);
                         PRINTV2(M_prime);
                         assert(M_prime.rows() == M_prime.cols() && M_prime.rows() == d_prime.size()); // assert square matrix and d_prime has correct length
@@ -310,3 +330,7 @@ std::vector<SignCondition> signDetermination(const std::vector<UnivariatePolynom
         return std::vector<SignCondition>();
         
 }
+
+} // namespace carl
+
+

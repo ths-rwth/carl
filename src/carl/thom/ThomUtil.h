@@ -12,8 +12,8 @@
 #include "../core/UnivariatePolynomial.h"
 #include "../core/Sign.h"
 
-#define DEBUG
-#ifdef DEBUG
+#define THOM_DEBUG
+#ifdef THOM_DEBUG
         #define PRINTV(x) std::cout << #x << " = " << x << std::endl;
         #define PRINTV2(x) std::cout << #x << " = " << std::endl << x << std::endl;
         #define PRINT(x) std::cout << x << std::endl;

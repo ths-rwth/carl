@@ -9,3 +9,5 @@ nbproject/
 **/CMakeOptions.cpp
 /resources/
 /src/carl/config.h
+/src/carl/thom/todos
+/src/carl/thom/todo

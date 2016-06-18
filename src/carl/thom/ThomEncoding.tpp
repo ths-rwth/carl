@@ -11,7 +11,7 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include "SignDetermination.h"
+#include "SignDetermination/SignDetermination.h"
 #include "ThomUtil.h"
 
 

@@ -35,7 +35,7 @@ std::vector<ThomEncoding<Coeff>> realRoots(
         assert(derivatives.size() == polynomial.degree() - 1);
         
         // run the core algorithm on p and its derivatives
-        std::vector<SignCondition> signConds = signDetermination(derivatives, polynomial, true);
+        std::vector<SignCondition> signConds = signDetermination(derivatives, polynomial);
         
         std::vector<ThomEncoding<Coeff>> res;
         res.reserve(signConds.size());

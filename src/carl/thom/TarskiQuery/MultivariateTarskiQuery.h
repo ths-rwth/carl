@@ -19,7 +19,7 @@ int multivariateTarskiQuery(const MultivariatePolynomial<Coeff>& Q, const Multip
         BaseRepr<Coeff> q = normalForm(Q, gb);
         std::vector<_Monomial<Coeff>> base = table.getBase();
         // compute the traces...
-        Matrix<Coeff> m(base.size(), base.size());
+        CoeffMatrix<Coeff> m(base.size(), base.size());
         for(int i = 0; i < base.size(); i++) {
                 for(int j = 0; j < base.size(); j++) {
                         MultivariatePolynomial<Coeff> Qc = Q * base[i] * base[j];
