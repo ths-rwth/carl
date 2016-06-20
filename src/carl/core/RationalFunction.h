@@ -132,6 +132,7 @@ namespace carl
         
         RationalFunction& operator=(const RationalFunction& _rf)
         {
+            if( this == &_rf ) return *this;
             mIsSimplified = _rf.mIsSimplified;
             mNumberQuotient = _rf.mNumberQuotient;
             if( !isConstant() )
