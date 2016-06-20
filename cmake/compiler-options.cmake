@@ -1,4 +1,4 @@
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") # Matches "Clang" and "AppleClang"
 	if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
 		message(FATAL_ERROR " clang version must be at least 3.5!")
 	endif()
@@ -27,7 +27,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set(CMAKE_CXX_RELEASE_FLAGS "${CMAKE_CXX_RELEASE_FLAGS} /O2 /MT")
 	set(CMAKE_CXX_DEBUG_FLAGS "${CMAKE_CXX_DEBUG_FLAGS} /MTd")
 else()
-	message(WARNING "Possibly unsupported compiler")
+	message(WARNING "Possibly unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
