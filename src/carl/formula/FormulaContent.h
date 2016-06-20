@@ -193,6 +193,8 @@ namespace carl {
             mutable std::mutex mActivityMutex;
             /// Mutex for access to difficulty.
             mutable std::mutex mDifficultyMutex;
+            /// Mutex for collecting the variables within this formula.
+            mutable std::mutex mCollectVariablesMutex;
             ///
             mutable bool mTseitinClause = false;
             /// Container collecting the variables which occur in this formula.

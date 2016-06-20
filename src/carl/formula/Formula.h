@@ -74,9 +74,11 @@ namespace carl
             #ifdef THREAD_SAFE
             #define ACTIVITY_LOCK_GUARD std::lock_guard<std::mutex> lock1( mpContent->mActivityMutex );
             #define DIFFICULTY_LOCK_GUARD std::lock_guard<std::mutex> lock2( mpContent->mDifficultyMutex );
+            #define COLLECT_VARIABLES_LOCK_GUARD std::lock_guard<std::mutex> lock3( mpContent->mCollectVariablesMutex );
             #else
             #define ACTIVITY_LOCK_GUARD
             #define DIFFICULTY_LOCK_GUARD
+            #define COLLECT_VARIABLES_LOCK_GUARD
             #endif
             
         public:
@@ -307,6 +309,7 @@ namespace carl
             
             const Variables& variables() const
             {
+                COLLECT_VARIABLES_LOCK_GUARD
                 if( mpContent->mpVariables != nullptr )
                 {
                     return *(mpContent->mpVariables);
