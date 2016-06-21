@@ -124,7 +124,7 @@ public:
 	 * @param variableName Flag, if a name set via setVariableName shall be considered.
 	 * @return Some name for the Variable.
 	 */
-	const std::string getName(Variable::Arg v, bool variableName = true) const;
+	std::string getName(Variable::Arg v, bool variableName = true) const;
 	/**
 	 * Add a name for a given Variable.
 	 * This method is thread-safe.
