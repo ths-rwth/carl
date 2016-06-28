@@ -48,7 +48,7 @@ endif()
 
 ##### Eigen3
 if(NOT FORCE_SHIPPED_RESOURCES)
-	load_library(carl Eigen3 3.2)
+	load_library(carl EIGEN3 3.2)
 endif()
 if(EIGEN3_FOUND)
 	message(STATUS "Use system version of Eigen3 ${EIGEN3_VERSION}")
