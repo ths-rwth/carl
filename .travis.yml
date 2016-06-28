@@ -1,7 +1,9 @@
-language: cpp
-
-#sudo: required
+language: generic
+sudo: required
 dist: trusty
+
+cache:
+  apt: true
 
 env:
   global:
@@ -12,10 +14,10 @@ addons:
     sources:
       - boost-latest
       - george-edison55-precise-backports
-      - llvm-toolchain-trusty
-      - llvm-toolchain-trusty-3.6
-      - llvm-toolchain-trusty-3.7
-      - llvm-toolchain-trusty-3.8
+      - llvm-toolchain-precise
+      - llvm-toolchain-precise-3.6
+      - llvm-toolchain-precise-3.7
+      - llvm-toolchain-precise-3.8
       - ubuntu-toolchain-r-test
     packages:
       - cmake
