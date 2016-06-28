@@ -4,6 +4,7 @@ source setup_common.sh
 
 function install {
 	#sudo apt-get -qq install --force-yes $*
+	:
 }
 
 #sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 1397BC53640DB551
