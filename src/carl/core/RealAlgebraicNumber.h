@@ -209,6 +209,7 @@ public:
 			}
 			return i.contains(mIR->interval);
 		}
+		else return false;
 	}
 	
 	bool refineAvoiding(const Number& n) const {
