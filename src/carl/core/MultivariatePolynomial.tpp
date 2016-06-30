@@ -368,8 +368,8 @@ bool MultivariatePolynomial<Coeff,Ordering,Policies>::isLinear() const
 template<typename Coeff, typename Ordering, typename Policies>
 Definiteness MultivariatePolynomial<Coeff,Ordering,Policies>::definiteness( bool _fullEffort ) const
 {
-    if( isLinear() )
-        return Definiteness::NON;
+	if( isLinear() )
+		return Definiteness::NON;
 	auto term = mTerms.rbegin();
 	if( term == mTerms.rend() ) return Definiteness::NON;
 	Definiteness result = term->definiteness();
@@ -1224,8 +1224,7 @@ Coeff MultivariatePolynomial<Coeff,Ordering,Policies>::coprimeFactorWithoutConst
 {
 	assert(nrTerms() != 0);
 	typename TermsType::const_iterator it = mTerms.begin();
-    if(it->isConstant())
-        ++it;
+	if (it->isConstant()) ++it;
 	typename IntegralType<Coeff>::type num = carl::abs(getNum((it)->coeff()));
 	typename IntegralType<Coeff>::type den = carl::abs(getDenom((it)->coeff()));
 	for(++it; it != mTerms.end(); ++it)
