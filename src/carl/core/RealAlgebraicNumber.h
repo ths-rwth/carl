@@ -9,48 +9,16 @@
 
 #include "RealAlgebraicNumberSettings.h"
 
+#include "RealAlgebraicNumber_Interval.h"
+
 namespace carl {
 
 template<typename Number>
 class RealAlgebraicNumber {
 private:
 	friend std::hash<RealAlgebraicNumber<Number>>;
-	using Polynomial = UnivariatePolynomial<Number>;
-	struct IntervalContent {
-		Polynomial polynomial;
-		Interval<Number> interval;
-		std::list<Polynomial> sturmSequence;
-		std::size_t refinementCount;
-		
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i
-		):
-			polynomial(p),
-			interval(i),
-			sturmSequence(p.standardSturmSequence()),
-			refinementCount(0)
-		{}
-		
-		IntervalContent(
-			const Polynomial& p,
-			const Interval<Number> i,
-			const std::list<UnivariatePolynomial<Number>>& seq
-		):
-			polynomial(p),
-			interval(i),
-			sturmSequence(seq),
-			refinementCount(0)
-		{}
-			
-		/** Refines the interval i of this real algebraic number yielding the interval j such that !j.meets(n). If true is returned, n is the exact numeric representation of this root. Otherwise not.
-		 * @param n
-		 * @rcomplexity constant
-		 * @scomplexity constant
-		 * @return true, if n is the exact numeric representation of this root, otherwise false
-		 */
-		bool refineAvoiding(const Number& n, const RealAlgebraicNumber<Number>& parent);
-	};
+	using IntervalContent = ran::IntervalContent<Number>;
+	using Polynomial = typename IntervalContent::Polynomial;
 	
 	mutable Number mValue;
 	bool mIsRoot;
@@ -63,10 +31,11 @@ private:
 	}
 	
 	void switchToNR(const Number& n) const {
-		assert(mIR);
-		mIR->interval = Interval<Number>(n);
 		mValue = n;
-		mIR.reset();
+		if (mIR) {
+			mIR->interval = Interval<Number>(n);
+			mIR.reset();
+		}
 	}
 	
 public:
@@ -96,7 +65,7 @@ public:
 			Number b = mIR->polynomial.coefficients()[0];
 			switchToNR(-b / a);
 		} else {
-			if (i.contains(0)) mIR->refineAvoiding(0, *this);
+			if (i.contains(0)) refineAvoiding(0);
 		}
 	}
 		
@@ -126,7 +95,8 @@ public:
 	
 	std::size_t size() const {
 		if (isNumeric()) return carl::bitsize(mValue);
-		else return carl::bitsize(lower()) + carl::bitsize(upper()) * getPolynomial().degree();
+		else if (isInterval()) return carl::bitsize(mIR->interval.lower()) + carl::bitsize(mIR->interval.upper()) * mIR->polynomial.degree();
+		else return 0;
 	}
 	
 	/**
@@ -146,15 +116,25 @@ public:
 	
 	bool isZero() const {
 		if (isNumeric()) return carl::isZero(mValue);
-		else return mIR->interval.isZero();
+		else if (isInterval()) return mIR->interval.isZero();
+		else return false;
 	}
 	
 	bool isNumeric() const {
 		checkForSimplification();
 		return !mIR;
 	}
+	bool isInterval() const {
+		checkForSimplification();
+		return bool(mIR);
+	}
 	
-	bool isIntegral() const;
+	bool isIntegral() const {
+		refineToIntegrality();
+		if (isNumeric()) return carl::isInteger(mValue);
+		else if (isInterval()) return mIR->isIntegral();
+		else return false;
+	}
 	
 	Number branchingPoint() const {
 		if (isNumeric()) return mValue;
@@ -218,13 +198,13 @@ public:
 	
 	bool containedIn(const Interval<Number>& i) const {
 		if (isNumeric()) return i.contains(mValue);
-		else {
-			if (getInterval().contains(i.lower())) {
-				mIR->refineAvoiding(i.lower(), *this);
+		else if (isInterval()) {
+			if (mIR->interval.contains(i.lower())) {
+				refineAvoiding(i.lower());
 				if (isNumeric()) return i.contains(mValue);
 			}
-			if (getInterval().contains(i.upper())) {
-				mIR->refineAvoiding(i.upper(), *this);
+			if (mIR->interval.contains(i.upper())) {
+				refineAvoiding(i.upper());
 				if (isNumeric()) return i.contains(mValue);
 			}
 			return i.contains(mIR->interval);
@@ -233,14 +213,18 @@ public:
 	
 	bool refineAvoiding(const Number& n) const {
 		assert(!isNumeric());
-		return mIR->refineAvoiding(n, *this);
+		bool res = mIR->refineAvoiding(n);
+		checkForSimplification();
+		return res;
 	}
-	void refine(RealAlgebraicNumberSettings::RefinementStrategy strategy = RealAlgebraicNumberSettings::RefinementStrategy::DEFAULT) const;
 	/// Refines until the number is either numeric or the interval does not contain any integer.
 	void refineToIntegrality() const {
-		while (!isNumeric() && mIR->interval.containsInteger()) {
-			refine();
-		}
+		if (isInterval()) mIR->refineToIntegrality();
+		checkForSimplification();
+	}
+	void refine() const {
+		if (isInterval()) mIR->refine();
+		checkForSimplification();
 	}
 	
 	bool equal(const RealAlgebraicNumber<Number>& n) const;
