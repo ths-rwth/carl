@@ -91,6 +91,7 @@ UnivariatePolynomial<Number> evaluateCoefficients(
 ////////////////////////////////////////
 // Implementation
 
+// This is called by carl::CAD implementation (from Constraint)
 template<typename Number, typename Coeff>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, const RealAlgebraicPoint<Number>& point, const std::vector<Variable>& variables) {
 	assert(point.dim() == variables.size());
@@ -113,6 +114,7 @@ RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Coeff>& p, con
 	return evaluate(pol, RANs);
 }
 
+// This is called by smtrat::CAD implementation (from CAD.h)
 template<typename Number>
 RealAlgebraicNumber<Number> evaluate(const MultivariatePolynomial<Number>& p, RANMap<Number>& m) {
 	CARL_LOG_DEBUG("carl.ran", "Evaluating " << p << " on " << m);
