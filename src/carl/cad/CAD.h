@@ -372,13 +372,6 @@ public:
 	// PUBLIC STATIC METHODS //
 	///////////////////////////
 
-	template<typename Inserter>
-	static void addSampleBelow(const RealAlgebraicNumber<Number>& left, Inserter i);
-	template<typename Inserter>
-	static void addSampleAbove(const RealAlgebraicNumber<Number>& right, Inserter i);
-	template<typename Inserter>
-	static void addSampleBetween(const RealAlgebraicNumber<Number>& left, const RealAlgebraicNumber<Number>& right, VariableType type, Inserter i);
-	
 	/**
 	 * Constructs the samples at the base level of a CAD construction, provided a set of prevailing samples.
 	 * This method only returns samples which are new, i.e. not contained in currentSamples. The new samples are already added to currentSamples.

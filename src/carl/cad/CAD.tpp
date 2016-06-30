@@ -729,92 +729,6 @@ std::vector<Interval<Number>> CAD<Number>::getBounds(const RealAlgebraicPoint<Nu
 }
 
 template<typename Number>
-template<typename Inserter>
-void CAD<Number>::addSampleBelow(
-		const RealAlgebraicNumber<Number>& left,
-		Inserter i
-) {
-	if (left.isNumeric()) {
-		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::floor(left.value()) - 1) << " below " << left);
-		i = RealAlgebraicNumber<Number>(carl::floor(left.value()) - 1, false);
-	} else {
-		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::floor(left.getInterval().lower()) - 1) << " below " << left);
-		i = RealAlgebraicNumber<Number>(carl::floor(left.getInterval().lower()) - 1, false);
-	}
-}
-
-template<typename Number>
-template<typename Inserter>
-void CAD<Number>::addSampleAbove(
-		const RealAlgebraicNumber<Number>& right,
-		Inserter i
-) {
-	if (right.isNumeric()) {
-		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::ceil(right.value()) + 1) << " above " << right);
-		i = RealAlgebraicNumber<Number>(carl::ceil(right.value()) + 1, false);
-	} else {
-		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (carl::ceil(right.getInterval().upper()) + 1) << " above " << right);
-		i = RealAlgebraicNumber<Number>(carl::ceil(right.getInterval().upper()) + 1, false);
-	}
-}
-
-template<typename Number>
-template<typename Inserter>
-void CAD<Number>::addSampleBetween(
-		const RealAlgebraicNumber<Number>& left,
-		const RealAlgebraicNumber<Number>& right,
-		VariableType type,
-		Inserter i
-) {
-	carl::Interval<Number> interval;
-	if (left.isNumeric()) {
-		if (right.isNumeric()) {
-			interval.set(left.value(), right.value());
-		} else {
-			if (left.value() >= right.getInterval().lower()) {
-				right.refineAvoiding(left.value());
-				return addSampleBetween(left, right, type, i);
-			}
-			interval.set(left.value(), right.getInterval().lower());
-		}
-	} else {
-		if (right.isNumeric()) {
-			if (left.getInterval().upper() >= right.value()) {
-				left.refineAvoiding(right.value());
-				return addSampleBetween(left, right, type, i);
-			}
-			interval.set(left.getInterval().upper(), right.value());
-		} else {
-			if (left.getInterval().upper() >= right.getInterval().lower()) {
-				left.refine();
-				right.refine();
-				return addSampleBetween(left, right, type, i);
-			}
-			interval.set(left.getInterval().upper(), right.getInterval().lower());
-		}
-	}
-	if (type == VariableType::VT_INT) {
-		//std::cout << "Using integer exploration. Diameter: " << interval.diameter() << std::endl;
-		if (interval.diameter() <= 1) {
-			i = RealAlgebraicNumber<Number>(interval.sample(false), false);
-		} else if (interval.diameter() < 7) {
-			Number x = carl::ceil(interval.lower());
-			while (interval.contains(x)) {
-				i = RealAlgebraicNumber<Number>(x, false);
-				x += carl::constant_one<Number>::get();
-			}
-		} else {
-			i = RealAlgebraicNumber<Number>(carl::floor(interval.lower()) - 1, false);
-			i = RealAlgebraicNumber<Number>(interval.sample(false), false);
-			i = RealAlgebraicNumber<Number>(carl::ceil(interval.upper()) + 1, false);
-		}
-	} else {
-		CARL_LOG_TRACE("carl.cad", "\tAdding sample " << (interval.sample(false)) << " between " << left << " and " << right);
-		i = RealAlgebraicNumber<Number>(interval.sample(false), false);
-	}
-}
-
-template<typename Number>
 cad::SampleSet<Number> CAD<Number>::samples(
 		std::size_t openVariableCount,
 		const std::list<RealAlgebraicNumber<Number>>& roots,
@@ -877,20 +791,20 @@ cad::SampleSet<Number> CAD<Number>::samples(
 		// -> next (safe here, but need to check for end() later)
 		neighbor++;
 		if (neighbor == currentSamples.end()) {
-			addSampleAbove((*insertIt), std::front_inserter(newSamples));
+			newSamples.push_front(RealAlgebraicNumber<Number>::sampleAbove(*insertIt));
 		} else if (neighbor->isRoot()) {
-			addSampleBetween((*insertIt), (*neighbor), type, std::front_inserter(newSamples));
+			newSamples.push_front(RealAlgebraicNumber<Number>::sampleBetween(*insertIt, *neighbor));
 		}
 
 		// previous: left neighbor
 		neighbor = insertIt;
 		if (neighbor == currentSamples.begin()) {
-			addSampleBelow((*insertIt), std::front_inserter(newSamples));
+			newSamples.push_front(RealAlgebraicNumber<Number>::sampleBelow(*insertIt));
 		} else {
 			neighbor--;
 			// now neighbor is the left bound (can be safely determined now)
 			if (neighbor->isRoot()) {
-				addSampleBetween((*neighbor), (*insertIt), type, std::front_inserter(newSamples));
+				newSamples.push_front(RealAlgebraicNumber<Number>::sampleBetween(*neighbor, *insertIt));
 			}
 		}
 
