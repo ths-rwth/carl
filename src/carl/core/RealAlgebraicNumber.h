@@ -249,6 +249,10 @@ public:
 private:
 	bool lessWhileUnequal(const RealAlgebraicNumber<Number>& n) const;
 public:
+	static RealAlgebraicNumber<Number> sampleBelow(const RealAlgebraicNumber<Number>& n);
+	static RealAlgebraicNumber<Number> sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper);
+	static RealAlgebraicNumber<Number> sampleAbove(const RealAlgebraicNumber<Number>& n);
+
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 		if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";

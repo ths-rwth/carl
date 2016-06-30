@@ -256,4 +256,46 @@ namespace carl {
 */
 	}
 	
+	template<typename Number>
+	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleBelow(const RealAlgebraicNumber<Number>& n) {
+		if (n.isNumeric()) {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.value()) - 1));
+			return RealAlgebraicNumber<Number>(carl::ceil(n.value()) - 1, false);
+		} else {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (-oo, " << n << ") -> " << (carl::ceil(n.lower()) - 1));
+			return RealAlgebraicNumber<Number>(carl::ceil(n.lower()) - 1, false);
+		}
+	}
+	template<typename Number>
+	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleBetween(const RealAlgebraicNumber<Number>& lower, const RealAlgebraicNumber<Number>& upper) {
+		carl::Interval<Number> i;
+		if (lower.isNumeric()) i.set(lower.value(), lower.value());
+		else i.set(lower.upper(), lower.upper());
+		if (upper.isNumeric()) i.setUpper(upper.value());
+		else i.setUpper(upper.lower());
+		while (i.isEmpty()) {
+			if (!lower.isNumeric()) {
+				lower.refine();
+				if (lower.isNumeric()) i.setLower(lower.value());
+				else i.setLower(lower.upper());
+			}
+			if (!upper.isNumeric()) {
+				upper.refine();
+				if (upper.isNumeric()) i.setUpper(upper.value());
+				else i.setUpper(upper.lower());
+			}
+		}
+		CARL_LOG_TRACE("carl.ran", "Selecting from (" << lower << ", " << upper << ") -> " << i.sample(false) << " (from " << i << ")");
+		return RealAlgebraicNumber<Number>(i.sample(false), false);
+	}
+	template<typename Number>
+	RealAlgebraicNumber<Number> RealAlgebraicNumber<Number>::sampleAbove(const RealAlgebraicNumber<Number>& n) {
+		if (n.isNumeric()) {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.value()) + 1));
+			return RealAlgebraicNumber<Number>(carl::floor(n.value()) + 1, false);
+		} else {
+			CARL_LOG_TRACE("carl.ran", "Selecting from (" << n << ", oo) -> " << (carl::floor(n.upper()) + 1));
+			return RealAlgebraicNumber<Number>(carl::floor(n.upper()) + 1, false);
+		}
+	}
 }
