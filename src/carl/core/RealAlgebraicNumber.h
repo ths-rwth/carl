@@ -150,15 +150,15 @@ public:
 		assert(!isNumeric());
 		return mIR->refinementCount;
 	}
-	const Interval<Number>& getInterval() const {
-		assert(!isNumeric());
-		return mIR->interval;
+	const auto& getIntervalContent() const {
+		return *mIR;
 	}
 	const Number& lower() const {
-		return getInterval().lower();
+		assert(isInterval());
+		return mIR->interval.lower();
 	}
 	const Number& upper() const {
-		return getInterval().upper();
+		return mIR->interval.upper();
 	}
 	const Polynomial& getPolynomial() const {
 		assert(!isNumeric());
@@ -193,7 +193,7 @@ public:
 	
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		if (isNumeric()) return p.countRealRoots(value()) == 1;
-		else return p.countRealRoots(getInterval()) == 1;
+		else if (isInterval()) return p.countRealRoots(mIR->interval) == 1;
 	}
 	
 	bool containedIn(const Interval<Number>& i) const {
@@ -241,7 +241,8 @@ public:
 	template<typename Num>
 	friend std::ostream& operator<<(std::ostream& os, const RealAlgebraicNumber<Num>& ran) {
 		if (ran.isNumeric()) return os << "(NR " << ran.value() << (ran.isRoot() ? " R" : "") << ")";
-		else return os << "(IR " << ran.getInterval() << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+		else if (ran.isInterval()) return os << "(IR " << ran.mIR->interval << ", " << ran.getPolynomial() << (ran.isRoot() ? " R" : "") << ")";
+		else return os << "(RAN)";
 	}
 };
 
