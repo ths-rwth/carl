@@ -150,7 +150,7 @@ public:
 		assert(!isNumeric());
 		return mIR->refinementCount;
 	}
-	const auto& getIntervalContent() const {
+	const ran::IntervalContent<Number>& getIntervalContent() const {
 		return *mIR;
 	}
 	const Number& lower() const {
