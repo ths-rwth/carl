@@ -52,9 +52,8 @@ Factors<MultivariatePolynomial<C,O,P>> factor(const Term<C>& _t)
 template<typename C, typename O, typename P>
 Factors<MultivariatePolynomial<C,O,P>> factor(std::shared_ptr<const Monomial> _m)
 {
-    Factors<MultivariatePolynomial<C,O,P>> result;
-    if( !_m )
-        return result;
+	Factors<MultivariatePolynomial<C,O,P>> result;
+	if (!_m) return result;
 	for(const auto& ve : *_m)
 	{
 		result.insert( std::pair<MultivariatePolynomial<C,O,P>, unsigned>( MultivariatePolynomial<C,O,P>(ve.first), ve.second ) );
