@@ -194,6 +194,7 @@ public:
 	bool isRootOf(const UnivariatePolynomial<Number>& p) const {
 		if (isNumeric()) return p.countRealRoots(value()) == 1;
 		else if (isInterval()) return p.countRealRoots(mIR->interval) == 1;
+		else return false;
 	}
 	
 	bool containedIn(const Interval<Number>& i) const {
